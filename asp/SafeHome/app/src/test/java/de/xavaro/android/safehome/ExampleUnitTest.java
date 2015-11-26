@@ -1,4 +1,4 @@
-package com.example.dezi.myapplication;
+package de.xavaro.android.safehome;
 
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.dezi.myapplication" >
+    package="de.xavaro.android.safehome" >
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
@@ -15,11 +15,11 @@
         android:theme="@style/AppTheme" >
 
         <service
-            android:name=".KioskService"
+            android:name="de.xavaro.android.safehome.KioskService"
             android:exported="false"/>
 
         <activity
-            android:name=".FullscreenActivity"
+            android:name="de.xavaro.android.safehome.FullscreenActivity"
             android:launchMode="singleInstance"
             android:excludeFromRecents="true"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -35,7 +35,7 @@
         </activity>
 
         <activity
-            android:name=".FakeHome"
+            android:name="de.xavaro.android.safehome.FakeHome"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +45,7 @@
         </activity>
 
         <activity
-            android:name=".FakeAssist"
+            android:name="de.xavaro.android.safehome.FakeAssist"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST" />
