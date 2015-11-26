@@ -11,10 +11,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.WindowManager;
-import android.view.Gravity;
 import android.graphics.PixelFormat;
-import android.graphics.Color;
-import android.widget.TextView;
+import android.widget.Toast;
 
 /*
  * Service to monitor foreign and system apps activity
@@ -57,14 +55,8 @@ public class KioskService extends Service
     // Window manager.
     //
 
-    private WindowManager windowManager;
-
-    //
-    // Window manager.
-    //
-
-    private TextView alertText;
     private String alertMessage;
+    private Toast alertToast;
 
     private final Handler handler = new Handler();
 
@@ -93,24 +85,19 @@ public class KioskService extends Service
         blacklistApps.add("com.samsung.android.email.composer");
         blacklistApps.add("com.samsung.android.email.ui");
 
-        alertText = new TextView(this);
-        alertText.setBackgroundColor(Color.argb(150, 255, 155, 155));
-        alertText.setTextSize(24f);
-        alertText.setPadding(25, 25, 25, 25);
-        alertText.setGravity(Gravity.CENTER);
-
-        WindowManager.LayoutParams alertLayout = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
+        WindowManager.LayoutParams alp = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        alertLayout.gravity = Gravity.TOP;
+        alertToast = Toast.makeText(this, "...", Toast.LENGTH_LONG);
 
-        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        wm.addView(alertToast.getView(),alp);
 
-        windowManager.addView(alertText, alertLayout);
+        alertToast.show();
     }
 
     @Override
@@ -240,25 +227,37 @@ public class KioskService extends Service
 
             Log.d(LOGTAG, "APP:" + mode + "=" + proc + "=" + pi.importance);
 
-            alertMessage = mode + " => " + proc;
+            String currentMessage = mode + " => " + proc;
+            boolean showit = true;
 
             if (mode.equals("xx") || mode.equals("bl"))
             {
-                alertMessage = "Blocking" + " " + proc;
+                currentMessage = "Blocking" + " " + proc;
             }
 
             if (mode.equals("me") || mode.equals("wl"))
             {
+                if (recentProc.equals(proc)) showit = false;
+
                 recentProc = proc;
             }
 
-            handler.post(new Runnable()
+            if ((alertMessage == null) || ! alertMessage.equals(currentMessage))
             {
-                public void run()
+                alertMessage = currentMessage;
+
+                if (showit)
                 {
-                    alertText.setText(alertMessage);
+                    handler.post(new Runnable()
+                    {
+                        public void run()
+                        {
+                            alertToast.setText(alertMessage);
+                            alertToast.show();
+                        }
+                    });
                 }
-            });
+            }
 
             if (mode.equals("xx") || mode.equals("bl"))
             {
