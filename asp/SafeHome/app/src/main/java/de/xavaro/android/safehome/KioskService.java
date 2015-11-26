@@ -147,7 +147,7 @@ public class KioskService extends Service
             wdThread.start();
         }
 
-        return Service.START_STICKY; // Service.START_NOT_STICKY;
+        return Service.START_NOT_STICKY; // Service.START_STICKY <=> Service.START_NOT_STICKY;
     }
 
     //
