@@ -1,10 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;

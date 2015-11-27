@@ -8,11 +8,9 @@ import android.content.Context;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 import android.view.WindowManager;
 import android.graphics.PixelFormat;
 import android.widget.Toast;
@@ -303,9 +301,7 @@ public class KioskService extends Service
         intent.addCategory(Intent.CATEGORY_HOME);
         ResolveInfo res = getPackageManager().resolveActivity(intent, 0);
 
-        if (res.activityInfo == null) return false;
-
-        return res.activityInfo.packageName.equals(getPackageName());
+        return (res.activityInfo != null) && res.activityInfo.packageName.equals(getPackageName());
     }
 
     @Override

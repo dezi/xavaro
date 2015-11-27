@@ -2,9 +2,10 @@ package de.xavaro.android.safehome;
 
 import android.app.Activity;
 
-/**
- * Created by dezi on 19.11.15.
- */
+//
+// Fake assist class to force popup of assist chooser.
+//
+
 public class FakeAssist extends Activity
 {
 }
