@@ -124,7 +124,8 @@ public class FullscreenActivity extends AppCompatActivity
                     {
                         Log.d("dezi", "onClick (whatsapp_button)...");
 
-                        Uri uri = Uri.parse("smsto:" + "4915152493345");
+                        // Uri uri = Uri.parse("smsto:" + "4915152493345");
+                        Uri uri = Uri.parse("smsto:" + "491704126208");
                         Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
                         sendIntent.addFlags(Intent.FLAG_ACTIVITY_RETAIN_IN_RECENTS);
                         sendIntent.setPackage("com.whatsapp");
@@ -202,8 +203,6 @@ public class FullscreenActivity extends AppCompatActivity
         ResolveInfo res = getPackageManager().resolveActivity(intent, 0);
 
         if (res.activityInfo == null) return false;
-
-        Log.d("dezi","Default home = " + res.activityInfo.packageName);
 
         return res.activityInfo.packageName.equals(getPackageName());
     }

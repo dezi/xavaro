@@ -7,9 +7,12 @@ import android.content.Intent;
 import android.content.Context;
 import android.app.ActivityManager;
 import android.app.Service;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.graphics.PixelFormat;
 import android.widget.Toast;
@@ -225,7 +228,7 @@ public class KioskService extends Service
             String proc = pi.processName;
             String mode = getAppType(proc);
 
-            Log.d(LOGTAG, "APP:" + mode + "=" + proc + "=" + pi.importance);
+            //Log.d(LOGTAG, "APP:" + mode + "=" + proc + "=" + pi.importance);
 
             String currentMessage = mode + " => " + proc;
             boolean showit = true;
@@ -261,7 +264,10 @@ public class KioskService extends Service
 
             if (mode.equals("xx") || mode.equals("bl"))
             {
-                restoreRecentProc();
+                if (isDefaultHome())
+                {
+                    restoreRecentProc();
+                }
             }
         }
     }
@@ -289,6 +295,17 @@ public class KioskService extends Service
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
+    }
+
+    private boolean isDefaultHome()
+    {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo res = getPackageManager().resolveActivity(intent, 0);
+
+        if (res.activityInfo == null) return false;
+
+        return res.activityInfo.packageName.equals(getPackageName());
     }
 
     @Override

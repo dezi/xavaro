@@ -21,4 +21,13 @@
         android:layout_marginTop="184dp"
         android:textSize="32sp"
         android:textStyle="bold"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dump Contacts"
+        android:id="@+id/contacts"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/textView"
+        android:layout_marginTop="68dp"/>
 </RelativeLayout>
