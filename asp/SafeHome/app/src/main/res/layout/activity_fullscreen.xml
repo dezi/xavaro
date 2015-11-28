@@ -3,7 +3,8 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="#0099cc"
-             tools:context="de.xavaro.android.safehome.FullscreenActivity">
+             tools:context="de.xavaro.android.safehome.FullscreenActivity"
+             android:id="@+id/top_screen">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,

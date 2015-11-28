@@ -11,6 +11,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.content.ComponentName;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -67,7 +70,15 @@ public class FullscreenActivity extends AppCompatActivity
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
-        // Set up the user interaction to manually show or hide the system UI.
+        LaunchItem li = new LaunchItem(this);
+
+        li.setSize(100,200);
+        li.setPosition(200,400);
+
+        FrameLayout fullview = (FrameLayout) findViewById(R.id.top_screen);
+        fullview.addView(li);
+
+            // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(
                 new View.OnClickListener()
                 {
