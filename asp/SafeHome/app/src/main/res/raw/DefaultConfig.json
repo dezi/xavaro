@@ -1,0 +1,24 @@
+{
+  "launchitems":
+  [
+    {
+      "label" : "Select Home",
+      "type"  : "select_home"
+    },
+
+    {
+      "label" : "Select Assist",
+      "type"  : "select_assist"
+    },
+
+    {
+      "label" : "Whatsapp Dezi",
+      "type"  : "whatsapp"
+    },
+
+    {
+      "label" : "Whatsapp Susi",
+      "type"  : "whatsapp"
+    }
+  ]
+}

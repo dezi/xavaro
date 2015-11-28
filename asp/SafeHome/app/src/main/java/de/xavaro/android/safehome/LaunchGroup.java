@@ -1,16 +1,12 @@
 package de.xavaro.android.safehome;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.widget.Toast;
 
 //
 // Launch item view on home screen.
@@ -28,41 +24,39 @@ public class LaunchGroup extends FrameLayout
     private int horzSpace;
     private int vertSpace;
 
-    private FrameLayout.LayoutParams layout;
+    private ArrayList<LaunchItem> launchItems = null;
 
     public LaunchGroup(Context context)
     {
         super(context);
 
-        myInit(context);
+        myInit();
     }
 
     public LaunchGroup(Context context, AttributeSet attrs)
     {
         super(context, attrs);
 
-        myInit(context);
+        myInit();
     }
 
     public LaunchGroup(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
 
-        myInit(context);
+        myInit();
     }
 
-    private void myInit(Context context)
+    private void myInit()
     {
         setBackgroundColor(0x8000ff00);
 
-        layout = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
 
         setLayoutParams(layout);
     }
-
-    private ArrayList<LaunchItem> launchItems = null;
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom)
@@ -97,6 +91,13 @@ public class LaunchGroup extends FrameLayout
 
         for (LaunchItem li : launchItems)
         {
+            if (row >= vertItems)
+            {
+                Toast.makeText(getContext(),"Zu viele LaunchItems!!!!",Toast.LENGTH_LONG).show();
+
+                break;
+            }
+
             li.setPosition(xpos, ypos);
 
             //Log.d(LOGTAG, "LI " + xpos + "/" + ypos);
@@ -110,7 +111,6 @@ public class LaunchGroup extends FrameLayout
                 ypos += vertSize + vertSpace;
 
                 col = 0;
-
                 row++;
             }
         }

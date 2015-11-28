@@ -20,12 +20,11 @@
             android:exported="false"/>
 
         <activity
-            android:name=".FullscreenActivity"
+            android:name=".HomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:excludeFromRecents="true"
             android:label="@string/app_name"
-            android:launchMode="singleInstance"
-            android:theme="@style/FullscreenTheme">
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
