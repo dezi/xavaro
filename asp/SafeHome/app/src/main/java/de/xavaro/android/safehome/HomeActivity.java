@@ -5,8 +5,12 @@ import android.os.Bundle;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 public class HomeActivity extends AppCompatActivity
 {
+    private JSONObject config;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -17,8 +21,6 @@ public class HomeActivity extends AppCompatActivity
         FrameLayout topscreen = (FrameLayout) findViewById(R.id.top_screen);
         topscreen.addView(lg);
 
-        String config = StaticUtils.readRawTextResource(this,R.raw.default_config);
-
-        Toast.makeText(this,config,Toast.LENGTH_LONG).show();
+        config = StaticUtils.readRawTextResourceJSON(this,R.raw.default_config);
     }
 }
