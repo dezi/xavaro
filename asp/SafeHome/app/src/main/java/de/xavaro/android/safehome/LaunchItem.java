@@ -45,7 +45,7 @@ public class LaunchItem extends ViewGroup
     {
         this.context = context;
 
-        setBackgroundColor(0xff0000ff);
+        setBackgroundColor(0xffff0000);
 
         layout = new FrameLayout.LayoutParams(0,0);
 
@@ -55,28 +55,18 @@ public class LaunchItem extends ViewGroup
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom)
     {
-        Log.d(LOGTAG, left + "=" + left + "=" + top + "=" + right + "=" + bottom);
-    }
-
-    @Override
-    protected void onMeasure(int width, int height)
-    {
-        super.onMeasure(width, height);
+        //Log.d(LOGTAG,"onLayout:" + left + "=" + top + "=" + right + "=" + bottom);
     }
 
     public void setSize(int width,int height)
     {
         layout.width  = width;
         layout.height = height;
-
-        setLayoutParams(layout);
     }
 
     public void setPosition(int left,int top)
     {
         layout.leftMargin = left;
         layout.topMargin  = top;
-
-        setLayoutParams(layout);
     }
 }

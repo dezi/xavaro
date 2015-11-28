@@ -14,6 +14,7 @@ import android.content.ComponentName;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -70,15 +71,12 @@ public class FullscreenActivity extends AppCompatActivity
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
-        LaunchItem li = new LaunchItem(this);
-
-        li.setSize(100,200);
-        li.setPosition(200,400);
+        LaunchGroup lg = new LaunchGroup(this);
 
         FrameLayout fullview = (FrameLayout) findViewById(R.id.top_screen);
-        fullview.addView(li);
+        fullview.addView(lg);
 
-            // Set up the user interaction to manually show or hide the system UI.
+        // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(
                 new View.OnClickListener()
                 {
@@ -136,7 +134,7 @@ public class FullscreenActivity extends AppCompatActivity
                         Log.d("dezi", "onClick (whatsapp_button)...");
 
                         // Uri uri = Uri.parse("smsto:" + "4915152493345");
-                        Uri uri = Uri.parse("smsto:" + "491704126208");
+                        Uri uri = Uri.parse("smsto:" + "491704126207");
                         Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
                         sendIntent.addFlags(Intent.FLAG_ACTIVITY_RETAIN_IN_RECENTS);
                         sendIntent.setPackage("com.whatsapp");
