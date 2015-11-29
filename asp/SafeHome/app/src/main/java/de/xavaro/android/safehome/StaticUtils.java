@@ -3,6 +3,8 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,4 +86,17 @@ public class StaticUtils
         return (res.activityInfo == null) ? null : res.activityInfo.packageName;
     }
 
+    //
+    // Get SDK compliant drawable resource.
+    //
+    public static Drawable getDrawableFromResources(Context context,int id)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            return context.getResources().getDrawable(id,null);
+        }
+
+        //noinspection deprecation
+        return context.getResources().getDrawable(id);
+    }
 }

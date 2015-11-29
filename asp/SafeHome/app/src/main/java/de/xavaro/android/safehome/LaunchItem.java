@@ -137,45 +137,43 @@ public class LaunchItem extends FrameLayout
             {
                 if (packageName.equals("org.wikipedia"))
                 {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    {
-                        icon.setImageDrawable(getContext().getResources().getDrawable(R.drawable.wikipedia_390x390,null));
-                    }
-                    else
-                    {
-                        //noinspection deprecation
-                        icon.setImageDrawable(getContext().getResources().getDrawable(R.drawable.wikipedia_390x390));
-                    }
+                    icon.setImageDrawable(StaticUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
                 }
                 else
                 {
-                    ApplicationInfo appInfo = getContext().getPackageManager().getApplicationInfo(packageName, 0);
-                    Resources res = getContext().getPackageManager().getResourcesForApplication(appInfo);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    try
                     {
-                        Drawable appIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XXXHIGH, null);
-                        icon.setImageDrawable(appIcon);
+                        ApplicationInfo appInfo = getContext().getPackageManager().getApplicationInfo(packageName, 0);
+                        Resources res = getContext().getPackageManager().getResourcesForApplication(appInfo);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        {
+                            Drawable appIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XXXHIGH, null);
+                            icon.setImageDrawable(appIcon);
+                        } else
+                        {
+                            Configuration appConfig = res.getConfiguration();
+                            appConfig.densityDpi = DisplayMetrics.DENSITY_XXXHIGH;
+                            DisplayMetrics dm = res.getDisplayMetrics();
+                            res.updateConfiguration(appConfig, dm);
+
+                            //noinspection deprecation
+                            Drawable appIcon = res.getDrawable(appInfo.icon);
+                            icon.setImageDrawable(appIcon);
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Configuration appConfig = res.getConfiguration();
-                        appConfig.densityDpi = DisplayMetrics.DENSITY_XXXHIGH;
-                        DisplayMetrics dm = res.getDisplayMetrics();
-                        res.updateConfiguration(appConfig, dm);
-
-                        //noinspection deprecation
-                        Drawable appIcon = res.getDrawable(appInfo.icon);
-                        icon.setImageDrawable(appIcon);
+                        icon.setImageDrawable(StaticUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
                     }
                 }
 
                 icon.setVisibility(VISIBLE);
             }
         }
-        catch (Exception ignore)
+        catch (Exception ex)
         {
-            Log.d(LOGTAG,"Label=fucked");
+            ex.printStackTrace();
         }
     }
 

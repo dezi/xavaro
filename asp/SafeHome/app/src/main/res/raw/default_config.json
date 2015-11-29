@@ -29,7 +29,8 @@
       },
       {
         "label": "Fehlertest",
-        "type": "pupsi"
+        "type": "pupsi",
+        "packagename": "nix.vorhanden"
       }
     ]
   }
