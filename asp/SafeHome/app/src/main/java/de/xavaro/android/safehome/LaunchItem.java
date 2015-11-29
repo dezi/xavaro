@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -75,7 +74,6 @@ public class LaunchItem extends FrameLayout
             }
         });
 
-        setBackgroundResource(R.drawable.shadow_400x400);
         setVisibility(INVISIBLE);
 
         layout = new FrameLayout.LayoutParams(0,0);
@@ -109,6 +107,8 @@ public class LaunchItem extends FrameLayout
 
     public void setConfig(JSONObject config)
     {
+        boolean hasProblem = false;
+
         this.config = config;
 
         try
@@ -137,7 +137,7 @@ public class LaunchItem extends FrameLayout
             {
                 if (packageName.equals("org.wikipedia"))
                 {
-                    icon.setImageDrawable(StaticUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
                 }
                 else
                 {
@@ -150,7 +150,8 @@ public class LaunchItem extends FrameLayout
                         {
                             Drawable appIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XXXHIGH, null);
                             icon.setImageDrawable(appIcon);
-                        } else
+                        }
+                        else
                         {
                             Configuration appConfig = res.getConfiguration();
                             appConfig.densityDpi = DisplayMetrics.DENSITY_XXXHIGH;
@@ -164,7 +165,8 @@ public class LaunchItem extends FrameLayout
                     }
                     catch (Exception ex)
                     {
-                        icon.setImageDrawable(StaticUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
+                        hasProblem = true;
                     }
                 }
 
@@ -175,6 +177,8 @@ public class LaunchItem extends FrameLayout
         {
             ex.printStackTrace();
         }
+
+        setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
     }
 
     private void onMyClick()
@@ -202,7 +206,6 @@ public class LaunchItem extends FrameLayout
             if (type.equals("select_assist")) { launchSelectAssist(); return; }
             if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("genericapp"   )) { launchGenericApp();   return; }
-
             // @formatter:on
 
             Toast.makeText(getContext(),"Nix launcher type <" + type + "> configured.",Toast.LENGTH_LONG).show();

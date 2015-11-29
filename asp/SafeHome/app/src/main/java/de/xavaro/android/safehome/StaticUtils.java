@@ -85,18 +85,4 @@ public class StaticUtils
 
         return (res.activityInfo == null) ? null : res.activityInfo.packageName;
     }
-
-    //
-    // Get SDK compliant drawable resource.
-    //
-    public static Drawable getDrawableFromResources(Context context,int id)
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            return context.getResources().getDrawable(id,null);
-        }
-
-        //noinspection deprecation
-        return context.getResources().getDrawable(id);
-    }
 }

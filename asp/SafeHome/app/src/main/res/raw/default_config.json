@@ -11,13 +11,13 @@
         "type": "select_assist"
       },
       {
-        "label": "WhatsApp Dezi",
+        "label": "Dezi",
         "type": "whatsapp",
         "packagename": "com.whatsapp",
         "waphonenumber": "4915152493345"
       },
       {
-        "label": "WhatsApp Susi",
+        "label": "Susi",
         "type": "whatsapp",
         "packagename": "com.whatsapp",
         "waphonenumber": "491704126207"
