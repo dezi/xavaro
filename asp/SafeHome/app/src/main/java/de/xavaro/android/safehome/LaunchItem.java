@@ -7,12 +7,20 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
+import android.graphics.drawable.shapes.Shape;
 import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -107,6 +115,7 @@ public class LaunchItem extends FrameLayout
 
     public void setConfig(JSONObject config)
     {
+        String packageName = null;
         boolean hasProblem = false;
 
         this.config = config;
@@ -116,7 +125,7 @@ public class LaunchItem extends FrameLayout
             label.setText(config.getString("label"));
             setVisibility(VISIBLE);
 
-            String packageName = config.has("packagename") ? config.getString("packagename") : null;
+            packageName = config.has("packagename") ? config.getString("packagename") : null;
 
             if (config.has("type"))
             {
@@ -131,52 +140,77 @@ public class LaunchItem extends FrameLayout
                 {
                     packageName = StaticUtils.getDefaultAssist(context);
                 }
-            }
 
-            if (packageName != null)
-            {
-                if (packageName.equals("org.wikipedia"))
+                if (type.equals("developer"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
-                }
-                else
-                {
-                    try
-                    {
-                        ApplicationInfo appInfo = getContext().getPackageManager().getApplicationInfo(packageName, 0);
-                        Resources res = getContext().getPackageManager().getResourcesForApplication(appInfo);
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                        {
-                            Drawable appIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XXXHIGH, null);
-                            icon.setImageDrawable(appIcon);
-                        }
-                        else
-                        {
-                            Configuration appConfig = res.getConfiguration();
-                            appConfig.densityDpi = DisplayMetrics.DENSITY_XXXHIGH;
-                            DisplayMetrics dm = res.getDisplayMetrics();
-                            res.updateConfiguration(appConfig, dm);
-
-                            //noinspection deprecation
-                            Drawable appIcon = res.getDrawable(appInfo.icon);
-                            icon.setImageDrawable(appIcon);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
-                        hasProblem = true;
-                    }
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.developer_400x400));
+                    icon.setVisibility(VISIBLE);
                 }
 
-                icon.setVisibility(VISIBLE);
+                if (type.equals("whatsapp"))
+                {
+                    if (config.has("waphonenumber"))
+                    {
+                        String phone = config.getString("waphonenumber");
+                        Bitmap thumbnail = StaticUtils.getWhatsAppProfileBitmap(context, phone);
+
+                        if (thumbnail != null)
+                        {
+                            thumbnail = StaticUtils.getCircleBitmap(thumbnail);
+
+                            icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                            icon.setVisibility(VISIBLE);
+                            packageName = null;
+                        }
+                    }
+                }
             }
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
         }
+
+        if (packageName != null)
+        {
+            if (packageName.equals("org.wikipedia"))
+            {
+                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
+            }
+            else
+            {
+                try
+                {
+                    ApplicationInfo appInfo = getContext().getPackageManager().getApplicationInfo(packageName, 0);
+                    Resources res = getContext().getPackageManager().getResourcesForApplication(appInfo);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    {
+                        Drawable appIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XXXHIGH, null);
+                        icon.setImageDrawable(appIcon);
+                    }
+                    else
+                    {
+                        Configuration appConfig = res.getConfiguration();
+                        appConfig.densityDpi = DisplayMetrics.DENSITY_XXXHIGH;
+                        DisplayMetrics dm = res.getDisplayMetrics();
+                        res.updateConfiguration(appConfig, dm);
+
+                        //noinspection deprecation
+                        Drawable appIcon = res.getDrawable(appInfo.icon);
+                        icon.setImageDrawable(appIcon);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
+                    hasProblem = true;
+                }
+            }
+
+            icon.setVisibility(VISIBLE);
+        }
+
 
         setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
     }
@@ -206,6 +240,7 @@ public class LaunchItem extends FrameLayout
             if (type.equals("select_assist")) { launchSelectAssist(); return; }
             if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("genericapp"   )) { launchGenericApp();   return; }
+            if (type.equals("developer"    )) { launchDeveloper();    return; }
             // @formatter:on
 
             Toast.makeText(getContext(),"Nix launcher type <" + type + "> configured.",Toast.LENGTH_LONG).show();
@@ -286,5 +321,9 @@ public class LaunchItem extends FrameLayout
         {
             ex.printStackTrace();
         }
+    }
+
+    private void launchDeveloper()
+    {
     }
 }

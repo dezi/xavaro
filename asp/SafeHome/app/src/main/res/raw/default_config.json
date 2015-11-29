@@ -11,21 +11,31 @@
         "type": "select_assist"
       },
       {
-        "label": "Dezi",
+        "label": "Whatsi Dezi",
         "type": "whatsapp",
         "packagename": "com.whatsapp",
         "waphonenumber": "4915152493345"
       },
       {
-        "label": "Susi",
+        "label": "Whatsi Susi",
         "type": "whatsapp",
         "packagename": "com.whatsapp",
         "waphonenumber": "491704126207"
       },
       {
+        "label": "Whatsi Sandra",
+        "type": "whatsapp",
+        "packagename": "com.whatsapp",
+        "waphonenumber": "491712303902"
+      },
+      {
         "label": "Wikipedia",
         "type": "genericapp",
         "packagename": "org.wikipedia"
+      },
+      {
+        "label": "Test Feature",
+        "type": "developer"
       },
       {
         "label": "Fehlertest",
