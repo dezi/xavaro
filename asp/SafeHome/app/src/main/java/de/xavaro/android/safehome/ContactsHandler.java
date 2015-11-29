@@ -42,10 +42,8 @@ public class ContactsHandler
         ctx = context;
     }
 
-    public String contacts2JSON()
+    public JSONObject contacts2JSONObject()
     {
-        String json = "";
-
         items = ctx.getContentResolver().query(
                 Data.CONTENT_URI,
                 null, null, null, null);
@@ -236,11 +234,11 @@ public class ContactsHandler
                 // @formatter:on
             }
 
-            if (! joitem.has("KIND"))
+            if (!joitem.has("KIND"))
             {
                 String kind = mt;
 
-                if (! kind.startsWith("vnd.android.cursor.item/"))
+                if (!kind.startsWith("vnd.android.cursor.item/"))
                 {
                     //
                     // We ignore items not within
@@ -274,28 +272,36 @@ public class ContactsHandler
                 // @formatter:on
             }
 
-             JSONArray jocontact;
+            JSONArray jocontact;
 
             try
             {
                 if (jocontacts.has(String.valueOf(ci)))
                 {
                     jocontact = jocontacts.getJSONArray(String.valueOf(ci));
-                }
-                else
+                } else
                 {
                     jocontacts.put(String.valueOf(ci), jocontact = new JSONArray());
                 }
 
                 jocontact.put(joitem);
 
-            }
-            catch (JSONException ignored)
+            } catch (JSONException ignored)
             {
             }
         }
 
         items.close();
+
+        return jocontacts;
+    }
+
+    public String contacts2JSONString()
+    {
+        JSONObject jocontacts = contacts2JSONObject();
+        if (jocontacts == null) return null;
+
+        String json = null;
 
         try
         {
@@ -304,6 +310,8 @@ public class ContactsHandler
         catch (JSONException ignored)
         {
         }
+
+        if (json == null) return null;
 
         String[] lines = json.split("\n");
 
@@ -376,20 +384,9 @@ public class ContactsHandler
 
         if (bytes == null) return;
 
-        char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[ bytes.length << 1 ];
-
-        for (int inx = 0; inx < bytes.length; inx++)
-        {
-            //noinspection PointlessArithmeticExpression
-            hexChars[ (inx << 1) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
-            //noinspection PointlessBitwiseExpression
-            hexChars[ (inx << 1) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
-        }
-
         try
         {
-            joitem.put(name,String.valueOf(hexChars));
+            joitem.put(name,StaticUtils.hexBytesToString(bytes));
         }
         catch (JSONException ignore)
         {

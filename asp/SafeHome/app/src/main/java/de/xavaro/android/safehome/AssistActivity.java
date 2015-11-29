@@ -25,7 +25,7 @@ public class AssistActivity extends AppCompatActivity
 
                         ContactsHandler ch = new ContactsHandler(AssistActivity.this);
 
-                        ch.contacts2JSON();
+                        ch.contacts2JSONString();
                     }
                 });
 

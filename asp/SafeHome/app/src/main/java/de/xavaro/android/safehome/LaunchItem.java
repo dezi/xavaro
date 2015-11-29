@@ -152,7 +152,7 @@ public class LaunchItem extends FrameLayout
                     if (config.has("waphonenumber"))
                     {
                         String phone = config.getString("waphonenumber");
-                        Bitmap thumbnail = StaticUtils.getWhatsAppProfileBitmap(context, phone);
+                        Bitmap thumbnail = StaticUtils.getAnyProfileBitmap(context, phone);
 
                         if (thumbnail != null)
                         {
