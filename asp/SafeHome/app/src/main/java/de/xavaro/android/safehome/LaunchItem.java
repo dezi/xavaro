@@ -8,14 +8,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
-import android.graphics.drawable.shapes.Shape;
 import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -192,7 +187,7 @@ public class LaunchItem extends FrameLayout
                     else
                     {
                         Configuration appConfig = res.getConfiguration();
-                        appConfig.densityDpi = DisplayMetrics.DENSITY_XXXHIGH;
+                        appConfig.densityDpi = VersionUtils.getBestDensity();
                         DisplayMetrics dm = res.getDisplayMetrics();
                         res.updateConfiguration(appConfig, dm);
 
@@ -241,6 +236,9 @@ public class LaunchItem extends FrameLayout
             if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("genericapp"   )) { launchGenericApp();   return; }
             if (type.equals("developer"    )) { launchDeveloper();    return; }
+            if (type.equals("skypechat"    )) { launchSkypeChat();    return; }
+            if (type.equals("skypecall"    )) { launchSkypeCall();    return; }
+
             // @formatter:on
 
             Toast.makeText(getContext(),"Nix launcher type <" + type + "> configured.",Toast.LENGTH_LONG).show();
@@ -302,6 +300,54 @@ public class LaunchItem extends FrameLayout
         }
     }
 
+    private void launchSkypeChat()
+    {
+        if (! config.has("skypename"))
+        {
+            Toast.makeText(getContext(),"Nix <skypename> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            String skypename = config.getString("skypename");
+
+            Intent skype = new Intent(Intent.ACTION_VIEW);
+            skype.setData(Uri.parse("skype:" + skypename + "?chat"));
+            skype.setPackage("com.skype.raider");
+            context.startActivity(skype);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    private void launchSkypeCall()
+    {
+        if (! config.has("skypename"))
+        {
+            Toast.makeText(getContext(),"Nix <skypename> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            String skypename = config.getString("skypename");
+
+            Intent skype = new Intent(Intent.ACTION_VIEW);
+            skype.setData(Uri.parse("skype:" + skypename + "?call"));
+            skype.setPackage("com.skype.raider");
+            context.startActivity(skype);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     private void launchGenericApp()
     {
         if (! config.has("packagename"))
@@ -325,5 +371,6 @@ public class LaunchItem extends FrameLayout
 
     private void launchDeveloper()
     {
+        StaticUtils.JSON2String(StaticUtils.getAllInstalledApps(context), true);
     }
 }

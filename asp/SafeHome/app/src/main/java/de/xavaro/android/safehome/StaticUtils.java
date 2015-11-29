@@ -7,9 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -288,5 +291,73 @@ public class StaticUtils
         bitmap.recycle();
 
         return output;
+    }
+
+    public static JSONObject getAllInstalledApps(Context context)
+    {
+        JSONArray joappsarray = new JSONArray();
+
+        PackageManager pm = context.getPackageManager();
+        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        for (ApplicationInfo packageInfo : packages)
+        {
+            JSONObject joapp = new JSONObject();
+
+            try
+            {
+                joapp.put("packagename", packageInfo.packageName);
+                joapp.put("sourcedir", packageInfo.sourceDir);
+                joapp.put("launchintent", pm.getLaunchIntentForPackage(packageInfo.packageName));
+
+                Log.d(LOGTAG, "Installed package: " + joapp.getString("packagename"));
+                Log.d(LOGTAG, "Source dir: " + joapp.getString("sourcedir"));
+                Log.d(LOGTAG, "Launch Activity: " + joapp.getString("launchintent"));
+
+                joappsarray.put(joapp);
+            }
+            catch (JSONException ignore)
+            {
+            }
+        }
+
+        try
+        {
+            return new JSONObject().put("packages",joappsarray);
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    public static String JSON2String(JSONObject jsonObject, boolean dump)
+    {
+        if (jsonObject == null) return null;
+
+        String json = null;
+
+        try
+        {
+            json = jsonObject.toString(2);
+        }
+        catch (JSONException ignored)
+        {
+        }
+
+        if (json == null) return null;
+
+        if (dump)
+        {
+            String[] lines = json.split("\n");
+
+            for (String line : lines)
+            {
+                Log.d(LOGTAG, line);
+            }
+        }
+
+        return json;
     }
 }

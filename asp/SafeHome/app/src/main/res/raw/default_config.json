@@ -34,6 +34,23 @@
         "packagename": "org.wikipedia"
       },
       {
+        "label": "Skype",
+        "type": "genericapp",
+        "packagename": "com.skype.raider"
+      },
+      {
+        "label": "Skype Kim Chat",
+        "type": "skypechat",
+        "packagename": "com.skype.raider",
+        "skypename": "kikilolxd357"
+      },
+      {
+        "label": "Skype Kim Call",
+        "type": "skypecall",
+        "packagename": "com.skype.raider",
+        "skypename": "kikilolxd357"
+      },
+      {
         "label": "Test Feature",
         "type": "developer"
       },

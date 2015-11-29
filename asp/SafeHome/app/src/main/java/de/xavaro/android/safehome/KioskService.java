@@ -81,6 +81,8 @@ public class KioskService extends Service
         defsystemApps.add("android:ui");
 
         whitelistApps.add("com.whatsapp");
+        whitelistApps.add("org.wikipedia");
+        whitelistApps.add("com.skype.raider");
 
         blacklistApps.add("com.android.systemui.recentsactivity");
         blacklistApps.add("com.samsung.android.email.composer");
