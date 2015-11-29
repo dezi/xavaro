@@ -8,6 +8,10 @@ import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 //
 // Launch item view on home screen.
 //
@@ -16,8 +20,10 @@ public class LaunchGroup extends FrameLayout
 {
     private final String LOGTAG = "LaunchGroup";
 
-    private int horzSize = 180;
-    private int vertSize = 180;
+    private JSONObject config;
+
+    private int horzSize = 220;
+    private int vertSize = 220;
 
     private int horzItems;
     private int vertItems;
@@ -49,7 +55,7 @@ public class LaunchGroup extends FrameLayout
 
     private void myInit()
     {
-        setBackgroundColor(0x8000ff00);
+        setBackgroundColor(0xffffffee);
 
         FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -120,14 +126,49 @@ public class LaunchGroup extends FrameLayout
     {
         launchItems = new ArrayList<>();
 
-        int numItems = horzItems * vertItems;
-
-        for (int inx = 0; inx < numItems; inx++)
+        if ((config == null) || ! config.has("launchitems"))
         {
-            LaunchItem li = new LaunchItem(getContext());
-            li.setSize(horzSize, vertSize);
-            launchItems.add(li);
-            addView(li);
+            Toast.makeText(getContext(), "Keine <launchitems> gefunden.", Toast.LENGTH_LONG).show();
+
+            return;
         }
+
+        try
+        {
+            JSONArray lis = config.getJSONArray("launchitems");
+
+            int numItems = horzItems * vertItems;
+            int maxSlots = lis.length();
+
+            for (int inx = 0; inx < numItems; inx++)
+            {
+                LaunchItem li = new LaunchItem(getContext());
+                li.setSize(horzSize, vertSize);
+
+                if (inx < maxSlots) li.setConfig(lis.getJSONObject(inx));
+
+                launchItems.add(li);
+                addView(li);
+            }
+        }
+        catch (JSONException ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void setConfig(JSONObject config)
+    {
+        this.config = config;
+    }
+
+    public int getNumLaunchItems()
+    {
+        return (launchItems == null) ? 0 : launchItems.size();
+    }
+
+    public LaunchItem geLaunchItem(int inx)
+    {
+        return (launchItems == null) ? null : launchItems.get(inx);
     }
 }

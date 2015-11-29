@@ -1,24 +1,36 @@
 {
-  "launchitems":
-  [
-    {
-      "label" : "Select Home",
-      "type"  : "select_home"
-    },
 
-    {
-      "label" : "Select Assist",
-      "type"  : "select_assist"
-    },
-
-    {
-      "label" : "Whatsapp Dezi",
-      "type"  : "whatsapp"
-    },
-
-    {
-      "label" : "Whatsapp Susi",
-      "type"  : "whatsapp"
-    }
-  ]
+  "launchgroup": {
+    "launchitems": [
+      {
+        "label": "Select Home",
+        "type": "select_home"
+      },
+      {
+        "label": "Select Assistant",
+        "type": "select_assist"
+      },
+      {
+        "label": "WhatsApp Dezi",
+        "type": "whatsapp",
+        "packagename": "com.whatsapp",
+        "waphonenumber": "4915152493345"
+      },
+      {
+        "label": "WhatsApp Susi",
+        "type": "whatsapp",
+        "packagename": "com.whatsapp",
+        "waphonenumber": "491704126207"
+      },
+      {
+        "label": "Wikipedia",
+        "type": "genericapp",
+        "packagename": "org.wikipedia"
+      },
+      {
+        "label": "Fehlertest",
+        "type": "pupsi"
+      }
+    ]
+  }
 }

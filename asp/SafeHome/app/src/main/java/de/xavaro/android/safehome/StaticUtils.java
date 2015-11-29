@@ -1,7 +1,8 @@
 package de.xavaro.android.safehome;
 
-
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,9 +17,9 @@ public class StaticUtils
     //
     // Read raw text resource into string.
     //
-    public static String readRawTextResource(Context ctx, int resId)
+    public static String readRawTextResource(Context context, int resId)
     {
-        InputStream inputStream = ctx.getResources().openRawResource(resId);
+        InputStream inputStream = context.getResources().openRawResource(resId);
 
         InputStreamReader inputreader = new InputStreamReader(inputStream);
         BufferedReader buffreader = new BufferedReader(inputreader);
@@ -43,9 +44,9 @@ public class StaticUtils
     //
     // Read raw text JSON resource into JSONObject.
     //
-    public static JSONObject readRawTextResourceJSON(Context ctx, int resId)
+    public static JSONObject readRawTextResourceJSON(Context context, int resId)
     {
-        String json = readRawTextResource(ctx, resId);
+        String json = readRawTextResource(context, resId);
         if (json == null) return null;
 
         try
@@ -58,4 +59,29 @@ public class StaticUtils
 
         return null;
     }
+
+    //
+    // Retrieve package name handling home button press.
+    //
+    public static String getDefaultHome(Context context)
+    {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
+    }
+
+    //
+    // Retrieve package name handling home button press.
+    //
+    public static String getDefaultAssist(Context context)
+    {
+        Intent intent = new Intent(Intent.ACTION_ASSIST);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
+    }
+
 }
