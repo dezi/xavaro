@@ -236,8 +236,7 @@ public class LaunchItem extends FrameLayout
             if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("genericapp"   )) { launchGenericApp();   return; }
             if (type.equals("developer"    )) { launchDeveloper();    return; }
-            if (type.equals("skypechat"    )) { launchSkypeChat();    return; }
-            if (type.equals("skypecall"    )) { launchSkypeCall();    return; }
+            if (type.equals("skype"        )) { launchSkype();        return; }
 
             // @formatter:on
 
@@ -300,7 +299,7 @@ public class LaunchItem extends FrameLayout
         }
     }
 
-    private void launchSkypeChat()
+    private void launchSkype()
     {
         if (! config.has("skypename"))
         {
@@ -312,33 +311,22 @@ public class LaunchItem extends FrameLayout
         try
         {
             String skypename = config.getString("skypename");
+            String subtype = config.has("subtype") ? config.getString("subtype") : "chat";
+
+            Uri uri = Uri.parse("skype:" + skypename);
+
+            if (subtype.equals("chat"))
+            {
+                uri = Uri.parse("skype:" + skypename + "?chat");
+            }
+
+            if (subtype.equals("call"))
+            {
+                uri = Uri.parse("skype:" + skypename + "?call");
+            }
 
             Intent skype = new Intent(Intent.ACTION_VIEW);
-            skype.setData(Uri.parse("skype:" + skypename + "?chat"));
-            skype.setPackage("com.skype.raider");
-            context.startActivity(skype);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    private void launchSkypeCall()
-    {
-        if (! config.has("skypename"))
-        {
-            Toast.makeText(getContext(),"Nix <skypename> configured.",Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            String skypename = config.getString("skypename");
-
-            Intent skype = new Intent(Intent.ACTION_VIEW);
-            skype.setData(Uri.parse("skype:" + skypename + "?call"));
+            skype.setData(uri);
             skype.setPackage("com.skype.raider");
             context.startActivity(skype);
         }

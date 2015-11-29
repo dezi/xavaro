@@ -29,6 +29,12 @@
         "waphonenumber": "491712303902"
       },
       {
+        "label": "Whatsi Kim",
+        "type": "whatsapp",
+        "packagename": "com.whatsapp",
+        "waphonenumber": "4917699960594"
+      },
+      {
         "label": "Wikipedia",
         "type": "genericapp",
         "packagename": "org.wikipedia"
@@ -40,13 +46,15 @@
       },
       {
         "label": "Skype Kim Chat",
-        "type": "skypechat",
+        "type": "skype",
+        "subtype": "chat",
         "packagename": "com.skype.raider",
         "skypename": "kikilolxd357"
       },
       {
         "label": "Skype Kim Call",
-        "type": "skypecall",
+        "type": "skype",
+        "subtype": "call",
         "packagename": "com.skype.raider",
         "skypename": "kikilolxd357"
       },
