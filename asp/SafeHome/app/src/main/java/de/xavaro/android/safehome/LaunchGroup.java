@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -19,6 +20,8 @@ import org.json.JSONObject;
 public class LaunchGroup extends FrameLayout
 {
     private final String LOGTAG = "LaunchGroup";
+
+    private Context context;
 
     private JSONObject config;
 
@@ -36,25 +39,27 @@ public class LaunchGroup extends FrameLayout
     {
         super(context);
 
-        myInit();
+        myInit(context);
     }
 
     public LaunchGroup(Context context, AttributeSet attrs)
     {
         super(context, attrs);
 
-        myInit();
+        myInit(context);
     }
 
     public LaunchGroup(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
 
-        myInit();
+        myInit(context);
     }
 
-    private void myInit()
+    private void myInit(Context context)
     {
+        this.context = context;
+
         setBackgroundColor(0xffffffee);
 
         FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(
@@ -69,8 +74,16 @@ public class LaunchGroup extends FrameLayout
     {
         Log.d(LOGTAG,"onLayout:" + changed + "=" + left + "=" + top + "=" + right + "=" + bottom);
 
-        int width  = right - left;
-        int height = bottom - top;
+        positionLaunchItems();
+
+        super.onLayout(changed, left, top, right, bottom);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    {
+        int width  = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
 
         horzItems = width  / horzSize;
         vertItems = height / vertSize;
@@ -78,13 +91,12 @@ public class LaunchGroup extends FrameLayout
         horzSpace = (width  - (horzItems * horzSize)) / horzItems;
         vertSpace = (height - (vertItems * vertSize)) / vertItems;
 
-        Log.d(LOGTAG, "onLayout:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
+        Log.d(LOGTAG, "onMeasure:" + width + "=" + height);
+        Log.d(LOGTAG, "onMeasure:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
 
         if (launchItems == null) createLaunchItems();
 
-        positionLaunchItems();
-
-        super.onLayout(changed, left, top, right, bottom);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     private void positionLaunchItems()
@@ -99,7 +111,7 @@ public class LaunchGroup extends FrameLayout
         {
             if (row >= vertItems)
             {
-                Toast.makeText(getContext(),"Zu viele LaunchItems!!!!",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"Zu viele LaunchItems!!!!",Toast.LENGTH_LONG).show();
 
                 break;
             }
@@ -128,7 +140,7 @@ public class LaunchGroup extends FrameLayout
 
         if ((config == null) || ! config.has("launchitems"))
         {
-            Toast.makeText(getContext(), "Keine <launchitems> gefunden.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Keine <launchitems> gefunden.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -142,7 +154,7 @@ public class LaunchGroup extends FrameLayout
 
             for (int inx = 0; inx < numItems; inx++)
             {
-                LaunchItem li = new LaunchItem(getContext());
+                LaunchItem li = new LaunchItem(context);
                 li.setSize(horzSize, vertSize);
 
                 if (inx < maxSlots) li.setConfig(lis.getJSONObject(inx));

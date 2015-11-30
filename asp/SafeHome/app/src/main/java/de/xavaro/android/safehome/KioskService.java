@@ -270,7 +270,7 @@ public class KioskService extends Service
             {
                 if (isDefaultHome())
                 {
-                    restoreRecentProc();
+                    //restoreRecentProc();
                 }
             }
         }

@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.support.v7.app.AppCompatActivity;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -7,20 +9,24 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+
 import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
 import android.view.View;
+import android.view.Gravity;
+
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.view.Gravity;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -46,6 +52,8 @@ public class LaunchItem extends FrameLayout
     private FrameLayout overlay;
     private LayoutParams oversize;
     private ImageView overicon;
+
+    private LaunchGroup directory;
 
     public LaunchItem(Context context)
     {
@@ -99,7 +107,7 @@ public class LaunchItem extends FrameLayout
         this.addView(label);
 
         oversize = new LayoutParams(0,0);
-        oversize.gravity = Gravity.RIGHT + Gravity.TOP;
+        oversize.gravity = Gravity.END + Gravity.TOP;
 
         overlay = new FrameLayout(context);
         overlay.setLayoutParams(oversize);
@@ -117,6 +125,8 @@ public class LaunchItem extends FrameLayout
 
         oversize.width  = width  / 4;
         oversize.height = height / 4;
+
+        Log.d(LOGTAG,"Size=" + width + "=" + height);
     }
 
     public void setPosition(int left,int top)
@@ -137,6 +147,8 @@ public class LaunchItem extends FrameLayout
         {
             label.setText(config.getString("label"));
             setVisibility(VISIBLE);
+
+            Log.d(LOGTAG, config.getString("label"));
 
             packageName = config.has("packagename") ? config.getString("packagename") : null;
 
@@ -268,9 +280,10 @@ public class LaunchItem extends FrameLayout
             // @formatter:off
             if (type.equals("select_home"  )) { launchSelectHome();   return; }
             if (type.equals("select_assist")) { launchSelectAssist(); return; }
-            if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("genericapp"   )) { launchGenericApp();   return; }
+            if (type.equals("directory"    )) { launchDirectory();    return; }
             if (type.equals("developer"    )) { launchDeveloper();    return; }
+            if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("skype"        )) { launchSkype();        return; }
 
             // @formatter:on
@@ -389,6 +402,33 @@ public class LaunchItem extends FrameLayout
         catch (Exception ex)
         {
             ex.printStackTrace();
+        }
+    }
+
+    private void launchDirectory()
+    {
+        if (! config.has("launchgroup"))
+        {
+            Toast.makeText(getContext(),"Nix <launchgroup> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        if (directory == null)
+        {
+            directory = new LaunchGroup(context);
+
+            FrameLayout topscreen = (FrameLayout) ((AppCompatActivity) context).findViewById(R.id.top_screen);
+            topscreen.addView(directory);
+
+            try
+            {
+                directory.setConfig(config.getJSONObject("launchgroup"));
+            }
+            catch (JSONException ex)
+            {
+                ex.printStackTrace();
+            }
         }
     }
 

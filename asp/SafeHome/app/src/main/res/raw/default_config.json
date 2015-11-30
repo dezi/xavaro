@@ -41,22 +41,26 @@
       },
       {
         "label": "Skype",
-        "type": "genericapp",
-        "packagename": "com.skype.raider"
-      },
-      {
-        "label": "Skype Kim Chat",
-        "type": "skype",
-        "subtype": "chat",
+        "type": "directory",
         "packagename": "com.skype.raider",
-        "skypename": "kikilolxd357"
-      },
-      {
-        "label": "Skype Kim Call",
-        "type": "skype",
-        "subtype": "call",
-        "packagename": "com.skype.raider",
-        "skypename": "kikilolxd357"
+        "launchgroup": {
+          "launchitems": [
+            {
+              "label": "Skype Kim Chat",
+              "type": "skype",
+              "subtype": "chat",
+              "packagename": "com.skype.raider",
+              "skypename": "kikilolxd357"
+            },
+            {
+              "label": "Skype Kim Call",
+              "type": "skype",
+              "subtype": "call",
+              "packagename": "com.skype.raider",
+              "skypename": "kikilolxd357"
+            }
+          ]
+        }
       },
       {
         "label": "Test Feature",

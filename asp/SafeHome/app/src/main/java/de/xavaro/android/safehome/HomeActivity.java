@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 public class HomeActivity extends AppCompatActivity
 {
@@ -45,15 +44,23 @@ public class HomeActivity extends AppCompatActivity
         super.onPostCreate(savedInstanceState);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
 
         Intent intent = new Intent(this, KioskService.class);
         bindService(intent, kioskConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
-    protected void onResume()
+    protected void onStop()
     {
-        super.onResume();
+        super.onStop();
+
+        if (kioskService != null) unbindService(kioskConnection);
     }
 
     @Override
@@ -70,7 +77,7 @@ public class HomeActivity extends AppCompatActivity
     {
         config = StaticUtils.readRawTextResourceJSON(this, R.raw.default_config);
 
-        if ((config == null) || !config.has("launchgroup"))
+        if ((config == null) || ! config.has("launchgroup"))
         {
             Toast.makeText(this, "Keine <launchgroup> gefunden.", Toast.LENGTH_LONG).show();
 
@@ -80,7 +87,8 @@ public class HomeActivity extends AppCompatActivity
         try
         {
             launchGroup.setConfig(config.getJSONObject("launchgroup"));
-        } catch (JSONException ex)
+        }
+        catch (JSONException ex)
         {
             ex.printStackTrace();
         }
