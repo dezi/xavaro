@@ -314,14 +314,14 @@ public class StaticUtils
         // Search for a matching phone number in contacts.
         //
 
-        String phone = getPhoneFromSkype(context,skypename);
+        String phone = getPhoneFromSkype(context, skypename);
         if (phone == null) return null;
 
         //
         // Retry with WhatsApp profile image anyway.
         //
 
-        return getWhatsAppProfileBitmap(context,phone);
+        return getWhatsAppProfileBitmap(context, phone);
     }
 
     //
@@ -399,6 +399,7 @@ public class StaticUtils
     public static JSONObject getAllInstalledApps(Context context)
     {
         JSONArray joappsarray = new JSONArray();
+        JSONArray josyssarray = new JSONArray();
 
         PackageManager pm = context.getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -410,14 +411,24 @@ public class StaticUtils
             try
             {
                 joapp.put("packagename", packageInfo.packageName);
-                joapp.put("sourcedir", packageInfo.sourceDir);
-                joapp.put("launchintent", pm.getLaunchIntentForPackage(packageInfo.packageName));
-
                 Log.d(LOGTAG, "Installed package: " + joapp.getString("packagename"));
-                Log.d(LOGTAG, "Source dir: " + joapp.getString("sourcedir"));
-                Log.d(LOGTAG, "Launch Activity: " + joapp.getString("launchintent"));
 
-                joappsarray.put(joapp);
+                joapp.put("sourcedir", packageInfo.sourceDir);
+                Log.d(LOGTAG, "Source dir: " + joapp.getString("sourcedir"));
+
+                Intent launchintent = pm.getLaunchIntentForPackage(packageInfo.packageName);
+
+                if (launchintent != null)
+                {
+                    joapp.put("launchintent", launchintent);
+                    Log.d(LOGTAG, "Launch Activity: " + joapp.getString("launchintent"));
+
+                    joappsarray.put(joapp);
+                }
+                else
+                {
+                    josyssarray.put(joapp);
+                }
             }
             catch (JSONException ignore)
             {
@@ -426,7 +437,11 @@ public class StaticUtils
 
         try
         {
-            return new JSONObject().put("packages",joappsarray);
+            JSONObject jo =  new JSONObject();
+            jo.put("apppackages",joappsarray);
+            jo.put("syspackages",josyssarray);
+
+            return jo;
         }
         catch (JSONException ignore)
         {

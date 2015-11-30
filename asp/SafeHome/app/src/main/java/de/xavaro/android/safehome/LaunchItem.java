@@ -1,7 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.support.v7.app.AppCompatActivity;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +43,7 @@ public class LaunchItem extends FrameLayout
     private LayoutParams layout;
 
     private JSONObject config;
+    private JSONObject settings;
 
     private TextView label;
     private ImageView icon;
@@ -125,8 +124,6 @@ public class LaunchItem extends FrameLayout
 
         oversize.width  = width  / 4;
         oversize.height = height / 4;
-
-        Log.d(LOGTAG,"Size=" + width + "=" + height);
     }
 
     public void setPosition(int left,int top)
@@ -169,6 +166,12 @@ public class LaunchItem extends FrameLayout
                 if (type.equals("developer"))
                 {
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.developer_400x400));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (type.equals("settings"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.settings_512x512));
                     icon.setVisibility(VISIBLE);
                 }
 
@@ -222,29 +225,13 @@ public class LaunchItem extends FrameLayout
             }
             else
             {
-                try
+                Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+
+                if (appIcon != null)
                 {
-                    ApplicationInfo appInfo = getContext().getPackageManager().getApplicationInfo(packageName, 0);
-                    Resources res = getContext().getPackageManager().getResourcesForApplication(appInfo);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    {
-                        Drawable appIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XXXHIGH, null);
-                        targetIcon.setImageDrawable(appIcon);
-                    }
-                    else
-                    {
-                        Configuration appConfig = res.getConfiguration();
-                        appConfig.densityDpi = VersionUtils.getBestDensity();
-                        DisplayMetrics dm = res.getDisplayMetrics();
-                        res.updateConfiguration(appConfig, dm);
-
-                        //noinspection deprecation
-                        Drawable appIcon = res.getDrawable(appInfo.icon);
-                        targetIcon.setImageDrawable(appIcon);
-                    }
+                    targetIcon.setImageDrawable(appIcon);
                 }
-                catch (Exception ex)
+                else
                 {
                     targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
                     hasProblem = true;
@@ -283,6 +270,7 @@ public class LaunchItem extends FrameLayout
             if (type.equals("genericapp"   )) { launchGenericApp();   return; }
             if (type.equals("directory"    )) { launchDirectory();    return; }
             if (type.equals("developer"    )) { launchDeveloper();    return; }
+            if (type.equals("settings"     )) { launchSettings();     return; }
             if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("skype"        )) { launchSkype();        return; }
 
@@ -405,6 +393,37 @@ public class LaunchItem extends FrameLayout
         }
     }
 
+    private void launchSettings()
+    {
+        if (settings == null)
+        {
+            settings = StaticUtils.readRawTextResourceJSON(context, R.raw.default_settings);
+
+            if ((settings == null) || ! settings.has("launchgroup"))
+            {
+                Toast.makeText(context, "Keine <launchgroup> gefunden.", Toast.LENGTH_LONG).show();
+
+                return;
+            }
+        }
+
+        if (directory == null)
+        {
+            directory = new LaunchGroup(context);
+
+            try
+            {
+                directory.setConfig(settings.getJSONObject("launchgroup"));
+            }
+            catch (JSONException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+        ((HomeActivity) context).addLauncherToBackStack(directory);
+    }
+
     private void launchDirectory()
     {
         if (! config.has("launchgroup"))
@@ -418,9 +437,6 @@ public class LaunchItem extends FrameLayout
         {
             directory = new LaunchGroup(context);
 
-            FrameLayout topscreen = (FrameLayout) ((AppCompatActivity) context).findViewById(R.id.top_screen);
-            topscreen.addView(directory);
-
             try
             {
                 directory.setConfig(config.getJSONObject("launchgroup"));
@@ -430,10 +446,14 @@ public class LaunchItem extends FrameLayout
                 ex.printStackTrace();
             }
         }
+
+        ((HomeActivity) context).addLauncherToBackStack(directory);
     }
 
     private void launchDeveloper()
     {
+        //StaticUtils.getAllInstalledApps(context);
+
         StaticUtils.JSON2String(StaticUtils.getAllInstalledApps(context), true);
     }
 }

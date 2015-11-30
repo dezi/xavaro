@@ -15,6 +15,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class HomeActivity extends AppCompatActivity
 {
     private final String LOGTAG = "HomeActivity";
@@ -22,6 +24,7 @@ public class HomeActivity extends AppCompatActivity
     private LaunchGroup launchGroup;
     private JSONObject config;
     private KioskService kioskService;
+    private FrameLayout topscreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -29,8 +32,9 @@ public class HomeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        topscreen = (FrameLayout) findViewById(R.id.top_screen);
+
         launchGroup = new LaunchGroup(this);
-        FrameLayout topscreen = (FrameLayout) findViewById(R.id.top_screen);
         topscreen.addView(launchGroup);
 
         createConfig();
@@ -70,7 +74,21 @@ public class HomeActivity extends AppCompatActivity
 
         Log.d(LOGTAG, "onWindowFocusChanged=" + hasFocus);
 
-        if (kioskService != null) kioskService.setFocused(LOGTAG,hasFocus);
+        if (kioskService != null) kioskService.setFocused(LOGTAG, hasFocus);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (backStack.size() > 0)
+        {
+            Object lastview = backStack.remove(backStack.size() - 1);
+            topscreen.removeView((FrameLayout) lastview);
+
+            return;
+        }
+
+        super.onBackPressed();
     }
 
     private void createConfig()
@@ -92,6 +110,14 @@ public class HomeActivity extends AppCompatActivity
         {
             ex.printStackTrace();
         }
+    }
+
+    private ArrayList backStack = new ArrayList();
+
+    public void addLauncherToBackStack(Object view)
+    {
+        topscreen.addView((FrameLayout) view);
+        backStack.add((FrameLayout) view);
     }
 
     private ServiceConnection kioskConnection = new ServiceConnection()

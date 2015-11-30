@@ -68,7 +68,7 @@ public class KioskService extends Service
     private boolean running = false;
     private boolean focused = false;
 
-    private static final long INTERVAL = 500;
+    private static final long INTERVAL = 100;
 
     @Override
     public void onCreate()
@@ -235,11 +235,14 @@ public class KioskService extends Service
             //Log.d(LOGTAG, "APP:" + mode + "=" + proc + "=" + pi.importance);
 
             String currentMessage = mode + " => " + proc;
+
             boolean showit = true;
+            boolean blockit = false;
 
             if (mode.equals("xx") || mode.equals("bl"))
             {
                 currentMessage = "Blocking" + " " + proc;
+                blockit = true;
             }
 
             if (mode.equals("me") || mode.equals("wl"))
@@ -249,7 +252,7 @@ public class KioskService extends Service
                 recentProc = proc;
             }
 
-            if ((alertMessage == null) || ! alertMessage.equals(currentMessage))
+            if (blockit || (alertMessage == null) || ! alertMessage.equals(currentMessage))
             {
                 alertMessage = currentMessage;
 
@@ -266,12 +269,9 @@ public class KioskService extends Service
                 }
             }
 
-            if (mode.equals("xx") || mode.equals("bl"))
+            if (blockit && isDefaultHome())
             {
-                if (isDefaultHome())
-                {
-                    //restoreRecentProc();
-                }
+                restoreRecentProc();
             }
         }
     }

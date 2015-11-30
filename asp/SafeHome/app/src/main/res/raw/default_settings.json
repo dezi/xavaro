@@ -1,0 +1,19 @@
+{
+  "launchgroup": {
+    "launchitems": [
+      {
+        "label": "Select Home",
+        "type": "select_home"
+      },
+      {
+        "label": "Select Assistant",
+        "type": "select_assist"
+      },
+      {
+        "label": "System",
+        "type": "genericapp",
+        "packagename": "com.android.settings"
+      }
+    ]
+  }
+}
