@@ -36,6 +36,8 @@ public class StaticUtils
 {
     private static final String LOGTAG = "StaticUtils";
 
+    private static JSONObject contacts = null;
+
     //
     // Convert array of bytes to hex string.
     //
@@ -148,36 +150,21 @@ public class StaticUtils
     }
 
     //
-    // Retrieve profile image bitmap for any telefone number.
-    //
-    public static Bitmap getAnyProfileBitmap(Context context, String phone)
-    {
-        Bitmap bitmap = null;
-
-        try
-        {
-            //noinspection ConstantConditions
-            if (bitmap == null) bitmap = getWhatsAppProfileBitmap(context, phone);
-            if (bitmap == null) bitmap = getContactsProfileBitmap(context,phone);
-        }
-        catch (Exception ignore)
-        {
-        }
-
-        return bitmap;
-    }
-
-    //
     // Retrieve profile image bitmap for contacts telefone number.
     //
-    public static Bitmap getContactsProfileBitmap(Context context, String phone)
+    public static String getPhoneFromSkype(Context context, String skypename)
     {
         boolean ismatch = false;
-        String photo = null;
+        String phone = null;
 
-        phone = phone.replaceAll(" ","");
+        if (contacts == null)
+        {
+            //
+            // Read into static contacts once.
+            //
 
-        JSONObject contacts = new ContactsHandler(context).contacts2JSONObject();
+            contacts = new ContactsHandler(context).contacts2JSONObject();
+        }
 
         try
         {
@@ -189,6 +176,84 @@ public class StaticUtils
                 JSONArray contact = contacts.getJSONArray(id);
                 if (contact == null) continue;
 
+                ismatch = false;
+                phone = null;
+
+                for (int inx = 0; inx < contact.length(); inx++)
+                {
+                    JSONObject item = contact.getJSONObject(inx);
+
+                    if (item.has("DATA1"))
+                    {
+                        String number = item.getString("DATA1").replaceAll(" ","");
+
+                        if (number.endsWith(skypename))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("NUMBER"))
+                    {
+                        phone = item.getString("NUMBER");
+
+                        if (phone != null)
+                        {
+                            phone = phone.replaceAll("\\+", "");
+                            phone = phone.replaceAll(" ", "");
+                        }
+                    }
+                }
+
+                if (ismatch && (phone != null))
+                {
+                    //
+                    // We have found a phone number within skype contact.
+                    //
+
+                    return phone;
+                }
+            }
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    //
+    // Retrieve profile image bitmap for contacts telefone number.
+    //
+    public static Bitmap getContactsProfileBitmap(Context context, String search)
+    {
+        boolean ismatch = false;
+        String photo = null;
+
+        search = search.replaceAll(" ", "");
+
+        if (contacts == null)
+        {
+            //
+            // Read into static contacts once.
+            //
+
+            contacts = new ContactsHandler(context).contacts2JSONObject();
+        }
+
+        try
+        {
+            Iterator<?> ids = contacts.keys();
+
+            while (ids.hasNext())
+            {
+                String id = (String) ids.next();
+                JSONArray contact = contacts.getJSONArray(id);
+                if (contact == null) continue;
+
+                ismatch = false;
+                photo = null;
+
                 for (int inx = 0; inx < contact.length(); inx++)
                 {
                     JSONObject item = contact.getJSONObject(inx);
@@ -197,7 +262,17 @@ public class StaticUtils
                     {
                         String number = item.getString("NUMBER").replaceAll(" ","");
 
-                        if (number.endsWith(phone))
+                        if (number.endsWith(search))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("DATA1"))
+                    {
+                        String number = item.getString("DATA1").replaceAll(" ","");
+
+                        if (number.endsWith(search))
                         {
                             ismatch = true;
                         }
@@ -221,6 +296,32 @@ public class StaticUtils
         byte[] rawbytes = StaticUtils.hexStringToBytes(photo);
 
         return BitmapFactory.decodeByteArray(rawbytes, 0, rawbytes.length);
+    }
+
+    //
+    // Retrieve profile image bitmap for Sykpe account.
+    //
+    public static Bitmap getSkypeProfileBitmap(Context context, String skypename)
+    {
+        //
+        // Try to get generic contact image.
+        //
+
+        Bitmap bitmap = getContactsProfileBitmap(context,skypename);
+        if (bitmap != null) return bitmap;
+
+        //
+        // Search for a matching phone number in contacts.
+        //
+
+        String phone = getPhoneFromSkype(context,skypename);
+        if (phone == null) return null;
+
+        //
+        // Retry with WhatsApp profile image anyway.
+        //
+
+        return getWhatsAppProfileBitmap(context,phone);
     }
 
     //
@@ -254,13 +355,15 @@ public class StaticUtils
                 catch (Exception ex)
                 {
                     Log.e(LOGTAG,"getWhatsAppProfileBitmap: " + ex.getMessage());
-
-                    return null;
                 }
             }
         }
 
-        return null;
+        //
+        // Retry with generic contacts profile image.
+        //
+
+        return getContactsProfileBitmap(context, phone);
     }
 
     //

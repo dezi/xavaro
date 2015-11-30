@@ -57,7 +57,7 @@ public class ContactsHandler
         while (items.moveToNext())
         {
             ri = items.getLong(items.getColumnIndex(Data._ID));
-            ci = items.getLong(items.getColumnIndex(Data.RAW_CONTACT_ID));
+            ci = items.getLong(items.getColumnIndex(Data.CONTACT_ID));
             mt = items.getString(items.getColumnIndex(Data.MIMETYPE));
 
             joitem = new JSONObject();
@@ -238,14 +238,14 @@ public class ContactsHandler
             {
                 String kind = mt;
 
-                if (!kind.startsWith("vnd.android.cursor.item/"))
+                if (! kind.startsWith("vnd.android.cursor.item/"))
                 {
                     //
                     // We ignore items not within
                     // the android cursor namespace.
                     //
 
-                    continue;
+                    //continue;
                 }
 
                 kind = kind.substring(24);

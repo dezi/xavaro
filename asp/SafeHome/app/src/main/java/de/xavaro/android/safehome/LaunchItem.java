@@ -36,12 +36,16 @@ public class LaunchItem extends FrameLayout
 
     private Context context;
 
-    private FrameLayout.LayoutParams layout;
+    private LayoutParams layout;
 
     private JSONObject config;
 
     private TextView label;
     private ImageView icon;
+    
+    private FrameLayout overlay;
+    private LayoutParams oversize;
+    private ImageView overicon;
 
     public LaunchItem(Context context)
     {
@@ -79,11 +83,10 @@ public class LaunchItem extends FrameLayout
 
         setVisibility(INVISIBLE);
 
-        layout = new FrameLayout.LayoutParams(0,0);
+        layout = new LayoutParams(0,0);
         setLayoutParams(layout);
 
         icon = new ImageView(context);
-        //icon.setBackgroundColor(0x88888888);
         icon.setPadding(0, 0, 0, 40);
         icon.setVisibility(INVISIBLE);
         this.addView(icon);
@@ -94,12 +97,26 @@ public class LaunchItem extends FrameLayout
         label.setTypeface(label.getTypeface(), Typeface.BOLD);
         label.setTextSize(18f);
         this.addView(label);
+
+        oversize = new LayoutParams(0,0);
+        oversize.gravity = Gravity.RIGHT + Gravity.TOP;
+
+        overlay = new FrameLayout(context);
+        overlay.setLayoutParams(oversize);
+        this.addView(overlay);
+
+        overicon = new ImageView(context);
+        overicon.setVisibility(INVISIBLE);
+        overlay.addView(overicon);
     }
 
     public void setSize(int width,int height)
     {
         layout.width  = width;
         layout.height = height;
+
+        oversize.width  = width  / 4;
+        oversize.height = height / 4;
     }
 
     public void setPosition(int left,int top)
@@ -112,6 +129,7 @@ public class LaunchItem extends FrameLayout
     {
         String packageName = null;
         boolean hasProblem = false;
+        ImageView targetIcon = icon;
 
         this.config = config;
 
@@ -147,7 +165,7 @@ public class LaunchItem extends FrameLayout
                     if (config.has("waphonenumber"))
                     {
                         String phone = config.getString("waphonenumber");
-                        Bitmap thumbnail = StaticUtils.getAnyProfileBitmap(context, phone);
+                        Bitmap thumbnail = StaticUtils.getWhatsAppProfileBitmap(context, phone);
 
                         if (thumbnail != null)
                         {
@@ -155,7 +173,25 @@ public class LaunchItem extends FrameLayout
 
                             icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
                             icon.setVisibility(VISIBLE);
-                            packageName = null;
+                            targetIcon = overicon;
+                        }
+                    }
+                }
+
+                if (type.equals("skype"))
+                {
+                    if (config.has("skypename"))
+                    {
+                        String skypename = config.getString("skypename");
+                        Bitmap thumbnail = StaticUtils.getSkypeProfileBitmap(context, skypename);
+
+                        if (thumbnail != null)
+                        {
+                            thumbnail = StaticUtils.getCircleBitmap(thumbnail);
+
+                            icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                            icon.setVisibility(VISIBLE);
+                            targetIcon = overicon;
                         }
                     }
                 }
@@ -170,7 +206,7 @@ public class LaunchItem extends FrameLayout
         {
             if (packageName.equals("org.wikipedia"))
             {
-                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
+                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
             }
             else
             {
@@ -182,7 +218,7 @@ public class LaunchItem extends FrameLayout
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     {
                         Drawable appIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XXXHIGH, null);
-                        icon.setImageDrawable(appIcon);
+                        targetIcon.setImageDrawable(appIcon);
                     }
                     else
                     {
@@ -193,19 +229,18 @@ public class LaunchItem extends FrameLayout
 
                         //noinspection deprecation
                         Drawable appIcon = res.getDrawable(appInfo.icon);
-                        icon.setImageDrawable(appIcon);
+                        targetIcon.setImageDrawable(appIcon);
                     }
                 }
                 catch (Exception ex)
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
+                    targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
                     hasProblem = true;
                 }
             }
 
-            icon.setVisibility(VISIBLE);
+            targetIcon.setVisibility(VISIBLE);
         }
-
 
         setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
     }

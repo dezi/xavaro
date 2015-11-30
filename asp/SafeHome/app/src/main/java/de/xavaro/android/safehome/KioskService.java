@@ -8,6 +8,7 @@ import android.content.Context;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.pm.ResolveInfo;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -53,8 +54,10 @@ public class KioskService extends Service
     private static final String LOGTAG = KioskService.class.getSimpleName();
 
     //
-    // Window manager.
+    // Binder service.
     //
+
+    private final IBinder binder = new KioskBinder();
 
     private String alertMessage;
     private Toast alertToast;
@@ -63,6 +66,7 @@ public class KioskService extends Service
 
     private String recentProc = null;
     private boolean running = false;
+    private boolean focused = false;
 
     private static final long INTERVAL = 500;
 
@@ -133,7 +137,7 @@ public class KioskService extends Service
                 {
                     while (running)
                     {
-                        handleKioskMode();
+                        if (! focused) handleKioskMode();
 
                         try
                         {
@@ -306,9 +310,32 @@ public class KioskService extends Service
         return (res.activityInfo != null) && res.activityInfo.packageName.equals(getPackageName());
     }
 
+    //
+    // Set if main activity has focus.
+    //
+
+    public void setFocused(String activity,boolean hasFocus)
+    {
+        Log.d(LOGTAG, "setFocused: " + activity + "=" + hasFocus);
+
+        focused = hasFocus;
+    }
+
+    //
+    // Binder stuff allows activity to call methods here.
+    //
+
+    public class KioskBinder extends Binder
+    {
+        KioskService getService()
+        {
+            return KioskService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent)
     {
-        return null;
+        return binder;
     }
 }

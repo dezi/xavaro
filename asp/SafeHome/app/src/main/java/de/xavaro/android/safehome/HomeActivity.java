@@ -1,5 +1,10 @@
 package de.xavaro.android.safehome;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +22,7 @@ public class HomeActivity extends AppCompatActivity
 
     private LaunchGroup launchGroup;
     private JSONObject config;
+    private KioskService kioskService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -29,6 +35,8 @@ public class HomeActivity extends AppCompatActivity
         topscreen.addView(launchGroup);
 
         createConfig();
+
+        startService(new Intent(this, KioskService.class));
     }
 
     @Override
@@ -37,6 +45,9 @@ public class HomeActivity extends AppCompatActivity
         super.onPostCreate(savedInstanceState);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        Intent intent = new Intent(this, KioskService.class);
+        bindService(intent, kioskConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -45,13 +56,23 @@ public class HomeActivity extends AppCompatActivity
         super.onResume();
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        super.onWindowFocusChanged(hasFocus);
+
+        Log.d(LOGTAG, "onWindowFocusChanged=" + hasFocus);
+
+        if (kioskService != null) kioskService.setFocused(LOGTAG,hasFocus);
+    }
+
     private void createConfig()
     {
-        config = StaticUtils.readRawTextResourceJSON(this,R.raw.default_config);
+        config = StaticUtils.readRawTextResourceJSON(this, R.raw.default_config);
 
-        if ((config == null) || ! config.has("launchgroup"))
+        if ((config == null) || !config.has("launchgroup"))
         {
-            Toast.makeText(this,"Keine <launchgroup> gefunden.",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Keine <launchgroup> gefunden.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -59,10 +80,25 @@ public class HomeActivity extends AppCompatActivity
         try
         {
             launchGroup.setConfig(config.getJSONObject("launchgroup"));
-        }
-        catch (JSONException ex)
+        } catch (JSONException ex)
         {
             ex.printStackTrace();
         }
     }
+
+    private ServiceConnection kioskConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            KioskService.KioskBinder binder = (KioskService.KioskBinder) service;
+            kioskService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0)
+        {
+            kioskService = null;
+        }
+    };
 }
