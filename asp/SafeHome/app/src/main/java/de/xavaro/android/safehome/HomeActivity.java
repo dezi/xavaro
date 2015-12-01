@@ -1,14 +1,18 @@
 package de.xavaro.android.safehome;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -21,10 +25,14 @@ public class HomeActivity extends AppCompatActivity
 {
     private final String LOGTAG = "HomeActivity";
 
+    public KioskService kioskService;
+
     private LaunchGroup launchGroup;
     private JSONObject config;
-    private KioskService kioskService;
     private FrameLayout topscreen;
+
+    private boolean wasPaused = false;
+    private boolean lostFocus = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,11 +65,50 @@ public class HomeActivity extends AppCompatActivity
 
         Intent intent = new Intent(this, KioskService.class);
         bindService(intent, kioskConnection, Context.BIND_AUTO_CREATE);
+
+        Log.d(LOGTAG, "onStart...");
+    }
+
+    @Override
+    protected void onResume()
+    {
+        Log.d(LOGTAG, "onResume...");
+
+        super.onResume();
+
+        if (kioskService != null) kioskService.clearOneShot();
+
+        if (wasPaused && ! lostFocus)
+        {
+            //
+            // Home press in own app.
+            //
+
+            while (backStack.size() > 0)
+            {
+                Object lastview = backStack.remove(backStack.size() - 1);
+                topscreen.removeView((FrameLayout) lastview);
+            }
+        }
+
+        wasPaused = false;
+    }
+
+    @Override
+    protected void onPause()
+    {
+        Log.d(LOGTAG, "onPause...");
+
+        super.onPause();
+
+        wasPaused = true;
     }
 
     @Override
     protected void onStop()
     {
+        Log.d(LOGTAG, "onStop...");
+
         super.onStop();
 
         if (kioskService != null) unbindService(kioskConnection);
@@ -70,11 +117,13 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onWindowFocusChanged(boolean hasFocus)
     {
-        super.onWindowFocusChanged(hasFocus);
-
         Log.d(LOGTAG, "onWindowFocusChanged=" + hasFocus);
 
+        super.onWindowFocusChanged(hasFocus);
+
         if (kioskService != null) kioskService.setFocused(LOGTAG, hasFocus);
+
+        lostFocus = ! hasFocus;
     }
 
     @Override

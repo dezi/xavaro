@@ -10,7 +10,7 @@
         "type": "select_assist"
       },
       {
-        "label": "System",
+        "label": "Android Settings",
         "type": "genericapp",
         "packagename": "com.android.settings"
       }

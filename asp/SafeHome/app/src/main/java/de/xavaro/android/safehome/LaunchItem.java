@@ -1,7 +1,9 @@
 package de.xavaro.android.safehome;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -15,6 +17,7 @@ import android.graphics.drawable.Drawable;
 
 import android.net.Uri;
 import android.os.Build;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -22,6 +25,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Gravity;
 
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -384,6 +389,9 @@ public class LaunchItem extends FrameLayout
         try
         {
             String packagename = config.getString("packagename");
+
+            ((HomeActivity) context).kioskService.addOneShot(packagename);
+
             Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
             context.startActivity(launchIntent);
         }
@@ -421,7 +429,43 @@ public class LaunchItem extends FrameLayout
             }
         }
 
-        ((HomeActivity) context).addLauncherToBackStack(directory);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Enter Settings Password");
+
+        final EditText input = new EditText(context);
+
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setPadding(40, 40, 40, 40);
+        input.setTextSize(48f);
+
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                //m_Text = input.getText().toString();
+
+                ((HomeActivity) context).addLauncherToBackStack(directory);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(24f);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
     }
 
     private void launchDirectory()

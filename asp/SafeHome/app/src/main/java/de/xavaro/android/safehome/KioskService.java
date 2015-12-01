@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 public class KioskService extends Service
 {
+    private static final String LOGTAG = KioskService.class.getSimpleName();
+
     //
     // List of names of white-listed packages.
     //
@@ -42,16 +44,16 @@ public class KioskService extends Service
     private final ArrayList<String> defsystemApps = new ArrayList<>();
 
     //
+    // List of names of one shot allow packages.
+    //
+
+    private final ArrayList<String> oneshotApps = new ArrayList<>();
+
+    //
     // Watch dog background thread.
     //
 
     private Thread wdThread = null;
-
-    //
-    // Log tag.
-    //
-
-    private static final String LOGTAG = KioskService.class.getSimpleName();
 
     //
     // Binder service.
@@ -205,6 +207,11 @@ public class KioskService extends Service
             mode = "bl";
         }
 
+        if (oneshotApps.contains(processName))
+        {
+            mode = "os";
+        }
+
         if (processName.equals(getPackageName()))
         {
             mode = "me";
@@ -245,7 +252,7 @@ public class KioskService extends Service
                 blockit = true;
             }
 
-            if (mode.equals("me") || mode.equals("wl"))
+            if (mode.equals("me") || mode.equals("wl") || mode.equals("os"))
             {
                 if (recentProc.equals(proc)) showit = false;
 
@@ -319,6 +326,20 @@ public class KioskService extends Service
         Log.d(LOGTAG, "setFocused: " + activity + "=" + hasFocus);
 
         focused = hasFocus;
+    }
+
+    //
+    // Set one shot apps.
+    //
+
+    public void addOneShot(String packagename)
+    {
+        oneshotApps.add(packagename);
+    }
+
+    public void clearOneShot()
+    {
+        oneshotApps.clear();
     }
 
     //
