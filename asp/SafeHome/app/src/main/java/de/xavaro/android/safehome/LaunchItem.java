@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable;
 
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -25,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Gravity;
 
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -58,6 +60,7 @@ public class LaunchItem extends FrameLayout
     private ImageView overicon;
 
     private LaunchGroup directory;
+    private WebFrameLayout webview;
 
     public LaunchItem(Context context)
     {
@@ -494,10 +497,31 @@ public class LaunchItem extends FrameLayout
         ((HomeActivity) context).addLauncherToBackStack(directory);
     }
 
-    private void launchDeveloper()
+    private void launchDeveloperOld()
     {
         //StaticUtils.getAllInstalledApps(context);
 
-        StaticUtils.JSON2String(StaticUtils.getAllInstalledApps(context), true);
+        //StaticUtils.JSON2String(StaticUtils.getAllInstalledApps(context), true);
+
+        /*
+        String app_pkg_name = "marcone.toddlerlock";
+
+        Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+        intent.setData(Uri.parse("package:" + app_pkg_name));
+        context.startActivity(intent);
+        */
+
+        Intent intentOpenBluetoothSettings = new Intent(Settings.ACTION_DATE_SETTINGS);
+        context.startActivity(intentOpenBluetoothSettings);
+    }
+
+    private void launchDeveloper()
+    {
+        if (webview == null)
+        {
+            webview = new WebFrameLayout(context);
+        }
+
+        ((HomeActivity) context).addLauncherToBackStack(webview);
     }
 }
