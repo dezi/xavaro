@@ -14,6 +14,7 @@ public class WebFrameLayout extends FrameLayout
     private Context context;
 
     private WebView webview;
+    private WebClient webclient;
 
     public WebFrameLayout(Context context)
     {
@@ -48,8 +49,11 @@ public class WebFrameLayout extends FrameLayout
 
         setLayoutParams(layout);
 
+        webclient = new WebClient();
+        webclient.setContext(context);
+
         webview = new WebView(context);
-        webview.setWebViewClient(new WebClient());
+        webview.setWebViewClient(webclient);
 
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setDomStorageEnabled(false);
