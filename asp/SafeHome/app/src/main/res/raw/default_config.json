@@ -36,6 +36,39 @@
         "packagename": "org.wikipedia"
       },
       {
+        "label": "Presse",
+        "type": "directory",
+        "icon": "newspaper_470x470",
+        "launchgroup": {
+          "launchitems": [
+            {
+              "label": "Bild Online",
+              "type": "webframe",
+              "url": "http://m.bild.de",
+              "icon": "http://bilder.bild.de/fotos/bild-logo-35166394/Bild/29.bild.png"
+            },
+            {
+              "label": "Spiegel Online",
+              "type": "webframe",
+              "url": "http://m.spiegel.de",
+              "icon": "http://www.spiegel.de/static/sys/v10/logo/fb_logo_default.jpg"
+            },
+            {
+              "label": "Gala",
+              "type": "webframe",
+              "url": "http://m.gala.de",
+              "icon": "http://www.gala.de/bundles/gujcmscontentfrontend/images/gala_logo.png"
+            },
+            {
+              "label": "Bunte",
+              "type": "webframe",
+              "url": "http://mobil.bunte.de",
+              "icon": "http://i2.bstatic.de/sites/all/themes/custom/bunte/images/rebrush-2014/sprite-global/bunte-navi-logo.png"
+            }
+          ]
+        }
+      },
+      {
         "label": "Skype",
         "type": "directory",
         "packagename": "com.skype.raider",

@@ -5,29 +5,25 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.TimedText;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.Settings;
 import android.text.InputType;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import android.view.View;
 import android.view.Gravity;
 
-import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -36,6 +32,10 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 //
 // Launch item view on home screen.
@@ -60,7 +60,7 @@ public class LaunchItem extends FrameLayout
     private ImageView overicon;
 
     private LaunchGroup directory;
-    private WebFrameLayout webview;
+    private WebFrame webview;
 
     public LaunchItem(Context context)
     {
@@ -156,6 +156,32 @@ public class LaunchItem extends FrameLayout
             Log.d(LOGTAG, config.getString("label"));
 
             packageName = config.has("packagename") ? config.getString("packagename") : null;
+
+            if (config.has("icon"))
+            {
+                String iconname = config.getString("icon");
+
+                if (iconname.startsWith("http://") || iconname.startsWith("https://"))
+                {
+                    Bitmap thumbnail = StaticUtils.getBitmapFromURL(iconname);
+
+                    if (thumbnail != null)
+                    {
+                        icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                        icon.setVisibility(VISIBLE);
+                    }
+                }
+                else
+                {
+                    int resourceId = context.getResources().getIdentifier(iconname, "drawable", context.getPackageName());
+
+                    if (resourceId > 0)
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, resourceId));
+                        icon.setVisibility(VISIBLE);
+                    }
+                }
+            }
 
             if (config.has("type"))
             {
@@ -279,6 +305,7 @@ public class LaunchItem extends FrameLayout
             if (type.equals("directory"    )) { launchDirectory();    return; }
             if (type.equals("developer"    )) { launchDeveloper();    return; }
             if (type.equals("settings"     )) { launchSettings();     return; }
+            if (type.equals("webframe"     )) { launchWebframe();     return; }
             if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("skype"        )) { launchSkype();        return; }
 
@@ -497,6 +524,33 @@ public class LaunchItem extends FrameLayout
         ((HomeActivity) context).addLauncherToBackStack(directory);
     }
 
+    private void launchWebframe()
+    {
+        if (! config.has("url"))
+        {
+            Toast.makeText(getContext(),"Nix <url> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            if (webview == null)
+            {
+                String url = config.getString("url");
+
+                webview = new WebFrame(context);
+                webview.setLoadURL(url);
+            }
+
+            ((HomeActivity) context).addLauncherToBackStack(webview);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     private void launchDeveloperOld()
     {
         //StaticUtils.getAllInstalledApps(context);
@@ -517,11 +571,42 @@ public class LaunchItem extends FrameLayout
 
     private void launchDeveloper()
     {
-        if (webview == null)
+        MediaPlayer mPlayer = new MediaPlayer();
+        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try
         {
-            webview = new WebFrameLayout(context);
+            Map<String, String> headers = new HashMap<String, String>();
+            headers.put("Icy-MetaData", "1");
+
+            //mPlayer.setDataSource(context, Uri.parse("http://mp3channels.webradio.antenne.de/antenne"), headers);
+            mPlayer.setDataSource(context,Uri.parse("http://online-radioroks.tavrmedia.ua/RadioROKS"),headers);
+
+            mPlayer.setOnTimedTextListener(
+                    new MediaPlayer.OnTimedTextListener()
+                    {
+                        @Override
+                        public void onTimedText(MediaPlayer mp, TimedText text)
+                        {
+                            Log.d("PLLLLLLL", text.getText());
+                        }
+
+                    });
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
         }
 
-        ((HomeActivity) context).addLauncherToBackStack(webview);
+        try
+        {
+            mPlayer.prepare();
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
+        mPlayer.start();
     }
 }

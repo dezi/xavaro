@@ -7,30 +7,30 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 
-public class WebFrameLayout extends FrameLayout
+public class WebFrame extends FrameLayout
 {
     private final String LOGTAG = "WebFrameLayout";
 
     private Context context;
 
     private WebView webview;
-    private WebClient webclient;
+    private WebGuard webclient;
 
-    public WebFrameLayout(Context context)
+    public WebFrame(Context context)
     {
         super(context);
 
         myInit(context);
     }
 
-    public WebFrameLayout(Context context, AttributeSet attrs)
+    public WebFrame(Context context, AttributeSet attrs)
     {
         super(context, attrs);
 
         myInit(context);
     }
 
-    public WebFrameLayout(Context context, AttributeSet attrs, int defStyle)
+    public WebFrame(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
 
@@ -49,7 +49,7 @@ public class WebFrameLayout extends FrameLayout
 
         setLayoutParams(layout);
 
-        webclient = new WebClient();
+        webclient = new WebGuard();
         webclient.setContext(context);
 
         webview = new WebView(context);
@@ -63,8 +63,11 @@ public class WebFrameLayout extends FrameLayout
 
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-        webview.loadUrl("http://m.bild.de/");
-
         addView(webview);
+    }
+
+    public void setLoadURL(String url)
+    {
+        webview.loadUrl(url);
     }
 }
