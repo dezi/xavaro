@@ -70,7 +70,20 @@
               "type": "webframe",
               "url": "http://m.manager-magazin.de/",
               "icon": "https://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH.png"
+            },
+            {
+              "label": "Stern",
+              "type": "webframe",
+              "url": "http://mobil.stern.de/",
+              "icon": "https://pbs.twimg.com/profile_images/453882199477985280/XAAheikJ_400x400.png"
+            },
+            {
+              "label": "MOPO",
+              "type": "webframe",
+              "url": "http://mobil.mopo.de/",
+              "icon": "https://pbs.twimg.com/profile_images/542314616097734657/0Fp6DpVa.jpeg"
             }
+
           ]
         }
       },

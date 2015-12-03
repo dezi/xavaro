@@ -9,13 +9,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 public class WebGuard extends WebViewClient
 {
     private final String LOGTAG = "WebGuard";
+
     private Context context;
-    private ArrayList backStack = new ArrayList();
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url)
@@ -23,8 +21,6 @@ public class WebGuard extends WebViewClient
         Log.d(LOGTAG, "URL=" + url);
 
         Toast.makeText(context,url,Toast.LENGTH_LONG).show();
-
-        backStack.add(url);
 
         view.loadUrl(url);
 
@@ -55,11 +51,17 @@ public class WebGuard extends WebViewClient
         }
 
         if (url.contains("krxd.net/") ||
+                url.contains("shop.mopo.de/") ||
+                url.contains("alster.mopo.de/") ||
+                url.contains("www.express.de/") ||
+                url.contains("praeludium_mopo.js") ||
                 url.contains("doubleclick.net/") ||
                 url.contains("adition.com/") ||
                 url.contains("yoc.com/") ||
+                url.contains("m6r.eu/") ||
                 url.contains("71i.de/") ||
                 url.contains("ioam.de/") ||
+                url.contains("criteo.com/") ||
                 url.contains("amobee.com/") ||
                 url.contains("yieldlab.net/") ||
                 url.contains("meetrics.net/") ||
@@ -68,12 +70,20 @@ public class WebGuard extends WebViewClient
                 url.contains("movad.de/") ||
                 url.contains("outbrain.com/") ||
                 url.contains("nuggad.net/") ||
-                url.contains("nuggad.net/") ||
+                url.contains("wt-eu02.net/") ||
+                url.contains("veeseo.com/") ||
+                url.contains("addthis.com/") ||
+                url.contains("ligatus.com/") ||
                 url.contains("emetriq.de/") ||
+                url.contains("laterpay.net/") ||
                 url.contains("optimizely.com/") ||
                 url.contains("edelight.biz/") ||
                 url.contains("emsservice.de/") ||
+                url.contains("adobedtm.com/") ||
+                url.contains("stroeerdigitalmedia.de/") ||
+                url.contains("plista.com/") ||
                 url.contains("stickyadstv.com/") ||
+                url.contains("elasticbeanstalk.com/") ||
                 url.contains("amazon-adsystem.com/") ||
                 url.contains("google-analytics.com/") ||
                 url.contains("googletagmanager.com/") ||
@@ -86,7 +96,10 @@ public class WebGuard extends WebViewClient
             return new WebResourceResponse("text/plain", "utf-8", null);
         }
 
-        Log.d(LOGTAG, "Load URL=" + url);
+        if ((! url.endsWith(".png")) && (! url.endsWith(".jpg")) && (! url.endsWith(".ico")))
+        {
+            Log.d(LOGTAG, "Load URL=" + url);
+        }
 
         return null;
     }
@@ -94,18 +107,5 @@ public class WebGuard extends WebViewClient
     public void setContext(Context context)
     {
         this.context = context;
-    }
-
-    public int getBackStackSize()
-    {
-        return backStack.size();
-    }
-
-    public void popBackStack()
-    {
-        if (backStack.size() > 0)
-        {
-            backStack.remove(backStack.size() - 1);
-        }
     }
 }

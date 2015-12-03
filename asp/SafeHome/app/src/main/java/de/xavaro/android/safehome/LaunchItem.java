@@ -551,7 +551,7 @@ public class LaunchItem extends FrameLayout
         }
     }
 
-    private void launchDeveloperOld()
+    private void launchDeveloper()
     {
         //StaticUtils.getAllInstalledApps(context);
 
@@ -565,11 +565,17 @@ public class LaunchItem extends FrameLayout
         context.startActivity(intent);
         */
 
+        /*
         Intent intentOpenBluetoothSettings = new Intent(Settings.ACTION_DATE_SETTINGS);
         context.startActivity(intentOpenBluetoothSettings);
+        */
+
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW);
+        goToMarket.setData(Uri.parse("market://details?id=org.wikipedia"));
+        context.startActivity(goToMarket);
     }
 
-    private void launchDeveloper()
+    private void launchDeveloperAudio()
     {
         MediaPlayer mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);

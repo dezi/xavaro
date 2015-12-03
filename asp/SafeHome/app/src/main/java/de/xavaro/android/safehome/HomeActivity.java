@@ -141,7 +141,7 @@ public class HomeActivity extends AppCompatActivity
         {
             Object lastview = backStack.get(backStack.size() - 1);
 
-            if (lastview instanceof LaunchItem)
+            if (lastview instanceof LaunchGroup)
             {
                 topscreen.removeView((FrameLayout) lastview);
                 backStack.remove(backStack.size() - 1);
