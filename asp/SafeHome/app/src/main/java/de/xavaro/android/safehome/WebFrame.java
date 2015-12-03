@@ -7,7 +7,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
-
 public class WebFrame extends FrameLayout
 {
     private final String LOGTAG = "WebFrameLayout";
@@ -15,7 +14,7 @@ public class WebFrame extends FrameLayout
     private Context context;
 
     private WebView webview;
-    private WebGuard webclient;
+    private WebGuard webguard;
 
     public WebFrame(Context context)
     {
@@ -50,11 +49,11 @@ public class WebFrame extends FrameLayout
 
         setLayoutParams(layout);
 
-        webclient = new WebGuard();
-        webclient.setContext(context);
+        webguard = new WebGuard();
+        webguard.setContext(context);
 
         webview = new WebView(context);
-        webview.setWebViewClient(webclient);
+        webview.setWebViewClient(webguard);
 
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setDomStorageEnabled(false);

@@ -38,7 +38,7 @@
       {
         "label": "Presse",
         "type": "directory",
-        "icon": "newspaper_470x470",
+        "icon": "newspaper_512x512",
         "launchgroup": {
           "launchitems": [
             {
@@ -64,6 +64,12 @@
               "type": "webframe",
               "url": "http://mobil.bunte.de",
               "icon": "http://i2.bstatic.de/sites/all/themes/custom/bunte/images/rebrush-2014/sprite-global/bunte-navi-logo.png"
+            },
+            {
+              "label": "Manager Magazin",
+              "type": "webframe",
+              "url": "http://m.manager-magazin.de/",
+              "icon": "https://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH.png"
             }
           ]
         }
