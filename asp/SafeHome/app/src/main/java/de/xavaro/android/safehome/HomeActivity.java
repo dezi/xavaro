@@ -139,8 +139,22 @@ public class HomeActivity extends AppCompatActivity
     {
         if (backStack.size() > 0)
         {
-            Object lastview = backStack.remove(backStack.size() - 1);
-            topscreen.removeView((FrameLayout) lastview);
+            Object lastview = backStack.get(backStack.size() - 1);
+
+            if (lastview instanceof LaunchItem)
+            {
+                topscreen.removeView((FrameLayout) lastview);
+                backStack.remove(backStack.size() - 1);
+            }
+
+            if (lastview instanceof WebFrame)
+            {
+                if (((WebFrame) lastview).doBackPressed())
+                {
+                    topscreen.removeView((FrameLayout) lastview);
+                    backStack.remove(backStack.size() - 1);
+                }
+            }
 
             return;
         }

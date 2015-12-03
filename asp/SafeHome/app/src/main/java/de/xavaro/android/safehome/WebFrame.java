@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
@@ -69,5 +70,19 @@ public class WebFrame extends FrameLayout
     public void setLoadURL(String url)
     {
         webview.loadUrl(url);
+    }
+
+    public boolean doBackPressed()
+    {
+        Log.d(LOGTAG, "doBackPressed");
+
+        if (webview.canGoBack())
+        {
+            webview.goBack();
+
+            return false;
+        }
+
+        return true;
     }
 }
