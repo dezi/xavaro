@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -46,6 +47,7 @@ public class WebFrame extends FrameLayout
         myInit(context);
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void myInit(Context context)
     {
         this.context = context;
@@ -65,10 +67,11 @@ public class WebFrame extends FrameLayout
         webview.setWebViewClient(webguard);
 
         webview.getSettings().setJavaScriptEnabled(true);
+        webview.getSettings().setSupportZoom(true);
+
         webview.getSettings().setDomStorageEnabled(false);
         webview.getSettings().setAppCacheEnabled(false);
         webview.getSettings().setDatabaseEnabled(false);
-        webview.getSettings().setSupportZoom(true);
 
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
@@ -79,7 +82,7 @@ public class WebFrame extends FrameLayout
 
     //region Static methods.
 
-    public static JSONObject config = null;
+    private static JSONObject config = null;
 
     public static JSONObject getConfig(Context context)
     {
@@ -89,7 +92,7 @@ public class WebFrame extends FrameLayout
             {
                 config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframes).getJSONObject("webframes");
             }
-            catch (JSONException ex)
+            catch (Exception ex)
             {
                 Log.e(LOGTAG, "getConfig: Cannot read default webframes.");
             }
@@ -115,7 +118,7 @@ public class WebFrame extends FrameLayout
     {
         try
         {
-            String iconurl = getConfig(context).getJSONObject(website).getString("icon");
+            String iconurl = getConfig(context,website).getString("icon");
             String iconext = MimeTypeMap.getFileExtensionFromUrl(iconurl);
             String iconfile = website + ".thumbnail." + iconext;
             Bitmap thumbnail = CacheManager.cacheThumbnail(context,iconfile,iconurl);
@@ -124,7 +127,7 @@ public class WebFrame extends FrameLayout
 
             return new BitmapDrawable(context.getResources(),thumbnail);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -135,9 +138,9 @@ public class WebFrame extends FrameLayout
     {
         try
         {
-            return getConfig(context).getJSONObject(website).getString("label");
+            return getConfig(context,website).getString("label");
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -150,7 +153,7 @@ public class WebFrame extends FrameLayout
         {
             return getConfig(context).getJSONObject(website).getString("url");
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 

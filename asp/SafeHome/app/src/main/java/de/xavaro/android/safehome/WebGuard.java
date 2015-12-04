@@ -2,18 +2,50 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class WebGuard extends WebViewClient
 {
-    private final String LOGTAG = "WebGuard";
+    private final static String LOGTAG = "WebGuard";
 
     private Context context;
+
+    //region Static methods.
+
+    private static JSONObject config = null;
+
+    public static JSONObject getConfig(Context context)
+    {
+        if (config == null)
+        {
+            try
+            {
+                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframes).getJSONObject("webguard");
+            }
+            catch (Exception ex)
+            {
+                Log.e(LOGTAG, "getConfig: Cannot read default webguard.");
+            }
+        }
+
+        return config;
+    }
+
+    //endregion
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url)
@@ -49,6 +81,10 @@ public class WebGuard extends WebViewClient
 
             return new WebResourceResponse("text/plain", "utf-8", null);
         }
+
+        Uri uri = Uri.parse(url);
+
+        //uri.getHost().endsWith();
 
         if (url.contains("krxd.net/") ||
                 url.contains("shop.mopo.de/") ||
