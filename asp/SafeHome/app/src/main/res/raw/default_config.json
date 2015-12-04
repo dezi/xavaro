@@ -81,9 +81,38 @@
               "label": "MOPO",
               "type": "webframe",
               "url": "http://mobil.mopo.de/",
-              "icon": "https://pbs.twimg.com/profile_images/542314616097734657/0Fp6DpVa.jpeg"
+              "icon": "https://pbs.twimg.com/profile_images/542314616097734657/0Fp6DpVa_400x400.jpeg"
+            },
+            {
+              "label": "Petra",
+              "type": "webframe",
+              "url": "http://m.petra.de/",
+              "icon": "http://m.petra.de/sites/petra/themes/mpetra/images/petra_logo.png"
+            },
+            {
+              "label": "Focus",
+              "type": "webframe",
+              "url": "http://m.focus.de/",
+              "icon": "https://pbs.twimg.com/profile_images/142508522/FOCUS-Facebook_400x400.jpg"
+            },
+            {
+              "label": "Nat Geo",
+              "type": "webframe",
+              "url": "http://m.nationalgeographic.de/",
+              "icon": "https://pbs.twimg.com/profile_images/648950685074071552/ZREwOKBz_400x400.jpg"
+            },
+            {
+              "label": "FAZ Online",
+              "type": "webframe",
+              "url": "http://m.faz.de/",
+              "icon": "https://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg"
+            },
+            {
+              "label": "Apo Umschau",
+              "type": "webframe",
+              "url": "http://m.apotheken-umschau.de/",
+              "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Apotheke_Deutschland_Logo.svg/757px-Apotheke_Deutschland_Logo.svg.png"
             }
-
           ]
         }
       },

@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -34,6 +36,8 @@ public class HomeActivity extends AppCompatActivity
 
     private boolean wasPaused = false;
     private boolean lostFocus = true;
+
+    private final Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -134,9 +138,52 @@ public class HomeActivity extends AppCompatActivity
         lostFocus = ! hasFocus;
     }
 
+    //region Region: onBackPressed handling.
+
+    //
+    // Execute back presses either within internal
+    // stack, call configuration if back pressed
+    // serveral times or return to android system.
+    //
+
+    private long backPressedTime = 0;
+    private int backPressedCount = 0;
+    private ArrayList backStack = new ArrayList();
+
+    public void addViewToBackStack(Object view)
+    {
+        topscreen.addView((FrameLayout) view);
+        backStack.add((FrameLayout) view);
+    }
+
+    private final Runnable delayOnBackPressed = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            executeOnBackPressed();
+        }
+    };
+
+    public void executeOnBackPressed()
+    {
+        if (! StaticUtils.isDefaultHome(this))
+        {
+            //
+            // Finally release user to system.
+            //
+
+            super.onBackPressed();
+        }
+    }
+
     @Override
     public void onBackPressed()
     {
+        //
+        // Internal back stack operation.
+        //
+
         if (backStack.size() > 0)
         {
             Object lastview = backStack.get(backStack.size() - 1);
@@ -159,8 +206,40 @@ public class HomeActivity extends AppCompatActivity
             return;
         }
 
-        super.onBackPressed();
+        //
+        // Top level back press handling.
+        //
+
+        long now = System.currentTimeMillis();
+
+        if ((now - backPressedTime) > 1000)
+        {
+            backPressedCount = 0;
+        }
+        else
+        {
+            backPressedCount += 1;
+        }
+
+        backPressedTime = now;
+
+        handler.removeCallbacks(delayOnBackPressed);
+
+        if (backPressedCount >= 4)
+        {
+            Toast.makeText(this,"Konfig.......",Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            //
+            // Execute back press within given time.
+            //
+
+            handler.postDelayed(delayOnBackPressed,1500);
+        }
     }
+
+    //endregion
 
     private void createConfig()
     {
@@ -181,14 +260,6 @@ public class HomeActivity extends AppCompatActivity
         {
             ex.printStackTrace();
         }
-    }
-
-    private ArrayList backStack = new ArrayList();
-
-    public void addLauncherToBackStack(Object view)
-    {
-        topscreen.addView((FrameLayout) view);
-        backStack.add((FrameLayout) view);
     }
 
     private ServiceConnection kioskConnection = new ServiceConnection()

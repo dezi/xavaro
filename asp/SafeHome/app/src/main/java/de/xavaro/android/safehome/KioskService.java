@@ -259,7 +259,7 @@ public class KioskService extends Service
                 recentProc = proc;
             }
 
-            if (blockit || (alertMessage == null) || ! alertMessage.equals(currentMessage))
+            if ((alertMessage == null) || ! alertMessage.equals(currentMessage))
             {
                 alertMessage = currentMessage;
 
@@ -276,7 +276,7 @@ public class KioskService extends Service
                 }
             }
 
-            if (blockit && isDefaultHome())
+            if (blockit && StaticUtils.isDefaultHome(this))
             {
                 restoreRecentProc();
             }
@@ -308,15 +308,6 @@ public class KioskService extends Service
         }
     }
 
-    private boolean isDefaultHome()
-    {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo res = getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo != null) && res.activityInfo.packageName.equals(getPackageName());
-    }
-
     //
     // Set if main activity has focus.
     //
@@ -325,6 +316,7 @@ public class KioskService extends Service
     {
         Log.d(LOGTAG, "setFocused: " + activity + "=" + hasFocus);
 
+        recentProc = getPackageName();
         focused = hasFocus;
     }
 

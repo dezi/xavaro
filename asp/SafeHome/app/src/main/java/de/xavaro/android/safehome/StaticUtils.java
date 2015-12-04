@@ -501,4 +501,13 @@ public class StaticUtils
 
         return null;
     }
+
+    public static boolean isDefaultHome(Context context)
+    {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
+    }
 }

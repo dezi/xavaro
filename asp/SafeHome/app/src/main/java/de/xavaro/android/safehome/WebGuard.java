@@ -78,7 +78,19 @@ public class WebGuard extends WebViewClient
                 url.contains("laterpay.net/") ||
                 url.contains("optimizely.com/") ||
                 url.contains("edelight.biz/") ||
+                url.contains("xplosion.de/") ||
+                url.contains("banner.t-online.de/") ||
                 url.contains("emsservice.de/") ||
+                url.contains("intellitxt.com/") ||
+                url.contains("theadex.com/") ||
+                url.contains("adtech.de/") ||
+                url.contains("mxcdn.net/") ||
+                url.contains("2mdn.net/") ||
+                url.contains("lp4.io/") ||
+                url.contains("adnxs.com/") ||
+                url.contains("research.de.com/") ||
+                url.contains("visualrevenue.com/") ||
+                url.contains("scorecardresearch.com/") ||
                 url.contains("adobedtm.com/") ||
                 url.contains("stroeerdigitalmedia.de/") ||
                 url.contains("plista.com/") ||

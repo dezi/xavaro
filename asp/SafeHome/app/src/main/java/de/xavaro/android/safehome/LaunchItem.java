@@ -16,7 +16,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.TimedText;
 import android.net.Uri;
-import android.provider.Settings;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -477,7 +476,7 @@ public class LaunchItem extends FrameLayout
             {
                 //m_Text = input.getText().toString();
 
-                ((HomeActivity) context).addLauncherToBackStack(directory);
+                ((HomeActivity) context).addViewToBackStack(directory);
             }
         });
 
@@ -521,7 +520,7 @@ public class LaunchItem extends FrameLayout
             }
         }
 
-        ((HomeActivity) context).addLauncherToBackStack(directory);
+        ((HomeActivity) context).addViewToBackStack(directory);
     }
 
     private void launchWebframe()
@@ -543,7 +542,7 @@ public class LaunchItem extends FrameLayout
                 webview.setLoadURL(url);
             }
 
-            ((HomeActivity) context).addLauncherToBackStack(webview);
+            ((HomeActivity) context).addViewToBackStack(webview);
         }
         catch (Exception ex)
         {
@@ -551,7 +550,7 @@ public class LaunchItem extends FrameLayout
         }
     }
 
-    private void launchDeveloper()
+    private void launchDeveloperOld1()
     {
         //StaticUtils.getAllInstalledApps(context);
 
@@ -570,9 +569,53 @@ public class LaunchItem extends FrameLayout
         context.startActivity(intentOpenBluetoothSettings);
         */
 
+        /*
         Intent goToMarket = new Intent(Intent.ACTION_VIEW);
         goToMarket.setData(Uri.parse("market://details?id=org.wikipedia"));
         context.startActivity(goToMarket);
+        */
+
+        /*
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW);
+        goToMarket.setData(Uri.parse("market://details?id=com.whatsapp"));
+        context.startActivity(goToMarket);
+        */
+    }
+
+    private void launchDeveloper()
+    {
+        MediaPlayer mPlayer = new MediaPlayer();
+
+        try
+        {
+            mPlayer.setDataSource(context,Uri.parse("http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/index_320_av-p.m3u8?sd=10&rebase=on"));
+
+            mPlayer.setOnTimedTextListener(
+                    new MediaPlayer.OnTimedTextListener()
+                    {
+                        @Override
+                        public void onTimedText(MediaPlayer mp, TimedText text)
+                        {
+                            Log.d("PLLLLLLL", text.getText());
+                        }
+
+                    });
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
+        try
+        {
+            mPlayer.prepare();
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
+        mPlayer.start();
     }
 
     private void launchDeveloperAudio()
