@@ -90,7 +90,7 @@ public class WebFrame extends FrameLayout
         {
             try
             {
-                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframes).getJSONObject("webframes");
+                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframe).getJSONObject("webframes");
             }
             catch (Exception ex)
             {

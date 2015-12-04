@@ -1,5 +1,5 @@
 {
- "wewbguard": {
+ "webguard": {
    "domains": {
      "allow": [
       ],
@@ -26,6 +26,7 @@
        "*.googletagservices.com",
        "*.intellitxt.com",
        "*.ioam.de",
+       "*.krxd.net",
        "*.laterpay.net",
        "*.ligatus.com",
        "*.lp4.io",
@@ -40,6 +41,7 @@
        "*.research.de.com",
        "*.revsci.net",
        "*.scorecardresearch.com",
+       "*.smartadserver.com",
        "*.stickyadstv.com",
        "*.stroeerdigitalmedia.de",
        "*.tfag.de",

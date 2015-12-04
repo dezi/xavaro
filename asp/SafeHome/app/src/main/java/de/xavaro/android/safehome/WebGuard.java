@@ -2,12 +2,8 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -34,7 +30,7 @@ public class WebGuard extends WebViewClient
         {
             try
             {
-                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframes).getJSONObject("webguard");
+                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webguard).getJSONObject("webguard");
             }
             catch (Exception ex)
             {
@@ -43,6 +39,34 @@ public class WebGuard extends WebViewClient
         }
 
         return config;
+    }
+
+    public static JSONArray getDomainsAllow(Context context)
+    {
+        try
+        {
+            return getConfig(context).getJSONObject("domains").getJSONArray("allow");
+        }
+        catch (Exception ex)
+        {
+            Log.e(LOGTAG, "getDomainsAllow: Cannot read config.");
+        }
+
+        return null;
+    }
+
+    public static JSONArray getDomainsDeny(Context context)
+    {
+        try
+        {
+            return getConfig(context).getJSONObject("domains").getJSONArray("deny");
+        }
+        catch (Exception ex)
+        {
+            Log.e(LOGTAG, "getDomainsAllow: Cannot read config.");
+        }
+
+        return null;
     }
 
     //endregion
@@ -73,80 +97,128 @@ public class WebGuard extends WebViewClient
         return checkUrlResource(url);
     }
 
+    //
+    // Validate host name against wildcard domain specification.
+    //
+    private boolean validateHost(String host,String domain)
+    {
+        if (domain.startsWith("*."))
+        {
+            String rest = domain.substring(2);
+
+            //Log.d(LOGTAG,"tubu <" + domain + ">" + host);
+
+            String[] restparts = rest.split("\\.");
+            String[] hostparts = host.split("\\.");
+
+            int restinx = restparts.length - 1;
+            int hostinx = hostparts.length - 1;
+
+            while ((restinx >= 0) && (hostinx >= 0))
+            {
+                if (! restparts[ restinx ].equals(hostparts[ hostinx ]))
+                {
+                    return false;
+                }
+
+                restinx--;
+                hostinx--;
+            }
+
+            return true;
+        }
+
+        return host.equals(domain);
+    }
+
     private WebResourceResponse checkUrlResource(String url)
     {
-        if (url.contains("smartadserver.com") && (! url.contains("diff/251")))
+        if (url.contains("smartadserver.com") && url.contains("diff/251"))
         {
-            Log.d(LOGTAG, "Kill URL=" + url);
+            Log.d(LOGTAG, "Allow URL=" + url);
 
-            return new WebResourceResponse("text/plain", "utf-8", null);
+            return null;
         }
 
         Uri uri = Uri.parse(url);
+        String host = uri.getHost();
 
-        //uri.getHost().endsWith();
+        JSONArray domain_allow = getDomainsAllow(context);
+        JSONArray domain_deny  = getDomainsDeny(context);
 
-        if (url.contains("krxd.net/") ||
-                url.contains("shop.mopo.de/") ||
-                url.contains("alster.mopo.de/") ||
-                url.contains("www.express.de/") ||
-                url.contains("praeludium_mopo.js") ||
-                url.contains("doubleclick.net/") ||
-                url.contains("adition.com/") ||
-                url.contains("yoc.com/") ||
-                url.contains("m6r.eu/") ||
-                url.contains("71i.de/") ||
-                url.contains("ioam.de/") ||
-                url.contains("criteo.com/") ||
-                url.contains("amobee.com/") ||
-                url.contains("yieldlab.net/") ||
-                url.contains("meetrics.net/") ||
-                url.contains("revsci.net/") ||
-                url.contains("tfag.de/") ||
-                url.contains("movad.de/") ||
-                url.contains("outbrain.com/") ||
-                url.contains("nuggad.net/") ||
-                url.contains("wt-eu02.net/") ||
-                url.contains("veeseo.com/") ||
-                url.contains("addthis.com/") ||
-                url.contains("ligatus.com/") ||
-                url.contains("emetriq.de/") ||
-                url.contains("laterpay.net/") ||
-                url.contains("optimizely.com/") ||
-                url.contains("edelight.biz/") ||
-                url.contains("xplosion.de/") ||
-                url.contains("banner.t-online.de/") ||
-                url.contains("emsservice.de/") ||
-                url.contains("intellitxt.com/") ||
-                url.contains("theadex.com/") ||
-                url.contains("adtech.de/") ||
-                url.contains("mxcdn.net/") ||
-                url.contains("2mdn.net/") ||
-                url.contains("lp4.io/") ||
-                url.contains("adnxs.com/") ||
-                url.contains("research.de.com/") ||
-                url.contains("visualrevenue.com/") ||
-                url.contains("scorecardresearch.com/") ||
-                url.contains("adobedtm.com/") ||
-                url.contains("stroeerdigitalmedia.de/") ||
-                url.contains("plista.com/") ||
-                url.contains("stickyadstv.com/") ||
-                url.contains("elasticbeanstalk.com/") ||
-                url.contains("amazon-adsystem.com/") ||
-                url.contains("google-analytics.com/") ||
-                url.contains("googletagmanager.com/") ||
-                url.contains("googlesyndication.com/") ||
-                url.contains("googletagservices.com/") ||
-                url.contains("googleadservices.com/"))
+        boolean allow;
+        String domain;
+        int inx;
+
+        //
+        // Check positive domain list.
+        //
+
+        allow = false;
+
+        if (domain_allow != null)
         {
-            Log.d(LOGTAG, "Kill URL=" + url);
+            try
+            {
+                for (inx = 0; inx < domain_allow.length(); inx++)
+                {
+                    domain = domain_allow.getString(inx);
+
+                    if (validateHost(host,domain))
+                    {
+                        allow = true;
+                        break;
+                    }
+                }
+            }
+            catch (JSONException ignore)
+            {
+            }
+        }
+
+        if (allow)
+        {
+            Log.d(LOGTAG,"checkUrlResource: allow " + host);
+
+            return null;
+        }
+
+        //
+        // Check negative domain list.
+        //
+
+        allow = true;
+
+        if (domain_deny != null)
+        {
+            try
+            {
+                for (inx = 0; inx < domain_deny.length(); inx++)
+                {
+                    domain = domain_deny.getString(inx);
+
+                    if (validateHost(host,domain))
+                    {
+                        allow = false;
+                        break;
+                    }
+                }
+            }
+            catch (JSONException ignore)
+            {
+            }
+        }
+
+        if (! allow)
+        {
+            Log.d(LOGTAG, "checkUrlResource: deny " + host);
 
             return new WebResourceResponse("text/plain", "utf-8", null);
         }
 
-        if ((! url.endsWith(".png")) && (! url.endsWith(".jpg")) && (! url.endsWith(".ico")))
+        if ((! url.endsWith(".png")) && (! url.endsWith(".jpg")) && (! url.endsWith(".gif")) && (! url.endsWith(".ico")))
         {
-            Log.d(LOGTAG, "Load URL=" + url);
+            Log.d(LOGTAG, "checkUrlResource: load " + host);
         }
 
         return null;
