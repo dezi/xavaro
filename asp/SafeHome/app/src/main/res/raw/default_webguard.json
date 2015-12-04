@@ -1,0 +1,56 @@
+{
+ "wewbguard": {
+   "domains": {
+     "allow": [
+      ],
+     "deny": [
+       "*.2mdn.net",
+       "*.71i.de",
+       "*.addthis.com",
+       "*.adition.com",
+       "*.adnxs.com",
+       "*.adobedtm.com",
+       "*.adtech.de",
+       "*.amazon-adsystem.com",
+       "*.amobee.com",
+       "*.criteo.com",
+       "*.doubleclick.net",
+       "*.edelight.biz",
+       "*.elasticbeanstalk.com",
+       "*.emetriq.de",
+       "*.emsservice.de",
+       "*.google-analytics.com",
+       "*.googleadservices.com",
+       "*.googlesyndication.com",
+       "*.googletagmanager.com",
+       "*.googletagservices.com",
+       "*.intellitxt.com",
+       "*.ioam.de",
+       "*.laterpay.net",
+       "*.ligatus.com",
+       "*.lp4.io",
+       "*.m6r.eu",
+       "*.meetrics.net",
+       "*.movad.de",
+       "*.mxcdn.net",
+       "*.nuggad.net",
+       "*.optimizely.com",
+       "*.outbrain.com",
+       "*.plista.com",
+       "*.research.de.com",
+       "*.revsci.net",
+       "*.scorecardresearch.com",
+       "*.stickyadstv.com",
+       "*.stroeerdigitalmedia.de",
+       "*.tfag.de",
+       "*.theadex.com",
+       "*.veeseo.com",
+       "*.visualrevenue.com",
+       "*.wt-eu02.net",
+       "*.xplosion.de",
+       "*.yieldlab.net",
+       "*.yoc.com"
+      ]
+    }
+  }
+}
