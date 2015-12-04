@@ -1,20 +1,29 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class WebFrame extends FrameLayout
 {
-    private final String LOGTAG = "WebFrameLayout";
+    private final static String LOGTAG = "WebFrameLayout";
 
     private Context context;
 
     private WebView webview;
     private WebGuard webguard;
+
+    //region Region: Constructor logic.
 
     public WebFrame(Context context)
     {
@@ -65,6 +74,90 @@ public class WebFrame extends FrameLayout
 
         addView(webview);
     }
+
+    //endregion
+
+    //region Static methods.
+
+    public static JSONObject config = null;
+
+    public static JSONObject getConfig(Context context)
+    {
+        if (config == null)
+        {
+            try
+            {
+                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframes).getJSONObject("webframes");
+            }
+            catch (JSONException ex)
+            {
+                Log.e(LOGTAG, "getConfig: Cannot read default webframes.");
+            }
+        }
+
+        return config;
+    }
+
+    public static JSONObject getConfig(Context context,String website)
+    {
+        try
+        {
+            return getConfig(context).getJSONObject(website);
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    public static Drawable getConfigIconDrawable(Context context,String website)
+    {
+        try
+        {
+            String iconurl = getConfig(context).getJSONObject(website).getString("icon");
+            String iconext = MimeTypeMap.getFileExtensionFromUrl(iconurl);
+            String iconfile = website + ".thumbnail." + iconext;
+            Bitmap thumbnail = CacheManager.cacheThumbnail(context,iconfile,iconurl);
+
+            Log.d(LOGTAG,"getIconDrawable: " + iconurl + "=>" + iconext);
+
+            return new BitmapDrawable(context.getResources(),thumbnail);
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    public static String getConfigLabel(Context context,String website)
+    {
+        try
+        {
+            return getConfig(context).getJSONObject(website).getString("label");
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    public static String getConfigUrl(Context context,String website)
+    {
+        try
+        {
+            return getConfig(context).getJSONObject(website).getString("url");
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    //endregion
 
     public void setLoadURL(String url)
     {

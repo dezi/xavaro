@@ -42,76 +42,52 @@
         "launchgroup": {
           "launchitems": [
             {
-              "label": "Bild Online",
               "type": "webframe",
-              "url": "http://m.bild.de",
-              "icon": "http://bilder.bild.de/fotos/bild-logo-35166394/Bild/29.bild.png"
+              "name": "m.bild.de"
             },
             {
-              "label": "Spiegel Online",
               "type": "webframe",
-              "url": "http://m.spiegel.de",
-              "icon": "http://www.spiegel.de/static/sys/v10/logo/fb_logo_default.jpg"
+              "name": "m.spiegel.de"
             },
             {
-              "label": "Gala",
               "type": "webframe",
-              "url": "http://m.gala.de",
-              "icon": "http://www.gala.de/bundles/gujcmscontentfrontend/images/gala_logo.png"
+              "name": "m.gala.de"
             },
             {
-              "label": "Bunte",
               "type": "webframe",
-              "url": "http://mobil.bunte.de",
-              "icon": "http://i2.bstatic.de/sites/all/themes/custom/bunte/images/rebrush-2014/sprite-global/bunte-navi-logo.png"
+              "name": "mobil.bunte.de"
             },
             {
-              "label": "Manager Magazin",
               "type": "webframe",
-              "url": "http://m.manager-magazin.de/",
-              "icon": "https://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH.png"
+              "name": "m.manager-magazin.de"
             },
             {
-              "label": "Stern",
               "type": "webframe",
-              "url": "http://mobil.stern.de/",
-              "icon": "https://pbs.twimg.com/profile_images/453882199477985280/XAAheikJ_400x400.png"
+              "name": "mobil.stern.de"
             },
             {
-              "label": "MOPO",
               "type": "webframe",
-              "url": "http://mobil.mopo.de/",
-              "icon": "https://pbs.twimg.com/profile_images/542314616097734657/0Fp6DpVa_400x400.jpeg"
+              "name": "mobil.mopo.de"
             },
             {
-              "label": "Petra",
               "type": "webframe",
-              "url": "http://m.petra.de/",
-              "icon": "http://m.petra.de/sites/petra/themes/mpetra/images/petra_logo.png"
+              "name": "m.petra.de"
             },
             {
-              "label": "Focus",
               "type": "webframe",
-              "url": "http://m.focus.de/",
-              "icon": "https://pbs.twimg.com/profile_images/142508522/FOCUS-Facebook_400x400.jpg"
+              "name": "m.focus.de"
             },
             {
-              "label": "Nat Geo",
               "type": "webframe",
-              "url": "http://m.nationalgeographic.de/",
-              "icon": "https://pbs.twimg.com/profile_images/648950685074071552/ZREwOKBz_400x400.jpg"
+              "name": "m.faz.de"
             },
             {
-              "label": "FAZ Online",
               "type": "webframe",
-              "url": "http://m.faz.de/",
-              "icon": "https://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg"
+              "name": "www.playboy.de"
             },
             {
-              "label": "Apo Umschau",
               "type": "webframe",
-              "url": "http://m.apotheken-umschau.de/",
-              "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Apotheke_Deutschland_Logo.svg/757px-Apotheke_Deutschland_Logo.svg.png"
+              "name": "www.bento.de"
             }
           ]
         }

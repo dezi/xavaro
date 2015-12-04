@@ -54,6 +54,16 @@
       "label": "FAZ Online",
       "url": "http://m.faz.de/",
       "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg"
+    },
+    "www.bento.de": {
+      "label": "bento",
+      "url": "http://www.bento.de/",
+      "icon": "http://pbs.twimg.com/profile_images/652103303103385600/e_TKuZ3q_400x400.jpg"
+    },
+    "www.playboy.de": {
+      "label": "Playboy",
+      "url": "http://www.playboy.de/",
+      "icon": "http://pbs.twimg.com/profile_images/668931765080227840/ZgR1OKJI_400x400.png"
     }
   }
 }

@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,12 +14,16 @@ import java.net.URL;
 
 public class CacheManager
 {
+    private final static String LOGTAG = "CacheManager";
+
     public static Bitmap cacheThumbnail(Context context,String filename,String src)
     {
         File file = new File(context.getCacheDir(), filename);
 
         if (! file.exists())
         {
+            Log.d(LOGTAG,"cacheThumbnail: fetch " + filename);
+
             try
             {
                 URL url = new URL(src);
@@ -46,10 +51,14 @@ public class CacheManager
 
                 return null;
             }
+
+            Log.d(LOGTAG,"cacheThumbnail: fetch done");
         }
 
         if (file.exists())
         {
+            Log.d(LOGTAG,"cacheThumbnail: load " + file.toString());
+
             try
             {
                 FileInputStream input = new FileInputStream(file);
@@ -57,6 +66,8 @@ public class CacheManager
                 Bitmap myBitmap = BitmapFactory.decodeStream(input);
 
                 input.close();
+
+                Log.d(LOGTAG, "cacheThumbnail: load done ");
 
                 return myBitmap;
 

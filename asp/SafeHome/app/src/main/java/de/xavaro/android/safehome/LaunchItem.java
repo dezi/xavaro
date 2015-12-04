@@ -149,10 +149,12 @@ public class LaunchItem extends FrameLayout
 
         try
         {
-            label.setText(config.getString("label"));
-            setVisibility(VISIBLE);
-
-            Log.d(LOGTAG, config.getString("label"));
+            if (config.has("label"))
+            {
+                label.setText(config.getString("label"));
+                Log.d(LOGTAG, config.getString("label"));
+                setVisibility(VISIBLE);
+            }
 
             packageName = config.has("packagename") ? config.getString("packagename") : null;
 
@@ -241,6 +243,22 @@ public class LaunchItem extends FrameLayout
                             icon.setVisibility(VISIBLE);
                             targetIcon = overicon;
                         }
+                    }
+                }
+
+                if (type.equals("webframe"))
+                {
+                    if (config.has("name"))
+                    {
+                        String name = config.getString("name");
+
+                        label.setText(WebFrame.getConfigLabel(context, name));
+                        setVisibility(VISIBLE);
+
+                        icon.setImageDrawable(WebFrame.getConfigIconDrawable(context, name));
+                        icon.setVisibility(VISIBLE);
+
+                        targetIcon = overicon;
                     }
                 }
             }
@@ -525,9 +543,9 @@ public class LaunchItem extends FrameLayout
 
     private void launchWebframe()
     {
-        if (! config.has("url"))
+        if (! config.has("name"))
         {
-            Toast.makeText(getContext(),"Nix <url> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"Nix <name> configured.",Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -536,7 +554,7 @@ public class LaunchItem extends FrameLayout
         {
             if (webview == null)
             {
-                String url = config.getString("url");
+                String url = WebFrame.getConfigUrl(context,config.getString("name"));
 
                 webview = new WebFrame(context);
                 webview.setLoadURL(url);
