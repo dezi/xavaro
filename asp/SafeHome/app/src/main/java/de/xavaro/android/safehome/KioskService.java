@@ -101,7 +101,7 @@ public class KioskService extends Service
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        alertToast = Toast.makeText(this, "...", Toast.LENGTH_LONG);
+        alertToast = Toast.makeText(this, "Clicken Sie 5 x Back zum Öffnen der Einstellungen", Toast.LENGTH_LONG);
 
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         wm.addView(alertToast.getView(),alp);

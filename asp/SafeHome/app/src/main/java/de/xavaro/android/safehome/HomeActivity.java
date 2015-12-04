@@ -148,12 +148,13 @@ public class HomeActivity extends AppCompatActivity
 
     private long backPressedTime = 0;
     private int backPressedCount = 0;
+
     private ArrayList backStack = new ArrayList();
 
     public void addViewToBackStack(Object view)
     {
         topscreen.addView((FrameLayout) view);
-        backStack.add((FrameLayout) view);
+        backStack.add(view);
     }
 
     private final Runnable delayOnBackPressed = new Runnable()
@@ -196,6 +197,11 @@ public class HomeActivity extends AppCompatActivity
 
             if (lastview instanceof WebFrame)
             {
+                //
+                // Give web browser option to do
+                // internal back press.
+                //
+
                 if (((WebFrame) lastview).doBackPressed())
                 {
                     topscreen.removeView((FrameLayout) lastview);
