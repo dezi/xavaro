@@ -11,11 +11,13 @@ import android.util.DisplayMetrics;
 //
 // SDK version specific utility methods.
 //
+
 public class VersionUtils
 {
     //
     // Get SDK compliant drawable resource.
     //
+
     public static Drawable getDrawableFromResources(Context context,int id)
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -30,6 +32,7 @@ public class VersionUtils
     //
     // Get SDK compliant drawable resource.
     //
+
     public static Drawable getIconFromApplication(Context context,String packageName)
     {
         try
@@ -60,6 +63,7 @@ public class VersionUtils
     //
     // Get best density value for SDK version.
     //
+
     public static int getBestDensity()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)

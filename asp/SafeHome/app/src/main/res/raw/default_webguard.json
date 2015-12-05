@@ -1,58 +1,107 @@
 {
- "webguard": {
-   "domains": {
-     "allow": [
-      ],
-     "deny": [
-       "*.2mdn.net",
-       "*.71i.de",
-       "*.addthis.com",
-       "*.adition.com",
-       "*.adnxs.com",
-       "*.adobedtm.com",
-       "*.adtech.de",
-       "*.amazon-adsystem.com",
-       "*.amobee.com",
-       "*.criteo.com",
-       "*.doubleclick.net",
-       "*.edelight.biz",
-       "*.elasticbeanstalk.com",
-       "*.emetriq.de",
-       "*.emsservice.de",
-       "*.google-analytics.com",
-       "*.googleadservices.com",
-       "*.googlesyndication.com",
-       "*.googletagmanager.com",
-       "*.googletagservices.com",
-       "*.intellitxt.com",
-       "*.ioam.de",
-       "*.krxd.net",
-       "*.laterpay.net",
-       "*.ligatus.com",
-       "*.lp4.io",
-       "*.m6r.eu",
-       "*.meetrics.net",
-       "*.movad.de",
-       "*.mxcdn.net",
-       "*.nuggad.net",
-       "*.optimizely.com",
-       "*.outbrain.com",
-       "*.plista.com",
-       "*.research.de.com",
-       "*.revsci.net",
-       "*.scorecardresearch.com",
-       "*.smartadserver.com",
-       "*.stickyadstv.com",
-       "*.stroeerdigitalmedia.de",
-       "*.tfag.de",
-       "*.theadex.com",
-       "*.veeseo.com",
-       "*.visualrevenue.com",
-       "*.wt-eu02.net",
-       "*.xplosion.de",
-       "*.yieldlab.net",
-       "*.yoc.com"
-      ]
+  "webguard": {
+
+    //
+    // Follow links control.
+    //
+
+    "links": {
+
+      //
+      // Domain wildcard specs on follow links hosts.
+      //
+
+      "domains": {
+
+        "allow": [
+        ],
+
+        "deny": [
+        ]
+      }
+    },
+
+    //
+    // Resource loading control.
+    //
+
+    "resource": {
+
+        //
+        // Regular expressions on loading resource urls.
+        //
+
+        "regex": {
+
+          "allow": [
+            "(http|https)\\:\\/\\/.*?\\.smartadserver\\.com\\/.*?diff\\/251.*"
+          ],
+
+          "deny": [
+          ]
+        },
+
+        //
+        // Domain wildcard specs on loading resource hosts.
+        //
+
+        "domains": {
+
+          "allow": [
+          ],
+
+          "deny": [
+            "*.2mdn.net",
+            "*.71i.de",
+            "*.addthis.com",
+            "*.adition.com",
+            "*.adnxs.com",
+            "*.adobedtm.com",
+            "*.adtech.de",
+            "*.amazon-adsystem.com",
+            "*.amobee.com",
+            "*.criteo.com",
+            "*.doubleclick.net",
+            "*.edelight.biz",
+            "*.elasticbeanstalk.com",
+            "*.emetriq.de",
+            "*.emsservice.de",
+            "*.google-analytics.com",
+            "*.googleadservices.com",
+            "*.googlesyndication.com",
+            "*.googletagmanager.com",
+            "*.googletagservices.com",
+            "*.intellitxt.com",
+            "*.ioam.de",
+            "*.krxd.net",
+            "*.laterpay.net",
+            "*.ligatus.com",
+            "*.lp4.io",
+            "*.m6r.eu",
+            "*.meetrics.net",
+            "*.movad.de",
+            "*.mxcdn.net",
+            "*.nuggad.net",
+            "*.optimizely.com",
+            "*.outbrain.com",
+            "*.plista.com",
+            "*.research.de.com",
+            "*.revsci.net",
+            "*.scorecardresearch.com",
+            "*.smartadserver.com",
+            "*.stickyadstv.com",
+            "*.stroeerdigitalmedia.de",
+            "*.tfag.de",
+            "*.theadex.com",
+            "*.veeseo.com",
+            "*.visualrevenue.com",
+            "*.wt-eu02.net",
+            "*.xplosion.de",
+            "*.yieldlab.net",
+            "*.yoc.com"
+          ]
+        }
+      }
     }
   }
 }

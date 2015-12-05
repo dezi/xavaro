@@ -1,65 +1,78 @@
 {
   "webframes": {
+
     "m.bild.de": {
       "label": "Bild Online",
       "url": "http://m.bild.de/",
       "icon": "http://pbs.twimg.com/profile_images/581217823067885569/h57YmPKm_400x400.png"
     },
+
     "m.spiegel.de": {
       "label": "Spiegel Online",
       "url": "http://m.spiegel.de/",
       "icon": "http://pbs.twimg.com/profile_images/1719664041/tw_spon_400x400.jpg"
     },
+
     "m.gala.de": {
       "label": "Gala",
       "url": "http://m.gala.de/",
       "icon": "http://pbs.twimg.com/profile_images/568402279900794880/PSCQkXzW_400x400.png"
     },
+
     "mobil.bunte.de": {
       "label": "Bunte",
       "url": "http://mobil.bunte.de/",
       "icon": "http://pbs.twimg.com/profile_images/308504986/bunte_only_400x400.jpg"
     },
+
     "m.manager-magazin.de": {
       "label": "Manager Magazin",
       "url": "http://m.manager-magazin.de/",
       "icon": "http://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH_400x400.png"
     },
+
     "mobil.stern.de": {
       "label": "Stern",
       "url": "http://mobil.stern.de/",
       "icon": "http://pbs.twimg.com/profile_images/453882199477985280/XAAheikJ_400x400.png"
     },
+
     "mobil.mopo.de": {
       "label": "MOPO",
       "url": "http://mobil.mopo.de/",
       "icon": "http://pbs.twimg.com/profile_images/542314616097734657/0Fp6DpVa_400x400.jpeg"
     },
+
     "m.petra.de": {
       "label": "Petra",
       "url": "http://m.petra.de/",
       "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg"
     },
+
     "m.focus.de": {
       "label": "Focus",
       "url": "http://m.focus.de/",
       "icon": "http://pbs.twimg.com/profile_images/142508522/FOCUS-Facebook_400x400.jpg"
     },
+
     "m.nationalgeographic.de": {
       "label": "National Geo",
       "url": "http://m.nationalgeographic.de/",
       "icon": "http://pbs.twimg.com/profile_images/648950685074071552/ZREwOKBz_400x400.jpg"
     },
+
     "m.faz.de": {
       "label": "FAZ Online",
       "url": "http://m.faz.de/",
       "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg"
     },
+
     "www.bento.de": {
       "label": "bento",
       "url": "http://www.bento.de/",
       "icon": "http://pbs.twimg.com/profile_images/652103303103385600/e_TKuZ3q_400x400.jpg"
     },
+
     "www.playboy.de": {
       "label": "Playboy",
       "url": "http://www.playboy.de/",

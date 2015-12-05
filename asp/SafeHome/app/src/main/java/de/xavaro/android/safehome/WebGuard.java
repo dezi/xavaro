@@ -1,18 +1,23 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.content.Context;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+//
+// Guarded access and display of web client.
+//
 
 public class WebGuard extends WebViewClient
 {
@@ -20,17 +25,48 @@ public class WebGuard extends WebViewClient
 
     private Context context;
 
+    private Uri initialUri;
+
+    public void setContext(Context context)
+    {
+        this.context = context;
+
+        getConfig(context);
+    }
+
+    public void setInitialUrl(String url)
+    {
+        initialUri = Uri.parse(url);
+    }
+
     //region Static methods.
 
     private static JSONObject config = null;
+
+    private static ArrayList<String> regex_allow;
+    private static ArrayList<String> regex_deny;
+    private static ArrayList<String> domains_allow;
+    private static ArrayList<String> domains_deny;
 
     public static JSONObject getConfig(Context context)
     {
         if (config == null)
         {
+            regex_allow   = new ArrayList<String>();
+            regex_deny    = new ArrayList<String>();
+            domains_allow = new ArrayList<String>();
+            domains_deny  = new ArrayList<String>();
+
             try
             {
                 config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webguard).getJSONObject("webguard");
+
+                // @formatter:off
+                regex_allow   = getConfigTreeArray(context, "resource", "regex",   "allow");
+                regex_deny    = getConfigTreeArray(context, "resource", "regex",   "deny" );
+                domains_allow = getConfigTreeArray(context, "resource", "domains", "allow");
+                domains_deny  = getConfigTreeArray(context, "resource", "domains", "deny" );
+                // @formatter:on
             }
             catch (Exception ex)
             {
@@ -41,44 +77,50 @@ public class WebGuard extends WebViewClient
         return config;
     }
 
-    public static JSONArray getDomainsAllow(Context context)
+    public static ArrayList<String> getConfigTreeArray(Context context, String arg1, String arg2, String arg3)
     {
+        ArrayList<String> list = new ArrayList<String>();
+
         try
         {
-            return getConfig(context).getJSONObject("domains").getJSONArray("allow");
+            JSONArray jsonArray = getConfig(context).getJSONObject(arg1).getJSONObject(arg2).getJSONArray(arg3);
+
+            for (int inx = 0; inx < jsonArray.length(); inx++)
+            {
+                list.add(jsonArray.getString(inx));
+            }
         }
         catch (Exception ex)
         {
-            Log.e(LOGTAG, "getDomainsAllow: Cannot read config.");
+            Log.e(LOGTAG, "getConfigTreeArray: Cannot read config " + arg1 + "/" + arg2 + "/" + arg3);
         }
 
-        return null;
-    }
-
-    public static JSONArray getDomainsDeny(Context context)
-    {
-        try
-        {
-            return getConfig(context).getJSONObject("domains").getJSONArray("deny");
-        }
-        catch (Exception ex)
-        {
-            Log.e(LOGTAG, "getDomainsAllow: Cannot read config.");
-        }
-
-        return null;
+        return list;
     }
 
     //endregion
+
+    //region Overridden methods.
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url)
     {
         Log.d(LOGTAG, "URL=" + url);
 
-        Toast.makeText(context,url,Toast.LENGTH_LONG).show();
+        Uri follow = Uri.parse(url);
 
-        view.loadUrl(url);
+        if (initialUri.getHost().equals(follow.getHost()))
+        {
+            view.loadUrl(url);
+
+            return true;
+        }
+
+        //
+        // Do more checking here.
+        //
+
+        Toast.makeText(context, "Blocking: " + url, Toast.LENGTH_LONG).show();
 
         return true;
     }
@@ -97,10 +139,14 @@ public class WebGuard extends WebViewClient
         return checkUrlResource(url);
     }
 
+    //endregion
+
+    //region Access checking methods.
+
     //
     // Validate host name against wildcard domain specification.
     //
-    private boolean validateHost(String host,String domain)
+    private boolean validateHost(String host, String domain)
     {
         if (domain.startsWith("*."))
         {
@@ -116,7 +162,7 @@ public class WebGuard extends WebViewClient
 
             while ((restinx >= 0) && (hostinx >= 0))
             {
-                if (! restparts[ restinx ].equals(hostparts[ hostinx ]))
+                if (!restparts[restinx].equals(hostparts[hostinx]))
                 {
                     return false;
                 }
@@ -133,87 +179,65 @@ public class WebGuard extends WebViewClient
 
     private WebResourceResponse checkUrlResource(String url)
     {
-        if (url.contains("smartadserver.com") && url.contains("diff/251"))
-        {
-            Log.d(LOGTAG, "Allow URL=" + url);
+        int inx;
 
-            return null;
+        //
+        // Check positive url regex list.
+        //
+
+        for (inx = 0; inx < regex_allow.size(); inx++)
+        {
+            if (url.matches(regex_allow.get(inx)))
+            {
+                Log.d(LOGTAG, "checkUrlResource: allow " + url);
+
+                return null;
+            }
+        }
+
+        //
+        // Check negative url regex list.
+        //
+
+        for (inx = 0; inx < regex_deny.size(); inx++)
+        {
+            if (url.matches(regex_deny.get(inx)))
+            {
+                Log.d(LOGTAG, "checkUrlResource: deny " + url);
+
+                return new WebResourceResponse("text/plain", "utf-8", null);
+            }
         }
 
         Uri uri = Uri.parse(url);
         String host = uri.getHost();
 
-        JSONArray domain_allow = getDomainsAllow(context);
-        JSONArray domain_deny  = getDomainsDeny(context);
-
-        boolean allow;
-        String domain;
-        int inx;
-
         //
         // Check positive domain list.
         //
 
-        allow = false;
-
-        if (domain_allow != null)
+        for (inx = 0; inx < domains_allow.size(); inx++)
         {
-            try
+            if (validateHost(host, domains_allow.get(inx)))
             {
-                for (inx = 0; inx < domain_allow.length(); inx++)
-                {
-                    domain = domain_allow.getString(inx);
+                Log.d(LOGTAG, "checkUrlResource: allow " + host);
 
-                    if (validateHost(host,domain))
-                    {
-                        allow = true;
-                        break;
-                    }
-                }
+                return null;
             }
-            catch (JSONException ignore)
-            {
-            }
-        }
-
-        if (allow)
-        {
-            Log.d(LOGTAG,"checkUrlResource: allow " + host);
-
-            return null;
         }
 
         //
         // Check negative domain list.
         //
 
-        allow = true;
-
-        if (domain_deny != null)
+        for (inx = 0; inx < domains_deny.size(); inx++)
         {
-            try
+            if (validateHost(host, domains_deny.get(inx)))
             {
-                for (inx = 0; inx < domain_deny.length(); inx++)
-                {
-                    domain = domain_deny.getString(inx);
+                Log.d(LOGTAG, "checkUrlResource: deny " + host);
 
-                    if (validateHost(host,domain))
-                    {
-                        allow = false;
-                        break;
-                    }
-                }
+                return new WebResourceResponse("text/plain", "utf-8", null);
             }
-            catch (JSONException ignore)
-            {
-            }
-        }
-
-        if (! allow)
-        {
-            Log.d(LOGTAG, "checkUrlResource: deny " + host);
-
-            return new WebResourceResponse("text/plain", "utf-8", null);
         }
 
         if ((! url.endsWith(".png")) && (! url.endsWith(".jpg")) && (! url.endsWith(".gif")) && (! url.endsWith(".ico")))
@@ -224,8 +248,5 @@ public class WebGuard extends WebViewClient
         return null;
     }
 
-    public void setContext(Context context)
-    {
-        this.context = context;
-    }
+    //endregion
 }

@@ -32,17 +32,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-@SuppressWarnings({"WeakerAccess", "UnusedParameters"})
+//
+// Static all purpose utility methods.
+//
 
+@SuppressWarnings({"WeakerAccess", "UnusedParameters"})
 public class StaticUtils
 {
     private static final String LOGTAG = "StaticUtils";
 
-    private static JSONObject contacts = null;
+    //region Generic conversion methods.
 
     //
     // Convert array of bytes to hex string.
     //
+
     public static String hexBytesToString(byte[] bytes)
     {
         if (bytes == null) return null;
@@ -64,6 +68,7 @@ public class StaticUtils
     //
     // Convert array of bytes to hex string.
     //
+
     public static byte[] hexStringToBytes(String hexstring)
     {
         if (hexstring == null) return null;
@@ -82,8 +87,46 @@ public class StaticUtils
     }
 
     //
+    // Convert JSON to string with indent and dump.
+    //
+
+    public static String JSON2String(JSONObject jsonObject, boolean dump)
+    {
+        if (jsonObject == null) return null;
+
+        String json = null;
+
+        try
+        {
+            json = jsonObject.toString(2);
+        }
+        catch (JSONException ignored)
+        {
+        }
+
+        if (json == null) return null;
+
+        if (dump)
+        {
+            String[] lines = json.split("\n");
+
+            for (String line : lines)
+            {
+                Log.d(LOGTAG, line);
+            }
+        }
+
+        return json;
+    }
+
+    //endregion
+
+    //region Config reader methods.
+
+    //
     // Read raw text resource into string.
     //
+
     public static String readRawTextResource(Context context, int resId)
     {
         InputStream inputStream = context.getResources().openRawResource(resId);
@@ -111,6 +154,7 @@ public class StaticUtils
     //
     // Read raw text JSON resource into JSONObject.
     //
+
     public static JSONObject readRawTextResourceJSON(Context context, int resId)
     {
         String json = readRawTextResource(context, resId);
@@ -119,7 +163,8 @@ public class StaticUtils
         try
         {
             return new JSONObject(json);
-        } catch (JSONException ex)
+        }
+        catch (JSONException ex)
         {
             ex.printStackTrace();
         }
@@ -127,9 +172,14 @@ public class StaticUtils
         return null;
     }
 
+    //endregion
+
+    //region Default home and assists methods.
+
     //
     // Retrieve package name handling home button press.
     //
+
     public static String getDefaultHome(Context context)
     {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -139,9 +189,19 @@ public class StaticUtils
         return (res.activityInfo == null) ? null : res.activityInfo.packageName;
     }
 
+    public static boolean isDefaultHome(Context context)
+    {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
+    }
+
     //
-    // Retrieve package name handling home button press.
+    // Retrieve package name handling assist button press.
     //
+
     public static String getDefaultAssist(Context context)
     {
         Intent intent = new Intent(Intent.ACTION_ASSIST);
@@ -151,9 +211,25 @@ public class StaticUtils
         return (res.activityInfo == null) ? null : res.activityInfo.packageName;
     }
 
+    public static boolean isDefaultAssist(Context context)
+    {
+        Intent intent = new Intent(Intent.ACTION_ASSIST);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
+    }
+
+    //endregion
+
+    //region Obtaining contacts profile images.
+
+    private static JSONObject contacts = null;
+
     //
-    // Retrieve profile image bitmap for contacts telefone number.
+    // Retrieve contacts phone number from skype account.
     //
+
     public static String getPhoneFromSkype(Context context, String skypename)
     {
         boolean ismatch = false;
@@ -227,6 +303,7 @@ public class StaticUtils
     //
     // Retrieve profile image bitmap for contacts telefone number.
     //
+
     public static Bitmap getContactsProfileBitmap(Context context, String search)
     {
         boolean ismatch = false;
@@ -303,6 +380,7 @@ public class StaticUtils
     //
     // Retrieve profile image bitmap for Sykpe account.
     //
+
     public static Bitmap getSkypeProfileBitmap(Context context, String skypename)
     {
         //
@@ -368,9 +446,14 @@ public class StaticUtils
         return getContactsProfileBitmap(context, phone);
     }
 
+    //endregion
+
+    //region Nice to have image methods.
+
     //
     // Draw bitmap as circle into new bitmap.
     //
+
     public static Bitmap getCircleBitmap(Bitmap bitmap)
     {
         Bitmap output = Bitmap.createBitmap(
@@ -397,6 +480,31 @@ public class StaticUtils
 
         return output;
     }
+
+    public static Bitmap getBitmapFromURL(String src)
+    {
+        try
+        {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+
+            return myBitmap;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    //endregion
+
+    //region Get all installed app.
 
     public static JSONObject getAllInstalledApps(Context context)
     {
@@ -440,7 +548,7 @@ public class StaticUtils
         try
         {
             JSONObject jo =  new JSONObject();
-            jo.put("apppackages",joappsarray);
+            jo.put("apppackages", joappsarray);
             jo.put("syspackages",josyssarray);
 
             return jo;
@@ -452,62 +560,5 @@ public class StaticUtils
         return null;
     }
 
-    public static String JSON2String(JSONObject jsonObject, boolean dump)
-    {
-        if (jsonObject == null) return null;
-
-        String json = null;
-
-        try
-        {
-            json = jsonObject.toString(2);
-        }
-        catch (JSONException ignored)
-        {
-        }
-
-        if (json == null) return null;
-
-        if (dump)
-        {
-            String[] lines = json.split("\n");
-
-            for (String line : lines)
-            {
-                Log.d(LOGTAG, line);
-            }
-        }
-
-        return json;
-    }
-
-    public static Bitmap getBitmapFromURL(String src)
-    {
-        try
-        {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
-            return myBitmap;
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static boolean isDefaultHome(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
-    }
+    //endregion
 }
