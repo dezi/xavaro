@@ -212,6 +212,8 @@ public class LaunchItem extends FrameLayout
 
                 if (type.equals("whatsapp"))
                 {
+                    GlobalConfigs.likeWhatsApp = true;
+
                     if (config.has("waphonenumber"))
                     {
                         String phone = config.getString("waphonenumber");
@@ -230,6 +232,8 @@ public class LaunchItem extends FrameLayout
 
                 if (type.equals("skype"))
                 {
+                    GlobalConfigs.likeSkype = true;
+
                     if (config.has("skypename"))
                     {
                         String skypename = config.getString("skypename");

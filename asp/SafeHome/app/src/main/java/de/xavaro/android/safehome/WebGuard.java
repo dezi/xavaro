@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.content.Context;
@@ -117,7 +118,23 @@ public class WebGuard extends WebViewClient
         }
 
         //
-        // Do more checking here.
+        // Do more cherry picking here.
+        //
+
+        if (follow.getScheme().equals("whatsapp") && GlobalConfigs.likeWhatsApp)
+        {
+            //
+            // We like/love WhatsApp.
+            //
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(follow);
+            intent.setPackage("com.whatsapp");
+            context.startActivity(intent);
+        }
+
+        //
+        // Finally block stuff.
         //
 
         Toast.makeText(context, "Blocking: " + url, Toast.LENGTH_LONG).show();
