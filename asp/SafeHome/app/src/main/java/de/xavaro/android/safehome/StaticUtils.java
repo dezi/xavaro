@@ -25,6 +25,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -174,7 +175,7 @@ public class StaticUtils
 
     //endregion
 
-    //region Default home and assists methods.
+    //region Default home and assist methods.
 
     //
     // Retrieve package name handling home button press.
@@ -218,6 +219,19 @@ public class StaticUtils
         ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
 
         return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
+    }
+
+    //
+    // Retrieve package name handling emails.
+    //
+
+    public static String getDefaultEmail(Context context)
+    {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("mailto:"));
+        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
     }
 
     //endregion

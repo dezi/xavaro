@@ -14,6 +14,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 //
@@ -121,16 +122,111 @@ public class WebGuard extends WebViewClient
         // Do more cherry picking here.
         //
 
+        if (follow.getScheme().equals("mailto") && GlobalConfigs.likeEmail)
+        {
+            //
+            // We like Email.
+            //
+
+            try
+            {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(follow);
+                context.startActivity(intent);
+            }
+            catch (Exception ignore)
+            {
+            }
+
+            return true;
+        }
+
         if (follow.getScheme().equals("whatsapp") && GlobalConfigs.likeWhatsApp)
         {
             //
-            // We like/love WhatsApp.
+            // We love WhatsApp.
             //
 
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(follow);
-            intent.setPackage("com.whatsapp");
-            context.startActivity(intent);
+            try
+            {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(follow);
+                intent.setPackage(GlobalConfigs.packageWhatsApp);
+                context.startActivity(intent);
+            }
+            catch (Exception ignore)
+            {
+            }
+
+            return true;
+        }
+
+        if (url.startsWith("https://twitter.com/") && GlobalConfigs.likeTwitter)
+        {
+            //
+            // We like Twitter.
+            //
+
+            try
+            {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(follow);
+                intent.setPackage(GlobalConfigs.packageTwitter);
+                context.startActivity(intent);
+
+                return true;
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
+
+        if (url.startsWith("https://plus.google.com/") && GlobalConfigs.likeGooglePlus)
+        {
+            //
+            // We hate GooglePlus.
+            //
+
+            try
+            {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(follow);
+                intent.setPackage(GlobalConfigs.packageGooglePlus);
+                context.startActivity(intent);
+
+                return true;
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
+
+        if (follow.getHost().endsWith(".facebook.com") && GlobalConfigs.likeFacebook)
+        {
+            //
+            // We like Facebook.
+            //
+
+            try
+            {
+                if (follow.getQueryParameter("u") != null)
+                {
+                    Intent intent = new Intent();
+                    intent.setAction("android.intent.action.SEND");
+                    intent.setType("text/plain");
+                    intent.putExtra("android.intent.extra.TEXT", follow.getQueryParameter("u"));
+                    intent.setPackage(GlobalConfigs.packageFacebook);
+                    context.startActivity(intent);
+
+                    return true;
+                }
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
         }
 
         //

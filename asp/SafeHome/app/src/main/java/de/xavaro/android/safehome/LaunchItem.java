@@ -156,7 +156,12 @@ public class LaunchItem extends FrameLayout
                 setVisibility(VISIBLE);
             }
 
-            packageName = config.has("packagename") ? config.getString("packagename") : null;
+            if (config.has("packagename"))
+            {
+                packageName = config.getString("packagename");
+
+                GlobalConfigs.weLikeThis(context,packageName);
+            }
 
             if (config.has("icon"))
             {
@@ -605,6 +610,14 @@ public class LaunchItem extends FrameLayout
     }
 
     private void launchDeveloper()
+    {
+        String mypack = StaticUtils.getDefaultEmail(context);
+
+        Log.d(LOGTAG,"Email=" + mypack);
+
+    }
+
+    private void launchDeveloperVideo()
     {
         MediaPlayer mPlayer = new MediaPlayer();
 
