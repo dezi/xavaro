@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.content.Context;
 import android.webkit.WebResourceRequest;
@@ -12,9 +13,11 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URLDecoder;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 //
@@ -27,65 +30,74 @@ public class WebGuard extends WebViewClient
 
     private Context context;
 
-    private Uri initialUri;
+    private Uri currentUri;
+    private String currentUrl;
+
+    private JSONObject config;
 
     public void setContext(Context context)
     {
         this.context = context;
 
-        getConfig(context);
+        getGlobalConfig(context);
     }
 
-    public void setInitialUrl(String url)
+    public void setCurrent(String website, String url)
     {
-        initialUri = Uri.parse(url);
+        currentUrl = url;
+        currentUri = Uri.parse(url);
+
+        config = WebFrame.getConfig(context, website);
     }
 
-    //region Static methods.
+    //region Static configuration methods.
 
-    private static JSONObject config = null;
+    private static JSONObject globalConfig = null;
 
-    private static ArrayList<String> regex_allow;
-    private static ArrayList<String> regex_deny;
-    private static ArrayList<String> domains_allow;
-    private static ArrayList<String> domains_deny;
+    // @formatter:off
+    private static ArrayList<String> regex_allow   = new ArrayList<>();
+    private static ArrayList<String> regex_deny    = new ArrayList<>();
+    private static ArrayList<String> domains_allow = new ArrayList<>();
+    private static ArrayList<String> domains_deny  = new ArrayList<>();
+    // @formatter:on
 
-    public static JSONObject getConfig(Context context)
+    @Nullable
+    private static JSONObject getGlobalConfig(Context context)
     {
-        if (config == null)
+        if (globalConfig == null)
         {
-            regex_allow   = new ArrayList<String>();
-            regex_deny    = new ArrayList<String>();
-            domains_allow = new ArrayList<String>();
-            domains_deny  = new ArrayList<String>();
-
             try
             {
-                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webguard).getJSONObject("webguard");
+                JSONObject ctemp = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webguard);
 
-                // @formatter:off
-                regex_allow   = getConfigTreeArray(context, "resource", "regex",   "allow");
-                regex_deny    = getConfigTreeArray(context, "resource", "regex",   "deny" );
-                domains_allow = getConfigTreeArray(context, "resource", "domains", "allow");
-                domains_deny  = getConfigTreeArray(context, "resource", "domains", "deny" );
-                // @formatter:on
+                if (ctemp != null)
+                {
+                    globalConfig = ctemp.getJSONObject("webguard");
+
+                    // @formatter:off
+                    regex_allow   = getConfigTreeArray(globalConfig, "resource", "regex",   "allow");
+                    regex_deny    = getConfigTreeArray(globalConfig, "resource", "regex",   "deny" );
+                    domains_allow = getConfigTreeArray(globalConfig, "resource", "domains", "allow");
+                    domains_deny  = getConfigTreeArray(globalConfig, "resource", "domains", "deny" );
+                    // @formatter:on
+                }
             }
-            catch (Exception ex)
+            catch (NullPointerException | JSONException ex)
             {
-                Log.e(LOGTAG, "getConfig: Cannot read default webguard.");
+                Log.e(LOGTAG, "getGlobalConfig: Cannot read default webguard config.");
             }
         }
 
-        return config;
+        return globalConfig;
     }
 
-    public static ArrayList<String> getConfigTreeArray(Context context, String arg1, String arg2, String arg3)
+    private static ArrayList<String> getConfigTreeArray(JSONObject config, String arg1, String arg2, String arg3)
     {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
 
         try
         {
-            JSONArray jsonArray = getConfig(context).getJSONObject(arg1).getJSONObject(arg2).getJSONArray(arg3);
+            JSONArray jsonArray = config.getJSONObject(arg1).getJSONObject(arg2).getJSONArray(arg3);
 
             for (int inx = 0; inx < jsonArray.length(); inx++)
             {
@@ -94,7 +106,7 @@ public class WebGuard extends WebViewClient
         }
         catch (Exception ex)
         {
-            Log.e(LOGTAG, "getConfigTreeArray: Cannot read config " + arg1 + "/" + arg2 + "/" + arg3);
+            Log.e(LOGTAG, "getConfigTreeArray: Cannot read globalConfig " + arg1 + "/" + arg2 + "/" + arg3);
         }
 
         return list;
@@ -111,11 +123,12 @@ public class WebGuard extends WebViewClient
 
         Uri follow = Uri.parse(url);
 
-        if (initialUri.getHost().equals(follow.getHost()))
+        if (currentUri.getHost().equals(follow.getHost()))
         {
-            view.loadUrl(url);
+            currentUrl = url;
+            currentUri = follow;
 
-            return true;
+            return false;
         }
 
         //
@@ -161,7 +174,7 @@ public class WebGuard extends WebViewClient
             return true;
         }
 
-        if (url.startsWith("https://twitter.com/") && GlobalConfigs.likeTwitter)
+        if (follow.getHost().endsWith("twitter.com") && GlobalConfigs.likeTwitter)
         {
             //
             // We like Twitter.
@@ -182,7 +195,7 @@ public class WebGuard extends WebViewClient
             }
         }
 
-        if (url.startsWith("https://plus.google.com/") && GlobalConfigs.likeGooglePlus)
+        if (follow.getHost().equals("plus.google.com") && GlobalConfigs.likeGooglePlus)
         {
             //
             // We hate GooglePlus.
@@ -206,7 +219,7 @@ public class WebGuard extends WebViewClient
         if (follow.getHost().endsWith(".facebook.com") && GlobalConfigs.likeFacebook)
         {
             //
-            // We like Facebook.
+            // We hate Facebook.
             //
 
             try
@@ -252,6 +265,12 @@ public class WebGuard extends WebViewClient
         return checkUrlResource(url);
     }
 
+    @Override
+    public void onPageFinished(WebView view, String url)
+    {
+        super.onPageFinished(view, url);
+    }
+
     //endregion
 
     //region Access checking methods.
@@ -259,6 +278,7 @@ public class WebGuard extends WebViewClient
     //
     // Validate host name against wildcard domain specification.
     //
+
     private boolean validateHost(String host, String domain)
     {
         if (domain.startsWith("*."))
@@ -275,7 +295,7 @@ public class WebGuard extends WebViewClient
 
             while ((restinx >= 0) && (hostinx >= 0))
             {
-                if (!restparts[restinx].equals(hostparts[hostinx]))
+                if (!restparts[ restinx ].equals(hostparts[ hostinx ]))
                 {
                     return false;
                 }
@@ -292,13 +312,53 @@ public class WebGuard extends WebViewClient
 
     private WebResourceResponse checkUrlResource(String url)
     {
-        int inx;
+        if (currentUrl.equals(url))
+        {
+            Log.d(LOGTAG, "=====> " + url);
+
+            if ((config != null) && config.has("webguard"))
+            {
+                try
+                {
+                    JSONObject mingle = config.getJSONObject("webguard").getJSONObject("mingle");
+                    JSONArray replace = mingle.has("replace") ? mingle.getJSONArray("replace") : null;
+
+                    if (replace != null)
+                    {
+                        String content = StaticUtils.getContentFromUrl(url);
+
+                        if (content != null)
+                        {
+                            for (int inx = 0; inx < replace.length(); inx++)
+                            {
+                                JSONObject item = replace.getJSONObject(inx);
+
+                                if (! item.has("regex")) continue;
+                                if (! item.has("replace")) continue;
+
+                                content = content.replaceAll(
+                                        item.getString("regex"),
+                                        item.getString("replace"));
+                            }
+
+                            byte[] bytes = content.getBytes("utf-8");
+                            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+
+                            return new WebResourceResponse("text/html", "utf-8", bais);
+                        }
+                    }
+                }
+                catch (JSONException | IOException ignore)
+                {
+                }
+            }
+        }
 
         //
         // Check positive url regex list.
         //
 
-        for (inx = 0; inx < regex_allow.size(); inx++)
+        for (int inx = 0; inx < regex_allow.size(); inx++)
         {
             if (url.matches(regex_allow.get(inx)))
             {
@@ -312,7 +372,7 @@ public class WebGuard extends WebViewClient
         // Check negative url regex list.
         //
 
-        for (inx = 0; inx < regex_deny.size(); inx++)
+        for (int inx = 0; inx < regex_deny.size(); inx++)
         {
             if (url.matches(regex_deny.get(inx)))
             {
@@ -329,7 +389,7 @@ public class WebGuard extends WebViewClient
         // Check positive domain list.
         //
 
-        for (inx = 0; inx < domains_allow.size(); inx++)
+        for (int inx = 0; inx < domains_allow.size(); inx++)
         {
             if (validateHost(host, domains_allow.get(inx)))
             {
@@ -343,7 +403,7 @@ public class WebGuard extends WebViewClient
         // Check negative domain list.
         //
 
-        for (inx = 0; inx < domains_deny.size(); inx++)
+        for (int inx = 0; inx < domains_deny.size(); inx++)
         {
             if (validateHost(host, domains_deny.get(inx)))
             {
@@ -353,9 +413,9 @@ public class WebGuard extends WebViewClient
             }
         }
 
-        if ((! url.endsWith(".png")) && (! url.endsWith(".jpg")) && (! url.endsWith(".gif")) && (! url.endsWith(".ico")))
+        if ((!url.endsWith(".png")) && (!url.endsWith(".jpg")) && (!url.endsWith(".gif")) && (!url.endsWith(".ico")))
         {
-            Log.d(LOGTAG, "checkUrlResource: load " + host);
+            Log.d(LOGTAG, "checkUrlResource: load " + url);
         }
 
         return null;

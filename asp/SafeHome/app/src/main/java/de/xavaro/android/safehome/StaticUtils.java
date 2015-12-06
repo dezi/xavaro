@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
+import android.support.annotation.Nullable;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -495,31 +496,11 @@ public class StaticUtils
         return output;
     }
 
-    public static Bitmap getBitmapFromURL(String src)
-    {
-        try
-        {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
-            return myBitmap;
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     //endregion
 
     //region Get all installed app.
 
+    @Nullable
     public static JSONObject getAllInstalledApps(Context context)
     {
         JSONArray joappsarray = new JSONArray();
@@ -569,6 +550,64 @@ public class StaticUtils
         }
         catch (JSONException ignore)
         {
+        }
+
+        return null;
+    }
+
+    //endregion
+
+    //region Get content from HTTP methods.
+
+    @Nullable
+    public static String getContentFromUrl(String src)
+    {
+        try
+        {
+            URL loadurl = new URL(src);
+
+            HttpURLConnection connection = (HttpURLConnection) loadurl.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+
+            InputStream input = connection.getInputStream();
+            StringBuilder string = new StringBuilder();
+            byte[] buffer = new byte[4096];
+            int xfer;
+
+            while ((xfer = input.read(buffer)) > 0)
+            {
+                string.append(new String(buffer, 0, xfer));
+            }
+
+            input.close();
+
+            return string.toString();
+        }
+        catch (IOException ex)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Bitmap getBitmapFromURL(String src)
+    {
+        try
+        {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+
+            return myBitmap;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
 
         return null;

@@ -77,6 +77,18 @@
             },
             {
               "type": "webframe",
+              "name": "de.m.xhamster.com"
+            },
+            {
+              "type": "webframe",
+              "name": "www.youporn.com"
+            },
+            {
+              "type": "webframe",
+              "name": "www.redtube.com"
+            },
+            {
+              "type": "webframe",
               "name": "m.faz.de"
             },
             {

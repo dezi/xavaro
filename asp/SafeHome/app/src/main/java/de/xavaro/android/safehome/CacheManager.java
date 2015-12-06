@@ -34,7 +34,7 @@ public class CacheManager
                 InputStream input = connection.getInputStream();
                 FileOutputStream output = new FileOutputStream(file);
 
-                byte[] bytes = new byte[4096];
+                byte[] bytes = new byte[ 4096 ];
                 int xfer;
 
                 while ((xfer = input.read(bytes)) > 0)

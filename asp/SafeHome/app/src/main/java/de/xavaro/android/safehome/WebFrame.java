@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -15,9 +16,13 @@ import android.widget.FrameLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+//
+// User agent: Mozilla/5.0 (Linux; Android 5.0.2; SM-T555 Build/LRX22G; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/46.0.2490.76 Safari/537.36
+//
+
 public class WebFrame extends FrameLayout
 {
-    private final static String LOGTAG = "WebFrameLayout";
+    private final static String LOGTAG = "WebFrame";
 
     private Context context;
 
@@ -75,6 +80,8 @@ public class WebFrame extends FrameLayout
 
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
+        Log.d(LOGTAG,webview.getSettings().getUserAgentString());
+
         addView(webview);
     }
 
@@ -82,15 +89,16 @@ public class WebFrame extends FrameLayout
 
     //region Static methods.
 
-    private static JSONObject config = null;
+    private static JSONObject globalConfig = null;
 
+    @Nullable
     public static JSONObject getConfig(Context context)
     {
-        if (config == null)
+        if (globalConfig == null)
         {
             try
             {
-                config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframe).getJSONObject("webframes");
+                globalConfig = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframe).getJSONObject("webframe");
             }
             catch (Exception ex)
             {
@@ -98,22 +106,24 @@ public class WebFrame extends FrameLayout
             }
         }
 
-        return config;
+        return globalConfig;
     }
 
+    @Nullable
     public static JSONObject getConfig(Context context,String website)
     {
         try
         {
             return getConfig(context).getJSONObject(website);
         }
-        catch (JSONException ignore)
+        catch (NullPointerException | JSONException ignore)
         {
         }
 
         return null;
     }
 
+    @Nullable
     public static Drawable getConfigIconDrawable(Context context,String website)
     {
         try
@@ -127,33 +137,35 @@ public class WebFrame extends FrameLayout
 
             return new BitmapDrawable(context.getResources(),thumbnail);
         }
-        catch (Exception ignore)
+        catch (NullPointerException | JSONException ignore)
         {
         }
 
         return null;
     }
 
+    @Nullable
     public static String getConfigLabel(Context context,String website)
     {
         try
         {
             return getConfig(context,website).getString("label");
         }
-        catch (Exception ignore)
+        catch (NullPointerException | JSONException ignore)
         {
         }
 
         return null;
     }
 
+    @Nullable
     public static String getConfigUrl(Context context,String website)
     {
         try
         {
             return getConfig(context).getJSONObject(website).getString("url");
         }
-        catch (Exception ignore)
+        catch (NullPointerException | JSONException ignore)
         {
         }
 
@@ -162,9 +174,9 @@ public class WebFrame extends FrameLayout
 
     //endregion
 
-    public void setLoadURL(String url)
+    public void setLoadURL(String website,String url)
     {
-        webguard.setInitialUrl(url);
+        webguard.setCurrent(website, url);
         webview.loadUrl(url);
     }
 

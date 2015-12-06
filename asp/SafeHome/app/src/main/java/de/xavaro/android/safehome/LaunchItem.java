@@ -59,7 +59,7 @@ public class LaunchItem extends FrameLayout
     private ImageView overicon;
 
     private LaunchGroup directory;
-    private WebFrame webview;
+    private WebFrame webframe;
 
     public LaunchItem(Context context)
     {
@@ -561,15 +561,16 @@ public class LaunchItem extends FrameLayout
 
         try
         {
-            if (webview == null)
+            if (webframe == null)
             {
-                String url = WebFrame.getConfigUrl(context,config.getString("name"));
+                String name = config.getString("name");
+                String url = WebFrame.getConfigUrl(context,name);
 
-                webview = new WebFrame(context);
-                webview.setLoadURL(url);
+                webframe = new WebFrame(context);
+                webframe.setLoadURL(name,url);
             }
 
-            ((HomeActivity) context).addViewToBackStack(webview);
+            ((HomeActivity) context).addViewToBackStack(webframe);
         }
         catch (Exception ex)
         {
