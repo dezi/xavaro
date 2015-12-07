@@ -81,13 +81,13 @@
 
     "de.m.xhamster.com": {
       "url": "http://de.m.xhamster.com/",
-      "icon": "https://pbs.twimg.com/profile_images/672339575696527360/Az0FTvLa_400x400.png",
+      "icon": "http://pbs.twimg.com/profile_images/672339575696527360/Az0FTvLa_400x400.png",
       "label": "xHamster",
 
       "webguard": {
         "mingle": {
           "replace": [
-            { "regex": "\\>Advertising.*?iframe\\>", "replace": ">" }
+            { "regex": ">Advertising.*?iframe>", "replace": ">" }
           ]
         }
       }
@@ -100,6 +100,10 @@
 
       "webguard": {
 
+        //
+        // Preset age check and table style.
+        //
+
         "cookies": [ "t8disclaimer=1", "platform=tablet" ],
 
         "mingle": {
@@ -110,8 +114,8 @@
             //
 
             {
-              "regex": "(?s)<div id=\"PornhubNetworkBar\"><\\/div>",
-              "replace": "<div id=\"PornhubNetworkBar\" style=\"display:none\"></div>"
+              "regex": "(?s)<div id=\"PornhubNetworkBar\">",
+              "replace": "<div id=\"PornhubNetworkBar\" style=\"display:none\">"
             },
 
             //
@@ -155,8 +159,187 @@
 
             {
               "regex": "Zusammenfassung",
-              "replace": "Weiter"
+              "replace": "Fortsetzen"
             }
+          ]
+        }
+      }
+    },
+
+    "www.pornhub.com": {
+      "url": "http://www.pornhub.com/",
+      "icon": "http://pbs.twimg.com/profile_images/615525585826222080/W9b7zw3R_400x400.jpg",
+      "label": "Pornhub",
+
+      "webguard": {
+
+        //
+        // Site javascript crashes w/o this.
+        //
+
+        "feature": [ "DomStorage=1" ],
+
+        //
+        // Preset age check and table style.
+        //
+
+        "cookies": [ "age_verified=1", "platform=tablet" ],
+
+        "mingle": {
+          "replace": [
+
+            //
+            // Get rid of PornHub NetworkBar.
+            //
+
+            {
+              "regex": "<div id=\"backgroundLayer\">",
+              "replace": "<div id=\"backgroundLayer\" style=\"display:none\">"
+            },
+            {
+              "regex": "<div id=\"pageLayer\">",
+              "replace": "<div id=\"pageLayer\" style=\"top:0px\">"
+            },
+
+            //
+            // Turn ads areas invisible.
+            //
+
+            {
+              "regex": "class=\"rightAds\"",
+              "replace": "class=\"rightAds\" style=\"display:none\""
+            },
+            {
+              "regex": "class=\"ad\"",
+              "replace": "class=\"ad\" style=\"display:none\""
+            },
+
+            //
+            // Resize video player.
+            //
+
+            {
+              "regex": "<div class=\"playerContainer\">",
+              "replace": "<div class=\"playerContainer\" style=\"float:none;width:650px;height:478px;margin:auto\">"
+            },
+
+            //
+            // Eliminate player pause ad.
+            //
+
+            {
+              "regex": "(?s)<div id=\"pb_block\">",
+              "replace": "<div id=\"pb_block\" style=\"background:rgba(255,0,0,0)\">"
+            },
+            {
+              "regex": "(?s)<div id=\"pb_top_bar\">.*?<\\/div>",
+              "replace": "<div id=\"pb_top_bar\" style=\"background:rgba(255,0,0,0)\"></div>"
+            },
+            {
+              "regex": "(?s)<div id=\"pb_content\">.*?<\\/div>",
+              "replace": "<div id=\"pb_content\" style=\"background:rgba(255,0,0,0)\"></div>"
+            }
+          ]
+        }
+      }
+    },
+
+    "www.youporn.com": {
+      "url": "http://www.youporn.com/",
+      "icon": "http://pbs.twimg.com/profile_images/615523987100057600/t3xeDQDX_400x400.jpg",
+      "label": "YouPorn",
+
+      "webguard": {
+
+        //
+        // Preset age check.
+        //
+
+        "cookies": [ "age_verified=1" ],
+
+        "mingle": {
+          "replace": [
+
+            //
+            // Eliminate undesired links from menu bar.
+            //
+
+            { "regex": "(?s)<li><[^<]*?trafficjunky.*?li>", "replace": "" },
+
+            //
+            // Eliminate ads blocks.
+            //
+
+            {
+              "regex": "(?s)<div class=\"ad-wrapper\">",
+              "replace": "<div class=\"ad-wrapper\" style=\"display:none\">"
+            },
+
+            //
+            // Adjust size in css.
+            //
+
+            { "regex": "305px", "replace": "650px" },
+            { "regex": "172px", "replace": "366px" }
+          ]
+        }
+      }
+    },
+
+    "www.redtube.com": {
+      "url": "http://www.redtube.com/",
+      "icon": "http://pbs.twimg.com/profile_images/619269637096628224/f5A48Q44_400x400.png",
+      "label": "RedTube",
+
+      "webguard": {
+
+        //
+        // Preset age check.
+        //
+
+        "cookies": [ "cookAV=1" ],
+
+        "mingle": {
+          "replace": [
+
+            //
+            // Eliminate undesired links from menu bar.
+            //
+
+            { "regex": "(?s)<li><[^<]*?trafficjunky.*?li>", "replace": "" },
+
+            //
+            // Eliminate ads blocks.
+            //
+
+            { "regex": "after-header", "replace": "" },
+            { "regex": "between-videos", "replace": "" },
+            { "regex": "before-footer", "replace": "" },
+
+            //
+            // Adjust mobile player to reasonable size.
+            //
+
+            { "regex": "height:208px", "replace": "height:100%" },
+
+            {
+              "regex": "class=\"video-player\"",
+              "replace": "class=\"video-player\" style=\"margin:auto;width:650px;height:384px\""
+            }
+          ]
+        }
+      }
+    },
+
+    "www.xvideos.com": {
+      "url": "http://www.xvideos.com/",
+      "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
+      "label": "Xvideos",
+
+      "webguard": {
+        "mingle": {
+          "replace": [
+
           ]
         }
       }
@@ -164,7 +347,7 @@
 
     "m.xnxx.com": {
       "url": "http://m.xnxx.com/",
-      "icon": "https://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
+      "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
       "label": "XNXX.COM",
 
       "webguard": {
@@ -174,56 +357,6 @@
             { "regex": "(?s)\\<topadblock\\>.*?\\<\\/topadblock\\>", "replace": "" },
             { "regex": "(?s)\\<bottomadblock\\>.*?\\<\\/bottomadblock\\>", "replace": "" }
 
-          ]
-        }
-      }
-    },
-
-    "www.xvideos.com": {
-      "url": "http://www.xvideos.com/",
-      "icon": "https://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
-      "label": "Xvideos",
-
-      "webguard": {
-        "mingle": {
-          "replace": [
-            { "regex": "\\>Advertising.*?iframe\\>", "replace": ">" }
-          ]
-        }
-      }
-    },
-
-    "www.youporn.com": {
-      "url": "http://www.youporn.com/",
-      "icon": "https://pbs.twimg.com/profile_images/615523987100057600/t3xeDQDX_400x400.jpg",
-      "label": "YouPorn",
-
-      "webguard": {
-        "mingle": {
-          "replace": [
-
-            { "regex": "(?s)\\\"ad-wrapper.*?Ad by Traffic Junky.*?\\<\\/a\\>", "replace": "\"</div>" },
-
-            { "regex": "(?s)\\<li.*?trafficjunky.*?li\\>", "replace": "" }
-          ]
-        }
-      }
-    },
-
-    "www.redtube.com": {
-      "url": "http://www.redtube.com/",
-      "icon": "https://pbs.twimg.com/profile_images/619269637096628224/f5A48Q44_400x400.png",
-      "label": "RedTube",
-
-      "webguard": {
-        "mingle": {
-          "replace": [
-
-            { "regex": "after-header", "replace": "" },
-            { "regex": "between-videos", "replace": "" },
-            { "regex": "before-footer", "replace": "" },
-
-            { "regex": "(?s)\\<li.*?trafficjunky.*?li\\>", "replace": "" }
           ]
         }
       }

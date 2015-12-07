@@ -72,9 +72,10 @@ public class WebFrame extends FrameLayout
         webview.setWebViewClient(webguard);
 
         webview.getSettings().setJavaScriptEnabled(true);
+        webview.getSettings().setDomStorageEnabled(false);
+
         webview.getSettings().setSupportZoom(true);
 
-        webview.getSettings().setDomStorageEnabled(false);
         webview.getSettings().setAppCacheEnabled(false);
         webview.getSettings().setDatabaseEnabled(false);
 
@@ -184,6 +185,8 @@ public class WebFrame extends FrameLayout
     public void setLoadURL(String website,String url)
     {
         webguard.setCurrent(url, website);
+        webguard.setFeatures(webview);
+
         webview.loadUrl(url);
     }
 

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 import android.content.Context;
@@ -60,6 +59,38 @@ public class WebGuard extends WebViewClient
         currentUri = Uri.parse(url);
 
         config = WebFrame.getConfig(context, website);
+    }
+
+    public void setFeatures(WebView webview)
+    {
+        if ((config == null) && ! config.has("webguard")) return;
+
+        try
+        {
+            JSONObject jot = config.getJSONObject("webguard");
+
+            if (! jot.has("feature")) return;
+
+            JSONArray features = jot.getJSONArray("feature");
+
+            for (int inx = 0; inx < features.length(); inx++)
+            {
+                String feature = features.getString(inx);
+                String[] parts = feature.split("=");
+
+                if (parts.length != 2) continue;
+
+                if (parts[ 0 ].equalsIgnoreCase("DomStorage"))
+                {
+                    webview.getSettings().setDomStorageEnabled(parts[ 1 ].equals("1"));
+
+                    Log.d(LOGTAG,"setFeatures " + parts[ 0 ] + "=" + parts[ 1 ]);
+                }
+            }
+        }
+        catch (JSONException ignore)
+        {
+        }
     }
 
     //
@@ -325,7 +356,10 @@ public class WebGuard extends WebViewClient
     @Nullable
     private WebResourceResponse checkUrlResource(String url)
     {
-        if (currentUrl.equals(url) || wasBackAction)
+        Uri uri = Uri.parse(url);
+        String host = uri.getHost();
+
+        if (url.equals(currentUrl) || wasBackAction || uri.getPath().endsWith(".css"))
         {
             wasBackAction = false;
 
@@ -347,10 +381,17 @@ public class WebGuard extends WebViewClient
                     {
                         JSONArray cookies = config.getJSONObject("webguard").getJSONArray("cookies");
                         android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
+                        String oldcookies = wkCookieManager.getCookie(url);
 
                         for (int inx = 0; inx < cookies.length(); inx++)
                         {
                             String cookie = cookies.getString(inx);
+
+                            if ((oldcookies != null) && oldcookies.contains(cookie))
+                            {
+                                continue;
+                            }
+
                             wkCookieManager.setCookie(url, cookie);
                             Log.d(LOGTAG, "checkUrlResource set cookie=" + cookie);
                         }
@@ -375,13 +416,28 @@ public class WebGuard extends WebViewClient
                         // Open a connection using java.net environment.
                         //
 
-                        android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
-                        String wkCookies = wkCookieManager.getCookie(url);
-                        if (wkCookies != null) Log.d(LOGTAG,"######" + wkCookies);
-
                         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
                         connection.setDoInput(true);
                         connection.connect();
+
+                        String mt = "text/html";
+                        String cs = "UTF-8";
+
+                        String[] ctype = connection.getContentType().split("; ");
+
+
+                        if (ctype.length == 1)
+                        {
+                            mt = ctype[ 0 ];
+                        }
+
+                        if (ctype.length == 2)
+                        {
+                            mt = ctype[ 0 ];
+                            cs = ctype[ 1 ];
+
+                            if (cs.startsWith("charset=")) cs = cs.substring(8);
+                        }
 
                         String content = StaticUtils.getContentFromStream(connection.getInputStream());
 
@@ -391,18 +447,18 @@ public class WebGuard extends WebViewClient
                             {
                                 JSONObject item = replace.getJSONObject(inx);
 
-                                if (!item.has("regex")) continue;
-                                if (!item.has("replace")) continue;
+                                if (! item.has("regex")) continue;
+                                if (! item.has("replace")) continue;
 
                                 content = content.replaceAll(
                                         item.getString("regex"),
                                         item.getString("replace"));
                             }
 
-                            byte[] bytes = content.getBytes("utf-8");
+                            byte[] bytes = content.getBytes(cs);
                             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
-                            return new WebResourceResponse("text/html", "utf-8", bais);
+                            return new WebResourceResponse(mt, cs, bais);
                         }
                     }
                 }
@@ -440,9 +496,6 @@ public class WebGuard extends WebViewClient
             }
         }
 
-        Uri uri = Uri.parse(url);
-        String host = uri.getHost();
-
         //
         // Check positive domain list.
         //
@@ -471,8 +524,10 @@ public class WebGuard extends WebViewClient
             }
         }
 
-        if ((! url.endsWith(".png")) && (! url.endsWith(".jpg")) && (! url.endsWith(".svg")) &&
-                (! url.endsWith(".gif")) && (! url.endsWith(".ico")))
+        String path = uri.getPath();
+
+        if ((! path.endsWith(".png")) && (! path.endsWith(".jpg")) && (! path.endsWith(".svg")) &&
+                (! path.endsWith(".gif")) && (! path.endsWith(".ico")))
         {
             Log.d(LOGTAG, "checkUrlResource: load " + url);
         }
