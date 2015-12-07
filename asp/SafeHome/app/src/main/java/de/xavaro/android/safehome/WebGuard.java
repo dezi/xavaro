@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,9 +23,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 //
 // Guarded access and display of web client.
@@ -298,8 +296,6 @@ public class WebGuard extends WebViewClient
         {
             String rest = domain.substring(2);
 
-            //Log.d(LOGTAG,"tubu <" + domain + ">" + host);
-
             String[] restparts = rest.split("\\.");
             String[] hostparts = host.split("\\.");
 
@@ -323,14 +319,23 @@ public class WebGuard extends WebViewClient
         return host.equals(domain);
     }
 
+    @Nullable
     private WebResourceResponse checkUrlResource(String url)
     {
         if (currentUrl.equals(url))
         {
+            //
+            // We are in root page load.
+            //
+
             Log.d(LOGTAG, "=====> " + url);
 
             if ((config != null) && config.has("webguard"))
             {
+                //
+                // Check for any static cookies to be added.
+                //
+
                 try
                 {
                     if (config.getJSONObject("webguard").has("cookies"))
@@ -346,9 +351,13 @@ public class WebGuard extends WebViewClient
                         }
                     }
                 }
-                catch (JSONException ex)
+                catch (JSONException ignore)
                 {
                 }
+
+                //
+                // Check for for replacement rules.
+                //
 
                 try
                 {
