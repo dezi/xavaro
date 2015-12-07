@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
@@ -22,22 +21,33 @@ public class WebCookie extends CookieManager
 {
     private final static String LOGTAG = "WebCookie";
 
-    private android.webkit.CookieManager webkitCookieManager;
+    //
+    // Global android.webkit cookie manager for this application.
+    //
 
-    public WebCookie(CookieStore store, CookiePolicy cookiePolicy)
+    private final android.webkit.CookieManager webkitCookieManager
+            = android.webkit.CookieManager.getInstance();
+
+    private WebCookie(CookiePolicy cookiePolicy)
     {
         super(null, cookiePolicy);
-
-        this.webkitCookieManager = android.webkit.CookieManager.getInstance();
     }
+
+    //
+    // Initialisation to be called from main activity.
+    //
 
     public static void initCookies()
     {
         android.webkit.CookieManager.getInstance().setAcceptCookie(true);
 
-        WebCookie coreCookieManager = new WebCookie(null, java.net.CookiePolicy.ACCEPT_ALL);
+        WebCookie coreCookieManager = new WebCookie(java.net.CookiePolicy.ACCEPT_ALL);
         java.net.CookieHandler.setDefault(coreCookieManager);
     }
+
+    //
+    // Put cookies from HTTP response into webkit cookie manager.
+    //
 
     @Override
     public void put(URI uri, Map<String, List<String>> responseHeaders) throws IOException
@@ -62,6 +72,10 @@ public class WebCookie extends CookieManager
         }
     }
 
+    //
+    // Get cookies from webkit cookie manager into HTTP request.
+    //
+
     @Override
     public Map<String, List<String>> get(URI uri, Map<String, List<String>> requestHeaders) throws IOException
     {
@@ -71,7 +85,7 @@ public class WebCookie extends CookieManager
 
         Log.d(LOGTAG, "get=" + url);
 
-        Map<String, List<String>> res = new java.util.HashMap<String, List<String>>();
+        Map<String, List<String>> res = new java.util.HashMap<>();
 
         String cookie = this.webkitCookieManager.getCookie(url);
 
@@ -79,6 +93,7 @@ public class WebCookie extends CookieManager
         {
             Log.d(LOGTAG, "get=" + cookie);
 
+            //noinspection ArraysAsListWithZeroOrOneArgument
             res.put("Cookie", Arrays.asList(cookie));
         }
 

@@ -77,6 +77,27 @@
             },
             {
               "type": "webframe",
+              "name": "m.faz.de"
+            },
+            {
+              "type": "webframe",
+              "name": "www.playboy.de"
+            },
+            {
+              "type": "webframe",
+              "name": "www.bento.de"
+            }
+          ]
+        }
+      },
+      {
+        "label": "Erotica",
+        "type": "directory",
+        "icon": "erotica_280x280",
+        "launchgroup": {
+          "launchitems": [
+            {
+              "type": "webframe",
               "name": "de.tube8.com"
             },
             {
@@ -90,18 +111,6 @@
             {
               "type": "webframe",
               "name": "www.redtube.com"
-            },
-            {
-              "type": "webframe",
-              "name": "m.faz.de"
-            },
-            {
-              "type": "webframe",
-              "name": "www.playboy.de"
-            },
-            {
-              "type": "webframe",
-              "name": "www.bento.de"
             }
           ]
         }

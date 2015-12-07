@@ -41,6 +41,8 @@ public class WebGuard extends WebViewClient
 
     private JSONObject config;
 
+    private boolean wasBackAction;
+
     //endregion
 
     //region Public setters.
@@ -58,6 +60,16 @@ public class WebGuard extends WebViewClient
         currentUri = Uri.parse(url);
 
         config = WebFrame.getConfig(context, website);
+    }
+
+    //
+    // Register back click in history and mark next
+    // request as main entry for content checking.
+    //
+
+    public void setWasBackAction()
+    {
+        wasBackAction = true;
     }
 
     //endregion
@@ -124,15 +136,6 @@ public class WebGuard extends WebViewClient
     //endregion
 
     //region Overridden methods.
-
-    @Override
-    public void onPageStarted(WebView view, String url, Bitmap favicon)
-    {
-        currentUrl = url;
-        currentUri = Uri.parse(url);
-
-        Log.d(LOGTAG,"onPageStarted=" + url);
-    }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url)
@@ -322,8 +325,10 @@ public class WebGuard extends WebViewClient
     @Nullable
     private WebResourceResponse checkUrlResource(String url)
     {
-        if (currentUrl.equals(url))
+        if (currentUrl.equals(url) || wasBackAction)
         {
+            wasBackAction = false;
+
             //
             // We are in root page load.
             //

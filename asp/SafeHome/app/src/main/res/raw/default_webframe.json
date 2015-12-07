@@ -105,76 +105,57 @@
         "mingle": {
           "replace": [
 
-            {
-              //
-              // Tube8 m.f. re-inserts this div if gone. So set to display none.
-              //
+            //
+            // Tube8 m.f. re-inserts this div if gone. So set to display none.
+            //
 
+            {
               "regex": "(?s)<div id=\"PornhubNetworkBar\"><\\/div>",
               "replace": "<div id=\"PornhubNetworkBar\" style=\"display:none\"></div>"
             },
 
-            {
-              //
-              // Eleminate undesired links from menu bar.
-              //
+            //
+            // Eliminate undesired links from menu bar.
+            //
 
+            {
               "regex": "(?s)<li class=\"float-left\">.*?loadAdFromHeaderTab.*?<\\/li>",
               "replace": ""
             },
 
-            {
-              //
-              // Eleminate ads blocks.
-              //
+            //
+            // Eliminate ads blocks.
+            //
 
+            {
               "regex": "(?s)<div class=\"blockHtml.*?Traffic Junky.*?<\\/div>",
               "replace": ""
             },
 
-            {
-              //
-              // Eleminate player pause ad.
-              //
+            //
+            // Eliminate player pause ad.
+            //
 
+            {
               "regex": "(?s)<div id=\"pb_block\">",
               "replace": "<div id=\"pb_block\" style=\"background:rgba(255,0,0,0)\">"
             },
-
             {
-              //
-              // Eleminate player pause ad.
-              //
-
               "regex": "(?s)<div id=\"pb_top_bar\">.*?<\\/div>",
               "replace": "<div id=\"pb_top_bar\" style=\"background:rgba(255,0,0,0)\"></div>"
             },
-
             {
-              //
-              // Eleminate player pause ad.
-              //
-
               "regex": "(?s)<div id=\"pb_content\">.*?<\\/div>",
               "replace": "<div id=\"pb_content\" style=\"background:rgba(255,0,0,0)\"></div>"
             },
 
-            {
-              //
-              // Correct bogus resume text.
-              //
+            //
+            // Correct bogus resume player button.
+            //
 
+            {
               "regex": "Zusammenfassung",
               "replace": "Weiter"
-            },
-
-            //
-            // Eleminate ads blocks.
-            //
-
-            {
-              "regex": "(?s)<div cla____ss=\"blockHtml.*?<\\/div>.*?<\\/div>",
-              "replace": ""
             }
           ]
         }

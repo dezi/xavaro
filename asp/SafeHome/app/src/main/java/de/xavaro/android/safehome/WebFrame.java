@@ -80,8 +80,6 @@ public class WebFrame extends FrameLayout
 
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-        Log.d(LOGTAG,webview.getSettings().getUserAgentString());
-
         addView(webview);
     }
 
@@ -91,36 +89,47 @@ public class WebFrame extends FrameLayout
 
     private static JSONObject globalConfig = null;
 
-    @Nullable
     public static JSONObject getConfig(Context context)
     {
         if (globalConfig == null)
         {
-            try
-            {
-                globalConfig = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframe).getJSONObject("webframe");
-            }
-            catch (Exception ex)
+            JSONObject jot = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframe);
+
+            if (jot == null)
             {
                 Log.e(LOGTAG, "getConfig: Cannot read default webframes.");
             }
+            else
+            {
+                try
+                {
+                    globalConfig = jot.getJSONObject("webframe");
+
+                    return globalConfig;
+                }
+                catch (JSONException ignore)
+                {
+                    Log.e(LOGTAG, "getConfig: Tag <webframe> missing in config.");
+                }
+            }
+
+            globalConfig = new JSONObject();
         }
 
         return globalConfig;
     }
 
-    @Nullable
     public static JSONObject getConfig(Context context,String website)
     {
         try
         {
             return getConfig(context).getJSONObject(website);
         }
-        catch (NullPointerException | JSONException ignore)
+        catch (JSONException ignore)
         {
         }
 
-        return null;
+        return new JSONObject();
     }
 
     @Nullable
@@ -131,13 +140,11 @@ public class WebFrame extends FrameLayout
             String iconurl = getConfig(context,website).getString("icon");
             String iconext = MimeTypeMap.getFileExtensionFromUrl(iconurl);
             String iconfile = website + ".thumbnail." + iconext;
-            Bitmap thumbnail = CacheManager.cacheThumbnail(context,iconfile,iconurl);
+            Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconfile, iconurl);
 
-            Log.d(LOGTAG,"getIconDrawable: " + iconurl + "=>" + iconext);
-
-            return new BitmapDrawable(context.getResources(),thumbnail);
+            return new BitmapDrawable(context.getResources(), thumbnail);
         }
-        catch (NullPointerException | JSONException ignore)
+        catch (JSONException ignore)
         {
         }
 
@@ -151,7 +158,7 @@ public class WebFrame extends FrameLayout
         {
             return getConfig(context,website).getString("label");
         }
-        catch (NullPointerException | JSONException ignore)
+        catch (JSONException ignore)
         {
         }
 
@@ -165,7 +172,7 @@ public class WebFrame extends FrameLayout
         {
             return getConfig(context).getJSONObject(website).getString("url");
         }
-        catch (NullPointerException | JSONException ignore)
+        catch (JSONException ignore)
         {
         }
 
@@ -187,6 +194,8 @@ public class WebFrame extends FrameLayout
         if (webview.canGoBack())
         {
             webview.goBack();
+
+            webguard.setWasBackAction();
 
             return false;
         }
