@@ -1,9 +1,10 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.content.Context;
 import android.webkit.WebResourceRequest;
@@ -18,7 +19,12 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 //
 // Guarded access and display of web client.
@@ -26,6 +32,8 @@ import java.util.ArrayList;
 
 public class WebGuard extends WebViewClient
 {
+    //region Internal variables.
+
     private final static String LOGTAG = "WebGuard";
 
     private Context context;
@@ -35,20 +43,26 @@ public class WebGuard extends WebViewClient
 
     private JSONObject config;
 
+    //endregion
+
+    //region Public setters.
+
     public void setContext(Context context)
     {
         this.context = context;
 
-        getGlobalConfig(context);
+        loadGlobalConfig(context);
     }
 
-    public void setCurrent(String website, String url)
+    public void setCurrent(String url,String website)
     {
         currentUrl = url;
         currentUri = Uri.parse(url);
 
         config = WebFrame.getConfig(context, website);
     }
+
+    //endregion
 
     //region Static configuration methods.
 
@@ -61,8 +75,7 @@ public class WebGuard extends WebViewClient
     private static ArrayList<String> domains_deny  = new ArrayList<>();
     // @formatter:on
 
-    @Nullable
-    private static JSONObject getGlobalConfig(Context context)
+    private static void loadGlobalConfig(Context context)
     {
         if (globalConfig == null)
         {
@@ -84,11 +97,9 @@ public class WebGuard extends WebViewClient
             }
             catch (NullPointerException | JSONException ex)
             {
-                Log.e(LOGTAG, "getGlobalConfig: Cannot read default webguard config.");
+                Log.e(LOGTAG, "loadGlobalConfig: Cannot read default webguard config.");
             }
         }
-
-        return globalConfig;
     }
 
     private static ArrayList<String> getConfigTreeArray(JSONObject config, String arg1, String arg2, String arg3)
@@ -117,16 +128,25 @@ public class WebGuard extends WebViewClient
     //region Overridden methods.
 
     @Override
+    public void onPageStarted(WebView view, String url, Bitmap favicon)
+    {
+        currentUrl = url;
+        currentUri = Uri.parse(url);
+
+        Log.d(LOGTAG,"onPageStarted=" + url);
+    }
+
+    @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url)
     {
-        Log.d(LOGTAG, "URL=" + url);
+        Log.d(LOGTAG, "shouldOverrideUrlLoading=" + url);
 
         Uri follow = Uri.parse(url);
 
         if (currentUri.getHost().equals(follow.getHost()))
         {
             currentUrl = url;
-            currentUri = follow;
+            currentUri = Uri.parse(url);
 
             return false;
         }
@@ -226,8 +246,7 @@ public class WebGuard extends WebViewClient
             {
                 if (follow.getQueryParameter("u") != null)
                 {
-                    Intent intent = new Intent();
-                    intent.setAction("android.intent.action.SEND");
+                    Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra("android.intent.extra.TEXT", follow.getQueryParameter("u"));
                     intent.setPackage(GlobalConfigs.packageFacebook);
@@ -263,12 +282,6 @@ public class WebGuard extends WebViewClient
     public WebResourceResponse shouldInterceptRequest(WebView view, String url)
     {
         return checkUrlResource(url);
-    }
-
-    @Override
-    public void onPageFinished(WebView view, String url)
-    {
-        super.onPageFinished(view, url);
     }
 
     //endregion
@@ -320,12 +333,43 @@ public class WebGuard extends WebViewClient
             {
                 try
                 {
+                    if (config.getJSONObject("webguard").has("cookies"))
+                    {
+                        JSONArray cookies = config.getJSONObject("webguard").getJSONArray("cookies");
+                        android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
+
+                        for (int inx = 0; inx < cookies.length(); inx++)
+                        {
+                            String cookie = cookies.getString(inx);
+                            wkCookieManager.setCookie(url, cookie);
+                            Log.d(LOGTAG, "checkUrlResource set cookie=" + cookie);
+                        }
+                    }
+                }
+                catch (JSONException ex)
+                {
+                }
+
+                try
+                {
                     JSONObject mingle = config.getJSONObject("webguard").getJSONObject("mingle");
                     JSONArray replace = mingle.has("replace") ? mingle.getJSONArray("replace") : null;
 
                     if (replace != null)
                     {
-                        String content = StaticUtils.getContentFromUrl(url);
+                        //
+                        // Open a connection using java.net environment.
+                        //
+
+                        android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
+                        String wkCookies = wkCookieManager.getCookie(url);
+                        if (wkCookies != null) Log.d(LOGTAG,"######" + wkCookies);
+
+                        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+                        connection.setDoInput(true);
+                        connection.connect();
+
+                        String content = StaticUtils.getContentFromStream(connection.getInputStream());
 
                         if (content != null)
                         {
@@ -333,8 +377,8 @@ public class WebGuard extends WebViewClient
                             {
                                 JSONObject item = replace.getJSONObject(inx);
 
-                                if (! item.has("regex")) continue;
-                                if (! item.has("replace")) continue;
+                                if (!item.has("regex")) continue;
+                                if (!item.has("replace")) continue;
 
                                 content = content.replaceAll(
                                         item.getString("regex"),
@@ -413,7 +457,8 @@ public class WebGuard extends WebViewClient
             }
         }
 
-        if ((!url.endsWith(".png")) && (!url.endsWith(".jpg")) && (!url.endsWith(".gif")) && (!url.endsWith(".ico")))
+        if ((! url.endsWith(".png")) && (! url.endsWith(".jpg")) && (! url.endsWith(".svg")) &&
+                (! url.endsWith(".gif")) && (! url.endsWith(".ico")))
         {
             Log.d(LOGTAG, "checkUrlResource: load " + url);
         }

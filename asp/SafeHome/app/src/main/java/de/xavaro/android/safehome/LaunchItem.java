@@ -616,6 +616,9 @@ public class LaunchItem extends FrameLayout
 
         Log.d(LOGTAG,"Email=" + mypack);
 
+        android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
+        wkCookieManager.removeAllCookies(null);
+
     }
 
     private void launchDeveloperVideo()

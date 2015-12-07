@@ -77,6 +77,10 @@
             },
             {
               "type": "webframe",
+              "name": "de.tube8.com"
+            },
+            {
+              "type": "webframe",
               "name": "de.m.xhamster.com"
             },
             {

@@ -592,6 +592,31 @@ public class StaticUtils
     }
 
     @Nullable
+    public static String getContentFromStream(InputStream input)
+    {
+        try
+        {
+            StringBuilder string = new StringBuilder();
+            byte[] buffer = new byte[4096];
+            int xfer;
+
+            while ((xfer = input.read(buffer)) > 0)
+            {
+                string.append(new String(buffer, 0, xfer));
+            }
+
+            input.close();
+
+            return string.toString();
+        }
+        catch (IOException ex)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static Bitmap getBitmapFromURL(String src)
     {
         try

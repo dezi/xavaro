@@ -176,7 +176,7 @@ public class WebFrame extends FrameLayout
 
     public void setLoadURL(String website,String url)
     {
-        webguard.setCurrent(website, url);
+        webguard.setCurrent(url, website);
         webview.loadUrl(url);
     }
 

@@ -55,6 +55,12 @@ public class HomeActivity extends AppCompatActivity
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        //
+        // Set common cookie store between webkit and java.net
+        //
+
+        WebCookie.initCookies();
     }
 
     @Override

@@ -93,11 +93,141 @@
       }
     },
 
+    "de.tube8.com": {
+      "url": "http://de.tube8.com/",
+      "icon": "http://a3-images.myspacecdn.com/images03/1/cb9e1e694ca941abaf62f0026d18049f/300x300.jpg",
+      "label": "TUBE8",
+
+      "webguard": {
+
+        "cookies": [ "t8disclaimer=1", "platform=tablet" ],
+
+        "mingle": {
+          "replace": [
+
+            {
+              //
+              // Tube8 m.f. re-inserts this div if gone. So set to display none.
+              //
+
+              "regex": "(?s)<div id=\"PornhubNetworkBar\"><\\/div>",
+              "replace": "<div id=\"PornhubNetworkBar\" style=\"display:none\"></div>"
+            },
+
+            {
+              //
+              // Eleminate undesired links from menu bar.
+              //
+
+              "regex": "(?s)<li class=\"float-left\">.*?loadAdFromHeaderTab.*?<\\/li>",
+              "replace": ""
+            },
+
+            {
+              //
+              // Eleminate ads blocks.
+              //
+
+              "regex": "(?s)<div class=\"blockHtml.*?Traffic Junky.*?<\\/div>",
+              "replace": ""
+            },
+
+            {
+              //
+              // Eleminate player pause ad.
+              //
+
+              "regex": "(?s)<div id=\"pb_block\">",
+              "replace": "<div id=\"pb_block\" style=\"background:rgba(255,0,0,0)\">"
+            },
+
+            {
+              //
+              // Eleminate player pause ad.
+              //
+
+              "regex": "(?s)<div id=\"pb_top_bar\">.*?<\\/div>",
+              "replace": "<div id=\"pb_top_bar\" style=\"background:rgba(255,0,0,0)\"></div>"
+            },
+
+            {
+              //
+              // Eleminate player pause ad.
+              //
+
+              "regex": "(?s)<div id=\"pb_content\">.*?<\\/div>",
+              "replace": "<div id=\"pb_content\" style=\"background:rgba(255,0,0,0)\"></div>"
+            },
+
+            {
+              //
+              // Correct bogus resume text.
+              //
+
+              "regex": "Zusammenfassung",
+              "replace": "Weiter"
+            },
+
+            //
+            // Eleminate ads blocks.
+            //
+
+            {
+              "regex": "(?s)<div cla____ss=\"blockHtml.*?<\\/div>.*?<\\/div>",
+              "replace": ""
+            }
+          ]
+        }
+      }
+    },
+
+    "m.xnxx.com": {
+      "url": "http://m.xnxx.com/",
+      "icon": "https://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
+      "label": "XNXX.COM",
+
+      "webguard": {
+        "mingle": {
+          "replace": [
+            { "regex": "(?s)\\<topnav\\>.*?\\<\\/topnav\\>", "replace": "<br/><br/><br/><br/><br/><br/>" },
+            { "regex": "(?s)\\<topadblock\\>.*?\\<\\/topadblock\\>", "replace": "" },
+            { "regex": "(?s)\\<bottomadblock\\>.*?\\<\\/bottomadblock\\>", "replace": "" }
+
+          ]
+        }
+      }
+    },
+
+    "www.xvideos.com": {
+      "url": "http://www.xvideos.com/",
+      "icon": "https://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
+      "label": "Xvideos",
+
+      "webguard": {
+        "mingle": {
+          "replace": [
+            { "regex": "\\>Advertising.*?iframe\\>", "replace": ">" }
+          ]
+        }
+      }
+    },
+
     "www.youporn.com": {
       "url": "http://www.youporn.com/",
       "icon": "https://pbs.twimg.com/profile_images/615523987100057600/t3xeDQDX_400x400.jpg",
-      "label": "YouPorn"
-      },
+      "label": "YouPorn",
+
+      "webguard": {
+        "mingle": {
+          "replace": [
+
+            { "regex": "(?s)\\\"ad-wrapper.*?Ad by Traffic Junky.*?\\<\\/a\\>", "replace": "\"</div>" },
+
+            { "regex": "(?s)\\<li.*?trafficjunky.*?li\\>", "replace": "" }
+          ]
+        }
+      }
+    },
 
     "www.redtube.com": {
       "url": "http://www.redtube.com/",
@@ -112,7 +242,7 @@
             { "regex": "between-videos", "replace": "" },
             { "regex": "before-footer", "replace": "" },
 
-            { "regex": "\\<li.*?trafficjunky.*?li\\>", "replace": "" }
+            { "regex": "(?s)\\<li.*?trafficjunky.*?li\\>", "replace": "" }
           ]
         }
       }
