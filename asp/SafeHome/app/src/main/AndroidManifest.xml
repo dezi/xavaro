@@ -18,8 +18,13 @@
         android:stateNotNeeded="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <service
             android:name=".KioskService"
+            android:exported="false"/>
+
+        <service
+            android:name=".UpushService"
             android:exported="false"/>
 
         <activity

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.Context;
 import android.app.ActivityManager;
 import android.app.Service;
-import android.content.pm.ResolveInfo;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;

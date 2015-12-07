@@ -23,7 +23,7 @@ public class HomeActivity extends AppCompatActivity
 {
     private final String LOGTAG = "HomeActivity";
 
-    public KioskService kioskService;
+    public static KioskService kioskService;
 
     private LaunchGroup launchGroup;
     private JSONObject config;
@@ -48,6 +48,7 @@ public class HomeActivity extends AppCompatActivity
         createConfig();
 
         startService(new Intent(this, KioskService.class));
+        startService(new Intent(this, UpushService.class));
 
         //
         // Allow cross fuck domain HTTP shit.
@@ -76,8 +77,11 @@ public class HomeActivity extends AppCompatActivity
     {
         super.onStart();
 
-        Intent intent = new Intent(this, KioskService.class);
-        bindService(intent, kioskConnection, Context.BIND_AUTO_CREATE);
+        Intent kioskIntent = new Intent(this, KioskService.class);
+        bindService(kioskIntent, kioskConnection, Context.BIND_AUTO_CREATE);
+
+        Intent upushIntent = new Intent(this, UpushService.class);
+        bindService(upushIntent, upushConnection, Context.BIND_AUTO_CREATE);
 
         Log.d(LOGTAG, "onStart...");
     }
@@ -125,6 +129,7 @@ public class HomeActivity extends AppCompatActivity
         super.onStop();
 
         if (kioskService != null) unbindService(kioskConnection);
+        if (UpushService.getInstance() != null) unbindService(upushConnection);
     }
 
     @Override
@@ -282,6 +287,22 @@ public class HomeActivity extends AppCompatActivity
         public void onServiceDisconnected(ComponentName arg0)
         {
             kioskService = null;
+        }
+    };
+
+    private ServiceConnection upushConnection = new ServiceConnection()
+    {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service)
+        {
+            UpushService.UpushBinder binder = (UpushService.UpushBinder) service;
+            UpushService.setInstance(binder.getService());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0)
+        {
+            UpushService.setInstance(null);
         }
     };
 }
