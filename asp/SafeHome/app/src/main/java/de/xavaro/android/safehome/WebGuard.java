@@ -63,7 +63,7 @@ public class WebGuard extends WebViewClient
 
     public void setFeatures(WebView webview)
     {
-        if ((config == null) && ! config.has("webguard")) return;
+        if ((config == null) || ! config.has("webguard")) return;
 
         try
         {
@@ -424,7 +424,6 @@ public class WebGuard extends WebViewClient
                         String cs = "UTF-8";
 
                         String[] ctype = connection.getContentType().split("; ");
-
 
                         if (ctype.length == 1)
                         {
