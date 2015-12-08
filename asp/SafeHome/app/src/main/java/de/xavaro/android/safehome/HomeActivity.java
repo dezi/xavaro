@@ -62,6 +62,8 @@ public class HomeActivity extends AppCompatActivity
         //
 
         WebCookie.initCookies();
+
+        SystemIdentity.initialize(this);
     }
 
     @Override

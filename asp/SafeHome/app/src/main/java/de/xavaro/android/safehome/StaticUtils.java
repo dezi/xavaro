@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -636,6 +639,56 @@ public class StaticUtils
         }
 
         return null;
+    }
+
+    //endregion
+
+    //region Networking methods.
+
+    public static String getMACAddress(String interfaceName)
+    {
+        try
+        {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+
+            for (NetworkInterface intf : interfaces)
+            {
+                byte[] mac = intf.getHardwareAddress();
+
+                StringBuilder buf = new StringBuilder();
+
+                if (mac != null)
+                {
+                    for (int idx = 0; idx < mac.length; idx++)
+                    {
+                        buf.append(String.format("%02X:", mac[ idx ]));
+                    }
+                }
+
+                if (buf.length() > 0) buf.deleteCharAt(buf.length() - 1);
+
+                Log.d(LOGTAG,"getMACAddress interface:" + intf.getName() + "=" + buf.toString());
+
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+
+                for (InetAddress addr : addrs)
+                {
+                    //if (! addr.isLoopbackAddress())
+                    {
+                        String sAddr = addr.getHostAddress();
+
+                        boolean isIPv4 = sAddr.indexOf(':') < 0;
+
+                        Log.d(LOGTAG,"getMACAddress addresses:" + intf.getName() + "=" + sAddr);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+
+        return "";
     }
 
     //endregion

@@ -369,7 +369,7 @@ public class WebGuard extends WebViewClient
 
             Log.d(LOGTAG, "=====> " + url);
 
-            UpushService.Log(LOGTAG, "=====> " + url);
+            UpushService.RLog(LOGTAG, "=====> " + url);
 
             if ((config != null) && config.has("webguard"))
             {

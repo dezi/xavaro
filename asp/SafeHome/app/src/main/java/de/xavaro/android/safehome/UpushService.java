@@ -6,7 +6,18 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.system.ErrnoException;
+import android.system.OsConstants;
 import android.util.Log;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /*
  * Service to communicate with backend servers
@@ -31,7 +42,7 @@ public class UpushService extends Service
 
     private boolean running = false;
 
-    private static final long INTERVAL = 10000;
+    private static final long INTERVAL = 5000;
 
     //region Static singleton methods.
 
@@ -48,14 +59,56 @@ public class UpushService extends Service
         return myService;
     }
 
-    public static void Log(String tag,String message)
+    public static void RLog(String tag, String message)
     {
         if (myService == null) return;
-        
-        Log.d(LOGTAG,tag + ":" + message);
+
+        myService.sendMessage(tag,message);
     }
 
     //endregion
+
+    private InetAddress serverAddr;
+    private DatagramSocket datagramSocket;
+
+    private void sendMessage(String tag, String message)
+    {
+        if (datagramSocket == null) return;
+
+        String body = tag + ":" + message;
+
+        byte[] data = body.getBytes();
+
+        DatagramPacket packet = new DatagramPacket(data,data.length);
+
+        try
+        {
+            datagramSocket.send(packet);
+
+            Log.d(LOGTAG,"sendMessage: " + body);
+        }
+        catch (IOException ex)
+        {
+            OopsHandler.Log(LOGTAG,ex);
+
+            int errno = -1;
+
+            Throwable errnoex = ex.getCause();
+
+            if (errnoex instanceof ErrnoException)
+            {
+                errno = ((ErrnoException) errnoex).errno;
+            }
+
+            //OsConstants.ECONNREFUSED
+            //OsConstants.EINVAL
+            //OsConstants.ENETUNREACH
+
+            Log.d(LOGTAG, "SEND: (" + errno + ")" + ex.getMessage());
+        }
+    }
+
+    //region Overriden methods.
 
     @Override
     public void onCreate()
@@ -84,6 +137,31 @@ public class UpushService extends Service
 
         if (wdThread == null)
         {
+            try
+            {
+                datagramSocket = new DatagramSocket();
+
+                InetSocketAddress socketAdress = (InetSocketAddress) datagramSocket.getLocalSocketAddress();
+
+                Log.d(LOGTAG,socketAdress.getAddress().toString() + ":" + socketAdress.getPort());
+
+                StaticUtils.getMACAddress("");
+
+                try
+                {
+                    serverAddr = InetAddress.getByName("www.xavaro.de");
+                }
+                catch (UnknownHostException exception)
+                {
+                }
+
+                datagramSocket.connect(serverAddr, 42742);
+            }
+            catch (SocketException ex)
+            {
+                ex.printStackTrace();
+            }
+
             running = true;
 
             Log.d(LOGTAG, "onStartCommand: starting watchdog thread.");
@@ -95,15 +173,37 @@ public class UpushService extends Service
                 {
                     while (running)
                     {
-                        Log.d(LOGTAG,"nix.");
-
-                        try
+                        /*
+                        if (datagramSocket != null)
                         {
-                            Thread.sleep(INTERVAL);
+                            byte[] buffer = new byte[ 2048 ];
+                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
-                        } catch (InterruptedException e)
+                            try
+                            {
+                                datagramSocket.receive(packet);
+
+                                Log.d(LOGTAG, "receive="
+                                        + packet.getAddress().toString() + ":"
+                                        + packet.getPort() + "="
+                                        + packet.getLength());
+                            }
+                            catch (IOException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        else
+                        */
                         {
-                            Log.d(LOGTAG, "wdThread: sleep interrupted.");
+                            try
+                            {
+                                Thread.sleep(INTERVAL);
+
+                            } catch (InterruptedException e)
+                            {
+                                Log.d(LOGTAG, "wdThread: sleep interrupted.");
+                            }
                         }
                     }
                 }
@@ -115,8 +215,12 @@ public class UpushService extends Service
         return Service.START_NOT_STICKY;
     }
 
+    //endregion
+
+    //region Binder methods.
+
     //
-    // Binder stuff allows activity to call methods here.
+    // Binder stuff allows anyobe to call methods here.
     //
 
     public class UpushBinder extends Binder
@@ -132,5 +236,7 @@ public class UpushService extends Service
     {
         return binder;
     }
+
+    //endregion
 }
 

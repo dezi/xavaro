@@ -8,6 +8,8 @@ import android.content.Context;
 
 public class GlobalConfigs
 {
+    //region Standard apps.
+
     //
     // Apps we like in this setup.
     //
@@ -47,4 +49,20 @@ public class GlobalConfigs
         if (packagename.equals(packageEmail     )) likeEmail      = true;
         // @formatter:on
     }
+
+    //endregion
+
+    //region Server adresses.
+
+    // @formatter:off
+
+    public static final String nameOopsServer = "www.xavaro.de";
+    public static final int    portOopsServer = 42742;
+
+    public static final String nameUuidServer = "www.xavaro.de";
+    public static final int    portUuidServer = 42743;
+
+    // @formatter:on
+
+    //endregion
 }

@@ -1,5 +1,11 @@
 package de.xavaro.android.safehome;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.OperationApplicationException;
+import android.net.Uri;
+import android.os.RemoteException;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import android.content.Context;
@@ -23,6 +29,8 @@ import android.provider.ContactsContract.CommonDataKinds.SipAddress;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 @SuppressWarnings("SameParameterValue")
 
@@ -390,6 +398,91 @@ public class ContactsHandler
         }
         catch (JSONException ignore)
         {
+        }
+    }
+
+    public static long getContactID(Context context,String name)
+    {
+        Cursor cursor = null;
+
+        try
+        {
+            Uri uri = Data.CONTENT_URI;
+            String selection = StructuredName.DISPLAY_NAME + " = ?";
+            String[] selectionArguments = { name };
+            cursor = context.getContentResolver().query(uri, null, selection, selectionArguments, null);
+
+            if (cursor != null)
+            {
+                while (cursor.moveToNext())
+                {
+                    long cid = cursor.getLong(cursor.getColumnIndex(Data.CONTACT_ID));
+                    String sn = cursor.getString(cursor.getColumnIndex(StructuredName.DISPLAY_NAME));
+                    String magic = cursor.getString(cursor.getColumnIndex(Data.DATA15));
+
+                    Log.d("getContactID", cid + "=" + sn + "=" + magic);
+                }
+            }
+
+            return -1;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (cursor != null)
+            {
+                cursor.close();
+                cursor = null;
+            }
+        }
+
+        return -1;
+    }
+
+    public static void WritePhoneContact(Context context,String name, String number)
+    {
+
+        getContactID(context,"XAVARO");
+
+        ArrayList<ContentProviderOperation> contProOper = new ArrayList<>();
+        int contactIndex = contProOper.size();
+
+        Log.d("WritePhoneContact","size=" + contactIndex);
+
+        contProOper.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build());
+
+        contProOper.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValueBackReference(Data.RAW_CONTACT_ID, contactIndex)
+                .withValue(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE)
+                .withValue(StructuredName.DISPLAY_NAME, name)
+                .withValue(Data.DATA15, "xyzzy")
+                .build());
+
+        /*
+        contProOper.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, contactIndex)
+                .withValue(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE)
+                .withValue(Phone.NUMBER, number)
+                .withValue(Phone.TYPE, Phone.TYPE_MOBILE).build());
+        */
+
+        try
+        {
+            ContentProviderResult[] contentProresult = null;
+            contentProresult = context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, contProOper);
+        }
+        catch (RemoteException ex)
+        {
+            //logs;
+        }
+        catch (OperationApplicationException ex)
+        {
+            ex.printStackTrace();
         }
     }
 }
