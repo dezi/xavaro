@@ -612,13 +612,24 @@ public class LaunchItem extends FrameLayout
 
     private void launchDeveloper()
     {
+        try
+        {
+            int x = 0;
+            int y = 2 / x;
+        }
+        catch (Exception ex)
+        {
+            OopsService.Log(LOGTAG,ex);
+        }
+
+        /*
         String mypack = StaticUtils.getDefaultEmail(context);
 
         Log.d(LOGTAG,"Email=" + mypack);
 
         android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
         wkCookieManager.removeAllCookies(null);
-
+        */
     }
 
     private void launchDeveloperVideo()

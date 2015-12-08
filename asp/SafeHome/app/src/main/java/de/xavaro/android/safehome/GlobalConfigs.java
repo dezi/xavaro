@@ -56,8 +56,10 @@ public class GlobalConfigs
 
     // @formatter:off
 
-    public static final String nameOopsServer = "www.xavaro.de";
-    public static final int    portOopsServer = 42742;
+    public static final String nameOopsServer     = "www.xavaro.de";
+    public static final int    portOopsServer     = 42742;
+    public static final int    sleepMinOopsServer = 1000;
+    public static final int    sleepMaxOopsServer = 1000 * 3600;
 
     public static final String nameUuidServer = "www.xavaro.de";
     public static final int    portUuidServer = 42743;

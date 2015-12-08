@@ -49,6 +49,7 @@ public class HomeActivity extends AppCompatActivity
 
         startService(new Intent(this, KioskService.class));
         startService(new Intent(this, UpushService.class));
+        startService(new Intent(this, OopsService.class));
 
         //
         // Allow cross fuck domain HTTP shit.

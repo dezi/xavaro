@@ -1,7 +1,6 @@
 package de.xavaro.android.safehome;
 
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -129,7 +128,7 @@ public class SystemIdentity
         }
         catch (Exception ex)
         {
-            OopsHandler.Log(LOGTAG,ex);
+            OopsService.Log(LOGTAG, ex);
         }
 
         if (cursor != null) cursor.close();

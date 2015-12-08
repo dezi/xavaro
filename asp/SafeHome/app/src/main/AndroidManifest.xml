@@ -27,6 +27,10 @@
             android:name=".UpushService"
             android:exported="false"/>
 
+        <service
+            android:name=".OopsService"
+            android:exported="false"/>
+
         <activity
             android:name=".HomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

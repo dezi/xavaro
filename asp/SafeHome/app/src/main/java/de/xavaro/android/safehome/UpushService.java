@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.system.ErrnoException;
-import android.system.OsConstants;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -89,7 +87,7 @@ public class UpushService extends Service
         }
         catch (IOException ex)
         {
-            OopsHandler.Log(LOGTAG,ex);
+            OopsService.Log(LOGTAG, ex);
 
             int errno = -1;
 

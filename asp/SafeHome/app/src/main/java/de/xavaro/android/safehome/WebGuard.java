@@ -367,9 +367,7 @@ public class WebGuard extends WebViewClient
             // We are in root page load.
             //
 
-            Log.d(LOGTAG, "=====> " + url);
-
-            UpushService.RLog(LOGTAG, "=====> " + url);
+            OopsService.Log(LOGTAG, "checkUrlResource: " + url);
 
             if ((config != null) && config.has("webguard"))
             {

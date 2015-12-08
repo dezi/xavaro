@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.system.ErrnoException;
 import android.util.DisplayMetrics;
 
 //
@@ -72,5 +73,24 @@ public class VersionUtils
         }
 
         return DisplayMetrics.DENSITY_XHIGH;
+    }
+
+    //
+    // Get error number form exception.
+    //
+
+    public static int getErrno(Exception exception)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            Throwable errnoex = exception.getCause();
+
+            if (errnoex instanceof ErrnoException)
+            {
+                return ((ErrnoException) errnoex).errno;
+            }
+        }
+
+        return -1;
     }
 }

@@ -692,4 +692,25 @@ public class StaticUtils
     }
 
     //endregion
+
+    //region Simplyfied methods.
+
+    public static void sleep(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+
+        }
+        catch (InterruptedException ignore)
+        {
+        }
+    }
+
+    public static String defuckJSON(String json)
+    {
+        return json.replace("\\/","/");
+    }
+
+    //endregion
 }
