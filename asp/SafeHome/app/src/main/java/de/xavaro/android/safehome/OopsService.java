@@ -185,7 +185,7 @@ public class OopsService extends Service
     {
         Log.d(LOGTAG, "workerThread: running");
 
-        long sleeptime = GlobalConfigs.sleepMinOopsServer;
+        long sleeptime = GlobalConfigs.OopsServerSleepMin;
 
         DatagramSocket datagramSocket = null;
         DatagramPacket datagrampacket = null;
@@ -194,9 +194,9 @@ public class OopsService extends Service
 
         while (running)
         {
-            if (sleeptime > GlobalConfigs.sleepMaxOopsServer)
+            if (sleeptime > GlobalConfigs.OopsServerSleepMax)
             {
-                sleeptime = GlobalConfigs.sleepMaxOopsServer;
+                sleeptime = GlobalConfigs.OopsServerSleepMax;
             }
 
             StaticUtils.sleep(sleeptime);
@@ -222,8 +222,8 @@ public class OopsService extends Service
             {
                 try
                 {
-                    serverAddr = InetAddress.getByName(GlobalConfigs.nameOopsServer);
-                    serverPort = GlobalConfigs.portOopsServer;
+                    serverAddr = InetAddress.getByName(GlobalConfigs.OopsServerName);
+                    serverPort = GlobalConfigs.OopsServerPort;
 
                     datagramSocket = new DatagramSocket();
                     datagrampacket = new DatagramPacket(new byte[ 0 ],0);
@@ -272,7 +272,7 @@ public class OopsService extends Service
 
                 datagramSocket.send(datagrampacket);
 
-                sleeptime = GlobalConfigs.sleepMinOopsServer;
+                sleeptime = GlobalConfigs.OopsServerSleepMin;
 
                 Log.d(LOGTAG,"Send one message.");
             }

@@ -29,6 +29,7 @@ public class SystemIdentity
 
     private static String foundInContacts;
     private static String foundInStorage;
+    private static String foundInCookies;
 
     //
     // Retrieve UUID or generate a new one.
@@ -37,9 +38,10 @@ public class SystemIdentity
     public static void initialize(Context context)
     {
         retrieveFromStorage(context);
+        retrieveFromCookies(context);
         retrieveFromContacts(context);
 
-        if ((foundInContacts == null) && (foundInStorage == null))
+        if ((foundInContacts == null) && (foundInStorage == null) && (foundInCookies == null))
         {
             //
             // Master create new uuid.
@@ -60,14 +62,21 @@ public class SystemIdentity
                 identity = foundInContacts;
             }
             else
+            if (foundInStorage != null)
             {
                 identity = foundInStorage;
+            }
+            else
+            {
+                identity = foundInCookies;
             }
         }
 
         if (foundInStorage == null) storeIntoStorage(context);
 
         if (foundInContacts == null) storeIntoContacts(context);
+
+        if (foundInCookies == null) storeIntoCookies(context);
     }
 
     private static void retrieveFromContacts(Context context)
@@ -94,17 +103,18 @@ public class SystemIdentity
                     String type = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_TYPE));
                     String uuid = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.SOURCE_ID));
 
-                    Log.d(LOGTAG,"retrieveFromContacts: (" + rawi + ") " + name + "=" + type + "=" + uuid);
-
                     if (uuid == null)
                     {
                         //
                         // Bogus contact w/o UUID.
                         //
 
-                        Uri delete = Uri.withAppendedPath(ContactsContract.RawContacts.CONTENT_URI, rawi);
-                        Log.d(LOGTAG, "retrieveFromContacts: delete=" + delete.toString());
-                        cr.delete(delete, null, null);
+                        if (gone.equals("0"))
+                        {
+                            Uri delete = Uri.withAppendedPath(ContactsContract.RawContacts.CONTENT_URI, rawi);
+                            cr.delete(delete, null, null);
+                            Log.d(LOGTAG, "retrieveFromContacts: delete=" + delete.toString());
+                        }
 
                         continue;
                     }
@@ -135,7 +145,7 @@ public class SystemIdentity
 
         if (cursor != null) cursor.close();
 
-        if (foundInContacts != null) Log.d(LOGTAG,"foundInContacts:" + foundInContacts);
+        if (foundInContacts != null) Log.d(LOGTAG, "foundInContacts: " + foundInContacts);
     }
 
     private static void storeIntoContacts(Context context)
@@ -188,7 +198,7 @@ public class SystemIdentity
             OopsService.log(LOGTAG, ex);
         }
 
-        if (foundInStorage != null) Log.d(LOGTAG,"foundInStorage:" + foundInStorage);
+        if (foundInStorage != null) Log.d(LOGTAG,"foundInStorage: " + foundInStorage);
     }
 
     private static void storeIntoStorage(Context context)
@@ -209,5 +219,29 @@ public class SystemIdentity
         {
             OopsService.log(LOGTAG, ex);
         }
+    }
+
+    private static void retrieveFromCookies(Context context)
+    {
+        foundInCookies = null;
+
+        android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
+        String cookies = wkCookieManager.getCookie("http://" + context.getPackageName());
+
+        if ((cookies != null) && cookies.contains("identity="))
+        {
+            String temp = cookies.substring(cookies.indexOf("identity=") + 9);
+            if (temp.contains(";")) temp = temp.substring(0,temp.indexOf(";"));
+
+            foundInCookies = temp;
+        }
+
+        if (foundInCookies != null) Log.d(LOGTAG,"foundInCookies: " + foundInCookies);
+    }
+
+    private static void storeIntoCookies(Context context)
+    {
+        android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
+        wkCookieManager.setCookie("http://" + context.getPackageName(),"identity=" + identity);
     }
 }
