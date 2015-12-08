@@ -87,7 +87,7 @@ public class UpushService extends Service
         }
         catch (IOException ex)
         {
-            OopsService.Log(LOGTAG, ex);
+            OopsService.log(LOGTAG, ex);
 
             int errno = -1;
 

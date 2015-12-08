@@ -619,7 +619,7 @@ public class LaunchItem extends FrameLayout
         }
         catch (Exception ex)
         {
-            OopsService.Log(LOGTAG,ex);
+            OopsService.log(LOGTAG,ex);
         }
 
         /*

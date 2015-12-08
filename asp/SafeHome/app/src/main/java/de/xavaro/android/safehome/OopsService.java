@@ -21,7 +21,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 //
-// Error logging for "This should never happen" problems.
+// Remote logging for "This should never happen" problems
+// or other interesting things.
 //
 
 public class OopsService extends Service
@@ -30,7 +31,7 @@ public class OopsService extends Service
 
     //region Public methods.
 
-    public static void Log(String tag, String message)
+    public static void log(String tag, String message)
     {
         try
         {
@@ -52,11 +53,11 @@ public class OopsService extends Service
         }
         catch (JSONException ignore)
         {
-            // Manno. Fuckit.
+            // Unlikely. Fuckit.
         }
     }
 
-    public static void Log(String tag,Exception exception)
+    public static void log(String tag,Exception exception)
     {
         try
         {

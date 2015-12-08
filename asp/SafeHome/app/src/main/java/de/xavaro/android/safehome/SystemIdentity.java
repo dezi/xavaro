@@ -10,13 +10,16 @@ import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import org.json.JSONObject;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
 //
 // Maintain our system identity guid.
 //
-
 
 public class SystemIdentity
 {
@@ -33,8 +36,8 @@ public class SystemIdentity
 
     public static void initialize(Context context)
     {
-        retrieveFromContacts(context);
         retrieveFromStorage(context);
+        retrieveFromContacts(context);
 
         if ((foundInContacts == null) && (foundInStorage == null))
         {
@@ -61,6 +64,10 @@ public class SystemIdentity
                 identity = foundInStorage;
             }
         }
+
+        if (foundInStorage == null) storeIntoStorage(context);
+
+        if (foundInContacts == null) storeIntoContacts(context);
     }
 
     private static void retrieveFromContacts(Context context)
@@ -102,8 +109,6 @@ public class SystemIdentity
                         continue;
                     }
 
-                    foundInContacts = uuid;
-
                     if (gone.equals("0"))
                     {
                         //
@@ -122,53 +127,87 @@ public class SystemIdentity
                     }
                 }
             }
-
-            int x = 0;
-            int y = 2 / x;
         }
         catch (Exception ex)
         {
-            OopsService.Log(LOGTAG, ex);
+            OopsService.log(LOGTAG, ex);
         }
 
         if (cursor != null) cursor.close();
+
+        if (foundInContacts != null) Log.d(LOGTAG,"foundInContacts:" + foundInContacts);
     }
 
-    private static void retrieveFromStorage(Context context)
+    private static void storeIntoContacts(Context context)
     {
-        foundInStorage = null;
-    }
-
-    private static void create(Context context)
-    {
-        String uuid = UUID.randomUUID().toString();
-
         ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
 
         cpo.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
                 .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, context.getPackageName())
                 .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, "XAVARO")
-                .withValue(ContactsContract.RawContacts.SOURCE_ID, uuid)
+                .withValue(ContactsContract.RawContacts.SOURCE_ID, identity)
                 .build());
 
         cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
                 .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
                 .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, "XAVARO")
-                .withValue(ContactsContract.Data.DATA15, uuid)
+                .withValue(ContactsContract.Data.DATA15, identity)
                 .build());
 
         try
         {
             context.getContentResolver().applyBatch(ContactsContract.AUTHORITY, cpo);
         }
-        catch (RemoteException ex)
+        catch (RemoteException | OperationApplicationException ex)
         {
-            //logs;
+            OopsService.log(LOGTAG, ex);
         }
-        catch (OperationApplicationException ex)
+    }
+
+    private static void retrieveFromStorage(Context context)
+    {
+        foundInStorage = null;
+
+        String filename = context.getPackageName() + ".identity.json";
+        FileInputStream inputStream;
+
+        try
         {
-            ex.printStackTrace();
+            byte[] content = new byte[ 4096 ];
+
+            inputStream = context.openFileInput(filename);
+            int xfer = inputStream.read(content);
+            inputStream.close();
+
+            JSONObject ident = new JSONObject(new String(content,0,xfer));
+            foundInStorage = ident.getString("identity");
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        if (foundInStorage != null) Log.d(LOGTAG,"foundInStorage:" + foundInStorage);
+    }
+
+    private static void storeIntoStorage(Context context)
+    {
+        String filename = context.getPackageName() + ".identity.json";
+        FileOutputStream outputStream;
+
+        try
+        {
+            JSONObject ident = new JSONObject();
+            ident.put("identity",identity);
+
+            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream.write(ident.toString(2).getBytes());
+            outputStream.close();
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
         }
     }
 }
