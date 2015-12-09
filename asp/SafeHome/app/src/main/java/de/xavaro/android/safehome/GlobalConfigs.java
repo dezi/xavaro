@@ -62,8 +62,11 @@ public class GlobalConfigs
     // @formatter:on
 
     // @formatter:off
-    public static final String nameUuidServer = "www.xavaro.de";
-    public static final int    portUuidServer = 42743;
+    public static final String CommServerName     = "www.xavaro.de";
+    public static final int    CommServerPort     = 42742; // 42743
+    public static final int    CommServerSleepMin = 100;
+    public static final int    CommServerSleepMax = 100 * 1000;
+    public static final int    CommServerPingSec  = 1;
     // @formatter:on
 
     //endregion

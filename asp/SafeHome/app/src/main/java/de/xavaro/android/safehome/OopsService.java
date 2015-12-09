@@ -15,8 +15,8 @@ import java.io.IOException;
 
 import java.net.UnknownHostException;
 import java.net.SocketException;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
@@ -35,6 +35,8 @@ public class OopsService extends Service
     {
         try
         {
+            Log.d(tag, message);
+
             JSONObject msg = new JSONObject();
 
             msg.put("tag", tag);
@@ -61,6 +63,10 @@ public class OopsService extends Service
     {
         try
         {
+            StackTraceElement[] st = exception.getStackTrace();
+
+            Log.e(tag, st[ 0 ].getMethodName() + ": " + exception.getMessage());
+
             JSONObject err = new JSONObject();
 
             err.put("tag", tag);
@@ -70,8 +76,6 @@ public class OopsService extends Service
             {
                 err.put("err", VersionUtils.getErrno(exception));
             }
-
-            StackTraceElement[] st = exception.getStackTrace();
 
             //
             // Put most recent caller as the one to blame.
@@ -154,12 +158,10 @@ public class OopsService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Log.d(LOGTAG, "onStartCommand");
+        running = true;
 
         if (worker == null)
         {
-            running = true;
-
             worker = new Thread(new Runnable()
             {
                 @Override
@@ -188,7 +190,7 @@ public class OopsService extends Service
         long sleeptime = GlobalConfigs.OopsServerSleepMin;
 
         DatagramSocket datagramSocket = null;
-        DatagramPacket datagrampacket = null;
+        DatagramPacket datagramPacket = null;
         InetAddress serverAddr;
         int serverPort;
 
@@ -238,10 +240,10 @@ public class OopsService extends Service
                     serverPort = GlobalConfigs.OopsServerPort;
 
                     datagramSocket = new DatagramSocket();
-                    datagrampacket = new DatagramPacket(new byte[ 0 ],0);
+                    datagramPacket = new DatagramPacket(new byte[ 0 ],0);
 
-                    datagrampacket.setAddress(serverAddr);
-                    datagrampacket.setPort(serverPort);
+                    datagramPacket.setAddress(serverAddr);
+                    datagramPacket.setPort(serverPort);
                 }
                 catch (UnknownHostException | SocketException ex)
                 {
@@ -269,7 +271,7 @@ public class OopsService extends Service
             String body = "JSON" + StaticUtils.defuckJSON(msg.toString());
             byte[] data = body.getBytes();
 
-            datagrampacket.setData(data);
+            datagramPacket.setData(data);
 
             //
             // Send datagram packet.
@@ -282,7 +284,7 @@ public class OopsService extends Service
                 // Means, packet is lost in this case.
                 //
 
-                datagramSocket.send(datagrampacket);
+                datagramSocket.send(datagramPacket);
 
                 sleeptime = GlobalConfigs.OopsServerSleepMin;
 
@@ -328,6 +330,8 @@ public class OopsService extends Service
         }
 
         Log.d(LOGTAG, "workerThread: finished");
+
+        worker = null;
     }
 
     //endregion
@@ -335,15 +339,10 @@ public class OopsService extends Service
     //region Binder methods.
 
     //
-    // Binder service.
+    // Binder stuff allows anyone to call methods here.
     //
 
     private final IBinder binder = new OopsBinder();
-
-    //
-    // Binder stuff allows anyobe to call methods here.
-    //
-
 
     private class OopsBinder extends Binder
     {
