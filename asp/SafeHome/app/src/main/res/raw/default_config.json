@@ -68,6 +68,11 @@
             {
               "type": "install",
               "label": "NETTO",
+              "packagename": "com.bfi.netto"
+            },
+            {
+              "type": "install",
+              "label": "NETTO",
               "packagename": "com.valuephone.vpnetto"
             }
           ]

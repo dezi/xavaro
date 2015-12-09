@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
 import android.graphics.Bitmap;
@@ -279,31 +280,24 @@ public class LaunchItem extends FrameLayout
 
         if (packageName != null)
         {
-            if (packageName.equals("org.wikipedia.xxxx"))
+            Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+
+            if (appIcon != null)
             {
-                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
+                targetIcon.setImageDrawable(appIcon);
             }
             else
             {
-                Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+                Bitmap thumbnail = StaticUtils.getIconFromAppStore(context, packageName);
 
-                if (appIcon != null)
+                if (thumbnail != null)
                 {
-                    targetIcon.setImageDrawable(appIcon);
+                    targetIcon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
                 }
                 else
                 {
-                    Bitmap thumbnail = StaticUtils.getIconFromAppStore(context, packageName);
-
-                    if (thumbnail != null)
-                    {
-                        targetIcon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
-                    }
-                    else
-                    {
-                        targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
-                        hasProblem = true;
-                    }
+                    targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
+                    hasProblem = true;
                 }
             }
 
@@ -340,6 +334,7 @@ public class LaunchItem extends FrameLayout
             if (type.equals("directory"    )) { launchDirectory();    return; }
             if (type.equals("developer"    )) { launchDeveloper();    return; }
             if (type.equals("settings"     )) { launchSettings();     return; }
+            if (type.equals("install"      )) { launchInstall();      return; }
             if (type.equals("webframe"     )) { launchWebframe();     return; }
             if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
             if (type.equals("skype"        )) { launchSkype();        return; }
@@ -439,6 +434,44 @@ public class LaunchItem extends FrameLayout
         catch (Exception ex)
         {
             ex.printStackTrace();
+        }
+    }
+
+    private void launchInstall()
+    {
+        if (! config.has("packagename"))
+        {
+            Toast.makeText(getContext(),"Nix <packagename> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            String packagename = config.getString("packagename");
+
+            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packagename, 0);
+
+            if (appInfo != null) launchGenericApp();
+        }
+
+        catch (Exception ignore)
+        {
+            //
+            // Package is not installed.
+        }
+
+        try
+        {
+            String packagename = config.getString("packagename");
+
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
+            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
+            context.startActivity(goToMarket);
+        }
+        catch (Exception oops)
+        {
+            OopsService.log(LOGTAG,oops);
         }
     }
 
