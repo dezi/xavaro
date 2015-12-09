@@ -15,6 +15,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
 import android.support.annotation.Nullable;
@@ -278,7 +280,7 @@ public class StaticUtils
 
     //endregion
 
-    //region Get all installed app.
+    //region Get all installed apps.
 
     @Nullable
     public static JSONObject getAllInstalledApps(Context context)
@@ -335,6 +337,41 @@ public class StaticUtils
         return null;
     }
 
+    @Nullable
+    public static Bitmap getIconFromAppStore(Context context, String packageName)
+    {
+        String iconfile = "appstore." + packageName + ".thumbnail.png";
+
+        Bitmap icon = CacheManager.getThumbnail(context,iconfile);
+        if (icon != null) return icon;
+
+        try
+        {
+            String url = "https://play.google.com/store/apps/details?id=" + packageName;
+
+            Log.d(LOGTAG,"getIconFromAppStore:" + url);
+
+            String content = StaticUtils.getContentFromUrl(url);
+            if (content == null) return null;
+
+            Pattern pattern = Pattern.compile("class=\"cover-image\" src=\"([^\"]*)\"");
+            Matcher matcher = pattern.matcher(content);
+            if (! matcher.find()) return null;
+
+            String iconurl = matcher.group(1);
+
+            Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
+
+            return CacheManager.cacheThumbnail(context,iconfile,iconurl);
+        }
+        catch (Exception oops)
+        {
+            OopsService.log(LOGTAG,oops);
+        }
+
+        return null;
+    }
+
     //endregion
 
     //region Get content from HTTP methods.
@@ -352,7 +389,7 @@ public class StaticUtils
 
             InputStream input = connection.getInputStream();
             StringBuilder string = new StringBuilder();
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[ 4096 ];
             int xfer;
 
             while ((xfer = input.read(buffer)) > 0)
@@ -402,9 +439,11 @@ public class StaticUtils
         try
         {
             URL url = new URL(src);
+
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setDoInput(true);
             connection.connect();
+
             InputStream input = connection.getInputStream();
             Bitmap myBitmap = BitmapFactory.decodeStream(input);
 
@@ -422,6 +461,7 @@ public class StaticUtils
 
     //region Networking methods.
 
+    @Nullable
     public static String getMACAddress(String interfaceName)
     {
         try
@@ -470,7 +510,7 @@ public class StaticUtils
 
     //endregion
 
-    //region Simplyfied methods.
+    //region Simplified methods.
 
     public static void sleep(long millis)
     {

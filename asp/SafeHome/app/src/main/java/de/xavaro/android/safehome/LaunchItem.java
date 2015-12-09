@@ -279,7 +279,7 @@ public class LaunchItem extends FrameLayout
 
         if (packageName != null)
         {
-            if (packageName.equals("org.wikipedia"))
+            if (packageName.equals("org.wikipedia.xxxx"))
             {
                 targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.wikipedia_390x390));
             }
@@ -293,8 +293,17 @@ public class LaunchItem extends FrameLayout
                 }
                 else
                 {
-                    targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
-                    hasProblem = true;
+                    Bitmap thumbnail = StaticUtils.getIconFromAppStore(context, packageName);
+
+                    if (thumbnail != null)
+                    {
+                        targetIcon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                    }
+                    else
+                    {
+                        targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
+                        hasProblem = true;
+                    }
                 }
             }
 

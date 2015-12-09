@@ -33,7 +33,8 @@ public class CommService extends Service
     // Worker background thread.
     //
 
-    private Thread worker = null;
+    private Thread workerSend = null;
+    private Thread workerRecv = null;
 
     private boolean running = false;
 
@@ -77,18 +78,32 @@ public class CommService extends Service
     {
         running = true;
 
-        if (worker == null)
+        if (workerSend == null)
         {
-            worker = new Thread(new Runnable()
+            workerSend = new Thread(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    workerThread();
+                    sendThread();
                 }
             });
 
-            worker.start();
+            workerSend.start();
+        }
+
+        if (workerRecv == null)
+        {
+            workerRecv = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    recvThread();
+                }
+            });
+
+            workerRecv.start();
         }
 
         return Service.START_NOT_STICKY;
@@ -98,16 +113,44 @@ public class CommService extends Service
 
     private static final ArrayList<JSONObject> messageBacklog = new ArrayList<>();
 
-    private void workerThread()
+    DatagramSocket datagramSocket = null;
+    DatagramPacket datagramPacket = null;
+    InetAddress serverAddr;
+    int serverPort;
+
+    private void recvThread()
     {
-        Log.d(LOGTAG, "workerThread: running");
+        Log.d(LOGTAG, "recvThread: running");
+
+        while (running)
+        {
+            StaticUtils.sleep(1000);
+
+            if (datagramSocket == null) continue;
+
+            try
+            {
+                byte[] recvBytes = new byte[ 4096 ];
+                DatagramPacket recvPacket = new DatagramPacket(recvBytes, recvBytes.length);
+
+                datagramSocket.receive(recvPacket);
+            }
+            catch (IOException ex)
+            {
+                Log.d(LOGTAG,"recvThread: " + ex.getMessage());
+            }
+        }
+
+        Log.d(LOGTAG, "recvThread: finished");
+
+        workerRecv = null;
+    }
+
+    private void sendThread()
+    {
+        Log.d(LOGTAG, "sendThread: running");
 
         long sleeptime = GlobalConfigs.CommServerSleepMin;
-
-        DatagramSocket datagramSocket = null;
-        DatagramPacket datagramPacket = null;
-        InetAddress serverAddr;
-        int serverPort;
 
         while (running)
         {
@@ -161,18 +204,26 @@ public class CommService extends Service
 
                     datagramPacket.setAddress(serverAddr);
                     datagramPacket.setPort(serverPort);
+
+                    //
+                    // Make sure a ping is sent immedeately.
+                    //
+
+                    lastping = 0;
                 }
                 catch (UnknownHostException | SocketException ex)
                 {
-                    Log.d(LOGTAG,"workerThread: " + ex.getMessage());
+                    Log.d(LOGTAG,"sendThread: " + ex.getMessage());
 
                     //
                     // Reschedule message.
                     //
-
-                    synchronized (messageBacklog)
+                    if (! msg.has("ping"))
                     {
-                        messageBacklog.add(0,msg);
+                        synchronized (messageBacklog)
+                        {
+                            messageBacklog.add(0, msg);
+                        }
                     }
 
                     sleeptime = sleeptime * 2;
@@ -209,15 +260,18 @@ public class CommService extends Service
             }
             catch (IOException ex)
             {
-                Log.d(LOGTAG,"workerThread: " + ex.getMessage());
+                Log.d(LOGTAG,"sendThread: " + ex.getMessage());
 
                 //
                 // Reschedule message.
                 //
 
-                synchronized (messageBacklog)
+                if (! msg.has("ping"))
                 {
-                    messageBacklog.add(0,msg);
+                    synchronized (messageBacklog)
+                    {
+                        messageBacklog.add(0, msg);
+                    }
                 }
 
                 //
@@ -246,9 +300,9 @@ public class CommService extends Service
             }
         }
 
-        Log.d(LOGTAG, "workerThread: finished");
+        Log.d(LOGTAG, "sendThread: finished");
 
-        worker = null;
+        workerSend = null;
     }
 
     private long lastping = 0;
@@ -266,18 +320,15 @@ public class CommService extends Service
 
             synchronized (messageBacklog)
             {
-                boolean duplicate = false;
-
-                for (JSONObject msg : messageBacklog)
+                for (int inx = 0; inx < messageBacklog.size(); inx++)
                 {
-                    if (msg.has("ping"))
+                    if (messageBacklog.get(inx).has("ping"))
                     {
-                        duplicate = true;
-                        break;
+                        messageBacklog.remove(inx--);
                     }
                 }
 
-                if (! duplicate) messageBacklog.add(ping);
+                messageBacklog.add(ping);
             }
         }
         catch (JSONException ignore)

@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
@@ -16,6 +17,38 @@ public class CacheManager
 {
     private final static String LOGTAG = "CacheManager";
 
+    @Nullable
+    public static Bitmap getThumbnail(Context context,String filename)
+    {
+        File file = new File(context.getCacheDir(), filename);
+
+        if (file.exists())
+        {
+            Log.d(LOGTAG,"getThumbnail: load " + file.toString());
+
+            try
+            {
+                FileInputStream input = new FileInputStream(file);
+
+                Bitmap myBitmap = BitmapFactory.decodeStream(input);
+
+                input.close();
+
+                Log.d(LOGTAG, "getThumbnail: load done ");
+
+                return myBitmap;
+
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG,ex);
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static Bitmap cacheThumbnail(Context context,String filename,String src)
     {
         File file = new File(context.getCacheDir(), filename);
@@ -55,29 +88,6 @@ public class CacheManager
             Log.d(LOGTAG,"cacheThumbnail: fetch done");
         }
 
-        if (file.exists())
-        {
-            Log.d(LOGTAG,"cacheThumbnail: load " + file.toString());
-
-            try
-            {
-                FileInputStream input = new FileInputStream(file);
-
-                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
-                input.close();
-
-                Log.d(LOGTAG, "cacheThumbnail: load done ");
-
-                return myBitmap;
-
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        return null;
+        return getThumbnail(context,filename);
     }
 }
