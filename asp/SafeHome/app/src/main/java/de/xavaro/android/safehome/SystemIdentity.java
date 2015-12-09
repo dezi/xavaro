@@ -8,17 +8,26 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.UUID;
 
 //
-// Maintain our system identity guid.
+// Maintain our system identity guid. The
+// copy is stored in individual places,
+// file storage, contact and cookies
+// to avoid deletion by system or user.
 //
 
 public class SystemIdentity
@@ -26,6 +35,7 @@ public class SystemIdentity
     private static final String LOGTAG = SystemIdentity.class.getSimpleName();
 
     public static String identity;
+    public static String randomiz;
 
     private static String foundInContacts;
     private static String foundInStorage;
@@ -41,35 +51,42 @@ public class SystemIdentity
         retrieveFromCookies(context);
         retrieveFromContacts(context);
 
-        if ((foundInContacts == null) && (foundInStorage == null) && (foundInCookies == null))
+        try
+        {
+            if (foundInContacts != null)
+            {
+                identity = foundInContacts.split(":")[ 0 ];
+                randomiz = foundInContacts.split(":")[ 1 ];
+            }
+            else
+            if (foundInStorage != null)
+            {
+                identity = foundInStorage.split(":")[ 0 ];
+                randomiz = foundInStorage.split(":")[ 1 ];
+            }
+            else
+            if (foundInCookies != null)
+            {
+                identity = foundInCookies.split(":")[ 0 ];
+                randomiz = foundInCookies.split(":")[ 1 ];
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+
+        if ((identity == null) || (randomiz == null))
         {
             //
             // Master create new uuid.
             //
 
             identity = UUID.randomUUID().toString();
-        }
-        else
-        {
-            //
-            // We give preference to the contacts UUID,
-            // since user or system might clear app data
-            // every now and then.
-            //
+            randomiz = UUID.randomUUID().toString();
 
-            if (foundInContacts != null)
-            {
-                identity = foundInContacts;
-            }
-            else
-            if (foundInStorage != null)
-            {
-                identity = foundInStorage;
-            }
-            else
-            {
-                identity = foundInCookies;
-            }
+            foundInStorage  = null;
+            foundInCookies  = null;
+            foundInContacts = null;
         }
 
         if (foundInStorage == null) storeIntoStorage(context);
@@ -99,11 +116,9 @@ public class SystemIdentity
                 {
                     String rawi = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts._ID));
                     String gone = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.DELETED));
-                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_NAME));
-                    String type = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.ACCOUNT_TYPE));
                     String uuid = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.SOURCE_ID));
 
-                    if (uuid == null)
+                    if ((uuid == null) || ! uuid.contains(":"))
                     {
                         //
                         // Bogus contact w/o UUID.
@@ -152,17 +167,19 @@ public class SystemIdentity
     {
         ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
 
+        String idvalue = identity + ":" + randomiz;
+
         cpo.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
                 .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, context.getPackageName())
                 .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, "XAVARO")
-                .withValue(ContactsContract.RawContacts.SOURCE_ID, identity)
+                .withValue(ContactsContract.RawContacts.SOURCE_ID, idvalue)
                 .build());
 
         cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
                 .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
                 .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, "XAVARO")
-                .withValue(ContactsContract.Data.DATA15, identity)
+                .withValue(ContactsContract.Data.DATA15, idvalue)
                 .build());
 
         try
@@ -209,7 +226,7 @@ public class SystemIdentity
         try
         {
             JSONObject ident = new JSONObject();
-            ident.put("identity",identity);
+            ident.put("identity",identity + ":" + randomiz);
 
             outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
             outputStream.write(ident.toString(2).getBytes());
@@ -242,6 +259,6 @@ public class SystemIdentity
     private static void storeIntoCookies(Context context)
     {
         android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
-        wkCookieManager.setCookie("http://" + context.getPackageName(),"identity=" + identity);
+        wkCookieManager.setCookie("http://" + context.getPackageName(),"identity=" + identity + ":" + randomiz);
     }
 }

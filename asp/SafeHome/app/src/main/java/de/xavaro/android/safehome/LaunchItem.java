@@ -222,7 +222,7 @@ public class LaunchItem extends FrameLayout
                     if (config.has("waphonenumber"))
                     {
                         String phone = config.getString("waphonenumber");
-                        Bitmap thumbnail = StaticUtils.getWhatsAppProfileBitmap(context, phone);
+                        Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
 
                         if (thumbnail != null)
                         {
@@ -242,7 +242,7 @@ public class LaunchItem extends FrameLayout
                     if (config.has("skypename"))
                     {
                         String skypename = config.getString("skypename");
-                        Bitmap thumbnail = StaticUtils.getSkypeProfileBitmap(context, skypename);
+                        Bitmap thumbnail = ProfileImages.getSkypeProfileBitmap(context, skypename);
 
                         if (thumbnail != null)
                         {
@@ -619,7 +619,7 @@ public class LaunchItem extends FrameLayout
         }
         catch (Exception ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
         }
 
         /*

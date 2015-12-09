@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity
         createConfig();
 
         startService(new Intent(this, KioskService.class));
-        startService(new Intent(this, UpushService.class));
+        startService(new Intent(this, CommService.class));
         startService(new Intent(this, OopsService.class));
 
         //
@@ -83,8 +83,8 @@ public class HomeActivity extends AppCompatActivity
         Intent kioskIntent = new Intent(this, KioskService.class);
         bindService(kioskIntent, kioskConnection, Context.BIND_AUTO_CREATE);
 
-        Intent upushIntent = new Intent(this, UpushService.class);
-        bindService(upushIntent, upushConnection, Context.BIND_AUTO_CREATE);
+        Intent commIntent = new Intent(this, CommService.class);
+        bindService(commIntent, commConnection, Context.BIND_AUTO_CREATE);
 
         Log.d(LOGTAG, "onStart...");
     }
@@ -132,7 +132,7 @@ public class HomeActivity extends AppCompatActivity
         super.onStop();
 
         if (kioskService != null) unbindService(kioskConnection);
-        if (UpushService.getInstance() != null) unbindService(upushConnection);
+        if (CommService.getInstance() != null) unbindService(commConnection);
     }
 
     @Override
@@ -293,19 +293,19 @@ public class HomeActivity extends AppCompatActivity
         }
     };
 
-    private ServiceConnection upushConnection = new ServiceConnection()
+    private ServiceConnection commConnection = new ServiceConnection()
     {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service)
         {
-            UpushService.UpushBinder binder = (UpushService.UpushBinder) service;
-            UpushService.setInstance(binder.getService());
+            CommService.CommBinder binder = (CommService.CommBinder) service;
+            CommService.setInstance(binder.getService());
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0)
         {
-            UpushService.setInstance(null);
+            CommService.setInstance(null);
         }
     };
 }

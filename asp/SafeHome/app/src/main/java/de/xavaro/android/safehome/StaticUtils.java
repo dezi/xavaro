@@ -3,9 +3,11 @@ package de.xavaro.android.safehome;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -14,6 +16,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
 import android.support.annotation.Nullable;
 import android.content.Context;
 import android.content.Intent;
@@ -236,232 +239,6 @@ public class StaticUtils
         ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
 
         return (res.activityInfo == null) ? null : res.activityInfo.packageName;
-    }
-
-    //endregion
-
-    //region Obtaining contacts profile images.
-
-    private static JSONObject contacts = null;
-
-    //
-    // Retrieve contacts phone number from skype account.
-    //
-
-    public static String getPhoneFromSkype(Context context, String skypename)
-    {
-        boolean ismatch = false;
-        String phone = null;
-
-        if (contacts == null)
-        {
-            //
-            // Read into static contacts once.
-            //
-
-            contacts = new ContactsHandler(context).contacts2JSONObject();
-        }
-
-        try
-        {
-            Iterator<?> ids = contacts.keys();
-
-            while (ids.hasNext())
-            {
-                String id = (String) ids.next();
-                JSONArray contact = contacts.getJSONArray(id);
-                if (contact == null) continue;
-
-                ismatch = false;
-                phone = null;
-
-                for (int inx = 0; inx < contact.length(); inx++)
-                {
-                    JSONObject item = contact.getJSONObject(inx);
-
-                    if (item.has("DATA1"))
-                    {
-                        String number = item.getString("DATA1").replaceAll(" ","");
-
-                        if (number.endsWith(skypename))
-                        {
-                            ismatch = true;
-                        }
-                    }
-
-                    if (item.has("NUMBER"))
-                    {
-                        phone = item.getString("NUMBER");
-
-                        if (phone != null)
-                        {
-                            phone = phone.replaceAll("\\+", "");
-                            phone = phone.replaceAll(" ", "");
-                        }
-                    }
-                }
-
-                if (ismatch && (phone != null))
-                {
-                    //
-                    // We have found a phone number within skype contact.
-                    //
-
-                    return phone;
-                }
-            }
-        }
-        catch (JSONException ignore)
-        {
-        }
-
-        return null;
-    }
-
-    //
-    // Retrieve profile image bitmap for contacts telefone number.
-    //
-
-    public static Bitmap getContactsProfileBitmap(Context context, String search)
-    {
-        boolean ismatch = false;
-        String photo = null;
-
-        search = search.replaceAll(" ", "");
-
-        if (contacts == null)
-        {
-            //
-            // Read into static contacts once.
-            //
-
-            contacts = new ContactsHandler(context).contacts2JSONObject();
-        }
-
-        try
-        {
-            Iterator<?> ids = contacts.keys();
-
-            while (ids.hasNext())
-            {
-                String id = (String) ids.next();
-                JSONArray contact = contacts.getJSONArray(id);
-                if (contact == null) continue;
-
-                ismatch = false;
-                photo = null;
-
-                for (int inx = 0; inx < contact.length(); inx++)
-                {
-                    JSONObject item = contact.getJSONObject(inx);
-
-                    if (item.has("NUMBER"))
-                    {
-                        String number = item.getString("NUMBER").replaceAll(" ","");
-
-                        if (number.endsWith(search))
-                        {
-                            ismatch = true;
-                        }
-                    }
-
-                    if (item.has("DATA1"))
-                    {
-                        String number = item.getString("DATA1").replaceAll(" ","");
-
-                        if (number.endsWith(search))
-                        {
-                            ismatch = true;
-                        }
-                    }
-
-                    if (item.has("PHOTO"))
-                    {
-                        photo = item.getString("PHOTO");
-                    }
-                }
-
-                if (ismatch && (photo != null)) break;
-            }
-        }
-        catch (JSONException ignore)
-        {
-        }
-
-        if ((! ismatch) || (photo == null)) return null;
-
-        byte[] rawbytes = StaticUtils.hexStringToBytes(photo);
-
-        return BitmapFactory.decodeByteArray(rawbytes, 0, rawbytes.length);
-    }
-
-    //
-    // Retrieve profile image bitmap for Sykpe account.
-    //
-
-    public static Bitmap getSkypeProfileBitmap(Context context, String skypename)
-    {
-        //
-        // Try to get generic contact image.
-        //
-
-        Bitmap bitmap = getContactsProfileBitmap(context,skypename);
-        if (bitmap != null) return bitmap;
-
-        //
-        // Search for a matching phone number in contacts.
-        //
-
-        String phone = getPhoneFromSkype(context, skypename);
-        if (phone == null) return null;
-
-        //
-        // Retry with WhatsApp profile image anyway.
-        //
-
-        return getWhatsAppProfileBitmap(context, phone);
-    }
-
-    //
-    // Retrieve profile image bitmap for WhatsApp telefone number.
-    //
-    public static Bitmap getWhatsAppProfileBitmap(Context context, String phone)
-    {
-        File wappdir = new File(Environment.getExternalStorageDirectory().getPath() + "/WhatsApp/Profile Pictures");
-
-        if (! wappdir.isDirectory()) return null;
-
-        String[] wappdirlist = wappdir.list();
-
-        if (wappdirlist == null) return null;
-
-        for (String ppfile : wappdirlist)
-        {
-            if (ppfile.startsWith(phone))
-            {
-                try
-                {
-                    FileInputStream fi = new FileInputStream(wappdir + File.separator + ppfile);
-                    Bitmap thumbnail = BitmapFactory.decodeStream(fi);
-                    fi.close();
-
-                    Log.d(LOGTAG, "getWhatsAppProfileBitmap: OK.");
-
-                    return thumbnail;
-
-                }
-                catch (Exception ex)
-                {
-                    Log.e(LOGTAG,"getWhatsAppProfileBitmap: " + ex.getMessage());
-                }
-            }
-        }
-
-        //
-        // Retry with generic contacts profile image.
-        //
-
-        return getContactsProfileBitmap(context, phone);
     }
 
     //endregion
@@ -710,6 +487,23 @@ public class StaticUtils
     public static String defuckJSON(String json)
     {
         return json.replace("\\/","/");
+    }
+
+    public static void fileCopy(File src, File dst) throws IOException
+    {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        byte[] buf = new byte[1024];
+        int len;
+
+        while ((len = in.read(buf)) > 0)
+        {
+            out.write(buf, 0, len);
+        }
+
+        in.close();
+        out.close();
     }
 
     //endregion

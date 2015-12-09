@@ -88,7 +88,7 @@ public class OopsService extends Service
             // Put at most two callers from own app into dump.
             //
 
-            String appname = UpushService.class.getPackage().getName();
+            String appname = CommService.class.getPackage().getName();
 
             JSONArray bys = new JSONArray();
 
@@ -202,7 +202,7 @@ public class OopsService extends Service
             StaticUtils.sleep(sleeptime);
 
             //
-            // Get  message if one present.
+            // Get message if one present.
             //
 
             JSONObject msg;
@@ -212,6 +212,18 @@ public class OopsService extends Service
                 if (messageBacklog.size() == 0) continue;
 
                 msg = messageBacklog.remove(0);
+            }
+
+            //
+            // Add identity to message.
+            //
+
+            try
+            {
+                msg.put("identity",SystemIdentity.identity);
+            }
+            catch (JSONException ignore)
+            {
             }
 
             //
