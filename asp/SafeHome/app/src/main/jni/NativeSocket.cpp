@@ -2,50 +2,108 @@
 
 extern "C"
 {
-    JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_FortyTwo(JNIEnv* env, jobject obj, jstring text, jint port);
+JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeCreate(
+        JNIEnv* env, jobject obj);
+
+JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeClose(
+        JNIEnv* env, jobject obj,
+        jint socketfd);
+
+JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
+        JNIEnv* env, jobject obj,
+        jint socketfd,
+        jint ttl);
+
+JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeSend(
+        JNIEnv* env, jobject obj,
+        jint socketfd,
+        jbyteArray data, jint offset,jint length,
+        jstring destip, jint destport);
+
+JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeReceive(
+        JNIEnv* env, jobject obj,
+        jint socketfd,
+        jbyteArray data,jint length);
 }
 
-int Java_de_xavaro_android_safehome_NativeSocket_FortyTwo(JNIEnv* env, jobject obj, jstring text, jint port)
+int Java_de_xavaro_android_safehome_NativeSocket_nativeCreate(JNIEnv* env, jobject obj)
 {
-    const char* strChars = env->GetStringUTFChars(text, (jboolean *) 0);
+    int socketfd = socket(AF_INET, SOCK_DGRAM, 0);
 
-    LOGE("&&&&&&&&%s&&=%d",strChars,port);
+    return socketfd;
+}
 
-    struct sockaddr_in si_me,si_other;
+int Java_de_xavaro_android_safehome_NativeSocket_nativeClose(
+        JNIEnv* env, jobject obj,
+        jint socketfd)
+{
+    return close(socketfd);
+}
 
-    memset((char *) &si_me, 0, sizeof(si_me));
+int Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
+        JNIEnv* env, jobject obj,
+        jint socketfd,
+        jint ttl)
+{
+    socklen_t ttlval = (socklen_t) ttl;
 
-    si_me.sin_family = AF_INET;
-    si_me.sin_port = htons(port);
-    si_me.sin_addr.s_addr = htonl(INADDR_ANY);
+    return setsockopt(socketfd, IPPROTO_IP, IP_TTL, &ttlval, sizeof(socklen_t));
+}
 
-    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+int Java_de_xavaro_android_safehome_NativeSocket_nativeSend(
+        JNIEnv* env, jobject obj,
+        jint socketfd,
+        jbyteArray data, jint offset, jint length,
+        jstring destip, jint destport)
+{
+    //
+    // Pepare destination ip and port.
+    //
 
-    LOGE("&&&&&&&& Socket=%d",sockfd);
+    const char *cdestip = env->GetStringUTFChars(destip, (jboolean *) 0);
 
-    int error;
+    struct sockaddr_in dest_si;
 
-    socklen_t ttl = 200;
+    memset((char *) &dest_si, 0, sizeof(dest_si));
 
-    error = setsockopt(sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(socklen_t));
-    LOGE("&&&&&&&& setsockopt-TTL=%d",error);
+    dest_si.sin_family = AF_INET;
+    dest_si.sin_port = htons(destport);
+    inet_aton(cdestip, &dest_si.sin_addr);
 
-    socklen_t enable = 1;
-    error = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(socklen_t));
-    LOGE("&&&&&&&& setsockopt-REUSE=%d",error);
+    //
+    // Dereference byte[] from java.
+    //
 
-    error = bind(sockfd,(struct sockaddr *) &si_me, sizeof(si_me));
+    size_t clength = (size_t) length;
+    char *cdata = (char *) env->GetByteArrayElements(data,(jboolean *) 0);
 
-    LOGE("&&&&&&&& bind=%d",error);
+    ssize_t xfer = sendto(socketfd, cdata + offset, clength, 0, (struct sockaddr *) &dest_si, sizeof(dest_si));
 
+    //
+    // Release dereferenced item.
+    //
 
-    memset((char *) &si_other, 0, sizeof(si_other));
-    si_other.sin_family = AF_INET;
-    si_other.sin_port = htons(42742);
-    inet_aton("176.9.65.213", &si_other.sin_addr);
+    env->ReleaseByteArrayElements(data, (jbyte *) cdata, JNI_ABORT);
 
+    return (int) xfer;
+}
 
-    sendto(sockfd, strChars, 5, 0, (struct sockaddr*)&si_other, sizeof(si_other));
+int Java_de_xavaro_android_safehome_NativeSocket_nativeReceive(
+        JNIEnv* env, jobject obj,
+        jint socketfd,
+        jbyteArray data, jint length)
+{
+    size_t clength = (size_t) length;
+    void *cdata = malloc(clength);
 
-    return 42;
+    ssize_t xfer = recv(socketfd,cdata,clength,0);
+
+    if (xfer >= 0)
+    {
+        env->SetByteArrayRegion(data, 0, (int) xfer, (const jbyte*) cdata);
+    }
+
+    free(cdata);
+
+    return (int) xfer;
 }

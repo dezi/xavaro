@@ -255,10 +255,12 @@ public class CommService extends Service
                 {
                     Log.d(LOGTAG, "ispups");
 
-                    NativeSocket.FortyTwo("pupspups", 47111);
+                    datagramSocket.setTTL(5);
+                    datagramSocket.send(datagramPacket);
                 }
                 else
                 {
+                    datagramSocket.setTTL(200);
                     datagramSocket.send(datagramPacket);
                 }
 
