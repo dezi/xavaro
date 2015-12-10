@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.SocketException;
+import java.net.SocketOptions;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
@@ -113,7 +115,7 @@ public class CommService extends Service
 
     private static final ArrayList<JSONObject> messageBacklog = new ArrayList<>();
 
-    DatagramSocket datagramSocket = null;
+    MulticastSocket datagramSocket = null;
     DatagramPacket datagramPacket = null;
     InetAddress serverAddr;
     int serverPort;
@@ -134,6 +136,8 @@ public class CommService extends Service
                 DatagramPacket recvPacket = new DatagramPacket(recvBytes, recvBytes.length);
 
                 datagramSocket.receive(recvPacket);
+
+                Log.d(LOGTAG, "recvThread: received:" + recvPacket.getLength());
             }
             catch (IOException ex)
             {
@@ -199,7 +203,7 @@ public class CommService extends Service
                     serverAddr = InetAddress.getByName(GlobalConfigs.CommServerName);
                     serverPort = GlobalConfigs.CommServerPort;
 
-                    datagramSocket = new DatagramSocket();
+                    datagramSocket = new MulticastSocket();
                     datagramPacket = new DatagramPacket(new byte[ 0 ],0);
 
                     datagramPacket.setAddress(serverAddr);
@@ -211,7 +215,7 @@ public class CommService extends Service
 
                     lastping = 0;
                 }
-                catch (UnknownHostException | SocketException ex)
+                catch (Exception ex)
                 {
                     Log.d(LOGTAG,"sendThread: " + ex.getMessage());
 
@@ -252,7 +256,22 @@ public class CommService extends Service
                 // Means, packet is lost in this case.
                 //
 
-                datagramSocket.send(datagramPacket);
+                if (msg.has("pups"))
+                {
+                    Log.d(LOGTAG, "ispups");
+
+                    //datagramSocket.setTTL((byte) 1);
+                    datagramSocket.setTimeToLive(1);
+                    datagramSocket.send(datagramPacket);
+                }
+                else
+                {
+                    //datagramSocket.setTTL((byte) 250);
+                    datagramSocket.setTimeToLive(255);
+                    datagramSocket.send(datagramPacket);
+                }
+
+                Log.d(LOGTAG,"Live=" + datagramSocket.getTimeToLive() + "TTL=" + datagramSocket.getTTL());
 
                 sleeptime = GlobalConfigs.CommServerSleepMin;
 
@@ -306,36 +325,51 @@ public class CommService extends Service
     }
 
     private long lastping = 0;
+    private long lastpups = 0;
 
     private void checkPing()
     {
         long now = System.currentTimeMillis();
 
-        if ((lastping + (GlobalConfigs.CommServerPingSec * 1000)) > now) return;
-
         try
         {
-            JSONObject ping = new JSONObject();
-            ping.put("ping", new JSONObject());
+            JSONObject ping = null;
 
-            synchronized (messageBacklog)
+            if ((lastpups + (GlobalConfigs.CommServerPupsSec * 1000)) < now)
             {
-                for (int inx = 0; inx < messageBacklog.size(); inx++)
-                {
-                    if (messageBacklog.get(inx).has("ping"))
-                    {
-                        messageBacklog.remove(inx--);
-                    }
-                }
+                ping = new JSONObject();
+                ping.put("pups", new JSONObject());
 
-                messageBacklog.add(ping);
+                lastpups = now;
+            }
+            else
+            if ((lastping + (GlobalConfigs.CommServerPingSec * 1000)) < now)
+            {
+                ping = new JSONObject();
+                ping.put("ping", new JSONObject());
+
+                lastping = now;
+            }
+
+            if (ping != null)
+            {
+                synchronized (messageBacklog)
+                {
+                    for (int inx = 0; inx < messageBacklog.size(); inx++)
+                    {
+                        if (messageBacklog.get(inx).has("ping"))
+                        {
+                            messageBacklog.remove(inx--);
+                        }
+                    }
+
+                    messageBacklog.add(ping);
+                }
             }
         }
         catch (JSONException ignore)
         {
         }
-
-        lastping = now;
     }
 
     //region Binder methods.
