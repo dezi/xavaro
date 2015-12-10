@@ -14,12 +14,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.SocketException;
-import java.net.SocketOptions;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 //
@@ -115,7 +110,7 @@ public class CommService extends Service
 
     private static final ArrayList<JSONObject> messageBacklog = new ArrayList<>();
 
-    MulticastSocket datagramSocket = null;
+    NativeSocket datagramSocket = null;
     DatagramPacket datagramPacket = null;
     InetAddress serverAddr;
     int serverPort;
@@ -203,7 +198,7 @@ public class CommService extends Service
                     serverAddr = InetAddress.getByName(GlobalConfigs.CommServerName);
                     serverPort = GlobalConfigs.CommServerPort;
 
-                    datagramSocket = new MulticastSocket();
+                    datagramSocket = new NativeSocket();
                     datagramPacket = new DatagramPacket(new byte[ 0 ],0);
 
                     datagramPacket.setAddress(serverAddr);
@@ -260,18 +255,12 @@ public class CommService extends Service
                 {
                     Log.d(LOGTAG, "ispups");
 
-                    //datagramSocket.setTTL((byte) 1);
-                    datagramSocket.setTimeToLive(1);
-                    datagramSocket.send(datagramPacket);
+                    NativeSocket.FortyTwo("pupspups", 47111);
                 }
                 else
                 {
-                    //datagramSocket.setTTL((byte) 250);
-                    datagramSocket.setTimeToLive(255);
                     datagramSocket.send(datagramPacket);
                 }
-
-                Log.d(LOGTAG,"Live=" + datagramSocket.getTimeToLive() + "TTL=" + datagramSocket.getTTL());
 
                 sleeptime = GlobalConfigs.CommServerSleepMin;
 
