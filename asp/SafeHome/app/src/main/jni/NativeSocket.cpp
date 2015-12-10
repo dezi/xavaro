@@ -9,6 +9,10 @@ JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeClose(
         JNIEnv* env, jobject obj,
         jint socketfd);
 
+JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeGetTTL(
+        JNIEnv* env, jobject obj,
+        jint socketfd);
+
 JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
         JNIEnv* env, jobject obj,
         jint socketfd,
@@ -24,6 +28,10 @@ JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeReceive
         JNIEnv* env, jobject obj,
         jint socketfd,
         jbyteArray data,jint length);
+
+JNIEXPORT jstring JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeStrError(
+        JNIEnv* env, jobject obj,
+        jint errnum);
 }
 
 int Java_de_xavaro_android_safehome_NativeSocket_nativeCreate(JNIEnv* env, jobject obj)
@@ -40,6 +48,18 @@ int Java_de_xavaro_android_safehome_NativeSocket_nativeClose(
     return close(socketfd);
 }
 
+int Java_de_xavaro_android_safehome_NativeSocket_nativeGetTTL(
+        JNIEnv* env, jobject obj,
+        jint socketfd)
+{
+    socklen_t ttlval;
+    socklen_t ttllen;
+
+    int err = getsockopt(socketfd, IPPROTO_IP, IP_TTL, &ttlval, &ttllen);
+
+    return (err < 0) ? err : ttlval;
+}
+
 int Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
         JNIEnv* env, jobject obj,
         jint socketfd,
@@ -47,7 +67,9 @@ int Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
 {
     socklen_t ttlval = (socklen_t) ttl;
 
-    return setsockopt(socketfd, IPPROTO_IP, IP_TTL, &ttlval, sizeof(socklen_t));
+    int err = setsockopt(socketfd, IPPROTO_IP, IP_TTL, &ttlval, sizeof(socklen_t));
+
+    return err;
 }
 
 int Java_de_xavaro_android_safehome_NativeSocket_nativeSend(
@@ -106,4 +128,11 @@ int Java_de_xavaro_android_safehome_NativeSocket_nativeReceive(
     free(cdata);
 
     return (int) xfer;
+}
+
+JNIEXPORT jstring JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeStrError(
+        JNIEnv* env, jobject obj,
+        jint errnum)
+{
+    return env->NewStringUTF(strerror(errnum));
 }

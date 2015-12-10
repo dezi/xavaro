@@ -1,17 +1,18 @@
 package de.xavaro.android.safehome;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.Arrays;
+
+//
+// Small native datagram socket class with ability
+// to set the TTL. This is required to keep Router
+// NAT-Tables alive w/o really sending packets to
+// server outside in the internet.
+//
 
 public class NativeSocket
 {
-    private static final String LOGTAG = NativeSocket.class.getSimpleName();
-
     static
     {
         System.loadLibrary("NativeSocket");
@@ -19,15 +20,36 @@ public class NativeSocket
 
     public static native int nativeCreate();
     public static native int nativeClose(int socketfd);
+
+    public static native int nativeGetTTL(int socketfd);
     public static native int nativeSetTTL(int socketfd, int ttl);
+
     public static native int nativeSend(int socketfd, byte[] data, int offset, int length, String destip, int destport);
     public static native int nativeReceive(int socketfd, byte[] data, int length);
 
-    private static int socketfd;
+    public static native String nativeStrError(int errnum);
 
-    public NativeSocket()
+    private static int socketfd;
+    private static int initialTTL;
+    private static int currentTTL;
+
+    private String errorMessage(int errnum)
+    {
+        return nativeStrError(errnum) + " (" + errnum + ")";
+    }
+
+    public NativeSocket() throws IOException
     {
         socketfd = nativeCreate();
+
+        if (socketfd > 0)
+        {
+            initialTTL = currentTTL = this.getTTL();
+
+            return;
+        }
+
+        throw new IOException(errorMessage(socketfd));
     }
 
     public void close()
@@ -40,9 +62,30 @@ public class NativeSocket
         }
     }
 
-    public void setTTL(int ttl)
+    public int getTTL() throws IOException
     {
-        nativeSetTTL(socketfd,ttl);
+        int ttl = nativeGetTTL(socketfd);
+
+        if (ttl > 0) return ttl;
+
+        throw new IOException(errorMessage(ttl));
+    }
+
+    public void setTTL(int ttl) throws IOException
+    {
+        if (ttl == 0) ttl = initialTTL;
+        if (ttl == currentTTL) return;
+
+        int err = nativeSetTTL(socketfd, ttl);
+
+        if (err >= 0)
+        {
+            currentTTL = ttl;
+
+            return;
+        }
+
+        throw new IOException(errorMessage(err));
     }
 
     public void send(DatagramPacket packet) throws IOException
@@ -54,7 +97,9 @@ public class NativeSocket
 
         int xfer = nativeSend(socketfd,buffer,0,length,destip,destport);
 
-        Log.d(LOGTAG, "send=" + xfer + "=" + destip + ":" + destport);
+        if (xfer > 0) return;
+
+        throw new IOException(errorMessage(xfer));
     }
 
     public void receive(DatagramPacket packet) throws IOException
@@ -62,10 +107,15 @@ public class NativeSocket
         byte[] buffer = packet.getData();
         int length = buffer.length;
 
-        int xfer = nativeReceive(socketfd,buffer,length);
+        int xfer = nativeReceive(socketfd, buffer, length);
 
-        packet.setData(Arrays.copyOfRange(buffer, 0, xfer));
+        if (xfer > 0)
+        {
+            packet.setData(Arrays.copyOfRange(buffer, 0, xfer));
 
-        Log.d(LOGTAG, "recv=" + xfer + "=" + new String(packet.getData()));
+            return;
+        }
+
+        throw new IOException(errorMessage(xfer));
     }
 }
