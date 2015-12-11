@@ -5,6 +5,23 @@
         "type": "settings"
       },
       {
+        "label": "Radio",
+        "type": "directory",
+        "icon": "radio_400x400",
+        "launchgroup": {
+          "launchitems": [
+            {
+              "type": "webradio",
+              "name": "www.antenne.de"
+            },
+            {
+              "type": "webradio",
+              "name": "radio.sunshine-live.de"
+            }
+          ]
+        }
+      },
+      {
         "label": "Recommended",
         "type": "directory",
         "packagename": "com.android.vending",

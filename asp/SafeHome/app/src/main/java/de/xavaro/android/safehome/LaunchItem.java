@@ -13,7 +13,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.TimedText;
 import android.net.Uri;
@@ -34,8 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 //
 // Launch item view on home screen.
@@ -44,6 +41,8 @@ import java.util.Map;
 public class LaunchItem extends FrameLayout
 {
     private final String LOGTAG = "LaunchItem";
+
+    private static ProxyPlayer proxyPlayer;
 
     private Context context;
 
@@ -61,6 +60,7 @@ public class LaunchItem extends FrameLayout
 
     private LaunchGroup directory;
     private WebFrame webframe;
+    private WebRadio webradio;
 
     public LaunchItem(Context context)
     {
@@ -271,6 +271,22 @@ public class LaunchItem extends FrameLayout
                         targetIcon = overicon;
                     }
                 }
+
+                if (type.equals("webradio"))
+                {
+                    if (config.has("name"))
+                    {
+                        String name = config.getString("name");
+
+                        label.setText(WebRadio.getConfigLabel(context, name));
+                        setVisibility(VISIBLE);
+
+                        icon.setImageDrawable(WebRadio.getConfigIconDrawable(context, name));
+                        icon.setVisibility(VISIBLE);
+
+                        targetIcon = overicon;
+                    }
+                }
             }
         }
         catch (Exception ex)
@@ -316,36 +332,48 @@ public class LaunchItem extends FrameLayout
             return;
         }
 
-        if (! config.has("type"))
+        String type = null;
+
+        try
+        {
+            if (config.has("audiourl"))
+            {
+                type = "audioplayer";
+            }
+
+            if (config.has("type"))
+            {
+                type = config.getString("type");
+            }
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        if (type == null)
         {
             Toast.makeText(getContext(),"Nix <type> configured.",Toast.LENGTH_LONG).show();
 
             return;
         }
 
-        try
-        {
-            String type = config.getString("type");
+        // @formatter:off
+        if (type.equals("select_home"  )) { launchSelectHome();   return; }
+        if (type.equals("select_assist")) { launchSelectAssist(); return; }
+        if (type.equals("audioplayer"  )) { launchAudioPlayer();  return; }
+        if (type.equals("genericapp"   )) { launchGenericApp();   return; }
+        if (type.equals("directory"    )) { launchDirectory();    return; }
+        if (type.equals("developer"    )) { launchDeveloper();    return; }
+        if (type.equals("settings"     )) { launchSettings();     return; }
+        if (type.equals("install"      )) { launchInstall();      return; }
+        if (type.equals("webframe"     )) { launchWebframe();     return; }
+        if (type.equals("webradio"     )) { launchWebradio();     return; }
+        if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
+        if (type.equals("skype"        )) { launchSkype();        return; }
 
-            // @formatter:off
-            if (type.equals("select_home"  )) { launchSelectHome();   return; }
-            if (type.equals("select_assist")) { launchSelectAssist(); return; }
-            if (type.equals("genericapp"   )) { launchGenericApp();   return; }
-            if (type.equals("directory"    )) { launchDirectory();    return; }
-            if (type.equals("developer"    )) { launchDeveloper();    return; }
-            if (type.equals("settings"     )) { launchSettings();     return; }
-            if (type.equals("install"      )) { launchInstall();      return; }
-            if (type.equals("webframe"     )) { launchWebframe();     return; }
-            if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
-            if (type.equals("skype"        )) { launchSkype();        return; }
+        // @formatter:on
 
-            // @formatter:on
-
-            Toast.makeText(getContext(),"Nix launcher type <" + type + "> configured.",Toast.LENGTH_LONG).show();
-        }
-        catch (JSONException ignore)
-        {
-        }
+        Toast.makeText(getContext(),"Nix launcher type <" + type + "> configured.",Toast.LENGTH_LONG).show();
     }
 
     private void launchSelectHome()
@@ -471,7 +499,7 @@ public class LaunchItem extends FrameLayout
         }
         catch (Exception oops)
         {
-            OopsService.log(LOGTAG,oops);
+            OopsService.log(LOGTAG, oops);
         }
     }
 
@@ -592,6 +620,33 @@ public class LaunchItem extends FrameLayout
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
+    private void launchWebradio()
+    {
+        if (! config.has("name"))
+        {
+            Toast.makeText(getContext(),"Nix <name> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            if (webradio == null)
+            {
+                String name = config.getString("name");
+
+                webradio = new WebRadio(context);
+                webradio.setName(name);
+            }
+
+            ((HomeActivity) context).addViewToBackStack(webradio);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     private void launchWebframe()
     {
         if (! config.has("name"))
@@ -652,7 +707,7 @@ public class LaunchItem extends FrameLayout
         */
     }
 
-    private void launchDeveloper()
+    private void launchDeveloperException()
     {
         try
         {
@@ -710,44 +765,30 @@ public class LaunchItem extends FrameLayout
         mPlayer.start();
     }
 
-    private void launchDeveloperAudio()
+    private void launchAudioPlayer()
     {
-        MediaPlayer mPlayer = new MediaPlayer();
-        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        try
+        if (! config.has("audiourl"))
         {
-            Map<String, String> headers = new HashMap<String, String>();
-            headers.put("Icy-MetaData", "1");
+            Toast.makeText(getContext(),"Nix <audiourl> configured.",Toast.LENGTH_LONG).show();
 
-            //mPlayer.setDataSource(context, Uri.parse("http://mp3channels.webradio.antenne.de/antenne"), headers);
-            mPlayer.setDataSource(context,Uri.parse("http://online-radioroks.tavrmedia.ua/RadioROKS"),headers);
-
-            mPlayer.setOnTimedTextListener(
-                    new MediaPlayer.OnTimedTextListener()
-                    {
-                        @Override
-                        public void onTimedText(MediaPlayer mp, TimedText text)
-                        {
-                            Log.d("PLLLLLLL", text.getText());
-                        }
-
-                    });
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
+            return;
         }
 
         try
         {
-            mPlayer.prepare();
+            String audiourl = config.getString("audiourl");
+
+            if (proxyPlayer == null) proxyPlayer = new ProxyPlayer();
+
+            proxyPlayer.setAudioUrl(context,audiourl);
         }
-        catch (IOException ex)
+        catch (Exception ex)
         {
             ex.printStackTrace();
         }
+    }
 
-        mPlayer.start();
+    private void launchDeveloper()
+    {
     }
 }

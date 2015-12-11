@@ -19,21 +19,21 @@ import org.json.JSONObject;
 
 public class LaunchGroup extends FrameLayout
 {
-    private final String LOGTAG = "LaunchGroup";
+    protected final String LOGTAG = "LaunchGroup";
 
-    private Context context;
+    protected Context context;
 
-    private JSONObject config;
+    protected JSONObject config;
 
-    private int horzSize = 220;
-    private int vertSize = 220;
+    protected int horzSize = 220;
+    protected int vertSize = 220;
 
-    private int horzItems;
-    private int vertItems;
-    private int horzSpace;
-    private int vertSpace;
+    protected int horzItems;
+    protected int vertItems;
+    protected int horzSpace;
+    protected int vertSpace;
 
-    private ArrayList<LaunchItem> launchItems = null;
+    protected ArrayList<LaunchItem> launchItems = null;
 
     public LaunchGroup(Context context)
     {
@@ -56,7 +56,7 @@ public class LaunchGroup extends FrameLayout
         myInit(context);
     }
 
-    private void myInit(Context context)
+    protected void myInit(Context context)
     {
         this.context = context;
 
@@ -99,7 +99,7 @@ public class LaunchGroup extends FrameLayout
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    private void positionLaunchItems()
+    protected void positionLaunchItems()
     {
         int col = 0;
         int row = 0;
@@ -134,7 +134,7 @@ public class LaunchGroup extends FrameLayout
         }
     }
 
-    private void createLaunchItems()
+    protected void createLaunchItems()
     {
         launchItems = new ArrayList<>();
 

@@ -253,20 +253,22 @@ public class CommService extends Service
 
                 if (msg.has("pups"))
                 {
-                    Log.d(LOGTAG, "ispups");
+                    //
+                    // Keep NAT connection alive with bogus packet.
+                    //
 
-                    datagramSocket.setTTL(5);
+                    datagramSocket.setTTL(4);
+                    datagramPacket.setData("PUPS".getBytes());
                     datagramSocket.send(datagramPacket);
                 }
                 else
                 {
+                    Log.d(LOGTAG, "ping");
                     datagramSocket.setTTL(200);
                     datagramSocket.send(datagramPacket);
                 }
 
                 sleeptime = GlobalConfigs.CommServerSleepMin;
-
-                Log.d(LOGTAG,"Send one message.");
             }
             catch (IOException ex)
             {
