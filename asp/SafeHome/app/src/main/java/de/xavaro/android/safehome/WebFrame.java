@@ -141,7 +141,7 @@ public class WebFrame extends FrameLayout
             String iconurl = getConfig(context,website).getString("icon");
             String iconext = MimeTypeMap.getFileExtensionFromUrl(iconurl);
             String iconfile = website + ".thumbnail." + iconext;
-            Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconfile, iconurl);
+            Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl, iconfile);
 
             return new BitmapDrawable(context.getResources(), thumbnail);
         }

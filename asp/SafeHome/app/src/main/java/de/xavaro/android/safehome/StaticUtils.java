@@ -362,7 +362,7 @@ public class StaticUtils
 
             Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
 
-            return CacheManager.cacheThumbnail(context,iconfile,iconurl);
+            return CacheManager.cacheThumbnail(context, iconurl, iconfile);
         }
         catch (Exception oops)
         {

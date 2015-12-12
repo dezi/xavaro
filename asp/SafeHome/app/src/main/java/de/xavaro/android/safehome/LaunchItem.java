@@ -170,7 +170,7 @@ public class LaunchItem extends FrameLayout
 
                 if (iconname.startsWith("http://") || iconname.startsWith("https://"))
                 {
-                    Bitmap thumbnail = StaticUtils.getBitmapFromURL(iconname);
+                    Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconname);
 
                     if (thumbnail != null)
                     {
@@ -777,6 +777,9 @@ public class LaunchItem extends FrameLayout
         try
         {
             String audiourl = config.getString("audiourl");
+
+            overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.loading_260x260));
+            overicon.setVisibility(VISIBLE);
 
             if (proxyPlayer == null) proxyPlayer = new ProxyPlayer();
 

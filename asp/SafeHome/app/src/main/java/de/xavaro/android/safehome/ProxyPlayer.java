@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.os.Handler;
+import android.support.annotation.Nullable;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -26,13 +28,22 @@ public class ProxyPlayer extends Thread
 {
     private static final String LOGTAG = ProxyPlayer.class.getSimpleName();
 
+    private static final Handler handler = new Handler();
+
     private static ServerSocket proxySocket;
     private static int proxyPort;
+    private static String proxyUrl;
+
     private static MediaPlayer audioPlayer;
     private static boolean running;
+    private static Context context;
 
     public void setAudioUrl(Context context, String url)
     {
+        this.context = context;
+
+        proxyUrl = url;
+
         //
         // Initialize and start proxy server.
         //
@@ -53,6 +64,10 @@ public class ProxyPlayer extends Thread
 
             running = true;
 
+            //
+            // Should run forever.
+            //
+
             start();
         }
 
@@ -61,44 +76,9 @@ public class ProxyPlayer extends Thread
             audioPlayer = new MediaPlayer();
             audioPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         }
-        else
-        {
-            if (audioPlayer.isPlaying())
-            {
-                audioPlayer.reset();
-            }
-        }
 
-        //
-        // Set header field and direct mediaplayer to proxy.
-        //
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("AudioProxy-Url", url);
-
-        try
-        {
-            audioPlayer.setDataSource(context, Uri.parse("http://127.0.0.1:" + proxyPort + "/"), headers);
-        }
-        catch (IOException ex)
-        {
-            OopsService.log(LOGTAG,ex);
-
-            return;
-        }
-
-        try
-        {
-            audioPlayer.prepare();
-        }
-        catch (IOException ex)
-        {
-            OopsService.log(LOGTAG, ex);
-
-            return;
-        }
-
-        audioPlayer.start();
+        ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+        startPlayer.start();
     }
 
     @Override
@@ -121,7 +101,7 @@ public class ProxyPlayer extends Thread
         }
         catch (IOException ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
         }
         finally
         {
@@ -141,6 +121,55 @@ public class ProxyPlayer extends Thread
         }
     }
 
+    private class ProxyPlayerStarter extends Thread
+    {
+        @Override
+        public void run()
+        {
+            synchronized (audioPlayer)
+            {
+                if (audioPlayer.isPlaying())
+                {
+                    audioPlayer.reset();
+                }
+
+                //
+                // Set header field and direct mediaplayer to proxy.
+                //
+
+                Map<String, String> headers = new HashMap<>();
+                headers.put("AudioProxy-Url", proxyUrl);
+
+                try
+                {
+                    audioPlayer.setDataSource(context, Uri.parse("http://127.0.0.1:" + proxyPort + "/"), headers);
+                }
+                catch (IOException ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+
+                    return;
+                }
+
+                try
+                {
+                    audioPlayer.prepare();
+                }
+                catch (IOException ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+
+                    return;
+                }
+
+                audioPlayer.start();
+            }
+        }
+    };
+
+    //
+    // Thread startet on each individual connection.
+    //
     private class ProxyPlayerWorker extends Thread
     {
         private final String LOGTAG = ProxyPlayerWorker.class.getSimpleName();
@@ -151,6 +180,7 @@ public class ProxyPlayer extends Thread
         private Socket proxiconn;
         private InputStream proxy_in;
         private OutputStream proxy_out;
+        private HttpURLConnection connection;
 
         public ProxyPlayerWorker(Socket connect) throws IOException
         {
@@ -176,7 +206,7 @@ public class ProxyPlayer extends Thread
                 // Open a straight connection with Icy metadata request.
                 //
 
-                HttpURLConnection connection = (HttpURLConnection) new URL(proxiurl).openConnection();
+                connection = (HttpURLConnection) new URL(proxiurl).openConnection();
                 connection.setRequestProperty("Icy-MetaData", "1");
                 connection.setUseCaches(false);
                 connection.setDoInput(true);
@@ -221,7 +251,7 @@ public class ProxyPlayer extends Thread
 
                 while (true)
                 {
-                    max = icymetaint - chunk;
+                    max = (icymetaint > 0) ? icymetaint - chunk : buffer.length;
                     if (max > buffer.length) max = buffer.length;
 
                     xfer = shoutcast.read(buffer,0,max);
@@ -231,29 +261,39 @@ public class ProxyPlayer extends Thread
                     proxy_out.flush();
                     chunk += xfer;
 
-                    if (chunk == icymetaint)
+                    if ((icymetaint > 0) && (chunk == icymetaint))
                     {
-                        int bytesToRead = shoutcast.read() * 16;
+                        String icymeta = readIcyMeta(shoutcast);
 
-                        if (bytesToRead > 0)
-                        {
-                            byte[] line = new byte[ bytesToRead ];
-                            int read = 0;
-                            while (read != bytesToRead) line[ read++ ] = (byte) shoutcast.read();
-
-                            Log.d(LOGTAG, "ICY-Meta-String: " + new String(line).trim());
-
-                            String[] splits = new String(line).trim().split(";");
-                        }
+                        if (icymeta != null) Log.d(LOGTAG, "ICY-Meta-String: " + icymeta);
 
                         chunk = 0;
                     }
                 }
             }
-            catch (IOException ex)
+            catch (IOException ignore)
             {
-                ex.printStackTrace();
+                //
+                // Silently ignore and exit thread.
+                //
             }
+        }
+
+        @Nullable
+        private String readIcyMeta(InputStream input) throws IOException
+        {
+            int bytesToRead = input.read() * 16;
+
+            if (bytesToRead > 0)
+            {
+                byte[] line = new byte[ bytesToRead ];
+                int read = 0;
+                while (read != bytesToRead) line[ read++ ] = (byte) input.read();
+
+                return new String(line).trim();
+            }
+
+            return null;
         }
 
         private String readHeaders(InputStream input) throws IOException
@@ -266,7 +306,7 @@ public class ProxyPlayer extends Thread
 
             while (! new String(buffer,0,cnt).endsWith("\r\n\r\n"))
             {
-                input.read(buffer, cnt++, 1);
+                if (input.read(buffer, cnt++, 1) < 0) break;
             }
 
             String[] lines = new String(buffer,0,cnt).split("\r\n");

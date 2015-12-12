@@ -3,8 +3,10 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,7 +51,20 @@ public class CacheManager
     }
 
     @Nullable
-    public static Bitmap cacheThumbnail(Context context,String filename,String src)
+    public static Bitmap cacheThumbnail(Context context, String src)
+    {
+        Uri uri = Uri.parse(src);
+        String name = uri.getLastPathSegment();
+        String ext = MimeTypeMap.getFileExtensionFromUrl(name);
+        name = name.substring(0,name.length() - ext.length());
+
+        String filename = uri.getHost() + "." + name + "thumbnail." + ext;
+
+        return cacheThumbnail(context, src, filename);
+    }
+
+    @Nullable
+    public static Bitmap cacheThumbnail(Context context, String src, String filename)
     {
         File file = new File(context.getCacheDir(), filename);
 

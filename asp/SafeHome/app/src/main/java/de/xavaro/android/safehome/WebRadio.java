@@ -128,7 +128,7 @@ public class WebRadio extends LaunchGroup
             String iconurl = getConfig(context,website).getString("icon");
             String iconext = MimeTypeMap.getFileExtensionFromUrl(iconurl);
             String iconfile = website + ".thumbnail." + iconext;
-            Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconfile, iconurl);
+            Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl, iconfile);
 
             return new BitmapDrawable(context.getResources(), thumbnail);
         }
@@ -145,20 +145,6 @@ public class WebRadio extends LaunchGroup
         try
         {
             return getConfig(context, website).getString("label");
-        }
-        catch (JSONException ignore)
-        {
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static String getConfigUrl(Context context,String website)
-    {
-        try
-        {
-            return getConfig(context).getJSONObject(website).getString("url");
         }
         catch (JSONException ignore)
         {
