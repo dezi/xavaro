@@ -74,6 +74,10 @@
           <option name="BRACE_STYLE" value="2" />
           <option name="CLASS_BRACE_STYLE" value="2" />
           <option name="METHOD_BRACE_STYLE" value="2" />
+          <option name="ELSE_ON_NEW_LINE" value="true" />
+          <option name="CATCH_ON_NEW_LINE" value="true" />
+          <option name="FINALLY_ON_NEW_LINE" value="true" />
+          <option name="SPECIAL_ELSE_IF_TREATMENT" value="false" />
           <option name="SPACE_WITHIN_BRACKETS" value="true" />
         </codeStyleSettings>
         <codeStyleSettings language="JSON">
