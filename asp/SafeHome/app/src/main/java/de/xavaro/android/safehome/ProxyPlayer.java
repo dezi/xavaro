@@ -34,9 +34,15 @@ public class ProxyPlayer extends Thread
     private static int proxyPort;
     private static String proxyUrl;
 
+    private static CommonCallback callback;
     private static MediaPlayer audioPlayer;
     private static boolean running;
     private static Context context;
+
+    public void setCallback(CommonCallback context)
+    {
+        callback = context;
+    }
 
     public void setAudioUrl(Context context, String url)
     {
@@ -126,8 +132,12 @@ public class ProxyPlayer extends Thread
         @Override
         public void run()
         {
+            CommonCallback mycallback = callback;
+
             synchronized (audioPlayer)
             {
+                if (mycallback != null) mycallback.onStartingActivity(null);
+
                 if (audioPlayer.isPlaying())
                 {
                     audioPlayer.reset();
@@ -163,6 +173,8 @@ public class ProxyPlayer extends Thread
                 }
 
                 audioPlayer.start();
+
+                if (mycallback != null) mycallback.onFinishedActivity(null);
             }
         }
     };

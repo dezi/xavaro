@@ -9,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -16,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.TimedText;
 import android.net.Uri;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -23,9 +25,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Gravity;
 
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,11 +42,12 @@ import java.io.IOException;
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout
+public class LaunchItem extends FrameLayout implements CommonCallback
 {
     private final String LOGTAG = "LaunchItem";
 
     private static ProxyPlayer proxyPlayer;
+    private static ProgressBar spinner;
 
     private Context context;
 
@@ -57,6 +62,7 @@ public class LaunchItem extends FrameLayout
     private FrameLayout overlay;
     private LayoutParams oversize;
     private ImageView overicon;
+    private Handler handler;
 
     private LaunchGroup directory;
     private WebFrame webframe;
@@ -322,6 +328,44 @@ public class LaunchItem extends FrameLayout
 
         setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
     }
+
+    @Override
+    public void onStartingActivity(Object obj)
+    {
+        Log.d(LOGTAG, "onStartingActivity");
+
+        handler.postDelayed(startingActivity, 10);
+    }
+
+    private final Runnable startingActivity = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            spinner.setVisibility(VISIBLE);
+
+            Log.d(LOGTAG, "startingActivity");
+        }
+    };
+
+    @Override
+    public void onFinishedActivity(Object obj)
+    {
+        Log.d(LOGTAG, "onFinishedActivity");
+
+        handler.postDelayed(finishedActivity, 10);
+    }
+
+    private final Runnable finishedActivity = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            spinner.setVisibility(INVISIBLE);
+
+            Log.d(LOGTAG, "finishedActivity");
+        }
+    };
 
     private void onMyClick()
     {
@@ -778,11 +822,26 @@ public class LaunchItem extends FrameLayout
         {
             String audiourl = config.getString("audiourl");
 
-            overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.loading_260x260));
-            overicon.setVisibility(VISIBLE);
+            if (handler == null) handler = new Handler();
+
+            if (spinner == null)
+            {
+                spinner = new ProgressBar(context, null, android.R.attr.progressBarStyleSmall);
+                spinner.setPadding(40, 40, 40, 80);
+                spinner.getIndeterminateDrawable().setColorFilter(0xffff0000, PorterDuff.Mode.MULTIPLY);
+                spinner.setVisibility(INVISIBLE);
+            }
+
+            if (spinner.getParent() != null)
+            {
+                ((ViewGroup) spinner.getParent()).removeView(spinner);
+            }
+
+            this.addView(spinner);
 
             if (proxyPlayer == null) proxyPlayer = new ProxyPlayer();
 
+            proxyPlayer.setCallback(this);
             proxyPlayer.setAudioUrl(context,audiourl);
         }
         catch (Exception ex)
