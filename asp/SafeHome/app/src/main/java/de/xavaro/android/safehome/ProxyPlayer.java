@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.os.Handler;
 import android.support.annotation.Nullable;
 
 import android.content.Context;
@@ -8,6 +7,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
+import android.os.Handler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,30 +28,36 @@ public class ProxyPlayer extends Thread
 {
     private static final String LOGTAG = ProxyPlayer.class.getSimpleName();
 
-    private static final Handler handler = new Handler();
-
+    private static ProxyPlayer proxiPlayer;
     private static ServerSocket proxySocket;
     private static int proxyPort;
     private static String proxyUrl;
 
-    private static CommonCallback callback;
+    private static Callbacks calling;
+    private static Callbacks playing;
     private static MediaPlayer audioPlayer;
+    private static boolean audioPrepared;
     private static boolean running;
     private static Context context;
+    private static Handler handler;
 
-    public void setCallback(CommonCallback context)
+    public static ProxyPlayer getInstance()
     {
-        callback = context;
+        if (handler == null) handler = new Handler();
+
+        if (proxiPlayer == null) proxiPlayer = new ProxyPlayer();
+
+        return proxiPlayer;
     }
 
-    public void setAudioUrl(Context context, String url)
+    public void setAudioUrl(Context ctx, String url, Callbacks caller)
     {
-        this.context = context;
-
+        context = ctx;
+        calling = caller;
         proxyUrl = url;
 
         //
-        // Initialize and start proxy server.
+        // Initialize and start proxy server once.
         //
 
         if (proxySocket == null)
@@ -87,6 +93,68 @@ public class ProxyPlayer extends Thread
         startPlayer.start();
     }
 
+    public boolean isPlaying()
+    {
+        return (audioPlayer != null) && audioPlayer.isPlaying();
+    }
+
+    public void playerPause()
+    {
+        if (audioPlayer != null)
+        {
+            //
+            // In this state the player still consumes
+            // stream data from internet!!!
+            //
+
+            audioPlayer.pause();
+
+            //
+            // Schedule a full stop within limited time.
+            //
+
+            handler.postDelayed(stopAudioPlayer,10 * 1000);
+        }
+    }
+
+    private final Runnable stopAudioPlayer = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "stopAudioPlayer");
+
+            audioPlayer.reset();
+            audioPrepared = false;
+        }
+    };
+
+    public void playerResume()
+    {
+        if (audioPlayer != null)
+        {
+            handler.removeCallbacks(stopAudioPlayer);
+
+            if (audioPrepared)
+            {
+                //
+                // Soft restart.
+                //
+
+                audioPlayer.start();
+            }
+            else
+            {
+                //
+                // Hard restart on media player.
+                //
+
+                ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+                startPlayer.start();
+            }
+        }
+    }
+
     @Override
     public void run()
     {
@@ -102,7 +170,7 @@ public class ProxyPlayer extends Thread
 
                 ProxyPlayerWorker worker = new ProxyPlayerWorker(connect);
 
-                worker.run();
+                worker.start();
             }
         }
         catch (IOException ex)
@@ -132,16 +200,15 @@ public class ProxyPlayer extends Thread
         @Override
         public void run()
         {
-            CommonCallback mycallback = callback;
+            Callbacks mycallback = calling;
 
-            synchronized (audioPlayer)
+            synchronized (LOGTAG)
             {
-                if (mycallback != null) mycallback.onStartingActivity(null);
+                if (playing != null) playing.onPlaybackFinished();
 
-                if (audioPlayer.isPlaying())
-                {
-                    audioPlayer.reset();
-                }
+                audioPlayer.reset();
+
+                if (mycallback != null) mycallback.onPlaybackPrepare();
 
                 //
                 // Set header field and direct mediaplayer to proxy.
@@ -164,6 +231,8 @@ public class ProxyPlayer extends Thread
                 try
                 {
                     audioPlayer.prepare();
+                    audioPrepared = true;
+
                 }
                 catch (IOException ex)
                 {
@@ -174,10 +243,12 @@ public class ProxyPlayer extends Thread
 
                 audioPlayer.start();
 
-                if (mycallback != null) mycallback.onFinishedActivity(null);
+                if (mycallback != null) mycallback.onPlaybackStartet();
+
+                playing = mycallback;
             }
         }
-    };
+    }
 
     //
     // Thread startet on each individual connection.
@@ -189,17 +260,14 @@ public class ProxyPlayer extends Thread
         private int icymetaint;
 
         private String proxiurl;
-        private Socket proxiconn;
         private InputStream proxy_in;
         private OutputStream proxy_out;
         private HttpURLConnection connection;
 
         public ProxyPlayerWorker(Socket connect) throws IOException
         {
-            proxiconn = connect;
-
-            proxy_in =  proxiconn.getInputStream();
-            proxy_out = proxiconn.getOutputStream();
+            proxy_in = connect.getInputStream();
+            proxy_out = connect.getOutputStream();
         }
 
         @Override
@@ -277,7 +345,12 @@ public class ProxyPlayer extends Thread
                     {
                         String icymeta = readIcyMeta(shoutcast);
 
-                        if (icymeta != null) Log.d(LOGTAG, "ICY-Meta-String: " + icymeta);
+                        if (icymeta != null)
+                        {
+                            Log.d(LOGTAG, "ICY-Meta-String: " + icymeta);
+
+                            if (playing != null) playing.onPlaybackMeta(icymeta);
+                        }
 
                         chunk = 0;
                     }
@@ -288,6 +361,8 @@ public class ProxyPlayer extends Thread
                 //
                 // Silently ignore and exit thread.
                 //
+
+                Log.d(LOGTAG,"ProxyPlayerWorker: terminating thread.");
             }
         }
 
@@ -335,5 +410,16 @@ public class ProxyPlayer extends Thread
 
             return proxiurl;
         }
+    }
+
+    public interface Callbacks
+    {
+        void onPlaybackPrepare();
+
+        void onPlaybackStartet();
+
+        void onPlaybackFinished();
+
+        void onPlaybackMeta(String meta);
     }
 }

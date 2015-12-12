@@ -42,11 +42,10 @@ import java.io.IOException;
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout implements CommonCallback
+public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
 {
     private final String LOGTAG = "LaunchItem";
 
-    private static ProxyPlayer proxyPlayer;
     private static ProgressBar spinner;
 
     private Context context;
@@ -67,6 +66,8 @@ public class LaunchItem extends FrameLayout implements CommonCallback
     private LaunchGroup directory;
     private WebFrame webframe;
     private WebRadio webradio;
+
+    private boolean isPlayingMedia;
 
     public LaunchItem(Context context)
     {
@@ -124,11 +125,21 @@ public class LaunchItem extends FrameLayout implements CommonCallback
 
         overlay = new FrameLayout(context);
         overlay.setLayoutParams(oversize);
+        overlay.setVisibility(INVISIBLE);
         this.addView(overlay);
 
         overicon = new ImageView(context);
-        overicon.setVisibility(INVISIBLE);
         overlay.addView(overicon);
+
+        overlay.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                onMyOverlayClick();
+            }
+        });
+
     }
 
     public void setSize(int width,int height)
@@ -136,8 +147,8 @@ public class LaunchItem extends FrameLayout implements CommonCallback
         layout.width  = width;
         layout.height = height;
 
-        oversize.width  = width  / 4;
-        oversize.height = height / 4;
+        oversize.width  = layout.width  / 4;
+        oversize.height = layout.height / 4;
     }
 
     public void setPosition(int left,int top)
@@ -324,48 +335,108 @@ public class LaunchItem extends FrameLayout implements CommonCallback
             }
 
             targetIcon.setVisibility(VISIBLE);
+            if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
         }
 
         setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
     }
 
-    @Override
-    public void onStartingActivity(Object obj)
+    public void onPlaybackPrepare()
     {
-        Log.d(LOGTAG, "onStartingActivity");
+        Log.d(LOGTAG, "onPlaybackPrepare");
 
-        handler.postDelayed(startingActivity, 10);
+        handler.removeCallbacks(playbackFinished);
+        handler.postDelayed(playbackPrepare, 10);
     }
 
-    private final Runnable startingActivity = new Runnable()
+    private final Runnable playbackPrepare = new Runnable()
     {
         @Override
         public void run()
         {
+            isPlayingMedia = true;
+
             spinner.setVisibility(VISIBLE);
 
-            Log.d(LOGTAG, "startingActivity");
+            Log.d(LOGTAG, "playbackPrepare");
         }
     };
 
-    @Override
-    public void onFinishedActivity(Object obj)
+    public void onPlaybackStartet()
     {
-        Log.d(LOGTAG, "onFinishedActivity");
+        Log.d(LOGTAG, "onPlaybackStartet");
 
-        handler.postDelayed(finishedActivity, 10);
+        handler.postDelayed(playbackStartet, 10);
     }
 
-    private final Runnable finishedActivity = new Runnable()
+    private final Runnable playbackStartet = new Runnable()
     {
         @Override
         public void run()
         {
             spinner.setVisibility(INVISIBLE);
 
-            Log.d(LOGTAG, "finishedActivity");
+            oversize.width  = layout.width  / 3;
+            oversize.height = layout.height / 3;
+
+            overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
+            overicon.setVisibility(VISIBLE);
+            overlay.setVisibility(VISIBLE);
+
+            Log.d(LOGTAG, "playbackStartet");
         }
     };
+
+    public void onPlaybackFinished()
+    {
+        Log.d(LOGTAG, "onPlaybackFinished");
+
+        handler.postDelayed(playbackFinished, 100);
+    }
+
+    private final Runnable playbackFinished = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            oversize.width  = layout.width  / 4;
+            oversize.height = layout.height / 4;
+
+            overicon.setVisibility(INVISIBLE);
+            overlay.setVisibility(INVISIBLE);
+
+            isPlayingMedia = false;
+
+            Log.d(LOGTAG, "playbackFinished");
+        }
+
+    };
+
+    public void onPlaybackMeta(String meta)
+    {
+        Log.d(LOGTAG, "onPlaybackMeta: " + meta);
+    }
+
+    private void onMyOverlayClick()
+    {
+        if (isPlayingMedia)
+        {
+            ProxyPlayer pp = ProxyPlayer.getInstance();
+
+            if (pp.isPlaying())
+            {
+                pp.playerPause();
+
+                overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_play_190x190));
+            }
+            else
+            {
+                pp.playerResume();
+
+                overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
+            }
+        }
+    }
 
     private void onMyClick()
     {
@@ -839,10 +910,7 @@ public class LaunchItem extends FrameLayout implements CommonCallback
 
             this.addView(spinner);
 
-            if (proxyPlayer == null) proxyPlayer = new ProxyPlayer();
-
-            proxyPlayer.setCallback(this);
-            proxyPlayer.setAudioUrl(context,audiourl);
+            ProxyPlayer.getInstance().setAudioUrl(context,audiourl,this);
         }
         catch (Exception ex)
         {

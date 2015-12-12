@@ -66,8 +66,8 @@ public class GlobalConfigs
     public static final int    CommServerPort     = 42742; // 42743
     public static final int    CommServerSleepMin = 100;
     public static final int    CommServerSleepMax = 100 * 1000;
-    public static final int    CommServerPupsSec  = 2;
-    public static final int    CommServerPingSec  = 20;
+    public static final int    CommServerPupsSec  = 30;
+    public static final int    CommServerPingSec  = 180;
     // @formatter:on
 
     //endregion
