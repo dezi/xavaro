@@ -56,7 +56,7 @@ public class WebCookie extends CookieManager
 
         String url = uri.toString();
 
-        Log.d(LOGTAG, "put=" + url);
+        //Log.d(LOGTAG, "put=" + url);
 
         for (String headerKey : responseHeaders.keySet())
         {
@@ -83,7 +83,7 @@ public class WebCookie extends CookieManager
 
         String url = uri.toString();
 
-        Log.d(LOGTAG, "get=" + url);
+        //Log.d(LOGTAG, "get=" + url);
 
         Map<String, List<String>> res = new java.util.HashMap<>();
 
@@ -91,7 +91,7 @@ public class WebCookie extends CookieManager
 
         if (cookie != null)
         {
-            Log.d(LOGTAG, "get=" + cookie);
+            //Log.d(LOGTAG, "get=" + cookie);
 
             //noinspection ArraysAsListWithZeroOrOneArgument
             res.put("Cookie", Arrays.asList(cookie));

@@ -23,6 +23,8 @@ import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -44,7 +46,7 @@ import java.util.ArrayList;
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
+public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, SurfaceHolder.Callback
 {
     private final String LOGTAG = "LaunchItem";
 
@@ -358,7 +360,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
     // Bubble up launch items for player control.
     //
 
-    private ArrayList<LaunchItem> isPlayingParents;
+    private ArrayList<LaunchItem> isPlayingParents = new ArrayList<>();
 
     //region ProxiPlayer callback interface.
 
@@ -530,6 +532,11 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
 
     private void setSpinner(boolean visible)
     {
+        if ((spinner != null) && (spinner.getParent() != null))
+        {
+            ((ViewGroup) spinner.getParent()).removeView(spinner);
+        }
+
         if (visible)
         {
             if (spinner == null)
@@ -540,16 +547,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
             }
 
             this.addView(spinner);
-        }
-        else
-        {
-            if (spinner != null)
-            {
-                if (spinner.getParent() != null)
-                {
-                    ((ViewGroup) spinner.getParent()).removeView(spinner);
-                }
-            }
         }
     }
 
@@ -746,12 +743,12 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
             String packagename = config.getString("packagename");
 
             Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
+        goToMarket.setData(Uri.parse("market://details?id=" + packagename));
             context.startActivity(goToMarket);
         }
         catch (Exception oops)
         {
-            OopsService.log(LOGTAG, oops);
+        OopsService.log(LOGTAG, oops);
         }
     }
 
@@ -888,7 +885,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
                 String name = config.getString("name");
 
                 webradio = new WebRadio(context);
-                webradio.setName(this,name);
+                webradio.setName(this, name);
             }
 
             ((HomeActivity) context).addViewToBackStack(webradio);
@@ -913,10 +910,10 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
             if (webframe == null)
             {
                 String name = config.getString("name");
-                String url = WebFrame.getConfigUrl(context,name);
+                String url=WebFrame.getConfigUrl(context, name);
 
                 webframe = new WebFrame(context);
-                webframe.setLoadURL(name,url);
+        webframe.setLoadURL(name, url);
             }
 
             ((HomeActivity) context).addViewToBackStack(webframe);
@@ -981,31 +978,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         */
     }
 
-    private void launchDeveloperVideo()
-    {
-        MediaPlayer mPlayer = new MediaPlayer();
-
-        try
-        {
-            mPlayer.setDataSource(context,Uri.parse("http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/index_320_av-p.m3u8?sd=10&rebase=on"));
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
-        }
-
-        try
-        {
-            mPlayer.prepare();
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
-        }
-
-        mPlayer.start();
-    }
-
     private void launchAudioPlayer()
     {
         if (! config.has("audiourl"))
@@ -1046,7 +1018,39 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         }
     }
 
+    @Override
+    public void surfaceCreated(SurfaceHolder holder)
+    {
+        ProxyPlayer.getInstance().setDisplay(holder);
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,int height)
+    {
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder)
+    {
+    }
+
     private void launchDeveloper()
     {
+        if (ProxyPlayer.getInstance().isPlaying()) return;
+
+        // http://www.daserste.de/live/live-de-104~playerXml.xml
+        // http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/master.m3u8
+
+        String videourl = "http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/index_320_av-p.m3u8?sd=10&rebase=on";
+
+        if (handler == null) handler = new Handler();
+
+        ProxyPlayer.getInstance().setVideoUrl(context, videourl, this);
+
+        SurfaceView surfaceView = new SurfaceView(context);
+        SurfaceHolder holder = surfaceView.getHolder();
+        //holder.setFixedSize(176, 144);
+        holder.addCallback(this);
+        this.addView(surfaceView);
     }
 }
