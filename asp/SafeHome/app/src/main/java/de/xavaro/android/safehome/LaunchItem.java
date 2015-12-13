@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.support.annotation.Nullable;
+
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,7 +17,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 import android.media.MediaPlayer;
-import android.media.TimedText;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.InputType;
@@ -24,8 +25,8 @@ import android.util.Log;
 
 import android.view.View;
 import android.view.Gravity;
-
 import android.view.ViewGroup;
+
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -37,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 //
 // Launch item view on home screen.
@@ -46,12 +48,13 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
 {
     private final String LOGTAG = "LaunchItem";
 
-    private static ProgressBar spinner;
-
     private Context context;
+    private Handler handler;
 
     private LayoutParams layout;
+    private LayoutParams oversize;
 
+    private LaunchGroup parent;
     private JSONObject config;
     private JSONObject settings;
 
@@ -59,15 +62,11 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
     private ImageView icon;
     
     private FrameLayout overlay;
-    private LayoutParams oversize;
     private ImageView overicon;
-    private Handler handler;
 
     private LaunchGroup directory;
     private WebFrame webframe;
     private WebRadio webradio;
-
-    private boolean isPlayingMedia;
 
     public LaunchItem(Context context)
     {
@@ -93,15 +92,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
     private void myInit(Context context)
     {
         this.context = context;
-
-        setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                onMyClick();
-            }
-        });
 
         setVisibility(INVISIBLE);
 
@@ -131,6 +121,15 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         overicon = new ImageView(context);
         overlay.addView(overicon);
 
+        setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                onMyClick();
+            }
+        });
+
         overlay.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -139,7 +138,12 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
                 onMyOverlayClick();
             }
         });
+    }
 
+    @Nullable
+    public LaunchGroup getLaunchGroup()
+    {
+        return this.parent;
     }
 
     public void setSize(int width,int height)
@@ -157,13 +161,14 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         layout.topMargin  = top;
     }
 
-    public void setConfig(JSONObject config)
+    public void setConfig(LaunchGroup parent,JSONObject config)
     {
+        this.config = config;
+        this.parent = parent;
+
         String packageName = null;
         boolean hasProblem = false;
         ImageView targetIcon = icon;
-
-        this.config = config;
 
         try
         {
@@ -341,81 +346,218 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
     }
 
+    //region Media playback stuff.
+
+    //
+    // Flag if media playing is active here.
+    //
+
+    private boolean isPlayingMedia;
+
+    //
+    // Bubble up launch items for player control.
+    //
+
+    private ArrayList<LaunchItem> isPlayingParents;
+
+    //region ProxiPlayer callback interface.
+
     public void onPlaybackPrepare()
     {
-        Log.d(LOGTAG, "onPlaybackPrepare");
-
-        handler.removeCallbacks(playbackFinished);
+        clearAllCallbacks();
         handler.postDelayed(playbackPrepare, 10);
     }
+
+    public void onPlaybackStartet()
+    {
+        clearAllCallbacks();
+        handler.postDelayed(playbackStartet, 10);
+    }
+
+    public void onPlaybackPaused()
+    {
+        clearAllCallbacks();
+        handler.postDelayed(playbackPaused, 10);
+    }
+
+    public void onPlaybackResumed()
+    {
+        clearAllCallbacks();
+        handler.postDelayed(playbackResumed, 10);
+    }
+
+    public void onPlaybackFinished()
+    {
+        clearAllCallbacks();
+        handler.postDelayed(playbackFinished, 100);
+    }
+
+    public void onPlaybackMeta(String meta)
+    {
+        Log.d(LOGTAG, "onPlaybackMeta: " + meta);
+    }
+
+    private void clearAllCallbacks()
+    {
+        handler.removeCallbacks(playbackPrepare);
+        handler.removeCallbacks(playbackStartet);
+        handler.removeCallbacks(playbackPaused);
+        handler.removeCallbacks(playbackResumed);
+        handler.removeCallbacks(playbackFinished);
+    }
+
+    //endregion ProxiPlayer callback interface.
+
+    //region Media playback control.
+
+    //
+    // Required handlers for thread change.
+    //
 
     private final Runnable playbackPrepare = new Runnable()
     {
         @Override
         public void run()
         {
-            isPlayingMedia = true;
-
-            spinner.setVisibility(VISIBLE);
-
             Log.d(LOGTAG, "playbackPrepare");
+
+            for (LaunchItem li : isPlayingParents)
+            {
+                li.setPlaybackPrepare();
+            }
         }
     };
-
-    public void onPlaybackStartet()
-    {
-        Log.d(LOGTAG, "onPlaybackStartet");
-
-        handler.postDelayed(playbackStartet, 10);
-    }
 
     private final Runnable playbackStartet = new Runnable()
     {
         @Override
         public void run()
         {
-            spinner.setVisibility(INVISIBLE);
-
-            oversize.width  = layout.width  / 3;
-            oversize.height = layout.height / 3;
-
-            overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
-            overicon.setVisibility(VISIBLE);
-            overlay.setVisibility(VISIBLE);
-
             Log.d(LOGTAG, "playbackStartet");
+
+            for (LaunchItem li : isPlayingParents)
+            {
+                li.setPlaybackStartet();
+            }
         }
     };
 
-    public void onPlaybackFinished()
+    private final Runnable playbackPaused = new Runnable()
     {
-        Log.d(LOGTAG, "onPlaybackFinished");
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "playbackPaused");
 
-        handler.postDelayed(playbackFinished, 100);
-    }
+            for (LaunchItem li : isPlayingParents)
+            {
+                li.setPlaybackPaused();
+            }
+        }
+    };
+
+    private final Runnable playbackResumed = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "playbackResumed");
+
+            for (LaunchItem li : isPlayingParents)
+            {
+                li.setPlaybackResumed();
+            }
+        }
+    };
 
     private final Runnable playbackFinished = new Runnable()
     {
         @Override
         public void run()
         {
-            oversize.width  = layout.width  / 4;
-            oversize.height = layout.height / 4;
-
-            overicon.setVisibility(INVISIBLE);
-            overlay.setVisibility(INVISIBLE);
-
-            isPlayingMedia = false;
-
             Log.d(LOGTAG, "playbackFinished");
+
+            for (LaunchItem li : isPlayingParents)
+            {
+                li.setPlaybackFinished();
+            }
         }
-
     };
-
-    public void onPlaybackMeta(String meta)
+    public void setPlaybackPrepare()
     {
-        Log.d(LOGTAG, "onPlaybackMeta: " + meta);
+        isPlayingMedia = true;
+
+        setSpinner(true);
     }
+
+    public void setPlaybackStartet()
+    {
+        Log.d(LOGTAG,"setPlaybackStartet:" + label.getText());
+
+        setSpinner(false);
+
+        oversize.width  = layout.width  / 3;
+        oversize.height = layout.height / 3;
+
+        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
+        overicon.setVisibility(VISIBLE);
+        overlay.setVisibility(VISIBLE);
+    }
+
+    public void setPlaybackPaused()
+    {
+        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_play_190x190));
+    }
+
+    public void setPlaybackResumed()
+    {
+        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
+    }
+
+    public void setPlaybackFinished()
+    {
+        setSpinner(false);
+
+        oversize.width  = layout.width  / 4;
+        oversize.height = layout.height / 4;
+
+        overicon.setVisibility(INVISIBLE);
+        overlay.setVisibility(INVISIBLE);
+
+        isPlayingMedia = false;
+    }
+
+    private ProgressBar spinner;
+
+    private void setSpinner(boolean visible)
+    {
+        if (visible)
+        {
+            if (spinner == null)
+            {
+                spinner = new ProgressBar(context, null, android.R.attr.progressBarStyleSmall);
+                spinner.getIndeterminateDrawable().setColorFilter(0xffff0000, PorterDuff.Mode.MULTIPLY);
+                spinner.setPadding(40, 40, 40, 80);
+            }
+
+            this.addView(spinner);
+        }
+        else
+        {
+            if (spinner != null)
+            {
+                if (spinner.getParent() != null)
+                {
+                    ((ViewGroup) spinner.getParent()).removeView(spinner);
+                }
+            }
+        }
+    }
+
+    //endregion Media playback control.
+
+    //endregion Media playback stuff.
+
 
     private void onMyOverlayClick()
     {
@@ -426,14 +568,10 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
             if (pp.isPlaying())
             {
                 pp.playerPause();
-
-                overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_play_190x190));
             }
             else
             {
                 pp.playerResume();
-
-                overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
             }
         }
     }
@@ -662,7 +800,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
 
             try
             {
-                directory.setConfig(settings.getJSONObject("launchgroup"));
+                directory.setConfig(this,settings.getJSONObject("launchgroup"));
             }
             catch (JSONException ex)
             {
@@ -724,7 +862,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
 
             try
             {
-                directory.setConfig(config.getJSONObject("launchgroup"));
+                directory.setConfig(this,config.getJSONObject("launchgroup"));
             }
             catch (JSONException ex)
             {
@@ -751,7 +889,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
                 String name = config.getString("name");
 
                 webradio = new WebRadio(context);
-                webradio.setName(name);
+                webradio.setName(this,name);
             }
 
             ((HomeActivity) context).addViewToBackStack(webradio);
@@ -884,20 +1022,22 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
 
             if (handler == null) handler = new Handler();
 
-            if (spinner == null)
-            {
-                spinner = new ProgressBar(context, null, android.R.attr.progressBarStyleSmall);
-                spinner.setPadding(40, 40, 40, 80);
-                spinner.getIndeterminateDrawable().setColorFilter(0xffff0000, PorterDuff.Mode.MULTIPLY);
-                spinner.setVisibility(INVISIBLE);
-            }
+            isPlayingParents = new ArrayList<>();
 
-            if (spinner.getParent() != null)
-            {
-                ((ViewGroup) spinner.getParent()).removeView(spinner);
-            }
+            LaunchItem bubble = this;
 
-            this.addView(spinner);
+            while (bubble != null)
+            {
+                Log.d(LOGTAG,"########################:" + bubble.label.getText());
+
+                isPlayingParents.add(bubble);
+
+                Log.d(LOGTAG,"########################:" + bubble.getLaunchGroup());
+
+                if (bubble.getLaunchGroup() == null) break;
+
+                bubble = bubble.getLaunchGroup().getLaunchItem();
+            }
 
             ProxyPlayer.getInstance().setAudioUrl(context,audiourl,this);
         }

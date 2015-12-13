@@ -110,6 +110,8 @@ public class ProxyPlayer extends Thread
 
             audioPlayer.pause();
 
+            playing.onPlaybackPaused();
+
             //
             // Schedule a full stop within limited time.
             //
@@ -153,6 +155,8 @@ public class ProxyPlayer extends Thread
                 ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
                 startPlayer.start();
             }
+
+            playing.onPlaybackResumed();
         }
     }
 
@@ -423,9 +427,9 @@ public class ProxyPlayer extends Thread
     public interface Callbacks
     {
         void onPlaybackPrepare();
-
         void onPlaybackStartet();
-
+        void onPlaybackPaused();
+        void onPlaybackResumed();
         void onPlaybackFinished();
 
         void onPlaybackMeta(String meta);

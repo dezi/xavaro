@@ -30,8 +30,9 @@ public class WebRadio extends LaunchGroup
         super(context);
     }
 
-    public void setName(String webradio)
+    public void setName(LaunchItem parent, String webradio)
     {
+        this.parent = parent;
         this.webradio = webradio;
 
         config = getConfig(context,webradio);
@@ -61,7 +62,7 @@ public class WebRadio extends LaunchGroup
                 LaunchItem li = new LaunchItem(context);
                 li.setSize(horzSize, vertSize);
 
-                if (inx < maxSlots) li.setConfig(lis.getJSONObject(inx));
+                if (inx < maxSlots) li.setConfig(this,lis.getJSONObject(inx));
 
                 launchItems.add(li);
                 addView(li);

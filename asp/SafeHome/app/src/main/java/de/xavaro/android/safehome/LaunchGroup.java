@@ -1,17 +1,18 @@
 package de.xavaro.android.safehome;
 
-import java.util.ArrayList;
+import android.support.annotation.Nullable;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONException;
+
+import java.util.ArrayList;
 
 //
 // Launch item view on home screen.
@@ -23,6 +24,7 @@ public class LaunchGroup extends FrameLayout
 
     protected Context context;
 
+    protected LaunchItem parent;
     protected JSONObject config;
 
     protected int horzSize = 220;
@@ -157,7 +159,7 @@ public class LaunchGroup extends FrameLayout
                 LaunchItem li = new LaunchItem(context);
                 li.setSize(horzSize, vertSize);
 
-                if (inx < maxSlots) li.setConfig(lis.getJSONObject(inx));
+                if (inx < maxSlots) li.setConfig(this,lis.getJSONObject(inx));
 
                 launchItems.add(li);
                 addView(li);
@@ -169,8 +171,9 @@ public class LaunchGroup extends FrameLayout
         }
     }
 
-    public void setConfig(JSONObject config)
+    public void setConfig(LaunchItem parent, JSONObject config)
     {
+        this.parent = parent;
         this.config = config;
     }
 
@@ -182,5 +185,11 @@ public class LaunchGroup extends FrameLayout
     public LaunchItem geLaunchItem(int inx)
     {
         return (launchItems == null) ? null : launchItems.get(inx);
+    }
+
+    @Nullable
+    public LaunchItem getLaunchItem()
+    {
+        return this.parent;
     }
 }

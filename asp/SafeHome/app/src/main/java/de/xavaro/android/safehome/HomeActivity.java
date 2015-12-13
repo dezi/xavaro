@@ -269,7 +269,7 @@ public class HomeActivity extends AppCompatActivity
 
         try
         {
-            launchGroup.setConfig(config.getJSONObject("launchgroup"));
+            launchGroup.setConfig(null,config.getJSONObject("launchgroup"));
         }
         catch (JSONException ex)
         {
