@@ -364,32 +364,27 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
 
     public void onPlaybackPrepare()
     {
-        clearAllCallbacks();
-        handler.postDelayed(playbackPrepare, 10);
+        clearAndPost(playbackPrepare);
     }
 
     public void onPlaybackStartet()
     {
-        clearAllCallbacks();
-        handler.postDelayed(playbackStartet, 10);
+        clearAndPost(playbackStartet);
     }
 
     public void onPlaybackPaused()
     {
-        clearAllCallbacks();
-        handler.postDelayed(playbackPaused, 10);
+        clearAndPost(playbackPaused);
     }
 
     public void onPlaybackResumed()
     {
-        clearAllCallbacks();
-        handler.postDelayed(playbackResumed, 10);
+        clearAndPost(playbackResumed);
     }
 
     public void onPlaybackFinished()
     {
-        clearAllCallbacks();
-        handler.postDelayed(playbackFinished, 100);
+        clearAndPost(playbackFinished);
     }
 
     public void onPlaybackMeta(String meta)
@@ -397,13 +392,15 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         Log.d(LOGTAG, "onPlaybackMeta: " + meta);
     }
 
-    private void clearAllCallbacks()
+    private void clearAndPost(Runnable start)
     {
         handler.removeCallbacks(playbackPrepare);
         handler.removeCallbacks(playbackStartet);
         handler.removeCallbacks(playbackPaused);
         handler.removeCallbacks(playbackResumed);
         handler.removeCallbacks(playbackFinished);
+
+        handler.postDelayed(start,5);
     }
 
     //endregion ProxiPlayer callback interface.
@@ -485,6 +482,8 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
     };
     public void setPlaybackPrepare()
     {
+        Log.d(LOGTAG,"setPlaybackPrepare:" + label.getText());
+
         isPlayingMedia = true;
 
         setSpinner(true);
