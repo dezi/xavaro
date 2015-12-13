@@ -631,7 +631,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         {
             String packagename = config.getString("packagename");
 
-            ((HomeActivity) context).kioskService.addOneShot(packagename);
+            HomeActivity.kioskService.addOneShot(packagename);
 
             Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
             context.startActivity(launchIntent);
@@ -851,17 +851,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks
         try
         {
             mPlayer.setDataSource(context,Uri.parse("http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/index_320_av-p.m3u8?sd=10&rebase=on"));
-
-            mPlayer.setOnTimedTextListener(
-                    new MediaPlayer.OnTimedTextListener()
-                    {
-                        @Override
-                        public void onTimedText(MediaPlayer mp, TimedText text)
-                        {
-                            Log.d("PLLLLLLL", text.getText());
-                        }
-
-                    });
         }
         catch (IOException ex)
         {

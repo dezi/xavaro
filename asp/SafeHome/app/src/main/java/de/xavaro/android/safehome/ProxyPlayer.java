@@ -29,59 +29,60 @@ public class ProxyPlayer extends Thread
     private static final String LOGTAG = ProxyPlayer.class.getSimpleName();
 
     private static ProxyPlayer proxiPlayer;
-    private static ServerSocket proxySocket;
-    private static int proxyPort;
-    private static String proxyUrl;
-
-    private static Callbacks calling;
-    private static Callbacks playing;
-    private static MediaPlayer audioPlayer;
-    private static boolean audioPrepared;
-    private static boolean running;
-    private static Context context;
-    private static Handler handler;
 
     public static ProxyPlayer getInstance()
     {
-        if (handler == null) handler = new Handler();
-
         if (proxiPlayer == null) proxiPlayer = new ProxyPlayer();
 
         return proxiPlayer;
     }
+
+    public ProxyPlayer()
+    {
+        //
+        // Initialize and start proxy server.
+        //
+
+        try
+        {
+            proxySocket = new ServerSocket(0);
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG,ex);
+
+            return;
+        }
+
+        proxyPort = proxySocket.getLocalPort();
+
+        //
+        // Should run forever.
+        //
+
+        start();
+
+        handler = new Handler();
+    }
+
+    private  ServerSocket proxySocket;
+    private  int proxyPort;
+    private  String proxyUrl;
+
+    private  Callbacks calling;
+    private  Callbacks playing;
+
+    private  MediaPlayer audioPlayer;
+    private  boolean audioPrepared;
+    private  boolean running;
+    private  Context context;
+    private  Handler handler;
 
     public void setAudioUrl(Context ctx, String url, Callbacks caller)
     {
         context = ctx;
         calling = caller;
         proxyUrl = url;
-
-        //
-        // Initialize and start proxy server once.
-        //
-
-        if (proxySocket == null)
-        {
-            try
-            {
-                proxySocket = new ServerSocket(0);
-            }
-            catch (IOException ex)
-            {
-                OopsService.log(LOGTAG,ex);
-                return;
-            }
-
-            proxyPort = proxySocket.getLocalPort();
-
-            running = true;
-
-            //
-            // Should run forever.
-            //
-
-            start();
-        }
 
         if (audioPlayer == null)
         {
@@ -146,7 +147,7 @@ public class ProxyPlayer extends Thread
             else
             {
                 //
-                // Hard restart on media player.
+                // Full restart on media player.
                 //
 
                 ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
@@ -160,6 +161,12 @@ public class ProxyPlayer extends Thread
     {
         try
         {
+            //
+            // Proxy HTTP server loop.
+            //
+
+            running = true;
+
             while (running)
             {
                 Log.d(LOGTAG, "Waiting on port " + proxyPort);
@@ -186,8 +193,9 @@ public class ProxyPlayer extends Thread
         {
             proxySocket.close();
         }
-        catch (IOException ignore)
+        catch (IOException ex)
         {
+            OopsService.log(LOGTAG, ex);
         }
         finally
         {
