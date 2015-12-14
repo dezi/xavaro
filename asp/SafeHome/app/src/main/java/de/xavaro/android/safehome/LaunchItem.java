@@ -16,7 +16,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.InputType;
@@ -39,7 +38,6 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 //
@@ -68,7 +66,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
 
     private LaunchGroup directory;
     private WebFrame webframe;
-    private WebRadio webradio;
+    private WebStream webstream;
 
     public LaunchItem(Context context)
     {
@@ -296,16 +294,16 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
                     }
                 }
 
-                if (type.equals("webradio"))
+                if (type.equals("webradio") || type.equals("webiptv"))
                 {
                     if (config.has("name"))
                     {
                         String name = config.getString("name");
 
-                        label.setText(WebRadio.getConfigLabel(context, name));
+                        label.setText(WebStream.getConfigLabel(context, type, name));
                         setVisibility(VISIBLE);
 
-                        icon.setImageDrawable(WebRadio.getConfigIconDrawable(context, name));
+                        icon.setImageDrawable(WebStream.getConfigIconDrawable(context, type, name));
                         icon.setVisibility(VISIBLE);
 
                         targetIcon = overicon;
@@ -590,6 +588,11 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
                 type = "audioplayer";
             }
 
+            if (config.has("videourl"))
+            {
+                type = "videoplayer";
+            }
+
             if (config.has("type"))
             {
                 type = config.getString("type");
@@ -610,13 +613,15 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
         if (type.equals("select_home"  )) { launchSelectHome();   return; }
         if (type.equals("select_assist")) { launchSelectAssist(); return; }
         if (type.equals("audioplayer"  )) { launchAudioPlayer();  return; }
+        if (type.equals("videoplayer"  )) { launchVideoPlayer();  return; }
         if (type.equals("genericapp"   )) { launchGenericApp();   return; }
         if (type.equals("directory"    )) { launchDirectory();    return; }
         if (type.equals("developer"    )) { launchDeveloper();    return; }
         if (type.equals("settings"     )) { launchSettings();     return; }
         if (type.equals("install"      )) { launchInstall();      return; }
         if (type.equals("webframe"     )) { launchWebframe();     return; }
-        if (type.equals("webradio"     )) { launchWebradio();     return; }
+        if (type.equals("webradio"     )) { launchWebstream();    return; }
+        if (type.equals("webiptv"      )) { launchWebstream();    return; }
         if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
 
@@ -869,7 +874,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
-    private void launchWebradio()
+    private void launchWebstream()
     {
         if (! config.has("name"))
         {
@@ -880,15 +885,16 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
 
         try
         {
-            if (webradio == null)
+            if (webstream == null)
             {
+                String type = config.getString("type");
                 String name = config.getString("name");
 
-                webradio = new WebRadio(context);
-                webradio.setName(this, name);
+                webstream = new WebStream(context);
+                webstream.setName(this, type, name);
             }
 
-            ((HomeActivity) context).addViewToBackStack(webradio);
+            ((HomeActivity) context).addViewToBackStack(webstream);
         }
         catch (Exception ex)
         {
@@ -978,39 +984,27 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
         */
     }
 
-    private void launchAudioPlayer()
+    private void launchVideoPlayer()
     {
-        if (! config.has("audiourl"))
+        if (! config.has("videourl"))
         {
-            Toast.makeText(getContext(),"Nix <audiourl> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"Nix <videourl> configured.",Toast.LENGTH_LONG).show();
 
             return;
         }
 
+        if (handler == null) handler = new Handler();
+
+        SurfaceView surfaceView = new SurfaceView(context);
+        SurfaceHolder holder = surfaceView.getHolder();
+        holder.addCallback(this);
+        this.addView(surfaceView);
+
         try
         {
-            String audiourl = config.getString("audiourl");
+            String videourl = config.getString("videourl");
 
-            if (handler == null) handler = new Handler();
-
-            isPlayingParents = new ArrayList<>();
-
-            LaunchItem bubble = this;
-
-            while (bubble != null)
-            {
-                Log.d(LOGTAG,"########################:" + bubble.label.getText());
-
-                isPlayingParents.add(bubble);
-
-                Log.d(LOGTAG,"########################:" + bubble.getLaunchGroup());
-
-                if (bubble.getLaunchGroup() == null) break;
-
-                bubble = bubble.getLaunchGroup().getLaunchItem();
-            }
-
-            ProxyPlayer.getInstance().setAudioUrl(context,audiourl,this);
+            ProxyPlayer.getInstance().setVideoUrl(context, videourl, this);
         }
         catch (Exception ex)
         {
@@ -1034,6 +1028,42 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
     {
     }
 
+    private void launchAudioPlayer()
+    {
+        if (! config.has("audiourl"))
+        {
+            Toast.makeText(getContext(),"Nix <audiourl> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            String audiourl = config.getString("audiourl");
+
+            if (handler == null) handler = new Handler();
+
+            isPlayingParents = new ArrayList<>();
+
+            LaunchItem bubble = this;
+
+            while (bubble != null)
+            {
+                isPlayingParents.add(bubble);
+
+                if (bubble.getLaunchGroup() == null) break;
+
+                bubble = bubble.getLaunchGroup().getLaunchItem();
+            }
+
+            ProxyPlayer.getInstance().setAudioUrl(context,audiourl,this);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     private void launchDeveloper()
     {
         if (ProxyPlayer.getInstance().isPlaying()) return;
@@ -1043,14 +1073,5 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
 
         String videourl = "http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/index_320_av-p.m3u8?sd=10&rebase=on";
 
-        if (handler == null) handler = new Handler();
-
-        ProxyPlayer.getInstance().setVideoUrl(context, videourl, this);
-
-        SurfaceView surfaceView = new SurfaceView(context);
-        SurfaceHolder holder = surfaceView.getHolder();
-        //holder.setFixedSize(176, 144);
-        holder.addCallback(this);
-        this.addView(surfaceView);
     }
 }

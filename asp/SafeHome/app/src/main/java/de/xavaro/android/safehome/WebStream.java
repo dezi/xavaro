@@ -17,25 +17,28 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 //
-// Webradio base class.
+// Web stream receivers base class.
 //
-public class WebRadio extends LaunchGroup
+
+public class WebStream extends LaunchGroup
 {
-    private static final String LOGTAG = WebRadio.class.getSimpleName();
+    private static final String LOGTAG = WebStream.class.getSimpleName();
 
-    protected String webradio;
+    private String webtype;
+    private String webstream;
 
-    public WebRadio(Context context)
+    public WebStream(Context context)
     {
         super(context);
     }
 
-    public void setName(LaunchItem parent, String webradio)
+    public void setName(LaunchItem parent, String type, String website)
     {
         this.parent = parent;
-        this.webradio = webradio;
+        this.webtype = type;
+        this.webstream = website;
 
-        config = getConfig(context,webradio);
+        config = getConfig(context, webtype, webstream);
     }
 
     @Override
@@ -76,43 +79,45 @@ public class WebRadio extends LaunchGroup
 
     //region Static methods.
 
-    private static JSONObject globalConfig = null;
+    private static JSONObject globalConfig = new JSONObject();
 
-    public static JSONObject getConfig(Context context)
+    private static JSONObject getConfig(Context context,String type)
     {
-        if (globalConfig == null)
+        JSONObject typeroot = new JSONObject();
+
+        try
         {
-            JSONObject jot = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webradio);
+            if (! globalConfig.has(type))
+            {
+                int resourceId = context.getResources().getIdentifier("default_" + type, "raw", context.getPackageName());
 
-            if (jot == null)
-            {
-                Log.e(LOGTAG, "getConfig: Cannot read default webradios.");
-            }
-            else
-            {
-                try
+                JSONObject jot = StaticUtils.readRawTextResourceJSON(context, resourceId);
+
+                if ((jot == null) || !jot.has(type))
                 {
-                    globalConfig = jot.getJSONObject("webradio");
-
-                    return globalConfig;
+                    Log.e(LOGTAG, "getConfig: Cannot read default " + type);
                 }
-                catch (JSONException ignore)
+                else
                 {
-                    Log.e(LOGTAG, "getConfig: Tag <webradio> missing in config.");
+                    globalConfig.put(type, jot.getJSONObject(type));
                 }
             }
 
-            globalConfig = new JSONObject();
+            typeroot = globalConfig.getJSONObject(type);
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
         }
 
-        return globalConfig;
+        return typeroot;
     }
 
-    public static JSONObject getConfig(Context context,String website)
+    public static JSONObject getConfig(Context context, String type, String website)
     {
         try
         {
-            return getConfig(context).getJSONObject(website);
+            return getConfig(context,type).getJSONObject(website);
         }
         catch (JSONException ignore)
         {
@@ -122,11 +127,11 @@ public class WebRadio extends LaunchGroup
     }
 
     @Nullable
-    public static Drawable getConfigIconDrawable(Context context,String website)
+    public static Drawable getConfigIconDrawable(Context context, String type, String website)
     {
         try
         {
-            String iconurl = getConfig(context,website).getString("icon");
+            String iconurl = getConfig(context, type, website).getString("icon");
             String iconext = MimeTypeMap.getFileExtensionFromUrl(iconurl);
             String iconfile = website + ".thumbnail." + iconext;
             Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl, iconfile);
@@ -141,11 +146,11 @@ public class WebRadio extends LaunchGroup
     }
 
     @Nullable
-    public static String getConfigLabel(Context context,String website)
+    public static String getConfigLabel(Context context,String type, String website)
     {
         try
         {
-            return getConfig(context, website).getString("label");
+            return getConfig(context, type, website).getString("label");
         }
         catch (JSONException ignore)
         {
