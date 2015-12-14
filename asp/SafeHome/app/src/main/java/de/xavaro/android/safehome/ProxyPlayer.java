@@ -688,7 +688,17 @@ public class ProxyPlayer extends Thread
                 next = ((lastFragment != null) && lastFragment.equals(line));
             }
 
-            if (audioPrepared) while (frags.size() > 3) frags.remove(0);
+            if (audioPrepared)
+            {
+                //
+                // When the mediaplayer is prepared and has done
+                // all of its stupid "get this", "get that" work,
+                // we go as close as possible to the current live
+                // time line.
+                //
+
+                while (frags.size() > 4) frags.remove(0);
+            }
 
             nextFragment = (lastFragment == null) ? frags.get(0) : null;
         }
