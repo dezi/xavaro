@@ -303,9 +303,10 @@ public class ProxyPlayer extends Thread
         private String proxiurl;
         private boolean proxyIsAudio;
         private boolean proxyIsVideo;
-        private boolean isPartial;
         private InputStream proxy_in;
         private OutputStream proxy_out;
+
+        private boolean isPartial;
         private HttpURLConnection connection;
 
         private ArrayList<StreamOptions> streamOptions;
@@ -330,10 +331,32 @@ public class ProxyPlayer extends Thread
 
                 readHeaders(proxy_in);
 
-                if (proxiurl != null)
+                Log.d(LOGTAG,"#########################" + audioPrepared);
+
+                /*
+                if (isPartial)
                 {
-                    if (proxyIsAudio) workOnAudio(proxiurl);
-                    if (proxyIsVideo) workOnVideo(proxiurl);
+                    //
+                    // MediaPLayer fucks around with partial requests
+                    // to test capability on seeking. We are not
+                    // on a file so we behave a little bit stupid
+                    // to speed things up.
+                    //
+
+                    String goodbye = "HTTP/1.0 200 Ok\r\nContent-Type: text/plain\r\n\r\n";
+
+                    proxy_out.write(goodbye.getBytes());
+
+                    Log.d(LOGTAG, "workOnVideo: partial request exit.");
+                }
+                else
+                */
+                {
+                    if (proxiurl != null)
+                    {
+                        if (proxyIsAudio) workOnAudio(proxiurl);
+                        if (proxyIsVideo) workOnVideo(proxiurl);
+                    }
                 }
 
                 proxy_in.close();
@@ -343,7 +366,6 @@ public class ProxyPlayer extends Thread
             {
                 ex.printStackTrace();
             }
-
         }
 
         private void workOnVideo(String url)
@@ -428,20 +450,6 @@ public class ProxyPlayer extends Thread
                     nextFragment = null;
 
                     Log.d(LOGTAG, "workOnVideo: fragment close: " + total);
-
-                    if (isPartial)
-                    {
-                        //
-                        // MediaPLayer fucks around with partial requests
-                        // to test capability on seeking. We are not
-                        // on a file so we behave a little bit stupid
-                        // to speed things up.
-                        //
-
-                        Log.d(LOGTAG, "workOnVideo: partial request exit.");
-
-                        break;
-                    }
                 }
             }
             catch (Exception ignore)
@@ -643,7 +651,7 @@ public class ProxyPlayer extends Thread
                 streamOptions.add(so);
             }
 
-            currentOption = 0; //streamOptions.size() - 1;
+            currentOption = streamOptions.size() >> 2;
         }
 
         private void readFragments() throws Exception
@@ -680,7 +688,7 @@ public class ProxyPlayer extends Thread
                 next = ((lastFragment != null) && lastFragment.equals(line));
             }
 
-            while (frags.size() > 3) frags.remove(0);
+            if (audioPrepared) while (frags.size() > 3) frags.remove(0);
 
             nextFragment = (lastFragment == null) ? frags.get(0) : null;
         }
@@ -723,7 +731,6 @@ public class ProxyPlayer extends Thread
             for (String line : lines)
             {
                 Log.d(LOGTAG,"Header: " + line);
-
 
                 if (line.startsWith("Range:"))
                 {
