@@ -10,6 +10,7 @@ import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -25,9 +26,17 @@ public class HomeActivity extends AppCompatActivity
 
     public static KioskService kioskService;
 
+    public static HomeActivity homeActivity;
+
+    public static HomeActivity getInstance()
+    {
+        return homeActivity;
+    }
+
     private LaunchGroup launchGroup;
     private JSONObject config;
     private FrameLayout topscreen;
+    private FrameLayout videoSurface;
 
     private boolean wasPaused = false;
     private boolean lostFocus = true;
@@ -39,6 +48,8 @@ public class HomeActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        homeActivity = this;
 
         topscreen = (FrameLayout) findViewById(R.id.top_screen);
 
@@ -164,6 +175,19 @@ public class HomeActivity extends AppCompatActivity
     {
         topscreen.addView((FrameLayout) view);
         backStack.add(view);
+
+        if (videoSurface != null) videoSurface.bringToFront();
+    }
+
+    public void addView(Object view, ViewGroup.LayoutParams params)
+    {
+        topscreen.addView((FrameLayout) view, params);
+    }
+
+    public void addVideoSurface(FrameLayout video)
+    {
+        videoSurface = video;
+        topscreen.addView(video);
     }
 
     private final Runnable delayOnBackPressed = new Runnable()

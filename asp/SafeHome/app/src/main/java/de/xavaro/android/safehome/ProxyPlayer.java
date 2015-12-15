@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.media.SyncParams;
 import android.support.annotation.Nullable;
 
 import android.content.Context;
@@ -10,7 +9,6 @@ import android.net.Uri;
 import android.util.Log;
 import android.os.Handler;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,8 +75,8 @@ public class ProxyPlayer extends Thread
     private  boolean proxyIsVideo;
     private  boolean proxyIsAudio;
 
-    private  Callbacks calling;
-    private  Callbacks playing;
+    private Callback calling;
+    private Callback playing;
 
     private  MediaPlayer mediaPlayer;
     private  boolean audioPrepared;
@@ -86,7 +84,7 @@ public class ProxyPlayer extends Thread
     private  Context context;
     private  Handler handler;
 
-    public void setAudioUrl(Context ctx, String url, Callbacks caller)
+    public void setAudioUrl(Context ctx, String url, Callback caller)
     {
         context = ctx;
         calling = caller;
@@ -101,7 +99,7 @@ public class ProxyPlayer extends Thread
         startPlayer.start();
     }
 
-    public void setVideoUrl(Context ctx, String url, Callbacks caller)
+    public void setVideoUrl(Context ctx, String url, Callback caller)
     {
         context = ctx;
         calling = caller;
@@ -239,7 +237,7 @@ public class ProxyPlayer extends Thread
         @Override
         public void run()
         {
-            Callbacks mycallback = calling;
+            Callback mycallback = calling;
 
             synchronized (LOGTAG)
             {
@@ -405,7 +403,7 @@ public class ProxyPlayer extends Thread
                             {
                                 if ((headerKey != null) && headerKey.equals("Content-Length"))
                                 {
-                                    headerValue = "" + Long.MAX_VALUE;
+                                    headerValue = "99999999"; // + Long.MAX_VALUE;
                                 }
 
                                 if ((headerKey == null)
@@ -577,6 +575,7 @@ public class ProxyPlayer extends Thread
             connection.connect();
         }
 
+        @Nullable
         private String[] readLines(String url) throws Exception
         {
             openUnderscoreConnection(url);
@@ -593,14 +592,49 @@ public class ProxyPlayer extends Thread
 
             input.close();
 
-            return string.toString().split("\n");
+            String temp = string.toString();
+
+            if (temp.contains("\r\n")) return temp.split("\r\n");
+
+            return temp.split("\n");
+        }
+
+        private String resolveRelativeUrl(String baseurl, String streamurl)
+        {
+            if (! (streamurl.startsWith("http:") || streamurl.startsWith("https:")))
+            {
+                //
+                // Releative fragment urls.
+                //
+
+                String prefix = baseurl;
+
+                if (prefix.lastIndexOf("/") > 0)
+                {
+                    prefix = prefix.substring(0,prefix.lastIndexOf("/"));
+                }
+
+                while (streamurl.startsWith("../"))
+                {
+                    streamurl = streamurl.substring(3);
+                    prefix = prefix.substring(0,prefix.lastIndexOf("/"));
+                }
+
+                streamurl = prefix + "/" + streamurl;
+            }
+
+            return streamurl;
         }
 
         private void readMaster(String url) throws Exception
         {
+            Log.d(LOGTAG,"readMaster: " + url);
+
             streamOptions = new ArrayList<>();
 
             String[] lines = readLines(url);
+
+            Log.d(LOGTAG,"readMaster: " + lines.length);
 
             for (int inx = 0; (inx + 1) < lines.length; inx++)
             {
@@ -609,11 +643,11 @@ public class ProxyPlayer extends Thread
                 String line = lines[ inx ].substring(18);
 
                 String width     = StaticUtils.findDat("RESOLUTION=([0-9]*)x", line);
-                String height    = StaticUtils.findDat("RESOLUTION=[0-9]*x([0-9]*),", line);
-                String bandwith  = StaticUtils.findDat("BANDWIDTH=([0-9]*),", line);
+                String height    = StaticUtils.findDat("RESOLUTION=[0-9]*x([0-9]*)", line);
+                String bandwith  = StaticUtils.findDat("BANDWIDTH=([0-9]*)", line);
                 String streamurl = lines[ ++inx ];
 
-                if ((width == null) || (height == null) || (bandwith == null) || (streamurl == null))
+                if ((bandwith == null) || (streamurl == null))
                 {
                     continue;
                 }
@@ -627,16 +661,18 @@ public class ProxyPlayer extends Thread
                     continue;
                 }
 
+                streamurl = resolveRelativeUrl(url, streamurl);
+
                 StreamOptions so = new StreamOptions();
 
-                so.width = Integer.parseInt(width);
-                so.height = Integer.parseInt(height);
-                so.bandWidth = Integer.parseInt(bandwith);
+                so.width = (width == null) ? 0 : Integer.parseInt(width);
+                so.height = (height == null) ? 0 : Integer.parseInt(height);
+                so.bandWidth = (bandwith == null) ? 0 : Integer.parseInt(bandwith);
                 so.streamUrl = streamurl;
 
                 streamOptions.add(so);
 
-                Log.d(LOGTAG,"readMaster: Live-Stream: " + width + "x" + height + " bw=" + bandwith);
+                Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
             }
 
             if (streamOptions.size() == 0)
@@ -675,6 +711,8 @@ public class ProxyPlayer extends Thread
             for (String line : lines)
             {
                 if (line.startsWith("#")) continue;
+
+                line = resolveRelativeUrl(url, line);
 
                 frags.add(line);
 
@@ -772,7 +810,7 @@ public class ProxyPlayer extends Thread
         public int height;
     }
 
-    public interface Callbacks
+    public interface Callback
     {
         void onPlaybackPrepare();
         void onPlaybackStartet();

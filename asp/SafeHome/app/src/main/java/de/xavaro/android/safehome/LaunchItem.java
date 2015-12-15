@@ -44,7 +44,7 @@ import java.util.ArrayList;
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, SurfaceHolder.Callback
+public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, SurfaceHolder.Callback
 {
     private final String LOGTAG = "LaunchItem";
 
@@ -480,6 +480,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
             }
         }
     };
+
     public void setPlaybackPrepare()
     {
         Log.d(LOGTAG,"setPlaybackPrepare:" + label.getText());
@@ -995,16 +996,42 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
 
         if (handler == null) handler = new Handler();
 
+        /*
+        FrameLayout videoLayout = new FrameLayout(context);
+
         SurfaceView surfaceView = new SurfaceView(context);
         SurfaceHolder holder = surfaceView.getHolder();
         holder.addCallback(this);
-        this.addView(surfaceView);
+
+        videoLayout.addView(surfaceView);
+
+        LayoutParams videolay = new LayoutParams(400, 240);
+        videolay.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+
+        //this.parent.addView(surfaceView,videolay);
+        ((HomeActivity) context).addView(videoLayout, videolay);
+        */
 
         try
         {
             String videourl = config.getString("videourl");
 
+            isPlayingParents = new ArrayList<>();
+
+            LaunchItem bubble = this;
+
+            while (bubble != null)
+            {
+                isPlayingParents.add(bubble);
+
+                if (bubble.getLaunchGroup() == null) break;
+
+                bubble = bubble.getLaunchGroup().getLaunchItem();
+            }
+
             ProxyPlayer.getInstance().setVideoUrl(context, videourl, this);
+
+            VideoSurface.getInstance();
         }
         catch (Exception ex)
         {
@@ -1066,12 +1093,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callbacks, Su
 
     private void launchDeveloper()
     {
-        if (ProxyPlayer.getInstance().isPlaying()) return;
-
-        // http://www.daserste.de/live/live-de-104~playerXml.xml
-        // http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/master.m3u8
-
-        String videourl = "http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/index_320_av-p.m3u8?sd=10&rebase=on";
-
+        VideoSurface.getInstance();
     }
 }

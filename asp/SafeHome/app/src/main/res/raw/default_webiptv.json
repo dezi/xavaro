@@ -82,12 +82,12 @@
 
       "label": "kika",
       "url": "http://www.kika.de/",
-      "icon": "http://www.kika.de/resources/img/kika/svg/logo.svg",
+      "icon": "http://www.designtagebuch.de/wp-content/uploads/mediathek/2011/12/kika-logo.jpg",
 
       "channels": [
         {
           "label": "kika",
-          "icon": "http://www.kika.de/resources/img/kika/svg/logo.svg",
+          "icon": "http://www.designtagebuch.de/wp-content/uploads/mediathek/2011/12/kika-logo.jpg",
           "videourl": "http://kika_geo-lh.akamaihd.net/i/livetvkika_de@75114/master.m3u8"
         }
       ]
@@ -207,12 +207,12 @@
 
       "label": "SR Fernsehen",
       "url": "http://www.sr.de/",
-      "icon": "http://de.wikipedia.org/wiki/SR_Fernsehen#/media/File:SR_Fernsehen.svg",
+      "icon": "http://pbs.twimg.com/profile_images/460794791693778944/T8dr5hFO_400x400.jpeg",
 
       "channels": [
         {
           "label": "SR Fernsehen",
-          "icon": "http://de.wikipedia.org/wiki/SR_Fernsehen#/media/File:SR_Fernsehen.svg",
+          "icon": "http://pbs.twimg.com/profile_images/460794791693778944/T8dr5hFO_400x400.jpeg",
           "videourl": "http://livestream.sr-online.de/live.m3u8"
         }
       ]

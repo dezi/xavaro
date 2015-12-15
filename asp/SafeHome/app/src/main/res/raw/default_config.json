@@ -33,86 +33,56 @@
             },
             {
               "type": "webiptv",
-              "name": "www.zdf.de"
+              "name": "www.tagesschau.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.kika.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.br.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.ndr.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.mdr.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.wdr.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.rbb-online.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.sr.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.swr.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.n24.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.alex-berlin.de"
+            },
+            {
+              "type": "webiptv",
+              "name": "www.arte.tv"
             }
           ]
         }
       },
-      {
-        "label": "Recommended",
-        "type": "directory",
-        "packagename": "com.android.vending",
-        "launchgroup": {
-          "launchitems": [
-            {
-              "type": "install",
-              "label": "WhatsApp",
-              "packagename": "com.whatsapp"
-            },
-            {
-              "type": "install",
-              "label": "Skype",
-              "packagename": "com.skype.raider"
-            },
-            {
-              "type": "install",
-              "label": "Wikipedia",
-              "packagename": "org.wikipedia"
-            },
-            {
-              "type": "install",
-              "label": "EDEKA App",
-              "packagename": "com.valuephone.vpedeka"
-            },
-            {
-              "type": "install",
-              "label": "REWE",
-              "packagename": "de.rewe.app"
-            },
-            {
-              "type": "install",
-              "label": "PENNY",
-              "packagename": "de.penny.pennyandroid"
-            },
-            {
-              "type": "install",
-              "label": "ALDI Nord",
-              "packagename": "de.aldiNord.android"
-            },
-            {
-              "type": "install",
-              "label": "ALDI Süd",
-              "packagename": "de.apptiv.business.android.aldi_de"
-            },
-            {
-              "type": "install",
-              "label": "Lidl",
-              "packagename": "de.sec.mobile"
-            },
-            {
-              "type": "install",
-              "label": "real,-",
-              "packagename": "com.wfp2.realapp"
-            },
-            {
-              "type": "install",
-              "label": "NORMA",
-              "packagename": "de.norma"
-            },
-            {
-              "type": "install",
-              "label": "NETTO",
-              "packagename": "com.bfi.netto"
-            },
-            {
-              "type": "install",
-              "label": "NETTO",
-              "packagename": "com.valuephone.vpnetto"
-            }
-          ]
-        }
-      },
-      {
+     {
         "label": "Whatsi Dezi",
         "type": "whatsapp",
         "packagename": "com.whatsapp",
