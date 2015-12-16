@@ -89,8 +89,7 @@ public class VideoSurface extends FrameLayout implements
         normalParams.leftMargin = 40;
         normalParams.topMargin  = 400;
 
-        offPosition = new LayoutParams(80,80);
-        offPosition.gravity = Gravity.START + Gravity.TOP;
+        offPosition = new LayoutParams(80,80,Gravity.START + Gravity.TOP);
         offButton = new FrameLayout(context);
         offButton.setLayoutParams(offPosition);
         offButton.setPadding(10, 10, 10, 10);
@@ -111,8 +110,7 @@ public class VideoSurface extends FrameLayout implements
             }
         });
 
-        playPosition = new LayoutParams(80,80);
-        playPosition.gravity = Gravity.END + Gravity.TOP;
+        playPosition = new LayoutParams(80,80,Gravity.END + Gravity.TOP);
         playButton = new FrameLayout(context);
         playButton.setLayoutParams(playPosition);
         playButton.setPadding(10, 10, 10, 10);
