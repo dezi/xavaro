@@ -186,8 +186,20 @@ public class HomeActivity extends AppCompatActivity
 
     public void addVideoSurface(FrameLayout video)
     {
-        videoSurface = video;
-        topscreen.addView(video);
+        if (videoSurface == null)
+        {
+            topscreen.addView(video);
+            videoSurface = video;
+        }
+    }
+
+    public void removeVideoSurface()
+    {
+        if (videoSurface != null)
+        {
+            topscreen.removeView(videoSurface);
+            videoSurface = null;
+        }
     }
 
     private final Runnable delayOnBackPressed = new Runnable()

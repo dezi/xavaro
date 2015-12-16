@@ -23,7 +23,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -353,6 +352,8 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
     //
 
     private boolean isPlayingMedia;
+    private boolean isPlayingAudio;
+    private boolean isPlayingVideo;
 
     //
     // Bubble up launch items for player control.
@@ -360,7 +361,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
 
     private ArrayList<LaunchItem> isPlayingParents = new ArrayList<>();
 
-    //region ProxiPlayer callback interface.
+    //region ProxyPlayer.Callback interface.
 
     public void onPlaybackPrepare()
     {
@@ -403,10 +404,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
         handler.postDelayed(start,5);
     }
 
-    //endregion ProxiPlayer callback interface.
-
-    //region Media playback control.
-
     //
     // Required handlers for thread change.
     //
@@ -422,6 +419,11 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             {
                 li.setPlaybackPrepare();
             }
+
+            if (isPlayingVideo)
+            {
+                VideoSurface.getInstance().onPlaybackPrepare();
+            }
         }
     };
 
@@ -435,6 +437,11 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             for (LaunchItem li : isPlayingParents)
             {
                 li.setPlaybackStartet();
+            }
+
+            if (isPlayingVideo)
+            {
+                VideoSurface.getInstance().onPlaybackStartet();
             }
         }
     };
@@ -450,6 +457,11 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             {
                 li.setPlaybackPaused();
             }
+
+            if (isPlayingVideo)
+            {
+                VideoSurface.getInstance().onPlaybackPaused();
+            }
         }
     };
 
@@ -463,6 +475,11 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             for (LaunchItem li : isPlayingParents)
             {
                 li.setPlaybackResumed();
+            }
+
+            if (isPlayingVideo)
+            {
+                VideoSurface.getInstance().onPlaybackResumed();
             }
         }
     };
@@ -478,8 +495,17 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             {
                 li.setPlaybackFinished();
             }
+
+            if (isPlayingVideo)
+            {
+                VideoSurface.getInstance().onPlaybackFinished();
+            }
         }
     };
+
+    //endregion ProxiPlayer callback interface.
+
+    //region Media playback control.
 
     public void setPlaybackPrepare()
     {
@@ -550,9 +576,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
     }
 
     //endregion Media playback control.
-
-    //endregion Media playback stuff.
-
 
     private void onMyOverlayClick()
     {
@@ -996,22 +1019,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
 
         if (handler == null) handler = new Handler();
 
-        /*
-        FrameLayout videoLayout = new FrameLayout(context);
-
-        SurfaceView surfaceView = new SurfaceView(context);
-        SurfaceHolder holder = surfaceView.getHolder();
-        holder.addCallback(this);
-
-        videoLayout.addView(surfaceView);
-
-        LayoutParams videolay = new LayoutParams(400, 240);
-        videolay.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-
-        //this.parent.addView(surfaceView,videolay);
-        ((HomeActivity) context).addView(videoLayout, videolay);
-        */
-
         try
         {
             String videourl = config.getString("videourl");
@@ -1030,6 +1037,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             }
 
             ProxyPlayer.getInstance().setVideoUrl(context, videourl, this);
+            isPlayingVideo = true;
 
             VideoSurface.getInstance();
         }
@@ -1084,6 +1092,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             }
 
             ProxyPlayer.getInstance().setAudioUrl(context,audiourl,this);
+            isPlayingAudio = true;
         }
         catch (Exception ex)
         {

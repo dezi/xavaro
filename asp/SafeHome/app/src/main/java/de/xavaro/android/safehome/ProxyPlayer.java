@@ -31,6 +31,8 @@ public class ProxyPlayer extends Thread
 {
     private static final String LOGTAG = ProxyPlayer.class.getSimpleName();
 
+    //region Contructor and static instance startup.
+
     private static ProxyPlayer proxiPlayer;
 
     public static ProxyPlayer getInstance()
@@ -69,6 +71,8 @@ public class ProxyPlayer extends Thread
         mediaPlayer = new MediaPlayer();
     }
 
+    //endregion
+
     private  ServerSocket proxySocket;
     private  int proxyPort;
     private  String proxyUrl;
@@ -83,6 +87,8 @@ public class ProxyPlayer extends Thread
     private  boolean running;
     private  Context context;
     private  Handler handler;
+
+    //region Setter methods.
 
     public void setAudioUrl(Context ctx, String url, Callback caller)
     {
@@ -116,8 +122,17 @@ public class ProxyPlayer extends Thread
 
     public void setDisplay(SurfaceHolder holder)
     {
-        mediaPlayer.setDisplay(holder);
+        Log.d(LOGTAG,"******************************************************************************");
+
+        //synchronized (LOGTAG)
+        {
+            mediaPlayer.setDisplay(holder);
+        }
     }
+
+    //endregion
+
+    //region Control methods.
 
     public boolean isPlaying()
     {
@@ -184,6 +199,21 @@ public class ProxyPlayer extends Thread
             playing.onPlaybackResumed();
         }
     }
+
+    public void playerReset()
+    {
+        if (mediaPlayer != null)
+        {
+            mediaPlayer.reset();
+            audioPrepared = false;
+        }
+
+        if (playing != null) playing.onPlaybackFinished();
+    }
+
+    //endregion
+
+    //region Proxy server thread.
 
     @Override
     public void run()
@@ -271,7 +301,6 @@ public class ProxyPlayer extends Thread
                 {
                     mediaPlayer.prepare();
                     audioPrepared = true;
-
                 }
                 catch (IOException ex)
                 {
@@ -289,6 +318,10 @@ public class ProxyPlayer extends Thread
         }
     }
 
+    //endregion
+
+    //region ProxyPlayerWorker class.
+
     //
     // Thread startet on each individual connection.
     //
@@ -296,15 +329,15 @@ public class ProxyPlayer extends Thread
     {
         private final String LOGTAG = ProxyPlayerWorker.class.getSimpleName();
 
+        private String requestUrl;
+
+        private boolean requestIsAudio;
+        private boolean requestIsVideo;
+        private InputStream requestInput;
+        private OutputStream requestOutput;
+
         private int icymetaint;
-
-        private String proxiurl;
-        private boolean proxyIsAudio;
-        private boolean proxyIsVideo;
-        private InputStream proxy_in;
-        private OutputStream proxy_out;
-
-        private boolean isPartial;
+        private boolean requestIsPartial;
         private HttpURLConnection connection;
 
         private ArrayList<StreamOptions> streamOptions;
@@ -314,8 +347,8 @@ public class ProxyPlayer extends Thread
 
         public ProxyPlayerWorker(Socket connect) throws IOException
         {
-            proxy_in = connect.getInputStream();
-            proxy_out = connect.getOutputStream();
+            requestInput = connect.getInputStream();
+            requestOutput = connect.getOutputStream();
         }
 
         @Override
@@ -327,12 +360,12 @@ public class ProxyPlayer extends Thread
                 // Read headers to obtain real url.
                 //
 
-                readHeaders(proxy_in);
+                readHeaders(requestInput);
 
                 Log.d(LOGTAG,"#########################" + audioPrepared);
 
                 /*
-                if (isPartial)
+                if (requestIsPartial)
                 {
                     //
                     // MediaPLayer fucks around with partial requests
@@ -343,22 +376,22 @@ public class ProxyPlayer extends Thread
 
                     String goodbye = "HTTP/1.0 200 Ok\r\nContent-Type: text/plain\r\n\r\n";
 
-                    proxy_out.write(goodbye.getBytes());
+                    requestOutput.write(goodbye.getBytes());
 
                     Log.d(LOGTAG, "workOnVideo: partial request exit.");
                 }
                 else
                 */
                 {
-                    if (proxiurl != null)
+                    if (requestUrl != null)
                     {
-                        if (proxyIsAudio) workOnAudio(proxiurl);
-                        if (proxyIsVideo) workOnVideo(proxiurl);
+                        if (requestIsAudio) workOnAudio(requestUrl);
+                        if (requestIsVideo) workOnVideo(requestUrl);
                     }
                 }
 
-                proxy_in.close();
-                proxy_out.close();
+                requestInput.close();
+                requestOutput.close();
             }
             catch (IOException ex)
             {
@@ -412,15 +445,15 @@ public class ProxyPlayer extends Thread
                                 {
                                     String copy = ((headerKey != null) ? headerKey + ": " : "") + headerValue + "\r\n";
 
-                                    proxy_out.write(copy.getBytes());
+                                    requestOutput.write(copy.getBytes());
 
                                     Log.d(LOGTAG, "First:" + copy.trim());
                                 }
                             }
                         }
 
-                        proxy_out.write("\r\n".getBytes());
-                        proxy_out.flush();
+                        requestOutput.write("\r\n".getBytes());
+                        requestOutput.flush();
 
                         first = false;
                     }
@@ -436,8 +469,8 @@ public class ProxyPlayer extends Thread
 
                         if (xfer < 0) break;
 
-                        proxy_out.write(buffer, 0, xfer);
-                        proxy_out.flush();
+                        requestOutput.write(buffer, 0, xfer);
+                        requestOutput.flush();
 
                         total += xfer;
                     }
@@ -450,13 +483,9 @@ public class ProxyPlayer extends Thread
                     Log.d(LOGTAG, "workOnVideo: fragment close: " + total);
                 }
             }
-            catch (Exception ignore)
+            catch (Exception ex)
             {
-                //
-                // Silently ignore and exit thread.
-                //
-
-                Log.d(LOGTAG, "ProxyPlayerWorker: =========> " + ignore.getMessage());
+                Log.d(LOGTAG, "ProxyPlayerWorker: =========> " + ex.getMessage());
             }
 
             Log.d(LOGTAG, "ProxyPlayerWorker: workOnVideo terminating thread.");
@@ -487,12 +516,12 @@ public class ProxyPlayer extends Thread
 
                         String copy = ((headerKey != null) ? headerKey + ": " : "") + headerValue + "\r\n";
 
-                        proxy_out.write(copy.getBytes());
+                        requestOutput.write(copy.getBytes());
                     }
                 }
 
-                proxy_out.write("\r\n".getBytes());
-                proxy_out.flush();
+                requestOutput.write("\r\n".getBytes());
+                requestOutput.flush();
 
                 Log.d(LOGTAG, "Icy-Metaint: " + icymetaint);
 
@@ -513,8 +542,8 @@ public class ProxyPlayer extends Thread
                     xfer = shoutcast.read(buffer, 0, max);
                     if (xfer < 0) break;
 
-                    proxy_out.write(buffer, 0, xfer);
-                    proxy_out.flush();
+                    requestOutput.write(buffer, 0, xfer);
+                    requestOutput.flush();
                     chunk += xfer;
 
                     if ((icymetaint > 0) && (chunk == icymetaint))
@@ -568,7 +597,7 @@ public class ProxyPlayer extends Thread
             connection = (HttpURLConnection) url.openConnection();
 
             if (host != null) connection.setRequestProperty("Host", host);
-            if (proxyIsAudio) connection.setRequestProperty("Icy-MetaData", "1");
+            if (requestIsAudio) connection.setRequestProperty("Icy-MetaData", "1");
 
             connection.setUseCaches(false);
             connection.setDoInput(true);
@@ -634,45 +663,49 @@ public class ProxyPlayer extends Thread
 
             String[] lines = readLines(url);
 
-            Log.d(LOGTAG,"readMaster: " + lines.length);
-
-            for (int inx = 0; (inx + 1) < lines.length; inx++)
+            if (lines != null)
             {
-                if (! lines[ inx ].startsWith("#EXT-X-STREAM-INF:")) continue;
+                Log.d(LOGTAG, "readMaster: " + lines.length);
 
-                String line = lines[ inx ].substring(18);
-
-                String width     = StaticUtils.findDat("RESOLUTION=([0-9]*)x", line);
-                String height    = StaticUtils.findDat("RESOLUTION=[0-9]*x([0-9]*)", line);
-                String bandwith  = StaticUtils.findDat("BANDWIDTH=([0-9]*)", line);
-                String streamurl = lines[ ++inx ];
-
-                if ((bandwith == null) || (streamurl == null))
+                for (int inx = 0; (inx + 1) < lines.length; inx++)
                 {
-                    continue;
+                    if (!lines[ inx ].startsWith("#EXT-X-STREAM-INF:")) continue;
+
+                    String line = lines[ inx ].substring(18);
+
+                    String width = StaticUtils.findDat("RESOLUTION=([0-9]*)x", line);
+                    String height = StaticUtils.findDat("RESOLUTION=[0-9]*x([0-9]*)", line);
+                    String bandwith = StaticUtils.findDat("BANDWIDTH=([0-9]*)", line);
+                    String streamurl = lines[ ++inx ];
+
+                    if ((bandwith == null) || (streamurl == null))
+                    {
+                        continue;
+                    }
+
+                    if (streamurl.contains("akamaihd.net/") && streamurl.contains("av-b.m3u8"))
+                    {
+                        //
+                        // My guess: these are interlaced variants we do not need.
+                        //
+
+                        continue;
+                    }
+
+                    streamurl = resolveRelativeUrl(url, streamurl);
+
+                    StreamOptions so = new StreamOptions();
+
+                    so.width = (width == null) ? 0 : Integer.parseInt(width);
+                    so.height = (height == null) ? 0 : Integer.parseInt(height);
+
+                    so.bandWidth = Integer.parseInt(bandwith);
+                    so.streamUrl = streamurl;
+
+                    streamOptions.add(so);
+
+                    Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
                 }
-
-                if (streamurl.contains("akamaihd.net/") && streamurl.contains("av-b.m3u8"))
-                {
-                    //
-                    // My guess: these are interlaced variants we do not need.
-                    //
-
-                    continue;
-                }
-
-                streamurl = resolveRelativeUrl(url, streamurl);
-
-                StreamOptions so = new StreamOptions();
-
-                so.width = (width == null) ? 0 : Integer.parseInt(width);
-                so.height = (height == null) ? 0 : Integer.parseInt(height);
-                so.bandWidth = (bandwith == null) ? 0 : Integer.parseInt(bandwith);
-                so.streamUrl = streamurl;
-
-                streamOptions.add(so);
-
-                Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
             }
 
             if (streamOptions.size() == 0)
@@ -703,30 +736,33 @@ public class ProxyPlayer extends Thread
 
             String url = streamOptions.get(currentOption).streamUrl;
 
-            String[] lines = readLines(url);
-
             ArrayList<String> frags = new ArrayList<>();
             Boolean next = false;
 
-            for (String line : lines)
+            String[] lines = readLines(url);
+
+            if (lines != null)
             {
-                if (line.startsWith("#")) continue;
-
-                line = resolveRelativeUrl(url, line);
-
-                frags.add(line);
-
-                if (next)
+                for (String line : lines)
                 {
-                    nextFragment = line;
+                    if (line.startsWith("#")) continue;
 
-                    return;
+                    line = resolveRelativeUrl(url, line);
+
+                    frags.add(line);
+
+                    if (next)
+                    {
+                        nextFragment = line;
+
+                        return;
+                    }
+
+                    next = ((lastFragment != null) && lastFragment.equals(line));
                 }
-
-                next = ((lastFragment != null) && lastFragment.equals(line));
             }
 
-            if (audioPrepared)
+            //if (audioPrepared)
             {
                 //
                 // When the mediaplayer is prepared and has done
@@ -735,10 +771,10 @@ public class ProxyPlayer extends Thread
                 // time line.
                 //
 
-                while (frags.size() > 4) frags.remove(0);
+                while (frags.size() > 5) frags.remove(0);
             }
 
-            nextFragment = (lastFragment == null) ? frags.get(0) : null;
+            nextFragment = ((lastFragment == null) && (frags.size() > 0)) ? frags.get(0) : null;
         }
 
         @Nullable
@@ -760,10 +796,10 @@ public class ProxyPlayer extends Thread
 
         private void readHeaders(InputStream input) throws IOException
         {
-            proxiurl = null;
-            isPartial = false;
-            proxyIsAudio = false;
-            proxyIsVideo = false;
+            requestUrl = null;
+            requestIsAudio = false;
+            requestIsVideo = false;
+            requestIsPartial = false;
 
             byte[] buffer = new byte[ 32000 ];
 
@@ -782,19 +818,19 @@ public class ProxyPlayer extends Thread
 
                 if (line.startsWith("Range:"))
                 {
-                    isPartial = true;
+                    requestIsPartial = true;
                 }
 
                 if (line.startsWith("AudioProxy-Url:"))
                 {
-                    proxiurl = line.substring(15).trim();
-                    proxyIsAudio = true;
+                    requestUrl = line.substring(15).trim();
+                    requestIsAudio = true;
                 }
 
                 if (line.startsWith("VideoProxy-Url:"))
                 {
-                    proxiurl = line.substring(15).trim();
-                    proxyIsVideo = true;
+                    requestUrl = line.substring(15).trim();
+                    requestIsVideo = true;
                 }
             }
         }
@@ -820,4 +856,6 @@ public class ProxyPlayer extends Thread
 
         void onPlaybackMeta(String meta);
     }
+
+    //endregion
 }

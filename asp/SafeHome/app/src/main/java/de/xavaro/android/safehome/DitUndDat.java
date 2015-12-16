@@ -1,27 +1,30 @@
 package de.xavaro.android.safehome;
 
-//
-// Utility namespace for wrapped classes.
-//
 
-import android.graphics.Color;
 import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
+import android.graphics.Color;
 
 import java.util.ArrayList;
 
+//
+// Utility namespace for included small classes.
+//
 public class DitUndDat
 {
     private static final String LOGTAG = DitUndDat.class.getSimpleName();
 
-    //region Animator
+    //region public class Animator extends Animation
 
     public static class Animator extends Animation
     {
-        private ArrayList steps = new ArrayList();
+        private final ArrayList<Object> steps = new ArrayList<>();
+
+        private Runnable finalCall;
+        private boolean finalized;
 
         public void setLayout(FrameLayout view, LayoutParams from, LayoutParams toto)
         {
@@ -47,9 +50,16 @@ public class DitUndDat
             steps.add(step);
         }
 
+        public void setFinalCall(Runnable call)
+        {
+            finalCall = call;
+        }
+
         @Override
         protected void applyTransformation(float it, Transformation t)
         {
+            if (finalized) return;
+
             if (steps.size() == 0) return;
 
             double div = 1.0 / steps.size();
@@ -72,6 +82,13 @@ public class DitUndDat
 
                 if (step instanceof StepLayout) applyStepLayout((inx < mod) ? 1.0f : scaledit, (StepLayout) step);
                 if (step instanceof StepColor) applyStepColor  ((inx < mod) ? 1.0f : scaledit, (StepColor)  step);
+            }
+
+            if (it >= 1.0f)
+            {
+                if (finalCall != null) finalCall.run();
+
+                finalized = true;
             }
         }
 
@@ -106,6 +123,7 @@ public class DitUndDat
             step.fini = (it >= 1.0f);
         }
 
+        @SuppressWarnings("PointlessBitwiseExpression")
         private void applyStepColor(float it,StepColor step)
         {
             if (step.fini) return;
@@ -163,7 +181,7 @@ public class DitUndDat
 
             public boolean fini;
         }
-    };
+    }
 
     //endregion
 }
