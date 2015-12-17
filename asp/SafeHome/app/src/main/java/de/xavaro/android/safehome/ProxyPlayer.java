@@ -406,7 +406,7 @@ public class ProxyPlayer extends Thread
         // Video stuff.
         //
 
-        private ArrayList<StreamOptions> streamOptions;
+        private ArrayList<DitUndDat.StreamOptions> streamOptions;
         private int currentOption;
 
         private String lastFragment;
@@ -811,7 +811,7 @@ public class ProxyPlayer extends Thread
 
                     streamurl = resolveRelativeUrl(requestUrl, streamurl);
 
-                    StreamOptions so = new StreamOptions();
+                    DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
 
                     so.width = (width == null) ? 0 : Integer.parseInt(width);
                     so.height = (height == null) ? 0 : Integer.parseInt(height);
@@ -831,7 +831,7 @@ public class ProxyPlayer extends Thread
                 // Nothing found, so add original url as stream.
                 //
 
-                StreamOptions so = new StreamOptions();
+                DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
                 so.streamUrl = requestUrl;
 
                 streamOptions.add(so);
@@ -966,16 +966,6 @@ public class ProxyPlayer extends Thread
                 }
             }
         }
-    }
-
-    private class StreamOptions
-    {
-        public String streamUrl;
-
-        public int bandWidth;
-
-        public int width;
-        public int height;
     }
 
     public interface Callback

@@ -14,6 +14,33 @@ import java.util.ArrayList;
 //
 public class DitUndDat
 {
+    //region public static class VideoQuality
+
+    public static class VideoQuality
+    {
+        public static final int LQ = 0;
+        public static final int SD = 1;
+        public static final int HQ = 2;
+        public static final int HD = 3;
+    }
+
+    //endregion public static class VideoQuality
+
+    //region public static class StreamOptions
+
+    public static class StreamOptions
+    {
+        public String streamUrl;
+
+        public int quality;
+        public int bandWidth;
+
+        public int width;
+        public int height;
+    }
+
+    //region public static class StreamOptions
+
     //region public class Animator extends Animation
 
     public static class Animator extends Animation
@@ -189,5 +216,5 @@ public class DitUndDat
         }
     }
 
-    //endregion
+    //endregion public class Animator extends Animation
 }

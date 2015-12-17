@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,8 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 //
 // Video play surface layout connected to HomeActivity.
@@ -80,10 +81,11 @@ public class VideoSurface extends FrameLayout implements
 
     private FrameLayout qualityLayoutOuter;
     private FrameLayout qualityLayoutInner;
-    private FrameLayout qualityLQImage;
-    private FrameLayout qualitySDImage;
-    private FrameLayout qualityHQImage;
-    private FrameLayout qualityHDImage;
+
+    private FrameLayout qualityLQButton;
+    private FrameLayout qualitySDButton;
+    private FrameLayout qualityHQButton;
+    private FrameLayout qualityHDButton;
 
     private void myInit(Context context)
     {
@@ -148,25 +150,17 @@ public class VideoSurface extends FrameLayout implements
         qualityLayoutOuter.addView(qualityLayoutInner);
         topArea.addView(qualityLayoutOuter);
 
-        qualityHDImage = new FrameLayout(context);
-        qualityHDImage.setLayoutParams(new LayoutParams(60, 60, Gravity.START));
-        qualityHDImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_hd_190x190));
-        qualityLayoutOuter.addView(qualityHDImage);
+        qualityHDButton = buttonWithText(context, "HD", Gravity.START);
+        qualityLayoutOuter.addView(qualityHDButton);
 
-        qualityHQImage = new FrameLayout(context);
-        qualityHQImage.setLayoutParams(new LayoutParams(60, 60, Gravity.START));
-        qualityHQImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_hq_190x190));
-        qualityLayoutInner.addView(qualityHQImage);
+        qualityHQButton = buttonWithText(context, "HQ", Gravity.START);
+        qualityLayoutInner.addView(qualityHQButton);
 
-        qualitySDImage = new FrameLayout(context);
-        qualitySDImage.setLayoutParams(new LayoutParams(60, 60, Gravity.END));
-        qualitySDImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_sd_190x190));
-        qualityLayoutInner.addView(qualitySDImage);
+        qualitySDButton = buttonWithText(context, "SD", Gravity.END);
+        qualityLayoutInner.addView(qualitySDButton);
 
-        qualityLQImage = new FrameLayout(context);
-        qualityLQImage.setLayoutParams(new LayoutParams(60, 60, Gravity.END));
-        qualityLQImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_lq_190x190));
-        qualityLayoutOuter.addView(qualityLQImage);
+        qualityLQButton = buttonWithText(context, "LQ", Gravity.END);
+        qualityLayoutOuter.addView(qualityLQButton);
 
         surfaceLayout = new FrameLayout(context);
         surfaceView = new SurfaceView(context);
@@ -176,6 +170,24 @@ public class VideoSurface extends FrameLayout implements
         surfaceLayout.setOnTouchListener(this);
 
         this.addView(surfaceLayout, normalParams);
+    }
+
+    private FrameLayout buttonWithText(Context context, String text, int gravity)
+    {
+        FrameLayout button = new FrameLayout(context);
+        button.setLayoutParams(new LayoutParams(60, 60, gravity));
+        button.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_empty_190x190));
+
+        TextView textview = new TextView(context);
+        textview.setTypeface(null, Typeface.BOLD);
+        textview.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
+        textview.setTextColor(0xccfffff8);
+        textview.setPadding(0, 5, 0, 0);
+        textview.setTextSize(32f);
+        textview.setText(text);
+        button.addView(textview);
+
+        return button;
     }
 
     //region View.OnTouchListener interface.
