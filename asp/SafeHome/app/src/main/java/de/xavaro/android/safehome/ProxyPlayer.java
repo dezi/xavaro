@@ -75,18 +75,19 @@ public class ProxyPlayer extends Thread
 
     //endregion
 
-    private  ServerSocket proxySocket;
-    private  int proxyPort;
-    private  String proxyUrl;
-    private  boolean proxyIsVideo;
-    private  boolean proxyIsAudio;
+    private ServerSocket proxySocket;
+    private int proxyPort;
+
+    private String proxyUrl;
+    private boolean proxyIsVideo;
+    private boolean proxyIsAudio;
 
     private Callback calling;
     private Callback playing;
 
-    private  MediaPlayer mediaPlayer;
-    private  Context context;
-    private  Handler handler;
+    private MediaPlayer mediaPlayer;
+    private Context context;
+    private Handler handler;
 
     //region Setter methods.
 
@@ -122,12 +123,7 @@ public class ProxyPlayer extends Thread
 
     public void setDisplay(SurfaceHolder holder)
     {
-        Log.d(LOGTAG,"******************************************************************************");
-
-        //synchronized (LOGTAG)
-        {
-            mediaPlayer.setDisplay(holder);
-        }
+        mediaPlayer.setDisplay(holder);
     }
 
     //endregion
@@ -486,7 +482,16 @@ public class ProxyPlayer extends Thread
 
                 boolean first = true;
 
-                if (desiredUrl.equals(requestUrl)) nextFragment = desiredNextFragment;
+                if (desiredUrl.equals(requestUrl))
+                {
+                    //
+                    // Re-entrance check. MediaPlayer opens
+                    // stream serveral times. Prefer to continue
+                    // with the last partially streamed fragment.
+                    //
+
+                    nextFragment = desiredNextFragment;
+                }
 
                 while (true)
                 {
@@ -510,6 +515,11 @@ public class ProxyPlayer extends Thread
 
                     if (first)
                     {
+                        //
+                        // First fragment in request. Prepare header and
+                        // eventually skip partial content.
+                        //
+
                         String response = "HTTP/1.1 200 Ok";
                         String contentType = "Content-Type: " + readContentType();
                         String contentLength = "Content-Length: " + fakeContentLength;
@@ -536,7 +546,7 @@ public class ProxyPlayer extends Thread
                         requestOutput.write((contentType + "\r\n").getBytes());
                         requestOutput.write((contentLength + "\r\n").getBytes());
 
-                        if (contentRange != null)
+                        if (requestIsPartial)
                         {
                             Log.d(LOGTAG, "workOnVideo First: " + contentRange);
                             requestOutput.write((contentRange + "\r\n").getBytes());
