@@ -1,12 +1,11 @@
 package de.xavaro.android.safehome;
 
-
-import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.graphics.Color;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -15,16 +14,17 @@ import java.util.ArrayList;
 //
 public class DitUndDat
 {
-    private static final String LOGTAG = DitUndDat.class.getSimpleName();
-
     //region public class Animator extends Animation
 
     public static class Animator extends Animation
     {
+        private final String LOGTAG = Animator.class.getSimpleName();
+
         private final ArrayList<Object> steps = new ArrayList<>();
 
         private Runnable finalCall;
         private boolean finalized;
+        private boolean excessive;
 
         public void setLayout(FrameLayout view, LayoutParams from, LayoutParams toto)
         {
@@ -55,6 +55,12 @@ public class DitUndDat
             finalCall = call;
         }
 
+        @SuppressWarnings("unused")
+        public void setExcessiveLog(boolean dodat)
+        {
+            excessive = dodat;
+        }
+
         @Override
         protected void applyTransformation(float it, Transformation t)
         {
@@ -72,7 +78,7 @@ public class DitUndDat
 
             if (mod >= steps.size()) mod = steps.size() - 1;
 
-            Log.d(LOGTAG,"applyTransformation:" + mod + "=" + it);
+            if (excessive) Log.d(LOGTAG,"applyTransformation:" + mod + "=" + it);
 
             float scaledit = (float) ((it - (mod * div)) / div);
 
@@ -98,7 +104,7 @@ public class DitUndDat
         {
             if (step.fini) return;
 
-            Log.d(LOGTAG,"applyStepLayout:" + it);
+            if (excessive) Log.d(LOGTAG,"applyStepLayout:" + it);
 
             LayoutParams from = step.from;
             LayoutParams toto = step.toto;
@@ -128,7 +134,7 @@ public class DitUndDat
         {
             if (step.fini) return;
 
-            Log.d(LOGTAG,"applyStepColor:" + it);
+            if (excessive) Log.d(LOGTAG,"applyStepColor:" + it);
 
             int from = step.from;
             int toto = step.toto;
