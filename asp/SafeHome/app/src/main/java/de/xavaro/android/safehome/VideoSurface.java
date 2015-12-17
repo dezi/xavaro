@@ -73,13 +73,17 @@ public class VideoSurface extends FrameLayout implements
         myInit(context);
     }
 
-    private LayoutParams playPosition;
-    private FrameLayout playButton;
-    private ImageView playImage;
+    private FrameLayout topArea;
 
-    private LayoutParams offPosition;
+    private FrameLayout playButton;
     private FrameLayout offButton;
-    private ImageView offImage;
+
+    private FrameLayout qualityLayoutOuter;
+    private FrameLayout qualityLayoutInner;
+    private FrameLayout qualityLQImage;
+    private FrameLayout qualitySDImage;
+    private FrameLayout qualityHQImage;
+    private FrameLayout qualityHDImage;
 
     private void myInit(Context context)
     {
@@ -89,17 +93,18 @@ public class VideoSurface extends FrameLayout implements
         normalParams.leftMargin = 40;
         normalParams.topMargin  = 400;
 
-        offPosition = new LayoutParams(80,80,Gravity.START + Gravity.TOP);
+        topArea = new FrameLayout(context);
+        topArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 80));
+        topArea.setPadding(10, 10, 10, 10);
+        topArea.setVisibility(INVISIBLE);
+
+        this.addView(topArea);
+
         offButton = new FrameLayout(context);
-        offButton.setLayoutParams(offPosition);
-        offButton.setPadding(10, 10, 10, 10);
-        offButton.setVisibility(INVISIBLE);
-        offImage = new ImageView(context);
-        offButton.addView(offImage);
+        offButton.setLayoutParams(new LayoutParams(60, 60, Gravity.START + Gravity.TOP));
+        offButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_shutdown_190x190));
 
-        this.addView(offButton);
-
-        offImage.setImageDrawable(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_shutdown_190x190));
+        topArea.addView(offButton);
 
         offButton.setOnClickListener(new View.OnClickListener()
         {
@@ -110,15 +115,11 @@ public class VideoSurface extends FrameLayout implements
             }
         });
 
-        playPosition = new LayoutParams(80,80,Gravity.END + Gravity.TOP);
         playButton = new FrameLayout(context);
-        playButton.setLayoutParams(playPosition);
-        playButton.setPadding(10, 10, 10, 10);
-        playButton.setVisibility(INVISIBLE);
-        playImage = new ImageView(context);
-        playButton.addView(playImage);
+        playButton.setLayoutParams(new LayoutParams(60, 60, Gravity.END + Gravity.TOP));
+        playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_play_190x190));
 
-        this.addView(playButton);
+        topArea.addView(playButton);
 
         playButton.setOnClickListener(new View.OnClickListener()
         {
@@ -135,6 +136,37 @@ public class VideoSurface extends FrameLayout implements
                 }
             }
         });
+
+        qualityLayoutOuter = new FrameLayout(context);
+        qualityLayoutOuter.setLayoutParams(new LayoutParams(320, 80, Gravity.CENTER_HORIZONTAL));
+        qualityLayoutOuter.setPadding(10, 0, 10, 0);
+
+        qualityLayoutInner = new FrameLayout(context);
+        qualityLayoutInner.setLayoutParams(new LayoutParams(150, 60, Gravity.CENTER_HORIZONTAL));
+        qualityLayoutInner.setPadding(5, 0, 5, 0);
+
+        qualityLayoutOuter.addView(qualityLayoutInner);
+        topArea.addView(qualityLayoutOuter);
+
+        qualityHDImage = new FrameLayout(context);
+        qualityHDImage.setLayoutParams(new LayoutParams(60, 60, Gravity.START));
+        qualityHDImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_hd_190x190));
+        qualityLayoutOuter.addView(qualityHDImage);
+
+        qualityHQImage = new FrameLayout(context);
+        qualityHQImage.setLayoutParams(new LayoutParams(60, 60, Gravity.START));
+        qualityHQImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_hq_190x190));
+        qualityLayoutInner.addView(qualityHQImage);
+
+        qualitySDImage = new FrameLayout(context);
+        qualitySDImage.setLayoutParams(new LayoutParams(60, 60, Gravity.END));
+        qualitySDImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_sd_190x190));
+        qualityLayoutInner.addView(qualitySDImage);
+
+        qualityLQImage = new FrameLayout(context);
+        qualityLQImage.setLayoutParams(new LayoutParams(60, 60, Gravity.END));
+        qualityLQImage.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_quality_lq_190x190));
+        qualityLayoutOuter.addView(qualityLQImage);
 
         surfaceLayout = new FrameLayout(context);
         surfaceView = new SurfaceView(context);
@@ -159,8 +191,7 @@ public class VideoSurface extends FrameLayout implements
         @Override
         public void run()
         {
-            offButton.setVisibility(VISIBLE);
-            playButton.setVisibility(VISIBLE);
+            topArea.setVisibility(VISIBLE);
         }
     };
 
@@ -221,8 +252,8 @@ public class VideoSurface extends FrameLayout implements
 
                     if (isFullscreen)
                     {
-                        offButton.setVisibility(INVISIBLE);
-                        playButton.setVisibility(INVISIBLE);
+                        topArea.setVisibility(INVISIBLE);
+
                         surfaceLayout.setLayoutParams(normalParams);
                         setBackgroundColor(Color.TRANSPARENT);
 
@@ -307,8 +338,7 @@ public class VideoSurface extends FrameLayout implements
 
         setSpinner(true);
 
-        offButton.setVisibility(INVISIBLE);
-        playButton.setVisibility(INVISIBLE);
+        topArea.setVisibility(INVISIBLE);
     }
 
     public void onPlaybackStartet()
@@ -318,10 +348,9 @@ public class VideoSurface extends FrameLayout implements
         isPlaying = true;
         setSpinner(false);
 
-        playImage.setImageDrawable(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
+        playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
 
-        offButton.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
-        playButton.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
+        topArea.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
     }
 
     public void onPlaybackPaused()
@@ -331,10 +360,9 @@ public class VideoSurface extends FrameLayout implements
         isPlaying = false;
         setSpinner(false);
 
-        playImage.setImageDrawable(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_play_190x190));
+        playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_play_190x190));
 
-        offButton.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
-        playButton.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
+        topArea.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
     }
 
     public void onPlaybackResumed()
@@ -344,10 +372,9 @@ public class VideoSurface extends FrameLayout implements
         isPlaying = true;
         setSpinner(false);
 
-        playImage.setImageDrawable(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
+        playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
 
-        offButton.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
-        playButton.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
+        topArea.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
     }
 
     public void onPlaybackFinished()
@@ -357,8 +384,7 @@ public class VideoSurface extends FrameLayout implements
         isPlaying = false;
         setSpinner(false);
 
-        offButton.setVisibility(INVISIBLE);
-        playButton.setVisibility(INVISIBLE);
+        topArea.setVisibility(INVISIBLE);
 
         HomeActivity.getInstance().removeVideoSurface();
     }

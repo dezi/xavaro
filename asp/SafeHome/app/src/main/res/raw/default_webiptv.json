@@ -43,22 +43,42 @@
         {
           "label": "ZDF.kultur",
           "icon": "http://pbs.twimg.com/profile_images/1867262018/kultur_profilbild2_400x400.jpg",
-          "videourl": "http://zdf_hds_de-f.akamaihd.net/i/de11_v1@87013/master.m3u8"
+          "videourl": "http://zdf1112-lh.akamaihd.net/i/de11_v1@392881/master.m3u8"
         },
         {
           "label": "ZDF info",
           "icon": "http://pbs.twimg.com/profile_images/603477029095366657/LuJjvT8-_400x400.png",
-          "videourl": "http://zdf_hds_de-f.akamaihd.net/i/de12_v1@87013/master.m3u8"
+          "videourl": "http://zdf1112-lh.akamaihd.net/i/de12_v1@392882/master.m3u8"
         },
         {
           "label": "ZDF_neo",
           "icon": "http://pbs.twimg.com/profile_images/464706383225446400/GtZ6aQYq_400x400.png",
-          "videourl": "http://zdf_hds_de-f.akamaihd.net/i/de13_v1@147090/master.m3u8"
+          "videourl": "http://zdf1314-lh.akamaihd.net/i/de13_v1@392877/master.m3u8"
         },
         {
           "label": "3sat",
-          "icon": "http://pbs.twimg.com/profile_images/543428461692334080/tDaNbBCQ_400x400.jpeg",
-          "videourl": "http://zdf_hds_ng-f.akamaihd.net/i/none02_v1@87014/master.m3u8"
+          "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2306126/timg644x363blob/12550745",
+          "videourl": "http://zdf0910-lh.akamaihd.net/i/dach10_v1@392872/master.m3u8?dw=0"
+        },
+        {
+          "label": "phoenix",
+          "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2492878/timg644x363blob/12166545",
+          "videourl": "http://zdf-hds-de-f.zdf.de/i/de09_v1@87012/master.m3u8?dw=0"
+        }
+      ]
+    },
+
+    "www.hr-online.de": {
+
+      "label": "hr Fernsehen",
+      "url": "http://www.hr-online.de/",
+      "icon": "http://pbs.twimg.com/profile_images/628137082884653057/HoVaWPix_400x400.png",
+
+      "channels": [
+        {
+          "label": "hr Fernsehen",
+          "icon": "http://pbs.twimg.com/profile_images/628137082884653057/HoVaWPix_400x400.png",
+          "videourl": "http://live1_hr-lh.akamaihd.net/i/hr_fernsehen@75910/master.m3u8"
         }
       ]
     },
@@ -117,12 +137,12 @@
 
       "label": "WDR Fernsehen",
       "url": "http://www.wdr.de//",
-      "icon": "https://pbs.twimg.com/profile_images/454236824987127809/zU-6n863_400x400.jpeg",
+      "icon": "http://pbs.twimg.com/profile_images/454236824987127809/zU-6n863_400x400.jpeg",
 
       "channels": [
         {
           "label": "WDR Fernsehen",
-          "icon": "https://pbs.twimg.com/profile_images/454236824987127809/zU-6n863_400x400.jpeg",
+          "icon": "http://pbs.twimg.com/profile_images/454236824987127809/zU-6n863_400x400.jpeg",
           "videourl": "http://www.metafilegenerator.de/WDR/WDR_FS/m3u8/wdrfernsehen.m3u8"
         }
       ]
@@ -136,12 +156,12 @@
 
       "channels": [
         {
-          "label": "NDR Niedersachsen",
+          "label": "NDR Region NDS",
           "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
           "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_nds@119224/master.m3u8"
         },
         {
-          "label": "NDR Schleswig-Holstein",
+          "label": "NDR Region SH",
           "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
           "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_sh@119225/master.m3u8"
         },
@@ -151,7 +171,7 @@
           "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_hh@119223/master.m3u8"
         },
         {
-          "label": "NDR Mecklenburg-Vorpommern",
+          "label": "NDR Region MV",
           "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
           "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_hh@119223/master.m3u8"
         }
@@ -166,7 +186,7 @@
 
       "channels": [
         {
-          "label": "MDR Sachsen-Anhalt",
+          "label": "MDR Sachsen-Anh.",
           "icon": "http://pbs.twimg.com/profile_images/2289426760/87rpk2wht21idumo1y1y_400x400.jpeg",
           "videourl": "http://mdr_sa_hls-lh.akamaihd.net/i/livetvmdrsachsenanhalt_de@106901/master.m3u8"
         },
@@ -250,13 +270,13 @@
 
     "www.alex-berlin.de": {
 
-      "label": "ALEX",
+      "label": "ALEX Berlin",
       "url": "http://www.alex-berlin.de/",
       "icon": "http://pbs.twimg.com/profile_images/479636878870589440/l2dGkfZb_400x400.jpeg",
 
       "channels": [
         {
-          "label": "ALEX",
+          "label": "ALEX Berlin",
           "icon": "http://pbs.twimg.com/profile_images/479636878870589440/l2dGkfZb_400x400.jpeg",
           "videourl": "http://alex-stream.rosebud-media.de:80/live/alexlivetv.smil/playlist.m3u8"
         }

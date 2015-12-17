@@ -33,6 +33,10 @@
             },
             {
               "type": "webiptv",
+              "name": "www.zdf.de"
+            },
+            {
+              "type": "webiptv",
               "name": "www.tagesschau.de"
             },
             {
@@ -61,6 +65,10 @@
             },
             {
               "type": "webiptv",
+              "name": "www.hr-online.de"
+            },
+            {
+              "type": "webiptv",
               "name": "www.sr.de"
             },
             {
@@ -69,15 +77,15 @@
             },
             {
               "type": "webiptv",
+              "name": "www.arte.tv"
+            },
+            {
+              "type": "webiptv",
               "name": "www.n24.de"
             },
             {
               "type": "webiptv",
               "name": "www.alex-berlin.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.arte.tv"
             }
           ]
         }
