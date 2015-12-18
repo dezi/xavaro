@@ -8,13 +8,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 //
 // Web stream receivers base class.
@@ -30,6 +26,8 @@ public class WebStream extends LaunchGroup
     public WebStream(Context context)
     {
         super(context);
+
+        configTree = "channels";
     }
 
     public void setName(LaunchItem parent, String type, String website)
@@ -39,42 +37,6 @@ public class WebStream extends LaunchGroup
         this.webstream = website;
 
         config = getConfig(context, webtype, webstream);
-    }
-
-    @Override
-    protected void createLaunchItems()
-    {
-        launchItems = new ArrayList<>();
-
-        if ((config == null) || ! config.has("channels"))
-        {
-            Toast.makeText(context, "Keine <channels> gefunden.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            JSONArray lis = config.getJSONArray("channels");
-
-            int numItems = horzItems * vertItems;
-            int maxSlots = lis.length();
-
-            for (int inx = 0; inx < numItems; inx++)
-            {
-                LaunchItem li = new LaunchItem(context);
-                li.setSize(horzSize, vertSize);
-
-                if (inx < maxSlots) li.setConfig(this,lis.getJSONObject(inx));
-
-                launchItems.add(li);
-                addView(li);
-            }
-        }
-        catch (JSONException ex)
-        {
-            ex.printStackTrace();
-        }
     }
 
     //region Static methods.

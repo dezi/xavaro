@@ -2,9 +2,17 @@ package de.xavaro.android.safehome;
 
 import android.support.annotation.Nullable;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -18,7 +26,9 @@ import java.util.ArrayList;
 // Launch item view on home screen.
 //
 
-public class LaunchGroup extends FrameLayout
+public class LaunchGroup extends FrameLayout implements
+        View.OnTouchListener
+
 {
     protected final String LOGTAG = "LaunchGroup";
 
@@ -26,15 +36,22 @@ public class LaunchGroup extends FrameLayout
 
     protected LaunchItem parent;
     protected JSONObject config;
+    protected String configTree;
 
     protected int horzSize = 220;
     protected int vertSize = 220;
 
     protected int horzItems;
     protected int vertItems;
+    protected int horzStart;
+    protected int vertStart;
     protected int horzSpace;
     protected int vertSpace;
 
+    protected FrameLayout arrowLeft;
+    protected FrameLayout arrowRight;
+
+    protected ArrayList<FrameLayout> launchPages = null;
     protected ArrayList<LaunchItem> launchItems = null;
 
     public LaunchGroup(Context context)
@@ -62,13 +79,69 @@ public class LaunchGroup extends FrameLayout
     {
         this.context = context;
 
-        setBackgroundColor(0xffffffee);
+        setBackgroundColor(GlobalConfigs.LaunchPageBackgroundColor);
 
         FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
 
         setLayoutParams(layout);
+
+        addSliderButtons();
+
+        setOnTouchListener(this);
+
+        configTree = "launchitems";
+    }
+
+    private void addSliderButtons()
+    {
+        Bitmap bmp;
+        BitmapDrawable bmpDraw;
+
+        final int MP = FrameLayout.LayoutParams.MATCH_PARENT;
+
+        arrowLeft = new FrameLayout(getContext());
+        arrowLeft.setLayoutParams(new FrameLayout.LayoutParams(32, MP, Gravity.START));
+        arrowLeft.setBackgroundColor(GlobalConfigs.LaunchArrowBackgroundColor);
+
+        FrameLayout ali = new FrameLayout(getContext());
+        ali.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
+        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_left);
+        bmpDraw = new BitmapDrawable(getResources(),bmp);
+        bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
+        ali.setBackground(bmpDraw);
+
+        arrowLeft.addView(ali);
+        this.addView(arrowLeft);
+
+        arrowRight = new FrameLayout(getContext());
+        arrowRight.setLayoutParams(new FrameLayout.LayoutParams(32, MP, Gravity.END));
+        arrowRight.setBackgroundColor(GlobalConfigs.LaunchArrowBackgroundColor);
+
+        FrameLayout ari = new FrameLayout(getContext());
+        ari.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
+        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_right);
+        bmpDraw = new BitmapDrawable(getResources(),bmp);
+        bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
+        ari.setBackground(bmpDraw);
+
+        arrowRight.addView(ari);
+        this.addView(arrowRight);
+    }
+
+    public boolean onTouch(View view, MotionEvent motionEvent)
+    {
+        if (view == this)
+        {
+            //
+            // Kill all clicks between items.
+            //
+
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -90,8 +163,14 @@ public class LaunchGroup extends FrameLayout
         horzItems = width  / horzSize;
         vertItems = height / vertSize;
 
-        horzSpace = (width  - (horzItems * horzSize)) / horzItems;
+        horzSpace = (width  - (horzItems * horzSize)) / (horzItems + 1);
         vertSpace = (height - (vertItems * vertSize)) / vertItems;
+
+        horzStart = ((width  - (horzItems * horzSize)) % (horzItems + 1)) / 2;
+        vertStart = ((height - (vertItems * vertSize)) % vertItems) / 2;
+
+        horzStart += horzSpace;
+        vertStart += vertSpace / 2;
 
         Log.d(LOGTAG, "onMeasure:" + width + "=" + height);
         Log.d(LOGTAG, "onMeasure:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
@@ -106,18 +185,11 @@ public class LaunchGroup extends FrameLayout
         int col = 0;
         int row = 0;
 
-        int xpos = horzSpace / 2;
-        int ypos = vertSpace / 2;
+        int xpos = horzStart;
+        int ypos = vertStart;
 
         for (LaunchItem li : launchItems)
         {
-            if (row >= vertItems)
-            {
-                Toast.makeText(context,"Zu viele LaunchItems!!!!",Toast.LENGTH_LONG).show();
-
-                break;
-            }
-
             li.setPosition(xpos, ypos);
 
             //Log.d(LOGTAG, "LI " + xpos + "/" + ypos);
@@ -126,12 +198,18 @@ public class LaunchGroup extends FrameLayout
 
             if (++col >= horzItems)
             {
-                xpos = horzSpace / 2;
+                xpos = horzStart;
 
                 ypos += vertSize + vertSpace;
 
                 col = 0;
-                row++;
+
+                if (++row >= vertItems)
+                {
+                    ypos = vertStart;
+
+                    row = 0;
+                }
             }
         }
     }
@@ -139,36 +217,65 @@ public class LaunchGroup extends FrameLayout
     protected void createLaunchItems()
     {
         launchItems = new ArrayList<>();
+        launchPages = new ArrayList<>();
 
-        if ((config == null) || ! config.has("launchitems"))
+        if ((config == null) || ! config.has(configTree))
         {
-            Toast.makeText(context, "Keine <launchitems> gefunden.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Keine <" + configTree + "> gefunden.", Toast.LENGTH_LONG).show();
 
             return;
         }
 
         try
         {
-            JSONArray lis = config.getJSONArray("launchitems");
+            JSONArray lis = config.getJSONArray(configTree);
 
-            int numItems = horzItems * vertItems;
-            int maxSlots = lis.length();
+            int bgcol = GlobalConfigs.LaunchPageBackgroundColor;
+
+            FrameLayout lp = new FrameLayout(context);
+            lp.setBackgroundColor(bgcol);
+            launchPages.add(lp);
+            this.addView(lp);
+
+            int numItems = lis.length();
+            int maxSlots = horzItems * vertItems;
+            int nextSlot = 0;
 
             for (int inx = 0; inx < numItems; inx++)
             {
                 LaunchItem li = new LaunchItem(context);
                 li.setSize(horzSize, vertSize);
 
-                if (inx < maxSlots) li.setConfig(this,lis.getJSONObject(inx));
-
+                li.setConfig(this, lis.getJSONObject(inx));
                 launchItems.add(li);
-                addView(li);
+
+                if (nextSlot >= maxSlots)
+                {
+                    lp = new FrameLayout(context);
+                    lp.setBackgroundColor(bgcol);
+                    launchPages.add(lp);
+                    this.addView(lp);
+
+                    nextSlot = 0;
+                }
+
+                lp.addView(li);
+                nextSlot++;
             }
         }
         catch (JSONException ex)
         {
             ex.printStackTrace();
         }
+
+        launchPages.get(0).bringToFront();
+
+        arrowLeft.setVisibility(INVISIBLE);
+
+        arrowRight.setVisibility((launchPages.size() > 1) ? VISIBLE : INVISIBLE);
+
+        arrowLeft.bringToFront();
+        arrowRight.bringToFront();
     }
 
     public void setConfig(LaunchItem parent, JSONObject config)

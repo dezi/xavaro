@@ -4,12 +4,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -20,7 +26,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class HomeActivity extends AppCompatActivity
+public class HomeActivity extends AppCompatActivity implements
+        View.OnSystemUiVisibilityChangeListener
 {
     private final String LOGTAG = "HomeActivity";
 
@@ -43,6 +50,16 @@ public class HomeActivity extends AppCompatActivity
 
     private final Handler handler = new Handler();
 
+    private static final int UI_HIDE = 0
+//          | View.SYSTEM_UI_FLAG_LOW_PROFILE
+//          | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_FULLSCREEN
+//          | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//          | View.SYSTEM_UI_FLAG_IMMERSIVE
+//          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -52,6 +69,7 @@ public class HomeActivity extends AppCompatActivity
         homeActivity = this;
 
         topscreen = (FrameLayout) findViewById(R.id.top_screen);
+        topscreen.setSystemUiVisibility(UI_HIDE);
 
         launchGroup = new LaunchGroup(this);
         topscreen.addView(launchGroup);
@@ -84,6 +102,34 @@ public class HomeActivity extends AppCompatActivity
         super.onPostCreate(savedInstanceState);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        topscreen.setOnSystemUiVisibilityChangeListener(this);
+    }
+
+    private final Runnable makeFullscreen = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            // Delayed removal of status and navigation bar
+
+            // Note that some of these constants are new as of API 16 (Jelly Bean)
+            // and API 19 (KitKat). It is safe to use them, as they are inlined
+            // at compile-time and do nothing on earlier devices.
+
+            topscreen.setSystemUiVisibility(UI_HIDE);
+        }
+    };
+
+    @Override
+    public void onSystemUiVisibilityChange(int visibility)
+    {
+        Log.d(LOGTAG, "onSystemUiVisibilityChange:" + visibility);
+
+        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0)
+        {
+            handler.postDelayed(makeFullscreen, 2000);
+        }
     }
 
     @Override
@@ -155,10 +201,12 @@ public class HomeActivity extends AppCompatActivity
 
         if (kioskService != null) kioskService.setFocused(LOGTAG, hasFocus);
 
+        if (hasFocus) handler.postDelayed(makeFullscreen, 500);
+
         lostFocus = ! hasFocus;
     }
 
-    //region Region: onBackPressed handling.
+    //region onBackPressed handling
 
     //
     // Execute back presses either within internal
@@ -290,7 +338,7 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-    //endregion
+    //endregion onBackPressed handling
 
     private void createConfig()
     {

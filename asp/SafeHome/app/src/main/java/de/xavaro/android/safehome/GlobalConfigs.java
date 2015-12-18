@@ -8,7 +8,7 @@ import android.content.Context;
 
 public class GlobalConfigs
 {
-    //region Standard apps.
+    //region Standard apps
 
     //
     // Apps we like in this setup.
@@ -24,7 +24,7 @@ public class GlobalConfigs
     // @formatter:on
 
     //
-    // Famous package names.
+    // Famous package names
     //
 
     // @formatter:off
@@ -52,7 +52,7 @@ public class GlobalConfigs
 
     //endregion
 
-    //region Server adresses.
+    //region Server adresses
 
     // @formatter:off
     public static final String OopsServerName     = "www.xavaro.de";
@@ -71,4 +71,14 @@ public class GlobalConfigs
     // @formatter:on
 
     //endregion
+
+    //region Colors and styles
+
+    // @formatter:off
+    public static final int LaunchPageBackgroundColor  = 0xffffffee;
+    public static final int LaunchArrowBackgroundColor = 0x40ddddcc;
+    // @formatter:on
+
+    //endregion
+
 }
