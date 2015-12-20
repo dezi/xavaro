@@ -943,7 +943,7 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
                 String url=WebFrame.getConfigUrl(context, name);
 
                 webframe = new WebFrame(context);
-        webframe.setLoadURL(name, url);
+                webframe.setLoadURL(name, url);
             }
 
             ((HomeActivity) context).addViewToBackStack(webframe);

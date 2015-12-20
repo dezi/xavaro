@@ -3,8 +3,14 @@
 
     "m.bild.de": {
       "url": "http://m.bild.de/",
-      "icon": "http://pbs.twimg.com/profile_images/581217823067885569/h57YmPKm_400x400.png",
+      "icon": "http://pbs.twimg.com/profile_images/672813907057229824/g3MBf6VF_400x400.png",
       "label": "Bild Online"
+    },
+
+    "m.zalando.de": {
+      "url": "http://m.zalando.de/",
+      "icon": "http://pbs.twimg.com/profile_images/665540388376154112/A0pCZzMH_400x400.png",
+      "label": "Zalando"
     },
 
     "m.spiegel.de": {

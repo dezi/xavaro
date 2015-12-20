@@ -70,6 +70,11 @@ public class GlobalConfigs
     public static final int    CommServerPingSec  = 180;
     // @formatter:on
 
+    // @formatter:off
+    public static final boolean  BetaVersion        = true;
+    public static final String   BetaServerName     = "www.xavaro.de";
+    // @formatter:on
+
     //endregion
 
     //region Colors and styles

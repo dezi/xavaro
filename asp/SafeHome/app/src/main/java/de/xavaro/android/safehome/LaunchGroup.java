@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 
 public class LaunchGroup extends FrameLayout implements
         View.OnTouchListener
-
 {
     protected final String LOGTAG = "LaunchGroup";
 
@@ -40,6 +40,9 @@ public class LaunchGroup extends FrameLayout implements
 
     protected int horzSize = 220;
     protected int vertSize = 220;
+
+    protected int realWidth;
+    protected int realHeight;
 
     protected int horzItems;
     protected int vertItems;
@@ -53,6 +56,7 @@ public class LaunchGroup extends FrameLayout implements
 
     protected ArrayList<FrameLayout> launchPages = null;
     protected ArrayList<LaunchItem> launchItems = null;
+    protected int launchPage;
 
     public LaunchGroup(Context context)
     {
@@ -92,7 +96,18 @@ public class LaunchGroup extends FrameLayout implements
         setOnTouchListener(this);
 
         configTree = "launchitems";
+
+        bubble = new FrameLayout(context);
+        LayoutParams lp = new LayoutParams(200,100);
+        lp.leftMargin = 400;
+        lp.topMargin = 200;
+        bubble.setLayoutParams(lp);
+        //bubble.setBackground(StaticUtils.getflippedDrawable(getContext(), R.drawable.bubble, false, false, 0));
+        bubble.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.bubble));
+        this.addView(bubble);
     }
+
+    private FrameLayout bubble;
 
     private void addSliderButtons()
     {
@@ -104,6 +119,7 @@ public class LaunchGroup extends FrameLayout implements
         arrowLeft = new FrameLayout(getContext());
         arrowLeft.setLayoutParams(new FrameLayout.LayoutParams(32, MP, Gravity.START));
         arrowLeft.setBackgroundColor(GlobalConfigs.LaunchArrowBackgroundColor);
+        arrowLeft.setOnTouchListener(this);
 
         FrameLayout ali = new FrameLayout(getContext());
         ali.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
@@ -118,6 +134,7 @@ public class LaunchGroup extends FrameLayout implements
         arrowRight = new FrameLayout(getContext());
         arrowRight.setLayoutParams(new FrameLayout.LayoutParams(32, MP, Gravity.END));
         arrowRight.setBackgroundColor(GlobalConfigs.LaunchArrowBackgroundColor);
+        arrowRight.setOnTouchListener(this);
 
         FrameLayout ari = new FrameLayout(getContext());
         ari.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
@@ -130,6 +147,14 @@ public class LaunchGroup extends FrameLayout implements
         this.addView(arrowRight);
     }
 
+    private boolean touchValid;
+    private int xStartTouch;
+    private int yStartTouch;
+    private int xLastTouch;
+    private int yLastTouch;
+    private int xDirTouch;
+    private int yDirTouch;
+
     public boolean onTouch(View view, MotionEvent motionEvent)
     {
         if (view == this)
@@ -138,18 +163,141 @@ public class LaunchGroup extends FrameLayout implements
             // Kill all clicks between items.
             //
 
-            return true;
+            return false;
         }
 
-        return false;
+        int xscreen = (int) motionEvent.getRawX();
+        int yscreen = (int) motionEvent.getRawY();
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+        {
+            xStartTouch = xLastTouch = xscreen;
+            yStartTouch = yLastTouch = yscreen;
+
+            touchValid = false;
+        }
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_MOVE)
+        {
+            if (! touchValid)
+            {
+                if ((Math.abs(xscreen - xStartTouch) >= 10) || (Math.abs(yscreen - yStartTouch) >= 10))
+                {
+                    //
+                    // The touch needs to move a bit before we accept it
+                    // and it just became valid.
+                    //
+
+                    touchValid = true;
+                }
+
+                return true;
+            }
+
+            xDirTouch = (xLastTouch > xscreen) ? -1 : 1;
+            yDirTouch = (yLastTouch > yscreen) ? -1 : 1;
+
+            xLastTouch = xscreen;
+            yLastTouch = yscreen;
+
+            if ((view == arrowLeft) && (launchPage > 0))
+            {
+                FrameLayout lpage = launchPages.get(launchPage - 1);
+
+                LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
+                lparams.leftMargin = xscreen - lpage.getWidth();
+                lpage.bringToFront();
+            }
+
+            if ((view == arrowRight) && ((launchPage + 1) < launchPages.size()))
+            {
+                FrameLayout lpage = launchPages.get(launchPage + 1);
+
+                LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
+                lparams.leftMargin = xscreen;
+                lpage.bringToFront();
+            }
+        }
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+        {
+            Log.d(LOGTAG,"funal=" + xscreen + "=>" + xLastTouch);
+
+            FrameLayout lpage = null;
+            int finalMargin = 0;
+
+            if ((view == arrowLeft) && (launchPage > 0))
+            {
+                launchPage--;
+
+                lpage = launchPages.get(launchPage);
+
+                if (xDirTouch < 0)
+                {
+                    finalMargin = -lpage.getWidth();
+                    launchPage++;
+                }
+            }
+
+            if ((view == arrowRight) && ((launchPage + 1) < launchPages.size()))
+            {
+                launchPage++;
+
+                lpage = launchPages.get(launchPage);
+
+                if (xDirTouch > 0)
+                {
+                    finalMargin = lpage.getWidth();
+                    launchPage--;
+                }
+            }
+
+            if (lpage != null)
+            {
+                LayoutParams from = (LayoutParams) lpage.getLayoutParams();
+                LayoutParams toto = new LayoutParams(lpage.getLayoutParams());
+                toto.leftMargin = finalMargin;
+
+                DitUndDat.Animator animator = new DitUndDat.Animator();
+
+                animator.setDuration(500);
+                animator.setLayout(lpage, from, toto);
+                animator.setFinalCall(animationFinished);
+
+                this.startAnimation(animator);
+            }
+        }
+
+        return true;
     }
+
+    private void adjustArrows()
+    {
+        arrowLeft.setVisibility((launchPage > 0) ? VISIBLE : INVISIBLE);
+        arrowRight.setVisibility(((launchPage + 1) < launchPages.size()) ? VISIBLE : INVISIBLE);
+
+        arrowLeft.bringToFront();
+        arrowRight.bringToFront();
+    }
+
+    private Runnable animationFinished = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            adjustArrows();
+        }
+    };
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom)
     {
-        Log.d(LOGTAG,"onLayout:" + changed + "=" + left + "=" + top + "=" + right + "=" + bottom);
+        if (changed)
+        {
+            Log.d(LOGTAG,"onLayout:" + changed + "=" + left + "=" + top + "=" + right + "=" + bottom);
 
-        positionLaunchItems();
+            positionLaunchItems();
+        }
 
         super.onLayout(changed, left, top, right, bottom);
     }
@@ -160,22 +308,41 @@ public class LaunchGroup extends FrameLayout implements
         int width  = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
 
-        horzItems = width  / horzSize;
-        vertItems = height / vertSize;
+        if ((width != realWidth) || (height != realHeight))
+        {
+            realWidth  = width;
+            realHeight = height;
 
-        horzSpace = (width  - (horzItems * horzSize)) / (horzItems + 1);
-        vertSpace = (height - (vertItems * vertSize)) / vertItems;
+            horzItems = realWidth / horzSize;
+            vertItems = realHeight / vertSize;
 
-        horzStart = ((width  - (horzItems * horzSize)) % (horzItems + 1)) / 2;
-        vertStart = ((height - (vertItems * vertSize)) % vertItems) / 2;
+            horzSpace = (realWidth - (horzItems * horzSize)) / (horzItems + 1);
+            vertSpace = (realHeight - (vertItems * vertSize)) / vertItems;
 
-        horzStart += horzSpace;
-        vertStart += vertSpace / 2;
+            horzStart = ((realWidth - (horzItems * horzSize)) % (horzItems + 1)) / 2;
+            vertStart = ((realHeight - (vertItems * vertSize)) % vertItems) / 2;
 
-        Log.d(LOGTAG, "onMeasure:" + width + "=" + height);
-        Log.d(LOGTAG, "onMeasure:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
+            horzStart += horzSpace;
+            vertStart += vertSpace / 2;
 
-        if (launchItems == null) createLaunchItems();
+            if (launchItems == null)
+            {
+                createLaunchItems();
+            }
+            else
+            {
+                for (FrameLayout lp : launchPages)
+                {
+                    LayoutParams lpar = (LayoutParams) lp.getLayoutParams();
+                    lpar.width = realWidth;
+                    lpar.height = realHeight;
+                    lp.setLayoutParams(lpar);
+                }
+            }
+
+            Log.d(LOGTAG, "onMeasure:" + width + "=" + height);
+            Log.d(LOGTAG, "onMeasure:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
+        }
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
@@ -233,6 +400,7 @@ public class LaunchGroup extends FrameLayout implements
             int bgcol = GlobalConfigs.LaunchPageBackgroundColor;
 
             FrameLayout lp = new FrameLayout(context);
+            lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth,realHeight));
             lp.setBackgroundColor(bgcol);
             launchPages.add(lp);
             this.addView(lp);
@@ -252,6 +420,7 @@ public class LaunchGroup extends FrameLayout implements
                 if (nextSlot >= maxSlots)
                 {
                     lp = new FrameLayout(context);
+                    lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth,realHeight));
                     lp.setBackgroundColor(bgcol);
                     launchPages.add(lp);
                     this.addView(lp);
@@ -268,30 +437,18 @@ public class LaunchGroup extends FrameLayout implements
             ex.printStackTrace();
         }
 
-        launchPages.get(0).bringToFront();
+        launchPage = 0;
+        launchPages.get(launchPage).bringToFront();
 
-        arrowLeft.setVisibility(INVISIBLE);
+        adjustArrows();
 
-        arrowRight.setVisibility((launchPages.size() > 1) ? VISIBLE : INVISIBLE);
-
-        arrowLeft.bringToFront();
-        arrowRight.bringToFront();
+        bubble.bringToFront();
     }
 
     public void setConfig(LaunchItem parent, JSONObject config)
     {
         this.parent = parent;
         this.config = config;
-    }
-
-    public int getNumLaunchItems()
-    {
-        return (launchItems == null) ? 0 : launchItems.size();
-    }
-
-    public LaunchItem geLaunchItem(int inx)
-    {
-        return (launchItems == null) ? null : launchItems.get(inx);
     }
 
     @Nullable

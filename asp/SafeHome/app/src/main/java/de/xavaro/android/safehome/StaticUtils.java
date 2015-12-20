@@ -19,6 +19,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.support.annotation.Nullable;
 import android.content.Context;
 import android.content.Intent;
@@ -246,6 +250,36 @@ public class StaticUtils
     //endregion
 
     //region Nice to have image methods.
+
+    //
+    // Draw bitmap as circle into new bitmap.
+    //
+
+    public static Drawable getflippedDrawable(Context context, int id, boolean horz, boolean vert, int rotate)
+    {
+        Bitmap sprite = BitmapFactory.decodeResource(context.getResources(), id);
+        Matrix mirrorMatrix = new Matrix();
+        mirrorMatrix.preScale(horz ? -1f : 1f, vert ? -1f : 1f);
+        Bitmap fSprite = Bitmap.createBitmap(sprite, 0, 0, sprite.getWidth(), sprite.getHeight(), mirrorMatrix, false);
+
+        if (rotate != 0)
+        {
+            Bitmap output = Bitmap.createBitmap(
+                    fSprite.getWidth(),
+                    fSprite.getHeight(),
+                    Bitmap.Config.ARGB_8888);
+
+            Canvas canvas = new Canvas(output);
+
+            canvas.rotate(90, fSprite.getWidth() / 2, fSprite.getHeight() / 2);
+            canvas.drawBitmap(fSprite, 0, 0, null);
+
+            fSprite.recycle();
+            fSprite = output;
+        }
+
+        return new BitmapDrawable(context.getResources(), fSprite);
+    }
 
     //
     // Draw bitmap as circle into new bitmap.

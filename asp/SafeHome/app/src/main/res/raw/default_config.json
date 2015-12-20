@@ -127,6 +127,10 @@
           "launchitems": [
             {
               "type": "webframe",
+              "name": "m.zalando.de"
+            },
+            {
+              "type": "webframe",
               "name": "m.bild.de"
             },
             {
