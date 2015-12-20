@@ -1,5 +1,12 @@
 package de.xavaro.android.safehome;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.telecom.Call;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
@@ -39,9 +46,9 @@ public class DitUndDat
         public int height;
     }
 
-    //region public static class StreamOptions
+    //endregion public static class StreamOptions
 
-    //region public class Animator extends Animation
+    //region public static class Animator extends Animation
 
     public static class Animator extends Animation
     {
@@ -216,5 +223,76 @@ public class DitUndDat
         }
     }
 
-    //endregion public class Animator extends Animation
+    //endregion public static class Animator extends Animation
+
+    //region public static class InternetState extends BroadcastReceiver
+
+    public static class InternetState extends BroadcastReceiver
+    {
+        private final static String LOGTAG = InternetState.class.getSimpleName();
+
+        private final static ArrayList<Callback> callbacks = new ArrayList<>();
+        private static InternetState instance;
+
+        public static boolean isConnected;
+        public static boolean isMobile;
+        public static boolean isWifi;
+
+        public static void initialize(Context context)
+        {
+            if (instance == null) instance = new InternetState(context);
+        }
+
+        public static void subscribe(Callback callback)
+        {
+            if (! callbacks.contains(callback)) callbacks.add(callback);
+        }
+
+        private final ConnectivityManager cm;
+
+        public InternetState(Context context)
+        {
+            cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+            context.registerReceiver(this, filter);
+
+            onReceive(context, null);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            NetworkInfo actNetwork = cm.getActiveNetworkInfo();
+
+            if (actNetwork == null)
+            {
+                isConnected = isMobile = isWifi = false;
+            }
+            else
+            {
+                isConnected = (actNetwork != null) && actNetwork.isConnectedOrConnecting();
+                isMobile = (actNetwork.getType() == ConnectivityManager.TYPE_MOBILE);
+                isWifi = (actNetwork.getType() == ConnectivityManager.TYPE_WIFI);
+            }
+
+            Log.d(LOGTAG, "onReceive:"
+                    + " isConnected=" + isConnected
+                    + " isMobile=" + isMobile
+                    + " isWifi=" + isWifi);
+
+            for (Callback callback : callbacks)
+            {
+                callback.onInternetChanged();
+            }
+        }
+
+        public interface Callback
+        {
+            void onInternetChanged();
+        }
+    }
+
+    //endregion public static class InternetState extends BroadcastReceiver
 }

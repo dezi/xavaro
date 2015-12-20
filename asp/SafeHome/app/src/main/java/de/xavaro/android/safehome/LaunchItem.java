@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 
 import android.app.AlertDialog;
@@ -43,7 +44,10 @@ import java.util.ArrayList;
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, SurfaceHolder.Callback
+public class LaunchItem extends FrameLayout implements
+        ProxyPlayer.Callback,
+        SurfaceHolder.Callback,
+        DitUndDat.InternetState.Callback
 {
     private final String LOGTAG = "LaunchItem";
 
@@ -59,10 +63,12 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
 
     private TextView label;
     private ImageView icon;
-    
+
+    private FrameLayout dimmer;
     private FrameLayout overlay;
     private ImageView overicon;
 
+    private String type;
     private LaunchGroup directory;
     private WebFrame webframe;
     private WebStream webstream;
@@ -120,6 +126,10 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
         overicon = new ImageView(context);
         overlay.addView(overicon);
 
+        dimmer = new FrameLayout(context);
+        dimmer.setBackgroundColor(Color.TRANSPARENT);
+        this.addView(dimmer);
+
         setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -137,6 +147,8 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
                 onMyOverlayClick();
             }
         });
+
+        DitUndDat.InternetState.subscribe(this);
     }
 
     @Nullable
@@ -211,9 +223,14 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
                 }
             }
 
-            if (config.has("type"))
+            if (! config.has("type"))
             {
-                String type = config.getString("type");
+                if (config.has("audiourl")) type = "audioplayer";
+                if (config.has("videourl")) type = "videoplayer";
+            }
+            else
+            {
+                type = config.getString("type");
 
                 if (type.equals("select_home"))
                 {
@@ -577,6 +594,34 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
 
     //endregion Media playback control.
 
+    public void onInternetChanged()
+    {
+        if (DitUndDat.InternetState.isWifi)
+        {
+            dimmer.setBackgroundColor(Color.TRANSPARENT);
+
+            return;
+        }
+
+        if (DitUndDat.InternetState.isMobile)
+        {
+            if (type.equals("audioplayer") || type.equals("videoplayer"))
+            {
+                dimmer.setBackgroundColor(0xcccccccc);
+            }
+        }
+
+        if (! DitUndDat.InternetState.isConnected)
+        {
+            if (type.equals("webframe")
+                    || type.equals("audioplayer")
+                    || type.equals("videoplayer"))
+            {
+                dimmer.setBackgroundColor(0xcccccccc);
+            }
+        }
+    }
+
     private void onMyOverlayClick()
     {
         if (isPlayingMedia)
@@ -601,29 +646,6 @@ public class LaunchItem extends FrameLayout implements ProxyPlayer.Callback, Sur
             Toast.makeText(getContext(),"Nix configured.",Toast.LENGTH_LONG).show();
 
             return;
-        }
-
-        String type = null;
-
-        try
-        {
-            if (config.has("audiourl"))
-            {
-                type = "audioplayer";
-            }
-
-            if (config.has("videourl"))
-            {
-                type = "videoplayer";
-            }
-
-            if (config.has("type"))
-            {
-                type = config.getString("type");
-            }
-        }
-        catch (JSONException ignore)
-        {
         }
 
         if (type == null)

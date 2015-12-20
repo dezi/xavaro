@@ -84,6 +84,7 @@
           <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
           <option name="SPACE_WITHIN_BRACKETS" value="true" />
           <option name="SPACE_WITHIN_BRACES" value="true" />
+          <option name="WRAP_LONG_LINES" value="true" />
         </codeStyleSettings>
         <codeStyleSettings language="XML">
           <option name="FORCE_REARRANGE_MODE" value="1" />

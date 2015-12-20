@@ -87,8 +87,10 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
-        SettingsManager.initialize(this);
+
         SystemIdentity.initialize(this);
+        SettingsManager.initialize(this);
+        DitUndDat.InternetState.initialize(this);
     }
 
     @Override
