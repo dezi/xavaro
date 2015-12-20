@@ -12,7 +12,6 @@ import java.io.OutputStream;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 public class SettingsManager
 {
@@ -22,6 +21,7 @@ public class SettingsManager
     private static boolean dirty;
     private static Context ctx;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void initialize(Context context)
     {
         if (settings != null) return;
@@ -58,6 +58,7 @@ public class SettingsManager
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void flush()
     {
         if (! dirty) return;
@@ -85,7 +86,7 @@ public class SettingsManager
         }
     }
 
-    public static JSONObject resolveXpath(String[] parts, boolean create) throws JSONException
+    private static JSONObject resolveXpath(String[] parts, boolean create) throws JSONException
     {
         JSONObject jo = settings;
 
@@ -105,7 +106,7 @@ public class SettingsManager
     @Nullable
     public static String getXpathString(String xpath)
     {
-        String[] parts = xpath.split("\\/");
+        String[] parts = xpath.split("/");
 
         try
         {
@@ -122,7 +123,7 @@ public class SettingsManager
 
     public static void putXpath(String xpath,String value)
     {
-        String[] parts = xpath.split("\\/");
+        String[] parts = xpath.split("/");
 
         try
         {

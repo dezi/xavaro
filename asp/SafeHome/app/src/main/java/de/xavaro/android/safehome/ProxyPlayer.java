@@ -884,20 +884,29 @@ public class ProxyPlayer extends Thread
                 streamOptions.add(so);
             }
 
+            //
+            // Preset a medium quality and choose the best
+            // fitting quality the user desired.
+            //
+
             currentOption = streamOptions.size() >> 2;
 
             if (desiredQuality > 0)
             {
-                int currentQuality = 0;
+                int currentQuality   = 0;
+                int currentBandwidth = 0;
 
                 for (int inx = 0; inx < streamOptions.size(); inx++)
                 {
                     DitUndDat.StreamOptions so = streamOptions.get( inx );
 
-                    if ((so.quality <= desiredQuality) && (so.quality >= currentQuality))
+                    if ((so.quality <= desiredQuality)
+                            && (so.quality >= currentQuality)
+                            && (so.bandWidth >= currentBandwidth))
                     {
-                        currentQuality = so.quality;
                         currentOption = inx;
+                        currentQuality = so.quality;
+                        currentBandwidth = so.bandWidth;
                     }
                 }
             }

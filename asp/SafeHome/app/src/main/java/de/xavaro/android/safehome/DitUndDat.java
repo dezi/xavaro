@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.telecom.Call;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
@@ -281,7 +280,7 @@ public class DitUndDat
             }
             else
             {
-                isConnected = (actNetwork != null) && actNetwork.isConnectedOrConnecting();
+                isConnected = actNetwork.isConnectedOrConnecting();
                 isMobile = (actNetwork.getType() == ConnectivityManager.TYPE_MOBILE);
                 isWifi = (actNetwork.getType() == ConnectivityManager.TYPE_WIFI);
             }

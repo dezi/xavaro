@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -221,8 +220,6 @@ public class LaunchGroup extends FrameLayout implements
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP)
         {
-            Log.d(LOGTAG,"funal=" + xscreen + "=>" + xLastTouch);
-
             FrameLayout lpage = null;
             int finalMargin = 0;
 

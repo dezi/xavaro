@@ -86,7 +86,6 @@ public class GlobalConfigs
     public static final int VideoSurfaceDisabledButton = 0x88888884;
     public static final int VideoSurfaceEnabledButton  = 0xddddddd6;
     public static final int VideoSurfaceSelectedButton = 0xfffffff8;
-
     // @formatter:on
 
     //endregion
