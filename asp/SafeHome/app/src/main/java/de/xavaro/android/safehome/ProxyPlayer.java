@@ -152,16 +152,16 @@ public class ProxyPlayer extends Thread
             // Schedule a full stop within limited time.
             //
 
-            handler.postDelayed(stopAudioPlayer,10 * 1000);
+            handler.postDelayed(stopMediaPlayer,10 * 1000);
         }
     }
 
-    private final Runnable stopAudioPlayer = new Runnable()
+    private final Runnable stopMediaPlayer = new Runnable()
     {
         @Override
         public void run()
         {
-            Log.d(LOGTAG, "stopAudioPlayer");
+            Log.d(LOGTAG, "stopMediaPlayer");
 
             mediaPlayer.reset();
             mediaPrepared = false;
@@ -172,7 +172,7 @@ public class ProxyPlayer extends Thread
     {
         if (mediaPlayer != null)
         {
-            handler.removeCallbacks(stopAudioPlayer);
+            handler.removeCallbacks(stopMediaPlayer);
 
             if (mediaPrepared)
             {
@@ -196,6 +196,27 @@ public class ProxyPlayer extends Thread
         }
     }
 
+    public void playerRestart()
+    {
+        if (mediaPlayer != null)
+        {
+            handler.removeCallbacks(stopMediaPlayer);
+
+            if (mediaPrepared)
+            {
+                mediaPlayer.reset();
+                mediaPrepared = false;
+            }
+
+            //
+            // Full restart on media player.
+            //
+
+            ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+            startPlayer.start();
+        }
+    }
+
     public void playerReset()
     {
         if (mediaPlayer != null)
@@ -205,6 +226,28 @@ public class ProxyPlayer extends Thread
         }
 
         if (playing != null) playing.onPlaybackFinished();
+    }
+
+    public void setCurrentQuality(int quality)
+    {
+        desiredQuality = quality;
+    }
+
+    public int getCurrentQuality()
+    {
+        return streamOptions.get(currentOption).quality;
+    }
+
+    public int getAvailableQualities()
+    {
+        int mask = 0;
+
+        for (DitUndDat.StreamOptions so : streamOptions)
+        {
+            mask |= so.quality;
+        }
+
+        return mask;
     }
 
     //endregion Control methods.
@@ -359,6 +402,10 @@ public class ProxyPlayer extends Thread
 
     private String desiredUrl;
     private String desiredNextFragment;
+    private int desiredQuality;
+
+    private ArrayList<DitUndDat.StreamOptions> streamOptions;
+    private int currentOption;
 
     private boolean mediaPrepared;
 
@@ -405,9 +452,6 @@ public class ProxyPlayer extends Thread
         //
         // Video stuff.
         //
-
-        private ArrayList<DitUndDat.StreamOptions> streamOptions;
-        private int currentOption;
 
         private String lastFragment;
         private String nextFragment;
@@ -819,6 +863,8 @@ public class ProxyPlayer extends Thread
                     so.bandWidth = Integer.parseInt(bandwith);
                     so.streamUrl = streamurl;
 
+                    so.quality = DitUndDat.VideoQuality.deriveQuality(so.height);
+
                     streamOptions.add(so);
 
                     Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
@@ -833,11 +879,28 @@ public class ProxyPlayer extends Thread
 
                 DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
                 so.streamUrl = requestUrl;
+                so.quality = DitUndDat.VideoQuality.LQ;
 
                 streamOptions.add(so);
             }
 
             currentOption = streamOptions.size() >> 2;
+
+            if (desiredQuality > 0)
+            {
+                int currentQuality = 0;
+
+                for (int inx = 0; inx < streamOptions.size(); inx++)
+                {
+                    DitUndDat.StreamOptions so = streamOptions.get( inx );
+
+                    if ((so.quality <= desiredQuality) && (so.quality >= currentQuality))
+                    {
+                        currentQuality = so.quality;
+                        currentOption = inx;
+                    }
+                }
+            }
         }
 
         private void readFragments() throws Exception

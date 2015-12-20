@@ -82,6 +82,11 @@ public class GlobalConfigs
     // @formatter:off
     public static final int LaunchPageBackgroundColor  = 0xffffffee;
     public static final int LaunchArrowBackgroundColor = 0x40ddddcc;
+
+    public static final int VideoSurfaceDisabledButton = 0x88888884;
+    public static final int VideoSurfaceEnabledButton  = 0xddddddd6;
+    public static final int VideoSurfaceSelectedButton = 0xfffffff8;
+
     // @formatter:on
 
     //endregion

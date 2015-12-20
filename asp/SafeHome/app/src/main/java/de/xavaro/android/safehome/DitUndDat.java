@@ -25,10 +25,19 @@ public class DitUndDat
 
     public static class VideoQuality
     {
-        public static final int LQ = 0;
-        public static final int SD = 1;
-        public static final int HQ = 2;
-        public static final int HD = 3;
+        public static final int LQ = 0x01;
+        public static final int SD = 0x02;
+        public static final int HQ = 0x04;
+        public static final int HD = 0x08;
+
+        public static int deriveQuality(int scanlines)
+        {
+            if (scanlines <= 270) return LQ;
+            if (scanlines <= 480) return SD;
+            if (scanlines <= 576) return HQ;
+
+            return HD;
+        }
     }
 
     //endregion public static class VideoQuality

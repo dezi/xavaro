@@ -41,7 +41,6 @@ public class VideoSurface extends FrameLayout implements
     }
 
     private LayoutParams normalParams;
-    private LayoutParams fullScreenParams;
 
     private FrameLayout surfaceLayout;
     private SurfaceView surfaceView;
@@ -50,8 +49,8 @@ public class VideoSurface extends FrameLayout implements
     private boolean isFullscreen;
     private boolean isPlaying;
 
-    private int xRatio = 16;
-    private int yRatio =  9;
+    private final int xRatio = 16;
+    private final int yRatio =  9;
 
     public VideoSurface(Context context)
     {
@@ -78,9 +77,6 @@ public class VideoSurface extends FrameLayout implements
 
     private FrameLayout playButton;
     private FrameLayout offButton;
-
-    private FrameLayout qualityLayoutOuter;
-    private FrameLayout qualityLayoutInner;
 
     private FrameLayout qualityLQButton;
     private FrameLayout qualitySDButton;
@@ -139,28 +135,28 @@ public class VideoSurface extends FrameLayout implements
             }
         });
 
-        qualityLayoutOuter = new FrameLayout(context);
-        qualityLayoutOuter.setLayoutParams(new LayoutParams(320, 80, Gravity.CENTER_HORIZONTAL));
-        qualityLayoutOuter.setPadding(10, 0, 10, 0);
+        FrameLayout outer = new FrameLayout(context);
+        outer.setLayoutParams(new LayoutParams(320, 80, Gravity.CENTER_HORIZONTAL));
+        outer.setPadding(10, 0, 10, 0);
 
-        qualityLayoutInner = new FrameLayout(context);
-        qualityLayoutInner.setLayoutParams(new LayoutParams(150, 60, Gravity.CENTER_HORIZONTAL));
-        qualityLayoutInner.setPadding(5, 0, 5, 0);
+        FrameLayout inner = new FrameLayout(context);
+        inner.setLayoutParams(new LayoutParams(150, 60, Gravity.CENTER_HORIZONTAL));
+        inner.setPadding(5, 0, 5, 0);
 
-        qualityLayoutOuter.addView(qualityLayoutInner);
-        topArea.addView(qualityLayoutOuter);
+        outer.addView(inner);
+        topArea.addView(outer);
 
         qualityHDButton = buttonWithText(context, "HD", Gravity.START);
-        qualityLayoutOuter.addView(qualityHDButton);
+        outer.addView(qualityHDButton);
 
         qualityHQButton = buttonWithText(context, "HQ", Gravity.START);
-        qualityLayoutInner.addView(qualityHQButton);
+        inner.addView(qualityHQButton);
 
         qualitySDButton = buttonWithText(context, "SD", Gravity.END);
-        qualityLayoutInner.addView(qualitySDButton);
+        inner.addView(qualitySDButton);
 
         qualityLQButton = buttonWithText(context, "LQ", Gravity.END);
-        qualityLayoutOuter.addView(qualityLQButton);
+        outer.addView(qualityLQButton);
 
         surfaceLayout = new FrameLayout(context);
         surfaceView = new SurfaceView(context);
@@ -172,6 +168,45 @@ public class VideoSurface extends FrameLayout implements
         this.addView(surfaceLayout, normalParams);
     }
 
+    private final View.OnClickListener qualityButtonOnClick = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            ProxyPlayer pp = ProxyPlayer.getInstance();
+
+            int options = pp.getAvailableQualities();
+            int select = 0;
+
+            if ((view == qualityLQButton) && (options & DitUndDat.VideoQuality.LQ) != 0)
+            {
+                select = DitUndDat.VideoQuality.LQ;
+            }
+
+            if ((view == qualitySDButton) && (options & DitUndDat.VideoQuality.SD) != 0)
+            {
+                select = DitUndDat.VideoQuality.SD;
+            }
+
+            if ((view == qualityHQButton) && (options & DitUndDat.VideoQuality.HQ) != 0)
+            {
+                select = DitUndDat.VideoQuality.HQ;
+            }
+
+            if ((view == qualityHDButton) && (options & DitUndDat.VideoQuality.HD) != 0)
+            {
+                select = DitUndDat.VideoQuality.HD;
+            }
+
+            if (select > 0)
+            {
+                pp.setCurrentQuality(select);
+
+                pp.playerRestart();
+            }
+        }
+    };
+
     private FrameLayout buttonWithText(Context context, String text, int gravity)
     {
         FrameLayout button = new FrameLayout(context);
@@ -181,13 +216,70 @@ public class VideoSurface extends FrameLayout implements
         TextView textview = new TextView(context);
         textview.setTypeface(null, Typeface.BOLD);
         textview.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-        textview.setTextColor(0xccfffff8);
+        textview.setTextColor(GlobalConfigs.VideoSurfaceDisabledButton);
         textview.setPadding(0, 5, 0, 0);
         textview.setTextSize(32f);
         textview.setText(text);
         button.addView(textview);
 
+        button.setOnClickListener(qualityButtonOnClick);
+
         return button;
+    }
+
+    private void setButtonTextColor(FrameLayout button,int color)
+    {
+        View child = button.getChildAt(0);
+
+        if (child instanceof TextView) ((TextView) child).setTextColor(color);
+    }
+
+    private void setButtonStates()
+    {
+        ProxyPlayer pp = ProxyPlayer.getInstance();
+
+        int current = pp.getCurrentQuality();
+        int options = pp.getAvailableQualities();
+
+        int dis = GlobalConfigs.VideoSurfaceDisabledButton;
+        int ena = GlobalConfigs.VideoSurfaceEnabledButton;
+        int sel = GlobalConfigs.VideoSurfaceSelectedButton;
+
+        if ((options & DitUndDat.VideoQuality.LQ) == 0)
+        {
+            setButtonTextColor(qualityLQButton,dis);
+        }
+        else
+        {
+            setButtonTextColor(qualityLQButton,(current == DitUndDat.VideoQuality.LQ) ? sel : ena);
+        }
+
+        if ((options & DitUndDat.VideoQuality.SD) == 0)
+        {
+            setButtonTextColor(qualitySDButton,dis);
+        }
+        else
+        {
+            setButtonTextColor(qualitySDButton,(current == DitUndDat.VideoQuality.SD) ? sel : ena);
+        }
+
+        if ((options & DitUndDat.VideoQuality.HQ) == 0)
+        {
+            setButtonTextColor(qualityHQButton,dis);
+        }
+        else
+        {
+            setButtonTextColor(qualityHQButton,(current == DitUndDat.VideoQuality.HQ) ? sel : ena);
+        }
+
+        if ((options & DitUndDat.VideoQuality.HD) == 0)
+        {
+            setButtonTextColor(qualityHDButton,dis);
+        }
+        else
+        {
+            setButtonTextColor(qualityHDButton,(current == DitUndDat.VideoQuality.HD) ? sel : ena);
+        }
     }
 
     //region View.OnTouchListener interface.
@@ -198,7 +290,7 @@ public class VideoSurface extends FrameLayout implements
     private int xStartTouch;
     private int yStartTouch;
 
-    private Runnable animationFinished = new Runnable()
+    private final Runnable animationFinished = new Runnable()
     {
         @Override
         public void run()
@@ -258,7 +350,7 @@ public class VideoSurface extends FrameLayout implements
                     int newWidth = parentWidth;
                     int newHeight = newWidth * yRatio / xRatio;
 
-                    fullScreenParams = new FrameLayout.LayoutParams(newWidth,newHeight);
+                    LayoutParams fullScreenParams = new LayoutParams(newWidth,newHeight);
                     fullScreenParams.leftMargin = (parentWidth - newWidth) / 2;
                     fullScreenParams.topMargin = (parentHeight - newHeight) / 2;
 
@@ -349,8 +441,6 @@ public class VideoSurface extends FrameLayout implements
         HomeActivity.getInstance().addVideoSurface(this);
 
         setSpinner(true);
-
-        topArea.setVisibility(INVISIBLE);
     }
 
     public void onPlaybackStartet()
@@ -362,7 +452,7 @@ public class VideoSurface extends FrameLayout implements
 
         playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
 
-        topArea.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
+        setButtonStates();
     }
 
     public void onPlaybackPaused()
@@ -373,8 +463,6 @@ public class VideoSurface extends FrameLayout implements
         setSpinner(false);
 
         playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_play_190x190));
-
-        topArea.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
     }
 
     public void onPlaybackResumed()
@@ -385,8 +473,6 @@ public class VideoSurface extends FrameLayout implements
         setSpinner(false);
 
         playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
-
-        topArea.setVisibility(isFullscreen ? VISIBLE : INVISIBLE);
     }
 
     public void onPlaybackFinished()
@@ -395,8 +481,6 @@ public class VideoSurface extends FrameLayout implements
 
         isPlaying = false;
         setSpinner(false);
-
-        topArea.setVisibility(INVISIBLE);
 
         HomeActivity.getInstance().removeVideoSurface();
     }
