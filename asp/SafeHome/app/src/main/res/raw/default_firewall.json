@@ -1,0 +1,350 @@
+{
+  "firewall" : {
+    "domains": [
+      {
+        "domain": "2mdn.net",
+        "type": "Tracker",
+        "source": "Abine Inc.",
+        "description": [
+          "2mdn.net ist eine Domäne, die von Doubleclick benutzt wird. Doubleclick ist eine ",
+          "Werbefirma die Teil eines Netzwerkes ist und mit Cookies und anderen Technologien ",
+          "den Anwender tracken. Auf lange Sicht erstellen Sites wie 2mdn.net Profile über den ",
+          "Anwender, die Daten über besuchte Websites, Suchen, Einkäufe und andere Aktivitäten ",
+          "enthalten. Möglicherweise werden diese Profile and andere Vermarkter weiterverkauft."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "71i.de",
+        "type": "Adserver",
+        "source": "Recherche",
+        "description": [
+          "Unsere Recherche zeigt, dass 71i.de dem Unternehmen ProSiebenSat.1 Produktion GmbH ",
+          "zugeordnet ist. Die Homepage erfordert einen User-Account. Eine Datenschutzerklärung ",
+          "kann nicht abgerufen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "addthis.com",
+        "type": "Tracker",
+        "source": "Wikipedia",
+        "description": [
+          "Nach Berichten einiger Nachrichtenportale hat AddThis eine neue Tracking-Technik ",
+          "getestet, das \"Canvas Fingerprinting\", die es fast unmöglich macht sich von der ",
+          "Verfolgung (Tracking) im Internet zu schützen. Nach Angaben des Unternehmens wurde ",
+          "die Testphase mittlerweile beendet und der entsprechende Code deaktiviert. \"Canvas ",
+          "Fingerprinting\" ermöglicht es den Nutzer in etwa 90 Prozent der Fälle eindeutig zu ",
+          "identifizieren und somit sein Surfverhalten zu analysieren. Forscher der Princeton ",
+          "University und der Katholischen Universität Löwen haben auf etwa fünf Prozent der ",
+          "weltweit meistbesuchten Webseiten den entsprechenden Code gefunden. Angeblich wurde ",
+          "diese Technik ohne Wissen vieler Seitenbetreiber eingesetzt."
+        ],
+        "faults": [ "noprivger", "nooptin" ]
+      },
+      {
+        "domain": "adition.com",
+        "type": "Adserver",
+        "source": "ADITION",
+        "description": [
+          "ADITION setzt Cookies ein, um die Einblendung von Werbemitteln, die durch die ",
+          "Kunden von ADITION geschaltet werden, für den User auszusteuern und zu optimieren. ",
+          "Dies betrifft zum Beispiel die maximale Anzeigehäufigkeit von Werbemitteln, die ",
+          "ein User zu sehen bekommt. Zudem nutzt ADITION in Einzelfällen gespeicherte ",
+          "Cookie-Informationen für statistische Erhebungen."
+        ],
+        "faults": [ "nooptin" ]
+      },
+      {
+        "domain": "adnxs.com",
+        "type": "Tracker",
+        "source": "The Guardian",
+        "description": [
+          "Adnxs.com is run by AppNexus, a company that provides technology, data and analytics ",
+          "to help companies buy and sell online display advertising. ",
+          "The technology it uses can plug into other advertising serving platforms, such as ",
+          "Google's Doubleclick, and \"data aggregators\", such as Quantcast, which provide ",
+          "behavioural targeting. In essence, this makes AppNexus an an \"advertising exchange ",
+          "for advertising exchanges\". ",
+          "Die Homepage erfordert einen User-Account. Eine Datenschutzerklärung ",
+          "kann nicht abgerufen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "adtech.de",
+        "type": "Adserver",
+        "source": "ADTECH",
+        "description": [
+          "ADTECHs Adserving Lösungen ermöglichen es Web-Publishern, Vermarktern, Agenturen und ",
+          "Werbetreibenden ihre Online Werbekampagnen im Bereich Display, Video und Mobile zu ",
+          "verwalten, auszuliefern und auszuwerten."
+        ],
+        "faults": [ "nooptin" ]
+      },
+      {
+        "domain": "amazon-adsystem.com",
+        "type": "Adserver",
+        "source": "",
+        "description": [
+          "Anzeigen-Server von Amazon. Weitere Information sind kaum zu finden. ",
+          "Die Homepage kann ebensowenig wie eine Datenschutzerklärung ",
+          "abgerufen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "amobee.com",
+        "type": "Adserver",
+        "source": "Wikipedia",
+        "description": [
+          "Amobee is a mobile advertising technology company providing services for large ",
+          "advertisers, publishers and operators. Amobee has a proprietary platform that ",
+          "supports existing and emerging mobile ad formats on any mobile, internet-enabled ",
+          "device, including gaming platforms."
+        ],
+        "faults": [ "noprivger", "nooptout" ]
+      },
+      {
+        "domain": "awempire.com",
+        "type": "Pornografie",
+        "source": "Wikipedia",
+        "description": [
+          "Awempire.com ist ein Adult Affiliate Programm aus den USA. Vermarktet werden ",
+          "vorwiegend Live-Cam Angebote."
+        ],
+        "faults": [ "noprivger", "isporn", "ispremium" ]
+      },
+      {
+        "domain": "contentabc.com",
+        "type": "Adserver",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage lädt nicht."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "criteo.com",
+        "type": "Tracking",
+        "source": "Wikipedia",
+        "description": [
+          "Criteo is a \"personalized retargeting company\" that works with Internet retailers ",
+          "to serve personalized online display advertisements to consumers that have ",
+          "previously visited the advertiser's website."
+        ],
+        "faults": [ "noprivger", "nooptin" ]
+      },
+      {
+        "domain": "doubleclick.net",
+        "type": "Tracking",
+        "source": "Wikipedia",
+        "description": [
+          "DoubleClick ist eine Marke des US-amerikanischen Unternehmens Google Inc., unter der ",
+          "Online-Marketing-Lösungen angeboten werden. DoubleClick wird oft in Verbindung mit ",
+          "Spyware gebracht, da HTTP-Cookies im Browser so gesetzt sind, dass eine Rückverfolgung ",
+          "des Benutzers von Webseite zu Webseite möglich ist. Eine Aufzeichnung darüber, welche ",
+          "Werbung angezeigt und angeklickt wird, ist ebenso möglich."
+        ],
+        "faults": [ "nofaults" ]
+      },
+      {
+        "domain": "doublepimp.com",
+        "type": "Pornografie",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage erfordert einen User-Account."
+        ],
+        "faults": [ "nohome", "nopriv", "isporn" ]
+      },
+      {
+        "domain": "edelight.biz",
+        "type": "Shopping",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "emetriq.de",
+        "type": "Tracking",
+        "source": "emetriq",
+        "description": [
+          "Unser Ziel ist es, Onlinewerbung für Internetnutzer relevanter zu machen, indem ",
+          "werbliche Inhalte den voraussichtlich richtigen Zielgruppen gezeigt werden. ",
+          "Gleichzeitig versuchen wir dadurch irrelevante Werbung zu vermeiden. Voraussetzung ",
+          "ist die optimierte Ausspielung der Onlinewerbung durch Vermarkter und Werbungtreibende ",
+          "Unternehmen auf Basis qualitativ hochwertiger Daten. Die dafür notwendigen ",
+          "Daten erfasst emetriq."
+        ],
+        "faults": [ "nofaults" ]
+      },
+      {
+        "domain": "emsservice.de",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "etahub.com",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "exoclick.com",
+        "type": "Adserver",
+        "source": "Wikipedia",
+        "description": [
+          "ExoClick is a Barcelona-based online advertising company, which provides online ",
+          "advertising services to both advertisers and publishers all over the world via ",
+          "web, mobile, tablet and smart TV. ExoClick's customers include advertisers, ",
+          "advertising agencies, traffic distribution partners and publishers."
+        ],
+        "faults": [ "noprivger" ]
+      },
+      {
+        "domain": "intellitxt.com",
+        "type": "In-Text-Anzeigen",
+        "source": "Wikipedia",
+        "description": [
+          "IntelliTXT, an \"in-text\" advertisement platform developed by Vibrant Media, ",
+          "is an example of keyword advertising. Web page publishers insert a script into ",
+          "their pages which calls the IntelliTXT platform when a viewer views the page. ",
+          "This script then finds keywords on the page and double underlines them. When ",
+          "holding the mouse over the double underlined link, an advertisement associated ",
+          "with that word will pop up. Advertisers pay to have their particular words ",
+          "associated to their advertisements. ",
+          "IntelliTXT may make pages more difficult to read, also delaying page navigation ",
+          "while advertisements load and flash onto the screen. Some publishers offer a help ",
+          "link inside the IntelliTXT ad' box that leads to a page that lets users turn ",
+          "off IntelliTXT."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "ioam.de",
+        "type": "Tracker",
+        "source": "Recherche",
+        "description": [
+          "Unsere Website nutzt das „Skalierbare Zentrale Messverfahren next Generation“ ",
+          "(SZMnG) der INFOnline GmbH (http://www.infonline.de) für die Ermittlung ",
+          "statistischer Kennwerte zur Nutzung unserer Angebote. Dabei werden anonyme ",
+          "Messwerte erhoben. Die SZM-Reichweitenmessung verwendet zur Wiedererkennung von ",
+          "Computersystemen alternativ entweder einen Cookie mit der Kennung „ioam.de“, ein ",
+          "LocalStorage Objekt oder eine Signatur, die aus verschiedenen automatisch ",
+          "übertragenen Informationen Ihres Browsers erstellt wird."
+        ],
+        "faults": [ "nofault" ]
+      },
+      {
+        "domain": "jasmin.com",
+        "type": "Pornografie",
+        "source": "Recherche",
+        "description": [
+          "Jasmin ist eine VideoChat Plattform, auf der sich Mitglieder und Besucher mit ",
+          "Amateurdarstellern aus der ganzen Welt unterhalten koennen. ",
+          "Siehe auch livejasmin.com."
+        ],
+        "faults": [ "isporn", "ispremium" ]
+      },
+      {
+        "domain": "krxd.net",
+        "type": "Tracker",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "laterpay.net",
+        "type": "Bezahlsystem",
+        "source": "Laterpay Homepage",
+        "description": [
+          "LaterPay ist eine Bezahlplattform, die es Ihnen als Anbieter ermöglicht, digitale ",
+          "Inhalte direkt aus der eigenen Website heraus zu verkaufen, und das bereits ab ",
+          "Kleinstbeträgen von 5 Cent. Ihre Nutzer können ohne Vorabregistrierung oder -zahlung ",
+          "Ihre Inhalte mit nur einem Klick kaufen, was die Konversionsraten im Kaufprozess ",
+          "deutlich steigert. LaterPay aggregiert dabei websiteübergreifend die Käufe Ihrer ",
+          "Nutzer und bittet diese erst ab einer Gesamtrechnung von 5,00 € zur Kasse."
+        ],
+        "faults": [ "ispremium" ]
+      },
+      {
+        "domain": "ligatus.com",
+        "type": "Tracker",
+        "source": "Ads Wiki",
+        "description": [
+          "Ligatus is a performance-marketing system permanently integrated into more than 260 ",
+          "premium-partner portals. Using its own optimisation algorithm, Ligatus enables ",
+          "advertising clients and agencies to position their advertising messages intelligently ",
+          "so that they precisely match the respective target group. In this way Ligatus develops ",
+          "successful campaigns in close collaboration with the client."
+        ],
+        "faults": [ "nofaults" ]
+      },
+      {
+        "domain": "livejasmin.com",
+        "type": "Pornografie",
+        "source": "Recherche",
+        "description": [
+          "Jasmin ist eine VideoChat Plattform, auf der sich Mitglieder und Besucher mit ",
+          "Amateurdarstellern aus der ganzen Welt unterhalten koennen. ",
+          "Siehe auch livejasmin.com."
+        ],
+        "faults": [ "isporn", "ispremium" ]
+      },
+      {
+        "domain": "lp4.io",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden. Die Domain steht zum ",
+          "Verkauf."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+      {
+        "domain": "m6r.eu",
+        "type": "Tracker",
+        "source": "mbr-targeting",
+        "description": [
+          "mbr targeting uses patent pending algorithms for highly efficient real-time ",
+          "advertising. We are 100% science- and technology-focused and process and ",
+          "analyze massive amounts of data. We are working at the cutting edge of big data, ",
+          "machine learning and real-time technologies and we are operating large-scale ",
+          "deployments of real-time web services."
+        ],
+        "faults": [ "nofaults" ]
+      },
+      {
+        "domain": "meetrics.net",
+        "type": "Tracker",
+        "source": "Meetrics",
+        "description": [
+          "Meetrics ist ein führendes Unternehmen auf dem internationalen Markt für technische ",
+          "Lösungen zur Steigerung der Qualität und Wirkung von Onlinemarketing Kampagnen. ",
+          "Neben der Sichtbarkeitsmessung von Online Ads, ermöglicht Meetrics Werbetreibenden, ",
+          "Media Agenturen und Vermarktern die Kontrolle von Werbeumfeldern, Zielgruppen und ",
+          "betrügerischen Aktivitäten innerhalb der Kampagne."
+        ],
+        "faults": [ "nofaults" ]
+      }
+    ]
+  }
+}
