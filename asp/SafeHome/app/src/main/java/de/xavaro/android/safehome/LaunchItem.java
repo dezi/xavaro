@@ -254,6 +254,12 @@ public class LaunchItem extends FrameLayout implements
                     icon.setVisibility(VISIBLE);
                 }
 
+                if (type.equals("firewall"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.firewall_256x256));
+                    icon.setVisibility(VISIBLE);
+                }
+
                 if (type.equals("whatsapp"))
                 {
                     GlobalConfigs.likeWhatsApp = true;
@@ -658,6 +664,7 @@ public class LaunchItem extends FrameLayout implements
         // @formatter:off
         if (type.equals("select_home"  )) { launchSelectHome();   return; }
         if (type.equals("select_assist")) { launchSelectAssist(); return; }
+        if (type.equals("firewall"     )) { launchFireWall();     return; }
         if (type.equals("audioplayer"  )) { launchAudioPlayer();  return; }
         if (type.equals("videoplayer"  )) { launchVideoPlayer();  return; }
         if (type.equals("genericapp"   )) { launchGenericApp();   return; }
@@ -702,6 +709,10 @@ public class LaunchItem extends FrameLayout implements
         context.startActivity(startMain);
 
         pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+    }
+
+    private void launchFireWall()
+    {
     }
 
     private void launchWhatsApp()

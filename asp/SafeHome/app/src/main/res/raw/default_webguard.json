@@ -295,10 +295,7 @@
         "description": [
           ""
         ]
-      },
-
-
-
+      }
     ]
   },
 
@@ -378,6 +375,7 @@
           "*.elasticbeanstalk.com",
           "*.emetriq.de",
           "*.emsservice.de",
+          "*.epimg.net",
           "*.etahub.com",
           "*.exoclick.com",
           "*.google-analytics.com",

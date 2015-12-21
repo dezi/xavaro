@@ -10,12 +10,16 @@
         "type": "select_assist"
       },
       {
+        "label": "Firewall",
+        "type": "firewall"
+      },
+      {
         "label": "Android Settings",
         "type": "genericapp",
         "packagename": "com.android.settings"
       },
       {
-        "label": "Recommended",
+        "label": "App-Empfehlungen",
         "type": "directory",
         "packagename": "com.android.vending",
         "launchgroup": {
