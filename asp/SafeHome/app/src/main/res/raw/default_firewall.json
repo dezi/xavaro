@@ -1,6 +1,7 @@
 {
   "firewall" : {
     "domains": [
+
       {
         "domain": "2mdn.net",
         "type": "Tracker",
@@ -14,6 +15,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "71i.de",
         "type": "Adserver",
@@ -25,6 +27,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "addthis.com",
         "type": "Tracker",
@@ -42,6 +45,7 @@
         ],
         "faults": [ "noprivger", "nooptin" ]
       },
+
       {
         "domain": "adition.com",
         "type": "Adserver",
@@ -55,6 +59,7 @@
         ],
         "faults": [ "nooptin" ]
       },
+
       {
         "domain": "adnxs.com",
         "type": "Tracker",
@@ -71,6 +76,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "adtech.de",
         "type": "Adserver",
@@ -82,6 +88,7 @@
         ],
         "faults": [ "nooptin" ]
       },
+
       {
         "domain": "amazon-adsystem.com",
         "type": "Adserver",
@@ -93,6 +100,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "amobee.com",
         "type": "Adserver",
@@ -105,6 +113,7 @@
         ],
         "faults": [ "noprivger", "nooptout" ]
       },
+
       {
         "domain": "awempire.com",
         "type": "Pornografie",
@@ -115,6 +124,7 @@
         ],
         "faults": [ "noprivger", "isporn", "ispremium" ]
       },
+
       {
         "domain": "contentabc.com",
         "type": "Adserver",
@@ -125,6 +135,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "criteo.com",
         "type": "Tracking",
@@ -136,6 +147,7 @@
         ],
         "faults": [ "noprivger", "nooptin" ]
       },
+
       {
         "domain": "doubleclick.net",
         "type": "Tracking",
@@ -149,6 +161,7 @@
         ],
         "faults": [ "nofaults" ]
       },
+
       {
         "domain": "doublepimp.com",
         "type": "Pornografie",
@@ -159,6 +172,7 @@
         ],
         "faults": [ "nohome", "nopriv", "isporn" ]
       },
+
       {
         "domain": "edelight.biz",
         "type": "Shopping",
@@ -169,6 +183,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "emetriq.de",
         "type": "Tracking",
@@ -183,6 +198,7 @@
         ],
         "faults": [ "nofaults" ]
       },
+
       {
         "domain": "emsservice.de",
         "type": "Unbekannt",
@@ -193,6 +209,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "etahub.com",
         "type": "Unbekannt",
@@ -203,6 +220,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "exoclick.com",
         "type": "Adserver",
@@ -215,6 +233,7 @@
         ],
         "faults": [ "noprivger" ]
       },
+
       {
         "domain": "intellitxt.com",
         "type": "In-Text-Anzeigen",
@@ -234,6 +253,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "ioam.de",
         "type": "Tracker",
@@ -249,6 +269,7 @@
         ],
         "faults": [ "nofault" ]
       },
+
       {
         "domain": "jasmin.com",
         "type": "Pornografie",
@@ -260,6 +281,7 @@
         ],
         "faults": [ "isporn", "ispremium" ]
       },
+
       {
         "domain": "krxd.net",
         "type": "Tracker",
@@ -270,6 +292,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "laterpay.net",
         "type": "Bezahlsystem",
@@ -284,6 +307,7 @@
         ],
         "faults": [ "ispremium" ]
       },
+
       {
         "domain": "ligatus.com",
         "type": "Tracker",
@@ -297,17 +321,18 @@
         ],
         "faults": [ "nofaults" ]
       },
+
       {
         "domain": "livejasmin.com",
         "type": "Pornografie",
         "source": "Recherche",
         "description": [
           "Jasmin ist eine VideoChat Plattform, auf der sich Mitglieder und Besucher mit ",
-          "Amateurdarstellern aus der ganzen Welt unterhalten koennen. ",
-          "Siehe auch livejasmin.com."
+          "Amateurdarstellern aus der ganzen Welt unterhalten koennen. "
         ],
         "faults": [ "isporn", "ispremium" ]
       },
+
       {
         "domain": "lp4.io",
         "type": "Unbekannt",
@@ -319,6 +344,7 @@
         ],
         "faults": [ "nohome", "nopriv" ]
       },
+
       {
         "domain": "m6r.eu",
         "type": "Tracker",
@@ -332,19 +358,155 @@
         ],
         "faults": [ "nofaults" ]
       },
+
       {
         "domain": "meetrics.net",
         "type": "Tracker",
         "source": "Meetrics",
         "description": [
-          "Meetrics ist ein führendes Unternehmen auf dem internationalen Markt für technische ",
-          "Lösungen zur Steigerung der Qualität und Wirkung von Onlinemarketing Kampagnen. ",
-          "Neben der Sichtbarkeitsmessung von Online Ads, ermöglicht Meetrics Werbetreibenden, ",
-          "Media Agenturen und Vermarktern die Kontrolle von Werbeumfeldern, Zielgruppen und ",
-          "betrügerischen Aktivitäten innerhalb der Kampagne."
+          "Meetrics führt im Auftrag von und im Einverständnis mit den Betreibern von Webseiten ",
+          "und Onlinevermarktern Auswertungen zum besseren Verständnis des Nutzungsverhaltens ",
+          "der Webseiten durch. Die Daten werden erhoben, um Attraktivität, Inhalt und ",
+          "Funktionalität der gemessenen Webseite zu erhöhen und Marketingmaßnahmen besser ",
+          "bewerten zu können. Dabei werden auf einzelnen Besuchen aufbauende Auswertungen ",
+          "erstellt, die Aufschluss über die Sichtbarkeit auf Internetseiten geben."
         ],
         "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "movad.de",
+        "type": "Adserver",
+        "source": "Recherche",
+        "description": [
+          "Out.stream Video ist ein innovatives, aufmerksamkeitsstarkes Werbeformat, welches ",
+          "die Anzahl an Werbeflächen drastisch erhöht. Im Gegensatz zu in.stream Video Werbung ",
+          "wie Pre-Rolls auf YouTube, werden out.stream Video Ads nicht in den Video Content ",
+          "miteingebunden, sondern unabhängig im Text zwischen Absätzen platziert."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "nuggad.net",
+        "type": "Adserver",
+        "source": "nugg ad",
+        "description": [
+          "Die nugg.ad Smart Audience PlatformTM steht für Multichannel Audience Targeting ",
+          "auf Basis unterschiedlichster Daten und Smart Data Management, bis hin zu ",
+          "individuell entwickelten Vermarkter- oder Advertiser-Zielgruppen. Mit nugg.ads ",
+          "langjähriger Zielgruppen-Expertise und innovativer Technologie auf Basis von ",
+          "Echtzeit-Machine Learning profitieren Unternehmen von hocheffektiver digitaler ",
+          "Werbung entlang der gesamten Customer Journey und umfassendem Zielgruppenwissen. ",
+          "nugg.ad wurde 2006 gegründet und ist Pioneer sowie führender Anbieter für ",
+          "Predictive Targeting."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "outbrain.com",
+        "type": "Advertising",
+        "source": "Wikipedia",
+        "description": [
+          "Outbrain is a content discovery platform whose content marketing module offers ",
+          "to help Internet publishers increase web traffic by presenting them with relevant ",
+          "website links. It provides recommendations for several media types, including ",
+          "online, news, video, and mobile."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "plista.com",
+        "type": "Advertising",
+        "source": "plista",
+        "description": [
+          "plista ist Pionier innovativer Lösungen für zielgerichtete digitale Werbung und ",
+          "Content Distribution in redaktionellen Umfeldern. Über unsere datengetriebene ",
+          "Content- und Werbeplattform bringen wir seit 2008 Werbetreibende und Medien ",
+          "erfolgreich zusammen und sind auf mehreren internationalen Märkten federführend ",
+          "in seinem Segment. Durch unsere eigens entwickelte Echtzeit-Empfehlungstechnologie ",
+          "sind wir in der Lage, sowohl Inhalte als auch Werbung passend zu den Interessen des ",
+          "einzelnen Nutzers auszuliefern – auf allen Kanälen (online, mobile und in Apps) ",
+          "und über alle Endgeräte hinweg (Desktop-PCs, Tablets und Smartphones)."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "research.de.com",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "research.de.com gehört zu Meetrics, siehe dort."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "revsci.net",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden. Die Domain steht zum ",
+          "Verkauf."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "scorecardresearch.com",
+        "type": "Tracker",
+        "source": "ScorecardResearch",
+        "description": [
+          "ScorecardResearch, ein Service von Full Circle Studies, Inc. ist Teil von ",
+          "comScore, Inc. Marktforschungsgemeinschaft, einer führenden globalen ",
+          "Marktforschungseinrichtung, die Trends und Verhaltensweisen im Internet ",
+          "studiert und darüber berichtet. ScorecardResearch führt Recherchen mittels ",
+          "Sammlung von Daten über das Internetverhalten durch und verwendet diese ",
+          "Daten dann dafür, aufzuzeigen, wie Menschen das Internet nutzen und was sie ",
+          "dabei bevorzugen und was nicht."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "slopeaota.com",
+        "type": "Pornografie",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "smartadserver.com",
+        "type": "Advertising",
+        "source": "Recherche",
+        "description": [
+          "Smart AdServer is an all-inclusive ad server that allows users to program rich ",
+          "media and video campaigns and to deliver ads to mobile sites and applications."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "veeseo.com",
+        "type": "Advertising",
+        "source": "veeseo",
+        "description": [
+          "veeseo-Technologien helfen Publishern dabei ihre individuellen Ziele durch ",
+          "intelligente User-Steuerung zu erreichen. Zusätzlich steigert veeseo die ",
+          "Gesamtreichweite von Webseiten und erzielt signifikante Werbeerlöse von AdBlock-Usern.",
+        ],
+        "faults": [ "nopriv" ]
       }
+
+
     ]
   }
 }
