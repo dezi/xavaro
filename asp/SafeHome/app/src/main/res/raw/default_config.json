@@ -24,7 +24,7 @@
       {
         "label": "Fernsehen",
         "type": "directory",
-        "icon": "vintagetv_512x512",
+        "icon": "television_275x275",
         "launchgroup": {
           "launchitems": [
             {

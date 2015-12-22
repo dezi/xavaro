@@ -4,8 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
@@ -14,6 +17,8 @@ import android.graphics.Color;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 //
 // Utility namespace for included small classes.
@@ -55,6 +60,43 @@ public class DitUndDat
     }
 
     //endregion public static class StreamOptions
+
+    //region public static class SharedPrefs
+
+    public static class SharedPrefs
+    {
+        public static SharedPreferences sharedPrefs;
+
+        public static void initialize(Context context)
+        {
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            //
+            // Register all dynamic preferences.
+            //
+
+            FirewallActivity.SafetyFragment.registerAll(context);
+            FirewallActivity.DomainsFragment.registerAll(context);
+        }
+
+        public static Map<String, Object> getPrefix(String prefix)
+        {
+            Map<String, Object> result = new HashMap<>();
+
+            Map<String, ?> prefs = sharedPrefs.getAll();
+
+            for (Map.Entry<String, ?> entry : prefs.entrySet())
+            {
+                if (! entry.getKey().startsWith(prefix)) continue;
+
+                result.put(entry.getKey(), entry.getValue());
+            }
+
+            return result;
+        }
+    }
+
+    //endregion public static class SharedPrefs
 
     //region public static class Animator extends Animation
 

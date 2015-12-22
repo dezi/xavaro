@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,6 +70,9 @@ public class UpdateManager extends Thread
 
                 return;
             }
+
+            String text = "Eine neue Version von SafeHome wird geladen...";
+            Toast.makeText(context, text, Toast.LENGTH_LONG).show();
 
             Log.d(LOGTAG, "Loading new version");
 

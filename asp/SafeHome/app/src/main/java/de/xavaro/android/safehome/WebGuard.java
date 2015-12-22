@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
 
 //
 // Guarded access and display of web client.
@@ -39,6 +40,8 @@ public class WebGuard extends WebViewClient
     private String currentUrl;
 
     private JSONObject config;
+
+    private final ArrayList<String> subdomains = new ArrayList<>();
 
     private boolean wasBackAction;
 
@@ -59,37 +62,81 @@ public class WebGuard extends WebViewClient
         currentUri = Uri.parse(url);
 
         config = WebFrame.getConfig(context, website);
+
+        if (! subdomains.contains(website)) subdomains.add(website);
     }
 
     public void setFeatures(WebView webview)
     {
-        if ((config == null) || ! config.has("webguard")) return;
+        //
+        // Add allowable domains from preferences.
+        //
 
-        try
+        subdomains.add("www.facebook.com");
+        subdomains.add("www.facebook.net");
+        subdomains.add("pixel.facebook.com");
+        subdomains.add("graph.facebook.net");
+        subdomains.add("static.xx.fbcdn.net");
+        subdomains.add("connect.facebook.net");
+        subdomains.add("staticxx.facebook.com");
+
+        subdomains.add("platform.twitter.com");
+        subdomains.add("syndication.twitter.com");
+
+        if (config == null) return;
+
+        //
+        // Check for known and validated subdomains.
+        //
+
+        if (config.has("subdomains"))
         {
-            JSONObject jot = config.getJSONObject("webguard");
-
-            if (! jot.has("feature")) return;
-
-            JSONArray features = jot.getJSONArray("feature");
-
-            for (int inx = 0; inx < features.length(); inx++)
+            try
             {
-                String feature = features.getString(inx);
-                String[] parts = feature.split("=");
+                JSONArray json = config.getJSONArray("subdomains");
 
-                if (parts.length != 2) continue;
-
-                if (parts[ 0 ].equalsIgnoreCase("DomStorage"))
+                for (int inx = 0; inx < json.length(); inx++)
                 {
-                    webview.getSettings().setDomStorageEnabled(parts[ 1 ].equals("1"));
-
-                    Log.d(LOGTAG,"setFeatures " + parts[ 0 ] + "=" + parts[ 1 ]);
+                    subdomains.add(json.getString(inx));
                 }
             }
+            catch (JSONException ignore)
+            {
+            }
         }
-        catch (JSONException ignore)
+
+        //
+        // Check for special webguard instructions.
+        //
+
+        if (config.has("webguard"))
         {
+            try
+            {
+                JSONObject jot = config.getJSONObject("webguard");
+
+                if (! jot.has("feature")) return;
+
+                JSONArray features = jot.getJSONArray("feature");
+
+                for (int inx = 0; inx < features.length(); inx++)
+                {
+                    String feature = features.getString(inx);
+                    String[] parts = feature.split("=");
+
+                    if (parts.length != 2) continue;
+
+                    if (parts[ 0 ].equalsIgnoreCase("DomStorage"))
+                    {
+                        webview.getSettings().setDomStorageEnabled(parts[ 1 ].equals("1"));
+
+                        Log.d(LOGTAG, "setFeatures " + parts[ 0 ] + "=" + parts[ 1 ]);
+                    }
+                }
+            }
+            catch (JSONException ignore)
+            {
+            }
         }
     }
 
@@ -134,6 +181,19 @@ public class WebGuard extends WebViewClient
                     domains_allow = getConfigTreeArray(globalConfig, "resource", "domains", "allow");
                     domains_deny  = getConfigTreeArray(globalConfig, "resource", "domains", "deny" );
                     // @formatter:on
+
+                    //
+                    // Add restricted domains from firewall.
+
+                    Map<String, Object> domains = DitUndDat.SharedPrefs.getPrefix("firewall_domain_");
+
+                    for (String prefkey : domains.keySet())
+                    {
+                        if ((boolean) domains.get(prefkey)) continue;
+
+                        String[] splits = prefkey.substring(16).split("\\+");
+                        for (String domain : splits) domains_deny.add("*." + domain);
+                    }
                 }
             }
             catch (NullPointerException | JSONException ex)
@@ -367,10 +427,10 @@ public class WebGuard extends WebViewClient
             // We are in root page load.
             //
 
-            OopsService.log(LOGTAG, "checkUrlResource: " + url);
-
             if ((config != null) && config.has("webguard"))
             {
+                OopsService.log(LOGTAG, "checkUrlResource: " + url);
+
                 //
                 // Check for any static cookies to be added.
                 //
@@ -475,7 +535,7 @@ public class WebGuard extends WebViewClient
         {
             if (url.matches(regex_allow.get(inx)))
             {
-                Log.d(LOGTAG, "checkUrlResource: allow " + url);
+                //Log.d(LOGTAG, "checkUrlResource: allow " + url);
 
                 return null;
             }
@@ -503,7 +563,7 @@ public class WebGuard extends WebViewClient
         {
             if (validateHost(host, domains_allow.get(inx)))
             {
-                Log.d(LOGTAG, "checkUrlResource: allow " + host);
+                //Log.d(LOGTAG, "checkUrlResource: allow " + host);
 
                 return null;
             }
@@ -524,6 +584,8 @@ public class WebGuard extends WebViewClient
         }
 
         String path = uri.getPath();
+
+        if (subdomains.contains(uri.getHost())) return null;
 
         if ((! path.endsWith(".png")) && (! path.endsWith(".jpg")) && (! path.endsWith(".svg")) &&
                 (! path.endsWith(".gif")) && (! path.endsWith(".ico")))

@@ -4,7 +4,7 @@
 
       {
         "domain": "2mdn.net",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "Abine Inc.",
         "description": [
           "2mdn.net ist eine Domäne, die von Doubleclick benutzt wird. Doubleclick ist eine ",
@@ -18,7 +18,7 @@
 
       {
         "domain": "71i.de",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "Recherche",
         "description": [
           "Unsere Recherche zeigt, dass 71i.de dem Unternehmen ProSiebenSat.1 Produktion GmbH ",
@@ -29,8 +29,22 @@
       },
 
       {
+        "domain": "ad4mat.de",
+        "type": "Advertising",
+        "source": "ad4mat",
+        "description": [
+          "ad4mat filtert werberelevante Zielgruppen nach soziodemographischen Merkmalen und ",
+          "Interessen. Eine Zuweisung zu sensiblen Interessenkategorien, die etwa auf Rasse, ",
+          "Religion oder sexueller Orientierung basieren, findet bei ad4mat nicht statt. ",
+          "Die nach soziodemographischen Merkmalen gefilterten unterschiedlichen Zielgruppen ",
+          "bekommen für diese möglichst relevante Werbeinhalte präsentiert."
+        ],
+        "faults": [ "nofault" ]
+      },
+
+      {
         "domain": "addthis.com",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "Wikipedia",
         "description": [
           "Nach Berichten einiger Nachrichtenportale hat AddThis eine neue Tracking-Technik ",
@@ -48,7 +62,7 @@
 
       {
         "domain": "adition.com",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "ADITION",
         "description": [
           "ADITION setzt Cookies ein, um die Einblendung von Werbemitteln, die durch die ",
@@ -62,7 +76,7 @@
 
       {
         "domain": "adnxs.com",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "The Guardian",
         "description": [
           "Adnxs.com is run by AppNexus, a company that provides technology, data and analytics ",
@@ -79,7 +93,7 @@
 
       {
         "domain": "adtech.de",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "ADTECH",
         "description": [
           "ADTECHs Adserving Lösungen ermöglichen es Web-Publishern, Vermarktern, Agenturen und ",
@@ -91,7 +105,7 @@
 
       {
         "domain": "amazon-adsystem.com",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "",
         "description": [
           "Anzeigen-Server von Amazon. Weitere Information sind kaum zu finden. ",
@@ -103,7 +117,7 @@
 
       {
         "domain": "amobee.com",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "Wikipedia",
         "description": [
           "Amobee is a mobile advertising technology company providing services for large ",
@@ -126,14 +140,50 @@
       },
 
       {
+        "domain": "browser-update.org",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Fordert den Anwender auf, seinen Browser zu aktualisieren, wenn dieser veraltet ist. "
+        ],
+        "faults": [ "noprivger" ]
+      },
+
+      {
         "domain": "contentabc.com",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "Recherche",
         "description": [
           "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
           "Datenschutz-Erklärung vor. Die Homepage lädt nicht."
         ],
         "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "chartbeat.com",
+        "type": "Tracking",
+        "source": "Wikipedia",
+        "description": [
+          "Chartbeat is a web analytics company headquartered in New York City. It was started ",
+          "in 2009. The company helps provide actionable insights to news websites and blogs ",
+          "that the websites and blogs can use to make real-time decisions about the content ",
+          "to publish and promote on their sites."
+        ],
+        "faults": [ "noprivger", "nooptout" ]
+      },
+
+      {
+        "domain": "chartbeat.net",
+        "type": "Tracking",
+        "source": "Wikipedia",
+        "description": [
+          "Chartbeat is a web analytics company headquartered in New York City. It was started ",
+          "in 2009. The company helps provide actionable insights to news websites and blogs ",
+          "that the websites and blogs can use to make real-time decisions about the content ",
+          "to publish and promote on their sites."
+        ],
+        "faults": [ "noprivger", "nooptout" ]
       },
 
       {
@@ -146,6 +196,18 @@
           "previously visited the advertiser's website."
         ],
         "faults": [ "noprivger", "nooptin" ]
+      },
+
+      {
+        "domain": "decibelinsight.net",
+        "type": "Session-Replay",
+        "source": "Decibelinsight",
+        "description": [
+          "Decibel Insight is the most innovative and advanced enterprise customer experience ",
+          "platform available. From session replay to error reports, our software continues ",
+          "to evolve in exciting directions."
+        ],
+        "faults": [ "noprivger", "nooptout" ]
       },
 
       {
@@ -223,7 +285,7 @@
 
       {
         "domain": "exoclick.com",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "Wikipedia",
         "description": [
           "ExoClick is a Barcelona-based online advertising company, which provides online ",
@@ -232,6 +294,58 @@
           "advertising agencies, traffic distribution partners and publishers."
         ],
         "faults": [ "noprivger" ]
+      },
+
+      {
+        "domain": "firebaseapp.com",
+        "type": "Advertising",
+        "source": "Recherche",
+        "description": [
+          "Hoster für Apps. Produziert Popups."
+        ],
+        "faults": [ "noprivger" ]
+      },
+
+      {
+        "domain": "google-analytics.com",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "Gehört natürlich zu Google."
+        ],
+        "faults": [ "nofault" ]
+      },
+
+      {
+        "domain": "googleadservices.com",
+        "type": "Advertising",
+        "source": "Recherche",
+        "description": [
+          "Gehört natürlich zu Google. Leider kann keine Homepage und demnach auch keine ",
+          "Datenschutzbestimmung geladen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "googletagservices.com",
+        "type": "Advertising",
+        "source": "Recherche",
+        "description": [
+          "Gehört natürlich zu Google. Leider kann keine Homepage und demnach auch keine ",
+          "Datenschutzbestimmung geladen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "googletagmanager.com",
+        "type": "Advertising",
+        "source": "Recherche",
+        "description": [
+          "Gehört natürlich zu Google."
+        ],
+        "faults": [ "nofault" ]
       },
 
       {
@@ -255,8 +369,19 @@
       },
 
       {
+        "domain": "iqcontentplatform.de",
+        "type": "Advertising",
+        "source": "Wikipedia",
+        "description": [
+          "Eine Domäne von iq media marketing gmbh. Die Homepage erfordert ein Login, ",
+          "ein Datenschutzerklärung ist nicht abrufbar."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "ioam.de",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "Recherche",
         "description": [
           "Unsere Website nutzt das „Skalierbare Zentrale Messverfahren next Generation“ ",
@@ -284,7 +409,7 @@
 
       {
         "domain": "krxd.net",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "Recherche",
         "description": [
           "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
@@ -310,7 +435,7 @@
 
       {
         "domain": "ligatus.com",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "Ads Wiki",
         "description": [
           "Ligatus is a performance-marketing system permanently integrated into more than 260 ",
@@ -347,7 +472,7 @@
 
       {
         "domain": "m6r.eu",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "mbr-targeting",
         "description": [
           "mbr targeting uses patent pending algorithms for highly efficient real-time ",
@@ -360,8 +485,20 @@
       },
 
       {
+        "domain": "mediavoice.com",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "Unsere Recherche zeigt, dass mediavoice.com dem Unternehmen GODADDY.COM, LLC ",
+          "zugeordnet ist. Die Homepage erfordert einen User-Account. Eine Datenschutzerklärung ",
+          "kann nicht abgerufen werden."
+          ],
+          "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "meetrics.net",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "Meetrics",
         "description": [
           "Meetrics führt im Auftrag von und im Einverständnis mit den Betreibern von Webseiten ",
@@ -376,7 +513,7 @@
 
       {
         "domain": "movad.de",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "Recherche",
         "description": [
           "Out.stream Video ist ein innovatives, aufmerksamkeitsstarkes Werbeformat, welches ",
@@ -388,8 +525,31 @@
       },
 
       {
+        "domain": "mxcdn.net",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "mxcdn.net gehört zu Meetrics, siehe dort. Ruft man www.mxcdn.net auf, wird man ",
+          "auf eine Shopping Seite namens \"www.fusskleidung.de\" umgeleitet. Wir ",
+          "unterstellen mal, dass da ein Meetrics-Spassvogel am Werk ist."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "nexxcdn.com",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "Diese Domöne gehört nexx.tv Service GmbH. Es ist keine Homepage vorhanden ",
+          "insbesondere liegt keine Datenschutz-Erklärung vor."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "nuggad.net",
-        "type": "Adserver",
+        "type": "Advertising",
         "source": "nugg ad",
         "description": [
           "Die nugg.ad Smart Audience PlatformTM steht für Multichannel Audience Targeting ",
@@ -402,6 +562,23 @@
           "Predictive Targeting."
         ],
         "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "optimizely.com",
+        "type": "Advertising",
+        "source": "Optimizely",
+        "description": [
+          "We may collect personally identifiable information about you through our Service ",
+          "when you register for an account, such as your full name, phone number and email ",
+          "address. If you choose to purchase a product from us, we or our third-party payment ",
+          "processors will collect your payment information also. We also collect data through ",
+          "our partners (customers) who use our Service (including by embedding our code on ",
+          "their websites) to analyze usage of their websites. When you use our Service or if ",
+          "you visit such websites, your browser may send us certain information about you as ",
+          "described below."
+        ],
+        "faults": [ "noprivger" ]
       },
 
       {
@@ -418,8 +595,19 @@
       },
 
       {
-        "domain": "plista.com",
+        "domain": "pagefair.com+pagefair.net",
         "type": "Advertising",
+        "source": "PageFair",
+        "description": [
+          "Measure how many visitors block your ads, and unlock revenue with non-intrusive ",
+          "ads just for your adblockers."
+        ],
+        "faults": [ "noprivger" ]
+      },
+
+      {
+        "domain": "plista.com",
+        "type": "Recommending",
         "source": "plista",
         "description": [
           "plista ist Pionier innovativer Lösungen für zielgerichtete digitale Werbung und ",
@@ -457,8 +645,18 @@
       },
 
       {
+        "domain": "sascdn.com",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "Diese Domäne ist geparkt und vorregistriert. Mithin unseriös."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "scorecardresearch.com",
-        "type": "Tracker",
+        "type": "Tracking",
         "source": "ScorecardResearch",
         "description": [
           "ScorecardResearch, ein Service von Full Circle Studies, Inc. ist Teil von ",
@@ -495,18 +693,79 @@
       },
 
       {
+        "domain": "theadex.com",
+        "type": "Tracking",
+        "source": "The Adex",
+        "description": [
+          "Unsere Mission ist es, Werbetreibenden, Publishern und Agenturen zu helfen mehr ",
+          "über ihre Zielgruppen zu erfahren. Darüberhinaus ermöglicht unsere Data Management ",
+          "Lösung der nächsten Generation allen Marktteilnehmern, einen datengestützten ",
+          "Zugang zu digitalen-Echtzeit Marktplätzen."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
         "domain": "veeseo.com",
         "type": "Advertising",
         "source": "veeseo",
         "description": [
           "veeseo-Technologien helfen Publishern dabei ihre individuellen Ziele durch ",
           "intelligente User-Steuerung zu erreichen. Zusätzlich steigert veeseo die ",
-          "Gesamtreichweite von Webseiten und erzielt signifikante Werbeerlöse von AdBlock-Usern.",
+          "Gesamtreichweite von Webseiten und erzielt signifikante Werbeerlöse von AdBlock-Usern."
         ],
         "faults": [ "nopriv" ]
+      },
+
+      {
+        "domain": "visualrevenue.com",
+        "type": "Recommending",
+        "source": "Recherche",
+        "description": [
+          "Gehört zu Outbrain, Inc."
+        ],
+        "faults": [ "nofault" ]
+      },
+
+      {
+        "domain": "wt-eu02.net",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "Ist auf den Namen Webtrekk GmbH registriert. Leider kann keine Homepage und demnach ",
+          "auch keine Datenschutzbestimmung geladen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "xplosion.de",
+        "type": "Tracking",
+        "source": "The Adex",
+        "description": [
+          "Unser Herz schlägt für Retargeting. Es ist die effektivste Art, Ihre Conversion ",
+          "zu optimieren. Wir nutzen das schlummernde Potenzial von Website-Besuchern, die ",
+          "Interesse gezeigt, sich aber noch nicht zum Kauf entschlossen haben. Wir finden ",
+          "Ihre Kunden auf Premiumkanälen, im Social und Mobile Web wieder und überzeugen ",
+          "Sie mit individuellen Empfehlungen von Ihren Produkten. Dabei gehen wir mit sehr ",
+          "viel Präzision und Markenbewusstsein vor."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "yieldlab.net",
+        "type": "Advertising",
+        "source": "Yieldlab",
+        "description": [
+          "Yieldlab setzt Cookies ein, um die Einblendung von Werbemitteln, die durch die ",
+          "Kunden von Yieldlab geschaltet werden, für den User auszusteuern und zu optimieren. ",
+          "Dies betrifft zum Beispiel die maximale Anzeigehäufigkeit von Werbemitteln, die ein ",
+          "User zu sehen bekommt. Zudem nutzt Yieldlab in Einzelfällen gespeicherte ",
+          "Cookie-Informationen für statistische Erhebungen."
+        ],
+        "faults": [ "nofaults" ]
       }
-
-
     ]
   }
 }

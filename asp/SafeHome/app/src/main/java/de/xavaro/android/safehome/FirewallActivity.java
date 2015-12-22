@@ -1,9 +1,11 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.PreferenceActivity;
 import android.os.Bundle;
@@ -15,11 +17,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FirewallActivity extends PreferenceActivity
 {
     private static final String LOGTAG = FirewallActivity.class.getSimpleName();
+
+    private static SharedPreferences sharedPrefs;
 
     //region Static configuration methods.
 
@@ -33,7 +38,7 @@ public class FirewallActivity extends PreferenceActivity
         loadGlobalConfig(this);
     }
 
-    private void loadGlobalConfig(Context context)
+    private static void loadGlobalConfig(Context context)
     {
         if (globalConfig == null)
         {
@@ -88,6 +93,9 @@ public class FirewallActivity extends PreferenceActivity
         public DomainsCBPreference(Context context)
         {
             super(context);
+
+            setPersistent(true);
+            setDefaultValue(false);
         }
 
         @Override
@@ -110,6 +118,21 @@ public class FirewallActivity extends PreferenceActivity
             boolean value = (boolean) newValue;
 
             return true;
+        }
+
+        @Override
+        public void setKey(String text)
+        {
+            super.setKey(text);
+
+            if ((sharedPrefs != null) && ! sharedPrefs.contains(text))
+            {
+                //
+                // Initially commit shared preference.
+                //
+
+                sharedPrefs.edit().putBoolean(text,false).apply();
+            }
         }
 
         public void setSummary(String text, String domain, JSONArray faults)
@@ -144,14 +167,14 @@ public class FirewallActivity extends PreferenceActivity
 
     public static class DomainsFragment extends PreferenceFragment
     {
-        @Override
-        public void onCreate(Bundle savedInstanceState)
+        private static final ArrayList<Preference> preferences = new ArrayList<>();
+
+        public static void registerAll(Context context)
         {
-            super.onCreate(savedInstanceState);
+            if (sharedPrefs == null) sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
+            preferences.clear();
+            loadGlobalConfig(context);
             if (globalConfig == null) return;
 
             try
@@ -183,13 +206,13 @@ public class FirewallActivity extends PreferenceActivity
                     for (int cnt = 0; cnt < desc.length(); cnt++) text += desc.getString(cnt);
                     if (source != null) text += " (Quelle: " + source + ")";
 
-                    cb = new DomainsCBPreference(getActivity());
+                    cb = new DomainsCBPreference(context);
 
                     cb.setKey("firewall_domain_" + name);
                     cb.setTitle(title);
                     cb.setSummary(text, name, faults);
 
-                    root.addPreference(cb);
+                    preferences.add(cb);
                 }
 
             }
@@ -198,17 +221,31 @@ public class FirewallActivity extends PreferenceActivity
                 OopsService.log(LOGTAG,ex);
             }
         }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+       }
     }
 
     private static class SafetyCBPreference extends CheckBoxPreference
         implements Preference.OnPreferenceChangeListener
     {
-        private View view;
         private TextView summary;
 
         public SafetyCBPreference(Context context)
         {
             super(context);
+
+            setPersistent(true);
 
             setOnPreferenceChangeListener(this);
         }
@@ -218,14 +255,27 @@ public class FirewallActivity extends PreferenceActivity
         {
             super.onBindView(view);
 
-            this.view = view;
-
             //
             // Stupid limitation on size of description.
             //
 
             summary = (TextView) view.findViewById(android.R.id.summary);
             summary.setMaxLines(50);
+        }
+
+        @Override
+        public void setKey(String text)
+        {
+            super.setKey(text);
+
+            if ((sharedPrefs != null) && ! sharedPrefs.contains(text))
+            {
+                //
+                // Initially commit shared preference.
+                //
+
+                sharedPrefs.edit().putBoolean(text,false).apply();
+            }
         }
 
         public void setSummaryOff(String text)
@@ -245,17 +295,17 @@ public class FirewallActivity extends PreferenceActivity
 
     public static class SafetyFragment extends PreferenceFragment
     {
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
+        private final static ArrayList<Preference> preferences = new ArrayList<>();
 
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
+        public static void registerAll(Context context)
+        {
+            if (sharedPrefs == null) sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            preferences.clear();
 
             SafetyCBPreference cb;
 
-            cb = new SafetyCBPreference(getActivity());
+            cb = new SafetyCBPreference(context);
 
             cb.setKey("firewall_respect_privacy");
             cb.setTitle("Datenschutz immer sicherstellen");
@@ -266,9 +316,22 @@ public class FirewallActivity extends PreferenceActivity
                     + "der Anwender beim Surfen in Bezug auf den Datenschutz immer "
                     + "möglichst geschützt ist.");
 
-            root.addPreference(cb);
+            preferences.add(cb);
 
-            cb = new SafetyCBPreference(getActivity());
+            cb = new SafetyCBPreference(context);
+
+            cb.setKey("firewall_respect_privacy");
+            cb.setTitle("Datenschutz immer sicherstellen");
+
+            cb.setSummaryOn("Der Datenschutz wird immer sichergestellt.");
+
+            cb.setSummaryOff("Durch Setzen dieser Option stellen sie sicher, dass "
+                    + "der Anwender beim Surfen in Bezug auf den Datenschutz immer "
+                    + "möglichst geschützt ist.");
+
+            preferences.add(cb);
+
+            cb = new SafetyCBPreference(context);
 
             cb.setKey("firewall_stay_onsite");
             cb.setTitle("Beim Surfen das Verlassen der Web-Seite unterbinden");
@@ -278,9 +341,9 @@ public class FirewallActivity extends PreferenceActivity
             cb.setSummaryOff("Durch Setzen dieser Option stellen sie sicher, dass der "
                     + "Anwender nicht durch unqualifizierte Verlinkungen gefährdet wird.");
 
-            root.addPreference(cb);
+            preferences.add(cb);
 
-            cb = new SafetyCBPreference(getActivity());
+            cb = new SafetyCBPreference(context);
 
             cb.setKey("firewall_block_popups");
             cb.setTitle("Popups blockieren");
@@ -290,9 +353,9 @@ public class FirewallActivity extends PreferenceActivity
             cb.setSummaryOff("Durch Setzen dieser Option stellen sie sicher, dass der "
                     + "Anwender nicht durch plötzlich auftauchende Popups belästigt wird.");
 
-            root.addPreference(cb);
+            preferences.add(cb);
 
-            cb = new SafetyCBPreference(getActivity());
+            cb = new SafetyCBPreference(context);
 
             cb.setKey("firewall_block_premium");
             cb.setTitle("Kostenpflichtige Premium-Angebote blockieren");
@@ -303,9 +366,9 @@ public class FirewallActivity extends PreferenceActivity
                     + "Anwender keine Abonnements oder kostenpflichtige Premium-Angebote "
                     + "bestellen kannn.");
 
-            root.addPreference(cb);
+            preferences.add(cb);
 
-            cb = new SafetyCBPreference(getActivity());
+            cb = new SafetyCBPreference(context);
 
             cb.setKey("firewall_block_shops");
             cb.setTitle("Zugang zu Website-Shops blockieren");
@@ -315,9 +378,9 @@ public class FirewallActivity extends PreferenceActivity
             cb.setSummaryOff("Durch Setzen dieser Option stellen sie sicher, dass der "
                     + "Anwender nicht versehentlich Shop-Angebote wahrnimmt.");
 
-            root.addPreference(cb);
+            preferences.add(cb);
 
-            cb = new SafetyCBPreference(getActivity());
+            cb = new SafetyCBPreference(context);
 
             cb.setKey("firewall_block_inlinead");
             cb.setTitle("Werbe-Verknüpfungen im Lesetext blockieren");
@@ -328,9 +391,9 @@ public class FirewallActivity extends PreferenceActivity
                     + "Anwender nicht durch irreführenden Werbelinks im redaktionellen. "
                     + "Text einer Webseite auf Anzeigen geführt wird.");
 
-            root.addPreference(cb);
+            preferences.add(cb);
 
-            cb = new SafetyCBPreference(getActivity());
+            cb = new SafetyCBPreference(context);
 
             cb.setKey("firewall_block_ads");
             cb.setTitle("Anzeigenblöcke ausblenden");
@@ -341,7 +404,20 @@ public class FirewallActivity extends PreferenceActivity
                     + "Anwender nicht durch unerwünschte Werbung behindert, belästig oder "
                     + "das Datenvolumen unnötig belastet wird.");
 
-            root.addPreference(cb);
+            preferences.add(cb);
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
         }
     }
 }
