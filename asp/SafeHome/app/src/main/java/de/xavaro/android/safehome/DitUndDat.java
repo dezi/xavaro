@@ -75,8 +75,8 @@ public class DitUndDat
             // Register all dynamic preferences.
             //
 
-            FirewallActivity.SafetyFragment.registerAll(context);
-            FirewallActivity.DomainsFragment.registerAll(context);
+            PreferenceFragments.SafetyFragment.registerAll(context);
+            PreferenceFragments.DomainsFragment.registerAll(context);
         }
 
         public static Map<String, Object> getPrefix(String prefix)

@@ -184,14 +184,15 @@ public class WebGuard extends WebViewClient
 
                     //
                     // Add restricted domains from firewall.
+                    //
 
-                    Map<String, Object> domains = DitUndDat.SharedPrefs.getPrefix("firewall_domain_");
+                    Map<String, Object> domains = DitUndDat.SharedPrefs.getPrefix("firewall.domains.");
 
                     for (String prefkey : domains.keySet())
                     {
                         if ((boolean) domains.get(prefkey)) continue;
 
-                        String[] splits = prefkey.substring(16).split("\\+");
+                        String[] splits = prefkey.substring(17).split("\\+");
                         for (String domain : splits) domains_deny.add("*." + domain);
                     }
                 }

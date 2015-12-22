@@ -42,10 +42,10 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".FirewallActivity">
+        <activity android:name=".FirewallActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
@@ -69,6 +69,10 @@
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".XXXActivity"
+            android:label="@string/title_activity_xxx">
         </activity>
     </application>
 

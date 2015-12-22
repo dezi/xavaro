@@ -1135,6 +1135,6 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchDeveloper()
     {
-        VideoSurface.getInstance();
+        DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
     }
 }
