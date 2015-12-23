@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
@@ -13,6 +14,9 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.View;
 import android.os.Bundle;
@@ -35,6 +39,199 @@ public class PrefFragments
     {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
+
+    //region WhatsApp preferences
+
+    public static class WhatsAppFragment extends PreferenceFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Whatsapp Benutzer";
+            header.fragment = WhatsAppFragment.class.getName();
+
+            return header;
+        }
+
+        public WhatsAppFragment()
+        {
+            super();
+
+            root = "whatsapp";
+            iconres = GlobalConfigs.IconResWhatsApp;
+            keyprefix = "whatsapp";
+            masterenable = "Whatsapp Benutzer freischalten";
+        }
+
+        private final ArrayList<Preference> preferences = new ArrayList<>();
+
+        protected String root;
+        protected int iconres;
+        protected String keyprefix;
+        protected String masterenable;
+
+        public void registerAll(Context context)
+        {
+            preferences.clear();
+
+            EnableSwitchPreference sw = new EnableSwitchPreference(context);
+
+            sw.setKey(keyprefix + ".enable");
+            sw.setTitle(masterenable);
+            sw.setIcon(VersionUtils.getDrawableFromResources(context, iconres));
+            sw.setDefaultValue(false);
+
+            preferences.add(sw);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            CharSequence[] entries = { "Nicht aktiviert", "Home-Bildschirm", "Whatsapp-Directory" };
+            CharSequence[] evalues = { "inact" , "home" , "wadir"};
+
+            try
+            {
+                JSONObject contacts = ContactsHandler.getJSONData(context);
+                Iterator<String> keysIterator = contacts.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String cid = keysIterator.next();
+
+                    //
+                    // We are in a contact.
+                    //
+
+                    String name = null;
+                    String chatphone = null;
+                    String voipphone = null;
+
+                    JSONArray items = contacts.getJSONArray(cid);
+
+                    for (int inx = 0; inx < items.length(); inx++)
+                    {
+                        JSONObject item = items.getJSONObject(inx);
+
+                        if (! item.has("KIND")) continue;
+
+                        String kind = item.getString("KIND");
+
+                        if (kind.equals("StructuredName"))
+                        {
+                            name = item.getString("DISPLAY_NAME");
+                        }
+
+                        if (kind.equals("@vnd.com.whatsapp.profile"))
+                        {
+                            chatphone = item.getString("DATA1");
+                        }
+
+                        if (kind.equals("@vnd.com.whatsapp.voip.call"))
+                        {
+                            voipphone = item.getString("DATA1");
+                        }
+                    }
+
+                    if ((chatphone == null) && (voipphone == null)) continue;
+
+                    NicePreferenceCategory nc = new NicePreferenceCategory(context);
+                    nc.setTitle(name);
+                    preferences.add(nc);
+
+                    if (chatphone != null)
+                    {
+                        chatphone = chatphone.replaceAll("@s.whatsapp.net","");
+                        String key = keyprefix + ".chat." + voipphone;
+                        NiceListPreference cb = new NiceListPreference(context);
+
+                        cb.setEntries(entries);
+                        cb.setEntryValues(evalues);
+                        cb.setDefaultValue("inact");
+                        cb.setKey(key);
+                        cb.setTitle("Chat +" + chatphone);
+
+                        preferences.add(cb);
+
+                        if (! sharedPrefs.contains(key))
+                        {
+                            sharedPrefs.edit().putString(key, "inact").apply();
+                        }
+                    }
+
+                    if (voipphone != null)
+                    {
+                        voipphone = voipphone.replaceAll("@s.whatsapp.net","");
+                        String key = keyprefix + ".voip." + voipphone;
+                        NiceListPreference cb = new NiceListPreference(context);
+
+                        cb.setEntries(entries);
+                        cb.setEntryValues(evalues);
+                        cb.setDefaultValue("inact");
+                        cb.setKey(key);
+                        cb.setTitle("Voip +" + voipphone);
+
+                        preferences.add(cb);
+
+                        if (! sharedPrefs.contains(key))
+                        {
+                            sharedPrefs.edit().putString(key, "inact").apply();
+                        }
+                    }
+                }
+            }
+            catch (JSONException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+        }
+
+        //region EnableSwitchPreference implementation
+
+        private class EnableSwitchPreference extends SwitchPreference
+                implements Preference.OnPreferenceChangeListener
+        {
+            public EnableSwitchPreference(Context context)
+            {
+                super(context);
+
+                setOnPreferenceChangeListener(this);
+            }
+
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object obj)
+            {
+                Log.d(LOGTAG, "onPreferenceChange:" + obj.toString());
+
+                for (Preference pref : preferences)
+                {
+                    if (pref instanceof CheckBoxPreference)
+                    {
+                        pref.setEnabled((boolean) obj);
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        //endregion EnableSwitchPreference implementation
+    }
+
+    //endregion IP Radio preferences
 
     //region Firewall safety preferences
 
@@ -745,7 +942,7 @@ public class PrefFragments
             for (Preference pref : preferences) root.addPreference(pref);
         }
 
-        //region IPStreanSwitchPreference implementation
+        //region JSONConfigSwitchPreference implementation
 
         private class JSONConfigSwitchPreference extends SwitchPreference
                 implements Preference.OnPreferenceChangeListener
@@ -774,7 +971,7 @@ public class PrefFragments
             }
         }
 
-        //endregion IPStreanSwitchPreference implementation
+        //endregion JSONConfigSwitchPreference implementation
     }
 
     //endregion JSONConfigFragment base class
@@ -796,6 +993,96 @@ public class PrefFragments
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
             title.setTextSize(20f);
+        }
+    }
+
+    public static class NiceListPreference extends ListPreference
+            implements Preference.OnPreferenceChangeListener
+    {
+        private String key;
+        private TextView current;
+        private CharSequence[] entries;
+        private CharSequence[] values;
+
+        public NiceListPreference(Context context)
+        {
+            super(context);
+
+            setOnPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void setKey(String key)
+        {
+            super.setKey(key);
+            this.key = (String) key;
+        }
+
+        @Override
+        public void setEntries(CharSequence[] entries)
+        {
+            super.setEntries(entries);
+            this.entries = entries;
+        }
+
+        @Override
+        public void setEntryValues(CharSequence[] values)
+        {
+            super.setEntryValues(values);
+            this.values = values;
+        }
+
+        private String getDisplayValue(String value)
+        {
+            for (int inx = 0; inx < values.length; inx++)
+            {
+                if (values[ inx ].equals(value))
+                {
+                    return (String) entries[ inx ];
+                }
+            }
+
+            return "unknown";
+        }
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object obj)
+        {
+            if (current != null) current.setText(getDisplayValue((String) obj));
+
+            return true;
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            if (current == null)
+            {
+                current = new TextView(getContext());
+                current.setGravity(Gravity.END);
+                current.setTextSize(18f);
+
+                if (sharedPrefs.contains(key))
+                {
+                    current.setText(getDisplayValue(sharedPrefs.getString(key,null)));
+                }
+            }
+
+            if (current.getParent() != null)
+            {
+                ((LinearLayout) current.getParent()).removeView(current);
+            }
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.END);
+
+            ((LinearLayout) view).addView(current, lp);
+
+            Log.d(LOGTAG, "onBindView:" + view);
         }
     }
 }

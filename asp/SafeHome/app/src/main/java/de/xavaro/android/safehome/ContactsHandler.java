@@ -39,6 +39,13 @@ public class ContactsHandler
     @SuppressWarnings("FieldCanBeLocal")
     private final String LOGTAG = "ContactsHandler";
 
+    private static JSONObject contacts = null;
+
+    public static JSONObject getJSONData(Context context)
+    {
+        return new ContactsHandler(context).contacts2JSONObject();
+    }
+
     private final Context ctx;
 
     private Cursor items;

@@ -94,10 +94,11 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final int IconResFireWall           = R.drawable.firewall_256x256;
+    public static final int IconResWhatsApp           = R.drawable.whatsapp_512x512;
     public static final int IconResIPTelevision       = R.drawable.television_275x275;
     public static final int IconResIPRadio            = R.drawable.radio_400x400;
-    public static final int IconResWebConfigNewspaper = R.drawable.newspaper_512x512;
-    public static final int IconResWebConfigMagazine  = R.drawable.newspaper_512x512;
+    public static final int IconResWebConfigNewspaper = R.drawable.newspaper_480x480;
+    public static final int IconResWebConfigMagazine  = R.drawable.magazine_220x220;
     public static final int IconResWebConfigShopping  = R.drawable.shopping_440x440;
     public static final int IconResWebConfigErotics   = R.drawable.erotica_280x280;
     // @formatter:on

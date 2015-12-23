@@ -28,6 +28,8 @@ public class FirewallActivity extends PreferenceActivity
         target.add(PrefFragments.SafetyFragment.getHeader());
         target.add(PrefFragments.DomainsFragment.getHeader());
 
+        target.add(PrefFragments.WhatsAppFragment.getHeader());
+
         target.add(PrefFragments.IPTelevisionFragment.getHeader());
         target.add(PrefFragments.IPRadioFragment.getHeader());
 
