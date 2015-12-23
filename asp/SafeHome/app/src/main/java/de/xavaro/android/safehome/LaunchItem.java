@@ -306,6 +306,8 @@ public class LaunchItem extends FrameLayout implements
 
                     if (config.has("waphonenumber"))
                     {
+                        targetIcon = icon;
+
                         String phone = config.getString("waphonenumber");
                         Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
 
@@ -317,6 +319,27 @@ public class LaunchItem extends FrameLayout implements
                             icon.setVisibility(VISIBLE);
                             targetIcon = overicon;
                         }
+
+                        if (config.has("subtype"))
+                        {
+                            String subtype = config.getString("subtype");
+
+                            if (subtype.equals("chat"))
+                            {
+                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppChat));
+                                targetIcon.setVisibility(VISIBLE);
+                            }
+                            if (subtype.equals("voip"))
+                            {
+                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppVoip));
+                                targetIcon.setVisibility(VISIBLE);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsApp));
+                        icon.setVisibility(VISIBLE);
                     }
                 }
 
@@ -386,8 +409,9 @@ public class LaunchItem extends FrameLayout implements
             }
 
             targetIcon.setVisibility(VISIBLE);
-            if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
         }
+
+        if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
 
         setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
     }
@@ -742,26 +766,31 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchWhatsApp()
     {
-        if (! config.has("waphonenumber"))
+        if (config.has("waphonenumber"))
         {
-            Toast.makeText(getContext(),"Nix <waphonenumber> configured.",Toast.LENGTH_LONG).show();
+            try
+            {
+                String waphonenumber = config.getString("waphonenumber");
+                Uri uri = Uri.parse("smsto:" + waphonenumber);
+                Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
+                sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                sendIntent.setPackage("com.whatsapp");
+                context.startActivity(Intent.createChooser(sendIntent, ""));
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
 
             return;
         }
 
-        try
+        if (directory == null)
         {
-            String waphonenumber = config.getString("waphonenumber");
-            Uri uri = Uri.parse("smsto:" + waphonenumber);
-            Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
-            sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            sendIntent.setPackage("com.whatsapp");
-            context.startActivity(Intent.createChooser(sendIntent, ""));
+            directory = new WhatsappGroup(context);
         }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
     }
 
     private void launchSkype()

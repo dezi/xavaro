@@ -39,65 +39,14 @@
         "enable": "webconfig.erotics.enable"
       },
       {
-        "label": "Whatsi Dezi",
+        "label": "WhatsApp",
         "type": "whatsapp",
-        "packagename": "com.whatsapp",
-        "waphonenumber": "4915152493345"
-      },
-      {
-        "label": "Whatsi Susi",
-        "type": "whatsapp",
-        "packagename": "com.whatsapp",
-        "waphonenumber": "491704126207"
-      },
-      {
-        "label": "Whatsi Sandra",
-        "type": "whatsapp",
-        "packagename": "com.whatsapp",
-        "waphonenumber": "491712303902"
-      },
-      {
-        "label": "Whatsi Kim",
-        "type": "whatsapp",
-        "packagename": "com.whatsapp",
-        "waphonenumber": "4917699960594"
+        "enable": "whatsapp.enable"
       },
       {
         "label": "Wikipedia",
         "type": "genericapp",
         "packagename": "org.wikipedia"
-      },
-      {
-        "label": "Skype",
-        "type": "directory",
-        "packagename": "com.skype.raider",
-        "launchgroup": {
-          "launchitems": [
-            {
-              "label": "Skype Kim Chat",
-              "type": "skype",
-              "subtype": "chat",
-              "packagename": "com.skype.raider",
-              "skypename": "kikilolxd357"
-            },
-            {
-              "label": "Skype Kim Call",
-              "type": "skype",
-              "subtype": "call",
-              "packagename": "com.skype.raider",
-              "skypename": "kikilolxd357"
-            }
-          ]
-        }
-      },
-      {
-        "label": "Test Feature",
-        "type": "developer"
-      },
-      {
-        "label": "Fehlertest",
-        "type": "pupsi",
-        "packagename": "nix.vorhanden"
       }
     ]
   }

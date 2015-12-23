@@ -49,7 +49,7 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Whatsapp Benutzer";
+            header.title = "Whatsapp";
             header.fragment = WhatsAppFragment.class.getName();
 
             return header;
@@ -62,7 +62,7 @@ public class PrefFragments
             root = "whatsapp";
             iconres = GlobalConfigs.IconResWhatsApp;
             keyprefix = "whatsapp";
-            masterenable = "Whatsapp Benutzer freischalten";
+            masterenable = "Whatsapp freischalten";
         }
 
         private final ArrayList<Preference> preferences = new ArrayList<>();
@@ -137,12 +137,13 @@ public class PrefFragments
 
                     NicePreferenceCategory nc = new NicePreferenceCategory(context);
                     nc.setTitle(name);
+                    nc.setEnabled(enabled);
                     preferences.add(nc);
 
                     if (chatphone != null)
                     {
                         chatphone = chatphone.replaceAll("@s.whatsapp.net","");
-                        String key = keyprefix + ".chat." + voipphone;
+                        String key = keyprefix + ".chat." + chatphone;
                         NiceListPreference cb = new NiceListPreference(context);
 
                         cb.setEntries(entries);
@@ -150,6 +151,7 @@ public class PrefFragments
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
                         cb.setTitle("Chat +" + chatphone);
+                        cb.setEnabled(enabled);
 
                         preferences.add(cb);
 
@@ -170,6 +172,7 @@ public class PrefFragments
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
                         cb.setTitle("Voip +" + voipphone);
+                        cb.setEnabled(enabled);
 
                         preferences.add(cb);
 
@@ -218,7 +221,9 @@ public class PrefFragments
 
                 for (Preference pref : preferences)
                 {
-                    if (pref instanceof CheckBoxPreference)
+                    if (pref == this) continue;
+
+                    if (pref instanceof ListPreference)
                     {
                         pref.setEnabled((boolean) obj);
                     }
@@ -961,6 +966,8 @@ public class PrefFragments
 
                 for (Preference pref : preferences)
                 {
+                    if (pref == this) continue;
+
                     if (pref instanceof CheckBoxPreference)
                     {
                         pref.setEnabled((boolean) obj);
@@ -1015,7 +1022,7 @@ public class PrefFragments
         public void setKey(String key)
         {
             super.setKey(key);
-            this.key = (String) key;
+            this.key = key;
         }
 
         @Override

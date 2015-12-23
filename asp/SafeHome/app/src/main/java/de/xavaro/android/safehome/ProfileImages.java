@@ -35,6 +35,71 @@ public class ProfileImages
     //
 
     @Nullable
+    public static String getDisplayFromPhone(Context context, String phone)
+    {
+        boolean ismatch = false;
+        String display = null;
+
+        if (contacts == null)
+        {
+            //
+            // Read into static contacts once.
+            //
+
+            contacts = new ContactsHandler(context).contacts2JSONObject();
+        }
+
+        try
+        {
+            Iterator<?> ids = contacts.keys();
+
+            while (ids.hasNext())
+            {
+                String id = (String) ids.next();
+                JSONArray contact = contacts.getJSONArray(id);
+                if (contact == null) continue;
+
+                ismatch = false;
+                display = null;
+
+                for (int inx = 0; inx < contact.length(); inx++)
+                {
+                    JSONObject item = contact.getJSONObject(inx);
+
+                    if (item.has("NUMBER"))
+                    {
+                        String number = item.getString("NUMBER").replaceAll(" ","");
+
+                        if (number.endsWith(phone))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("DISPLAY_NAME"))
+                    {
+                        display = item.getString("DISPLAY_NAME");
+                    }
+                }
+
+                if (ismatch && (display != null))
+                {
+                    //
+                    // We have found a phone number within skype contact.
+                    //
+
+                    return display;
+                }
+            }
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static String getPhoneFromSkype(Context context, String skypename)
     {
         boolean ismatch = false;
