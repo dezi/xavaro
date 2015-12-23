@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.graphics.Bitmap;
@@ -408,6 +409,16 @@ public class LaunchGroup extends FrameLayout implements
 
             for (int inx = 0; inx < numItems; inx++)
             {
+                if (lis.getJSONObject(inx).has("enable"))
+                {
+                    String key = lis.getJSONObject(inx).getString("enable");
+
+                    if (! StaticUtils.getSharedPrefsBoolean(context,key))
+                    {
+                        continue;
+                    }
+                }
+
                 LaunchItem li = new LaunchItem(context);
                 li.setSize(horzSize, vertSize);
 

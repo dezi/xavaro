@@ -256,7 +256,19 @@ public class LaunchItem extends FrameLayout implements
 
                 if (type.equals("firewall"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.firewall_256x256));
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResFireWall));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (type.equals("iptelevision"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResIPTelevision));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (type.equals("ipradio"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResIPRadio));
                     icon.setVisibility(VISIBLE);
                 }
 
@@ -665,6 +677,8 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("select_home"  )) { launchSelectHome();   return; }
         if (type.equals("select_assist")) { launchSelectAssist(); return; }
         if (type.equals("firewall"     )) { launchFireWall();     return; }
+        if (type.equals("iptelevision" )) { launchIPTelevision(); return; }
+        if (type.equals("ipradio"      )) { launchIPRadio();      return; }
         if (type.equals("audioplayer"  )) { launchAudioPlayer();  return; }
         if (type.equals("videoplayer"  )) { launchVideoPlayer();  return; }
         if (type.equals("genericapp"   )) { launchGenericApp();   return; }
@@ -926,6 +940,26 @@ public class LaunchItem extends FrameLayout implements
             {
                 ex.printStackTrace();
             }
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
+    private void launchIPTelevision()
+    {
+        if (directory == null)
+        {
+            directory = new WebStream2(context, "webiptv");
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
+    private void launchIPRadio()
+    {
+        if (directory == null)
+        {
+            directory = new WebStream2(context, "webradio");
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);

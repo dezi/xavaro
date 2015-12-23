@@ -5,92 +5,16 @@
         "type": "settings"
       },
       {
-        "label": "Radio",
-        "type": "directory",
-        "icon": "radio_400x400",
-        "launchgroup": {
-          "launchitems": [
-            {
-              "type": "webradio",
-              "name": "www.antenne.de"
-            },
-            {
-              "type": "webradio",
-              "name": "radio.sunshine-live.de"
-            }
-          ]
-        }
+        "label": "Internet Radio",
+        "type": "ipradio",
+        "enable": "ipradio.enable"
       },
       {
-        "label": "Fernsehen",
-        "type": "directory",
-        "icon": "television_275x275",
-        "launchgroup": {
-          "launchitems": [
-            {
-              "type": "webiptv",
-              "name": "www.daserste.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.zdf.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.tagesschau.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.kika.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.br.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.ndr.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.mdr.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.wdr.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.rbb-online.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.hr-online.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.sr.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.swr.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.arte.tv"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.n24.de"
-            },
-            {
-              "type": "webiptv",
-              "name": "www.alex-berlin.de"
-            }
-          ]
-        }
+        "label": "Internet Fernsehen",
+        "type": "iptelevision",
+        "enable": "iptelevision.enable"
       },
-     {
+      {
         "label": "Whatsi Dezi",
         "type": "whatsapp",
         "packagename": "com.whatsapp",

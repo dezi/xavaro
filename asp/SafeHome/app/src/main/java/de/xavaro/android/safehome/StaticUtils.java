@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.DrawableWrapper;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.content.Context;
 import android.content.Intent;
@@ -596,6 +598,13 @@ public class StaticUtils
         if (resourceId > 0)  return context.getResources().getDimensionPixelSize(resourceId);
 
         return 0;
+    }
+
+    public static boolean getSharedPrefsBoolean(Context context, String key)
+    {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return sharedPrefs.getBoolean(key, false);
     }
 
     //endregion

@@ -95,6 +95,7 @@ public class GlobalConfigs
     // @formatter:off
     public static final int IconResFireWall     = R.drawable.firewall_256x256;
     public static final int IconResIPTelevision = R.drawable.television_275x275;
+    public static final int IconResIPRadio      = R.drawable.radio_400x400;
     // @formatter:on
 
     //endregion

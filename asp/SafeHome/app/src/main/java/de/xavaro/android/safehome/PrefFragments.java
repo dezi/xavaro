@@ -47,7 +47,6 @@ public class PrefFragments
 
             header = new PreferenceActivity.Header();
             header.title = "Datenschutz und Sicherheit";
-            //header.iconRes = GlobalConfigs.IconResFireWall;
             header.fragment = PrefFragments.SafetyFragment.class.getName();
 
             return header;
@@ -258,7 +257,6 @@ public class PrefFragments
 
             header = new PreferenceActivity.Header();
             header.title = "Domänen Freischaltung";
-            //header.iconRes = GlobalConfigs.IconResFireWall;
             header.fragment = PrefFragments.DomainsFragment.class.getName();
 
             return header;
@@ -403,63 +401,114 @@ public class PrefFragments
 
     //region IP Television preferences
 
-    public static class IPTelevisionFragment extends PreferenceFragment
+    public static class IPTelevisionFragment extends IPStreamFragment
     {
-        private static final ArrayList<Preference> preferences = new ArrayList<>();
-
-        private static JSONObject globalConfig;
-
-        private static void loadGlobalConfig(Context context)
-        {
-            if (globalConfig == null)
-            {
-                try
-                {
-                    JSONObject ctemp = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webiptv);
-
-                    if (ctemp != null)
-                    {
-                        globalConfig = ctemp.getJSONObject("webiptv");
-                    }
-                }
-                catch (NullPointerException | JSONException ex)
-                {
-                    Log.e(LOGTAG, "loadGlobalConfig: Cannot read default webiptv config.");
-                }
-            }
-        }
-
         public static PreferenceActivity.Header getHeader()
         {
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
             header.title = "Internet Fernsehen";
-            //header.iconRes = GlobalConfigs.IconResIPTelevision;
             header.fragment = IPTelevisionFragment.class.getName();
 
             return header;
         }
 
-        public static void registerAll(Context context)
+        public IPTelevisionFragment()
+        {
+            super();
+
+            root = "webiptv";
+            jsonres = R.raw.default_webiptv;
+            iconres = GlobalConfigs.IconResIPTelevision;
+            keyprefix = "iptelevision";
+            masterenable = "Internet Fernsehen freischalten";
+        }
+    }
+
+    //endregion IP Television preferences
+
+    //region IP Radio preferences
+
+    public static class IPRadioFragment extends IPStreamFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Internet Radio";
+            header.fragment = IPRadioFragment.class.getName();
+
+            return header;
+        }
+
+        public IPRadioFragment()
+        {
+            super();
+
+            root = "webradio";
+            jsonres = R.raw.default_webradio;
+            iconres = GlobalConfigs.IconResIPRadio;
+            keyprefix = "ipradio";
+            masterenable = "Internet Radio freischalten";
+        }
+    }
+
+    //endregion IP Television preferences
+
+    //region IP Stream abstract class
+
+    public static class IPStreamFragment extends PreferenceFragment
+    {
+        private final ArrayList<Preference> preferences = new ArrayList<>();
+
+        private JSONObject globalConfig;
+
+        protected String root;
+        protected int jsonres;
+        protected int iconres;
+        protected String keyprefix;
+        protected String masterenable;
+
+        private void loadGlobalConfig(Context context)
+        {
+            if (globalConfig == null)
+            {
+                try
+                {
+                    JSONObject ctemp = StaticUtils.readRawTextResourceJSON(context, jsonres);
+
+                    if (ctemp != null)
+                    {
+                        globalConfig = ctemp.getJSONObject(root);
+                    }
+                }
+                catch (NullPointerException | JSONException ex)
+                {
+                    Log.e(LOGTAG, "loadGlobalConfig: Cannot read default " + root + " config.");
+                }
+            }
+        }
+
+        public void registerAll(Context context)
         {
             preferences.clear();
 
-            loadGlobalConfig(context);
-            if (globalConfig == null) return;
-
             try
             {
-                IPTelevisionSwitchPreference sw = new IPTelevisionSwitchPreference(context);
+                IPStreamSwitchPreference sw = new IPStreamSwitchPreference(context);
 
-                sw.setKey("iptelevision.enable");
-                sw.setTitle("Internet Fernsehen freischalten");
-                sw.setIcon(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResIPTelevision));
+                sw.setKey(keyprefix + ".enable");
+                sw.setTitle(masterenable);
+                sw.setIcon(VersionUtils.getDrawableFromResources(context, iconres));
                 sw.setDefaultValue(false);
 
                 preferences.add(sw);
 
-                boolean enabled = sharedPrefs.getBoolean("iptelevision.enable",false);
+                boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable",false);
+
+                loadGlobalConfig(context);
 
                 CheckBoxPreference cb;
                 Iterator<String> keysIterator = globalConfig.keys();
@@ -479,7 +528,7 @@ public class PrefFragments
                         cb = new CheckBoxPreference(context);
 
                         String label = channel.getString("label");
-                        String key = "iptelevision.channel." + website + ":" + label.replace(" ", "_");
+                        String key = keyprefix + ".channel." + website + ":" + label.replace(" ", "_");
                         String iconurl = channel.getString("icon");
                         Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl);
                         Drawable drawable = new BitmapDrawable(context.getResources(),thumbnail);
@@ -491,7 +540,7 @@ public class PrefFragments
 
                         preferences.add(cb);
 
-                        boolean def = channel.getBoolean("default");
+                        boolean def = channel.has("default") && channel.getBoolean("default");
 
                         if (def && ! sharedPrefs.contains(key))
                         {
@@ -524,12 +573,12 @@ public class PrefFragments
             for (Preference pref : preferences) root.addPreference(pref);
         }
 
-        //region IPTelevisionSwitchPreference implementation
+        //region IPStreanSwitchPreference implementation
 
-        private static class IPTelevisionSwitchPreference extends SwitchPreference
+        private class IPStreamSwitchPreference extends SwitchPreference
                 implements Preference.OnPreferenceChangeListener
         {
-            public IPTelevisionSwitchPreference(Context context)
+            public IPStreamSwitchPreference(Context context)
             {
                 super(context);
 
@@ -553,8 +602,8 @@ public class PrefFragments
             }
         }
 
-        //endregion IPTelevisionSwitchPreference implementation
+        //endregion IPStreanSwitchPreference implementation
     }
 
-    //endregion IPTelevision preferences
+    //endregion Stream abstract class
 }
