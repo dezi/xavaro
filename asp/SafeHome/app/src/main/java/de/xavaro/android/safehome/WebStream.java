@@ -1,16 +1,13 @@
 package de.xavaro.android.safehome;
 
-import android.support.annotation.Nullable;
-
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Iterator;
 
 //
 // Web stream receivers base class.
@@ -20,30 +17,30 @@ public class WebStream extends LaunchGroup
 {
     private static final String LOGTAG = WebStream.class.getSimpleName();
 
-    private String webtype;
-    private String webstream;
-
     public WebStream(Context context)
     {
         super(context);
-
-        configTree = "channels";
     }
 
-    public void setName(LaunchItem parent, String type, String website)
+    public WebStream(Context context, String webtype)
     {
-        this.parent = parent;
-        this.webtype = type;
-        this.webstream = website;
+        super(context);
 
-        config = getConfig(context, webtype, webstream);
+        this.config = getConfig(context, webtype, null);
+    }
+
+    public WebStream(Context context, String webtype, String subtype)
+    {
+        super(context);
+
+        this.config = getConfig(context, webtype, subtype);
     }
 
     //region Static methods.
 
     private static JSONObject globalConfig = new JSONObject();
 
-    private static JSONObject getConfig(Context context,String type)
+    private static JSONObject loadConfig(Context context, String type)
     {
         JSONObject typeroot = new JSONObject();
 
@@ -75,50 +72,87 @@ public class WebStream extends LaunchGroup
         return typeroot;
     }
 
-    public static JSONObject getConfig(Context context, String type, String website)
+    private String getPrefPrefix(String type, String subtype)
+    {
+        if (type.equals("webiptv")) return "iptelevision.channel";
+
+        if (type.equals("webradio")) return "ipradio.channel";
+
+        if (type.equals("webconfig") && (subtype != null))
+        {
+            return type + "." + subtype;
+        }
+
+        return "unknown";
+    }
+
+    private JSONObject getConfig(Context context, String type, String subtype)
     {
         try
         {
-            return getConfig(context,type).getJSONObject(website);
+            JSONObject config = loadConfig(context, type);
+
+            JSONObject launchgroup = new JSONObject();
+            JSONArray launchitems = new JSONArray();
+
+            Iterator<String> keysIterator = config.keys();
+
+            String key;
+            String label;
+            String ptype = getPrefPrefix(type,subtype);
+
+            while (keysIterator.hasNext())
+            {
+                String website = keysIterator.next();
+
+                JSONObject webitem = config.getJSONObject(website);
+
+                if (webitem.has("subtype") && (subtype != null)
+                        && ! webitem.getString("subtype").equals(subtype))
+                {
+                    continue;
+                }
+
+                if (! webitem.has("channels"))
+                {
+                    key = ptype + ".website." + website;
+
+                    if (StaticUtils.getSharedPrefsBoolean(context, key))
+                    {
+                        webitem.put("type","webframe");
+                        webitem.put("name",website);
+                        launchitems.put(webitem);
+                    }
+                }
+                else
+                {
+                    JSONArray channels = webitem.getJSONArray("channels");
+
+                    for (int inx = 0; inx < channels.length(); inx++)
+                    {
+                        JSONObject channel = channels.getJSONObject(inx);
+
+                        label = channel.getString("label");
+                        key = ptype + "." + website + ":" + label.replace(" ", "_");
+
+                        if (StaticUtils.getSharedPrefsBoolean(context, key))
+                        {
+                            launchitems.put(channel);
+                        }
+                    }
+                }
+            }
+
+            launchgroup.put("launchitems", launchitems);
+
+            return launchgroup;
         }
-        catch (JSONException ignore)
+        catch (JSONException ex)
         {
+            ex.printStackTrace();
         }
 
         return new JSONObject();
-    }
-
-    @Nullable
-    public static Drawable getConfigIconDrawable(Context context, String type, String website)
-    {
-        try
-        {
-            String iconurl = getConfig(context, type, website).getString("icon");
-            String iconext = MimeTypeMap.getFileExtensionFromUrl(iconurl);
-            String iconfile = website + ".thumbnail." + iconext;
-            Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl, iconfile);
-
-            return new BitmapDrawable(context.getResources(), thumbnail);
-        }
-        catch (JSONException ignore)
-        {
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static String getConfigLabel(Context context,String type, String website)
-    {
-        try
-        {
-            return getConfig(context, type, website).getString("label");
-        }
-        catch (JSONException ignore)
-        {
-        }
-
-        return null;
     }
 
     //endregion

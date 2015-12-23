@@ -94,23 +94,23 @@ public class WebFrame extends FrameLayout
     {
         if (globalConfig == null)
         {
-            JSONObject jot = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webframe);
+            JSONObject jot = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webconfig);
 
             if (jot == null)
             {
-                Log.e(LOGTAG, "getConfig: Cannot read default webframes.");
+                Log.e(LOGTAG, "getConfig: Cannot read default webconfig.");
             }
             else
             {
                 try
                 {
-                    globalConfig = jot.getJSONObject("webframe");
+                    globalConfig = jot.getJSONObject("webconfig");
 
                     return globalConfig;
                 }
                 catch (JSONException ignore)
                 {
-                    Log.e(LOGTAG, "getConfig: Tag <webframe> missing in config.");
+                    Log.e(LOGTAG, "getConfig: Tag <webconfig> missing in config.");
                 }
             }
 

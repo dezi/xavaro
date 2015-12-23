@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -39,8 +40,6 @@ public class PrefFragments
 
     public static class SafetyFragment extends PreferenceFragment
     {
-        private final static ArrayList<Preference> preferences = new ArrayList<>();
-
         public static PreferenceActivity.Header getHeader()
         {
             PreferenceActivity.Header header;
@@ -51,6 +50,8 @@ public class PrefFragments
 
             return header;
         }
+
+        private final static ArrayList<Preference> preferences = new ArrayList<>();
 
         public static void registerAll(Context context)
         {
@@ -227,6 +228,17 @@ public class PrefFragments
 
     public static class DomainsFragment extends PreferenceFragment
     {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Domänen Freischaltung";
+            header.fragment = PrefFragments.DomainsFragment.class.getName();
+
+            return header;
+        }
+
         private static final ArrayList<Preference> preferences = new ArrayList<>();
 
         private static JSONObject globalConfig;
@@ -249,17 +261,6 @@ public class PrefFragments
                     Log.e(LOGTAG, "loadGlobalConfig: Cannot read default firewall config.");
                 }
             }
-        }
-
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Domänen Freischaltung";
-            header.fragment = PrefFragments.DomainsFragment.class.getName();
-
-            return header;
         }
 
         public static void registerAll(Context context)
@@ -399,9 +400,129 @@ public class PrefFragments
 
     //endregion Firewall domains preferences
 
+    //region Webframe newspaper preferences
+
+    public static class WebConfigNewspaperFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Online Tageszeitungen";
+            header.fragment = WebConfigNewspaperFragment.class.getName();
+
+            return header;
+        }
+
+        public WebConfigNewspaperFragment()
+        {
+            super();
+
+            root = "webconfig";
+            subtype = "newspaper";
+            jsonres = R.raw.default_webconfig;
+            iconres = GlobalConfigs.IconResWebConfigNewspaper;
+            keyprefix = "webconfig.newspaper";
+            masterenable = "Online Tageszeitungen freischalten";
+        }
+    }
+
+    //endregion Webframe newspaper preferences
+
+    //region Webframe magazine preferences
+
+    public static class WebConfigMagazineFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Online Magazine";
+            header.fragment = WebConfigMagazineFragment.class.getName();
+
+            return header;
+        }
+
+        public WebConfigMagazineFragment()
+        {
+            super();
+
+            root = "webconfig";
+            subtype = "magazine";
+            jsonres = R.raw.default_webconfig;
+            iconres = GlobalConfigs.IconResWebConfigMagazine;
+            keyprefix = "webconfig.magazine";
+            masterenable = "Online Magazine freischalten";
+        }
+    }
+
+    //endregion Webframe magazine preferences
+
+    //region Webframe shopping preferences
+
+    public static class WebConfigShoppingFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Online Shopping";
+            header.fragment = WebConfigShoppingFragment.class.getName();
+
+            return header;
+        }
+
+        public WebConfigShoppingFragment()
+        {
+            super();
+
+            root = "webconfig";
+            subtype = "shopping";
+            jsonres = R.raw.default_webconfig;
+            iconres = GlobalConfigs.IconResWebConfigShopping;
+            keyprefix = "webconfig.shopping";
+            masterenable = "Online Shopping freischalten";
+        }
+    }
+
+    //endregion Webframe shopping preferences
+
+    //region Webframe erotics preferences
+
+    public static class WebConfigEroticsFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Online Erotisches";
+            header.fragment = WebConfigEroticsFragment.class.getName();
+
+            return header;
+        }
+
+        public WebConfigEroticsFragment()
+        {
+            super();
+
+            root = "webconfig";
+            subtype = "erotics";
+            jsonres = R.raw.default_webconfig;
+            iconres = GlobalConfigs.IconResWebConfigErotics;
+            keyprefix = "webconfig.erotics";
+            masterenable = "Online Erotisches freischalten";
+        }
+    }
+
+    //endregion Webframe erotics preferences
+
     //region IP Television preferences
 
-    public static class IPTelevisionFragment extends IPStreamFragment
+    public static class IPTelevisionFragment extends JSONConfigFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -430,7 +551,7 @@ public class PrefFragments
 
     //region IP Radio preferences
 
-    public static class IPRadioFragment extends IPStreamFragment
+    public static class IPRadioFragment extends JSONConfigFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -455,17 +576,18 @@ public class PrefFragments
         }
     }
 
-    //endregion IP Television preferences
+    //endregion IP Radio preferences
 
-    //region IP Stream abstract class
+    //region JSONConfigFragment base class
 
-    public static class IPStreamFragment extends PreferenceFragment
+    public static class JSONConfigFragment extends PreferenceFragment
     {
         private final ArrayList<Preference> preferences = new ArrayList<>();
 
         private JSONObject globalConfig;
 
         protected String root;
+        protected String subtype;
         protected int jsonres;
         protected int iconres;
         protected String keyprefix;
@@ -497,7 +619,7 @@ public class PrefFragments
 
             try
             {
-                IPStreamSwitchPreference sw = new IPStreamSwitchPreference(context);
+                JSONConfigSwitchPreference sw = new JSONConfigSwitchPreference(context);
 
                 sw.setKey(keyprefix + ".enable");
                 sw.setTitle(masterenable);
@@ -513,34 +635,42 @@ public class PrefFragments
                 CheckBoxPreference cb;
                 Iterator<String> keysIterator = globalConfig.keys();
 
+                String key;
+                String label;
+                String iconurl;
+                Bitmap thumbnail;
+                Drawable drawable;
+
                 while (keysIterator.hasNext())
                 {
                     String website = keysIterator.next();
 
-                    JSONObject sender = globalConfig.getJSONObject(website);
+                    JSONObject webitem = globalConfig.getJSONObject(website);
 
-                    JSONArray channels = sender.getJSONArray("channels");
+                    label = webitem.getString("label");
+                    iconurl = webitem.getString("icon");
+                    thumbnail = CacheManager.cacheThumbnail(context, iconurl);
+                    drawable = new BitmapDrawable(context.getResources(),thumbnail);
 
-                    for (int inx = 0; inx < channels.length(); inx++)
+                    if (webitem.has("subtype") && (subtype != null)
+                            && ! webitem.getString("subtype").equals(subtype))
                     {
-                        JSONObject channel = channels.getJSONObject(inx);
+                        continue;
+                    }
+
+                    if (! webitem.has("channels"))
+                    {
+                        key = keyprefix + ".website." + website;
 
                         cb = new CheckBoxPreference(context);
-
-                        String label = channel.getString("label");
-                        String key = keyprefix + ".channel." + website + ":" + label.replace(" ", "_");
-                        String iconurl = channel.getString("icon");
-                        Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl);
-                        Drawable drawable = new BitmapDrawable(context.getResources(),thumbnail);
 
                         cb.setKey(key);
                         cb.setTitle(label);
                         cb.setIcon(drawable);
-                        cb.setEnabled(enabled);
 
                         preferences.add(cb);
 
-                        boolean def = channel.has("default") && channel.getBoolean("default");
+                        boolean def = webitem.has("default") && webitem.getBoolean("default");
 
                         if (def && ! sharedPrefs.contains(key))
                         {
@@ -548,7 +678,49 @@ public class PrefFragments
                             // Initially commit shared preference.
                             //
 
-                            sharedPrefs.edit().putBoolean(key,true).apply();
+                            sharedPrefs.edit().putBoolean(key, true).apply();
+                        }
+                    }
+                    else
+                    {
+                        NicePreferenceCategory pc = new NicePreferenceCategory(context);
+
+                        pc.setTitle(label);
+                        pc.setIcon(drawable);
+
+                        preferences.add(pc);
+
+                        JSONArray channels = webitem.getJSONArray("channels");
+
+                        for (int inx = 0; inx < channels.length(); inx++)
+                        {
+                            JSONObject channel = channels.getJSONObject(inx);
+
+                            label = channel.getString("label");
+                            key = keyprefix + ".channel." + website + ":" + label.replace(" ", "_");
+                            iconurl = channel.getString("icon");
+                            thumbnail = CacheManager.cacheThumbnail(context, iconurl);
+                            drawable = new BitmapDrawable(context.getResources(), thumbnail);
+
+                            cb = new CheckBoxPreference(context);
+
+                            cb.setKey(key);
+                            cb.setTitle(label);
+                            cb.setIcon(drawable);
+                            cb.setEnabled(enabled);
+
+                            preferences.add(cb);
+
+                            boolean def = channel.has("default") && channel.getBoolean("default");
+
+                            if (def && !sharedPrefs.contains(key))
+                            {
+                                //
+                                // Initially commit shared preference.
+                                //
+
+                                sharedPrefs.edit().putBoolean(key, true).apply();
+                            }
                         }
                     }
                 }
@@ -575,10 +747,10 @@ public class PrefFragments
 
         //region IPStreanSwitchPreference implementation
 
-        private class IPStreamSwitchPreference extends SwitchPreference
+        private class JSONConfigSwitchPreference extends SwitchPreference
                 implements Preference.OnPreferenceChangeListener
         {
-            public IPStreamSwitchPreference(Context context)
+            public JSONConfigSwitchPreference(Context context)
             {
                 super(context);
 
@@ -588,7 +760,7 @@ public class PrefFragments
             @Override
             public boolean onPreferenceChange(Preference preference, Object obj)
             {
-                Log.d(LOGTAG,"onPreferenceChange:" + obj.toString());
+                Log.d(LOGTAG, "onPreferenceChange:" + obj.toString());
 
                 for (Preference pref : preferences)
                 {
@@ -605,5 +777,25 @@ public class PrefFragments
         //endregion IPStreanSwitchPreference implementation
     }
 
-    //endregion Stream abstract class
+    //endregion JSONConfigFragment base class
+
+    public static class NicePreferenceCategory extends PreferenceCategory
+    {
+        public NicePreferenceCategory(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            view.setPadding(20, 20, 20, 20);
+            view.setBackgroundColor(0xcccccccc);
+
+            TextView title = (TextView) view.findViewById(android.R.id.title);
+            title.setTextSize(20f);
+        }
+    }
 }

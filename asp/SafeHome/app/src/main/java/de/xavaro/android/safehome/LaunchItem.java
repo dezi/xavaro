@@ -71,7 +71,6 @@ public class LaunchItem extends FrameLayout implements
     private String type;
     private LaunchGroup directory;
     private WebFrame webframe;
-    private WebStream webstream;
 
     public LaunchItem(Context context)
     {
@@ -272,6 +271,35 @@ public class LaunchItem extends FrameLayout implements
                     icon.setVisibility(VISIBLE);
                 }
 
+                if (type.equals("webconfig") && config.has("subtype"))
+                {
+                    String subtype = config.getString("subtype");
+
+                    if (subtype.equals("newspaper"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigNewspaper));
+                        icon.setVisibility(VISIBLE);
+                    }
+
+                    if (subtype.equals("magazine"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigMagazine));
+                        icon.setVisibility(VISIBLE);
+                    }
+
+                    if (subtype.equals("shopping"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigShopping));
+                        icon.setVisibility(VISIBLE);
+                    }
+
+                    if (subtype.equals("erotics"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigErotics));
+                        icon.setVisibility(VISIBLE);
+                    }
+                }
+
                 if (type.equals("whatsapp"))
                 {
                     GlobalConfigs.likeWhatsApp = true;
@@ -322,22 +350,6 @@ public class LaunchItem extends FrameLayout implements
                         setVisibility(VISIBLE);
 
                         icon.setImageDrawable(WebFrame.getConfigIconDrawable(context, name));
-                        icon.setVisibility(VISIBLE);
-
-                        targetIcon = overicon;
-                    }
-                }
-
-                if (type.equals("webradio") || type.equals("webiptv"))
-                {
-                    if (config.has("name"))
-                    {
-                        String name = config.getString("name");
-
-                        label.setText(WebStream.getConfigLabel(context, type, name));
-                        setVisibility(VISIBLE);
-
-                        icon.setImageDrawable(WebStream.getConfigIconDrawable(context, type, name));
                         icon.setVisibility(VISIBLE);
 
                         targetIcon = overicon;
@@ -679,6 +691,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("firewall"     )) { launchFireWall();     return; }
         if (type.equals("iptelevision" )) { launchIPTelevision(); return; }
         if (type.equals("ipradio"      )) { launchIPRadio();      return; }
+        if (type.equals("webconfig"    )) { launchWebConfig();    return; }
         if (type.equals("audioplayer"  )) { launchAudioPlayer();  return; }
         if (type.equals("videoplayer"  )) { launchVideoPlayer();  return; }
         if (type.equals("genericapp"   )) { launchGenericApp();   return; }
@@ -687,8 +700,6 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("settings"     )) { launchSettings();     return; }
         if (type.equals("install"      )) { launchInstall();      return; }
         if (type.equals("webframe"     )) { launchWebframe();     return; }
-        if (type.equals("webradio"     )) { launchWebstream();    return; }
-        if (type.equals("webiptv"      )) { launchWebstream();    return; }
         if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
 
@@ -949,7 +960,7 @@ public class LaunchItem extends FrameLayout implements
     {
         if (directory == null)
         {
-            directory = new WebStream2(context, "webiptv");
+            directory = new WebStream(context, "webiptv");
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
@@ -959,38 +970,36 @@ public class LaunchItem extends FrameLayout implements
     {
         if (directory == null)
         {
-            directory = new WebStream2(context, "webradio");
+            directory = new WebStream(context, "webradio");
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
-    private void launchWebstream()
+    private void launchWebConfig()
     {
-        if (! config.has("name"))
+        if (! config.has("subtype"))
         {
-            Toast.makeText(getContext(),"Nix <name> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"Nix <subtype> configured.",Toast.LENGTH_LONG).show();
 
             return;
         }
 
         try
         {
-            if (webstream == null)
+            if (directory == null)
             {
-                String type = config.getString("type");
-                String name = config.getString("name");
+                String subtype = config.getString("subtype");
 
-                webstream = new WebStream(context);
-                webstream.setName(this, type, name);
+                directory = new WebStream(context, "webconfig", subtype);
             }
-
-            ((HomeActivity) context).addViewToBackStack(webstream);
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
         }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
     }
 
     private void launchWebframe()

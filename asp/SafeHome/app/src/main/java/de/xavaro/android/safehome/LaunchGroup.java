@@ -97,6 +97,7 @@ public class LaunchGroup extends FrameLayout implements
 
         configTree = "launchitems";
 
+        /*
         bubble = new FrameLayout(context);
         LayoutParams lp = new LayoutParams(200,100);
         lp.leftMargin = 400;
@@ -105,6 +106,7 @@ public class LaunchGroup extends FrameLayout implements
         //bubble.setBackground(StaticUtils.getflippedDrawable(getContext(), R.drawable.bubble, false, false, 0));
         bubble.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.bubble));
         this.addView(bubble);
+        */
     }
 
     private FrameLayout bubble;
@@ -449,8 +451,6 @@ public class LaunchGroup extends FrameLayout implements
         launchPages.get(launchPage).bringToFront();
 
         adjustArrows();
-
-        bubble.bringToFront();
     }
 
     public void setConfig(LaunchItem parent, JSONObject config)

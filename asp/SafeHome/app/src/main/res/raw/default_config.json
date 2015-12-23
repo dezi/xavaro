@@ -15,6 +15,30 @@
         "enable": "iptelevision.enable"
       },
       {
+        "label": "Online Zeitungen",
+        "type": "webconfig",
+        "subtype": "newspaper",
+        "enable": "webconfig.newspaper.enable"
+      },
+      {
+        "label": "Online Magazine",
+        "type": "webconfig",
+        "subtype": "magazine",
+        "enable": "webconfig.magazine.enable"
+      },
+      {
+        "label": "Online Shopping",
+        "type": "webconfig",
+        "subtype": "shopping",
+        "enable": "webconfig.shopping.enable"
+      },
+      {
+        "label": "Online Erotisches",
+        "type": "webconfig",
+        "subtype": "erotics",
+        "enable": "webconfig.erotics.enable"
+      },
+      {
         "label": "Whatsi Dezi",
         "type": "whatsapp",
         "packagename": "com.whatsapp",

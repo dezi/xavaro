@@ -27,7 +27,13 @@ public class FirewallActivity extends PreferenceActivity
     {
         target.add(PrefFragments.SafetyFragment.getHeader());
         target.add(PrefFragments.DomainsFragment.getHeader());
+
         target.add(PrefFragments.IPTelevisionFragment.getHeader());
         target.add(PrefFragments.IPRadioFragment.getHeader());
+
+        target.add(PrefFragments.WebConfigNewspaperFragment.getHeader());
+        target.add(PrefFragments.WebConfigMagazineFragment.getHeader());
+        target.add(PrefFragments.WebConfigShoppingFragment.getHeader());
+        target.add(PrefFragments.WebConfigEroticsFragment.getHeader());
     }
 }

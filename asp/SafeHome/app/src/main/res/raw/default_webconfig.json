@@ -1,10 +1,11 @@
 {
-  "webframe": {
+  "webconfig": {
 
     "m.bild.de": {
       "url": "http://m.bild.de/",
       "icon": "http://pbs.twimg.com/profile_images/672813907057229824/g3MBf6VF_400x400.png",
       "label": "Bild Online",
+      "subtype": "newspaper",
 
       "subdomains": [
         "code.bildstatic.de",
@@ -18,25 +19,29 @@
     "m.zalando.de": {
       "url": "http://m.zalando.de/",
       "icon": "http://pbs.twimg.com/profile_images/665540388376154112/A0pCZzMH_400x400.png",
-      "label": "Zalando"
+      "label": "Zalando",
+      "subtype": "shopping"
     },
 
     "m.spiegel.de": {
       "url": "http://m.spiegel.de/",
       "icon": "http://pbs.twimg.com/profile_images/1719664041/tw_spon_400x400.jpg",
-      "label": "Spiegel Online"
+      "label": "Spiegel Online",
+      "subtype": "magazine"
     },
 
     "m.gala.de": {
       "url": "http://m.gala.de/",
       "icon": "http://pbs.twimg.com/profile_images/568402279900794880/PSCQkXzW_400x400.png",
-      "label": "Gala"
+      "label": "Gala",
+      "subtype": "magazine"
     },
 
     "mobil.bunte.de": {
       "url": "http://mobil.bunte.de/",
       "icon": "http://pbs.twimg.com/profile_images/308504986/bunte_only_400x400.jpg",
       "label": "Bunte",
+      "subtype": "magazine",
 
       "subdomains": [ "i1.bstatic.de", "i2.bstatic.de", "i3.bstatic.de" ]
     },
@@ -44,13 +49,15 @@
     "m.manager-magazin.de": {
       "url": "http://m.manager-magazin.de/",
       "icon": "http://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH_400x400.png",
-      "label": "Manager Magazin"
+      "label": "Manager Magazin",
+      "subtype": "magazine"
     },
 
     "mobil.stern.de": {
       "url": "http://mobil.stern.de/",
       "icon": "http://pbs.twimg.com/profile_images/453882199477985280/XAAheikJ_400x400.png",
       "label": "Stern",
+      "subtype": "magazine",
 
       "subdomains": [ "static.stern.de" ]
     },
@@ -59,20 +66,23 @@
       "url": "http://mobil.mopo.de/",
       "icon": "http://pbs.twimg.com/profile_images/542314616097734657/0Fp6DpVa_400x400.jpeg",
       "label": "MOPO",
+      "subtype": "newspaper",
 
       "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
     },
 
     "m.petra.de": {
-      "label": "Petra",
       "url": "http://m.petra.de/",
-      "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg"
+      "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg",
+      "label": "Petra",
+      "subtype": "magazine"
     },
 
     "m.focus.de": {
       "url": "http://m.focus.de/",
       "icon": "http://pbs.twimg.com/profile_images/142508522/FOCUS-Facebook_400x400.jpg",
       "label": "Focus",
+      "subtype": "magazine",
 
       "subdomains": [ "chart.finanzen100.de" ]
     },
@@ -80,13 +90,15 @@
     "m.nationalgeographic.de": {
       "url": "http://m.nationalgeographic.de/",
       "icon": "http://pbs.twimg.com/profile_images/648950685074071552/ZREwOKBz_400x400.jpg",
-      "label": "National Geo"
+      "label": "National Geo",
+      "subtype": "magazine"
     },
 
     "m.faz.net": {
       "url": "http://m.faz.net/",
       "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg",
       "label": "FAZ Online",
+      "subtype": "newspaper",
 
       "subdomains": [ "static.faz.net", "gets.faz.net" ]
     },
@@ -95,6 +107,7 @@
       "url": "http://www.bento.de/",
       "icon": "http://pbs.twimg.com/profile_images/652103303103385600/e_TKuZ3q_400x400.jpg",
       "label": "bento",
+      "subtype": "magazin",
 
       "subdomains": [
         "disqus.com",
@@ -110,6 +123,7 @@
       "url": "http://www.playboy.de/",
       "icon": "http://pbs.twimg.com/profile_images/668931765080227840/ZgR1OKJI_400x400.png",
       "label": "Playboy",
+      "subtype": "magazin",
 
       "subdomains": [ "pbs.twimg.com" ]
     },
@@ -118,6 +132,7 @@
       "url": "http://de.m.xhamster.com/",
       "icon": "http://pbs.twimg.com/profile_images/672339575696527360/Az0FTvLa_400x400.png",
       "label": "xHamster",
+      "subtype": "erotics",
 
       "webguard": {
         "mingle": {
@@ -132,6 +147,7 @@
       "url": "http://de.tube8.com/",
       "icon": "http://a3-images.myspacecdn.com/images03/1/cb9e1e694ca941abaf62f0026d18049f/300x300.jpg",
       "label": "TUBE8",
+      "subtype": "erotics",
 
       "webguard": {
 
@@ -205,6 +221,7 @@
       "url": "http://www.pornhub.com/",
       "icon": "http://pbs.twimg.com/profile_images/615525585826222080/W9b7zw3R_400x400.jpg",
       "label": "Pornhub",
+      "subtype": "erotics",
 
       "webguard": {
 
@@ -283,6 +300,7 @@
       "url": "http://www.youporn.com/",
       "icon": "http://pbs.twimg.com/profile_images/615523987100057600/t3xeDQDX_400x400.jpg",
       "label": "YouPorn",
+      "subtype": "erotics",
 
       "webguard": {
 
@@ -325,6 +343,7 @@
       "url": "http://www.redtube.com/",
       "icon": "http://pbs.twimg.com/profile_images/619269637096628224/f5A48Q44_400x400.png",
       "label": "RedTube",
+      "subtype": "erotics",
 
       "webguard": {
 
@@ -370,6 +389,7 @@
       "url": "http://www.xvideos.com/",
       "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
       "label": "Xvideos",
+      "subtype": "erotics",
 
       "webguard": {
         "mingle": {
@@ -384,6 +404,7 @@
       "url": "http://m.xnxx.com/",
       "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
       "label": "XNXX.COM",
+      "subtype": "erotics",
 
       "webguard": {
         "mingle": {
