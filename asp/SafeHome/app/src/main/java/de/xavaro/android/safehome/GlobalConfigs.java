@@ -90,4 +90,12 @@ public class GlobalConfigs
 
     //endregion
 
+    //region Global icons
+
+    // @formatter:off
+    public static final int IconResFireWall     = R.drawable.firewall_256x256;
+    public static final int IconResIPTelevision = R.drawable.television_275x275;
+    // @formatter:on
+
+    //endregion
 }

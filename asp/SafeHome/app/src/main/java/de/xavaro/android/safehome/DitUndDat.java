@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -75,8 +74,8 @@ public class DitUndDat
             // Register all dynamic preferences.
             //
 
-            PreferenceFragments.SafetyFragment.registerAll(context);
-            PreferenceFragments.DomainsFragment.registerAll(context);
+            PrefFragments.SafetyFragment.registerAll(context);
+            PrefFragments.DomainsFragment.registerAll(context);
         }
 
         public static Map<String, Object> getPrefix(String prefix)

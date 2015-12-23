@@ -13,7 +13,7 @@ public class FirewallActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
 
-        PreferenceFragments.initialize(this);
+        PrefFragments.initialize(this);
     }
 
     @Override
@@ -25,18 +25,8 @@ public class FirewallActivity extends PreferenceActivity
     @Override
     public void onBuildHeaders(List<Header> target)
     {
-        Header header;
-
-        header = new Header();
-        header.title = "Datenschutz und Sicherheit";
-        header.fragment = PreferenceFragments.SafetyFragment.class.getName();
-
-        target.add(header);
-
-        header = new Header();
-        header.title = "Domänen Freischaltung";
-        header.fragment = PreferenceFragments.DomainsFragment.class.getName();
-
-        target.add(header);
+        target.add(PrefFragments.SafetyFragment.getHeader());
+        target.add(PrefFragments.DomainsFragment.getHeader());
+        target.add(PrefFragments.IPTelevisionFragment.getHeader());
     }
 }

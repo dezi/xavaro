@@ -805,7 +805,7 @@ public class LaunchItem extends FrameLayout implements
             String packagename = config.getString("packagename");
 
             Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-        goToMarket.setData(Uri.parse("market://details?id=" + packagename));
+            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
             context.startActivity(goToMarket);
         }
         catch (Exception oops)
