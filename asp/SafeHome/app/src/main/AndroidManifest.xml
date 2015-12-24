@@ -70,10 +70,6 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".XXXActivity"
-            android:label="@string/title_activity_xxx">
-        </activity>
     </application>
 
 </manifest>

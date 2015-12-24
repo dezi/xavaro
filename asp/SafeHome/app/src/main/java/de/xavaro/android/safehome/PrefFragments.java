@@ -87,7 +87,7 @@ public class PrefFragments
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
 
-            CharSequence[] entries = { "Nicht aktiviert", "Home-Bildschirm", "Whatsapp-Directory" };
+            CharSequence[] entries = { "Nicht aktiviert", "Home-Bildschirm", "Whatsapp-Verzeichnis" };
             CharSequence[] evalues = { "inact" , "home" , "wadir"};
 
             try
@@ -150,7 +150,7 @@ public class PrefFragments
                         cb.setEntryValues(evalues);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
-                        cb.setTitle("Chat +" + chatphone);
+                        cb.setTitle("Nachricht +" + chatphone);
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
@@ -171,7 +171,7 @@ public class PrefFragments
                         cb.setEntryValues(evalues);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
-                        cb.setTitle("Voip +" + voipphone);
+                        cb.setTitle("Anruf +" + voipphone);
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
