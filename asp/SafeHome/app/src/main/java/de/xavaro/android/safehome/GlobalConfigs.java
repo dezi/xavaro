@@ -97,6 +97,10 @@ public class GlobalConfigs
     public static final int IconResWhatsApp           = R.drawable.whatsapp_480x480;
     public static final int IconResWhatsAppVoip       = R.drawable.whatsapp_voip_480x480;
     public static final int IconResWhatsAppChat       = R.drawable.whatsapp_chat_480x480;
+    public static final int IconResSkype              = R.drawable.skype_256x256;
+    public static final int IconResSkypeVoip          = R.drawable.skype_voip_256x256;
+    public static final int IconResSkypeChat          = R.drawable.skype_chat_256x256;
+    public static final int IconResSkypeVideo         = R.drawable.skype_vica_256x256;
     public static final int IconResIPTelevision       = R.drawable.television_275x275;
     public static final int IconResIPRadio            = R.drawable.radio_400x400;
     public static final int IconResWebConfigNewspaper = R.drawable.newspaper_480x480;

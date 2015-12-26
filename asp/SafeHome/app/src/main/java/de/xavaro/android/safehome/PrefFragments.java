@@ -40,16 +40,46 @@ public class PrefFragments
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    //region WhatsApp preferences
+    //region Skype preferences
 
-    public static class WhatsAppFragment extends PreferenceFragment
+    public static class SkypeFragment extends ContactsFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Whatsapp";
+            header.title = "Skype";
+            header.iconRes = GlobalConfigs.IconResSkype;
+            header.fragment = SkypeFragment.class.getName();
+
+            return header;
+        }
+
+        public SkypeFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResSkype;
+            keyprefix = "skype";
+            masterenable = "Skype freischalten";
+            isSkype = true;
+        }
+    }
+
+    //endregion Skype preferences
+
+    //region WhatsApp preferences
+
+    public static class WhatsAppFragment extends ContactsFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "WhatsApp";
+            header.iconRes = GlobalConfigs.IconResWhatsApp;
             header.fragment = WhatsAppFragment.class.getName();
 
             return header;
@@ -59,36 +89,35 @@ public class PrefFragments
         {
             super();
 
-            root = "whatsapp";
             iconres = GlobalConfigs.IconResWhatsApp;
             keyprefix = "whatsapp";
-            masterenable = "Whatsapp freischalten";
+            masterenable = "WhatsApp freischalten";
+            isWhatsApp = true;
         }
+    }
 
-        private final ArrayList<Preference> preferences = new ArrayList<>();
+    //endregion WhatsApp preferences
 
-        protected String root;
-        protected int iconres;
-        protected String keyprefix;
-        protected String masterenable;
+    //region Contacts preferences stub
+
+    public static class ContactsFragment extends EnablePreferenceFragment
+    {
+        protected boolean isSkype;
+        protected boolean isWhatsApp;
 
         public void registerAll(Context context)
         {
-            preferences.clear();
-
-            EnableSwitchPreference sw = new EnableSwitchPreference(context);
-
-            sw.setKey(keyprefix + ".enable");
-            sw.setTitle(masterenable);
-            sw.setIcon(VersionUtils.getDrawableFromResources(context, iconres));
-            sw.setDefaultValue(false);
-
-            preferences.add(sw);
+            super.registerAll(context);
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
 
-            CharSequence[] entries = { "Nicht aktiviert", "Home-Bildschirm", "Whatsapp-Verzeichnis" };
-            CharSequence[] evalues = { "inact" , "home" , "wadir"};
+            CharSequence[] entries = {
+                    "Nicht aktiviert",
+                    "Home-Bildschirm",
+                    "App-Verzeichnis",
+                    "Kontakte-Verzeichnis"};
+
+            CharSequence[] evalues = { "inact", "home", "appdir", "comdir" };
 
             try
             {
@@ -106,6 +135,7 @@ public class PrefFragments
                     String name = null;
                     String chatphone = null;
                     String voipphone = null;
+                    String vicaphone = null;
 
                     JSONArray items = contacts.getJSONArray(cid);
 
@@ -113,23 +143,53 @@ public class PrefFragments
                     {
                         JSONObject item = items.getJSONObject(inx);
 
-                        if (! item.has("KIND")) continue;
+                        if (!item.has("KIND")) continue;
 
                         String kind = item.getString("KIND");
 
                         if (kind.equals("StructuredName"))
                         {
-                            name = item.getString("DISPLAY_NAME");
+                            //
+                            // Workaround for Skype which puts
+                            // nickname as display name and
+                            // duplicates it into given name.
+                            //
+
+                            String disp = item.getString("DISPLAY_NAME");
+                            String gina = item.getString("GIVEN_NAME");
+
+                            if ((name == null) || ! disp.equals(gina)) name = disp;
                         }
 
-                        if (kind.equals("@vnd.com.whatsapp.profile"))
+                        if (isSkype)
                         {
-                            chatphone = item.getString("DATA1");
+                            if (kind.equals("@com.skype.android.chat.action"))
+                            {
+                                chatphone = item.getString("DATA1");
+                            }
+
+                            if (kind.equals("@com.skype.android.skypecall.action"))
+                            {
+                                voipphone = item.getString("DATA1");
+                            }
+
+                            if (kind.equals("@com.skype.android.videocall.action"))
+                            {
+                                vicaphone = item.getString("DATA1");
+                            }
                         }
 
-                        if (kind.equals("@vnd.com.whatsapp.voip.call"))
+                        if (isWhatsApp)
                         {
-                            voipphone = item.getString("DATA1");
+                            if (kind.equals("@vnd.com.whatsapp.profile"))
+                            {
+                                chatphone = item.getString("DATA1");
+                            }
+
+                            if (kind.equals("@vnd.com.whatsapp.voip.call"))
+                            {
+                                voipphone = item.getString("DATA1");
+                            }
                         }
                     }
 
@@ -142,7 +202,7 @@ public class PrefFragments
 
                     if (chatphone != null)
                     {
-                        chatphone = chatphone.replaceAll("@s.whatsapp.net","");
+                        chatphone = chatphone.replaceAll("@s.whatsapp.net", "");
                         String key = keyprefix + ".chat." + chatphone;
                         NiceListPreference cb = new NiceListPreference(context);
 
@@ -155,7 +215,7 @@ public class PrefFragments
 
                         preferences.add(cb);
 
-                        if (! sharedPrefs.contains(key))
+                        if (!sharedPrefs.contains(key))
                         {
                             sharedPrefs.edit().putString(key, "inact").apply();
                         }
@@ -163,7 +223,7 @@ public class PrefFragments
 
                     if (voipphone != null)
                     {
-                        voipphone = voipphone.replaceAll("@s.whatsapp.net","");
+                        voipphone = voipphone.replaceAll("@s.whatsapp.net", "");
                         String key = keyprefix + ".voip." + voipphone;
                         NiceListPreference cb = new NiceListPreference(context);
 
@@ -176,7 +236,27 @@ public class PrefFragments
 
                         preferences.add(cb);
 
-                        if (! sharedPrefs.contains(key))
+                        if (!sharedPrefs.contains(key))
+                        {
+                            sharedPrefs.edit().putString(key, "inact").apply();
+                        }
+                    }
+
+                    if (vicaphone != null)
+                    {
+                        String key = keyprefix + ".vica." + vicaphone;
+                        NiceListPreference cb = new NiceListPreference(context);
+
+                        cb.setEntries(entries);
+                        cb.setEntryValues(evalues);
+                        cb.setDefaultValue("inact");
+                        cb.setKey(key);
+                        cb.setTitle("Videoanruf +" + vicaphone);
+                        cb.setEnabled(enabled);
+
+                        preferences.add(cb);
+
+                        if (!sharedPrefs.contains(key))
                         {
                             sharedPrefs.edit().putString(key, "inact").apply();
                         }
@@ -187,6 +267,34 @@ public class PrefFragments
             {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    //endregion Contacts preferences stub
+
+    //region EnablePreferenceFragment stub
+
+    public static class EnablePreferenceFragment extends PreferenceFragment
+    {
+        protected final ArrayList<Preference> preferences = new ArrayList<>();
+
+        protected String keyprefix;
+        protected String masterenable;
+
+        protected int iconres;
+
+        public void registerAll(Context context)
+        {
+            preferences.clear();
+
+            EnableSwitchPreference sw = new EnableSwitchPreference(context);
+
+            sw.setKey(keyprefix + ".enable");
+            sw.setTitle(masterenable);
+            sw.setIcon(VersionUtils.getDrawableFromResources(context, iconres));
+            sw.setDefaultValue(false);
+
+            preferences.add(sw);
         }
 
         @Override
@@ -202,9 +310,7 @@ public class PrefFragments
             for (Preference pref : preferences) root.addPreference(pref);
         }
 
-        //region EnableSwitchPreference implementation
-
-        private class EnableSwitchPreference extends SwitchPreference
+        protected class EnableSwitchPreference extends SwitchPreference
                 implements Preference.OnPreferenceChangeListener
         {
             public EnableSwitchPreference(Context context)
@@ -223,20 +329,15 @@ public class PrefFragments
                 {
                     if (pref == this) continue;
 
-                    if (pref instanceof ListPreference)
-                    {
-                        pref.setEnabled((boolean) obj);
-                    }
+                    pref.setEnabled((boolean) obj);
                 }
 
                 return true;
             }
         }
-
-        //endregion EnableSwitchPreference implementation
     }
 
-    //endregion IP Radio preferences
+    //endregion EnablePreferenceFragment stub
 
     //region Firewall safety preferences
 
@@ -248,6 +349,7 @@ public class PrefFragments
 
             header = new PreferenceActivity.Header();
             header.title = "Datenschutz und Sicherheit";
+            header.iconRes = GlobalConfigs.IconResFireWall;
             header.fragment = PrefFragments.SafetyFragment.class.getName();
 
             return header;
@@ -276,26 +378,13 @@ public class PrefFragments
 
             cb = new SafetyCBPreference(context);
 
-            cb.setKey("firewall.safety.respect.privacy");
-            cb.setTitle("Datenschutz immer sicherstellen");
-
-            cb.setSummaryOn("Der Datenschutz wird immer sichergestellt.");
-
-            cb.setSummaryOff("Durch Setzen dieser Option stellen sie sicher, dass "
-                    + "der Anwender beim Surfen in Bezug auf den Datenschutz immer "
-                    + "möglichst geschützt ist.");
-
-            preferences.add(cb);
-
-            cb = new SafetyCBPreference(context);
-
             cb.setKey("firewall.safety.stay.onsite");
             cb.setTitle("Beim Surfen das Verlassen der Web-Seite unterbinden");
 
             cb.setSummaryOn("Der Anwender ist vor unbeabsichtigtem Verlassen der Web-Seite geschützt.");
 
             cb.setSummaryOff("Durch Setzen dieser Option stellen sie sicher, dass der "
-                    + "Anwender nicht durch unqualifizierte Verlinkungen gefährdet wird.");
+                    + "Anwender nicht durch ungewollte Verlinkungen gefährdet wird.");
 
             preferences.add(cb);
 
@@ -436,6 +525,7 @@ public class PrefFragments
 
             header = new PreferenceActivity.Header();
             header.title = "Domänen Freischaltung";
+            header.iconRes = GlobalConfigs.IconResFireWall;
             header.fragment = PrefFragments.DomainsFragment.class.getName();
 
             return header;
@@ -611,7 +701,8 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Online Tageszeitungen";
+            header.title = "Tageszeitungen";
+            header.iconRes = GlobalConfigs.IconResWebConfigNewspaper;
             header.fragment = WebConfigNewspaperFragment.class.getName();
 
             return header;
@@ -641,7 +732,8 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Online Magazine";
+            header.title = "Magazine";
+            header.iconRes = GlobalConfigs.IconResWebConfigMagazine;
             header.fragment = WebConfigMagazineFragment.class.getName();
 
             return header;
@@ -671,7 +763,8 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Online Shopping";
+            header.title = "Shopping";
+            header.iconRes = GlobalConfigs.IconResWebConfigShopping;
             header.fragment = WebConfigShoppingFragment.class.getName();
 
             return header;
@@ -701,7 +794,8 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Online Erotisches";
+            header.title = "Erotisches";
+            header.iconRes = GlobalConfigs.IconResWebConfigErotics;
             header.fragment = WebConfigEroticsFragment.class.getName();
 
             return header;
@@ -731,7 +825,8 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Internet Fernsehen";
+            header.title = "Fernsehen";
+            header.iconRes = GlobalConfigs.IconResIPTelevision;
             header.fragment = IPTelevisionFragment.class.getName();
 
             return header;
@@ -760,7 +855,8 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Internet Radio";
+            header.title = "Radio";
+            header.iconRes = GlobalConfigs.IconResIPRadio;
             header.fragment = IPRadioFragment.class.getName();
 
             return header;
@@ -780,7 +876,7 @@ public class PrefFragments
 
     //endregion IP Radio preferences
 
-    //region JSONConfigFragment base class
+    //region JSONConfigFragment stub
 
     public static class JSONConfigFragment extends PreferenceFragment
     {
@@ -981,7 +1077,7 @@ public class PrefFragments
         //endregion JSONConfigSwitchPreference implementation
     }
 
-    //endregion JSONConfigFragment base class
+    //endregion JSONConfigFragment stub
 
     public static class NicePreferenceCategory extends PreferenceCategory
     {

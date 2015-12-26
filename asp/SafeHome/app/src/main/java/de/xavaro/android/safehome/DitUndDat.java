@@ -1,18 +1,22 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageView;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -24,6 +28,29 @@ import java.util.Map;
 //
 public class DitUndDat
 {
+    public static class ImageAntiAliasView extends ImageView
+    {
+        public ImageAntiAliasView(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        @SuppressLint("DrawAllocation")
+        protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+        {
+            super.onLayout(changed, left, top, right, bottom);
+
+            if (getDrawable() instanceof  BitmapDrawable)
+            {
+                Bitmap orig = ((BitmapDrawable) getDrawable()).getBitmap();
+                Bitmap anti = StaticUtils.downscaleAntiAliasBitmap(orig, right - left, bottom - top);
+
+                setImageDrawable(new BitmapDrawable(getResources(), anti));
+            }
+        }
+    }
+
     //region public static class VideoQuality
 
     public static class VideoQuality

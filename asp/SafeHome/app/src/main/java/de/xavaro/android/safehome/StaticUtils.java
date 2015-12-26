@@ -43,6 +43,8 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -493,6 +495,39 @@ public class StaticUtils
         return null;
     }
 
+    @SuppressWarnings({"PointlessBitwiseExpression", "PointlessArithmeticExpression"})
+    public static Bitmap downscaleAntiAliasBitmap(Bitmap src, int targetWidth, int targetHeight)
+    {
+        Bitmap nnn = Bitmap.createScaledBitmap(src, targetWidth << 1, targetHeight << 1, true);
+
+        Bitmap target = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888);
+
+        int p00, p01, p10, p11;
+        int a, r, g, b;
+
+        for (int row = 0; row < nnn.getHeight();  row += 2)
+        {
+            for (int col = 0; col < nnn.getWidth(); col += 2)
+            {
+                // @formatter:off
+                p00 = nnn.getPixel(col + 0, row + 0);
+                p01 = nnn.getPixel(col + 0, row + 1);
+                p10 = nnn.getPixel(col + 1, row + 0);
+                p11 = nnn.getPixel(col + 1, row + 1);
+
+                a = ((p00 >> 24) & 0xff) + ((p01 >> 24) & 0xff) + ((p10 >> 24) & 0xff) + ((p11 >> 24) & 0xff);
+                r = ((p00 >> 16) & 0xff) + ((p01 >> 16) & 0xff) + ((p10 >> 16) & 0xff) + ((p11 >> 16) & 0xff);
+                g = ((p00 >>  8) & 0xff) + ((p01 >>  8) & 0xff) + ((p10 >>  8) & 0xff) + ((p11 >>  8) & 0xff);
+                b = ((p00 >>  0) & 0xff) + ((p01 >>  0) & 0xff) + ((p10 >>  0) & 0xff) + ((p11 >>  0) & 0xff);
+                // @formatter:on
+
+                target.setPixel(col >> 1, row >> 1, Color.argb(a >> 2, r >> 2, g >> 2, b >> 2));
+            }
+        }
+
+        return target;
+    }
+
     //endregion
 
     //region Networking methods.
@@ -605,6 +640,16 @@ public class StaticUtils
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         return sharedPrefs.getBoolean(key, false);
+    }
+
+    public static void dumpViewsChildren(View view)
+    {
+        for(int i=0; i < ((ViewGroup) view).getChildCount(); ++i)
+        {
+            View nextChild = ((ViewGroup) view).getChildAt(i);
+
+            Log.d(LOGTAG,"dumpViewsChildren:" + nextChild);
+        }
     }
 
     //endregion
