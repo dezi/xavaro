@@ -35,10 +35,10 @@ public class ProfileImages
     //
 
     @Nullable
-    public static String getDisplayFromPhone(Context context, String phone)
+    public static String getDisplayFromPhoneOrSkype(Context context, String identtag)
     {
-        boolean ismatch = false;
-        String display = null;
+        boolean ismatch;
+        String display;
 
         if (contacts == null)
         {
@@ -70,7 +70,17 @@ public class ProfileImages
                     {
                         String number = item.getString("NUMBER").replaceAll(" ","");
 
-                        if (number.endsWith(phone))
+                        if (number.endsWith(identtag))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("DATA1"))
+                    {
+                        String number = item.getString("DATA1").replaceAll(" ","");
+
+                        if (number.endsWith(identtag))
                         {
                             ismatch = true;
                         }
@@ -78,7 +88,16 @@ public class ProfileImages
 
                     if (item.has("DISPLAY_NAME"))
                     {
-                        display = item.getString("DISPLAY_NAME");
+                        //
+                        // Workaround for Skype which puts
+                        // nickname as display name and
+                        // duplicates it into given name.
+                        //
+
+                        String disp = item.getString("DISPLAY_NAME");
+                        String gina = item.getString("GIVEN_NAME");
+
+                        if ((display == null) || ! disp.equals(gina)) display = disp;
                     }
                 }
 
@@ -102,8 +121,8 @@ public class ProfileImages
     @Nullable
     public static String getPhoneFromSkype(Context context, String skypename)
     {
-        boolean ismatch = false;
-        String phone = null;
+        boolean ismatch;
+        String phone;
 
         if (contacts == null)
         {
@@ -283,6 +302,8 @@ public class ProfileImages
     @Nullable
     public static Bitmap getWhatsAppProfileBitmap(Context context, String phone)
     {
+        if (phone.startsWith("+")) phone = phone.substring(1);
+
         String pwa = GlobalConfigs.packageWhatsApp;
 
         File datadir = context.getFilesDir();

@@ -48,6 +48,7 @@ public class FirewallActivity extends PreferenceActivity
         category.title = "Kommunikation";
         target.add(category);
 
+        target.add(PrefFragments.PhoneFragment.getHeader());
         target.add(PrefFragments.SkypeFragment.getHeader());
         target.add(PrefFragments.WhatsAppFragment.getHeader());
 

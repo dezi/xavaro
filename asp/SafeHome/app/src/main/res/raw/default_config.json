@@ -44,6 +44,16 @@
         "enable": "whatsapp.enable"
       },
       {
+        "label": "Skype",
+        "type": "skype",
+        "enable": "skype.enable"
+      },
+      {
+        "label": "Telefonie",
+        "type": "phone",
+        "enable": "phone.enable"
+      },
+      {
         "label": "Wikipedia",
         "type": "genericapp",
         "packagename": "org.wikipedia"
