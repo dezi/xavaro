@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,14 @@ import java.util.Map;
 //
 public class DitUndDat
 {
+    /*
+    public static class NiceToast extends Toast
+    {
+    }
+    */
+
+    //region public static class ImageAntiAliasView extends ImageView
+
     public static class ImageAntiAliasView extends ImageView
     {
         public ImageAntiAliasView(Context context)
@@ -50,6 +59,8 @@ public class DitUndDat
             }
         }
     }
+
+    //endregion public static class ImageAntiAliasView extends ImageView
 
     //region public static class VideoQuality
 
@@ -314,9 +325,19 @@ public class DitUndDat
         public static boolean isMobile;
         public static boolean isWifi;
 
-        public static void initialize(Context context)
+        public static void subscribe(Context context)
         {
             if (instance == null) instance = new InternetState(context);
+        }
+
+        public static void unsubscribe(Context context)
+        {
+            if (instance != null)
+            {
+                context.unregisterReceiver(instance);
+
+                instance = null;
+            }
         }
 
         public static void subscribe(Callback callback)

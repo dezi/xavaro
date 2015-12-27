@@ -1024,69 +1024,7 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSettings()
     {
-        if (settings == null)
-        {
-            settings = StaticUtils.readRawTextResourceJSON(context, R.raw.default_settings);
-
-            if ((settings == null) || ! settings.has("launchgroup"))
-            {
-                Toast.makeText(context, "Keine <launchgroup> gefunden.", Toast.LENGTH_LONG).show();
-
-                return;
-            }
-        }
-
-        if (directory == null)
-        {
-            directory = new LaunchGroup(context);
-
-            try
-            {
-                directory.setConfig(this,settings.getJSONObject("launchgroup"));
-            }
-            catch (JSONException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter Settings Password");
-
-        final EditText input = new EditText(context);
-
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        input.setPadding(40, 40, 40, 40);
-        input.setTextSize(48f);
-
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                //m_Text = input.getText().toString();
-
-                ((HomeActivity) context).addViewToBackStack(directory);
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.cancel();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(24f);
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
+        LaunchSettings.getInstance(context).open();
     }
 
     private void launchDirectory()

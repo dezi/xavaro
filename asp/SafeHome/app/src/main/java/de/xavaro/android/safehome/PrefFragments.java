@@ -50,7 +50,7 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Telefonie";
+            header.title = "Telefon";
             header.iconRes = GlobalConfigs.IconResPhoneApp;
             header.fragment = PhoneFragment.class.getName();
 
@@ -63,7 +63,7 @@ public class PrefFragments
 
             iconres = GlobalConfigs.IconResPhoneApp;
             keyprefix = "phone";
-            masterenable = "Telefonie freischalten";
+            masterenable = "Telefon freischalten";
             isPhone = true;
         }
     }

@@ -1,10 +1,6 @@
 {"launchgroup": {
     "launchitems": [
       {
-        "label": "Einstellungen",
-        "type": "settings"
-      },
-      {
         "label": "Internet Radio",
         "type": "ipradio",
         "enable": "ipradio.enable"

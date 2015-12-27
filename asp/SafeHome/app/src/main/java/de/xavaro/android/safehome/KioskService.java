@@ -92,20 +92,6 @@ public class KioskService extends Service
         blacklistApps.add("com.android.systemui.recentsactivity");
         blacklistApps.add("com.samsung.android.email.composer");
         blacklistApps.add("com.samsung.android.email.ui");
-
-        WindowManager.LayoutParams alp = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-
-        alertToast = Toast.makeText(this, "Clicken Sie 5 x Back zum Öffnen der Einstellungen", Toast.LENGTH_LONG);
-
-        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        wm.addView(alertToast.getView(),alp);
-
-        alertToast.show();
     }
 
     @Override
@@ -219,6 +205,33 @@ public class KioskService extends Service
         return mode;
     }
 
+    private Runnable handleAlert = new Runnable()
+    {
+        public void run()
+        {
+            if (alertToast == null)
+            {
+                WindowManager.LayoutParams alp = new WindowManager.LayoutParams(
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                        PixelFormat.TRANSLUCENT);
+
+                alertToast = Toast.makeText(getBaseContext(), alertMessage, Toast.LENGTH_LONG);
+
+                WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+                wm.addView(alertToast.getView(), alp);
+            }
+            else
+            {
+                alertToast.setText(alertMessage);
+            }
+
+            alertToast.show();
+        }
+    };
+
     private void handleKioskMode()
     {
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -262,17 +275,7 @@ public class KioskService extends Service
             {
                 alertMessage = currentMessage;
 
-                if (showit)
-                {
-                    handler.post(new Runnable()
-                    {
-                        public void run()
-                        {
-                            alertToast.setText(alertMessage);
-                            alertToast.show();
-                        }
-                    });
-                }
+                if (showit) handler.post(handleAlert);
             }
 
             if (blockit && StaticUtils.isDefaultHome(this))

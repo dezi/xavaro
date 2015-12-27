@@ -71,10 +71,7 @@ public class UpdateManager extends Thread
                 return;
             }
 
-            String text = "Eine neue Version von SafeHome wird geladen...";
-            Toast.makeText(context, text, Toast.LENGTH_LONG).show();
-
-            Log.d(LOGTAG, "Loading new version");
+            Log.d(LOGTAG, "Loading new version:" + lastModified + "=" + connection.getResponseCode());
 
             Map<String, List<String>> headers = connection.getHeaderFields();
 
