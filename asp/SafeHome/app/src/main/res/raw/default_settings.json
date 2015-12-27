@@ -2,16 +2,12 @@
   "launchgroup": {
     "launchitems": [
       {
-        "label": "Select Home",
+        "label": "Home Button",
         "type": "select_home"
       },
       {
-        "label": "Select Assistant",
+        "label": "Assistenz Button",
         "type": "select_assist"
-      },
-      {
-        "label": "Firewall",
-        "type": "firewall"
       },
       {
         "label": "Android Settings",

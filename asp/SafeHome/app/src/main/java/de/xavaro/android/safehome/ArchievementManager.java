@@ -8,14 +8,19 @@ import android.content.DialogInterface;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
+import android.os.Handler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Iterator;
 
 public class ArchievementManager implements
         DialogInterface.OnClickListener
 {
     private static final String LOGTAG = ArchievementManager.class.getSimpleName();
+
+    private static final Handler handler = new Handler();
 
     public static ArchievementManager instance;
 
@@ -29,13 +34,19 @@ public class ArchievementManager implements
     public static void show(String tag)
     {
         if (instance == null) return;
-        instance.showInternal(tag);
+
+        instance.setTag(tag);
+
+        handler.postDelayed(instance.showRunnable, 100);
     }
 
     public static void archieved(String tag)
     {
         if (instance == null) return;
-        instance.archievedInternal(tag);
+
+        instance.setTag(tag);
+
+        handler.postDelayed(instance.archievedRunnable, 100);
     }
 
     private Context context;
@@ -44,6 +55,7 @@ public class ArchievementManager implements
     private String currentTag;
     private String currentPositive;
     private String currentNegative;
+    private String currentNeutralb;
     private String currentXpathpref;
 
     public ArchievementManager(Context context)
@@ -52,7 +64,7 @@ public class ArchievementManager implements
 
         config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_archievements);
 
-        if ((config == null) || ! config.has("archievements"))
+        if ((config == null) || !config.has("archievements"))
         {
             Toast.makeText(context, "Keine <archievements> gefunden.", Toast.LENGTH_LONG).show();
 
@@ -67,6 +79,12 @@ public class ArchievementManager implements
         {
             OopsService.log(LOGTAG, ex);
         }
+    }
+
+    @Nullable
+    private void setTag(String tag)
+    {
+        currentTag = tag;
     }
 
     @Nullable
@@ -86,23 +104,33 @@ public class ArchievementManager implements
 
         if (tag.equals("ok")) title = "Ok";
         if (tag.equals("next")) title = "Weiter";
+        if (tag.equals("later")) title = "Später";
+        if (tag.equals("follow")) title = "Gute Idee";
         if (tag.equals("noshow")) title = "Nicht mehr anzeigen";
 
         return title;
     }
 
-    private void archievedInternal(String tag)
+    private final Runnable archievedRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            archievedInternal();
+        }
+    };
+
+    private void archievedInternal()
     {
         if (config == null) return;
 
-        if (!config.has(tag))
+        if (!config.has(currentTag))
         {
-            OopsService.log(LOGTAG, "archievedInternal: archievement <" + tag + "> not found.");
+            OopsService.log(LOGTAG, "archievedInternal: archievement <" + currentTag + "> not found.");
 
             return;
         }
 
-        currentTag = tag;
         currentXpathpref = "ArchievementManager/archievements/" + currentTag;
 
         String cpath = currentXpathpref + "/archieved";
@@ -115,20 +143,79 @@ public class ArchievementManager implements
         SettingsManager.flush();
     }
 
-    private void showInternal(String tag)
+    @Nullable
+    private String pickBestTag(String prefix)
+    {
+        String besttag = null;
+        int bestprio = 0;
+
+        prefix = prefix.substring(0, prefix.length() - 1);
+
+        Iterator<String> keysIterator = config.keys();
+
+        while (keysIterator.hasNext())
+        {
+            String tag = keysIterator.next();
+
+            if (! tag.startsWith(prefix)) continue;
+
+            try
+            {
+                JSONObject archie = config.getJSONObject(tag);
+
+                String xpath = "ArchievementManager/archievements/" + tag;
+
+                int archieved = SettingsManager.getXpathInt(xpath + "/archieved", true);
+                if (archieved > 0) continue;
+
+                int noshows = SettingsManager.getXpathInt(xpath + "/negative", true);
+                if (noshows > 0) continue;
+
+                int prio = archie.has("prio") ? archie.getInt("prio") : 0;
+
+                if (prio >= bestprio)
+                {
+                    besttag = tag;
+                    bestprio = prio;
+                }
+            }
+            catch (JSONException ignore)
+            {
+            }
+        }
+
+        return besttag;
+    }
+
+    private final Runnable showRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            showInternal();
+        }
+    };
+
+    private void showInternal()
     {
         if (config == null) return;
 
-        if (! config.has(tag))
+        if (currentTag.endsWith("*"))
         {
-            OopsService.log(LOGTAG,"showInternal: archievement <" + tag + "> not found.");
+            currentTag = pickBestTag(currentTag);
+            if (currentTag == null) return;
+        }
+
+        if (! config.has(currentTag))
+        {
+            OopsService.log(LOGTAG,"showInternal: archievement <" + currentTag + "> not found.");
 
             return;
         }
 
-        currentTag = tag;
         currentPositive = null;
         currentNegative = null;
+        currentNeutralb = null;
         currentXpathpref = "ArchievementManager/archievements/" + currentTag;
 
         try
@@ -140,11 +227,12 @@ public class ArchievementManager implements
             String[] buttons = archie.getString("buttons").split("\\|");
 
             JSONObject jo = SettingsManager.getXpathJSONObject(currentXpathpref, true);
-            if (jo != null) Log.d(LOGTAG,jo.toString());
+            if (jo != null) Log.d(LOGTAG,"showInternal: " + currentTag + "=" + jo.toString());
             Log.d(LOGTAG,"========================================");
 
             if (buttons.length > 0) currentPositive = buttons[ 0 ];
             if (buttons.length > 1) currentNegative = buttons[ 1 ];
+            if (buttons.length > 2) currentNeutralb = buttons[ 2 ];
 
             if ((currentNegative != null) && currentNegative.equals("noshow"))
             {
@@ -174,7 +262,12 @@ public class ArchievementManager implements
 
             if (currentNegative != null)
             {
-                builder.setNegativeButton(getButton(currentNegative),this);
+                builder.setNegativeButton(getButton(currentNegative), this);
+            }
+
+            if (currentNeutralb != null)
+            {
+                builder.setNeutralButton(getButton(currentNeutralb), this);
             }
 
             AlertDialog dialog = builder.create();
@@ -185,6 +278,8 @@ public class ArchievementManager implements
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTransformationMethod(null);
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTransformationMethod(null);
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(24f);
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTransformationMethod(null);
 
             String dpath = currentXpathpref + "/displays";
             int displaycount = SettingsManager.getXpathInt(dpath, true);

@@ -236,16 +236,24 @@ public class LaunchItem extends FrameLayout implements
                 if (type.equals("select_home"))
                 {
                     packageName = StaticUtils.getDefaultHome(context);
+
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectHome));
+                    icon.setVisibility(VISIBLE);
+                    targetIcon = overicon;
                 }
 
                 if (type.equals("select_assist"))
                 {
                     packageName = StaticUtils.getDefaultAssist(context);
+
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
+                    icon.setVisibility(VISIBLE);
+                    targetIcon = overicon;
                 }
 
                 if (type.equals("developer"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.developer_400x400));
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResTesting));
                     icon.setVisibility(VISIBLE);
                 }
 
@@ -1275,6 +1283,6 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchDeveloper()
     {
-        DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
+        //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
     }
 }

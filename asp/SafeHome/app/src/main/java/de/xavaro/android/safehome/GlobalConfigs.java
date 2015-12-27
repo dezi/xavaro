@@ -93,6 +93,9 @@ public class GlobalConfigs
     //region Global icons
 
     // @formatter:off
+    public static final int IconResSelectHome         = R.drawable.home_512x512;
+    public static final int IconResSelectAssist       = R.drawable.assistant_512x512;
+    public static final int IconResTesting            = R.drawable.testing_256x256;
     public static final int IconResFireWall           = R.drawable.firewall_256x256;
     public static final int IconResPhoneApp           = R.drawable.phone_256x256;
     public static final int IconResPhoneAppText       = R.drawable.phone_text_256x256;
