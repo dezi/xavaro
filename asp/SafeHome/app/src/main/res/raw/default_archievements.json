@@ -1,0 +1,32 @@
+{
+  "archievements": {
+
+    "howto.open.settings": {
+      "title": "important",
+      "message": "Sie können die Einstellungen durch 5 mal schnelles Drücken der Zurück-Taste öffnen.",
+      "buttons": "next|noshow",
+      "prio": 0
+    },
+
+    "configure.settings.password": {
+      "title": "important",
+      "message": "Vergessen Sie nicht, die Einstellungen mit einem Passwort sichern.",
+      "buttons": "next|noshow",
+      "prio": 200
+    },
+
+    "configure.settings.homebutton": {
+      "title": "important",
+      "message": "Die Anwendung sollte noch auf den Home-Button gelegt werden.",
+      "buttons": "next|noshow",
+      "prio": 100
+    },
+
+    "configure.settings.assistbutton": {
+      "title": "important",
+      "message": "Die Anwendung sollte noch auf den Assistenten-Button gelegt werden.",
+      "buttons": "next|noshow",
+      "prio": 300
+    }
+  }
+}

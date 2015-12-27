@@ -103,8 +103,15 @@ public class SettingsManager
         return jo;
     }
 
+
     @Nullable
     public static String getXpathString(String xpath)
+    {
+        return getXpathString(xpath, false);
+    }
+
+    @Nullable
+    public static String getXpathString(String xpath, boolean ignore)
     {
         String[] parts = xpath.split("/");
 
@@ -115,13 +122,82 @@ public class SettingsManager
         }
         catch (Exception ex)
         {
-            OopsService.log(LOGTAG,ex);
+            if (! ignore) OopsService.log(LOGTAG,ex);
         }
 
         return null;
     }
 
-    public static void putXpath(String xpath,String value)
+    public static boolean getXpathBoolean(String xpath)
+    {
+        return getXpathBoolean(xpath, false);
+    }
+
+    public static boolean getXpathBoolean(String xpath, boolean ignore)
+    {
+        String[] parts = xpath.split("/");
+
+        try
+        {
+            JSONObject jo = resolveXpath(parts, false);
+            return jo.getBoolean(parts[ parts.length - 1 ]);
+        }
+        catch (Exception ex)
+        {
+            if (! ignore) OopsService.log(LOGTAG,ex);
+        }
+
+        return false;
+    }
+
+    public static int getXpathInt(String xpath)
+    {
+        return getXpathInt(xpath, false);
+    }
+
+    public static int getXpathInt(String xpath, boolean ignore)
+    {
+        String[] parts = xpath.split("/");
+
+        try
+        {
+            JSONObject jo = resolveXpath(parts, false);
+            return jo.getInt(parts[ parts.length - 1 ]);
+        }
+        catch (Exception ex)
+        {
+            if (! ignore) OopsService.log(LOGTAG,ex);
+        }
+
+        return 0;
+    }
+
+    @Nullable
+    public static JSONObject getXpathJSONObject(String xpath)
+    {
+        return getXpathJSONObject(xpath, false);
+    }
+
+    @Nullable
+    public static JSONObject getXpathJSONObject(String xpath, boolean ignore)
+    {
+        String[] parts = xpath.split("/");
+
+        try
+        {
+            JSONObject jo = resolveXpath(parts, false);
+            return jo.getJSONObject(parts[ parts.length - 1 ]);
+        }
+        catch (Exception ex)
+        {
+            if (! ignore) OopsService.log(LOGTAG,ex);
+        }
+
+        return null;
+    }
+
+
+    public static void putXpath(String xpath, Object value)
     {
         String[] parts = xpath.split("/");
 

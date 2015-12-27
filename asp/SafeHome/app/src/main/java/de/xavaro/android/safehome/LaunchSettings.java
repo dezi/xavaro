@@ -54,11 +54,11 @@ public class LaunchSettings extends LaunchGroup implements
     {
         //m_Text = input.getText().toString();
 
-        Log.d(LOGTAG,"onClick=" + which);
-
         if (which == DialogInterface.BUTTON_POSITIVE)
         {
             ((HomeActivity) context).addViewToBackStack(this);
+
+            ArchievementManager.show("configure.settings.*");
 
             return;
         }
@@ -68,6 +68,8 @@ public class LaunchSettings extends LaunchGroup implements
 
     public void open()
     {
+        ArchievementManager.archieved("howto.open.settings");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Enter Settings Password");
 

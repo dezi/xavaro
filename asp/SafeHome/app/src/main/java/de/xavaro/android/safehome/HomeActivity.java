@@ -90,6 +90,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         SystemIdentity.initialize(this);
         SettingsManager.initialize(this);
+        ArchievementManager.initialize(this);
 
         DitUndDat.SharedPrefs.initialize(this);
     }
@@ -145,6 +146,8 @@ public class HomeActivity extends AppCompatActivity implements
 
         UpdateManager.selfUpdate(this, false);
         DitUndDat.InternetState.subscribe(this);
+
+        ArchievementManager.show("howto.open.settings");
     }
 
     @Override
