@@ -31,13 +31,6 @@
       ]
     },
 
-    "m.zalando.de": {
-      "url": "http://m.zalando.de/",
-      "icon": "http://pbs.twimg.com/profile_images/665540388376154112/A0pCZzMH_400x400.png",
-      "label": "Zalando",
-      "subtype": "shopping"
-    },
-
     "m.spiegel.de": {
       "url": "http://m.spiegel.de/",
       "icon": "http://pbs.twimg.com/profile_images/1719664041/tw_spon_400x400.jpg",
@@ -141,6 +134,33 @@
       "subtype": "pictorial",
 
       "subdomains": [ "pbs.twimg.com" ]
+    },
+
+    "m.zalando.de": {
+      "url": "http://m.zalando.de/",
+      "icon": "http://pbs.twimg.com/profile_images/665540388376154112/A0pCZzMH_400x400.png",
+      "label": "Zalando",
+      "subtype": "shopping",
+
+      "subdomains": [ "track.zalando.de", ".ztat.net" ]
+    },
+
+    "www.otto.de": {
+      "url": "http://www.otto.de/",
+      "icon": "http://pbs.twimg.com/profile_images/572316581649059840/kkLQ3q1X_400x400.png",
+      "label": "Otto",
+      "subtype": "shopping",
+
+      "subdomains": [ "images.otto.de", "assets.cdn-otto.de", "pxc.otto.de" ]
+    },
+
+    "de.dawanda.com": {
+      "url": "http://de.dawanda.com/",
+      "icon": "http://pbs.twimg.com/profile_images/542650070231822336/rpRDD2ge_400x400.png",
+      "label": "DaWanda",
+      "subtype": "shopping",
+
+      "subdomains": [ ".dawanda.com", ".dawandastatic.com", "apis.google.com", ".amazonaws.com" ]
     },
 
     "de.m.xhamster.com": {

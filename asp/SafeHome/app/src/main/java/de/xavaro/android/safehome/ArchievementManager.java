@@ -81,7 +81,6 @@ public class ArchievementManager implements
         }
     }
 
-    @Nullable
     private void setTag(String tag)
     {
         currentTag = tag;

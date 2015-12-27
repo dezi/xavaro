@@ -3,6 +3,17 @@
     "domains": [
 
       {
+        "domain": "2app.lk",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage lädt nicht."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "2mdn.net",
         "type": "Tracking",
         "source": "Abine Inc.",
@@ -75,6 +86,18 @@
       },
 
       {
+        "domain": "admized.com",
+        "type": "Tracking",
+        "source": "ADMIZED",
+        "description": [
+          "ADMIZED ist einer der führenden europäischen Anbieter für Display Buying Solutions. ",
+          "Wir sorgen für bessere Kampagnenperformance. Wir erreichen eine gezieltere Ansprache ",
+          "Ihrer Zielgruppe. Wir arbeiten für die Nachhaltigkeit Ihrer Werbebotschaft."
+        ],
+        "faults": [ "nooptin" ]
+      },
+
+      {
         "domain": "adnxs.com",
         "type": "Tracking",
         "source": "The Guardian",
@@ -140,6 +163,17 @@
       },
 
       {
+        "domain": "bunchbox.co",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage ist nicht vorhanden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "browser-update.org",
         "type": "Unbekannt",
         "source": "Recherche",
@@ -187,7 +221,7 @@
       },
 
       {
-        "domain": "criteo.com",
+        "domain": "criteo.com+criteo.net",
         "type": "Tracking",
         "source": "Wikipedia",
         "description": [
@@ -349,6 +383,21 @@
       },
 
       {
+        "domain": "hotjar.com",
+        "type": "Tracking",
+        "source": "hotjar",
+        "description": [
+          "Hotjar is a new all-in-one Analysis and Feedback tool that reveals the online ",
+          "behaviour and feedback of a website's visitors. By combining both A) Analysis and ",
+          "B) Feedback tools, Hotjar gives our clients the 'big picture' of how to improve ",
+          "their site's experience and its performance. The Analysis tools allow you to ",
+          "measure and observe user behaviour (what users do) while the Feedback tools allow ",
+          "you to hear what your users say (Voice of User / Customer)."
+        ],
+        "faults": [ "nogerpriv" ]
+      },
+
+      {
         "domain": "intellitxt.com",
         "type": "In-Text-Anzeigen",
         "source": "Wikipedia",
@@ -468,6 +517,18 @@
           "Verkauf."
         ],
         "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "m-pathy.com",
+        "type": "Tracking",
+        "source": "m-pathy",
+        "description": [
+          "m-pathy Analysen machen sichtbar was Ihre Kunden erleben. Durch die Auswertung ",
+          "tausender individueller Verhaltensdaten aus Gesten, Klicks und ",
+          "Formularinteraktionen geben wir fundierte Antworten auf Ihre Optimierungsprobleme."
+        ],
+        "faults": [ "nofaults" ]
       },
 
       {
@@ -623,6 +684,17 @@
       },
 
       {
+        "domain": "qcade.net",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "research.de.com",
         "type": "Tracking",
         "source": "Recherche",
@@ -693,6 +765,25 @@
       },
 
       {
+        "domain": "sociomantic.com",
+        "type": "Tracking",
+        "source": "Tagopedia",
+        "description": [
+          "Sociomantic Labs empowers advertisers with a real-time and personalized system that ",
+          "delivers increased and transparent performance. Simply put, the company makes ",
+          "display advertising more intelligent. Sociomantic is a market leader in Real-Time ",
+          "Bidding (RTB) and helps marketers drive incremental sales and grow Customer ",
+          "Lifetime Value (CLV) using today’s most advanced display advertising techniques, ",
+          "including: real-time retargeting and prospecting, stream-based data management, ",
+          "and dynamic ad personalization. These technologies allow Sociomantic’s clients to ",
+          "reach new and existing customers with individually priced and personalized display ",
+          "ads. Real-time reporting enables clients to see results just milliseconds after ",
+          "they happen."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
         "domain": "trafficjunky.net",
         "type": "Pornografie",
         "source": "Recherche",
@@ -716,6 +807,17 @@
       },
 
       {
+        "domain": "uimserv.net",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
         "domain": "veeseo.com",
         "type": "Advertising",
         "source": "veeseo",
@@ -735,6 +837,19 @@
           "Gehört zu Outbrain, Inc."
         ],
         "faults": [ "nofault" ]
+      },
+
+      {
+        "domain": "webtrends.com",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "Your data may be shared with service providers who work on our behalf. It may also, ",
+          "with your consent only, be shared with marketing partners or other independent third ",
+          "parties. You may opt-out of our sharing your information with independent third ",
+          "parties by emailing."
+        ],
+        "faults": [ "noprivger", "nooptin" ]
       },
 
       {
@@ -775,6 +890,30 @@
           "Cookie-Informationen für statistische Erhebungen."
         ],
         "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "zanox.com+zanox.ws",
+        "type": "Tracking",
+        "source": "zanox",
+        "description": [
+          "Bei der zanox TPV Tracking Technologie startet unser Tracking dann, wenn ein ",
+          "Werbemittel über unser Netzwerk eingeblendet wurde. TPV wird durch ID-, Cookie- ",
+          "und Fingerprint-Tracking-Verfahren ermöglicht und kann bei Bedarf auch externe ",
+          "Tracking-Technologien unterstützen."
+        ],
+        "faults": [ "noprivger" ]
+      },
+
+      {
+        "domain": "zsrpc.net",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
       }
     ]
   }
