@@ -16,11 +16,19 @@
       ]
     },
 
-    "m.zalando.de": {
-      "url": "http://m.zalando.de/",
-      "icon": "http://pbs.twimg.com/profile_images/665540388376154112/A0pCZzMH_400x400.png",
-      "label": "Zalando",
-      "subtype": "shopping"
+    "m.sportbild.bild.de": {
+      "url": "http://m.sportbild.bild.de/",
+      "icon": "http://pbs.twimg.com/profile_images/378800000268844744/33094934ef7680645fb39e87b02c99df_400x400.jpeg",
+      "label": "Sport Bild",
+      "subtype": "newspaper",
+
+      "subdomains": [
+        "code.bildstatic.de",
+        "rem-track.bild.de",
+        "pixel.bild.de",
+        "bilder.bild.de",
+        "m.wetter.bild.de"
+      ]
     },
 
     "m.spiegel.de": {
@@ -34,14 +42,14 @@
       "url": "http://m.gala.de/",
       "icon": "http://pbs.twimg.com/profile_images/568402279900794880/PSCQkXzW_400x400.png",
       "label": "Gala",
-      "subtype": "magazine"
+      "subtype": "pictorial"
     },
 
     "mobil.bunte.de": {
       "url": "http://mobil.bunte.de/",
       "icon": "http://pbs.twimg.com/profile_images/308504986/bunte_only_400x400.jpg",
       "label": "Bunte",
-      "subtype": "magazine",
+      "subtype": "pictorial",
 
       "subdomains": [ "i1.bstatic.de", "i2.bstatic.de", "i3.bstatic.de" ]
     },
@@ -57,7 +65,7 @@
       "url": "http://mobil.stern.de/",
       "icon": "http://pbs.twimg.com/profile_images/453882199477985280/XAAheikJ_400x400.png",
       "label": "Stern",
-      "subtype": "magazine",
+      "subtype": "pictorial",
 
       "subdomains": [ "static.stern.de" ]
     },
@@ -75,7 +83,7 @@
       "url": "http://m.petra.de/",
       "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg",
       "label": "Petra",
-      "subtype": "magazine"
+      "subtype": "pictorial"
     },
 
     "m.focus.de": {
@@ -123,9 +131,36 @@
       "url": "http://www.playboy.de/",
       "icon": "http://pbs.twimg.com/profile_images/668931765080227840/ZgR1OKJI_400x400.png",
       "label": "Playboy",
-      "subtype": "magazin",
+      "subtype": "pictorial",
 
       "subdomains": [ "pbs.twimg.com" ]
+    },
+
+    "m.zalando.de": {
+      "url": "http://m.zalando.de/",
+      "icon": "http://pbs.twimg.com/profile_images/665540388376154112/A0pCZzMH_400x400.png",
+      "label": "Zalando",
+      "subtype": "shopping",
+
+      "subdomains": [ "track.zalando.de", ".ztat.net" ]
+    },
+
+    "www.otto.de": {
+      "url": "http://www.otto.de/",
+      "icon": "http://pbs.twimg.com/profile_images/572316581649059840/kkLQ3q1X_400x400.png",
+      "label": "Otto",
+      "subtype": "shopping",
+
+      "subdomains": [ "images.otto.de", "assets.cdn-otto.de", "pxc.otto.de" ]
+    },
+
+    "de.dawanda.com": {
+      "url": "http://de.dawanda.com/",
+      "icon": "http://pbs.twimg.com/profile_images/542650070231822336/rpRDD2ge_400x400.png",
+      "label": "DaWanda",
+      "subtype": "shopping",
+
+      "subdomains": [ ".dawanda.com", ".dawandastatic.com", "apis.google.com", ".amazonaws.com" ]
     },
 
     "de.m.xhamster.com": {
@@ -148,6 +183,8 @@
       "icon": "http://a3-images.myspacecdn.com/images03/1/cb9e1e694ca941abaf62f0026d18049f/300x300.jpg",
       "label": "TUBE8",
       "subtype": "erotics",
+
+      "subdomains": [ "tube8.com", "phncdn.com" ],
 
       "webguard": {
 
@@ -222,6 +259,8 @@
       "icon": "http://pbs.twimg.com/profile_images/615525585826222080/W9b7zw3R_400x400.jpg",
       "label": "Pornhub",
       "subtype": "erotics",
+
+      "subdomains": [ "phncdn.com" ],
 
       "webguard": {
 
@@ -301,6 +340,8 @@
       "icon": "http://pbs.twimg.com/profile_images/615523987100057600/t3xeDQDX_400x400.jpg",
       "label": "YouPorn",
       "subtype": "erotics",
+
+      "subdomains": [ "phncdn.com" ],
 
       "webguard": {
 
@@ -390,6 +431,7 @@
       "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
       "label": "Xvideos",
       "subtype": "erotics",
+      "enabled": false,
 
       "webguard": {
         "mingle": {
@@ -405,6 +447,7 @@
       "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
       "label": "XNXX.COM",
       "subtype": "erotics",
+      "enabled": false,
 
       "webguard": {
         "mingle": {

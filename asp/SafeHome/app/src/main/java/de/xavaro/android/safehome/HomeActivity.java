@@ -90,9 +90,9 @@ public class HomeActivity extends AppCompatActivity implements
 
         SystemIdentity.initialize(this);
         SettingsManager.initialize(this);
+        ArchievementManager.initialize(this);
 
         DitUndDat.SharedPrefs.initialize(this);
-        DitUndDat.InternetState.initialize(this);
     }
 
     @Override
@@ -144,7 +144,10 @@ public class HomeActivity extends AppCompatActivity implements
 
         Log.d(LOGTAG, "onStart...");
 
-        UpdateManager.selfUpdate(this,false);
+        UpdateManager.selfUpdate(this, false);
+        DitUndDat.InternetState.subscribe(this);
+
+        ArchievementManager.show("howto.open.settings");
     }
 
     @Override
@@ -191,6 +194,8 @@ public class HomeActivity extends AppCompatActivity implements
 
         if (kioskService != null) unbindService(kioskConnection);
         if (CommService.getInstance() != null) unbindService(commConnection);
+
+        DitUndDat.InternetState.unsubscribe(this);
     }
 
     @Override
@@ -327,7 +332,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         if (backPressedCount >= 4)
         {
-            Toast.makeText(this,"Konfig.......",Toast.LENGTH_LONG).show();
+            LaunchSettings.getInstance(this).open();
         }
         else
         {

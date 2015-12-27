@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 public class PrefFragments
 {
@@ -39,6 +40,35 @@ public class PrefFragments
     {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
+
+    //region Phone preferences
+
+    public static class PhoneFragment extends ContactsFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Telefon";
+            header.iconRes = GlobalConfigs.IconResPhoneApp;
+            header.fragment = PhoneFragment.class.getName();
+
+            return header;
+        }
+
+        public PhoneFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResPhoneApp;
+            keyprefix = "phone";
+            masterenable = "Telefon freischalten";
+            isPhone = true;
+        }
+    }
+
+    //endregion Telefon preferences
 
     //region Skype preferences
 
@@ -100,24 +130,31 @@ public class PrefFragments
 
     //region Contacts preferences stub
 
+    @SuppressWarnings("WeakerAccess")
     public static class ContactsFragment extends EnablePreferenceFragment
     {
+        protected boolean isPhone;
         protected boolean isSkype;
         protected boolean isWhatsApp;
 
+        protected final CharSequence[] entries = {
+                "Nicht aktiviert",
+                "Home-Bildschirm",
+                "App-Verzeichnis",
+                "Kontakte-Verzeichnis"};
+
+        protected final CharSequence[] evalues = {
+                "inact",
+                "home",
+                "appdir",
+                "comdir" };
+
+        @SuppressWarnings("ConstantConditions")
         public void registerAll(Context context)
         {
             super.registerAll(context);
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
-
-            CharSequence[] entries = {
-                    "Nicht aktiviert",
-                    "Home-Bildschirm",
-                    "App-Verzeichnis",
-                    "Kontakte-Verzeichnis"};
-
-            CharSequence[] evalues = { "inact", "home", "appdir", "comdir" };
 
             try
             {
@@ -161,6 +198,16 @@ public class PrefFragments
                             if ((name == null) || ! disp.equals(gina)) name = disp;
                         }
 
+                        if (isPhone)
+                        {
+                            if (kind.equals("Phone"))
+                            {
+                                String number = item.getString("NUMBER");
+
+                                if (number.startsWith("+")) voipphone = number;
+                            }
+                        }
+
                         if (isSkype)
                         {
                             if (kind.equals("@com.skype.android.chat.action"))
@@ -193,16 +240,38 @@ public class PrefFragments
                         }
                     }
 
-                    if ((chatphone == null) && (voipphone == null)) continue;
+                    if ((chatphone == null) && (voipphone == null) && (vicaphone == null)) continue;
+
+                    //
+                    // Check how many different nicknames / phonenumbers.
+                    //
+
+                    if (chatphone != null) chatphone = chatphone.replaceAll("@s.whatsapp.net", "");
+                    if (voipphone != null) voipphone = voipphone.replaceAll("@s.whatsapp.net", "");
+                    if (vicaphone != null) vicaphone = vicaphone.replaceAll("@s.whatsapp.net", "");
+
+                    ArrayList<String> check = new ArrayList<>();
+
+                    if ((chatphone != null) && ! check.contains(chatphone)) check.add(chatphone);
+                    if ((voipphone != null) && ! check.contains(voipphone)) check.add(voipphone);
+                    if ((vicaphone != null) && ! check.contains(vicaphone)) check.add(vicaphone);
+
+                    boolean alike = (check.size() == 1);
+
+                    //
+                    // Build contacts category preference.
+
+                    String cattitle = name;
+
+                    if (alike) cattitle += " (" + check.get(0) + ")";
 
                     NicePreferenceCategory nc = new NicePreferenceCategory(context);
-                    nc.setTitle(name);
+                    nc.setTitle(cattitle);
                     nc.setEnabled(enabled);
                     preferences.add(nc);
 
                     if (chatphone != null)
                     {
-                        chatphone = chatphone.replaceAll("@s.whatsapp.net", "");
                         String key = keyprefix + ".chat." + chatphone;
                         NiceListPreference cb = new NiceListPreference(context);
 
@@ -210,10 +279,32 @@ public class PrefFragments
                         cb.setEntryValues(evalues);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
-                        cb.setTitle("Nachricht +" + chatphone);
+                        cb.setTitle("Nachricht" + (alike ? "" : " " + chatphone));
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
+
+                        if (!sharedPrefs.contains(key))
+                        {
+                            sharedPrefs.edit().putString(key, "inact").apply();
+                        }
+                    }
+
+                    if ((voipphone != null) && isPhone)
+                    {
+                        String key = keyprefix + ".text." + voipphone;
+                        NiceListPreference cb = new NiceListPreference(context);
+
+                        cb.setEntries(entries);
+                        cb.setEntryValues(evalues);
+                        cb.setDefaultValue("inact");
+                        cb.setKey(key);
+                        cb.setTitle("SMS" + (alike ? "" : " " + voipphone));
+                        cb.setEnabled(enabled);
+
+                        preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         if (!sharedPrefs.contains(key))
                         {
@@ -223,7 +314,6 @@ public class PrefFragments
 
                     if (voipphone != null)
                     {
-                        voipphone = voipphone.replaceAll("@s.whatsapp.net", "");
                         String key = keyprefix + ".voip." + voipphone;
                         NiceListPreference cb = new NiceListPreference(context);
 
@@ -231,10 +321,11 @@ public class PrefFragments
                         cb.setEntryValues(evalues);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
-                        cb.setTitle("Anruf +" + voipphone);
+                        cb.setTitle("Anruf" + (alike ? "" : " " + voipphone));
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         if (!sharedPrefs.contains(key))
                         {
@@ -251,16 +342,36 @@ public class PrefFragments
                         cb.setEntryValues(evalues);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
-                        cb.setTitle("Videoanruf +" + vicaphone);
+                        cb.setTitle("Videoanruf" + (alike ? "" : " " + vicaphone));
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         if (!sharedPrefs.contains(key))
                         {
                             sharedPrefs.edit().putString(key, "inact").apply();
                         }
                     }
+                }
+
+                //
+                // Remove disabled or obsoleted preferences.
+                //
+
+                String websiteprefix = keyprefix + ".";
+
+                Map<String, ?> exists = sharedPrefs.getAll();
+
+                for (Map.Entry<String, ?> entry : exists.entrySet())
+                {
+                    if (! entry.getKey().startsWith(websiteprefix)) continue;
+
+                    if (activekeys.contains(entry.getKey())) continue;
+
+                    sharedPrefs.edit().remove(entry.getKey()).apply();
+
+                    Log.d(LOGTAG, "registerAll: obsolete:" + entry.getKey() + "=" + entry.getValue());
                 }
             }
             catch (JSONException ex)
@@ -274,9 +385,11 @@ public class PrefFragments
 
     //region EnablePreferenceFragment stub
 
+    @SuppressWarnings("WeakerAccess")
     public static class EnablePreferenceFragment extends PreferenceFragment
     {
         protected final ArrayList<Preference> preferences = new ArrayList<>();
+        protected final ArrayList<String> activekeys = new ArrayList<>();
 
         protected String keyprefix;
         protected String masterenable;
@@ -295,6 +408,8 @@ public class PrefFragments
             sw.setDefaultValue(false);
 
             preferences.add(sw);
+
+            activekeys.add(sw.getKey());
         }
 
         @Override
@@ -754,6 +869,37 @@ public class PrefFragments
 
     //endregion Webframe magazine preferences
 
+    //region Webframe magazine preferences
+
+    public static class WebConfigPictorialFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Illustrierte";
+            header.iconRes = GlobalConfigs.IconResWebConfigPictorial;
+            header.fragment = WebConfigPictorialFragment.class.getName();
+
+            return header;
+        }
+
+        public WebConfigPictorialFragment()
+        {
+            super();
+
+            root = "webconfig";
+            subtype = "pictorial";
+            jsonres = R.raw.default_webconfig;
+            iconres = GlobalConfigs.IconResWebConfigPictorial;
+            keyprefix = "webconfig.pictorial";
+            masterenable = "Online Illustrierte freischalten";
+        }
+    }
+
+    //endregion Webframe magazine preferences
+
     //region Webframe shopping preferences
 
     public static class WebConfigShoppingFragment extends JSONConfigFragment
@@ -816,36 +962,6 @@ public class PrefFragments
 
     //endregion Webframe erotics preferences
 
-    //region IP Television preferences
-
-    public static class IPTelevisionFragment extends JSONConfigFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Fernsehen";
-            header.iconRes = GlobalConfigs.IconResIPTelevision;
-            header.fragment = IPTelevisionFragment.class.getName();
-
-            return header;
-        }
-
-        public IPTelevisionFragment()
-        {
-            super();
-
-            root = "webiptv";
-            jsonres = R.raw.default_webiptv;
-            iconres = GlobalConfigs.IconResIPTelevision;
-            keyprefix = "iptelevision";
-            masterenable = "Internet Fernsehen freischalten";
-        }
-    }
-
-    //endregion IP Television preferences
-
     //region IP Radio preferences
 
     public static class IPRadioFragment extends JSONConfigFragment
@@ -876,11 +992,43 @@ public class PrefFragments
 
     //endregion IP Radio preferences
 
+    //region IP Television preferences
+
+    public static class IPTelevisionFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Fernsehen";
+            header.iconRes = GlobalConfigs.IconResIPTelevision;
+            header.fragment = IPTelevisionFragment.class.getName();
+
+            return header;
+        }
+
+        public IPTelevisionFragment()
+        {
+            super();
+
+            root = "webiptv";
+            jsonres = R.raw.default_webiptv;
+            iconres = GlobalConfigs.IconResIPTelevision;
+            keyprefix = "iptelevision";
+            masterenable = "Internet Fernsehen freischalten";
+        }
+    }
+
+    //endregion IP Television preferences
+
     //region JSONConfigFragment stub
 
+    @SuppressWarnings("WeakerAccess")
     public static class JSONConfigFragment extends PreferenceFragment
     {
         private final ArrayList<Preference> preferences = new ArrayList<>();
+        protected final ArrayList<String> activekeys = new ArrayList<>();
 
         private JSONObject globalConfig;
 
@@ -925,6 +1073,7 @@ public class PrefFragments
                 sw.setDefaultValue(false);
 
                 preferences.add(sw);
+                activekeys.add(sw.getKey());
 
                 boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable",false);
 
@@ -950,6 +1099,11 @@ public class PrefFragments
                     thumbnail = CacheManager.cacheThumbnail(context, iconurl);
                     drawable = new BitmapDrawable(context.getResources(),thumbnail);
 
+                    if (webitem.has("enabled") && ! webitem.getBoolean("enabled"))
+                    {
+                        continue;
+                    }
+
                     if (webitem.has("subtype") && (subtype != null)
                             && ! webitem.getString("subtype").equals(subtype))
                     {
@@ -967,6 +1121,7 @@ public class PrefFragments
                         cb.setIcon(drawable);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         boolean def = webitem.has("default") && webitem.getBoolean("default");
 
@@ -1008,6 +1163,7 @@ public class PrefFragments
                             cb.setEnabled(enabled);
 
                             preferences.add(cb);
+                            activekeys.add(cb.getKey());
 
                             boolean def = channel.has("default") && channel.getBoolean("default");
 
@@ -1023,6 +1179,24 @@ public class PrefFragments
                     }
                 }
 
+                //
+                // Remove disabled or obsoleted preferences.
+                //
+
+                String websiteprefix = keyprefix + ".website.";
+
+                Map<String, ?> exists = sharedPrefs.getAll();
+
+                for (Map.Entry<String, ?> entry : exists.entrySet())
+                {
+                    if (! entry.getKey().startsWith(websiteprefix)) continue;
+
+                    if (activekeys.contains(entry.getKey())) continue;
+
+                    sharedPrefs.edit().remove(entry.getKey()).apply();
+
+                    Log.d(LOGTAG, "registerAll: obsolete:" + entry.getKey() + "=" + entry.getValue());
+                }
             }
             catch (JSONException ex)
             {
@@ -1078,6 +1252,8 @@ public class PrefFragments
     }
 
     //endregion JSONConfigFragment stub
+
+    //region Niced preferences
 
     public static class NicePreferenceCategory extends PreferenceCategory
     {
@@ -1175,6 +1351,12 @@ public class PrefFragments
 
             if (current.getParent() != null)
             {
+                //
+                // Der inder calls bind view every now and then because
+                // of bad programming. So check if textview is child
+                // of obsoleted view and remove before processing.
+                //
+
                 ((LinearLayout) current.getParent()).removeView(current);
             }
 
@@ -1184,8 +1366,8 @@ public class PrefFragments
                     Gravity.END);
 
             ((LinearLayout) view).addView(current, lp);
-
-            Log.d(LOGTAG, "onBindView:" + view);
         }
     }
+
+    //endregion Niced preferences
 }

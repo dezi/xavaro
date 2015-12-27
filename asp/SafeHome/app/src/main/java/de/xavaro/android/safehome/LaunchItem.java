@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 
@@ -39,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 //
 // Launch item view on home screen.
@@ -122,7 +124,7 @@ public class LaunchItem extends FrameLayout implements
         overlay.setVisibility(INVISIBLE);
         this.addView(overlay);
 
-        overicon = new ImageView(context);
+        overicon = new DitUndDat.ImageAntiAliasView(context);
         overlay.addView(overicon);
 
         dimmer = new FrameLayout(context);
@@ -234,16 +236,24 @@ public class LaunchItem extends FrameLayout implements
                 if (type.equals("select_home"))
                 {
                     packageName = StaticUtils.getDefaultHome(context);
+
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectHome));
+                    icon.setVisibility(VISIBLE);
+                    targetIcon = overicon;
                 }
 
                 if (type.equals("select_assist"))
                 {
                     packageName = StaticUtils.getDefaultAssist(context);
+
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
+                    icon.setVisibility(VISIBLE);
+                    targetIcon = overicon;
                 }
 
                 if (type.equals("developer"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.developer_400x400));
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResTesting));
                     icon.setVisibility(VISIBLE);
                 }
 
@@ -287,6 +297,12 @@ public class LaunchItem extends FrameLayout implements
                         icon.setVisibility(VISIBLE);
                     }
 
+                    if (subtype.equals("pictorial"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigPictorial));
+                        icon.setVisibility(VISIBLE);
+                    }
+
                     if (subtype.equals("shopping"))
                     {
                         icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigShopping));
@@ -296,6 +312,48 @@ public class LaunchItem extends FrameLayout implements
                     if (subtype.equals("erotics"))
                     {
                         icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigErotics));
+                        icon.setVisibility(VISIBLE);
+                    }
+                }
+                if (type.equals("phone"))
+                {
+                    GlobalConfigs.likeWhatsApp = true;
+
+                    if (config.has("phonenumber"))
+                    {
+                        targetIcon = icon;
+
+                        String phone = config.getString("phonenumber");
+                        Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
+
+                        if (thumbnail != null)
+                        {
+                            thumbnail = StaticUtils.getCircleBitmap(thumbnail);
+
+                            icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                            icon.setVisibility(VISIBLE);
+                            targetIcon = overicon;
+                        }
+
+                        if (config.has("subtype"))
+                        {
+                            String subtype = config.getString("subtype");
+
+                            if (subtype.equals("text"))
+                            {
+                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppText));
+                                targetIcon.setVisibility(VISIBLE);
+                            }
+                            if (subtype.equals("voip"))
+                            {
+                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppCall));
+                                targetIcon.setVisibility(VISIBLE);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneApp));
                         icon.setVisibility(VISIBLE);
                     }
                 }
@@ -360,6 +418,32 @@ public class LaunchItem extends FrameLayout implements
                             icon.setVisibility(VISIBLE);
                             targetIcon = overicon;
                         }
+
+                        if (config.has("subtype"))
+                        {
+                            String subtype = config.getString("subtype");
+
+                            if (subtype.equals("chat"))
+                            {
+                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeChat));
+                                targetIcon.setVisibility(VISIBLE);
+                            }
+                            if (subtype.equals("voip"))
+                            {
+                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVoip));
+                                targetIcon.setVisibility(VISIBLE);
+                            }
+                            if (subtype.equals("vica"))
+                            {
+                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVica));
+                                targetIcon.setVisibility(VISIBLE);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkype));
+                        icon.setVisibility(VISIBLE);
                     }
                 }
 
@@ -725,6 +809,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("install"      )) { launchInstall();      return; }
         if (type.equals("webframe"     )) { launchWebframe();     return; }
         if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
+        if (type.equals("phone"        )) { launchPhone();        return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
 
         // @formatter:on
@@ -764,6 +849,49 @@ public class LaunchItem extends FrameLayout implements
     {
     }
 
+    private void launchPhone()
+    {
+        if (config.has("phonenumber"))
+        {
+            try
+            {
+                String phonenumber = config.getString("phonenumber");
+                String subtype = config.has("subtype") ? config.getString("subtype") : "text";
+
+                if (subtype.equals("text"))
+                {
+                    Uri uri = Uri.parse("smsto:" + phonenumber);
+                    Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
+                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    sendIntent.setPackage("com.android.mms");
+                    context.startActivity(Intent.createChooser(sendIntent, ""));
+                }
+
+                if (subtype.equals("voip"))
+                {
+                    Uri uri = Uri.parse("tel:" + phonenumber);
+                    Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
+                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    sendIntent.setPackage("com.android.server.telecom");
+                    context.startActivity(Intent.createChooser(sendIntent, ""));
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
+
+            return;
+        }
+
+        if (directory == null)
+        {
+            directory = new AppsGroup.PhoneGroup(context);
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
     private void launchWhatsApp()
     {
         if (config.has("waphonenumber"))
@@ -787,7 +915,7 @@ public class LaunchItem extends FrameLayout implements
 
         if (directory == null)
         {
-            directory = new WhatsappGroup(context);
+            directory = new AppsGroup.WhatsappGroup(context);
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
@@ -795,39 +923,49 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSkype()
     {
-        if (! config.has("skypename"))
+        if (config.has("skypename"))
         {
-            Toast.makeText(getContext(),"Nix <skypename> configured.",Toast.LENGTH_LONG).show();
+            try
+            {
+                String skypename = config.getString("skypename");
+                String subtype = config.has("subtype") ? config.getString("subtype") : "chat";
+
+                Uri uri = Uri.parse("skype:" + skypename);
+
+                if (subtype.equals("chat"))
+                {
+                    uri = Uri.parse("skype:" + skypename + "?chat");
+                }
+
+                if (subtype.equals("call"))
+                {
+                    uri = Uri.parse("skype:" + skypename + "?call");
+                }
+
+                if (subtype.equals("vica"))
+                {
+                    uri = Uri.parse("skype:" + skypename + "?call&video=true");
+                }
+
+                Intent skype = new Intent(Intent.ACTION_VIEW);
+                skype.setData(uri);
+                skype.setPackage("com.skype.raider");
+                context.startActivity(skype);
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
 
             return;
         }
 
-        try
+        if (directory == null)
         {
-            String skypename = config.getString("skypename");
-            String subtype = config.has("subtype") ? config.getString("subtype") : "chat";
-
-            Uri uri = Uri.parse("skype:" + skypename);
-
-            if (subtype.equals("chat"))
-            {
-                uri = Uri.parse("skype:" + skypename + "?chat");
-            }
-
-            if (subtype.equals("call"))
-            {
-                uri = Uri.parse("skype:" + skypename + "?call");
-            }
-
-            Intent skype = new Intent(Intent.ACTION_VIEW);
-            skype.setData(uri);
-            skype.setPackage("com.skype.raider");
-            context.startActivity(skype);
+            directory = new AppsGroup.SkypeGroup(context);
         }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
     }
 
     private void launchInstall()
@@ -894,69 +1032,7 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSettings()
     {
-        if (settings == null)
-        {
-            settings = StaticUtils.readRawTextResourceJSON(context, R.raw.default_settings);
-
-            if ((settings == null) || ! settings.has("launchgroup"))
-            {
-                Toast.makeText(context, "Keine <launchgroup> gefunden.", Toast.LENGTH_LONG).show();
-
-                return;
-            }
-        }
-
-        if (directory == null)
-        {
-            directory = new LaunchGroup(context);
-
-            try
-            {
-                directory.setConfig(this,settings.getJSONObject("launchgroup"));
-            }
-            catch (JSONException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter Settings Password");
-
-        final EditText input = new EditText(context);
-
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        input.setPadding(40, 40, 40, 40);
-        input.setTextSize(48f);
-
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                //m_Text = input.getText().toString();
-
-                ((HomeActivity) context).addViewToBackStack(directory);
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.cancel();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(24f);
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
+        LaunchSettings.getInstance(context).open();
     }
 
     private void launchDirectory()
@@ -1207,6 +1283,6 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchDeveloper()
     {
-        DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
+        //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
     }
 }

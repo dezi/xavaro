@@ -38,16 +38,16 @@ public class FirewallActivity extends PreferenceActivity
         Header category;
 
         category = new Header();
-        category.title = "Firewall";
+        category.title = "Wichtige Einstellungen";
         target.add(category);
 
         target.add(PrefFragments.SafetyFragment.getHeader());
-        target.add(PrefFragments.DomainsFragment.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";
         target.add(category);
 
+        target.add(PrefFragments.PhoneFragment.getHeader());
         target.add(PrefFragments.SkypeFragment.getHeader());
         target.add(PrefFragments.WhatsAppFragment.getHeader());
 
@@ -64,8 +64,15 @@ public class FirewallActivity extends PreferenceActivity
 
         target.add(PrefFragments.WebConfigNewspaperFragment.getHeader());
         target.add(PrefFragments.WebConfigMagazineFragment.getHeader());
+        target.add(PrefFragments.WebConfigPictorialFragment.getHeader());
         target.add(PrefFragments.WebConfigShoppingFragment.getHeader());
         target.add(PrefFragments.WebConfigEroticsFragment.getHeader());
+
+        category = new Header();
+        category.title = "Firewall";
+        target.add(category);
+
+        target.add(PrefFragments.DomainsFragment.getHeader());
 
         setHeaders(target);
     }

@@ -93,18 +93,25 @@ public class GlobalConfigs
     //region Global icons
 
     // @formatter:off
+    public static final int IconResSelectHome         = R.drawable.home_512x512;
+    public static final int IconResSelectAssist       = R.drawable.assistant_512x512;
+    public static final int IconResTesting            = R.drawable.testing_256x256;
     public static final int IconResFireWall           = R.drawable.firewall_256x256;
+    public static final int IconResPhoneApp           = R.drawable.phone_256x256;
+    public static final int IconResPhoneAppText       = R.drawable.phone_text_256x256;
+    public static final int IconResPhoneAppCall       = R.drawable.phone_voip_256x256;
     public static final int IconResWhatsApp           = R.drawable.whatsapp_480x480;
     public static final int IconResWhatsAppVoip       = R.drawable.whatsapp_voip_480x480;
     public static final int IconResWhatsAppChat       = R.drawable.whatsapp_chat_480x480;
     public static final int IconResSkype              = R.drawable.skype_256x256;
     public static final int IconResSkypeVoip          = R.drawable.skype_voip_256x256;
     public static final int IconResSkypeChat          = R.drawable.skype_chat_256x256;
-    public static final int IconResSkypeVideo         = R.drawable.skype_vica_256x256;
+    public static final int IconResSkypeVica          = R.drawable.skype_vica_256x256;
     public static final int IconResIPTelevision       = R.drawable.television_275x275;
     public static final int IconResIPRadio            = R.drawable.radio_400x400;
     public static final int IconResWebConfigNewspaper = R.drawable.newspaper_480x480;
     public static final int IconResWebConfigMagazine  = R.drawable.magazine_128x128;
+    public static final int IconResWebConfigPictorial = R.drawable.crown_256x256;
     public static final int IconResWebConfigShopping  = R.drawable.shopping_440x440;
     public static final int IconResWebConfigErotics   = R.drawable.erotica_280x280;
     // @formatter:on

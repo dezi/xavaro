@@ -588,6 +588,11 @@ public class WebGuard extends WebViewClient
 
         if (subdomains.contains(uri.getHost())) return null;
 
+        for (String subdomain : subdomains)
+        {
+            if (uri.getHost().endsWith(subdomain)) return null;
+        }
+
         if ((! path.endsWith(".png")) && (! path.endsWith(".jpg")) && (! path.endsWith(".svg")) &&
                 (! path.endsWith(".gif")) && (! path.endsWith(".ico")))
         {

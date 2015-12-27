@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.support.annotation.Nullable;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,20 +14,20 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteBindOrColumnIndexOutOfRangeException;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableWrapper;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -41,7 +43,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -597,6 +598,10 @@ public class StaticUtils
 
     public static String defuckJSON(String json)
     {
+        //
+        // I hate slash escaping.
+        //
+
         return json.replace("\\/","/");
     }
 
@@ -652,5 +657,11 @@ public class StaticUtils
         }
     }
 
+    public static String nowAsISO()
+    {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return df.format(new Date());
+    }
     //endregion
 }
