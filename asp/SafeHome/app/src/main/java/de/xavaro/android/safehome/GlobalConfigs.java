@@ -108,6 +108,7 @@ public class GlobalConfigs
     public static final int IconResIPRadio            = R.drawable.radio_400x400;
     public static final int IconResWebConfigNewspaper = R.drawable.newspaper_480x480;
     public static final int IconResWebConfigMagazine  = R.drawable.magazine_128x128;
+    public static final int IconResWebConfigPictorial = R.drawable.crown_256x256;
     public static final int IconResWebConfigShopping  = R.drawable.shopping_440x440;
     public static final int IconResWebConfigErotics   = R.drawable.erotica_280x280;
     // @formatter:on

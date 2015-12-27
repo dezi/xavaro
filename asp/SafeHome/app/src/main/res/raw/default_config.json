@@ -27,6 +27,12 @@
         "enable": "webconfig.magazine.enable"
       },
       {
+        "label": "Online Illustrierte",
+        "type": "webconfig",
+        "subtype": "pictorial",
+        "enable": "webconfig.pictorial.enable"
+      },
+      {
         "label": "Online Shopping",
         "type": "webconfig",
         "subtype": "shopping",

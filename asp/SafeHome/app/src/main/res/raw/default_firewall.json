@@ -693,6 +693,16 @@
       },
 
       {
+        "domain": "trafficjunky.net",
+        "type": "Pornografie",
+        "source": "Recherche",
+        "description": [
+          "Traffic Junky ist ein Netzwerk zur Promotion von erotischen Anzeigen."
+        ],
+        "faults": [ "noprivger" ]
+      },
+
+      {
         "domain": "theadex.com",
         "type": "Tracking",
         "source": "The Adex",

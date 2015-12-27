@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 
@@ -39,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 //
 // Launch item view on home screen.
@@ -284,6 +286,12 @@ public class LaunchItem extends FrameLayout implements
                     if (subtype.equals("magazine"))
                     {
                         icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigMagazine));
+                        icon.setVisibility(VISIBLE);
+                    }
+
+                    if (subtype.equals("pictorial"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigPictorial));
                         icon.setVisibility(VISIBLE);
                     }
 
@@ -839,6 +847,26 @@ public class LaunchItem extends FrameLayout implements
         {
             try
             {
+                String phonenumber = config.getString("phonenumber");
+                String subtype = config.has("subtype") ? config.getString("subtype") : "text";
+
+                if (subtype.equals("text"))
+                {
+                    Uri uri = Uri.parse("smsto:" + phonenumber);
+                    Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
+                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    sendIntent.setPackage("com.android.mms");
+                    context.startActivity(Intent.createChooser(sendIntent, ""));
+                }
+
+                if (subtype.equals("voip"))
+                {
+                    Uri uri = Uri.parse("tel:" + phonenumber);
+                    Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
+                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    sendIntent.setPackage("com.android.server.telecom");
+                    context.startActivity(Intent.createChooser(sendIntent, ""));
+                }
             }
             catch (Exception ex)
             {

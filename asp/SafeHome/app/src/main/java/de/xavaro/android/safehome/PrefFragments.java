@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 public class PrefFragments
 {
@@ -129,25 +130,31 @@ public class PrefFragments
 
     //region Contacts preferences stub
 
+    @SuppressWarnings("WeakerAccess")
     public static class ContactsFragment extends EnablePreferenceFragment
     {
         protected boolean isPhone;
         protected boolean isSkype;
         protected boolean isWhatsApp;
 
+        protected final CharSequence[] entries = {
+                "Nicht aktiviert",
+                "Home-Bildschirm",
+                "App-Verzeichnis",
+                "Kontakte-Verzeichnis"};
+
+        protected final CharSequence[] evalues = {
+                "inact",
+                "home",
+                "appdir",
+                "comdir" };
+
+        @SuppressWarnings("ConstantConditions")
         public void registerAll(Context context)
         {
             super.registerAll(context);
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
-
-            CharSequence[] entries = {
-                    "Nicht aktiviert",
-                    "Home-Bildschirm",
-                    "App-Verzeichnis",
-                    "Kontakte-Verzeichnis"};
-
-            CharSequence[] evalues = { "inact", "home", "appdir", "comdir" };
 
             try
             {
@@ -276,6 +283,7 @@ public class PrefFragments
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         if (!sharedPrefs.contains(key))
                         {
@@ -296,6 +304,7 @@ public class PrefFragments
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         if (!sharedPrefs.contains(key))
                         {
@@ -316,6 +325,7 @@ public class PrefFragments
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         if (!sharedPrefs.contains(key))
                         {
@@ -336,12 +346,32 @@ public class PrefFragments
                         cb.setEnabled(enabled);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         if (!sharedPrefs.contains(key))
                         {
                             sharedPrefs.edit().putString(key, "inact").apply();
                         }
                     }
+                }
+
+                //
+                // Remove disabled or obsoleted preferences.
+                //
+
+                String websiteprefix = keyprefix + ".";
+
+                Map<String, ?> exists = sharedPrefs.getAll();
+
+                for (Map.Entry<String, ?> entry : exists.entrySet())
+                {
+                    if (! entry.getKey().startsWith(websiteprefix)) continue;
+
+                    if (activekeys.contains(entry.getKey())) continue;
+
+                    sharedPrefs.edit().remove(entry.getKey()).apply();
+
+                    Log.d(LOGTAG, "registerAll: obsolete:" + entry.getKey() + "=" + entry.getValue());
                 }
             }
             catch (JSONException ex)
@@ -355,9 +385,11 @@ public class PrefFragments
 
     //region EnablePreferenceFragment stub
 
+    @SuppressWarnings("WeakerAccess")
     public static class EnablePreferenceFragment extends PreferenceFragment
     {
         protected final ArrayList<Preference> preferences = new ArrayList<>();
+        protected final ArrayList<String> activekeys = new ArrayList<>();
 
         protected String keyprefix;
         protected String masterenable;
@@ -376,6 +408,8 @@ public class PrefFragments
             sw.setDefaultValue(false);
 
             preferences.add(sw);
+
+            activekeys.add(sw.getKey());
         }
 
         @Override
@@ -835,6 +869,37 @@ public class PrefFragments
 
     //endregion Webframe magazine preferences
 
+    //region Webframe magazine preferences
+
+    public static class WebConfigPictorialFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Illustrierte";
+            header.iconRes = GlobalConfigs.IconResWebConfigPictorial;
+            header.fragment = WebConfigPictorialFragment.class.getName();
+
+            return header;
+        }
+
+        public WebConfigPictorialFragment()
+        {
+            super();
+
+            root = "webconfig";
+            subtype = "pictorial";
+            jsonres = R.raw.default_webconfig;
+            iconres = GlobalConfigs.IconResWebConfigPictorial;
+            keyprefix = "webconfig.pictorial";
+            masterenable = "Online Illustrierte freischalten";
+        }
+    }
+
+    //endregion Webframe magazine preferences
+
     //region Webframe shopping preferences
 
     public static class WebConfigShoppingFragment extends JSONConfigFragment
@@ -959,9 +1024,11 @@ public class PrefFragments
 
     //region JSONConfigFragment stub
 
+    @SuppressWarnings("WeakerAccess")
     public static class JSONConfigFragment extends PreferenceFragment
     {
         private final ArrayList<Preference> preferences = new ArrayList<>();
+        protected final ArrayList<String> activekeys = new ArrayList<>();
 
         private JSONObject globalConfig;
 
@@ -1006,6 +1073,7 @@ public class PrefFragments
                 sw.setDefaultValue(false);
 
                 preferences.add(sw);
+                activekeys.add(sw.getKey());
 
                 boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable",false);
 
@@ -1031,6 +1099,11 @@ public class PrefFragments
                     thumbnail = CacheManager.cacheThumbnail(context, iconurl);
                     drawable = new BitmapDrawable(context.getResources(),thumbnail);
 
+                    if (webitem.has("enabled") && ! webitem.getBoolean("enabled"))
+                    {
+                        continue;
+                    }
+
                     if (webitem.has("subtype") && (subtype != null)
                             && ! webitem.getString("subtype").equals(subtype))
                     {
@@ -1048,6 +1121,7 @@ public class PrefFragments
                         cb.setIcon(drawable);
 
                         preferences.add(cb);
+                        activekeys.add(cb.getKey());
 
                         boolean def = webitem.has("default") && webitem.getBoolean("default");
 
@@ -1089,6 +1163,7 @@ public class PrefFragments
                             cb.setEnabled(enabled);
 
                             preferences.add(cb);
+                            activekeys.add(cb.getKey());
 
                             boolean def = channel.has("default") && channel.getBoolean("default");
 
@@ -1104,6 +1179,24 @@ public class PrefFragments
                     }
                 }
 
+                //
+                // Remove disabled or obsoleted preferences.
+                //
+
+                String websiteprefix = keyprefix + ".website.";
+
+                Map<String, ?> exists = sharedPrefs.getAll();
+
+                for (Map.Entry<String, ?> entry : exists.entrySet())
+                {
+                    if (! entry.getKey().startsWith(websiteprefix)) continue;
+
+                    if (activekeys.contains(entry.getKey())) continue;
+
+                    sharedPrefs.edit().remove(entry.getKey()).apply();
+
+                    Log.d(LOGTAG, "registerAll: obsolete:" + entry.getKey() + "=" + entry.getValue());
+                }
             }
             catch (JSONException ex)
             {
