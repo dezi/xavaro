@@ -46,7 +46,16 @@ public class ArchievementManager implements
 
         instance.setTag(tag);
 
-        handler.postDelayed(instance.archievedRunnable, 100);
+        instance.archievedInternal(false);
+    }
+
+    public static void revoke(String tag)
+    {
+        if (instance == null) return;
+
+        instance.setTag(tag);
+
+        instance.archievedInternal(true);
     }
 
     private Context context;
@@ -110,16 +119,7 @@ public class ArchievementManager implements
         return title;
     }
 
-    private final Runnable archievedRunnable = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            archievedInternal();
-        }
-    };
-
-    private void archievedInternal()
+    private void archievedInternal(boolean revoke)
     {
         if (config == null) return;
 
@@ -134,12 +134,14 @@ public class ArchievementManager implements
 
         String cpath = currentXpathpref + "/archieved";
         int count = SettingsManager.getXpathInt(cpath, true);
-        SettingsManager.putXpath(cpath,++count);
+        SettingsManager.putXpath(cpath,revoke ? 0 : ++count);
 
         String lpath = currentXpathpref + "/lastarchieved";
         SettingsManager.putXpath(lpath, StaticUtils.nowAsISO());
 
         SettingsManager.flush();
+
+        Log.d(LOGTAG,"archievedInternal: " + currentTag);
     }
 
     @Nullable
@@ -311,6 +313,33 @@ public class ArchievementManager implements
             int negcount = SettingsManager.getXpathInt(path, true);
             SettingsManager.putXpath(path,++negcount);
             SettingsManager.flush();
+        }
+
+        if ((which == DialogInterface.BUTTON_NEUTRAL) && currentNeutralb.equals("follow"))
+        {
+            handler.postDelayed(instance.folloRunnable, 100);
+        }
+    }
+
+    private Runnable folloRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            follow();
+        }
+    };
+
+    private void follow()
+    {
+        if (currentTag.equals("configure.settings.homebutton"))
+        {
+            DitUndDat.DefaultApps.setDefaultHome(context);
+        }
+
+        if (currentTag.equals("configure.settings.assistbutton"))
+        {
+            DitUndDat.DefaultApps.setDefaultAssist(context);
         }
     }
 }

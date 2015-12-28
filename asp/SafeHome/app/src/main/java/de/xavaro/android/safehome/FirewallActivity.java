@@ -23,7 +23,11 @@ public class FirewallActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
 
+        SystemIdentity.initialize(this);
+        SettingsManager.initialize(this);
+        ArchievementManager.initialize(this);
         PrefFragments.initialize(this);
+        DitUndDat.SharedPrefs.initialize(this);
     }
 
     @Override
@@ -41,7 +45,7 @@ public class FirewallActivity extends PreferenceActivity
         category.title = "Wichtige Einstellungen";
         target.add(category);
 
-        target.add(PrefFragments.SafetyFragment.getHeader());
+        target.add(PrefFragments.AdminFragment.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";
@@ -61,6 +65,8 @@ public class FirewallActivity extends PreferenceActivity
         category = new Header();
         category.title = "Internet Online Content";
         target.add(category);
+
+        target.add(PrefFragments.SafetyFragment.getHeader());
 
         target.add(PrefFragments.WebConfigNewspaperFragment.getHeader());
         target.add(PrefFragments.WebConfigMagazineFragment.getHeader());

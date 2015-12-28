@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -40,6 +41,115 @@ public class PrefFragments
     {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
+
+    //region Administrator preferences
+
+    public static class AdminFragment extends PreferenceFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Administrator";
+            header.iconRes = GlobalConfigs.IconResAdministrator;
+            header.fragment = AdminFragment.class.getName();
+
+            return header;
+        }
+
+        private final static ArrayList<Preference> preferences = new ArrayList<>();
+
+        private static Context runctx;
+
+        public static void registerAll(Context context)
+        {
+            runctx = context;
+
+            preferences.clear();
+
+            NiceEditTextPreference et;
+
+            et = new NiceEditTextPreference(context);
+
+            et.setKey("admin.password");
+            et.setTitle("Administrator Passwort");
+
+            if (! sharedPrefs.getString(et.getKey(),"").equals(""))
+            {
+                ArchievementManager.archieved("configure.settings.password");
+            }
+
+            preferences.add(et);
+
+            et = new NiceEditTextPreference(context);
+
+            et.setKey("admin.home.button");
+            et.setTitle("Anwendung auf dem Home-Button");
+            et.setText(DitUndDat.DefaultApps.getDefaultHomeLabel(context));
+
+            if (sharedPrefs.getString(et.getKey(),"").equals(DitUndDat.DefaultApps.getAppLable(context)))
+            {
+                ArchievementManager.archieved("configure.settings.homebutton");
+            }
+            else
+            {
+                ArchievementManager.revoke("configure.settings.homebutton");
+            }
+
+            et.setOnclick(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    DitUndDat.DefaultApps.setDefaultHome(runctx);
+                }
+            });
+
+            preferences.add(et);
+
+            et = new NiceEditTextPreference(context);
+
+            et.setKey("admin.assist.button");
+            et.setTitle("Anwendung auf dem Assistenz-Button");
+            et.setText(DitUndDat.DefaultApps.getDefaultAssistLabel(context));
+
+            if (sharedPrefs.getString(et.getKey(),"").equals(DitUndDat.DefaultApps.getAppLable(context)))
+            {
+                ArchievementManager.archieved("configure.settings.assistbutton");
+            }
+            else
+            {
+                ArchievementManager.revoke("configure.settings.assistbutton");
+            }
+
+            et.setOnclick(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    DitUndDat.DefaultApps.setDefaultAssist(runctx);
+                }
+            });
+
+            preferences.add(et);
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+        }
+    }
+
+    //endregion Administrator preferences
 
     //region Phone preferences
 
@@ -463,7 +573,7 @@ public class PrefFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Datenschutz und Sicherheit";
+            header.title = "Anwenderschutz";
             header.iconRes = GlobalConfigs.IconResFireWall;
             header.fragment = PrefFragments.SafetyFragment.class.getName();
 
@@ -1366,6 +1476,79 @@ public class PrefFragments
                     Gravity.END);
 
             ((LinearLayout) view).addView(current, lp);
+        }
+    }
+
+    public static class NiceEditTextPreference extends EditTextPreference
+            implements Preference.OnPreferenceChangeListener
+    {
+        private String key;
+        private TextView current;
+        private Runnable onClickRunner;
+
+        public NiceEditTextPreference(Context context)
+        {
+            super(context);
+
+            setOnPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void setKey(String key)
+        {
+            super.setKey(key);
+            this.key = key;
+        }
+
+        @Override
+        public void setText(String text)
+        {
+            super.setText(text);
+
+            sharedPrefs.edit().putString(key, text).apply();
+        }
+
+        public void setOnclick(Runnable onlick)
+        {
+            onClickRunner = onlick;
+        }
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object obj)
+        {
+            if (current != null) current.setText((String) obj);
+
+            return true;
+        }
+
+        @Override
+        protected void showDialog(Bundle state)
+        {
+            if (onClickRunner == null)
+            {
+                super.showDialog(state);
+
+                return;
+            }
+
+            onClickRunner.run();
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            current = new TextView(getContext());
+            current.setGravity(Gravity.END);
+            current.setTextSize(18f);
+
+            if (sharedPrefs.contains(key))
+            {
+                current.setText(sharedPrefs.getString(key, null));
+            }
+
+            ((ViewGroup) view).addView(current);
         }
     }
 

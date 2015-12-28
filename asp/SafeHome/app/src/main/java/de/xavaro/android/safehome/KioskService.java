@@ -278,7 +278,7 @@ public class KioskService extends Service
                 if (showit) handler.post(handleAlert);
             }
 
-            if (blockit && StaticUtils.isDefaultHome(this))
+            if (blockit && DitUndDat.DefaultApps.isDefaultHome(this))
             {
                 restoreRecentProc();
             }

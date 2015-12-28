@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.content.ComponentName;
 import android.support.annotation.Nullable;
 
 import java.io.BufferedReader;
@@ -193,52 +194,6 @@ public class StaticUtils
 
     //endregion
 
-    //region Default home and assist methods.
-
-    //
-    // Retrieve package name handling home button press.
-    //
-
-    public static String getDefaultHome(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
-    }
-
-    public static boolean isDefaultHome(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
-    }
-
-    //
-    // Retrieve package name handling assist button press.
-    //
-
-    public static String getDefaultAssist(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_ASSIST);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
-    }
-
-    public static boolean isDefaultAssist(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_ASSIST);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
-    }
-
     //
     // Retrieve package name handling emails.
     //
@@ -398,6 +353,8 @@ public class StaticUtils
             if (! matcher.find()) return null;
 
             String iconurl = matcher.group(1);
+
+            if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
 
             Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
 
@@ -649,11 +606,24 @@ public class StaticUtils
 
     public static void dumpViewsChildren(View view)
     {
-        for(int i=0; i < ((ViewGroup) view).getChildCount(); ++i)
-        {
-            View nextChild = ((ViewGroup) view).getChildAt(i);
+        dumpViewsChildrenRecurse(view, 0);
+    }
 
-            Log.d(LOGTAG,"dumpViewsChildren:" + nextChild);
+    private static void dumpViewsChildrenRecurse(View view, int level)
+    {
+        if (! (view instanceof ViewGroup)) return;
+
+        String tab = "";
+
+        for (int inx = 0; inx < level; inx++) tab += "  ";
+
+        for(int inx = 0; inx < ((ViewGroup) view).getChildCount(); ++inx)
+        {
+            View nextChild = ((ViewGroup) view).getChildAt(inx);
+
+            Log.d(LOGTAG, "dumpViewsChildren:" + tab + nextChild);
+
+            dumpViewsChildrenRecurse(nextChild, level + 1);
         }
     }
 

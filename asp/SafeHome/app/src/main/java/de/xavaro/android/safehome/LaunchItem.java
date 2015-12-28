@@ -235,7 +235,7 @@ public class LaunchItem extends FrameLayout implements
 
                 if (type.equals("select_home"))
                 {
-                    packageName = StaticUtils.getDefaultHome(context);
+                    packageName = DitUndDat.DefaultApps.getDefaultHome(context);
 
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectHome));
                     icon.setVisibility(VISIBLE);
@@ -244,7 +244,7 @@ public class LaunchItem extends FrameLayout implements
 
                 if (type.equals("select_assist"))
                 {
-                    packageName = StaticUtils.getDefaultAssist(context);
+                    packageName = DitUndDat.DefaultApps.getDefaultAssist(context);
 
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
                     icon.setVisibility(VISIBLE);
@@ -819,30 +819,12 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSelectHome()
     {
-        PackageManager pm = context.getPackageManager();
-        ComponentName cn = new ComponentName(context, FakeHome.class);
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        Intent startMain = new Intent(Intent.ACTION_MAIN);
-        startMain.addCategory(Intent.CATEGORY_HOME);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(startMain);
-
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        DitUndDat.DefaultApps.setDefaultHome(context);
     }
 
     private void launchSelectAssist()
     {
-        PackageManager pm = context.getPackageManager();
-        ComponentName cn = new ComponentName(context, FakeAssist.class);
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        Intent startMain = new Intent(Intent.ACTION_ASSIST);
-        startMain.addCategory(Intent.CATEGORY_DEFAULT);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(startMain);
-
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        DitUndDat.DefaultApps.setDefaultAssist(context);
     }
 
     private void launchFireWall()
