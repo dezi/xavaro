@@ -257,10 +257,21 @@ public class LaunchItem extends FrameLayout implements
                     icon.setVisibility(VISIBLE);
                 }
 
-                if (type.equals("settings"))
+                if (type.equals("settings") && config.has("subtype"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.settings_512x512));
-                    icon.setVisibility(VISIBLE);
+                    String subtype = config.getString("subtype");
+
+                    if (subtype.equals("safehome"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsSafehome));
+                        icon.setVisibility(VISIBLE);
+                    }
+
+                    if (subtype.equals("android"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsAndroid));
+                        icon.setVisibility(VISIBLE);
+                    }
                 }
 
                 if (type.equals("firewall"))
@@ -1014,7 +1025,35 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSettings()
     {
-        LaunchSettings.getInstance(context).open();
+        if (! config.has("subtype"))
+        {
+            Toast.makeText(getContext(),"Nix <subtype> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            String subtype = config.getString("subtype");
+
+            if (subtype.equals("android"))
+            {
+                String packagename = "com.android.settings";
+                HomeActivity.kioskService.addOneShot(packagename);
+                Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
+                context.startActivity(launchIntent);
+            }
+
+            if (subtype.equals("safehome"))
+            {
+                Intent intent = new Intent(context, SettingsActivity.class);
+                context.startActivity(intent);
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG,ex);
+        }
     }
 
     private void launchDirectory()

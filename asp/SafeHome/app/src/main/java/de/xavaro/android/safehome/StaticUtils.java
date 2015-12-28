@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.content.ComponentName;
 import android.support.annotation.Nullable;
 
 import java.io.BufferedReader;
@@ -56,7 +55,7 @@ import org.json.JSONObject;
 // Static all purpose utility methods.
 //
 
-@SuppressWarnings({"WeakerAccess", "UnusedParameters"})
+@SuppressWarnings({"WeakerAccess", "UnusedParameters", "unused"})
 public class StaticUtils
 {
     private static final String LOGTAG = "StaticUtils";
@@ -397,7 +396,7 @@ public class StaticUtils
 
             return string.toString();
         }
-        catch (IOException ex)
+        catch (IOException ignore)
         {
         }
 
@@ -422,7 +421,7 @@ public class StaticUtils
 
             return string.toString();
         }
-        catch (IOException ex)
+        catch (IOException ignore)
         {
         }
 
@@ -441,9 +440,7 @@ public class StaticUtils
             connection.connect();
 
             InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
-            return myBitmap;
+            return BitmapFactory.decodeStream(input);
         }
         catch (IOException e)
         {
@@ -505,9 +502,9 @@ public class StaticUtils
 
                 if (mac != null)
                 {
-                    for (int idx = 0; idx < mac.length; idx++)
+                    for (byte byt : mac)
                     {
-                        buf.append(String.format("%02X:", mac[ idx ]));
+                        buf.append(String.format("%02X:", byt));
                     }
                 }
 
@@ -525,12 +522,12 @@ public class StaticUtils
 
                         boolean isIPv4 = sAddr.indexOf(':') < 0;
 
-                        Log.d(LOGTAG,"getMACAddress addresses:" + intf.getName() + "=" + sAddr);
+                        Log.d(LOGTAG,"getMACAddress addresses:" + intf.getName() + "=" + sAddr + ":" + isIPv4);
                     }
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception ignore)
         {
         }
 
@@ -633,5 +630,21 @@ public class StaticUtils
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         return df.format(new Date());
     }
+
+    public static boolean isAppInstalled(Context context, String packageName)
+    {
+        try
+        {
+            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
+
+            return (appInfo != null);
+        }
+        catch (PackageManager.NameNotFoundException ignore)
+        {
+        }
+
+        return false;
+    }
+
     //endregion
 }

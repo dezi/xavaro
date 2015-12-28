@@ -1,10 +1,12 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -15,6 +17,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -27,13 +30,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-public class PrefFragments
+public class SettingsFragments
 {
-    private static final String LOGTAG = PrefFragments.class.getSimpleName();
+    private static final String LOGTAG = SettingsFragments.class.getSimpleName();
+
+    private static final CharSequence[] recentText = {
+            "Android",
+            "SafeHome"};
+
+    private static final CharSequence[] recentVals = {
+            "android",
+            "safehome"};
 
     private static SharedPreferences sharedPrefs;
 
@@ -73,11 +85,16 @@ public class PrefFragments
             et = new NiceEditTextPreference(context);
 
             et.setKey("admin.password");
-            et.setTitle("Administrator Passwort");
+            et.setTitle("Administrator Passwort (zum Anzeigen clicken)");
+            et.setIsPassword();
 
             if (! sharedPrefs.getString(et.getKey(),"").equals(""))
             {
                 ArchievementManager.archieved("configure.settings.password");
+            }
+            else
+            {
+                ArchievementManager.revoke("configure.settings.password");
             }
 
             preferences.add(et);
@@ -133,6 +150,21 @@ public class PrefFragments
             });
 
             preferences.add(et);
+
+            NiceListPreference cb = new NiceListPreference(context);
+
+            cb.setEntries(recentText);
+            cb.setEntryValues(recentVals);
+            cb.setDefaultValue("safehome");
+            cb.setKey("admin.recent.button");
+            cb.setTitle("Anwendung auf dem Menü-Button");
+
+            if (!sharedPrefs.contains(et.getKey()))
+            {
+                sharedPrefs.edit().putString(et.getKey(), "safehome").apply();
+            }
+
+            preferences.add(cb);
         }
 
         @Override
@@ -171,10 +203,10 @@ public class PrefFragments
         {
             super();
 
+            isPhone = true;
             iconres = GlobalConfigs.IconResPhoneApp;
             keyprefix = "phone";
             masterenable = "Telefon freischalten";
-            isPhone = true;
         }
     }
 
@@ -200,10 +232,12 @@ public class PrefFragments
         {
             super();
 
+            isSkype = true;
             iconres = GlobalConfigs.IconResSkype;
             keyprefix = "skype";
             masterenable = "Skype freischalten";
-            isSkype = true;
+            installtext = "Skype Anwendung auf diesem Tablet";
+            installpack = GlobalConfigs.packageSkype;
         }
     }
 
@@ -229,10 +263,12 @@ public class PrefFragments
         {
             super();
 
+            isWhatsApp = true;
             iconres = GlobalConfigs.IconResWhatsApp;
             keyprefix = "whatsapp";
             masterenable = "WhatsApp freischalten";
-            isWhatsApp = true;
+            installtext = "WhatsApp Anwendung auf diesem Tablet";
+            installpack = GlobalConfigs.packageWhatsApp;
         }
     }
 
@@ -246,6 +282,8 @@ public class PrefFragments
         protected boolean isPhone;
         protected boolean isSkype;
         protected boolean isWhatsApp;
+        protected String installtext;
+        protected String installpack;
 
         protected final CharSequence[] entries = {
                 "Nicht aktiviert",
@@ -259,12 +297,54 @@ public class PrefFragments
                 "appdir",
                 "comdir" };
 
+        protected final CharSequence[] installText = {
+                "Installieren",
+                "Bereit"};
+
+        protected final CharSequence[] installVals = {
+                "notinst",
+                "ready"};
+
         @SuppressWarnings("ConstantConditions")
         public void registerAll(Context context)
         {
             super.registerAll(context);
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            if (installpack != null)
+            {
+                NiceListPreference ip = new NiceListPreference(context);
+
+                boolean installed = StaticUtils.isAppInstalled(context, installpack);
+
+                ip.setEntries(installText);
+                ip.setEntryValues(installVals);
+                ip.setKey(keyprefix + ".installed");
+                ip.setTitle(installtext);
+                ip.setEnabled(enabled);
+
+                //
+                // This is nice about Java. No clue how it is done!
+                //
+
+                final String installName = installpack;
+                final Context installContext = context;
+
+                ip.setOnclick(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        DitUndDat.DefaultApps.installAppFromPlaystore(installContext, installName);
+                    }
+                });
+
+                sharedPrefs.edit().putString(ip.getKey(), installed ? "ready" : "notinst").apply();
+
+                preferences.add(ip);
+                activekeys.add(ip.getKey());
+            }
 
             try
             {
@@ -575,7 +655,7 @@ public class PrefFragments
             header = new PreferenceActivity.Header();
             header.title = "Anwenderschutz";
             header.iconRes = GlobalConfigs.IconResFireWall;
-            header.fragment = PrefFragments.SafetyFragment.class.getName();
+            header.fragment = SettingsFragments.SafetyFragment.class.getName();
 
             return header;
         }
@@ -751,7 +831,7 @@ public class PrefFragments
             header = new PreferenceActivity.Header();
             header.title = "Domänen Freischaltung";
             header.iconRes = GlobalConfigs.IconResFireWall;
-            header.fragment = PrefFragments.DomainsFragment.class.getName();
+            header.fragment = SettingsFragments.DomainsFragment.class.getName();
 
             return header;
         }
@@ -1392,6 +1472,9 @@ public class PrefFragments
         private TextView current;
         private CharSequence[] entries;
         private CharSequence[] values;
+        private Runnable onClickRunner;
+
+        private boolean enabled = true;
 
         public NiceListPreference(Context context)
         {
@@ -1421,6 +1504,21 @@ public class PrefFragments
             this.values = values;
         }
 
+        @Override
+        public void setEnabled(boolean enabled)
+        {
+            super.setEnabled(enabled);
+
+            this.enabled = enabled;
+
+            if (current != null)
+            {
+                current.setTextColor(enabled
+                        ? GlobalConfigs.PreferenceTextEnabledColor
+                        : GlobalConfigs.PreferenceTextDisabledColor);
+            }
+        }
+
         private String getDisplayValue(String value)
         {
             for (int inx = 0; inx < values.length; inx++)
@@ -1432,6 +1530,24 @@ public class PrefFragments
             }
 
             return "unknown";
+        }
+
+        public void setOnclick(Runnable onlick)
+        {
+            onClickRunner = onlick;
+        }
+
+        @Override
+        protected void showDialog(Bundle state)
+        {
+            if (onClickRunner == null)
+            {
+                super.showDialog(state);
+
+                return;
+            }
+
+            onClickRunner.run();
         }
 
         @Override
@@ -1452,6 +1568,10 @@ public class PrefFragments
                 current = new TextView(getContext());
                 current.setGravity(Gravity.END);
                 current.setTextSize(18f);
+
+                current.setTextColor(enabled
+                        ? GlobalConfigs.PreferenceTextEnabledColor
+                        : GlobalConfigs.PreferenceTextDisabledColor);
 
                 if (sharedPrefs.contains(key))
                 {
@@ -1485,6 +1605,7 @@ public class PrefFragments
         private String key;
         private TextView current;
         private Runnable onClickRunner;
+        private boolean isPassword;
 
         public NiceEditTextPreference(Context context)
         {
@@ -1508,17 +1629,14 @@ public class PrefFragments
             sharedPrefs.edit().putString(key, text).apply();
         }
 
+        public void setIsPassword()
+        {
+            isPassword = true;
+        }
+
         public void setOnclick(Runnable onlick)
         {
             onClickRunner = onlick;
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object obj)
-        {
-            if (current != null) current.setText((String) obj);
-
-            return true;
         }
 
         @Override
@@ -1535,6 +1653,14 @@ public class PrefFragments
         }
 
         @Override
+        public boolean onPreferenceChange(Preference preference, Object obj)
+        {
+            if (current != null) current.setText((String) obj);
+
+            return true;
+        }
+
+        @Override
         protected void onBindView(View view)
         {
             super.onBindView(view);
@@ -1542,6 +1668,12 @@ public class PrefFragments
             current = new TextView(getContext());
             current.setGravity(Gravity.END);
             current.setTextSize(18f);
+
+            if (isPassword)
+            {
+                current.setInputType(InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
 
             if (sharedPrefs.contains(key))
             {

@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements
         SystemIdentity.initialize(this);
         SettingsManager.initialize(this);
         ArchievementManager.initialize(this);
-        PrefFragments.initialize(this);
+        SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
     }
 

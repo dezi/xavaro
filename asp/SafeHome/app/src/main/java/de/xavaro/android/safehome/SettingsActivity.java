@@ -14,9 +14,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class FirewallActivity extends PreferenceActivity
+public class SettingsActivity extends PreferenceActivity
 {
-    private static final String LOGTAG = FirewallActivity.class.getSimpleName();
+    private static final String LOGTAG = SettingsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,7 +26,7 @@ public class FirewallActivity extends PreferenceActivity
         SystemIdentity.initialize(this);
         SettingsManager.initialize(this);
         ArchievementManager.initialize(this);
-        PrefFragments.initialize(this);
+        SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
     }
 
@@ -45,40 +45,40 @@ public class FirewallActivity extends PreferenceActivity
         category.title = "Wichtige Einstellungen";
         target.add(category);
 
-        target.add(PrefFragments.AdminFragment.getHeader());
+        target.add(SettingsFragments.AdminFragment.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";
         target.add(category);
 
-        target.add(PrefFragments.PhoneFragment.getHeader());
-        target.add(PrefFragments.SkypeFragment.getHeader());
-        target.add(PrefFragments.WhatsAppFragment.getHeader());
+        target.add(SettingsFragments.PhoneFragment.getHeader());
+        target.add(SettingsFragments.SkypeFragment.getHeader());
+        target.add(SettingsFragments.WhatsAppFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";
         target.add(category);
 
-        target.add(PrefFragments.IPTelevisionFragment.getHeader());
-        target.add(PrefFragments.IPRadioFragment.getHeader());
+        target.add(SettingsFragments.IPTelevisionFragment.getHeader());
+        target.add(SettingsFragments.IPRadioFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Online Content";
         target.add(category);
 
-        target.add(PrefFragments.SafetyFragment.getHeader());
+        target.add(SettingsFragments.SafetyFragment.getHeader());
 
-        target.add(PrefFragments.WebConfigNewspaperFragment.getHeader());
-        target.add(PrefFragments.WebConfigMagazineFragment.getHeader());
-        target.add(PrefFragments.WebConfigPictorialFragment.getHeader());
-        target.add(PrefFragments.WebConfigShoppingFragment.getHeader());
-        target.add(PrefFragments.WebConfigEroticsFragment.getHeader());
+        target.add(SettingsFragments.WebConfigNewspaperFragment.getHeader());
+        target.add(SettingsFragments.WebConfigMagazineFragment.getHeader());
+        target.add(SettingsFragments.WebConfigPictorialFragment.getHeader());
+        target.add(SettingsFragments.WebConfigShoppingFragment.getHeader());
+        target.add(SettingsFragments.WebConfigEroticsFragment.getHeader());
 
         category = new Header();
         category.title = "Firewall";
         target.add(category);
 
-        target.add(PrefFragments.DomainsFragment.getHeader());
+        target.add(SettingsFragments.DomainsFragment.getHeader());
 
         setHeaders(target);
     }

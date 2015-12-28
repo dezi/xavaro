@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import android.content.BroadcastReceiver;
@@ -25,7 +26,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +40,18 @@ public class DitUndDat
     public static class DefaultApps
     {
         private static final String LOGTAG = DefaultApps.class.getSimpleName();
+
+        public static void installAppFromPlaystore(Context context, String packagename)
+        {
+            if (HomeActivity.kioskService != null)
+            {
+                HomeActivity.kioskService.addOneShot(GlobalConfigs.packagePlaystore);
+            }
+
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
+            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
+            context.startActivity(goToMarket);
+        }
 
         public static String getAppLable(Context context)
         {
@@ -252,9 +264,9 @@ public class DitUndDat
             // Register all dynamic preferences.
             //
 
-            PrefFragments.AdminFragment.registerAll(context);
-            PrefFragments.SafetyFragment.registerAll(context);
-            PrefFragments.DomainsFragment.registerAll(context);
+            SettingsFragments.AdminFragment.registerAll(context);
+            SettingsFragments.SafetyFragment.registerAll(context);
+            SettingsFragments.DomainsFragment.registerAll(context);
         }
 
         public static Map<String, Object> getPrefix(String prefix)
