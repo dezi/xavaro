@@ -1156,38 +1156,6 @@ public class LaunchItem extends FrameLayout implements
         }
     }
 
-    private void launchDeveloperOld1()
-    {
-        //StaticUtils.getAllInstalledApps(context);
-
-        //StaticUtils.JSON2String(StaticUtils.getAllInstalledApps(context), true);
-
-        /*
-        String app_pkg_name = "marcone.toddlerlock";
-
-        Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
-        intent.setData(Uri.parse("package:" + app_pkg_name));
-        context.startActivity(intent);
-        */
-
-        /*
-        Intent intentOpenBluetoothSettings = new Intent(Settings.ACTION_DATE_SETTINGS);
-        context.startActivity(intentOpenBluetoothSettings);
-        */
-
-        /*
-        Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-        goToMarket.setData(Uri.parse("market://details?id=org.wikipedia"));
-        context.startActivity(goToMarket);
-        */
-
-        /*
-        Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-        goToMarket.setData(Uri.parse("market://details?id=com.whatsapp"));
-        context.startActivity(goToMarket);
-        */
-    }
-
     private void launchDeveloperException()
     {
         try
