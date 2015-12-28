@@ -317,11 +317,11 @@ public class ArchievementManager implements
 
         if ((which == DialogInterface.BUTTON_NEUTRAL) && currentNeutralb.equals("follow"))
         {
-            handler.postDelayed(instance.folloRunnable, 100);
+            handler.postDelayed(instance.followRunnable, 100);
         }
     }
 
-    private Runnable folloRunnable = new Runnable()
+    private Runnable followRunnable = new Runnable()
     {
         @Override
         public void run()
