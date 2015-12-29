@@ -50,11 +50,53 @@ public class LaunchSettings extends LaunchGroup implements
         }
     }
 
+    private EditText pwedit;
+
+    public void open()
+    {
+        if (DitUndDat.SharedPrefs.sharedPrefs.getString("admin.password","").equals(""))
+        {
+            ((HomeActivity) context).addViewToBackStack(this);
+
+            ArchievementManager.show("configure.settings.*");
+
+            return;
+        }
+
+        //
+        // Build and open password dialog.
+        //
+
+        ArchievementManager.archieved("howto.open.settings");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Enter Settings Password");
+
+        pwedit = new EditText(context);
+
+        pwedit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        pwedit.setPadding(40, 40, 40, 40);
+        pwedit.setTextSize(48f);
+
+        builder.setView(pwedit);
+
+        builder.setPositiveButton("Ok", this);
+        builder.setNegativeButton("Cancel", this);
+
+        AlertDialog dialog = builder.create();
+
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(24f);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
+    }
+
     public void onClick(DialogInterface dialog, int which)
     {
-        //m_Text = input.getText().toString();
+        String pwreal = DitUndDat.SharedPrefs.sharedPrefs.getString("admin.password", "");
+        String pwuser = pwedit.getText().toString();
 
-        if (which == DialogInterface.BUTTON_POSITIVE)
+        if ((which == DialogInterface.BUTTON_POSITIVE) && pwreal.equals(pwuser))
         {
             ((HomeActivity) context).addViewToBackStack(this);
 
@@ -64,31 +106,5 @@ public class LaunchSettings extends LaunchGroup implements
         }
 
         dialog.cancel();
-    }
-
-    public void open()
-    {
-        ArchievementManager.archieved("howto.open.settings");
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter Settings Password");
-
-        final EditText input = new EditText(context);
-
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        input.setPadding(40, 40, 40, 40);
-        input.setTextSize(48f);
-
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", this);
-        builder.setNegativeButton("Cancel", this);
-
-        AlertDialog dialog = builder.create();
-
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(24f);
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
     }
 }

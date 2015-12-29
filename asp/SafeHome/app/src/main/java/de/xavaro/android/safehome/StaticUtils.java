@@ -55,7 +55,7 @@ import org.json.JSONObject;
 // Static all purpose utility methods.
 //
 
-@SuppressWarnings({"WeakerAccess", "UnusedParameters"})
+@SuppressWarnings({"WeakerAccess", "UnusedParameters", "unused"})
 public class StaticUtils
 {
     private static final String LOGTAG = "StaticUtils";
@@ -192,52 +192,6 @@ public class StaticUtils
     }
 
     //endregion
-
-    //region Default home and assist methods.
-
-    //
-    // Retrieve package name handling home button press.
-    //
-
-    public static String getDefaultHome(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
-    }
-
-    public static boolean isDefaultHome(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
-    }
-
-    //
-    // Retrieve package name handling assist button press.
-    //
-
-    public static String getDefaultAssist(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_ASSIST);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
-    }
-
-    public static boolean isDefaultAssist(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_ASSIST);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
-    }
 
     //
     // Retrieve package name handling emails.
@@ -399,6 +353,8 @@ public class StaticUtils
 
             String iconurl = matcher.group(1);
 
+            if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
+
             Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
 
             return CacheManager.cacheThumbnail(context, iconurl, iconfile);
@@ -440,7 +396,7 @@ public class StaticUtils
 
             return string.toString();
         }
-        catch (IOException ex)
+        catch (IOException ignore)
         {
         }
 
@@ -465,7 +421,7 @@ public class StaticUtils
 
             return string.toString();
         }
-        catch (IOException ex)
+        catch (IOException ignore)
         {
         }
 
@@ -484,9 +440,7 @@ public class StaticUtils
             connection.connect();
 
             InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
-            return myBitmap;
+            return BitmapFactory.decodeStream(input);
         }
         catch (IOException e)
         {
@@ -548,9 +502,9 @@ public class StaticUtils
 
                 if (mac != null)
                 {
-                    for (int idx = 0; idx < mac.length; idx++)
+                    for (byte byt : mac)
                     {
-                        buf.append(String.format("%02X:", mac[ idx ]));
+                        buf.append(String.format("%02X:", byt));
                     }
                 }
 
@@ -568,12 +522,12 @@ public class StaticUtils
 
                         boolean isIPv4 = sAddr.indexOf(':') < 0;
 
-                        Log.d(LOGTAG,"getMACAddress addresses:" + intf.getName() + "=" + sAddr);
+                        Log.d(LOGTAG,"getMACAddress addresses:" + intf.getName() + "=" + sAddr + ":" + isIPv4);
                     }
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception ignore)
         {
         }
 
@@ -649,11 +603,24 @@ public class StaticUtils
 
     public static void dumpViewsChildren(View view)
     {
-        for(int i=0; i < ((ViewGroup) view).getChildCount(); ++i)
-        {
-            View nextChild = ((ViewGroup) view).getChildAt(i);
+        dumpViewsChildrenRecurse(view, 0);
+    }
 
-            Log.d(LOGTAG,"dumpViewsChildren:" + nextChild);
+    private static void dumpViewsChildrenRecurse(View view, int level)
+    {
+        if (! (view instanceof ViewGroup)) return;
+
+        String tab = "";
+
+        for (int inx = 0; inx < level; inx++) tab += "  ";
+
+        for(int inx = 0; inx < ((ViewGroup) view).getChildCount(); ++inx)
+        {
+            View nextChild = ((ViewGroup) view).getChildAt(inx);
+
+            Log.d(LOGTAG, "dumpViewsChildren:" + tab + nextChild);
+
+            dumpViewsChildrenRecurse(nextChild, level + 1);
         }
     }
 
@@ -663,5 +630,21 @@ public class StaticUtils
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         return df.format(new Date());
     }
+
+    public static boolean isAppInstalled(Context context, String packageName)
+    {
+        try
+        {
+            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
+
+            return (appInfo != null);
+        }
+        catch (PackageManager.NameNotFoundException ignore)
+        {
+        }
+
+        return false;
+    }
+
     //endregion
 }

@@ -1,11 +1,18 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
+import android.support.annotation.Nullable;
+
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
@@ -18,7 +25,6 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,11 +35,157 @@ import java.util.Map;
 //
 public class DitUndDat
 {
-    /*
-    public static class NiceToast extends Toast
+    //region public static class DefaultLauncher
+
+    public static class DefaultApps
     {
+        private static final String LOGTAG = DefaultApps.class.getSimpleName();
+
+        public static void installAppFromPlaystore(Context context, String packagename)
+        {
+            if (HomeActivity.kioskService != null)
+            {
+                HomeActivity.kioskService.addOneShot(GlobalConfigs.packagePlaystore);
+            }
+
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
+            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
+            context.startActivity(goToMarket);
+        }
+
+        public static String getAppLable(Context context)
+        {
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo ai = null;
+
+            try
+            {
+                ai = pm.getApplicationInfo(context.getApplicationInfo().packageName, 0);
+            }
+            catch (final PackageManager.NameNotFoundException ex)
+            {
+                OopsService.log(LOGTAG,ex);
+            }
+
+            return (String) (ai != null ? pm.getApplicationLabel(ai) : "Unknown");
+        }
+
+        public static String getDefaultHome(Context context)
+        {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+            return (res.activityInfo == null) ? null : res.activityInfo.packageName;
+        }
+
+        public static void setDefaultHome(Context context)
+        {
+            PackageManager pm = context.getPackageManager();
+            ComponentName cn = new ComponentName(context, FakeHome.class);
+            pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startMain);
+
+            pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        }
+
+        @Nullable
+        public static String getDefaultHomeLabel(Context context)
+        {
+            PackageManager pm = context.getPackageManager();
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+            if (res.activityInfo == null) return null;
+            String packageName = res.activityInfo.packageName;
+
+            try
+            {
+                ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
+                return (String) pm.getApplicationLabel(ai);
+            }
+            catch (PackageManager.NameNotFoundException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+
+            return null;
+        }
+
+        public static boolean isDefaultHome(Context context)
+        {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+            return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
+        }
+
+        //
+        // Retrieve package name handling assist button press.
+        //
+
+        public static String getDefaultAssist(Context context)
+        {
+            Intent intent = new Intent(Intent.ACTION_ASSIST);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+            return (res.activityInfo == null) ? null : res.activityInfo.packageName;
+        }
+
+        public static void setDefaultAssist(Context context)
+        {
+            PackageManager pm = context.getPackageManager();
+            ComponentName cn = new ComponentName(context, FakeAssist.class);
+            pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+            Intent startMain = new Intent(Intent.ACTION_ASSIST);
+            startMain.addCategory(Intent.CATEGORY_DEFAULT);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startMain);
+
+            pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        }
+
+        @Nullable
+        public static String getDefaultAssistLabel(Context context)
+        {
+            PackageManager pm = context.getPackageManager();
+            Intent intent = new Intent(Intent.ACTION_ASSIST);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+            if (res.activityInfo == null) return null;
+            String packageName = res.activityInfo.packageName;
+
+            try
+            {
+                ApplicationInfo ai = pm.getApplicationInfo(packageName, 0);
+                return (String) pm.getApplicationLabel(ai);
+            }
+            catch (PackageManager.NameNotFoundException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+
+            return null;
+        }
+
+        public static boolean isDefaultAssist(Context context)
+        {
+            Intent intent = new Intent(Intent.ACTION_ASSIST);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+            return (res.activityInfo != null) && res.activityInfo.packageName.equals(context.getPackageName());
+        }
     }
-    */
+
+    //endregion public static class DefaultLauncher
 
     //region public static class ImageAntiAliasView extends ImageView
 
@@ -112,8 +264,9 @@ public class DitUndDat
             // Register all dynamic preferences.
             //
 
-            PrefFragments.SafetyFragment.registerAll(context);
-            PrefFragments.DomainsFragment.registerAll(context);
+            SettingsFragments.AdminFragment.registerAll(context);
+            SettingsFragments.SafetyFragment.registerAll(context);
+            SettingsFragments.DomainsFragment.registerAll(context);
         }
 
         public static Map<String, Object> getPrefix(String prefix)

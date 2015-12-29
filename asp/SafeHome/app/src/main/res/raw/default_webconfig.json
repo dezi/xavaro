@@ -160,7 +160,24 @@
       "label": "DaWanda",
       "subtype": "shopping",
 
-      "subdomains": [ ".dawanda.com", ".dawandastatic.com", "apis.google.com", ".amazonaws.com" ]
+      "subdomains": [
+        ".dawanda.com",
+        ".dawandastatic.com",
+        "fonts.googleapis.com",
+        "fonts.gstatic.com",
+        "apis.google.com",
+        ".amazonaws.com"
+      ]
+    },
+
+    "www.klingel.de": {
+      "url": "http://www.klingel.de/",
+      "icon": "http://www.mydealz.de/images/merchants/klingel_logo.png",
+      "label": "KLINGEL.de",
+      "subtype": "shopping",
+
+      "subdomains": [
+      ]
     },
 
     "de.m.xhamster.com": {

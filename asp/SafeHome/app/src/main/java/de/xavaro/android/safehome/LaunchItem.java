@@ -235,7 +235,7 @@ public class LaunchItem extends FrameLayout implements
 
                 if (type.equals("select_home"))
                 {
-                    packageName = StaticUtils.getDefaultHome(context);
+                    packageName = DitUndDat.DefaultApps.getDefaultHome(context);
 
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectHome));
                     icon.setVisibility(VISIBLE);
@@ -244,7 +244,7 @@ public class LaunchItem extends FrameLayout implements
 
                 if (type.equals("select_assist"))
                 {
-                    packageName = StaticUtils.getDefaultAssist(context);
+                    packageName = DitUndDat.DefaultApps.getDefaultAssist(context);
 
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
                     icon.setVisibility(VISIBLE);
@@ -257,10 +257,21 @@ public class LaunchItem extends FrameLayout implements
                     icon.setVisibility(VISIBLE);
                 }
 
-                if (type.equals("settings"))
+                if (type.equals("settings") && config.has("subtype"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.settings_512x512));
-                    icon.setVisibility(VISIBLE);
+                    String subtype = config.getString("subtype");
+
+                    if (subtype.equals("safehome"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsSafehome));
+                        icon.setVisibility(VISIBLE);
+                    }
+
+                    if (subtype.equals("android"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsAndroid));
+                        icon.setVisibility(VISIBLE);
+                    }
                 }
 
                 if (type.equals("firewall"))
@@ -819,30 +830,12 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSelectHome()
     {
-        PackageManager pm = context.getPackageManager();
-        ComponentName cn = new ComponentName(context, FakeHome.class);
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        Intent startMain = new Intent(Intent.ACTION_MAIN);
-        startMain.addCategory(Intent.CATEGORY_HOME);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(startMain);
-
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        DitUndDat.DefaultApps.setDefaultHome(context);
     }
 
     private void launchSelectAssist()
     {
-        PackageManager pm = context.getPackageManager();
-        ComponentName cn = new ComponentName(context, FakeAssist.class);
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        Intent startMain = new Intent(Intent.ACTION_ASSIST);
-        startMain.addCategory(Intent.CATEGORY_DEFAULT);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(startMain);
-
-        pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        DitUndDat.DefaultApps.setDefaultAssist(context);
     }
 
     private void launchFireWall()
@@ -1032,7 +1025,35 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSettings()
     {
-        LaunchSettings.getInstance(context).open();
+        if (! config.has("subtype"))
+        {
+            Toast.makeText(getContext(),"Nix <subtype> configured.",Toast.LENGTH_LONG).show();
+
+            return;
+        }
+
+        try
+        {
+            String subtype = config.getString("subtype");
+
+            if (subtype.equals("android"))
+            {
+                String packagename = "com.android.settings";
+                HomeActivity.kioskService.addOneShot(packagename);
+                Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
+                context.startActivity(launchIntent);
+            }
+
+            if (subtype.equals("safehome"))
+            {
+                Intent intent = new Intent(context, SettingsActivity.class);
+                context.startActivity(intent);
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG,ex);
+        }
     }
 
     private void launchDirectory()
@@ -1133,38 +1154,6 @@ public class LaunchItem extends FrameLayout implements
         {
             ex.printStackTrace();
         }
-    }
-
-    private void launchDeveloperOld1()
-    {
-        //StaticUtils.getAllInstalledApps(context);
-
-        //StaticUtils.JSON2String(StaticUtils.getAllInstalledApps(context), true);
-
-        /*
-        String app_pkg_name = "marcone.toddlerlock";
-
-        Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
-        intent.setData(Uri.parse("package:" + app_pkg_name));
-        context.startActivity(intent);
-        */
-
-        /*
-        Intent intentOpenBluetoothSettings = new Intent(Settings.ACTION_DATE_SETTINGS);
-        context.startActivity(intentOpenBluetoothSettings);
-        */
-
-        /*
-        Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-        goToMarket.setData(Uri.parse("market://details?id=org.wikipedia"));
-        context.startActivity(goToMarket);
-        */
-
-        /*
-        Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-        goToMarket.setData(Uri.parse("market://details?id=com.whatsapp"));
-        context.startActivity(goToMarket);
-        */
     }
 
     private void launchDeveloperException()

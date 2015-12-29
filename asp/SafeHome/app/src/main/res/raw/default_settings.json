@@ -10,9 +10,14 @@
         "type": "select_assist"
       },
       {
-        "label": "Android Settings",
-        "type": "genericapp",
-        "packagename": "com.android.settings"
+        "label": "SafeHome Settings",
+        "type": "settings",
+        "subtype": "safehome"
+      },
+      {
+        "label": "Android Setting",
+        "type": "settings",
+        "subtype": "android"
       },
       {
         "label": "Test Feature",

@@ -50,7 +50,7 @@
           "Die nach soziodemographischen Merkmalen gefilterten unterschiedlichen Zielgruppen ",
           "bekommen für diese möglichst relevante Werbeinhalte präsentiert."
         ],
-        "faults": [ "nofault" ]
+        "faults": [ "nofaults" ]
       },
 
       {
@@ -163,6 +163,18 @@
       },
 
       {
+        "domain": "bazaarvoice.com",
+        "type": "Recommendation",
+        "source": "Wikipedia",
+        "description": [
+          "Bazaarvoice ist im Bereich Online-Marketing tätig und bietet anderen Unternehmen ",
+          "seinen Dienst als Software as a Service an. Es hat sich auf User-Generated-Content ",
+          "spezialisiert, bei dem Kunden von Onlineshops Produkte bewerten und empfehlen können."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
         "domain": "bunchbox.co",
         "type": "Unbekannt",
         "source": "Recherche",
@@ -195,20 +207,7 @@
       },
 
       {
-        "domain": "chartbeat.com",
-        "type": "Tracking",
-        "source": "Wikipedia",
-        "description": [
-          "Chartbeat is a web analytics company headquartered in New York City. It was started ",
-          "in 2009. The company helps provide actionable insights to news websites and blogs ",
-          "that the websites and blogs can use to make real-time decisions about the content ",
-          "to publish and promote on their sites."
-        ],
-        "faults": [ "noprivger", "nooptout" ]
-      },
-
-      {
-        "domain": "chartbeat.net",
+        "domain": "chartbeat.com+chartbeat.net",
         "type": "Tracking",
         "source": "Wikipedia",
         "description": [
@@ -269,6 +268,15 @@
         "faults": [ "nohome", "nopriv", "isporn" ]
       },
 
+      {
+        "domain": "econda-monitor.de",
+        "type": "Tracking",
+        "source": "Recherche",
+        "description": [
+          "Todo."
+        ],
+        "faults": [ "nofaults" ]
+      },
       {
         "domain": "edelight.biz",
         "type": "Shopping",
@@ -347,7 +355,7 @@
         "description": [
           "Gehört natürlich zu Google."
         ],
-        "faults": [ "nofault" ]
+        "faults": [ "nofaults" ]
       },
 
       {
@@ -379,7 +387,7 @@
         "description": [
           "Gehört natürlich zu Google."
         ],
-        "faults": [ "nofault" ]
+        "faults": [ "nofaults" ]
       },
 
       {
@@ -441,7 +449,7 @@
           "LocalStorage Objekt oder eine Signatur, die aus verschiedenen automatisch ",
           "übertragenen Informationen Ihres Browsers erstellt wird."
         ],
-        "faults": [ "nofault" ]
+        "faults": [ "nofaults" ]
       },
 
       {
@@ -546,6 +554,21 @@
       },
 
       {
+        "domain": "maxymiser.net",
+        "type": "Tracking",
+        "source": "maxymiser",
+        "description": [
+          "Kombinieren Sie Echtzeit-Analysen mit individuellen Kundenprofilen. Spielen Sie in ",
+          "Sekundenschnelle Website-Varianten ein, die auf den Besucher zugeschnitten sind. ",
+          "Präsentieren Sie intelligente Zusatzangebote und Empfehlungen je nach Bestellphase, ",
+          "Kundenprofil und Verhalten. Nutzen Sie externe Daten, um Ihre Kunden noch gezielter ",
+          "anzusprechen. Bieten Sie Ihren Kunden auf allen Plattformen ein personalisiertes ",
+          "Erlebnis. Zeigen Sie ihnen je nach Gerät die relevanten Inhalte."
+        ],
+        "faults": [ "nofaults" ]
+      },
+
+      {
         "domain": "mediavoice.com",
         "type": "Tracking",
         "source": "Recherche",
@@ -595,6 +618,18 @@
           "unterstellen mal, dass da ein Meetrics-Spassvogel am Werk ist."
         ],
         "faults": [ "nohome", "nopriv" ]
+      },
+
+      {
+        "domain": "newrelic.com+nr-data.net",
+        "type": "Monitoring",
+        "source": "New Relic",
+        "description": [
+          "Around 90% of a web page’s load time is accounted for on the front-end. New Relic ",
+          "Browser takes advantage of this opportunity to improve browser-side performance ",
+          "and offers powerful performance insights."
+        ],
+        "faults": [ "noprivger" ]
       },
 
       {
@@ -836,7 +871,18 @@
         "description": [
           "Gehört zu Outbrain, Inc."
         ],
-        "faults": [ "nofault" ]
+        "faults": [ "nofaults" ]
+      },
+
+      {
+        "domain": "webmasterplan.com",
+        "type": "Unbekannt",
+        "source": "Recherche",
+        "description": [
+          "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+          "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+        ],
+        "faults": [ "nohome", "nopriv" ]
       },
 
       {

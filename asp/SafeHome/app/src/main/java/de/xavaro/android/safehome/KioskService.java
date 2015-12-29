@@ -205,7 +205,7 @@ public class KioskService extends Service
         return mode;
     }
 
-    private Runnable handleAlert = new Runnable()
+    private final Runnable handleAlert = new Runnable()
     {
         public void run()
         {
@@ -278,7 +278,14 @@ public class KioskService extends Service
                 if (showit) handler.post(handleAlert);
             }
 
-            if (blockit && StaticUtils.isDefaultHome(this))
+            if (proc.equals("com.android.systemui.recentsactivity"))
+            {
+                String what = DitUndDat.SharedPrefs.sharedPrefs.getString("admin.recent.button","");
+
+                if (what.equals("android")) blockit = false;
+            }
+
+            if (blockit && DitUndDat.DefaultApps.isDefaultHome(this))
             {
                 restoreRecentProc();
             }

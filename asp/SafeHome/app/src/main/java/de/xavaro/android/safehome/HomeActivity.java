@@ -91,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements
         SystemIdentity.initialize(this);
         SettingsManager.initialize(this);
         ArchievementManager.initialize(this);
-
+        SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
     }
 
@@ -267,7 +267,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void executeOnBackPressed()
     {
-        if (! StaticUtils.isDefaultHome(this))
+        if (! DitUndDat.DefaultApps.isDefaultHome(this))
         {
             //
             // Finally release user to system.
