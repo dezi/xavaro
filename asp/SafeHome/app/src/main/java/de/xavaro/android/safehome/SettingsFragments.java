@@ -1003,7 +1003,7 @@ public class SettingsFragments
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Tageszeitungen";
+            header.title = "Zeitungen";
             header.iconRes = GlobalConfigs.IconResWebConfigNewspaper;
             header.fragment = WebConfigNewspaperFragment.class.getName();
 
@@ -1019,7 +1019,7 @@ public class SettingsFragments
             jsonres = R.raw.default_webconfig;
             iconres = GlobalConfigs.IconResWebConfigNewspaper;
             keyprefix = "webconfig.newspaper";
-            masterenable = "Online Tageszeitungen freischalten";
+            masterenable = "Online Zeitungen freischalten";
         }
     }
 
