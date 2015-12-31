@@ -50,11 +50,6 @@ import java.util.UUID;
 //
 public class DitUndDat
 {
-    //region public static class BlueTooth
-
-
-    //enregion public static class BlueTooth
-
     //region public static class SpeekDat
 
     public static class SpeekDat extends UtteranceProgressListener implements

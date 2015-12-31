@@ -1289,9 +1289,10 @@ public class LaunchItem extends FrameLayout implements
     {
         //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
 
-
-        DitUndDat.BlueTooth bt = new DitUndDat.BlueTooth(context);
-
         //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
+
+        BlueTooth bt = BlueTooth.getInstance(context);
+
+        bt.startDiscovery();
     }
 }

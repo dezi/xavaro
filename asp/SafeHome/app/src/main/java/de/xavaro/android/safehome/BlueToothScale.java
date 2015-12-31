@@ -4,29 +4,47 @@ import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
+import java.security.acl.LastOwnerException;
 import java.util.Arrays;
 import java.util.Date;
 
+@SuppressWarnings({"UnusedAssignment", "unused"})
 public class BlueToothScale
 {
     private static final String LOGTAG = BlueToothScale.class.getSimpleName();
 
     private static class Scales
     {
-        public static final String BEURER_BC57 = "BC57";
+        public static final String SBF70 = "SBF70";
         public static final String BF710 = "Beurer BF710";
-        public static final String BM75 = "BM75";
         public static final String GS485 = "Beurer GS485";
         public static final String SANITAS_SBF70 = "SANITAS SBF70";
-        public static final String SANITAS_SBM37 = "Sanitas SBM37";
-        public static final String SANITAS_SBM67 = "BPM Smart";
+    }
+
+    private static class Sensors
+    {
         public static final String SAS75 = "SAS75";
-        public static final String SBF70 = "SBF70";
+    }
+
+    private static class BPMs
+    {
+        public static final String BM75 = "BM75";
         public static final String SBM37 = "SBM37";
         public static final String SBM67 = "SBM67";
+        public static final String BEURER_BC57 = "BC57";
+        public static final String SANITAS_SBM37 = "Sanitas SBM37";
+        public static final String SANITAS_SBM67 = "BPM Smart";
     }
-    
-    public static byte[] convertLongToBytes(long value)
+
+    public static boolean isCompatibleScale(String devicename)
+    {
+        return (devicename.equalsIgnoreCase(Scales.SBF70) ||
+                devicename.equalsIgnoreCase(Scales.BF710) ||
+                devicename.equalsIgnoreCase(Scales.GS485) ||
+                devicename.equalsIgnoreCase(Scales.SANITAS_SBF70));
+    }
+
+    public byte[] convertLongToBytes(long value)
     {
         byte[] data = new byte[ 8 ];
         for (int i = 0; i < 8; i++)
@@ -36,7 +54,7 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] convertIntToBytes(int value)
+    public byte[] convertIntToBytes(int value)
     {
         byte[] data = new byte[ 8 ];
         for (int i = 0; i < 4; i++)
@@ -72,7 +90,9 @@ public class BlueToothScale
 
     public static int convertByteToInt(byte data)
     {
-        return Integer.parseInt(String.format("%X", new Object[]{Byte.valueOf(data)}), 16);
+        //return Integer.parseInt(String.format("%X", new Object[]{Byte.valueOf(data)}), 16);
+
+        return data & 0xff;
     }
 
     public static long getTimeStampInMilliSeconds(int timeStampInSeconds)
@@ -85,35 +105,51 @@ public class BlueToothScale
         return (int) (timeStampInMilliSeconds / 1000);
     }
 
+    public BlueToothScale(String model)
+    {
+        this.model = model;
+    }
+
+    private String model;
     private int mMaximumUsers;
-    private int[] rawAmrArray;
-    private float[] rawBmiArray;
-    private int[] rawBmrArray;
-    private float[] rawBodyFatArray;
-    private float[] rawBoneMassArray;
-    private int[] rawImpedanceArray;
-    private long[] rawListOfUuids;
-    private int[] rawMeasurementIdArray;
-    private float[] rawMuscleArray;
-    private int[] rawTimeStampArray;
-    private String[] rawUserListInitials;
-    private float[] rawWaterArray;
-    private double[] rawWeightArray;
     private byte waterByte;
     private int didFinishMeasurementStatus;
 
-    public void parseDataForGS485(BluetoothGatt gatt, byte[] rd)
+    // @formatter:off
+    private long[]   rawListOfUuids        = new long  [  8 ];
+    private String[] rawUserListInitials   = new String[  8 ];
+    // @formatter:on
+
+    // @formatter:off
+
+    private int[]    rawAmrArray           = new int   [ 50 ];
+    private float[]  rawBmiArray           = new float [ 50 ];
+    private int[]    rawBmrArray           = new int   [ 50 ];
+    private float[]  rawBodyFatArray       = new float [ 50 ];
+    private float[]  rawBoneMassArray      = new float [ 50 ];
+    private int[]    rawImpedanceArray     = new int   [ 50 ];
+    private int[]    rawMeasurementIdArray = new int   [ 50 ];
+    private float[]  rawMuscleArray        = new float [ 50 ];
+    private int[]    rawTimeStampArray     = new int   [ 50 ];
+    private float[]  rawWaterArray         = new float [ 50 ];
+    private double[] rawWeightArray        = new double[ 50 ];
+    // @formatter:on
+
+    public boolean parseData(byte[] rd)
     {
+        Log.d(LOGTAG, "parseData: " + rd[ 0 ] + " " + rd[ 1 ]);
+        Log.d(LOGTAG, "parseData: " + StaticUtils.hexBytesToString(rd));
+
         if (rd[ 0 ] == -32)
         {
-            return;
+            return false;
         }
 
         if (rd[ 0 ] == -26)
         {
             Log.d(LOGTAG, "Device Ready");
 
-            return;
+            return false;
         }
 
         if (rd[ 0 ] == -24)
@@ -122,12 +158,12 @@ public class BlueToothScale
             {
                 Log.d(LOGTAG, "Pairing Completed Successfully");
 
-                return;
+                return false;
             }
 
             Log.d(LOGTAG, "Pairing Completed Unsuccessfully");
 
-            return;
+            return false;
         }
 
         if (rd[ 0 ] == -16)
@@ -141,14 +177,16 @@ public class BlueToothScale
 
             // this.mBleScaleCallbacks.didGetScaleSleepWithStatus(status);
 
-            return;
+            return false;
         }
 
         if (rd[ 0 ] == -15)
         {
+            Log.d(LOGTAG, "parseData: ModuleVersion=" + rd[ 1 ]);
+
             // this.mBleScaleCallbacks.didGetModuleVersion(convertByteToInt(recievedData[ 1 ]));
 
-            return;
+            return false;
         }
 
         if (rd[ 0 ] == -14)
@@ -157,7 +195,7 @@ public class BlueToothScale
 
             //this.mBleScaleCallbacks.didGetRemoteTimeStamp(timeStamp);
 
-            return;
+            return false;
         }
 
         if (rd[ 0 ] == -25)
@@ -188,7 +226,7 @@ public class BlueToothScale
                             //this.mBleScaleCallbacks.didGetUUIDsListOfUsers(null, null, 0, this.mMaximumUsers);
                         }
 
-                        return;
+                        return false;
                     }
 
                     if (rd[ 2 ] == 54)
@@ -230,7 +268,7 @@ public class BlueToothScale
 
                         //this.mBleScaleCallbacks.didGetUserInfoOfInitials(initial, birthDate, height, gender, activityIndex, status2);
 
-                        return;
+                        return false;
                     }
 
                     if (rd[ 2 ] == 65)
@@ -240,7 +278,7 @@ public class BlueToothScale
                             // this.mBleScaleCallbacks.didGetUserMeasurementsTimeStamps(null, null, null, null, null, null, null, null, null, null, 0);
                         }
 
-                        return;
+                        return false;
                     }
 
                     if (rd[ 2 ] == 70)
@@ -253,7 +291,7 @@ public class BlueToothScale
 
                     //this.mBleScaleCallbacks.scaleAcknowledgedCommand(convertByteToInt(recievedData[ 2 ]), convertByteToInt(recievedData[ 3 ]));
 
-                    return;
+                    return false;
                 }
 
                 if (rd[ 2 ] == 69 && rd.length >= 5)
@@ -268,7 +306,7 @@ public class BlueToothScale
 
                     //this.mBleScaleCallbacks.didGetUserWithStatus(status2, timeStamp, weight, bodyFat);
 
-                    return;
+                    return false;
                 }
 
                 if (rd[ 2 ] == 69 && rd.length < 5)
@@ -277,7 +315,7 @@ public class BlueToothScale
 
                     //this.mBleScaleCallbacks.didGetUserWithStatus(status2, 0, 0.0d, 0.0f);
 
-                    return;
+                    return false;
                 }
 
                 if (rd[ 2 ] == 79 && rd.length >= 5)
@@ -306,10 +344,10 @@ public class BlueToothScale
 
                     // this.mBleScaleCallbacks.didGetScaleStatusWithBatteryLevel(batteryLevel, weightThreshold, bodyFatThreshold, unit, isUserExists, isUserReferWeightExists, isUserMeasurementExists, scaleVersion);
 
-                    return;
+                    return false;
                 }
 
-                return;
+                return false;
             }
 
             if (rd[ 1 ] == 52)
@@ -343,7 +381,7 @@ public class BlueToothScale
                     //    this.mBleScaleCallbacks.didGetUUIDsListOfUsers(listOfUuids, userListInitials, count, this.mMaximumUsers);
                 }
 
-                return;
+                return false;
             }
 
             if (rd[ 1 ] == 66)
@@ -419,7 +457,7 @@ public class BlueToothScale
                     }
                 }
 
-                return;
+                return false;
             }
 
             if (rd[ 1 ] == 71)
@@ -451,7 +489,7 @@ public class BlueToothScale
                     // this.mBleScaleCallbacks.didGetUnknownMeasurementsIDs(measurementIdArray, timeStampArray, weightArray, impedanceArrary, totalMeasurementCount);
                 }
 
-                return;
+                return false;
             }
 
             if (rd[ 1 ] == 89)
@@ -459,13 +497,17 @@ public class BlueToothScale
                 if (rd[ 3 ] == 1)
                 {
                     byte[] rawUuid = new byte[ 8 ];
+
                     for (int i = 0; i < 8; i++)
                     {
                         rawUuid[ i ] = rd[ i + 5 ];
                     }
+
                     this.rawListOfUuids[ 0 ] = convertBytesToLong(rawUuid);
 
                     this.didFinishMeasurementStatus = convertByteToInt(rd[ 4 ]);
+
+                    Log.d(LOGTAG, "parseData: Finish(1): UUID=" + this.rawListOfUuids[ 0 ] + " Status=" + this.didFinishMeasurementStatus);
                 }
 
                 if (rd[ 3 ] == 2)
@@ -476,6 +518,8 @@ public class BlueToothScale
                     this.rawImpedanceArray[ 0 ] = (convertByteToInt(rd[ 10 ]) * 256) + convertByteToInt(rd[ 11 ]);
                     this.rawBodyFatArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 12 ]) * 256) + convertByteToInt(rd[ 13 ]))) / 10.0d);
                     this.waterByte = rd[ 14 ];
+
+                    Log.d(LOGTAG, "parseData: Finish(2): TS=" + this.rawTimeStampArray[ 0 ]);
                 }
 
                 if (rd[ 3 ] == 3)
@@ -487,14 +531,13 @@ public class BlueToothScale
                     this.rawAmrArray[ 0 ] = (convertByteToInt(rd[ 11 ]) * 256) + convertByteToInt(rd[ 12 ]);
                     this.rawBmiArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 13 ]) * 256) + convertByteToInt(rd[ 14 ]))) / 10.0d);
 
+                    Log.d(LOGTAG, "parseData: Finish(3): BMI=" + this.rawBmiArray[ 0 ]);
+
                     long timeStamp = getTimeStampInMilliSeconds(this.rawTimeStampArray[ 0 ]);
-                    long j = timeStamp;
-                    //this.mBleScaleCallbacks.didFinishMeasurementOnTimestamp(j, this.rawWeightArray[ 0 ], this.rawImpedanceArray[ 0 ], this.rawBmiArray[ 0 ], this.rawBodyFatArray[ 0 ], this.rawWaterArray[ 0 ], this.rawMuscleArray[ 0 ], this.rawBoneMassArray[ 0 ], this.rawBmrArray[ 0 ], this.rawAmrArray[ 0 ], this.rawListOfUuids[ 0 ], this.didFinishMeasurementStatus);
+                    //this.mBleScaleCallbacks.didFinishMeasurementOnTimestamp(timeStamp, this.rawWeightArray[ 0 ], this.rawImpedanceArray[ 0 ], this.rawBmiArray[ 0 ], this.rawBodyFatArray[ 0 ], this.rawWaterArray[ 0 ], this.rawMuscleArray[ 0 ], this.rawBoneMassArray[ 0 ], this.rawBmrArray[ 0 ], this.rawAmrArray[ 0 ], this.rawListOfUuids[ 0 ], this.didFinishMeasurementStatus);
                 }
 
-                //new Handler(this.mBluetoothLeApi.mContext.getMainLooper()).postDelayed(new C02352(rd), 10);
-
-                return;
+                return true;
             }
 
             if (rd[ 1 ] == 76)
@@ -528,36 +571,34 @@ public class BlueToothScale
                     //    this.mBleScaleCallbacks.didAssignMeasurementFromtimeStamp(timeStamp, this.rawWeightArray[ 0 ], this.rawImpedanceArray[ 0 ], this.rawBmiArray[ 0 ], this.rawBodyFatArray[ 0 ], this.rawWaterArray[ 0 ], this.rawMuscleArray[ 0 ], this.rawBoneMassArray[ 0 ], this.rawBmrArray[ 0 ], this.rawAmrArray[ 0 ]);
                 }
 
-                return;
+                return false;
             }
 
             if (rd[ 1 ] == 88)
             {
-                boolean status = false;
-                if (rd[ 2 ] != 1)
-                {
-                    status = true;
-                }
+                boolean status = (rd[ 2 ] != 1);
 
                 byte[] data = new byte[ 4 ];
                 data[ 2 ] = rd[ 3 ];
                 data[ 3 ] = rd[ 4 ];
                 weight = ((double) convertBytesToInt(data)) / 20.0d;
-                Log.d(LOGTAG, "Weight->" + weight);
+
+                Log.d(LOGTAG, "parseData: Weight=" + weight + " Status=" + status);
 
                 //this.mBleScaleCallbacks.didGetLiveWeight(weight, status);
 
-                //this.mBluetoothLeApi.send_acknowledgement(rd);
+                return true;
             }
         }
+
+        return false;
     }
 
-
-    public static byte[] getUserListBytesData(String scaleName)
+    public byte[] getUserListBytesData(String scaleName)
     {
         Log.d(LOGTAG,"getUserListBytesData");
         byte[] data = new byte[ 2 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 51;
@@ -570,11 +611,11 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getScaleStatusForUserBytesData(long uuid, String scaleName)
+    public byte[] getScaleStatusForUserBytesData(long uuid)
     {
         Log.d(LOGTAG,"getScaleStatusForUserBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 79;
@@ -592,30 +633,33 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getTxPowerBytesData(String scaleName)
+    public byte[] getTxPowerBytesData()
     {
         Log.d(LOGTAG,"getTxPowerBytesData");
+
         byte[] data = new byte[ 2 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -20;
-            data[ 1 ] = (byte) 2;
         }
         else
         {
             data[ 0 ] = (byte) -4;
-            data[ 1 ] = (byte) 2;
         }
+
+        data[ 1 ] = (byte) 2;
+
         return data;
     }
 
-    public static byte[] getSlowAdvertisementBytesData(boolean isSet, int interval, String scaleName)
+    public byte[] getSlowAdvertisementBytesData(boolean isSet, int interval)
     {
         Log.d(LOGTAG,"getSlowAdvertisementBytesData-->isSet : " + isSet + ", interval : " + interval);
         byte[] data = new byte[ 2 ];
         if (isSet)
         {
-            if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+            if (isCompatibleScale(model))
             {
                 data[ 0 ] = (byte) -19;
                 data[ 1 ] = (byte) interval;
@@ -627,7 +671,7 @@ public class BlueToothScale
             }
         }
         else
-            if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+            if (isCompatibleScale(model))
             {
                 data[ 0 ] = (byte) -18;
                 data[ 1 ] = (byte) 2;
@@ -640,11 +684,11 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getCheckUserExistsBytesData(long uuid, String scaleName)
+    public byte[] getCheckUserExistsBytesData(long uuid)
     {
         Log.d(LOGTAG,"getCheckUserExistsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 0;
@@ -662,48 +706,54 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getCreateUserBytesData(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex, String scaleName)
+    public byte[] getCreateUserBytesData(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
     {
-        int i;
-        Log.d(LOGTAG,"getCreateUserBytesData-->uuid : " + uuid + ", initial : " + initial + ", birthDate : " + Arrays.toString(birthDate) + ", height : " + height + ", gender : " + gender + ", activityIndex : " + activityIndex);
+        Log.d(LOGTAG,"getCreateUserBytesData:"
+                + " uuid=" + uuid
+                + " initial=" + initial
+                + " birthDate=" + Arrays.toString(birthDate)
+                + " height=" + height
+                + " gender=" + gender
+                + " activityIndex=" + activityIndex);
+
         byte[] data = new byte[ 18 ];
-        byte[] rawUuid = convertLongToBytes(uuid);
-        byte rawGender = (byte) (((byte) (gender == 'M' ? 128 : 0)) + activityIndex);
-        char[] rawInitial = initial.toCharArray();
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 49;
         }
         else
         {
             data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 49;
         }
-        for (i = 0; i < 8; i++)
-        {
-            data[ i + 2 ] = rawUuid[ i ];
-        }
-        for (i = 0; i < rawInitial.length; i++)
-        {
-            data[ i + 10 ] = (byte) rawInitial[ i ];
-        }
-        birthDate[ 0 ] = birthDate[ 0 ] - 1900;
-        for (i = 0; i < 3; i++)
-        {
-            data[ i + 13 ] = (byte) birthDate[ i ];
-        }
+
+        data[ 1 ] = (byte) 49;
+
+        byte[] rawUuid = convertLongToBytes(uuid);
+
+        System.arraycopy(rawUuid, 0, data, 2, 8);
+
+        while (initial.length() < 3) initial += " ";
+        char[] rawInitial = initial.toCharArray();
+
+        data[ 10 ] = (byte) rawInitial[ 0 ];
+        data[ 11 ] = (byte) rawInitial[ 1 ];
+        data[ 12 ] = (byte) rawInitial[ 2 ];
+        data[ 13 ] = (byte) (birthDate[ 0 ] - 1900);
+        data[ 14 ] = (byte) birthDate[ 1 ];
+        data[ 15 ] = (byte) birthDate[ 2 ];
         data[ 16 ] = (byte) height;
-        data[ 17 ] = rawGender;
+        data[ 17 ] = (byte) ((gender == 'M' ? 128 : 0) + activityIndex);
+
         return data;
     }
 
-    public static byte[] getDeleteUserBytesData(long uuid, String scaleName)
+    public byte[] getDeleteUserBytesData(long uuid)
     {
         Log.d(LOGTAG,"getDeleteUserBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 50;
@@ -720,12 +770,12 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getTakeUserMeasurementBytesData(long uuid, String scaleName)
+    public byte[] getTakeUserMeasurementBytesData(long uuid)
     {
         Log.d(LOGTAG,"getTakeUserMeasurementBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 64;
@@ -742,12 +792,12 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getUserMeasurementsBytesData(long uuid, String scaleName)
+    public byte[] getUserMeasurementsBytesData(long uuid)
     {
         Log.d(LOGTAG,"getUserMeasurementsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 65;
@@ -764,12 +814,12 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getDeleteUserMeasurementsBytesData(long uuid, String scaleName)
+    public byte[] getDeleteUserMeasurementsBytesData(long uuid)
     {
         Log.d(LOGTAG,"getDeleteUserMeasurementsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 67;
@@ -786,13 +836,13 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getSetUserWeightBytesData(long uuid, float weight, float bodyFat, long timeStamp, String scaleName)
+    public byte[] getSetUserWeightBytesData(long uuid, float weight, float bodyFat, long timeStamp)
     {
         int i;
         Log.d(LOGTAG,"getSetUserWeightBytesData-->uuid : " + uuid + ", weight : " + weight + ", bodyFat : " + bodyFat + ", timeStamp : " + timeStamp);
         byte[] data = new byte[ 18 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 68;
@@ -820,12 +870,12 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getUserWeightAndBodyFatBytesData(long uuid, String scaleName)
+    public byte[] getUserWeightAndBodyFatBytesData(long uuid)
     {
         Log.d(LOGTAG,"getUserWeightAndBodyFatBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 69;
@@ -842,11 +892,11 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getUnknownMeasurementsBytesData(String scaleName)
+    public byte[] getUnknownMeasurementsBytesData(String scaleName)
     {
         Log.d(LOGTAG, "getUnknownMeasurementsBytesData");
         byte[] data = new byte[ 2 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 70;
@@ -859,11 +909,11 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getSaveAsUnknownMeasurementWithtimestampBytesData(int timeStamp, float weight, int impedance, String scaleName)
+    public byte[] getSaveAsUnknownMeasurementWithtimestampBytesData(int timeStamp, float weight, int impedance)
     {
         Log.d(LOGTAG,"getSaveAsUnknownMeasurementWithtimestampBytesData-->timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance);
         byte[] data = new byte[ 10 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 72;
@@ -885,11 +935,11 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getDeleteUnknownMeasurementBytesData(int measurementId, String scaleName)
+    public byte[] getDeleteUnknownMeasurementBytesData(int measurementId)
     {
         Log.d(LOGTAG,"getDeleteUnknownMeasurementBytesData-->measurementId : " + measurementId);
         byte[] data = new byte[ 3 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 73;
@@ -904,14 +954,14 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getTakeGuestMeasurementWithInitialsBytesData(String initial, int[] birthDate, int height, char gender, int activityIndex, int unit, String scaleName)
+    public byte[] getTakeGuestMeasurementWithInitialsBytesData(String initial, int[] birthDate, int height, char gender, int activityIndex, int unit)
     {
         int i;
         Log.d(LOGTAG,"getTakeGuestMeasurementWithInitialsBytesData-->initial : " + initial + ", birthDate : " + Arrays.toString(birthDate) + ", height : " + height + ", gender : " + gender + ", activityIndex : " + activityIndex + ", unit : " + unit);
         byte[] data = new byte[ 11 ];
         byte rawGender = (byte) (((byte) (gender == 'M' ? 128 : 0)) + activityIndex);
         char[] rawInitial = initial.toCharArray();
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 74;
@@ -936,11 +986,13 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getSetDateTimeBytesData(String scaleName)
+    public byte[] getSetDateTimeBytesData()
     {
         Log.d(LOGTAG,"getSetDateTimeBytesData");
+
         byte[] data = new byte[ 5 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -23;
         }
@@ -948,47 +1000,46 @@ public class BlueToothScale
         {
             data[ 0 ] = (byte) -7;
         }
+
         byte[] rawTimeStamp = convertIntToBytes(getTimeStampInSeconds(new Date().getTime()));
+
         for (int i = 0; i < 4; i++)
         {
             data[ i + 1 ] = rawTimeStamp[ i ];
         }
+
         return data;
     }
 
-    public static byte[] getAssignMeasurementToUserBytesData(long uuid, int timeStamp, float weight, int impedance, int measurementId, String scaleName)
+    public byte[] getAssignMeasurementToUserBytesData(long uuid, int timeStamp, float weight, int impedance, int measurementId)
     {
         byte[] rawUuid;
         int i;
         Log.d(LOGTAG,"getAssignMeasurementToUserBytesData-->uuid : " + uuid + ", timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance + ", measurementId : " + measurementId);
         byte[] data = new byte[ 19 ];
-        if (!scaleName.equalsIgnoreCase(Scales.GS485))
+
+        if (!isCompatibleScale(model))
         {
-            if (!scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70))
+            data[ 0 ] = (byte) -9;
+            data[ 1 ] = (byte) 75;
+            rawUuid = convertLongToBytes(uuid);
+            for (i = 0; i < 8; i++)
             {
-                if (!scaleName.equalsIgnoreCase(Scales.BF710))
-                {
-                    data[ 0 ] = (byte) -9;
-                    data[ 1 ] = (byte) 75;
-                    rawUuid = convertLongToBytes(uuid);
-                    for (i = 0; i < 8; i++)
-                    {
-                        data[ i + 2 ] = rawUuid[ i ];
-                    }
-                    for (i = 0; i < 4; i++)
-                    {
-                        data[ i + 10 ] = (byte) (timeStamp >> ((3 - i) * 8));
-                    }
-                    weight *= 20.0f;
-                    data[ 14 ] = (byte) ((int) (weight / 256.0f));
-                    data[ 15 ] = (byte) ((int) weight);
-                    data[ 16 ] = (byte) (impedance / 256);
-                    data[ 17 ] = (byte) impedance;
-                    data[ 18 ] = (byte) measurementId;
-                    return data;
-                }
+                data[ i + 2 ] = rawUuid[ i ];
             }
+            for (i = 0; i < 4; i++)
+            {
+                data[ i + 10 ] = (byte) (timeStamp >> ((3 - i) * 8));
+            }
+            weight *= 20.0f;
+            data[ 14 ] = (byte) ((int) (weight / 256.0f));
+            data[ 15 ] = (byte) ((int) weight);
+            data[ 16 ] = (byte) (impedance / 256);
+            data[ 17 ] = (byte) impedance;
+            data[ 18 ] = (byte) measurementId;
+            return data;
         }
+
         data[ 0 ] = (byte) -25;
         data[ 1 ] = (byte) 75;
         rawUuid = convertLongToBytes(uuid);
@@ -1009,11 +1060,11 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getSetUnitBytesData(int unit, String scaleName)
+    public byte[] getSetUnitBytesData(int unit)
     {
         Log.d(LOGTAG,"getSetUnitBytesData-->unit : " + unit);
         byte[] data = new byte[ 3 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 77;
@@ -1028,11 +1079,11 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getSetReferDefinitionToWeightThresholdBytesData(float weightThreshold, float bodyFatThreshold, String scaleName)
+    public byte[] getSetReferDefinitionToWeightThresholdBytesData(float weightThreshold, float bodyFatThreshold)
     {
         Log.d(LOGTAG,"getSetReferDefinitionToWeightThresholdBytesData-->weightThreshold : " + weightThreshold + ", bodyFatThreshold : " + bodyFatThreshold);
         byte[] data = new byte[ 4 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
         }
@@ -1046,35 +1097,31 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getChangeUserFromOldUUID(long oldUuid, long newUuid, String scaleName)
+    public byte[] getChangeUserFromOldUUID(long oldUuid, long newUuid)
     {
         byte[] rawOldUuid;
         int i;
         byte[] rawNewUuid;
         Log.d(LOGTAG,"getChangeUserFromOldUUID-->oldUuid : " + oldUuid + ", newUuid : " + newUuid);
         byte[] data = new byte[ 18 ];
-        if (!scaleName.equalsIgnoreCase(Scales.GS485))
+
+        if (! isCompatibleScale(model))
         {
-            if (!scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70))
+            data[ 0 ] = (byte) -9;
+            data[ 1 ] = (byte) 86;
+            rawOldUuid = convertLongToBytes(oldUuid);
+            for (i = 0; i < 8; i++)
             {
-                if (!scaleName.equalsIgnoreCase(Scales.BF710))
-                {
-                    data[ 0 ] = (byte) -9;
-                    data[ 1 ] = (byte) 86;
-                    rawOldUuid = convertLongToBytes(oldUuid);
-                    for (i = 0; i < 8; i++)
-                    {
-                        data[ i + 2 ] = rawOldUuid[ i ];
-                    }
-                    rawNewUuid = convertLongToBytes(newUuid);
-                    for (i = 0; i < 8; i++)
-                    {
-                        data[ i + 10 ] = rawNewUuid[ i ];
-                    }
-                    return data;
-                }
+                data[ i + 2 ] = rawOldUuid[ i ];
             }
+            rawNewUuid = convertLongToBytes(newUuid);
+            for (i = 0; i < 8; i++)
+            {
+                data[ i + 10 ] = rawNewUuid[ i ];
+            }
+            return data;
         }
+
         data[ 0 ] = (byte) -25;
         data[ 1 ] = (byte) 86;
         rawOldUuid = convertLongToBytes(oldUuid);
@@ -1090,7 +1137,7 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getUpdateUserBytesDate(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex, String scaleName)
+    public byte[] getUpdateUserBytesDate(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
     {
         int i;
         Log.d(LOGTAG,"getUpdateUserBytesDate-->uuid : " + uuid + ", initial : " + initial + ", birthDate : " + Arrays.toString(birthDate) + ", height : " + height + ", gender : " + gender + ", activityIndex : " + activityIndex);
@@ -1098,16 +1145,15 @@ public class BlueToothScale
         byte[] rawUuid = convertLongToBytes(uuid);
         byte rawGender = (byte) (((byte) (gender == 'M' ? 128 : 0)) + activityIndex);
         char[] rawInitial = initial.toCharArray();
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 53;
         }
         else
         {
             data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 53;
         }
+        data[ 1 ] = (byte) 53;
         for (i = 0; i < 8; i++)
         {
             data[ i + 2 ] = rawUuid[ i ];
@@ -1126,38 +1172,38 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getScaleSleepStatusBytesData(String scaleName)
+    public byte[] getScaleSleepStatusBytesData(String scaleName)
     {
         Log.d(LOGTAG, "getScaleSleepStatusBytesData");
         byte[] data = new byte[ 2 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -16;
-            data[ 1 ] = (byte) 2;
         }
         else
         {
             data[ 0 ] = (byte) -32;
-            data[ 1 ] = (byte) 2;
         }
+        data[ 1 ] = (byte) 2;
         return data;
     }
 
-    public static byte[] getUserInfoBytesData(long uuid, String scaleName)
+    public byte[] getUserInfoBytesData(long uuid)
     {
         Log.d(LOGTAG,"getUserInfoBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 54;
         }
         else
         {
             data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 54;
         }
+
+        data[ 1 ] = (byte) 54;
+
         for (int i = 0; i < 8; i++)
         {
             data[ i + 2 ] = rawUuid[ i ];
@@ -1165,28 +1211,29 @@ public class BlueToothScale
         return data;
     }
 
-    public static byte[] getRemoteTimeStampBytesData(String scaleName)
+    public byte[] getRemoteTimeStampBytesData(String scaleName)
     {
         Log.d(LOGTAG,"getRemoteTimeStampBytesData");
         byte[] data = new byte[ 2 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -14;
-            data[ 1 ] = (byte) 2;
         }
         else
         {
             data[ 0 ] = (byte) -30;
-            data[ 1 ] = (byte) 2;
         }
+        data[ 1 ] = (byte) 2;
         return data;
     }
 
-    public static byte[] getModuleVersionBytesData(String scaleName)
+    public byte[] getModuleVersionBytesData()
     {
         Log.d(LOGTAG,"getModuleVersionBytesData");
+
         byte[] data = new byte[ 2 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -15;
         }
@@ -1194,15 +1241,17 @@ public class BlueToothScale
         {
             data[ 0 ] = (byte) -31;
         }
+
         data[ 1 ] = (byte) 2;
+
         return data;
     }
 
-    public static byte[] getForceDisconnectBytesData(String scaleName)
+    public byte[] getForceDisconnectBytesData(String scaleName)
     {
         Log.d(LOGTAG,"getForceDisconnectBytesData");
         byte[] data = new byte[ 2 ];
-        if (scaleName.equalsIgnoreCase(Scales.GS485) || scaleName.equalsIgnoreCase(Scales.SANITAS_SBF70) || scaleName.equalsIgnoreCase(Scales.BF710))
+        if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -22;
         }
@@ -1214,4 +1263,24 @@ public class BlueToothScale
         return data;
     }
 
+    public byte[] getAcknowledgementData(byte[] resp)
+    {
+        byte[] data = new byte[ 5 ];
+
+        if (isCompatibleScale(model))
+        {
+            data[ 0 ] = (byte) -25;
+        }
+        else
+        {
+            data[ 0 ] = (byte) -9;
+        }
+
+        data[ 1 ] = (byte) -15;
+        data[ 2 ] = resp[ 1 ];
+        data[ 3 ] = resp[ 2 ];
+        data[ 4 ] = resp[ 3 ];
+
+        return data;
+    }
 }
