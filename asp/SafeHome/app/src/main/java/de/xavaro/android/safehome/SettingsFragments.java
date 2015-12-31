@@ -5,10 +5,12 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.CheckBoxPreference;
+import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -23,7 +25,9 @@ import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -35,7 +39,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -43,13 +51,8 @@ public class SettingsFragments
 {
     private static final String LOGTAG = SettingsFragments.class.getSimpleName();
 
-    private static final CharSequence[] recentText = {
-            "Android-System",
-            "SafeHome"};
-
-    private static final CharSequence[] recentVals = {
-            "android",
-            "safehome"};
+    private static final CharSequence[] recentText = { "Android-System", "SafeHome" };
+    private static final CharSequence[] recentVals = { "android", "safehome" };
 
     private static SharedPreferences sharedPrefs;
 
@@ -199,7 +202,7 @@ public class SettingsFragments
 
             header = new PreferenceActivity.Header();
             header.title = "Gewicht";
-            header.iconRes = GlobalConfigs.IconResHealtCoach;
+            header.iconRes = GlobalConfigs.IconResHealtScale;
             header.fragment = HealthScaleFragment.class.getName();
 
             return header;
@@ -209,7 +212,7 @@ public class SettingsFragments
         {
             super();
 
-            iconres = GlobalConfigs.IconResHealtCoach;
+            iconres = GlobalConfigs.IconResHealtScale;
             keyprefix = "health.scale";
             masterenable = "Gewicht freischalten";
         }
@@ -231,6 +234,14 @@ public class SettingsFragments
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
 
+            //
+            // Bluetooth device selection preference
+            //
+
+            NicePreferenceCategory pc = new NicePreferenceCategory(context);
+            pc.setTitle("Geräteauswahl");
+            preferences.add(pc);
+
             devicePref = new NiceListPreference(context);
 
             devicePref.setKey(keyprefix + ".device");
@@ -246,7 +257,7 @@ public class SettingsFragments
                 if ((! btDevice.equals("unknown")) && (btDeviceparts.length == 2))
                 {
                     recentText.add(btDeviceparts[ 0 ]);
-                    recentVals.add(btDeviceparts[ 1 ]);
+                    recentVals.add(btDevice);
                 }
             }
 
@@ -264,6 +275,93 @@ public class SettingsFragments
             }
 
             preferences.add(devicePref);
+
+            //
+            // Units.
+            //
+
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Maßeinheiten");
+            preferences.add(pc);
+
+            NiceListPreference lp;
+
+            lp = new NiceListPreference(context);
+
+            String[] unitSizeText = { "Zentimeter", "Fuß"  };
+            String[] unitSizeVals = { "cm", "foot" };
+
+            lp.setKey(keyprefix + ".units.size");
+            lp.setEntries(unitSizeText);
+            lp.setEntryValues(unitSizeVals);
+            lp.setDefaultValue("cm");
+            lp.setTitle("Größe in");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NiceListPreference(context);
+
+            String[] unitWeightText = { "Kilogramm", "Pfund"  };
+            String[] unitWeightVals = { "kg", "lbs" };
+
+            lp.setKey(keyprefix + ".units.weight");
+            lp.setEntries(unitWeightText);
+            lp.setEntryValues(unitWeightVals);
+            lp.setDefaultValue("kg");
+            lp.setTitle("Gewicht in");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            //
+            // Personal user data required for calculations.
+            //
+
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Persönliche Daten");
+            preferences.add(pc);
+
+            lp = new NiceListPreference(context);
+
+            String[] genderText = { "Nicht gesetzt", "Männlich", "Weiblich"  };
+            String[] genderVals = { "unknown", "male", "female" };
+
+            lp.setKey(keyprefix + ".user.gender");
+            lp.setEntries(genderText);
+            lp.setEntryValues(genderVals);
+            lp.setDefaultValue("unknown");
+            lp.setTitle("Geschlecht");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            NiceDatePreference dp = new NiceDatePreference(context);
+
+            dp.setKey(keyprefix + ".user.birthdate");
+            dp.setTitle("Geburtsdatum");
+            dp.setEnabled(enabled);
+
+            preferences.add(dp);
+
+            NiceNumberPreference np = new NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".user.size");
+            np.setUnit("cm");
+            np.setMinMaxValue(100, 250);
+            np.setTitle("Größe");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            NiceEditTextPreference ep = new NiceEditTextPreference(context);
+
+            ep.setKey(keyprefix + ".user.initials");
+            ep.setTitle("Initialen");
+            ep.setIsUppercase();
+            ep.setEnabled(enabled);
+
+            preferences.add(ep);
         }
 
         private final Handler handler = new Handler();
@@ -307,7 +405,8 @@ public class SettingsFragments
 
                     //
                     // Display unknown as text option, selected devices
-                    // with name and mac address.
+                    // with name and mac address to get better overwiev
+                    // for user.
                     //
 
                     rb.setText((inx == 0) ? recentText.get(inx) : recentVals.get(inx));
@@ -318,9 +417,9 @@ public class SettingsFragments
                     rb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
                     {
                         @Override
-                        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean checked)
                         {
-                            if (b)
+                            if (checked)
                             {
                                 Log.d(LOGTAG, "onCheckedChanged:" + compoundButton.getTag());
 
@@ -328,9 +427,9 @@ public class SettingsFragments
                                         (String) compoundButton.getTag()).apply();
 
                                 devicePref.onPreferenceChange(devicePref, compoundButton.getTag());
-
-                                handler.postDelayed(cancelDialog, 200);
                             }
+
+                            handler.postDelayed(cancelDialog, 200);
                         }
                     });
 
@@ -1867,6 +1966,7 @@ public class SettingsFragments
         private TextView current;
         private Runnable onClickRunner;
         private boolean isPassword;
+        private boolean isUppercase;
 
         public NiceEditTextPreference(Context context)
         {
@@ -1893,6 +1993,11 @@ public class SettingsFragments
         public void setIsPassword()
         {
             isPassword = true;
+        }
+
+        public void setIsUppercase()
+        {
+            isUppercase = true;
         }
 
         public void setOnclick(Runnable onlick)
@@ -1936,6 +2041,11 @@ public class SettingsFragments
                         InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
 
+            if (isUppercase)
+            {
+                current.setAllCaps(true);
+            }
+
             if (sharedPrefs.contains(key))
             {
                 current.setText(sharedPrefs.getString(key, null));
@@ -1945,5 +2055,332 @@ public class SettingsFragments
         }
     }
 
+    public static class NiceDialogPreference extends DialogPreference
+    {
+        protected TextView current;
+        protected boolean enabled;
+        protected boolean isInteger;
+        protected String unit;
+
+        public NiceDialogPreference(Context context)
+        {
+            super(context, null);
+        }
+
+        @Override
+        public void setEnabled(boolean enabled)
+        {
+            super.setEnabled(enabled);
+            this.enabled = enabled;
+
+            if (current != null)
+            {
+                current.setTextColor(enabled
+                        ? GlobalConfigs.PreferenceTextEnabledColor
+                        : GlobalConfigs.PreferenceTextDisabledColor);
+            }
+        }
+
+        public void setValue(String value)
+        {
+            if (current != null)
+            {
+                current.setText(value);
+            }
+        }
+
+        public void setValue(int value)
+        {
+            if (current != null)
+            {
+                String text = "" + value;
+
+                if (unit != null)
+                {
+                    text += " " + unit;
+                }
+
+                current.setText(text);
+            }
+        }
+
+        public void setUnit(String unit)
+        {
+            this.unit = unit;
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            if (current == null)
+            {
+                current = new TextView(getContext());
+                current.setGravity(Gravity.END);
+                current.setTextSize(18f);
+
+                current.setTextColor(enabled
+                        ? GlobalConfigs.PreferenceTextEnabledColor
+                        : GlobalConfigs.PreferenceTextDisabledColor);
+
+                if (sharedPrefs.contains(this.getKey()))
+                {
+                    if (isInteger)
+                    {
+                        this.setValue(sharedPrefs.getInt(this.getKey(), 0));
+                    }
+                    else
+                    {
+                        this.setValue(sharedPrefs.getString(this.getKey(), null));
+                    }
+                }
+            }
+
+            if (current.getParent() != null)
+            {
+                //
+                // Der inder calls bind view every now and then because
+                // of bad programming. So check if textview is child
+                // of obsoleted view and remove before processing.
+                //
+
+                ((LinearLayout) current.getParent()).removeView(current);
+            }
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.END);
+
+            ((LinearLayout) view).addView(current, lp);
+        }
+    }
+
+    public static class NiceDatePreference extends NiceDialogPreference implements
+            DatePicker.OnDateChangedListener
+    {
+        private String dateString;
+        private String changedValueCanBeNull;
+        private DatePicker datePicker;
+
+        public NiceDatePreference(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        protected View onCreateDialogView()
+        {
+            this.datePicker = new DatePicker(getContext());
+
+            Calendar calendar = getDate();
+
+            datePicker.init(calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH),
+                    this);
+
+            return datePicker;
+        }
+
+        public Calendar getDate()
+        {
+            try
+            {
+                Date date = formatter().parse(defaultValue());
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                return cal;
+            }
+            catch (java.text.ParseException ex)
+            {
+                return new GregorianCalendar(2000, 0, 1);
+            }
+        }
+
+        public void setDate(String dateString)
+        {
+            this.dateString = dateString;
+        }
+
+        public SimpleDateFormat formatter()
+        {
+            return new SimpleDateFormat("yyyy.MM.dd");
+        }
+
+        public SimpleDateFormat summaryFormatter()
+        {
+            return new SimpleDateFormat("dd.MM.yyyy");
+        }
+
+        @Override
+        protected Object onGetDefaultValue(TypedArray a, int index)
+        {
+            return a.getString(index);
+        }
+
+        @Override
+        protected void onSetInitialValue(boolean restoreValue, Object def)
+        {
+            if (restoreValue)
+            {
+                this.dateString = getPersistedString(defaultValue());
+                setTheDate(this.dateString);
+            }
+            else
+            {
+                boolean wasNull = this.dateString == null;
+
+                setDate((String) def);
+
+                if (!wasNull) persistDate(this.dateString);
+            }
+        }
+
+        public void onDateChanged(DatePicker view, int year, int month, int day)
+        {
+            Calendar selected = new GregorianCalendar(year, month, day);
+            this.changedValueCanBeNull = formatter().format(selected.getTime());
+        }
+
+        @Override
+        protected void onDialogClosed(boolean shouldSave)
+        {
+            if (shouldSave && this.changedValueCanBeNull != null)
+            {
+                setTheDate(this.changedValueCanBeNull);
+                this.changedValueCanBeNull = null;
+            }
+        }
+
+        private void setTheDate(String s)
+        {
+            setDate(s);
+            persistDate(s);
+        }
+
+        private void persistDate(String s)
+        {
+            persistString(s);
+
+            if (current != null) current.setText(summaryFormatter().format(getDate().getTime()));
+        }
+
+        private String defaultValue()
+        {
+            if (this.dateString == null)
+            {
+                setDate(formatter().format(new GregorianCalendar(2000, 0, 1).getTime()));
+            }
+
+            return this.dateString;
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            current.setText(summaryFormatter().format(getDate().getTime()));
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            super.onClick(dialog, which);
+
+            datePicker.clearFocus();
+
+            onDateChanged(datePicker,
+                    datePicker.getYear(),
+                    datePicker.getMonth(),
+                    datePicker.getDayOfMonth());
+
+            onDialogClosed(which == DialogInterface.BUTTON_POSITIVE);
+        }
+    }
+
+    public static class NiceNumberPreference extends NiceDialogPreference
+    {
+        private NumberPicker numberPicker;
+
+        private int actValue = 170;
+        private int minValue = Integer.MIN_VALUE;
+        private int maxValue = Integer.MAX_VALUE;
+
+        public NiceNumberPreference(Context context)
+        {
+            super(context);
+
+            isInteger = true;
+
+            setPositiveButtonText(android.R.string.ok);
+            setNegativeButtonText(android.R.string.cancel);
+        }
+
+        public void setMinMaxValue(int min, int max)
+        {
+            minValue = min;
+            maxValue = max;
+        }
+
+        @Override
+        protected View onCreateDialogView()
+        {
+            numberPicker = new NumberPicker(getContext());
+
+            numberPicker.setMinValue(minValue);
+            numberPicker.setMaxValue(maxValue);
+
+            numberPicker.setValue(actValue);
+
+            //
+            // Inhibit display of completely useless keyboard.
+            //
+
+            numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+            return numberPicker;
+        }
+
+        @Override
+        protected void onDialogClosed(boolean positiveResult)
+        {
+            if (positiveResult)
+            {
+                setValue(numberPicker.getValue());
+            }
+        }
+
+        @Override
+        protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
+        {
+            setValue(restoreValue ? getPersistedInt(actValue) : actValue);
+        }
+
+        @Override
+        public void setValue(int value)
+        {
+            super.setValue(value);
+
+            if (shouldPersist())
+            {
+                persistInt(value);
+            }
+
+            if (value != actValue)
+            {
+                actValue = value;
+                notifyChanged();
+            }
+        }
+
+        @Override
+        protected Object onGetDefaultValue(TypedArray a, int index)
+        {
+            return a.getInt(index, 0);
+        }
+    }
     //endregion Niced preferences
 }
