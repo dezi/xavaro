@@ -70,21 +70,24 @@ public class BlueTooth extends BroadcastReceiver
 
     public boolean isDiscovering;
 
-    public void startDiscovery()
+    public boolean discoverLE;
+    public boolean discoverClassic;
+    public boolean discoverScales;
+    public int discoverBGJobs;
+    public BlueToothDiscoverCallback discoverCallback;
+
+    public void discoverScales(BlueToothDiscoverCallback callback)
     {
         if (isDiscovering) return;
+
+        discoverLE = true;
+        discoverClassic = false;
+        discoverScales = true;
+        discoverCallback = callback;
 
         devices.clear();
         bta.startDiscovery();
         isDiscovering = true;
-    }
-
-    public void cancelDiscovery()
-    {
-        if (! isDiscovering) return;
-
-        bta.cancelDiscovery();
-        isDiscovering = false;
     }
 
     private class GattAction
@@ -147,14 +150,23 @@ public class BlueTooth extends BroadcastReceiver
             if (uuidExtra == null)
             {
                 Log.e(LOGTAG, "onReceive: UUID = null");
-
-                return;
             }
-
-            for (Parcelable ep : uuidExtra)
+            else
             {
-                Log.d(LOGTAG, "onReceive: UUID records : " + ep.toString());
+                for (Parcelable ep : uuidExtra)
+                {
+                    Log.d(LOGTAG, "onReceive: UUID records : " + ep.toString());
+                }
             }
+
+            if (--discoverBGJobs == 0)
+            {
+                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
+
+                isDiscovering = false;
+            }
+
+            return;
         }
 
         if (BluetoothDevice.ACTION_FOUND.equals(action))
@@ -168,36 +180,43 @@ public class BlueTooth extends BroadcastReceiver
                     + "=" + device.getBondState()
                     + "=" + getDeviceTypeString(device.getType()));
 
-            if (BlueToothScale.isCompatibleScale(device.getName()))
-            {
-                devices.add(device);
+            devices.add(device);
 
-                cancelDiscovery();
+            if (discoverClassic && ((device.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC) ||
+                    (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
+            {
+                Log.d(LOGTAG, "onReceive: fetchUuidsWithSdp=" + device.getName());
+                device.fetchUuidsWithSdp();
+                discoverBGJobs++;
+            }
+
+            if (discoverLE && ((device.getType() == BluetoothDevice.DEVICE_TYPE_LE) ||
+                    (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
+            {
+                Log.d(LOGTAG, "onReceive: connectGatt=" + device.getName());
+                device.connectGatt(context, true, gattCallback);
+                discoverBGJobs++;
             }
         }
 
         if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
         {
             Log.d(LOGTAG, "onReceive: discovery started");
+
+            if (discoverCallback != null) discoverCallback.onDiscoverStarted();
+
+            discoverBGJobs = 0;
         }
 
         if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
         {
             Log.d(LOGTAG, "onReceive: discoveryfinished");
 
-            for (BluetoothDevice device : devices)
+            if (discoverBGJobs == 0)
             {
-                if (device.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC)
-                {
-                    Log.d(LOGTAG, "onReceive: fetchUuidsWithSdp=" + device.getName());
-                    device.fetchUuidsWithSdp();
-                }
+                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
 
-                if (device.getType() == BluetoothDevice.DEVICE_TYPE_LE)
-                {
-                    Log.d(LOGTAG, "onReceive: connectGatt=" + device.getName());
-                    device.connectGatt(context, true, gattCallback);
-                }
+                isDiscovering = false;
             }
         }
     }
@@ -257,18 +276,35 @@ public class BlueTooth extends BroadcastReceiver
                             currentControl = characteristic;
 
                             Log.d(LOGTAG,"Found compatible scale=" + currentModel);
+
+                            if (discoverScales && (discoverCallback != null))
+                            {
+                                discoverCallback.onDeviceDiscovered(gatt.getDevice());
+                            }
                         }
                     }
                 }
             }
 
+            if (--discoverBGJobs == 0)
+            {
+                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
+
+                isDiscovering = false;
+            }
+
+            if (discoverCallback == null) testDat();
+        }
+
+        private void testDat()
+        {
             if (currentControl != null)
             {
                 GattAction ga;
 
                 ga = new GattAction();
 
-                ga.gatt = gatt;
+                ga.gatt = currentGatt;
                 ga.mode = GattAction.MODE_NOTIFY;
                 ga.characteristic = currentControl;
 
@@ -276,7 +312,7 @@ public class BlueTooth extends BroadcastReceiver
 
                 ga = new GattAction();
 
-                ga.gatt = gatt;
+                ga.gatt = currentGatt;
                 ga.mode = GattAction.MODE_WRITE;
                 ga.data = currentScale.getModuleVersionBytesData();
                 ga.characteristic = currentControl;
@@ -285,7 +321,16 @@ public class BlueTooth extends BroadcastReceiver
 
                 ga = new GattAction();
 
-                ga.gatt = gatt;
+                ga.gatt = currentGatt;
+                ga.mode = GattAction.MODE_WRITE;
+                ga.data = currentScale.getScaleStatusForUserBytesData(101);
+                ga.characteristic = currentControl;
+
+                gattSchedule.add(ga);
+
+                ga = new GattAction();
+
+                ga.gatt = currentGatt;
                 ga.mode = GattAction.MODE_WRITE;
                 ga.data = currentScale.getSetDateTimeBytesData();
                 ga.characteristic = currentControl;
@@ -400,5 +445,12 @@ public class BlueTooth extends BroadcastReceiver
         if ((perms & BluetoothGattCharacteristic.PERMISSION_WRITE_ENCRYPTED) > 0) pstr += "WRITE_ENCRYPTED ";
 
         return pstr.trim();
+    }
+
+    public interface BlueToothDiscoverCallback
+    {
+        public void onDiscoverStarted();
+        public void onDiscoverFinished();
+        public void onDeviceDiscovered(BluetoothDevice device);
     }
 }

@@ -323,28 +323,25 @@ public class BlueToothScale
                     float weightThreshold = ((float) convertByteToInt(rd[ 5 ])) / 10.0f;
                     float bodyFatThreshold = ((float) convertByteToInt(rd[ 6 ])) / 10.0f;
                     float batteryLevel = (float) convertByteToInt(rd[ 4 ]);
-                    int scaleVersion = convertByteToInt(rd[ 11 ]);
                     int unit = convertByteToInt(rd[ 7 ]);
-                    boolean isUserExists = false;
-                    boolean isUserReferWeightExists = false;
-                    boolean isUserMeasurementExists = false;
+                    boolean userExists = (rd[ 8 ] == 0);
+                    boolean referWeightExists = (rd[ 9 ] == 0);
+                    boolean measurementExists = (rd[ 10 ] == 0);
+                    int scaleVersion = convertByteToInt(rd[ 11 ]);
 
-                    if (rd[ 8 ] == 0)
-                    {
-                        isUserExists = true;
-                    }
-                    if (rd[ 9 ] == 0)
-                    {
-                        isUserReferWeightExists = true;
-                    }
-                    if (rd[ 10 ] == 0)
-                    {
-                        isUserMeasurementExists = true;
-                    }
+                    Log.d(LOGTAG,"parseDat:"
+                            + " weightThreshold=" + weightThreshold
+                            + " bodyFatThreshold=" + bodyFatThreshold
+                            + " batteryLevel=" + batteryLevel
+                            + " unit=" + unit
+                            + " userExist=" + userExists
+                            + " referWeightExists=" + referWeightExists
+                            + " measurementExists=" + measurementExists
+                            + " scaleVersion=" + scaleVersion);
 
                     // this.mBleScaleCallbacks.didGetScaleStatusWithBatteryLevel(batteryLevel, weightThreshold, bodyFatThreshold, unit, isUserExists, isUserReferWeightExists, isUserMeasurementExists, scaleVersion);
 
-                    return false;
+                    return true;
                 }
 
                 return false;
@@ -381,7 +378,7 @@ public class BlueToothScale
                     //    this.mBleScaleCallbacks.didGetUUIDsListOfUsers(listOfUuids, userListInitials, count, this.mMaximumUsers);
                 }
 
-                return false;
+                return true;
             }
 
             if (rd[ 1 ] == 66)
@@ -513,8 +510,7 @@ public class BlueToothScale
                 if (rd[ 3 ] == 2)
                 {
                     this.rawTimeStampArray[ 0 ] = convertBytesToInt(Arrays.copyOfRange(rd, 4, 8));
-                    byte[] data = new byte[ 4 ];
-                    this.rawWeightArray[ 0 ] = ((double) convertBytesToInt(data)) / 20.0d;
+                    this.rawWeightArray[ 0 ] = ((convertByteToInt(rd[ 8 ]) * 256) + convertByteToInt(rd[ 9 ])) / 20.0d;
                     this.rawImpedanceArray[ 0 ] = (convertByteToInt(rd[ 10 ]) * 256) + convertByteToInt(rd[ 11 ]);
                     this.rawBodyFatArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 12 ]) * 256) + convertByteToInt(rd[ 13 ]))) / 10.0d);
                     this.waterByte = rd[ 14 ];
@@ -531,7 +527,15 @@ public class BlueToothScale
                     this.rawAmrArray[ 0 ] = (convertByteToInt(rd[ 11 ]) * 256) + convertByteToInt(rd[ 12 ]);
                     this.rawBmiArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 13 ]) * 256) + convertByteToInt(rd[ 14 ]))) / 10.0d);
 
-                    Log.d(LOGTAG, "parseData: Finish(3): BMI=" + this.rawBmiArray[ 0 ]);
+                    Log.d(LOGTAG, "parseData: Finish(3):"
+                            + " Weight=" + this.rawWeightArray[ 0 ]
+                            + " Impedance=" + this.rawImpedanceArray[ 0 ]
+                            + " BodyFat=" + this.rawBodyFatArray[ 0 ]
+                            + " Water=" + this.rawWaterArray[ 0 ]
+                            + " Bones=" + this.rawBoneMassArray[ 0 ]
+                            + " BMR=" + this.rawBmrArray[ 0 ]
+                            + " AMR=" + this.rawAmrArray[ 0 ]
+                            + " BMI=" + this.rawBmiArray[ 0 ]);
 
                     long timeStamp = getTimeStampInMilliSeconds(this.rawTimeStampArray[ 0 ]);
                     //this.mBleScaleCallbacks.didFinishMeasurementOnTimestamp(timeStamp, this.rawWeightArray[ 0 ], this.rawImpedanceArray[ 0 ], this.rawBmiArray[ 0 ], this.rawBodyFatArray[ 0 ], this.rawWaterArray[ 0 ], this.rawMuscleArray[ 0 ], this.rawBoneMassArray[ 0 ], this.rawBmrArray[ 0 ], this.rawAmrArray[ 0 ], this.rawListOfUuids[ 0 ], this.didFinishMeasurementStatus);
@@ -582,7 +586,6 @@ public class BlueToothScale
                 data[ 2 ] = rd[ 3 ];
                 data[ 3 ] = rd[ 4 ];
                 weight = ((double) convertBytesToInt(data)) / 20.0d;
-
                 Log.d(LOGTAG, "parseData: Weight=" + weight + " Status=" + status);
 
                 //this.mBleScaleCallbacks.didGetLiveWeight(weight, status);
@@ -594,37 +597,43 @@ public class BlueToothScale
         return false;
     }
 
-    public byte[] getUserListBytesData(String scaleName)
+    public byte[] getUserListBytesData()
     {
         Log.d(LOGTAG,"getUserListBytesData");
+
         byte[] data = new byte[ 2 ];
+
         if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 51;
         }
         else
         {
             data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 51;
         }
+
+        data[ 1 ] = (byte) 51;
+
         return data;
     }
 
     public byte[] getScaleStatusForUserBytesData(long uuid)
     {
         Log.d(LOGTAG,"getScaleStatusForUserBytesData-->uuid : " + uuid);
+
         byte[] data = new byte[ 10 ];
+
         if (isCompatibleScale(model))
         {
             data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 79;
         }
         else
         {
             data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 79;
         }
+
+        data[ 1 ] = (byte) 79;
+
         byte[] uuidInBytes = convertLongToBytes(uuid);
         for (int i = 0; i < 8; i++)
         {
