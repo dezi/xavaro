@@ -1,9 +1,21 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothProfile;
+import android.os.Parcelable;
+import android.os.Handler;
+
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -24,17 +36,105 @@ import android.widget.ImageView;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 //
 // Utility namespace for included small classes.
 //
 public class DitUndDat
 {
+    //region public static class BlueTooth
+
+
+    //enregion public static class BlueTooth
+
+    //region public static class SpeekDat
+
+    public static class SpeekDat extends UtteranceProgressListener implements
+            TextToSpeech.OnInitListener
+    {
+        private static final String LOGTAG = SpeekDat.class.getSimpleName();
+
+        private static SpeekDat instance;
+
+        public static void speak(Context context, String text)
+        {
+            if (instance == null) instance = new SpeekDat(context);
+
+            instance.addQueue(text);
+        }
+
+        private TextToSpeech ttspeech;
+        private final ArrayList<String> texts = new ArrayList<>();
+        private boolean isInited;
+
+        public SpeekDat(Context context)
+        {
+            ttspeech = new TextToSpeech(context,this);
+            ttspeech.setOnUtteranceProgressListener(this);
+        }
+
+        public void addQueue(String text)
+        {
+            synchronized (texts)
+            {
+                texts.add(text);
+            }
+
+            if (isInited && ! ttspeech.isSpeaking()) queueAll();
+        }
+
+        private void queueAll()
+        {
+            synchronized (texts)
+            {
+                while (texts.size() > 0)
+                {
+                    String text = texts.remove(0);
+
+                    ttspeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, text);
+                }
+            }
+        }
+
+        public void onInit(int status)
+        {
+            if (status == TextToSpeech.SUCCESS)
+            {
+                queueAll();
+
+                isInited = true;
+            }
+        }
+
+        @Override
+        public void onStart(String text)
+        {
+            Log.d(LOGTAG,"onStart: " + text);
+        }
+
+        @Override
+        public void onDone(String text)
+        {
+            Log.d(LOGTAG,"onDone: " + text);
+        }
+
+        @Override
+        public void onError(String text)
+        {
+            Log.d(LOGTAG,"onError: " + text);
+        }
+    }
+
+    //endregion public static class SpeekDat
+
     //region public static class DefaultLauncher
 
     public static class DefaultApps
@@ -175,6 +275,7 @@ public class DitUndDat
             return null;
         }
 
+        @SuppressWarnings("unused")
         public static boolean isDefaultAssist(Context context)
         {
             Intent intent = new Intent(Intent.ACTION_ASSIST);
