@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -22,7 +23,10 @@ import android.text.InputType;
 import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.util.Log;
 import android.os.Bundle;
@@ -213,6 +217,12 @@ public class SettingsFragments
 
         private final HealthScaleFragment self = this;
         private Context context;
+        private ArrayList<BluetoothDevice> btDevices = new ArrayList<>();
+
+        private NiceListPreference devicePref;
+
+        ArrayList<String> recentText = new ArrayList<>();
+        ArrayList<String> recentVals = new ArrayList<>();
 
         @Override
         public void registerAll(Context context)
@@ -223,29 +233,52 @@ public class SettingsFragments
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
 
-            NiceListPreference cb = new NiceListPreference(context);
+            devicePref = new NiceListPreference(context);
 
-            CharSequence[] recentText = { "Nicht zugeordnet" };
-            CharSequence[] recentVals = { "unknown" };
+            devicePref.setKey(keyprefix + ".device");
 
-            cb.setEntries(recentText);
-            cb.setEntryValues(recentVals);
-            cb.setDefaultValue("unknown");
-            cb.setKey(keyprefix + ".device");
-            cb.setTitle("BlueTooth Waage");
-            cb.setEnabled(enabled);
+            recentText.add("Nicht zugeordnet");
+            recentVals.add("unknown");
 
-            cb.setOnclick(discoverDialog);
-
-            if (!sharedPrefs.contains(cb.getKey()))
+            if (sharedPrefs.contains(devicePref.getKey()))
             {
-                sharedPrefs.edit().putString(cb.getKey(), "unknown").apply();
+                String btDevice = sharedPrefs.getString(devicePref.getKey(), "unknown");
+                String[] btDeviceparts = btDevice.split(" => ");
+
+                if ((! btDevice.equals("unknown")) && (btDeviceparts.length == 2))
+                {
+                    recentText.add(btDeviceparts[ 0 ]);
+                    recentVals.add(btDeviceparts[ 1 ]);
+                }
             }
 
-            preferences.add(cb);
+            devicePref.setEntries(recentText);
+            devicePref.setEntryValues(recentVals);
+            devicePref.setDefaultValue("unknown");
+            devicePref.setTitle("BlueTooth Waage");
+            devicePref.setEnabled(enabled);
+
+            devicePref.setOnclick(discoverDialog);
+
+            if (!sharedPrefs.contains(devicePref.getKey()))
+            {
+                sharedPrefs.edit().putString(devicePref.getKey(), "unknown").apply();
+            }
+
+            preferences.add(devicePref);
         }
 
+        private final Handler handler = new Handler();
         private AlertDialog dialog;
+
+        public Runnable cancelDialog = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                dialog.cancel();
+            }
+        };
 
         public Runnable discoverDialog = new Runnable()
         {
@@ -259,6 +292,55 @@ public class SettingsFragments
                 builder.setNeutralButton("Nach Geräten suchen", self);
 
                 dialog = builder.create();
+
+                String btDevice = sharedPrefs.getString(keyprefix + ".device", "unknown");
+
+                RadioGroup rg = new RadioGroup(context);
+                rg.setOrientation(RadioGroup.VERTICAL);
+                rg.setPadding(40, 10, 0, 0);
+
+                for (int inx = 0; inx < recentText.size(); inx++)
+                {
+                    RadioButton rb = new RadioButton(context);
+
+                    rb.setId(4711 + inx);
+                    rb.setTextSize(18f);
+                    rb.setPadding(0, 10, 0, 10);
+
+                    //
+                    // Display unknown as text option, selected devices
+                    // with name and mac address.
+                    //
+
+                    rb.setText((inx == 0) ? recentText.get(inx) : recentVals.get(inx));
+
+                    rb.setTag(recentVals.get(inx));
+                    rb.setChecked(recentVals.get(inx).equals(btDevice));
+
+                    rb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+                    {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+                        {
+                            if (b)
+                            {
+                                Log.d(LOGTAG, "onCheckedChanged:" + (String) compoundButton.getTag());
+
+                                sharedPrefs.edit().putString(
+                                        keyprefix + ".device",
+                                        (String) compoundButton.getTag()).commit();
+
+                                devicePref.onPreferenceChange(devicePref, (String) compoundButton.getTag());
+
+                                handler.postDelayed(cancelDialog, 200);
+                            }
+                        }
+                    });
+
+                    rg.addView(rb);
+                }
+
+                dialog.setView(rg);
                 dialog.show();
 
                 //
@@ -279,21 +361,56 @@ public class SettingsFragments
 
         public void onDiscoverStarted()
         {
-            dialog.setTitle("BlueTooth Waagen werden gesucht...");
-
             Log.d(LOGTAG,"onDiscoverStarted");
+
+            btDevices.clear();
+
+            Runnable runner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    dialog.setTitle("BlueTooth Waagen werden gesucht...");
+                }
+            };
+
+            handler.post(runner);
         }
 
         public void onDiscoverFinished()
         {
-            dialog.setTitle("BlueTooth Waagen Suche abgeschlossen");
+            Log.d(LOGTAG, "onDiscoverFinished");
 
-            Log.d(LOGTAG,"onDiscoverFinished");
+            Runnable runner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    dialog.cancel();
+                    discoverDialog.run();
+                }
+            };
+
+            handler.post(runner);
         }
 
         public void onDeviceDiscovered(BluetoothDevice device)
         {
-            Log.d(LOGTAG,"onDeviceDiscovered: " + device.getName());
+            Log.d(LOGTAG, "onDeviceDiscovered: " + device.getName());
+
+            btDevices.add(device);
+
+            String newEntry = device.getName();
+            String newValue = device.getName() + " => " + device.getAddress();
+
+            if (! recentText.contains(newEntry))
+            {
+                recentText.add(newEntry);
+                recentVals.add(newValue);
+            }
+
+            devicePref.setEntries(recentText);
+            devicePref.setEntryValues(recentVals);
         }
 
         public void onClick(DialogInterface dialog, int which)
@@ -1615,11 +1732,37 @@ public class SettingsFragments
             this.key = key;
         }
 
+        public void setEntries(ArrayList<String> entries)
+        {
+            String[] intern = new String[ entries.size() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = entries.get(inx);
+            }
+
+            super.setEntries(intern);
+            this.entries = intern;
+        }
+
         @Override
         public void setEntries(CharSequence[] entries)
         {
             super.setEntries(entries);
             this.entries = entries;
+        }
+
+        public void setEntryValues(ArrayList<String> values)
+        {
+            String[] intern = new String[ values.size() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = values.get(inx);
+            }
+
+            super.setEntryValues(intern);
+            this.values = intern;
         }
 
         @Override
