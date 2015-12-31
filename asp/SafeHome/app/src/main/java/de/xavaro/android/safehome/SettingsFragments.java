@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -28,9 +27,9 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.util.Log;
+import android.os.Handler;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -217,12 +216,11 @@ public class SettingsFragments
 
         private final HealthScaleFragment self = this;
         private Context context;
-        private ArrayList<BluetoothDevice> btDevices = new ArrayList<>();
 
         private NiceListPreference devicePref;
 
-        ArrayList<String> recentText = new ArrayList<>();
-        ArrayList<String> recentVals = new ArrayList<>();
+        final ArrayList<String> recentText = new ArrayList<>();
+        final ArrayList<String> recentVals = new ArrayList<>();
 
         @Override
         public void registerAll(Context context)
@@ -271,7 +269,7 @@ public class SettingsFragments
         private final Handler handler = new Handler();
         private AlertDialog dialog;
 
-        public Runnable cancelDialog = new Runnable()
+        public final Runnable cancelDialog = new Runnable()
         {
             @Override
             public void run()
@@ -280,7 +278,7 @@ public class SettingsFragments
             }
         };
 
-        public Runnable discoverDialog = new Runnable()
+        public final Runnable discoverDialog = new Runnable()
         {
             @Override
             public void run()
@@ -324,13 +322,12 @@ public class SettingsFragments
                         {
                             if (b)
                             {
-                                Log.d(LOGTAG, "onCheckedChanged:" + (String) compoundButton.getTag());
+                                Log.d(LOGTAG, "onCheckedChanged:" + compoundButton.getTag());
 
-                                sharedPrefs.edit().putString(
-                                        keyprefix + ".device",
-                                        (String) compoundButton.getTag()).commit();
+                                sharedPrefs.edit().putString(keyprefix + ".device",
+                                        (String) compoundButton.getTag()).apply();
 
-                                devicePref.onPreferenceChange(devicePref, (String) compoundButton.getTag());
+                                devicePref.onPreferenceChange(devicePref, compoundButton.getTag());
 
                                 handler.postDelayed(cancelDialog, 200);
                             }
@@ -362,8 +359,6 @@ public class SettingsFragments
         public void onDiscoverStarted()
         {
             Log.d(LOGTAG,"onDiscoverStarted");
-
-            btDevices.clear();
 
             Runnable runner = new Runnable()
             {
@@ -397,8 +392,6 @@ public class SettingsFragments
         public void onDeviceDiscovered(BluetoothDevice device)
         {
             Log.d(LOGTAG, "onDeviceDiscovered: " + device.getName());
-
-            btDevices.add(device);
 
             String newEntry = device.getName();
             String newValue = device.getName() + " => " + device.getAddress();
