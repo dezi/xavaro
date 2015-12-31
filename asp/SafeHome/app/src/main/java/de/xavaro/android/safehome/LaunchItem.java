@@ -1,7 +1,14 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
+import android.os.Parcelable;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 
 import android.app.AlertDialog;
@@ -39,8 +46,14 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
 
 //
 // Launch item view on home screen.
@@ -1270,8 +1283,16 @@ public class LaunchItem extends FrameLayout implements
         }
     }
 
+    public TextToSpeech ttob;
+
     private void launchDeveloper()
     {
         //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
+
+        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
+
+        BlueTooth bt = BlueTooth.getInstance(context);
+
+        bt.discoverScales(null);
     }
 }

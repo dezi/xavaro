@@ -1,6 +1,9 @@
 package de.xavaro.android.safehome;
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -23,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.util.Log;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -156,9 +160,9 @@ public class SettingsFragments
             cb.setKey("admin.recent.button");
             cb.setTitle("Anwendung auf dem Menü-Button");
 
-            if (!sharedPrefs.contains(et.getKey()))
+            if (!sharedPrefs.contains(cb.getKey()))
             {
-                sharedPrefs.edit().putString(et.getKey(), "safehome").apply();
+                sharedPrefs.edit().putString(cb.getKey(), "safehome").apply();
             }
 
             preferences.add(cb);
@@ -179,6 +183,129 @@ public class SettingsFragments
     }
 
     //endregion Administrator preferences
+
+    //region Health Scale preferences
+
+    public static class HealthScaleFragment extends EnablePreferenceFragment implements
+            DialogInterface.OnClickListener,
+            BlueTooth.BlueToothDiscoverCallback
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Gewicht";
+            header.iconRes = GlobalConfigs.IconResHealtCoach;
+            header.fragment = HealthScaleFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthScaleFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResHealtCoach;
+            keyprefix = "health.scale";
+            masterenable = "Gewicht freischalten";
+        }
+
+        private final HealthScaleFragment self = this;
+        private Context context;
+
+        @Override
+        public void registerAll(Context context)
+        {
+            this.context = context;
+
+            super.registerAll(context);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            NiceListPreference cb = new NiceListPreference(context);
+
+            CharSequence[] recentText = { "Nicht zugeordnet" };
+            CharSequence[] recentVals = { "unknown" };
+
+            cb.setEntries(recentText);
+            cb.setEntryValues(recentVals);
+            cb.setDefaultValue("unknown");
+            cb.setKey(keyprefix + ".device");
+            cb.setTitle("BlueTooth Waage");
+            cb.setEnabled(enabled);
+
+            cb.setOnclick(discoverDialog);
+
+            if (!sharedPrefs.contains(cb.getKey()))
+            {
+                sharedPrefs.edit().putString(cb.getKey(), "unknown").apply();
+            }
+
+            preferences.add(cb);
+        }
+
+        private AlertDialog dialog;
+
+        public Runnable discoverDialog = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("BlueTooth Waage");
+
+                builder.setNegativeButton("Abbrechen", self);
+                builder.setNeutralButton("Nach Geräten suchen", self);
+
+                dialog = builder.create();
+                dialog.show();
+
+                //
+                // Set neutral button handler to avoid closing
+                // of list preference dialog.
+                //
+
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        BlueTooth.getInstance(context).discoverScales(self);
+                    }
+                });
+            }
+        };
+
+        public void onDiscoverStarted()
+        {
+            dialog.setTitle("BlueTooth Waagen werden gesucht...");
+
+            Log.d(LOGTAG,"onDiscoverStarted");
+        }
+
+        public void onDiscoverFinished()
+        {
+            dialog.setTitle("BlueTooth Waagen Suche abgeschlossen");
+
+            Log.d(LOGTAG,"onDiscoverFinished");
+        }
+
+        public void onDeviceDiscovered(BluetoothDevice device)
+        {
+            Log.d(LOGTAG,"onDeviceDiscovered: " + device.getName());
+        }
+
+        public void onClick(DialogInterface dialog, int which)
+        {
+            if (which == DialogInterface.BUTTON_NEGATIVE)
+            {
+                dialog.cancel();
+            }
+        }
+    }
+
+    //endregion Health preferences
 
     //region Phone preferences
 
@@ -302,6 +429,7 @@ public class SettingsFragments
                 "notinst",
                 "ready"};
 
+        @Override
         @SuppressWarnings("ConstantConditions")
         public void registerAll(Context context)
         {

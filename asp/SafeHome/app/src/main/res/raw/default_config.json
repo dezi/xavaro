@@ -59,6 +59,10 @@
         "label": "Wikipedia",
         "type": "genericapp",
         "packagename": "org.wikipedia"
+      },
+      {
+        "label": "Test Feature",
+        "type": "developer"
       }
     ]
   }

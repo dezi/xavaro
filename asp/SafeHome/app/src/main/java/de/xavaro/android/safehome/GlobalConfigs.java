@@ -121,6 +121,7 @@ public class GlobalConfigs
     public static final int IconResWebConfigPictorial = R.drawable.crown_256x256;
     public static final int IconResWebConfigShopping  = R.drawable.shopping_440x440;
     public static final int IconResWebConfigErotics   = R.drawable.erotica_280x280;
+    public static final int IconResHealtCoach         = R.drawable.healt_512x512;
     // @formatter:on
 
     //endregion
