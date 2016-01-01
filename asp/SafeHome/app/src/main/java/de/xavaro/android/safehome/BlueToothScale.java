@@ -1,17 +1,26 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothGatt;
+import android.content.Context;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
-import java.security.acl.LastOwnerException;
 import java.util.Arrays;
 import java.util.Date;
 
 @SuppressWarnings({"UnusedAssignment", "unused"})
-public class BlueToothScale
+public class BlueToothScale extends BlueTooth
 {
     private static final String LOGTAG = BlueToothScale.class.getSimpleName();
+
+    public BlueToothScale(Context context)
+    {
+        super(context);
+    }
+
+    public BlueToothScale(Context context, String deviceTag)
+    {
+        super(context, deviceTag);
+    }
 
     private static class Scales
     {
@@ -34,70 +43,71 @@ public class BlueToothScale
                 devicename.equalsIgnoreCase(Scales.SANITAS_SBF70));
     }
 
-    public byte[] convertLongToBytes(long value)
+    @Override
+    protected void parseResponse(byte[] resp)
     {
-        byte[] data = new byte[ 8 ];
-        for (int i = 0; i < 8; i++)
+        boolean wantsack = parseData(resp);
+
+        if (wantsack)
         {
-            data[ i ] = (byte) ((int) (value >> ((7 - i) * 8)));
+            Log.d(LOGTAG, "parseResponse: send ack");
+
+            GattAction ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_WRITE;
+            ga.data = getAcknowledgementData(resp);
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(0, ga);
+
+            fireNext();
         }
-        return data;
     }
 
-    public byte[] convertIntToBytes(int value)
+    private void testScale()
     {
-        byte[] data = new byte[ 8 ];
-        for (int i = 0; i < 4; i++)
+        if (currentControl != null)
         {
-            data[ i ] = (byte) (value >> ((3 - i) * 8));
+            GattAction ga;
+
+            ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_NOTIFY;
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(ga);
+
+            ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_WRITE;
+            ga.data = getModuleVersionBytesData();
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(ga);
+
+            ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_WRITE;
+            ga.data = getScaleStatusForUserBytesData(101);
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(ga);
+
+            ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_WRITE;
+            ga.data = getSetDateTimeBytesData();
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(ga);
+
+            fireNext();
         }
-        return data;
-    }
-
-    public static long convertBytesToLong(byte[] data)
-    {
-        if (data.length != 8)
-        {
-            return 0;
-        }
-        ByteBuffer buffer = ByteBuffer.allocate(8);
-        buffer.put(data);
-        buffer.flip();
-        return buffer.getLong();
-    }
-
-    public static int convertBytesToInt(byte[] data)
-    {
-        if (data.length != 4)
-        {
-            return 0;
-        }
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.put(data);
-        buffer.flip();
-        return buffer.getInt();
-    }
-
-    public static int convertByteToInt(byte data)
-    {
-        //return Integer.parseInt(String.format("%X", new Object[]{Byte.valueOf(data)}), 16);
-
-        return data & 0xff;
-    }
-
-    public static long getTimeStampInMilliSeconds(int timeStampInSeconds)
-    {
-        return ((long) timeStampInSeconds) * 1000;
-    }
-
-    public static int getTimeStampInSeconds(long timeStampInMilliSeconds)
-    {
-        return (int) (timeStampInMilliSeconds / 1000);
-    }
-
-    public BlueToothScale(String model)
-    {
-        this.model = model;
     }
 
     private String model;
@@ -1282,4 +1292,67 @@ public class BlueToothScale
 
         return data;
     }
+
+    //region Conversion helper
+
+    public byte[] convertLongToBytes(long value)
+    {
+        byte[] data = new byte[ 8 ];
+        for (int i = 0; i < 8; i++)
+        {
+            data[ i ] = (byte) ((int) (value >> ((7 - i) * 8)));
+        }
+        return data;
+    }
+
+    public byte[] convertIntToBytes(int value)
+    {
+        byte[] data = new byte[ 8 ];
+        for (int i = 0; i < 4; i++)
+        {
+            data[ i ] = (byte) (value >> ((3 - i) * 8));
+        }
+        return data;
+    }
+
+    public static long convertBytesToLong(byte[] data)
+    {
+        if (data.length != 8)
+        {
+            return 0;
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(data);
+        buffer.flip();
+        return buffer.getLong();
+    }
+
+    public static int convertBytesToInt(byte[] data)
+    {
+        if (data.length != 4)
+        {
+            return 0;
+        }
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.put(data);
+        buffer.flip();
+        return buffer.getInt();
+    }
+
+    public static int convertByteToInt(byte data)
+    {
+        return data & 0xff;
+    }
+
+    public static long getTimeStampInMilliSeconds(int timeStampInSeconds)
+    {
+        return ((long) timeStampInSeconds) * 1000;
+    }
+
+    public static int getTimeStampInSeconds(long timeStampInMilliSeconds)
+    {
+        return (int) (timeStampInMilliSeconds / 1000);
+    }
+
+    //endregion Conversion helper
 }

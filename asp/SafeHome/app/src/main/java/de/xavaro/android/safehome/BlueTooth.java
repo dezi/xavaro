@@ -34,6 +34,19 @@ public class BlueTooth extends BroadcastReceiver
         return instance;
     }
 
+    protected final Context context;
+    protected final BluetoothAdapter bta;
+
+    protected String modelName;
+    protected String macAddress;
+
+    protected BluetoothGatt currentGatt;
+    protected BluetoothGattCharacteristic currentControl;
+    protected boolean currentConnectState;
+
+    protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
+    protected BlueToothConnectCallback connectCallback;
+
     private static final String SCALE_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb";
     private static final String SCALE_CHARACTERISTIC = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
@@ -44,34 +57,57 @@ public class BlueTooth extends BroadcastReceiver
 
     private static final String NOTIFY_DESCRIPTOR = "00002902-0000-1000-8000-00805f9b34fb";
 
-    private final Context context;
-    private final BluetoothAdapter bta;
     private final ArrayList<BluetoothDevice> devices = new ArrayList<>();
-    private final ArrayList<GattAction> gattSchedule = new ArrayList<>();
 
-    private String currentModel;
-    private BluetoothGatt currentGatt;
-    private BlueToothBPM currentBPM;
-    private BlueToothScale currentScale;
     private BluetoothDevice currentDevice;
-    private BluetoothGattCharacteristic currentControl;
 
-    private BlueTooth(Context context)
+    public BlueTooth(Context context)
     {
         this.context = context;
 
-        IntentFilter filter;
-
-        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        context.registerReceiver(this, filter);
-        filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
-        context.registerReceiver(this, filter);
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        context.registerReceiver(this, filter);
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        context.registerReceiver(this, filter);
-
         this.bta = BluetoothAdapter.getDefaultAdapter();
+    }
+
+    public BlueTooth(Context context, String deviceTag)
+    {
+        this(context);
+
+        if (deviceTag != null)
+        {
+            String[] parts = deviceTag.split(" => ");
+
+            modelName = parts[ 0 ];
+
+            if (parts.length == 2)
+            {
+                macAddress = parts[ 1 ];
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    public void connect()
+    {
+        BluetoothDevice device = bta.getRemoteDevice(this.macAddress);
+
+        Log.d(LOGTAG,"connect: device=" + device);
+
+        currentGatt = device.connectGatt(context, true, gattCallback);
+    }
+
+    @SuppressLint("NewApi")
+    public void setConnectCallback(BlueToothConnectCallback callback)
+    {
+        connectCallback = callback;
+
+        if (currentConnectState)
+        {
+            connectCallback.onBluetoothConnect(currentGatt.getDevice());
+        }
+        else
+        {
+            connectCallback.onBluetoothDisconnect(currentGatt.getDevice());
+        }
     }
 
     public boolean isDiscovering;
@@ -86,6 +122,18 @@ public class BlueTooth extends BroadcastReceiver
     public void discoverBPMs(BlueToothDiscoverCallback callback)
     {
         if (isDiscovering) return;
+        isDiscovering = true;
+
+        IntentFilter filter;
+
+        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        context.registerReceiver(this, filter);
+        filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
+        context.registerReceiver(this, filter);
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        context.registerReceiver(this, filter);
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        context.registerReceiver(this, filter);
 
         discoverLE = true;
         discoverClassic = false;
@@ -100,6 +148,18 @@ public class BlueTooth extends BroadcastReceiver
     public void discoverScales(BlueToothDiscoverCallback callback)
     {
         if (isDiscovering) return;
+        isDiscovering = true;
+
+        IntentFilter filter;
+
+        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        context.registerReceiver(this, filter);
+        filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
+        context.registerReceiver(this, filter);
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        context.registerReceiver(this, filter);
+        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        context.registerReceiver(this, filter);
 
         discoverLE = true;
         discoverClassic = false;
@@ -108,62 +168,6 @@ public class BlueTooth extends BroadcastReceiver
 
         devices.clear();
         bta.startDiscovery();
-        isDiscovering = true;
-    }
-
-    private class GattAction
-    {
-        static final int MODE_INDICATE = 1;
-        static final int MODE_NOTIFY = 2;
-        static final int MODE_WRITE = 3;
-        static final int MODE_READ = 4;
-
-        BluetoothGattCharacteristic characteristic;
-        BluetoothGatt gatt;
-        byte[] data;
-        int mode;
-    }
-
-    @SuppressLint("NewApi")
-    private void fireNext()
-    {
-        if (gattSchedule.size() == 0) return;
-
-        GattAction ga = gattSchedule.remove(0);
-
-        boolean executed = true;
-
-        if (ga.mode == GattAction.MODE_READ)
-        {
-            executed = ga.gatt.readCharacteristic(ga.characteristic);
-        }
-
-        if (ga.mode == GattAction.MODE_WRITE)
-        {
-            Log.d(LOGTAG,"fireNext: " + StaticUtils.hexBytesToString(ga.data));
-            ga.characteristic.setValue(ga.data);
-            executed = ga.gatt.writeCharacteristic(ga.characteristic);
-        }
-
-        if (ga.mode == GattAction.MODE_NOTIFY)
-        {
-            ga.gatt.setCharacteristicNotification(ga.characteristic, true);
-
-            UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
-            BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            executed = ga.gatt.writeDescriptor(descriptor);
-        }
-
-        if (ga.mode == GattAction.MODE_INDICATE)
-        {
-            ga.gatt.setCharacteristicNotification(ga.characteristic, true);
-
-            UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
-            BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-            executed = ga.gatt.writeDescriptor(descriptor);
-        }
     }
 
     @Override
@@ -248,6 +252,63 @@ public class BlueTooth extends BroadcastReceiver
             {
                 discoverCallback.onDiscoverFinished();
             }
+
+            context.unregisterReceiver(this);
+        }
+    }
+
+    protected class GattAction
+    {
+        static final int MODE_INDICATE = 1;
+        static final int MODE_NOTIFY = 2;
+        static final int MODE_WRITE = 3;
+        static final int MODE_READ = 4;
+
+        BluetoothGattCharacteristic characteristic;
+        BluetoothGatt gatt;
+        byte[] data;
+        int mode;
+    }
+
+    @SuppressLint("NewApi")
+    protected void fireNext()
+    {
+        if (gattSchedule.size() == 0) return;
+
+        GattAction ga = gattSchedule.remove(0);
+
+        boolean executed = true;
+
+        if (ga.mode == GattAction.MODE_READ)
+        {
+            executed = ga.gatt.readCharacteristic(ga.characteristic);
+        }
+
+        if (ga.mode == GattAction.MODE_WRITE)
+        {
+            Log.d(LOGTAG,"fireNext: " + StaticUtils.hexBytesToString(ga.data));
+            ga.characteristic.setValue(ga.data);
+            executed = ga.gatt.writeCharacteristic(ga.characteristic);
+        }
+
+        if (ga.mode == GattAction.MODE_NOTIFY)
+        {
+            ga.gatt.setCharacteristicNotification(ga.characteristic, true);
+
+            UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
+            BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            executed = ga.gatt.writeDescriptor(descriptor);
+        }
+
+        if (ga.mode == GattAction.MODE_INDICATE)
+        {
+            ga.gatt.setCharacteristicNotification(ga.characteristic, true);
+
+            UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
+            BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+            executed = ga.gatt.writeDescriptor(descriptor);
         }
     }
 
@@ -259,16 +320,26 @@ public class BlueTooth extends BroadcastReceiver
         {
             Log.i(LOGTAG, "onConnectionStateChange [" + newState + "]");
 
+            String devicetag = gatt.getDevice().getName() + " => " + gatt.getDevice().getAddress();
+
             if (newState == BluetoothProfile.STATE_CONNECTED)
             {
-                Log.i(LOGTAG, "onConnectionStateChange: device connected");
+                Log.i(LOGTAG, "onConnectionStateChange: device " + devicetag + " connected");
+
+                currentConnectState = true;
+
+                if (connectCallback != null) connectCallback.onBluetoothConnect(gatt.getDevice());
 
                 if (isDiscovering) gatt.discoverServices();
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)
             {
-                Log.i(LOGTAG, "onConnectionStateChange: device disconnected");
+                Log.i(LOGTAG, "onConnectionStateChange: device " + devicetag + " disconnected");
+
+                currentConnectState = false;
+
+                if (connectCallback != null) connectCallback.onBluetoothDisconnect(gatt.getDevice());
             }
         }
 
@@ -310,12 +381,9 @@ public class BlueTooth extends BroadcastReceiver
                                 descriptor.getUuid().toString().equals(NOTIFY_DESCRIPTOR))
                         {
                             currentGatt = gatt;
-                            currentDevice = gatt.getDevice();
-                            currentModel = currentDevice.getName();
-                            currentScale = new BlueToothScale(currentModel);
                             currentControl = characteristic;
 
-                            Log.d(LOGTAG,"Found compatible scale=" + currentModel);
+                            Log.d(LOGTAG,"Found compatible scale=" + gatt.getDevice().getName());
 
                             if (discoverScales && (discoverCallback != null))
                             {
@@ -327,12 +395,9 @@ public class BlueTooth extends BroadcastReceiver
                                 descriptor.getUuid().toString().equals(NOTIFY_DESCRIPTOR))
                         {
                             currentGatt = gatt;
-                            currentDevice = gatt.getDevice();
-                            currentModel = currentDevice.getName();
-                            currentBPM = new BlueToothBPM(currentModel);
                             currentControl = characteristic;
 
-                            Log.d(LOGTAG,"Found compatible bpm=" + currentModel);
+                            Log.d(LOGTAG,"Found compatible bpm=" + gatt.getDevice().getName());
 
                             if (discoverBPMs && (discoverCallback != null))
                             {
@@ -346,74 +411,6 @@ public class BlueTooth extends BroadcastReceiver
             if ((--discoverBGJobs == 0) && (! isDiscovering) && (discoverCallback != null))
             {
                 discoverCallback.onDiscoverFinished();
-            }
-
-            if (discoverBPMs && (discoverCallback == null)) testBPM();
-            if (discoverScales && (discoverCallback == null)) testScale();
-        }
-
-        private void testBPM()
-        {
-            Log.d(LOGTAG,"testBPM");
-
-            if (currentControl != null)
-            {
-                GattAction ga;
-
-                ga = new GattAction();
-
-                ga.gatt = currentGatt;
-                ga.mode = GattAction.MODE_INDICATE;
-                ga.characteristic = currentControl;
-
-                gattSchedule.add(ga);
-
-                fireNext();
-            }
-        }
-
-        private void testScale()
-        {
-            if (currentControl != null)
-            {
-                GattAction ga;
-
-                ga = new GattAction();
-
-                ga.gatt = currentGatt;
-                ga.mode = GattAction.MODE_NOTIFY;
-                ga.characteristic = currentControl;
-
-                gattSchedule.add(ga);
-
-                ga = new GattAction();
-
-                ga.gatt = currentGatt;
-                ga.mode = GattAction.MODE_WRITE;
-                ga.data = currentScale.getModuleVersionBytesData();
-                ga.characteristic = currentControl;
-
-                gattSchedule.add(ga);
-
-                ga = new GattAction();
-
-                ga.gatt = currentGatt;
-                ga.mode = GattAction.MODE_WRITE;
-                ga.data = currentScale.getScaleStatusForUserBytesData(101);
-                ga.characteristic = currentControl;
-
-                gattSchedule.add(ga);
-
-                ga = new GattAction();
-
-                ga.gatt = currentGatt;
-                ga.mode = GattAction.MODE_WRITE;
-                ga.data = currentScale.getSetDateTimeBytesData();
-                ga.characteristic = currentControl;
-
-                gattSchedule.add(ga);
-
-                fireNext();
             }
         }
 
@@ -462,33 +459,9 @@ public class BlueTooth extends BroadcastReceiver
         }
     };
 
-    private void parseResponse(byte[] resp)
+    protected void parseResponse(byte[] resp)
     {
-        if (currentScale != null)
-        {
-            boolean wantsack = currentScale.parseData(resp);
-
-            if (wantsack)
-            {
-                Log.d(LOGTAG, "parseResponse: send ack");
-
-                GattAction ga = new GattAction();
-
-                ga.gatt = currentGatt;
-                ga.mode = GattAction.MODE_WRITE;
-                ga.data = currentScale.getAcknowledgementData(resp);
-                ga.characteristic = currentControl;
-
-                gattSchedule.add(0, ga);
-
-                fireNext();
-            }
-        }
-
-        if (currentBPM != null)
-        {
-            boolean wantsack = currentBPM.parseData(resp);
-        }
+        Log.d(LOGTAG,"parseResponse: Please implement this method in derived class.");
     }
 
     private String getDeviceTypeString(int devtype)
@@ -519,22 +492,16 @@ public class BlueTooth extends BroadcastReceiver
         return pstr.trim();
     }
 
-    private String getPermsString(int perms)
-    {
-        String pstr = "";
-
-        if ((perms & BluetoothGattCharacteristic.PERMISSION_READ) > 0) pstr += "READ ";
-        if ((perms & BluetoothGattCharacteristic.PERMISSION_READ_ENCRYPTED) > 0) pstr += "READ_ENCRYPTED ";
-        if ((perms & BluetoothGattCharacteristic.PERMISSION_WRITE) > 0) pstr += "WRITE ";
-        if ((perms & BluetoothGattCharacteristic.PERMISSION_WRITE_ENCRYPTED) > 0) pstr += "WRITE_ENCRYPTED ";
-
-        return pstr.trim();
-    }
-
     public interface BlueToothDiscoverCallback
     {
         public void onDiscoverStarted();
         public void onDiscoverFinished();
         public void onDeviceDiscovered(BluetoothDevice device);
+    }
+
+    public interface BlueToothConnectCallback
+    {
+        public void onBluetoothConnect(BluetoothDevice device);
+        public void onBluetoothDisconnect(BluetoothDevice device);
     }
 }

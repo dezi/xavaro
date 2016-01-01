@@ -1,23 +1,14 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
-import android.content.pm.ResolveInfo;
-import android.graphics.Color;
-import android.os.Parcelable;
-import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 
-import android.app.AlertDialog;
-import android.content.ComponentName;
+import android.graphics.Color;
+import android.speech.tts.TextToSpeech;
+
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
@@ -27,7 +18,6 @@ import android.graphics.drawable.Drawable;
 
 import android.net.Uri;
 import android.os.Handler;
-import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -36,7 +26,6 @@ import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
 
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -46,14 +35,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
 
 //
 // Launch item view on home screen.
@@ -62,7 +44,8 @@ import java.util.UUID;
 public class LaunchItem extends FrameLayout implements
         ProxyPlayer.Callback,
         SurfaceHolder.Callback,
-        DitUndDat.InternetState.Callback
+        DitUndDat.InternetState.Callback,
+        BlueTooth.BlueToothConnectCallback
 {
     private final String LOGTAG = "LaunchItem";
 
@@ -262,6 +245,35 @@ public class LaunchItem extends FrameLayout implements
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
                     icon.setVisibility(VISIBLE);
                     targetIcon = overicon;
+                }
+
+                if (type.equals("health"))
+                {
+                    if (config.has("subtype"))
+                    {
+                        String subtype = config.getString("subtype");
+
+                        if (subtype.equals("bpm"))
+                        {
+                            HealthGroup.subscribeDevice(this,"bpm");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtBPM));
+                            icon.setVisibility(VISIBLE);
+                        }
+
+                        if (subtype.equals("scale"))
+                        {
+                            HealthGroup.subscribeDevice(this,"scale");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtScale));
+                            icon.setVisibility(VISIBLE);
+                        }
+                    }
+                    else
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealth));
+                        icon.setVisibility(VISIBLE);
+                    }
                 }
 
                 if (type.equals("developer"))
@@ -835,6 +847,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
         if (type.equals("phone"        )) { launchPhone();        return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
+        if (type.equals("health"       )) { launchHealth();        return; }
 
         // @formatter:on
 
@@ -1065,7 +1078,7 @@ public class LaunchItem extends FrameLayout implements
         }
         catch (JSONException ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
         }
     }
 
@@ -1110,6 +1123,16 @@ public class LaunchItem extends FrameLayout implements
         if (directory == null)
         {
             directory = new WebStream(context, "webradio");
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
+    private void launchHealth()
+    {
+        if (directory == null)
+        {
+            directory = new HealthGroup(context);
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
@@ -1291,9 +1314,17 @@ public class LaunchItem extends FrameLayout implements
 
         //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
 
-        BlueTooth bt = BlueTooth.getInstance(context);
+        BlueTooth.getInstance(context).discoverBPMs(null);
+    }
 
-        //bt.discoverScales(null);
-        bt.discoverBPMs(null);
+    public void onBluetoothConnect(BluetoothDevice device)
+    {
+        Log.d(LOGTAG,"onBluetoothConnect: " + device.getName());
+    }
+
+    public void onBluetoothDisconnect(BluetoothDevice device)
+    {
+        Log.d(LOGTAG,"onBluetoothDisconnect: " + device.getName());
+
     }
 }

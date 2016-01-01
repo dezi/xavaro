@@ -93,6 +93,7 @@ public class HomeActivity extends AppCompatActivity implements
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
+        HealthGroup.initialize(this);
     }
 
     @Override

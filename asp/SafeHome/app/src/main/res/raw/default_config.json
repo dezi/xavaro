@@ -56,13 +56,18 @@
         "enable": "phone.enable"
       },
       {
-        "label": "Wikipedia",
-        "type": "genericapp",
-        "packagename": "org.wikipedia"
+        "label": "Vitaldaten",
+        "type": "health",
+        "enable": "health.bpm.enable"
       },
       {
         "label": "Test Feature",
         "type": "developer"
+      },
+      {
+        "label": "Wikipedia",
+        "type": "genericapp",
+        "packagename": "org.wikipedia"
       }
     ]
   }
