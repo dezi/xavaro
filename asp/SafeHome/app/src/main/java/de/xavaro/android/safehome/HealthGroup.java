@@ -27,7 +27,7 @@ public class HealthGroup extends LaunchGroup
 
             if (bpmDevice != null)
             {
-                bpmBlueTooth = new BlueTooth(context, bpmDevice);
+                bpmBlueTooth = new BlueToothBPM(context, bpmDevice);
 
                 bpmBlueTooth.connect();
             }
@@ -39,7 +39,7 @@ public class HealthGroup extends LaunchGroup
 
             if (scaleDevice != null)
             {
-                scaleBlueTooth = new BlueTooth(context, scaleDevice);
+                scaleBlueTooth = new BlueToothScale(context, scaleDevice);
 
                 scaleBlueTooth.connect();
             }

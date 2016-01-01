@@ -1317,14 +1317,46 @@ public class LaunchItem extends FrameLayout implements
         BlueTooth.getInstance(context).discoverBPMs(null);
     }
 
+    //region BlueTooth connect states
+
+    public final Runnable bluetoothIsConnected = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResBlueTooth));
+            overicon.setVisibility(VISIBLE);
+            overlay.setVisibility(VISIBLE);
+        }
+    };
+
+    public final Runnable bluetoothIsDisconnected = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            overicon.setVisibility(INVISIBLE);
+            overlay.setVisibility(INVISIBLE);
+        }
+    };
+
     public void onBluetoothConnect(BluetoothDevice device)
     {
-        Log.d(LOGTAG,"onBluetoothConnect: " + device.getName());
+        Log.d(LOGTAG, "onBluetoothConnect: " + device.getName());
+
+        if (handler == null) handler = new Handler();
+
+        handler.post(bluetoothIsConnected);
     }
 
     public void onBluetoothDisconnect(BluetoothDevice device)
     {
         Log.d(LOGTAG,"onBluetoothDisconnect: " + device.getName());
 
+        if (handler == null) handler = new Handler();
+
+        handler.post(bluetoothIsDisconnected);
     }
+
+    //endregion BlueTooth connect states
 }

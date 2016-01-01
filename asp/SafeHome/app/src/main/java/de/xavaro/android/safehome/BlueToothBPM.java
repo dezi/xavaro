@@ -1,7 +1,12 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
+
+import java.util.List;
+import java.util.UUID;
 
 public class BlueToothBPM extends BlueTooth
 {
@@ -37,15 +42,15 @@ public class BlueToothBPM extends BlueTooth
                 devicename.equalsIgnoreCase(BPMs.SANITAS_SBM37));
     }
 
-    private void testBPM()
+    @Override
+    @SuppressLint("NewApi")
+    protected void enableDevice()
     {
-        Log.d(LOGTAG,"testBPM");
+        Log.d(LOGTAG,"enableDevice: " + currentControl);
 
         if (currentControl != null)
         {
-            GattAction ga;
-
-            ga = new GattAction();
+            GattAction ga = new GattAction();
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_INDICATE;

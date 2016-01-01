@@ -47,11 +47,12 @@ public class BlueTooth extends BroadcastReceiver
     protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
     protected BlueToothConnectCallback connectCallback;
 
-    private static final String SCALE_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb";
-    private static final String SCALE_CHARACTERISTIC = "0000ffe1-0000-1000-8000-00805f9b34fb";
+    protected static final String SCALE_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb";
+    protected static final String SCALE_CHARACTERISTIC = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
-    private static final String BPM_SERVICE = "00001810-0000-1000-8000-00805f9b34fb";
-    private static final String BPM_CHARACTERISTIC_MEASURE = "00002a35-0000-1000-8000-00805f9b34fb";
+    protected static final String BPM_SERVICE = "00001810-0000-1000-8000-00805f9b34fb";
+    protected static final String BPM_CHARACTERISTIC_MEASURE = "00002a35-0000-1000-8000-00805f9b34fb";
+
     private static final String BPM_CHARACTERISTIC_FEATURE = "00002a49-0000-1000-8000-00805f9b34fb";
     private static final String BPM_CHARACTERISTIC_INTERMEDIATE = "00002a36-0000-1000-8000-00805f9b34fb";
 
@@ -328,9 +329,7 @@ public class BlueTooth extends BroadcastReceiver
 
                 currentConnectState = true;
 
-                if (connectCallback != null) connectCallback.onBluetoothConnect(gatt.getDevice());
-
-                if (isDiscovering) gatt.discoverServices();
+                gatt.discoverServices();
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)
@@ -385,6 +384,13 @@ public class BlueTooth extends BroadcastReceiver
 
                             Log.d(LOGTAG,"Found compatible scale=" + gatt.getDevice().getName());
 
+                            if (! isDiscovering)
+                            {
+                                enableDevice();
+
+                                if (connectCallback != null) connectCallback.onBluetoothConnect(gatt.getDevice());
+                            }
+
                             if (discoverScales && (discoverCallback != null))
                             {
                                 discoverCallback.onDeviceDiscovered(gatt.getDevice());
@@ -398,6 +404,13 @@ public class BlueTooth extends BroadcastReceiver
                             currentControl = characteristic;
 
                             Log.d(LOGTAG,"Found compatible bpm=" + gatt.getDevice().getName());
+
+                            if (! isDiscovering)
+                            {
+                                enableDevice();
+
+                                if (connectCallback != null) connectCallback.onBluetoothConnect(gatt.getDevice());
+                            }
 
                             if (discoverBPMs && (discoverCallback != null))
                             {
@@ -462,6 +475,15 @@ public class BlueTooth extends BroadcastReceiver
     protected void parseResponse(byte[] resp)
     {
         Log.d(LOGTAG,"parseResponse: Please implement this method in derived class.");
+    }
+
+    protected void enableDevice()
+    {
+        //
+        // Overriden by sub class if there is anything to do.
+        //
+
+        Log.d(LOGTAG,"enableDevice: " + currentControl);
     }
 
     private String getDeviceTypeString(int devtype)
