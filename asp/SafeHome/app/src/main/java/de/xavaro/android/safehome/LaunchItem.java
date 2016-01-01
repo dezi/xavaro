@@ -1293,6 +1293,7 @@ public class LaunchItem extends FrameLayout implements
 
         BlueTooth bt = BlueTooth.getInstance(context);
 
-        bt.discoverScales(null);
+        //bt.discoverScales(null);
+        bt.discoverBPMs(null);
     }
 }

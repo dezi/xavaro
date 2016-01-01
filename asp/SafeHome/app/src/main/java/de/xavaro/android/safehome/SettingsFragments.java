@@ -190,11 +190,96 @@ public class SettingsFragments
 
     //endregion Administrator preferences
 
+    //region Health BPM preferences
+
+    public static class HealthBPMFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Blutdruck";
+            header.iconRes = GlobalConfigs.IconResHealtBPM;
+            header.fragment = HealthBPMFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthBPMFragment()
+        {
+            super();
+
+            isBPM = true;
+
+            iconres = GlobalConfigs.IconResHealtBPM;
+            keyprefix = "health.bpm";
+            masterenable = "Blutdruck freischalten";
+            devicetitle = "Bultdruckmessgerät";
+            devicesearch = "Bultdruckmessgeräte werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            NicePreferenceCategory pc;
+            NiceListPreference lp;
+
+            //
+            // Units.
+            //
+
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Maßeinheiten");
+            preferences.add(pc);
+
+            lp = new NiceListPreference(context);
+
+            String[] unitPressureText = { "mmHg", "kPa" };
+            String[] unitPressureVals = { "mmhg", "kpa" };
+
+            lp.setKey(keyprefix + ".units.pressure");
+            lp.setEntries(unitPressureText);
+            lp.setEntryValues(unitPressureVals);
+            lp.setDefaultValue("mmhg");
+            lp.setTitle("Blutdruck in");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            //
+            // User.
+            //
+
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Benutzerauswahl");
+            preferences.add(pc);
+
+            lp = new NiceListPreference(context);
+
+            String[] userSelectText = { "Benutzer 1", "Benutzer 2", "Benutzer 3", "Benutzer 4" };
+            String[] userSelectVals = { "1", "2", "3", "4" };
+
+            lp.setKey(keyprefix + ".selecteduser");
+            lp.setEntries(userSelectText);
+            lp.setEntryValues(userSelectVals);
+            lp.setDefaultValue("1");
+            lp.setTitle("Gerätebenutzer");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+        }
+    }
+
+    //endregion Health BPM preferences
+
     //region Health Scale preferences
 
-    public static class HealthScaleFragment extends EnablePreferenceFragment implements
-            DialogInterface.OnClickListener,
-            BlueTooth.BlueToothDiscoverCallback
+    public static class HealthScaleFragment extends BlueToothFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -212,69 +297,27 @@ public class SettingsFragments
         {
             super();
 
+            isScale = true;
+
             iconres = GlobalConfigs.IconResHealtScale;
             keyprefix = "health.scale";
             masterenable = "Gewicht freischalten";
+            devicetitle = "Waage";
+            devicesearch = "Waagen werden gesucht...";
         }
-
-        private final HealthScaleFragment self = this;
-        private Context context;
-
-        private NiceListPreference devicePref;
-
-        final ArrayList<String> recentText = new ArrayList<>();
-        final ArrayList<String> recentVals = new ArrayList<>();
 
         @Override
         public void registerAll(Context context)
         {
-            this.context = context;
-
             super.registerAll(context);
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
 
-            //
-            // Bluetooth device selection preference
-            //
-
-            NicePreferenceCategory pc = new NicePreferenceCategory(context);
-            pc.setTitle("Geräteauswahl");
-            preferences.add(pc);
-
-            devicePref = new NiceListPreference(context);
-
-            devicePref.setKey(keyprefix + ".device");
-
-            recentText.add("Nicht zugeordnet");
-            recentVals.add("unknown");
-
-            if (sharedPrefs.contains(devicePref.getKey()))
-            {
-                String btDevice = sharedPrefs.getString(devicePref.getKey(), "unknown");
-                String[] btDeviceparts = btDevice.split(" => ");
-
-                if ((! btDevice.equals("unknown")) && (btDeviceparts.length == 2))
-                {
-                    recentText.add(btDeviceparts[ 0 ]);
-                    recentVals.add(btDevice);
-                }
-            }
-
-            devicePref.setEntries(recentText);
-            devicePref.setEntryValues(recentVals);
-            devicePref.setDefaultValue("unknown");
-            devicePref.setTitle("BlueTooth Waage");
-            devicePref.setEnabled(enabled);
-
-            devicePref.setOnclick(discoverDialog);
-
-            if (!sharedPrefs.contains(devicePref.getKey()))
-            {
-                sharedPrefs.edit().putString(devicePref.getKey(), "unknown").apply();
-            }
-
-            preferences.add(devicePref);
+            NicePreferenceCategory pc;
+            NiceListPreference lp;
+            NiceDatePreference dp;
+            NiceNumberPreference np;
+            NiceEditTextPreference ep;
 
             //
             // Units.
@@ -283,8 +326,6 @@ public class SettingsFragments
             pc = new NicePreferenceCategory(context);
             pc.setTitle("Maßeinheiten");
             preferences.add(pc);
-
-            NiceListPreference lp;
 
             lp = new NiceListPreference(context);
 
@@ -336,7 +377,7 @@ public class SettingsFragments
 
             preferences.add(lp);
 
-            NiceDatePreference dp = new NiceDatePreference(context);
+            dp = new NiceDatePreference(context);
 
             dp.setKey(keyprefix + ".user.birthdate");
             dp.setTitle("Geburtsdatum");
@@ -344,7 +385,7 @@ public class SettingsFragments
 
             preferences.add(dp);
 
-            NiceNumberPreference np = new NiceNumberPreference(context);
+            np = new NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".user.size");
             np.setUnit("cm");
@@ -354,7 +395,7 @@ public class SettingsFragments
 
             preferences.add(np);
 
-            NiceEditTextPreference ep = new NiceEditTextPreference(context);
+            ep = new NiceEditTextPreference(context);
 
             ep.setKey(keyprefix + ".user.initials");
             ep.setTitle("Initialen");
@@ -362,6 +403,81 @@ public class SettingsFragments
             ep.setEnabled(enabled);
 
             preferences.add(ep);
+        }
+    }
+
+    //endregion Health Scale preferences
+
+    //region BlueTooth preferences stub
+
+    public static class BlueToothFragment extends EnablePreferenceFragment implements
+            DialogInterface.OnClickListener,
+            BlueTooth.BlueToothDiscoverCallback
+    {
+        protected String devicetitle;
+        protected String devicesearch;
+
+        protected boolean isScale;
+        protected boolean isBPM;
+
+        private final BlueToothFragment self = this;
+        private Context context;
+
+        private NiceListPreference devicePref;
+
+        final ArrayList<String> recentText = new ArrayList<>();
+        final ArrayList<String> recentVals = new ArrayList<>();
+
+        @Override
+        public void registerAll(Context context)
+        {
+            this.context = context;
+
+            super.registerAll(context);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            //
+            // Bluetooth device selection preference
+            //
+
+            NicePreferenceCategory pc = new NicePreferenceCategory(context);
+            pc.setTitle("BlueTooth Geräteauswahl");
+            preferences.add(pc);
+
+            devicePref = new NiceListPreference(context);
+
+            devicePref.setKey(keyprefix + ".device");
+
+            recentText.add("Nicht zugeordnet");
+            recentVals.add("unknown");
+
+            if (sharedPrefs.contains(devicePref.getKey()))
+            {
+                String btDevice = sharedPrefs.getString(devicePref.getKey(), "unknown");
+                String[] btDeviceparts = btDevice.split(" => ");
+
+                if ((! btDevice.equals("unknown")) && (btDeviceparts.length == 2))
+                {
+                    recentText.add(btDeviceparts[ 0 ]);
+                    recentVals.add(btDevice);
+                }
+            }
+
+            devicePref.setEntries(recentText);
+            devicePref.setEntryValues(recentVals);
+            devicePref.setDefaultValue("unknown");
+            devicePref.setTitle(devicetitle);
+            devicePref.setEnabled(enabled);
+
+            devicePref.setOnclick(discoverDialog);
+
+            if (!sharedPrefs.contains(devicePref.getKey()))
+            {
+                sharedPrefs.edit().putString(devicePref.getKey(), "unknown").apply();
+            }
+
+            preferences.add(devicePref);
         }
 
         private final Handler handler = new Handler();
@@ -382,7 +498,7 @@ public class SettingsFragments
             public void run()
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("BlueTooth Waage");
+                builder.setTitle(devicetitle);
 
                 builder.setNegativeButton("Abbrechen", self);
                 builder.setNeutralButton("Nach Geräten suchen", self);
@@ -449,7 +565,8 @@ public class SettingsFragments
                     @Override
                     public void onClick(View view)
                     {
-                        BlueTooth.getInstance(context).discoverScales(self);
+                        if (isBPM) BlueTooth.getInstance(context).discoverBPMs(self);
+                        if (isScale) BlueTooth.getInstance(context).discoverScales(self);
                     }
                 });
             }
@@ -464,7 +581,7 @@ public class SettingsFragments
                 @Override
                 public void run()
                 {
-                    dialog.setTitle("BlueTooth Waagen werden gesucht...");
+                    dialog.setTitle(devicesearch);
                 }
             };
 
@@ -514,7 +631,7 @@ public class SettingsFragments
         }
     }
 
-    //endregion Health preferences
+    //endregion BlueTooth preferences stub
 
     //region Phone preferences
 

@@ -60,6 +60,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(category);
 
         target.add(SettingsFragments.HealthScaleFragment.getHeader());
+        target.add(SettingsFragments.HealthBPMFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";

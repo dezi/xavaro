@@ -26,16 +26,6 @@ public class BlueToothScale
         public static final String SAS75 = "SAS75";
     }
 
-    private static class BPMs
-    {
-        public static final String BM75 = "BM75";
-        public static final String SBM37 = "SBM37";
-        public static final String SBM67 = "SBM67";
-        public static final String BEURER_BC57 = "BC57";
-        public static final String SANITAS_SBM37 = "Sanitas SBM37";
-        public static final String SANITAS_SBM67 = "BPM Smart";
-    }
-
     public static boolean isCompatibleScale(String devicename)
     {
         return (devicename.equalsIgnoreCase(Scales.SBF70) ||
