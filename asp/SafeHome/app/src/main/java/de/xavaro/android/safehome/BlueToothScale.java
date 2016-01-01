@@ -47,6 +47,43 @@ public class BlueToothScale extends BlueTooth
                 modelName.equalsIgnoreCase(Scales.SANITAS_SBF70));
     }
 
+    protected void enablecccDiscovered()
+    {
+        Log.d(LOGTAG, "enableDiscovered: " + currentControl);
+
+        if (currentControl != null)
+        {
+            GattAction ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_DISCONNECT;
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(ga);
+
+            fireNext();
+        }
+    }
+
+    @Override
+    protected void enableDevice()
+    {
+        Log.d(LOGTAG,"enableDevice: " + currentControl);
+
+        if (currentControl != null)
+        {
+            GattAction ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_NOTIFY;
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(ga);
+
+            fireNext();
+        }
+    }
+
     @Override
     protected void parseResponse(byte[] resp)
     {
@@ -64,26 +101,6 @@ public class BlueToothScale extends BlueTooth
             ga.characteristic = currentControl;
 
             gattSchedule.add(0, ga);
-
-            fireNext();
-        }
-    }
-
-    @Override
-    @SuppressLint("NewApi")
-    protected void enableDevice()
-    {
-        Log.d(LOGTAG,"enableDevice: " + currentControl);
-
-        if (currentControl != null)
-        {
-            GattAction ga = new GattAction();
-
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_NOTIFY;
-            ga.characteristic = currentControl;
-
-            gattSchedule.add(ga);
 
             fireNext();
         }
@@ -189,6 +206,8 @@ public class BlueToothScale extends BlueTooth
             {
                 status = true;
             }
+
+            Log.d(LOGTAG, "parseData: ScaleSleepWithStatus=" + status);
 
             // this.mBleScaleCallbacks.didGetScaleSleepWithStatus(status);
 
@@ -916,7 +935,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getUnknownMeasurementsBytesData(String scaleName)
+    public byte[] getUnknownMeasurementsBytesData()
     {
         Log.d(LOGTAG, "getUnknownMeasurementsBytesData");
         byte[] data = new byte[ 2 ];
@@ -1196,10 +1215,12 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getScaleSleepStatusBytesData(String scaleName)
+    public byte[] getScaleSleepStatusBytesData()
     {
         Log.d(LOGTAG, "getScaleSleepStatusBytesData");
+
         byte[] data = new byte[ 2 ];
+
         if (isCompatibleScale())
         {
             data[ 0 ] = (byte) -16;
@@ -1208,7 +1229,9 @@ public class BlueToothScale extends BlueTooth
         {
             data[ 0 ] = (byte) -32;
         }
+
         data[ 1 ] = (byte) 2;
+
         return data;
     }
 
@@ -1235,7 +1258,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getRemoteTimeStampBytesData(String scaleName)
+    public byte[] getRemoteTimeStampBytesData()
     {
         Log.d(LOGTAG,"getRemoteTimeStampBytesData");
         byte[] data = new byte[ 2 ];
@@ -1271,10 +1294,12 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getForceDisconnectBytesData(String scaleName)
+    public byte[] getForceDisconnectBytesData()
     {
         Log.d(LOGTAG,"getForceDisconnectBytesData");
+
         byte[] data = new byte[ 2 ];
+
         if (isCompatibleScale())
         {
             data[ 0 ] = (byte) -22;
@@ -1283,7 +1308,9 @@ public class BlueToothScale extends BlueTooth
         {
             data[ 0 ] = (byte) -6;
         }
+
         data[ 1 ] = (byte) 2;
+
         return data;
     }
 

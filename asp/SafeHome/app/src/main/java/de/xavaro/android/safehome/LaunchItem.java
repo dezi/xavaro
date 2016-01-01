@@ -255,6 +255,7 @@ public class LaunchItem extends FrameLayout implements
 
                         if (subtype.equals("bpm"))
                         {
+                            if (handler == null) handler = new Handler();
                             HealthGroup.subscribeDevice(this,"bpm");
 
                             icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtBPM));
@@ -263,6 +264,7 @@ public class LaunchItem extends FrameLayout implements
 
                         if (subtype.equals("scale"))
                         {
+                            if (handler == null) handler = new Handler();
                             HealthGroup.subscribeDevice(this,"scale");
 
                             icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtScale));
@@ -1130,6 +1132,11 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchHealth()
     {
+        if (config.has("subtype"))
+        {
+            return;
+        }
+
         if (directory == null)
         {
             directory = new HealthGroup(context);
@@ -1344,16 +1351,12 @@ public class LaunchItem extends FrameLayout implements
     {
         Log.d(LOGTAG, "onBluetoothConnect: " + device.getName());
 
-        if (handler == null) handler = new Handler();
-
         handler.post(bluetoothIsConnected);
     }
 
     public void onBluetoothDisconnect(BluetoothDevice device)
     {
         Log.d(LOGTAG,"onBluetoothDisconnect: " + device.getName());
-
-        if (handler == null) handler = new Handler();
 
         handler.post(bluetoothIsDisconnected);
     }

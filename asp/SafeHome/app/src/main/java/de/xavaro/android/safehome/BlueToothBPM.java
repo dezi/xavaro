@@ -1,21 +1,11 @@
 package de.xavaro.android.safehome;
 
-import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
-
-import java.util.List;
-import java.util.UUID;
 
 public class BlueToothBPM extends BlueTooth
 {
     private static final String LOGTAG = BlueToothBPM.class.getSimpleName();
-
-    public BlueToothBPM(Context context)
-    {
-        super(context);
-    }
 
     public BlueToothBPM(Context context, String deviceTag)
     {
@@ -43,7 +33,6 @@ public class BlueToothBPM extends BlueTooth
     }
 
     @Override
-    @SuppressLint("NewApi")
     protected void enableDevice()
     {
         Log.d(LOGTAG,"enableDevice: " + currentControl);

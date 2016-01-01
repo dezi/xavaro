@@ -19,13 +19,15 @@ public class HealthGroup extends LaunchGroup
 
     public static void initialize(Context context)
     {
+        Log.d(LOGTAG,"initialize");
+
         SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
 
         if (sp.getBoolean("health.bpm.enable", false))
         {
             String bpmDevice = sp.getString("health.bpm.device",null);
 
-            if (bpmDevice != null)
+            if ((bpmDevice != null) && ! bpmDevice.equals("unknown"))
             {
                 bpmBlueTooth = new BlueToothBPM(context, bpmDevice);
 
@@ -37,7 +39,7 @@ public class HealthGroup extends LaunchGroup
         {
             String scaleDevice = sp.getString("health.scale.device",null);
 
-            if (scaleDevice != null)
+            if ((scaleDevice != null) && ! scaleDevice.equals("unknown"))
             {
                 scaleBlueTooth = new BlueToothScale(context, scaleDevice);
 
@@ -73,15 +75,10 @@ public class HealthGroup extends LaunchGroup
             JSONObject launchgroup = new JSONObject();
             JSONArray launchitems = new JSONArray();
 
-            SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
             Map<String, Object> hp = DitUndDat.SharedPrefs.getPrefix("health.");
 
             for (String prefkey : hp.keySet())
             {
-                Object val = hp.get(prefkey);
-
-                Log.d(LOGTAG, "getConfig: " + prefkey + "=" + val);
-
                 if (prefkey.equals("health.bpm.enable"))
                 {
                     JSONObject entry = new JSONObject();
