@@ -1,15 +1,11 @@
 package de.xavaro.android.safehome;
 
-import android.annotation.SuppressLint;
-
-import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.UUID;
 
 @SuppressWarnings({"UnusedAssignment", "unused"})
 public class BlueToothScale extends BlueTooth
@@ -47,24 +43,6 @@ public class BlueToothScale extends BlueTooth
                 modelName.equalsIgnoreCase(Scales.SANITAS_SBF70));
     }
 
-    protected void enablecccDiscovered()
-    {
-        Log.d(LOGTAG, "enableDiscovered: " + currentControl);
-
-        if (currentControl != null)
-        {
-            GattAction ga = new GattAction();
-
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_DISCONNECT;
-            ga.characteristic = currentControl;
-
-            gattSchedule.add(ga);
-
-            fireNext();
-        }
-    }
-
     @Override
     protected void enableDevice()
     {
@@ -72,10 +50,32 @@ public class BlueToothScale extends BlueTooth
 
         if (currentControl != null)
         {
-            GattAction ga = new GattAction();
+            GattAction ga;
+
+            //
+            // Subscribe to normal data notification.
+            //
+
+            ga = new GattAction();
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_NOTIFY;
+            ga.characteristic = currentControl;
+
+            gattSchedule.add(ga);
+
+            //
+            // Issue a status request to figure out
+            // if device connects by itself or user.
+            // Issue a force disconnect if device is
+            // sleeping.
+            //
+
+            ga = new GattAction();
+
+            ga.gatt = currentGatt;
+            ga.mode = GattAction.MODE_WRITE;
+            ga.data = getScaleSleepStatus();
             ga.characteristic = currentControl;
 
             gattSchedule.add(ga);
@@ -85,7 +85,7 @@ public class BlueToothScale extends BlueTooth
     }
 
     @Override
-    protected void parseResponse(byte[] resp)
+    protected void parseResponse(byte[] resp, boolean intermediate)
     {
         boolean wantsack = parseData(resp);
 
@@ -106,7 +106,7 @@ public class BlueToothScale extends BlueTooth
         }
     }
 
-    private void testScale()
+    private void testScalex()
     {
         if (currentControl != null)
         {
@@ -116,7 +116,7 @@ public class BlueToothScale extends BlueTooth
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
-            ga.data = getModuleVersionBytesData();
+            ga.data = getModuleVersion();
             ga.characteristic = currentControl;
 
             gattSchedule.add(ga);
@@ -125,7 +125,7 @@ public class BlueToothScale extends BlueTooth
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
-            ga.data = getScaleStatusForUserBytesData(101);
+            ga.data = getScaleStatusForUser(101);
             ga.characteristic = currentControl;
 
             gattSchedule.add(ga);
@@ -134,7 +134,7 @@ public class BlueToothScale extends BlueTooth
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
-            ga.data = getSetDateTimeBytesData();
+            ga.data = getSetDateTime();
             ga.characteristic = currentControl;
 
             gattSchedule.add(ga);
@@ -200,14 +200,26 @@ public class BlueToothScale extends BlueTooth
 
         if (rd[ 0 ] == -16)
         {
-            boolean status = false;
-
-            if (rd[ 1 ] != 0)
-            {
-                status = true;
-            }
+            boolean status = (rd[ 1 ] != 0);
 
             Log.d(LOGTAG, "parseData: ScaleSleepWithStatus=" + status);
+
+            if (status)
+            {
+                forceDisconnect();
+            }
+            else
+            {
+                if (connectCallback != null)
+                {
+                    //
+                    // Scale equippment ist active, when it does
+                    // not sleep.
+                    //
+
+                    connectCallback.onBluetoothActive(currentGatt.getDevice());
+                }
+            }
 
             // this.mBleScaleCallbacks.didGetScaleSleepWithStatus(status);
 
@@ -631,7 +643,7 @@ public class BlueToothScale extends BlueTooth
         return false;
     }
 
-    public byte[] getUserListBytesData()
+    public byte[] getUserList()
     {
         Log.d(LOGTAG,"getUserListBytesData");
 
@@ -651,7 +663,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getScaleStatusForUserBytesData(long uuid)
+    public byte[] getScaleStatusForUser(long uuid)
     {
         Log.d(LOGTAG,"getScaleStatusForUserBytesData-->uuid : " + uuid);
 
@@ -676,7 +688,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getTxPowerBytesData()
+    public byte[] getTxPower()
     {
         Log.d(LOGTAG,"getTxPowerBytesData");
 
@@ -696,7 +708,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getSlowAdvertisementBytesData(boolean isSet, int interval)
+    public byte[] getSlowAdvertisement(boolean isSet, int interval)
     {
         Log.d(LOGTAG,"getSlowAdvertisementBytesData-->isSet : " + isSet + ", interval : " + interval);
         byte[] data = new byte[ 2 ];
@@ -727,7 +739,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getCheckUserExistsBytesData(long uuid)
+    public byte[] getCheckUserExists(long uuid)
     {
         Log.d(LOGTAG,"getCheckUserExistsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
@@ -749,7 +761,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getCreateUserBytesData(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
+    public byte[] getCreateUser(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
     {
         Log.d(LOGTAG,"getCreateUserBytesData:"
                 + " uuid=" + uuid
@@ -791,7 +803,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getDeleteUserBytesData(long uuid)
+    public byte[] getDeleteUser(long uuid)
     {
         Log.d(LOGTAG,"getDeleteUserBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
@@ -813,7 +825,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getTakeUserMeasurementBytesData(long uuid)
+    public byte[] getTakeUserMeasurement(long uuid)
     {
         Log.d(LOGTAG,"getTakeUserMeasurementBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
@@ -835,7 +847,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getUserMeasurementsBytesData(long uuid)
+    public byte[] getUserMeasurements(long uuid)
     {
         Log.d(LOGTAG,"getUserMeasurementsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
@@ -857,7 +869,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getDeleteUserMeasurementsBytesData(long uuid)
+    public byte[] getDeleteUserMeasurements(long uuid)
     {
         Log.d(LOGTAG,"getDeleteUserMeasurementsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
@@ -879,7 +891,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getSetUserWeightBytesData(long uuid, float weight, float bodyFat, long timeStamp)
+    public byte[] getSetUserWeight(long uuid, float weight, float bodyFat, long timeStamp)
     {
         int i;
         Log.d(LOGTAG,"getSetUserWeightBytesData-->uuid : " + uuid + ", weight : " + weight + ", bodyFat : " + bodyFat + ", timeStamp : " + timeStamp);
@@ -913,7 +925,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getUserWeightAndBodyFatBytesData(long uuid)
+    public byte[] getUserWeightAndBodyFat(long uuid)
     {
         Log.d(LOGTAG,"getUserWeightAndBodyFatBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
@@ -935,7 +947,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getUnknownMeasurementsBytesData()
+    public byte[] getUnknownMeasurements()
     {
         Log.d(LOGTAG, "getUnknownMeasurementsBytesData");
         byte[] data = new byte[ 2 ];
@@ -952,7 +964,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getSaveAsUnknownMeasurementWithtimestampBytesData(int timeStamp, float weight, int impedance)
+    public byte[] getSaveAsUnknownMeasurementWithtimestamp(int timeStamp, float weight, int impedance)
     {
         Log.d(LOGTAG,"getSaveAsUnknownMeasurementWithtimestampBytesData-->timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance);
         byte[] data = new byte[ 10 ];
@@ -978,7 +990,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getDeleteUnknownMeasurementBytesData(int measurementId)
+    public byte[] getDeleteUnknownMeasurement(int measurementId)
     {
         Log.d(LOGTAG,"getDeleteUnknownMeasurementBytesData-->measurementId : " + measurementId);
         byte[] data = new byte[ 3 ];
@@ -997,7 +1009,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getTakeGuestMeasurementWithInitialsBytesData(String initial, int[] birthDate, int height, char gender, int activityIndex, int unit)
+    public byte[] getTakeGuestMeasurementWithInitials(String initial, int[] birthDate, int height, char gender, int activityIndex, int unit)
     {
         int i;
         Log.d(LOGTAG,"getTakeGuestMeasurementWithInitialsBytesData-->initial : " + initial + ", birthDate : " + Arrays.toString(birthDate) + ", height : " + height + ", gender : " + gender + ", activityIndex : " + activityIndex + ", unit : " + unit);
@@ -1029,7 +1041,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getSetDateTimeBytesData()
+    public byte[] getSetDateTime()
     {
         Log.d(LOGTAG,"getSetDateTimeBytesData");
 
@@ -1054,7 +1066,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getAssignMeasurementToUserBytesData(long uuid, int timeStamp, float weight, int impedance, int measurementId)
+    public byte[] getAssignMeasurementToUser(long uuid, int timeStamp, float weight, int impedance, int measurementId)
     {
         byte[] rawUuid;
         int i;
@@ -1103,7 +1115,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getSetUnitBytesData(int unit)
+    public byte[] getSetUnit(int unit)
     {
         Log.d(LOGTAG,"getSetUnitBytesData-->unit : " + unit);
         byte[] data = new byte[ 3 ];
@@ -1122,7 +1134,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getSetReferDefinitionToWeightThresholdBytesData(float weightThreshold, float bodyFatThreshold)
+    public byte[] getSetReferDefinitionToWeightThreshold(float weightThreshold, float bodyFatThreshold)
     {
         Log.d(LOGTAG,"getSetReferDefinitionToWeightThresholdBytesData-->weightThreshold : " + weightThreshold + ", bodyFatThreshold : " + bodyFatThreshold);
         byte[] data = new byte[ 4 ];
@@ -1215,7 +1227,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getScaleSleepStatusBytesData()
+    public byte[] getScaleSleepStatus()
     {
         Log.d(LOGTAG, "getScaleSleepStatusBytesData");
 
@@ -1235,7 +1247,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getUserInfoBytesData(long uuid)
+    public byte[] getUserInfo(long uuid)
     {
         Log.d(LOGTAG,"getUserInfoBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
@@ -1258,7 +1270,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getRemoteTimeStampBytesData()
+    public byte[] getRemoteTimeStamp()
     {
         Log.d(LOGTAG,"getRemoteTimeStampBytesData");
         byte[] data = new byte[ 2 ];
@@ -1274,7 +1286,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getModuleVersionBytesData()
+    public byte[] getModuleVersion()
     {
         Log.d(LOGTAG,"getModuleVersionBytesData");
 
@@ -1294,7 +1306,7 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getForceDisconnectBytesData()
+    public byte[] getForceDisconnect()
     {
         Log.d(LOGTAG,"getForceDisconnectBytesData");
 

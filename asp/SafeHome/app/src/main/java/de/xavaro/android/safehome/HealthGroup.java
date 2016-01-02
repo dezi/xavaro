@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -10,7 +11,8 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class HealthGroup extends LaunchGroup
+public class HealthGroup extends LaunchGroup implements
+        BlueTooth.BlueToothDataCallback
 {
     private static final String LOGTAG = HealthGroup.class.getSimpleName();
 
@@ -66,6 +68,9 @@ public class HealthGroup extends LaunchGroup
         super(context);
 
         this.config = getConfig(context);
+
+        if (bpmBlueTooth != null) bpmBlueTooth.setDataCallback(this);
+        if (scaleBlueTooth != null) scaleBlueTooth.setDataCallback(this);
     }
 
     private JSONObject getConfig(Context context)
@@ -112,5 +117,10 @@ public class HealthGroup extends LaunchGroup
         }
 
         return new JSONObject();
+    }
+
+    public void onBluetoothReceivedData(BluetoothDevice device, JSONObject data)
+    {
+        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
     }
 }

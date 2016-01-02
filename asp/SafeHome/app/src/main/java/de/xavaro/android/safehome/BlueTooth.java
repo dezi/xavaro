@@ -15,8 +15,11 @@ import android.content.IntentFilter;
 import android.os.Parcelable;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class BlueTooth extends BroadcastReceiver
@@ -39,10 +42,14 @@ public class BlueTooth extends BroadcastReceiver
     protected String macAddress;
 
     protected BluetoothGatt currentGatt;
-    protected BluetoothGattCharacteristic currentControl;
     protected boolean currentConnectState;
 
+    protected BluetoothGattCharacteristic currentControl;
+    protected BluetoothGattCharacteristic currentIntermediate;
+
     protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
+
+    protected BlueToothDataCallback dataCallback;
     protected BlueToothConnectCallback connectCallback;
 
     protected static final String SCALE_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb";
@@ -50,8 +57,6 @@ public class BlueTooth extends BroadcastReceiver
 
     protected static final String BPM_SERVICE = "00001810-0000-1000-8000-00805f9b34fb";
     protected static final String BPM_CHARACTERISTIC_MEASURE = "00002a35-0000-1000-8000-00805f9b34fb";
-
-    private static final String BPM_CHARACTERISTIC_FEATURE = "00002a49-0000-1000-8000-00805f9b34fb";
     private static final String BPM_CHARACTERISTIC_INTERMEDIATE = "00002a36-0000-1000-8000-00805f9b34fb";
 
     private static final String NOTIFY_DESCRIPTOR = "00002902-0000-1000-8000-00805f9b34fb";
@@ -99,6 +104,11 @@ public class BlueTooth extends BroadcastReceiver
         {
             connectCallback.onBluetoothConnect(currentGatt.getDevice());
         }
+    }
+
+    public void setDataCallback(BlueToothDataCallback callback)
+    {
+        dataCallback = callback;
     }
 
     public boolean isDiscovering;
@@ -255,10 +265,12 @@ public class BlueTooth extends BroadcastReceiver
         static final int MODE_WRITE = 4;
         static final int MODE_READ = 5;
 
-        BluetoothGattCharacteristic characteristic;
-        BluetoothGatt gatt;
-        byte[] data;
         int mode;
+
+        BluetoothGatt gatt;
+        BluetoothGattCharacteristic characteristic;
+
+        byte[] data;
     }
 
     protected void fireNext()
@@ -286,6 +298,7 @@ public class BlueTooth extends BroadcastReceiver
             UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
             BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+
             ga.gatt.writeDescriptor(descriptor);
         }
 
@@ -298,15 +311,9 @@ public class BlueTooth extends BroadcastReceiver
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
             ga.gatt.writeDescriptor(descriptor);
         }
-
-        if (ga.mode == GattAction.MODE_DISCONNECT)
-        {
-            ga.gatt.disconnect();
-            ga.gatt.connect();
-        }
     }
 
-    private BluetoothGattCallback gattCallback = new BluetoothGattCallback()
+    protected BluetoothGattCallback gattCallback = new BluetoothGattCallback()
     {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
@@ -321,14 +328,7 @@ public class BlueTooth extends BroadcastReceiver
 
                 currentConnectState = true;
 
-                if (currentControl == null)
-                {
-                    gatt.discoverServices();
-                }
-                else
-                {
-                    enableDevice();
-                }
+                gatt.discoverServices();
 
                 if (connectCallback != null) connectCallback.onBluetoothConnect(gatt.getDevice());
             }
@@ -404,13 +404,21 @@ public class BlueTooth extends BroadcastReceiver
                                 discoverCallback.onDeviceDiscovered(gatt.getDevice());
                             }
                         }
+
+                        if (characteristic.getUuid().toString().equals(BPM_CHARACTERISTIC_INTERMEDIATE) &&
+                                descriptor.getUuid().toString().equals(NOTIFY_DESCRIPTOR))
+                        {
+                            Log.d(LOGTAG,"Found intermediate bpm=" + gatt.getDevice().getName());
+
+                            currentIntermediate = characteristic;
+                        }
                     }
                 }
             }
 
             if (! isDiscovering)
             {
-                enableDiscovered();
+                enableDevice();
             }
 
             if ((--discoverBGJobs == 0) && (! isDiscovering) && (discoverCallback != null))
@@ -426,7 +434,8 @@ public class BlueTooth extends BroadcastReceiver
             Log.d(LOGTAG, "onCharacteristicChanged="
                     + StaticUtils.hexBytesToString(characteristic.getValue()));
 
-            parseResponse(characteristic.getValue());
+            boolean intermediate = (characteristic == currentIntermediate);
+            parseResponse(characteristic.getValue(), intermediate);
         }
 
         @Override
@@ -464,14 +473,15 @@ public class BlueTooth extends BroadcastReceiver
         }
     };
 
-    protected void parseResponse(byte[] resp)
+    protected void forceDisconnect()
     {
-        Log.d(LOGTAG,"parseResponse: Please implement this method in derived class.");
+        currentGatt.disconnect();
+        currentGatt = currentGatt.getDevice().connectGatt(context, true, gattCallback);
     }
 
-    protected void enableDiscovered()
+    protected void parseResponse(byte[] resp, boolean intermediate)
     {
-        enableDevice();
+        Log.d(LOGTAG,"parseResponse: Please implement this method in derived class.");
     }
 
     protected void enableDevice()
@@ -521,6 +531,12 @@ public class BlueTooth extends BroadcastReceiver
     public interface BlueToothConnectCallback
     {
         public void onBluetoothConnect(BluetoothDevice device);
+        public void onBluetoothActive(BluetoothDevice device);
         public void onBluetoothDisconnect(BluetoothDevice device);
+    }
+
+    public interface BlueToothDataCallback
+    {
+        public void onBluetoothReceivedData(BluetoothDevice device, JSONObject data);
     }
 }

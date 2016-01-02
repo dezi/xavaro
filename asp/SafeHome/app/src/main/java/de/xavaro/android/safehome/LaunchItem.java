@@ -1351,13 +1351,24 @@ public class LaunchItem extends FrameLayout implements
     {
         Log.d(LOGTAG, "onBluetoothConnect: " + device.getName());
 
-        handler.post(bluetoothIsConnected);
+        //
+        // Post delayed in case of sleeping devices with
+        // short time idle connect.
+        //
+
+        handler.postDelayed(bluetoothIsConnected, 2000);
+    }
+
+    public void onBluetoothActive(BluetoothDevice device)
+    {
+        Log.d(LOGTAG, "onBluetoothActive: " + device.getName());
     }
 
     public void onBluetoothDisconnect(BluetoothDevice device)
     {
         Log.d(LOGTAG,"onBluetoothDisconnect: " + device.getName());
 
+        handler.removeCallbacks(bluetoothIsConnected);
         handler.post(bluetoothIsDisconnected);
     }
 
