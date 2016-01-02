@@ -3,6 +3,10 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Date;
@@ -84,10 +88,39 @@ public class BlueToothScale extends BlueTooth
         }
     }
 
-    @Override
-    protected void parseResponse(byte[] resp, boolean intermediate)
+    private JSONObject cbtemp;
+    private JSONObject cbdata;
+    private JSONArray cbtarr;
+    private byte cbbyte;
+
+    private void cbtempPut(String key, Object value)
     {
-        boolean wantsack = parseData(resp);
+        try
+        {
+            cbtemp.put(key, value);
+        }
+        catch (JSONException ignore)
+        {
+        }
+    }
+
+    private void cbdataPut(String key, Object value)
+    {
+        try
+        {
+            cbdata.put(key, value);
+        }
+        catch (JSONException ignore)
+        {
+        }
+    }
+
+    @Override
+    protected void parseResponse(byte[] rd, boolean intermediate)
+    {
+        cbdata = new JSONObject();
+
+        boolean wantsack = parseData(rd);
 
         if (wantsack)
         {
@@ -97,12 +130,33 @@ public class BlueToothScale extends BlueTooth
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
-            ga.data = getAcknowledgementData(resp);
+            ga.data = getAcknowledgementData(rd);
             ga.characteristic = currentControl;
 
             gattSchedule.add(0, ga);
 
             fireNext();
+        }
+
+        if (cbdata.keys().hasNext())
+        {
+            //
+            // Object is not empty.
+            //
+
+            try
+            {
+                JSONObject data = new JSONObject();
+                data.put("scale", cbdata);
+
+                if (dataCallback != null)
+                {
+                    dataCallback.onBluetoothReceivedData(currentGatt.getDevice(), data);
+                }
+            }
+            catch (JSONException ignore)
+            {
+            }
         }
     }
 
@@ -172,37 +226,14 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG, "parseData: " + rd[ 0 ] + " " + rd[ 1 ]);
         Log.d(LOGTAG, "parseData: " + StaticUtils.hexBytesToString(rd));
 
-        if (rd[ 0 ] == -32)
-        {
-            return false;
-        }
-
-        if (rd[ 0 ] == -26)
-        {
-            Log.d(LOGTAG, "Device Ready");
-
-            return false;
-        }
-
-        if (rd[ 0 ] == -24)
-        {
-            if (rd[ 1 ] == -2 && rd[ 2 ] == -69 && rd[ 3 ] == -17)
-            {
-                Log.d(LOGTAG, "Pairing Completed Successfully");
-
-                return false;
-            }
-
-            Log.d(LOGTAG, "Pairing Completed Unsuccessfully");
-
-            return false;
-        }
-
         if (rd[ 0 ] == -16)
         {
-            boolean status = (rd[ 1 ] != 0);
+            //
+            // Special response used to disconnect sleeping
+            // scale.
+            //
 
-            Log.d(LOGTAG, "parseData: ScaleSleepWithStatus=" + status);
+            boolean status = (rd[ 1 ] != 0);
 
             if (status)
             {
@@ -221,28 +252,235 @@ public class BlueToothScale extends BlueTooth
                 }
             }
 
-            // this.mBleScaleCallbacks.didGetScaleSleepWithStatus(status);
+            cbdataPut("type", "ScaleSleepWithStatus");
+            cbdataPut("status", status);
 
             return false;
         }
 
         if (rd[ 0 ] == -15)
         {
-            Log.d(LOGTAG, "parseData: ModuleVersion=" + rd[ 1 ]);
+            cbdataPut("type", "ModuleVersion");
+            cbdataPut("version", rd[ 1 ]);
 
-            // this.mBleScaleCallbacks.didGetModuleVersion(convertByteToInt(recievedData[ 1 ]));
+            return false;
+        }
+
+        if (rd[ 0 ] == -32)
+        {
+            cbdataPut("type", "UnknownResponse");
+            cbdataPut("data", rd[ 1 ]);
+
+            return false;
+        }
+
+        if (rd[ 0 ] == -26)
+        {
+            cbdataPut("type", "DeviceReady");
+            cbdataPut("status", rd[ 1 ]);
+
+            return false;
+        }
+
+        if (rd[ 0 ] == -24)
+        {
+            boolean status = (rd[ 1 ] == -2 && rd[ 2 ] == -69 && rd[ 3 ] == -17);
+
+            cbdataPut("type", "PairingCompleted");
+            cbdataPut("status", status);
 
             return false;
         }
 
         if (rd[ 0 ] == -14)
         {
-            //timeStamp = getTimeStampInMilliSeconds(convertBytesToInt(Arrays.copyOfRange(recievedData, 1, 5)));
+            long timeStamp = getTimeStampInMilliSeconds(convertBytesToInt(Arrays.copyOfRange(rd, 1, 5)));
 
-            //this.mBleScaleCallbacks.didGetRemoteTimeStamp(timeStamp);
+            cbdataPut("type", "RemoteTimeStamp");
+            cbdataPut("timeStamp", timeStamp);
 
             return false;
         }
+
+        if ((rd[ 0 ] == -25) && (rd[ 2 ] == 79) && (rd.length >= 5))
+        {
+            cbdataPut("type", "ScaleStatusWithBatteryLevel");
+
+            cbdataPut("weightThreshold", ((float) unsignedByteToInt(rd[ 5 ])) / 10.0f);
+            cbdataPut("bodyFatThreshold", ((float) unsignedByteToInt(rd[ 6 ])) / 10.0f);
+
+            cbdataPut("batteryLevel", (float) unsignedByteToInt(rd[ 4 ]));
+
+            cbdataPut("weightUnit", unsignedByteToInt(rd[ 7 ]));
+
+            cbdataPut("userExists", (rd[ 8 ] == 0));
+            cbdataPut("referWeightExists", (rd[ 9 ] == 0));
+            cbdataPut("measurementExists", (rd[ 10 ] == 0));
+            cbdataPut("scaleVersion", unsignedByteToInt(rd[ 11 ]));
+
+            return true;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == 88))
+        {
+            cbdataPut("type", "LiveWeight");
+
+            cbdataPut("status", (rd[ 2 ] != 1));
+            cbdataPut("weight", ((double) unsignedBytesToInt(rd[ 3 ], rd[ 4 ])) / 20.0d);
+
+            return true;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == 89))
+        {
+            if (rd[ 3 ] == 1)
+            {
+                cbtemp = new JSONObject();
+                cbtempPut("type", "FinishMeasurementOnTimestamp");
+
+                byte[] rawUuid = new byte[ 8 ];
+                System.arraycopy(rd, 5, rawUuid, 0, 8);
+
+                cbtempPut("Uuid", convertBytesToLong(rawUuid));
+                cbtempPut("finished", convertByteToInt(rd[ 4 ]));
+
+                Log.d(LOGTAG, "parseData: FinishMeasurementOnTimestamp part 1");
+            }
+
+            if (rd[ 3 ] == 2)
+            {
+                cbtempPut("timeStamp", convertBytesToInt(Arrays.copyOfRange(rd, 4, 8)));
+                cbtempPut("weightArray", unsignedBytesToInt(rd[ 8 ], rd[ 9 ]) / 20.0d);
+                cbtempPut("impedance", unsignedBytesToInt(rd[ 10 ], rd[ 11 ]));
+                cbtempPut("bodyFat", unsignedBytesToInt(rd[ 12 ], rd[ 13 ]) / 10.0d);
+
+                //
+                // Parts split in the middle of data, nice.
+                //
+
+                cbbyte = rd[ 14 ];
+
+                Log.d(LOGTAG, "parseData: FinishMeasurementOnTimestamp part 2");
+            }
+
+            if (rd[ 3 ] == 3)
+            {
+                cbtempPut("water", unsignedBytesToInt(cbbyte , rd[ 4 ]) / 10.0d);
+                cbtempPut("muscle", unsignedBytesToInt(rd[ 5 ], rd[ 6 ]) / 10.0d);
+                cbtempPut("boneMass", unsignedBytesToInt(rd[ 7 ], rd[ 8 ]) / 20.0d);
+                cbtempPut("BMR", unsignedBytesToInt(rd[ 9 ], rd[ 10 ]));
+                cbtempPut("AMR", unsignedBytesToInt(rd[ 11 ], rd[ 12 ]));
+                cbtempPut("BMI", unsignedBytesToInt(rd[ 13 ], rd[ 14 ]) / 10.0d);
+
+                Log.d(LOGTAG, "parseData: FinishMeasurementOnTimestamp part 3");
+
+                cbdata = cbtemp;
+                cbtemp = null;
+            }
+
+            return true;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 69))
+        {
+            Log.d(LOGTAG, "parseData: UserWithStatus");
+
+            cbdataPut("type", "UserWithStatus");
+            cbdataPut("status", rd[ 3 ]);
+
+            if (rd.length >= 5)
+            {
+                cbdataPut("timeStamp", convertBytesToInt(Arrays.copyOfRange(rd, 4, 8)));
+                cbdataPut("weight", unsignedBytesToInt(rd[ 8 ], rd[ 9 ]) / 20.0d);
+                cbdataPut("bodyFat", unsignedBytesToInt(rd[ 8 ], rd[ 9 ]) / 10.0d);
+            }
+            else
+            {
+                cbdataPut("timeStamp", 0);
+                cbdataPut("weight", 0.0d);
+                cbdataPut("bodyFat", 0.0d);
+            }
+
+            return false;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 51))
+        {
+            cbdataPut("type", "MaximumUsers");
+            cbdataPut("maxUser", rd[ 5 ]);
+
+            return false;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == 66))
+        {
+
+            int part = rd[ 3 ];
+
+            if (part == 1)
+            {
+                //
+                // Very first record.
+                //
+
+                cbtarr = new JSONArray();
+            }
+
+            if ((part % 2) == 1)
+            {
+                //
+                // Part 1 of records.
+                //
+
+                cbtemp = new JSONObject();
+
+                cbtempPut("timeStamp", convertBytesToInt(Arrays.copyOfRange(rd, 4, 8)));
+                cbtempPut("weightArray", unsignedBytesToInt(rd[ 8 ], rd[ 9 ]) / 20.0d);
+                cbtempPut("impedance", unsignedBytesToInt(rd[ 10 ], rd[ 11 ]));
+                cbtempPut("bodyFat", unsignedBytesToInt(rd[ 12 ], rd[ 13 ]) / 10.0d);
+
+                //
+                // Parts split in the middle of data, nice.
+                //
+
+                cbbyte = rd[ 14 ];
+            }
+
+            if ((part % 2) == 0)
+            {
+                //
+                // Part 2 of records.
+                //
+
+                cbtempPut("water", unsignedBytesToInt(cbbyte , rd[ 4 ]) / 10.0d);
+                cbtempPut("muscle", unsignedBytesToInt(rd[ 5 ], rd[ 6 ]) / 10.0d);
+                cbtempPut("boneMass", unsignedBytesToInt(rd[ 7 ], rd[ 8 ]) / 20.0d);
+                cbtempPut("BMR", unsignedBytesToInt(rd[ 9 ], rd[ 10 ]));
+                cbtempPut("AMR", unsignedBytesToInt(rd[ 11 ], rd[ 12 ]));
+                cbtempPut("BMI", unsignedBytesToInt(rd[ 13 ], rd[ 14 ]) / 10.0d);
+
+                cbtarr.put(cbtemp);
+                cbtemp = null;
+            }
+
+            if (rd[ 2 ] == rd[ 3 ])
+            {
+                //
+                // Very last record.
+                //
+
+                cbdata = new JSONObject();
+                cbdataPut("type", "UserMeasurementsTimeStamps");
+                cbdataPut("array", cbtarr);
+                cbtarr = null;
+            }
+
+            return true;
+        }
+
+
+
+
 
         if (rd[ 0 ] == -25)
         {
@@ -263,18 +501,6 @@ public class BlueToothScale extends BlueTooth
                         rd[ 2 ] == 78 || rd[ 2 ] == 86 ||
                         rd[ 2 ] == 53 || rd[ 2 ] == 54)
                 {
-                    if (rd[ 2 ] == 51)
-                    {
-                        //this.mMaximumUsers = convertByteToInt(recievedData[ 5 ]);
-
-                        if (rd[ 4 ] == 0)
-                        {
-                            //this.mBleScaleCallbacks.didGetUUIDsListOfUsers(null, null, 0, this.mMaximumUsers);
-                        }
-
-                        return false;
-                    }
-
                     if (rd[ 2 ] == 54)
                     {
                         char gender;
@@ -339,57 +565,6 @@ public class BlueToothScale extends BlueTooth
 
                     return false;
                 }
-
-                if (rd[ 2 ] == 69 && rd.length >= 5)
-                {
-                    status2 = convertByteToInt(rd[ 3 ]);
-                    long timeStamp = getTimeStampInMilliSeconds(convertBytesToInt(Arrays.copyOfRange(rd, 4, 8)));
-                    byte[] data = new byte[ 4 ];
-                    data[ 2 ] = rd[ 8 ];
-                    data[ 3 ] = rd[ 9 ];
-                    weight = ((double) convertBytesToInt(data)) / 20.0d;
-                    float bodyFat = (((float) (((double) convertByteToInt(rd[ 10 ])) * 256.0d)) + ((float) convertByteToInt(rd[ 11 ]))) / 10.0f;
-
-                    //this.mBleScaleCallbacks.didGetUserWithStatus(status2, timeStamp, weight, bodyFat);
-
-                    return false;
-                }
-
-                if (rd[ 2 ] == 69 && rd.length < 5)
-                {
-                    status2 = convertByteToInt(rd[ 3 ]);
-
-                    //this.mBleScaleCallbacks.didGetUserWithStatus(status2, 0, 0.0d, 0.0f);
-
-                    return false;
-                }
-
-                if (rd[ 2 ] == 79 && rd.length >= 5)
-                {
-                    float weightThreshold = ((float) convertByteToInt(rd[ 5 ])) / 10.0f;
-                    float bodyFatThreshold = ((float) convertByteToInt(rd[ 6 ])) / 10.0f;
-                    float batteryLevel = (float) convertByteToInt(rd[ 4 ]);
-                    int unit = convertByteToInt(rd[ 7 ]);
-                    boolean userExists = (rd[ 8 ] == 0);
-                    boolean referWeightExists = (rd[ 9 ] == 0);
-                    boolean measurementExists = (rd[ 10 ] == 0);
-                    int scaleVersion = convertByteToInt(rd[ 11 ]);
-
-                    Log.d(LOGTAG,"parseDat:"
-                            + " weightThreshold=" + weightThreshold
-                            + " bodyFatThreshold=" + bodyFatThreshold
-                            + " batteryLevel=" + batteryLevel
-                            + " unit=" + unit
-                            + " userExist=" + userExists
-                            + " referWeightExists=" + referWeightExists
-                            + " measurementExists=" + measurementExists
-                            + " scaleVersion=" + scaleVersion);
-
-                    // this.mBleScaleCallbacks.didGetScaleStatusWithBatteryLevel(batteryLevel, weightThreshold, bodyFatThreshold, unit, isUserExists, isUserReferWeightExists, isUserMeasurementExists, scaleVersion);
-
-                    return true;
-                }
-
                 return false;
             }
 
@@ -427,81 +602,6 @@ public class BlueToothScale extends BlueTooth
                 return true;
             }
 
-            if (rd[ 1 ] == 66)
-            {
-                int messagePart = convertByteToInt(rd[ 3 ]) % 2;
-                int measurementIndex;
-                if (messagePart == 1)
-                {
-                    Log.d(LOGTAG, "First part message");
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append("Measurement data length : " + rd.length);
-                    stringBuilder.append("Data : ");
-                    for (x = 0; x < rd.length; x++)
-                    {
-                        StringBuilder stringBuilder2 = stringBuilder;
-                        stringBuilder2.append(String.format("%X, ", new Object[]{Byte.valueOf(rd[ x ])}));
-                    }
-
-                    measurementIndex = convertByteToInt(rd[ 3 ]) / 2;
-                    this.rawTimeStampArray[ measurementIndex ] = convertBytesToInt(Arrays.copyOfRange(rd, 4, 8));
-                    byte[] data = new byte[ 4 ];
-                    this.rawWeightArray[ measurementIndex ] = ((double) convertBytesToInt(data)) / 20.0d;
-                    this.rawImpedanceArray[ measurementIndex ] = (convertByteToInt(rd[ 10 ]) * 256) + convertByteToInt(rd[ 11 ]);
-                    this.rawBodyFatArray[ measurementIndex ] = (float) (((double) ((convertByteToInt(rd[ 12 ]) * 256) + convertByteToInt(rd[ 13 ]))) / 10.0d);
-                    this.waterByte = rd[ 14 ];
-
-                    //this.mBluetoothLeApi.send_acknowledgement(rd);
-                }
-
-                if (messagePart == 0)
-                {
-                    Log.d("TTT", "Second part message");
-                    measurementIndex = (convertByteToInt(rd[ 3 ]) / 2) - 1;
-                    this.rawWaterArray[ measurementIndex ] = (float) (((double) ((this.waterByte * 256) + convertByteToInt(rd[ 4 ]))) / 10.0d);
-                    this.rawMuscleArray[ measurementIndex ] = (float) (((double) ((convertByteToInt(rd[ 5 ]) * 256) + convertByteToInt(rd[ 6 ]))) / 10.0d);
-                    this.rawBoneMassArray[ measurementIndex ] = (float) (((double) ((convertByteToInt(rd[ 7 ]) * 256) + convertByteToInt(rd[ 8 ]))) / 20.0d);
-                    this.rawBmrArray[ measurementIndex ] = (convertByteToInt(rd[ 9 ]) * 256) + convertByteToInt(rd[ 10 ]);
-                    this.rawAmrArray[ measurementIndex ] = (convertByteToInt(rd[ 11 ]) * 256) + convertByteToInt(rd[ 12 ]);
-                    this.rawBmiArray[ measurementIndex ] = (float) (((double) ((convertByteToInt(rd[ 13 ]) * 256) + convertByteToInt(rd[ 14 ]))) / 10.0d);
-
-                    //this.mBluetoothLeApi.send_acknowledgement(rd);
-
-                    if (rd[ 2 ] == rd[ 3 ])
-                    {
-                        Log.d("TTT", "Last Packet->count->" + convertByteToInt(rd[ 2 ]));
-                        int totalMeasurementCount = convertByteToInt(rd[ 2 ]) / 2;
-                        float[] bmiArray = new float[ totalMeasurementCount ];
-                        float[] bodyFatArray = new float[ totalMeasurementCount ];
-                        float[] waterArray = new float[ totalMeasurementCount ];
-                        float[] muscleArray = new float[ totalMeasurementCount ];
-                        float[] boneMassArray = new float[ totalMeasurementCount ];
-                        int[] bmrArray = new int[ totalMeasurementCount ];
-                        int[] amrArray = new int[ totalMeasurementCount ];
-                        int[] impedanceArray = new int[ totalMeasurementCount ];
-                        long[] timeStampArray = new long[ totalMeasurementCount ];
-                        double[] weightArray = new double[ totalMeasurementCount ];
-
-                        for (int i = 0; i < totalMeasurementCount; i++)
-                        {
-                            timeStampArray[ i ] = getTimeStampInMilliSeconds(this.rawTimeStampArray[ i ]);
-                            weightArray[ i ] = this.rawWeightArray[ i ];
-                            impedanceArray[ i ] = this.rawImpedanceArray[ i ];
-                            bmiArray[ i ] = this.rawBmiArray[ i ];
-                            bodyFatArray[ i ] = this.rawBodyFatArray[ i ];
-                            waterArray[ i ] = this.rawWaterArray[ i ];
-                            muscleArray[ i ] = this.rawMuscleArray[ i ];
-                            boneMassArray[ i ] = this.rawBoneMassArray[ i ];
-                            bmrArray[ i ] = this.rawBmrArray[ i ];
-                            amrArray[ i ] = this.rawAmrArray[ i ];
-                        }
-
-                        // this.mBleScaleCallbacks.didGetUserMeasurementsTimeStamps(timeStampArray, weightArray, impedanceArray, bmiArray, bodyFatArray, waterArray, muscleArray, boneMassArray, bmrArray, amrArray, totalMeasurementCount);
-                    }
-                }
-
-                return false;
-            }
 
             if (rd[ 1 ] == 71)
             {
@@ -533,61 +633,6 @@ public class BlueToothScale extends BlueTooth
                 }
 
                 return false;
-            }
-
-            if (rd[ 1 ] == 89)
-            {
-                if (rd[ 3 ] == 1)
-                {
-                    byte[] rawUuid = new byte[ 8 ];
-
-                    for (int i = 0; i < 8; i++)
-                    {
-                        rawUuid[ i ] = rd[ i + 5 ];
-                    }
-
-                    this.rawListOfUuids[ 0 ] = convertBytesToLong(rawUuid);
-
-                    this.didFinishMeasurementStatus = convertByteToInt(rd[ 4 ]);
-
-                    Log.d(LOGTAG, "parseData: Finish(1): UUID=" + this.rawListOfUuids[ 0 ] + " Status=" + this.didFinishMeasurementStatus);
-                }
-
-                if (rd[ 3 ] == 2)
-                {
-                    this.rawTimeStampArray[ 0 ] = convertBytesToInt(Arrays.copyOfRange(rd, 4, 8));
-                    this.rawWeightArray[ 0 ] = ((convertByteToInt(rd[ 8 ]) * 256) + convertByteToInt(rd[ 9 ])) / 20.0d;
-                    this.rawImpedanceArray[ 0 ] = (convertByteToInt(rd[ 10 ]) * 256) + convertByteToInt(rd[ 11 ]);
-                    this.rawBodyFatArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 12 ]) * 256) + convertByteToInt(rd[ 13 ]))) / 10.0d);
-                    this.waterByte = rd[ 14 ];
-
-                    Log.d(LOGTAG, "parseData: Finish(2): TS=" + this.rawTimeStampArray[ 0 ]);
-                }
-
-                if (rd[ 3 ] == 3)
-                {
-                    this.rawWaterArray[ 0 ] = (float) (((double) ((convertByteToInt(this.waterByte) * 256) + convertByteToInt(rd[ 4 ]))) / 10.0d);
-                    this.rawMuscleArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 5 ]) * 256) + convertByteToInt(rd[ 6 ]))) / 10.0d);
-                    this.rawBoneMassArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 7 ]) * 256) + convertByteToInt(rd[ 8 ]))) / 20.0d);
-                    this.rawBmrArray[ 0 ] = (convertByteToInt(rd[ 9 ]) * 256) + convertByteToInt(rd[ 10 ]);
-                    this.rawAmrArray[ 0 ] = (convertByteToInt(rd[ 11 ]) * 256) + convertByteToInt(rd[ 12 ]);
-                    this.rawBmiArray[ 0 ] = (float) (((double) ((convertByteToInt(rd[ 13 ]) * 256) + convertByteToInt(rd[ 14 ]))) / 10.0d);
-
-                    Log.d(LOGTAG, "parseData: Finish(3):"
-                            + " Weight=" + this.rawWeightArray[ 0 ]
-                            + " Impedance=" + this.rawImpedanceArray[ 0 ]
-                            + " BodyFat=" + this.rawBodyFatArray[ 0 ]
-                            + " Water=" + this.rawWaterArray[ 0 ]
-                            + " Bones=" + this.rawBoneMassArray[ 0 ]
-                            + " BMR=" + this.rawBmrArray[ 0 ]
-                            + " AMR=" + this.rawAmrArray[ 0 ]
-                            + " BMI=" + this.rawBmiArray[ 0 ]);
-
-                    long timeStamp = getTimeStampInMilliSeconds(this.rawTimeStampArray[ 0 ]);
-                    //this.mBleScaleCallbacks.didFinishMeasurementOnTimestamp(timeStamp, this.rawWeightArray[ 0 ], this.rawImpedanceArray[ 0 ], this.rawBmiArray[ 0 ], this.rawBodyFatArray[ 0 ], this.rawWaterArray[ 0 ], this.rawMuscleArray[ 0 ], this.rawBoneMassArray[ 0 ], this.rawBmrArray[ 0 ], this.rawAmrArray[ 0 ], this.rawListOfUuids[ 0 ], this.didFinishMeasurementStatus);
-                }
-
-                return true;
             }
 
             if (rd[ 1 ] == 76)
@@ -623,21 +668,6 @@ public class BlueToothScale extends BlueTooth
 
                 return false;
             }
-
-            if (rd[ 1 ] == 88)
-            {
-                boolean status = (rd[ 2 ] != 1);
-
-                byte[] data = new byte[ 4 ];
-                data[ 2 ] = rd[ 3 ];
-                data[ 3 ] = rd[ 4 ];
-                weight = ((double) convertBytesToInt(data)) / 20.0d;
-                Log.d(LOGTAG, "parseData: Weight=" + weight + " Status=" + status);
-
-                //this.mBleScaleCallbacks.didGetLiveWeight(weight, status);
-
-                return true;
-            }
         }
 
         return false;
@@ -645,7 +675,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getUserList()
     {
-        Log.d(LOGTAG,"getUserListBytesData");
+        Log.d(LOGTAG,"getUserList");
 
         byte[] data = new byte[ 2 ];
 
@@ -690,7 +720,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getTxPower()
     {
-        Log.d(LOGTAG,"getTxPowerBytesData");
+        Log.d(LOGTAG,"getTxPower");
 
         byte[] data = new byte[ 2 ];
 
@@ -949,7 +979,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getUnknownMeasurements()
     {
-        Log.d(LOGTAG, "getUnknownMeasurementsBytesData");
+        Log.d(LOGTAG, "getUnknownMeasurements");
         byte[] data = new byte[ 2 ];
         if (isCompatibleScale())
         {
@@ -1043,7 +1073,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getSetDateTime()
     {
-        Log.d(LOGTAG,"getSetDateTimeBytesData");
+        Log.d(LOGTAG,"getSetDateTime");
 
         byte[] data = new byte[ 5 ];
 
@@ -1229,7 +1259,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getScaleSleepStatus()
     {
-        Log.d(LOGTAG, "getScaleSleepStatusBytesData");
+        Log.d(LOGTAG, "getScaleSleepStatus");
 
         byte[] data = new byte[ 2 ];
 
@@ -1272,7 +1302,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getRemoteTimeStamp()
     {
-        Log.d(LOGTAG,"getRemoteTimeStampBytesData");
+        Log.d(LOGTAG,"getRemoteTimeStamp");
         byte[] data = new byte[ 2 ];
         if (isCompatibleScale())
         {
@@ -1288,7 +1318,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getModuleVersion()
     {
-        Log.d(LOGTAG,"getModuleVersionBytesData");
+        Log.d(LOGTAG,"getModuleVersion");
 
         byte[] data = new byte[ 2 ];
 
@@ -1308,7 +1338,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getForceDisconnect()
     {
-        Log.d(LOGTAG,"getForceDisconnectBytesData");
+        Log.d(LOGTAG,"getForceDisconnect");
 
         byte[] data = new byte[ 2 ];
 
@@ -1367,18 +1397,6 @@ public class BlueToothScale extends BlueTooth
             data[ i ] = (byte) (value >> ((3 - i) * 8));
         }
         return data;
-    }
-
-    public static long convertBytesToLong(byte[] data)
-    {
-        if (data.length != 8)
-        {
-            return 0;
-        }
-        ByteBuffer buffer = ByteBuffer.allocate(8);
-        buffer.put(data);
-        buffer.flip();
-        return buffer.getLong();
     }
 
     public static int convertBytesToInt(byte[] data)

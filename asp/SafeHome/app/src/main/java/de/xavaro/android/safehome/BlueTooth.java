@@ -17,11 +17,12 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("WeakerAccess")
 public class BlueTooth extends BroadcastReceiver
 {
     private static final String LOGTAG = BlueTooth.class.getSimpleName();
@@ -60,8 +61,6 @@ public class BlueTooth extends BroadcastReceiver
     private static final String BPM_CHARACTERISTIC_INTERMEDIATE = "00002a36-0000-1000-8000-00805f9b34fb";
 
     private static final String NOTIFY_DESCRIPTOR = "00002902-0000-1000-8000-00805f9b34fb";
-
-    private final ArrayList<BluetoothDevice> devices = new ArrayList<>();
 
     public BlueTooth(Context context)
     {
@@ -141,7 +140,6 @@ public class BlueTooth extends BroadcastReceiver
         discoverBPMs = true;
         discoverCallback = callback;
 
-        devices.clear();
         bta.startDiscovery();
         isDiscovering = true;
     }
@@ -167,7 +165,6 @@ public class BlueTooth extends BroadcastReceiver
         discoverScales = true;
         discoverCallback = callback;
 
-        devices.clear();
         bta.startDiscovery();
     }
 
@@ -180,7 +177,7 @@ public class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onReceive: found UUID");
 
-            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            //BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
 
             if (uuidExtra == null)
@@ -213,8 +210,6 @@ public class BlueTooth extends BroadcastReceiver
                     + "=" + device.getName()
                     + "=" + device.getBondState()
                     + "=" + getDeviceTypeString(device.getType()));
-
-            devices.add(device);
 
             if (discoverClassic && ((device.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC) ||
                     (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
@@ -259,11 +254,10 @@ public class BlueTooth extends BroadcastReceiver
 
     protected class GattAction
     {
-        static final int MODE_DISCONNECT = 1;
-        static final int MODE_INDICATE = 2;
-        static final int MODE_NOTIFY = 3;
-        static final int MODE_WRITE = 4;
-        static final int MODE_READ = 5;
+        static final int MODE_INDICATE = 1;
+        static final int MODE_NOTIFY = 2;
+        static final int MODE_WRITE = 3;
+        static final int MODE_READ = 4;
 
         int mode;
 
@@ -313,7 +307,7 @@ public class BlueTooth extends BroadcastReceiver
         }
     }
 
-    protected BluetoothGattCallback gattCallback = new BluetoothGattCallback()
+    protected final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
     {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
@@ -479,7 +473,8 @@ public class BlueTooth extends BroadcastReceiver
         currentGatt = currentGatt.getDevice().connectGatt(context, true, gattCallback);
     }
 
-    protected void parseResponse(byte[] resp, boolean intermediate)
+    @SuppressWarnings("UnusedParameters")
+    protected void parseResponse(byte[] rd, boolean intermediate)
     {
         Log.d(LOGTAG,"parseResponse: Please implement this method in derived class.");
     }
@@ -523,20 +518,68 @@ public class BlueTooth extends BroadcastReceiver
 
     public interface BlueToothDiscoverCallback
     {
-        public void onDiscoverStarted();
-        public void onDiscoverFinished();
-        public void onDeviceDiscovered(BluetoothDevice device);
+        void onDiscoverStarted();
+        void onDiscoverFinished();
+        void onDeviceDiscovered(BluetoothDevice device);
     }
 
     public interface BlueToothConnectCallback
     {
-        public void onBluetoothConnect(BluetoothDevice device);
-        public void onBluetoothActive(BluetoothDevice device);
-        public void onBluetoothDisconnect(BluetoothDevice device);
+        void onBluetoothConnect(BluetoothDevice device);
+        void onBluetoothActive(BluetoothDevice device);
+        void onBluetoothDisconnect(BluetoothDevice device);
     }
 
     public interface BlueToothDataCallback
     {
-        public void onBluetoothReceivedData(BluetoothDevice device, JSONObject data);
+        void onBluetoothReceivedData(BluetoothDevice device, JSONObject data);
     }
+
+    //region Conversion helper
+
+    protected int unsignedByteToInt(byte b)
+    {
+        return b & 0xff;
+    }
+
+    protected int unsignedToSigned(int unsigned, int size)
+    {
+        if ((unsigned & (1 << size - 1)) != 0)
+        {
+            unsigned = -1 * ((1 << size - 1) - (unsigned & ((1 << size - 1) - 1)));
+        }
+
+        return unsigned;
+    }
+
+    protected float bytesToFloat(byte b0, byte b1)
+    {
+        int mantissa = unsignedToSigned(unsignedByteToInt(b0)
+                + ((unsignedByteToInt(b1) & 0x0F) << 8), 12);
+
+        int exponent = unsignedToSigned(unsignedByteToInt(b1) >> 4, 4);
+
+        return (float) (mantissa * Math.pow(10, exponent));
+    }
+
+    protected int unsignedBytesToInt(byte b0, byte b1)
+    {
+        return (unsignedByteToInt(b0) + (unsignedByteToInt(b1) << 8));
+    }
+
+    protected long convertBytesToLong(byte[] data)
+    {
+        if (data.length != 8)
+        {
+            return 0;
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(data);
+        buffer.flip();
+
+        return buffer.getLong();
+    }
+
+    //endregion Conversion helper
 }
