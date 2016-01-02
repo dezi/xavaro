@@ -1,16 +1,14 @@
 package de.xavaro.android.safehome;
 
-import android.content.pm.ResolveInfo;
-import android.graphics.Color;
+import android.bluetooth.BluetoothDevice;
 import android.support.annotation.Nullable;
 
-import android.app.AlertDialog;
-import android.content.ComponentName;
+import android.graphics.Color;
+import android.speech.tts.TextToSpeech;
+
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
@@ -20,7 +18,6 @@ import android.graphics.drawable.Drawable;
 
 import android.net.Uri;
 import android.os.Handler;
-import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -29,7 +26,6 @@ import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
 
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -40,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 //
 // Launch item view on home screen.
@@ -49,7 +44,8 @@ import java.util.List;
 public class LaunchItem extends FrameLayout implements
         ProxyPlayer.Callback,
         SurfaceHolder.Callback,
-        DitUndDat.InternetState.Callback
+        DitUndDat.InternetState.Callback,
+        BlueTooth.BlueToothConnectCallback
 {
     private final String LOGTAG = "LaunchItem";
 
@@ -249,6 +245,37 @@ public class LaunchItem extends FrameLayout implements
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
                     icon.setVisibility(VISIBLE);
                     targetIcon = overicon;
+                }
+
+                if (type.equals("health"))
+                {
+                    if (config.has("subtype"))
+                    {
+                        String subtype = config.getString("subtype");
+
+                        if (subtype.equals("bpm"))
+                        {
+                            if (handler == null) handler = new Handler();
+                            HealthGroup.subscribeDevice(this,"bpm");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtBPM));
+                            icon.setVisibility(VISIBLE);
+                        }
+
+                        if (subtype.equals("scale"))
+                        {
+                            if (handler == null) handler = new Handler();
+                            HealthGroup.subscribeDevice(this,"scale");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtScale));
+                            icon.setVisibility(VISIBLE);
+                        }
+                    }
+                    else
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealth));
+                        icon.setVisibility(VISIBLE);
+                    }
                 }
 
                 if (type.equals("developer"))
@@ -822,6 +849,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
         if (type.equals("phone"        )) { launchPhone();        return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
+        if (type.equals("health"       )) { launchHealth();        return; }
 
         // @formatter:on
 
@@ -1052,7 +1080,7 @@ public class LaunchItem extends FrameLayout implements
         }
         catch (JSONException ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
         }
     }
 
@@ -1097,6 +1125,21 @@ public class LaunchItem extends FrameLayout implements
         if (directory == null)
         {
             directory = new WebStream(context, "webradio");
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
+    private void launchHealth()
+    {
+        if (config.has("subtype"))
+        {
+            return;
+        }
+
+        if (directory == null)
+        {
+            directory = new HealthGroup(context);
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
@@ -1270,8 +1313,64 @@ public class LaunchItem extends FrameLayout implements
         }
     }
 
+    public TextToSpeech ttob;
+
     private void launchDeveloper()
     {
         //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
+
+        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
+
+        BlueTooth.getInstance(context).discoverBPMs(null);
     }
+
+    //region BlueTooth connect states
+
+    public final Runnable bluetoothIsConnected = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResBlueTooth));
+            overicon.setVisibility(VISIBLE);
+            overlay.setVisibility(VISIBLE);
+        }
+    };
+
+    public final Runnable bluetoothIsDisconnected = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            overicon.setVisibility(INVISIBLE);
+            overlay.setVisibility(INVISIBLE);
+        }
+    };
+
+    public void onBluetoothConnect(BluetoothDevice device)
+    {
+        Log.d(LOGTAG, "onBluetoothConnect: " + device.getName());
+
+        //
+        // Post delayed in case of sleeping devices with
+        // short time idle connect.
+        //
+
+        handler.postDelayed(bluetoothIsConnected, 2000);
+    }
+
+    public void onBluetoothActive(BluetoothDevice device)
+    {
+        Log.d(LOGTAG, "onBluetoothActive: " + device.getName());
+    }
+
+    public void onBluetoothDisconnect(BluetoothDevice device)
+    {
+        Log.d(LOGTAG,"onBluetoothDisconnect: " + device.getName());
+
+        handler.removeCallbacks(bluetoothIsConnected);
+        handler.post(bluetoothIsDisconnected);
+    }
+
+    //endregion BlueTooth connect states
 }
