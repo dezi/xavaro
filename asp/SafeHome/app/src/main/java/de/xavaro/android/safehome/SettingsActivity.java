@@ -59,8 +59,11 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Vitaldaten";
         target.add(category);
 
-        target.add(SettingsFragments.HealthScaleFragment.getHeader());
+        target.add(SettingsFragments.HealthPersonalFragment.getHeader());
         target.add(SettingsFragments.HealthBPMFragment.getHeader());
+        target.add(SettingsFragments.HealthScaleFragment.getHeader());
+        target.add(SettingsFragments.HealthSensorFragment.getHeader());
+        target.add(SettingsFragments.HealthUnitsFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";

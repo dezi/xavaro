@@ -18,6 +18,7 @@ public class HealthGroup extends LaunchGroup implements
 
     private static BlueTooth bpmBlueTooth;
     private static BlueTooth scaleBlueTooth;
+    private static BlueTooth sensorBlueTooth;
 
     public static void initialize(Context context)
     {
@@ -48,6 +49,18 @@ public class HealthGroup extends LaunchGroup implements
                 scaleBlueTooth.connect();
             }
         }
+
+        if (sp.getBoolean("health.sensor.enable", false))
+        {
+            String scaleDevice = sp.getString("health.sensor.device",null);
+
+            if ((scaleDevice != null) && ! scaleDevice.equals("unknown"))
+            {
+                sensorBlueTooth = new BlueToothSensor(context, scaleDevice);
+
+                sensorBlueTooth.connect();
+            }
+        }
     }
 
     public static void subscribeDevice(BlueTooth.BlueToothConnectCallback subscriber, String subtype)
@@ -61,6 +74,11 @@ public class HealthGroup extends LaunchGroup implements
         {
             scaleBlueTooth.setConnectCallback(subscriber);
         }
+
+        if (subtype.equals("sensor") && (sensorBlueTooth != null))
+        {
+            sensorBlueTooth.setConnectCallback(subscriber);
+        }
     }
 
     public HealthGroup(Context context)
@@ -71,6 +89,7 @@ public class HealthGroup extends LaunchGroup implements
 
         if (bpmBlueTooth != null) bpmBlueTooth.setDataCallback(this);
         if (scaleBlueTooth != null) scaleBlueTooth.setDataCallback(this);
+        if (sensorBlueTooth != null) sensorBlueTooth.setDataCallback(this);
     }
 
     private JSONObject getConfig(Context context)
@@ -102,6 +121,17 @@ public class HealthGroup extends LaunchGroup implements
                     entry.put("type", "health");
                     entry.put("label", "Gewicht");
                     entry.put("subtype", "scale");
+
+                    launchitems.put(entry);
+                }
+
+                if (prefkey.equals("health.sensor.enable"))
+                {
+                    JSONObject entry = new JSONObject();
+
+                    entry.put("type", "health");
+                    entry.put("label", "Aktivität");
+                    entry.put("subtype", "sensor");
 
                     launchitems.put(entry);
                 }

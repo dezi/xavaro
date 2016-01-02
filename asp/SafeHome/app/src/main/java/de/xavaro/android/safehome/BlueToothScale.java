@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
@@ -34,25 +36,33 @@ public class BlueToothScale extends BlueTooth
         public static final String SANITAS_SBF70 = "SANITAS SBF70";
     }
 
-    private static class Sensors
+    @Override
+    protected boolean isCompatibleDevice(String devicename)
     {
-        public static final String SAS75 = "SAS75";
+        return (devicename.equalsIgnoreCase(Scales.SBF70) ||
+                devicename.equalsIgnoreCase(Scales.BF710) ||
+                devicename.equalsIgnoreCase(Scales.GS485) ||
+                devicename.equalsIgnoreCase(Scales.SANITAS_SBF70));
     }
 
-    public boolean isCompatibleScale()
+    @Override
+    protected boolean isCompatibleService(BluetoothGattService service)
     {
-        return (modelName.equalsIgnoreCase(Scales.SBF70) ||
-                modelName.equalsIgnoreCase(Scales.BF710) ||
-                modelName.equalsIgnoreCase(Scales.GS485) ||
-                modelName.equalsIgnoreCase(Scales.SANITAS_SBF70));
+        return service.getUuid().toString().equals("0000ffe0-0000-1000-8000-00805f9b34fb");
+    }
+
+    @Override
+    protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
+    {
+        return characteristic.getUuid().toString().equals("0000ffe1-0000-1000-8000-00805f9b34fb");
     }
 
     @Override
     protected void enableDevice()
     {
-        Log.d(LOGTAG,"enableDevice: " + currentControl);
+        Log.d(LOGTAG,"enableDevice: " + currentPrimary);
 
-        if (currentControl != null)
+        if (currentPrimary != null)
         {
             GattAction ga;
 
@@ -64,7 +74,7 @@ public class BlueToothScale extends BlueTooth
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_NOTIFY;
-            ga.characteristic = currentControl;
+            ga.characteristic = currentPrimary;
 
             gattSchedule.add(ga);
 
@@ -80,7 +90,7 @@ public class BlueToothScale extends BlueTooth
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
             ga.data = getScaleSleepStatus();
-            ga.characteristic = currentControl;
+            ga.characteristic = currentPrimary;
 
             gattSchedule.add(ga);
 
@@ -131,7 +141,7 @@ public class BlueToothScale extends BlueTooth
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
             ga.data = getAcknowledgementData(rd);
-            ga.characteristic = currentControl;
+            ga.characteristic = currentPrimary;
 
             gattSchedule.add(0, ga);
 
@@ -162,7 +172,7 @@ public class BlueToothScale extends BlueTooth
 
     private void testScalex()
     {
-        if (currentControl != null)
+        if (currentPrimary != null)
         {
             GattAction ga;
 
@@ -171,7 +181,7 @@ public class BlueToothScale extends BlueTooth
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
             ga.data = getModuleVersion();
-            ga.characteristic = currentControl;
+            ga.characteristic = currentPrimary;
 
             gattSchedule.add(ga);
 
@@ -180,7 +190,7 @@ public class BlueToothScale extends BlueTooth
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
             ga.data = getScaleStatusForUser(101);
-            ga.characteristic = currentControl;
+            ga.characteristic = currentPrimary;
 
             gattSchedule.add(ga);
 
@@ -189,7 +199,7 @@ public class BlueToothScale extends BlueTooth
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_WRITE;
             ga.data = getSetDateTime();
-            ga.characteristic = currentControl;
+            ga.characteristic = currentPrimary;
 
             gattSchedule.add(ga);
 
@@ -414,7 +424,6 @@ public class BlueToothScale extends BlueTooth
 
         if ((rd[ 0 ] == -25) && (rd[ 1 ] == 66))
         {
-
             int part = rd[ 3 ];
 
             if (part == 1)
@@ -452,7 +461,7 @@ public class BlueToothScale extends BlueTooth
                 // Part 2 of records.
                 //
 
-                cbtempPut("water", unsignedBytesToInt(cbbyte , rd[ 4 ]) / 10.0d);
+                cbtempPut("water", unsignedBytesToInt(cbbyte, rd[ 4 ]) / 10.0d);
                 cbtempPut("muscle", unsignedBytesToInt(rd[ 5 ], rd[ 6 ]) / 10.0d);
                 cbtempPut("boneMass", unsignedBytesToInt(rd[ 7 ], rd[ 8 ]) / 20.0d);
                 cbtempPut("BMR", unsignedBytesToInt(rd[ 9 ], rd[ 10 ]));
@@ -463,7 +472,7 @@ public class BlueToothScale extends BlueTooth
                 cbtemp = null;
             }
 
-            if (rd[ 2 ] == rd[ 3 ])
+            if (part == rd[ 2 ])
             {
                 //
                 // Very last record.
@@ -673,13 +682,19 @@ public class BlueToothScale extends BlueTooth
         return false;
     }
 
+
+    private boolean isCompatibleDevice()
+    {
+        return isCompatibleDevice(this.modelName);
+    }
+
     public byte[] getUserList()
     {
         Log.d(LOGTAG,"getUserList");
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
         }
@@ -699,7 +714,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
         }
@@ -724,7 +739,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -20;
         }
@@ -744,7 +759,7 @@ public class BlueToothScale extends BlueTooth
         byte[] data = new byte[ 2 ];
         if (isSet)
         {
-            if (isCompatibleScale())
+            if (isCompatibleDevice())
             {
                 data[ 0 ] = (byte) -19;
                 data[ 1 ] = (byte) interval;
@@ -756,7 +771,7 @@ public class BlueToothScale extends BlueTooth
             }
         }
         else
-            if (isCompatibleScale())
+            if (isCompatibleDevice())
             {
                 data[ 0 ] = (byte) -18;
                 data[ 1 ] = (byte) 2;
@@ -773,7 +788,7 @@ public class BlueToothScale extends BlueTooth
     {
         Log.d(LOGTAG,"getCheckUserExistsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 0;
@@ -803,7 +818,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 18 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
         }
@@ -838,7 +853,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getDeleteUserBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 50;
@@ -860,7 +875,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getTakeUserMeasurementBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 64;
@@ -882,7 +897,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getUserMeasurementsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 65;
@@ -904,7 +919,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getDeleteUserMeasurementsBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 67;
@@ -927,7 +942,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getSetUserWeightBytesData-->uuid : " + uuid + ", weight : " + weight + ", bodyFat : " + bodyFat + ", timeStamp : " + timeStamp);
         byte[] data = new byte[ 18 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 68;
@@ -960,7 +975,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getUserWeightAndBodyFatBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 69;
@@ -981,7 +996,7 @@ public class BlueToothScale extends BlueTooth
     {
         Log.d(LOGTAG, "getUnknownMeasurements");
         byte[] data = new byte[ 2 ];
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 70;
@@ -998,7 +1013,7 @@ public class BlueToothScale extends BlueTooth
     {
         Log.d(LOGTAG,"getSaveAsUnknownMeasurementWithtimestampBytesData-->timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance);
         byte[] data = new byte[ 10 ];
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 72;
@@ -1024,7 +1039,7 @@ public class BlueToothScale extends BlueTooth
     {
         Log.d(LOGTAG,"getDeleteUnknownMeasurementBytesData-->measurementId : " + measurementId);
         byte[] data = new byte[ 3 ];
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 73;
@@ -1046,7 +1061,7 @@ public class BlueToothScale extends BlueTooth
         byte[] data = new byte[ 11 ];
         byte rawGender = (byte) (((byte) (gender == 'M' ? 128 : 0)) + activityIndex);
         char[] rawInitial = initial.toCharArray();
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 74;
@@ -1077,7 +1092,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 5 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -23;
         }
@@ -1103,7 +1118,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getAssignMeasurementToUserBytesData-->uuid : " + uuid + ", timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance + ", measurementId : " + measurementId);
         byte[] data = new byte[ 19 ];
 
-        if (!isCompatibleScale())
+        if (!isCompatibleDevice())
         {
             data[ 0 ] = (byte) -9;
             data[ 1 ] = (byte) 75;
@@ -1149,7 +1164,7 @@ public class BlueToothScale extends BlueTooth
     {
         Log.d(LOGTAG,"getSetUnitBytesData-->unit : " + unit);
         byte[] data = new byte[ 3 ];
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
             data[ 1 ] = (byte) 77;
@@ -1168,7 +1183,7 @@ public class BlueToothScale extends BlueTooth
     {
         Log.d(LOGTAG,"getSetReferDefinitionToWeightThresholdBytesData-->weightThreshold : " + weightThreshold + ", bodyFatThreshold : " + bodyFatThreshold);
         byte[] data = new byte[ 4 ];
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
         }
@@ -1190,7 +1205,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getChangeUserFromOldUUID-->oldUuid : " + oldUuid + ", newUuid : " + newUuid);
         byte[] data = new byte[ 18 ];
 
-        if (! isCompatibleScale())
+        if (! isCompatibleDevice())
         {
             data[ 0 ] = (byte) -9;
             data[ 1 ] = (byte) 86;
@@ -1230,7 +1245,7 @@ public class BlueToothScale extends BlueTooth
         byte[] rawUuid = convertLongToBytes(uuid);
         byte rawGender = (byte) (((byte) (gender == 'M' ? 128 : 0)) + activityIndex);
         char[] rawInitial = initial.toCharArray();
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
         }
@@ -1263,7 +1278,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -16;
         }
@@ -1282,7 +1297,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getUserInfoBytesData-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
         byte[] rawUuid = convertLongToBytes(uuid);
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
         }
@@ -1304,7 +1319,7 @@ public class BlueToothScale extends BlueTooth
     {
         Log.d(LOGTAG,"getRemoteTimeStamp");
         byte[] data = new byte[ 2 ];
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -14;
         }
@@ -1322,7 +1337,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -15;
         }
@@ -1342,7 +1357,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -22;
         }
@@ -1360,7 +1375,7 @@ public class BlueToothScale extends BlueTooth
     {
         byte[] data = new byte[ 5 ];
 
-        if (isCompatibleScale())
+        if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
         }

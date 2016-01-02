@@ -190,120 +190,29 @@ public class SettingsFragments
 
     //endregion Administrator preferences
 
-    //region Health BPM preferences
+    //region Health Person preferences
 
-    public static class HealthBPMFragment extends BlueToothFragment
+    public static class HealthPersonalFragment extends EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Blutdruck";
-            header.iconRes = GlobalConfigs.IconResHealtBPM;
-            header.fragment = HealthBPMFragment.class.getName();
+            header.title = "Persönliches";
+            header.iconRes = GlobalConfigs.IconResHealthPerson;
+            header.fragment = HealthPersonalFragment.class.getName();
 
             return header;
         }
 
-        public HealthBPMFragment()
+        public HealthPersonalFragment()
         {
             super();
 
-            isBPM = true;
-
-            iconres = GlobalConfigs.IconResHealtBPM;
-            keyprefix = "health.bpm";
-            masterenable = "Blutdruck freischalten";
-            devicetitle = "Bultdruckmessgerät";
-            devicesearch = "Bultdruckmessgeräte werden gesucht...";
-        }
-
-        @Override
-        public void registerAll(Context context)
-        {
-            super.registerAll(context);
-
-            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
-
-            NicePreferenceCategory pc;
-            NiceListPreference lp;
-
-            //
-            // Units.
-            //
-
-            pc = new NicePreferenceCategory(context);
-            pc.setTitle("Maßeinheiten");
-            preferences.add(pc);
-
-            lp = new NiceListPreference(context);
-
-            String[] unitPressureText = { "mmHg", "kPa" };
-            String[] unitPressureVals = { "mmhg", "kpa" };
-
-            lp.setKey(keyprefix + ".units.pressure");
-            lp.setEntries(unitPressureText);
-            lp.setEntryValues(unitPressureVals);
-            lp.setDefaultValue("mmhg");
-            lp.setTitle("Blutdruck in");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
-
-            //
-            // User.
-            //
-
-            pc = new NicePreferenceCategory(context);
-            pc.setTitle("Benutzerauswahl");
-            preferences.add(pc);
-
-            lp = new NiceListPreference(context);
-
-            String[] userSelectText = { "Benutzer 1", "Benutzer 2", "Benutzer 3", "Benutzer 4" };
-            String[] userSelectVals = { "1", "2", "3", "4" };
-
-            lp.setKey(keyprefix + ".selecteduser");
-            lp.setEntries(userSelectText);
-            lp.setEntryValues(userSelectVals);
-            lp.setDefaultValue("1");
-            lp.setTitle("Gerätebenutzer");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
-        }
-    }
-
-    //endregion Health BPM preferences
-
-    //region Health Scale preferences
-
-    public static class HealthScaleFragment extends BlueToothFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Gewicht";
-            header.iconRes = GlobalConfigs.IconResHealtScale;
-            header.fragment = HealthScaleFragment.class.getName();
-
-            return header;
-        }
-
-        public HealthScaleFragment()
-        {
-            super();
-
-            isScale = true;
-
-            iconres = GlobalConfigs.IconResHealtScale;
-            keyprefix = "health.scale";
-            masterenable = "Gewicht freischalten";
-            devicetitle = "Waage";
-            devicesearch = "Waagen werden gesucht...";
+            iconres = GlobalConfigs.IconResHealthPerson;
+            keyprefix = "health";
+            masterenable = "Vitaldaten freischalten";
         }
 
         @Override
@@ -318,42 +227,6 @@ public class SettingsFragments
             NiceDatePreference dp;
             NiceNumberPreference np;
             NiceEditTextPreference ep;
-
-            //
-            // Units.
-            //
-
-            pc = new NicePreferenceCategory(context);
-            pc.setTitle("Maßeinheiten");
-            preferences.add(pc);
-
-            lp = new NiceListPreference(context);
-
-            String[] unitSizeText = { "Zentimeter", "Fuß"  };
-            String[] unitSizeVals = { "cm", "foot" };
-
-            lp.setKey(keyprefix + ".units.size");
-            lp.setEntries(unitSizeText);
-            lp.setEntryValues(unitSizeVals);
-            lp.setDefaultValue("cm");
-            lp.setTitle("Größe in");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
-
-            lp = new NiceListPreference(context);
-
-            String[] unitWeightText = { "Kilogramm", "Pfund"  };
-            String[] unitWeightVals = { "kg", "lbs" };
-
-            lp.setKey(keyprefix + ".units.weight");
-            lp.setEntries(unitWeightText);
-            lp.setEntryValues(unitWeightVals);
-            lp.setDefaultValue("kg");
-            lp.setTitle("Gewicht in");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
 
             //
             // Personal user data required for calculations.
@@ -395,10 +268,243 @@ public class SettingsFragments
 
             preferences.add(np);
 
+            lp = new NiceListPreference(context);
+
+            String[] userActivityText = { "Nicht aktiv", "Leicht aktiv", "Moderat aktiv", "Sehr aktiv", "Besonders aktiv"  };
+            String[] userActivityVals = { "sa", "la", "ma", "va", "ea" };
+
+            lp.setKey(keyprefix + ".user.activity");
+            lp.setEntries(userActivityText);
+            lp.setEntryValues(userActivityVals);
+            lp.setDefaultValue("ma");
+            lp.setTitle("Aktivität");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+        }
+    }
+
+    //endregion Health Person preferences
+
+    //region Health Units preferences
+
+    public static class HealthUnitsFragment extends EnablePreferenceFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Maßeinheiten";
+            header.iconRes = GlobalConfigs.IconResHealthUnits;
+            header.fragment = HealthUnitsFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthUnitsFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResHealthUnits;
+            keyprefix = "health.units";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            NicePreferenceCategory pc;
+            NiceListPreference lp;
+            NiceDatePreference dp;
+            NiceNumberPreference np;
+            NiceEditTextPreference ep;
+
+            lp = new NiceListPreference(context);
+
+            String[] unitTimeText = { "24 Stunden", "12 Stunden"  };
+            String[] unitTimeVals = { "24h", "12h" };
+
+            lp.setKey(keyprefix + ".timedisp");
+            lp.setEntries(unitTimeText);
+            lp.setEntryValues(unitTimeVals);
+            lp.setDefaultValue("24h");
+            lp.setTitle("Zeitangabe mit");
+
+            preferences.add(lp);
+
+            lp = new NiceListPreference(context);
+
+            String[] unitSizeText = {"Zentimeter", "Inch"};
+            String[] unitSizeVals = {"cm", "inch"};
+
+            lp.setKey(keyprefix + ".size");
+            lp.setEntries(unitSizeText);
+            lp.setEntryValues(unitSizeVals);
+            lp.setDefaultValue("cm");
+            lp.setTitle("Größe in");
+
+            preferences.add(lp);
+
+            lp = new NiceListPreference(context);
+
+            String[] unitDistText = { "Meter", "Yards"  };
+            String[] unitDistVals = { "m", "yard" };
+
+            lp.setKey(keyprefix + ".distance");
+            lp.setEntries(unitDistText);
+            lp.setEntryValues(unitDistVals);
+            lp.setDefaultValue("m");
+            lp.setTitle("Distanz in");
+
+            preferences.add(lp);
+
+            lp = new NiceListPreference(context);
+
+            String[] unitWeightText = { "Kilogramm", "Pfund"  };
+            String[] unitWeightVals = { "kg", "lbs" };
+
+            lp.setKey(keyprefix + ".weight");
+            lp.setEntries(unitWeightText);
+            lp.setEntryValues(unitWeightVals);
+            lp.setDefaultValue("kg");
+            lp.setTitle("Gewicht in");
+
+            preferences.add(lp);
+
+            lp = new NiceListPreference(context);
+
+            String[] unitPressureText = { "mmHg", "kPa" };
+            String[] unitPressureVals = { "mmhg", "kpa" };
+
+            lp.setKey(keyprefix + ".pressure");
+            lp.setEntries(unitPressureText);
+            lp.setEntryValues(unitPressureVals);
+            lp.setDefaultValue("mmhg");
+            lp.setTitle("Blutdruck in");
+
+            preferences.add(lp);
+        }
+    }
+
+    //region Health BPM preferences
+
+    public static class HealthBPMFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Blutdruck";
+            header.iconRes = GlobalConfigs.IconResHealthBPM;
+            header.fragment = HealthBPMFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthBPMFragment()
+        {
+            super();
+
+            isBPM = true;
+
+            iconres = GlobalConfigs.IconResHealthBPM;
+            keyprefix = "health.bpm";
+            masterenable = "Blutdruck freischalten";
+            devicetitle = "Bultdruckmessgerät";
+            devicesearch = "Bultdruckmessgeräte werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            NicePreferenceCategory pc;
+            NiceListPreference lp;
+
+            //
+            // User.
+            //
+
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Benutzerauswahl");
+            preferences.add(pc);
+
+            lp = new NiceListPreference(context);
+
+            String[] userSelectText = { "Benutzer 1", "Benutzer 2", "Benutzer 3", "Benutzer 4" };
+            String[] userSelectVals = { "1", "2", "3", "4" };
+
+            lp.setKey(keyprefix + ".selecteduser");
+            lp.setEntries(userSelectText);
+            lp.setEntryValues(userSelectVals);
+            lp.setDefaultValue("1");
+            lp.setTitle("Gerätebenutzer");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+        }
+    }
+
+    //endregion Health BPM preferences
+
+    //region Health Scale preferences
+
+    public static class HealthScaleFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Gewicht";
+            header.iconRes = GlobalConfigs.IconResHealthScale;
+            header.fragment = HealthScaleFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthScaleFragment()
+        {
+            super();
+
+            isScale = true;
+
+            iconres = GlobalConfigs.IconResHealthScale;
+            keyprefix = "health.scale";
+            masterenable = "Gewicht freischalten";
+            devicetitle = "Waage";
+            devicesearch = "Waagen werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            NicePreferenceCategory pc;
+            NiceListPreference lp;
+            NiceDatePreference dp;
+            NiceNumberPreference np;
+            NiceEditTextPreference ep;
+
+            //
+            // Personal user data required for calculations.
+            //
+
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Persönliche Daten");
+            preferences.add(pc);
+
             ep = new NiceEditTextPreference(context);
 
             ep.setKey(keyprefix + ".user.initials");
-            ep.setTitle("Initialen");
+            ep.setTitle("Waagenbenutzer Initialen");
             ep.setIsUppercase();
             ep.setEnabled(enabled);
 
@@ -407,6 +513,94 @@ public class SettingsFragments
     }
 
     //endregion Health Scale preferences
+
+    //region Health Sensor preferences
+
+    public static class HealthSensorFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Aktivität";
+            header.iconRes = GlobalConfigs.IconResHealthSensor;
+            header.fragment = HealthSensorFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthSensorFragment()
+        {
+            super();
+
+            isSensor = true;
+
+            iconres = GlobalConfigs.IconResHealthSensor;
+            keyprefix = "health.sensor";
+            masterenable = "Aktivität freischalten";
+            devicetitle = "Aktivitäts-Sensor";
+            devicesearch = "Aktivitäts-Sensoren werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            NicePreferenceCategory pc;
+            NiceListPreference lp;
+            NiceDatePreference dp;
+            NiceNumberPreference np;
+            NiceEditTextPreference ep;
+
+            //
+            // Goals.
+            //
+
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Ziele");
+            preferences.add(pc);
+
+            np = new NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".goals.steps");
+            np.setMinMaxValue(1000, 20000);
+            np.setDefaultValue(3000);
+            np.setTitle("Schritte pro Tag machen");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            np = new NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".goals.calories");
+            np.setMinMaxValue(1000, 5000);
+            np.setDefaultValue(2000);
+            np.setTitle("Kalorien pro Tag verbrauchen");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            lp = new NiceListPreference(context);
+
+            String[] unitGoalText = { "Schritte", "Kalorien"  };
+            String[] unitGoalVals = { "steps", "calories" };
+
+            lp.setKey(keyprefix + ".goals.sensor");
+            lp.setEntries(unitGoalText);
+            lp.setEntryValues(unitGoalVals);
+            lp.setDefaultValue("steps");
+            lp.setTitle("Hauptziel im Sensor");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+        }
+    }
+
+    //endregion Health Sensor preferences
 
     //region BlueTooth preferences stub
 
@@ -417,8 +611,9 @@ public class SettingsFragments
         protected String devicetitle;
         protected String devicesearch;
 
-        protected boolean isScale;
         protected boolean isBPM;
+        protected boolean isScale;
+        protected boolean isSensor;
 
         private final BlueToothFragment self = this;
         private Context context;
@@ -565,8 +760,9 @@ public class SettingsFragments
                     @Override
                     public void onClick(View view)
                     {
-                        if (isBPM) BlueTooth.getInstance(context).discoverBPMs(self);
-                        if (isScale) BlueTooth.getInstance(context).discoverScales(self);
+                        if (isBPM) new BlueToothBPM(context).discover(self);
+                        if (isScale) new BlueToothScale(context).discover(self);
+                        if (isSensor) new BlueToothSensor(context).discover(self);
                     }
                 });
             }
@@ -1428,7 +1624,7 @@ public class SettingsFragments
                         if (fault.equals("noprivger")) text += "\n– Problem: Datenschutzerklärung nur in Englisch";
                         if (fault.equals("nooptin"  )) text += "\n– Problem: Nur nachträglicher Opt-Out";
                         if (fault.equals("nooptout" )) text += "\n– Problem: Keine Opt-Out Möglichkeit angeboten";
-                        if (fault.equals("nofaults" )) text += "\n– Problem: Eigentlich keines.";
+                        if (fault.equals("nofaults" )) text += "\n– Problem: Eigentlich keines";
 
                         if (fault.equals("isporn"   )) text += "\n– Problem: Pornografie";
                         if (fault.equals("ispremium")) text += "\n– Problem: Premium Dienste";
@@ -1718,9 +1914,11 @@ public class SettingsFragments
 
                 boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable",false);
 
+                NicePreferenceCategory pc;
+                CheckBoxPreference cb;
+
                 loadGlobalConfig(context);
 
-                CheckBoxPreference cb;
                 Iterator<String> keysIterator = globalConfig.keys();
 
                 String key;
@@ -1777,7 +1975,7 @@ public class SettingsFragments
                     }
                     else
                     {
-                        NicePreferenceCategory pc = new NicePreferenceCategory(context);
+                        pc = new NicePreferenceCategory(context);
 
                         pc.setTitle(label);
                         pc.setIcon(drawable);

@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
@@ -9,6 +11,11 @@ import org.json.JSONObject;
 public class BlueToothBPM extends BlueTooth
 {
     private static final String LOGTAG = BlueToothBPM.class.getSimpleName();
+
+    public BlueToothBPM(Context context)
+    {
+        super(context);
+    }
 
     public BlueToothBPM(Context context, String deviceTag)
     {
@@ -25,8 +32,8 @@ public class BlueToothBPM extends BlueTooth
         public static final String SANITAS_SBM37 = "Sanitas SBM37";
     }
 
-    @SuppressWarnings("unused")
-    public static boolean isCompatibleBPM(String devicename)
+    @Override
+    protected boolean isCompatibleDevice(String devicename)
     {
         return (devicename.equalsIgnoreCase(BPMs.BM75) ||
                 devicename.equalsIgnoreCase(BPMs.SBM37) ||
@@ -37,11 +44,29 @@ public class BlueToothBPM extends BlueTooth
     }
 
     @Override
+    protected boolean isCompatibleService(BluetoothGattService service)
+    {
+        return service.getUuid().toString().equals("00001810-0000-1000-8000-00805f9b34fb");
+    }
+
+    @Override
+    protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
+    {
+        return characteristic.getUuid().toString().equals("00002a35-0000-1000-8000-00805f9b34fb");
+    }
+
+    @Override
+    protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
+    {
+        return characteristic.getUuid().toString().equals("00002a36-0000-1000-8000-00805f9b34fb");
+    }
+
+    @Override
     protected void enableDevice()
     {
-        Log.d(LOGTAG,"enableDevice: " + currentControl);
+        Log.d(LOGTAG,"enableDevice: " + currentPrimary);
 
-        if (currentControl != null)
+        if (currentPrimary != null)
         {
             GattAction ga;
 
@@ -53,7 +78,7 @@ public class BlueToothBPM extends BlueTooth
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_INDICATE;
-            ga.characteristic = currentControl;
+            ga.characteristic = currentPrimary;
 
             gattSchedule.add(ga);
 
@@ -66,7 +91,7 @@ public class BlueToothBPM extends BlueTooth
 
             ga.gatt = currentGatt;
             ga.mode = GattAction.MODE_NOTIFY;
-            ga.characteristic = currentIntermediate;
+            ga.characteristic = currentSecondary;
 
             gattSchedule.add(ga);
 
@@ -76,7 +101,7 @@ public class BlueToothBPM extends BlueTooth
         if (connectCallback != null)
         {
             //
-            // BPM equippment ist active, when it is connected.
+            // BPM equippment ist active when it is connected.
             //
 
             connectCallback.onBluetoothActive(currentGatt.getDevice());

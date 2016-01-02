@@ -27,15 +27,6 @@ public class BlueTooth extends BroadcastReceiver
 {
     private static final String LOGTAG = BlueTooth.class.getSimpleName();
 
-    private static BlueTooth instance;
-
-    public static BlueTooth getInstance(Context context)
-    {
-        if (instance == null) instance = new BlueTooth(context);
-
-        return instance;
-    }
-
     protected final Context context;
     protected final BluetoothAdapter bta;
 
@@ -45,20 +36,13 @@ public class BlueTooth extends BroadcastReceiver
     protected BluetoothGatt currentGatt;
     protected boolean currentConnectState;
 
-    protected BluetoothGattCharacteristic currentControl;
-    protected BluetoothGattCharacteristic currentIntermediate;
+    protected BluetoothGattCharacteristic currentPrimary;
+    protected BluetoothGattCharacteristic currentSecondary;
 
     protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
 
     protected BlueToothDataCallback dataCallback;
     protected BlueToothConnectCallback connectCallback;
-
-    protected static final String SCALE_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb";
-    protected static final String SCALE_CHARACTERISTIC = "0000ffe1-0000-1000-8000-00805f9b34fb";
-
-    protected static final String BPM_SERVICE = "00001810-0000-1000-8000-00805f9b34fb";
-    protected static final String BPM_CHARACTERISTIC_MEASURE = "00002a35-0000-1000-8000-00805f9b34fb";
-    private static final String BPM_CHARACTERISTIC_INTERMEDIATE = "00002a36-0000-1000-8000-00805f9b34fb";
 
     private static final String NOTIFY_DESCRIPTOR = "00002902-0000-1000-8000-00805f9b34fb";
 
@@ -105,24 +89,45 @@ public class BlueTooth extends BroadcastReceiver
         }
     }
 
+    protected boolean isCompatibleDevice(String devicename)
+    {
+        return false;
+    }
+
+    protected boolean isCompatibleService(BluetoothGattService service)
+    {
+        return false;
+    }
+
+    protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
+    }
+
+    protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
+    }
+
     public void setDataCallback(BlueToothDataCallback callback)
     {
         dataCallback = callback;
     }
 
     public boolean isDiscovering;
-
-    public boolean discoverLE;
-    public boolean discoverClassic;
-    public boolean discoverScales;
-    public boolean discoverBPMs;
     public int discoverBGJobs;
+
+    public boolean discoverLE = true;
+    public boolean discoverClassic = false;
+
     public BlueToothDiscoverCallback discoverCallback;
 
-    public void discoverBPMs(BlueToothDiscoverCallback callback)
+    public void discover(BlueToothDiscoverCallback callback)
     {
         if (isDiscovering) return;
+
         isDiscovering = true;
+        discoverCallback = callback;
 
         IntentFilter filter;
 
@@ -134,36 +139,6 @@ public class BlueTooth extends BroadcastReceiver
         context.registerReceiver(this, filter);
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         context.registerReceiver(this, filter);
-
-        discoverLE = true;
-        discoverClassic = false;
-        discoverBPMs = true;
-        discoverCallback = callback;
-
-        bta.startDiscovery();
-        isDiscovering = true;
-    }
-
-    public void discoverScales(BlueToothDiscoverCallback callback)
-    {
-        if (isDiscovering) return;
-        isDiscovering = true;
-
-        IntentFilter filter;
-
-        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        context.registerReceiver(this, filter);
-        filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
-        context.registerReceiver(this, filter);
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        context.registerReceiver(this, filter);
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        context.registerReceiver(this, filter);
-
-        discoverLE = true;
-        discoverClassic = false;
-        discoverScales = true;
-        discoverCallback = callback;
 
         bta.startDiscovery();
     }
@@ -192,9 +167,13 @@ public class BlueTooth extends BroadcastReceiver
                 }
             }
 
-            if ((--discoverBGJobs == 0) && (! isDiscovering) && (discoverCallback != null))
+            discoverBGJobs--;
+
+            if (isDiscovering && (discoverBGJobs == 0))
             {
-                discoverCallback.onDiscoverFinished();
+                isDiscovering = false;
+
+                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
             }
 
             return;
@@ -241,11 +220,11 @@ public class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onReceive: discoveryfinished");
 
-            isDiscovering = false;
-
-            if ((discoverBGJobs == 0) && (discoverCallback != null))
+            if (isDiscovering && (discoverBGJobs == 0))
             {
-                discoverCallback.onDiscoverFinished();
+                isDiscovering = false;
+
+                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
             }
 
             context.unregisterReceiver(this);
@@ -348,14 +327,9 @@ public class BlueTooth extends BroadcastReceiver
             {
                 Log.d(LOGTAG, "serv=" + service.getUuid());
 
-                if (service.getUuid().toString().equals(SCALE_SERVICE))
+                if (isCompatibleService(service))
                 {
-                    Log.d(LOGTAG,"Found scale service=" + gatt.getDevice().getName());
-                }
-
-                if (service.getUuid().toString().equals(BPM_SERVICE))
-                {
-                    Log.d(LOGTAG,"Found BPM service=" + gatt.getDevice().getName());
+                    Log.d(LOGTAG,"Found compatible service=" + gatt.getDevice().getName());
                 }
 
                 List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
@@ -371,53 +345,46 @@ public class BlueTooth extends BroadcastReceiver
                     {
                         Log.d(LOGTAG, "    descs=" + descriptor.getUuid());
 
-                        if (characteristic.getUuid().toString().equals(SCALE_CHARACTERISTIC) &&
-                                descriptor.getUuid().toString().equals(NOTIFY_DESCRIPTOR))
+                        if (isCompatiblePrimary(characteristic))
                         {
                             currentGatt = gatt;
-                            currentControl = characteristic;
+                            currentPrimary = characteristic;
 
-                            Log.d(LOGTAG,"Found compatible scale=" + gatt.getDevice().getName());
+                            Log.d(LOGTAG,"Found compatible primary=" + gatt.getDevice().getName());
 
-                            if (discoverScales && (discoverCallback != null))
+                            if (discoverCallback != null)
                             {
                                 discoverCallback.onDeviceDiscovered(gatt.getDevice());
                             }
                         }
 
-                        if (characteristic.getUuid().toString().equals(BPM_CHARACTERISTIC_MEASURE) &&
-                                descriptor.getUuid().toString().equals(NOTIFY_DESCRIPTOR))
+                        if (isCompatibleSecondary(characteristic))
                         {
                             currentGatt = gatt;
-                            currentControl = characteristic;
+                            currentSecondary = characteristic;
 
-                            Log.d(LOGTAG,"Found compatible bpm=" + gatt.getDevice().getName());
-
-                            if (discoverBPMs && (discoverCallback != null))
-                            {
-                                discoverCallback.onDeviceDiscovered(gatt.getDevice());
-                            }
-                        }
-
-                        if (characteristic.getUuid().toString().equals(BPM_CHARACTERISTIC_INTERMEDIATE) &&
-                                descriptor.getUuid().toString().equals(NOTIFY_DESCRIPTOR))
-                        {
-                            Log.d(LOGTAG,"Found intermediate bpm=" + gatt.getDevice().getName());
-
-                            currentIntermediate = characteristic;
+                            Log.d(LOGTAG,"Found compatible secondary=" + gatt.getDevice().getName());
                         }
                     }
                 }
             }
+
+            //
+            // Do not access device while discovering.
+            //
 
             if (! isDiscovering)
             {
                 enableDevice();
             }
 
-            if ((--discoverBGJobs == 0) && (! isDiscovering) && (discoverCallback != null))
+            discoverBGJobs--;
+
+            if (isDiscovering && (discoverBGJobs == 0))
             {
-                discoverCallback.onDiscoverFinished();
+                isDiscovering = false;
+
+                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
             }
         }
 
@@ -428,7 +395,7 @@ public class BlueTooth extends BroadcastReceiver
             Log.d(LOGTAG, "onCharacteristicChanged="
                     + StaticUtils.hexBytesToString(characteristic.getValue()));
 
-            boolean intermediate = (characteristic == currentIntermediate);
+            boolean intermediate = (characteristic == currentSecondary);
             parseResponse(characteristic.getValue(), intermediate);
         }
 
@@ -485,7 +452,7 @@ public class BlueTooth extends BroadcastReceiver
         // Overriden by sub class if there is anything to do.
         //
 
-        Log.d(LOGTAG,"enableDevice: " + currentControl);
+        Log.d(LOGTAG,"enableDevice: " + currentPrimary);
     }
 
     private String getDeviceTypeString(int devtype)

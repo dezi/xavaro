@@ -258,7 +258,7 @@ public class LaunchItem extends FrameLayout implements
                             if (handler == null) handler = new Handler();
                             HealthGroup.subscribeDevice(this,"bpm");
 
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtBPM));
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthBPM));
                             icon.setVisibility(VISIBLE);
                         }
 
@@ -267,7 +267,16 @@ public class LaunchItem extends FrameLayout implements
                             if (handler == null) handler = new Handler();
                             HealthGroup.subscribeDevice(this,"scale");
 
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtScale));
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthScale));
+                            icon.setVisibility(VISIBLE);
+                        }
+
+                        if (subtype.equals("sensor"))
+                        {
+                            if (handler == null) handler = new Handler();
+                            HealthGroup.subscribeDevice(this,"sensor");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthSensor));
                             icon.setVisibility(VISIBLE);
                         }
                     }
@@ -1321,7 +1330,7 @@ public class LaunchItem extends FrameLayout implements
 
         //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
 
-        BlueTooth.getInstance(context).discoverBPMs(null);
+        new BlueToothSensor(context).discover(null);
     }
 
     //region BlueTooth connect states
