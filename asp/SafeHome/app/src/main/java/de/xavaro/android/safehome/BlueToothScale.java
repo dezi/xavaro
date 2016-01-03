@@ -348,8 +348,42 @@ public class BlueToothScale extends BlueTooth
         if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 51))
         {
             cbdataPut("type", "UserList");
-            cbdataPut("actUsers", rd[ 4 ]);
-            cbdataPut("maxUsers", rd[ 5 ]);
+            cbdataPut("status", rd[ 3 ]);
+
+            if (rd.length > 5)
+            {
+                cbdataPut("actUsers", rd[ 4 ]);
+                cbdataPut("maxUsers", rd[ 5 ]);
+            }
+
+            return false;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 54))
+        {
+            cbdataPut("type", "UserInfo");
+            cbdataPut("status", rd[ 3 ]);
+
+            if (rd.length > 5)
+            {
+                char[] initialchars = new char[ 3 ];
+                initialchars[ 0 ] = (char) rd[ 4 ];
+                initialchars[ 1 ] = (char) rd[ 5 ];
+                initialchars[ 2 ] = (char) rd[ 6 ];
+
+                int[] birthDate = new int[ 3 ];
+                birthDate[ 0 ] = rd[ 7 ] + 1900;
+                birthDate[ 1 ] = rd[ 8 ];
+                birthDate[ 2 ] = rd[ 9 ];
+
+                cbdataPut("initials", new String(initialchars));
+                cbdataPut("birthDateYear", birthDate[ 0 ]);
+                cbdataPut("birthDateMonth", birthDate[ 1 ]);
+                cbdataPut("birthDateDay", birthDate[ 2 ]);
+                cbdataPut("height", unsignedByteToInt(rd[ 10 ]));
+                cbdataPut("gender", (unsignedByteToInt(rd[ 11 ]) >= 128) ? "M" : "F");
+                cbdataPut("activityIndex", unsignedByteToInt(rd[ 11 ]) & 0x7f);
+            }
 
             return false;
         }
@@ -367,7 +401,7 @@ public class BlueToothScale extends BlueTooth
             cbdataPut("type", "UserWeightAndBodyFat");
             cbdataPut("status", rd[ 3 ]);
 
-            if (rd.length >= 5)
+            if (rd.length > 5)
             {
                 cbdataPut("timeStamp", convertBytesToInt(Arrays.copyOfRange(rd, 4, 8)));
                 cbdataPut("weight", unsignedBytesToInt(rd[ 8 ], rd[ 9 ]) / 20.0d);
@@ -380,18 +414,22 @@ public class BlueToothScale extends BlueTooth
         if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 79))
         {
             cbdataPut("type", "ScaleStatusForUser");
+            cbdataPut("status", rd[ 3 ]);
 
-            cbdataPut("weightThreshold", ((float) unsignedByteToInt(rd[ 5 ])) / 10.0f);
-            cbdataPut("bodyFatThreshold", ((float) unsignedByteToInt(rd[ 6 ])) / 10.0f);
+            if (rd.length > 5)
+            {
+                cbdataPut("weightThreshold", ((float) unsignedByteToInt(rd[ 5 ])) / 10.0f);
+                cbdataPut("bodyFatThreshold", ((float) unsignedByteToInt(rd[ 6 ])) / 10.0f);
 
-            cbdataPut("batteryLevel", (float) unsignedByteToInt(rd[ 4 ]));
+                cbdataPut("batteryLevel", (float) unsignedByteToInt(rd[ 4 ]));
 
-            cbdataPut("weightUnit", unsignedByteToInt(rd[ 7 ]));
+                cbdataPut("weightUnit", unsignedByteToInt(rd[ 7 ]));
 
-            cbdataPut("userExists", (rd[ 8 ] == 0));
-            cbdataPut("referWeightExists", (rd[ 9 ] == 0));
-            cbdataPut("measurementExists", (rd[ 10 ] == 0));
-            cbdataPut("scaleVersion", unsignedByteToInt(rd[ 11 ]));
+                cbdataPut("userExists", (rd[ 8 ] == 0));
+                cbdataPut("referWeightExists", (rd[ 9 ] == 0));
+                cbdataPut("measurementExists", (rd[ 10 ] == 0));
+                cbdataPut("scaleVersion", unsignedByteToInt(rd[ 11 ]));
+            }
 
             return false;
         }
@@ -489,48 +527,6 @@ public class BlueToothScale extends BlueTooth
                         rd[ 2 ] == 78 || rd[ 2 ] == 86 ||
                         rd[ 2 ] == 53 || rd[ 2 ] == 54)
                 {
-                    if (rd[ 2 ] == 54)
-                    {
-                        char gender;
-                        int activityIndex;
-                        int[] birthDate = new int[ 3 ];
-                        char[] initials = new char[ 3 ];
-                        String initial = BuildConfig.FLAVOR;
-                        status2 = convertByteToInt(rd[ 3 ]);
-
-                        for (x = 0; x < 3; x++)
-                        {
-                            birthDate[ x ] = convertByteToInt(rd[ x + 7 ]);
-                        }
-                        birthDate[ 0 ] = birthDate[ 0 ] + 1900;
-                        if (convertByteToInt(rd[ 11 ]) >= convertByteToInt(Byte.MIN_VALUE))
-                        {
-                            gender = 'M';
-                        }
-                        else
-                        {
-                            gender = 'F';
-                        }
-                        int height = convertByteToInt(rd[ 10 ]);
-                        if (convertByteToInt(rd[ 11 ]) >= convertByteToInt(Byte.MIN_VALUE))
-                        {
-                            activityIndex = convertByteToInt(rd[ 11 ]) - convertByteToInt(Byte.MIN_VALUE);
-                        }
-                        else
-                        {
-                            activityIndex = convertByteToInt(rd[ 11 ]);
-                        }
-                        for (x = 0; x < 3; x++)
-                        {
-                            initials[ x ] = (char) rd[ x + 4 ];
-                        }
-                        initial = new String(initials);
-
-                        //this.mBleScaleCallbacks.didGetUserInfoOfInitials(initial, birthDate, height, gender, activityIndex, status2);
-
-                        return false;
-                    }
-
                     if (rd[ 2 ] == 65)
                     {
                         if (rd[ 3 ] == 0)
@@ -685,7 +681,8 @@ public class BlueToothScale extends BlueTooth
             if (what.equals("getTakeUserMeasurement"))
             {
                 //gattSchedule.add(new GattAction(getTakeUserMeasurement(0x4711)));
-                gattSchedule.add(new GattAction(getScaleStatusForUser(0x4711)));
+                //gattSchedule.add(new GattAction(getScaleStatusForUser(0x4711)));
+                gattSchedule.add(new GattAction(getUserInfo(0x4711)));
             }
         }
         catch (JSONException ex)
@@ -844,9 +841,29 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getCreateUserFromPreferences()
     {
-        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+        return getMakeUserFromPreferences(49);
 
-        Log.d(LOGTAG,"getCreateUserFromPreferences: " + sp.getString("health.scale.user.initials", null));
+    }
+
+    public byte[] getUpdateUserFromPreferences()
+    {
+        return getMakeUserFromPreferences(53);
+
+    }
+
+    public byte[] getCreateUser(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
+    {
+        return getMakeUser(49, uuid, initial, birthDate, height, gender, activityIndex);
+    }
+
+    public byte[] getUpdateUser(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
+    {
+        return getMakeUser(53, uuid, initial, birthDate, height, gender, activityIndex);
+    }
+
+    public byte[] getMakeUserFromPreferences(int command)
+    {
+        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
 
         long uuid = 0x4711;
         String initials = sp.getString("health.scale.user.initials", "");
@@ -862,15 +879,16 @@ public class BlueToothScale extends BlueTooth
         {
             birthDate[ 0 ] = Integer.parseInt(birthParts[ 0 ],10);
             birthDate[ 1 ] = Integer.parseInt(birthParts[ 1 ],10);
-            birthDate[ 2 ] = Integer.parseInt(birthParts[ 2 ],10);
+            birthDate[ 2 ] = Integer.parseInt(birthParts[ 2 ], 10);
         }
 
-        return getCreateUser(uuid, initials, birthDate, height, gender, activityIndex);
+        return getMakeUser(command, uuid, initials, birthDate, height, gender, activityIndex);
     }
 
-    public byte[] getCreateUser(long uuid, String initials, int[] birthDate, int height, char gender, int activityIndex)
+    public byte[] getMakeUser(int command, long uuid, String initials, int[] birthDate, int height, char gender, int activityIndex)
     {
-        Log.d(LOGTAG,"getCreateUserBytesData:"
+        Log.d(LOGTAG,"getMakeUser:"
+                + " command=" + command
                 + " uuid=" + uuid
                 + " initials=" + initials
                 + " birthDate=" + Arrays.toString(birthDate)
@@ -889,7 +907,7 @@ public class BlueToothScale extends BlueTooth
             data[ 0 ] = (byte) -9;
         }
 
-        data[ 1 ] = (byte) 49;
+        data[ 1 ] = (byte) command;
 
         byte[] rawUuid = convertLongToBytes(uuid);
 
@@ -1309,41 +1327,6 @@ public class BlueToothScale extends BlueTooth
         return data;
     }
 
-    public byte[] getUpdateUserBytesDate(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
-    {
-        int i;
-        Log.d(LOGTAG,"getUpdateUserBytesDate-->uuid : " + uuid + ", initial : " + initial + ", birthDate : " + Arrays.toString(birthDate) + ", height : " + height + ", gender : " + gender + ", activityIndex : " + activityIndex);
-        byte[] data = new byte[ 18 ];
-        byte[] rawUuid = convertLongToBytes(uuid);
-        byte rawGender = (byte) (((byte) (gender == 'M' ? 128 : 0)) + activityIndex);
-        char[] rawInitial = initial.toCharArray();
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-        data[ 1 ] = (byte) 53;
-        for (i = 0; i < 8; i++)
-        {
-            data[ i + 2 ] = rawUuid[ i ];
-        }
-        for (i = 0; i < rawInitial.length; i++)
-        {
-            data[ i + 10 ] = (byte) rawInitial[ i ];
-        }
-        birthDate[ 0 ] = birthDate[ 0 ] - 1900;
-        for (i = 0; i < 3; i++)
-        {
-            data[ i + 13 ] = (byte) birthDate[ i ];
-        }
-        data[ 16 ] = (byte) height;
-        data[ 17 ] = rawGender;
-        return data;
-    }
-
     public byte[] getScaleSleepStatus()
     {
         Log.d(LOGTAG, "getScaleSleepStatus");
@@ -1367,8 +1350,9 @@ public class BlueToothScale extends BlueTooth
     public byte[] getUserInfo(long uuid)
     {
         Log.d(LOGTAG,"getUserInfo-->uuid : " + uuid);
+
         byte[] data = new byte[ 10 ];
-        byte[] rawUuid = convertLongToBytes(uuid);
+
         if (isCompatibleDevice())
         {
             data[ 0 ] = (byte) -25;
@@ -1380,10 +1364,13 @@ public class BlueToothScale extends BlueTooth
 
         data[ 1 ] = (byte) 54;
 
+        byte[] rawUuid = convertLongToBytes(uuid);
+
         for (int i = 0; i < 8; i++)
         {
             data[ i + 2 ] = rawUuid[ i ];
         }
+
         return data;
     }
 
