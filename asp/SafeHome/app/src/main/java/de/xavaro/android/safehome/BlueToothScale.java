@@ -159,30 +159,6 @@ public class BlueToothScale extends BlueTooth
         }
     }
 
-    private int mMaximumUsers;
-    private byte waterByte;
-    private int didFinishMeasurementStatus;
-
-    // @formatter:off
-    private long[]   rawListOfUuids        = new long  [  8 ];
-    private String[] rawUserListInitials   = new String[  8 ];
-    // @formatter:on
-
-    // @formatter:off
-
-    private int[]    rawAmrArray           = new int   [ 50 ];
-    private float[]  rawBmiArray           = new float [ 50 ];
-    private int[]    rawBmrArray           = new int   [ 50 ];
-    private float[]  rawBodyFatArray       = new float [ 50 ];
-    private float[]  rawBoneMassArray      = new float [ 50 ];
-    private int[]    rawImpedanceArray     = new int   [ 50 ];
-    private int[]    rawMeasurementIdArray = new int   [ 50 ];
-    private float[]  rawMuscleArray        = new float [ 50 ];
-    private int[]    rawTimeStampArray     = new int   [ 50 ];
-    private float[]  rawWaterArray         = new float [ 50 ];
-    private double[] rawWeightArray        = new double[ 50 ];
-    // @formatter:on
-
     public boolean parseData(byte[] rd)
     {
         Log.d(LOGTAG, "parseData: " + rd[ 0 ] + " " + rd[ 1 ]);
@@ -552,7 +528,7 @@ public class BlueToothScale extends BlueTooth
                 System.arraycopy(rd, 5, rawUuid, 0, 8);
 
                 cbtempPut("Uuid", convertBytesToLong(rawUuid));
-                cbtempPut("finished", convertByteToInt(rd[ 4 ]));
+                cbtempPut("finished", unsignedByteToInt(rd[ 4 ]));
 
                 Log.d(LOGTAG, "parseData: LiveMeasurementOnTimestamp part 1");
             }
@@ -666,15 +642,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+	    data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 79;
 
         byte[] uuidInBytes = convertLongToBytes(uuid);
@@ -688,48 +656,9 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -20;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -4;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -20 : -4);
         data[ 1 ] = (byte) 2;
 
-        return data;
-    }
-
-    public byte[] getSlowAdvertisement(boolean isSet, int interval)
-    {
-        Log.d(LOGTAG,"getSlowAdvertisement-->isSet : " + isSet + ", interval : " + interval);
-        byte[] data = new byte[ 2 ];
-        if (isSet)
-        {
-            if (isCompatibleDevice())
-            {
-                data[ 0 ] = (byte) -19;
-                data[ 1 ] = (byte) interval;
-            }
-            else
-            {
-                data[ 0 ] = (byte) -3;
-                data[ 1 ] = (byte) interval;
-            }
-        }
-        else
-            if (isCompatibleDevice())
-            {
-                data[ 0 ] = (byte) -18;
-                data[ 1 ] = (byte) 2;
-            }
-            else
-            {
-                data[ 0 ] = (byte) -2;
-                data[ 1 ] = (byte) 2;
-            }
         return data;
     }
 
@@ -739,15 +668,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 0;
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
@@ -814,31 +735,24 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 18 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) command;
 
-        byte[] rawUuid = convertLongToBytes(uuid);
-
-        System.arraycopy(rawUuid, 0, data, 2, 8);
+        System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
 
         while (initials.length() < 3) initials += " ";
-        char[] rawInitial = initials.toCharArray();
+        char[] rawInitials = initials.toCharArray();
 
-        data[ 10 ] = (byte) rawInitial[ 0 ];
-        data[ 11 ] = (byte) rawInitial[ 1 ];
-        data[ 12 ] = (byte) rawInitial[ 2 ];
+        data[ 10 ] = (byte) rawInitials[ 0 ];
+        data[ 11 ] = (byte) rawInitials[ 1 ];
+        data[ 12 ] = (byte) rawInitials[ 2 ];
+
         data[ 13 ] = (byte) (birthDate[ 0 ] - 1900);
         data[ 14 ] = (byte) birthDate[ 1 ];
         data[ 15 ] = (byte) birthDate[ 2 ];
+
         data[ 16 ] = (byte) height;
+
         data[ 17 ] = (byte) ((gender == 'M' ? 128 : 0) + activityIndex);
 
         return data;
@@ -850,17 +764,9 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 50;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 50;
-        }
-        
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
+        data[ 1 ] = (byte) 50;
+
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
         
         return data;
@@ -872,15 +778,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 64;
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
@@ -894,15 +792,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 51;
 
         return data;
@@ -914,15 +804,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 65;
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
@@ -936,15 +818,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 67;
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
@@ -954,24 +828,15 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getSetUserWeight(long uuid, float weight, float bodyFat, long timeStamp)
     {
-        int i;
         Log.d(LOGTAG,"getSetUserWeight-->uuid : " + uuid + ", weight : " + weight + ", bodyFat : " + bodyFat + ", timeStamp : " + timeStamp);
+
         byte[] data = new byte[ 18 ];
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 68;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 68;
-        }
-        byte[] rawUuid = convertLongToBytes(uuid);
-        for (i = 0; i < 8; i++)
-        {
-            data[ i + 2 ] = rawUuid[ i ];
-        }
+
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
+        data[ 1 ] = (byte) 68;
+
+        System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
+
         weight *= 20.0f;
         data[ 10 ] = (byte) ((int) (weight / 256.0f));
         data[ 11 ] = (byte) ((int) weight);
@@ -979,7 +844,7 @@ public class BlueToothScale extends BlueTooth
         data[ 12 ] = (byte) ((int) (bodyFat / 256.0f));
         data[ 13 ] = (byte) ((int) bodyFat);
         int timeStampInSeconds = getTimeStampInSeconds(timeStamp);
-        for (i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             data[ i + 14 ] = (byte) (timeStampInSeconds >> ((3 - i) * 8));
         }
@@ -991,15 +856,7 @@ public class BlueToothScale extends BlueTooth
         Log.d(LOGTAG,"getUserWeightAndBodyFat-->uuid : " + uuid);
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 69;
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
@@ -1012,15 +869,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 70;
 
         return data;
@@ -1029,17 +878,12 @@ public class BlueToothScale extends BlueTooth
     public byte[] getSaveAsUnknownMeasurementWithtimestamp(int timeStamp, float weight, int impedance)
     {
         Log.d(LOGTAG,"getSaveAsUnknownMeasurementWithtimestamp-->timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance);
+
         byte[] data = new byte[ 10 ];
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 72;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 72;
-        }
+
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
+        data[ 1 ] = (byte) 72;
+
         for (int i = 0; i < 4; i++)
         {
             data[ i + 2 ] = (byte) (timeStamp >> ((3 - i) * 8));
@@ -1055,51 +899,42 @@ public class BlueToothScale extends BlueTooth
     public byte[] getDeleteUnknownMeasurement(int measurementId)
     {
         Log.d(LOGTAG,"getDeleteUnknownMeasurement-->measurementId : " + measurementId);
+
         byte[] data = new byte[ 3 ];
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 73;
-            data[ 2 ] = (byte) measurementId;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 73;
-            data[ 2 ] = (byte) measurementId;
-        }
+
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
+        data[ 1 ] = (byte) 73;
+        data[ 2 ] = (byte) measurementId;
+
         return data;
     }
 
-    public byte[] getTakeGuestMeasurementWithInitials(String initial, int[] birthDate, int height, char gender, int activityIndex, int unit)
+    public byte[] getTakeGuestMeasurementWithInitials(String initials, int[] birthDate, int height, char gender, int activityIndex, int unit)
     {
-        int i;
-        Log.d(LOGTAG,"getTakeGuestMeasurementWithInitials-->initial : " + initial + ", birthDate : " + Arrays.toString(birthDate) + ", height : " + height + ", gender : " + gender + ", activityIndex : " + activityIndex + ", unit : " + unit);
+        Log.d(LOGTAG,"getTakeGuestMeasurementWithInitials-->initial : " + initials + ", birthDate : " + Arrays.toString(birthDate) + ", height : " + height + ", gender : " + gender + ", activityIndex : " + activityIndex + ", unit : " + unit);
+
         byte[] data = new byte[ 11 ];
-        byte rawGender = (byte) (((byte) (gender == 'M' ? 128 : 0)) + activityIndex);
-        char[] rawInitial = initial.toCharArray();
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 74;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 74;
-        }
-        for (i = 0; i < 3; i++)
-        {
-            data[ i + 2 ] = (byte) rawInitial[ i ];
-        }
-        birthDate[ 0 ] = birthDate[ 0 ] - 1900;
-        for (i = 0; i < 3; i++)
-        {
-            data[ i + 5 ] = (byte) birthDate[ i ];
-        }
+
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
+        data[ 1 ] = (byte) 74;
+
+        while (initials.length() < 3) initials += " ";
+        char[] rawInitials = initials.toCharArray();
+
+        data[ 2 ] = (byte) rawInitials[ 0 ];
+        data[ 3 ] = (byte) rawInitials[ 1 ];
+        data[ 4 ] = (byte) rawInitials[ 2 ];
+
+        data[ 5 ] = (byte) (birthDate[ 0 ] - 1900);
+        data[ 6 ] = (byte) birthDate[ 1 ];
+        data[ 7 ] = (byte) birthDate[ 2 ];
+
         data[ 8 ] = (byte) height;
-        data[ 9 ] = rawGender;
+
+        data[ 9 ] = (byte) ((gender == 'M' ? 128 : 0) + activityIndex);
+
         data[ 10 ] = (byte) unit;
+
         return data;
     }
 
@@ -1109,67 +944,11 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 5 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -23;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -7;
-        }
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -23 : -7);
 
         byte[] rawTimeStamp = convertIntToBytes(getTimeStampInSeconds(new Date().getTime()));
         System.arraycopy(rawTimeStamp, 0, data, 1, 4);
 
-        return data;
-    }
-
-    public byte[] getAssignMeasurementToUser(long uuid, int timeStamp, float weight, int impedance, int measurementId)
-    {
-        byte[] rawUuid;
-        int i;
-        Log.d(LOGTAG,"getAssignMeasurementToUser-->uuid : " + uuid + ", timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance + ", measurementId : " + measurementId);
-        byte[] data = new byte[ 19 ];
-
-        if (!isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 75;
-            rawUuid = convertLongToBytes(uuid);
-            for (i = 0; i < 8; i++)
-            {
-                data[ i + 2 ] = rawUuid[ i ];
-            }
-            for (i = 0; i < 4; i++)
-            {
-                data[ i + 10 ] = (byte) (timeStamp >> ((3 - i) * 8));
-            }
-            weight *= 20.0f;
-            data[ 14 ] = (byte) ((int) (weight / 256.0f));
-            data[ 15 ] = (byte) ((int) weight);
-            data[ 16 ] = (byte) (impedance / 256);
-            data[ 17 ] = (byte) impedance;
-            data[ 18 ] = (byte) measurementId;
-            return data;
-        }
-
-        data[ 0 ] = (byte) -25;
-        data[ 1 ] = (byte) 75;
-        rawUuid = convertLongToBytes(uuid);
-        for (i = 0; i < 8; i++)
-        {
-            data[ i + 2 ] = rawUuid[ i ];
-        }
-        for (i = 0; i < 4; i++)
-        {
-            data[ i + 10 ] = (byte) (timeStamp >> ((3 - i) * 8));
-        }
-        weight *= 20.0f;
-        data[ 14 ] = (byte) ((int) (weight / 256.0f));
-        data[ 15 ] = (byte) ((int) weight);
-        data[ 16 ] = (byte) (impedance / 256);
-        data[ 17 ] = (byte) impedance;
-        data[ 18 ] = (byte) measurementId;
         return data;
     }
 
@@ -1195,58 +974,15 @@ public class BlueToothScale extends BlueTooth
     public byte[] getSetReferDefinitionToWeightThreshold(float weightThreshold, float bodyFatThreshold)
     {
         Log.d(LOGTAG,"getSetReferDefinitionToWeightThreshold-->weightThreshold : " + weightThreshold + ", bodyFatThreshold : " + bodyFatThreshold);
+
         byte[] data = new byte[ 4 ];
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
+
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 78;
-        data[ 2 ] = (byte) ((int) (weightThreshold * 10.0f));
-        data[ 3 ] = (byte) ((int) (bodyFatThreshold * 10.0f));
-        return data;
-    }
 
-    public byte[] getChangeUserFromOldUUID(long oldUuid, long newUuid)
-    {
-        byte[] rawOldUuid;
-        int i;
-        byte[] rawNewUuid;
-        Log.d(LOGTAG,"getChangeUserFromOldUUID-->oldUuid : " + oldUuid + ", newUuid : " + newUuid);
-        byte[] data = new byte[ 18 ];
+        data[ 2 ] = (byte) (weightThreshold * 10.0f);
+        data[ 3 ] = (byte) (bodyFatThreshold * 10.0f);
 
-        if (! isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 86;
-            rawOldUuid = convertLongToBytes(oldUuid);
-            for (i = 0; i < 8; i++)
-            {
-                data[ i + 2 ] = rawOldUuid[ i ];
-            }
-            rawNewUuid = convertLongToBytes(newUuid);
-            for (i = 0; i < 8; i++)
-            {
-                data[ i + 10 ] = rawNewUuid[ i ];
-            }
-            return data;
-        }
-
-        data[ 0 ] = (byte) -25;
-        data[ 1 ] = (byte) 86;
-        rawOldUuid = convertLongToBytes(oldUuid);
-        for (i = 0; i < 8; i++)
-        {
-            data[ i + 2 ] = rawOldUuid[ i ];
-        }
-        rawNewUuid = convertLongToBytes(newUuid);
-        for (i = 0; i < 8; i++)
-        {
-            data[ i + 10 ] = rawNewUuid[ i ];
-        }
         return data;
     }
 
@@ -1256,15 +992,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -16;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -32;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -16 : -32);
         data[ 1 ] = (byte) 2;
 
         return data;
@@ -1276,15 +1004,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 10 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 54;
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
@@ -1298,15 +1018,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -14;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -30;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -14 : -30);
         data[ 1 ] = (byte) 2;
 
         return data;
@@ -1318,15 +1030,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -15;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -31;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -15 : -31);
         data[ 1 ] = (byte) 2;
 
         return data;
@@ -1338,15 +1042,7 @@ public class BlueToothScale extends BlueTooth
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -22;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -6;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -22 : -6);
         data[ 1 ] = (byte) 2;
 
         return data;
@@ -1356,15 +1052,7 @@ public class BlueToothScale extends BlueTooth
     {
         byte[] data = new byte[ 5 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) -15;
         data[ 2 ] = resp[ 1 ];
         data[ 3 ] = resp[ 2 ];
@@ -1405,11 +1093,6 @@ public class BlueToothScale extends BlueTooth
         buffer.put(data);
         buffer.flip();
         return buffer.getInt();
-    }
-
-    public static int convertByteToInt(byte data)
-    {
-        return data & 0xff;
     }
 
     public static long getTimeStampInMilliSeconds(int timeStampInSeconds)
