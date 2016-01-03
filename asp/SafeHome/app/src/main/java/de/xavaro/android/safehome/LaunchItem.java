@@ -1356,9 +1356,9 @@ public class LaunchItem extends FrameLayout implements
         }
     };
 
-    public void onBluetoothConnect(BluetoothDevice device)
+    public void onBluetoothConnect(String deviceName)
     {
-        Log.d(LOGTAG, "onBluetoothConnect: " + device.getName());
+        Log.d(LOGTAG, "onBluetoothConnect: " + deviceName);
 
         //
         // Post delayed in case of sleeping devices with
@@ -1368,14 +1368,14 @@ public class LaunchItem extends FrameLayout implements
         handler.postDelayed(bluetoothIsConnected, 2000);
     }
 
-    public void onBluetoothActive(BluetoothDevice device)
+    public void onBluetoothEnabled(String deviceName)
     {
-        Log.d(LOGTAG, "onBluetoothActive: " + device.getName());
+        Log.d(LOGTAG, "onBluetoothEnabled: " + deviceName);
     }
 
-    public void onBluetoothDisconnect(BluetoothDevice device)
+    public void onBluetoothDisconnect(String deviceName)
     {
-        Log.d(LOGTAG,"onBluetoothDisconnect: " + device.getName());
+        Log.d(LOGTAG,"onBluetoothDisconnect: " + deviceName);
 
         handler.removeCallbacks(bluetoothIsConnected);
         handler.post(bluetoothIsDisconnected);

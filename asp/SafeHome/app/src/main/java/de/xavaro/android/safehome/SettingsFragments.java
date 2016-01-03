@@ -433,6 +433,7 @@ public class SettingsFragments
 
             NicePreferenceCategory pc;
             NiceListPreference lp;
+            CheckBoxPreference cb;
 
             //
             // User.
@@ -455,6 +456,23 @@ public class SettingsFragments
             lp.setEnabled(enabled);
 
             preferences.add(lp);
+
+            cb = new CheckBoxPreference(context);
+
+            cb.setKey(keyprefix + ".anyuser");
+            cb.setTitle("Jeden Gerätebenutzer akzeptieren");
+            cb.setEnabled(enabled);
+
+            cb.setSummary("Das Blutdruckmessgerät erlaubt eine Auswahl von Benutzer 1 - 4. "
+                    + "Erfahrungsgemäß wird der Benutzer im Blutdruck-Messgerät "
+                    + "versehentlich vom Anwender verstellt. Das führt zu Unmut bei "
+                    + "der Messung, wenn der Messvorgang nicht aufgezeichnet wird. "
+                    + "Mit dieser Option akzeptiert das Vitalsystem jeden Benutzer auf "
+                    + "dem Gerät, der misst und ordnet die Messsung automatisch dem "
+                    + "hiesigen Anwender zu.");
+
+            preferences.add(cb);
+
         }
     }
 
@@ -585,6 +603,16 @@ public class SettingsFragments
             np.setMinMaxValue(1000, 5000);
             np.setDefaultValue(2000);
             np.setTitle("Kalorien pro Tag verbrauchen");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            np = new NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".goals.sleephours");
+            np.setMinMaxValue(4,10);
+            np.setDefaultValue(8);
+            np.setTitle("Stunden pro Tag schlafen");
             np.setEnabled(enabled);
 
             preferences.add(np);

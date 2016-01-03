@@ -62,6 +62,11 @@ public class BlueToothBPM extends BlueTooth
     }
 
     @Override
+    protected void connectedDevice()
+    {
+    }
+
+    @Override
     protected void enableDevice()
     {
         Log.d(LOGTAG,"enableDevice: " + currentPrimary);
@@ -96,15 +101,6 @@ public class BlueToothBPM extends BlueTooth
             gattSchedule.add(ga);
 
             fireNext();
-        }
-
-        if (connectCallback != null)
-        {
-            //
-            // BPM equippment ist active when it is connected.
-            //
-
-            connectCallback.onBluetoothActive(currentGatt.getDevice());
         }
     }
 
@@ -154,12 +150,17 @@ public class BlueToothBPM extends BlueTooth
             JSONObject data = new JSONObject();
             data.put("bpm", bpmdata);
 
-            if (dataCallback != null) dataCallback.onBluetoothReceivedData(currentGatt.getDevice(), data);
+            if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
         }
         catch (JSONException ex)
         {
             OopsService.log(LOGTAG, ex);
         }
+    }
+
+    @Override
+    public void sendCommand(JSONObject command)
+    {
     }
 
     private String getMaskString(int mask)

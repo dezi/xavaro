@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("WeakerAccess")
-public class BlueTooth extends BroadcastReceiver
+public abstract class BlueTooth extends BroadcastReceiver
 {
     private static final String LOGTAG = BlueTooth.class.getSimpleName();
 
     protected final Context context;
     protected final BluetoothAdapter bta;
 
-    protected String modelName;
+    protected String deviceName;
     protected String macAddress;
 
     protected BluetoothGatt currentGatt;
@@ -63,7 +63,7 @@ public class BlueTooth extends BroadcastReceiver
         {
             String[] parts = deviceTag.split(" => ");
 
-            modelName = parts[ 0 ];
+            deviceName = parts[ 0 ];
 
             if (parts.length == 2)
             {
@@ -76,7 +76,7 @@ public class BlueTooth extends BroadcastReceiver
     {
         BluetoothDevice device = bta.getRemoteDevice(this.macAddress);
 
-        Log.d(LOGTAG,"connect: device=" + device.getName() + " => " + device.getAddress());
+        Log.d(LOGTAG,"connect: device=" + deviceName + " => " + device.getAddress());
 
         currentGatt = device.connectGatt(context, true, gattCallback);
     }
@@ -87,34 +87,21 @@ public class BlueTooth extends BroadcastReceiver
 
         if (currentConnectState)
         {
-            connectCallback.onBluetoothConnect(currentGatt.getDevice());
+            connectCallback.onBluetoothConnect(deviceName);
         }
-    }
-
-    protected boolean isCompatibleDevice(String devicename)
-    {
-        return false;
-    }
-
-    protected boolean isCompatibleService(BluetoothGattService service)
-    {
-        return false;
-    }
-
-    protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
-    {
-        return false;
-    }
-
-    protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
-    {
-        return false;
     }
 
     public void setDataCallback(BlueToothDataCallback callback)
     {
         dataCallback = callback;
     }
+
+    protected abstract boolean isCompatibleDevice(String devicename);
+    protected abstract boolean isCompatibleService(BluetoothGattService service);
+    protected abstract boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic);
+    protected abstract boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
+
+    //region Device discovery
 
     public boolean isDiscovering;
     public int discoverBGJobs;
@@ -233,6 +220,8 @@ public class BlueTooth extends BroadcastReceiver
         }
     }
 
+    //endregion Device discovery
+
     protected class GattAction
     {
         public GattAction()
@@ -340,7 +329,7 @@ public class BlueTooth extends BroadcastReceiver
         {
             Log.i(LOGTAG, "onConnectionStateChange [" + newState + "]");
 
-            String devicetag = gatt.getDevice().getName() + " => " + gatt.getDevice().getAddress();
+            String devicetag = deviceName + " => " + gatt.getDevice().getAddress();
 
             if (newState == BluetoothProfile.STATE_CONNECTED)
             {
@@ -350,7 +339,7 @@ public class BlueTooth extends BroadcastReceiver
 
                 gatt.discoverServices();
 
-                if (connectCallback != null) connectCallback.onBluetoothConnect(gatt.getDevice());
+                if (connectCallback != null) connectCallback.onBluetoothConnect(deviceName);
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)
@@ -359,7 +348,7 @@ public class BlueTooth extends BroadcastReceiver
 
                 currentConnectState = false;
 
-                if (connectCallback != null) connectCallback.onBluetoothDisconnect(gatt.getDevice());
+                if (connectCallback != null) connectCallback.onBluetoothDisconnect(deviceName);
             }
         }
 
@@ -376,7 +365,7 @@ public class BlueTooth extends BroadcastReceiver
 
                 if (isCompatibleService(service))
                 {
-                    Log.d(LOGTAG,"Found compatible service=" + gatt.getDevice().getName());
+                    Log.d(LOGTAG,"Found compatible service=" + deviceName);
                 }
 
                 List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
@@ -397,7 +386,7 @@ public class BlueTooth extends BroadcastReceiver
                             currentGatt = gatt;
                             currentPrimary = characteristic;
 
-                            Log.d(LOGTAG,"Found compatible primary=" + gatt.getDevice().getName());
+                            Log.d(LOGTAG,"Found compatible primary=" + deviceName);
 
                             if (discoverCallback != null)
                             {
@@ -410,7 +399,7 @@ public class BlueTooth extends BroadcastReceiver
                             currentGatt = gatt;
                             currentSecondary = characteristic;
 
-                            Log.d(LOGTAG,"Found compatible secondary=" + gatt.getDevice().getName());
+                            Log.d(LOGTAG,"Found compatible secondary=" + deviceName);
                         }
                     }
                 }
@@ -420,7 +409,7 @@ public class BlueTooth extends BroadcastReceiver
             // Do not access device while discovering.
             //
 
-            if (! isDiscovering)
+            if ((! isDiscovering) && (currentPrimary != null))
             {
                 enableDevice();
             }
@@ -503,26 +492,27 @@ public class BlueTooth extends BroadcastReceiver
         currentGatt = currentGatt.getDevice().connectGatt(context, true, gattCallback);
     }
 
-    @SuppressWarnings("UnusedParameters")
-    protected void parseResponse(byte[] rd, boolean intermediate)
-    {
-        Log.d(LOGTAG,"parseResponse: Please implement this method in derived class.");
-    }
+    //
+    // This method is called as soon, as the device is connected
+    // to the gatt service. This allows the subclass to fire an early
+    // connection callback as we like a fast haptic feedback to
+    // the user when he activates a device. Method must also
+    // set the connect state.
+    //
+    protected abstract void connectedDevice();
 
-    @SuppressWarnings("UnusedParameters")
-    public void sendCommand(JSONObject command)
-    {
-        Log.d(LOGTAG,"sendCommand: Please implement this method in derived class.");
-    }
+    //
+    // This method is called when the services have been discovered
+    // and the device is about to be enabled. Used to initialize
+    // notifiers and other stuff and also to fire a late connection
+    // callback, if enabling the device is successful. Method must also
+    // set the connect state.
+    //
+    protected abstract void enableDevice();
 
-    protected void enableDevice()
-    {
-        //
-        // Overriden by sub class if there is anything to do.
-        //
+    protected abstract void parseResponse(byte[] rd, boolean intermediate);
 
-        Log.d(LOGTAG,"enableDevice: " + currentPrimary);
-    }
+    public abstract void sendCommand(JSONObject command);
 
     private String getDeviceTypeString(int devtype)
     {
@@ -555,20 +545,20 @@ public class BlueTooth extends BroadcastReceiver
     public interface BlueToothDiscoverCallback
     {
         void onDiscoverStarted();
-        void onDiscoverFinished();
         void onDeviceDiscovered(BluetoothDevice device);
+        void onDiscoverFinished();
     }
 
     public interface BlueToothConnectCallback
     {
-        void onBluetoothConnect(BluetoothDevice device);
-        void onBluetoothActive(BluetoothDevice device);
-        void onBluetoothDisconnect(BluetoothDevice device);
+        void onBluetoothConnect(String deviceName);
+        void onBluetoothEnabled(String deviceName);
+        void onBluetoothDisconnect(String deviceName);
     }
 
     public interface BlueToothDataCallback
     {
-        void onBluetoothReceivedData(BluetoothDevice device, JSONObject data);
+        void onBluetoothReceivedData(String deviceName, JSONObject data);
     }
 
     //region Conversion helper
@@ -610,16 +600,58 @@ public class BlueTooth extends BroadcastReceiver
 
     protected long convertBytesToLong(byte[] data)
     {
-        if (data.length != 8)
-        {
-            return 0;
-        }
+        if (data.length != 8)  return 0;
 
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.put(data);
         buffer.flip();
 
         return buffer.getLong();
+    }
+
+    public byte[] convertLongToBytes(long value)
+    {
+        byte[] data = new byte[ 8 ];
+
+        for (int i = 0; i < 8; i++)
+        {
+            data[ i ] = (byte) ((int) (value >> ((7 - i) * 8)));
+        }
+
+        return data;
+    }
+
+    public byte[] convertIntToBytes(int value)
+    {
+        byte[] data = new byte[ 8 ];
+
+        for (int i = 0; i < 4; i++)
+        {
+            data[ i ] = (byte) (value >> ((3 - i) * 8));
+        }
+
+        return data;
+    }
+
+    public static int convertBytesToInt(byte[] data)
+    {
+        if (data.length != 4) return 0;
+
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.put(data);
+        buffer.flip();
+
+        return buffer.getInt();
+    }
+
+    public static long getTimeStampInMilliSeconds(int timeStampInSeconds)
+    {
+        return ((long) timeStampInSeconds) * 1000;
+    }
+
+    public static int getTimeStampInSeconds(long timeStampInMilliSeconds)
+    {
+        return (int) (timeStampInMilliSeconds / 1000);
     }
 
     //endregion Conversion helper

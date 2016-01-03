@@ -52,6 +52,17 @@ public class BlueToothSensor extends BlueTooth
     }
 
     @Override
+    protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
+    }
+
+    @Override
+    protected void connectedDevice()
+    {
+    }
+
+    @Override
     protected void enableDevice()
     {
         Log.d(LOGTAG,"enableDevice: " + currentPrimary);
@@ -98,7 +109,7 @@ public class BlueToothSensor extends BlueTooth
             JSONObject data = new JSONObject();
             data.put("sensor", bpmdata);
 
-            if (dataCallback != null) dataCallback.onBluetoothReceivedData(currentGatt.getDevice(), data);
+            if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
         }
         catch (JSONException ex)
         {
@@ -172,6 +183,11 @@ public class BlueToothSensor extends BlueTooth
         data[ 15 ] = (byte) 1;
 
         return data;
+    }
+
+    @Override
+    public void sendCommand(JSONObject command)
+    {
     }
 
     public byte[] getSetAlaram(boolean isON, Date alarmTime)

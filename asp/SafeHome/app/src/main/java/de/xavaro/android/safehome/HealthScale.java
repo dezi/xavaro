@@ -41,7 +41,7 @@ public class HealthScale implements BlueTooth.BlueToothDataCallback
         blueTooth.setConnectCallback(subscriber);
     }
 
-    public void onBluetoothReceivedData(BluetoothDevice device, JSONObject data)
+    public void onBluetoothReceivedData(String deviceName, JSONObject data)
     {
         Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
 
@@ -68,7 +68,8 @@ public class HealthScale implements BlueTooth.BlueToothDataCallback
             if (type.equals("RemoteTimeStamp"))
             {
                 //
-                // Scale time has now been set.
+                // Scale time has now been set proceed with
+                // setting the scale to our user.
                 //
 
                 command.put("command", "getTakeUserMeasurement");

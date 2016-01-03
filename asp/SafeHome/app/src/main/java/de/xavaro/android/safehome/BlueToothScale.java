@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -56,6 +55,17 @@ public class BlueToothScale extends BlueTooth
     protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
         return characteristic.getUuid().toString().equals("0000ffe1-0000-1000-8000-00805f9b34fb");
+    }
+
+    @Override
+    protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
+    }
+
+    @Override
+    protected void connectedDevice()
+    {
     }
 
     @Override
@@ -148,7 +158,7 @@ public class BlueToothScale extends BlueTooth
                     JSONObject data = new JSONObject();
                     data.put("scale", cbdata);
 
-                    dataCallback.onBluetoothReceivedData(currentGatt.getDevice(), data);
+                    dataCallback.onBluetoothReceivedData(deviceName, data);
                 }
             }
             catch (JSONException ignore)
@@ -188,15 +198,6 @@ public class BlueToothScale extends BlueTooth
                 forceDisconnect();
 
                 return false;
-            }
-
-            if (connectCallback != null)
-            {
-                //
-                // Scale equippment ist active, when it does not sleep.
-                //
-
-                connectCallback.onBluetoothActive(currentGatt.getDevice());
             }
 
             //
@@ -616,7 +617,7 @@ public class BlueToothScale extends BlueTooth
 
     private boolean isCompatibleDevice()
     {
-        return isCompatibleDevice(this.modelName);
+        return isCompatibleDevice(this.deviceName);
     }
 
     //region Command builders
@@ -1035,56 +1036,4 @@ public class BlueToothScale extends BlueTooth
 
         return data;
     }
-
-    //region Conversion helper
-
-    public byte[] convertLongToBytes(long value)
-    {
-        byte[] data = new byte[ 8 ];
-
-        for (int i = 0; i < 8; i++)
-        {
-            data[ i ] = (byte) ((int) (value >> ((7 - i) * 8)));
-        }
-
-        return data;
-    }
-
-    public byte[] convertIntToBytes(int value)
-    {
-        byte[] data = new byte[ 8 ];
-
-        for (int i = 0; i < 4; i++)
-        {
-            data[ i ] = (byte) (value >> ((3 - i) * 8));
-        }
-
-        return data;
-    }
-
-    public static int convertBytesToInt(byte[] data)
-    {
-        if (data.length != 4)
-        {
-            return 0;
-        }
-
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.put(data);
-        buffer.flip();
-
-        return buffer.getInt();
-    }
-
-    public static long getTimeStampInMilliSeconds(int timeStampInSeconds)
-    {
-        return ((long) timeStampInSeconds) * 1000;
-    }
-
-    public static int getTimeStampInSeconds(long timeStampInMilliSeconds)
-    {
-        return (int) (timeStampInMilliSeconds / 1000);
-    }
-
-    //endregion Conversion helper
 }
