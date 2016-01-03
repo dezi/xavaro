@@ -127,6 +127,7 @@ public class GlobalConfigs
     public static final int IconResHealthBPM          = R.drawable.health_bpm_256x256;
     public static final int IconResHealthScale        = R.drawable.health_scale_280x280;
     public static final int IconResHealthSensor       = R.drawable.health_sensor_256x256;
+    public static final int IconResHealthGlucose      = R.drawable.health_glucose_512x512;
     public static final int IconResBlueTooth          = R.drawable.bluetooth_256x256;
     // @formatter:on
 

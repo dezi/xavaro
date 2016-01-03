@@ -226,7 +226,6 @@ public class SettingsFragments
             NiceListPreference lp;
             NiceDatePreference dp;
             NiceNumberPreference np;
-            NiceEditTextPreference ep;
 
             //
             // Personal user data required for calculations.
@@ -263,7 +262,19 @@ public class SettingsFragments
             np.setKey(keyprefix + ".user.size");
             np.setUnit("cm");
             np.setMinMaxValue(100, 250);
+            np.setDefaultValue(170);
             np.setTitle("Größe");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            np = new NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".user.weight");
+            np.setUnit("kg");
+            np.setMinMaxValue(40, 250);
+            np.setDefaultValue(75);
+            np.setTitle("Gewicht");
             np.setEnabled(enabled);
 
             preferences.add(np);
@@ -271,12 +282,12 @@ public class SettingsFragments
             lp = new NiceListPreference(context);
 
             String[] userActivityText = { "Nicht aktiv", "Leicht aktiv", "Moderat aktiv", "Sehr aktiv", "Besonders aktiv"  };
-            String[] userActivityVals = { "sa", "la", "ma", "va", "ea" };
+            String[] userActivityVals = { "0", "1", "2", "3", "4" };
 
             lp.setKey(keyprefix + ".user.activity");
             lp.setEntries(userActivityText);
             lp.setEntryValues(userActivityVals);
-            lp.setDefaultValue("ma");
+            lp.setDefaultValue("2");
             lp.setTitle("Aktivität");
             lp.setEnabled(enabled);
 
@@ -313,11 +324,7 @@ public class SettingsFragments
         @Override
         public void registerAll(Context context)
         {
-            NicePreferenceCategory pc;
             NiceListPreference lp;
-            NiceDatePreference dp;
-            NiceNumberPreference np;
-            NiceEditTextPreference ep;
 
             lp = new NiceListPreference(context);
 
@@ -385,6 +392,8 @@ public class SettingsFragments
             preferences.add(lp);
         }
     }
+
+    //endregion Health Units preferences
 
     //region Health BPM preferences
 
@@ -488,9 +497,6 @@ public class SettingsFragments
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
 
             NicePreferenceCategory pc;
-            NiceListPreference lp;
-            NiceDatePreference dp;
-            NiceNumberPreference np;
             NiceEditTextPreference ep;
 
             //
@@ -505,6 +511,7 @@ public class SettingsFragments
 
             ep.setKey(keyprefix + ".user.initials");
             ep.setTitle("Waagenbenutzer Initialen");
+            ep.setDefaultValue("XXX");
             ep.setIsUppercase();
             ep.setEnabled(enabled);
 
@@ -552,9 +559,7 @@ public class SettingsFragments
 
             NicePreferenceCategory pc;
             NiceListPreference lp;
-            NiceDatePreference dp;
             NiceNumberPreference np;
-            NiceEditTextPreference ep;
 
             //
             // Goals.
@@ -601,6 +606,52 @@ public class SettingsFragments
     }
 
     //endregion Health Sensor preferences
+
+    //region Health Glucose preferences
+
+    public static class HealthGlucoseFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Blutzucker";
+            header.iconRes = GlobalConfigs.IconResHealthGlucose;
+            header.fragment = HealthGlucoseFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthGlucoseFragment()
+        {
+            super();
+
+            isSensor = true;
+
+            iconres = GlobalConfigs.IconResHealthGlucose;
+            keyprefix = "health.glucose";
+            masterenable = "Blutzucker freischalten";
+            devicetitle = "Blutzucker-Messgerät";
+            devicesearch = "Blutzucker-Messgeräte werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+
+            NicePreferenceCategory pc;
+            NiceListPreference lp;
+            NiceDatePreference dp;
+            NiceNumberPreference np;
+            NiceEditTextPreference ep;
+        }
+    }
+
+    //endregion Health Glucose preferences
 
     //region BlueTooth preferences stub
 
@@ -2620,7 +2671,7 @@ public class SettingsFragments
     {
         private NumberPicker numberPicker;
 
-        private int actValue = 170;
+        private int actValue;
         private int minValue = Integer.MIN_VALUE;
         private int maxValue = Integer.MAX_VALUE;
 

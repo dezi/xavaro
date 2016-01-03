@@ -4,13 +4,11 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.acl.LastOwnerException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -72,7 +70,7 @@ public class BlueToothSensor extends BlueTooth
 
             //
             // Initialize sensor device with current
-            // goal data.
+            // goal data and current time.
             //
 
             ga = new GattAction();
@@ -96,7 +94,6 @@ public class BlueToothSensor extends BlueTooth
         try
         {
             JSONObject bpmdata = new JSONObject();
-
 
             JSONObject data = new JSONObject();
             data.put("sensor", bpmdata);
@@ -175,5 +172,21 @@ public class BlueToothSensor extends BlueTooth
         data[ 15 ] = (byte) 1;
 
         return data;
+    }
+
+    public byte[] getSetAlaram(boolean isON, Date alarmTime)
+    {
+        byte[] temp = new byte[ 4 ];
+
+        temp[ 0 ] = (byte) 0;
+        temp[ 1 ] = (byte) (isON ? 0x80 : 0x00);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(alarmTime);
+
+        temp[ 2 ] = (byte) calendar.get(Calendar.HOUR_OF_DAY);
+        temp[ 3 ] = (byte) calendar.get(Calendar.MINUTE);
+
+        return temp;
     }
 }

@@ -128,7 +128,7 @@ public class BlueToothBPM extends BlueTooth
 
             if ((rd[ 0 ] & 0x02) >= 1)
             {
-                bpmdata.put("year", unsignedBytesToInt(rd[ ++offset ], rd[ ++offset ]));
+                bpmdata.put("year", unsignedBytesToIntRev(rd[ ++offset ], rd[ ++offset ]));
                 bpmdata.put("month", unsignedByteToInt(rd[ ++offset ]));
                 bpmdata.put("day", unsignedByteToInt(rd[ ++offset ]));
                 bpmdata.put("hour", unsignedByteToInt(rd[ ++offset ]));

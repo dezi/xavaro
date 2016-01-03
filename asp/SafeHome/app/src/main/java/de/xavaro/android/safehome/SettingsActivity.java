@@ -63,6 +63,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(SettingsFragments.HealthBPMFragment.getHeader());
         target.add(SettingsFragments.HealthScaleFragment.getHeader());
         target.add(SettingsFragments.HealthSensorFragment.getHeader());
+        target.add(SettingsFragments.HealthGlucoseFragment.getHeader());
         target.add(SettingsFragments.HealthUnitsFragment.getHeader());
 
         category = new Header();

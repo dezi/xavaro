@@ -631,6 +631,13 @@ public class StaticUtils
         return df.format(new Date());
     }
 
+    public static String timeStampAsISO(long timestamp)
+    {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return df.format(new Date(timestamp));
+    }
+
     public static boolean isAppInstalled(Context context, String packageName)
     {
         try

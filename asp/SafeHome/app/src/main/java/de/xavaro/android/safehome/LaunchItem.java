@@ -279,6 +279,15 @@ public class LaunchItem extends FrameLayout implements
                             icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthSensor));
                             icon.setVisibility(VISIBLE);
                         }
+
+                        if (subtype.equals("glucose"))
+                        {
+                            if (handler == null) handler = new Handler();
+                            HealthGroup.subscribeDevice(this,"glucose");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthGlucose));
+                            icon.setVisibility(VISIBLE);
+                        }
                     }
                     else
                     {
@@ -1324,15 +1333,6 @@ public class LaunchItem extends FrameLayout implements
 
     public TextToSpeech ttob;
 
-    private void launchDeveloper()
-    {
-        //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
-
-        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
-
-        new BlueToothSensor(context).discover(null);
-    }
-
     //region BlueTooth connect states
 
     public final Runnable bluetoothIsConnected = new Runnable()
@@ -1382,4 +1382,14 @@ public class LaunchItem extends FrameLayout implements
     }
 
     //endregion BlueTooth connect states
+
+    private void launchDeveloper()
+    {
+        //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
+
+        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
+
+        new BlueToothScale(context).getCreateUserFromPreferences();
+    }
+
 }

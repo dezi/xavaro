@@ -11,13 +11,11 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class HealthGroup extends LaunchGroup implements
-        BlueTooth.BlueToothDataCallback
+public class HealthGroup extends LaunchGroup
 {
     private static final String LOGTAG = HealthGroup.class.getSimpleName();
 
     private static BlueTooth bpmBlueTooth;
-    private static BlueTooth scaleBlueTooth;
     private static BlueTooth sensorBlueTooth;
 
     public static void initialize(Context context)
@@ -44,9 +42,7 @@ public class HealthGroup extends LaunchGroup implements
 
             if ((scaleDevice != null) && ! scaleDevice.equals("unknown"))
             {
-                scaleBlueTooth = new BlueToothScale(context, scaleDevice);
-
-                scaleBlueTooth.connect();
+                HealthScale.getInstance().setBlueTooth(new BlueToothScale(context, scaleDevice));
             }
         }
 
@@ -70,9 +66,9 @@ public class HealthGroup extends LaunchGroup implements
             bpmBlueTooth.setConnectCallback(subscriber);
         }
 
-        if (subtype.equals("scale") && (scaleBlueTooth != null))
+        if (subtype.equals("scale") && (HealthScale.getInstance() != null))
         {
-            scaleBlueTooth.setConnectCallback(subscriber);
+            HealthScale.subscribe(subscriber);
         }
 
         if (subtype.equals("sensor") && (sensorBlueTooth != null))
@@ -86,10 +82,6 @@ public class HealthGroup extends LaunchGroup implements
         super(context);
 
         this.config = getConfig(context);
-
-        if (bpmBlueTooth != null) bpmBlueTooth.setDataCallback(this);
-        if (scaleBlueTooth != null) scaleBlueTooth.setDataCallback(this);
-        if (sensorBlueTooth != null) sensorBlueTooth.setDataCallback(this);
     }
 
     private JSONObject getConfig(Context context)
@@ -99,11 +91,12 @@ public class HealthGroup extends LaunchGroup implements
             JSONObject launchgroup = new JSONObject();
             JSONArray launchitems = new JSONArray();
 
+            SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
             Map<String, Object> hp = DitUndDat.SharedPrefs.getPrefix("health.");
 
             for (String prefkey : hp.keySet())
             {
-                if (prefkey.equals("health.bpm.enable"))
+                if (prefkey.equals("health.bpm.enable") && sp.getBoolean("health.bpm.enable",false))
                 {
                     JSONObject entry = new JSONObject();
 
@@ -114,7 +107,7 @@ public class HealthGroup extends LaunchGroup implements
                     launchitems.put(entry);
                 }
 
-                if (prefkey.equals("health.scale.enable"))
+                if (prefkey.equals("health.scale.enable") && sp.getBoolean("health.scale.enable",false))
                 {
                     JSONObject entry = new JSONObject();
 
@@ -125,13 +118,24 @@ public class HealthGroup extends LaunchGroup implements
                     launchitems.put(entry);
                 }
 
-                if (prefkey.equals("health.sensor.enable"))
+                if (prefkey.equals("health.sensor.enable") && sp.getBoolean("health.sensor.enable",false))
                 {
                     JSONObject entry = new JSONObject();
 
                     entry.put("type", "health");
                     entry.put("label", "Aktivität");
                     entry.put("subtype", "sensor");
+
+                    launchitems.put(entry);
+                }
+
+                if (prefkey.equals("health.glucose.enable") && sp.getBoolean("health.glucose.enable",false))
+                {
+                    JSONObject entry = new JSONObject();
+
+                    entry.put("type", "health");
+                    entry.put("label", "Blutzucker");
+                    entry.put("subtype", "glucose");
 
                     launchitems.put(entry);
                 }
@@ -147,10 +151,5 @@ public class HealthGroup extends LaunchGroup implements
         }
 
         return new JSONObject();
-    }
-
-    public void onBluetoothReceivedData(BluetoothDevice device, JSONObject data)
-    {
-        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
     }
 }

@@ -58,7 +58,7 @@
       {
         "label": "Vitaldaten",
         "type": "health",
-        "enable": "health.bpm.enable"
+        "enable": "health.scale.enable"
       },
       {
         "label": "Test Feature",

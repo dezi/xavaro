@@ -12,6 +12,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.util.Log;
 
@@ -39,6 +40,7 @@ public class BlueTooth extends BroadcastReceiver
     protected BluetoothGattCharacteristic currentPrimary;
     protected BluetoothGattCharacteristic currentSecondary;
 
+    protected final Handler gattHandler = new Handler();
     protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
 
     protected BlueToothDataCallback dataCallback;
@@ -233,6 +235,22 @@ public class BlueTooth extends BroadcastReceiver
 
     protected class GattAction
     {
+        public GattAction()
+        {
+        }
+
+        public GattAction(int mode)
+        {
+            this.mode = mode;
+        }
+
+        public GattAction(byte[] data)
+        {
+            this.mode = MODE_WRITE;
+            this.data = data;
+        }
+
+        static final int MODE_UNDEFINED = 0;
         static final int MODE_INDICATE = 1;
         static final int MODE_NOTIFY = 2;
         static final int MODE_WRITE = 3;
@@ -248,43 +266,72 @@ public class BlueTooth extends BroadcastReceiver
 
     protected void fireNext()
     {
+        fireNext(false);
+    }
+
+    protected void fireNext(boolean delayed)
+    {
         if (gattSchedule.size() == 0) return;
 
-        GattAction ga = gattSchedule.remove(0);
-
-        if (ga.mode == GattAction.MODE_READ)
+        if (delayed)
         {
-            ga.gatt.readCharacteristic(ga.characteristic);
+            gattHandler.postDelayed(fireNextRunnable, 300);
+
+            return;
         }
 
-        if (ga.mode == GattAction.MODE_WRITE)
-        {
-            Log.d(LOGTAG, "fireNext: " + StaticUtils.hexBytesToString(ga.data));
-            ga.characteristic.setValue(ga.data);
-            ga.gatt.writeCharacteristic(ga.characteristic);
-        }
+        gattHandler.removeCallbacks(fireNextRunnable);
 
-        if (ga.mode == GattAction.MODE_NOTIFY)
-        {
-            ga.gatt.setCharacteristicNotification(ga.characteristic, true);
-
-            UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
-            BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-
-            ga.gatt.writeDescriptor(descriptor);
-        }
-
-        if (ga.mode == GattAction.MODE_INDICATE)
-        {
-            ga.gatt.setCharacteristicNotification(ga.characteristic, true);
-
-            UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
-            BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-            ga.gatt.writeDescriptor(descriptor);
-        }
+        fireNextRunnable.run();
     }
+
+    private final Runnable fireNextRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (gattSchedule.size() == 0) return;
+
+            GattAction ga = gattSchedule.remove(0);
+
+            if (ga.gatt == null) ga.gatt = currentGatt;
+            if (ga.characteristic == null) ga.characteristic = currentPrimary;
+            if (ga.mode == GattAction.MODE_UNDEFINED) ga.mode = GattAction.MODE_WRITE;
+
+            if (ga.mode == GattAction.MODE_READ)
+            {
+                ga.gatt.readCharacteristic(ga.characteristic);
+            }
+
+            if (ga.mode == GattAction.MODE_WRITE)
+            {
+                Log.d(LOGTAG, "fireNext: " + StaticUtils.hexBytesToString(ga.data));
+                ga.characteristic.setValue(ga.data);
+                ga.gatt.writeCharacteristic(ga.characteristic);
+            }
+
+            if (ga.mode == GattAction.MODE_NOTIFY)
+            {
+                ga.gatt.setCharacteristicNotification(ga.characteristic, true);
+
+                UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
+                BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
+                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+
+                ga.gatt.writeDescriptor(descriptor);
+            }
+
+            if (ga.mode == GattAction.MODE_INDICATE)
+            {
+                ga.gatt.setCharacteristicNotification(ga.characteristic, true);
+
+                UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
+                BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
+                descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+                ga.gatt.writeDescriptor(descriptor);
+            }
+        }
+    };
 
     protected final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
     {
@@ -389,6 +436,34 @@ public class BlueTooth extends BroadcastReceiver
         }
 
         @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
+        {
+            Log.d(LOGTAG, "onCharacteristicWrite=" + characteristic.getUuid());
+            Log.d(LOGTAG, "onCharacteristicWrite=" + status
+                    + "=" + StaticUtils.hexBytesToString(characteristic.getValue()));
+
+            //
+            // A change notification might come.
+            //
+
+            fireNext(true);
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status)
+        {
+            Log.d(LOGTAG, "onDescriptorWrite=" + descriptor.getUuid());
+            Log.d(LOGTAG, "onDescriptorWrite=" + status
+                    + "=" + StaticUtils.hexBytesToString(descriptor.getValue()));
+
+            //
+            // Fire next event immedeately.
+            //
+
+            fireNext(false);
+        }
+
+        @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic)
         {
             Log.d(LOGTAG, "onCharacteristicChanged=" + characteristic.getUuid());
@@ -397,6 +472,12 @@ public class BlueTooth extends BroadcastReceiver
 
             boolean intermediate = (characteristic == currentSecondary);
             parseResponse(characteristic.getValue(), intermediate);
+
+            //
+            // Fire next event immedeately.
+            //
+
+            fireNext(false);
         }
 
         @Override
@@ -408,29 +489,11 @@ public class BlueTooth extends BroadcastReceiver
         }
 
         @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
-        {
-            Log.d(LOGTAG, "onCharacteristicWrite=" + characteristic.getUuid());
-            Log.d(LOGTAG, "onCharacteristicWrite=" + status
-                    + "=" + StaticUtils.hexBytesToString(characteristic.getValue()));
-        }
-
-        @Override
         public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status)
         {
             Log.d(LOGTAG, "onDescriptorRead=" + descriptor.getUuid());
             Log.d(LOGTAG, "onDescriptorRead=" + status
                     + "=" + StaticUtils.hexBytesToString(descriptor.getValue()));
-        }
-
-        @Override
-        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status)
-        {
-            Log.d(LOGTAG, "onDescriptorWrite=" + descriptor.getUuid());
-            Log.d(LOGTAG, "onDescriptorWrite=" + status
-                    + "=" + StaticUtils.hexBytesToString(descriptor.getValue()));
-
-            fireNext();
         }
     };
 
@@ -444,6 +507,12 @@ public class BlueTooth extends BroadcastReceiver
     protected void parseResponse(byte[] rd, boolean intermediate)
     {
         Log.d(LOGTAG,"parseResponse: Please implement this method in derived class.");
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    public void sendCommand(JSONObject command)
+    {
+        Log.d(LOGTAG,"sendCommand: Please implement this method in derived class.");
     }
 
     protected void enableDevice()
@@ -531,7 +600,12 @@ public class BlueTooth extends BroadcastReceiver
 
     protected int unsignedBytesToInt(byte b0, byte b1)
     {
-        return (unsignedByteToInt(b0) + (unsignedByteToInt(b1) << 8));
+        return ((unsignedByteToInt(b0) << 8) + unsignedByteToInt(b1));
+    }
+
+    protected int unsignedBytesToIntRev(byte b1, byte b0)
+    {
+        return ((unsignedByteToInt(b0) << 8) + unsignedByteToInt(b1));
     }
 
     protected long convertBytesToLong(byte[] data)
