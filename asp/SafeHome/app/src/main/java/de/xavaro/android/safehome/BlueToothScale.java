@@ -2,8 +2,8 @@ package de.xavaro.android.safehome;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Date;
 
-@SuppressWarnings({"UnusedAssignment", "unused"})
+@SuppressWarnings({"unused"})
 public class BlueToothScale extends BlueTooth
 {
     private static final String LOGTAG = BlueToothScale.class.getSimpleName();
@@ -65,8 +65,6 @@ public class BlueToothScale extends BlueTooth
 
         if (currentPrimary != null)
         {
-            GattAction ga;
-
             //
             // Subscribe to normal data notification.
             //
@@ -121,7 +119,7 @@ public class BlueToothScale extends BlueTooth
         boolean wantsack = parseData(rd);
 
         //
-        // First satisfy acknowledgement requests.
+        // First satisfy multirecord acknowledgement requests.
         //
 
         if (wantsack)
@@ -145,11 +143,11 @@ public class BlueToothScale extends BlueTooth
 
             try
             {
-                JSONObject data = new JSONObject();
-                data.put("scale", cbdata);
-
                 if (dataCallback != null)
                 {
+                    JSONObject data = new JSONObject();
+                    data.put("scale", cbdata);
+
                     dataCallback.onBluetoothReceivedData(currentGatt.getDevice(), data);
                 }
             }
@@ -590,20 +588,25 @@ public class BlueToothScale extends BlueTooth
 
             if (what.equals("getSetDateTime"))
             {
+                //
+                // Issue resultles getSetDateTime plus resultful
+                // getRemoteTimeStamp commands.
+                //
+
                 gattSchedule.add(new GattAction(getSetDateTime()));
                 gattSchedule.add(new GattAction(getRemoteTimeStamp()));
             }
 
             if (what.equals("getTakeUserMeasurement"))
             {
-                //gattSchedule.add(new GattAction(getScaleStatusForUser(0x4711)));
-                //gattSchedule.add(new GattAction(getUserInfo(0x4711)));
-                //gattSchedule.add(new GattAction(getUserMeasurements(0x4711)));
-                //gattSchedule.add(new GattAction(getUserList()));
-                //gattSchedule.add(new GattAction(getUnknownMeasurements()));
-
                 gattSchedule.add(new GattAction(getTakeUserMeasurement(0x4711)));
             }
+
+            //gattSchedule.add(new GattAction(getScaleStatusForUser(0x4711)));
+            //gattSchedule.add(new GattAction(getUserInfo(0x4711)));
+            //gattSchedule.add(new GattAction(getUserMeasurements(0x4711)));
+            //gattSchedule.add(new GattAction(getUserList()));
+            //gattSchedule.add(new GattAction(getUnknownMeasurements()));
         }
         catch (JSONException ex)
         {
@@ -616,21 +619,15 @@ public class BlueToothScale extends BlueTooth
         return isCompatibleDevice(this.modelName);
     }
 
+    //region Command builders
+
     public byte[] getDeviceReady()
     {
         Log.d(LOGTAG,"getDeviceReady");
 
         byte[] data = new byte[ 2 ];
 
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -26;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -10;
-        }
-
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -26 : -10);
         data[ 1 ] = (byte) 1;
 
         return data;
@@ -679,13 +676,11 @@ public class BlueToothScale extends BlueTooth
     public byte[] getCreateUserFromPreferences()
     {
         return getMakeUserFromPreferences(49);
-
     }
 
     public byte[] getUpdateUserFromPreferences()
     {
         return getMakeUserFromPreferences(53);
-
     }
 
     public byte[] getCreateUser(long uuid, String initial, int[] birthDate, int height, char gender, int activityIndex)
@@ -828,7 +823,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getSetUserWeight(long uuid, float weight, float bodyFat, long timeStamp)
     {
-        Log.d(LOGTAG,"getSetUserWeight-->uuid : " + uuid + ", weight : " + weight + ", bodyFat : " + bodyFat + ", timeStamp : " + timeStamp);
+        Log.d(LOGTAG, "getSetUserWeight-->uuid : " + uuid + ", weight : " + weight + ", bodyFat : " + bodyFat + ", timeStamp : " + timeStamp);
 
         byte[] data = new byte[ 18 ];
 
@@ -837,29 +832,35 @@ public class BlueToothScale extends BlueTooth
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
 
-        weight *= 20.0f;
-        data[ 10 ] = (byte) ((int) (weight / 256.0f));
-        data[ 11 ] = (byte) ((int) weight);
-        bodyFat *= 10.0f;
-        data[ 12 ] = (byte) ((int) (bodyFat / 256.0f));
-        data[ 13 ] = (byte) ((int) bodyFat);
+        int intWeight = (int) (weight * 20.0f);
+        data[ 10 ] = (byte) ((intWeight >> 8) & 0xff);
+        data[ 11 ] = (byte) (intWeight & 0xff);
+
+        int intBodyFat = (int) (bodyFat * 10.0f);
+        data[ 12 ] = (byte) ((intBodyFat >> 8) & 0xff);
+        data[ 13 ] = (byte) (intBodyFat & 0xff);
+
         int timeStampInSeconds = getTimeStampInSeconds(timeStamp);
+
         for (int i = 0; i < 4; i++)
         {
             data[ i + 14 ] = (byte) (timeStampInSeconds >> ((3 - i) * 8));
         }
+
         return data;
     }
 
     public byte[] getUserWeightAndBodyFat(long uuid)
     {
         Log.d(LOGTAG,"getUserWeightAndBodyFat-->uuid : " + uuid);
+
         byte[] data = new byte[ 10 ];
 
         data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 69;
 
         System.arraycopy(convertLongToBytes(uuid), 0, data, 2, 8);
+
         return data;
     }
 
@@ -872,27 +873,6 @@ public class BlueToothScale extends BlueTooth
         data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) 70;
 
-        return data;
-    }
-
-    public byte[] getSaveAsUnknownMeasurementWithtimestamp(int timeStamp, float weight, int impedance)
-    {
-        Log.d(LOGTAG,"getSaveAsUnknownMeasurementWithtimestamp-->timeStamp : " + timeStamp + ", weight : " + weight + ", impedance : " + impedance);
-
-        byte[] data = new byte[ 10 ];
-
-        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
-        data[ 1 ] = (byte) 72;
-
-        for (int i = 0; i < 4; i++)
-        {
-            data[ i + 2 ] = (byte) (timeStamp >> ((3 - i) * 8));
-        }
-        weight *= 20.0f;
-        data[ 6 ] = (byte) ((int) (weight / 256.0f));
-        data[ 7 ] = (byte) ((int) weight);
-        data[ 8 ] = (byte) (impedance / 256);
-        data[ 9 ] = (byte) impedance;
         return data;
     }
 
@@ -955,19 +935,13 @@ public class BlueToothScale extends BlueTooth
     public byte[] getSetUnit(int unit)
     {
         Log.d(LOGTAG,"getSetUnit-->unit : " + unit);
+
         byte[] data = new byte[ 3 ];
-        if (isCompatibleDevice())
-        {
-            data[ 0 ] = (byte) -25;
-            data[ 1 ] = (byte) 77;
-            data[ 2 ] = (byte) unit;
-        }
-        else
-        {
-            data[ 0 ] = (byte) -9;
-            data[ 1 ] = (byte) 77;
-            data[ 2 ] = (byte) unit;
-        }
+
+        data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
+        data[ 1 ] = (byte) 77;
+        data[ 2 ] = (byte) unit;
+
         return data;
     }
 
@@ -1054,6 +1028,7 @@ public class BlueToothScale extends BlueTooth
 
         data[ 0 ] = (byte) (isCompatibleDevice() ? -25 : -9);
         data[ 1 ] = (byte) -15;
+
         data[ 2 ] = resp[ 1 ];
         data[ 3 ] = resp[ 2 ];
         data[ 4 ] = resp[ 3 ];
@@ -1066,20 +1041,24 @@ public class BlueToothScale extends BlueTooth
     public byte[] convertLongToBytes(long value)
     {
         byte[] data = new byte[ 8 ];
+
         for (int i = 0; i < 8; i++)
         {
             data[ i ] = (byte) ((int) (value >> ((7 - i) * 8)));
         }
+
         return data;
     }
 
     public byte[] convertIntToBytes(int value)
     {
         byte[] data = new byte[ 8 ];
+
         for (int i = 0; i < 4; i++)
         {
             data[ i ] = (byte) (value >> ((3 - i) * 8));
         }
+
         return data;
     }
 
@@ -1089,9 +1068,11 @@ public class BlueToothScale extends BlueTooth
         {
             return 0;
         }
+
         ByteBuffer buffer = ByteBuffer.allocate(4);
         buffer.put(data);
         buffer.flip();
+
         return buffer.getInt();
     }
 
