@@ -193,9 +193,7 @@ public class BlueToothScale extends BlueTooth
                 // Sleepwalking force back to bed.
                 //
 
-                Log.d(LOGTAG, "parseData: ScaleSleepWithStatus is sleeping, disconnect");
-
-                forceDisconnect();
+                Log.d(LOGTAG, "parseData: ScaleSleepWithStatus is sleeping, ignore");
 
                 return false;
             }

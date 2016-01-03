@@ -40,11 +40,9 @@ public abstract class BlueTooth extends BroadcastReceiver
     protected BluetoothGattCharacteristic currentPrimary;
     protected BluetoothGattCharacteristic currentSecondary;
 
-    protected final Handler gattHandler = new Handler();
-    protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
-
-    protected BlueToothDataCallback dataCallback;
+    protected BlueToothDiscoverCallback discoverCallback;
     protected BlueToothConnectCallback connectCallback;
+    protected BlueToothDataCallback dataCallback;
 
     private static final String NOTIFY_DESCRIPTOR = "00002902-0000-1000-8000-00805f9b34fb";
 
@@ -96,11 +94,6 @@ public abstract class BlueTooth extends BroadcastReceiver
         dataCallback = callback;
     }
 
-    protected abstract boolean isCompatibleDevice(String devicename);
-    protected abstract boolean isCompatibleService(BluetoothGattService service);
-    protected abstract boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic);
-    protected abstract boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
-
     //region Device discovery
 
     public boolean isDiscovering;
@@ -108,8 +101,6 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     public boolean discoverLE = true;
     public boolean discoverClassic = false;
-
-    public BlueToothDiscoverCallback discoverCallback;
 
     public void discover(BlueToothDiscoverCallback callback)
     {
@@ -216,11 +207,21 @@ public abstract class BlueTooth extends BroadcastReceiver
                 if (discoverCallback != null) discoverCallback.onDiscoverFinished();
             }
 
+            //
+            // Prepare an easy garbage collection death.
+            //
+
             context.unregisterReceiver(this);
+            discoverCallback = null;
         }
     }
 
     //endregion Device discovery
+
+    //region Device communication handling
+
+    protected final Handler gattHandler = new Handler();
+    protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
 
     protected class GattAction
     {
@@ -322,7 +323,11 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     };
 
-    protected final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
+    //endregion Device communication handling
+
+    //region Gatt callback handler
+
+    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
     {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
@@ -486,11 +491,14 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     };
 
-    protected void forceDisconnect()
-    {
-        currentGatt.disconnect();
-        currentGatt = currentGatt.getDevice().connectGatt(context, true, gattCallback);
-    }
+    //endregion Gatt callback handler
+
+    //region Derived class abstract stuff
+
+    protected abstract boolean isCompatibleDevice(String devicename);
+    protected abstract boolean isCompatibleService(BluetoothGattService service);
+    protected abstract boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic);
+    protected abstract boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
 
     //
     // This method is called as soon, as the device is connected
@@ -513,6 +521,10 @@ public abstract class BlueTooth extends BroadcastReceiver
     protected abstract void parseResponse(byte[] rd, boolean intermediate);
 
     public abstract void sendCommand(JSONObject command);
+
+    //endregion Derived class abstract stuff
+
+    //region Mask formatter helper
 
     private String getDeviceTypeString(int devtype)
     {
@@ -542,6 +554,10 @@ public abstract class BlueTooth extends BroadcastReceiver
         return pstr.trim();
     }
 
+    //endregion Mask formatter helper
+
+    //region Callback interfaces
+
     public interface BlueToothDiscoverCallback
     {
         void onDiscoverStarted();
@@ -560,6 +576,8 @@ public abstract class BlueTooth extends BroadcastReceiver
     {
         void onBluetoothReceivedData(String deviceName, JSONObject data);
     }
+
+    //endregion Callback interfaces
 
     //region Conversion helper
 
