@@ -62,8 +62,9 @@ public class BlueToothBPM extends BlueTooth
     }
 
     @Override
-    protected void connectedDevice()
+    protected void discoveredDevice()
     {
+        if (connectCallback != null) connectCallback.onBluetoothConnect(deviceName);
     }
 
     @Override

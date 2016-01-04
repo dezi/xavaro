@@ -58,10 +58,16 @@ public class DitUndDat
         private static final String LOGTAG = SpeekDat.class.getSimpleName();
 
         private static SpeekDat instance;
+        private static Context runctx;
 
-        public static void speak(Context context, String text)
+        public static void initialize(Context context)
         {
-            if (instance == null) instance = new SpeekDat(context);
+            runctx = context;
+        }
+
+        public static void speak(String text)
+        {
+            if (instance == null) instance = new SpeekDat(runctx);
 
             instance.addQueue(text);
         }
@@ -73,6 +79,7 @@ public class DitUndDat
         public SpeekDat(Context context)
         {
             ttspeech = new TextToSpeech(context,this);
+            ttspeech.setPitch(0.4f);
             ttspeech.setOnUtteranceProgressListener(this);
         }
 
@@ -94,7 +101,7 @@ public class DitUndDat
                 {
                     String text = texts.remove(0);
 
-                    ttspeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, text);
+                    ttspeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);
                 }
             }
         }
@@ -119,6 +126,8 @@ public class DitUndDat
         public void onDone(String text)
         {
             Log.d(LOGTAG,"onDone: " + text);
+
+            queueAll();
         }
 
         @Override

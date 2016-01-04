@@ -344,7 +344,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
                 gatt.discoverServices();
 
-                if (connectCallback != null) connectCallback.onBluetoothConnect(deviceName);
+                discoveredDevice();
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)
@@ -507,7 +507,7 @@ public abstract class BlueTooth extends BroadcastReceiver
     // the user when he activates a device. Method must also
     // set the connect state.
     //
-    protected abstract void connectedDevice();
+    protected abstract void discoveredDevice();
 
     //
     // This method is called when the services have been discovered
@@ -568,7 +568,6 @@ public abstract class BlueTooth extends BroadcastReceiver
     public interface BlueToothConnectCallback
     {
         void onBluetoothConnect(String deviceName);
-        void onBluetoothEnabled(String deviceName);
         void onBluetoothDisconnect(String deviceName);
     }
 

@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 public class SettingsFragments
 {
@@ -516,24 +517,43 @@ public class SettingsFragments
 
             NicePreferenceCategory pc;
             NiceEditTextPreference ep;
+            NiceDisplayTextPreference dt;
 
             //
             // Personal user data required for calculations.
             //
 
             pc = new NicePreferenceCategory(context);
-            pc.setTitle("Persönliche Daten");
+            pc.setTitle("Waagenbenutzer");
             preferences.add(pc);
 
             ep = new NiceEditTextPreference(context);
 
-            ep.setKey(keyprefix + ".user.initials");
-            ep.setTitle("Waagenbenutzer Initialen");
+            ep.setKey(keyprefix + ".initials");
+            ep.setTitle("Initialen");
             ep.setDefaultValue("XXX");
             ep.setIsUppercase();
             ep.setEnabled(enabled);
 
             preferences.add(ep);
+
+            dt = new NiceDisplayTextPreference(context);
+
+            dt.setKey(keyprefix + ".userid");
+            dt.setTitle("User-ID");
+            dt.setEnabled(enabled);
+
+            if (! sharedPrefs.contains(dt.getKey()))
+            {
+                //
+                // Initially compute user id.
+                //
+
+                int userid = new Random().nextInt();
+                sharedPrefs.edit().putString(dt.getKey(), "" + userid).apply();
+            }
+
+            preferences.add(dt);
         }
     }
 
@@ -2350,6 +2370,19 @@ public class SettingsFragments
                     Gravity.END);
 
             ((LinearLayout) view).addView(current, lp);
+        }
+    }
+
+    public static class NiceDisplayTextPreference extends NiceEditTextPreference
+    {
+        public NiceDisplayTextPreference(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        protected void showDialog(Bundle state)
+        {
         }
     }
 

@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothDevice;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
@@ -1365,12 +1364,7 @@ public class LaunchItem extends FrameLayout implements
         // short time idle connect.
         //
 
-        handler.postDelayed(bluetoothIsConnected, 2000);
-    }
-
-    public void onBluetoothEnabled(String deviceName)
-    {
-        Log.d(LOGTAG, "onBluetoothEnabled: " + deviceName);
+        handler.post(bluetoothIsConnected);
     }
 
     public void onBluetoothDisconnect(String deviceName)

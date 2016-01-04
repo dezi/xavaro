@@ -1,13 +1,13 @@
 package de.xavaro.android.safehome;
 
-
-import android.bluetooth.BluetoothDevice;
+import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HealthScale implements BlueTooth.BlueToothDataCallback
+public class HealthScale extends HealthDevice
 {
     private static final String LOGTAG = HealthScale.class.getSimpleName();
 
@@ -25,22 +25,7 @@ public class HealthScale implements BlueTooth.BlueToothDataCallback
         getInstance().setConnectCallback(subscriber);
     }
 
-    private BlueToothScale blueTooth;
-
-    public void setBlueTooth(BlueToothScale blueTooth)
-    {
-        this.blueTooth = blueTooth;
-        this.blueTooth.connect();
-        this.blueTooth.setDataCallback(this);
-    }
-
-    public void setConnectCallback(BlueTooth.BlueToothConnectCallback subscriber)
-    {
-        if (blueTooth == null) return;
-
-        blueTooth.setConnectCallback(subscriber);
-    }
-
+    @Override
     public void onBluetoothReceivedData(String deviceName, JSONObject data)
     {
         Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
@@ -50,11 +35,8 @@ public class HealthScale implements BlueTooth.BlueToothDataCallback
         try
         {
             JSONObject command = new JSONObject();
-            JSONObject mesg;
-            String type;
-
-            mesg = data.getJSONObject("scale");
-            type = mesg.getString("type");
+            JSONObject mesg = data.getJSONObject("scale");
+            String type = mesg.getString("type");
 
             if (type.equals("DeviceReady"))
             {
@@ -72,7 +54,106 @@ public class HealthScale implements BlueTooth.BlueToothDataCallback
                 // setting the scale to our user.
                 //
 
-                command.put("command", "getTakeUserMeasurement");
+                command.put("command", "getUserList");
+            }
+
+            if (type.equals("UserList"))
+            {
+                //
+                // Todo: check number of users and delete if required.
+                //
+            }
+
+            if (type.equals("UserListArray"))
+            {
+                //
+                // Scale time has now been set proceed with
+                // setting the scale to our user.
+                //
+
+                SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+                long uuid = Long.parseLong(sp.getString("health.scale.userid", ""));
+                boolean found = false;
+
+                try
+                {
+                    if (mesg.has("array"))
+                    {
+                        JSONArray array = mesg.getJSONArray("array");
+
+                        for (int inx = 0; inx < array.length(); inx++)
+                        {
+                            JSONObject user = array.getJSONObject(inx);
+
+                            if (user.has("uuid") && (user.getLong("uuid") == uuid))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (found)
+                    {
+                        command.put("command", "getUpdateUserFromPreferences");
+                    }
+                    else
+                    {
+                        command.put("command", "getCreateUserFromPreferences");
+                    }
+
+                    blueTooth.sendCommand(command);
+
+                    //
+                    // Above calls have no result. Just load the next command
+                    // to set scale to active user.
+                    //
+
+                    command = new JSONObject();
+                    command.put("command", "getTakeUserMeasurementFromPreferences");
+                }
+                catch (JSONException ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
+            }
+
+            if (type.equals("TakeUserMeasurement"))
+            {
+                DitUndDat.SpeekDat.speak("Die Waage ist nun für Sie eingestellt.");
+            }
+
+            if (type.equals("LiveMeasurementOnTimestamp"))
+            {
+                long uuid = mesg.getLong("uuid");
+                double weight = mesg.getDouble("weight");
+                double impedance = mesg.getDouble("impedance");
+
+                if (impedance == 0)
+                {
+                    DitUndDat.SpeekDat.speak("Die Waage kann nur odentlich arbeiten, wenn sie Barfuss messen.");
+                    DitUndDat.SpeekDat.speak("Bitte wiederholen sie die Messung.");
+                }
+                else
+                {
+                    String[] weithParts = ("" + weight).split("\\.");
+
+                    if (weithParts.length == 2)
+                    {
+                        DitUndDat.SpeekDat.speak("Ihr Gewicht beträgt "
+                                + weithParts[ 0 ] + " Komma "
+                                + weithParts[ 1 ] + " Kilogramm");
+                    }
+                    else
+                    {
+                        DitUndDat.SpeekDat.speak("Ihr Gewicht beträgt "
+                                + weithParts[ 0 ] + " Kilogramm");
+                    }
+
+                    DitUndDat.SpeekDat.speak("Fettsack");
+
+                    DitUndDat.SpeekDat.speak("Vielen Dank für ihre Messung");
+                }
             }
 
             if (command.has("command")) blueTooth.sendCommand(command);
