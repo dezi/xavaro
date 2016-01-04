@@ -49,6 +49,16 @@ public class HealthGroup extends LaunchGroup
                 HealthSensor.getInstance().setBlueTooth(new BlueToothSensor(context, sensorDevice));
             }
         }
+
+        if (sp.getBoolean("health.glucose.enable", false))
+        {
+            String glucoseDevice = sp.getString("health.glucose.device",null);
+
+            if ((glucoseDevice != null) && ! glucoseDevice.equals("unknown"))
+            {
+                HealthGlucose.getInstance().setBlueTooth(new BlueToothGlucose(context, glucoseDevice));
+            }
+        }
     }
 
     public static void subscribeDevice(BlueTooth.BlueToothConnectCallback subscriber, String subtype)
@@ -66,6 +76,11 @@ public class HealthGroup extends LaunchGroup
         if (subtype.equals("sensor") && (HealthSensor.getInstance() != null))
         {
             HealthSensor.subscribe(subscriber);
+        }
+
+        if (subtype.equals("glucose") && (HealthGlucose.getInstance() != null))
+        {
+            HealthGlucose.subscribe(subscriber);
         }
     }
 

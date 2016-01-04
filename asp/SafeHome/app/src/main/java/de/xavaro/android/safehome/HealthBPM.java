@@ -71,7 +71,7 @@ public class HealthBPM extends HealthBase
 
                 if (result.equals("final"))
                 {
-                    if ((lastDate == null) || (lastDate.compareTo(date) < 0))
+                    if ((lastDate == null) || (lastDate.compareTo(date) <= 0))
                     {
                         lastSystolic = systolic;
                         lastDiastolic = diastolic;

@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -458,6 +459,10 @@ public class SettingsFragments
 
             preferences.add(lp);
 
+            pc = new NicePreferenceCategory(context);
+            pc.setTitle("Vereinfachte Bedienung");
+            preferences.add(pc);
+
             cb = new CheckBoxPreference(context);
 
             cb.setKey(keyprefix + ".anyuser");
@@ -474,6 +479,18 @@ public class SettingsFragments
 
             preferences.add(cb);
 
+            cb = new CheckBoxPreference(context);
+
+            cb.setKey(keyprefix + ".anytime");
+            cb.setTitle("Zurückgesetztes Datum im Gerät kompensieren");
+            cb.setEnabled(enabled);
+
+            cb.setSummary("Das Blutdruckmessgerät verliert seine Uhrzeit, wenn "
+                    + "die Batterien gewechselt werden. Wenn der Anwender nicht "
+                    + "in der Lage ist, Datum und Uhrzeit wieder korrekt einzustellen "
+                    + "empfiehlt sich diese Option.");
+
+            preferences.add(cb);
         }
     }
 
@@ -610,7 +627,6 @@ public class SettingsFragments
             np = new NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.steps");
-            DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
             np.setMinMaxValue(100, 10000, 100);
             np.setDefaultValue(500);
             np.setTitle("Schritte machen");
@@ -621,10 +637,9 @@ public class SettingsFragments
             np = new NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.calories");
-            DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
             np.setMinMaxValue(100, 2000, 100);
             np.setDefaultValue(300);
-            np.setTitle("Kalorien verbrauchen");
+            np.setTitle("Kalorien verbrennen");
             np.setEnabled(enabled);
 
             preferences.add(np);
@@ -632,7 +647,6 @@ public class SettingsFragments
             np = new NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.sleephours");
-            DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
             np.setMinMaxValue(4, 10, 1);
             np.setDefaultValue(8);
             np.setTitle("Stunden schlafen");
@@ -678,7 +692,7 @@ public class SettingsFragments
         {
             super();
 
-            isSensor = true;
+            isGlucose = true;
 
             iconres = GlobalConfigs.IconResHealthGlucose;
             keyprefix = "health.glucose";
@@ -716,6 +730,7 @@ public class SettingsFragments
         protected boolean isBPM;
         protected boolean isScale;
         protected boolean isSensor;
+        protected boolean isGlucose;
 
         private final BlueToothFragment self = this;
         private Context context;
@@ -865,6 +880,7 @@ public class SettingsFragments
                         if (isBPM) new BlueToothBPM(context).discover(self);
                         if (isScale) new BlueToothScale(context).discover(self);
                         if (isSensor) new BlueToothSensor(context).discover(self);
+                        if (isGlucose) new BlueToothGlucose(context).discover(self);
                     }
                 });
             }
@@ -2634,11 +2650,13 @@ public class SettingsFragments
             this.dateString = dateString;
         }
 
+        @SuppressLint("SimpleDateFormat")
         public SimpleDateFormat formatter()
         {
             return new SimpleDateFormat("yyyy.MM.dd");
         }
 
+        @SuppressLint("SimpleDateFormat")
         public SimpleDateFormat summaryFormatter()
         {
             return new SimpleDateFormat("dd.MM.yyyy");

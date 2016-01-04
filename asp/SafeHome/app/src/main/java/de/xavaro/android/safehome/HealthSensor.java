@@ -1,12 +1,9 @@
 package de.xavaro.android.safehome;
 
 import android.util.Log;
-import android.os.Handler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Formatter;
 
 public class HealthSensor extends HealthBase
 {
