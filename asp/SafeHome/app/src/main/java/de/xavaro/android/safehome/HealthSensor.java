@@ -35,12 +35,32 @@ public class HealthSensor extends HealthBase
 
         try
         {
+            JSONObject command = new JSONObject();
             JSONObject mesg = data.getJSONObject("sensor");
             String type = mesg.getString("type");
 
-            if (type.equals("Measurement"))
+            if (type.equals("TodaysData"))
             {
+                command.put("command", "getStepHistoryData");
+                command.put("day", 0);
+
+                int steps = mesg.getInt("steps");
+
+                DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
             }
+
+            if (type.equals("StepHistoryData"))
+            {
+                command.put("command", "getSleepHistoryData");
+                command.put("position", 0);
+            }
+
+            if (type.equals("SleepHistoryData"))
+            {
+                command.put("command", "getDisconnect");
+            }
+
+            if (command.has("command")) blueTooth.sendCommand(command);
         }
         catch (JSONException ex)
         {

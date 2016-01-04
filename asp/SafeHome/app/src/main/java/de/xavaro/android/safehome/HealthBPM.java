@@ -1,7 +1,6 @@
 package de.xavaro.android.safehome;
 
 import android.util.Log;
-import android.os.Handler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,8 +24,6 @@ public class HealthBPM extends HealthBase
     {
         getInstance().setConnectCallback(subscriber);
     }
-
-    private final Handler handler = new Handler();
 
     private String lastDate;
     private int lastSystolic;

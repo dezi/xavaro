@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -15,6 +16,8 @@ public abstract class HealthBase implements
     protected boolean isConnected;
     protected BlueTooth blueTooth;
     protected BlueTooth.BlueToothConnectCallback connectCallback;
+
+    protected final Handler handler = new Handler();
 
     public void setBlueTooth(BlueTooth blueTooth)
     {

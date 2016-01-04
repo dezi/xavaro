@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,6 +61,33 @@ public class BlueToothSensor extends BlueTooth
     @Override
     public void sendCommand(JSONObject command)
     {
+        try
+        {
+            String what = command.getString("command");
+
+            if (what.equals("getStepHistoryData"))
+            {
+                int day = command.getInt("day");
+
+                gattSchedule.add(new GattAction(getStepHistoryData(day)));
+            }
+
+            if (what.equals("getSleepHistoryData"))
+            {
+                int position = command.getInt("position");
+
+                gattSchedule.add(new GattAction(getSleepHistoryData(position)));
+            }
+
+            if (what.equals("getDisconnect"))
+            {
+                gattSchedule.add(new GattAction(GattAction.MODE_DISCONNECT));
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
     }
 
     @Override
@@ -86,6 +114,10 @@ public class BlueToothSensor extends BlueTooth
 
         gattSchedule.add(new GattAction(getSetUserSettingWithGoalFromPreferences()));
 
+        //
+        // Read todays stuff.
+        //
+
         GattAction ga = new GattAction();
 
         ga.mode = GattAction.MODE_READ;
@@ -93,81 +125,156 @@ public class BlueToothSensor extends BlueTooth
 
         gattSchedule.add(ga);
 
-        /*
-        gattSchedule.add(new GattAction(getStepHistoryData(0)));
-        gattSchedule.add(new GattAction(getStepHistoryData(1)));
-        gattSchedule.add(new GattAction(getStepHistoryData(2)));
-        gattSchedule.add(new GattAction(getStepHistoryData(3)));
-        gattSchedule.add(new GattAction(getStepHistoryData(4)));
-        gattSchedule.add(new GattAction(getStepHistoryData(5)));
-        gattSchedule.add(new GattAction(getStepHistoryData(6)));
-        gattSchedule.add(new GattAction(getStepHistoryData(7)));
-        gattSchedule.add(new GattAction(getStepHistoryData(8)));
-        gattSchedule.add(new GattAction(getStepHistoryData(9)));
-        gattSchedule.add(new GattAction(getStepHistoryData(10)));
-        */
-
         fireNext();
     }
+
+    private final int ACTIVITY_DEEPSLEEP = 16;
+    private final int ACTIVITY_LIGHTSLEEP = 32;
 
     @Override
     public void parseResponse(byte[] rd, boolean intermediate)
     {
         Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
 
+        if ((rd[ 0 ] == (byte) 0xff) && (rd.length == 1))
+        {
+            Log.d(LOGTAG, "parseResponse: Invalid command");
+
+            return;
+        }
+
         try
         {
-            JSONObject bpmdata = new JSONObject();
+            JSONObject sensordata = new JSONObject();
 
-            // Write 8D230E570400000000000000A0860101
-            // Read  3F000000 000C 0006 000000
-            //       72000000 000C 0006 000000
-            //       72000000 000C 0006 000000
-            //       72000000 000C 0006 000000
-            // Step history: 0000000000005704000000000000A08601
-            // Step history: 0000000000005704000000000000A08601
-            // Step history: 010000000000570400B80BD00700A08601
+            if (rd.length == 11)
+            {
+                //
+                // Todays data.
+                //
 
-            /*
-            0000000000005704000000000000A08601
-            0000000000005704000000000000A08601
+                sensordata.put("type", "TodaysData");
 
-            010000000000570400B80BD00700A08601
-            00 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
-            010000000000570400B80BD00700A08601
+                byte[] data = new byte[ 4 ];
 
-            020000000000080701001973B980F74C02
-            020000000000080701001973B980F74C02
+                data[ 0 ] = 0;
+                data[ 1 ] = rd[ 2 ];
+                data[ 2 ] = rd[ 1 ];
+                data[ 3 ] = rd[ 0 ];
 
-            030000000000080701001973B980F74C02
-            030000000000080701001973B980F74C02
+                sensordata.put("steps", convertBytesToInt(data));
 
-            040000000000080701001973B980F74C02
-            040000000000080701001973B980F74C02
+                data[ 0 ] = 0;
+                data[ 1 ] = 0;
+                data[ 2 ] = rd[ 7 ];
+                data[ 3 ] = rd[ 6 ];
 
-            050000000000080701001973B980F74C02
-            050000000000080701001973B980F74C02
+                sensordata.put("sleep", convertBytesToInt(data));
+            }
 
-            060000000000080701001973B980F74C02
-            060000000000080701001973B980F74C02
+            if (rd.length == 20)
+            {
+                //
+                // Sleep history data.
+                //
 
-            070000000000080701001973B980F74C02
-            070000000000080701001973B980F74C02
+                int position = (rd[ 0 ] & 0x7f) + (rd[ 1 ] << 7);
 
-            080000000000080701001973B980F74C02
-            080000000000080701001973B980F74C02
+                sensordata.put("type", "SleepHistoryData");
+                sensordata.put("position", position);
+                sensordata.put("recvtime", StaticUtils.nowAsISO());
 
-            09F500000100080701001973B980F74C02
-            09F500000100080701001973B980F74C02
+                JSONArray detail = new JSONArray();
 
-            0A0000000000080701001973B980F74C02
-            0A0000000000080701001973B980F74C02
-            */
+                //
+                // Detail data is reversed. Make a kind of
+                // runlength encoding on awake sequences.
+                //
 
-            // Sleep history: 8000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                int awake = 0;
+
+                for (int inx = rd.length - 1; inx >= 2; inx--)
+                {
+                    if (rd[ inx ] == -1)
+                    {
+                        awake++;
+                    }
+                    else
+                    {
+                        if (awake > 0)
+                        {
+                            detail.put(-awake);
+                            awake = 0;
+                        }
+
+                        detail.put(rd[ inx ] & 0xff);
+                    }
+                }
+
+                if (awake > 0) detail.put(-awake);
+
+                sensordata.put("detail", detail);
+            }
+
+            if (rd.length == 17)
+            {
+                //
+                // Step history data.
+                //
+
+                sensordata.put("type", "StepHistoryData");
+                sensordata.put("day", rd[ 0 ]);
+
+                byte[] data = new byte[ 4 ];
+
+                data[ 0 ] = 0;
+                data[ 1 ] = rd[ 3 ];
+                data[ 2 ] = rd[ 2 ];
+                data[ 3 ] = rd[ 1 ];
+
+                sensordata.put("steps", convertBytesToInt(data));
+
+                data[ 0 ] = 0;
+                data[ 1 ] = 0;
+                data[ 2 ] = rd[ 5 ];
+                data[ 3 ] = rd[ 4 ];
+
+                sensordata.put("exercisetime", convertBytesToInt(data));
+
+                data[ 0 ] = 0;
+                data[ 1 ] = (byte) (rd[ 8 ] & 0x7f);
+                data[ 2 ] = rd[ 7 ];
+                data[ 3 ] = rd[ 6 ];
+
+                sensordata.put("goal", convertBytesToInt(data));
+
+                data[ 0 ] = 0;
+                data[ 1 ] = 0;
+                data[ 2 ] = rd[ 10 ];
+                data[ 3 ] = rd[  9 ];
+
+                sensordata.put("stepdistance", convertBytesToInt(data) / 100f);
+
+                data[ 0 ] = 0;
+                data[ 1 ] = (byte) (rd[ 13 ] & 0x7f);
+                data[ 2 ] = rd[ 12 ];
+                data[ 3 ] = rd[ 11 ];
+
+                sensordata.put("ca10kstep", convertBytesToInt(data) / 100f);
+
+                data[ 0 ] = 0;
+                data[ 1 ] = rd[ 16 ];
+                data[ 2 ] = rd[ 15 ];
+                data[ 3 ] = rd[ 14 ];
+
+                sensordata.put("BMR", convertBytesToInt(data) / 100f);
+
+                sensordata.put("goalUnit", ((rd[ 8 ] & 0x80) == 0) ? 0 : 1);
+                sensordata.put("distanceUnit", ((rd[ 13 ] & 0x80) == 0) ? 0 : 1);
+            }
 
             JSONObject data = new JSONObject();
-            data.put("sensor", bpmdata);
+            data.put("sensor", sensordata);
 
             if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
         }
@@ -181,37 +288,38 @@ public class BlueToothSensor extends BlueTooth
     {
         String keyprefix = "health.sensor";
 
+        //
+        // Default values from device.
+        //
+
+        float BMR = 1507.75f;
+        float distanceWalkCM = 103.00f;
+        float caloriePer10000Steps = 474.75f;
+
         SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
 
         String timeFormatString = sp.getString(keyprefix + ".units.timedisp", "24h");
         String distanceUnitString = sp.getString(keyprefix + ".units.distance", "m");
         String goalUnitString = sp.getString(keyprefix + ".goals.sensor", "steps");
 
-        Log.d(LOGTAG,"getSetUserSettingWithGoalFromPreferences: du=" + distanceUnitString + " gu=" + goalUnitString);
-
         int timeFormat = timeFormatString.equals("24h") ? 1 : 0;
         int distanceUnit = distanceUnitString.equals("m") ? 1 : 0;
         int goalUnit = goalUnitString.equals("steps") ? 0 : 1;
-        int distanceWalk = sp.getInt(keyprefix + ".goals.steps", 0);
-        int calorieBurned = sp.getInt(keyprefix + ".goals.calories", 0);
 
-        int BMR = 1000;
-        int goal = 1000;
+        int goal = sp.getInt(keyprefix + ".goals.steps", 0);
+        if (goalUnit == 1) goal = 100 * sp.getInt(keyprefix + ".goals.calories", 0);
 
-        Log.d(LOGTAG,"getSetUserSettingWithGoalFromPreferences:"
-                + " distanceWalk=" + distanceWalk
-                + " calorieBurned=" + calorieBurned);
-
-        return getSetUserSettingWithGoal(goal, distanceWalk, calorieBurned, BMR, timeFormat, distanceUnit, goalUnit);
+        return getSetUserSettingWithGoal(goal, goalUnit, distanceWalkCM, caloriePer10000Steps, BMR, timeFormat, distanceUnit);
     }
 
     public byte[] getSetUserSettingWithGoal(
-            int goal, int distanceWalk, int calorieBurned, int BMR,
-            int timeFormat, int distanceUnit, int goalUnit)
+            int goal, int goalUnit,
+            float distanceWalkCM, float caloriePer10000Steps, float BMR,
+            int timeFormat, int distanceUnit)
     {
         Log.d(LOGTAG,"getSetUserSettingWithGoal");
 
-        byte[] data = new byte[16];
+        byte[] data = new byte[ 16 ];
 
         Date today = new Date();
         Calendar calendar = Calendar.getInstance();
@@ -229,12 +337,13 @@ public class BlueToothSensor extends BlueTooth
 
         if (goalUnit == 1) data[ 5 ] |= (byte) 0x80;
 
-        distanceWalk = 2000;
-
-        if (distanceUnit == 1) distanceWalk = (int) (distanceWalk * 62.1371192d);
+        int distanceWalk = (int) (distanceWalkCM * 100.0f);
+        if (distanceUnit == 1) distanceWalk = (int) (distanceWalkCM * 62.1371192f);
 
         data[ 6 ] = (byte) (distanceWalk & 0xff);
         data[ 7 ] = (byte) ((distanceWalk >> 8) & 0xff);
+
+        int calorieBurned = (int) (caloriePer10000Steps * 100.0f);
 
         data[  8 ] = (byte) (calorieBurned & 0xff);
         data[  9 ] = (byte) ((calorieBurned >> 8) & 0xff);
@@ -243,11 +352,12 @@ public class BlueToothSensor extends BlueTooth
 
         if (distanceUnit == 1) data[ 11 ] |= (byte) 0x80;
 
-        BMR *= 100;
+        int intBMR = (int) (BMR * 100.0f);
 
-        data[ 12 ] = (byte) (BMR & 0xff);
-        data[ 13 ] = (byte) ((BMR >> 8) & 0xff);
-        data[ 14 ] = (byte) ((BMR >> 16) & 0xff);
+        data[ 12 ] = (byte) (intBMR & 0xff);
+        data[ 13 ] = (byte) ((intBMR >> 8) & 0xff);
+        data[ 14 ] = (byte) ((intBMR >> 16) & 0xff);
+
         data[ 15 ] = (byte) 1;
 
         return data;
@@ -262,12 +372,12 @@ public class BlueToothSensor extends BlueTooth
         return data;
     }
 
-    private byte[] getSleepHistoryData()
+    private byte[] getSleepHistoryData(int position)
     {
         byte[] data = new byte[ 2 ];
 
-        data[ 0 ] = (byte) 0x80;
-        data[ 1 ] = (byte) 0;
+        data[ 0 ] = (byte) (0x80 + (position & 0x7f));
+        data[ 1 ] = (byte) (position >> 7);
 
         return data;
     }

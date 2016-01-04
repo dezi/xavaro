@@ -611,8 +611,8 @@ public class SettingsFragments
 
             np.setKey(keyprefix + ".goals.steps");
             DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
-            np.setMinMaxValue(1000, 20000, 1000);
-            np.setDefaultValue(3000);
+            np.setMinMaxValue(100, 10000, 100);
+            np.setDefaultValue(500);
             np.setTitle("Schritte machen");
             np.setEnabled(enabled);
 
@@ -622,8 +622,8 @@ public class SettingsFragments
 
             np.setKey(keyprefix + ".goals.calories");
             DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
-            np.setMinMaxValue(1000, 5000, 100);
-            np.setDefaultValue(2000);
+            np.setMinMaxValue(100, 2000, 100);
+            np.setDefaultValue(300);
             np.setTitle("Kalorien verbrauchen");
             np.setEnabled(enabled);
 

@@ -240,11 +240,11 @@ public abstract class BlueTooth extends BroadcastReceiver
             this.data = data;
         }
 
-        static final int MODE_UNDEFINED = 0;
-        static final int MODE_INDICATE = 1;
-        static final int MODE_NOTIFY = 2;
-        static final int MODE_WRITE = 3;
-        static final int MODE_READ = 4;
+        static final int MODE_READ = 1;
+        static final int MODE_WRITE = 2;
+        static final int MODE_NOTIFY = 3;
+        static final int MODE_INDICATE = 4;
+        static final int MODE_DISCONNECT = 5;
 
         int mode;
 
@@ -286,7 +286,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
             if (ga.gatt == null) ga.gatt = currentGatt;
             if (ga.characteristic == null) ga.characteristic = currentPrimary;
-            if (ga.mode == GattAction.MODE_UNDEFINED) ga.mode = GattAction.MODE_WRITE;
+            if (ga.mode == 0) ga.mode = GattAction.MODE_WRITE;
 
             if (ga.mode == GattAction.MODE_READ)
             {
@@ -319,6 +319,12 @@ public abstract class BlueTooth extends BroadcastReceiver
                 BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
                 ga.gatt.writeDescriptor(descriptor);
+            }
+
+            if (ga.mode == GattAction.MODE_DISCONNECT)
+            {
+                ga.gatt.disconnect();
+                connect();
             }
         }
     };
@@ -480,6 +486,15 @@ public abstract class BlueTooth extends BroadcastReceiver
             Log.d(LOGTAG, "onCharacteristicRead=" + characteristic.getUuid());
             Log.d(LOGTAG, "onCharacteristicRead=" + status
                     + "=" + StaticUtils.hexBytesToString(characteristic.getValue()));
+
+            boolean intermediate = (characteristic == currentSecondary);
+            parseResponse(characteristic.getValue(), intermediate);
+
+            //
+            // Fire next event immedeately.
+            //
+
+            fireNext(false);
         }
 
         @Override
