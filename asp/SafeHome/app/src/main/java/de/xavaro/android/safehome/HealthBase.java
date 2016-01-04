@@ -7,21 +7,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class HealthDevice implements
+public abstract class HealthBase implements
         BlueTooth.BlueToothDataCallback,
         BlueTooth.BlueToothConnectCallback
 {
     protected String deviceName;
     protected boolean isConnected;
-    protected BlueToothScale blueTooth;
+    protected BlueTooth blueTooth;
     protected BlueTooth.BlueToothConnectCallback connectCallback;
 
-    public void setBlueTooth(BlueToothScale blueTooth)
+    public void setBlueTooth(BlueTooth blueTooth)
     {
         this.blueTooth = blueTooth;
-        this.blueTooth.connect();
+
         this.blueTooth.setDataCallback(this);
         this.blueTooth.setConnectCallback(this);
+
+        this.blueTooth.connect();
     }
 
     public void setConnectCallback(BlueTooth.BlueToothConnectCallback subscriber)

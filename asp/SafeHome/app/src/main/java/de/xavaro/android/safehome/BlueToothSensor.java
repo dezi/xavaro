@@ -54,7 +54,12 @@ public class BlueToothSensor extends BlueTooth
     @Override
     protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
     {
-        return false;
+        return characteristic.getUuid().toString().equals("0000fed2-494c-4f47-4943-544543480000");
+    }
+
+    @Override
+    public void sendCommand(JSONObject command)
+    {
     }
 
     @Override
@@ -68,34 +73,41 @@ public class BlueToothSensor extends BlueTooth
     {
         Log.d(LOGTAG,"enableDevice: " + currentPrimary);
 
-        if (connectCallback != null)
-        {
-            GattAction ga;
+        //
+        // Subscribe to normal data notification.
+        //
 
-            ga = new GattAction();
+        gattSchedule.add(new GattAction(GattAction.MODE_NOTIFY));
 
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_NOTIFY;
-            ga.characteristic = currentPrimary;
+        //
+        // Initialize sensor device with current
+        // goal data and current time.
+        //
 
-            gattSchedule.add(ga);
+        gattSchedule.add(new GattAction(getSetUserSettingWithGoalFromPreferences()));
 
-            //
-            // Initialize sensor device with current
-            // goal data and current time.
-            //
+        GattAction ga = new GattAction();
 
-            ga = new GattAction();
+        ga.mode = GattAction.MODE_READ;
+        ga.characteristic = currentSecondary;
 
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_WRITE;
-            ga.data = getSetUserSettingWithGoalFromPreferences();
-            ga.characteristic = currentPrimary;
+        gattSchedule.add(ga);
 
-            gattSchedule.add(ga);
+        /*
+        gattSchedule.add(new GattAction(getStepHistoryData(0)));
+        gattSchedule.add(new GattAction(getStepHistoryData(1)));
+        gattSchedule.add(new GattAction(getStepHistoryData(2)));
+        gattSchedule.add(new GattAction(getStepHistoryData(3)));
+        gattSchedule.add(new GattAction(getStepHistoryData(4)));
+        gattSchedule.add(new GattAction(getStepHistoryData(5)));
+        gattSchedule.add(new GattAction(getStepHistoryData(6)));
+        gattSchedule.add(new GattAction(getStepHistoryData(7)));
+        gattSchedule.add(new GattAction(getStepHistoryData(8)));
+        gattSchedule.add(new GattAction(getStepHistoryData(9)));
+        gattSchedule.add(new GattAction(getStepHistoryData(10)));
+        */
 
-            fireNext();
-        }
+        fireNext();
     }
 
     @Override
@@ -106,6 +118,53 @@ public class BlueToothSensor extends BlueTooth
         try
         {
             JSONObject bpmdata = new JSONObject();
+
+            // Write 8D230E570400000000000000A0860101
+            // Read  3F000000 000C 0006 000000
+            //       72000000 000C 0006 000000
+            //       72000000 000C 0006 000000
+            //       72000000 000C 0006 000000
+            // Step history: 0000000000005704000000000000A08601
+            // Step history: 0000000000005704000000000000A08601
+            // Step history: 010000000000570400B80BD00700A08601
+
+            /*
+            0000000000005704000000000000A08601
+            0000000000005704000000000000A08601
+
+            010000000000570400B80BD00700A08601
+            00 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
+            010000000000570400B80BD00700A08601
+
+            020000000000080701001973B980F74C02
+            020000000000080701001973B980F74C02
+
+            030000000000080701001973B980F74C02
+            030000000000080701001973B980F74C02
+
+            040000000000080701001973B980F74C02
+            040000000000080701001973B980F74C02
+
+            050000000000080701001973B980F74C02
+            050000000000080701001973B980F74C02
+
+            060000000000080701001973B980F74C02
+            060000000000080701001973B980F74C02
+
+            070000000000080701001973B980F74C02
+            070000000000080701001973B980F74C02
+
+            080000000000080701001973B980F74C02
+            080000000000080701001973B980F74C02
+
+            09F500000100080701001973B980F74C02
+            09F500000100080701001973B980F74C02
+
+            0A0000000000080701001973B980F74C02
+            0A0000000000080701001973B980F74C02
+            */
+
+            // Sleep history: 8000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
             JSONObject data = new JSONObject();
             data.put("sensor", bpmdata);
@@ -128,14 +187,20 @@ public class BlueToothSensor extends BlueTooth
         String distanceUnitString = sp.getString(keyprefix + ".units.distance", "m");
         String goalUnitString = sp.getString(keyprefix + ".goals.sensor", "steps");
 
+        Log.d(LOGTAG,"getSetUserSettingWithGoalFromPreferences: du=" + distanceUnitString + " gu=" + goalUnitString);
+
         int timeFormat = timeFormatString.equals("24h") ? 1 : 0;
-        int distanceUnit = distanceUnitString.equals("m") ? 0 : 1;
+        int distanceUnit = distanceUnitString.equals("m") ? 1 : 0;
         int goalUnit = goalUnitString.equals("steps") ? 0 : 1;
         int distanceWalk = sp.getInt(keyprefix + ".goals.steps", 0);
         int calorieBurned = sp.getInt(keyprefix + ".goals.calories", 0);
 
         int BMR = 1000;
-        int goal = 1111;
+        int goal = 1000;
+
+        Log.d(LOGTAG,"getSetUserSettingWithGoalFromPreferences:"
+                + " distanceWalk=" + distanceWalk
+                + " calorieBurned=" + calorieBurned);
 
         return getSetUserSettingWithGoal(goal, distanceWalk, calorieBurned, BMR, timeFormat, distanceUnit, goalUnit);
     }
@@ -164,6 +229,8 @@ public class BlueToothSensor extends BlueTooth
 
         if (goalUnit == 1) data[ 5 ] |= (byte) 0x80;
 
+        distanceWalk = 2000;
+
         if (distanceUnit == 1) distanceWalk = (int) (distanceWalk * 62.1371192d);
 
         data[ 6 ] = (byte) (distanceWalk & 0xff);
@@ -186,9 +253,23 @@ public class BlueToothSensor extends BlueTooth
         return data;
     }
 
-    @Override
-    public void sendCommand(JSONObject command)
+    private byte[] getStepHistoryData(int day)
     {
+        byte[] data = new byte[ 1 ];
+
+        data[ 0 ] = (byte) day;
+
+        return data;
+    }
+
+    private byte[] getSleepHistoryData()
+    {
+        byte[] data = new byte[ 2 ];
+
+        data[ 0 ] = (byte) 0x80;
+        data[ 1 ] = (byte) 0;
+
+        return data;
     }
 
     public byte[] getSetAlaram(boolean isON, Date alarmTime)

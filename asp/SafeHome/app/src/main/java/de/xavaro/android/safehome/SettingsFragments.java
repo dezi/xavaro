@@ -262,7 +262,7 @@ public class SettingsFragments
 
             np.setKey(keyprefix + ".user.size");
             np.setUnit("cm");
-            np.setMinMaxValue(100, 250);
+            np.setMinMaxValue(100, 250, 1);
             np.setDefaultValue(170);
             np.setTitle("Größe");
             np.setEnabled(enabled);
@@ -273,7 +273,7 @@ public class SettingsFragments
 
             np.setKey(keyprefix + ".user.weight");
             np.setUnit("kg");
-            np.setMinMaxValue(40, 250);
+            np.setMinMaxValue(40, 250, 1);
             np.setDefaultValue(75);
             np.setTitle("Gewicht");
             np.setEnabled(enabled);
@@ -604,15 +604,16 @@ public class SettingsFragments
             //
 
             pc = new NicePreferenceCategory(context);
-            pc.setTitle("Ziele");
+            pc.setTitle("Tagesziele");
             preferences.add(pc);
 
             np = new NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.steps");
-            np.setMinMaxValue(1000, 20000);
+            DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
+            np.setMinMaxValue(1000, 20000, 1000);
             np.setDefaultValue(3000);
-            np.setTitle("Schritte pro Tag machen");
+            np.setTitle("Schritte machen");
             np.setEnabled(enabled);
 
             preferences.add(np);
@@ -620,9 +621,10 @@ public class SettingsFragments
             np = new NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.calories");
-            np.setMinMaxValue(1000, 5000);
+            DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
+            np.setMinMaxValue(1000, 5000, 100);
             np.setDefaultValue(2000);
-            np.setTitle("Kalorien pro Tag verbrauchen");
+            np.setTitle("Kalorien verbrauchen");
             np.setEnabled(enabled);
 
             preferences.add(np);
@@ -630,9 +632,10 @@ public class SettingsFragments
             np = new NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.sleephours");
-            np.setMinMaxValue(4,10);
+            DitUndDat.SharedPrefs.sharedPrefs.edit().remove(np.getKey()).apply();
+            np.setMinMaxValue(4, 10, 1);
             np.setDefaultValue(8);
-            np.setTitle("Stunden pro Tag schlafen");
+            np.setTitle("Stunden schlafen");
             np.setEnabled(enabled);
 
             preferences.add(np);
@@ -2736,6 +2739,9 @@ public class SettingsFragments
         private int minValue = Integer.MIN_VALUE;
         private int maxValue = Integer.MAX_VALUE;
 
+        private int stepValue = 1;
+        private String[] stepValues;
+
         public NiceNumberPreference(Context context)
         {
             super(context);
@@ -2746,10 +2752,11 @@ public class SettingsFragments
             setNegativeButtonText(android.R.string.cancel);
         }
 
-        public void setMinMaxValue(int min, int max)
+        public void setMinMaxValue(int min, int max, int step)
         {
             minValue = min;
             maxValue = max;
+            stepValue = step;
         }
 
         @Override
@@ -2759,8 +2766,27 @@ public class SettingsFragments
 
             numberPicker.setMinValue(minValue);
             numberPicker.setMaxValue(maxValue);
-
             numberPicker.setValue(actValue);
+
+            if (stepValue != 1)
+            {
+                int steps = (maxValue - minValue) / stepValue;
+
+                if (steps < 100)
+                {
+                    stepValues = new String[ steps ];
+
+                    for (int inx = 0; inx < steps; inx++)
+                    {
+                        stepValues[ inx ] = "" + (minValue + (inx * stepValue));
+                    }
+
+                    numberPicker.setMinValue(0);
+                    numberPicker.setMaxValue(stepValues.length - 1);
+                    numberPicker.setValue((actValue - minValue) / stepValue);
+                    numberPicker.setDisplayedValues(stepValues);
+                }
+            }
 
             //
             // Inhibit display of completely useless keyboard.
@@ -2776,14 +2802,21 @@ public class SettingsFragments
         {
             if (positiveResult)
             {
-                setValue(numberPicker.getValue());
+                if (stepValues == null)
+                {
+                    setValue(numberPicker.getValue());
+                }
+                else
+                {
+                    setValue(Integer.parseInt(stepValues[ numberPicker.getValue() ]));
+                }
             }
         }
 
         @Override
         protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
         {
-            setValue(restoreValue ? getPersistedInt(actValue) : actValue);
+            setValue(restoreValue ? getPersistedInt(actValue) : (int) defaultValue);
         }
 
         @Override
@@ -2802,12 +2835,7 @@ public class SettingsFragments
                 notifyChanged();
             }
         }
-
-        @Override
-        protected Object onGetDefaultValue(TypedArray a, int index)
-        {
-            return a.getInt(index, 0);
-        }
     }
+
     //endregion Niced preferences
 }

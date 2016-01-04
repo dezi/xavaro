@@ -380,32 +380,32 @@ public abstract class BlueTooth extends BroadcastReceiver
                     String props = getPropsString(characteristic.getProperties());
                     Log.d(LOGTAG, "  chara=" + characteristic.getUuid() + ":" + props);
 
+                    if (isCompatiblePrimary(characteristic))
+                    {
+                        currentGatt = gatt;
+                        currentPrimary = characteristic;
+
+                        Log.d(LOGTAG,"Found compatible primary=" + deviceName);
+
+                        if (discoverCallback != null)
+                        {
+                            discoverCallback.onDeviceDiscovered(gatt.getDevice());
+                        }
+                    }
+
+                    if (isCompatibleSecondary(characteristic))
+                    {
+                        currentGatt = gatt;
+                        currentSecondary = characteristic;
+
+                        Log.d(LOGTAG,"Found compatible secondary=" + deviceName);
+                    }
+
                     List<BluetoothGattDescriptor> descriptors = characteristic.getDescriptors();
 
                     for (BluetoothGattDescriptor descriptor : descriptors)
                     {
                         Log.d(LOGTAG, "    descs=" + descriptor.getUuid());
-
-                        if (isCompatiblePrimary(characteristic))
-                        {
-                            currentGatt = gatt;
-                            currentPrimary = characteristic;
-
-                            Log.d(LOGTAG,"Found compatible primary=" + deviceName);
-
-                            if (discoverCallback != null)
-                            {
-                                discoverCallback.onDeviceDiscovered(gatt.getDevice());
-                            }
-                        }
-
-                        if (isCompatibleSecondary(characteristic))
-                        {
-                            currentGatt = gatt;
-                            currentSecondary = characteristic;
-
-                            Log.d(LOGTAG,"Found compatible secondary=" + deviceName);
-                        }
                     }
                 }
             }

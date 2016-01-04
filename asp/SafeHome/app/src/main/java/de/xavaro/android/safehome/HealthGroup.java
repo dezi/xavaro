@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -15,9 +14,6 @@ public class HealthGroup extends LaunchGroup
 {
     private static final String LOGTAG = HealthGroup.class.getSimpleName();
 
-    private static BlueTooth bpmBlueTooth;
-    private static BlueTooth sensorBlueTooth;
-
     public static void initialize(Context context)
     {
         Log.d(LOGTAG,"initialize");
@@ -30,9 +26,7 @@ public class HealthGroup extends LaunchGroup
 
             if ((bpmDevice != null) && ! bpmDevice.equals("unknown"))
             {
-                bpmBlueTooth = new BlueToothBPM(context, bpmDevice);
-
-                bpmBlueTooth.connect();
+                HealthBPM.getInstance().setBlueTooth(new BlueToothBPM(context, bpmDevice));
             }
         }
 
@@ -48,22 +42,20 @@ public class HealthGroup extends LaunchGroup
 
         if (sp.getBoolean("health.sensor.enable", false))
         {
-            String scaleDevice = sp.getString("health.sensor.device",null);
+            String sensorDevice = sp.getString("health.sensor.device",null);
 
-            if ((scaleDevice != null) && ! scaleDevice.equals("unknown"))
+            if ((sensorDevice != null) && ! sensorDevice.equals("unknown"))
             {
-                sensorBlueTooth = new BlueToothSensor(context, scaleDevice);
-
-                sensorBlueTooth.connect();
+                HealthSensor.getInstance().setBlueTooth(new BlueToothSensor(context, sensorDevice));
             }
         }
     }
 
     public static void subscribeDevice(BlueTooth.BlueToothConnectCallback subscriber, String subtype)
     {
-        if (subtype.equals("bpm") && (bpmBlueTooth != null))
+        if (subtype.equals("bpm") && (HealthBPM.getInstance() != null))
         {
-            bpmBlueTooth.setConnectCallback(subscriber);
+            HealthBPM.subscribe(subscriber);
         }
 
         if (subtype.equals("scale") && (HealthScale.getInstance() != null))
@@ -71,9 +63,9 @@ public class HealthGroup extends LaunchGroup
             HealthScale.subscribe(subscriber);
         }
 
-        if (subtype.equals("sensor") && (sensorBlueTooth != null))
+        if (subtype.equals("sensor") && (HealthSensor.getInstance() != null))
         {
-            sensorBlueTooth.setConnectCallback(subscriber);
+            HealthSensor.subscribe(subscriber);
         }
     }
 

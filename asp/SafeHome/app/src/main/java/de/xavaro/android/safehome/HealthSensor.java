@@ -1,0 +1,50 @@
+package de.xavaro.android.safehome;
+
+import android.util.Log;
+import android.os.Handler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Formatter;
+
+public class HealthSensor extends HealthBase
+{
+    private static final String LOGTAG = HealthSensor.class.getSimpleName();
+
+    private static HealthSensor instance;
+
+    public static HealthSensor getInstance()
+    {
+        if (instance == null) instance = new HealthSensor();
+
+        return instance;
+    }
+
+    public static void subscribe(BlueTooth.BlueToothConnectCallback subscriber)
+    {
+        getInstance().setConnectCallback(subscriber);
+    }
+
+    @Override
+    public void onBluetoothReceivedData(String deviceName, JSONObject data)
+    {
+        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
+
+        if (! data.has("sensor")) return;
+
+        try
+        {
+            JSONObject mesg = data.getJSONObject("sensor");
+            String type = mesg.getString("type");
+
+            if (type.equals("Measurement"))
+            {
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+}

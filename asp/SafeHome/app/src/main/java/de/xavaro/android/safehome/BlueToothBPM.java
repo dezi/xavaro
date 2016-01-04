@@ -117,6 +117,8 @@ public class BlueToothBPM extends BlueTooth
 
             int offset = 0;
 
+            bpmdata.put("type", "Measurement");
+
             bpmdata.put("result", intermediate ? "intermediate" : "final");
 
             bpmdata.put("systolic", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));

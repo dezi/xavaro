@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class HealthScale extends HealthDevice
+public class HealthScale extends HealthBase
 {
     private static final String LOGTAG = HealthScale.class.getSimpleName();
 
@@ -120,7 +120,7 @@ public class HealthScale extends HealthDevice
 
             if (type.equals("TakeUserMeasurement"))
             {
-                DitUndDat.SpeekDat.speak("Die Waage ist nun für Sie eingestellt.");
+                DitUndDat.SpeekDat.speak("Die Waage ist nun für Sie eingestellt");
             }
 
             if (type.equals("LiveMeasurementOnTimestamp"))
@@ -131,8 +131,8 @@ public class HealthScale extends HealthDevice
 
                 if (impedance == 0)
                 {
-                    DitUndDat.SpeekDat.speak("Die Waage kann nur odentlich arbeiten, wenn sie Barfuss messen.");
-                    DitUndDat.SpeekDat.speak("Bitte wiederholen sie die Messung.");
+                    DitUndDat.SpeekDat.speak("Die Waage kann nur ordentlich arbeiten, wenn sie Barfuss messen");
+                    DitUndDat.SpeekDat.speak("Bitte ziehen sie Schuhe und Strümpfe aus und wiederholen sie die Messung");
                 }
                 else
                 {
