@@ -793,80 +793,6 @@ public class SettingsFragments
 
     //endregion Contacts preferences stub
 
-    //region EnablePreferenceFragment stub
-
-    @SuppressWarnings("WeakerAccess")
-    public static class EnablePreferenceFragment extends PreferenceFragment
-    {
-        protected final ArrayList<Preference> preferences = new ArrayList<>();
-        protected final ArrayList<String> activekeys = new ArrayList<>();
-
-        protected String keyprefix;
-        protected String masterenable;
-        protected boolean enabled;
-
-        protected int iconres;
-
-        public void registerAll(Context context)
-        {
-            preferences.clear();
-
-            EnableSwitchPreference sw = new EnableSwitchPreference(context);
-
-            sw.setKey(keyprefix + ".enable");
-            sw.setTitle(masterenable);
-            sw.setIcon(VersionUtils.getDrawableFromResources(context, iconres));
-            sw.setDefaultValue(false);
-
-            preferences.add(sw);
-
-            activekeys.add(sw.getKey());
-
-            enabled = DitUndDat.SharedPrefs.sharedPrefs.getBoolean(keyprefix + ".enable", false);
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
-            registerAll(getActivity());
-
-            for (Preference pref : preferences) root.addPreference(pref);
-        }
-
-        protected class EnableSwitchPreference extends SwitchPreference
-                implements Preference.OnPreferenceChangeListener
-        {
-            public EnableSwitchPreference(Context context)
-            {
-                super(context);
-
-                setOnPreferenceChangeListener(this);
-            }
-
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object obj)
-            {
-                Log.d(LOGTAG, "onPreferenceChange:" + obj.toString());
-
-                for (Preference pref : preferences)
-                {
-                    if (pref == this) continue;
-
-                    pref.setEnabled((boolean) obj);
-                }
-
-                return true;
-            }
-        }
-    }
-
-    //endregion EnablePreferenceFragment stub
-
     //region Firewall safety preferences
 
     public static class SafetyFragment extends PreferenceFragment
@@ -1220,161 +1146,6 @@ public class SettingsFragments
 
     //endregion Firewall domains preferences
 
-    //region Webframe newspaper preferences
-
-    public static class WebConfigNewspaperFragment extends JSONConfigFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Zeitungen";
-            header.iconRes = GlobalConfigs.IconResWebConfigNewspaper;
-            header.fragment = WebConfigNewspaperFragment.class.getName();
-
-            return header;
-        }
-
-        public WebConfigNewspaperFragment()
-        {
-            super();
-
-            root = "webconfig";
-            subtype = "newspaper";
-            jsonres = R.raw.default_webconfig;
-            iconres = GlobalConfigs.IconResWebConfigNewspaper;
-            keyprefix = "webconfig.newspaper";
-            masterenable = "Online Zeitungen freischalten";
-        }
-    }
-
-    //endregion Webframe newspaper preferences
-
-    //region Webframe magazine preferences
-
-    public static class WebConfigMagazineFragment extends JSONConfigFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Magazine";
-            header.iconRes = GlobalConfigs.IconResWebConfigMagazine;
-            header.fragment = WebConfigMagazineFragment.class.getName();
-
-            return header;
-        }
-
-        public WebConfigMagazineFragment()
-        {
-            super();
-
-            root = "webconfig";
-            subtype = "magazine";
-            jsonres = R.raw.default_webconfig;
-            iconres = GlobalConfigs.IconResWebConfigMagazine;
-            keyprefix = "webconfig.magazine";
-            masterenable = "Online Magazine freischalten";
-        }
-    }
-
-    //endregion Webframe magazine preferences
-
-    //region Webframe magazine preferences
-
-    public static class WebConfigPictorialFragment extends JSONConfigFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Illustrierte";
-            header.iconRes = GlobalConfigs.IconResWebConfigPictorial;
-            header.fragment = WebConfigPictorialFragment.class.getName();
-
-            return header;
-        }
-
-        public WebConfigPictorialFragment()
-        {
-            super();
-
-            root = "webconfig";
-            subtype = "pictorial";
-            jsonres = R.raw.default_webconfig;
-            iconres = GlobalConfigs.IconResWebConfigPictorial;
-            keyprefix = "webconfig.pictorial";
-            masterenable = "Online Illustrierte freischalten";
-        }
-    }
-
-    //endregion Webframe magazine preferences
-
-    //region Webframe shopping preferences
-
-    public static class WebConfigShoppingFragment extends JSONConfigFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Shopping";
-            header.iconRes = GlobalConfigs.IconResWebConfigShopping;
-            header.fragment = WebConfigShoppingFragment.class.getName();
-
-            return header;
-        }
-
-        public WebConfigShoppingFragment()
-        {
-            super();
-
-            root = "webconfig";
-            subtype = "shopping";
-            jsonres = R.raw.default_webconfig;
-            iconres = GlobalConfigs.IconResWebConfigShopping;
-            keyprefix = "webconfig.shopping";
-            masterenable = "Online Shopping freischalten";
-        }
-    }
-
-    //endregion Webframe shopping preferences
-
-    //region Webframe erotics preferences
-
-    public static class WebConfigEroticsFragment extends JSONConfigFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Erotisches";
-            header.iconRes = GlobalConfigs.IconResWebConfigErotics;
-            header.fragment = WebConfigEroticsFragment.class.getName();
-
-            return header;
-        }
-
-        public WebConfigEroticsFragment()
-        {
-            super();
-
-            root = "webconfig";
-            subtype = "erotics";
-            jsonres = R.raw.default_webconfig;
-            iconres = GlobalConfigs.IconResWebConfigErotics;
-            keyprefix = "webconfig.erotics";
-            masterenable = "Online Erotisches freischalten";
-        }
-    }
-
-    //endregion Webframe erotics preferences
-
     //region IP Radio preferences
 
     public static class IPRadioFragment extends JSONConfigFragment
@@ -1667,4 +1438,78 @@ public class SettingsFragments
     }
 
     //endregion JSONConfigFragment stub
+
+    //region EnablePreferenceFragment stub
+
+    @SuppressWarnings("WeakerAccess")
+    public static class EnablePreferenceFragment extends PreferenceFragment
+    {
+        protected final ArrayList<Preference> preferences = new ArrayList<>();
+        protected final ArrayList<String> activekeys = new ArrayList<>();
+
+        protected String keyprefix;
+        protected String masterenable;
+        protected boolean enabled;
+
+        protected int iconres;
+
+        public void registerAll(Context context)
+        {
+            preferences.clear();
+
+            EnableSwitchPreference sw = new EnableSwitchPreference(context);
+
+            sw.setKey(keyprefix + ".enable");
+            sw.setTitle(masterenable);
+            sw.setIcon(VersionUtils.getDrawableFromResources(context, iconres));
+            sw.setDefaultValue(false);
+
+            preferences.add(sw);
+
+            activekeys.add(sw.getKey());
+
+            enabled = DitUndDat.SharedPrefs.sharedPrefs.getBoolean(keyprefix + ".enable", false);
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+        }
+
+        protected class EnableSwitchPreference extends SwitchPreference
+                implements Preference.OnPreferenceChangeListener
+        {
+            public EnableSwitchPreference(Context context)
+            {
+                super(context);
+
+                setOnPreferenceChangeListener(this);
+            }
+
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object obj)
+            {
+                Log.d(LOGTAG, "onPreferenceChange:" + obj.toString());
+
+                for (Preference pref : preferences)
+                {
+                    if (pref == this) continue;
+
+                    pref.setEnabled((boolean) obj);
+                }
+
+                return true;
+            }
+        }
+    }
+
+    //endregion EnablePreferenceFragment stub
 }
