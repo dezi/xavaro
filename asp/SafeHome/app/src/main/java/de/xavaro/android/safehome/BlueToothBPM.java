@@ -22,27 +22,6 @@ public class BlueToothBPM extends BlueTooth
         super(context, deviceTag);
     }
 
-    private static class BPMs
-    {
-        public static final String BM75 = "BM75";
-        public static final String SBM37 = "SBM37";
-        public static final String SBM67 = "SBM67";
-        public static final String BEURER_BC57 = "BC57";
-        public static final String SANITAS_SBM67 = "BPM Smart";
-        public static final String SANITAS_SBM37 = "Sanitas SBM37";
-    }
-
-    @Override
-    protected boolean isCompatibleDevice(String devicename)
-    {
-        return (devicename.equalsIgnoreCase(BPMs.BM75) ||
-                devicename.equalsIgnoreCase(BPMs.SBM37) ||
-                devicename.equalsIgnoreCase(BPMs.SBM67) ||
-                devicename.equalsIgnoreCase(BPMs.BEURER_BC57) ||
-                devicename.equalsIgnoreCase(BPMs.SANITAS_SBM67) ||
-                devicename.equalsIgnoreCase(BPMs.SANITAS_SBM37));
-    }
-
     @Override
     protected boolean isCompatibleService(BluetoothGattService service)
     {
@@ -62,51 +41,23 @@ public class BlueToothBPM extends BlueTooth
     }
 
     @Override
-    protected void discoveredDevice()
+    protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
     {
-        if (connectCallback != null) connectCallback.onBluetoothConnect(deviceName);
+        return false;
     }
 
     @Override
     protected void enableDevice()
     {
-        Log.d(LOGTAG,"enableDevice: " + currentPrimary);
+        super.enableDevice();
 
-        if (currentPrimary != null)
-        {
-            GattAction ga;
+        Log.d(LOGTAG,"enableDevice: " + deviceName);
 
-            //
-            // Subscribe to normal data indication.
-            //
-
-            ga = new GattAction();
-
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_INDICATE;
-            ga.characteristic = currentPrimary;
-
-            gattSchedule.add(ga);
-
-            //
-            // Subscribe to intermediate data notification
-            // when user is conduction measurement.
-            //
-
-            ga = new GattAction();
-
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_NOTIFY;
-            ga.characteristic = currentSecondary;
-
-            gattSchedule.add(ga);
-
-            fireNext();
-        }
+        fireNext(true);
     }
 
     @Override
-    public void parseResponse(byte[] rd, boolean intermediate)
+    public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
         Log.d(LOGTAG, "parseResponse: " + getMaskString(rd[ 0 ]));
@@ -119,7 +70,7 @@ public class BlueToothBPM extends BlueTooth
 
             bpmdata.put("type", "Measurement");
 
-            bpmdata.put("result", intermediate ? "intermediate" : "final");
+            bpmdata.put("result", (characteristic == currentPrimary) ? "final" : "intermediate");
 
             bpmdata.put("systolic", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
             bpmdata.put("diastolic", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));

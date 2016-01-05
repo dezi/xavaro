@@ -1,8 +1,10 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -20,18 +22,6 @@ public class BlueToothGlucose extends BlueTooth
     public BlueToothGlucose(Context context, String deviceTag)
     {
         super(context, deviceTag);
-    }
-
-    private static class BPMs
-    {
-        public static final String MT2BT = "MediTouch 2 BT";
-    }
-
-    @Override
-    protected boolean isCompatibleDevice(String devicename)
-    {
-        return (devicename.equalsIgnoreCase(BPMs.MT2BT) ||
-                devicename.equalsIgnoreCase(BPMs.MT2BT));
     }
 
     @Override
@@ -53,16 +43,103 @@ public class BlueToothGlucose extends BlueTooth
     }
 
     @Override
-    protected void discoveredDevice()
+    protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
     {
-        if (connectCallback != null) connectCallback.onBluetoothConnect(deviceName);
+        return characteristic.getUuid().toString().equals("00002a52-0000-1000-8000-00805f9b34fb");
     }
 
     @Override
     protected void enableDevice()
     {
-        Log.d(LOGTAG,"enableDevice: " + currentPrimary);
+        Log.d(LOGTAG, "enableDevice: " + deviceName);
 
+        GattAction ga;
+
+        //
+        // Indicate control.
+        //
+
+        ga = new GattAction();
+
+        ga.mode = GattAction.MODE_INDICATE;
+        ga.characteristic = currentControl;
+
+        gattSchedule.add(ga);
+
+        //
+        // Notify primary.
+        //
+
+        ga = new GattAction();
+
+        ga.mode = GattAction.MODE_NOTIFY;
+        ga.characteristic = currentPrimary;
+
+        gattSchedule.add(ga);
+
+        /*
+        //
+        // Indicate service changed characteristic.
+        //
+
+        ga = new GattAction();
+
+        ga.mode = GattAction.MODE_INDICATE;
+        ga.characteristic = currentChanged;
+
+        gattSchedule.add(ga);
+
+        for (int inx = 0; inx < 20; inx++)
+        {
+            ga = new GattAction();
+
+            ga.mode = GattAction.MODE_READ;
+            ga.characteristic = currentSerial;
+
+            gattSchedule.add(ga);
+        }
+
+
+        /*
+
+        //
+        // Notify secondary.
+        //
+
+        ga = new GattAction();
+
+        ga.mode = GattAction.MODE_NOTIFY;
+        ga.characteristic = currentSecondary;
+
+        gattSchedule.add(ga);
+
+        //
+        // Read number of records.
+        //
+
+        ga = new GattAction();
+
+        ga.mode = GattAction.MODE_WRITE;
+        ga.data = getNumberOfRecords();
+        ga.characteristic = currentControl;
+
+        gattSchedule.add(ga);
+
+        /*
+        //
+        // Read serial number.
+        //
+
+        ga = new GattAction();
+
+        ga.mode = GattAction.MODE_READ;
+        ga.characteristic = currentSerial;
+
+        gattSchedule.add(ga);
+
+        */
+
+        fireNext(true);
     }
 
     @Override
@@ -71,9 +148,33 @@ public class BlueToothGlucose extends BlueTooth
     }
 
     @Override
-    public void parseResponse(byte[] rd, boolean intermediate)
+    public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
         Log.d(LOGTAG, "parseResponse: " + rd[ 0 ]);
+    }
+
+    public byte[] getNumberOfRecords()
+    {
+        Log.d(LOGTAG, "getNumberOfRecords");
+
+        byte[] data = new byte[ 2 ];
+
+        data[ 0 ] = 4;
+        data[ 1 ] = 1;
+
+        return data;
+    }
+
+    public byte[] getAllRecords()
+    {
+        Log.d(LOGTAG, "getAllRecords");
+
+        byte[] data = new byte[ 2 ];
+
+        data[ 0 ] = 1;
+        data[ 1 ] = 1;
+
+        return data;
     }
 }

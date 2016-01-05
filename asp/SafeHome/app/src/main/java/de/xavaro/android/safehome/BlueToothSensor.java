@@ -17,12 +17,6 @@ public class BlueToothSensor extends BlueTooth
 {
     private static final String LOGTAG = BlueToothSensor.class.getSimpleName();
 
-    private static class Sensors
-    {
-        public static final String SAS75 = "SAS75";
-        public static final String PR102 = "PR102";
-    }
-
     public BlueToothSensor(Context context)
     {
         super(context);
@@ -31,13 +25,6 @@ public class BlueToothSensor extends BlueTooth
     public BlueToothSensor(Context context, String deviceTag)
     {
         super(context, deviceTag);
-    }
-
-    @Override
-    protected boolean isCompatibleDevice(String devicename)
-    {
-        return devicename.equalsIgnoreCase(Sensors.SAS75)
-                || devicename.equalsIgnoreCase(Sensors.PR102);
     }
 
     @Override
@@ -56,6 +43,12 @@ public class BlueToothSensor extends BlueTooth
     protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
     {
         return characteristic.getUuid().toString().equals("0000fed2-494c-4f47-4943-544543480000");
+    }
+
+    @Override
+    protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
     }
 
     @Override
@@ -91,21 +84,11 @@ public class BlueToothSensor extends BlueTooth
     }
 
     @Override
-    protected void discoveredDevice()
-    {
-        if (connectCallback != null) connectCallback.onBluetoothConnect(deviceName);
-    }
-
-    @Override
     protected void enableDevice()
     {
-        Log.d(LOGTAG,"enableDevice: " + currentPrimary);
+        super.enableDevice();
 
-        //
-        // Subscribe to normal data notification.
-        //
-
-        gattSchedule.add(new GattAction(GattAction.MODE_NOTIFY));
+        Log.d(LOGTAG, "enableDevice: " + deviceName);
 
         //
         // Initialize sensor device with current
@@ -125,14 +108,14 @@ public class BlueToothSensor extends BlueTooth
 
         gattSchedule.add(ga);
 
-        fireNext();
+        fireNext(true);
     }
 
     private final int ACTIVITY_DEEPSLEEP = 16;
     private final int ACTIVITY_LIGHTSLEEP = 32;
 
     @Override
-    public void parseResponse(byte[] rd, boolean intermediate)
+    public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
 
@@ -290,6 +273,8 @@ public class BlueToothSensor extends BlueTooth
 
         //
         // Default values from device.
+        //
+        // Todo: need to be derived from history or preferences.
         //
 
         float BMR = 1507.75f;

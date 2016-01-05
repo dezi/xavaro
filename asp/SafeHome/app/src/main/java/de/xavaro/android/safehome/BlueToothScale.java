@@ -36,7 +36,6 @@ public class BlueToothScale extends BlueTooth
         public static final String SANITAS_SBF70 = "SANITAS SBF70";
     }
 
-    @Override
     protected boolean isCompatibleDevice(String devicename)
     {
         return (devicename.equalsIgnoreCase(Scales.SBF70) ||
@@ -64,20 +63,25 @@ public class BlueToothScale extends BlueTooth
     }
 
     @Override
+    protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
+    }
+
+    @Override
     protected void discoveredDevice()
     {
+        //
+        // Do nothing and check if scale is sleepwalking.
+        //
     }
 
     @Override
     protected void enableDevice()
     {
-        Log.d(LOGTAG, "enableDevice: " + currentPrimary);
+        super.enableDevice();
 
-        //
-        // Subscribe to normal data notification.
-        //
-
-        gattSchedule.add(new GattAction(GattAction.MODE_NOTIFY));
+        Log.d(LOGTAG, "enableDevice: " + deviceName);
 
         //
         // Issue a status request to figure out
@@ -88,7 +92,7 @@ public class BlueToothScale extends BlueTooth
 
         gattSchedule.add(new GattAction(getScaleSleepStatus()));
 
-        fireNext();
+        fireNext(true);
     }
 
     private Runnable disconnectScale = new Runnable()
@@ -100,10 +104,6 @@ public class BlueToothScale extends BlueTooth
 
             currentGatt.disconnect();
             connect();
-
-            //gattSchedule.add(new GattAction(getForceDisconnect()));
-
-            fireNext();
         }
     };
 
@@ -147,7 +147,7 @@ public class BlueToothScale extends BlueTooth
     }
 
     @Override
-    protected void parseResponse(byte[] rd, boolean intermediate)
+    protected void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         cbdata = new JSONObject();
 
@@ -163,7 +163,7 @@ public class BlueToothScale extends BlueTooth
 
             gattSchedule.add(0, new GattAction(getAcknowledgementData(rd)));
 
-            fireNext();
+            fireNext(true);
         }
 
         //
@@ -238,7 +238,7 @@ public class BlueToothScale extends BlueTooth
 
             gattSchedule.add(new GattAction(getDeviceReady()));
 
-            fireNext();
+            fireNext(true);
 
             return false;
         }
