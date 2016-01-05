@@ -89,30 +89,59 @@
 
           "Weiterhing sagt die App, wir sollen zuerst eine Markt auswählen, um Angebote ",
           "einsehen zu können. Das geht aber erst, wenn man ein Konto eingerichtet hat. ",
-          "Mithin die schlechsteste App in diesem Bereich."
+          "Mithin die schlechsteste App in diesem Bereich. Thema verfehlt."
         ]
       },
 
       "com.bfi.netto":
       {
         "what": "NETTO Scotty",
-        "score": "14",
+        "score": "15",
 
         "info": [
           "Einfacher geht es nicht mehr. App aufrufen. \"Hammer Donnerstag\" oder ",
-          "\"Hammer Samstag\" clicken, und der Handzettel geht auf. Mehr ist nicht "
-          "zu sagen. Genial. Ohne Ironie."
-          ]
+          "\"Hammer Samstag\" clicken, und der Handzettel geht auf. Mehr ist nicht ",
+          "zu sagen. Genial. Einfach genial."
+        ]
       },
 
+      "de.aldiNord.android":
+      {
+        "what": "Aldi Nord",
+        "score": "12",
 
+        "info": [
+          "Angebote, Angebote, Angebote. Was anderes kann man nicht machen. Was ",
+          "anderes ist auch nicht gefordert. Handzettel gibt es zwar keine, aber ",
+          "die dargestellten Rubriken sind recht übersichtlich. Ein Marktauswahl oder ",
+          "sonstiger Schnickschnack fehlt. Das gefällt."
+        ]
+      },
 
+      "de.penny.pennyandroid":
+      {
+        "what": "Penny",
+        "score": "9",
 
+        "info": [
+          "Die Marktsuche mit Landkarte funktioniert prima. Ist der Mark erstmal ausgewählt, ",
+          "kann man recht schnell die Angebote in Listenform einsehen. Handzettel gibt es ",
+          "keine, aber die Rubrikenauswahl ist recht gelungen."
+        ]
+      },
 
+      "de.sec.mobile":
+      {
+        "what": "Lidl",
+        "score": "7",
 
-      "de.sec.mobile": { "what": "Lidl" },
-      "de.penny.pennyandroid": { "what": "Penny" },
-      "de.aldiNord.android": { "what": "Aldi Nord" }
+        "info": [
+          "Die benutzerführung bei der Marktsuche ist wenig intuitiv. Aber, immerhin, ist der ",
+          "Markt ausgewählt, kann man recht schnell die Angebote in Listenform einsehen. ",
+          "Handzettel gibt es auch, allerdings müssen die als PDF geladen werden, und in einem ",
+          "externen Browser angezeigt werden. Das kann man besser machen."
+        ]
+      }
     }
   }
 }
