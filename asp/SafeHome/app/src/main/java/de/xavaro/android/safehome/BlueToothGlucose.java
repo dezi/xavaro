@@ -1,13 +1,10 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BlueToothGlucose extends BlueTooth
