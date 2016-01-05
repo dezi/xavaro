@@ -1,34 +1,21 @@
 package de.xavaro.android.safehome;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.preference.CheckBoxPreference;
-import android.preference.DialogPreference;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.text.InputType;
 import android.view.View;
-import android.view.Gravity;
-import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -40,21 +27,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Random;
 
 public class SettingsFragments
 {
     private static final String LOGTAG = SettingsFragments.class.getSimpleName();
-
-    private static final CharSequence[] recentText = { "Android-System", "SafeHome" };
-    private static final CharSequence[] recentVals = { "android", "safehome" };
 
     private static SharedPreferences sharedPrefs;
 
@@ -79,7 +58,9 @@ public class SettingsFragments
             return header;
         }
 
-        private final static ArrayList<Preference> preferences = new ArrayList<>();
+        private static final ArrayList<Preference> preferences = new ArrayList<>();
+        private static final CharSequence[] recentText = { "Android-System", "SafeHome" };
+        private static final CharSequence[] recentVals = { "android", "safehome" };
 
         private static Context runctx;
 
@@ -89,9 +70,9 @@ public class SettingsFragments
 
             preferences.clear();
 
-            NiceEditTextPreference et;
+            SettingsNiced.NiceEditTextPreference et;
 
-            et = new NiceEditTextPreference(context);
+            et = new SettingsNiced.NiceEditTextPreference(context);
 
             et.setKey("admin.password");
             et.setTitle("Administrator Passwort (zum Anzeigen clicken)");
@@ -108,7 +89,7 @@ public class SettingsFragments
 
             preferences.add(et);
 
-            et = new NiceEditTextPreference(context);
+            et = new SettingsNiced.NiceEditTextPreference(context);
 
             et.setKey("admin.home.button");
             et.setTitle("Anwendung auf dem Home-Button");
@@ -134,7 +115,7 @@ public class SettingsFragments
 
             preferences.add(et);
 
-            et = new NiceEditTextPreference(context);
+            et = new SettingsNiced.NiceEditTextPreference(context);
 
             et.setKey("admin.assist.button");
             et.setTitle("Anwendung auf dem Assistenz-Button");
@@ -160,7 +141,7 @@ public class SettingsFragments
 
             preferences.add(et);
 
-            NiceListPreference cb = new NiceListPreference(context);
+            SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
 
             cb.setEntries(recentText);
             cb.setEntryValues(recentVals);
@@ -209,7 +190,7 @@ public class SettingsFragments
         private final BlueToothFragment self = this;
         private Context context;
 
-        private NiceListPreference devicePref;
+        private SettingsNiced.NiceListPreference devicePref;
 
         final ArrayList<String> recentText = new ArrayList<>();
         final ArrayList<String> recentVals = new ArrayList<>();
@@ -227,11 +208,11 @@ public class SettingsFragments
             // Bluetooth device selection preference
             //
 
-            NicePreferenceCategory pc = new NicePreferenceCategory(context);
+            SettingsNiced.NiceCategoryPreference pc = new SettingsNiced.NiceCategoryPreference(context);
             pc.setTitle("BlueTooth Geräteauswahl");
             preferences.add(pc);
 
-            devicePref = new NiceListPreference(context);
+            devicePref = new SettingsNiced.NiceListPreference(context);
 
             devicePref.setKey(keyprefix + ".device");
 
@@ -553,7 +534,7 @@ public class SettingsFragments
 
             if (installpack != null)
             {
-                NiceListPreference ip = new NiceListPreference(context);
+                SettingsNiced.NiceListPreference ip = new SettingsNiced.NiceListPreference(context);
 
                 boolean installed = StaticUtils.isAppInstalled(context, installpack);
 
@@ -694,7 +675,7 @@ public class SettingsFragments
 
                     if (alike) cattitle += " (" + check.get(0) + ")";
 
-                    NicePreferenceCategory nc = new NicePreferenceCategory(context);
+                    SettingsNiced.NiceCategoryPreference nc = new SettingsNiced.NiceCategoryPreference(context);
                     nc.setTitle(cattitle);
                     nc.setEnabled(enabled);
                     preferences.add(nc);
@@ -702,7 +683,7 @@ public class SettingsFragments
                     if (chatphone != null)
                     {
                         String key = keyprefix + ".chat." + chatphone;
-                        NiceListPreference cb = new NiceListPreference(context);
+                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -723,7 +704,7 @@ public class SettingsFragments
                     if ((voipphone != null) && isPhone)
                     {
                         String key = keyprefix + ".text." + voipphone;
-                        NiceListPreference cb = new NiceListPreference(context);
+                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -744,7 +725,7 @@ public class SettingsFragments
                     if (voipphone != null)
                     {
                         String key = keyprefix + ".voip." + voipphone;
-                        NiceListPreference cb = new NiceListPreference(context);
+                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -765,7 +746,7 @@ public class SettingsFragments
                     if (vicaphone != null)
                     {
                         String key = keyprefix + ".vica." + vicaphone;
-                        NiceListPreference cb = new NiceListPreference(context);
+                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -1014,7 +995,7 @@ public class SettingsFragments
 
         //region SafetyCBPreference implementation.
 
-        private static class SafetyCBPreference extends CheckBoxPreference
+        private static class SafetyCBPreference extends SettingsNiced.NiceCheckboxPreference
         {
             public SafetyCBPreference(Context context)
             {
@@ -1169,7 +1150,7 @@ public class SettingsFragments
 
         //region DomainsCBPreference implementation
 
-        private static class DomainsCBPreference extends CheckBoxPreference
+        private static class DomainsCBPreference extends SettingsNiced.NiceCheckboxPreference
         {
             public DomainsCBPreference(Context context)
             {
@@ -1509,8 +1490,8 @@ public class SettingsFragments
 
                 boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable",false);
 
-                NicePreferenceCategory pc;
-                CheckBoxPreference cb;
+                SettingsNiced.NiceCategoryPreference pc;
+                SettingsNiced.NiceCheckboxPreference cb;
 
                 loadGlobalConfig(context);
 
@@ -1548,7 +1529,7 @@ public class SettingsFragments
                     {
                         key = keyprefix + ".website." + website;
 
-                        cb = new CheckBoxPreference(context);
+                        cb = new SettingsNiced.NiceCheckboxPreference(context);
 
                         cb.setKey(key);
                         cb.setTitle(label);
@@ -1570,7 +1551,7 @@ public class SettingsFragments
                     }
                     else
                     {
-                        pc = new NicePreferenceCategory(context);
+                        pc = new SettingsNiced.NiceCategoryPreference(context);
 
                         pc.setTitle(label);
                         pc.setIcon(drawable);
@@ -1589,7 +1570,7 @@ public class SettingsFragments
                             thumbnail = CacheManager.cacheThumbnail(context, iconurl);
                             drawable = new BitmapDrawable(context.getResources(), thumbnail);
 
-                            cb = new CheckBoxPreference(context);
+                            cb = new SettingsNiced.NiceCheckboxPreference(context);
 
                             cb.setKey(key);
                             cb.setTitle(label);
@@ -1672,7 +1653,7 @@ public class SettingsFragments
                 {
                     if (pref == this) continue;
 
-                    if (pref instanceof CheckBoxPreference)
+                    if (pref instanceof SettingsNiced.NiceCheckboxPreference)
                     {
                         pref.setEnabled((boolean) obj);
                     }
@@ -1686,651 +1667,4 @@ public class SettingsFragments
     }
 
     //endregion JSONConfigFragment stub
-
-    //region Niced preferences
-
-    public static class NicePreferenceCategory extends PreferenceCategory
-    {
-        public NicePreferenceCategory(Context context)
-        {
-            super(context);
-        }
-
-        @Override
-        protected void onBindView(View view)
-        {
-            super.onBindView(view);
-
-            view.setPadding(20, 20, 20, 20);
-            view.setBackgroundColor(0xcccccccc);
-
-            TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setTextSize(20f);
-        }
-    }
-
-    public static class NiceListPreference extends ListPreference
-            implements Preference.OnPreferenceChangeListener
-    {
-        private String key;
-        private TextView current;
-        private CharSequence[] entries;
-        private CharSequence[] values;
-        private Runnable onClickRunner;
-
-        private boolean enabled = true;
-
-        public NiceListPreference(Context context)
-        {
-            super(context);
-
-            setOnPreferenceChangeListener(this);
-        }
-
-        @Override
-        public void setKey(String key)
-        {
-            super.setKey(key);
-            this.key = key;
-        }
-
-        public void setEntries(ArrayList<String> entries)
-        {
-            String[] intern = new String[ entries.size() ];
-
-            for (int inx = 0; inx < intern.length; inx++)
-            {
-                intern[ inx ] = entries.get(inx);
-            }
-
-            super.setEntries(intern);
-            this.entries = intern;
-        }
-
-        @Override
-        public void setEntries(CharSequence[] entries)
-        {
-            super.setEntries(entries);
-            this.entries = entries;
-        }
-
-        public void setEntryValues(ArrayList<String> values)
-        {
-            String[] intern = new String[ values.size() ];
-
-            for (int inx = 0; inx < intern.length; inx++)
-            {
-                intern[ inx ] = values.get(inx);
-            }
-
-            super.setEntryValues(intern);
-            this.values = intern;
-        }
-
-        @Override
-        public void setEntryValues(CharSequence[] values)
-        {
-            super.setEntryValues(values);
-            this.values = values;
-        }
-
-        @Override
-        public void setEnabled(boolean enabled)
-        {
-            super.setEnabled(enabled);
-
-            this.enabled = enabled;
-
-            if (current != null)
-            {
-                current.setTextColor(enabled
-                        ? GlobalConfigs.PreferenceTextEnabledColor
-                        : GlobalConfigs.PreferenceTextDisabledColor);
-            }
-        }
-
-        private String getDisplayValue(String value)
-        {
-            for (int inx = 0; inx < values.length; inx++)
-            {
-                if (values[ inx ].equals(value))
-                {
-                    return (String) entries[ inx ];
-                }
-            }
-
-            return "unknown";
-        }
-
-        public void setOnclick(Runnable onlick)
-        {
-            onClickRunner = onlick;
-        }
-
-        @Override
-        protected void showDialog(Bundle state)
-        {
-            if (onClickRunner == null)
-            {
-                super.showDialog(state);
-
-                return;
-            }
-
-            onClickRunner.run();
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object obj)
-        {
-            if (current != null) current.setText(getDisplayValue((String) obj));
-
-            return true;
-        }
-
-        @Override
-        protected void onBindView(View view)
-        {
-            super.onBindView(view);
-
-            if (current == null)
-            {
-                current = new TextView(getContext());
-                current.setGravity(Gravity.END);
-                current.setTextSize(18f);
-
-                current.setTextColor(enabled
-                        ? GlobalConfigs.PreferenceTextEnabledColor
-                        : GlobalConfigs.PreferenceTextDisabledColor);
-
-                if (sharedPrefs.contains(key))
-                {
-                    current.setText(getDisplayValue(sharedPrefs.getString(key,null)));
-                }
-            }
-
-            if (current.getParent() != null)
-            {
-                //
-                // Der inder calls bind view every now and then because
-                // of bad programming. So check if textview is child
-                // of obsoleted view and remove before processing.
-                //
-
-                ((LinearLayout) current.getParent()).removeView(current);
-            }
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.END);
-
-            ((LinearLayout) view).addView(current, lp);
-        }
-    }
-
-    public static class NiceDisplayTextPreference extends NiceEditTextPreference
-    {
-        public NiceDisplayTextPreference(Context context)
-        {
-            super(context);
-        }
-
-        @Override
-        protected void showDialog(Bundle state)
-        {
-        }
-    }
-
-    public static class NiceEditTextPreference extends EditTextPreference
-            implements Preference.OnPreferenceChangeListener
-    {
-        private String key;
-        private TextView current;
-        private Runnable onClickRunner;
-        private boolean isPassword;
-        private boolean isUppercase;
-
-        public NiceEditTextPreference(Context context)
-        {
-            super(context);
-
-            setOnPreferenceChangeListener(this);
-        }
-
-        @Override
-        public void setKey(String key)
-        {
-            super.setKey(key);
-            this.key = key;
-        }
-
-        @Override
-        public void setText(String text)
-        {
-            super.setText(text);
-
-            sharedPrefs.edit().putString(key, text).apply();
-        }
-
-        public void setIsPassword()
-        {
-            isPassword = true;
-        }
-
-        public void setIsUppercase()
-        {
-            isUppercase = true;
-        }
-
-        public void setOnclick(Runnable onlick)
-        {
-            onClickRunner = onlick;
-        }
-
-        @Override
-        protected void showDialog(Bundle state)
-        {
-            if (onClickRunner == null)
-            {
-                super.showDialog(state);
-
-                return;
-            }
-
-            onClickRunner.run();
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object obj)
-        {
-            if (current != null) current.setText((String) obj);
-
-            return true;
-        }
-
-        @Override
-        protected void onBindView(View view)
-        {
-            super.onBindView(view);
-
-            current = new TextView(getContext());
-            current.setGravity(Gravity.END);
-            current.setTextSize(18f);
-
-            if (isPassword)
-            {
-                current.setInputType(InputType.TYPE_CLASS_TEXT |
-                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            }
-
-            if (isUppercase)
-            {
-                current.setAllCaps(true);
-            }
-
-            if (sharedPrefs.contains(key))
-            {
-                current.setText(sharedPrefs.getString(key, null));
-            }
-
-            ((ViewGroup) view).addView(current);
-        }
-    }
-
-    public static class NiceDialogPreference extends DialogPreference
-    {
-        protected TextView current;
-        protected boolean enabled;
-        protected boolean isInteger;
-        protected String unit;
-
-        public NiceDialogPreference(Context context)
-        {
-            super(context, null);
-        }
-
-        @Override
-        public void setEnabled(boolean enabled)
-        {
-            super.setEnabled(enabled);
-            this.enabled = enabled;
-
-            if (current != null)
-            {
-                current.setTextColor(enabled
-                        ? GlobalConfigs.PreferenceTextEnabledColor
-                        : GlobalConfigs.PreferenceTextDisabledColor);
-            }
-        }
-
-        public void setValue(String value)
-        {
-            if (current != null)
-            {
-                current.setText(value);
-            }
-        }
-
-        public void setValue(int value)
-        {
-            if (current != null)
-            {
-                String text = "" + value;
-
-                if (unit != null)
-                {
-                    text += " " + unit;
-                }
-
-                current.setText(text);
-            }
-        }
-
-        public void setUnit(String unit)
-        {
-            this.unit = unit;
-        }
-
-        @Override
-        protected void onBindView(View view)
-        {
-            super.onBindView(view);
-
-            if (current == null)
-            {
-                current = new TextView(getContext());
-                current.setGravity(Gravity.END);
-                current.setTextSize(18f);
-
-                current.setTextColor(enabled
-                        ? GlobalConfigs.PreferenceTextEnabledColor
-                        : GlobalConfigs.PreferenceTextDisabledColor);
-
-                if (sharedPrefs.contains(this.getKey()))
-                {
-                    if (isInteger)
-                    {
-                        this.setValue(sharedPrefs.getInt(this.getKey(), 0));
-                    }
-                    else
-                    {
-                        this.setValue(sharedPrefs.getString(this.getKey(), null));
-                    }
-                }
-            }
-
-            if (current.getParent() != null)
-            {
-                //
-                // Der inder calls bind view every now and then because
-                // of bad programming. So check if textview is child
-                // of obsoleted view and remove before processing.
-                //
-
-                ((LinearLayout) current.getParent()).removeView(current);
-            }
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.END);
-
-            ((LinearLayout) view).addView(current, lp);
-        }
-    }
-
-    public static class NiceDatePreference extends NiceDialogPreference implements
-            DatePicker.OnDateChangedListener
-    {
-        private String dateString;
-        private String changedValueCanBeNull;
-        private DatePicker datePicker;
-
-        public NiceDatePreference(Context context)
-        {
-            super(context);
-        }
-
-        @Override
-        protected View onCreateDialogView()
-        {
-            this.datePicker = new DatePicker(getContext());
-
-            Calendar calendar = getDate();
-
-            datePicker.init(calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH),
-                    this);
-
-            return datePicker;
-        }
-
-        public Calendar getDate()
-        {
-            try
-            {
-                Date date = formatter().parse(defaultValue());
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
-                return cal;
-            }
-            catch (java.text.ParseException ex)
-            {
-                return new GregorianCalendar(2000, 0, 1);
-            }
-        }
-
-        public void setDate(String dateString)
-        {
-            this.dateString = dateString;
-        }
-
-        @SuppressLint("SimpleDateFormat")
-        public SimpleDateFormat formatter()
-        {
-            return new SimpleDateFormat("yyyy.MM.dd");
-        }
-
-        @SuppressLint("SimpleDateFormat")
-        public SimpleDateFormat summaryFormatter()
-        {
-            return new SimpleDateFormat("dd.MM.yyyy");
-        }
-
-        @Override
-        protected Object onGetDefaultValue(TypedArray a, int index)
-        {
-            return a.getString(index);
-        }
-
-        @Override
-        protected void onSetInitialValue(boolean restoreValue, Object def)
-        {
-            if (restoreValue)
-            {
-                this.dateString = getPersistedString(defaultValue());
-                setTheDate(this.dateString);
-            }
-            else
-            {
-                boolean wasNull = this.dateString == null;
-
-                setDate((String) def);
-
-                if (!wasNull) persistDate(this.dateString);
-            }
-        }
-
-        public void onDateChanged(DatePicker view, int year, int month, int day)
-        {
-            Calendar selected = new GregorianCalendar(year, month, day);
-            this.changedValueCanBeNull = formatter().format(selected.getTime());
-        }
-
-        @Override
-        protected void onDialogClosed(boolean shouldSave)
-        {
-            if (shouldSave && this.changedValueCanBeNull != null)
-            {
-                setTheDate(this.changedValueCanBeNull);
-                this.changedValueCanBeNull = null;
-            }
-        }
-
-        private void setTheDate(String s)
-        {
-            setDate(s);
-            persistDate(s);
-        }
-
-        private void persistDate(String s)
-        {
-            persistString(s);
-
-            if (current != null) current.setText(summaryFormatter().format(getDate().getTime()));
-        }
-
-        private String defaultValue()
-        {
-            if (this.dateString == null)
-            {
-                setDate(formatter().format(new GregorianCalendar(2000, 0, 1).getTime()));
-            }
-
-            return this.dateString;
-        }
-
-        @Override
-        protected void onBindView(View view)
-        {
-            super.onBindView(view);
-
-            current.setText(summaryFormatter().format(getDate().getTime()));
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which)
-        {
-            super.onClick(dialog, which);
-
-            datePicker.clearFocus();
-
-            onDateChanged(datePicker,
-                    datePicker.getYear(),
-                    datePicker.getMonth(),
-                    datePicker.getDayOfMonth());
-
-            onDialogClosed(which == DialogInterface.BUTTON_POSITIVE);
-        }
-    }
-
-    public static class NiceNumberPreference extends NiceDialogPreference
-    {
-        private NumberPicker numberPicker;
-
-        private int actValue;
-        private int minValue = Integer.MIN_VALUE;
-        private int maxValue = Integer.MAX_VALUE;
-
-        private int stepValue = 1;
-        private String[] stepValues;
-
-        public NiceNumberPreference(Context context)
-        {
-            super(context);
-
-            isInteger = true;
-
-            setPositiveButtonText(android.R.string.ok);
-            setNegativeButtonText(android.R.string.cancel);
-        }
-
-        public void setMinMaxValue(int min, int max, int step)
-        {
-            minValue = min;
-            maxValue = max;
-            stepValue = step;
-        }
-
-        @Override
-        protected View onCreateDialogView()
-        {
-            numberPicker = new NumberPicker(getContext());
-
-            numberPicker.setMinValue(minValue);
-            numberPicker.setMaxValue(maxValue);
-            numberPicker.setValue(actValue);
-
-            if (stepValue != 1)
-            {
-                int steps = (maxValue - minValue) / stepValue;
-
-                if (steps < 100)
-                {
-                    stepValues = new String[ steps ];
-
-                    for (int inx = 0; inx < steps; inx++)
-                    {
-                        stepValues[ inx ] = "" + (minValue + (inx * stepValue));
-                    }
-
-                    numberPicker.setMinValue(0);
-                    numberPicker.setMaxValue(stepValues.length - 1);
-                    numberPicker.setValue((actValue - minValue) / stepValue);
-                    numberPicker.setDisplayedValues(stepValues);
-                }
-            }
-
-            //
-            // Inhibit display of completely useless keyboard.
-            //
-
-            numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-
-            return numberPicker;
-        }
-
-        @Override
-        protected void onDialogClosed(boolean positiveResult)
-        {
-            if (positiveResult)
-            {
-                if (stepValues == null)
-                {
-                    setValue(numberPicker.getValue());
-                }
-                else
-                {
-                    setValue(Integer.parseInt(stepValues[ numberPicker.getValue() ]));
-                }
-            }
-        }
-
-        @Override
-        protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
-        {
-            setValue(restoreValue ? getPersistedInt(actValue) : (int) defaultValue);
-        }
-
-        @Override
-        public void setValue(int value)
-        {
-            super.setValue(value);
-
-            if (shouldPersist())
-            {
-                persistInt(value);
-            }
-
-            if (value != actValue)
-            {
-                actValue = value;
-                notifyChanged();
-            }
-        }
-    }
-
-    //endregion Niced preferences
 }

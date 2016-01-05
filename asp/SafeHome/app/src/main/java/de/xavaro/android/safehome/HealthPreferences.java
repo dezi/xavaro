@@ -1,7 +1,6 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 
 import java.util.Random;
@@ -38,20 +37,20 @@ public class HealthPreferences
         {
             super.registerAll(context);
 
-            SettingsFragments.NicePreferenceCategory pc;
-            SettingsFragments.NiceListPreference lp;
-            SettingsFragments.NiceDatePreference dp;
-            SettingsFragments.NiceNumberPreference np;
+            SettingsNiced.NiceCategoryPreference pc;
+            SettingsNiced.NiceListPreference lp;
+            SettingsNiced.NiceDatePreference dp;
+            SettingsNiced.NiceNumberPreference np;
 
             //
             // Personal user data required for calculations.
             //
 
-            pc = new SettingsFragments.NicePreferenceCategory(context);
+            pc = new SettingsNiced.NiceCategoryPreference(context);
             pc.setTitle("Persönliche Daten");
             preferences.add(pc);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] genderText = { "Nicht gesetzt", "Männlich", "Weiblich"  };
             String[] genderVals = { "unknown", "male", "female" };
@@ -65,7 +64,7 @@ public class HealthPreferences
 
             preferences.add(lp);
 
-            dp = new SettingsFragments.NiceDatePreference(context);
+            dp = new SettingsNiced.NiceDatePreference(context);
 
             dp.setKey(keyprefix + ".user.birthdate");
             dp.setTitle("Geburtsdatum");
@@ -73,7 +72,7 @@ public class HealthPreferences
 
             preferences.add(dp);
 
-            np = new SettingsFragments.NiceNumberPreference(context);
+            np = new SettingsNiced.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".user.size");
             np.setUnit("cm");
@@ -84,7 +83,7 @@ public class HealthPreferences
 
             preferences.add(np);
 
-            np = new SettingsFragments.NiceNumberPreference(context);
+            np = new SettingsNiced.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".user.weight");
             np.setUnit("kg");
@@ -95,7 +94,7 @@ public class HealthPreferences
 
             preferences.add(np);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] userActivityText = { "Nicht aktiv", "Leicht aktiv", "Moderat aktiv", "Sehr aktiv", "Besonders aktiv"  };
             String[] userActivityVals = { "0", "1", "2", "3", "4" };
@@ -140,9 +139,9 @@ public class HealthPreferences
         @Override
         public void registerAll(Context context)
         {
-            SettingsFragments.NiceListPreference lp;
+            SettingsNiced.NiceListPreference lp;
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] unitTimeText = { "24 Stunden", "12 Stunden"  };
             String[] unitTimeVals = { "24h", "12h" };
@@ -155,7 +154,7 @@ public class HealthPreferences
 
             preferences.add(lp);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] unitSizeText = {"Zentimeter", "Inch"};
             String[] unitSizeVals = {"cm", "inch"};
@@ -168,7 +167,7 @@ public class HealthPreferences
 
             preferences.add(lp);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] unitDistText = { "Meter", "Yards"  };
             String[] unitDistVals = { "m", "yard" };
@@ -181,7 +180,7 @@ public class HealthPreferences
 
             preferences.add(lp);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] unitWeightText = { "Kilogramm", "Pfund"  };
             String[] unitWeightVals = { "kg", "lbs" };
@@ -194,7 +193,7 @@ public class HealthPreferences
 
             preferences.add(lp);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] unitPressureText = { "mmHg", "kPa" };
             String[] unitPressureVals = { "mmhg", "kpa" };
@@ -245,19 +244,19 @@ public class HealthPreferences
         {
             super.registerAll(context);
 
-            SettingsFragments.NicePreferenceCategory pc;
-            SettingsFragments.NiceListPreference lp;
-            CheckBoxPreference cb;
+            SettingsNiced.NiceCategoryPreference pc;
+            SettingsNiced.NiceListPreference lp;
+            SettingsNiced.NiceCheckboxPreference cb;
 
             //
             // User.
             //
 
-            pc = new SettingsFragments.NicePreferenceCategory(context);
+            pc = new SettingsNiced.NiceCategoryPreference(context);
             pc.setTitle("Benutzerauswahl");
             preferences.add(pc);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] userSelectText = { "Benutzer 1", "Benutzer 2", "Benutzer 3", "Benutzer 4" };
             String[] userSelectVals = { "1", "2", "3", "4" };
@@ -271,11 +270,11 @@ public class HealthPreferences
 
             preferences.add(lp);
 
-            pc = new SettingsFragments.NicePreferenceCategory(context);
+            pc = new SettingsNiced.NiceCategoryPreference(context);
             pc.setTitle("Vereinfachte Bedienung");
             preferences.add(pc);
 
-            cb = new CheckBoxPreference(context);
+            cb = new SettingsNiced.NiceCheckboxPreference(context);
 
             cb.setKey(keyprefix + ".anyuser");
             cb.setTitle("Jeden Gerätebenutzer akzeptieren");
@@ -291,7 +290,7 @@ public class HealthPreferences
 
             preferences.add(cb);
 
-            cb = new CheckBoxPreference(context);
+            cb = new SettingsNiced.NiceCheckboxPreference(context);
 
             cb.setKey(keyprefix + ".anytime");
             cb.setTitle("Zurückgesetztes Datum im Gerät kompensieren");
@@ -342,19 +341,19 @@ public class HealthPreferences
         {
             super.registerAll(context);
 
-            SettingsFragments.NicePreferenceCategory pc;
-            SettingsFragments.NiceEditTextPreference ep;
-            SettingsFragments.NiceDisplayTextPreference dt;
+            SettingsNiced.NiceCategoryPreference pc;
+            SettingsNiced.NiceEditTextPreference ep;
+            SettingsNiced.NiceDisplayTextPreference dt;
 
             //
             // Personal user data required for calculations.
             //
 
-            pc = new SettingsFragments.NicePreferenceCategory(context);
+            pc = new SettingsNiced.NiceCategoryPreference(context);
             pc.setTitle("Waagenbenutzer");
             preferences.add(pc);
 
-            ep = new SettingsFragments.NiceEditTextPreference(context);
+            ep = new SettingsNiced.NiceEditTextPreference(context);
 
             ep.setKey(keyprefix + ".initials");
             ep.setTitle("Initialen");
@@ -364,7 +363,7 @@ public class HealthPreferences
 
             preferences.add(ep);
 
-            dt = new SettingsFragments.NiceDisplayTextPreference(context);
+            dt = new SettingsNiced.NiceDisplayTextPreference(context);
 
             dt.setKey(keyprefix + ".userid");
             dt.setTitle("User-ID");
@@ -420,19 +419,19 @@ public class HealthPreferences
         {
             super.registerAll(context);
 
-            SettingsFragments.NicePreferenceCategory pc;
-            SettingsFragments.NiceListPreference lp;
-            SettingsFragments.NiceNumberPreference np;
+            SettingsNiced.NiceCategoryPreference pc;
+            SettingsNiced.NiceListPreference lp;
+            SettingsNiced.NiceNumberPreference np;
 
             //
             // Goals.
             //
 
-            pc = new SettingsFragments.NicePreferenceCategory(context);
+            pc = new SettingsNiced.NiceCategoryPreference(context);
             pc.setTitle("Tagesziele");
             preferences.add(pc);
 
-            np = new SettingsFragments.NiceNumberPreference(context);
+            np = new SettingsNiced.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.steps");
             np.setMinMaxValue(100, 10000, 100);
@@ -442,7 +441,7 @@ public class HealthPreferences
 
             preferences.add(np);
 
-            np = new SettingsFragments.NiceNumberPreference(context);
+            np = new SettingsNiced.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.calories");
             np.setMinMaxValue(100, 2000, 100);
@@ -452,7 +451,7 @@ public class HealthPreferences
 
             preferences.add(np);
 
-            np = new SettingsFragments.NiceNumberPreference(context);
+            np = new SettingsNiced.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".goals.sleephours");
             np.setMinMaxValue(4, 10, 1);
@@ -462,7 +461,7 @@ public class HealthPreferences
 
             preferences.add(np);
 
-            lp = new SettingsFragments.NiceListPreference(context);
+            lp = new SettingsNiced.NiceListPreference(context);
 
             String[] unitGoalText = { "Schritte", "Kalorien"  };
             String[] unitGoalVals = { "steps", "calories" };
@@ -514,11 +513,11 @@ public class HealthPreferences
         {
             super.registerAll(context);
 
-            SettingsFragments.NicePreferenceCategory pc;
-            SettingsFragments.NiceListPreference lp;
-            SettingsFragments.NiceDatePreference dp;
-            SettingsFragments.NiceNumberPreference np;
-            SettingsFragments.NiceEditTextPreference ep;
+            SettingsNiced.NiceCategoryPreference pc;
+            SettingsNiced.NiceEditTextPreference ep;
+            SettingsNiced.NiceListPreference lp;
+            SettingsNiced.NiceDatePreference dp;
+            SettingsNiced.NiceNumberPreference np;
         }
     }
 
