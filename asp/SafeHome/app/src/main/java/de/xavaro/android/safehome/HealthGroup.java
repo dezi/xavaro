@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -11,13 +10,9 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class HealthGroup extends LaunchGroup implements
-        BlueTooth.BlueToothDataCallback
+public class HealthGroup extends LaunchGroup
 {
     private static final String LOGTAG = HealthGroup.class.getSimpleName();
-
-    private static BlueTooth bpmBlueTooth;
-    private static BlueTooth scaleBlueTooth;
 
     public static void initialize(Context context)
     {
@@ -31,9 +26,7 @@ public class HealthGroup extends LaunchGroup implements
 
             if ((bpmDevice != null) && ! bpmDevice.equals("unknown"))
             {
-                bpmBlueTooth = new BlueToothBPM(context, bpmDevice);
-
-                bpmBlueTooth.connect();
+                HealthBPM.getInstance().setBlueTooth(new BlueToothBPM(context, bpmDevice));
             }
         }
 
@@ -43,23 +36,51 @@ public class HealthGroup extends LaunchGroup implements
 
             if ((scaleDevice != null) && ! scaleDevice.equals("unknown"))
             {
-                scaleBlueTooth = new BlueToothScale(context, scaleDevice);
+                HealthScale.getInstance().setBlueTooth(new BlueToothScale(context, scaleDevice));
+            }
+        }
 
-                scaleBlueTooth.connect();
+        if (sp.getBoolean("health.sensor.enable", false))
+        {
+            String sensorDevice = sp.getString("health.sensor.device",null);
+
+            if ((sensorDevice != null) && ! sensorDevice.equals("unknown"))
+            {
+                HealthSensor.getInstance().setBlueTooth(new BlueToothSensor(context, sensorDevice));
+            }
+        }
+
+        if (sp.getBoolean("health.glucose.enable", false))
+        {
+            String glucoseDevice = sp.getString("health.glucose.device",null);
+
+            if ((glucoseDevice != null) && ! glucoseDevice.equals("unknown"))
+            {
+                HealthGlucose.getInstance().setBlueTooth(new BlueToothGlucose(context, glucoseDevice));
             }
         }
     }
 
     public static void subscribeDevice(BlueTooth.BlueToothConnectCallback subscriber, String subtype)
     {
-        if (subtype.equals("bpm") && (bpmBlueTooth != null))
+        if (subtype.equals("bpm") && (HealthBPM.getInstance() != null))
         {
-            bpmBlueTooth.setConnectCallback(subscriber);
+            HealthBPM.subscribe(subscriber);
         }
 
-        if (subtype.equals("scale") && (scaleBlueTooth != null))
+        if (subtype.equals("scale") && (HealthScale.getInstance() != null))
         {
-            scaleBlueTooth.setConnectCallback(subscriber);
+            HealthScale.subscribe(subscriber);
+        }
+
+        if (subtype.equals("sensor") && (HealthSensor.getInstance() != null))
+        {
+            HealthSensor.subscribe(subscriber);
+        }
+
+        if (subtype.equals("glucose") && (HealthGlucose.getInstance() != null))
+        {
+            HealthGlucose.subscribe(subscriber);
         }
     }
 
@@ -68,9 +89,6 @@ public class HealthGroup extends LaunchGroup implements
         super(context);
 
         this.config = getConfig(context);
-
-        if (bpmBlueTooth != null) bpmBlueTooth.setDataCallback(this);
-        if (scaleBlueTooth != null) scaleBlueTooth.setDataCallback(this);
     }
 
     private JSONObject getConfig(Context context)
@@ -80,11 +98,12 @@ public class HealthGroup extends LaunchGroup implements
             JSONObject launchgroup = new JSONObject();
             JSONArray launchitems = new JSONArray();
 
+            SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
             Map<String, Object> hp = DitUndDat.SharedPrefs.getPrefix("health.");
 
             for (String prefkey : hp.keySet())
             {
-                if (prefkey.equals("health.bpm.enable"))
+                if (prefkey.equals("health.bpm.enable") && sp.getBoolean("health.bpm.enable",false))
                 {
                     JSONObject entry = new JSONObject();
 
@@ -95,13 +114,35 @@ public class HealthGroup extends LaunchGroup implements
                     launchitems.put(entry);
                 }
 
-                if (prefkey.equals("health.scale.enable"))
+                if (prefkey.equals("health.scale.enable") && sp.getBoolean("health.scale.enable",false))
                 {
                     JSONObject entry = new JSONObject();
 
                     entry.put("type", "health");
                     entry.put("label", "Gewicht");
                     entry.put("subtype", "scale");
+
+                    launchitems.put(entry);
+                }
+
+                if (prefkey.equals("health.sensor.enable") && sp.getBoolean("health.sensor.enable",false))
+                {
+                    JSONObject entry = new JSONObject();
+
+                    entry.put("type", "health");
+                    entry.put("label", "Aktivität");
+                    entry.put("subtype", "sensor");
+
+                    launchitems.put(entry);
+                }
+
+                if (prefkey.equals("health.glucose.enable") && sp.getBoolean("health.glucose.enable",false))
+                {
+                    JSONObject entry = new JSONObject();
+
+                    entry.put("type", "health");
+                    entry.put("label", "Blutzucker");
+                    entry.put("subtype", "glucose");
 
                     launchitems.put(entry);
                 }
@@ -117,10 +158,5 @@ public class HealthGroup extends LaunchGroup implements
         }
 
         return new JSONObject();
-    }
-
-    public void onBluetoothReceivedData(BluetoothDevice device, JSONObject data)
-    {
-        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
     }
 }

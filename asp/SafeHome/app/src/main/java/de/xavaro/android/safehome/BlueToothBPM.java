@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
@@ -10,81 +12,52 @@ public class BlueToothBPM extends BlueTooth
 {
     private static final String LOGTAG = BlueToothBPM.class.getSimpleName();
 
+    public BlueToothBPM(Context context)
+    {
+        super(context);
+    }
+
     public BlueToothBPM(Context context, String deviceTag)
     {
         super(context, deviceTag);
     }
 
-    private static class BPMs
+    @Override
+    protected boolean isCompatibleService(BluetoothGattService service)
     {
-        public static final String BM75 = "BM75";
-        public static final String SBM37 = "SBM37";
-        public static final String SBM67 = "SBM67";
-        public static final String BEURER_BC57 = "BC57";
-        public static final String SANITAS_SBM67 = "BPM Smart";
-        public static final String SANITAS_SBM37 = "Sanitas SBM37";
+        return service.getUuid().toString().equals("00001810-0000-1000-8000-00805f9b34fb");
     }
 
-    @SuppressWarnings("unused")
-    public static boolean isCompatibleBPM(String devicename)
+    @Override
+    protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
-        return (devicename.equalsIgnoreCase(BPMs.BM75) ||
-                devicename.equalsIgnoreCase(BPMs.SBM37) ||
-                devicename.equalsIgnoreCase(BPMs.SBM67) ||
-                devicename.equalsIgnoreCase(BPMs.BEURER_BC57) ||
-                devicename.equalsIgnoreCase(BPMs.SANITAS_SBM67) ||
-                devicename.equalsIgnoreCase(BPMs.SANITAS_SBM37));
+        return characteristic.getUuid().toString().equals("00002a35-0000-1000-8000-00805f9b34fb");
+    }
+
+    @Override
+    protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
+    {
+        return characteristic.getUuid().toString().equals("00002a36-0000-1000-8000-00805f9b34fb");
+    }
+
+    @Override
+    protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
     }
 
     @Override
     protected void enableDevice()
     {
-        Log.d(LOGTAG,"enableDevice: " + currentControl);
+        super.enableDevice();
 
-        if (currentControl != null)
-        {
-            GattAction ga;
+        Log.d(LOGTAG,"enableDevice: " + deviceName);
 
-            //
-            // Subscribe to normal data indication.
-            //
-
-            ga = new GattAction();
-
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_INDICATE;
-            ga.characteristic = currentControl;
-
-            gattSchedule.add(ga);
-
-            //
-            // Subscribe to intermediate data notification
-            // when user is conduction measurement.
-            //
-
-            ga = new GattAction();
-
-            ga.gatt = currentGatt;
-            ga.mode = GattAction.MODE_NOTIFY;
-            ga.characteristic = currentIntermediate;
-
-            gattSchedule.add(ga);
-
-            fireNext();
-        }
-
-        if (connectCallback != null)
-        {
-            //
-            // BPM equippment ist active, when it is connected.
-            //
-
-            connectCallback.onBluetoothActive(currentGatt.getDevice());
-        }
+        fireNext(true);
     }
 
     @Override
-    public void parseResponse(byte[] rd, boolean intermediate)
+    public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
         Log.d(LOGTAG, "parseResponse: " + getMaskString(rd[ 0 ]));
@@ -95,7 +68,9 @@ public class BlueToothBPM extends BlueTooth
 
             int offset = 0;
 
-            bpmdata.put("result", intermediate ? "intermediate" : "final");
+            bpmdata.put("type", "Measurement");
+
+            bpmdata.put("result", (characteristic == currentPrimary) ? "final" : "intermediate");
 
             bpmdata.put("systolic", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
             bpmdata.put("diastolic", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
@@ -103,7 +78,7 @@ public class BlueToothBPM extends BlueTooth
 
             if ((rd[ 0 ] & 0x02) >= 1)
             {
-                bpmdata.put("year", unsignedBytesToInt(rd[ ++offset ], rd[ ++offset ]));
+                bpmdata.put("year", unsignedBytesToIntRev(rd[ ++offset ], rd[ ++offset ]));
                 bpmdata.put("month", unsignedByteToInt(rd[ ++offset ]));
                 bpmdata.put("day", unsignedByteToInt(rd[ ++offset ]));
                 bpmdata.put("hour", unsignedByteToInt(rd[ ++offset ]));
@@ -129,12 +104,17 @@ public class BlueToothBPM extends BlueTooth
             JSONObject data = new JSONObject();
             data.put("bpm", bpmdata);
 
-            if (dataCallback != null) dataCallback.onBluetoothReceivedData(currentGatt.getDevice(), data);
+            if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
         }
         catch (JSONException ex)
         {
             OopsService.log(LOGTAG, ex);
         }
+    }
+
+    @Override
+    public void sendCommand(JSONObject command)
+    {
     }
 
     private String getMaskString(int mask)

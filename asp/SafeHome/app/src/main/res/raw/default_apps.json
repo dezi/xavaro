@@ -1,0 +1,175 @@
+{
+  "apps": {
+
+    "musthave":
+    {
+      "org.wikipedia": {
+        "what": "Wikipedia",
+        "score": "15",
+
+        "info": [
+          "Was soll man sagen?. Die #1 App überhaupt. Keine Werbung, viel substantielle ",
+          "Information. Beste App des Universums. Bitte installieren. Und spenden."
+        ]
+      }
+    },
+
+    "discounter":
+    {
+      "com.famila.nordost":
+      {
+        "what": "famila Nordost",
+        "score": "0",
+
+        "info": [
+          "Die App möchte als erstes ein Kundenkonto erstellen. Ohne das geht es nicht weiter. ",
+          "Da wir natürlich hier kein Konto einrichten, sind die Handzettel oder irgendwelche ",
+          "Angebote demnach nicht einsehbar. Thema verfehlt."
+        ]
+      },
+
+      "com.wfp2.realapp":
+      {
+        "what": "Real",
+        "score": "7",
+
+        "info": [
+          "Nach relativ langem Laden will die App, dass wir sie bewerten. Wir haben aber noch ",
+          "gar nichts gemacht. Das ist schonmal negativ. Nachdem wir die Konto-Eröffnungshürde ",
+          "überwunden haben, können wir ohne Konto einen Markt auswählen. ",
+          "Die Real-Tester können sich offenbar kein Tablet leisten, daher sieht der Bildschirm ",
+          "auf dem Tablet merkwürdig aus. ",
+          "Die Marktauswahl ist ohne Landkarte, nur in Listenform. Aber, immerhin. Die Prospekte ",
+          "öffnen sich schnell und können innerhalb der App eingesehen werden."
+        ]
+      },
+
+      "de.norma":
+      {
+        "what": "NORMA",
+        "score": "4",
+
+        "info": [
+          "Die App ist für Mobil-Telefone ausgelegt. Alle Anzeigen sind mikroskopisch ",
+          "klein. Man kann einen Markt auswählen, allerdings hat das keine Einfluss auf ",
+          "die Angebote, da diese landesweit einheitlich gelten. Handzettel können nicht ",
+          "eingesehen werden, nur nach Kategorien geordnete Angebote, die wiederum unendlich ",
+          "klein dargestellt werden."
+          ]
+      },
+
+      "de.rewe.app":
+      {
+        "what": "REWE",
+        "score": "5",
+
+        "info": [
+          "Die App hat ein nettes Design. Die Marktsuche ergabt stereotyp \"keine Märkte in der ",
+          "Nähe\". Das ist natürlich eine Falschmeldung und mithin ärgerlich. Was in der Nähe ",
+          "ist, bestimmt immer noch der Anwender. Der erste Kontrollverlust. ",
+
+          "Hat die App sich dazu herabgelassen, doch eine Markt auszuwählen, werden Angebote ",
+          "in einer Liste relativ klein angezeigt. Immerhin. "
+        ]
+      },
+
+      "com.valuephone.vpedeka":
+      {
+        "what": "EDEKA",
+        "score": "14",
+
+        "info": [
+          "Die Marktauswahl ist sehr einfach. Es wird eine Karte der Umgebung angezeigt. ",
+          "Der Liebslingsmarkt ist schnell gefunden und ausgewählt. Das dauert weniger ",
+          "als 5 Sekunden. ",
+
+          "Bevor man auch nur SchwippSchwapp gesagt hat, ist der dem Mark zugeordnete Handzettel ",
+          "geöffnet.",
+
+          "Dazu gibt es noch ein paar nutzlose, aber auch nicht hinderliche Menü-Optionen."
+          ]
+      },
+
+      "com.valuephone.vpnetto":
+      {
+        "what": "Netto (EDEKA)",
+        "score": "0",
+
+        "info": [
+          "Die App möchte als erstes ein Kundenkonto erstellen. Ohne das geht es nicht weiter. ",
+          "Da wir natürlich hier kein Konto einrichten, sind die Handzettel oder irgendwelche ",
+          "Angebote demnach nicht einsehbar. Thema verfehlt. ",
+
+          "Weiterhing sagt die App, wir sollen zuerst eine Markt auswählen, um Angebote ",
+          "einsehen zu können. Das geht aber erst, wenn man ein Konto eingerichtet hat. ",
+          "Mithin die schlechsteste App in diesem Bereich. Thema verfehlt."
+        ]
+      },
+
+      "com.bfi.netto":
+      {
+        "what": "NETTO Scotty",
+        "score": "15",
+
+        "info": [
+          "Einfacher geht es nicht mehr. App aufrufen. \"Hammer Donnerstag\" oder ",
+          "\"Hammer Samstag\" clicken, und der Handzettel geht auf. Mehr ist nicht ",
+          "zu sagen. Genial. Einfach genial."
+        ]
+      },
+
+      "de.aldiNord.android":
+      {
+        "what": "Aldi Nord",
+        "score": "12",
+
+        "info": [
+          "Angebote, Angebote, Angebote. Was anderes kann man nicht machen. Was ",
+          "anderes ist auch nicht gefordert. Handzettel gibt es zwar keine, aber ",
+          "die dargestellten Rubriken sind recht übersichtlich. Ein Marktauswahl oder ",
+          "sonstiger Schnickschnack fehlt. Das gefällt."
+        ]
+      },
+
+      "de.penny.pennyandroid":
+      {
+        "what": "Penny",
+        "score": "9",
+
+        "info": [
+          "Die Marktsuche mit Landkarte funktioniert prima. Ist der Mark erstmal ausgewählt, ",
+          "kann man recht schnell die Angebote in Listenform einsehen. Handzettel gibt es ",
+          "keine, aber die Rubrikenauswahl ist recht gelungen."
+        ]
+      },
+
+      "de.sec.mobile":
+      {
+        "what": "Lidl",
+        "score": "7",
+
+        "info": [
+          "Die Benutzerführung bei der Marktsuche ist wenig intuitiv. Aber, immerhin, ist der ",
+          "Markt ausgewählt, kann man recht schnell die Angebote in Listenform einsehen. ",
+          "Handzettel gibt es auch, allerdings müssen die als PDF geladen werden, und in einem ",
+          "externen Browser angezeigt werden. Das kann man besser machen."
+        ]
+      },
+
+      "com.kaiserstengelman.yswa":
+      {
+        "what": "Kaisers/Tengelmann",
+        "score": "9",
+
+        "info": [
+          "Die Marktsuche ist nicht zielführend. Immerhin sind Angebote auch ohne ",
+          "Marktauswahl einsehbar. Die Angebote werden groß und übersichtlich dargestellt. ",
+          "Alles in allen eine Prima App. Man kann einfach die Region wechseln. ",
+
+          "Der Handzettel kann als nur PDF heruntergeladen werden. Der Download dauert unendlich, ",
+          "und wird nicht automatisch geöffnet. Das führt zu mehrfachem Download."
+        ]
+      }
+    }
+  }
+}

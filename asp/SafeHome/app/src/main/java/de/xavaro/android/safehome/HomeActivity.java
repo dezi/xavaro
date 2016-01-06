@@ -92,6 +92,7 @@ public class HomeActivity extends AppCompatActivity implements
         SettingsManager.initialize(this);
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
+        DitUndDat.SpeekDat.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
         HealthGroup.initialize(this);
     }

@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothDevice;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
@@ -258,7 +257,7 @@ public class LaunchItem extends FrameLayout implements
                             if (handler == null) handler = new Handler();
                             HealthGroup.subscribeDevice(this,"bpm");
 
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtBPM));
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthBPM));
                             icon.setVisibility(VISIBLE);
                         }
 
@@ -267,7 +266,25 @@ public class LaunchItem extends FrameLayout implements
                             if (handler == null) handler = new Handler();
                             HealthGroup.subscribeDevice(this,"scale");
 
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealtScale));
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthScale));
+                            icon.setVisibility(VISIBLE);
+                        }
+
+                        if (subtype.equals("sensor"))
+                        {
+                            if (handler == null) handler = new Handler();
+                            HealthGroup.subscribeDevice(this,"sensor");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthSensor));
+                            icon.setVisibility(VISIBLE);
+                        }
+
+                        if (subtype.equals("glucose"))
+                        {
+                            if (handler == null) handler = new Handler();
+                            HealthGroup.subscribeDevice(this,"glucose");
+
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthGlucose));
                             icon.setVisibility(VISIBLE);
                         }
                     }
@@ -1315,15 +1332,6 @@ public class LaunchItem extends FrameLayout implements
 
     public TextToSpeech ttob;
 
-    private void launchDeveloper()
-    {
-        //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
-
-        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
-
-        BlueTooth.getInstance(context).discoverBPMs(null);
-    }
-
     //region BlueTooth connect states
 
     public final Runnable bluetoothIsConnected = new Runnable()
@@ -1347,30 +1355,35 @@ public class LaunchItem extends FrameLayout implements
         }
     };
 
-    public void onBluetoothConnect(BluetoothDevice device)
+    public void onBluetoothConnect(String deviceName)
     {
-        Log.d(LOGTAG, "onBluetoothConnect: " + device.getName());
+        Log.d(LOGTAG, "onBluetoothConnect: " + deviceName);
 
         //
         // Post delayed in case of sleeping devices with
         // short time idle connect.
         //
 
-        handler.postDelayed(bluetoothIsConnected, 2000);
+        handler.post(bluetoothIsConnected);
     }
 
-    public void onBluetoothActive(BluetoothDevice device)
+    public void onBluetoothDisconnect(String deviceName)
     {
-        Log.d(LOGTAG, "onBluetoothActive: " + device.getName());
-    }
-
-    public void onBluetoothDisconnect(BluetoothDevice device)
-    {
-        Log.d(LOGTAG,"onBluetoothDisconnect: " + device.getName());
+        Log.d(LOGTAG,"onBluetoothDisconnect: " + deviceName);
 
         handler.removeCallbacks(bluetoothIsConnected);
         handler.post(bluetoothIsDisconnected);
     }
 
     //endregion BlueTooth connect states
+
+    private void launchDeveloper()
+    {
+        //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
+
+        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
+
+        new BlueToothScale(context).getCreateUserFromPreferences();
+    }
+
 }

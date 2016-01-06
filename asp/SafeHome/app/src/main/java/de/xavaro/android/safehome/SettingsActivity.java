@@ -56,11 +56,21 @@ public class SettingsActivity extends PreferenceActivity
         target.add(SettingsFragments.WhatsAppFragment.getHeader());
 
         category = new Header();
+        category.title = "Apps";
+        target.add(category);
+
+        target.add(SettingsFragments.AppsDiscounterFragment.getHeader());
+
+        category = new Header();
         category.title = "Vitaldaten";
         target.add(category);
 
-        target.add(SettingsFragments.HealthScaleFragment.getHeader());
-        target.add(SettingsFragments.HealthBPMFragment.getHeader());
+        target.add(HealthPreferences.HealthPersonalFragment.getHeader());
+        target.add(HealthPreferences.HealthBPMFragment.getHeader());
+        target.add(HealthPreferences.HealthScaleFragment.getHeader());
+        target.add(HealthPreferences.HealthSensorFragment.getHeader());
+        target.add(HealthPreferences.HealthGlucoseFragment.getHeader());
+        target.add(HealthPreferences.HealthUnitsFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";
@@ -75,11 +85,11 @@ public class SettingsActivity extends PreferenceActivity
 
         target.add(SettingsFragments.SafetyFragment.getHeader());
 
-        target.add(SettingsFragments.WebConfigNewspaperFragment.getHeader());
-        target.add(SettingsFragments.WebConfigMagazineFragment.getHeader());
-        target.add(SettingsFragments.WebConfigPictorialFragment.getHeader());
-        target.add(SettingsFragments.WebConfigShoppingFragment.getHeader());
-        target.add(SettingsFragments.WebConfigEroticsFragment.getHeader());
+        target.add(WebPreferences.WebConfigNewspaperFragment.getHeader());
+        target.add(WebPreferences.WebConfigMagazineFragment.getHeader());
+        target.add(WebPreferences.WebConfigPictorialFragment.getHeader());
+        target.add(WebPreferences.WebConfigShoppingFragment.getHeader());
+        target.add(WebPreferences.WebConfigEroticsFragment.getHeader());
 
         category = new Header();
         category.title = "Firewall";
@@ -240,8 +250,10 @@ public class SettingsActivity extends PreferenceActivity
                 holder = (HeaderViewHolder) view.getTag();
             }
 
-            // All view fields must be updated every time, because the view may
-            // be recycled
+            //
+            // All view fields must be updated every time,
+            // because the view may be recycled.
+            //
 
             if ((holder.icon != null) && (header.iconRes != 0))
             {
