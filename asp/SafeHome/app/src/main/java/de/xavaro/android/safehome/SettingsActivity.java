@@ -56,6 +56,12 @@ public class SettingsActivity extends PreferenceActivity
         target.add(SettingsFragments.WhatsAppFragment.getHeader());
 
         category = new Header();
+        category.title = "Apps";
+        target.add(category);
+
+        target.add(SettingsFragments.AppsDiscounterFragment.getHeader());
+
+        category = new Header();
         category.title = "Vitaldaten";
         target.add(category);
 

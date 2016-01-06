@@ -1146,6 +1146,37 @@ public class SettingsFragments
 
     //endregion Firewall domains preferences
 
+    //region App discounter preferences
+
+    public static class AppsDiscounterFragment extends JSONConfigFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Discounter";
+            header.iconRes = GlobalConfigs.IconResAppsDiscounter;
+            header.fragment = AppsDiscounterFragment.class.getName();
+
+            return header;
+        }
+
+        public AppsDiscounterFragment()
+        {
+            super();
+
+            root = "apps/discounter";
+            isApps = true;
+            jsonres = R.raw.default_apps;
+            iconres = GlobalConfigs.IconResAppsDiscounter;
+            keyprefix = "apps.discounter";
+            masterenable = "Discounter Apps freischalten";
+        }
+    }
+
+    //endregion App discounters preferences
+
     //region IP Radio preferences
 
     public static class IPRadioFragment extends JSONConfigFragment
@@ -1223,6 +1254,8 @@ public class SettingsFragments
         protected String keyprefix;
         protected String masterenable;
 
+        protected boolean isApps;
+
         private void loadGlobalConfig(Context context)
         {
             if (globalConfig == null)
@@ -1233,7 +1266,14 @@ public class SettingsFragments
 
                     if (ctemp != null)
                     {
-                        globalConfig = ctemp.getJSONObject(root);
+                        String[] parts = root.split("/");
+
+                        for (String part : parts)
+                        {
+                            ctemp = ctemp.getJSONObject(part);
+                        }
+
+                        globalConfig = ctemp;
                     }
                 }
                 catch (NullPointerException | JSONException ex)
@@ -1266,11 +1306,15 @@ public class SettingsFragments
 
                 loadGlobalConfig(context);
 
+                if (globalConfig == null) return;
+
                 Iterator<String> keysIterator = globalConfig.keys();
 
                 String key;
                 String label;
                 String iconurl;
+                String summary;
+                int iconres;
                 Bitmap thumbnail;
                 Drawable drawable;
 
@@ -1280,10 +1324,23 @@ public class SettingsFragments
 
                     JSONObject webitem = globalConfig.getJSONObject(website);
 
-                    label = webitem.getString("label");
-                    iconurl = webitem.getString("icon");
-                    thumbnail = CacheManager.cacheThumbnail(context, iconurl);
-                    drawable = new BitmapDrawable(context.getResources(),thumbnail);
+                    iconres = 0;
+                    summary = null;
+                    drawable = null;
+
+                    if (isApps)
+                    {
+                        label = webitem.getString("what");
+                        summary = webitem.getString("info");
+                        iconres = GlobalConfigs.IconResAppsDiscounter;
+                    }
+                    else
+                    {
+                        label = webitem.getString("label");
+                        iconurl = webitem.getString("icon");
+                        thumbnail = CacheManager.cacheThumbnail(context, iconurl);
+                        drawable = new BitmapDrawable(context.getResources(), thumbnail);
+                    }
 
                     if (webitem.has("enabled") && ! webitem.getBoolean("enabled"))
                     {
@@ -1304,7 +1361,11 @@ public class SettingsFragments
 
                         cb.setKey(key);
                         cb.setTitle(label);
-                        cb.setIcon(drawable);
+                        cb.setEnabled(enabled);
+
+                        if (iconres != 0) cb.setIcon(iconres);
+                        if (drawable != null) cb.setIcon(drawable);
+                        if (summary != null) cb.setSummary(summary);
 
                         preferences.add(cb);
                         activekeys.add(cb.getKey());

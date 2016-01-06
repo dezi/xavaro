@@ -1,6 +1,19 @@
 {
   "apps": {
 
+    "musthave":
+    {
+      "org.wikipedia": {
+        "what": "Wikipedia",
+        "score": "15",
+
+        "info": [
+          "Was soll man sagen?. Die #1 App überhaupt. Keine Werbung, viel substantielle ",
+          "Information. Beste App des Universums. Bitte installieren. Und spenden."
+        ]
+      }
+    },
+
     "discounter":
     {
       "com.famila.nordost":
@@ -136,10 +149,25 @@
         "score": "7",
 
         "info": [
-          "Die benutzerführung bei der Marktsuche ist wenig intuitiv. Aber, immerhin, ist der ",
+          "Die Benutzerführung bei der Marktsuche ist wenig intuitiv. Aber, immerhin, ist der ",
           "Markt ausgewählt, kann man recht schnell die Angebote in Listenform einsehen. ",
           "Handzettel gibt es auch, allerdings müssen die als PDF geladen werden, und in einem ",
           "externen Browser angezeigt werden. Das kann man besser machen."
+        ]
+      },
+
+      "com.kaiserstengelman.yswa":
+      {
+        "what": "Kaisers/Tengelmann",
+        "score": "9",
+
+        "info": [
+          "Die Marktsuche ist nicht zielführend. Immerhin sind Angebote auch ohne ",
+          "Marktauswahl einsehbar. Die Angebote werden groß und übersichtlich dargestellt. ",
+          "Alles in allen eine Prima App. Man kann einfach die Region wechseln. ",
+
+          "Der Handzettel kann als nur PDF heruntergeladen werden. Der Download dauert unendlich, ",
+          "und wird nicht automatisch geöffnet. Das führt zu mehrfachem Download."
         ]
       }
     }
