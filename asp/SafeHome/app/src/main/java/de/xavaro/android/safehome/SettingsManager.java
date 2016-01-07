@@ -105,11 +105,10 @@ public class SettingsManager
         return jo;
     }
 
-
     @Nullable
     public static String getXpathString(String xpath)
     {
-        return getXpathString(xpath, false);
+        return getXpathString(xpath, true);
     }
 
     @Nullable
@@ -132,7 +131,7 @@ public class SettingsManager
 
     public static boolean getXpathBoolean(String xpath)
     {
-        return getXpathBoolean(xpath, false);
+        return getXpathBoolean(xpath, true);
     }
 
     public static boolean getXpathBoolean(String xpath, boolean ignore)
@@ -154,7 +153,7 @@ public class SettingsManager
 
     public static int getXpathInt(String xpath)
     {
-        return getXpathInt(xpath, false);
+        return getXpathInt(xpath, true);
     }
 
     public static int getXpathInt(String xpath, boolean ignore)
@@ -177,7 +176,7 @@ public class SettingsManager
     @Nullable
     public static JSONObject getXpathJSONObject(String xpath)
     {
-        return getXpathJSONObject(xpath, false);
+        return getXpathJSONObject(xpath, true);
     }
 
     @Nullable
@@ -197,7 +196,6 @@ public class SettingsManager
 
         return null;
     }
-
 
     public static void putXpath(String xpath, Object value)
     {

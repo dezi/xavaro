@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
@@ -21,10 +22,10 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class SettingsNiced
 {

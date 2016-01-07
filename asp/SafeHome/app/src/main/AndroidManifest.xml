@@ -21,14 +21,15 @@
         android:stateNotNeeded="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <service
             android:name=".KioskService"
             android:exported="false"/>
         <service
-            android:name=".CommService"
+            android:name="de.xavaro.android.common.CommService"
             android:exported="false"/>
         <service
-            android:name=".OopsService"
+            android:name="de.xavaro.android.common.OopsService"
             android:exported="false"/>
 
         <activity

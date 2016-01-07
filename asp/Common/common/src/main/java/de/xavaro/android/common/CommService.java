@@ -181,7 +181,10 @@ public class CommService extends Service
 
             try
             {
+                String[] packageName = getApplicationContext().getPackageName().split("\\.");
+
                 msg.put("identity",SystemIdentity.identity);
+                msg.put("app",packageName[ packageName.length - 1 ]);
             }
             catch (JSONException ignore)
             {
