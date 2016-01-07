@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.app.Service;
 import android.content.Intent;
@@ -187,7 +187,7 @@ public class OopsService extends Service
     {
         Log.d(LOGTAG, "workerThread: running");
 
-        long sleeptime = GlobalConfigs.OopsServerSleepMin;
+        long sleeptime = CommonConfigs.OopsServerSleepMin;
 
         DatagramSocket datagramSocket = null;
         DatagramPacket datagramPacket = null;
@@ -196,9 +196,9 @@ public class OopsService extends Service
 
         while (running)
         {
-            if (sleeptime > GlobalConfigs.OopsServerSleepMax)
+            if (sleeptime > CommonConfigs.OopsServerSleepMax)
             {
-                sleeptime = GlobalConfigs.OopsServerSleepMax;
+                sleeptime = CommonConfigs.OopsServerSleepMax;
             }
 
             StaticUtils.sleep(sleeptime);
@@ -236,8 +236,8 @@ public class OopsService extends Service
             {
                 try
                 {
-                    serverAddr = InetAddress.getByName(GlobalConfigs.OopsServerName);
-                    serverPort = GlobalConfigs.OopsServerPort;
+                    serverAddr = InetAddress.getByName(CommonConfigs.OopsServerName);
+                    serverPort = CommonConfigs.OopsServerPort;
 
                     datagramSocket = new DatagramSocket();
                     datagramPacket = new DatagramPacket(new byte[ 0 ],0);
@@ -286,7 +286,7 @@ public class OopsService extends Service
 
                 datagramSocket.send(datagramPacket);
 
-                sleeptime = GlobalConfigs.OopsServerSleepMin;
+                sleeptime = CommonConfigs.OopsServerSleepMin;
 
                 Log.d(LOGTAG,"Send one message.");
             }

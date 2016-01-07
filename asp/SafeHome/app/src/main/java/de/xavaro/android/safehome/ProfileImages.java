@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
 
+import de.xavaro.android.common.OopsService;
+
 public class ProfileImages
 {
     private static final String LOGTAG = ProfileImages.class.getSimpleName();
@@ -349,7 +351,7 @@ public class ProfileImages
                     }
                     catch (Exception ex)
                     {
-                        OopsService.log(LOGTAG,ex);
+                        OopsService.log(LOGTAG, ex);
                     }
                 }
             }

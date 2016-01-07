@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import de.xavaro.android.common.OopsService;
+
 //
 // Utility namespace for included small classes.
 //
@@ -168,7 +170,7 @@ public class DitUndDat
             }
             catch (final PackageManager.NameNotFoundException ex)
             {
-                OopsService.log(LOGTAG,ex);
+                OopsService.log(LOGTAG, ex);
             }
 
             return (String) (ai != null ? pm.getApplicationLabel(ai) : "Unknown");

@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.Date;
 
+import de.xavaro.android.common.OopsService;
+
 public class BlueToothSensor extends BlueTooth
 {
     private static final String LOGTAG = BlueToothSensor.class.getSimpleName();

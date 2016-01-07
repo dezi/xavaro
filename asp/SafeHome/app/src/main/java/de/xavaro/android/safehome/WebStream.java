@@ -9,6 +9,8 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.xavaro.android.common.OopsService;
+
 //
 // Web stream receivers base class.
 //

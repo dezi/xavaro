@@ -15,6 +15,8 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.xavaro.android.common.OopsService;
+
 public class ArchievementManager implements
         DialogInterface.OnClickListener
 {
@@ -293,7 +295,7 @@ public class ArchievementManager implements
         }
         catch (JSONException ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
         }
     }
 

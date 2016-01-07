@@ -51,6 +51,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.OopsService;
+
 //
 // Static all purpose utility methods.
 //
@@ -325,43 +327,6 @@ public class StaticUtils
         }
         catch (JSONException ignore)
         {
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static Bitmap getIconFromAppStore(Context context, String packageName)
-    {
-        String iconfile = "appstore." + packageName + ".thumbnail.png";
-
-        Bitmap icon = CacheManager.getThumbnail(context,iconfile);
-        if (icon != null) return icon;
-
-        try
-        {
-            String url = "https://play.google.com/store/apps/details?id=" + packageName;
-
-            Log.d(LOGTAG,"getIconFromAppStore:" + url);
-
-            String content = StaticUtils.getContentFromUrl(url);
-            if (content == null) return null;
-
-            Pattern pattern = Pattern.compile("class=\"cover-image\" src=\"([^\"]*)\"");
-            Matcher matcher = pattern.matcher(content);
-            if (! matcher.find()) return null;
-
-            String iconurl = matcher.group(1);
-
-            if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
-
-            Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
-
-            return CacheManager.cacheThumbnail(context, iconurl, iconfile);
-        }
-        catch (Exception oops)
-        {
-            OopsService.log(LOGTAG,oops);
         }
 
         return null;

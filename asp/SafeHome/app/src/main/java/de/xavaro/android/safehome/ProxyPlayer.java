@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import de.xavaro.android.common.OopsService;
+
 //
 // Proxy media player class with icy metadata detection
 // in audio streams.
@@ -56,7 +58,7 @@ public class ProxyPlayer extends Thread
         }
         catch (IOException ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
 
             return;
         }

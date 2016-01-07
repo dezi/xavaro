@@ -9,6 +9,9 @@
         <option name="gradleJvm" value="1.7" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/.." />
+            <option value="$PROJECT_DIR$/../Common" />
+            <option value="$PROJECT_DIR$/../Common/common" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>

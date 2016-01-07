@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 
@@ -149,13 +149,13 @@ public class CommService extends Service
     {
         Log.d(LOGTAG, "sendThread: running");
 
-        long sleeptime = GlobalConfigs.CommServerSleepMin;
+        long sleeptime = CommonConfigs.CommServerSleepMin;
 
         while (running)
         {
-            if (sleeptime > GlobalConfigs.CommServerSleepMax)
+            if (sleeptime > CommonConfigs.CommServerSleepMax)
             {
-                sleeptime = GlobalConfigs.CommServerSleepMax;
+                sleeptime = CommonConfigs.CommServerSleepMax;
             }
 
             StaticUtils.sleep(sleeptime);
@@ -195,8 +195,8 @@ public class CommService extends Service
             {
                 try
                 {
-                    serverAddr = InetAddress.getByName(GlobalConfigs.CommServerName);
-                    serverPort = GlobalConfigs.CommServerPort;
+                    serverAddr = InetAddress.getByName(CommonConfigs.CommServerName);
+                    serverPort = CommonConfigs.CommServerPort;
 
                     datagramSocket = new NativeSocket();
                     datagramPacket = new DatagramPacket(new byte[ 0 ],0);
@@ -268,7 +268,7 @@ public class CommService extends Service
                     datagramSocket.send(datagramPacket);
                 }
 
-                sleeptime = GlobalConfigs.CommServerSleepMin;
+                sleeptime = CommonConfigs.CommServerSleepMin;
             }
             catch (IOException ex)
             {
@@ -328,7 +328,7 @@ public class CommService extends Service
         {
             JSONObject ping = null;
 
-            if ((lastpups + (GlobalConfigs.CommServerPupsSec * 1000)) < now)
+            if ((lastpups + (CommonConfigs.CommServerPupsSec * 1000)) < now)
             {
                 ping = new JSONObject();
                 ping.put("pups", new JSONObject());
@@ -336,7 +336,7 @@ public class CommService extends Service
                 lastpups = now;
             }
             else
-            if ((lastping + (GlobalConfigs.CommServerPingSec * 1000)) < now)
+            if ((lastping + (CommonConfigs.CommServerPingSec * 1000)) < now)
             {
                 ping = new JSONObject();
                 ping.put("ping", new JSONObject());
@@ -375,7 +375,7 @@ public class CommService extends Service
 
     public class CommBinder extends Binder
     {
-        CommService getService()
+        public CommService getService()
         {
             return CommService.this;
         }

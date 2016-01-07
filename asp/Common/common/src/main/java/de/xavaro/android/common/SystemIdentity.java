@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;

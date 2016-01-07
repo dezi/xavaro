@@ -36,6 +36,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.OopsService;
+
 //
 // Launch item view on home screen.
 //
@@ -534,7 +536,7 @@ public class LaunchItem extends FrameLayout implements
             }
             else
             {
-                Bitmap thumbnail = StaticUtils.getIconFromAppStore(context, packageName);
+                Bitmap thumbnail = CacheManager.getIconFromAppStore(context, packageName);
 
                 if (thumbnail != null)
                 {
@@ -1040,7 +1042,7 @@ public class LaunchItem extends FrameLayout implements
         }
         catch (Exception oops)
         {
-        OopsService.log(LOGTAG, oops);
+            OopsService.log(LOGTAG, oops);
         }
     }
 

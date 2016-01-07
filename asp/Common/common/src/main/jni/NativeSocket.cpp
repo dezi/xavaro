@@ -2,53 +2,53 @@
 
 extern "C"
 {
-JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeCreate(
+JNIEXPORT int JNICALL Java_de_xavaro_android_common_NativeSocket_nativeCreate(
         JNIEnv* env, jobject obj);
 
-JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeClose(
+JNIEXPORT int JNICALL Java_de_xavaro_android_common_NativeSocket_nativeClose(
         JNIEnv* env, jobject obj,
         jint socketfd);
 
-JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeGetTTL(
+JNIEXPORT int JNICALL Java_de_xavaro_android_common_NativeSocket_nativeGetTTL(
         JNIEnv* env, jobject obj,
         jint socketfd);
 
-JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
+JNIEXPORT int JNICALL Java_de_xavaro_android_common_NativeSocket_nativeSetTTL(
         JNIEnv* env, jobject obj,
         jint socketfd,
         jint ttl);
 
-JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeSend(
+JNIEXPORT int JNICALL Java_de_xavaro_android_common_NativeSocket_nativeSend(
         JNIEnv* env, jobject obj,
         jint socketfd,
         jbyteArray data, jint offset,jint length,
         jstring destip, jint destport);
 
-JNIEXPORT int JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeReceive(
+JNIEXPORT int JNICALL Java_de_xavaro_android_common_NativeSocket_nativeReceive(
         JNIEnv* env, jobject obj,
         jint socketfd,
         jbyteArray data,jint length);
 
-JNIEXPORT jstring JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeStrError(
+JNIEXPORT jstring JNICALL Java_de_xavaro_android_common_NativeSocket_nativeStrError(
         JNIEnv* env, jobject obj,
         jint errnum);
 }
 
-int Java_de_xavaro_android_safehome_NativeSocket_nativeCreate(JNIEnv* env, jobject obj)
+int Java_de_xavaro_android_common_NativeSocket_nativeCreate(JNIEnv* env, jobject obj)
 {
     int socketfd = socket(AF_INET, SOCK_DGRAM, 0);
 
     return socketfd;
 }
 
-int Java_de_xavaro_android_safehome_NativeSocket_nativeClose(
+int Java_de_xavaro_android_common_NativeSocket_nativeClose(
         JNIEnv* env, jobject obj,
         jint socketfd)
 {
     return close(socketfd);
 }
 
-int Java_de_xavaro_android_safehome_NativeSocket_nativeGetTTL(
+int Java_de_xavaro_android_common_NativeSocket_nativeGetTTL(
         JNIEnv* env, jobject obj,
         jint socketfd)
 {
@@ -60,7 +60,7 @@ int Java_de_xavaro_android_safehome_NativeSocket_nativeGetTTL(
     return (err < 0) ? err : ttlval;
 }
 
-int Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
+int Java_de_xavaro_android_common_NativeSocket_nativeSetTTL(
         JNIEnv* env, jobject obj,
         jint socketfd,
         jint ttl)
@@ -72,7 +72,7 @@ int Java_de_xavaro_android_safehome_NativeSocket_nativeSetTTL(
     return err;
 }
 
-int Java_de_xavaro_android_safehome_NativeSocket_nativeSend(
+int Java_de_xavaro_android_common_NativeSocket_nativeSend(
         JNIEnv* env, jobject obj,
         jint socketfd,
         jbyteArray data, jint offset, jint length,
@@ -110,7 +110,7 @@ int Java_de_xavaro_android_safehome_NativeSocket_nativeSend(
     return (int) xfer;
 }
 
-int Java_de_xavaro_android_safehome_NativeSocket_nativeReceive(
+int Java_de_xavaro_android_common_NativeSocket_nativeReceive(
         JNIEnv* env, jobject obj,
         jint socketfd,
         jbyteArray data, jint length)
@@ -130,7 +130,7 @@ int Java_de_xavaro_android_safehome_NativeSocket_nativeReceive(
     return (int) xfer;
 }
 
-JNIEXPORT jstring JNICALL Java_de_xavaro_android_safehome_NativeSocket_nativeStrError(
+JNIEXPORT jstring JNICALL Java_de_xavaro_android_common_NativeSocket_nativeStrError(
         JNIEnv* env, jobject obj,
         jint errnum)
 {

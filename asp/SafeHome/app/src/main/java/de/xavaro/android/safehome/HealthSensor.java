@@ -5,6 +5,8 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.OopsService;
+
 public class HealthSensor extends HealthBase
 {
     private static final String LOGTAG = HealthSensor.class.getSimpleName();

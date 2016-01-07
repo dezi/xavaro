@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.xavaro.android.common.OopsService;
+
 public class SettingsFragments
 {
     private static final String LOGTAG = SettingsFragments.class.getSimpleName();
@@ -1057,7 +1059,7 @@ public class SettingsFragments
             }
             catch (JSONException ex)
             {
-                OopsService.log(LOGTAG,ex);
+                OopsService.log(LOGTAG, ex);
             }
         }
 

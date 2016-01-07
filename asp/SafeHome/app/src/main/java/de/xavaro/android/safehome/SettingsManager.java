@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.OopsService;
+
 public class SettingsManager
 {
     private static final String LOGTAG = SettingsManager.class.getSimpleName();
@@ -122,7 +124,7 @@ public class SettingsManager
         }
         catch (Exception ex)
         {
-            if (! ignore) OopsService.log(LOGTAG,ex);
+            if (! ignore) OopsService.log(LOGTAG, ex);
         }
 
         return null;

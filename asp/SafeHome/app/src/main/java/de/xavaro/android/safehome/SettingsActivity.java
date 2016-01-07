@@ -1,7 +1,9 @@
 package de.xavaro.android.safehome;
 
-import android.content.Context;
+import de.xavaro.android.common.SystemIdentity;
+
 import android.preference.PreferenceActivity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
