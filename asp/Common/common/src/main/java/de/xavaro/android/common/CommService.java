@@ -50,6 +50,14 @@ public class CommService extends Service
         return myService;
     }
 
+    public static void sendMessage(JSONObject message)
+    {
+        synchronized (messageBacklog)
+        {
+            messageBacklog.add(message);
+        }
+    }
+
     //endregion
 
     //region Overriden methods.

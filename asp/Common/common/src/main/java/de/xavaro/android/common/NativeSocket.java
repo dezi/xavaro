@@ -95,7 +95,7 @@ public class NativeSocket
         String destip = packet.getAddress().getHostAddress();
         int destport = packet.getPort();
 
-        int xfer = nativeSend(socketfd,buffer,0,length,destip,destport);
+        int xfer = nativeSend(socketfd, buffer, 0, length, destip, destport);
 
         if (xfer > 0) return;
 

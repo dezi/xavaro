@@ -99,6 +99,7 @@ public class GlobalConfigs
     //region Global icons
 
     // @formatter:off
+    public static final int IconResXavaro             = R.drawable.xavaro_192x192;
     public static final int IconResSelectHome         = R.drawable.home_512x512;
     public static final int IconResSelectAssist       = R.drawable.assistant_512x512;
     public static final int IconResSettingsAndroid    = R.drawable.settings_android_512x512;

@@ -14,6 +14,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
 
@@ -404,6 +406,151 @@ public class SettingsFragments
     }
 
     //endregion BlueTooth preferences stub
+
+    //region Xavaro preferences
+
+    public static class XavaroFragment extends EnablePreferenceFragment implements
+            DialogInterface.OnClickListener
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Xavaro";
+            header.iconRes = GlobalConfigs.IconResXavaro;
+            header.fragment = XavaroFragment.class.getName();
+
+            return header;
+        }
+
+        private final XavaroFragment self = this;
+
+        private Context context;
+        private AlertDialog dialog;
+
+        private SettingsNiced.NiceListPreference devicePref;
+        final ArrayList<String> recentText = new ArrayList<>();
+        final ArrayList<String> recentVals = new ArrayList<>();
+
+        public XavaroFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResXavaro;
+            keyprefix = "xavaro";
+            masterenable = "Xavaro Kommunikation freischalten";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            this.context = context;
+
+            super.registerAll(context);
+
+            SettingsNiced.NiceCategoryPreference pc;
+            SettingsNiced.NiceListPreference lp;
+            SettingsNiced.NiceNumberPreference np;
+
+            //
+            // Connect.
+            //
+
+            pc = new SettingsNiced.NiceCategoryPreference(context);
+            pc.setTitle("Verbindungen herstellen");
+            preferences.add(pc);
+
+            //
+            // Make visible.
+            //
+
+            devicePref = new SettingsNiced.NiceListPreference(context);
+
+            devicePref.setKey(keyprefix + ".pincode");
+
+            recentText.add("1234-5678");
+            recentVals.add("1234-5678");
+
+            devicePref.setEntries(recentText);
+            devicePref.setEntryValues(recentVals);
+            devicePref.setDefaultValue(recentVals.get(0));
+            devicePref.setTitle("Mit Pincode");
+            devicePref.setEnabled(enabled);
+
+            devicePref.setOnclick(publishDialog);
+
+            if (!sharedPrefs.contains(devicePref.getKey()))
+            {
+                sharedPrefs.edit().putString(devicePref.getKey(), recentVals.get(0)).apply();
+            }
+
+            preferences.add(devicePref);
+        }
+
+        public final Runnable publishDialog = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Pincode publizieren");
+
+                builder.setNegativeButton("Neuer Code", self);
+                builder.setPositiveButton("Abbrechen", self);
+                builder.setNeutralButton("Jetzt publizieren", self);
+
+                dialog = builder.create();
+
+                TextView pincode = new TextView(context);
+                pincode.setTextSize(24f);
+                pincode.setPadding(40, 24, 0, 0);
+                pincode.setText(sharedPrefs.getString(devicePref.getKey(), ""));
+
+                dialog.setView(pincode);
+                dialog.show();
+
+                //
+                // Set neutral button handler to avoid closing
+                // of list preference dialog.
+                //
+
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        try
+                        {
+                            JSONObject publishPincode = new JSONObject();
+
+                            publishPincode.put("pincode", sharedPrefs.getString(devicePref.getKey(), ""));
+
+                            CommService.sendMessage(publishPincode);
+                        }
+                        catch (JSONException ignore)
+                        {
+                        }
+                    }
+                });
+            }
+        };
+
+        public void onClick(DialogInterface dialog, int which)
+        {
+            if (which == DialogInterface.BUTTON_POSITIVE)
+            {
+                dialog.cancel();
+            }
+
+            if (which == DialogInterface.BUTTON_NEGATIVE)
+            {
+                dialog.cancel();
+            }
+        }
+    }
+
+    //endregion Xavaro preferences
 
     //region Phone preferences
 

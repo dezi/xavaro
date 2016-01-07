@@ -56,6 +56,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(SettingsFragments.PhoneFragment.getHeader());
         target.add(SettingsFragments.SkypeFragment.getHeader());
         target.add(SettingsFragments.WhatsAppFragment.getHeader());
+        target.add(SettingsFragments.XavaroFragment.getHeader());
 
         category = new Header();
         category.title = "Apps";
