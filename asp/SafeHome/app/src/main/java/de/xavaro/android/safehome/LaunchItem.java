@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 //
 // Launch item view on home screen.

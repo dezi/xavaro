@@ -6,6 +6,8 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 
+import de.xavaro.android.common.StaticUtils;
+
 public class GlobalConfigs
 {
     //region Standard apps

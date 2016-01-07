@@ -32,6 +32,8 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.StaticUtils;
+
 @SuppressWarnings("SameParameterValue")
 
 public class ContactsHandler
@@ -401,7 +403,7 @@ public class ContactsHandler
 
         try
         {
-            joitem.put(name,StaticUtils.hexBytesToString(bytes));
+            joitem.put(name, StaticUtils.hexBytesToString(bytes));
         }
         catch (JSONException ignore)
         {

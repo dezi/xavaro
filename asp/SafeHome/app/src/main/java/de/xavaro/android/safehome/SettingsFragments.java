@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 public class SettingsFragments
 {

@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.util.Iterator;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 public class ArchievementManager implements
         DialogInterface.OnClickListener

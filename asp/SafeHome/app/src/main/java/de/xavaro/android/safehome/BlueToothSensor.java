@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 public class BlueToothSensor extends BlueTooth
 {

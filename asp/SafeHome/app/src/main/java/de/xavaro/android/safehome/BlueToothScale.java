@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 @SuppressWarnings({"unused"})
 public class BlueToothScale extends BlueTooth

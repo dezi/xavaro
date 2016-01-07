@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.SystemIdentity;
 
 import android.support.v7.app.AppCompatActivity;

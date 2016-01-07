@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 //
 // Utility namespace for included small classes.

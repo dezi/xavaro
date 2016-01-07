@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.Iterator;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 //
 // Web stream receivers base class.
