@@ -8,18 +8,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
-import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -34,10 +28,11 @@ public class SystemIdentity
 {
     private static final String LOGTAG = SystemIdentity.class.getSimpleName();
 
+    public static String appsname;
     public static String identity;
     public static String randomiz;
 
-    private static String foundInContacts;
+    private static String foundInContact;
     private static String foundInStorage;
     private static String foundInCookies;
 
@@ -49,30 +44,48 @@ public class SystemIdentity
     {
         retrieveFromStorage(context);
         retrieveFromCookies(context);
-        retrieveFromContacts(context);
+        retrieveFromContact(context);
 
         try
         {
-            if (foundInContacts != null)
-            {
-                identity = foundInContacts.split(":")[ 0 ];
-                randomiz = foundInContacts.split(":")[ 1 ];
-            }
-            else
             if (foundInStorage != null)
             {
-                identity = foundInStorage.split(":")[ 0 ];
-                randomiz = foundInStorage.split(":")[ 1 ];
+                appsname = foundInContact.split(":")[ 0 ];
+                identity = foundInContact.split(":")[ 1 ];
+                randomiz = foundInContact.split(":")[ 2 ];
             }
             else
             if (foundInCookies != null)
             {
-                identity = foundInCookies.split(":")[ 0 ];
-                randomiz = foundInCookies.split(":")[ 1 ];
+                appsname = foundInCookies.split(":")[ 0 ];
+                identity = foundInCookies.split(":")[ 1 ];
+                randomiz = foundInCookies.split(":")[ 2 ];
+            }
+            else
+            if (foundInContact != null)
+            {
+                String[] packageName = context.getPackageName().split("\\.");
+
+                String[] ids = foundInContact.split(";");
+
+                for (String id : ids)
+                {
+                    if (id.split(":")[ 0 ].equals(packageName[ packageName.length - 1 ]))
+                    {
+                        appsname = id.split(":")[ 0 ];
+                        identity = id.split(":")[ 1 ];
+                        randomiz = id.split(":")[ 2 ];
+
+                        break;
+                    }
+                }
             }
         }
-        catch (Exception ex)
+        catch (Exception ignore)
         {
+            //
+            // Should not happen, oops service not yet up.
+            //
         }
 
         if ((identity == null) || (randomiz == null))
@@ -81,24 +94,29 @@ public class SystemIdentity
             // Master create new uuid.
             //
 
+            String[] packageName = context.getPackageName().split("\\.");
+
+            appsname = packageName[ packageName.length - 1];
             identity = UUID.randomUUID().toString();
             randomiz = UUID.randomUUID().toString();
 
-            foundInStorage  = null;
-            foundInCookies  = null;
-            foundInContacts = null;
+            foundInStorage = null;
+            foundInCookies = null;
+            foundInContact = null;
         }
 
         if (foundInStorage == null) storeIntoStorage(context);
 
-        if (foundInContacts == null) storeIntoContacts(context);
+        if (foundInContact == null) storeIntoContact(context);
 
         if (foundInCookies == null) storeIntoCookies(context);
+
+        storeIntoCookies(context);
     }
 
-    private static void retrieveFromContacts(Context context)
+    private static void retrieveFromContact(Context context)
     {
-        foundInContacts = null;
+        foundInContact = null;
 
         Cursor cursor = null;
 
@@ -140,7 +158,7 @@ public class SystemIdentity
                         // First class valid UUID.
                         //
 
-                        foundInContacts = uuid;
+                        foundInContact = uuid;
                     }
                     else
                     {
@@ -148,7 +166,7 @@ public class SystemIdentity
                         // Deleted account UUID. Accept if nothing else present.
                         //
 
-                        if (foundInContacts == null) foundInContacts = uuid;
+                        if (foundInContact == null) foundInContact = uuid;
                     }
                 }
             }
@@ -160,14 +178,35 @@ public class SystemIdentity
 
         if (cursor != null) cursor.close();
 
-        if (foundInContacts != null) Log.d(LOGTAG, "foundInContacts: " + foundInContacts);
+        if (foundInContact != null) Log.d(LOGTAG, "foundInContact: " + foundInContact);
     }
 
-    private static void storeIntoContacts(Context context)
+    private static void storeIntoContact(Context context)
     {
         ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
 
-        String idvalue = identity + ":" + randomiz;
+        String idvalue = "";
+
+        if (foundInContact != null)
+        {
+            String[] oldids = foundInContact.split(";");
+
+            for (String oldid : oldids)
+            {
+                if (! oldid.split(":")[ 0 ].equals(appsname))
+                {
+                    //
+                    // Identity from different app.
+                    //
+
+                    if (idvalue.length() > 0) idvalue += ";";
+                    idvalue += oldid;
+                }
+            }
+        }
+
+        if (idvalue.length() > 0) idvalue += ";";
+        idvalue += appsname + ":" + identity + ":" + randomiz;
 
         cpo.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
                 .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, context.getPackageName())
@@ -226,7 +265,7 @@ public class SystemIdentity
         try
         {
             JSONObject ident = new JSONObject();
-            ident.put("identity",identity + ":" + randomiz);
+            ident.put("identity",appsname + ":" + identity + ":" + randomiz);
 
             outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
             outputStream.write(ident.toString(2).getBytes());
@@ -259,6 +298,7 @@ public class SystemIdentity
     private static void storeIntoCookies(Context context)
     {
         android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
-        wkCookieManager.setCookie("http://" + context.getPackageName(),"identity=" + identity + ":" + randomiz);
+
+        wkCookieManager.setCookie("http://" + context.getPackageName(),"identity=" + appsname + ":" + identity + ":" + randomiz);
     }
 }

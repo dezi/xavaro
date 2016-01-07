@@ -1381,9 +1381,8 @@ public class LaunchItem extends FrameLayout implements
     {
         //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
 
-        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
+        //new BlueToothScale(context).getCreateUserFromPreferences();
 
-        new BlueToothScale(context).getCreateUserFromPreferences();
+        DitUndDat.SpeekDat.speak("Die Sprachausgabe von Android funktioniert prima.");
     }
-
 }
