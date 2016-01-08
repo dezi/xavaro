@@ -1,7 +1,5 @@
 package de.xavaro.android.common;
 
-import android.bluetooth.BluetoothDevice;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.app.Service;
@@ -14,15 +12,10 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 //
@@ -49,15 +42,35 @@ public class CommService extends Service
         return myService;
     }
 
-    private static final ArrayList<JSONObject> messageBacklog = new ArrayList<>();
+    private static final ArrayList<MessageClass> messageBacklog = new ArrayList<>();
 
     private static final Map<String, ArrayList<CommServiceCallback>> messageSubscribers = new HashMap<>();
+
+    private static class MessageClass
+    {
+        public final JSONObject msg;
+        public final boolean enc;
+
+        public MessageClass(JSONObject message, boolean encrypt)
+        {
+            this.msg = message;
+            this.enc = encrypt;
+        }
+    }
 
     public static void sendMessage(JSONObject message)
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(message);
+            messageBacklog.add(new MessageClass(message, false));
+        }
+    }
+
+    public static void sendEncrypted(JSONObject message)
+    {
+        synchronized (messageBacklog)
+        {
+            messageBacklog.add(new MessageClass(message, true));
         }
     }
 
@@ -75,6 +88,7 @@ public class CommService extends Service
         }
     }
 
+    @SuppressWarnings("unused")
     public static void unsubscribeMessage(String type, CommServiceCallback callback)
     {
         synchronized (messageSubscribers)
@@ -171,10 +185,12 @@ public class CommService extends Service
 
     //endregion
 
-    NativeSocket datagramSocket = null;
-    DatagramPacket datagramPacket = null;
-    InetAddress serverAddr;
-    int serverPort;
+    private NativeSocket datagramSocket = null;
+    private DatagramPacket datagramPacket = null;
+
+    private long sleeptime = CommonConfigs.CommServerSleepMin;
+    private long lastping = 0;
+    private long lastpups = 0;
 
     private void recvThread()
     {
@@ -238,7 +254,7 @@ public class CommService extends Service
                 JSONObject responsePublicKeyXChange = new JSONObject();
 
                 responsePublicKeyXChange.put("type", "responsePublicKeyXChange");
-                responsePublicKeyXChange.put("remoteIdentity", remoteIdentity);
+                responsePublicKeyXChange.put("idremote", remoteIdentity);
                 responsePublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(getApplicationContext()));
                 responsePublicKeyXChange.put("status", "success");
 
@@ -263,10 +279,27 @@ public class CommService extends Service
                 JSONObject responseAESpassXChange = new JSONObject();
 
                 responseAESpassXChange.put("type", "responseAESpassXChange");
-                responseAESpassXChange.put("remoteIdentity", remoteIdentity);
+                responseAESpassXChange.put("idremote", remoteIdentity);
                 responseAESpassXChange.put("status", "success");
 
                 CommService.sendMessage(responseAESpassXChange);
+
+                return true;
+            }
+
+            if (type.equals("requestOwnerIdentity"))
+            {
+                String remoteIdentity = json.getString("identity");
+
+                JSONObject responseOwnerIdentity = new JSONObject();
+
+                responseOwnerIdentity.put("type", "responseOwnerIdentity");
+                responseOwnerIdentity.put("idremote", remoteIdentity);
+                responseOwnerIdentity.put("status", "success");
+
+                // TODO:
+
+                CommService.sendMessage(responseOwnerIdentity);
 
                 return true;
             }
@@ -281,13 +314,30 @@ public class CommService extends Service
 
     private void deliverPacket(DatagramPacket recvPacket)
     {
-        String recvString = new String(recvPacket.getData());
+        byte[] data = recvPacket.getData();
+        String ptype = new String(data, 0, 4);
 
-        if (! recvString.startsWith("JSON")) return;
+        if (ptype.equals("CRYP"))
+        {
+            byte[] identBytes = new byte[ 16 ];
+            System.arraycopy(data, 20, identBytes, 0, 16);
+
+            String ident = StaticUtils.getUUIDString(identBytes);
+
+            byte[] rest = new byte[ data.length - 36 ];
+            System.arraycopy(data, 36, rest, 0, rest.length);
+
+            data = CryptUtils.AESdecrypt(ident, rest);
+            if (data == null) return;
+
+            ptype = new String(data, 0, 4);
+        }
+
+        if (! ptype.equals("JSON")) return;
 
         try
         {
-            JSONObject json = new JSONObject(recvString.substring(4));
+            JSONObject json = new JSONObject(new String(data, 4, data.length - 4));
 
             if (! onMessageReceived(json))
             {
@@ -322,11 +372,47 @@ public class CommService extends Service
         }
     }
 
+    private boolean checkSocket()
+    {
+        //
+        // Check datagram socket.
+        //
+
+        if (datagramSocket == null)
+        {
+            try
+            {
+                InetAddress serverAddr = InetAddress.getByName(CommonConfigs.CommServerName);
+                int serverPort = CommonConfigs.CommServerPort;
+
+                datagramSocket = new NativeSocket();
+                datagramPacket = new DatagramPacket(new byte[ 0 ],0);
+
+                datagramPacket.setAddress(serverAddr);
+                datagramPacket.setPort(serverPort);
+
+                //
+                // Make sure a ping is sent immediately.
+                //
+
+                lastping = 0;
+            }
+            catch (Exception ex)
+            {
+                Log.d(LOGTAG,"checkSocket: " + ex.getMessage());
+
+                sleeptime = sleeptime * 2;
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private void sendThread()
     {
         Log.d(LOGTAG, "sendThread: running");
-
-        long sleeptime = CommonConfigs.CommServerSleepMin;
 
         while (running)
         {
@@ -339,17 +425,19 @@ public class CommService extends Service
 
             checkPing();
 
+            if (! checkSocket()) continue;
+
             //
             // Get message if one present.
             //
 
-            JSONObject msg;
+            MessageClass mc;
 
             synchronized (messageBacklog)
             {
                 if (messageBacklog.size() == 0) continue;
 
-                msg = messageBacklog.remove(0);
+                mc = messageBacklog.remove(0);
             }
 
             //
@@ -358,75 +446,45 @@ public class CommService extends Service
 
             try
             {
-                String[] packageName = getApplicationContext().getPackageName().split("\\.");
-
-                msg.put("identity",SystemIdentity.identity);
-                msg.put("app",packageName[ packageName.length - 1 ]);
+                mc.msg.put("identity", SystemIdentity.identity);
             }
-            catch (JSONException ignore)
+            catch (JSONException ex)
             {
+                OopsService.log(LOGTAG, ex);
             }
 
-            //
-            // Check datagram socket.
-            //
-
-            if (datagramSocket == null)
+            try
             {
-                try
+                String body = "JSON" + StaticUtils.defuckJSON(mc.msg.toString());
+                datagramPacket.setData(body.getBytes());
+
+                if (mc.enc && mc.msg.has("idremote"))
                 {
-                    serverAddr = InetAddress.getByName(CommonConfigs.CommServerName);
-                    serverPort = CommonConfigs.CommServerPort;
-
-                    datagramSocket = new NativeSocket();
-                    datagramPacket = new DatagramPacket(new byte[ 0 ],0);
-
-                    datagramPacket.setAddress(serverAddr);
-                    datagramPacket.setPort(serverPort);
-
                     //
-                    // Make sure a ping is sent immediately.
+                    // Encrypt message.
                     //
 
-                    lastping = 0;
-                }
-                catch (Exception ex)
-                {
-                    Log.d(LOGTAG,"sendThread: " + ex.getMessage());
+                    String ident = SystemIdentity.identity;
+                    String remid = mc.msg.getString("idremote");
+                    byte[] encrypted = CryptUtils.AESencrypt(remid, body);
 
-                    //
-                    // Reschedule message.
-                    //
-
-                    try
+                    if (encrypted != null)
                     {
-                        if (!(msg.has("type") && msg.getString("type").equals("ping")))
-                        {
-                            synchronized (messageBacklog)
-                            {
-                                messageBacklog.add(0, msg);
-                            }
-                        }
-                    }
-                    catch (JSONException exex)
-                    {
-                        Log.d(LOGTAG,"sendThread: " + exex.getMessage());
-                    }
+                        byte[] cryp = new byte[ 4 + 16 + 16 + encrypted.length ];
 
-                    sleeptime = sleeptime * 2;
+                        System.arraycopy("CRYP".getBytes(), 0, cryp, 0, 4);
+                        System.arraycopy(StaticUtils.getUUIDBytes(remid), 0, cryp, 4 , 16);
+                        System.arraycopy(StaticUtils.getUUIDBytes(ident), 0, cryp, 20 , 16);
+                        System.arraycopy(encrypted, 0, cryp, 36 , encrypted.length);
 
-                    continue;
+                        datagramPacket.setData(cryp);
+                    }
                 }
             }
-
-            //
-            // Assemble packet.
-            //
-
-            String body = "JSON" + StaticUtils.defuckJSON(msg.toString());
-            byte[] data = body.getBytes();
-
-            datagramPacket.setData(data);
+            catch (JSONException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
 
             //
             // Send datagram packet.
@@ -439,9 +497,9 @@ public class CommService extends Service
                 // Means, packet is lost in this case.
                 //
 
-                if (msg.has("type"))
+                if (mc.msg.has("type"))
                 {
-                    if (msg.getString("type").equals("pups"))
+                    if (mc.msg.getString("type").equals("pups"))
                     {
                         //
                         // Keep NAT connection alive with bogus packet.
@@ -453,7 +511,18 @@ public class CommService extends Service
                     }
                     else
                     {
-                        Log.d(LOGTAG, "sendThread: " + msg.getString("type"));
+                        if (mc.msg.getString("type").equals("ping"))
+                        {
+                            byte[] ping = new byte[ 4 + 16 ];
+                            byte[] uuid = StaticUtils.getUUIDBytes(SystemIdentity.identity);
+
+                            System.arraycopy("PING".getBytes(), 0, ping, 0, 4);
+                            System.arraycopy(uuid, 0, ping, 4 , 16);
+
+                            datagramPacket.setData(ping);
+                        }
+
+                        Log.d(LOGTAG, "sendThread: " + datagramPacket.getData().length + "=" + mc.msg.getString("type"));
                         datagramSocket.setTTL(200);
                         datagramSocket.send(datagramPacket);
                     }
@@ -471,11 +540,11 @@ public class CommService extends Service
 
                 try
                 {
-                    if (!(msg.has("type") && msg.getString("type").equals("ping")))
+                    if (!(mc.msg.has("type") && mc.msg.getString("type").equals("ping")))
                     {
                         synchronized (messageBacklog)
                         {
-                            messageBacklog.add(0, msg);
+                            messageBacklog.add(0, mc);
                         }
                     }
                 }
@@ -515,9 +584,6 @@ public class CommService extends Service
         workerSend = null;
     }
 
-    private long lastping = 0;
-    private long lastpups = 0;
-
     private void checkPing()
     {
         long now = System.currentTimeMillis();
@@ -548,14 +614,14 @@ public class CommService extends Service
                 {
                     for (int inx = 0; inx < messageBacklog.size(); inx++)
                     {
-                        if (messageBacklog.get(inx).has("type") &&
-                                messageBacklog.get(inx).getString("type").equals("ping"))
+                        if (messageBacklog.get(inx).msg.has("type") &&
+                                messageBacklog.get(inx).msg.getString("type").equals("ping"))
                         {
                             messageBacklog.remove(inx--);
                         }
                     }
 
-                    messageBacklog.add(ping);
+                    messageBacklog.add(new MessageClass(ping, false));
                 }
             }
         }

@@ -766,13 +766,13 @@ public class SettingsFragments
                                 }
                             });
 
-                            String remoteIdentity = message.getString("identity");
+                            String remoteIdentity = message.getString("idremote");
 
                             JSONObject requestPublicKeyXChange = new JSONObject();
 
                             requestPublicKeyXChange.put("type", "requestPublicKeyXChange");
                             requestPublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(context));
-                            requestPublicKeyXChange.put("remoteIdentity", remoteIdentity);
+                            requestPublicKeyXChange.put("idremote", remoteIdentity);
 
                             CommService.sendMessage(requestPublicKeyXChange);
 
@@ -795,19 +795,17 @@ public class SettingsFragments
 
                             String remoteIdentity = message.getString("identity");
                             String remotePublicKey = message.getString("publicKey");
-                            String remoteApp = message.getString("app");
                             String passPhrase = UUID.randomUUID().toString();
                             String encoPassPhrase = CryptUtils.RSAEncrypt(remotePublicKey, passPhrase);
 
                             IdentityManager.getInstance().put(remoteIdentity, "publicKey", remotePublicKey);
-                            IdentityManager.getInstance().put(remoteIdentity, "appName", remoteApp);
                             IdentityManager.getInstance().put(remoteIdentity, "passPhrase", passPhrase);
 
                             JSONObject requestAESpassXChange = new JSONObject();
 
                             requestAESpassXChange.put("type", "requestAESpassXChange");
+                            requestAESpassXChange.put("idremote", remoteIdentity);
                             requestAESpassXChange.put("encodedPassPhrase", encoPassPhrase);
-                            requestAESpassXChange.put("remoteIdentity", remoteIdentity);
 
                             CommService.sendMessage(requestAESpassXChange);
 
@@ -827,6 +825,34 @@ public class SettingsFragments
                                     dialog.setTitle("Verschlüsselung aktiviert...");
                                 }
                             });
+
+                            String remoteIdentity = message.getString("identity");
+
+                            JSONObject requestOwnerIdentity = new JSONObject();
+
+                            requestOwnerIdentity.put("type", "requestOwnerIdentity");
+                            requestOwnerIdentity.put("idremote", remoteIdentity);
+
+                            CommService.sendEncrypted(requestOwnerIdentity);
+
+                            return;
+                        }
+                    }
+
+                    if (type.equals("responseOwnerIdentity"))
+                    {
+                        if (status.equals("success"))
+                        {
+                            handler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    dialog.setTitle("Verschlüsselung aktiviert...");
+                                }
+                            });
+
+                            // Todo identity wegspecihen.-....
                         }
                     }
                 }

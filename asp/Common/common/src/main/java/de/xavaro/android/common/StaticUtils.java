@@ -14,12 +14,14 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -623,5 +625,17 @@ public class StaticUtils
         return false;
     }
 
+    public static byte[] getUUIDBytes(String uuid)
+    {
+        String uuidstr = uuid.replace("-","");
+        return StaticUtils.hexStringToBytes(uuidstr);
+    }
+
+    public static String getUUIDString(byte[] bytes)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        UUID uuid = new UUID(bb.getLong(), bb.getLong());
+        return uuid.toString();
+    }
     //endregion
 }

@@ -25,6 +25,7 @@ import java.util.UUID;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 //
@@ -35,46 +36,95 @@ public class CryptUtils
 {
     private static final String LOGTAG = CryptUtils.class.getSimpleName();
 
-    public static byte[] encrypt(byte[] key, byte[] decrypted) throws Exception
+    private static byte[] AESencrypt(byte[] key, byte[] decrypted) throws Exception
     {
         SecretKeySpec skeySpec = new SecretKeySpec(key, "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        IvParameterSpec spec = new IvParameterSpec(new byte[ cipher.getBlockSize() ]);
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec, spec);
         byte[] encrypted = cipher.doFinal(decrypted);
+
+        Log.d(LOGTAG,"encrypt:" + StaticUtils.hexBytesToString(key));
+        Log.d(LOGTAG,"encrypt:" + StaticUtils.hexBytesToString(encrypted));
+
         return encrypted;
     }
 
-    public static byte[] decrypt(byte[] key, byte[] encrypted) throws Exception
+    private static byte[] AESdecrypt(byte[] key, byte[] encrypted) throws Exception
     {
+        Log.d(LOGTAG,"decrypt:" + StaticUtils.hexBytesToString(key));
+        Log.d(LOGTAG,"decrypt:" + StaticUtils.hexBytesToString(encrypted));
+
         SecretKeySpec skeySpec = new SecretKeySpec(key, "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, skeySpec);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        IvParameterSpec spec = new IvParameterSpec(new byte[ cipher.getBlockSize() ]);
+        cipher.init(Cipher.DECRYPT_MODE, skeySpec, spec);
         byte[] decrypted = cipher.doFinal(encrypted);
+
         return decrypted;
     }
 
-    public static byte[] AESmakeKey(String strkey)
+    @Nullable
+    private static byte[] AESmakeKey(String uuid)
     {
+        return StaticUtils.getUUIDBytes(uuid);
+
+        /*
         try
         {
-            byte[] keyStart = strkey.getBytes();
+            byte[] keyStart = passPhrase.getBytes();
             KeyGenerator kgen = KeyGenerator.getInstance("AES");
             SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
             sr.setSeed(keyStart);
             kgen.init(128, sr); // 192 and 256 bits may not be available
             SecretKey skey = kgen.generateKey();
-            byte[] key = skey.getEncoded();
+            return skey.getEncoded();
         }
         catch (NoSuchAlgorithmException ex)
         {
         }
 
         return null;
+        */
     }
 
-    PublicKey publicKey;
-    PrivateKey privateKey;
-    byte [] encryptedBytes,decryptedBytes;
+    @Nullable
+    public static byte[] AESencrypt(String identity, String message)
+    {
+        try
+        {
+            JSONObject ident = IdentityManager.getInstance().getIdentity(identity);
+            if (!ident.has("passPhrase")) return null;
+            Log.d(LOGTAG,"encrypt:" + ident.getString("passPhrase"));
+            byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
+            return AESencrypt(aesKey, message.getBytes());
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static byte[] AESdecrypt(String identity, byte[] message)
+    {
+        try
+        {
+            JSONObject ident = IdentityManager.getInstance().getIdentity(identity);
+            if (!ident.has("passPhrase")) return null;
+            Log.d(LOGTAG,"decrypt:" + ident.getString("passPhrase"));
+            byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
+            return AESdecrypt(aesKey, message);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
 
     @Nullable
     private static PublicKey RSAgetPublicKeyFromBase64(String publicKey)
