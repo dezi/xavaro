@@ -715,9 +715,10 @@ public class SettingsFragments
                             recvPincode.put("type", "requestPin");
                             recvPincode.put("pincode", sharedPrefs.getString(sendPinPref.getKey(), ""));
 
-                            CommService.subscribeMessage("responsePin", self);
-                            CommService.subscribeMessage("responsePublicKeyXChange", self);
-                            CommService.subscribeMessage("responseAESpassXChange", self);
+                            CommService.subscribeMessage(self, "responsePin");
+                            CommService.subscribeMessage(self, "responsePublicKeyXChange");
+                            CommService.subscribeMessage(self, "responseAESpassXChange");
+                            CommService.subscribeMessage(self, "responseOwnerIdentity");
 
                             CommService.sendMessage(recvPincode);
                         }
@@ -848,7 +849,7 @@ public class SettingsFragments
                                 @Override
                                 public void run()
                                 {
-                                    dialog.setTitle("Verschlüsselung aktiviert...");
+                                    dialog.setTitle("Benutzerdaten erhalten.");
                                 }
                             });
 

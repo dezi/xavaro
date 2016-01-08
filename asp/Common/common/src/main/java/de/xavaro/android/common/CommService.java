@@ -74,7 +74,7 @@ public class CommService extends Service
         }
     }
 
-    public static void subscribeMessage(String type, CommServiceCallback callback)
+    public static void subscribeMessage(CommServiceCallback callback, String type)
     {
         synchronized (messageSubscribers)
         {
@@ -89,7 +89,7 @@ public class CommService extends Service
     }
 
     @SuppressWarnings("unused")
-    public static void unsubscribeMessage(String type, CommServiceCallback callback)
+    public static void unsubscribeMessage(CommServiceCallback callback, String type)
     {
         synchronized (messageSubscribers)
         {
