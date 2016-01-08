@@ -1,10 +1,5 @@
 package de.xavaro.android.safehome;
 
-import de.xavaro.android.common.CommService;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.SystemIdentity;
-
 import android.support.v7.app.AppCompatActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,6 +20,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import de.xavaro.android.common.CommService;
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.SystemIdentity;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener

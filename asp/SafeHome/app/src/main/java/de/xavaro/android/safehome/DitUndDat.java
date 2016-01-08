@@ -373,6 +373,7 @@ public class DitUndDat
             //
 
             SettingsFragments.AdminFragment.registerAll(context);
+            SettingsFragments.OwnerFragment.registerAll(context);
             SettingsFragments.SafetyFragment.registerAll(context);
             SettingsFragments.DomainsFragment.registerAll(context);
         }

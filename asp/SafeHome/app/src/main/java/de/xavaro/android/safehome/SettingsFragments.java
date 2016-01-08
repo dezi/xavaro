@@ -14,7 +14,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
@@ -31,10 +30,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import de.xavaro.android.common.CommService;
+import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.CryptUtils;
 
 public class SettingsFragments
 {
@@ -46,6 +48,105 @@ public class SettingsFragments
     {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
+
+    //region Owner preferences
+
+    public static class OwnerFragment extends PreferenceFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Eigentümer";
+            header.iconRes = GlobalConfigs.IconResOwner;
+            header.fragment = OwnerFragment.class.getName();
+
+            return header;
+        }
+
+        private static final ArrayList<Preference> preferences = new ArrayList<>();
+
+        public static void registerAll(Context context)
+        {
+            preferences.clear();
+
+            SettingsNiced.NiceListPreference lp;
+            SettingsNiced.NiceEditTextPreference et;
+
+            lp = new SettingsNiced.NiceListPreference(context);
+
+            final CharSequence[] prefixText = { "Keine", "Herr", "Frau" };
+            final CharSequence[] prefixVals = { "no",    "mr",   "ms"   };
+
+            lp.setEntries(prefixText);
+            lp.setEntryValues(prefixVals);
+            lp.setDefaultValue("no");
+            lp.setKey("owner.prefix");
+            lp.setTitle("Anrede");
+
+            if (! sharedPrefs.contains(lp.getKey()))
+            {
+                sharedPrefs.edit().putString(lp.getKey(), "no").apply();
+            }
+
+            preferences.add(lp);
+
+            et = new SettingsNiced.NiceEditTextPreference(context);
+
+            et.setKey("owner.firstname");
+            et.setTitle("Vorname");
+
+            preferences.add(et);
+
+            et = new SettingsNiced.NiceEditTextPreference(context);
+
+            et.setKey("owner.givenname");
+            et.setTitle("Nachname");
+
+            preferences.add(et);
+
+            lp = new SettingsNiced.NiceListPreference(context);
+
+            final CharSequence[] siezenText =
+                    {
+                            "gesiezt werden",
+                            "geduzt werden",
+                            "Hamburger Sie",
+                            "Münchner Du"
+                    };
+
+            final CharSequence[] siezenVals = { "siezen", "duzen", "hamsie", "mucdu" };
+
+            lp.setEntries(siezenText);
+            lp.setEntryValues(siezenVals);
+            lp.setDefaultValue("siezen");
+            lp.setKey("owner.siezen");
+            lp.setTitle("Anwender möchte");
+
+            if (! sharedPrefs.contains(lp.getKey()))
+            {
+                sharedPrefs.edit().putString(lp.getKey(), "siezen").apply();
+            }
+
+            preferences.add(lp);
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+        }
+   }
+
+    //endregion Owner preferences
 
     //region Administrator preferences
 
@@ -410,7 +511,8 @@ public class SettingsFragments
     //region Xavaro preferences
 
     public static class XavaroFragment extends EnablePreferenceFragment implements
-            DialogInterface.OnClickListener
+            DialogInterface.OnClickListener,
+            CommService.CommServiceCallback
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -428,8 +530,10 @@ public class SettingsFragments
 
         private Context context;
         private AlertDialog dialog;
+        private final Handler handler = new Handler();
 
-        private SettingsNiced.NiceListPreference devicePref;
+        private SettingsNiced.NiceListPreference sendPinPref;
+        private SettingsNiced.NiceListPreference recvPinPref;
         final ArrayList<String> recentText = new ArrayList<>();
         final ArrayList<String> recentVals = new ArrayList<>();
 
@@ -462,50 +566,84 @@ public class SettingsFragments
             preferences.add(pc);
 
             //
-            // Make visible.
+            // Send pin code.
             //
 
-            devicePref = new SettingsNiced.NiceListPreference(context);
+            sendPinPref = new SettingsNiced.NiceListPreference(context);
 
-            devicePref.setKey(keyprefix + ".pincode");
+            sendPinPref.setKey(keyprefix + ".sendpin");
 
             recentText.add("1234-5678");
             recentVals.add("1234-5678");
 
-            devicePref.setEntries(recentText);
-            devicePref.setEntryValues(recentVals);
-            devicePref.setDefaultValue(recentVals.get(0));
-            devicePref.setTitle("Mit Pincode");
-            devicePref.setEnabled(enabled);
+            sendPinPref.setEntries(recentText);
+            sendPinPref.setEntryValues(recentVals);
+            sendPinPref.setDefaultValue(recentVals.get(0));
+            sendPinPref.setTitle("Pincode freigeben");
+            sendPinPref.setEnabled(enabled);
 
-            devicePref.setOnclick(publishDialog);
+            sendPinPref.setOnclick(sendDialog);
 
-            if (!sharedPrefs.contains(devicePref.getKey()))
+            if (!sharedPrefs.contains(sendPinPref.getKey()))
             {
-                sharedPrefs.edit().putString(devicePref.getKey(), recentVals.get(0)).apply();
+                sharedPrefs.edit().putString(sendPinPref.getKey(), recentVals.get(0)).apply();
             }
 
-            preferences.add(devicePref);
+            preferences.add(sendPinPref);
+
+            //
+            // Receive pin code.
+            //
+
+            recvPinPref = new SettingsNiced.NiceListPreference(context);
+
+            recvPinPref.setKey(keyprefix + ".recvpin");
+
+            recentVals.add("1234-5678");
+            recentVals.add("1234-5678");
+
+            recvPinPref.setEntries(recentText);
+            recvPinPref.setEntryValues(recentVals);
+            recvPinPref.setDefaultValue(recentVals.get(0));
+            recvPinPref.setTitle("Pincode verbinden");
+            recvPinPref.setEnabled(enabled);
+
+            recvPinPref.setOnclick(recvDialog);
+
+            if (!sharedPrefs.contains(recvPinPref.getKey()))
+            {
+                sharedPrefs.edit().putString(recvPinPref.getKey(), recentVals.get(0)).apply();
+            }
+
+            preferences.add(recvPinPref);
+
+            //
+            // Confirmed connects.
+            //
+
+            pc = new SettingsNiced.NiceCategoryPreference(context);
+            pc.setTitle("Bestätigte Verbindungen");
+            preferences.add(pc);
         }
 
-        public final Runnable publishDialog = new Runnable()
+        public final Runnable sendDialog = new Runnable()
         {
             @Override
             public void run()
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Pincode publizieren");
+                builder.setTitle(sendPinPref.getTitle());
 
                 builder.setNegativeButton("Neuer Code", self);
                 builder.setPositiveButton("Abbrechen", self);
-                builder.setNeutralButton("Jetzt publizieren", self);
+                builder.setNeutralButton("Jetzt freigeben", self);
 
                 dialog = builder.create();
 
                 TextView pincode = new TextView(context);
                 pincode.setTextSize(24f);
                 pincode.setPadding(40, 24, 0, 0);
-                pincode.setText(sharedPrefs.getString(devicePref.getKey(), ""));
+                pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
 
                 dialog.setView(pincode);
                 dialog.show();
@@ -522,11 +660,66 @@ public class SettingsFragments
                     {
                         try
                         {
-                            JSONObject publishPincode = new JSONObject();
+                            JSONObject sendPincode = new JSONObject();
 
-                            publishPincode.put("pincode", sharedPrefs.getString(devicePref.getKey(), ""));
+                            sendPincode.put("type", "sendPin");
+                            sendPincode.put("pincode", sharedPrefs.getString(sendPinPref.getKey(), ""));
 
-                            CommService.sendMessage(publishPincode);
+                            CommService.sendMessage(sendPincode);
+
+                            dialog.cancel();
+                        }
+                        catch (JSONException ignore)
+                        {
+                        }
+                    }
+                });
+            }
+        };
+
+        public final Runnable recvDialog = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle(recvPinPref.getTitle());
+
+                builder.setPositiveButton("Abbrechen", self);
+                builder.setNeutralButton("Jetzt verbinden", self);
+
+                dialog = builder.create();
+
+                TextView pincode = new TextView(context);
+                pincode.setTextSize(24f);
+                pincode.setPadding(40, 24, 0, 0);
+                pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
+
+                dialog.setView(pincode);
+                dialog.show();
+
+                //
+                // Set neutral button handler to avoid closing
+                // of list preference dialog.
+                //
+
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        try
+                        {
+                            JSONObject recvPincode = new JSONObject();
+
+                            recvPincode.put("type", "requestPin");
+                            recvPincode.put("pincode", sharedPrefs.getString(sendPinPref.getKey(), ""));
+
+                            CommService.subscribeMessage("responsePin", self);
+                            CommService.subscribeMessage("responsePublicKeyXChange", self);
+                            CommService.subscribeMessage("responseAESpassXChange", self);
+
+                            CommService.sendMessage(recvPincode);
                         }
                         catch (JSONException ignore)
                         {
@@ -547,6 +740,103 @@ public class SettingsFragments
             {
                 dialog.cancel();
             }
+        }
+
+        public void onMessageReceived(JSONObject message)
+        {
+            Log.d(LOGTAG, "onMessageReceived: " + message.toString());
+
+            try
+            {
+                if (message.has("type") && message.has("status"))
+                {
+                    String type = message.getString("type");
+                    String status = message.getString("status");
+
+                    if (type.equals("responsePin"))
+                    {
+                        if (status.equals("success"))
+                        {
+                            handler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    dialog.setTitle("Pincode gefunden...");
+                                }
+                            });
+
+                            String remoteIdentity = message.getString("identity");
+
+                            JSONObject requestPublicKeyXChange = new JSONObject();
+
+                            requestPublicKeyXChange.put("type", "requestPublicKeyXChange");
+                            requestPublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(context));
+                            requestPublicKeyXChange.put("remoteIdentity", remoteIdentity);
+
+                            CommService.sendMessage(requestPublicKeyXChange);
+
+                            return;
+                        }
+                    }
+
+                    if (type.equals("responsePublicKeyXChange"))
+                    {
+                        if (status.equals("success"))
+                        {
+                            handler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    dialog.setTitle("Öffentliche Schlüssel getauscht...");
+                                }
+                            });
+
+                            String remoteIdentity = message.getString("identity");
+                            String remotePublicKey = message.getString("publicKey");
+                            String remoteApp = message.getString("app");
+                            String passPhrase = UUID.randomUUID().toString();
+                            String encoPassPhrase = CryptUtils.RSAEncrypt(remotePublicKey, passPhrase);
+
+                            IdentityManager.getInstance().put(remoteIdentity, "publicKey", remotePublicKey);
+                            IdentityManager.getInstance().put(remoteIdentity, "appName", remoteApp);
+                            IdentityManager.getInstance().put(remoteIdentity, "passPhrase", passPhrase);
+
+                            JSONObject requestAESpassXChange = new JSONObject();
+
+                            requestAESpassXChange.put("type", "requestAESpassXChange");
+                            requestAESpassXChange.put("encodedPassPhrase", encoPassPhrase);
+                            requestAESpassXChange.put("remoteIdentity", remoteIdentity);
+
+                            CommService.sendMessage(requestAESpassXChange);
+
+                            return;
+                        }
+                    }
+
+                    if (type.equals("responseAESpassXChange"))
+                    {
+                        if (status.equals("success"))
+                        {
+                            handler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    dialog.setTitle("Verschlüsselung aktiviert...");
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            catch (JSONException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+
+            CommService.unsubscribeAllMessages(self);
         }
     }
 

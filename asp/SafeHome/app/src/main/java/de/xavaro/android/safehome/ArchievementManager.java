@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.xavaro.android.common.SettingsManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
 

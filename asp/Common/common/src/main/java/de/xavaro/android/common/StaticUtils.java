@@ -109,6 +109,13 @@ public class StaticUtils
     // Convert JSON to string with indent and dump.
     //
 
+    @Nullable
+    public static String JSON2String(JSONObject jsonObject)
+    {
+        return JSON2String(jsonObject, false);
+    }
+
+    @Nullable
     public static String JSON2String(JSONObject jsonObject, boolean dump)
     {
         if (jsonObject == null) return null;
