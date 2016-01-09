@@ -8,6 +8,15 @@ import android.content.Context;
 
 public class CommonConfigs
 {
+    //region Colors and styles
+
+    // @formatter:off
+    public static final int PreferenceTextEnabledColor  = 0xff444444;
+    public static final int PreferenceTextDisabledColor = 0x88888888;
+    // @formatter:on
+
+    //endregion
+
     // @formatter:off
     public static final String OopsServerName     = "www.xavaro.de";
     public static final int    OopsServerPort     = 42742;

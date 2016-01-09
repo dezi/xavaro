@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
 
@@ -12,6 +12,7 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
+import android.preference.SwitchPreference;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class SettingsNiced
+public class NicedPreferences
 {
     public static class NiceDatePreference extends NiceDialogPreference implements
             DatePicker.OnDateChangedListener
@@ -302,8 +303,8 @@ public class SettingsNiced
             if (current != null)
             {
                 current.setTextColor(enabled
-                        ? GlobalConfigs.PreferenceTextEnabledColor
-                        : GlobalConfigs.PreferenceTextDisabledColor);
+                        ? CommonConfigs.PreferenceTextEnabledColor
+                        : CommonConfigs.PreferenceTextDisabledColor);
             }
         }
 
@@ -345,19 +346,16 @@ public class SettingsNiced
             current.setTextSize(18f);
 
             current.setTextColor(disabled
-                    ? GlobalConfigs.PreferenceTextDisabledColor
-                    : GlobalConfigs.PreferenceTextEnabledColor);
+                    ? CommonConfigs.PreferenceTextDisabledColor
+                    : CommonConfigs.PreferenceTextEnabledColor);
 
-            if (DitUndDat.SharedPrefs.sharedPrefs.contains(this.getKey()))
+            if (isInteger)
             {
-                if (isInteger)
-                {
-                    this.setValue(DitUndDat.SharedPrefs.sharedPrefs.getInt(this.getKey(), 0));
-                }
-                else
-                {
-                    this.setValue(DitUndDat.SharedPrefs.sharedPrefs.getString(this.getKey(), null));
-                }
+                this.setValue(getPersistedInt(0));
+            }
+            else
+            {
+                this.setValue(getPersistedString(""));
             }
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -443,8 +441,8 @@ public class SettingsNiced
             if (current != null)
             {
                 current.setTextColor(disabled
-                        ? GlobalConfigs.PreferenceTextDisabledColor
-                        : GlobalConfigs.PreferenceTextEnabledColor);
+                        ? CommonConfigs.PreferenceTextDisabledColor
+                        : CommonConfigs.PreferenceTextEnabledColor);
             }
         }
 
@@ -499,13 +497,10 @@ public class SettingsNiced
                 current.setTextSize(18f);
 
                 current.setTextColor(disabled
-                        ? GlobalConfigs.PreferenceTextDisabledColor
-                        : GlobalConfigs.PreferenceTextEnabledColor);
+                        ? CommonConfigs.PreferenceTextDisabledColor
+                        : CommonConfigs.PreferenceTextEnabledColor);
 
-                if (DitUndDat.SharedPrefs.sharedPrefs.contains(getKey()))
-                {
-                    current.setText(getDisplayValue(DitUndDat.SharedPrefs.sharedPrefs.getString(getKey(),null)));
-                }
+                current.setText(getDisplayValue(getPersistedString("")));
             }
 
             if (current.getParent() != null)
@@ -528,7 +523,7 @@ public class SettingsNiced
         }
     }
 
-    public static class NiceDisplayTextPreference extends SettingsNiced.NiceEditTextPreference
+    public static class NiceDisplayTextPreference extends NicedPreferences.NiceEditTextPreference
     {
         public NiceDisplayTextPreference(Context context)
         {
@@ -570,8 +565,8 @@ public class SettingsNiced
             if (current != null)
             {
                 current.setTextColor(enabled
-                        ? GlobalConfigs.PreferenceTextEnabledColor
-                        : GlobalConfigs.PreferenceTextDisabledColor);
+                        ? CommonConfigs.PreferenceTextEnabledColor
+                        : CommonConfigs.PreferenceTextDisabledColor);
             }
         }
 
@@ -629,8 +624,8 @@ public class SettingsNiced
             current.setTextSize(18f);
 
             current.setTextColor(disabled
-                    ? GlobalConfigs.PreferenceTextDisabledColor
-                    : GlobalConfigs.PreferenceTextEnabledColor);
+                    ? CommonConfigs.PreferenceTextDisabledColor
+                    : CommonConfigs.PreferenceTextEnabledColor);
 
             if (isPassword)
             {
@@ -646,6 +641,14 @@ public class SettingsNiced
             current.setText(getText());
 
             ((ViewGroup) view).addView(current);
+        }
+    }
+
+    public static class NiceSwitchPreference extends SwitchPreference
+    {
+        public NiceSwitchPreference(Context context)
+        {
+            super(context);
         }
     }
 
@@ -676,5 +679,4 @@ public class SettingsNiced
             title.setTextSize(20f);
         }
     }
-
 }
