@@ -282,9 +282,7 @@ public class SettingsFragments
 
     //region Xavaro communication preferences
 
-    public static class XavaroFragment extends EnablePreferenceFragment implements
-            DialogInterface.OnClickListener,
-            CommService.CommServiceCallback
+    public static class XavaroFragment extends EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -297,18 +295,6 @@ public class SettingsFragments
 
             return header;
         }
-
-        private final XavaroFragment self = this;
-
-        private Context context;
-        private AlertDialog dialog;
-        private final Handler handler = new Handler();
-
-        private NicedPreferences.NiceListPreference sendPinPref;
-        private NicedPreferences.NiceListPreference recvPinPref;
-
-        final ArrayList<String> recentText = new ArrayList<>();
-        final ArrayList<String> recentVals = new ArrayList<>();
 
         protected final CharSequence[] sendtoText= {
                 "Nicht aktiviert",
@@ -334,73 +320,11 @@ public class SettingsFragments
         @Override
         public void registerAll(Context context)
         {
-            this.context = context;
-
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference lp;
             NicedPreferences.NiceNumberPreference np;
-
-            //
-            // Connect.
-            //
-
-            pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Verbindungen herstellen");
-            preferences.add(pc);
-
-            //
-            // Send pin code.
-            //
-
-            sendPinPref = new NicedPreferences.NiceListPreference(context);
-
-            sendPinPref.setKey(keyprefix + ".sendpin");
-
-            recentText.add("1234-5678");
-            recentVals.add("1234-5678");
-
-            sendPinPref.setEntries(recentText);
-            sendPinPref.setEntryValues(recentVals);
-            sendPinPref.setDefaultValue(recentVals.get(0));
-            sendPinPref.setTitle("Pincode freigeben");
-            sendPinPref.setEnabled(enabled);
-
-            sendPinPref.setOnclick(sendDialog);
-
-            if (!sharedPrefs.contains(sendPinPref.getKey()))
-            {
-                sharedPrefs.edit().putString(sendPinPref.getKey(), recentVals.get(0)).apply();
-            }
-
-            preferences.add(sendPinPref);
-
-            //
-            // Receive pin code.
-            //
-
-            recvPinPref = new NicedPreferences.NiceListPreference(context);
-
-            recvPinPref.setKey(keyprefix + ".recvpin");
-
-            recentVals.add("1234-5678");
-            recentVals.add("1234-5678");
-
-            recvPinPref.setEntries(recentText);
-            recvPinPref.setEntryValues(recentVals);
-            recvPinPref.setDefaultValue(recentVals.get(0));
-            recvPinPref.setTitle("Pincode verbinden");
-            recvPinPref.setEnabled(enabled);
-
-            recvPinPref.setOnclick(recvDialog);
-
-            if (!sharedPrefs.contains(recvPinPref.getKey()))
-            {
-                sharedPrefs.edit().putString(recvPinPref.getKey(), recentVals.get(0)).apply();
-            }
-
-            preferences.add(recvPinPref);
 
             //
             // Confirmed connects.
@@ -417,6 +341,9 @@ public class SettingsFragments
             JSONObject rcs = SettingsManager.getXpathJSONObject(xpath);
             if (rcs == null) return;
 
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference cb;
+
             Iterator<String> keysIterator = rcs.keys();
 
             while (keysIterator.hasNext())
@@ -428,7 +355,7 @@ public class SettingsFragments
                     if (remoteContacts.contains(ident)) continue;
                     remoteContacts.add(ident);
 
-                    String prefkey = keyprefix + ".remote." + ident;
+                    String prefkey = keyprefix + ".remote";
                     JSONObject rc = rcs.getJSONObject(ident);
 
                     String name = "";
@@ -438,25 +365,18 @@ public class SettingsFragments
                     name = name.trim();
                     if (name.length() == 0) name = "Anonymer Benutzer";
 
-                    NicedPreferences.NiceCategoryPreference pc;
                     pc = new NicedPreferences.NiceCategoryPreference(context);
                     pc.setTitle(name);
 
                     preferences.add(pc);
                     if (! initial) getPreferenceScreen().addPreference(pc);
 
-                    NicedPreferences.NiceListPreference cb;
                     cb = new NicedPreferences.NiceListPreference(context);
+                    cb.setKey(prefkey + ".chat." + ident);
                     cb.setEntries(sendtoText);
                     cb.setEntryValues(sendtoVals);
                     cb.setDefaultValue("inact");
-                    cb.setKey(prefkey + ".chat");
                     cb.setTitle("Nachricht");
-
-                    if (! sharedPrefs.contains(cb.getKey()))
-                    {
-                        sharedPrefs.edit().putString(cb.getKey(), "inact").apply();
-                    }
 
                     preferences.add(cb);
                     if (! initial) getPreferenceScreen().addPreference(cb);
@@ -466,324 +386,6 @@ public class SettingsFragments
                     OopsService.log(LOGTAG, ex);
                 }
             }
-        }
-
-        public final Runnable sendDialog = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(sendPinPref.getTitle());
-
-                builder.setNegativeButton("Neuer Code", self);
-                builder.setPositiveButton("Abbrechen", self);
-                builder.setNeutralButton("Jetzt freigeben", self);
-
-                dialog = builder.create();
-
-                TextView pincode = new TextView(context);
-                pincode.setTextSize(24f);
-                pincode.setPadding(40, 24, 0, 0);
-                pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
-
-                dialog.setView(pincode);
-                dialog.show();
-
-                //
-                // Set neutral button handler to avoid closing
-                // of list preference dialog.
-                //
-
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        try
-                        {
-                            JSONObject sendPincode = new JSONObject();
-
-                            sendPincode.put("type", "sendPin");
-                            sendPincode.put("pincode", sharedPrefs.getString(sendPinPref.getKey(), ""));
-
-                            CommService.sendMessage(sendPincode);
-
-                            dialog.cancel();
-                        }
-                        catch (JSONException ignore)
-                        {
-                        }
-                    }
-                });
-            }
-        };
-
-        private TextView pincode;
-        private JSONObject remoteContact;
-
-        public final Runnable recvDialog = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(recvPinPref.getTitle());
-
-                builder.setPositiveButton("Abbrechen", self);
-                builder.setNeutralButton("Jetzt verbinden", self);
-
-                dialog = builder.create();
-
-                pincode = new TextView(context);
-                pincode.setTextSize(24f);
-                pincode.setPadding(40, 24, 0, 0);
-                pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
-
-                dialog.setView(pincode);
-                dialog.show();
-
-                //
-                // Set neutral button handler to avoid closing
-                // of list preference dialog.
-                //
-
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View view)
-                    {
-                        try
-                        {
-                            JSONObject recvPincode = new JSONObject();
-
-                            recvPincode.put("type", "requestPin");
-                            recvPincode.put("pincode", sharedPrefs.getString(sendPinPref.getKey(), ""));
-
-                            CommService.subscribeMessage(self, "responsePin");
-                            CommService.subscribeMessage(self, "responsePublicKeyXChange");
-                            CommService.subscribeMessage(self, "responseAESpassXChange");
-                            CommService.subscribeMessage(self, "responseOwnerIdentity");
-
-                            CommService.sendMessage(recvPincode);
-                        }
-                        catch (JSONException ignore)
-                        {
-                        }
-                    }
-                });
-            }
-        };
-
-        public void onClick(DialogInterface dialog, int which)
-        {
-            if (which == DialogInterface.BUTTON_POSITIVE)
-            {
-                dialog.cancel();
-            }
-
-            if (which == DialogInterface.BUTTON_NEGATIVE)
-            {
-                dialog.cancel();
-            }
-        }
-
-        public final Runnable storeContact = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    JSONObject rc = remoteContact;
-
-                    String ident = rc.getString("identity");
-                    String appna = rc.has("appName") ? rc.getString("appName") : "";
-                    String fname = rc.has("ownerFirstName") ? rc.getString("ownerFirstName") : "";
-                    String lname = rc.has("ownerGivenName") ? rc.getString("ownerGivenName") : "";
-
-                    String xpath = "RemoteContacts/identities/" + ident;
-                    JSONObject recontact = SettingsManager.getXpathJSONObject(xpath);
-                    if (recontact == null) recontact = new JSONObject();
-
-                    recontact.put("appName", appna);
-                    recontact.put("ownerFirstName", fname);
-                    recontact.put("ownerGivenName", lname);
-
-                    SettingsManager.putXpath(xpath, recontact);
-                    SettingsManager.flush();
-
-                    registerRemotes(context, false);
-                }
-                catch (JSONException ex)
-                {
-                    OopsService.log(LOGTAG, ex);
-                }
-
-            }
-        };
-
-        public void onMessageReceived(JSONObject message)
-        {
-            Log.d(LOGTAG, "onMessageReceived: " + message.toString());
-
-            try
-            {
-                if (message.has("type") && message.has("status"))
-                {
-                    String type = message.getString("type");
-                    String status = message.getString("status");
-
-                    if (type.equals("responsePin"))
-                    {
-                        if (status.equals("success"))
-                        {
-                            handler.post(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    dialog.setTitle("Pincode gefunden...");
-                                }
-                            });
-
-                            String remoteIdentity = message.getString("idremote");
-
-                            JSONObject requestPublicKeyXChange = new JSONObject();
-
-                            requestPublicKeyXChange.put("type", "requestPublicKeyXChange");
-                            requestPublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(context));
-                            requestPublicKeyXChange.put("idremote", remoteIdentity);
-
-                            CommService.sendMessage(requestPublicKeyXChange);
-
-                            return;
-                        }
-                    }
-
-                    if (type.equals("responsePublicKeyXChange"))
-                    {
-                        if (status.equals("success"))
-                        {
-                            handler.post(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    dialog.setTitle("Öffentliche Schlüssel getauscht...");
-                                }
-                            });
-
-                            String remoteIdentity = message.getString("identity");
-                            String remotePublicKey = message.getString("publicKey");
-                            String passPhrase = UUID.randomUUID().toString();
-                            String encoPassPhrase = CryptUtils.RSAEncrypt(remotePublicKey, passPhrase);
-
-                            IdentityManager.getInstance().put(remoteIdentity, "publicKey", remotePublicKey);
-                            IdentityManager.getInstance().put(remoteIdentity, "passPhrase", passPhrase);
-
-                            JSONObject requestAESpassXChange = new JSONObject();
-
-                            requestAESpassXChange.put("type", "requestAESpassXChange");
-                            requestAESpassXChange.put("idremote", remoteIdentity);
-                            requestAESpassXChange.put("encodedPassPhrase", encoPassPhrase);
-
-                            CommService.sendMessage(requestAESpassXChange);
-
-                            return;
-                        }
-                    }
-
-                    if (type.equals("responseAESpassXChange"))
-                    {
-                        if (status.equals("success"))
-                        {
-                            handler.post(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    dialog.setTitle("Verschlüsselung aktiviert...");
-                                }
-                            });
-
-                            String remoteIdentity = message.getString("identity");
-
-                            JSONObject requestOwnerIdentity = new JSONObject();
-
-                            requestOwnerIdentity.put("type", "requestOwnerIdentity");
-                            requestOwnerIdentity.put("idremote", remoteIdentity);
-
-                            CommService.sendEncrypted(requestOwnerIdentity);
-
-                            return;
-                        }
-                    }
-
-                    if (type.equals("responseOwnerIdentity"))
-                    {
-                        if (status.equals("success"))
-                        {
-                            remoteContact = message;
-
-                            handler.post(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    dialog.setTitle("Benutzerdaten erhalten.");
-
-                                    String name = "";
-
-                                    try
-                                    {
-                                        if (remoteContact.has("ownerFirstName"))
-                                        {
-                                            name += " " + remoteContact.getString("ownerFirstName");
-                                        }
-
-                                        if (remoteContact.has("ownerGivenName"))
-                                        {
-                                            name += " " + remoteContact.getString("ownerGivenName");
-                                        }
-
-                                        if (remoteContact.has("appName"))
-                                        {
-                                            name += " (" + remoteContact.getString("appName") + ")";
-                                        }
-                                    }
-                                    catch (JSONException ignore)
-                                    {
-                                    }
-
-                                    name = name.trim();
-                                    if (name.length() == 0) name = "Anonymer Benutzer";
-
-                                    pincode.setText(name);
-
-                                    dialog.getButton(DialogInterface.BUTTON_NEUTRAL).setText("Als Kontakt übernehmen");
-
-                                    dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(View view)
-                                        {
-                                            handler.post(storeContact);
-                                            dialog.cancel();
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-            catch (JSONException ex)
-            {
-                OopsService.log(LOGTAG, ex);
-            }
-
-            CommService.unsubscribeAllMessages(self);
         }
     }
 

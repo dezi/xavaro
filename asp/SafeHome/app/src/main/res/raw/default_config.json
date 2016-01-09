@@ -1,41 +1,31 @@
 {"launchgroup": {
     "launchitems": [
       {
-        "label": "Internet Radio",
-        "type": "ipradio",
-        "enable": "ipradio.enable"
-      },
-      {
-        "label": "Internet Fernsehen",
-        "type": "iptelevision",
-        "enable": "iptelevision.enable"
-      },
-      {
-        "label": "Online Zeitungen",
+        "label": "Zeitungen",
         "type": "webconfig",
         "subtype": "newspaper",
         "enable": "webconfig.newspaper.enable"
       },
       {
-        "label": "Online Magazine",
+        "label": "Magazine",
         "type": "webconfig",
         "subtype": "magazine",
         "enable": "webconfig.magazine.enable"
       },
       {
-        "label": "Online Illustrierte",
+        "label": "Illustrierte",
         "type": "webconfig",
         "subtype": "pictorial",
         "enable": "webconfig.pictorial.enable"
       },
       {
-        "label": "Online Shopping",
+        "label": "Shopping",
         "type": "webconfig",
         "subtype": "shopping",
         "enable": "webconfig.shopping.enable"
       },
       {
-        "label": "Online Erotisches",
+        "label": "Erotisches",
         "type": "webconfig",
         "subtype": "erotics",
         "enable": "webconfig.erotics.enable"
@@ -56,6 +46,11 @@
         "enable": "phone.enable"
       },
       {
+        "label": "Xavaro",
+        "type": "xavaro",
+        "enable": "xavaro.enable"
+      },
+      {
         "label": "Vitaldaten",
         "type": "health",
         "enable": "health.scale.enable"
@@ -68,6 +63,16 @@
         "label": "Wikipedia",
         "type": "genericapp",
         "packagename": "org.wikipedia"
+      },
+      {
+        "label": "Radio",
+        "type": "ipradio",
+        "enable": "ipradio.enable"
+      },
+      {
+        "label": "Fernsehen",
+        "type": "iptelevision",
+        "enable": "iptelevision.enable"
       }
     ]
   }

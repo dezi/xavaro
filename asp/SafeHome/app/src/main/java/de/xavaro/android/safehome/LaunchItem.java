@@ -373,10 +373,15 @@ public class LaunchItem extends FrameLayout implements
                         icon.setVisibility(VISIBLE);
                     }
                 }
+
+                if (type.equals("xavaro"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResCommunity));
+                    icon.setVisibility(VISIBLE);
+                }
+
                 if (type.equals("phone"))
                 {
-                    GlobalConfigs.likeWhatsApp = true;
-
                     if (config.has("phonenumber"))
                     {
                         targetIcon = icon;
@@ -868,6 +873,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("webframe"     )) { launchWebframe();     return; }
         if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
         if (type.equals("phone"        )) { launchPhone();        return; }
+        if (type.equals("xavaro"       )) { launchXavaro();       return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
         if (type.equals("health"       )) { launchHealth();        return; }
 
@@ -957,6 +963,16 @@ public class LaunchItem extends FrameLayout implements
         if (directory == null)
         {
             directory = new AppsGroup.WhatsappGroup(context);
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
+    private void launchXavaro()
+    {
+        if (directory == null)
+        {
+            directory = new AppsGroup.XavaroGroup(context);
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);

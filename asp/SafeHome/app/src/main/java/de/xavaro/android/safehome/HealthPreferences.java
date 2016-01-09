@@ -40,9 +40,9 @@ public class HealthPreferences
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceNumberPreference np;
             NicedPreferences.NiceListPreference lp;
             NicedPreferences.NiceDatePreference dp;
-            NicedPreferences.NiceNumberPreference np;
 
             //
             // Personal user data required for calculations.
@@ -515,11 +515,13 @@ public class HealthPreferences
         {
             super.registerAll(context);
 
+            /*
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceEditTextPreference ep;
             NicedPreferences.NiceListPreference lp;
             NicedPreferences.NiceDatePreference dp;
             NicedPreferences.NiceNumberPreference np;
+            */
         }
     }
 
