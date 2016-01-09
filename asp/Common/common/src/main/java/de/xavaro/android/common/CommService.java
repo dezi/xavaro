@@ -1,5 +1,7 @@
 package de.xavaro.android.common;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.app.Service;
@@ -282,13 +284,15 @@ public class CommService extends Service
                 responseAESpassXChange.put("idremote", remoteIdentity);
                 responseAESpassXChange.put("status", "success");
 
-                CommService.sendMessage(responseAESpassXChange);
+                CommService.sendEncrypted(responseAESpassXChange);
 
                 return true;
             }
 
             if (type.equals("requestOwnerIdentity"))
             {
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
                 String remoteIdentity = json.getString("identity");
 
                 JSONObject responseOwnerIdentity = new JSONObject();
@@ -297,9 +301,11 @@ public class CommService extends Service
                 responseOwnerIdentity.put("idremote", remoteIdentity);
                 responseOwnerIdentity.put("status", "success");
 
-                // TODO:
+                responseOwnerIdentity.put("appName", StaticUtils.getAppName(getApplicationContext()));
+                responseOwnerIdentity.put("ownerFirstName", sp.getString("owner.firstname", null));
+                responseOwnerIdentity.put("ownerGivenName", sp.getString("owner.givenname", null));
 
-                CommService.sendMessage(responseOwnerIdentity);
+                CommService.sendEncrypted(responseOwnerIdentity);
 
                 return true;
             }

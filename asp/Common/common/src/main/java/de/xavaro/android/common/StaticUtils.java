@@ -637,5 +637,11 @@ public class StaticUtils
         UUID uuid = new UUID(bb.getLong(), bb.getLong());
         return uuid.toString();
     }
+
+    public static String getAppName(Context context)
+    {
+        return context.getString(context.getApplicationInfo().labelRes);
+    }
+
     //endregion
 }

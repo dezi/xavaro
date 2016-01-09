@@ -385,6 +385,14 @@ public class SettingsNiced
             setOnPreferenceChangeListener(this);
         }
 
+        @Override
+        public void setDefaultValue(Object defaultValue)
+        {
+            super.setDefaultValue(defaultValue);
+
+            if (defaultValue instanceof String) persistString((String) defaultValue);
+        }
+
         public void setEntries(ArrayList<String> entries)
         {
             String[] intern = new String[ entries.size() ];

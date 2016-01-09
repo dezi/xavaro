@@ -35,6 +35,7 @@ import java.util.UUID;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.SettingsManager;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.CryptUtils;
 
@@ -48,236 +49,6 @@ public class SettingsFragments
     {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
-
-    //region Owner preferences
-
-    public static class OwnerFragment extends PreferenceFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Eigentümer";
-            header.iconRes = GlobalConfigs.IconResOwner;
-            header.fragment = OwnerFragment.class.getName();
-
-            return header;
-        }
-
-        private static final ArrayList<Preference> preferences = new ArrayList<>();
-
-        public static void registerAll(Context context)
-        {
-            preferences.clear();
-
-            SettingsNiced.NiceListPreference lp;
-            SettingsNiced.NiceEditTextPreference et;
-
-            lp = new SettingsNiced.NiceListPreference(context);
-
-            final CharSequence[] prefixText = { "Keine", "Herr", "Frau" };
-            final CharSequence[] prefixVals = { "no",    "mr",   "ms"   };
-
-            lp.setEntries(prefixText);
-            lp.setEntryValues(prefixVals);
-            lp.setDefaultValue("no");
-            lp.setKey("owner.prefix");
-            lp.setTitle("Anrede");
-
-            if (! sharedPrefs.contains(lp.getKey()))
-            {
-                sharedPrefs.edit().putString(lp.getKey(), "no").apply();
-            }
-
-            preferences.add(lp);
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("owner.firstname");
-            et.setTitle("Vorname");
-
-            preferences.add(et);
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("owner.givenname");
-            et.setTitle("Nachname");
-
-            preferences.add(et);
-
-            lp = new SettingsNiced.NiceListPreference(context);
-
-            final CharSequence[] siezenText =
-                    {
-                            "gesiezt werden",
-                            "geduzt werden",
-                            "Hamburger Sie",
-                            "Münchner Du"
-                    };
-
-            final CharSequence[] siezenVals = { "siezen", "duzen", "hamsie", "mucdu" };
-
-            lp.setEntries(siezenText);
-            lp.setEntryValues(siezenVals);
-            lp.setDefaultValue("siezen");
-            lp.setKey("owner.siezen");
-            lp.setTitle("Anwender möchte");
-
-            if (! sharedPrefs.contains(lp.getKey()))
-            {
-                sharedPrefs.edit().putString(lp.getKey(), "siezen").apply();
-            }
-
-            preferences.add(lp);
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
-            registerAll(getActivity());
-
-            for (Preference pref : preferences) root.addPreference(pref);
-        }
-   }
-
-    //endregion Owner preferences
-
-    //region Administrator preferences
-
-    public static class AdminFragment extends PreferenceFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Administrator";
-            header.iconRes = GlobalConfigs.IconResAdministrator;
-            header.fragment = AdminFragment.class.getName();
-
-            return header;
-        }
-
-        private static final ArrayList<Preference> preferences = new ArrayList<>();
-        private static final CharSequence[] recentText = { "Android-System", "SafeHome" };
-        private static final CharSequence[] recentVals = { "android", "safehome" };
-
-        private static Context runctx;
-
-        public static void registerAll(Context context)
-        {
-            runctx = context;
-
-            preferences.clear();
-
-            SettingsNiced.NiceEditTextPreference et;
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("admin.password");
-            et.setTitle("Administrator Passwort (zum Anzeigen clicken)");
-            et.setIsPassword();
-
-            if (! sharedPrefs.getString(et.getKey(),"").equals(""))
-            {
-                ArchievementManager.archieved("configure.settings.password");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.password");
-            }
-
-            preferences.add(et);
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("admin.home.button");
-            et.setTitle("Anwendung auf dem Home-Button");
-            et.setText(DitUndDat.DefaultApps.getDefaultHomeLabel(context));
-
-            if (sharedPrefs.getString(et.getKey(),"").equals(DitUndDat.DefaultApps.getAppLable(context)))
-            {
-                ArchievementManager.archieved("configure.settings.homebutton");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.homebutton");
-            }
-
-            et.setOnclick(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    DitUndDat.DefaultApps.setDefaultHome(runctx);
-                }
-            });
-
-            preferences.add(et);
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("admin.assist.button");
-            et.setTitle("Anwendung auf dem Assistenz-Button");
-            et.setText(DitUndDat.DefaultApps.getDefaultAssistLabel(context));
-
-            if (sharedPrefs.getString(et.getKey(),"").equals(DitUndDat.DefaultApps.getAppLable(context)))
-            {
-                ArchievementManager.archieved("configure.settings.assistbutton");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.assistbutton");
-            }
-
-            et.setOnclick(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    DitUndDat.DefaultApps.setDefaultAssist(runctx);
-                }
-            });
-
-            preferences.add(et);
-
-            SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
-
-            cb.setEntries(recentText);
-            cb.setEntryValues(recentVals);
-            cb.setDefaultValue("safehome");
-            cb.setKey("admin.recent.button");
-            cb.setTitle("Anwendung auf dem Menü-Button");
-
-            if (!sharedPrefs.contains(cb.getKey()))
-            {
-                sharedPrefs.edit().putString(cb.getKey(), "safehome").apply();
-            }
-
-            preferences.add(cb);
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
-            registerAll(getActivity());
-
-            for (Preference pref : preferences) root.addPreference(pref);
-        }
-    }
-
-    //endregion Administrator preferences
 
     //region BlueTooth preferences stub
 
@@ -508,7 +279,7 @@ public class SettingsFragments
 
     //endregion BlueTooth preferences stub
 
-    //region Xavaro preferences
+    //region Xavaro communication preferences
 
     public static class XavaroFragment extends EnablePreferenceFragment implements
             DialogInterface.OnClickListener,
@@ -534,8 +305,21 @@ public class SettingsFragments
 
         private SettingsNiced.NiceListPreference sendPinPref;
         private SettingsNiced.NiceListPreference recvPinPref;
+
         final ArrayList<String> recentText = new ArrayList<>();
         final ArrayList<String> recentVals = new ArrayList<>();
+
+        protected final CharSequence[] sendtoText= {
+                "Nicht aktiviert",
+                "Home-Bildschirm",
+                "App-Verzeichnis",
+                "Kontakte-Verzeichnis"};
+
+        protected final CharSequence[] sendtoVals = {
+                "inact",
+                "home",
+                "appdir",
+                "comdir" };
 
         public XavaroFragment()
         {
@@ -621,9 +405,66 @@ public class SettingsFragments
             // Confirmed connects.
             //
 
-            pc = new SettingsNiced.NiceCategoryPreference(context);
-            pc.setTitle("Bestätigte Verbindungen");
-            preferences.add(pc);
+            registerRemotes(context, true);
+        }
+
+        private final ArrayList<String> remoteContacts = new ArrayList<>();
+
+        private void registerRemotes(Context context, boolean initial)
+        {
+            String xpath = "RemoteContacts/identities";
+            JSONObject rcs = SettingsManager.getXpathJSONObject(xpath);
+            if (rcs == null) return;
+
+            Iterator<String> keysIterator = rcs.keys();
+
+            while (keysIterator.hasNext())
+            {
+                try
+                {
+                    String ident = keysIterator.next();
+
+                    if (remoteContacts.contains(ident)) continue;
+                    remoteContacts.add(ident);
+
+                    String prefkey = keyprefix + ".remote." + ident;
+                    JSONObject rc = rcs.getJSONObject(ident);
+
+                    String name = "";
+                    if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
+                    if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
+                    if (rc.has("appName")) name += " (" + rc.getString("appName") + ")";
+                    name = name.trim();
+                    if (name.length() == 0) name = "Anonymer Benutzer";
+
+                    SettingsNiced.NiceCategoryPreference pc;
+                    pc = new SettingsNiced.NiceCategoryPreference(context);
+                    pc.setTitle(name);
+
+                    preferences.add(pc);
+                    if (! initial) getPreferenceScreen().addPreference(pc);
+
+                    SettingsNiced.NiceListPreference cb;
+                    cb = new SettingsNiced.NiceListPreference(context);
+                    cb.setEntries(sendtoText);
+                    cb.setEntryValues(sendtoVals);
+                    cb.setDefaultValue("inact");
+                    cb.setKey(prefkey + ".chat");
+                    cb.setTitle("Nachricht");
+
+                    if (! sharedPrefs.contains(cb.getKey()))
+                    {
+                        sharedPrefs.edit().putString(cb.getKey(), "inact").apply();
+                    }
+
+                    preferences.add(cb);
+                    if (! initial) getPreferenceScreen().addPreference(cb);
+                }
+                catch (JSONException ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
+            }
         }
 
         public final Runnable sendDialog = new Runnable()
@@ -677,6 +518,9 @@ public class SettingsFragments
             }
         };
 
+        private TextView pincode;
+        private JSONObject remoteContact;
+
         public final Runnable recvDialog = new Runnable()
         {
             @Override
@@ -690,7 +534,7 @@ public class SettingsFragments
 
                 dialog = builder.create();
 
-                TextView pincode = new TextView(context);
+                pincode = new TextView(context);
                 pincode.setTextSize(24f);
                 pincode.setPadding(40, 24, 0, 0);
                 pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
@@ -742,6 +586,41 @@ public class SettingsFragments
                 dialog.cancel();
             }
         }
+
+        public final Runnable storeContact = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    JSONObject rc = remoteContact;
+
+                    String ident = rc.getString("identity");
+                    String appna = rc.has("appName") ? rc.getString("appName") : "";
+                    String fname = rc.has("ownerFirstName") ? rc.getString("ownerFirstName") : "";
+                    String lname = rc.has("ownerGivenName") ? rc.getString("ownerGivenName") : "";
+
+                    String xpath = "RemoteContacts/identities/" + ident;
+                    JSONObject recontact = SettingsManager.getXpathJSONObject(xpath);
+                    if (recontact == null) recontact = new JSONObject();
+
+                    recontact.put("appName", appna);
+                    recontact.put("ownerFirstName", fname);
+                    recontact.put("ownerGivenName", lname);
+
+                    SettingsManager.putXpath(xpath, recontact);
+                    SettingsManager.flush();
+
+                    registerRemotes(context, false);
+                }
+                catch (JSONException ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
+
+            }
+        };
 
         public void onMessageReceived(JSONObject message)
         {
@@ -844,16 +723,56 @@ public class SettingsFragments
                     {
                         if (status.equals("success"))
                         {
+                            remoteContact = message;
+
                             handler.post(new Runnable()
                             {
                                 @Override
                                 public void run()
                                 {
                                     dialog.setTitle("Benutzerdaten erhalten.");
+
+                                    String name = "";
+
+                                    try
+                                    {
+                                        if (remoteContact.has("ownerFirstName"))
+                                        {
+                                            name += " " + remoteContact.getString("ownerFirstName");
+                                        }
+
+                                        if (remoteContact.has("ownerGivenName"))
+                                        {
+                                            name += " " + remoteContact.getString("ownerGivenName");
+                                        }
+
+                                        if (remoteContact.has("appName"))
+                                        {
+                                            name += " (" + remoteContact.getString("appName") + ")";
+                                        }
+                                    }
+                                    catch (JSONException ignore)
+                                    {
+                                    }
+
+                                    name = name.trim();
+                                    if (name.length() == 0) name = "Anonymer Benutzer";
+
+                                    pincode.setText(name);
+
+                                    dialog.getButton(DialogInterface.BUTTON_NEUTRAL).setText("Als Kontakt übernehmen");
+
+                                    dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(View view)
+                                        {
+                                            handler.post(storeContact);
+                                            dialog.cancel();
+                                        }
+                                    });
                                 }
                             });
-
-                            // Todo identity wegspecihen.-....
                         }
                     }
                 }
@@ -867,7 +786,7 @@ public class SettingsFragments
         }
     }
 
-    //endregion Xavaro preferences
+    //endregion Xavaro remote preferences
 
     //region Phone preferences
 
@@ -896,7 +815,7 @@ public class SettingsFragments
         }
     }
 
-    //endregion Telefon preferences
+    //endregion Phone preferences
 
     //region Skype preferences
 

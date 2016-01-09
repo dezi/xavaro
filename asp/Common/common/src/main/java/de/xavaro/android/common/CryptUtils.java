@@ -1,9 +1,9 @@
 package de.xavaro.android.common;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
+
+import android.content.Context;
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,17 +14,12 @@ import java.io.FileOutputStream;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.UUID;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -42,50 +37,22 @@ public class CryptUtils
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         IvParameterSpec spec = new IvParameterSpec(new byte[ cipher.getBlockSize() ]);
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec, spec);
-        byte[] encrypted = cipher.doFinal(decrypted);
-
-        Log.d(LOGTAG,"encrypt:" + StaticUtils.hexBytesToString(key));
-        Log.d(LOGTAG,"encrypt:" + StaticUtils.hexBytesToString(encrypted));
-
-        return encrypted;
+        return cipher.doFinal(decrypted);
     }
 
     private static byte[] AESdecrypt(byte[] key, byte[] encrypted) throws Exception
     {
-        Log.d(LOGTAG,"decrypt:" + StaticUtils.hexBytesToString(key));
-        Log.d(LOGTAG,"decrypt:" + StaticUtils.hexBytesToString(encrypted));
-
         SecretKeySpec skeySpec = new SecretKeySpec(key, "AES");
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         IvParameterSpec spec = new IvParameterSpec(new byte[ cipher.getBlockSize() ]);
         cipher.init(Cipher.DECRYPT_MODE, skeySpec, spec);
-        byte[] decrypted = cipher.doFinal(encrypted);
-
-        return decrypted;
+        return cipher.doFinal(encrypted);
     }
 
     @Nullable
     private static byte[] AESmakeKey(String uuid)
     {
         return StaticUtils.getUUIDBytes(uuid);
-
-        /*
-        try
-        {
-            byte[] keyStart = passPhrase.getBytes();
-            KeyGenerator kgen = KeyGenerator.getInstance("AES");
-            SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
-            sr.setSeed(keyStart);
-            kgen.init(128, sr); // 192 and 256 bits may not be available
-            SecretKey skey = kgen.generateKey();
-            return skey.getEncoded();
-        }
-        catch (NoSuchAlgorithmException ex)
-        {
-        }
-
-        return null;
-        */
     }
 
     @Nullable
@@ -95,7 +62,6 @@ public class CryptUtils
         {
             JSONObject ident = IdentityManager.getInstance().getIdentity(identity);
             if (!ident.has("passPhrase")) return null;
-            Log.d(LOGTAG,"encrypt:" + ident.getString("passPhrase"));
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESencrypt(aesKey, message.getBytes());
         }
@@ -114,7 +80,6 @@ public class CryptUtils
         {
             JSONObject ident = IdentityManager.getInstance().getIdentity(identity);
             if (!ident.has("passPhrase")) return null;
-            Log.d(LOGTAG,"decrypt:" + ident.getString("passPhrase"));
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESdecrypt(aesKey, message);
         }
@@ -203,7 +168,7 @@ public class CryptUtils
         {
             JSONObject keys = RSAretrieveFromStorage(context);
 
-            return keys.getString("private").trim();
+            if (keys != null) return keys.getString("private");
         }
         catch (JSONException ex)
         {
@@ -220,7 +185,7 @@ public class CryptUtils
         {
             JSONObject keys = RSAretrieveFromStorage(context);
 
-            return keys.getString("public").trim();
+            if (keys != null) return keys.getString("public");
         }
         catch (JSONException ex)
         {

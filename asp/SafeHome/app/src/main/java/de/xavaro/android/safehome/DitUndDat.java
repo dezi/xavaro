@@ -372,8 +372,10 @@ public class DitUndDat
             // Register all dynamic preferences.
             //
 
-            SettingsFragments.AdminFragment.registerAll(context);
-            SettingsFragments.OwnerFragment.registerAll(context);
+            new PreferencesBasics.OwnerFragment().registerAll(context);
+            new PreferencesBasics.AdminFragment().registerAll(context);
+            new PreferencesBasics.CommunityFragment().registerAll(context);
+
             SettingsFragments.SafetyFragment.registerAll(context);
             SettingsFragments.DomainsFragment.registerAll(context);
         }

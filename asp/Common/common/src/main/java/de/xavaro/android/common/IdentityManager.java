@@ -33,8 +33,6 @@ public class IdentityManager
     {
         String xpath = "IdentityManager/identities/" + identity;
 
-        Log.d(LOGTAG,"putIdentity: " + identity + ":" + StaticUtils.JSON2String(ident));
-
         SettingsManager.putXpath(xpath, ident);
         SettingsManager.flush();
     }
