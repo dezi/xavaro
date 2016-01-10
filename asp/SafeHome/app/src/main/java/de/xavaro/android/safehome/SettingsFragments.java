@@ -30,6 +30,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
+
+import de.xavaro.android.common.CommService;
+import de.xavaro.android.common.IdentityManager;
+import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.CryptUtils;
 
 public class SettingsFragments
 {
@@ -41,137 +50,6 @@ public class SettingsFragments
     {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
-
-    //region Administrator preferences
-
-    public static class AdminFragment extends PreferenceFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Administrator";
-            header.iconRes = GlobalConfigs.IconResAdministrator;
-            header.fragment = AdminFragment.class.getName();
-
-            return header;
-        }
-
-        private static final ArrayList<Preference> preferences = new ArrayList<>();
-        private static final CharSequence[] recentText = { "Android-System", "SafeHome" };
-        private static final CharSequence[] recentVals = { "android", "safehome" };
-
-        private static Context runctx;
-
-        public static void registerAll(Context context)
-        {
-            runctx = context;
-
-            preferences.clear();
-
-            SettingsNiced.NiceEditTextPreference et;
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("admin.password");
-            et.setTitle("Administrator Passwort (zum Anzeigen clicken)");
-            et.setIsPassword();
-
-            if (! sharedPrefs.getString(et.getKey(),"").equals(""))
-            {
-                ArchievementManager.archieved("configure.settings.password");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.password");
-            }
-
-            preferences.add(et);
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("admin.home.button");
-            et.setTitle("Anwendung auf dem Home-Button");
-            et.setText(DitUndDat.DefaultApps.getDefaultHomeLabel(context));
-
-            if (sharedPrefs.getString(et.getKey(),"").equals(DitUndDat.DefaultApps.getAppLable(context)))
-            {
-                ArchievementManager.archieved("configure.settings.homebutton");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.homebutton");
-            }
-
-            et.setOnclick(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    DitUndDat.DefaultApps.setDefaultHome(runctx);
-                }
-            });
-
-            preferences.add(et);
-
-            et = new SettingsNiced.NiceEditTextPreference(context);
-
-            et.setKey("admin.assist.button");
-            et.setTitle("Anwendung auf dem Assistenz-Button");
-            et.setText(DitUndDat.DefaultApps.getDefaultAssistLabel(context));
-
-            if (sharedPrefs.getString(et.getKey(),"").equals(DitUndDat.DefaultApps.getAppLable(context)))
-            {
-                ArchievementManager.archieved("configure.settings.assistbutton");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.assistbutton");
-            }
-
-            et.setOnclick(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    DitUndDat.DefaultApps.setDefaultAssist(runctx);
-                }
-            });
-
-            preferences.add(et);
-
-            SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
-
-            cb.setEntries(recentText);
-            cb.setEntryValues(recentVals);
-            cb.setDefaultValue("safehome");
-            cb.setKey("admin.recent.button");
-            cb.setTitle("Anwendung auf dem Menü-Button");
-
-            if (!sharedPrefs.contains(cb.getKey()))
-            {
-                sharedPrefs.edit().putString(cb.getKey(), "safehome").apply();
-            }
-
-            preferences.add(cb);
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
-            registerAll(getActivity());
-
-            for (Preference pref : preferences) root.addPreference(pref);
-        }
-    }
-
-    //endregion Administrator preferences
 
     //region BlueTooth preferences stub
 
@@ -190,7 +68,7 @@ public class SettingsFragments
         private final BlueToothFragment self = this;
         private Context context;
 
-        private SettingsNiced.NiceListPreference devicePref;
+        private NicedPreferences.NiceListPreference devicePref;
 
         final ArrayList<String> recentText = new ArrayList<>();
         final ArrayList<String> recentVals = new ArrayList<>();
@@ -208,11 +86,11 @@ public class SettingsFragments
             // Bluetooth device selection preference
             //
 
-            SettingsNiced.NiceCategoryPreference pc = new SettingsNiced.NiceCategoryPreference(context);
+            NicedPreferences.NiceCategoryPreference pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("BlueTooth Geräteauswahl");
             preferences.add(pc);
 
-            devicePref = new SettingsNiced.NiceListPreference(context);
+            devicePref = new NicedPreferences.NiceListPreference(context);
 
             devicePref.setKey(keyprefix + ".device");
 
@@ -402,6 +280,117 @@ public class SettingsFragments
 
     //endregion BlueTooth preferences stub
 
+    //region Xavaro communication preferences
+
+    public static class XavaroFragment extends EnablePreferenceFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Xavaro";
+            header.iconRes = GlobalConfigs.IconResXavaro;
+            header.fragment = XavaroFragment.class.getName();
+
+            return header;
+        }
+
+        protected final CharSequence[] sendtoText= {
+                "Nicht aktiviert",
+                "Home-Bildschirm",
+                "App-Verzeichnis",
+                "Kontakte-Verzeichnis"};
+
+        protected final CharSequence[] sendtoVals = {
+                "inact",
+                "home",
+                "appdir",
+                "comdir" };
+
+        public XavaroFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResXavaro;
+            keyprefix = "xavaro";
+            masterenable = "Xavaro Kommunikation freischalten";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference lp;
+            NicedPreferences.NiceNumberPreference np;
+
+            //
+            // Confirmed connects.
+            //
+
+            registerRemotes(context, true);
+        }
+
+        private final ArrayList<String> remoteContacts = new ArrayList<>();
+
+        private void registerRemotes(Context context, boolean initial)
+        {
+            String xpath = "RemoteContacts/identities";
+            JSONObject rcs = SettingsManager.getXpathJSONObject(xpath);
+            if (rcs == null) return;
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference cb;
+
+            Iterator<String> keysIterator = rcs.keys();
+
+            while (keysIterator.hasNext())
+            {
+                try
+                {
+                    String ident = keysIterator.next();
+
+                    if (remoteContacts.contains(ident)) continue;
+                    remoteContacts.add(ident);
+
+                    String prefkey = keyprefix + ".remote";
+                    JSONObject rc = rcs.getJSONObject(ident);
+
+                    String name = "";
+                    if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
+                    if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
+                    if (rc.has("appName")) name += " (" + rc.getString("appName") + ")";
+                    name = name.trim();
+                    if (name.length() == 0) name = "Anonymer Benutzer";
+
+                    pc = new NicedPreferences.NiceCategoryPreference(context);
+                    pc.setTitle(name);
+
+                    preferences.add(pc);
+                    if (! initial) getPreferenceScreen().addPreference(pc);
+
+                    cb = new NicedPreferences.NiceListPreference(context);
+                    cb.setKey(prefkey + ".chat." + ident);
+                    cb.setEntries(sendtoText);
+                    cb.setEntryValues(sendtoVals);
+                    cb.setDefaultValue("inact");
+                    cb.setTitle("Nachricht");
+
+                    preferences.add(cb);
+                    if (! initial) getPreferenceScreen().addPreference(cb);
+                }
+                catch (JSONException ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
+            }
+        }
+    }
+
+    //endregion Xavaro remote preferences
+
     //region Phone preferences
 
     public static class PhoneFragment extends ContactsFragment
@@ -429,7 +418,7 @@ public class SettingsFragments
         }
     }
 
-    //endregion Telefon preferences
+    //endregion Phone preferences
 
     //region Skype preferences
 
@@ -534,7 +523,7 @@ public class SettingsFragments
 
             if (installpack != null)
             {
-                SettingsNiced.NiceListPreference ip = new SettingsNiced.NiceListPreference(context);
+                NicedPreferences.NiceListPreference ip = new NicedPreferences.NiceListPreference(context);
 
                 boolean installed = StaticUtils.isAppInstalled(context, installpack);
 
@@ -675,7 +664,7 @@ public class SettingsFragments
 
                     if (alike) cattitle += " (" + check.get(0) + ")";
 
-                    SettingsNiced.NiceCategoryPreference nc = new SettingsNiced.NiceCategoryPreference(context);
+                    NicedPreferences.NiceCategoryPreference nc = new NicedPreferences.NiceCategoryPreference(context);
                     nc.setTitle(cattitle);
                     nc.setEnabled(enabled);
                     preferences.add(nc);
@@ -683,7 +672,7 @@ public class SettingsFragments
                     if (chatphone != null)
                     {
                         String key = keyprefix + ".chat." + chatphone;
-                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
+                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -704,7 +693,7 @@ public class SettingsFragments
                     if ((voipphone != null) && isPhone)
                     {
                         String key = keyprefix + ".text." + voipphone;
-                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
+                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -725,7 +714,7 @@ public class SettingsFragments
                     if (voipphone != null)
                     {
                         String key = keyprefix + ".voip." + voipphone;
-                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
+                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -746,7 +735,7 @@ public class SettingsFragments
                     if (vicaphone != null)
                     {
                         String key = keyprefix + ".vica." + vicaphone;
-                        SettingsNiced.NiceListPreference cb = new SettingsNiced.NiceListPreference(context);
+                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
                         cb.setEntries(entries);
                         cb.setEntryValues(evalues);
@@ -921,7 +910,7 @@ public class SettingsFragments
 
         //region SafetyCBPreference implementation.
 
-        private static class SafetyCBPreference extends SettingsNiced.NiceCheckboxPreference
+        private static class SafetyCBPreference extends NicedPreferences.NiceCheckboxPreference
         {
             public SafetyCBPreference(Context context)
             {
@@ -1057,7 +1046,7 @@ public class SettingsFragments
             }
             catch (JSONException ex)
             {
-                OopsService.log(LOGTAG,ex);
+                OopsService.log(LOGTAG, ex);
             }
         }
 
@@ -1076,7 +1065,7 @@ public class SettingsFragments
 
         //region DomainsCBPreference implementation
 
-        private static class DomainsCBPreference extends SettingsNiced.NiceCheckboxPreference
+        private static class DomainsCBPreference extends NicedPreferences.NiceCheckboxPreference
         {
             public DomainsCBPreference(Context context)
             {
@@ -1301,8 +1290,8 @@ public class SettingsFragments
 
                 boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable",false);
 
-                SettingsNiced.NiceCategoryPreference pc;
-                SettingsNiced.NiceCheckboxPreference cb;
+                NicedPreferences.NiceCategoryPreference pc;
+                NicedPreferences.NiceCheckboxPreference cb;
 
                 loadGlobalConfig(context);
 
@@ -1357,7 +1346,7 @@ public class SettingsFragments
                     {
                         key = keyprefix + ".website." + website;
 
-                        cb = new SettingsNiced.NiceCheckboxPreference(context);
+                        cb = new NicedPreferences.NiceCheckboxPreference(context);
 
                         cb.setKey(key);
                         cb.setTitle(label);
@@ -1383,7 +1372,7 @@ public class SettingsFragments
                     }
                     else
                     {
-                        pc = new SettingsNiced.NiceCategoryPreference(context);
+                        pc = new NicedPreferences.NiceCategoryPreference(context);
 
                         pc.setTitle(label);
                         pc.setIcon(drawable);
@@ -1402,7 +1391,7 @@ public class SettingsFragments
                             thumbnail = CacheManager.cacheThumbnail(context, iconurl);
                             drawable = new BitmapDrawable(context.getResources(), thumbnail);
 
-                            cb = new SettingsNiced.NiceCheckboxPreference(context);
+                            cb = new NicedPreferences.NiceCheckboxPreference(context);
 
                             cb.setKey(key);
                             cb.setTitle(label);
@@ -1485,7 +1474,7 @@ public class SettingsFragments
                 {
                     if (pref == this) continue;
 
-                    if (pref instanceof SettingsNiced.NiceCheckboxPreference)
+                    if (pref instanceof NicedPreferences.NiceCheckboxPreference)
                     {
                         pref.setEnabled((boolean) obj);
                     }

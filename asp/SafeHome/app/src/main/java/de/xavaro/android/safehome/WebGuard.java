@@ -24,6 +24,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
+
 //
 // Guarded access and display of web client.
 //

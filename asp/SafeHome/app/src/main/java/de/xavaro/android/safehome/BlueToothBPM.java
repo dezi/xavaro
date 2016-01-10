@@ -8,6 +8,9 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
+
 public class BlueToothBPM extends BlueTooth
 {
     private static final String LOGTAG = BlueToothBPM.class.getSimpleName();

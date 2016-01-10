@@ -10,12 +10,83 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import de.xavaro.android.common.IdentityManager;
+import de.xavaro.android.common.RemoteContacts;
+import de.xavaro.android.common.SettingsManager;
+
 //
 // Utility namespace for app launch groups.
 //
 
 public class AppsGroup
 {
+    public static class XavaroGroup extends LaunchGroup
+    {
+        private static final String LOGTAG = XavaroGroup.class.getSimpleName();
+
+        public XavaroGroup(Context context)
+        {
+            super(context);
+
+            this.config = getConfig(context);
+        }
+
+        private JSONObject getConfig(Context context)
+        {
+            try
+            {
+                JSONObject launchgroup = new JSONObject();
+                JSONArray launchitems = new JSONArray();
+
+                Map<String, Object> xavaros = DitUndDat.SharedPrefs.getPrefix("xavaro");
+
+                for (String prefkey : xavaros.keySet())
+                {
+                    Log.d(LOGTAG, "===========" + prefkey + "=" + xavaros.get(prefkey));
+                }
+
+                SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+
+                for (String prefkey : xavaros.keySet())
+                {
+                    if (! prefkey.startsWith("xavaro.remote.chat"))
+                    {
+                        continue;
+                    }
+
+                    String what = sp.getString(prefkey, null);
+
+                    if ((what == null) || what.equals("inact")) continue;
+
+                    String ident = prefkey.substring(19);
+                    String subtype = prefkey.substring(14, 18);
+                    String label = RemoteContacts.getDisplayName(ident);
+
+                    JSONObject whatsentry = new JSONObject();
+
+                    whatsentry.put("label", label);
+                    whatsentry.put("type", "xavaro");
+                    whatsentry.put("subtype", subtype);
+                    whatsentry.put("identity", ident);
+
+                    launchitems.put(whatsentry);
+
+                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + ident + "=" + label);
+                }
+
+                launchgroup.put("launchitems", launchitems);
+
+                return launchgroup;
+            }
+            catch (JSONException ex)
+            {
+                ex.printStackTrace();
+            }
+
+            return new JSONObject();
+        }
+    }
+
     public static class PhoneGroup extends LaunchGroup
     {
         private static final String LOGTAG = PhoneGroup.class.getSimpleName();

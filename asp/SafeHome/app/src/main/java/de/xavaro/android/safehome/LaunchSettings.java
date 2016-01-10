@@ -11,6 +11,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.StaticUtils;
+
 public class LaunchSettings extends LaunchGroup implements
         DialogInterface.OnClickListener
 {

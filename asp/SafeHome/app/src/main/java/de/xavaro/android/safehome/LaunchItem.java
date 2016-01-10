@@ -36,6 +36,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
+
 //
 // Launch item view on home screen.
 //
@@ -370,10 +373,15 @@ public class LaunchItem extends FrameLayout implements
                         icon.setVisibility(VISIBLE);
                     }
                 }
+
+                if (type.equals("xavaro"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResCommunity));
+                    icon.setVisibility(VISIBLE);
+                }
+
                 if (type.equals("phone"))
                 {
-                    GlobalConfigs.likeWhatsApp = true;
-
                     if (config.has("phonenumber"))
                     {
                         targetIcon = icon;
@@ -534,7 +542,7 @@ public class LaunchItem extends FrameLayout implements
             }
             else
             {
-                Bitmap thumbnail = StaticUtils.getIconFromAppStore(context, packageName);
+                Bitmap thumbnail = CacheManager.getIconFromAppStore(context, packageName);
 
                 if (thumbnail != null)
                 {
@@ -865,6 +873,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("webframe"     )) { launchWebframe();     return; }
         if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
         if (type.equals("phone"        )) { launchPhone();        return; }
+        if (type.equals("xavaro"       )) { launchXavaro();       return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
         if (type.equals("health"       )) { launchHealth();        return; }
 
@@ -959,6 +968,35 @@ public class LaunchItem extends FrameLayout implements
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
+    private void launchXavaro()
+    {
+        try
+        {
+            String subtype = config.getString("subtype");
+            String ident = config.getString("identity");
+
+            if (subtype.equals("chat"))
+            {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("subtype", subtype);
+                intent.putExtra("identity",ident);
+                intent.putExtra("label",this.label.getText());
+                context.startActivity(intent);
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        if (directory == null)
+        {
+            directory = new AppsGroup.XavaroGroup(context);
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
     private void launchSkype()
     {
         if (config.has("skypename"))
@@ -1040,7 +1078,7 @@ public class LaunchItem extends FrameLayout implements
         }
         catch (Exception oops)
         {
-        OopsService.log(LOGTAG, oops);
+            OopsService.log(LOGTAG, oops);
         }
     }
 
@@ -1381,9 +1419,8 @@ public class LaunchItem extends FrameLayout implements
     {
         //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
 
-        //DitUndDat.SpeekDat.speak(context, "Susie hat sich auf die Waage gestellt nach Geesthacht.");
+        //new BlueToothScale(context).getCreateUserFromPreferences();
 
-        new BlueToothScale(context).getCreateUserFromPreferences();
+        DitUndDat.SpeekDat.speak("Die Sprachausgabe von Android funktioniert prima.");
     }
-
 }

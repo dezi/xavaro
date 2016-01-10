@@ -14,6 +14,11 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
 
 public class CacheManager
 {
@@ -43,7 +48,7 @@ public class CacheManager
             }
             catch (Exception ex)
             {
-                OopsService.log(LOGTAG,ex);
+                OopsService.log(LOGTAG, ex);
             }
         }
 
@@ -103,6 +108,43 @@ public class CacheManager
             Log.d(LOGTAG,"cacheThumbnail: fetch done");
         }
 
-        return getThumbnail(context,filename);
+        return getThumbnail(context, filename);
+    }
+
+    @Nullable
+    public static Bitmap getIconFromAppStore(Context context, String packageName)
+    {
+        String iconfile = "appstore." + packageName + ".thumbnail.png";
+
+        Bitmap icon = CacheManager.getThumbnail(context,iconfile);
+        if (icon != null) return icon;
+
+        try
+        {
+            String url = "https://play.google.com/store/apps/details?id=" + packageName;
+
+            Log.d(LOGTAG,"getIconFromAppStore:" + url);
+
+            String content = StaticUtils.getContentFromUrl(url);
+            if (content == null) return null;
+
+            Pattern pattern = Pattern.compile("class=\"cover-image\" src=\"([^\"]*)\"");
+            Matcher matcher = pattern.matcher(content);
+            if (! matcher.find()) return null;
+
+            String iconurl = matcher.group(1);
+
+            if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
+
+            Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
+
+            return CacheManager.cacheThumbnail(context, iconurl, iconfile);
+        }
+        catch (Exception oops)
+        {
+            OopsService.log(LOGTAG, oops);
+        }
+
+        return null;
     }
 }

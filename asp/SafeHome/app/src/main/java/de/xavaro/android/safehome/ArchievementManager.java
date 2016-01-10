@@ -15,6 +15,10 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.StaticUtils;
+
 public class ArchievementManager implements
         DialogInterface.OnClickListener
 {
@@ -133,7 +137,7 @@ public class ArchievementManager implements
         currentXpathpref = "ArchievementManager/archievements/" + currentTag;
 
         String cpath = currentXpathpref + "/archieved";
-        int count = SettingsManager.getXpathInt(cpath, true);
+        int count = SettingsManager.getXpathInt(cpath);
         SettingsManager.putXpath(cpath,revoke ? 0 : ++count);
 
         String lpath = currentXpathpref + "/lastarchieved";
@@ -166,10 +170,10 @@ public class ArchievementManager implements
 
                 String xpath = "ArchievementManager/archievements/" + tag;
 
-                int archieved = SettingsManager.getXpathInt(xpath + "/archieved", true);
+                int archieved = SettingsManager.getXpathInt(xpath + "/archieved");
                 if (archieved > 0) continue;
 
-                int noshows = SettingsManager.getXpathInt(xpath + "/negative", true);
+                int noshows = SettingsManager.getXpathInt(xpath + "/negative");
                 if (noshows > 0) continue;
 
                 int prio = archie.has("prio") ? archie.getInt("prio") : 0;
@@ -227,7 +231,7 @@ public class ArchievementManager implements
             String message = archie.getString("message");
             String[] buttons = archie.getString("buttons").split("\\|");
 
-            JSONObject jo = SettingsManager.getXpathJSONObject(currentXpathpref, true);
+            JSONObject jo = SettingsManager.getXpathJSONObject(currentXpathpref);
             if (jo != null) Log.d(LOGTAG,"showInternal: " + currentTag + "=" + jo.toString());
             Log.d(LOGTAG,"========================================");
 
@@ -237,10 +241,10 @@ public class ArchievementManager implements
 
             if ((currentNegative != null) && currentNegative.equals("noshow"))
             {
-                int archieved = SettingsManager.getXpathInt(currentXpathpref + "/archieved", true);
+                int archieved = SettingsManager.getXpathInt(currentXpathpref + "/archieved");
                 if (archieved > 0) return;
 
-                int noshows = SettingsManager.getXpathInt(currentXpathpref + "/negative", true);
+                int noshows = SettingsManager.getXpathInt(currentXpathpref + "/negative");
                 if (noshows > 0) return;
             }
 
@@ -283,7 +287,7 @@ public class ArchievementManager implements
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTransformationMethod(null);
 
             String dpath = currentXpathpref + "/displays";
-            int displaycount = SettingsManager.getXpathInt(dpath, true);
+            int displaycount = SettingsManager.getXpathInt(dpath);
             SettingsManager.putXpath(dpath, ++displaycount);
 
             String lpath = currentXpathpref + "/lastdisplay";
@@ -293,7 +297,7 @@ public class ArchievementManager implements
         }
         catch (JSONException ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
         }
     }
 
@@ -302,7 +306,7 @@ public class ArchievementManager implements
         if (which == DialogInterface.BUTTON_POSITIVE)
         {
             String path = currentXpathpref + "/positive";
-            int poscount = SettingsManager.getXpathInt(path, true);
+            int poscount = SettingsManager.getXpathInt(path);
             SettingsManager.putXpath(path,++poscount);
             SettingsManager.flush();
         }
@@ -310,7 +314,7 @@ public class ArchievementManager implements
         if (which == DialogInterface.BUTTON_NEGATIVE)
         {
             String path = currentXpathpref + "/negative";
-            int negcount = SettingsManager.getXpathInt(path, true);
+            int negcount = SettingsManager.getXpathInt(path);
             SettingsManager.putXpath(path,++negcount);
             SettingsManager.flush();
         }

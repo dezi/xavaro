@@ -23,6 +23,8 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.StaticUtils;
+
 //
 // Launch item view on home screen.
 //
@@ -415,7 +417,7 @@ public class LaunchGroup extends FrameLayout implements
                 {
                     String key = lis.getJSONObject(inx).getString("enable");
 
-                    if (! StaticUtils.getSharedPrefsBoolean(context,key))
+                    if (! StaticUtils.getSharedPrefsBoolean(context, key))
                     {
                         continue;
                     }

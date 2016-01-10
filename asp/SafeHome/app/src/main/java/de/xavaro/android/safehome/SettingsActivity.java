@@ -1,7 +1,7 @@
 package de.xavaro.android.safehome;
 
-import android.content.Context;
 import android.preference.PreferenceActivity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -13,6 +13,9 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.List;
+
+import de.xavaro.android.common.SystemIdentity;
+import de.xavaro.android.common.SettingsManager;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -45,7 +48,9 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Wichtige Einstellungen";
         target.add(category);
 
-        target.add(SettingsFragments.AdminFragment.getHeader());
+        target.add(PreferencesBasics.OwnerFragment.getHeader());
+        target.add(PreferencesBasics.AdminFragment.getHeader());
+        target.add(PreferencesBasics.CommunityFragment.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";
@@ -54,6 +59,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(SettingsFragments.PhoneFragment.getHeader());
         target.add(SettingsFragments.SkypeFragment.getHeader());
         target.add(SettingsFragments.WhatsAppFragment.getHeader());
+        target.add(SettingsFragments.XavaroFragment.getHeader());
 
         category = new Header();
         category.title = "Apps";

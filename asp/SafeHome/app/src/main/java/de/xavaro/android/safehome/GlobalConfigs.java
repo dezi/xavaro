@@ -6,6 +6,8 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 
+import de.xavaro.android.common.StaticUtils;
+
 public class GlobalConfigs
 {
     //region Standard apps
@@ -84,9 +86,6 @@ public class GlobalConfigs
     public static final int LaunchPageBackgroundColor   = 0xffffffee;
     public static final int LaunchArrowBackgroundColor  = 0x40ddddcc;
 
-    public static final int PreferenceTextEnabledColor  = 0xff444444;
-    public static final int PreferenceTextDisabledColor = 0x88888888;
-
     public static final int VideoSurfaceDisabledButton  = 0x88888884;
     public static final int VideoSurfaceEnabledButton   = 0xddddddd6;
     public static final int VideoSurfaceSelectedButton  = 0xfffffff8;
@@ -97,11 +96,14 @@ public class GlobalConfigs
     //region Global icons
 
     // @formatter:off
+    public static final int IconResXavaro             = R.drawable.communication_400x400;
     public static final int IconResSelectHome         = R.drawable.home_512x512;
     public static final int IconResSelectAssist       = R.drawable.assistant_512x512;
     public static final int IconResSettingsAndroid    = R.drawable.settings_android_512x512;
     public static final int IconResSettingsSafehome   = R.drawable.settings_safehome_512x512;
+    public static final int IconResOwner              = R.drawable.owner_512x512;
     public static final int IconResAdministrator      = R.drawable.admin_512x512;
+    public static final int IconResCommunity          = R.drawable.community_350x350_;
     public static final int IconResTesting            = R.drawable.testing_256x256;
     public static final int IconResFireWall           = R.drawable.firewall_256x256;
     public static final int IconResPhoneApp           = R.drawable.phone_256x256;

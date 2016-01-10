@@ -7,6 +7,8 @@ import org.json.JSONObject;
 
 import java.util.Formatter;
 
+import de.xavaro.android.common.OopsService;
+
 public class HealthBPM extends HealthBase
 {
     private static final String LOGTAG = HealthBPM.class.getSimpleName();

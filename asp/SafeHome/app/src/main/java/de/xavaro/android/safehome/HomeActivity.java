@@ -21,6 +21,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.CommService;
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.SystemIdentity;
+
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener
 {
@@ -61,13 +67,13 @@ public class HomeActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        homeActivity = this;
-
         topscreen = (FrameLayout) findViewById(R.id.top_screen);
         topscreen.setSystemUiVisibility(UI_HIDE);
 
         launchGroup = new LaunchGroup(this);
         topscreen.addView(launchGroup);
+
+        homeActivity = this;
 
         createConfig();
 

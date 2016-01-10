@@ -16,6 +16,8 @@ import android.widget.FrameLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.StaticUtils;
+
 //
 // User agent: Mozilla/5.0 (Linux; Android 5.0.2; SM-T555 Build/LRX22G; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/46.0.2490.76 Safari/537.36
 //

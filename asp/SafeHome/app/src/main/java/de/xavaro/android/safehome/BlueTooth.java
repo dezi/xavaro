@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import de.xavaro.android.common.StaticUtils;
+
 @SuppressWarnings("WeakerAccess")
 public abstract class BlueTooth extends BroadcastReceiver
 {

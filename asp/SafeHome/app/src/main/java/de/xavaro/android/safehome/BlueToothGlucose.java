@@ -7,6 +7,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.StaticUtils;
+
 public class BlueToothGlucose extends BlueTooth
 {
     private static final String LOGTAG = BlueToothGlucose.class.getSimpleName();

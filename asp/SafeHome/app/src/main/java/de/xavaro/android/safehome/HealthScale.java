@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.OopsService;
+
 public class HealthScale extends HealthBase
 {
     private static final String LOGTAG = HealthScale.class.getSimpleName();
