@@ -10,9 +10,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.RemoteContacts;
-import de.xavaro.android.common.SettingsManager;
 
 //
 // Utility namespace for app launch groups.

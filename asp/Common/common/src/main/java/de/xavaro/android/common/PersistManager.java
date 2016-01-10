@@ -13,11 +13,9 @@ import java.io.OutputStream;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.xavaro.android.common.OopsService;
-
-public class SettingsManager
+public class PersistManager
 {
-    private static final String LOGTAG = SettingsManager.class.getSimpleName();
+    private static final String LOGTAG = PersistManager.class.getSimpleName();
 
     private static JSONObject settings;
     private static boolean dirty;

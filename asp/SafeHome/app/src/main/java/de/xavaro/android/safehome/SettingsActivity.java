@@ -15,7 +15,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.xavaro.android.common.SystemIdentity;
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -27,7 +27,7 @@ public class SettingsActivity extends PreferenceActivity
         super.onCreate(savedInstanceState);
 
         SystemIdentity.initialize(this);
-        SettingsManager.initialize(this);
+        PersistManager.initialize(this);
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);

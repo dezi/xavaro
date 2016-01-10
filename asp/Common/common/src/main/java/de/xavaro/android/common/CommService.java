@@ -150,6 +150,8 @@ public class CommService extends Service
     {
         super.onCreate();
 
+        ChatManager.initialize(getApplicationContext());
+
         running = true;
     }
 

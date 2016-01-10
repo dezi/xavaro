@@ -20,7 +20,7 @@ import de.xavaro.android.common.CryptUtils;
 import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.PreferenceFragments;
 
@@ -35,7 +35,7 @@ public class PreferencesBasics
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Eigentümer";
+            header.title = "Anwender";
             header.iconRes = GlobalConfigs.IconResOwner;
             header.fragment = OwnerFragment.class.getName();
 
@@ -345,7 +345,7 @@ public class PreferencesBasics
         private void registerRemotes(Context context, boolean initial)
         {
             String xpath = "RemoteContacts/identities";
-            JSONObject rcs = SettingsManager.getXpathJSONObject(xpath);
+            JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
             if (rcs == null) return;
 
             Iterator<String> keysIterator = rcs.keys();
@@ -535,15 +535,15 @@ public class PreferencesBasics
                     String lname = rc.has("ownerGivenName") ? rc.getString("ownerGivenName") : "";
 
                     String xpath = "RemoteContacts/identities/" + ident;
-                    JSONObject recontact = SettingsManager.getXpathJSONObject(xpath);
+                    JSONObject recontact = PersistManager.getXpathJSONObject(xpath);
                     if (recontact == null) recontact = new JSONObject();
 
                     recontact.put("appName", appna);
                     recontact.put("ownerFirstName", fname);
                     recontact.put("ownerGivenName", lname);
 
-                    SettingsManager.putXpath(xpath, recontact);
-                    SettingsManager.flush();
+                    PersistManager.putXpath(xpath, recontact);
+                    PersistManager.flush();
 
                     registerRemotes(context, false);
                 }

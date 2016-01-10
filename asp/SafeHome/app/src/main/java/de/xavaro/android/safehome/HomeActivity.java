@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.SystemIdentity;
 
@@ -95,7 +95,7 @@ public class HomeActivity extends AppCompatActivity implements
         WebCookie.initCookies();
 
         SystemIdentity.initialize(this);
-        SettingsManager.initialize(this);
+        PersistManager.initialize(this);
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SpeekDat.initialize(this);

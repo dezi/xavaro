@@ -1,7 +1,5 @@
 package de.xavaro.android.common;
 
-import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,7 +22,7 @@ public class IdentityManager
     {
         String xpath = "IdentityManager/identities/" + identity;
 
-        JSONObject ident = SettingsManager.getXpathJSONObject(xpath);
+        JSONObject ident = PersistManager.getXpathJSONObject(xpath);
 
         return (ident != null) ? ident : new JSONObject();
     }
@@ -33,8 +31,8 @@ public class IdentityManager
     {
         String xpath = "IdentityManager/identities/" + identity;
 
-        SettingsManager.putXpath(xpath, ident);
-        SettingsManager.flush();
+        PersistManager.putXpath(xpath, ident);
+        PersistManager.flush();
     }
 
     public void put(String identity, String key, String value)

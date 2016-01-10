@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
 
@@ -137,13 +137,13 @@ public class ArchievementManager implements
         currentXpathpref = "ArchievementManager/archievements/" + currentTag;
 
         String cpath = currentXpathpref + "/archieved";
-        int count = SettingsManager.getXpathInt(cpath);
-        SettingsManager.putXpath(cpath,revoke ? 0 : ++count);
+        int count = PersistManager.getXpathInt(cpath);
+        PersistManager.putXpath(cpath, revoke ? 0 : ++count);
 
         String lpath = currentXpathpref + "/lastarchieved";
-        SettingsManager.putXpath(lpath, StaticUtils.nowAsISO());
+        PersistManager.putXpath(lpath, StaticUtils.nowAsISO());
 
-        SettingsManager.flush();
+        PersistManager.flush();
 
         Log.d(LOGTAG,"archievedInternal: " + currentTag);
     }
@@ -170,10 +170,10 @@ public class ArchievementManager implements
 
                 String xpath = "ArchievementManager/archievements/" + tag;
 
-                int archieved = SettingsManager.getXpathInt(xpath + "/archieved");
+                int archieved = PersistManager.getXpathInt(xpath + "/archieved");
                 if (archieved > 0) continue;
 
-                int noshows = SettingsManager.getXpathInt(xpath + "/negative");
+                int noshows = PersistManager.getXpathInt(xpath + "/negative");
                 if (noshows > 0) continue;
 
                 int prio = archie.has("prio") ? archie.getInt("prio") : 0;
@@ -231,7 +231,7 @@ public class ArchievementManager implements
             String message = archie.getString("message");
             String[] buttons = archie.getString("buttons").split("\\|");
 
-            JSONObject jo = SettingsManager.getXpathJSONObject(currentXpathpref);
+            JSONObject jo = PersistManager.getXpathJSONObject(currentXpathpref);
             if (jo != null) Log.d(LOGTAG,"showInternal: " + currentTag + "=" + jo.toString());
             Log.d(LOGTAG,"========================================");
 
@@ -241,10 +241,10 @@ public class ArchievementManager implements
 
             if ((currentNegative != null) && currentNegative.equals("noshow"))
             {
-                int archieved = SettingsManager.getXpathInt(currentXpathpref + "/archieved");
+                int archieved = PersistManager.getXpathInt(currentXpathpref + "/archieved");
                 if (archieved > 0) return;
 
-                int noshows = SettingsManager.getXpathInt(currentXpathpref + "/negative");
+                int noshows = PersistManager.getXpathInt(currentXpathpref + "/negative");
                 if (noshows > 0) return;
             }
 
@@ -287,13 +287,13 @@ public class ArchievementManager implements
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTransformationMethod(null);
 
             String dpath = currentXpathpref + "/displays";
-            int displaycount = SettingsManager.getXpathInt(dpath);
-            SettingsManager.putXpath(dpath, ++displaycount);
+            int displaycount = PersistManager.getXpathInt(dpath);
+            PersistManager.putXpath(dpath, ++displaycount);
 
             String lpath = currentXpathpref + "/lastdisplay";
-            SettingsManager.putXpath(lpath, StaticUtils.nowAsISO());
+            PersistManager.putXpath(lpath, StaticUtils.nowAsISO());
 
-            SettingsManager.flush();
+            PersistManager.flush();
         }
         catch (JSONException ex)
         {
@@ -306,17 +306,17 @@ public class ArchievementManager implements
         if (which == DialogInterface.BUTTON_POSITIVE)
         {
             String path = currentXpathpref + "/positive";
-            int poscount = SettingsManager.getXpathInt(path);
-            SettingsManager.putXpath(path,++poscount);
-            SettingsManager.flush();
+            int poscount = PersistManager.getXpathInt(path);
+            PersistManager.putXpath(path, ++poscount);
+            PersistManager.flush();
         }
 
         if (which == DialogInterface.BUTTON_NEGATIVE)
         {
             String path = currentXpathpref + "/negative";
-            int negcount = SettingsManager.getXpathInt(path);
-            SettingsManager.putXpath(path,++negcount);
-            SettingsManager.flush();
+            int negcount = PersistManager.getXpathInt(path);
+            PersistManager.putXpath(path, ++negcount);
+            PersistManager.flush();
         }
 
         if ((which == DialogInterface.BUTTON_NEUTRAL) && currentNeutralb.equals("follow"))
