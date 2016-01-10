@@ -1,6 +1,31 @@
 {"launchgroup": {
     "launchitems": [
       {
+        "label": "WhatsApp",
+        "type": "whatsapp",
+        "enable": "whatsapp.enable"
+      },
+      {
+        "label": "Skype",
+        "type": "skype",
+        "enable": "skype.enable"
+      },
+      {
+        "label": "Telefonie",
+        "type": "phone",
+        "enable": "phone.enable"
+      },
+      {
+        "label": "Xavaro",
+        "type": "xavaro",
+        "enable": "xavaro.enable"
+      },
+      {
+        "label": "Vitaldaten",
+        "type": "health",
+        "enable": "health.scale.enable"
+      },
+      {
         "label": "Zeitungen",
         "type": "webconfig",
         "subtype": "newspaper",
@@ -29,31 +54,6 @@
         "type": "webconfig",
         "subtype": "erotics",
         "enable": "webconfig.erotics.enable"
-      },
-      {
-        "label": "WhatsApp",
-        "type": "whatsapp",
-        "enable": "whatsapp.enable"
-      },
-      {
-        "label": "Skype",
-        "type": "skype",
-        "enable": "skype.enable"
-      },
-      {
-        "label": "Telefonie",
-        "type": "phone",
-        "enable": "phone.enable"
-      },
-      {
-        "label": "Xavaro",
-        "type": "xavaro",
-        "enable": "xavaro.enable"
-      },
-      {
-        "label": "Vitaldaten",
-        "type": "health",
-        "enable": "health.scale.enable"
       },
       {
         "label": "Test Feature",

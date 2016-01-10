@@ -67,7 +67,7 @@ public class AppsGroup
                     whatsentry.put("label", label);
                     whatsentry.put("type", "xavaro");
                     whatsentry.put("subtype", subtype);
-                    whatsentry.put("ident", ident);
+                    whatsentry.put("identity", ident);
 
                     launchitems.put(whatsentry);
 

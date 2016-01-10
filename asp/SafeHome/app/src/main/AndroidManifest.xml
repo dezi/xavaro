@@ -21,7 +21,6 @@
         android:stateNotNeeded="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <service
             android:name=".KioskService"
             android:exported="false"/>
@@ -73,6 +72,11 @@
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ChatActivity"
+            android:label="@string/title_activity_chat"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

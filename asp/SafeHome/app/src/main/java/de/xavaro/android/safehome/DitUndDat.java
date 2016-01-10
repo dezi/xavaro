@@ -3,17 +3,6 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothProfile;
-import android.os.Parcelable;
-import android.os.Handler;
-
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.content.BroadcastReceiver;
@@ -28,6 +17,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
+import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
@@ -41,9 +31,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
@@ -53,6 +41,31 @@ import de.xavaro.android.common.StaticUtils;
 //
 public class DitUndDat
 {
+    public static class MyFrameLayout extends FrameLayout
+    {
+        public MyFrameLayout(Context context)
+        {
+            super(context);
+        }
+
+        public MyFrameLayout(Context context, AttributeSet attrs)
+        {
+            super(context, attrs);
+        }
+
+        public MyFrameLayout(Context context, AttributeSet attrs, int defStyle)
+        {
+            super(context, attrs, defStyle);
+        }
+
+        protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+        {
+            Log.d("MyFrameLayout","onLayout:" + changed + "=" + left + "=" + top + "=" + right + "=" + bottom);
+
+            super.onLayout(changed, left, top, right, bottom);
+        }
+    }
+
     //region public static class SpeekDat
 
     public static class SpeekDat extends UtteranceProgressListener implements

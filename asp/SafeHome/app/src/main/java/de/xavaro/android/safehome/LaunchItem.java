@@ -970,6 +970,25 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchXavaro()
     {
+        try
+        {
+            String subtype = config.getString("subtype");
+            String ident = config.getString("identity");
+
+            if (subtype.equals("chat"))
+            {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("subtype", subtype);
+                intent.putExtra("identity",ident);
+                intent.putExtra("label",this.label.getText());
+                context.startActivity(intent);
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
         if (directory == null)
         {
             directory = new AppsGroup.XavaroGroup(context);

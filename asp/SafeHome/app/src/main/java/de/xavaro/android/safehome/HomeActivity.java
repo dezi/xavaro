@@ -67,13 +67,13 @@ public class HomeActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        homeActivity = this;
-
         topscreen = (FrameLayout) findViewById(R.id.top_screen);
         topscreen.setSystemUiVisibility(UI_HIDE);
 
         launchGroup = new LaunchGroup(this);
         topscreen.addView(launchGroup);
+
+        homeActivity = this;
 
         createConfig();
 

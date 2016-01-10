@@ -46,6 +46,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -641,6 +642,18 @@ public class StaticUtils
     public static String getAppName(Context context)
     {
         return context.getString(context.getApplicationInfo().labelRes);
+    }
+
+    public static int getActionBarHeight(Context context)
+    {
+        TypedValue tv = new TypedValue();
+
+        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
+        }
+
+        return 0;
     }
 
     //endregion
