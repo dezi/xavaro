@@ -978,8 +978,7 @@ public class LaunchItem extends FrameLayout implements
             if (subtype.equals("chat"))
             {
                 Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("subtype", subtype);
-                intent.putExtra("identity",ident);
+                intent.putExtra("idremote",ident);
                 intent.putExtra("label",this.label.getText());
                 context.startActivity(intent);
             }
