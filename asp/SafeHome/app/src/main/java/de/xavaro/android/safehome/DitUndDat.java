@@ -18,6 +18,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.view.Gravity;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.FrameLayout;
@@ -28,6 +30,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,30 +44,86 @@ import de.xavaro.android.common.StaticUtils;
 //
 public class DitUndDat
 {
-    public static class MyFrameLayout extends FrameLayout
+    //region public static class Toolbar
+
+    public static class Toolbar extends FrameLayout
     {
-        public MyFrameLayout(Context context)
+        public Toolbar(Context context)
         {
             super(context);
+
+            init();
         }
 
-        public MyFrameLayout(Context context, AttributeSet attrs)
+        public Toolbar(Context context, AttributeSet attrs)
         {
             super(context, attrs);
+
+            init();
         }
 
-        public MyFrameLayout(Context context, AttributeSet attrs, int defStyle)
+        public Toolbar(Context context, AttributeSet attrs, int defStyle)
         {
             super(context, attrs, defStyle);
+
+            init();
         }
 
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom)
-        {
-            Log.d("MyFrameLayout","onLayout:" + changed + "=" + left + "=" + top + "=" + right + "=" + bottom);
+        public ImageView icon;
+        public TextView title;
+        public TextView subtitle;
+        public ImageView trash;
 
-            super.onLayout(changed, left, top, right, bottom);
+        public void init()
+        {
+            FrameLayout.LayoutParams lp;
+
+            int MP = ViewGroup.LayoutParams.MATCH_PARENT;
+            int WC = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+            int abheight = StaticUtils.getActionBarHeight(getContext());
+
+            setLayoutParams(new FrameLayout.LayoutParams(MP, abheight));
+            setBackgroundColor(0xffff3456);
+
+            icon = new ImageView(getContext());
+
+            icon.setLayoutParams(new FrameLayout.LayoutParams(abheight, abheight));
+            icon.setPadding(10, 10, 10, 10);
+
+            addView(icon);
+
+            title = new TextView(getContext());
+
+            title.setGravity(Gravity.BOTTOM);
+            title.setTextColor(Color.WHITE);
+            title.setTextSize(24f);
+
+            lp = new FrameLayout.LayoutParams(WC, abheight - 26, Gravity.TOP);
+            lp.leftMargin = abheight;
+
+            addView(title, lp);
+
+            subtitle = new TextView(getContext());
+
+            subtitle.setGravity(Gravity.TOP);
+            subtitle.setTextColor(Color.WHITE);
+
+            lp = new FrameLayout.LayoutParams(WC, 28, Gravity.BOTTOM);
+            lp.leftMargin = abheight;
+
+            addView(subtitle, lp);
+
+            trash = new ImageView(getContext());
+
+            trash.setPadding(10, 10, 10, 10);
+            trash.setImageResource(android.R.drawable.ic_menu_delete);
+
+            addView(trash, new FrameLayout.LayoutParams(abheight, abheight, Gravity.END));
         }
     }
+
+    //endregion public static class Toolbar
 
     //region public static class SpeekDat
 

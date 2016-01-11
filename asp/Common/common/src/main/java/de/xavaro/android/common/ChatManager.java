@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -46,6 +45,8 @@ public class ChatManager implements
     private final Context context;
     private final Handler handler = new Handler();
     private final Map<String, MessageCallback> callbacks = new HashMap<>();
+    private final Map<String, String> outgoingStatus = new HashMap<>();
+    private final Map<String, String> incomingStatus = new HashMap<>();
 
     public ChatManager(Context context)
     {
@@ -56,6 +57,9 @@ public class ChatManager implements
         CommService.subscribeMessage(this, "readChatMessage");
 
         CommService.subscribeMessage(this, "serverAckMessage");
+
+        CommService.subscribeMessage(this, "sendOnlineStatus");
+        CommService.subscribeMessage(this, "recvOnlineStatus");
     }
 
     public void subscribe(String identity, MessageCallback callback)
@@ -64,11 +68,33 @@ public class ChatManager implements
 
         JSONObject protocoll = getProtocoll(identity);
         if (protocoll != null) callback.onProtocollMessages(protocoll);
+
+        outgoingStatus.put(identity, "joinchat=" + Simple.nowAsISO());
+
+        JSONObject sendOnlineStatus = new JSONObject();
+
+        Simple.JSONput(sendOnlineStatus, "type", "sendOnlineStatus");
+        Simple.JSONput(sendOnlineStatus, "idremote", identity);
+        Simple.JSONput(sendOnlineStatus, "status", "joinchat");
+        Simple.JSONput(sendOnlineStatus, "date", Simple.nowAsISO());
+
+        CommService.sendMessage(sendOnlineStatus);
     }
 
     public void unsubscribe(String identity, MessageCallback callback)
     {
         if (callbacks.containsKey(identity)) callbacks.put(identity, callback);
+
+        outgoingStatus.put(identity, "leftchat=" + Simple.nowAsISO());
+
+        JSONObject sendOnlineStatus = new JSONObject();
+
+        Simple.JSONput(sendOnlineStatus, "type", "sendOnlineStatus");
+        Simple.JSONput(sendOnlineStatus, "idremote", identity);
+        Simple.JSONput(sendOnlineStatus, "status", "leftchat");
+        Simple.JSONput(sendOnlineStatus, "date", Simple.nowAsISO());
+
+        CommService.sendMessage(sendOnlineStatus);
     }
 
     public String sendOutgoingMessage(String idremote, String message)
@@ -86,14 +112,7 @@ public class ChatManager implements
 
             CommService.sendEncryptedWithAck(sendChatMessage);
 
-            JSONObject proto = new JSONObject();
-
-            proto.put("type", "sendChatMessage");
-            proto.put("idremote", idremote);
-            proto.put("message", message);
-            proto.put("uuid", uuid);
-
-            updateOutgoingProtocoll(idremote, proto, "date");
+            updateOutgoingProtocoll(idremote, sendChatMessage, "date");
         }
         catch (JSONException ex)
         {
@@ -117,6 +136,49 @@ public class ChatManager implements
             if (message.has("type"))
             {
                 String type = message.getString("type");
+
+                if (type.equals("sendOnlineStatus"))
+                {
+                    String idremote = message.getString("identity");
+                    String status = message.getString("status");
+                    String date = message.getString("date");
+
+                    incomingStatus.put(idremote,status + "=" + date);
+
+                    status = "online";
+                    date = Simple.nowAsISO();
+
+                    if (outgoingStatus.containsKey(idremote))
+                    {
+                        String[] parts = outgoingStatus.get(idremote).split("=");
+
+                        if (parts.length == 2)
+                        {
+                            status = parts[ 0 ];
+                            date = parts[ 1 ];
+                        }
+                    }
+
+                    JSONObject recvOnlineStatus = new JSONObject();
+
+                    recvOnlineStatus.put("type", "recvOnlineStatus");
+                    recvOnlineStatus.put("idremote", idremote);
+                    recvOnlineStatus.put("status", status);
+                    recvOnlineStatus.put("date", date);
+
+                    CommService.sendMessage(recvOnlineStatus);
+
+                    return;
+                }
+
+                if (type.equals("recvOnlineStatus"))
+                {
+                    String idremote = message.getString("identity");
+                    String status = message.getString("status");
+                    String date = message.getString("date");
+
+                    incomingStatus.put(idremote, status + "=" + date);
+                }
 
                 if (type.equals("sendChatMessage"))
                 {
@@ -230,6 +292,8 @@ public class ChatManager implements
 
     private void putProtocoll(String identity, JSONObject protocoll)
     {
+        Log.d(LOGTAG,"putProtocoll: " + protocoll.toString());
+
         String filename = context.getPackageName() + ".chatprotocoll." + identity + ".json";
 
         try
@@ -255,13 +319,17 @@ public class ChatManager implements
 
         try
         {
-            if (!protocoll.has("outgoing")) protocoll.put("outgoing", new JSONObject());
+            if (! protocoll.has("outgoing")) protocoll.put("outgoing", new JSONObject());
             JSONObject outgoing = protocoll.getJSONObject("outgoing");
 
-            JSONObject proto = message;
+            JSONObject proto = new JSONObject(message.toString());
 
             if (! outgoing.has(uuid))
             {
+                if (proto.has("uuid")) proto.remove("uuid");
+                if (proto.has("identity")) proto.remove("identity");
+                if (proto.has("idremote")) proto.remove("idremote");
+
                 outgoing.put(uuid, proto);
             }
             else
@@ -269,7 +337,7 @@ public class ChatManager implements
                 proto = outgoing.getJSONObject(uuid);
             }
 
-            proto.put(status, StaticUtils.nowAsISO());
+            proto.put(status, Simple.nowAsISO());
 
             putProtocoll(identity, protocoll);
         }
@@ -284,20 +352,26 @@ public class ChatManager implements
         String identity = getMessageIdentity(message);
         if (identity == null) return false;
 
-        JSONObject protocoll = getProtocoll(identity);
-        if (protocoll == null) return false;
-
         String uuid = getMessageUUID(message);
         if (uuid == null) return false;
 
+        JSONObject protocoll = getProtocoll(identity);
+        if (protocoll == null) return false;
+
         try
         {
+            message.put("date", Simple.nowAsISO());
+
             if (! protocoll.has("incoming")) protocoll.put("incoming", new JSONObject());
             JSONObject incoming = protocoll.getJSONObject("incoming");
 
-            message.put("date", StaticUtils.nowAsISO());
+            JSONObject proto = new JSONObject(message.toString());
 
-            incoming.put(uuid, message);
+            if (proto.has("uuid")) proto.remove("uuid");
+            if (proto.has("identity")) proto.remove("identity");
+            if (proto.has("idremote")) proto.remove("idremote");
+
+            incoming.put(uuid, proto);
 
             putProtocoll(identity, protocoll);
         }

@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class ArchievementManager implements
@@ -141,7 +142,7 @@ public class ArchievementManager implements
         PersistManager.putXpath(cpath, revoke ? 0 : ++count);
 
         String lpath = currentXpathpref + "/lastarchieved";
-        PersistManager.putXpath(lpath, StaticUtils.nowAsISO());
+        PersistManager.putXpath(lpath, Simple.nowAsISO());
 
         PersistManager.flush();
 
@@ -291,7 +292,7 @@ public class ArchievementManager implements
             PersistManager.putXpath(dpath, ++displaycount);
 
             String lpath = currentXpathpref + "/lastdisplay";
-            PersistManager.putXpath(lpath, StaticUtils.nowAsISO());
+            PersistManager.putXpath(lpath, Simple.nowAsISO());
 
             PersistManager.flush();
         }

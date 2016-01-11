@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class BlueToothSensor extends BlueTooth
@@ -168,7 +169,7 @@ public class BlueToothSensor extends BlueTooth
 
                 sensordata.put("type", "SleepHistoryData");
                 sensordata.put("position", position);
-                sensordata.put("recvtime", StaticUtils.nowAsISO());
+                sensordata.put("recvtime", Simple.nowAsISO());
 
                 JSONArray detail = new JSONArray();
 

@@ -1,13 +1,13 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,9 +19,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.os.Handler;
 import android.os.Bundle;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 @SuppressWarnings("ResourceType")
@@ -51,7 +53,7 @@ public class ChatActivity extends AppCompatActivity implements
 
     private FrameLayout.LayoutParams lp;
     private FrameLayout topscreen;
-    private Toolbar toolbar;
+    private DitUndDat.Toolbar toolbar;
     private ImageView schwalbe;
     private EditText input;
     private FrameLayout.LayoutParams scrollviewlp;
@@ -61,6 +63,7 @@ public class ChatActivity extends AppCompatActivity implements
     private LinearLayout lastDiv;
 
     private boolean lastDivIsIncoming;
+    private String incomingLastDate;
 
     private final static int ID_TEXT = 1;
     private final static int ID_STATUS = 2;
@@ -93,10 +96,11 @@ public class ChatActivity extends AppCompatActivity implements
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 StaticUtils.getActionBarHeight(this));
 
-        toolbar = new Toolbar(this);
-        toolbar.setBackgroundColor(0xffff3456);
-        toolbar.setTitle(label);
-        toolbar.setLayoutParams(lp);
+        toolbar = new DitUndDat.Toolbar(this);
+
+        toolbar.title.setText(label);
+        toolbar.icon.setImageResource(R.drawable.communication_400x400);
+        toolbar.trash.setOnClickListener(onTrashClick);
 
         topscreen.addView(toolbar);
 
@@ -154,7 +158,7 @@ public class ChatActivity extends AppCompatActivity implements
             {
                 Log.d(LOGTAG, "onTouch");
 
-                if (!(boolean) input.getTag())
+                if (! (boolean) input.getTag())
                 {
                     input.setFocusable(true);
                     input.setFocusableInTouchMode(true);
@@ -203,7 +207,6 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        //ChatManager.getInstance(context).clearProtocoll(idremote);
         ChatManager.getInstance(context).subscribe(idremote, this);
     }
 
@@ -250,6 +253,11 @@ public class ChatActivity extends AppCompatActivity implements
             String uuid = chatMessage.getString("uuid");
             String message = chatMessage.getString("message");
             String date = chatMessage.getString("date");
+
+            if ((incomingLastDate == null) || (incomingLastDate.compareTo(date) < 0))
+            {
+                incomingLastDate = date;
+            }
 
             if ((lastDiv == null) || ! lastDivIsIncoming)
             {
@@ -302,7 +310,7 @@ public class ChatActivity extends AppCompatActivity implements
             TextView statusTime = new TextView(context);
             statusTime.setId(ID_TIME);
             statusTime.setPadding(0, 0, 12, 0);
-            statusTime.setText(date.substring(11, 16));
+            statusTime.setText(Simple.getLocal24HTimeFromISO(date));
 
             textLayout.addView(statusTime,lp);
 
@@ -322,7 +330,7 @@ public class ChatActivity extends AppCompatActivity implements
             String message = chatMessage.has("message") ? chatMessage.getString("message") : null;
             String date = chatMessage.has("date") ? chatMessage.getString("date") : null;
 
-            if (date == null) date = StaticUtils.nowAsISO();
+            if (date == null) date = Simple.nowAsISO();
 
             if ((lastDiv == null) || lastDivIsIncoming)
             {
@@ -377,7 +385,7 @@ public class ChatActivity extends AppCompatActivity implements
 
             TextView statusTime = new TextView(context);
             statusTime.setId(ID_TIME);
-            statusTime.setText(date.substring(11, 16));
+            statusTime.setText(Simple.getLocal24HTimeFromISO(date));
 
             statusFrame.addView(statusTime, lp);
 
@@ -422,6 +430,15 @@ public class ChatActivity extends AppCompatActivity implements
         return null;
     }
 
+    private View.OnClickListener onTrashClick = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            ChatManager.getInstance(context).clearProtocoll(idremote);
+        }
+    };
+
     private View.OnClickListener onSchwalbeClick = new View.OnClickListener()
     {
         @Override
@@ -429,6 +446,7 @@ public class ChatActivity extends AppCompatActivity implements
         {
             try
             {
+                if (! (boolean) input.getTag()) return;
                 if (input.getText().length() == 0) return;
 
                 String message = input.getText().toString();
@@ -498,7 +516,7 @@ public class ChatActivity extends AppCompatActivity implements
 
     public void onProtocollMessages(JSONObject protocoll)
     {
-        Log.d(LOGTAG,"onProtocollMessages: " + protocoll.toString());
+        Log.d(LOGTAG, "onProtocollMessages: " + protocoll.toString());
 
         try
         {
@@ -528,10 +546,10 @@ public class ChatActivity extends AppCompatActivity implements
                 boolean nextOutgoing = true;
                 boolean nextIncoming = true;
 
-                if ((outgoingUuid != null) && (incomingUuid == null))
+                if ((outgoingUuid != null) && (incomingUuid != null))
                 {
                     String outgoingDate = outgoing.getJSONObject(outgoingUuid).getString("date");
-                    String incomingDate = outgoing.getJSONObject(incomingUuid).getString("date");
+                    String incomingDate = incoming.getJSONObject(incomingUuid).getString("date");
 
                     if (outgoingDate.compareTo(incomingDate) > 0)
                     {
@@ -545,14 +563,20 @@ public class ChatActivity extends AppCompatActivity implements
 
                 if (nextOutgoing && (outgoingUuid != null))
                 {
-                    createOutgoingMessage(outgoing.getJSONObject(outgoingUuid));
+                    JSONObject temp = Simple.JSONClone(outgoing.getJSONObject(outgoingUuid));
+                    Simple.JSONput(temp, "uuid", outgoingUuid);
+
+                    createOutgoingMessage(temp);
 
                     outgoingUuid = null;
                 }
 
                 if (nextIncoming && (incomingUuid != null))
                 {
-                    createIncomingMessage(incoming.getJSONObject(incomingUuid));
+                    JSONObject temp = Simple.JSONClone(incoming.getJSONObject(incomingUuid));
+                    Simple.JSONput(temp, "uuid", incomingUuid);
+
+                    createIncomingMessage(temp);
 
                     incomingUuid = null;
                 }
@@ -571,6 +595,43 @@ public class ChatActivity extends AppCompatActivity implements
                 scrollview.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
+
+        displayLastOnline();
+    }
+
+    private void displayLastOnline()
+    {
+        if (incomingLastDate == null) return;
+
+        int secsago = Simple.getSecondsAgoFromISO(incomingLastDate);
+
+        if (secsago < 60)
+        {
+            toolbar.subtitle.setText("Online");
+
+            return;
+        }
+
+        int daysago = Simple.getDaysAgoFromISO(incomingLastDate);
+
+        if (daysago == 0)
+        {
+            toolbar.subtitle.setText("zul. online heute um " + Simple.getLocal24HTimeFromISO(incomingLastDate));
+
+            return;
+        }
+
+        if (daysago == 1)
+        {
+            toolbar.subtitle.setText("zul. online gestern um " + Simple.getLocal24HTimeFromISO(incomingLastDate));
+
+            return;
+        }
+
+        toolbar.subtitle.setText("zul. online am "
+                + Simple.getLocalDateFromISO(incomingLastDate)
+                + " um "
+                + Simple.getLocal24HTimeFromISO(incomingLastDate));
     }
 
     public void onIncomingMessage(JSONObject sendChatMessage)
@@ -585,6 +646,8 @@ public class ChatActivity extends AppCompatActivity implements
                 scrollview.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
+
+        displayLastOnline();
     }
 
     public void onSetMessageStatus(String uuid, String what)
