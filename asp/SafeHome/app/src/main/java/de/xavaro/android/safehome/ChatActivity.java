@@ -1,9 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Shader;
@@ -63,7 +61,7 @@ public class ChatActivity extends AppCompatActivity implements
     private LinearLayout lastDiv;
 
     private boolean lastDivIsIncoming;
-    private String incomingLastDate;
+    private String incomingLastMessage;
 
     private final static int ID_TEXT = 1;
     private final static int ID_STATUS = 2;
@@ -254,9 +252,9 @@ public class ChatActivity extends AppCompatActivity implements
             String message = chatMessage.getString("message");
             String date = chatMessage.getString("date");
 
-            if ((incomingLastDate == null) || (incomingLastDate.compareTo(date) < 0))
+            if ((incomingLastMessage == null) || (incomingLastMessage.compareTo(date) < 0))
             {
-                incomingLastDate = date;
+                incomingLastMessage = date;
             }
 
             if ((lastDiv == null) || ! lastDivIsIncoming)
@@ -514,6 +512,11 @@ public class ChatActivity extends AppCompatActivity implements
         statusImage.setImageResource(R.drawable.message_unsent);
     }
 
+    public void onRemoteStatus()
+    {
+        handler.post(displayRemoteStatus);
+    }
+
     public void onProtocollMessages(JSONObject protocoll)
     {
         Log.d(LOGTAG, "onProtocollMessages: " + protocoll.toString());
@@ -596,43 +599,134 @@ public class ChatActivity extends AppCompatActivity implements
             }
         });
 
-        displayLastOnline();
+        handler.postDelayed(displayRemoteStatus, 1000);
     }
 
-    private void displayLastOnline()
+
+    private final Runnable displayRemoteStatus = new Runnable()
     {
-        if (incomingLastDate == null) return;
-
-        int secsago = Simple.getSecondsAgoFromISO(incomingLastDate);
-
-        if (secsago < 60)
+        @Override
+        public void run()
         {
-            toolbar.subtitle.setText("Online");
+            //
+            // Check if partner is within chat or not.
+            //
 
-            return;
+            String incomingChat = ChatManager.getInstance(context).getLastChatStatus(idremote);
+
+            String incomingChatType = null;
+            String incomingChatDate = null;
+
+            if (incomingChat != null)
+            {
+                String[] parts = incomingChat.split("=");
+
+                if (parts.length == 2)
+                {
+                    incomingChatType = parts[ 0 ];
+                    incomingChatDate = parts[ 1 ];
+                }
+            }
+
+            String chatstatus = null;
+
+            if (incomingChatDate != null)
+            {
+                if (incomingChatType.equals("joinchat"))
+                {
+                    chatstatus = "Jetzt im Chat";
+                }
+                else
+                {
+                    chatstatus = "Hat den Chat verlassen";
+                }
+            }
+
+            //
+            // Figure out latest last online date.
+            //
+
+            String lastOnline = ChatManager.getInstance(context).getLastOnlineDate(idremote);
+
+            if (incomingLastMessage != null)
+            {
+                if (lastOnline == null)
+                {
+                    lastOnline = incomingLastMessage;
+                }
+                else
+                {
+                    if (incomingLastMessage.compareTo(lastOnline) > 0)
+                    {
+                        lastOnline = incomingLastMessage;
+                    }
+                }
+            }
+
+            //
+            // Build online message part.
+            //
+
+            String onlinestatus = null;
+
+            if ((lastOnline != null) &&
+                    ((incomingChatDate == null) || ! incomingChatType.equals("joinchat")))
+            {
+                int secsago = Simple.getSecondsAgoFromISO(lastOnline);
+
+                if (secsago < 60)
+                {
+                    onlinestatus = "Online";
+                }
+                else
+                {
+                    int daysago = Simple.getDaysAgoFromISO(lastOnline);
+
+                    if (daysago == 0)
+                    {
+                        onlinestatus = "zul. online heute um "
+                                + Simple.getLocal24HTimeFromISO(lastOnline);
+                    }
+
+                    if (daysago == 1)
+                    {
+                        onlinestatus = "zul. online gestern um "
+                                + Simple.getLocal24HTimeFromISO(lastOnline);
+                    }
+
+                    if (daysago > 1)
+                    {
+                        onlinestatus = "zul. online am "
+                                + Simple.getLocalDateFromISO(lastOnline)
+                                + " um "
+                                + Simple.getLocal24HTimeFromISO(lastOnline);
+                    }
+                }
+            }
+
+            //
+            // Assemble display status.
+            //
+
+            String status = chatstatus;
+
+            if (onlinestatus != null)
+            {
+                if (status == null)
+                {
+                    status = onlinestatus;
+                }
+                else
+                {
+                    status += ", " + onlinestatus;
+                }
+            }
+
+            if (status == null) status = "Offline";
+
+            toolbar.subtitle.setText(status);
         }
-
-        int daysago = Simple.getDaysAgoFromISO(incomingLastDate);
-
-        if (daysago == 0)
-        {
-            toolbar.subtitle.setText("zul. online heute um " + Simple.getLocal24HTimeFromISO(incomingLastDate));
-
-            return;
-        }
-
-        if (daysago == 1)
-        {
-            toolbar.subtitle.setText("zul. online gestern um " + Simple.getLocal24HTimeFromISO(incomingLastDate));
-
-            return;
-        }
-
-        toolbar.subtitle.setText("zul. online am "
-                + Simple.getLocalDateFromISO(incomingLastDate)
-                + " um "
-                + Simple.getLocal24HTimeFromISO(incomingLastDate));
-    }
+    };
 
     public void onIncomingMessage(JSONObject sendChatMessage)
     {
@@ -647,7 +741,7 @@ public class ChatActivity extends AppCompatActivity implements
             }
         });
 
-        displayLastOnline();
+        handler.post(displayRemoteStatus);
     }
 
     public void onSetMessageStatus(String uuid, String what)

@@ -45,8 +45,9 @@ public class ChatManager implements
     private final Context context;
     private final Handler handler = new Handler();
     private final Map<String, MessageCallback> callbacks = new HashMap<>();
-    private final Map<String, String> outgoingStatus = new HashMap<>();
-    private final Map<String, String> incomingStatus = new HashMap<>();
+    private final Map<String, String> outgoingChatStatus = new HashMap<>();
+    private final Map<String, String> incomingChatStatus = new HashMap<>();
+    private final Map<String, String> incomingOnlineStatus = new HashMap<>();
 
     public ChatManager(Context context)
     {
@@ -69,13 +70,14 @@ public class ChatManager implements
         JSONObject protocoll = getProtocoll(identity);
         if (protocoll != null) callback.onProtocollMessages(protocoll);
 
-        outgoingStatus.put(identity, "joinchat=" + Simple.nowAsISO());
+        outgoingChatStatus.put(identity, "joinchat=" + Simple.nowAsISO());
 
         JSONObject sendOnlineStatus = new JSONObject();
 
         Simple.JSONput(sendOnlineStatus, "type", "sendOnlineStatus");
         Simple.JSONput(sendOnlineStatus, "idremote", identity);
-        Simple.JSONput(sendOnlineStatus, "status", "joinchat");
+        Simple.JSONput(sendOnlineStatus, "chatstatus", "joinchat");
+        Simple.JSONput(sendOnlineStatus, "chatdate", Simple.nowAsISO());
         Simple.JSONput(sendOnlineStatus, "date", Simple.nowAsISO());
 
         CommService.sendMessage(sendOnlineStatus);
@@ -85,16 +87,38 @@ public class ChatManager implements
     {
         if (callbacks.containsKey(identity)) callbacks.put(identity, callback);
 
-        outgoingStatus.put(identity, "leftchat=" + Simple.nowAsISO());
+        outgoingChatStatus.put(identity, "leftchat=" + Simple.nowAsISO());
 
         JSONObject sendOnlineStatus = new JSONObject();
 
         Simple.JSONput(sendOnlineStatus, "type", "sendOnlineStatus");
         Simple.JSONput(sendOnlineStatus, "idremote", identity);
-        Simple.JSONput(sendOnlineStatus, "status", "leftchat");
+        Simple.JSONput(sendOnlineStatus, "chatstatus", "leftchat");
+        Simple.JSONput(sendOnlineStatus, "chatdate", Simple.nowAsISO());
         Simple.JSONput(sendOnlineStatus, "date", Simple.nowAsISO());
 
         CommService.sendMessage(sendOnlineStatus);
+    }
+
+    @Nullable
+    public String getLastChatStatus(String idremote)
+    {
+        if (incomingChatStatus.containsKey(idremote))
+        {
+            return incomingChatStatus.get(idremote);
+        }
+
+        return null;
+    }
+
+    public String getLastOnlineDate(String idremote)
+    {
+        if (incomingOnlineStatus.containsKey(idremote))
+        {
+            return incomingOnlineStatus.get(idremote);
+        }
+
+        return null;
     }
 
     public String sendOutgoingMessage(String idremote, String message)
@@ -140,22 +164,27 @@ public class ChatManager implements
                 if (type.equals("sendOnlineStatus"))
                 {
                     String idremote = message.getString("identity");
-                    String status = message.getString("status");
+                    String chatstatus = message.getString("chatstatus");
+                    String chatdate = message.getString("chatdate");
                     String date = message.getString("date");
 
-                    incomingStatus.put(idremote,status + "=" + date);
+                    incomingChatStatus.put(idremote, chatstatus + "=" + chatdate);
+                    incomingOnlineStatus.put(idremote, date);
 
-                    status = "online";
-                    date = Simple.nowAsISO();
+                    MessageCallback callback = callbacks.get(idremote);
+                    if (callback != null) callback.onRemoteStatus();
 
-                    if (outgoingStatus.containsKey(idremote))
+                    chatstatus = "online";
+                    chatdate = Simple.nowAsISO();
+
+                    if (outgoingChatStatus.containsKey(idremote))
                     {
-                        String[] parts = outgoingStatus.get(idremote).split("=");
+                        String[] parts = outgoingChatStatus.get(idremote).split("=");
 
                         if (parts.length == 2)
                         {
-                            status = parts[ 0 ];
-                            date = parts[ 1 ];
+                            chatstatus = parts[ 0 ];
+                            chatdate = parts[ 1 ];
                         }
                     }
 
@@ -163,8 +192,9 @@ public class ChatManager implements
 
                     recvOnlineStatus.put("type", "recvOnlineStatus");
                     recvOnlineStatus.put("idremote", idremote);
-                    recvOnlineStatus.put("status", status);
-                    recvOnlineStatus.put("date", date);
+                    recvOnlineStatus.put("chatstatus", chatstatus);
+                    recvOnlineStatus.put("chatdate", chatdate);
+                    recvOnlineStatus.put("date", Simple.nowAsISO());
 
                     CommService.sendMessage(recvOnlineStatus);
 
@@ -174,10 +204,17 @@ public class ChatManager implements
                 if (type.equals("recvOnlineStatus"))
                 {
                     String idremote = message.getString("identity");
-                    String status = message.getString("status");
+                    String chatstatus = message.getString("chatstatus");
+                    String chatdate = message.getString("chatdate");
                     String date = message.getString("date");
 
-                    incomingStatus.put(idremote, status + "=" + date);
+                    incomingChatStatus.put(idremote, chatstatus + "=" + chatdate);
+                    incomingOnlineStatus.put(idremote, date);
+
+                    MessageCallback callback = callbacks.get(idremote);
+                    if (callback != null) callback.onRemoteStatus();
+
+                    return;
                 }
 
                 if (type.equals("sendChatMessage"))
@@ -431,6 +468,7 @@ public class ChatManager implements
         void onProtocollMessages(JSONObject protocoll);
         void onIncomingMessage(JSONObject message);
         void onSetMessageStatus(String uuid, String what);
+        void onRemoteStatus();
     }
 
     //endregion Callback interface

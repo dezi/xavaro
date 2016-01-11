@@ -98,6 +98,7 @@ public class DitUndDat
             title.setGravity(Gravity.BOTTOM);
             title.setTextColor(Color.WHITE);
             title.setTextSize(24f);
+            title.setSingleLine();
 
             lp = new FrameLayout.LayoutParams(WC, abheight - 26, Gravity.TOP);
             lp.leftMargin = abheight;
@@ -108,6 +109,7 @@ public class DitUndDat
 
             subtitle.setGravity(Gravity.TOP);
             subtitle.setTextColor(Color.WHITE);
+            subtitle.setSingleLine();
 
             lp = new FrameLayout.LayoutParams(WC, 28, Gravity.BOTTOM);
             lp.leftMargin = abheight;
