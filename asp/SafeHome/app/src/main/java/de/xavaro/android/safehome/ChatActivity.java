@@ -113,14 +113,9 @@ public class ChatActivity extends AppCompatActivity implements
 
         topscreen.addView(scrollview);
 
-        lp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(16, 0, 16, 0);
-
         scrollcontent = new LinearLayout(this);
         scrollcontent.setOrientation(LinearLayout.VERTICAL);
-        scrollcontent.setLayoutParams(lp);
+        scrollcontent.setPadding(16, 0, 16, 0);
 
         scrollview.addView(scrollcontent);
 
