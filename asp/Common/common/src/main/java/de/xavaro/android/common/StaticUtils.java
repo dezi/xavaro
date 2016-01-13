@@ -581,17 +581,19 @@ public class StaticUtils
 
     private static void dumpViewsChildrenRecurse(View view, int level)
     {
-        if (! (view instanceof ViewGroup)) return;
-
         String tab = "";
 
         for (int inx = 0; inx < level; inx++) tab += "  ";
 
+        if (level == 0) Log.d(LOGTAG, "-------------------------");
+
+        Log.d(LOGTAG, "dumpViewsChildren:" + tab + view);
+
+        if (! (view instanceof ViewGroup)) return;
+
         for(int inx = 0; inx < ((ViewGroup) view).getChildCount(); ++inx)
         {
             View nextChild = ((ViewGroup) view).getChildAt(inx);
-
-            Log.d(LOGTAG, "dumpViewsChildren:" + tab + nextChild);
 
             dumpViewsChildrenRecurse(nextChild, level + 1);
         }

@@ -125,7 +125,7 @@ public class PreferencesBasics
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Administrator";
+            header.title = "Administration";
             header.iconRes = GlobalConfigs.IconResAdministrator;
             header.fragment = AdminFragment.class.getName();
 
@@ -147,7 +147,7 @@ public class PreferencesBasics
             et = new NicedPreferences.NiceEditTextPreference(context);
 
             et.setKey("admin.password");
-            et.setTitle("Administrator Passwort (zum Anzeigen clicken)");
+            et.setTitle("Admin Passwort");
             et.setIsPassword();
 
             if (! sharedPrefs.getString(et.getKey(),"").equals(""))
@@ -162,13 +162,13 @@ public class PreferencesBasics
             preferences.add(et);
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Abgeschlossenheit");
+            pc.setTitle("System-Buttons");
             preferences.add(pc);
 
             et = new NicedPreferences.NiceEditTextPreference(context);
 
             et.setKey("admin.home.button");
-            et.setTitle("Anwendung auf dem Home-Button");
+            et.setTitle("Home-Button");
             et.setText(DitUndDat.DefaultApps.getDefaultHomeLabel(context));
             et.setOnclick(selectHome);
 
@@ -186,7 +186,7 @@ public class PreferencesBasics
             et = new NicedPreferences.NiceEditTextPreference(context);
 
             et.setKey("admin.assist.button");
-            et.setTitle("Anwendung auf dem Assistenz-Button");
+            et.setTitle("Assistenz-Button");
             et.setText(DitUndDat.DefaultApps.getDefaultAssistLabel(context));
             et.setOnclick(selectAssist);
 
@@ -210,7 +210,7 @@ public class PreferencesBasics
             cb.setEntries(menueText);
             cb.setEntryValues(menueVals);
             cb.setDefaultValue("safehome");
-            cb.setTitle("Anwendung auf dem Menü-Button");
+            cb.setTitle("Menü-Button");
 
             preferences.add(cb);
         }
@@ -373,7 +373,7 @@ public class PreferencesBasics
             recvPinPref = new NicedPreferences.NiceEditTextPreference(context);
 
             recvPinPref.setKey(keyprefix + ".recvpin");
-            recvPinPref.setTitle("Pincode eingeben:");
+            recvPinPref.setTitle("Pincode verbinden:");
             recvPinPref.setOnclick(recvPinDialog);
 
             preferences.add(recvPinPref);
@@ -382,10 +382,10 @@ public class PreferencesBasics
             // Confirmed connects.
             //
 
-            registerRemotes(context, true);
+            registerRemotes(context, false);
         }
 
-        private void registerRemotes(Context context, boolean initial)
+        private void registerRemotes(Context context, boolean update)
         {
             String xpath = "RemoteContacts/identities";
             JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
@@ -394,7 +394,7 @@ public class PreferencesBasics
             Iterator<String> keysIterator = rcs.keys();
 
             NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceSwitchPreference sp;
+            NicedPreferences.NiceEditTextPreference ep;
 
             while (keysIterator.hasNext())
             {
@@ -411,25 +411,30 @@ public class PreferencesBasics
                     String name = "";
                     if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
                     if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
-                    if (rc.has("appName")) name += "\n" + rc.getString("appName");
-                    if (rc.has("devName")) name += " - " + rc.getString("devName");
                     name = name.trim();
                     if (name.length() == 0) name = "Anonymer Benutzer";
+
+                    String info = "";
+                    if (rc.has("appName")) info += rc.getString("appName");
+                    if (rc.has("devName")) info += " - " + rc.getString("devName");
+
+                    String title = (name + "\n" + info).trim();
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
                     pc.setKey(prefkey);
                     pc.setDefaultValue(true);
-                    pc.setTitle(name);
+                    pc.setTitle(title);
 
                     preferences.add(pc);
-                    if (! initial) getPreferenceScreen().addPreference(pc);
+                    if (update) root.addPreference(pc);
 
-                    sp = new NicedPreferences.NiceSwitchPreference(context);
-                    sp.setKey(prefkey + ".isremoteadmin");
-                    sp.setTitle("Remote Administration");
+                    ep = new NicedPreferences.NiceEditTextPreference(context);
+                    ep.setKey(prefkey + ".nickname");
+                    ep.setDefaultValue(name);
+                    ep.setTitle("Nickname");
 
-                    preferences.add(sp);
-                    if (! initial) getPreferenceScreen().addPreference(sp);
+                    preferences.add(ep);
+                    if (update) root.addPreference(ep);
                 }
                 catch (JSONException ex)
                 {
@@ -447,13 +452,13 @@ public class PreferencesBasics
                 builder.setTitle(sendPinPref.getTitle());
 
                 builder.setPositiveButton("Abbrechen", clickListener);
-                builder.setNegativeButton("Neuer Code", clickListener);
-                builder.setNeutralButton("Jetzt freigeben", clickListener);
+                builder.setNegativeButton("Neu", clickListener);
+                builder.setNeutralButton("Freigeben", clickListener);
 
                 dialog = builder.create();
 
                 pincode = new TextView(context);
-                pincode.setTextSize(24f);
+                pincode.setTextSize(Simple.getPreferredEditSize());
                 pincode.setPadding(40, 24, 0, 0);
                 pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
 
@@ -461,6 +466,7 @@ public class PreferencesBasics
                 dialog.show();
 
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(sendPinAction);
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(randPinAction);
             }
         };
 
@@ -492,7 +498,7 @@ public class PreferencesBasics
 
                 pinPart1 = new EditText(context);
                 pinPart1.setMinEms(3);
-                pinPart1.setTextSize(24f);
+                pinPart1.setTextSize(Simple.getPreferredEditSize());
                 pinPart1.setFilters(filters);
                 pinPart1.setGravity(Gravity.CENTER);
                 pinPart1.setBackgroundColor(0x80cccccc);
@@ -508,7 +514,7 @@ public class PreferencesBasics
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count)
                     {
-                        if (s.length() >= 4) pinPart2.requestFocus();
+                        if (s.length() == 4) pinPart2.requestFocus();
                     }
 
                     @Override
@@ -523,13 +529,13 @@ public class PreferencesBasics
                 });
 
                 TextView sep1 = new TextView(context);
-                sep1.setTextSize(24f);
+                sep1.setTextSize(Simple.getPreferredEditSize());
                 sep1.setText(" – ");
                 lp.addView(sep1);
 
                 pinPart2 = new EditText(context);
                 pinPart2.setMinEms(3);
-                pinPart2.setTextSize(24f);
+                pinPart2.setTextSize(Simple.getPreferredEditSize());
                 pinPart2.setFilters(filters);
                 pinPart2.setGravity(Gravity.CENTER);
                 pinPart2.setBackgroundColor(0x80cccccc);
@@ -545,7 +551,7 @@ public class PreferencesBasics
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count)
                     {
-                        if (s.length() >= 4) pinPart3.requestFocus();
+                        if (s.length() == 4) pinPart3.requestFocus();
                     }
 
                     @Override
@@ -560,13 +566,13 @@ public class PreferencesBasics
                 });
 
                 TextView sep2 = new TextView(context);
-                sep2.setTextSize(24f);
+                sep2.setTextSize(Simple.getPreferredEditSize());
                 sep2.setText(" – ");
                 lp.addView(sep2);
 
                 pinPart3 = new EditText(context);
                 pinPart3.setMinEms(3);
-                pinPart3.setTextSize(24f);
+                pinPart3.setTextSize(Simple.getPreferredEditSize());
                 pinPart3.setFilters(filters);
                 pinPart3.setGravity(Gravity.CENTER);
                 pinPart3.setBackgroundColor(0x80cccccc);
@@ -582,13 +588,15 @@ public class PreferencesBasics
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count)
                     {
-                        if (s.length() >= 4)
+                        if (s.length() == 4)
                         {
                             pinPart1.setFocusable(false);
                             pinPart2.setFocusable(false);
                             pinPart3.setFocusable(false);
 
                             Simple.dismissKeyboard(pinPart3);
+
+                            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(true);
                         }
                     }
 
@@ -604,7 +612,8 @@ public class PreferencesBasics
                 });
 
                 pinName = new TextView(context);
-                pinName.setTextSize(24f);
+                pinName.setPadding(0, 16, 0, 0);
+                pinName.setTextSize(Simple.getPreferredEditSize());
 
                 ll.addView(pinName);
 
@@ -612,6 +621,10 @@ public class PreferencesBasics
                 dialog.show();
 
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(recvPinAction);
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(actpincode.length == 3);
+
+                pinPart1.requestFocus();
+                Simple.showKeyboard(pinPart1);
             }
         };
 
@@ -629,6 +642,20 @@ public class PreferencesBasics
                 {
                     dialog.cancel();
                 }
+            }
+        };
+
+        private final View.OnClickListener randPinAction = new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                generatePincode();
+
+                String newpincode = sharedPrefs.getString(sendPinPref.getKey(), "");
+
+                sendPinPref.setText(newpincode);
+                pincode.setText(newpincode);
             }
         };
 
@@ -661,16 +688,22 @@ public class PreferencesBasics
             {
                 try
                 {
+                    pinPart1.setFocusable(false);
+                    pinPart2.setFocusable(false);
+                    pinPart3.setFocusable(false);
 
-                    String newpincode = pinPart1.getText() + "-" +
-                            pinPart2.getText() + "-" + pinPart3.getText();
+                    Simple.dismissKeyboard(pinPart3);
 
-                    sharedPrefs.edit().putString(recvPinPref.getKey(), newpincode).apply();
+                    String newpincode = pinPart1.getText() + "-"
+                            + pinPart2.getText() + "-"
+                            + pinPart3.getText();
+
+                    recvPinPref.setText(newpincode);
 
                     JSONObject recvPincode = new JSONObject();
 
                     recvPincode.put("type", "requestPin");
-                    recvPincode.put("pincode", sharedPrefs.getString(recvPinPref.getKey(), ""));
+                    recvPincode.put("pincode", newpincode);
 
                     CommService.subscribeMessage(CommunityFragment.this, "responsePin");
                     CommService.subscribeMessage(CommunityFragment.this, "responsePublicKeyXChange");
@@ -723,13 +756,12 @@ public class PreferencesBasics
                     PersistManager.putXpath(xpath, recontact);
                     PersistManager.flush();
 
-                    registerRemotes(context, false);
+                    registerRemotes(context, true);
                 }
                 catch (JSONException ex)
                 {
                     OopsService.log(LOGTAG, ex);
                 }
-
             }
         };
 
@@ -738,7 +770,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                dialog.setTitle("Benutzerdaten erhalten.");
+                dialog.setTitle("Benutzerdaten erhalten");
 
                 String name = "";
 
@@ -774,7 +806,7 @@ public class PreferencesBasics
                 recvPinPref.setTitle("Pincode verbunden mit:");
                 pinName.setText(name);
 
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setText("Als Kontakt übernehmen");
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setText("Kontakt speichern");
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(storeContactAction);
             }
         };
@@ -822,7 +854,7 @@ public class PreferencesBasics
                                 @Override
                                 public void run()
                                 {
-                                    dialog.setTitle("Pincode unbekannt.");
+                                    dialog.setTitle("Pincode unbekannt");
 
                                     pinPart1.selectAll();
                                     pinPart2.selectAll();
@@ -849,7 +881,7 @@ public class PreferencesBasics
                                 @Override
                                 public void run()
                                 {
-                                    dialog.setTitle("Öffentliche Schlüssel getauscht...");
+                                    dialog.setTitle("Schlüssel getauscht...");
                                 }
                             });
 

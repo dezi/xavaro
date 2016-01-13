@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.DialogPreference;
@@ -29,6 +30,7 @@ import java.util.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class NicedPreferences
 {
@@ -347,7 +349,7 @@ public class NicedPreferences
 
             current = new TextView(getContext());
             current.setGravity(Gravity.END);
-            current.setTextSize(18f);
+            current.setTextSize(Simple.getPreferredTextSize());
 
             current.setTextColor(disabled
                     ? CommonConfigs.PreferenceTextDisabledColor
@@ -405,7 +407,6 @@ public class NicedPreferences
             }
 
             super.setEntries(intern);
-            this.entries = intern;
         }
 
         @Override
@@ -425,7 +426,6 @@ public class NicedPreferences
             }
 
             super.setEntryValues(intern);
-            this.values = intern;
         }
 
         @Override
@@ -579,7 +579,24 @@ public class NicedPreferences
         {
             super.setText(text);
 
-            if (current != null) current.setText(text);
+            if (current == null) return;
+
+            if (isPassword)
+            {
+                if (getText().equals(""))
+                {
+                    current.setText("Nicht gesetzt");
+                    current.setTextColor(Color.RED);
+                }
+                else
+                {
+                    current.setText("Zum Anzeigen klicken");
+                }
+            }
+            else
+            {
+                current.setText(text);
+            }
         }
 
         public void setIsPassword()
@@ -613,7 +630,7 @@ public class NicedPreferences
         @Override
         public boolean onPreferenceChange(Preference preference, Object obj)
         {
-            if (current != null) current.setText((String) obj);
+            setText((String) obj);
 
             return true;
         }
@@ -625,24 +642,15 @@ public class NicedPreferences
 
             current = new TextView(getContext());
             current.setGravity(Gravity.END);
-            current.setTextSize(18f);
+            current.setTextSize(Simple.getPreferredTextSize());
 
             current.setTextColor(disabled
                     ? CommonConfigs.PreferenceTextDisabledColor
                     : CommonConfigs.PreferenceTextEnabledColor);
 
-            if (isPassword)
-            {
-                current.setInputType(InputType.TYPE_CLASS_TEXT |
-                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            }
+            if (isUppercase) current.setAllCaps(true);
 
-            if (isUppercase)
-            {
-                current.setAllCaps(true);
-            }
-
-            current.setText(getText());
+            setText(getText());
 
             ((ViewGroup) view).addView(current);
         }
@@ -670,16 +678,55 @@ public class NicedPreferences
 
             StaticUtils.dumpViewsChildren(view);
 
-            Log.d(LOGTAG, "-------------------------");
+            //
+            // Re-arrange completely shitty checkbox layout.
+            // The summary must be last item in layout. Icon,
+            // title and checkbox need to be in on layout.
+            //
+            // Step one: move all items into new horizontal linear layout.
+            //
 
-            CheckBox xxx = new CheckBox(getContext());
-            ViewGroup yyy = (ViewGroup) ((ViewGroup) view).getChildAt(2);
-            CheckBox zzz = (CheckBox) ((ViewGroup) yyy).getChildAt(0);
-            //zzz.setGravity(Gravity.TOP);
-            //zzz.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            //yyy.setBackgroundColor(0x80660000);
-            //yyy.addView(xxx, Simple.layoutParamsWW(Gravity.TOP));
-            //yyy.addView(xxx,0);
+            LinearLayout newlayout = new LinearLayout(getContext());
+            newlayout.setOrientation(LinearLayout.HORIZONTAL);
+            newlayout.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            ViewGroup vg = (ViewGroup) view;
+
+            while (vg.getChildCount() > 0)
+            {
+                newlayout.addView(Simple.removeFromParent(vg.getChildAt(0)));
+            }
+
+            vg.addView(newlayout);
+
+            //
+            // Step two: fuck top level layout to be vertical match parent.
+            // Also add a little bit of fucking padding at top and bottom.
+            //
+
+            ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
+            vg.setPadding(0, 8, 0, 8);
+
+            //
+            // Step three: remove summary from horizontal layout and add
+            // to top layout now beeing vertical.
+            //
+
+            TextView summary = (TextView) view.findViewById(android.R.id.summary);
+
+            vg.addView(Simple.removeFromParent(summary));
+
+            //
+            // Step four: do not forget to fuck stupid max lines on summary.
+            //
+
+            summary.setMaxLines(50);
+
+            //
+            // Fucked into shape.
+            //
         }
     }
 

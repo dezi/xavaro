@@ -390,7 +390,7 @@ public class SettingsFragments
 
     //region Phone preferences
 
-    public static class PhoneFragment extends ContactsFragment
+    public static class PhoneFragment extends ContactsFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -419,7 +419,7 @@ public class SettingsFragments
 
     //region Skype preferences
 
-    public static class SkypeFragment extends ContactsFragment
+    public static class SkypeFragment extends ContactsFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -441,7 +441,7 @@ public class SettingsFragments
             iconres = GlobalConfigs.IconResSkype;
             keyprefix = "skype";
             masterenable = "Skype freischalten";
-            installtext = "Skype Anwendung auf diesem Tablet";
+            installtext = "Skype App";
             installpack = GlobalConfigs.packageSkype;
         }
     }
@@ -450,7 +450,7 @@ public class SettingsFragments
 
     //region WhatsApp preferences
 
-    public static class WhatsAppFragment extends ContactsFragment
+    public static class WhatsAppFragment extends ContactsFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -472,7 +472,7 @@ public class SettingsFragments
             iconres = GlobalConfigs.IconResWhatsApp;
             keyprefix = "whatsapp";
             masterenable = "WhatsApp freischalten";
-            installtext = "WhatsApp Anwendung auf diesem Tablet";
+            installtext = "WhatsApp App";
             installpack = GlobalConfigs.packageWhatsApp;
         }
     }
@@ -482,7 +482,7 @@ public class SettingsFragments
     //region Contacts preferences stub
 
     @SuppressWarnings("WeakerAccess")
-    public static class ContactsFragment extends EnablePreferenceFragment
+    public static class ContactsFragmentStub extends EnablePreferenceFragment
     {
         protected boolean isPhone;
         protected boolean isSkype;
@@ -490,13 +490,13 @@ public class SettingsFragments
         protected String installtext;
         protected String installpack;
 
-        protected final CharSequence[] entries = {
+        protected final CharSequence[] destText = {
                 "Nicht aktiviert",
                 "Home-Bildschirm",
                 "App-Verzeichnis",
                 "Kontakte-Verzeichnis"};
 
-        protected final CharSequence[] evalues = {
+        protected final CharSequence[] destVals = {
                 "inact",
                 "home",
                 "appdir",
@@ -671,8 +671,8 @@ public class SettingsFragments
                         String key = keyprefix + ".chat." + chatphone;
                         NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(entries);
-                        cb.setEntryValues(evalues);
+                        cb.setEntries(destText);
+                        cb.setEntryValues(destVals);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
                         cb.setTitle("Nachricht" + (alike ? "" : " " + chatphone));
@@ -692,8 +692,8 @@ public class SettingsFragments
                         String key = keyprefix + ".text." + voipphone;
                         NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(entries);
-                        cb.setEntryValues(evalues);
+                        cb.setEntries(destText);
+                        cb.setEntryValues(destVals);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
                         cb.setTitle("SMS" + (alike ? "" : " " + voipphone));
@@ -713,8 +713,8 @@ public class SettingsFragments
                         String key = keyprefix + ".voip." + voipphone;
                         NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(entries);
-                        cb.setEntryValues(evalues);
+                        cb.setEntries(destText);
+                        cb.setEntryValues(destVals);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
                         cb.setTitle("Anruf" + (alike ? "" : " " + voipphone));
@@ -734,8 +734,8 @@ public class SettingsFragments
                         String key = keyprefix + ".vica." + vicaphone;
                         NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(entries);
-                        cb.setEntryValues(evalues);
+                        cb.setEntries(destText);
+                        cb.setEntryValues(destVals);
                         cb.setDefaultValue("inact");
                         cb.setKey(key);
                         cb.setTitle("Videoanruf" + (alike ? "" : " " + vicaphone));
@@ -1317,7 +1317,16 @@ public class SettingsFragments
                     if (isApps)
                     {
                         label = webitem.getString("what");
-                        summary = webitem.getString("info");
+
+                        JSONArray sumarray = webitem.getJSONArray("info");
+
+                        summary = "";
+
+                        for (int inx = 0; inx < sumarray.length(); inx++)
+                        {
+                            summary += sumarray.getString(inx);
+                        }
+
                         iconres = GlobalConfigs.IconResAppsDiscounter;
                     }
                     else

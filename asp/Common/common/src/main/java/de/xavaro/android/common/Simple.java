@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,11 +32,13 @@ public class Simple
 
     //region Initialisation
 
-    private static Activity context;
+    private static Activity appContext;
+    private static Handler appHandler;
 
     public static void setContext(Activity context)
     {
-        Simple.context = context;
+        Simple.appContext = context;
+        Simple.appHandler = new Handler();
     }
 
     //endregion Initialisation
@@ -43,34 +47,99 @@ public class Simple
 
     public static void dismissKeyboard(View view)
     {
-        if (context == null) return;
+        if (appContext == null) return;
 
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public static void showKeyboard(View view)
     {
-        if (context == null) return;
+        if (appContext == null) return;
 
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(view, 0);
+        final View runview = view;
+
+        appHandler.postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(runview, 0);
+            }
+        }, 500);
     }
 
     //endregion Keyboard stuff
 
-    //region All purpose simple getters
+    //region All purpose simple methods
 
-    public static Context getContext()
+    public static View removeFromParent(View view)
     {
-        return Simple.context;
+        ((ViewGroup) view.getParent()).removeView(view);
+
+        return view;
     }
 
+    //endregion All purpose simple methods
+
+    //region All purpose simple getters
+
+    public static Activity getContext()
+    {
+        return Simple.appContext;
+    }
+
+    @Nullable
     public static String getMacAddress()
     {
-        WifiManager wifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+        if (appContext == null) return null;
+
+        WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         return wInfo.getMacAddress();
+    }
+
+    public static int getDeviceWidth()
+    {
+        if (appContext == null) return 0;
+
+        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+        return displayMetrics.widthPixels;
+    }
+
+    public static int getDeviceHeight()
+    {
+        if (appContext == null) return 0;
+
+        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+        return displayMetrics.heightPixels;
+    }
+
+    public static float getPreferredEditSize()
+    {
+        if (appContext == null) return 16f;
+
+        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+
+        int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
+
+        if (pixels < 500) return 17f;
+
+        return 24f;
+    }
+
+    public static float getPreferredTextSize()
+    {
+        if (appContext == null) return 17f;
+
+        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+
+        int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
+
+        if (pixels < 500) return 17f;
+
+        return 18f;
     }
 
     @SuppressWarnings("SameReturnValue")
