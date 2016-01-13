@@ -1,8 +1,15 @@
 package de.xavaro.android.common;
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.support.annotation.Nullable;
 
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
 import org.json.JSONException;
@@ -20,11 +27,50 @@ public class Simple
 {
     private static final String LOGTAG = Simple.class.getSimpleName();
 
+    //region Initialisation
+
+    private static Activity context;
+
+    public static void setContext(Activity context)
+    {
+        Simple.context = context;
+    }
+
+    //endregion Initialisation
+
+    //region Keyboard stuff
+
+    public static void dismissKeyboard(View view)
+    {
+        if (context == null) return;
+
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    //endregion Keyboard stuff
+
+    //region All purpose simple getters
+
+    public static Context getContext()
+    {
+        return Simple.context;
+    }
+
+    public static String getMacAddress()
+    {
+        WifiManager wifiManager = (WifiManager) getContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wInfo = wifiManager.getConnectionInfo();
+        return wInfo.getMacAddress();
+    }
+
     @SuppressWarnings("SameReturnValue")
     public static String getDeviceName()
     {
         return android.os.Build.MODEL;
     }
+
+    //endregion All purpose simple getters
 
     //region JSON stuff
 

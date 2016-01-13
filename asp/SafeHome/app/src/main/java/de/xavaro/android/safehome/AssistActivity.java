@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import de.xavaro.android.common.Simple;
+
 public class AssistActivity extends AppCompatActivity
 {
     @Override
@@ -12,6 +14,8 @@ public class AssistActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_assist);
+
+        Simple.setContext(this);
 
         View contacts = findViewById(R.id.contacts);
 

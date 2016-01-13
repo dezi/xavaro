@@ -74,6 +74,8 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onCreate(savedInstanceState);
 
+        Simple.setContext(this);
+
         context = this;
 
         idremote = getIntent().getStringExtra("idremote");
