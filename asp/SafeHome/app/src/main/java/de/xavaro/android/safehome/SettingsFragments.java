@@ -1101,7 +1101,7 @@ public class SettingsFragments
             {
                 try
                 {
-                    text = "\n" + text + "\n";
+                    text += "\n";
 
                     for (int inx = 0; inx < faults.length(); inx++)
                     {
@@ -1113,7 +1113,6 @@ public class SettingsFragments
                         if (fault.equals("nooptin"  )) text += "\n– Problem: Nur nachträglicher Opt-Out";
                         if (fault.equals("nooptout" )) text += "\n– Problem: Keine Opt-Out Möglichkeit angeboten";
                         if (fault.equals("nofaults" )) text += "\n– Problem: Eigentlich keines";
-
                         if (fault.equals("isporn"   )) text += "\n– Problem: Pornografie";
                         if (fault.equals("ispremium")) text += "\n– Problem: Premium Dienste";
                     }
@@ -1288,7 +1287,7 @@ public class SettingsFragments
                 boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable",false);
 
                 NicedPreferences.NiceCategoryPreference pc;
-                NicedPreferences.NiceCheckboxPreference cb;
+                NicedPreferences.NiceScorePreference cb;
 
                 loadGlobalConfig(context);
 
@@ -1303,6 +1302,7 @@ public class SettingsFragments
                 int iconres;
                 Bitmap thumbnail;
                 Drawable drawable;
+                int score;
 
                 while (keysIterator.hasNext())
                 {
@@ -1310,6 +1310,7 @@ public class SettingsFragments
 
                     JSONObject webitem = globalConfig.getJSONObject(website);
 
+                    score = -1;
                     iconres = 0;
                     summary = null;
                     drawable = null;
@@ -1327,7 +1328,9 @@ public class SettingsFragments
                             summary += sumarray.getString(inx);
                         }
 
-                        iconres = GlobalConfigs.IconResAppsDiscounter;
+                        drawable = new BitmapDrawable(context.getResources(),CacheManager.getIconFromAppStore(context, website));
+
+                        score = Integer.parseInt(webitem.getString("score"));
                     }
                     else
                     {
@@ -1352,11 +1355,12 @@ public class SettingsFragments
                     {
                         key = keyprefix + ".website." + website;
 
-                        cb = new NicedPreferences.NiceCheckboxPreference(context);
+                        cb = new NicedPreferences.NiceScorePreference(context);
 
                         cb.setKey(key);
                         cb.setTitle(label);
                         cb.setEnabled(enabled);
+                        cb.setScore(score);
 
                         if (iconres != 0) cb.setIcon(iconres);
                         if (drawable != null) cb.setIcon(drawable);
@@ -1397,7 +1401,7 @@ public class SettingsFragments
                             thumbnail = CacheManager.cacheThumbnail(context, iconurl);
                             drawable = new BitmapDrawable(context.getResources(), thumbnail);
 
-                            cb = new NicedPreferences.NiceCheckboxPreference(context);
+                            cb = new NicedPreferences.NiceScorePreference(context);
 
                             cb.setKey(key);
                             cb.setTitle(label);

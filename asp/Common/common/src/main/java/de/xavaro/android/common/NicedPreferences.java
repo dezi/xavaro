@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -664,6 +665,129 @@ public class NicedPreferences
         }
     }
 
+    public static class NiceScorePreference extends NiceCheckboxPreference
+    {
+        public NiceScorePreference(Context context)
+        {
+            super(context);
+        }
+
+        private int score;
+
+        private final ImageView stars[] = new ImageView[ 5 ];
+
+        private String[] degreeText = {
+
+                "ungenügend",
+
+                "voll mangelhaft",
+                "mangelhaft",
+                "knapp mangelhaft",
+
+                "knapp ausreichend",
+                "ausreichend",
+                "voll ausreichend",
+
+                "knapp befriedigend",
+                "befriedigend",
+                "voll befriedigend",
+
+                "knapp gut",
+                "knapp gut",
+                "voll gut",
+
+                "knapp sehr gut",
+                "sehr gut",
+                "voll sehr gut"
+        };
+
+        private String[] degreeNote = {
+
+                "6",
+
+                "5-",
+                "5",
+                "5+",
+
+                "4-",
+                "4",
+                "4+",
+
+                "3-",
+                "3",
+                "3+",
+
+                "2-",
+                "2",
+                "2+",
+
+                "1-",
+                "1",
+                "1+"
+        };
+
+        public void setScore(int score)
+        {
+            this.score = score;
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            if (score >= 0)
+            {
+                LinearLayout scorelayout = new LinearLayout(getContext());
+                scorelayout.setOrientation(LinearLayout.HORIZONTAL);
+                scorelayout.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        36));
+
+                TextView degree = new TextView(getContext());
+                degree.setTextSize(Simple.getPreferredTextSize());
+                degree.setText(degreeNote[ score ] + " (" + degreeText[ score ] + ")");
+                scorelayout.addView(degree);
+
+                int rest = score;
+
+                for (int inx = 0; inx < 5; inx++)
+                {
+                    stars[ inx ] = new ImageView(getContext());
+                    stars[ inx ].setPadding(0, 5, 0, 0);
+                    scorelayout.addView(stars[ inx ], new ViewGroup.LayoutParams(25, 30));
+
+                    if (rest >= 3)
+                    {
+                        stars[ inx ].setImageResource(R.drawable.score_3_40x40);
+                    }
+                    else
+                    {
+                        if (rest >= 2)
+                        {
+                            stars[ inx ].setImageResource(R.drawable.score_2_40x40);
+                        }
+                        else
+                        {
+                            if (rest >= 1)
+                            {
+                                stars[ inx ].setImageResource(R.drawable.score_1_40x40);
+                            }
+                            else
+                            {
+                                stars[ inx ].setImageResource(R.drawable.score_0_40x40);
+                            }
+                        }
+                    }
+
+                    rest -= 3;
+                }
+
+                ((ViewGroup) view).addView(scorelayout, 1);
+            }
+        }
+    }
+
     public static class NiceCheckboxPreference extends CheckBoxPreference
     {
         public NiceCheckboxPreference(Context context)
@@ -703,11 +827,11 @@ public class NicedPreferences
 
             //
             // Step two: fuck top level layout to be vertical match parent.
-            // Also add a little bit of fucking padding at top and bottom.
+            // Also add a little bit of fucking padding at left, top and bottom.
             //
 
             ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            vg.setPadding(0, 8, 0, 8);
+            vg.setPadding(20, 8, 0, 8);
 
             //
             // Step three: remove summary from horizontal layout and add

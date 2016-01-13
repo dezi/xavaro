@@ -30,6 +30,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,6 +45,47 @@ import de.xavaro.android.common.StaticUtils;
 //
 public class DitUndDat
 {
+    //region public static class Ranking
+
+    public static class Ranking extends LinearLayout
+    {
+        public Ranking(Context context)
+        {
+            super(context);
+
+            init();
+        }
+
+        public Ranking(Context context, AttributeSet attrs)
+        {
+            super(context, attrs);
+
+            init();
+        }
+
+        public Ranking(Context context, AttributeSet attrs, int defStyle)
+        {
+            super(context, attrs, defStyle);
+
+            init();
+        }
+
+        private final ImageView stars[] = new ImageView[ 5 ];
+
+        public void init()
+        {
+            for (int inx = 0; inx < 5; inx++)
+            {
+                stars[ inx ] = new ImageView(getContext());
+                stars[ inx ].setImageResource(R.drawable.score_0_40x40);
+
+                addView(stars[ inx ]);
+            }
+        }
+    }
+
+    //endregion public static class Ranking
+
     //region public static class Toolbar
 
     public static class Toolbar extends FrameLayout
