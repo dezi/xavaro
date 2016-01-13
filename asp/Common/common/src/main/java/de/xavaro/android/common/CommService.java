@@ -316,6 +316,7 @@ public class CommService extends Service
                 responseOwnerIdentity.put("status", "success");
 
                 responseOwnerIdentity.put("appName", StaticUtils.getAppName(getApplicationContext()));
+                responseOwnerIdentity.put("devName", Simple.getDeviceName());
                 responseOwnerIdentity.put("ownerFirstName", sp.getString("owner.firstname", null));
                 responseOwnerIdentity.put("ownerGivenName", sp.getString("owner.givenname", null));
 

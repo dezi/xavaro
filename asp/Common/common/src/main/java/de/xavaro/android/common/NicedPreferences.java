@@ -14,9 +14,11 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.SwitchPreference;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -30,6 +32,8 @@ import java.util.Date;
 
 public class NicedPreferences
 {
+    private static final String LOGTAG = NicedPreferences.class.getSimpleName();
+
     public static class NiceDatePreference extends NiceDialogPreference implements
             DatePicker.OnDateChangedListener
     {
@@ -657,6 +661,25 @@ public class NicedPreferences
         public NiceCheckboxPreference(Context context)
         {
             super(context);
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            StaticUtils.dumpViewsChildren(view);
+
+            Log.d(LOGTAG, "-------------------------");
+
+            CheckBox xxx = new CheckBox(getContext());
+            ViewGroup yyy = (ViewGroup) ((ViewGroup) view).getChildAt(2);
+            CheckBox zzz = (CheckBox) ((ViewGroup) yyy).getChildAt(0);
+            //zzz.setGravity(Gravity.TOP);
+            //zzz.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            //yyy.setBackgroundColor(0x80660000);
+            //yyy.addView(xxx, Simple.layoutParamsWW(Gravity.TOP));
+            //yyy.addView(xxx,0);
         }
     }
 

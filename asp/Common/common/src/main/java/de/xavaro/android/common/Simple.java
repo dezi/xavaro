@@ -21,6 +21,11 @@ public class Simple
 {
     private static final String LOGTAG = Simple.class.getSimpleName();
 
+    public static String getDeviceName()
+    {
+        return android.os.Build.MODEL;
+    }
+
     //region JSON stuff
 
     @Nullable

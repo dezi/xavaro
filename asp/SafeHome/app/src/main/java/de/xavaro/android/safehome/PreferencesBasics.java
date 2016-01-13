@@ -369,6 +369,7 @@ public class PreferencesBasics
                     if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
                     if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
                     if (rc.has("appName")) name += " (" + rc.getString("appName") + ")";
+                    if (rc.has("devName")) name += " - " + rc.getString("devName");
                     name = name.trim();
                     if (name.length() == 0) name = "Anonymer Benutzer";
 
@@ -531,6 +532,7 @@ public class PreferencesBasics
 
                     String ident = rc.getString("identity");
                     String appna = rc.has("appName") ? rc.getString("appName") : "";
+                    String devna = rc.has("devName") ? rc.getString("devName") : "";
                     String fname = rc.has("ownerFirstName") ? rc.getString("ownerFirstName") : "";
                     String lname = rc.has("ownerGivenName") ? rc.getString("ownerGivenName") : "";
 
@@ -539,6 +541,7 @@ public class PreferencesBasics
                     if (recontact == null) recontact = new JSONObject();
 
                     recontact.put("appName", appna);
+                    recontact.put("devName", devna);
                     recontact.put("ownerFirstName", fname);
                     recontact.put("ownerGivenName", lname);
 
@@ -579,6 +582,11 @@ public class PreferencesBasics
                     if (remoteContact.has("appName"))
                     {
                         name += " (" + remoteContact.getString("appName") + ")";
+                    }
+
+                    if (remoteContact.has("devName"))
+                    {
+                        name += " - " + remoteContact.getString("devName");
                     }
                 }
                 catch (JSONException ignore)
