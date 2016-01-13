@@ -2,7 +2,6 @@ package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -12,15 +11,16 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.Date;
 import java.util.Locale;
 
+@SuppressWarnings("unused")
 public class Simple
 {
     private static final String LOGTAG = Simple.class.getSimpleName();
 
+    @SuppressWarnings("SameReturnValue")
     public static String getDeviceName()
     {
         return android.os.Build.MODEL;
