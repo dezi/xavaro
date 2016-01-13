@@ -357,7 +357,8 @@ public class SettingsFragments
                     String name = "";
                     if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
                     if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
-                    if (rc.has("appName")) name += " (" + rc.getString("appName") + ")";
+                    if (rc.has("appName")) name += "\n" + rc.getString("appName");
+                    if (rc.has("devName")) name += " - " + rc.getString("devName");
                     name = name.trim();
                     if (name.length() == 0) name = "Anonymer Benutzer";
 

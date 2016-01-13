@@ -282,18 +282,23 @@ public class PreferencesBasics
             String pincode = String.format("%04d-%04d-%04d",
                     rand.nextInt(9999), rand.nextInt(9999), rand.nextInt(9999));
 
-            if (Simple.getMacAddress().equals("38:2D:E8:E1:C2:2A"))
+            if (Simple.getMacAddress().equalsIgnoreCase("38:2D:E8:E1:C2:2A"))
             {
                 //
                 // Dezi's Samsung Tablet
                 //
 
                 pincode = "0000-0000-0001";
+            }
 
-                sharedPrefs.edit().putString(keyprefix + ".sendpin", pincode).apply();
-                sharedPrefs.edit().putString(keyprefix + ".recvpin", pincode).apply();
+            if (Simple.getMacAddress().equalsIgnoreCase("64:BC:0C:18:BB:AC"))
+            {
+                //
+                // Dezi's LG Phone
+                //
 
-                return;
+                pincode = "0000-0000-0002";
+
             }
 
             sharedPrefs.edit().putString(keyprefix + ".sendpin", pincode).apply();
@@ -370,11 +375,6 @@ public class PreferencesBasics
             recvPinPref.setKey(keyprefix + ".recvpin");
             recvPinPref.setTitle("Pincode eingeben:");
             recvPinPref.setOnclick(recvPinDialog);
-
-            if (Simple.getMacAddress().equals("38:2D:E8:E1:C2:2A"))
-            {
-                sendPinPref.setText("0000-0000-0001");
-            }
 
             preferences.add(recvPinPref);
 
@@ -469,6 +469,8 @@ public class PreferencesBasics
             @Override
             public void run()
             {
+                String[] actpincode = sharedPrefs.getString(recvPinPref.getKey(), "").split("-");
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle(recvPinPref.getTitle());
 
@@ -495,6 +497,10 @@ public class PreferencesBasics
                 pinPart1.setGravity(Gravity.CENTER);
                 pinPart1.setBackgroundColor(0x80cccccc);
                 pinPart1.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                pinPart1.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+                if (actpincode.length > 0) pinPart1.setText(actpincode[ 0 ]);
+                pinPart1.selectAll();
+
                 lp.addView(pinPart1);
 
                 pinPart1.addTextChangedListener(new TextWatcher()
@@ -528,6 +534,10 @@ public class PreferencesBasics
                 pinPart2.setGravity(Gravity.CENTER);
                 pinPart2.setBackgroundColor(0x80cccccc);
                 pinPart2.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                pinPart2.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+                if (actpincode.length > 1) pinPart2.setText(actpincode[ 1 ]);
+                pinPart2.selectAll();
+
                 lp.addView(pinPart2);
 
                 pinPart2.addTextChangedListener(new TextWatcher()
@@ -561,6 +571,10 @@ public class PreferencesBasics
                 pinPart3.setGravity(Gravity.CENTER);
                 pinPart3.setBackgroundColor(0x80cccccc);
                 pinPart3.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                pinPart3.setRawInputType(InputType.TYPE_CLASS_NUMBER);
+                if (actpincode.length > 2) pinPart3.setText(actpincode[ 2 ]);
+                pinPart3.selectAll();
+
                 lp.addView(pinPart3);
 
                 pinPart3.addTextChangedListener(new TextWatcher()
@@ -647,10 +661,16 @@ public class PreferencesBasics
             {
                 try
                 {
+
+                    String newpincode = pinPart1.getText() + "-" +
+                            pinPart2.getText() + "-" + pinPart3.getText();
+
+                    sharedPrefs.edit().putString(recvPinPref.getKey(), newpincode).apply();
+
                     JSONObject recvPincode = new JSONObject();
 
                     recvPincode.put("type", "requestPin");
-                    recvPincode.put("pincode", sharedPrefs.getString(sendPinPref.getKey(), ""));
+                    recvPincode.put("pincode", sharedPrefs.getString(recvPinPref.getKey(), ""));
 
                     CommService.subscribeMessage(CommunityFragment.this, "responsePin");
                     CommService.subscribeMessage(CommunityFragment.this, "responsePublicKeyXChange");
@@ -803,6 +823,18 @@ public class PreferencesBasics
                                 public void run()
                                 {
                                     dialog.setTitle("Pincode unbekannt.");
+
+                                    pinPart1.selectAll();
+                                    pinPart2.selectAll();
+                                    pinPart3.selectAll();
+
+                                    pinPart1.setFocusableInTouchMode(true);
+                                    pinPart2.setFocusableInTouchMode(true);
+                                    pinPart3.setFocusableInTouchMode(true);
+
+                                    pinPart1.requestFocus();
+
+                                    Simple.showKeyboard(pinPart1);
                                 }
                             });
                         }
