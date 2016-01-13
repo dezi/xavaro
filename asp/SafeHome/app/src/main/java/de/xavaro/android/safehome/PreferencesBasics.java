@@ -4,8 +4,17 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.PreferenceActivity;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -13,6 +22,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.UUID;
 
 import de.xavaro.android.common.CommService;
@@ -20,7 +30,8 @@ import de.xavaro.android.common.CryptUtils;
 import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.PreferenceFragments;
 
@@ -35,7 +46,7 @@ public class PreferencesBasics
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Eigentümer";
+            header.title = "Anwender";
             header.iconRes = GlobalConfigs.IconResOwner;
             header.fragment = OwnerFragment.class.getName();
 
@@ -259,6 +270,34 @@ public class PreferencesBasics
         private JSONObject remoteContact;
         private AlertDialog dialog;
         private TextView pincode;
+        private TextView pinName;
+        private EditText pinPart1;
+        private EditText pinPart2;
+        private EditText pinPart3;
+
+        private void generatePincode()
+        {
+            Random rand = new Random();
+
+            String pincode = String.format("%04d-%04d-%04d",
+                    rand.nextInt(9999), rand.nextInt(9999), rand.nextInt(9999));
+
+            if (Simple.getMacAddress().equals("38:2D:E8:E1:C2:2A"))
+            {
+                //
+                // Dezi's Samsung Tablet
+                //
+
+                pincode = "0000-0000-0001";
+
+                sharedPrefs.edit().putString(keyprefix + ".sendpin", pincode).apply();
+                sharedPrefs.edit().putString(keyprefix + ".recvpin", pincode).apply();
+
+                return;
+            }
+
+            sharedPrefs.edit().putString(keyprefix + ".sendpin", pincode).apply();
+        }
 
         @Override
         public void registerAll(Context context)
@@ -280,12 +319,12 @@ public class PreferencesBasics
             // Send pin code.
             //
 
+            generatePincode();
+
             sendPinPref = new NicedPreferences.NiceEditTextPreference(context);
 
             sendPinPref.setKey(keyprefix + ".sendpin");
-            sendPinPref.setDefaultValue("1234-5678-0000");
             sendPinPref.setTitle("Pincode freigeben");
-
             sendPinPref.setOnclick(sendPinDialog);
 
             preferences.add(sendPinPref);
@@ -329,9 +368,13 @@ public class PreferencesBasics
             recvPinPref = new NicedPreferences.NiceEditTextPreference(context);
 
             recvPinPref.setKey(keyprefix + ".recvpin");
-            recvPinPref.setDefaultValue("1234-5678-0000");
-            recvPinPref.setTitle("Pincode verbinden");
+            recvPinPref.setTitle("Pincode eingeben:");
             recvPinPref.setOnclick(recvPinDialog);
+
+            if (Simple.getMacAddress().equals("38:2D:E8:E1:C2:2A"))
+            {
+                sendPinPref.setText("0000-0000-0001");
+            }
 
             preferences.add(recvPinPref);
 
@@ -345,7 +388,7 @@ public class PreferencesBasics
         private void registerRemotes(Context context, boolean initial)
         {
             String xpath = "RemoteContacts/identities";
-            JSONObject rcs = SettingsManager.getXpathJSONObject(xpath);
+            JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
             if (rcs == null) return;
 
             Iterator<String> keysIterator = rcs.keys();
@@ -368,7 +411,8 @@ public class PreferencesBasics
                     String name = "";
                     if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
                     if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
-                    if (rc.has("appName")) name += " (" + rc.getString("appName") + ")";
+                    if (rc.has("appName")) name += "\n" + rc.getString("appName");
+                    if (rc.has("devName")) name += " - " + rc.getString("devName");
                     name = name.trim();
                     if (name.length() == 0) name = "Anonymer Benutzer";
 
@@ -433,12 +477,124 @@ public class PreferencesBasics
 
                 dialog = builder.create();
 
-                pincode = new TextView(context);
-                pincode.setTextSize(24f);
-                pincode.setPadding(40, 24, 0, 0);
-                pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
+                LinearLayout ll = new LinearLayout(context);
+                ll.setOrientation(LinearLayout.VERTICAL);
+                ll.setPadding(40, 24, 0, 0);
 
-                dialog.setView(pincode);
+                LinearLayout lp = new LinearLayout(context);
+                lp.setOrientation(LinearLayout.HORIZONTAL);
+                ll.addView(lp);
+
+                InputFilter[] filters = new InputFilter[ 1 ];
+                filters[ 0 ] = new InputFilter.LengthFilter(4);
+
+                pinPart1 = new EditText(context);
+                pinPart1.setMinEms(3);
+                pinPart1.setTextSize(24f);
+                pinPart1.setFilters(filters);
+                pinPart1.setGravity(Gravity.CENTER);
+                pinPart1.setBackgroundColor(0x80cccccc);
+                pinPart1.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                lp.addView(pinPart1);
+
+                pinPart1.addTextChangedListener(new TextWatcher()
+                {
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count)
+                    {
+                        if (s.length() >= 4) pinPart2.requestFocus();
+                    }
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int arg1, int arg2, int arg3)
+                    {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable arg0)
+                    {
+                    }
+                });
+
+                TextView sep1 = new TextView(context);
+                sep1.setTextSize(24f);
+                sep1.setText(" – ");
+                lp.addView(sep1);
+
+                pinPart2 = new EditText(context);
+                pinPart2.setMinEms(3);
+                pinPart2.setTextSize(24f);
+                pinPart2.setFilters(filters);
+                pinPart2.setGravity(Gravity.CENTER);
+                pinPart2.setBackgroundColor(0x80cccccc);
+                pinPart2.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                lp.addView(pinPart2);
+
+                pinPart2.addTextChangedListener(new TextWatcher()
+                {
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count)
+                    {
+                        if (s.length() >= 4) pinPart3.requestFocus();
+                    }
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int arg1, int arg2, int arg3)
+                    {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable arg0)
+                    {
+                    }
+                });
+
+                TextView sep2 = new TextView(context);
+                sep2.setTextSize(24f);
+                sep2.setText(" – ");
+                lp.addView(sep2);
+
+                pinPart3 = new EditText(context);
+                pinPart3.setMinEms(3);
+                pinPart3.setTextSize(24f);
+                pinPart3.setFilters(filters);
+                pinPart3.setGravity(Gravity.CENTER);
+                pinPart3.setBackgroundColor(0x80cccccc);
+                pinPart3.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                lp.addView(pinPart3);
+
+                pinPart3.addTextChangedListener(new TextWatcher()
+                {
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count)
+                    {
+                        if (s.length() >= 4)
+                        {
+                            pinPart1.setFocusable(false);
+                            pinPart2.setFocusable(false);
+                            pinPart3.setFocusable(false);
+
+                            Simple.dismissKeyboard(pinPart3);
+                        }
+                    }
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int arg1, int arg2, int arg3)
+                    {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable arg0)
+                    {
+                    }
+                });
+
+                pinName = new TextView(context);
+                pinName.setTextSize(24f);
+
+                ll.addView(pinName);
+
+                dialog.setView(ll);
                 dialog.show();
 
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(recvPinAction);
@@ -531,19 +687,21 @@ public class PreferencesBasics
 
                     String ident = rc.getString("identity");
                     String appna = rc.has("appName") ? rc.getString("appName") : "";
+                    String devna = rc.has("devName") ? rc.getString("devName") : "";
                     String fname = rc.has("ownerFirstName") ? rc.getString("ownerFirstName") : "";
                     String lname = rc.has("ownerGivenName") ? rc.getString("ownerGivenName") : "";
 
                     String xpath = "RemoteContacts/identities/" + ident;
-                    JSONObject recontact = SettingsManager.getXpathJSONObject(xpath);
+                    JSONObject recontact = PersistManager.getXpathJSONObject(xpath);
                     if (recontact == null) recontact = new JSONObject();
 
                     recontact.put("appName", appna);
+                    recontact.put("devName", devna);
                     recontact.put("ownerFirstName", fname);
                     recontact.put("ownerGivenName", lname);
 
-                    SettingsManager.putXpath(xpath, recontact);
-                    SettingsManager.flush();
+                    PersistManager.putXpath(xpath, recontact);
+                    PersistManager.flush();
 
                     registerRemotes(context, false);
                 }
@@ -578,7 +736,12 @@ public class PreferencesBasics
 
                     if (remoteContact.has("appName"))
                     {
-                        name += " (" + remoteContact.getString("appName") + ")";
+                        name += "\n" + remoteContact.getString("appName");
+                    }
+
+                    if (remoteContact.has("devName"))
+                    {
+                        name += " - " + remoteContact.getString("devName");
                     }
                 }
                 catch (JSONException ignore)
@@ -588,7 +751,8 @@ public class PreferencesBasics
                 name = name.trim();
                 if (name.length() == 0) name = "Anonymer Benutzer";
 
-                pincode.setText(name);
+                recvPinPref.setTitle("Pincode verbunden mit:");
+                pinName.setText(name);
 
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setText("Als Kontakt übernehmen");
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(storeContactAction);
@@ -630,6 +794,17 @@ public class PreferencesBasics
                             CommService.sendMessage(requestPublicKeyXChange);
 
                             return;
+                        }
+                        else
+                        {
+                            handler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    dialog.setTitle("Pincode unbekannt.");
+                                }
+                            });
                         }
                     }
 

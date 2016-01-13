@@ -875,8 +875,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("phone"        )) { launchPhone();        return; }
         if (type.equals("xavaro"       )) { launchXavaro();       return; }
         if (type.equals("skype"        )) { launchSkype();        return; }
-        if (type.equals("health"       )) { launchHealth();        return; }
-
+        if (type.equals("health"       )) { launchHealth();       return; }
         // @formatter:on
 
         Toast.makeText(getContext(),"Nix launcher type <" + type + "> configured.",Toast.LENGTH_LONG).show();
@@ -970,23 +969,27 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchXavaro()
     {
-        try
+        if (config.has("subtype"))
         {
-            String subtype = config.getString("subtype");
-            String ident = config.getString("identity");
-
-            if (subtype.equals("chat"))
+            try
             {
-                Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("subtype", subtype);
-                intent.putExtra("identity",ident);
-                intent.putExtra("label",this.label.getText());
-                context.startActivity(intent);
+                String subtype = config.getString("subtype");
+                String ident = config.getString("identity");
+
+                if (subtype.equals("chat"))
+                {
+                    Intent intent = new Intent(context, ChatActivity.class);
+                    intent.putExtra("idremote", ident);
+                    intent.putExtra("label", this.label.getText());
+                    context.startActivity(intent);
+                }
             }
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
+            catch (JSONException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+
+            return;
         }
 
         if (directory == null)

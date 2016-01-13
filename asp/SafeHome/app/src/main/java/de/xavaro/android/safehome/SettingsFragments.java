@@ -30,15 +30,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 
-import de.xavaro.android.common.CommService;
-import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.CryptUtils;
 
 public class SettingsFragments
 {
@@ -338,7 +334,7 @@ public class SettingsFragments
         private void registerRemotes(Context context, boolean initial)
         {
             String xpath = "RemoteContacts/identities";
-            JSONObject rcs = SettingsManager.getXpathJSONObject(xpath);
+            JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
             if (rcs == null) return;
 
             NicedPreferences.NiceCategoryPreference pc;

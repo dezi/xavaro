@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 @SuppressWarnings({"unused"})
@@ -252,7 +253,7 @@ public class BlueToothScale extends BlueTooth
 
             cbdataPut("type", "RemoteTimeStamp");
             cbdataPut("timeStamp", timeStamp);
-            cbdataPut("isodate", StaticUtils.timeStampAsISO(timeStamp));
+            cbdataPut("isodate", Simple.timeStampAsISO(timeStamp));
 
             return false;
         }

@@ -1,9 +1,9 @@
 package de.xavaro.android.common;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
+import android.preference.PreferenceManager;
+import android.content.SharedPreferences;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -50,10 +50,14 @@ public class CommService extends Service
 
     private static class MessageClass
     {
-        public final JSONObject msg;
-        public final boolean enc;
+        public static final int ENCRYPT_NONE = 0;
+        public static final int ENCRYPT_CRYPT = 1;
+        public static final int ENCRYPT_CRYPT_WITH_ACK = 2;
 
-        public MessageClass(JSONObject message, boolean encrypt)
+        public final JSONObject msg;
+        public final int enc;
+
+        public MessageClass(JSONObject message, int encrypt)
         {
             this.msg = message;
             this.enc = encrypt;
@@ -64,7 +68,7 @@ public class CommService extends Service
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, false));
+            messageBacklog.add(new MessageClass(message, MessageClass.ENCRYPT_NONE));
         }
     }
 
@@ -72,7 +76,15 @@ public class CommService extends Service
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, true));
+            messageBacklog.add(new MessageClass(message, MessageClass.ENCRYPT_CRYPT));
+        }
+    }
+
+    public static void sendEncryptedWithAck(JSONObject message)
+    {
+        synchronized (messageBacklog)
+        {
+            messageBacklog.add(new MessageClass(message, MessageClass.ENCRYPT_CRYPT_WITH_ACK));
         }
     }
 
@@ -137,6 +149,8 @@ public class CommService extends Service
     public void onCreate()
     {
         super.onCreate();
+
+        ChatManager.initialize(getApplicationContext());
 
         running = true;
     }
@@ -302,6 +316,7 @@ public class CommService extends Service
                 responseOwnerIdentity.put("status", "success");
 
                 responseOwnerIdentity.put("appName", StaticUtils.getAppName(getApplicationContext()));
+                responseOwnerIdentity.put("devName", Simple.getDeviceName());
                 responseOwnerIdentity.put("ownerFirstName", sp.getString("owner.firstname", null));
                 responseOwnerIdentity.put("ownerGivenName", sp.getString("owner.givenname", null));
 
@@ -326,7 +341,7 @@ public class CommService extends Service
         if (ptype.equals("CRYP"))
         {
             byte[] identBytes = new byte[ 16 ];
-            System.arraycopy(data, 20, identBytes, 0, 16);
+            System.arraycopy(data, 4, identBytes, 0, 16);
 
             String ident = StaticUtils.getUUIDString(identBytes);
 
@@ -336,6 +351,42 @@ public class CommService extends Service
             data = CryptUtils.AESdecrypt(ident, rest);
             if (data == null) return;
 
+            ptype = new String(data, 0, 4);
+        }
+
+        if (ptype.equals("CACK"))
+        {
+            byte[] identBytes = new byte[ 16 ];
+            System.arraycopy(data, 4, identBytes, 0, 16);
+            String ident = StaticUtils.getUUIDString(identBytes);
+
+            byte[] idremBytes = new byte[ 16 ];
+            System.arraycopy(data, 20, idremBytes, 0, 16);
+            String idrem = StaticUtils.getUUIDString(idremBytes);
+
+            byte[] ackidBytes = new byte[ 16 ];
+            System.arraycopy(data, 36, ackidBytes, 0, 16);
+            String ackid = StaticUtils.getUUIDString(ackidBytes);
+
+            JSONObject serverAckMessage = new JSONObject();
+
+            try
+            {
+                serverAckMessage.put("type", "serverAckMessage");
+                serverAckMessage.put("identity", ident);
+                serverAckMessage.put("idremote", idrem);
+                serverAckMessage.put("uuid", ackid);
+            }
+            catch (JSONException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+
+                return;
+            }
+
+            String ackmess = "JSON" + serverAckMessage.toString();
+
+            data = ackmess.getBytes();
             ptype = new String(data, 0, 4);
         }
 
@@ -464,7 +515,7 @@ public class CommService extends Service
                 String body = "JSON" + StaticUtils.defuckJSON(mc.msg.toString());
                 datagramPacket.setData(body.getBytes());
 
-                if (mc.enc && mc.msg.has("idremote"))
+                if ((mc.enc == MessageClass.ENCRYPT_CRYPT) && mc.msg.has("idremote"))
                 {
                     //
                     // Encrypt message.
@@ -479,13 +530,41 @@ public class CommService extends Service
                         byte[] cryp = new byte[ 4 + 16 + 16 + encrypted.length ];
 
                         System.arraycopy("CRYP".getBytes(), 0, cryp, 0, 4);
-                        System.arraycopy(StaticUtils.getUUIDBytes(remid), 0, cryp, 4 , 16);
-                        System.arraycopy(StaticUtils.getUUIDBytes(ident), 0, cryp, 20 , 16);
-                        System.arraycopy(encrypted, 0, cryp, 36 , encrypted.length);
+                        System.arraycopy(StaticUtils.getUUIDBytes(ident), 0, cryp,  4 , 16);
+                        System.arraycopy(StaticUtils.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                        System.arraycopy(encrypted, 0, cryp, 36, encrypted.length);
 
                         datagramPacket.setData(cryp);
                     }
                 }
+
+                if ((mc.enc == MessageClass.ENCRYPT_CRYPT_WITH_ACK)
+                        && mc.msg.has("idremote") && mc.msg.has("uuid"))
+                {
+                    //
+                    // Encrypt message.
+                    //
+
+                    String ident = SystemIdentity.identity;
+                    String remid = mc.msg.getString("idremote");
+                    String ackid = mc.msg.getString("uuid");
+
+                    byte[] encrypted = CryptUtils.AESencrypt(remid, body);
+
+                    if (encrypted != null)
+                    {
+                        byte[] cryp = new byte[ 4 + 16 + 16 + 16 + encrypted.length ];
+
+                        System.arraycopy("CACK".getBytes(), 0, cryp, 0, 4);
+                        System.arraycopy(StaticUtils.getUUIDBytes(ident), 0, cryp,  4 , 16);
+                        System.arraycopy(StaticUtils.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                        System.arraycopy(StaticUtils.getUUIDBytes(ackid), 0, cryp, 36 , 16);
+                        System.arraycopy(encrypted, 0, cryp, 52, encrypted.length);
+
+                        datagramPacket.setData(cryp);
+                    }
+                }
+
             }
             catch (JSONException ex)
             {
@@ -627,7 +706,7 @@ public class CommService extends Service
                         }
                     }
 
-                    messageBacklog.add(new MessageClass(ping, false));
+                    messageBacklog.add(new MessageClass(ping, MessageClass.ENCRYPT_NONE));
                 }
             }
         }

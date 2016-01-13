@@ -34,7 +34,7 @@ public class VersionUtils
     // Get SDK compliant drawable resource.
     //
 
-    public static Drawable getIconFromApplication(Context context,String packageName)
+    public static Drawable getIconFromApplication(Context context, String packageName)
     {
         try
         {

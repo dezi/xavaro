@@ -10,7 +10,7 @@ public class RemoteContacts
     public static String getDisplayName(String ident)
     {
         String xpath = "RemoteContacts/identities/" + ident;
-        JSONObject contact = SettingsManager.getXpathJSONObject(xpath);
+        JSONObject contact = PersistManager.getXpathJSONObject(xpath);
 
         if (contact != null)
         {

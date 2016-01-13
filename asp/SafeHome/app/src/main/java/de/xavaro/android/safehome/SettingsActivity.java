@@ -1,8 +1,10 @@
 package de.xavaro.android.safehome;
 
+import android.app.Activity;
 import android.preference.PreferenceActivity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +16,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SystemIdentity;
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -26,8 +29,10 @@ public class SettingsActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
 
+        Simple.setContext((Activity) this);
+
         SystemIdentity.initialize(this);
-        SettingsManager.initialize(this);
+        PersistManager.initialize(this);
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);

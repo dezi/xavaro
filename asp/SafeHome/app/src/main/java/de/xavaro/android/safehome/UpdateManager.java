@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import de.xavaro.android.common.SettingsManager;
+import de.xavaro.android.common.PersistManager;
 
 public class UpdateManager extends Thread
 {
@@ -51,7 +51,7 @@ public class UpdateManager extends Thread
             }
 
             String xpathmodif = "UpdateManager/Beta/" + packagename + "/LastModified";
-            String lastModified = SettingsManager.getXpathString(xpathmodif);
+            String lastModified = PersistManager.getXpathString(xpathmodif);
 
             String url = "http://" + GlobalConfigs.BetaServerName + "/beta/" + packagename + ".apk";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -116,8 +116,8 @@ public class UpdateManager extends Thread
             promptInstall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(promptInstall);
 
-            SettingsManager.putXpath(xpathmodif, lastModified);
-            SettingsManager.flush();
+            PersistManager.putXpath(xpathmodif, lastModified);
+            PersistManager.flush();
         }
         catch (Exception ex)
         {
