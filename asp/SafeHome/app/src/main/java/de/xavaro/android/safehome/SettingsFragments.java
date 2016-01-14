@@ -90,7 +90,7 @@ public class SettingsFragments
 
             devicePref.setKey(keyprefix + ".device");
 
-            recentText.add("Nicht zugeordnet");
+            recentText.add("Nicht gesetzt");
             recentVals.add("unknown");
 
             if (sharedPrefs.contains(devicePref.getKey()))

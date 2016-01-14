@@ -408,6 +408,7 @@ public class NicedPreferences
             }
 
             super.setEntries(intern);
+            this.entries = intern;
         }
 
         @Override
@@ -427,6 +428,7 @@ public class NicedPreferences
             }
 
             super.setEntryValues(intern);
+            this.values = intern;
         }
 
         @Override
@@ -453,15 +455,15 @@ public class NicedPreferences
 
         private String getDisplayValue(String value)
         {
-            for (int inx = 0; inx < values.length; inx++)
+            if (values != null)
             {
-                if (values[ inx ].equals(value))
+                for (int inx = 0; inx < values.length; inx++)
                 {
-                    return (String) entries[ inx ];
+                    if (values[ inx ].equals(value)) return (String) entries[ inx ];
                 }
             }
 
-            return "unknown";
+            return value;
         }
 
         public void setOnclick(Runnable onlick)
