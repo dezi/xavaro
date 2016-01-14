@@ -431,6 +431,11 @@ public class ChatActivity extends AppCompatActivity implements
         public void onClick(View view)
         {
             ChatManager.getInstance(context).clearProtocoll(idremote);
+
+            scrollcontent.removeAllViews();
+            protoIncoming.clear();
+            protoOutgoing.clear();
+            lastDiv = null;
         }
     };
 

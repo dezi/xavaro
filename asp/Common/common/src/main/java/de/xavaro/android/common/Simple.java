@@ -1,5 +1,7 @@
 package de.xavaro.android.common;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.Date;
 import java.util.Locale;
@@ -140,6 +143,20 @@ public class Simple
 
     //region All purpose simple methods
 
+    public static void removeAllPreferences(String prefix)
+    {
+        SharedPreferences sp = getSharedPrefs();
+
+        Map<String, ?> prefs = sp.getAll();
+
+        for (Map.Entry<String, ?> entry : prefs.entrySet())
+        {
+            if (! entry.getKey().startsWith(prefix)) continue;
+
+            sp.edit().remove(entry.getKey()).apply();
+        }
+    }
+
     public static View removeFromParent(View view)
     {
         ((ViewGroup) view.getParent()).removeView(view);
@@ -200,6 +217,16 @@ public class Simple
     //endregion All purpose simple methods
 
     //region All purpose simple getters
+
+    public static SharedPreferences getSharedPrefs()
+    {
+        return PreferenceManager.getDefaultSharedPreferences(appContext);
+    }
+
+    public static String getAppName()
+    {
+        return appContext.getString(appContext.getApplicationInfo().labelRes);
+    }
 
     @Nullable
     public static String getMacAddress()

@@ -38,6 +38,7 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
@@ -1423,6 +1424,10 @@ public class LaunchItem extends FrameLayout implements
 
         //new BlueToothScale(context).getCreateUserFromPreferences();
 
-        DitUndDat.SpeekDat.speak("Die Sprachausgabe von Android funktioniert prima.");
+        //DitUndDat.SpeekDat.speak("Die Sprachausgabe von Android funktioniert prima.");
+
+        String xpath = "RemoteContacts/identities";
+        PersistManager.delXpath(xpath);
+        PersistManager.flush();
     }
 }

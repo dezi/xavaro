@@ -309,14 +309,21 @@ public class CommService extends Service
 
                 String remoteIdentity = json.getString("identity");
 
+                RemoteContacts.registerContact(json);
+
+                //
+                // Build response with own identiy.
+                //
+
                 JSONObject responseOwnerIdentity = new JSONObject();
 
                 responseOwnerIdentity.put("type", "responseOwnerIdentity");
                 responseOwnerIdentity.put("idremote", remoteIdentity);
                 responseOwnerIdentity.put("status", "success");
 
-                responseOwnerIdentity.put("appName", StaticUtils.getAppName(getApplicationContext()));
+                responseOwnerIdentity.put("appName", Simple.getAppName());
                 responseOwnerIdentity.put("devName", Simple.getDeviceName());
+                responseOwnerIdentity.put("macAddr", Simple.getMacAddress());
                 responseOwnerIdentity.put("ownerFirstName", sp.getString("owner.firstname", null));
                 responseOwnerIdentity.put("ownerGivenName", sp.getString("owner.givenname", null));
 
@@ -590,7 +597,7 @@ public class CommService extends Service
                         // Keep NAT connection alive with bogus packet.
                         //
 
-                        datagramSocket.setTTL(4);
+                        datagramSocket.setTTL(200);
                         datagramPacket.setData("PUPS".getBytes());
                         datagramSocket.send(datagramPacket);
                     }

@@ -1,8 +1,11 @@
 package de.xavaro.android.safehome;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -31,6 +34,7 @@ import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.PreferenceFragments;
@@ -385,6 +389,36 @@ public class PreferencesBasics
             registerRemotes(context, false);
         }
 
+        private void removeRemoteContact(String idremote)
+        {
+            SharedPreferences sp = Simple.getSharedPrefs();
+
+            for (int inx = 0; inx < preferences.size(); inx++)
+            {
+                Preference pref = preferences.get(inx);
+
+                if ((pref.getKey() != null) && pref.getKey().contains(idremote))
+                {
+                    Log.d(LOGTAG, "removeRemoteContact:" + pref.getKey());
+
+                    sp.edit().remove(pref.getKey()).apply();
+
+                    root.removePreference(pref);
+                    preferences.remove(pref);
+
+                    inx--;
+                }
+            }
+
+            String xpath = "RemoteContacts/identities/" + idremote;
+            PersistManager.delXpath(xpath);
+            PersistManager.flush();
+
+            Log.d(LOGTAG,"removeRemoteContact:" + idremote);
+
+            remoteContacts.remove(idremote);
+        }
+
         private void registerRemotes(Context context, boolean update)
         {
             String xpath = "RemoteContacts/identities";
@@ -400,7 +434,7 @@ public class PreferencesBasics
             {
                 try
                 {
-                    String ident = keysIterator.next();
+                    final String ident = keysIterator.next();
 
                     if (remoteContacts.contains(ident)) continue;
                     remoteContacts.add(ident);
@@ -417,13 +451,25 @@ public class PreferencesBasics
                     String info = "";
                     if (rc.has("appName")) info += rc.getString("appName");
                     if (rc.has("devName")) info += " - " + rc.getString("devName");
+                    if (rc.has("macAddr")) info += " - " + rc.getString("macAddr");
 
-                    String title = (name + "\n" + info).trim();
+                    String title = (name + "\n" + info).trim() + "\n" + ident;
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
                     pc.setKey(prefkey);
                     pc.setDefaultValue(true);
                     pc.setTitle(title);
+
+                    pc.setOnLongClick(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            Log.d(LOGTAG, "onLongClick: " + ident);
+
+                            removeRemoteContact(ident);
+                        }
+                    });
 
                     preferences.add(pc);
                     if (update) root.addPreference(pc);
@@ -734,34 +780,8 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                try
-                {
-                    JSONObject rc = remoteContact;
-
-                    String ident = rc.getString("identity");
-                    String appna = rc.has("appName") ? rc.getString("appName") : "";
-                    String devna = rc.has("devName") ? rc.getString("devName") : "";
-                    String fname = rc.has("ownerFirstName") ? rc.getString("ownerFirstName") : "";
-                    String lname = rc.has("ownerGivenName") ? rc.getString("ownerGivenName") : "";
-
-                    String xpath = "RemoteContacts/identities/" + ident;
-                    JSONObject recontact = PersistManager.getXpathJSONObject(xpath);
-                    if (recontact == null) recontact = new JSONObject();
-
-                    recontact.put("appName", appna);
-                    recontact.put("devName", devna);
-                    recontact.put("ownerFirstName", fname);
-                    recontact.put("ownerGivenName", lname);
-
-                    PersistManager.putXpath(xpath, recontact);
-                    PersistManager.flush();
-
-                    registerRemotes(context, true);
-                }
-                catch (JSONException ex)
-                {
-                    OopsService.log(LOGTAG, ex);
-                }
+                RemoteContacts.registerContact(remoteContact);
+                registerRemotes(context, true);
             }
         };
 
@@ -924,6 +944,11 @@ public class PreferencesBasics
 
                             requestOwnerIdentity.put("type", "requestOwnerIdentity");
                             requestOwnerIdentity.put("idremote", remoteIdentity);
+                            requestOwnerIdentity.put("appName", Simple.getAppName());
+                            requestOwnerIdentity.put("devName", Simple.getDeviceName());
+                            requestOwnerIdentity.put("macAddr", Simple.getMacAddress());
+                            requestOwnerIdentity.put("ownerFirstName", sharedPrefs.getString("owner.firstname", null));
+                            requestOwnerIdentity.put("ownerGivenName", sharedPrefs.getString("owner.givenname", null));
 
                             CommService.sendEncrypted(requestOwnerIdentity);
 

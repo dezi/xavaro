@@ -282,13 +282,13 @@ public class ChatManager implements
     }
 
     @Nullable
-    private String getMessageIdentity(JSONObject message)
+    private String getMessageIdremote(JSONObject message)
     {
         String identity = null;
 
         try
         {
-            identity = message.getString("identity");
+            identity = message.getString("idremote");
         }
         catch (JSONException ex)
         {
@@ -329,7 +329,7 @@ public class ChatManager implements
 
     private void putProtocoll(String identity, JSONObject protocoll)
     {
-        Log.d(LOGTAG,"putProtocoll: " + protocoll.toString());
+        //Log.d(LOGTAG,"putProtocoll: " + protocoll.toString());
 
         String filename = context.getPackageName() + ".chatprotocoll." + identity + ".json";
 
@@ -386,7 +386,7 @@ public class ChatManager implements
 
     private boolean onIncomingMessage(JSONObject message)
     {
-        String identity = getMessageIdentity(message);
+        String identity = getMessageIdremote(message);
         if (identity == null) return false;
 
         String uuid = getMessageUUID(message);
@@ -437,7 +437,9 @@ public class ChatManager implements
 
     private void onSetMessageStatus(JSONObject message, String status)
     {
-        String idremote = getMessageIdentity(message);
+        Log.d(LOGTAG,"onSetMessageStatus:" + status + "=" + message.toString());
+
+        String idremote = getMessageIdremote(message);
         if (idremote == null) return;
 
         String uuid = getMessageUUID(message);
@@ -445,16 +447,19 @@ public class ChatManager implements
 
         updateOutgoingProtocoll(idremote, message, status);
 
-        final String cbidentity = idremote;
         final String cbuuid = uuid;
         final String cbstatus = status;
+        final String cbidentity = idremote;
 
         handler.post(new Runnable()
         {
             @Override
             public void run()
             {
+                Log.d(LOGTAG,"hier1:" + cbidentity);
                 MessageCallback callback = callbacks.get(cbidentity);
+                Log.d(LOGTAG,"hier2:" + callback);
+
                 if (callback != null) callback.onSetMessageStatus(cbuuid, cbstatus);
             }
         });

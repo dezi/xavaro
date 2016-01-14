@@ -3,6 +3,7 @@ package de.xavaro.android.common;
 import android.support.annotation.Nullable;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -210,5 +211,36 @@ public class PersistManager
         {
             OopsService.log(LOGTAG,ex);
         }
+    }
+
+    public static boolean delXpath(String xpath)
+    {
+        boolean result = false;
+
+        String[] parts = xpath.split("/");
+
+        try
+        {
+            JSONObject jo = resolveXpath(parts, true);
+
+            if (jo.has(parts[ parts.length - 1 ]))
+            {
+                jo.remove(parts[ parts.length - 1 ]);
+
+                dirty = result = true;
+
+                Log.d(LOGTAG,"delXpath: deleted=" + xpath);
+            }
+            else
+            {
+                Log.d(LOGTAG,"delXpath: notfound=" + xpath);
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG,ex);
+        }
+
+        return result;
     }
 }

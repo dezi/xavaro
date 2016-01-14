@@ -14,6 +14,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.SwitchPreference;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -464,9 +465,9 @@ public class NicedPreferences
             return value;
         }
 
-        public void setOnclick(Runnable onlick)
+        public void setOnclick(Runnable onclick)
         {
-            onClickRunner = onlick;
+            onClickRunner = onclick;
         }
 
         @Override
@@ -610,9 +611,9 @@ public class NicedPreferences
             isUppercase = true;
         }
 
-        public void setOnclick(Runnable onlick)
+        public void setOnclick(Runnable onclick)
         {
-            onClickRunner = onlick;
+            onClickRunner = onclick;
         }
 
         @Override
@@ -895,11 +896,19 @@ public class NicedPreferences
         }
     }
 
-    public static class NiceCategoryPreference extends PreferenceCategory
+    public static class NiceCategoryPreference extends PreferenceCategory implements
+            View.OnLongClickListener
     {
         public NiceCategoryPreference(Context context)
         {
             super(context);
+        }
+
+        private Runnable onLongClickRunner;
+
+        public void setOnLongClick(Runnable onclick)
+        {
+            onLongClickRunner = onclick;
         }
 
         @Override
@@ -912,6 +921,16 @@ public class NicedPreferences
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
             title.setTextSize(20f);
+
+            view.setOnLongClickListener(this);
+        }
+
+        @Override
+        public boolean onLongClick(View view)
+        {
+            if (onLongClickRunner != null) onLongClickRunner.run();
+
+            return false;
         }
     }
 }
