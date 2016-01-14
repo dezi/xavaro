@@ -1,19 +1,25 @@
 package de.xavaro.android.common;
 
-import android.app.Activity;
-import android.content.Context;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.net.Uri;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +45,11 @@ public class Simple
     {
         Simple.appContext = context;
         Simple.appHandler = new Handler();
+    }
+
+    public static Activity getContext()
+    {
+        return Simple.appContext;
     }
 
     //endregion Initialisation
@@ -72,6 +83,61 @@ public class Simple
 
     //endregion Keyboard stuff
 
+    //region Application stuff
+
+    public static void launchApp(String packagename)
+    {
+        if (appContext == null) return;
+
+        CommonStatic.addOneShotApp(packagename);
+
+        try
+        {
+            Intent launchIntent = appContext.getPackageManager().getLaunchIntentForPackage(packagename);
+            appContext.startActivity(launchIntent);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+
+    public static void installAppFromPlaystore(String packagename)
+    {
+        if (appContext == null) return;
+
+        CommonStatic.addOneShotApp(CommonConfigs.packagePlaystore);
+
+        try
+        {
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
+            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
+            appContext.startActivity(goToMarket);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+
+    public static void uninstallApp(String packagename)
+    {
+        if (appContext == null) return;
+
+        try
+        {
+            Uri packageUri = Uri.parse("package:" + packagename);
+            Intent unInstall = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
+            appContext.startActivity(unInstall);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+
+    //endregion Application stuff
+
     //region All purpose simple methods
 
     public static View removeFromParent(View view)
@@ -81,14 +147,59 @@ public class Simple
         return view;
     }
 
+    public static void makeRoundedCorners(View view, boolean solid)
+    {
+        GradientDrawable shape = new GradientDrawable();
+        shape.setCornerRadius(4);
+
+        if (solid)
+        {
+            shape.setColor(CommonConfigs.PreferenceTextButtonColor);
+        }
+        else
+        {
+            shape.setStroke(2, CommonConfigs.PreferenceTextButtonColor);
+        }
+
+        view.setPadding(12, 10, 10, 12);
+        view.setBackground(shape);
+    }
+
+    public static void makeStandardButton(View view, boolean preferred)
+    {
+        makeRoundedCorners(view, preferred);
+
+        view.setLayoutParams(Simple.layoutParamsMM(10, 0, 10, 0));
+
+        if (view instanceof TextView)
+        {
+            ((TextView) view).setTextColor(preferred ? Color.WHITE : Color.BLACK);
+            ((TextView) view).setTextSize(Simple.getPreferredTextSize());
+            ((TextView) view).setAllCaps(true);
+        }
+    }
+
+    public static boolean isAppInstalled(String packageName)
+    {
+        if (appContext == null) return false;
+
+        try
+        {
+            ApplicationInfo appInfo = appContext.getPackageManager().getApplicationInfo(packageName, 0);
+
+            return (appInfo != null);
+        }
+        catch (PackageManager.NameNotFoundException ignore)
+        {
+        }
+
+        return false;
+    }
+
+
     //endregion All purpose simple methods
 
     //region All purpose simple getters
-
-    public static Activity getContext()
-    {
-        return Simple.appContext;
-    }
 
     @Nullable
     public static String getMacAddress()
@@ -266,7 +377,7 @@ public class Simple
 
     //endregion Date and time
 
-    //region Frame layout params
+    //region Layout params
 
     public static FrameLayout.LayoutParams layoutParamsWW(int gravity)
     {
@@ -300,5 +411,73 @@ public class Simple
                 gravity);
     }
 
-    //endregion Frame layout params
+    public static ViewGroup.LayoutParams layoutParamsWW()
+    {
+        return new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    public static ViewGroup.LayoutParams layoutParamsMM()
+    {
+        return new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+    }
+
+    public static ViewGroup.LayoutParams layoutParamsMW()
+    {
+        return new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    public static ViewGroup.LayoutParams layoutParamsWM()
+    {
+        return new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+    }
+
+    public static LinearLayout.LayoutParams layoutParamsWW(int left, int top, int right, int bottom)
+    {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        lp.setMargins(left, top, right, bottom);
+        return lp;
+    }
+
+    public static LinearLayout.LayoutParams layoutParamsMM(int left, int top, int right, int bottom)
+    {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+
+        lp.setMargins(left, top, right, bottom);
+        return lp;
+    }
+
+    public static LinearLayout.LayoutParams layoutParamsMW(int left, int top, int right, int bottom)
+    {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        lp.setMargins(left, top, right, bottom);
+        return lp;
+    }
+
+    public static LinearLayout.LayoutParams layoutParamsWM(int left, int top, int right, int bottom)
+    {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+
+        lp.setMargins(left, top, right, bottom);
+        return lp;
+    }
+
+    //endregion Layout params
 }

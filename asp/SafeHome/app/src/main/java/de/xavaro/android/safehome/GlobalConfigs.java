@@ -6,6 +6,7 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.StaticUtils;
 
 public class GlobalConfigs
@@ -25,31 +26,17 @@ public class GlobalConfigs
     public static boolean likeEmail      = true;
     // @formatter:on
 
-    //
-    // Famous package names
-    //
-
-    // @formatter:off
-    public static String packageGooglePlus = "com.google.android.apps.plus";
-    public static String packageWhatsApp   = "com.whatsapp";
-    public static String packageFacebook   = "com.facebook.katana";
-    public static String packageTwitter    = "com.twitter.android";
-    public static String packageSkype      = "com.skype.raider";
-    public static String packagePlaystore  = "com.android.vending";
-    public static String packageEmail      = null;
-    // @formatter:on
-
     public static void weLikeThis(Context context,String packagename)
     {
-        if (packageEmail == null) packageEmail = StaticUtils.getDefaultEmail(context);
+        if (CommonConfigs.packageEmail == null) CommonConfigs.packageEmail = StaticUtils.getDefaultEmail(context);
 
         // @formatter:off
-        if (packagename.equals(packageWhatsApp  )) likeWhatsApp   = true;
-        if (packagename.equals(packageFacebook  )) likeFacebook   = true;
-        if (packagename.equals(packageTwitter   )) likeTwitter    = true;
-        if (packagename.equals(packageSkype     )) likeSkype      = true;
-        if (packagename.equals(packageGooglePlus)) likeGooglePlus = true;
-        if (packagename.equals(packageEmail     )) likeEmail      = true;
+        if (packagename.equals(CommonConfigs.packageWhatsApp  )) likeWhatsApp   = true;
+        if (packagename.equals(CommonConfigs.packageFacebook  )) likeFacebook   = true;
+        if (packagename.equals(CommonConfigs.packageTwitter   )) likeTwitter    = true;
+        if (packagename.equals(CommonConfigs.packageSkype     )) likeSkype      = true;
+        if (packagename.equals(CommonConfigs.packageGooglePlus)) likeGooglePlus = true;
+        if (packagename.equals(CommonConfigs.packageEmail     )) likeEmail      = true;
         // @formatter:on
     }
 

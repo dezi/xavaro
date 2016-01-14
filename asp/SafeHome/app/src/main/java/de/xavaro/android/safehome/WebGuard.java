@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
 
@@ -280,7 +281,7 @@ public class WebGuard extends WebViewClient
             {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(follow);
-                intent.setPackage(GlobalConfigs.packageWhatsApp);
+                intent.setPackage(CommonConfigs.packageWhatsApp);
                 context.startActivity(intent);
             }
             catch (Exception ignore)
@@ -300,7 +301,7 @@ public class WebGuard extends WebViewClient
             {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(follow);
-                intent.setPackage(GlobalConfigs.packageTwitter);
+                intent.setPackage(CommonConfigs.packageTwitter);
                 context.startActivity(intent);
 
                 return true;
@@ -321,7 +322,7 @@ public class WebGuard extends WebViewClient
             {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(follow);
-                intent.setPackage(GlobalConfigs.packageGooglePlus);
+                intent.setPackage(CommonConfigs.packageGooglePlus);
                 context.startActivity(intent);
 
                 return true;
@@ -345,7 +346,7 @@ public class WebGuard extends WebViewClient
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra("android.intent.extra.TEXT", follow.getQueryParameter("u"));
-                    intent.setPackage(GlobalConfigs.packageFacebook);
+                    intent.setPackage(CommonConfigs.packageFacebook);
                     context.startActivity(intent);
 
                     return true;

@@ -15,6 +15,8 @@ import android.view.WindowManager;
 import android.graphics.PixelFormat;
 import android.widget.Toast;
 
+import de.xavaro.android.common.CommonStatic;
+
 /*
  * Service to monitor foreign and system apps activity
  * and eventually close undesired activities.
@@ -41,12 +43,6 @@ public class KioskService extends Service
     //
 
     private final ArrayList<String> defsystemApps = new ArrayList<>();
-
-    //
-    // List of names of one shot allow packages.
-    //
-
-    private final ArrayList<String> oneshotApps = new ArrayList<>();
 
     //
     // Watch dog background thread.
@@ -192,7 +188,7 @@ public class KioskService extends Service
             mode = "bl";
         }
 
-        if (oneshotApps.contains(processName))
+        if (CommonStatic.oneshotApps.contains(processName))
         {
             mode = "os";
         }
@@ -327,20 +323,6 @@ public class KioskService extends Service
 
         recentProc = getPackageName();
         focused = hasFocus;
-    }
-
-    //
-    // Set one shot apps.
-    //
-
-    public void addOneShot(String packagename)
-    {
-        oneshotApps.add(packagename);
-    }
-
-    public void clearOneShot()
-    {
-        oneshotApps.clear();
     }
 
     //

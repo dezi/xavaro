@@ -28,7 +28,6 @@ import android.widget.ImageView;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -258,23 +257,11 @@ public class DitUndDat
 
     //endregion public static class SpeekDat
 
-    //region public static class DefaultLauncher
+    //region public static class DefaultApps
 
     public static class DefaultApps
     {
         private static final String LOGTAG = DefaultApps.class.getSimpleName();
-
-        public static void installAppFromPlaystore(Context context, String packagename)
-        {
-            if (HomeActivity.kioskService != null)
-            {
-                HomeActivity.kioskService.addOneShot(GlobalConfigs.packagePlaystore);
-            }
-
-            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
-            context.startActivity(goToMarket);
-        }
 
         public static String getAppLable(Context context)
         {
@@ -409,7 +396,7 @@ public class DitUndDat
         }
     }
 
-    //endregion public static class DefaultLauncher
+    //endregion public static class DefaultApps
 
     //region public static class ImageAntiAliasView extends ImageView
 

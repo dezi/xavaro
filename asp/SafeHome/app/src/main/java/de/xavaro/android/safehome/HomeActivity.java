@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.CommService;
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.Simple;
@@ -168,7 +169,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        if (kioskService != null) kioskService.clearOneShot();
+        CommonStatic.clearOneShotApps();
 
         if (wasPaused && ! lostFocus)
         {

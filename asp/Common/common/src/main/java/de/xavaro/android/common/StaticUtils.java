@@ -599,21 +599,6 @@ public class StaticUtils
         }
     }
 
-    public static boolean isAppInstalled(Context context, String packageName)
-    {
-        try
-        {
-            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
-
-            return (appInfo != null);
-        }
-        catch (PackageManager.NameNotFoundException ignore)
-        {
-        }
-
-        return false;
-    }
-
     public static byte[] getUUIDBytes(String uuid)
     {
         String uuidstr = uuid.replace("-","");

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
 
@@ -307,7 +308,7 @@ public class ProfileImages
     {
         if (phone.startsWith("+")) phone = phone.substring(1);
 
-        String pwa = GlobalConfigs.packageWhatsApp;
+        String pwa = CommonConfigs.packageWhatsApp;
 
         File datadir = context.getFilesDir();
         File wappdir = new File(Environment.getExternalStorageDirectory().getPath(),"WhatsApp/Profile Pictures");

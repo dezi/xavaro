@@ -36,7 +36,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 //
@@ -1098,10 +1100,7 @@ public class LaunchItem extends FrameLayout implements
         {
             String packagename = config.getString("packagename");
 
-            HomeActivity.kioskService.addOneShot(packagename);
-
-            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
-            context.startActivity(launchIntent);
+            Simple.launchApp(packagename);
         }
         catch (Exception ex)
         {
@@ -1125,7 +1124,7 @@ public class LaunchItem extends FrameLayout implements
             if (subtype.equals("android"))
             {
                 String packagename = "com.android.settings";
-                HomeActivity.kioskService.addOneShot(packagename);
+                CommonStatic.addOneShotApp(packagename);
                 Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
                 context.startActivity(launchIntent);
             }

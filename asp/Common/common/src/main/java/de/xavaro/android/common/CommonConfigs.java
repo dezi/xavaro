@@ -13,9 +13,24 @@ public class CommonConfigs
     // @formatter:off
     public static final int PreferenceTextEnabledColor  = 0xff444444;
     public static final int PreferenceTextDisabledColor = 0x88888888;
+    public static final int PreferenceTextButtonColor   = 0xff43932f;
     // @formatter:on
 
     //endregion
+
+    //region Famous package names
+
+    // @formatter:off
+    public static String packageGooglePlus = "com.google.android.apps.plus";
+    public static String packageWhatsApp   = "com.whatsapp";
+    public static String packageFacebook   = "com.facebook.katana";
+    public static String packageTwitter    = "com.twitter.android";
+    public static String packageSkype      = "com.skype.raider";
+    public static String packagePlaystore  = "com.android.vending";
+    public static String packageEmail      = null;
+    // @formatter:on
+
+    //endregion Famous package names
 
     // @formatter:off
     public static final String OopsServerName     = "www.xavaro.de";

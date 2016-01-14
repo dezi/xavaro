@@ -14,13 +14,12 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.SwitchPreference;
-import android.text.InputType;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -31,7 +30,6 @@ import java.util.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class NicedPreferences
 {
@@ -667,70 +665,70 @@ public class NicedPreferences
         }
     }
 
-    public static class NiceScorePreference extends NiceCheckboxPreference
+    public static class NiceScorePreference extends NiceCheckboxPreference implements
+            View.OnTouchListener
     {
         public NiceScorePreference(Context context)
         {
             super(context);
         }
 
-        private int score;
+        private int score = -1;
+        private String apkname;
 
         private final ImageView stars[] = new ImageView[ 5 ];
 
         private String[] degreeText = {
 
                 "ungenügend",
-
-                "voll mangelhaft",
-                "mangelhaft",
-                "knapp mangelhaft",
-
-                "knapp ausreichend",
-                "ausreichend",
-                "voll ausreichend",
-
-                "knapp befriedigend",
-                "befriedigend",
-                "voll befriedigend",
-
-                "knapp gut",
-                "knapp gut",
-                "voll gut",
-
-                "knapp sehr gut",
-                "sehr gut",
-                "voll sehr gut"
+                "mangelhaft", "mangelhaft", "mangelhaft",
+                "ausreichend", "ausreichend", "ausreichend",
+                "befriedigend", "befriedigend", "befriedigend",
+                "gut", "gut", "gut",
+                "sehr gut", "sehr gut", "sehr gut"
         };
 
         private String[] degreeNote = {
 
                 "6",
-
-                "5-",
-                "5",
-                "5+",
-
-                "4-",
-                "4",
-                "4+",
-
-                "3-",
-                "3",
-                "3+",
-
-                "2-",
-                "2",
-                "2+",
-
-                "1-",
-                "1",
-                "1+"
+                "5", "5", "5",
+                "4", "4", "4",
+                "3", "3", "3",
+                "2", "2", "2",
+                "1", "1", "1"
         };
 
         public void setScore(int score)
         {
             this.score = score;
+        }
+
+        public void setAPKName(String apkname)
+        {
+            this.apkname = apkname;
+        }
+
+        public boolean onTouch(View view, MotionEvent motionEvent)
+        {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+            {
+                if (view.getTag().toString().equals("open"))
+                {
+                    Simple.launchApp(apkname);
+                }
+
+                if (view.getTag().toString().equals("install"))
+                {
+                    Simple.installAppFromPlaystore(apkname);
+                }
+
+                if (view.getTag().toString().equals("deinstall"))
+                {
+                    Simple.uninstallApp(apkname);
+                }
+            }
+
+            return true;
         }
 
         @Override
@@ -743,13 +741,7 @@ public class NicedPreferences
                 LinearLayout scorelayout = new LinearLayout(getContext());
                 scorelayout.setOrientation(LinearLayout.HORIZONTAL);
                 scorelayout.setLayoutParams(new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        36));
-
-                TextView degree = new TextView(getContext());
-                degree.setTextSize(Simple.getPreferredTextSize());
-                degree.setText(degreeNote[ score ] + " (" + degreeText[ score ] + ")");
-                scorelayout.addView(degree);
+                        ViewGroup.LayoutParams.MATCH_PARENT, 36));
 
                 int rest = score;
 
@@ -785,7 +777,54 @@ public class NicedPreferences
                     rest -= 3;
                 }
 
+                TextView degree = new TextView(getContext());
+                degree.setTextSize(Simple.getPreferredTextSize());
+                degree.setText(degreeText[ score ]);
+                degree.setPadding(8, 0, 0, 0);
+                scorelayout.addView(degree);
+
                 ((ViewGroup) view).addView(scorelayout, 1);
+
+                if (apkname != null)
+                {
+                    FrameLayout installframe = new FrameLayout(getContext());
+                    installframe.setLayoutParams(Simple.layoutParamsMW());
+
+                    ((ViewGroup) view).addView(installframe, 3);
+
+                    LinearLayout installcenter = new LinearLayout(getContext());
+                    installcenter.setOrientation(LinearLayout.HORIZONTAL);
+                    installcenter.setLayoutParams(Simple.layoutParamsWM());
+                    installcenter.setPadding(0, 10, 0, 10);
+
+                    if (Simple.isAppInstalled(apkname))
+                    {
+                        TextView deinstall = new TextView(getContext());
+                        Simple.makeStandardButton(deinstall, false);
+                        deinstall.setOnTouchListener(this);
+                        deinstall.setText("Deinstallieren");
+                        deinstall.setTag("deinstall");
+                        installcenter.addView(deinstall);
+
+                        TextView open = new TextView(getContext());
+                        Simple.makeStandardButton(open, true);
+                        open.setOnTouchListener(this);
+                        open.setText("Öffnen");
+                        open.setTag("open");
+                        installcenter.addView(open);
+                    }
+                    else
+                    {
+                        TextView install = new TextView(getContext());
+                        Simple.makeStandardButton(install, true);
+                        install.setOnTouchListener(this);
+                        install.setText("Installieren");
+                        install.setTag("install");
+                        installcenter.addView(install);
+                    }
+
+                    installframe.addView(installcenter, Simple.layoutParamsWM(Gravity.END));
+                }
             }
         }
     }

@@ -31,9 +31,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class SettingsFragments
@@ -442,7 +444,7 @@ public class SettingsFragments
             keyprefix = "skype";
             masterenable = "Skype freischalten";
             installtext = "Skype App";
-            installpack = GlobalConfigs.packageSkype;
+            installpack = CommonConfigs.packageSkype;
         }
     }
 
@@ -473,7 +475,7 @@ public class SettingsFragments
             keyprefix = "whatsapp";
             masterenable = "WhatsApp freischalten";
             installtext = "WhatsApp App";
-            installpack = GlobalConfigs.packageWhatsApp;
+            installpack = CommonConfigs.packageWhatsApp;
         }
     }
 
@@ -522,7 +524,7 @@ public class SettingsFragments
             {
                 NicedPreferences.NiceListPreference ip = new NicedPreferences.NiceListPreference(context);
 
-                boolean installed = StaticUtils.isAppInstalled(context, installpack);
+                boolean installed = Simple.isAppInstalled(installpack);
 
                 ip.setEntries(installText);
                 ip.setEntryValues(installVals);
@@ -535,14 +537,13 @@ public class SettingsFragments
                 //
 
                 final String installName = installpack;
-                final Context installContext = context;
 
                 ip.setOnclick(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        DitUndDat.DefaultApps.installAppFromPlaystore(installContext, installName);
+                        Simple.installAppFromPlaystore(installName);
                     }
                 });
 
@@ -1302,6 +1303,7 @@ public class SettingsFragments
                 int iconres;
                 Bitmap thumbnail;
                 Drawable drawable;
+                String apkname;
                 int score;
 
                 while (keysIterator.hasNext())
@@ -1313,6 +1315,7 @@ public class SettingsFragments
                     score = -1;
                     iconres = 0;
                     summary = null;
+                    apkname = null;
                     drawable = null;
 
                     if (isApps)
@@ -1328,8 +1331,9 @@ public class SettingsFragments
                             summary += sumarray.getString(inx);
                         }
 
-                        drawable = new BitmapDrawable(context.getResources(),CacheManager.getIconFromAppStore(context, website));
-
+                        thumbnail = CacheManager.getIconFromAppStore(context, website);
+                        drawable = new BitmapDrawable(context.getResources(),thumbnail);
+                        apkname = website;
                         score = Integer.parseInt(webitem.getString("score"));
                     }
                     else
@@ -1361,6 +1365,7 @@ public class SettingsFragments
                         cb.setTitle(label);
                         cb.setEnabled(enabled);
                         cb.setScore(score);
+                        cb.setAPKName(apkname);
 
                         if (iconres != 0) cb.setIcon(iconres);
                         if (drawable != null) cb.setIcon(drawable);
