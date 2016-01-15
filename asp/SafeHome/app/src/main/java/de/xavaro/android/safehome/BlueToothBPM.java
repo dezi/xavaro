@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class BlueToothBPM extends BlueTooth
@@ -62,7 +63,7 @@ public class BlueToothBPM extends BlueTooth
     @Override
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
-        Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
+        Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
         Log.d(LOGTAG, "parseResponse: " + getMaskString(rd[ 0 ]));
 
         try

@@ -520,7 +520,7 @@ public class CommService extends Service
 
             try
             {
-                String body = "JSON" + StaticUtils.defuckJSON(mc.msg.toString());
+                String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
                 datagramPacket.setData(body.getBytes());
 
                 if ((mc.enc == MessageClass.ENCRYPT_CRYPT) && mc.msg.has("idremote"))

@@ -14,14 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +40,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -62,93 +55,6 @@ import org.json.JSONObject;
 public class StaticUtils
 {
     private static final String LOGTAG = "StaticUtils";
-
-    //region Generic conversion methods.
-
-    //
-    // Convert array of bytes to hex string.
-    //
-
-    public static String hexBytesToString(byte[] bytes)
-    {
-        if (bytes == null) return null;
-
-        char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[ bytes.length << 1 ];
-
-        for (int inx = 0; inx < bytes.length; inx++)
-        {
-            //noinspection PointlessArithmeticExpression
-            hexChars[ (inx << 1) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
-            //noinspection PointlessBitwiseExpression
-            hexChars[ (inx << 1) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
-        }
-
-        return String.valueOf(hexChars);
-    }
-
-    //
-    // Convert array of bytes to hex string.
-    //
-
-    public static byte[] hexStringToBytes(String hexstring)
-    {
-        if (hexstring == null) return null;
-
-        byte[] bytes = new byte[ hexstring.length() >> 1 ];
-
-        for (int inx = 0; inx < hexstring.length(); inx += 2)
-        {
-            //noinspection PointlessBitwiseExpression,PointlessArithmeticExpression
-            bytes[ inx >> 1 ] = (byte)
-                    ((Character.digit(hexstring.charAt(inx + 0), 16) << 4)
-                    + Character.digit(hexstring.charAt(inx + 1), 16) << 0);
-        }
-
-        return bytes;
-    }
-
-    //
-    // Convert JSON to string with indent and dump.
-    //
-
-    @Nullable
-    public static String JSON2String(JSONObject jsonObject)
-    {
-        return JSON2String(jsonObject, false);
-    }
-
-    @Nullable
-    public static String JSON2String(JSONObject jsonObject, boolean dump)
-    {
-        if (jsonObject == null) return null;
-
-        String json = null;
-
-        try
-        {
-            json = jsonObject.toString(2);
-        }
-        catch (JSONException ignored)
-        {
-        }
-
-        if (json == null) return null;
-
-        if (dump)
-        {
-            String[] lines = json.split("\n");
-
-            for (String line : lines)
-            {
-                Log.d(LOGTAG, line);
-            }
-        }
-
-        return json;
-    }
-
-    //endregion
 
     //region Config reader methods.
 
@@ -523,15 +429,6 @@ public class StaticUtils
         }
     }
 
-    public static String defuckJSON(String json)
-    {
-        //
-        // I hate slash escaping.
-        //
-
-        return json.replace("\\/","/");
-    }
-
     public static void fileCopy(File src, File dst) throws IOException
     {
         InputStream in = new FileInputStream(src);
@@ -557,14 +454,6 @@ public class StaticUtils
         if (! matcher.find()) return null;
 
         return matcher.group(1);
-    }
-
-    public static int getStatusBarHeight(Context context)
-    {
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0)  return context.getResources().getDimensionPixelSize(resourceId);
-
-        return 0;
     }
 
     public static boolean getSharedPrefsBoolean(Context context, String key)

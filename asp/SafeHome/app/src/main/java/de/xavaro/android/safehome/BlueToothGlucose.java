@@ -7,6 +7,7 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class BlueToothGlucose extends BlueTooth
@@ -149,7 +150,7 @@ public class BlueToothGlucose extends BlueTooth
     @Override
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
-        Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
+        Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
         Log.d(LOGTAG, "parseResponse: " + rd[ 0 ]);
     }
 

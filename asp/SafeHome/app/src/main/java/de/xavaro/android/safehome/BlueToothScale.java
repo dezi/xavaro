@@ -201,7 +201,7 @@ public class BlueToothScale extends BlueTooth
     public boolean parseData(byte[] rd)
     {
         Log.d(LOGTAG, "parseData: " + rd[ 0 ] + " " + rd[ 1 ]);
-        Log.d(LOGTAG, "parseData: " + StaticUtils.hexBytesToString(rd));
+        Log.d(LOGTAG, "parseData: " + Simple.getHexBytesToString(rd));
 
         //region Single byte main instructions
 

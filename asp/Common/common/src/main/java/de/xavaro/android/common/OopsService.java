@@ -271,7 +271,7 @@ public class OopsService extends Service
             // Assemble packet.
             //
 
-            String body = "JSON" + StaticUtils.defuckJSON(msg.toString());
+            String body = "JSON" + Simple.JSONdefuck(msg.toString());
             byte[] data = body.getBytes();
 
             datagramPacket.setData(data);

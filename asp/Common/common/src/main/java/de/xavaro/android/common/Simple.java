@@ -299,6 +299,18 @@ public class Simple
         return 64;
     }
 
+    public static int getStatusBarHeight()
+    {
+        if (appContext != null)
+        {
+            int resourceId = appContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0)  return appContext.getResources().getDimensionPixelSize(resourceId);
+        }
+
+        return 20;
+    }
+
+
     @SuppressWarnings("SameReturnValue")
     public static String getDeviceName()
     {
@@ -308,7 +320,7 @@ public class Simple
     public static byte[] getUUIDBytes(String uuid)
     {
         String uuidstr = uuid.replace("-","");
-        return StaticUtils.hexStringToBytes(uuidstr);
+        return getHexStringToBytes(uuidstr);
     }
 
     public static String getUUIDString(byte[] bytes)
@@ -316,6 +328,41 @@ public class Simple
         ByteBuffer bb = ByteBuffer.wrap(bytes);
         UUID uuid = new UUID(bb.getLong(), bb.getLong());
         return uuid.toString();
+    }
+
+    public static String getHexBytesToString(byte[] bytes)
+    {
+        if (bytes == null) return null;
+
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[ bytes.length << 1 ];
+
+        for (int inx = 0; inx < bytes.length; inx++)
+        {
+            //noinspection PointlessArithmeticExpression
+            hexChars[ (inx << 1) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
+            //noinspection PointlessBitwiseExpression
+            hexChars[ (inx << 1) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
+        }
+
+        return String.valueOf(hexChars);
+    }
+
+    public static byte[] getHexStringToBytes(String hexstring)
+    {
+        if (hexstring == null) return null;
+
+        byte[] bytes = new byte[ hexstring.length() >> 1 ];
+
+        for (int inx = 0; inx < hexstring.length(); inx += 2)
+        {
+            //noinspection PointlessBitwiseExpression,PointlessArithmeticExpression
+            bytes[ inx >> 1 ] = (byte)
+                    ((Character.digit(hexstring.charAt(inx + 0), 16) << 4)
+                            + Character.digit(hexstring.charAt(inx + 1), 16) << 0);
+        }
+
+        return bytes;
     }
 
     //endregion All purpose simple getters
@@ -347,6 +394,32 @@ public class Simple
         {
             OopsService.log(LOGTAG, ex);
         }
+    }
+
+    @Nullable
+    public static String JSON2String(JSONObject jsonObject)
+    {
+        if (jsonObject != null)
+        {
+            try
+            {
+                return jsonObject.toString(2);
+            }
+            catch (JSONException ignored)
+            {
+            }
+        }
+
+        return null;
+    }
+
+    public static String JSONdefuck(String json)
+    {
+        //
+        // I hate slash escaping.
+        //
+
+        return json.replace("\\/","/");
     }
 
     //endregion JSON stuff

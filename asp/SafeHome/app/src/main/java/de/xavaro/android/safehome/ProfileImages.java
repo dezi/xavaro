@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class ProfileImages
@@ -266,7 +267,7 @@ public class ProfileImages
 
         if ((! ismatch) || (photo == null)) return null;
 
-        byte[] rawbytes = StaticUtils.hexStringToBytes(photo);
+        byte[] rawbytes = Simple.getHexStringToBytes(photo);
 
         return BitmapFactory.decodeByteArray(rawbytes, 0, rawbytes.length);
     }

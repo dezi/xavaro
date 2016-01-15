@@ -121,7 +121,7 @@ public class BlueToothSensor extends BlueTooth
     @Override
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
-        Log.d(LOGTAG, "parseResponse: " + StaticUtils.hexBytesToString(rd));
+        Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
 
         if ((rd[ 0 ] == (byte) 0xff) && (rd.length == 1))
         {

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 @SuppressWarnings("WeakerAccess")
@@ -335,7 +336,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
             if (ga.mode == GattAction.MODE_WRITE)
             {
-                Log.d(LOGTAG, "fireNext: write:" + ga.characteristic.getUuid() + "=" + StaticUtils.hexBytesToString(ga.data));
+                Log.d(LOGTAG, "fireNext: write:" + ga.characteristic.getUuid() + "=" + Simple.getHexBytesToString(ga.data));
                 ga.characteristic.setValue(ga.data);
                 currentGatt.writeCharacteristic(ga.characteristic);
             }
@@ -564,7 +565,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onCharacteristicWrite=" + characteristic.getUuid());
             Log.d(LOGTAG, "onCharacteristicWrite=" + status
-                    + "=" + StaticUtils.hexBytesToString(characteristic.getValue()));
+                    + "=" + Simple.getHexBytesToString(characteristic.getValue()));
 
             //
             // A change notification might come.
@@ -578,7 +579,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onDescriptorWrite=" + descriptor.getUuid());
             Log.d(LOGTAG, "onDescriptorWrite=" + status
-                    + "=" + StaticUtils.hexBytesToString(descriptor.getValue()));
+                    + "=" + Simple.getHexBytesToString(descriptor.getValue()));
 
             //
             // Fire next event immedeately.
@@ -592,7 +593,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onCharacteristicChanged=" + characteristic.getUuid());
             Log.d(LOGTAG, "onCharacteristicChanged="
-                    + StaticUtils.hexBytesToString(characteristic.getValue()));
+                    + Simple.getHexBytesToString(characteristic.getValue()));
 
             parseResponse(characteristic.getValue(), characteristic);
 
@@ -608,7 +609,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onCharacteristicRead=" + characteristic.getUuid());
             Log.d(LOGTAG, "onCharacteristicRead=" + status
-                    + "=" + StaticUtils.hexBytesToString(characteristic.getValue()));
+                    + "=" + Simple.getHexBytesToString(characteristic.getValue()));
 
             if (status == 0)
             {
@@ -627,7 +628,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onDescriptorRead=" + descriptor.getUuid());
             Log.d(LOGTAG, "onDescriptorRead=" + status
-                    + "=" + StaticUtils.hexBytesToString(descriptor.getValue()));
+                    + "=" + Simple.getHexBytesToString(descriptor.getValue()));
         }
     };
 
