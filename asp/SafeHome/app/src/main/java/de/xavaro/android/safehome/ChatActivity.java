@@ -94,7 +94,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                StaticUtils.getActionBarHeight(this));
+                Simple.getActionBarHeight());
 
         toolbar = new DitUndDat.Toolbar(this);
 
@@ -108,10 +108,27 @@ public class ChatActivity extends AppCompatActivity implements
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
 
-        scrollviewlp.setMargins(0, StaticUtils.getActionBarHeight(this) + 8, 0, 0);
+        scrollviewlp.setMargins(0, Simple.getActionBarHeight() + 8, 0, 0);
 
         scrollview = new ScrollView(this);
         scrollview.setLayoutParams(scrollviewlp);
+
+        scrollview.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent)
+            {
+                if (input.isFocusable())
+                {
+                    input.setFocusable(false);
+                    Simple.dismissKeyboard(input);
+                    input.setTag(1);
+                }
+
+                return false;
+            }
+        });
+
 
         topscreen.addView(scrollview);
 
@@ -134,7 +151,7 @@ public class ChatActivity extends AppCompatActivity implements
         lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(8, 8, 82, 8);
+        lp.setMargins(8, 8, Simple.getActionBarHeight() + 16, 8);
 
         input = new EditText(this);
         input.setBackgroundColor(0xffffffff);
@@ -142,9 +159,9 @@ public class ChatActivity extends AppCompatActivity implements
         input.setPadding(16, 12, 16, 12);
         input.setFocusable(false);
         input.setTextSize(30f);
-        input.setText("Nachricht schreiben");
+        input.setText("Nachricht");
         input.setTextColor(0x33333333);
-        input.setTag(false);
+        input.setTag(0);
 
         input.setOnTouchListener(new View.OnTouchListener()
         {
@@ -153,13 +170,14 @@ public class ChatActivity extends AppCompatActivity implements
             {
                 Log.d(LOGTAG, "onTouch");
 
-                if (! (boolean) input.getTag())
+                if (((int) input.getTag()) < 2)
                 {
+                    if (((int) input.getTag()) == 0) input.setText("");
+
                     input.setFocusable(true);
                     input.setFocusableInTouchMode(true);
-                    input.setText("");
                     input.setTextColor(0xff000000);
-                    input.setTag(true);
+                    input.setTag(2);
                 }
 
                 return false;
@@ -169,8 +187,8 @@ public class ChatActivity extends AppCompatActivity implements
         inputframe.addView(input);
 
         lp = new FrameLayout.LayoutParams(
-                StaticUtils.getActionBarHeight(this),
-                StaticUtils.getActionBarHeight(this),
+                Simple.getActionBarHeight(),
+                Simple.getActionBarHeight(),
                 Gravity.END + Gravity.BOTTOM);
         lp.setMargins(8, 8, 8, 8);
 
@@ -307,7 +325,7 @@ public class ChatActivity extends AppCompatActivity implements
             statusTime.setPadding(0, 0, 12, 0);
             statusTime.setText(Simple.getLocal24HTimeFromISO(date));
 
-            textLayout.addView(statusTime,lp);
+            textLayout.addView(statusTime, lp);
 
             protoIncoming.put(uuid, textLayout);
         }
@@ -446,7 +464,7 @@ public class ChatActivity extends AppCompatActivity implements
         {
             try
             {
-                if (! (boolean) input.getTag()) return;
+                if (((int) input.getTag()) == 0) return;
                 if (input.getText().length() == 0) return;
 
                 String message = input.getText().toString();
@@ -732,6 +750,8 @@ public class ChatActivity extends AppCompatActivity implements
 
     public void onIncomingMessage(JSONObject sendChatMessage)
     {
+        Log.d(LOGTAG,"onIncomingMessage:" + sendChatMessage.toString());
+
         createIncomingMessage(sendChatMessage);
 
         scrollview.post(new Runnable()

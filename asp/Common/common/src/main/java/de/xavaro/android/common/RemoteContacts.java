@@ -1,7 +1,8 @@
 package de.xavaro.android.common;
 
-import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+
+import android.content.SharedPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,26 +11,40 @@ public class RemoteContacts
 {
     private static final String LOGTAG = RemoteContacts.class.getSimpleName();
 
+    private static final String xPathRoot = "RemoteContacts/identities";
+
+    public static void deliverOwnContact(JSONObject rc)
+    {
+        SharedPreferences sp = Simple.getSharedPrefs();
+
+        try
+        {
+            rc.put("appName", Simple.getAppName());
+            rc.put("devName", Simple.getDeviceName());
+            rc.put("macAddr", Simple.getMacAddress());
+            rc.put("ownerFirstName", sp.getString("owner.firstname", null));
+            rc.put("ownerGivenName", sp.getString("owner.givenname", null));
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+
     public static boolean registerContact(JSONObject rc)
     {
         try
         {
             String ident = rc.getString("identity");
-            String appna = rc.has("appName") ? rc.getString("appName") : "";
-            String devna = rc.has("devName") ? rc.getString("devName") : "";
-            String macad = rc.has("macAddr") ? rc.getString("macAddr") : "";
-            String fname = rc.has("ownerFirstName") ? rc.getString("ownerFirstName") : "";
-            String lname = rc.has("ownerGivenName") ? rc.getString("ownerGivenName") : "";
-
-            String xpath = "RemoteContacts/identities/" + ident;
+            String xpath = xPathRoot + "/"  + ident;
             JSONObject recontact = PersistManager.getXpathJSONObject(xpath);
             if (recontact == null) recontact = new JSONObject();
 
-            recontact.put("appName", appna);
-            recontact.put("devName", devna);
-            recontact.put("macAddr", macad);
-            recontact.put("ownerFirstName", fname);
-            recontact.put("ownerGivenName", lname);
+            recontact.put("appName", rc.getString("appName"));
+            recontact.put("devName", rc.getString("devName"));
+            recontact.put("macAddr", rc.getString("macAddr"));
+            recontact.put("ownerFirstName", rc.getString("ownerFirstName"));
+            recontact.put("ownerGivenName", rc.getString("ownerGivenName"));
 
             PersistManager.putXpath(xpath, recontact);
             PersistManager.flush();
@@ -47,8 +62,7 @@ public class RemoteContacts
     @Nullable
     public static String getDisplayName(String ident)
     {
-        String xpath = "RemoteContacts/identities/" + ident;
-        JSONObject rc = PersistManager.getXpathJSONObject(xpath);
+        JSONObject rc = PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
 
         if (rc != null)
         {

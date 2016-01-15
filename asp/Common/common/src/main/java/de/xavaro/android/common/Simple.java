@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.TypedValue;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +35,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class Simple
@@ -280,10 +283,39 @@ public class Simple
         return 18f;
     }
 
+    public static int getActionBarHeight()
+    {
+        if (appContext != null)
+        {
+            TypedValue tv = new TypedValue();
+
+            if (appContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+            {
+                DisplayMetrics dm = appContext.getResources().getDisplayMetrics();
+                return TypedValue.complexToDimensionPixelSize(tv.data, dm);
+            }
+        }
+
+        return 64;
+    }
+
     @SuppressWarnings("SameReturnValue")
     public static String getDeviceName()
     {
         return android.os.Build.MODEL;
+    }
+
+    public static byte[] getUUIDBytes(String uuid)
+    {
+        String uuidstr = uuid.replace("-","");
+        return StaticUtils.hexStringToBytes(uuidstr);
+    }
+
+    public static String getUUIDString(byte[] bytes)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        UUID uuid = new UUID(bb.getLong(), bb.getLong());
+        return uuid.toString();
     }
 
     //endregion All purpose simple getters

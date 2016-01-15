@@ -321,11 +321,7 @@ public class CommService extends Service
                 responseOwnerIdentity.put("idremote", remoteIdentity);
                 responseOwnerIdentity.put("status", "success");
 
-                responseOwnerIdentity.put("appName", Simple.getAppName());
-                responseOwnerIdentity.put("devName", Simple.getDeviceName());
-                responseOwnerIdentity.put("macAddr", Simple.getMacAddress());
-                responseOwnerIdentity.put("ownerFirstName", sp.getString("owner.firstname", null));
-                responseOwnerIdentity.put("ownerGivenName", sp.getString("owner.givenname", null));
+                RemoteContacts.deliverOwnContact(responseOwnerIdentity);
 
                 CommService.sendEncrypted(responseOwnerIdentity);
 
@@ -350,7 +346,7 @@ public class CommService extends Service
             byte[] identBytes = new byte[ 16 ];
             System.arraycopy(data, 4, identBytes, 0, 16);
 
-            String ident = StaticUtils.getUUIDString(identBytes);
+            String ident = Simple.getUUIDString(identBytes);
 
             byte[] rest = new byte[ data.length - 36 ];
             System.arraycopy(data, 36, rest, 0, rest.length);
@@ -365,23 +361,28 @@ public class CommService extends Service
         {
             byte[] identBytes = new byte[ 16 ];
             System.arraycopy(data, 4, identBytes, 0, 16);
-            String ident = StaticUtils.getUUIDString(identBytes);
+            String ident = Simple.getUUIDString(identBytes);
 
             byte[] idremBytes = new byte[ 16 ];
             System.arraycopy(data, 20, idremBytes, 0, 16);
-            String idrem = StaticUtils.getUUIDString(idremBytes);
+            String idrem = Simple.getUUIDString(idremBytes);
 
             byte[] ackidBytes = new byte[ 16 ];
             System.arraycopy(data, 36, ackidBytes, 0, 16);
-            String ackid = StaticUtils.getUUIDString(ackidBytes);
+            String ackid = Simple.getUUIDString(ackidBytes);
 
             JSONObject serverAckMessage = new JSONObject();
 
             try
             {
+                //
+                // Server gave ack. So fake twisted identity and
+                // make it look like it came from remote site.
+                //
+
                 serverAckMessage.put("type", "serverAckMessage");
-                serverAckMessage.put("identity", ident);
-                serverAckMessage.put("idremote", idrem);
+                serverAckMessage.put("identity", idrem);
+                serverAckMessage.put("idremote", ident);
                 serverAckMessage.put("uuid", ackid);
             }
             catch (JSONException ex)
@@ -537,8 +538,8 @@ public class CommService extends Service
                         byte[] cryp = new byte[ 4 + 16 + 16 + encrypted.length ];
 
                         System.arraycopy("CRYP".getBytes(), 0, cryp, 0, 4);
-                        System.arraycopy(StaticUtils.getUUIDBytes(ident), 0, cryp,  4 , 16);
-                        System.arraycopy(StaticUtils.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                        System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
+                        System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
                         System.arraycopy(encrypted, 0, cryp, 36, encrypted.length);
 
                         datagramPacket.setData(cryp);
@@ -563,9 +564,9 @@ public class CommService extends Service
                         byte[] cryp = new byte[ 4 + 16 + 16 + 16 + encrypted.length ];
 
                         System.arraycopy("CACK".getBytes(), 0, cryp, 0, 4);
-                        System.arraycopy(StaticUtils.getUUIDBytes(ident), 0, cryp,  4 , 16);
-                        System.arraycopy(StaticUtils.getUUIDBytes(remid), 0, cryp, 20 , 16);
-                        System.arraycopy(StaticUtils.getUUIDBytes(ackid), 0, cryp, 36 , 16);
+                        System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
+                        System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                        System.arraycopy(Simple.getUUIDBytes(ackid), 0, cryp, 36 , 16);
                         System.arraycopy(encrypted, 0, cryp, 52, encrypted.length);
 
                         datagramPacket.setData(cryp);
@@ -606,7 +607,7 @@ public class CommService extends Service
                         if (mc.msg.getString("type").equals("ping"))
                         {
                             byte[] ping = new byte[ 4 + 16 ];
-                            byte[] uuid = StaticUtils.getUUIDBytes(SystemIdentity.identity);
+                            byte[] uuid = Simple.getUUIDBytes(SystemIdentity.identity);
 
                             System.arraycopy("PING".getBytes(), 0, ping, 0, 4);
                             System.arraycopy(uuid, 0, ping, 4 , 16);

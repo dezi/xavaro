@@ -599,34 +599,9 @@ public class StaticUtils
         }
     }
 
-    public static byte[] getUUIDBytes(String uuid)
-    {
-        String uuidstr = uuid.replace("-","");
-        return StaticUtils.hexStringToBytes(uuidstr);
-    }
-
-    public static String getUUIDString(byte[] bytes)
-    {
-        ByteBuffer bb = ByteBuffer.wrap(bytes);
-        UUID uuid = new UUID(bb.getLong(), bb.getLong());
-        return uuid.toString();
-    }
-
     public static String getAppName(Context context)
     {
         return context.getString(context.getApplicationInfo().labelRes);
-    }
-
-    public static int getActionBarHeight(Context context)
-    {
-        TypedValue tv = new TypedValue();
-
-        if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-        {
-            return TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
-        }
-
-        return 0;
     }
 
     //endregion

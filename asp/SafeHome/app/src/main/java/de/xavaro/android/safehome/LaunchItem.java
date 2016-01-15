@@ -1426,8 +1426,10 @@ public class LaunchItem extends FrameLayout implements
 
         //DitUndDat.SpeekDat.speak("Die Sprachausgabe von Android funktioniert prima.");
 
+        /*
         String xpath = "RemoteContacts/identities";
         PersistManager.delXpath(xpath);
         PersistManager.flush();
+        */
     }
 }

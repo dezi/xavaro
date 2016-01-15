@@ -52,7 +52,7 @@ public class CryptUtils
     @Nullable
     private static byte[] AESmakeKey(String uuid)
     {
-        return StaticUtils.getUUIDBytes(uuid);
+        return Simple.getUUIDBytes(uuid);
     }
 
     @Nullable

@@ -85,7 +85,7 @@ public class ChatManager implements
 
     public void unsubscribe(String identity, MessageCallback callback)
     {
-        if (callbacks.containsKey(identity)) callbacks.put(identity, callback);
+        if (callbacks.containsKey(identity)) callbacks.remove(identity);
 
         outgoingChatStatus.put(identity, "leftchat=" + Simple.nowAsISO());
 
@@ -282,6 +282,23 @@ public class ChatManager implements
     }
 
     @Nullable
+    private String getMessageIdentity(JSONObject message)
+    {
+        String identity = null;
+
+        try
+        {
+            identity = message.getString("identity");
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return identity;
+    }
+
+    @Nullable
     private String getMessageIdremote(JSONObject message)
     {
         String identity = null;
@@ -386,7 +403,7 @@ public class ChatManager implements
 
     private boolean onIncomingMessage(JSONObject message)
     {
-        String identity = getMessageIdremote(message);
+        String identity = getMessageIdentity(message);
         if (identity == null) return false;
 
         String uuid = getMessageUUID(message);
@@ -439,7 +456,7 @@ public class ChatManager implements
     {
         Log.d(LOGTAG,"onSetMessageStatus:" + status + "=" + message.toString());
 
-        String idremote = getMessageIdremote(message);
+        String idremote = getMessageIdentity(message);
         if (idremote == null) return;
 
         String uuid = getMessageUUID(message);
@@ -456,14 +473,10 @@ public class ChatManager implements
             @Override
             public void run()
             {
-                Log.d(LOGTAG,"hier1:" + cbidentity);
                 MessageCallback callback = callbacks.get(cbidentity);
-                Log.d(LOGTAG,"hier2:" + callback);
-
                 if (callback != null) callback.onSetMessageStatus(cbuuid, cbstatus);
             }
         });
-
     }
 
     //region Callback interface

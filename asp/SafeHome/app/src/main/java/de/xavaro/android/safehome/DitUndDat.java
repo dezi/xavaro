@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 //
@@ -122,7 +123,7 @@ public class DitUndDat
             int MP = ViewGroup.LayoutParams.MATCH_PARENT;
             int WC = ViewGroup.LayoutParams.WRAP_CONTENT;
 
-            int abheight = StaticUtils.getActionBarHeight(getContext());
+            int abheight = Simple.getActionBarHeight();
 
             setLayoutParams(new FrameLayout.LayoutParams(MP, abheight));
             setBackgroundColor(0xffff3456);
