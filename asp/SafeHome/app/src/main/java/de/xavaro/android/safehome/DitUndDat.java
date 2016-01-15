@@ -118,14 +118,11 @@ public class DitUndDat
 
         public void init()
         {
-            FrameLayout.LayoutParams lp;
-
-            int MP = ViewGroup.LayoutParams.MATCH_PARENT;
-            int WC = ViewGroup.LayoutParams.WRAP_CONTENT;
-
             int abheight = Simple.getActionBarHeight();
 
-            setLayoutParams(new FrameLayout.LayoutParams(MP, abheight));
+            FrameLayout.LayoutParams lp;
+
+            setLayoutParams(new FrameLayout.LayoutParams(Simple.MP, abheight));
             setBackgroundColor(0xffff3456);
 
             icon = new ImageView(getContext());
@@ -142,7 +139,7 @@ public class DitUndDat
             title.setTextSize(24f);
             title.setSingleLine();
 
-            lp = new FrameLayout.LayoutParams(WC, abheight - 26, Gravity.TOP);
+            lp = new FrameLayout.LayoutParams(Simple.WC, abheight - 28, Gravity.TOP);
             lp.leftMargin = abheight;
 
             addView(title, lp);
@@ -153,7 +150,7 @@ public class DitUndDat
             subtitle.setTextColor(Color.WHITE);
             subtitle.setSingleLine();
 
-            lp = new FrameLayout.LayoutParams(WC, 28, Gravity.BOTTOM);
+            lp = new FrameLayout.LayoutParams(Simple.WC, 28, Gravity.BOTTOM);
             lp.leftMargin = abheight;
 
             addView(subtitle, lp);

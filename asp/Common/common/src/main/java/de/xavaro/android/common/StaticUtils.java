@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -105,6 +106,29 @@ public class StaticUtils
         }
 
         return null;
+    }
+
+    public static String readFile(String path) throws IOException
+    {
+        BufferedReader reader = null;
+        try
+        {
+            StringBuilder output = new StringBuilder();
+            reader = new BufferedReader(new FileReader(path));
+            for (String line = reader.readLine(), newLine = ""; line != null; line = reader.readLine())
+            {
+                output.append(newLine).append(line);
+                newLine = "\n";
+            }
+            return output.toString();
+        }
+        finally
+        {
+            if (reader != null)
+            {
+                reader.close();
+            }
+        }
     }
 
     //endregion
@@ -491,6 +515,19 @@ public class StaticUtils
     public static String getAppName(Context context)
     {
         return context.getString(context.getApplicationInfo().labelRes);
+    }
+
+    public static boolean isPlainASCII(String string)
+    {
+        byte[] bytes = string.getBytes();
+
+        for (int inx = 0; inx < bytes.length; inx++)
+        {
+            if ((bytes[ inx ] & 0xff) > 127) return false;
+
+        }
+
+        return true;
     }
 
     //endregion

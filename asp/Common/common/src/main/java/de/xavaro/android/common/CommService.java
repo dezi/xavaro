@@ -535,12 +535,23 @@ public class CommService extends Service
             String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
             datagramPacket.setData(body.getBytes());
 
+            if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
+                    && Simple.JSONgetString(mc.msg, "type").equals("ping"))
+            {
+                String ident = SystemIdentity.identity;
+
+                byte[] ping = new byte[ 4 + 16 ];
+
+                System.arraycopy("PING".getBytes(), 0, ping, 0, 4);
+                System.arraycopy(Simple.getUUIDBytes(ident), 0, ping, 4 , 16);
+
+                datagramPacket.setData(ping);
+            }
+
             if ((mc.enc == MessageClass.CLIENT_ACK) && mc.msg.has("uuid"))
             {
                 String ident = SystemIdentity.identity;
                 String uuid = Simple.JSONgetString(mc.msg, "uuid");
-
-                Log.d(LOGTAG,"++++++++++++++++++++++++++ACME:" + uuid);
 
                 byte[] acme = new byte[ 4 + 16 + 16 ];
                 System.arraycopy("ACME".getBytes(), 0, acme, 0, 4);
@@ -548,8 +559,6 @@ public class CommService extends Service
                 System.arraycopy(Simple.getUUIDBytes(uuid), 0, acme, 20, 16);
 
                 datagramPacket.setData(acme);
-
-                Log.d(LOGTAG, "++++++++++++++++++++++++++ACME:" + uuid);
             }
 
             if ((mc.enc == MessageClass.CRYPT) && mc.msg.has("idremote"))
@@ -629,18 +638,8 @@ public class CommService extends Service
                     }
                     else
                     {
-                        if (mc.msg.getString("type").equals("ping"))
-                        {
-                            byte[] ping = new byte[ 4 + 16 ];
-                            byte[] uuid = Simple.getUUIDBytes(SystemIdentity.identity);
-
-                            System.arraycopy("PING".getBytes(), 0, ping, 0, 4);
-                            System.arraycopy(uuid, 0, ping, 4 , 16);
-
-                            datagramPacket.setData(ping);
-                        }
-
                         Log.d(LOGTAG, "sendThread: " + datagramPacket.getData().length + "=" + mc.msg.getString("type"));
+
                         datagramSocket.setTTL(200);
                         datagramSocket.send(datagramPacket);
                     }

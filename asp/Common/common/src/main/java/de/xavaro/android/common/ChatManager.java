@@ -196,7 +196,7 @@ public class ChatManager implements
                     recvOnlineStatus.put("chatdate", chatdate);
                     recvOnlineStatus.put("date", Simple.nowAsISO());
 
-                    CommService.sendEncryptedReliable(recvOnlineStatus);
+                    CommService.sendEncrypted(recvOnlineStatus);
 
                     return;
                 }

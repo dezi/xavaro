@@ -36,6 +36,8 @@ import java.util.TimeZone;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class Simple
@@ -310,7 +312,6 @@ public class Simple
         return 20;
     }
 
-
     @SuppressWarnings("SameReturnValue")
     public static String getDeviceName()
     {
@@ -363,6 +364,16 @@ public class Simple
         }
 
         return bytes;
+    }
+
+    @Nullable
+    public static String getFirstMatch(String regex, String content)
+    {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+        if (! matcher.find()) return null;
+
+        return matcher.group(1);
     }
 
     //endregion All purpose simple getters
@@ -526,102 +537,73 @@ public class Simple
 
     //region Layout params
 
-    public static FrameLayout.LayoutParams layoutParamsWW(int gravity)
-    {
-        return new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                gravity);
-    }
-
-    public static FrameLayout.LayoutParams layoutParamsMM(int gravity)
-    {
-        return new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                gravity);
-    }
-
-    public static FrameLayout.LayoutParams layoutParamsMW(int gravity)
-    {
-        return new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                gravity);
-    }
-
-    public static FrameLayout.LayoutParams layoutParamsWM(int gravity)
-    {
-        return new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                gravity);
-    }
+    public static final int MP = ViewGroup.LayoutParams.MATCH_PARENT;
+    public static final int WC = ViewGroup.LayoutParams.WRAP_CONTENT;
 
     public static ViewGroup.LayoutParams layoutParamsWW()
     {
-        return new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        return new ViewGroup.LayoutParams(WC, WC);
     }
 
     public static ViewGroup.LayoutParams layoutParamsMM()
     {
-        return new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+        return new ViewGroup.LayoutParams(MP, MP);
     }
 
     public static ViewGroup.LayoutParams layoutParamsMW()
     {
-        return new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        return new ViewGroup.LayoutParams(MP, WC);
     }
 
     public static ViewGroup.LayoutParams layoutParamsWM()
     {
-        return new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+        return new ViewGroup.LayoutParams(WC, MP);
+    }
+
+    public static FrameLayout.LayoutParams layoutParamsWW(int gravity)
+    {
+        return new FrameLayout.LayoutParams(WC, WC, gravity);
+    }
+
+    public static FrameLayout.LayoutParams layoutParamsMM(int gravity)
+    {
+        return new FrameLayout.LayoutParams(MP, MP, gravity);
+    }
+
+    public static FrameLayout.LayoutParams layoutParamsMW(int gravity)
+    {
+        return new FrameLayout.LayoutParams(MP, WC, gravity);
+    }
+
+    public static FrameLayout.LayoutParams layoutParamsWM(int gravity)
+    {
+        return new FrameLayout.LayoutParams(WC, MP, gravity);
     }
 
     public static LinearLayout.LayoutParams layoutParamsWW(int left, int top, int right, int bottom)
     {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(WC, WC);
         lp.setMargins(left, top, right, bottom);
         return lp;
     }
 
     public static LinearLayout.LayoutParams layoutParamsMM(int left, int top, int right, int bottom)
     {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(MP, MP);
         lp.setMargins(left, top, right, bottom);
         return lp;
     }
 
     public static LinearLayout.LayoutParams layoutParamsMW(int left, int top, int right, int bottom)
     {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(MP, WC);
         lp.setMargins(left, top, right, bottom);
         return lp;
     }
 
     public static LinearLayout.LayoutParams layoutParamsWM(int left, int top, int right, int bottom)
     {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(WC, MP);
         lp.setMargins(left, top, right, bottom);
         return lp;
     }

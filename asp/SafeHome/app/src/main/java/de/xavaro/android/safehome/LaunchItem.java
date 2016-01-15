@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.app.ActivityManager;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
@@ -34,11 +35,14 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.ProcessManager;
+import de.xavaro.android.common.ProcessManagerJunk;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
@@ -1431,5 +1435,14 @@ public class LaunchItem extends FrameLayout implements
         PersistManager.delXpath(xpath);
         PersistManager.flush();
         */
+
+        //ProcessManager.getProcesses(true);
+
+        File[] files = new File("/proc/2705").listFiles();
+
+        for (File file : files)
+        {
+            Log.d(LOGTAG, "list=" + file.toString());
+        }
     }
 }

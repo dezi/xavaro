@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.content.Intent;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.graphics.PixelFormat;
 import android.widget.Toast;
 
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.ProcessManager;
 
 /*
  * Service to monitor foreign and system apps activity
@@ -58,7 +60,7 @@ public class KioskService extends Service
     private String recentProc = null;
     private boolean running = false;
 
-    private static final long INTERVAL = 100;
+    private static final long INTERVAL = 1000;
 
     @Override
     public void onCreate()
@@ -113,14 +115,18 @@ public class KioskService extends Service
                 {
                     while (running)
                     {
+                        /*
                         if (CommonStatic.focused)
                         {
                             recentProc = getPackageName();
                         }
                         else
+                        */
                         {
                             handleKioskMode();
                         }
+
+                        Log.d(LOGTAG,"Alive...");
 
                         try
                         {
@@ -137,7 +143,7 @@ public class KioskService extends Service
             wdThread.start();
         }
 
-        return Service.START_NOT_STICKY; // Service.START_STICKY <=> Service.START_NOT_STICKY;
+        return Service.START_STICKY; // Service.START_STICKY <=> Service.START_NOT_STICKY;
     }
 
     //
@@ -145,7 +151,7 @@ public class KioskService extends Service
     // apps into system default app list.
     //
 
-    private void registerDefsystemApps()
+    private void registerDefsystemAppsOld()
     {
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> piList = am.getRunningAppProcesses();
@@ -166,6 +172,18 @@ public class KioskService extends Service
             Log.d(LOGTAG, "registerDefsystemApps=" + pi.processName + "=" + pi.importance);
 
             defsystemApps.add(pi.processName);
+        }
+    }
+
+    private void registerDefsystemApps()
+    {
+        Map<Integer, ProcessManager.ProcessInfo> procs = ProcessManager.getProcesses(true);
+
+        for (Map.Entry<Integer, ProcessManager.ProcessInfo> pid : procs.entrySet())
+        {
+            ProcessManager.ProcessInfo pi = pid.getValue();
+
+            defsystemApps.add(pi.name);
         }
     }
 
@@ -228,7 +246,7 @@ public class KioskService extends Service
         }
     };
 
-    private void handleKioskMode()
+    private void handleKioskModeOld()
     {
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> piList = am.getRunningAppProcesses();
@@ -247,8 +265,9 @@ public class KioskService extends Service
             String proc = pi.processName;
             String mode = getAppType(proc);
 
-            //Log.d(LOGTAG, "APP:" + mode + "=" + proc + "=" + pi.importance);
+            Log.d(LOGTAG, "APP:" + mode + "=" + proc + "=" + pi.importance);
 
+            /*
             String currentMessage = mode + " => " + proc;
 
             boolean showit = true;
@@ -285,6 +304,63 @@ public class KioskService extends Service
             {
                 restoreRecentProc();
             }
+            */
+        }
+    }
+
+    private void handleKioskMode()
+    {
+        Map<Integer, ProcessManager.ProcessInfo> procs = ProcessManager.getProcesses(false);
+
+        for (Map.Entry<Integer, ProcessManager.ProcessInfo> pid : procs.entrySet())
+        {
+            ProcessManager.ProcessInfo pi = pid.getValue();
+
+            String proc = pi.name;
+            String mode = getAppType(proc);
+
+            if (mode.equals("ds")) continue;
+
+            Log.d(LOGTAG, "APP:" + mode + "=" + proc);
+
+            /*
+            String currentMessage = mode + " => " + proc;
+
+            boolean showit = true;
+            boolean blockit = false;
+
+            if (mode.equals("xx") || mode.equals("bl"))
+            {
+                currentMessage = "Blocking" + " " + proc;
+                blockit = true;
+            }
+
+            if (mode.equals("me") || mode.equals("wl") || mode.equals("os"))
+            {
+                if (recentProc.equals(proc)) showit = false;
+
+                recentProc = proc;
+            }
+
+            if ((alertMessage == null) || ! alertMessage.equals(currentMessage))
+            {
+                alertMessage = currentMessage;
+
+                if (showit) handler.post(handleAlert);
+            }
+
+            if (proc.equals("com.android.systemui.recentsactivity"))
+            {
+                String what = DitUndDat.SharedPrefs.sharedPrefs.getString("admin.recent.button","");
+
+                if (what.equals("android")) blockit = false;
+            }
+
+            if (blockit && DitUndDat.DefaultApps.isDefaultHome(this))
+            {
+                restoreRecentProc();
+            }
+            */
         }
     }
 

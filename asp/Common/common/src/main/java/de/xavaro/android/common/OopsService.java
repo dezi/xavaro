@@ -2,7 +2,6 @@ package de.xavaro.android.common;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.system.OsConstants;
 import android.util.Log;
@@ -11,14 +10,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.io.IOException;
-
 import java.net.UnknownHostException;
 import java.net.SocketException;
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.io.IOException;
 
 //
 // Remote logging for "This should never happen" problems
@@ -339,28 +337,9 @@ public class OopsService extends Service
 
     //endregion
 
-    //region Binder methods.
-
-    //
-    // Binder stuff allows anyone to call methods here.
-    //
-
-    private final IBinder binder = new OopsBinder();
-
-    private class OopsBinder extends Binder
-    {
-        @SuppressWarnings("unused")
-        OopsService getService()
-        {
-            return OopsService.this;
-        }
-    }
-
     @Override
     public IBinder onBind(Intent intent)
     {
-        return binder;
+        return null;
     }
-
-    //endregion
 }

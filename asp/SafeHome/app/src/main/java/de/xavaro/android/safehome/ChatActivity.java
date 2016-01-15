@@ -646,6 +646,7 @@ public class ChatActivity extends AppCompatActivity implements
         handler.postDelayed(displayRemoteStatus, 1000);
     }
 
+    private boolean wasInChat;
 
     private final Runnable displayRemoteStatus = new Runnable()
     {
@@ -678,11 +679,12 @@ public class ChatActivity extends AppCompatActivity implements
             {
                 if (incomingChatType.equals("joinchat"))
                 {
-                    chatstatus = "Jetzt im Chat";
+                    chatstatus = "jetzt im Chat";
+                    wasInChat = true;
                 }
                 else
                 {
-                    chatstatus = "Hat den Chat verlassen";
+                    if (wasInChat) chatstatus = "hat den Chat verlassen";
                 }
             }
 
@@ -720,7 +722,7 @@ public class ChatActivity extends AppCompatActivity implements
 
                 if (secsago < 60)
                 {
-                    onlinestatus = "Online";
+                    onlinestatus = "ist online";
                 }
                 else
                 {
@@ -769,6 +771,8 @@ public class ChatActivity extends AppCompatActivity implements
             if (status == null) status = "Offline";
 
             toolbar.subtitle.setText(status);
+
+            handler.postDelayed(displayRemoteStatus, 10000);
         }
     };
 
