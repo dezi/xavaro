@@ -50,12 +50,6 @@ public class KioskService extends Service
 
     private Thread wdThread = null;
 
-    //
-    // Binder service.
-    //
-
-    private final IBinder binder = new KioskBinder();
-
     private String alertMessage;
     private Toast alertToast;
 
@@ -63,7 +57,6 @@ public class KioskService extends Service
 
     private String recentProc = null;
     private boolean running = false;
-    private boolean focused = false;
 
     private static final long INTERVAL = 100;
 
@@ -120,7 +113,14 @@ public class KioskService extends Service
                 {
                     while (running)
                     {
-                        if (! focused) handleKioskMode();
+                        if (CommonStatic.focused)
+                        {
+                            recentProc = getPackageName();
+                        }
+                        else
+                        {
+                            handleKioskMode();
+                        }
 
                         try
                         {
@@ -313,33 +313,9 @@ public class KioskService extends Service
         }
     }
 
-    //
-    // Set if main activity has focus.
-    //
-
-    public void setFocused(String activity,boolean hasFocus)
-    {
-        Log.d(LOGTAG, "setFocused: " + activity + "=" + hasFocus);
-
-        recentProc = getPackageName();
-        focused = hasFocus;
-    }
-
-    //
-    // Binder stuff allows activity to call methods here.
-    //
-
-    public class KioskBinder extends Binder
-    {
-        KioskService getService()
-        {
-            return KioskService.this;
-        }
-    }
-
     @Override
     public IBinder onBind(Intent intent)
     {
-        return binder;
+        return null;
     }
 }

@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import de.xavaro.android.common.ChatManager;
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
@@ -231,6 +232,18 @@ public class ChatActivity extends AppCompatActivity implements
         super.onStop();
 
         ChatManager.getInstance(context).unsubscribe(idremote, this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        Log.d(LOGTAG, "onWindowFocusChanged=" + hasFocus);
+
+        super.onWindowFocusChanged(hasFocus);
+
+        CommonStatic.setFocused(ChatActivity.class.getSimpleName(), hasFocus);
+
+        if (hasFocus) handler.postDelayed(makeFullscreen, 500);
     }
 
     private final Runnable makeFullscreen = new Runnable()

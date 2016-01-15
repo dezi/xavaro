@@ -5,6 +5,7 @@ import android.preference.PreferenceActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.PersistManager;
@@ -36,6 +38,16 @@ public class SettingsActivity extends PreferenceActivity
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        Log.d(LOGTAG, "onWindowFocusChanged=" + hasFocus);
+
+        super.onWindowFocusChanged(hasFocus);
+
+        CommonStatic.setFocused(SettingsActivity.class.getSimpleName(), hasFocus);
     }
 
     @Override

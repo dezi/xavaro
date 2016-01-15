@@ -6,7 +6,6 @@ import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.system.OsConstants;
 import android.util.Log;
@@ -28,21 +27,6 @@ import java.util.Map;
 public class CommService extends Service
 {
     private static final String LOGTAG = CommService.class.getSimpleName();
-
-    //region Static singleton methods.
-
-    private static CommService myService;
-
-    public static void setInstance(CommService service)
-    {
-        myService = service;
-    }
-
-    @Nullable
-    public static CommService getInstance()
-    {
-        return myService;
-    }
 
     private static final ArrayList<MessageClass> messageBacklog = new ArrayList<>();
 
@@ -141,7 +125,6 @@ public class CommService extends Service
     private Thread workerRecv = null;
 
     private boolean running = false;
-
 
     //region Overriden methods.
 
@@ -373,24 +356,15 @@ public class CommService extends Service
 
             JSONObject serverAckMessage = new JSONObject();
 
-            try
-            {
-                //
-                // Server gave ack. So fake twisted identity and
-                // make it look like it came from remote site.
-                //
+            //
+            // Server gave ack. So fake twisted identity and
+            // make it look like it came from remote site.
+            //
 
-                serverAckMessage.put("type", "serverAckMessage");
-                serverAckMessage.put("identity", idrem);
-                serverAckMessage.put("idremote", ident);
-                serverAckMessage.put("uuid", ackid);
-            }
-            catch (JSONException ex)
-            {
-                OopsService.log(LOGTAG, ex);
-
-                return;
-            }
+            Simple.JSONput(serverAckMessage, "type", "serverAckMessage");
+            Simple.JSONput(serverAckMessage, "identity", idrem);
+            Simple.JSONput(serverAckMessage, "idremote", ident);
+            Simple.JSONput(serverAckMessage, "uuid", ackid);
 
             String ackmess = "JSON" + serverAckMessage.toString();
 
@@ -598,7 +572,7 @@ public class CommService extends Service
                         // Keep NAT connection alive with bogus packet.
                         //
 
-                        datagramSocket.setTTL(200);
+                        datagramSocket.setTTL(10);
                         datagramPacket.setData("PUPS".getBytes());
                         datagramSocket.send(datagramPacket);
                     }
@@ -723,26 +697,10 @@ public class CommService extends Service
         }
     }
 
-    //region Binder methods.
-
-    //
-    // Binder stuff allows anyone to call methods here.
-    //
-
-    private final IBinder binder = new CommBinder();
-
-    public class CommBinder extends Binder
-    {
-        public CommService getService()
-        {
-            return CommService.this;
-        }
-    }
-
     @Override
     public IBinder onBind(Intent intent)
     {
-        return binder;
+        return null;
     }
 
     //endregion

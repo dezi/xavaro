@@ -1,12 +1,8 @@
 package de.xavaro.android.safehome;
 
 import android.support.v7.app.AppCompatActivity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.StrictMode;
 import android.os.Bundle;
 import android.util.Log;
@@ -148,12 +144,6 @@ public class HomeActivity extends AppCompatActivity implements
     {
         super.onStart();
 
-        Intent kioskIntent = new Intent(this, KioskService.class);
-        bindService(kioskIntent, kioskConnection, Context.BIND_AUTO_CREATE);
-
-        Intent commIntent = new Intent(this, CommService.class);
-        bindService(commIntent, commConnection, Context.BIND_AUTO_CREATE);
-
         Log.d(LOGTAG, "onStart...");
 
         UpdateManager.selfUpdate(this, false);
@@ -204,9 +194,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onStop();
 
-        if (kioskService != null) unbindService(kioskConnection);
-        if (CommService.getInstance() != null) unbindService(commConnection);
-
         DitUndDat.InternetState.unsubscribe(this);
     }
 
@@ -217,7 +204,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onWindowFocusChanged(hasFocus);
 
-        if (kioskService != null) kioskService.setFocused(LOGTAG, hasFocus);
+        CommonStatic.setFocused(HomeActivity.class.getSimpleName(), hasFocus);
 
         if (hasFocus) handler.postDelayed(makeFullscreen, 500);
 
@@ -378,36 +365,4 @@ public class HomeActivity extends AppCompatActivity implements
             ex.printStackTrace();
         }
     }
-
-    private ServiceConnection kioskConnection = new ServiceConnection()
-    {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {
-            KioskService.KioskBinder binder = (KioskService.KioskBinder) service;
-            kioskService = binder.getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0)
-        {
-            kioskService = null;
-        }
-    };
-
-    private ServiceConnection commConnection = new ServiceConnection()
-    {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {
-            CommService.CommBinder binder = (CommService.CommBinder) service;
-            CommService.setInstance(binder.getService());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0)
-        {
-            CommService.setInstance(null);
-        }
-    };
 }
