@@ -257,7 +257,18 @@ public class ChatActivity extends AppCompatActivity implements
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
 
-            topscreen.setSystemUiVisibility(topscreen.getSystemUiVisibility() + UI_HIDE);
+            if (input.hasFocus())
+            {
+                //
+                // Focus with keyboard requires status bar for
+                // keyboard selection. Hiding the status bar now
+                // yields in a transparent, unreadable status bar.
+                //
+            }
+            else
+            {
+                topscreen.setSystemUiVisibility(topscreen.getSystemUiVisibility() + UI_HIDE);
+            }
         }
     };
 

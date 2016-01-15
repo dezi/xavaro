@@ -397,6 +397,21 @@ public class Simple
     }
 
     @Nullable
+    public static String JSONgetString(JSONObject json, String key)
+    {
+        try
+        {
+            return json.getString(key);
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static String JSON2String(JSONObject jsonObject)
     {
         if (jsonObject != null)

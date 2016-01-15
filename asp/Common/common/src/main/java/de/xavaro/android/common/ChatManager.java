@@ -134,7 +134,7 @@ public class ChatManager implements
             sendChatMessage.put("message", message);
             sendChatMessage.put("uuid", uuid);
 
-            CommService.sendEncryptedWithAck(sendChatMessage);
+            CommService.sendEncryptedReliable(sendChatMessage);
 
             updateOutgoingProtocoll(idremote, sendChatMessage, "date");
         }
@@ -196,7 +196,7 @@ public class ChatManager implements
                     recvOnlineStatus.put("chatdate", chatdate);
                     recvOnlineStatus.put("date", Simple.nowAsISO());
 
-                    CommService.sendEncrypted(recvOnlineStatus);
+                    CommService.sendEncryptedReliable(recvOnlineStatus);
 
                     return;
                 }
@@ -229,7 +229,7 @@ public class ChatManager implements
                     feedbackChatMessage.put("idremote", idremote);
                     feedbackChatMessage.put("uuid", uuid);
 
-                    CommService.sendEncrypted(feedbackChatMessage);
+                    CommService.sendEncryptedReliable(feedbackChatMessage);
 
                     return;
                 }
@@ -378,6 +378,20 @@ public class ChatManager implements
 
             JSONObject proto = new JSONObject(message.toString());
 
+            if ((status == "acks") && ! outgoing.has(uuid))
+            {
+                //
+                // Multiple server acks regarding this
+                // message also on receiver side from
+                // received and read feedback messages.
+                // We only care for server acks, if the
+                // message is outgoing and already
+                // registered.
+                //
+
+                return;
+            }
+
             if (! outgoing.has(uuid))
             {
                 if (proto.has("uuid")) proto.remove("uuid");
@@ -389,6 +403,16 @@ public class ChatManager implements
             else
             {
                 proto = outgoing.getJSONObject(uuid);
+            }
+
+            if ((status == "acks") && proto.has(status))
+            {
+                //
+                // Multiple server acks regarding this
+                // message. We only need the first one.
+                //
+
+                return;
             }
 
             proto.put(status, Simple.nowAsISO());

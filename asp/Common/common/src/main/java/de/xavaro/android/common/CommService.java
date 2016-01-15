@@ -34,9 +34,11 @@ public class CommService extends Service
 
     private static class MessageClass
     {
-        public static final int ENCRYPT_NONE = 0;
-        public static final int ENCRYPT_CRYPT = 1;
-        public static final int ENCRYPT_CRYPT_WITH_ACK = 2;
+        public static final int NONE = 0;
+        public static final int CRYPT = 1;
+        public static final int CRYPT_WITH_ACK = 2;
+        public static final int CRYPT_RELIABLE = 3;
+        public static final int CLIENT_ACK = 4;
 
         public final JSONObject msg;
         public final int enc;
@@ -48,11 +50,19 @@ public class CommService extends Service
         }
     }
 
+    private static void sendClientAck(JSONObject message)
+    {
+        synchronized (messageBacklog)
+        {
+            messageBacklog.add(new MessageClass(message, MessageClass.CLIENT_ACK));
+        }
+    }
+
     public static void sendMessage(JSONObject message)
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.ENCRYPT_NONE));
+            messageBacklog.add(new MessageClass(message, MessageClass.NONE));
         }
     }
 
@@ -60,7 +70,7 @@ public class CommService extends Service
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.ENCRYPT_CRYPT));
+            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT));
         }
     }
 
@@ -68,7 +78,15 @@ public class CommService extends Service
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.ENCRYPT_CRYPT_WITH_ACK));
+            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT_WITH_ACK));
+        }
+    }
+
+    public static void sendEncryptedReliable(JSONObject message)
+    {
+        synchronized (messageBacklog)
+        {
+            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT_RELIABLE));
         }
     }
 
@@ -326,15 +344,50 @@ public class CommService extends Service
 
         if (ptype.equals("CRYP"))
         {
-            byte[] identBytes = new byte[ 16 ];
-            System.arraycopy(data, 4, identBytes, 0, 16);
-
-            String ident = Simple.getUUIDString(identBytes);
+            byte[] idremBytes = new byte[ 16 ];
+            System.arraycopy(data, 4, idremBytes, 0, 16);
+            String idrem = Simple.getUUIDString(idremBytes);
 
             byte[] rest = new byte[ data.length - 36 ];
             System.arraycopy(data, 36, rest, 0, rest.length);
 
-            data = CryptUtils.AESdecrypt(ident, rest);
+            data = CryptUtils.AESdecrypt(idrem, rest);
+            if (data == null) return;
+
+            ptype = new String(data, 0, 4);
+        }
+
+        if (ptype.equals("CARL"))
+        {
+            byte[] idremBytes = new byte[ 16 ];
+            System.arraycopy(data, 4, idremBytes, 0, 16);
+            String idrem = Simple.getUUIDString(idremBytes);
+
+            byte[] identBytes = new byte[ 16 ];
+            System.arraycopy(data, 20, identBytes, 0, 16);
+            String ident = Simple.getUUIDString(identBytes);
+
+            byte[] ackidBytes = new byte[ 16 ];
+            System.arraycopy(data, 36, ackidBytes, 0, 16);
+            String ackid = Simple.getUUIDString(ackidBytes);
+
+            //
+            // Send client ack to server.
+            //
+
+            JSONObject clientAckMessage = new JSONObject();
+            Simple.JSONput(clientAckMessage, "type", "clientAckMessage");
+            Simple.JSONput(clientAckMessage, "uuid", ackid);
+            sendClientAck(clientAckMessage);
+
+            //
+            // Process message.
+            //
+
+            byte[] rest = new byte[ data.length - 52 ];
+            System.arraycopy(data, 52, rest, 0, rest.length);
+
+            data = CryptUtils.AESdecrypt(idrem, rest);
             if (data == null) return;
 
             ptype = new String(data, 0, 4);
@@ -342,13 +395,13 @@ public class CommService extends Service
 
         if (ptype.equals("CACK"))
         {
-            byte[] identBytes = new byte[ 16 ];
-            System.arraycopy(data, 4, identBytes, 0, 16);
-            String ident = Simple.getUUIDString(identBytes);
-
             byte[] idremBytes = new byte[ 16 ];
-            System.arraycopy(data, 20, idremBytes, 0, 16);
+            System.arraycopy(data, 4, idremBytes, 0, 16);
             String idrem = Simple.getUUIDString(idremBytes);
+
+            byte[] identBytes = new byte[ 16 ];
+            System.arraycopy(data, 20, identBytes, 0, 16);
+            String ident = Simple.getUUIDString(identBytes);
 
             byte[] ackidBytes = new byte[ 16 ];
             System.arraycopy(data, 36, ackidBytes, 0, 16);
@@ -356,14 +409,9 @@ public class CommService extends Service
 
             JSONObject serverAckMessage = new JSONObject();
 
-            //
-            // Server gave ack. So fake twisted identity and
-            // make it look like it came from remote site.
-            //
-
             Simple.JSONput(serverAckMessage, "type", "serverAckMessage");
-            Simple.JSONput(serverAckMessage, "identity", idrem);
-            Simple.JSONput(serverAckMessage, "idremote", ident);
+            Simple.JSONput(serverAckMessage, "identity", ident);
+            Simple.JSONput(serverAckMessage, "idremote", idrem);
             Simple.JSONput(serverAckMessage, "uuid", ackid);
 
             String ackmess = "JSON" + serverAckMessage.toString();
@@ -480,77 +528,80 @@ public class CommService extends Service
             }
 
             //
-            // Add identity to message.
+            // Add own identity to message and prepare.
             //
 
-            try
+            Simple.JSONput(mc.msg, "identity", SystemIdentity.identity);
+            String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
+            datagramPacket.setData(body.getBytes());
+
+            if ((mc.enc == MessageClass.CLIENT_ACK) && mc.msg.has("uuid"))
             {
-                mc.msg.put("identity", SystemIdentity.identity);
-            }
-            catch (JSONException ex)
-            {
-                OopsService.log(LOGTAG, ex);
+                String ident = SystemIdentity.identity;
+                String uuid = Simple.JSONgetString(mc.msg, "uuid");
+
+                Log.d(LOGTAG,"++++++++++++++++++++++++++ACME:" + uuid);
+
+                byte[] acme = new byte[ 4 + 16 + 16 ];
+                System.arraycopy("ACME".getBytes(), 0, acme, 0, 4);
+                System.arraycopy(Simple.getUUIDBytes(ident), 0, acme,  4 , 16);
+                System.arraycopy(Simple.getUUIDBytes(uuid), 0, acme, 20, 16);
+
+                datagramPacket.setData(acme);
+
+                Log.d(LOGTAG, "++++++++++++++++++++++++++ACME:" + uuid);
             }
 
-            try
+            if ((mc.enc == MessageClass.CRYPT) && mc.msg.has("idremote"))
             {
-                String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
-                datagramPacket.setData(body.getBytes());
+                //
+                // Encrypt message.
+                //
 
-                if ((mc.enc == MessageClass.ENCRYPT_CRYPT) && mc.msg.has("idremote"))
+                String ident = SystemIdentity.identity;
+                String remid = Simple.JSONgetString(mc.msg, "idremote");
+                byte[] encrypted = CryptUtils.AESencrypt(remid, body);
+
+                if (encrypted != null)
                 {
-                    //
-                    // Encrypt message.
-                    //
+                    byte[] cryp = new byte[ 4 + 16 + 16 + encrypted.length ];
 
-                    String ident = SystemIdentity.identity;
-                    String remid = mc.msg.getString("idremote");
-                    byte[] encrypted = CryptUtils.AESencrypt(remid, body);
+                    System.arraycopy("CRYP".getBytes(), 0, cryp, 0, 4);
+                    System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
+                    System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                    System.arraycopy(encrypted, 0, cryp, 36, encrypted.length);
 
-                    if (encrypted != null)
-                    {
-                        byte[] cryp = new byte[ 4 + 16 + 16 + encrypted.length ];
-
-                        System.arraycopy("CRYP".getBytes(), 0, cryp, 0, 4);
-                        System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
-                        System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
-                        System.arraycopy(encrypted, 0, cryp, 36, encrypted.length);
-
-                        datagramPacket.setData(cryp);
-                    }
+                    datagramPacket.setData(cryp);
                 }
-
-                if ((mc.enc == MessageClass.ENCRYPT_CRYPT_WITH_ACK)
-                        && mc.msg.has("idremote") && mc.msg.has("uuid"))
-                {
-                    //
-                    // Encrypt message.
-                    //
-
-                    String ident = SystemIdentity.identity;
-                    String remid = mc.msg.getString("idremote");
-                    String ackid = mc.msg.getString("uuid");
-
-                    byte[] encrypted = CryptUtils.AESencrypt(remid, body);
-
-                    if (encrypted != null)
-                    {
-                        byte[] cryp = new byte[ 4 + 16 + 16 + 16 + encrypted.length ];
-
-                        System.arraycopy("CACK".getBytes(), 0, cryp, 0, 4);
-                        System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
-                        System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
-                        System.arraycopy(Simple.getUUIDBytes(ackid), 0, cryp, 36 , 16);
-                        System.arraycopy(encrypted, 0, cryp, 52, encrypted.length);
-
-                        datagramPacket.setData(cryp);
-                    }
-                }
-
             }
-            catch (JSONException ex)
+
+            if (((mc.enc == MessageClass.CRYPT_WITH_ACK) ||
+                    (mc.enc == MessageClass.CRYPT_RELIABLE))
+                    && mc.msg.has("idremote") && mc.msg.has("uuid"))
             {
-                OopsService.log(LOGTAG, ex);
+                //
+                // Encrypt message with server ack or reliable.
+                //
+
+                String mtype = (mc.enc == MessageClass.CRYPT_WITH_ACK) ? "CACK" : "CARL";
+                String ident = SystemIdentity.identity;
+                String remid = Simple.JSONgetString(mc.msg, "idremote");
+                String ackid = Simple.JSONgetString(mc.msg, "uuid");
+
+                byte[] encrypted = CryptUtils.AESencrypt(remid, body);
+
+                if (encrypted != null)
+                {
+                    byte[] cryp = new byte[ 4 + 16 + 16 + 16 + encrypted.length ];
+
+                    System.arraycopy(mtype.getBytes(), 0, cryp, 0, 4);
+                    System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
+                    System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                    System.arraycopy(Simple.getUUIDBytes(ackid), 0, cryp, 36 , 16);
+                    System.arraycopy(encrypted, 0, cryp, 52, encrypted.length);
+
+                    datagramPacket.setData(cryp);
+                }
             }
 
             //
@@ -572,7 +623,7 @@ public class CommService extends Service
                         // Keep NAT connection alive with bogus packet.
                         //
 
-                        datagramSocket.setTTL(10);
+                        datagramSocket.setTTL(200);
                         datagramPacket.setData("PUPS".getBytes());
                         datagramSocket.send(datagramPacket);
                     }
@@ -688,7 +739,7 @@ public class CommService extends Service
                         }
                     }
 
-                    messageBacklog.add(new MessageClass(ping, MessageClass.ENCRYPT_NONE));
+                    messageBacklog.add(new MessageClass(ping, MessageClass.NONE));
                 }
             }
         }
