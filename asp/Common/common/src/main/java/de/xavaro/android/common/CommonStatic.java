@@ -13,27 +13,13 @@ public class CommonStatic
     private static final String LOGTAG = CommonStatic.class.getSimpleName();
 
     //
-    // Current aceptable external apps.
-    //
-
-    public static final ArrayList<String> oneshotApps = new ArrayList<>();
-
-    public static void addOneShotApp(String packagename)
-    {
-        oneshotApps.add(packagename);
-    }
-
-    public static void clearOneShotApps()
-    {
-        oneshotApps.clear();
-    }
-
-    //
     // Current focus status and active activity.
     //
 
-    public static boolean focused;
     public static String activity;
+    public static boolean focused;
+    public static boolean initialized;
+    public static boolean lostfocus;
 
     public static void setFocused(String activity, boolean hasFocus)
     {
@@ -41,5 +27,9 @@ public class CommonStatic
 
         CommonStatic.activity = activity;
         CommonStatic.focused = hasFocus;
+        CommonStatic.lostfocus |= ! hasFocus;
+        CommonStatic.initialized |= hasFocus;
+
+        if (hasFocus) ProcessManager.clearOneShotApps();
     }
 }

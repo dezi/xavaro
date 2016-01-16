@@ -715,7 +715,7 @@ public class NicedPreferences
             {
                 if (view.getTag().toString().equals("open"))
                 {
-                    Simple.launchApp(apkname);
+                    ProcessManager.launchApp(getContext(), apkname);
                 }
 
                 if (view.getTag().toString().equals("install"))

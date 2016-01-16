@@ -93,39 +93,14 @@ public class Simple
 
     //region Application stuff
 
-    public static void launchApp(String packagename)
-    {
-        if (appContext == null) return;
-
-        CommonStatic.addOneShotApp(packagename);
-
-        try
-        {
-            Intent launchIntent = appContext.getPackageManager().getLaunchIntentForPackage(packagename);
-            appContext.startActivity(launchIntent);
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-    }
-
     public static void installAppFromPlaystore(String packagename)
     {
         if (appContext == null) return;
 
-        CommonStatic.addOneShotApp(CommonConfigs.packagePlaystore);
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW);
+        goToMarket.setData(Uri.parse("market://details?id=" + packagename));
 
-        try
-        {
-            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
-            appContext.startActivity(goToMarket);
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+        ProcessManager.launchIntent(appContext, goToMarket);
     }
 
     public static void uninstallApp(String packagename)
@@ -232,6 +207,12 @@ public class Simple
     {
         return appContext.getString(appContext.getApplicationInfo().labelRes);
     }
+
+    public static String getPackageName()
+    {
+        return appContext.getPackageName();
+    }
+
 
     @Nullable
     public static String getMacAddress()

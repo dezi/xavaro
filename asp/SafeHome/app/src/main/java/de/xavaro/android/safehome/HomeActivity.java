@@ -159,8 +159,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        CommonStatic.clearOneShotApps();
-
         if (wasPaused && ! lostFocus)
         {
             //

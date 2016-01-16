@@ -1,14 +1,9 @@
 package de.xavaro.android.safehome;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 
 import android.content.Intent;
-import android.content.Context;
-import android.app.ActivityManager;
 import android.app.Service;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -18,49 +13,30 @@ import android.widget.Toast;
 
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.ProcessManager;
+import de.xavaro.android.common.Simple;
 
-/*
- * Service to monitor foreign and system apps activity
- * and eventually close undesired activities.
- */
+//
+// Service to monitor foreign and system apps activity
+// and eventually close undesired activities.
+//
 
 public class KioskService extends Service
 {
     private static final String LOGTAG = KioskService.class.getSimpleName();
 
-    //
-    // List of names of white-listed packages.
-    //
-
     private final ArrayList<String> whitelistApps = new ArrayList<>();
-
-    //
-    // List of names of black-listed packages.
-    //
-
     private final ArrayList<String> blacklistApps = new ArrayList<>();
 
-    //
-    // List of names of system default packages.
-    //
-
-    private final ArrayList<String> defsystemApps = new ArrayList<>();
-
-    //
-    // Watch dog background thread.
-    //
-
-    private Thread wdThread = null;
+    private Thread wdThread;
+    private String recentProc;
+    private boolean running;
 
     private String alertMessage;
     private Toast alertToast;
 
     private final Handler handler = new Handler();
 
-    private String recentProc = null;
-    private boolean running = false;
-
-    private static final long INTERVAL = 1000;
+    private static final long INTERVAL = 100;
 
     @Override
     public void onCreate()
@@ -73,12 +49,7 @@ public class KioskService extends Service
 
         recentProc = getPackageName();
 
-        defsystemApps.add("system:ui");
-        defsystemApps.add("android:ui");
-
         whitelistApps.add("com.whatsapp");
-        whitelistApps.add("org.wikipedia");
-        whitelistApps.add("com.skype.raider");
 
         blacklistApps.add("com.android.systemui.recentsactivity");
         blacklistApps.add("com.samsung.android.email.composer");
@@ -102,7 +73,7 @@ public class KioskService extends Service
 
         if (wdThread == null)
         {
-            registerDefsystemApps();
+            //registerDefsystemApps();
 
             running = true;
 
@@ -113,20 +84,14 @@ public class KioskService extends Service
                 @Override
                 public void run()
                 {
+                    long sequence = 0;
+
                     while (running)
                     {
-                        /*
-                        if (CommonStatic.focused)
-                        {
-                            recentProc = getPackageName();
-                        }
-                        else
-                        */
+                        if (((sequence % 10) == 0) || ! CommonStatic.focused)
                         {
                             handleKioskMode();
                         }
-
-                        Log.d(LOGTAG,"Alive...");
 
                         try
                         {
@@ -136,6 +101,8 @@ public class KioskService extends Service
                         {
                             Log.d(LOGTAG, "wdThread: sleep interrupted.");
                         }
+
+                        sequence++;
                     }
                 }
             });
@@ -143,78 +110,18 @@ public class KioskService extends Service
             wdThread.start();
         }
 
-        return Service.START_STICKY; // Service.START_STICKY <=> Service.START_NOT_STICKY;
-    }
-
-    //
-    // Register all currently running foreground
-    // apps into system default app list.
-    //
-
-    private void registerDefsystemAppsOld()
-    {
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> piList = am.getRunningAppProcesses();
-
-        for (int inx = 0; inx < piList.size(); inx++)
-        {
-            ActivityManager.RunningAppProcessInfo pi = piList.get(inx);
-
-            if (pi.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
-            {
-                //
-                // Only process foreground apps.
-                //
-
-                continue;
-            }
-
-            Log.d(LOGTAG, "registerDefsystemApps=" + pi.processName + "=" + pi.importance);
-
-            defsystemApps.add(pi.processName);
-        }
-    }
-
-    private void registerDefsystemApps()
-    {
-        Map<Integer, ProcessManager.ProcessInfo> procs = ProcessManager.getProcesses(true);
-
-        for (Map.Entry<Integer, ProcessManager.ProcessInfo> pid : procs.entrySet())
-        {
-            ProcessManager.ProcessInfo pi = pid.getValue();
-
-            defsystemApps.add(pi.name);
-        }
+        return Service.START_NOT_STICKY; // Service.START_STICKY <=> Service.START_NOT_STICKY;
     }
 
     private String getAppType(String processName)
     {
         String mode = "xx";
 
-        if (defsystemApps.contains(processName))
-        {
-            mode = "ds";
-        }
-
-        if (whitelistApps.contains(processName))
-        {
-            mode = "wl";
-        }
-
-        if (blacklistApps.contains(processName))
-        {
-            mode = "bl";
-        }
-
-        if (CommonStatic.oneshotApps.contains(processName))
-        {
-            mode = "os";
-        }
-
-        if (processName.equals(getPackageName()))
-        {
-            mode = "me";
-        }
+        if (whitelistApps.contains(processName)) mode = "wl";
+        if (blacklistApps.contains(processName)) mode = "bl";
+        if (ProcessManager.isSystemProcess(processName)) mode = "ds";
+        if (ProcessManager.isOneShotProcess(processName)) mode = "os";
+        if (processName.equals(getPackageName())) mode = "me";
 
         return mode;
     }
@@ -246,121 +153,55 @@ public class KioskService extends Service
         }
     };
 
-    private void handleKioskModeOld()
-    {
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> piList = am.getRunningAppProcesses();
-
-        for (int inx = 0; inx < piList.size(); inx++)
-        {
-            ActivityManager.RunningAppProcessInfo pi = piList.get(inx);
-
-            if (pi.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
-            {
-                continue;
-            }
-
-            if (inx > 0) continue;
-
-            String proc = pi.processName;
-            String mode = getAppType(proc);
-
-            Log.d(LOGTAG, "APP:" + mode + "=" + proc + "=" + pi.importance);
-
-            /*
-            String currentMessage = mode + " => " + proc;
-
-            boolean showit = true;
-            boolean blockit = false;
-
-            if (mode.equals("xx") || mode.equals("bl"))
-            {
-                currentMessage = "Blocking" + " " + proc;
-                blockit = true;
-            }
-
-            if (mode.equals("me") || mode.equals("wl") || mode.equals("os"))
-            {
-                if (recentProc.equals(proc)) showit = false;
-
-                recentProc = proc;
-            }
-
-            if ((alertMessage == null) || ! alertMessage.equals(currentMessage))
-            {
-                alertMessage = currentMessage;
-
-                if (showit) handler.post(handleAlert);
-            }
-
-            if (proc.equals("com.android.systemui.recentsactivity"))
-            {
-                String what = DitUndDat.SharedPrefs.sharedPrefs.getString("admin.recent.button","");
-
-                if (what.equals("android")) blockit = false;
-            }
-
-            if (blockit && DitUndDat.DefaultApps.isDefaultHome(this))
-            {
-                restoreRecentProc();
-            }
-            */
-        }
-    }
-
     private void handleKioskMode()
     {
-        Map<Integer, ProcessManager.ProcessInfo> procs = ProcessManager.getProcesses(false);
+        ProcessManager.ProcessInfo pi = ProcessManager.getRunning();
+        if (pi == null) return;
 
-        for (Map.Entry<Integer, ProcessManager.ProcessInfo> pid : procs.entrySet())
+        String proc = pi.name;
+        String mode = getAppType(proc);
+
+        if (mode.equals("ds")) return;
+
+        Log.d(LOGTAG, "APP:" + mode + "=" + proc
+                + " => " + pi.importance
+                + " threads=" + pi.iniThreads + "/" + pi.actThreads);
+
+        String currentMessage = mode + " => " + proc;
+
+        boolean showit = true;
+        boolean blockit = false;
+
+        if (mode.equals("xx") || mode.equals("bl"))
         {
-            ProcessManager.ProcessInfo pi = pid.getValue();
+            currentMessage = "Blocking" + " " + proc;
+            blockit = true;
+        }
 
-            String proc = pi.name;
-            String mode = getAppType(proc);
+        if (mode.equals("me") || mode.equals("wl") || mode.equals("os"))
+        {
+            if (recentProc.equals(proc)) showit = false;
 
-            if (mode.equals("ds")) continue;
+            recentProc = proc;
+        }
 
-            Log.d(LOGTAG, "APP:" + mode + "=" + proc);
+        if ((alertMessage == null) || !alertMessage.equals(currentMessage))
+        {
+            alertMessage = currentMessage;
 
-            /*
-            String currentMessage = mode + " => " + proc;
+            if (showit) handler.post(handleAlert);
+        }
 
-            boolean showit = true;
-            boolean blockit = false;
+        if (proc.equals("com.android.systemui.recentsactivity"))
+        {
+            String what = Simple.getSharedPrefs().getString("admin.recent.button", "");
 
-            if (mode.equals("xx") || mode.equals("bl"))
-            {
-                currentMessage = "Blocking" + " " + proc;
-                blockit = true;
-            }
+            if (what.equals("android")) blockit = false;
+        }
 
-            if (mode.equals("me") || mode.equals("wl") || mode.equals("os"))
-            {
-                if (recentProc.equals(proc)) showit = false;
-
-                recentProc = proc;
-            }
-
-            if ((alertMessage == null) || ! alertMessage.equals(currentMessage))
-            {
-                alertMessage = currentMessage;
-
-                if (showit) handler.post(handleAlert);
-            }
-
-            if (proc.equals("com.android.systemui.recentsactivity"))
-            {
-                String what = DitUndDat.SharedPrefs.sharedPrefs.getString("admin.recent.button","");
-
-                if (what.equals("android")) blockit = false;
-            }
-
-            if (blockit && DitUndDat.DefaultApps.isDefaultHome(this))
-            {
-                restoreRecentProc();
-            }
-            */
+        if (blockit && DitUndDat.DefaultApps.isDefaultHome(this))
+        {
+            restoreRecentProc();
         }
     }
 

@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.app.ActivityManager;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
@@ -37,13 +36,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
-import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
-import de.xavaro.android.common.ProcessManagerJunk;
-import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 //
@@ -1105,7 +1100,7 @@ public class LaunchItem extends FrameLayout implements
         {
             String packagename = config.getString("packagename");
 
-            Simple.launchApp(packagename);
+            ProcessManager.launchApp(context, packagename);
         }
         catch (Exception ex)
         {
@@ -1128,10 +1123,7 @@ public class LaunchItem extends FrameLayout implements
 
             if (subtype.equals("android"))
             {
-                String packagename = "com.android.settings";
-                CommonStatic.addOneShotApp(packagename);
-                Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
-                context.startActivity(launchIntent);
+                ProcessManager.launchApp(context, "com.android.settings");
             }
 
             if (subtype.equals("safehome"))
