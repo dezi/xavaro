@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_id": "safehome-76e00",
+    "project_number": "404416935707",
+    "name": "SafeHome"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404416935707:android:94cbf94212d3e516",
+        "client_id": "android:de.xavaro.android.safehome",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "de.xavaro.android.safehome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

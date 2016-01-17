@@ -1,11 +1,11 @@
 package de.xavaro.android.safehome;
 
-import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
+import android.content.Context;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,7 +33,6 @@ import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
 
 @SuppressWarnings("ResourceType")
 public class ChatActivity extends AppCompatActivity implements
