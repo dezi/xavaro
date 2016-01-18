@@ -14,7 +14,7 @@ public class GCMTokenRefreshService extends InstanceIDListenerService
     {
         Log.d(LOGTAG,"onTokenRefresh");
 
-        Intent intent = new Intent(this, GCMRegistrationIntentService.class);
+        Intent intent = new Intent(this, GCMRegistrationService.class);
         startService(intent);
     }
 }

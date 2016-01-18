@@ -536,6 +536,12 @@ public class CommService extends Service
             datagramPacket.setData(body.getBytes());
 
             if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
+                    && Simple.JSONgetString(mc.msg, "type").equals("pups"))
+            {
+                datagramPacket.setData("PUPS".getBytes());
+            }
+
+            if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
                     && Simple.JSONgetString(mc.msg, "type").equals("ping"))
             {
                 String ident = SystemIdentity.identity;
@@ -624,26 +630,10 @@ public class CommService extends Service
                 // Means, packet is lost in this case.
                 //
 
-                if (mc.msg.has("type"))
-                {
-                    if (mc.msg.getString("type").equals("pups"))
-                    {
-                        //
-                        // Keep NAT connection alive with bogus packet.
-                        //
+                Log.d(LOGTAG, "sendThread: " + datagramPacket.getData().length + "=" + mc.msg.getString("type"));
 
-                        datagramSocket.setTTL(200);
-                        datagramPacket.setData("PUPS".getBytes());
-                        datagramSocket.send(datagramPacket);
-                    }
-                    else
-                    {
-                        Log.d(LOGTAG, "sendThread: " + datagramPacket.getData().length + "=" + mc.msg.getString("type"));
-
-                        datagramSocket.setTTL(200);
-                        datagramSocket.send(datagramPacket);
-                    }
-                }
+                datagramSocket.setTTL(200);
+                datagramSocket.send(datagramPacket);
 
                 sleeptime = CommonConfigs.CommServerSleepMin;
             }

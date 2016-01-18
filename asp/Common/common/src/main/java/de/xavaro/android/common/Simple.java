@@ -131,7 +131,7 @@ public class Simple
 
         for (Map.Entry<String, ?> entry : prefs.entrySet())
         {
-            if (! entry.getKey().startsWith(prefix)) continue;
+            if (!entry.getKey().startsWith(prefix)) continue;
 
             sp.edit().remove(entry.getKey()).apply();
         }
@@ -213,7 +213,6 @@ public class Simple
         return appContext.getPackageName();
     }
 
-
     @Nullable
     public static String getMacAddress()
     {
@@ -222,6 +221,12 @@ public class Simple
         WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         return wInfo.getMacAddress();
+    }
+
+    @Nullable
+    public static String getGCMToken()
+    {
+        return CommonStatic.gcm_token;
     }
 
     public static int getDeviceWidth()
@@ -287,7 +292,7 @@ public class Simple
         if (appContext != null)
         {
             int resourceId = appContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
-            if (resourceId > 0)  return appContext.getResources().getDimensionPixelSize(resourceId);
+            if (resourceId > 0) return appContext.getResources().getDimensionPixelSize(resourceId);
         }
 
         return 20;
@@ -301,7 +306,7 @@ public class Simple
 
     public static byte[] getUUIDBytes(String uuid)
     {
-        String uuidstr = uuid.replace("-","");
+        String uuidstr = uuid.replace("-", "");
         return getHexStringToBytes(uuidstr);
     }
 
@@ -345,6 +350,19 @@ public class Simple
         }
 
         return bytes;
+    }
+
+    public static String dezify(String string)
+    {
+        byte[] dezi = { 0x29, 0x05, 0x19, 0x62 };
+        byte[] bytes = string.getBytes();
+
+        for (int inx = 0; inx < bytes.length; inx++)
+        {
+            bytes[ inx ] = (byte) (bytes[ inx ] ^ (0x0f & dezi[ inx % 4 ]));
+        }
+
+        return new String(bytes);
     }
 
     @Nullable

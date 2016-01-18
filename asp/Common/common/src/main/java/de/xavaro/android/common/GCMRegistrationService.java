@@ -7,11 +7,11 @@ import android.util.Log;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
-public class GCMRegistrationIntentService extends IntentService
+public class GCMRegistrationService extends IntentService
 {
-    private static final String LOGTAG = GCMRegistrationIntentService.class.getSimpleName();
+    private static final String LOGTAG = GCMRegistrationService.class.getSimpleName();
 
-    public GCMRegistrationIntentService()
+    public GCMRegistrationService()
     {
         super(LOGTAG);
     }
@@ -25,21 +25,15 @@ public class GCMRegistrationIntentService extends IntentService
         {
             InstanceID instanceID = InstanceID.getInstance(this);
 
-            String token = instanceID.getToken(CommonStatic.gcm_defaultSenderId,
+            CommonStatic.gcm_token = instanceID.getToken(CommonStatic.gcm_senderId,
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 
-            Log.i(LOGTAG, "GCM Sender-ID: " + CommonStatic.gcm_defaultSenderId);
-            Log.i(LOGTAG, "GCM Registration Token: " + token);
-
-            sendRegistrationToServer(token);
+            Log.d(LOGTAG, "GCM Sender-ID: " + CommonStatic.gcm_senderId);
+            Log.d(LOGTAG, "GCM Registration Token: " + CommonStatic.gcm_token);
         }
         catch (Exception ex)
         {
             Log.d(LOGTAG, "Failed to complete token refresh", ex);
         }
-    }
-
-    private void sendRegistrationToServer(String token)
-    {
     }
 }

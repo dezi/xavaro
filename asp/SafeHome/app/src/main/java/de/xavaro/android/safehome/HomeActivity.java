@@ -24,7 +24,7 @@ import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.SystemIdentity;
-import de.xavaro.android.common.GCMRegistrationIntentService;
+import de.xavaro.android.common.GCMRegistrationService;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener
@@ -63,10 +63,10 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Simple.setContext(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        Simple.setContext(this);
 
         topscreen = (FrameLayout) findViewById(R.id.top_screen);
         topscreen.setSystemUiVisibility(UI_HIDE);
@@ -82,8 +82,9 @@ public class HomeActivity extends AppCompatActivity implements
         startService(new Intent(this, CommService.class));
         startService(new Intent(this, OopsService.class));
 
-        CommonStatic.gcm_defaultSenderId = getString(R.string.gcm_defaultSenderId);
-        startService(new Intent(this, GCMRegistrationIntentService.class));
+        CommonStatic.gcm_apeyki = "HLscZ|HCQc]g}nZG=MKu~3H0?b?7sm1wp_kPcn=";
+        CommonStatic.gcm_senderId = getString(R.string.gcm_defaultSenderId);
+        startService(new Intent(this, GCMRegistrationService.class));
 
         //
         // Allow cross fuck domain HTTP shit.

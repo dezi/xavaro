@@ -50,7 +50,7 @@
         </receiver>
 
         <service
-            android:name="de.xavaro.android.common.GCMListenerService"
+            android:name="de.xavaro.android.common.GCMMessageService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -58,7 +58,7 @@
         </service>
 
         <service
-            android:name="de.xavaro.android.common.GCMRegistrationIntentService"
+            android:name="de.xavaro.android.common.GCMRegistrationService"
             android:exported="false">
         </service>
 
