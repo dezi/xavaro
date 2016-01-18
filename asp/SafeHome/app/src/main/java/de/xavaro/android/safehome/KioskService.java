@@ -163,9 +163,11 @@ public class KioskService extends Service
 
         if (mode.equals("ds")) return;
 
+        /*
         Log.d(LOGTAG, "APP:" + mode + "=" + proc
                 + " => " + pi.importance
                 + " threads=" + pi.iniThreads + "/" + pi.actThreads);
+        */
 
         String currentMessage = mode + " => " + proc;
 

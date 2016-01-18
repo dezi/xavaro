@@ -24,6 +24,7 @@ import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.SystemIdentity;
+import de.xavaro.android.common.GCMRegistrationIntentService;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener
@@ -80,6 +81,9 @@ public class HomeActivity extends AppCompatActivity implements
         startService(new Intent(this, KioskService.class));
         startService(new Intent(this, CommService.class));
         startService(new Intent(this, OopsService.class));
+
+        CommonStatic.gcm_defaultSenderId = getString(R.string.gcm_defaultSenderId);
+        startService(new Intent(this, GCMRegistrationIntentService.class));
 
         //
         // Allow cross fuck domain HTTP shit.
