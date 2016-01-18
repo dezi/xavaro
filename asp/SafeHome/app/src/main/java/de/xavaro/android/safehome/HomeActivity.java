@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
@@ -342,6 +343,24 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     //endregion onBackPressed handling
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        Log.d(LOGTAG,"onActivityResult: reques:" + requestCode + " result:" + resultCode);
+
+        if (requestCode == 1)
+        {
+            if (resultCode == Activity.RESULT_OK)
+            {
+                String result = data.getStringExtra("result");
+            }
+            if (resultCode == Activity.RESULT_CANCELED)
+            {
+
+            }
+        }
+    }
 
     private void createConfig()
     {

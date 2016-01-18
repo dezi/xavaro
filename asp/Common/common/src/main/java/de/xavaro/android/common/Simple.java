@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -27,6 +28,7 @@ import android.view.inputmethod.InputMethodManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -119,6 +121,11 @@ public class Simple
         }
     }
 
+    public static void startActivityForResult(Intent intent, int tag)
+    {
+        appContext.startActivityForResult(intent, tag);
+    }
+
     //endregion Application stuff
 
     //region All purpose simple methods
@@ -193,6 +200,22 @@ public class Simple
         return false;
     }
 
+    public static void dumpDirectory(String path)
+    {
+        dumpDirectory(new File(path));
+    }
+
+    public static void dumpDirectory(File path)
+    {
+        File[] files = path.listFiles();
+
+        Log.d(LOGTAG, "dumpDirectory: " + path.getAbsoluteFile());
+
+        for (File file : files)
+        {
+            Log.d(LOGTAG, "dumpDirectory: => " + file.getAbsoluteFile());
+        }
+    }
 
     //endregion All purpose simple methods
 

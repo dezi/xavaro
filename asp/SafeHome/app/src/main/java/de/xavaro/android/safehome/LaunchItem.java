@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 //
@@ -1428,13 +1431,14 @@ public class LaunchItem extends FrameLayout implements
         PersistManager.flush();
         */
 
-        //ProcessManager.getProcesses(true);
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        File photo = new File(Environment.getExternalStorageDirectory(),  "Pic.jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+        //Simple.startActivityForResult(intent, 1);
 
-        File[] files = new File("/proc/2705").listFiles();
-
-        for (File file : files)
-        {
-            Log.d(LOGTAG, "list=" + file.toString());
-        }
+        Log.d(LOGTAG, "launchDeveloper: " + Environment.getExternalStorageDirectory());
+        Log.d(LOGTAG, "launchDeveloper: " + Environment.DIRECTORY_PICTURES);
+        Simple.dumpDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
+        Simple.dumpDirectory("/storage/emulated/0");
     }
 }
