@@ -941,14 +941,10 @@ public class PreferencesBasics
                             String remoteIdentity = message.getString("identity");
 
                             JSONObject requestOwnerIdentity = new JSONObject();
-
                             requestOwnerIdentity.put("type", "requestOwnerIdentity");
                             requestOwnerIdentity.put("idremote", remoteIdentity);
-                            requestOwnerIdentity.put("appName", Simple.getAppName());
-                            requestOwnerIdentity.put("devName", Simple.getDeviceName());
-                            requestOwnerIdentity.put("macAddr", Simple.getMacAddress());
-                            requestOwnerIdentity.put("ownerFirstName", sharedPrefs.getString("owner.firstname", null));
-                            requestOwnerIdentity.put("ownerGivenName", sharedPrefs.getString("owner.givenname", null));
+
+                            RemoteContacts.deliverOwnContact(requestOwnerIdentity);
 
                             CommService.sendEncrypted(requestOwnerIdentity);
 

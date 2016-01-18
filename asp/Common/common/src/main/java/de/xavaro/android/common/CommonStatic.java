@@ -6,15 +6,19 @@ package de.xavaro.android.common;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-
 public class CommonStatic
 {
     private static final String LOGTAG = CommonStatic.class.getSimpleName();
 
-    //
-    // Current focus status and active activity.
-    //
+    //region Google cloud messaging stuff
+
+    public static String gcm_apeyki;
+    public static String gcm_senderId;
+    public static String gcm_token;
+
+    //enregion Google cloud messaging stuff
+
+    //region Current focus status and active activity
 
     public static String activity;
     public static boolean focused;
@@ -32,4 +36,6 @@ public class CommonStatic
 
         if (hasFocus) ProcessManager.clearOneShotApps();
     }
+
+    //endregion Current focus status and active activity
 }
