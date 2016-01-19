@@ -26,6 +26,11 @@ function json_encrec($data,$level = 0)
 			return '"' . $str . '"';
 			
 		case 'object':
+			if (get_class($data) == "GMP")
+			{
+				return gmp_strval($data);
+			}
+
 			$data = get_object_vars($data);
 			
 		case 'array':
