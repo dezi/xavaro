@@ -2,7 +2,7 @@
 
 include("../include/json.php");
 
-$epgdatabase = "/home/pi/.hts/tvheadend/epgdb.v2";
+$epgdatabase = "~/.hts/tvheadend/epgdb.v2";
 
 function readInt($fd)
 {
@@ -23,14 +23,14 @@ function readInt($fd)
 
 function readNumber($fd, $len)
 {
+	$data = fread($fd,$len);
+
 	$val = gmp_init(0);
 
-	for ($inx = 0; $inx < $len; $inx++)
+	for ($inx = $len - 1; $inx >= 0; $inx--)
 	{ 
-		$data = fread($fd,1);
-
 		$val = gmp_mul($val, gmp_init(256));
-		$val = gmp_add($val, gmp_init(ord($data[ 0 ])));
+		$val = gmp_add($val, gmp_init(ord($data[ $inx ])));
 	}
 
 	return $val;
@@ -233,9 +233,43 @@ readTags();
 readChannels();
 readNetworks();
 
+function saveEPG($epg)
+{
+	$country = $epg[ "country" ];
+	$channel = $epg[ "channel" ];
+
+	$actfile = "../../var/epg/" . $country . "/" . $channel . ".json"; 
+	
+	if ((! isset($GLOBALS[ "actfile" ])) || ($GLOBALS[ "actfile" ] != $actfile))
+	{
+		if (isset($GLOBALS[ "actfd" ]))
+		{
+			fclose($GLOBALS[ "actfd" ]);
+			unset($GLOBALS[ "actfd" ]);
+		}
+
+		$GLOBALS[ "actfd"   ] = fopen($actfile,"a+");
+		$GLOBALS[ "actfile" ] = $actfile;
+	}
+
+	fwrite($GLOBALS[ "actfd" ],json_encdat($epg) . ",\n");
+}
+
 function readEPG($epgdatabase)
 {
-$fd = fopen($epgdatabase,"r");
+	if (substr($epgdatabase, 0, 2) == "~/")
+	{	
+		$env = posix_getpwuid(posix_getuid());
+
+		$epgdatabase = $env[ "dir" ] . substr($epgdatabase,1);
+	}
+
+	$fd = fopen($epgdatabase,"r");
+	if ($fd === false)
+	{
+		echo "Cannot open database <$epgdatabase>\n";
+		exit(-1);
+	}
 
 while (! feof($fd))
 {
@@ -255,7 +289,32 @@ while (! feof($fd))
 		continue;
 	}
 
+	if ($section == "episodes")
+	{
+		if (! isset($GLOBALS[ "episodes" ])) $GLOBALS[ "episodes" ] = array();
+
+		//"uri":"tvh://channel-004f9c62d6081d0aa2b1e766b90568a8/bcast-10349/episode",
+
+		$uri = $json[ "uri" ];
+		preg_match("|bcast-([0-9]*)|", $uri, $treffer);
+		$id = $treffer[ 1 ];
+
+		unset($json[ "uri" ]);
+
+		$GLOBALS[ "episodes" ][ $id ] = $json;
+
+		continue;
+	}
+
 	if ($section != "broadcasts") continue;
+
+	$episode = $json[ "episode" ];
+	preg_match("|bcast-([0-9]*)|", $episode, $treffer);
+	$episode = $treffer[ 1 ];
+	$episode = $GLOBALS[ "episodes" ][ $episode ];
+
+	if (isset($episode[ "title"    ])) $json[ "title"    ] = $episode[ "title"    ];
+	if (isset($episode[ "subtitle" ])) $json[ "subtitle" ] = $episode[ "subtitle" ];
 
 	$channel = $json[ "channel" ];
 	$channel = $GLOBALS[ "channels" ][ $channel ];
@@ -269,14 +328,76 @@ while (! feof($fd))
 
 	$json[ "tags" ] = array();
 
+	$mode = "tv";
+
 	$tags = $channel[ "tags" ];
+
 	for ($inx = 0; $inx < count($tags); $inx++)
 	{
-		$json[ "tags" ][] = $GLOBALS[ "tags" ][ $tags[ $inx ] ][ "name" ];
+		$tag = $GLOBALS[ "tags" ][ $tags[ $inx ] ][ "name" ];
+		if ($tag == "Radio") $mode = "radio";
+		$json[ "tags" ][] = $tag;
 	}
 
+	$json[ "tags" ] = implode("|",$json[ "tags" ]);
+	$json[ "mode" ] = $mode;
+
+	$language = null;
+
+	if (isset($json[ "title" ])) 
+	{
+		foreach ($json[ "title" ] as $lang => $text)
+		{
+			$language = $lang;
+			$json[ "title" ] = $text;
+			break;
+		}
+	}
+
+	if (isset($json[ "subtitle" ])) 
+	{
+		foreach ($json[ "subtitle" ] as $lang => $text)
+		{
+			$language = $lang;
+			$json[ "subtitle" ] = $text;
+			break;
+		}
+	}
+
+	if (isset($json[ "description" ])) 
+	{
+		foreach ($json[ "description" ] as $lang => $text)
+		{
+			$language = $lang;
+			$json[ "description" ] = $text;
+			break;
+		}
+	}
+
+	if (isset($json[ "summary" ])) 
+	{
+		foreach ($json[ "summary" ] as $lang => $text)
+		{
+			$language = $lang;
+			$json[ "summary" ] = $text;
+			break;
+		}
+	}
+
+	$json[ "country"  ] = "ger";
+	$json[ "language" ] = $language;
+
+	$json[ "updated" ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "updated" ]));
+	$json[ "start"   ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "start"   ]));
+	$json[ "stop"    ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "stop"    ]));
+
+	unset($json[ "id"      ]);
+	unset($json[ "type"    ]);
 	unset($json[ "grabber" ]);
 	unset($json[ "episode" ]);
+	unset($json[ "dvb_eid" ]);
+
+	saveEPG($json);
 
 	echo json_encdat($json) . "\n";	
 }
