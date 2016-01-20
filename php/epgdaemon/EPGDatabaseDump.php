@@ -277,7 +277,6 @@ while (! feof($fd))
 
 	unset($json[ "grabber" ]);
 	unset($json[ "episode" ]);
-	unset($json[ "dvb-eid" ]);
 
 	echo json_encdat($json) . "\n";	
 }
