@@ -237,7 +237,7 @@ function readAstraConfig()
 		}
 	}
 	
-	$bypassrules = json_decdat(file_get_contents($configname));
+	$bypassrules = json_decdat(file_get_contents($rulesname));
 	
 	foreach ($bypassrules as $rule)
 	{
