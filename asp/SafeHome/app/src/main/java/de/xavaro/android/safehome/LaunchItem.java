@@ -1436,9 +1436,13 @@ public class LaunchItem extends FrameLayout implements
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
         //Simple.startActivityForResult(intent, 1);
 
+        /*
         Log.d(LOGTAG, "launchDeveloper: " + Environment.getExternalStorageDirectory());
         Log.d(LOGTAG, "launchDeveloper: " + Environment.DIRECTORY_PICTURES);
         Simple.dumpDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
         Simple.dumpDirectory("/storage/emulated/0");
+        */
+
+
     }
 }
