@@ -67,11 +67,21 @@ function resolveAstraCountry($name, $country, $language)
 	}
 	
 	//
-	// Country lookup.
+	// Country lookup part 1.
 	//
 	
 	if ($language == "ger") $mname = simplifySearchName($name . " Deutschland");
 	if ($language == "dut") $mname = simplifySearchName($name . " Nederland");
+	if ($language == "eng") $mname = simplifySearchName($name . " UK");
+
+	$result = resolveAstraCountryDoit($name, $country, $language, $mname);
+	if ($result != "xx") return $result;
+
+	//
+	// Country lookup part 2.
+	//
+	
+	if ($language == "ger") $mname = simplifySearchName($name . " Deutsch");
 
 	$result = resolveAstraCountryDoit($name, $country, $language, $mname);
 	if ($result != "xx") return $result;
