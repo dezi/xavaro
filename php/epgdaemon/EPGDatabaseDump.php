@@ -117,6 +117,11 @@ function decodeLength($fd, $length, &$json, $level = 0)
 	}
 }
 
+function readHostname()
+{
+	$GLOBALS[ "hostname" ] = trim(file_get_contents("/etc/hostname"));
+}
+
 function readChannels()
 {
 	if (! isset($GLOBALS[ "channels" ])) $GLOBALS[ "channels" ] = array();
@@ -133,7 +138,7 @@ function readChannels()
 		$jsondata = file_get_contents($channeldir . "/" . $entry);
 		$json = json_decdat($jsondata);
 
-		 $GLOBALS[ "channels" ][ $entry ] = $json;
+		$GLOBALS[ "channels" ][ $entry ] = $json;
 	}
 
 	closedir($dfd);
@@ -232,13 +237,15 @@ function readServices($servicesdir, $networkname)
 readTags();
 readChannels();
 readNetworks();
+readHostname();
 
 function saveEPG($epg)
 {
-	$country = $epg[ "country" ];
-	$channel = $epg[ "channel" ];
+	$channel  = $epg[ "channel" ];
+	$country  = $epg[ "country" ];
 
-	$actfile = "../../var/epg/" . $country . "/" . $channel . ".json"; 
+	$actdir  = "../../var/epgdata/" . $country . "/" . $channel; 
+	$actfile = $actdir . "/0000.00.00." . $GLOBALS[ "hostname" ] . ".json"; 
 	
 	if ((! isset($GLOBALS[ "actfile" ])) || ($GLOBALS[ "actfile" ] != $actfile))
 	{
@@ -248,8 +255,55 @@ function saveEPG($epg)
 			unset($GLOBALS[ "actfd" ]);
 		}
 
-		$GLOBALS[ "actfd"   ] = fopen($actfile,"a+");
+		if (! file_exists($actdir)) mkdir($actdir, 0755, true);
+		
 		$GLOBALS[ "actfile" ] = $actfile;
+		
+		if (isset($GLOBALS[ "actchannels" ][ $channel ]))
+		{
+			//
+			// Secondary write.
+			//
+			
+			$GLOBALS[ "actfd"   ] = fopen($actfile,"a+");
+		}
+		else
+		{
+			//
+			// Primary write.
+			//
+			
+			$GLOBALS[ "actfd"   ] = fopen($actfile,"w");
+		}
+		
+		$cdata = array();
+		$cdata[ "channel"  ] = $epg[ "channel"  ];
+		$cdata[ "provider" ] = isset($epg[ "provider" ]) ? $epg[ "provider" ] : "";
+		$cdata[ "network"  ] = $epg[ "network"  ];
+		$cdata[ "country"  ] = $epg[ "country"  ];
+		$cdata[ "mode"     ] = $epg[ "mode"     ];
+		$cdata[ "file"     ] = $actfile;
+		$cdata[ "dir"      ] = $actdir;
+		
+		$GLOBALS[ "actchannels" ][ $channel ] = $cdata;
+	}
+	
+	unset($epg[ "is_hd"         ]);
+	unset($epg[ "is_widescreen" ]);
+	unset($epg[ "is_subtitled"  ]);
+	
+	unset($epg[ "updated"  ]);
+	unset($epg[ "channel"  ]);
+	unset($epg[ "provider" ]);
+	unset($epg[ "network"  ]);
+	unset($epg[ "country"  ]);
+	unset($epg[ "mode"     ]);
+	unset($epg[ "tags"     ]);
+
+	if (isset($epg[ "summary" ]) && isset($epg[ "subtitle" ]) 
+		   && $epg[ "summary" ] == $epg[ "subtitle" ])
+	{
+		unset($epg[ "summary" ]);
 	}
 
 	fwrite($GLOBALS[ "actfd" ],json_encdat($epg) . ",\n");
@@ -271,138 +325,251 @@ function readEPG($epgdatabase)
 		exit(-1);
 	}
 
-while (! feof($fd))
+	$count = 0;
+	
+	while (! feof($fd))
+	{
+		$length = readInt($fd, 4);
+		if ($length < 0) break;
+
+		//echo "$length\n";	
+
+		$json = array();
+		decodeLength($fd, $length, $json);
+
+		if (isset($json[ "__section__" ]))
+		{
+			$section = $json[ "__section__" ];
+			echo json_encdat($json) . "\n";	
+
+			continue;
+		}
+
+		if ($section == "episodes")
+		{
+			if (! isset($GLOBALS[ "episodes" ])) $GLOBALS[ "episodes" ] = array();
+
+			//
+			//"uri":"tvh://channel-004f9c62d6081d0aa2b1e766b90568a8/bcast-10349/episode",
+			//
+			
+			$uri = $json[ "uri" ];
+			preg_match("|bcast-([0-9]*)|", $uri, $treffer);
+			$id = $treffer[ 1 ];
+
+			unset($json[ "uri" ]);
+
+			$GLOBALS[ "episodes" ][ $id ] = $json;
+
+			continue;
+		}
+
+		if ($section != "broadcasts") continue;
+
+		$episode = $json[ "episode" ];
+		preg_match("|bcast-([0-9]*)|", $episode, $treffer);
+		$episode = $treffer[ 1 ];
+		$episode = $GLOBALS[ "episodes" ][ $episode ];
+
+		if (isset($episode[ "title"    ])) $json[ "title"    ] = $episode[ "title"    ];
+		if (isset($episode[ "subtitle" ])) $json[ "subtitle" ] = $episode[ "subtitle" ];
+
+		$channel = $json[ "channel" ];
+		$channel = $GLOBALS[ "channels" ][ $channel ];
+
+		$service = $channel[ "services" ];
+		$service = $GLOBALS[ "services" ][ $service[ 0 ] ];
+
+		if (isset($service[ "svcname"     ])) $json[ "channel"  ] = $service[ "svcname"     ];
+		if (isset($service[ "provider"    ])) $json[ "provider" ] = $service[ "provider"    ];
+		if (isset($service[ "networkname" ])) $json[ "network"  ] = $service[ "networkname" ];
+
+		$json[ "tags" ] = array();
+
+		$mode = "tv";
+
+		$tags = $channel[ "tags" ];
+
+		for ($inx = 0; $inx < count($tags); $inx++)
+		{
+			$tag = $GLOBALS[ "tags" ][ $tags[ $inx ] ][ "name" ];
+			if ($tag == "Radio") $mode = "radio";
+			$json[ "tags" ][] = $tag;
+		}
+
+		$json[ "tags" ] = implode("|",$json[ "tags" ]);
+		$json[ "mode" ] = $mode;
+
+		$language = null;
+
+		if (isset($json[ "title" ])) 
+		{
+			foreach ($json[ "title" ] as $lang => $text)
+			{
+				$language = $lang;
+				$json[ "title" ] = $text;
+				break;
+			}
+		}
+
+		if (isset($json[ "subtitle" ])) 
+		{
+			foreach ($json[ "subtitle" ] as $lang => $text)
+			{
+				$language = $lang;
+				$json[ "subtitle" ] = $text;
+				break;
+			}
+		}
+
+		if (isset($json[ "description" ])) 
+		{
+			foreach ($json[ "description" ] as $lang => $text)
+			{
+				$language = $lang;
+				$json[ "description" ] = $text;
+				break;
+			}
+		}
+
+		if (isset($json[ "summary" ])) 
+		{
+			foreach ($json[ "summary" ] as $lang => $text)
+			{
+				$language = $lang;
+				$json[ "summary" ] = $text;
+				break;
+			}
+		}
+
+		$json[ "country"  ] = "ger";
+		$json[ "language" ] = $language;
+
+		$json[ "updated" ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "updated" ]));
+		$json[ "start"   ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "start"   ]));
+		$json[ "stop"    ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "stop"    ]));
+
+		unset($json[ "id"      ]);
+		unset($json[ "type"    ]);
+		unset($json[ "grabber" ]);
+		unset($json[ "episode" ]);
+		unset($json[ "dvb_eid" ]);
+
+		saveEPG($json);
+
+		echo json_encdat($json) . "\n";	
+		
+		//if (++$count >= 1000) break;
+	}
+}
+
+function sortEPG($a, $b)
 {
-	$length = readInt($fd, 4);
-	if ($length < 0) break;
-
-	//echo "$length\n";	
-
-	$json = array();
-	decodeLength($fd, $length, $json);
-
-	if (isset($json[ "__section__" ]))
-	{
-		$section = $json[ "__section__" ];
-   		echo json_encdat($json) . "\n";	
-
-		continue;
-	}
-
-	if ($section == "episodes")
-	{
-		if (! isset($GLOBALS[ "episodes" ])) $GLOBALS[ "episodes" ] = array();
-
-		//"uri":"tvh://channel-004f9c62d6081d0aa2b1e766b90568a8/bcast-10349/episode",
-
-		$uri = $json[ "uri" ];
-		preg_match("|bcast-([0-9]*)|", $uri, $treffer);
-		$id = $treffer[ 1 ];
-
-		unset($json[ "uri" ]);
-
-		$GLOBALS[ "episodes" ][ $id ] = $json;
-
-		continue;
-	}
-
-	if ($section != "broadcasts") continue;
-
-	$episode = $json[ "episode" ];
-	preg_match("|bcast-([0-9]*)|", $episode, $treffer);
-	$episode = $treffer[ 1 ];
-	$episode = $GLOBALS[ "episodes" ][ $episode ];
-
-	if (isset($episode[ "title"    ])) $json[ "title"    ] = $episode[ "title"    ];
-	if (isset($episode[ "subtitle" ])) $json[ "subtitle" ] = $episode[ "subtitle" ];
-
-	$channel = $json[ "channel" ];
-	$channel = $GLOBALS[ "channels" ][ $channel ];
-
-	$service = $channel[ "services" ];
-	$service = $GLOBALS[ "services" ][ $service[ 0 ] ];
-
-	if (isset($service[ "svcname"     ])) $json[ "channel"  ] = $service[ "svcname"     ];
-	if (isset($service[ "provider"    ])) $json[ "provider" ] = $service[ "provider"    ];
-	if (isset($service[ "networkname" ])) $json[ "network"  ] = $service[ "networkname" ];
-
-	$json[ "tags" ] = array();
-
-	$mode = "tv";
-
-	$tags = $channel[ "tags" ];
-
-	for ($inx = 0; $inx < count($tags); $inx++)
-	{
-		$tag = $GLOBALS[ "tags" ][ $tags[ $inx ] ][ "name" ];
-		if ($tag == "Radio") $mode = "radio";
-		$json[ "tags" ][] = $tag;
-	}
-
-	$json[ "tags" ] = implode("|",$json[ "tags" ]);
-	$json[ "mode" ] = $mode;
-
-	$language = null;
-
-	if (isset($json[ "title" ])) 
-	{
-		foreach ($json[ "title" ] as $lang => $text)
-		{
-			$language = $lang;
-			$json[ "title" ] = $text;
-			break;
-		}
-	}
-
-	if (isset($json[ "subtitle" ])) 
-	{
-		foreach ($json[ "subtitle" ] as $lang => $text)
-		{
-			$language = $lang;
-			$json[ "subtitle" ] = $text;
-			break;
-		}
-	}
-
-	if (isset($json[ "description" ])) 
-	{
-		foreach ($json[ "description" ] as $lang => $text)
-		{
-			$language = $lang;
-			$json[ "description" ] = $text;
-			break;
-		}
-	}
-
-	if (isset($json[ "summary" ])) 
-	{
-		foreach ($json[ "summary" ] as $lang => $text)
-		{
-			$language = $lang;
-			$json[ "summary" ] = $text;
-			break;
-		}
-	}
-
-	$json[ "country"  ] = "ger";
-	$json[ "language" ] = $language;
-
-	$json[ "updated" ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "updated" ]));
-	$json[ "start"   ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "start"   ]));
-	$json[ "stop"    ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "stop"    ]));
-
-	unset($json[ "id"      ]);
-	unset($json[ "type"    ]);
-	unset($json[ "grabber" ]);
-	unset($json[ "episode" ]);
-	unset($json[ "dvb_eid" ]);
-
-	saveEPG($json);
-
-	echo json_encdat($json) . "\n";	
-}
+	$starta = $a[ "start" ];
+	$startb = $b[ "start" ];
+	
+	return ($starta > $startb) ? 1 : -1;
 }
 
-readEPG($epgdatabase)
+function splitEPGs()
+{
+	foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
+	{
+		$tempfile = $cdata[ "file" ];
+		$currfile = str_replace("0000.00.00","current", $tempfile);
+		
+		echo "Splitting " . $tempfile . "\n";
+		
+		$json = "[" . substr(file_get_contents($tempfile),0,-2) . "]";
+		
+		$epgs = json_decdat($json);		
+		
+		usort($epgs, "sortEPG");
+		
+		$mindate = "9999.99.99";
+		$maxdate = "0000.00.00";
+		
+		foreach ($epgs as $epg)
+		{
+			$start = str_replace("-", ".", substr($epg[ "start" ], 0, 10));
+			
+			if ($start < $mindate) $mindate = $start;
+			if ($start > $maxdate) $maxdate = $start;
+		}
+		
+		$epgdays = array();
+		
+		foreach ($epgs as $epg)
+		{
+			$start = str_replace("-", ".", substr($epg[ "start" ], 0, 10));
+			
+			if ($start == $mindate) continue;
+			if ($start == $maxdate) continue;
+			
+			if (! isset($epgdays[ $start ])) $epgdays[ $start ] = array();
+			
+			$epgdays[ $start ][] = $epg;
+		}
+		
+		foreach ($epgdays as $day => $epgday)
+		{
+			$actfile = $cdata[ "dir" ] . "/" . $day . "." . $GLOBALS[ "hostname" ] . ".json"; 
+
+			$epgwrite[ "epgdata" ] = $epgday;
+			file_put_contents($actfile, json_encdat($epgwrite));
+			
+			echo "Writing " . $actfile . "\n";
+		}
+		
+		unlink($tempfile);
+
+		if (count($epgdays) > 0)
+		{
+			$epgswrite[ "epgdata" ] = $epgs;
+			$json = file_put_contents($cdata[ "file" ], json_encdat($currfile) . "\n");
+		}
+		else
+		{
+			rmdir(dirname($tempfile));
+		}
+	}
+}
+
+readEPG($epgdatabase);
+
+splitEPGs($epgdatabase);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ?>
