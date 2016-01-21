@@ -14,15 +14,15 @@ function resolveLanguage($language)
 		$languages = json_decdat($json);
 		$GLOBALS[ "languages" ] = array();
 		
-		foreach ($languages as $language)
+		foreach ($languages as $langentry)
 		{
-			$parts = explode(", ", $language[ 0 ]);
+			$parts = explode(", ", $langentry[ 0 ]);
 			
 			foreach ($parts as $part)
 			{
 				$entry = array();
 				$entry[ 0 ] = trim($part);
-				$entry[ 1 ] = $language[ 1 ];
+				$entry[ 1 ] = $langentry[ 1 ];
 				
 				$GLOBALS[ "languages" ][] = $entry;
 			}
@@ -31,7 +31,7 @@ function resolveLanguage($language)
 	
 	$ccc = null;
 	
-	$list = explode(",",$language);
+	$list = explode(",", $language);
 	
 	foreach ($list as $lc)
 	{
