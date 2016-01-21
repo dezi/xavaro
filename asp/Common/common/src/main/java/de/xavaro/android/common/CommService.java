@@ -1,7 +1,5 @@
 package de.xavaro.android.common;
 
-import android.support.annotation.Nullable;
-
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
 import android.app.Service;
@@ -24,13 +22,17 @@ import java.util.Map;
 // via datagramn packets.
 //
 
-public class CommService extends Service
+public class CommService extends Service implements
+        GCMMessageService.GCMMessageServiceCallback
 {
     private static final String LOGTAG = CommService.class.getSimpleName();
 
     private static final ArrayList<MessageClass> messageBacklog = new ArrayList<>();
 
     private static final Map<String, ArrayList<CommServiceCallback>> messageSubscribers = new HashMap<>();
+
+    private static final int COMMCLASS_UDP = 1;
+    private static final int COMMCLASS_GCM = 2;
 
     private static class MessageClass
     {
@@ -42,11 +44,13 @@ public class CommService extends Service
 
         public final JSONObject msg;
         public final int enc;
+        public final boolean gcm;
 
-        public MessageClass(JSONObject message, int encrypt)
+        public MessageClass(JSONObject message, int encrypt, boolean allowGCM)
         {
-            this.msg = message;
-            this.enc = encrypt;
+            msg = message;
+            enc = encrypt;
+            gcm = allowGCM;
         }
     }
 
@@ -54,7 +58,7 @@ public class CommService extends Service
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.CLIENT_ACK));
+            messageBacklog.add(new MessageClass(message, MessageClass.CLIENT_ACK, false));
         }
     }
 
@@ -62,31 +66,31 @@ public class CommService extends Service
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.NONE));
+            messageBacklog.add(new MessageClass(message, MessageClass.NONE, false));
         }
     }
 
-    public static void sendEncrypted(JSONObject message)
+    public static void sendEncrypted(JSONObject message, boolean allowGCM)
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT));
+            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT, allowGCM));
         }
     }
 
-    public static void sendEncryptedWithAck(JSONObject message)
+    public static void sendEncryptedWithAck(JSONObject message, boolean allowGCM)
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT_WITH_ACK));
+            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT_WITH_ACK, allowGCM));
         }
     }
 
-    public static void sendEncryptedReliable(JSONObject message)
+    public static void sendEncryptedReliable(JSONObject message, boolean allowGCM)
     {
         synchronized (messageBacklog)
         {
-            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT_RELIABLE));
+            messageBacklog.add(new MessageClass(message, MessageClass.CRYPT_RELIABLE, allowGCM));
         }
     }
 
@@ -197,6 +201,8 @@ public class CommService extends Service
             workerRecv.start();
         }
 
+        GCMMessageService.subscribe(this);
+
         return Service.START_NOT_STICKY;
     }
 
@@ -215,24 +221,23 @@ public class CommService extends Service
 
         while (running)
         {
-            StaticUtils.sleep(1000);
+            if (datagramSocket == null)
+            {
+                StaticUtils.sleep(1000);
 
-            if (datagramSocket == null) continue;
+                continue;
+            }
 
             try
             {
-                byte[] recvBytes = new byte[ 4096 ];
+                byte[] recvBytes = new byte[ 8192 ];
                 DatagramPacket recvPacket = new DatagramPacket(recvBytes, recvBytes.length);
 
                 datagramSocket.receive(recvPacket);
 
                 Log.d(LOGTAG, "recvThread: received:" + recvPacket.getLength());
 
-                //
-                // Deliver message to subscribers callback.
-                //
-
-                deliverPacket(recvPacket);
+                decryptPacket(recvPacket.getData(), COMMCLASS_UDP);
             }
             catch (Exception ex)
             {
@@ -299,7 +304,7 @@ public class CommService extends Service
                 responseAESpassXChange.put("idremote", remoteIdentity);
                 responseAESpassXChange.put("status", "success");
 
-                CommService.sendEncrypted(responseAESpassXChange);
+                CommService.sendEncrypted(responseAESpassXChange, false);
 
                 return true;
             }
@@ -324,7 +329,7 @@ public class CommService extends Service
 
                 RemoteContacts.deliverOwnContact(responseOwnerIdentity);
 
-                CommService.sendEncrypted(responseOwnerIdentity);
+                CommService.sendEncrypted(responseOwnerIdentity, false);
 
                 return true;
             }
@@ -337,9 +342,15 @@ public class CommService extends Service
         return false;
     }
 
-    private void deliverPacket(DatagramPacket recvPacket)
+    public void onGCMMessageReceived(byte[] rawMessage)
     {
-        byte[] data = recvPacket.getData();
+        Log.d(LOGTAG, "onGCMMessageReceived: received:" + rawMessage.length);
+
+        decryptPacket(rawMessage, COMMCLASS_GCM);
+    }
+
+    private void decryptPacket(byte[] data, int comclass)
+    {
         String ptype = new String(data, 0, 4);
 
         if (ptype.equals("CRYP"))
@@ -371,14 +382,18 @@ public class CommService extends Service
             System.arraycopy(data, 36, ackidBytes, 0, 16);
             String ackid = Simple.getUUIDString(ackidBytes);
 
-            //
-            // Send client ack to server.
-            //
+            if (comclass == COMMCLASS_UDP)
+            {
+                //
+                // Send client ack to server if via UDP.
+                // No ack required if send via GCM.
+                //
 
-            JSONObject clientAckMessage = new JSONObject();
-            Simple.JSONput(clientAckMessage, "type", "clientAckMessage");
-            Simple.JSONput(clientAckMessage, "uuid", ackid);
-            sendClientAck(clientAckMessage);
+                JSONObject clientAckMessage = new JSONObject();
+                Simple.JSONput(clientAckMessage, "type", "clientAckMessage");
+                Simple.JSONput(clientAckMessage, "uuid", ackid);
+                sendClientAck(clientAckMessage);
+            }
 
             //
             // Process message.
@@ -426,36 +441,58 @@ public class CommService extends Service
         {
             JSONObject json = new JSONObject(new String(data, 4, data.length - 4));
 
-            if (! onMessageReceived(json))
-            {
-                if (! json.has("type")) return;
-
-                String type = json.getString("type");
-
-                synchronized (messageSubscribers)
-                {
-                    if (messageSubscribers.containsKey(type))
-                    {
-                        ArrayList<CommService.CommServiceCallback> callbacks = messageSubscribers.get(type);
-
-                        for (CommService.CommServiceCallback callback : callbacks)
-                        {
-                            try
-                            {
-                                callback.onMessageReceived(json);
-                            }
-                            catch (Exception ex)
-                            {
-                                OopsService.log(LOGTAG, ex);
-                            }
-                        }
-                    }
-                }
-            }
+            deliverMessage(json);
         }
         catch (JSONException ex)
         {
             OopsService.log(LOGTAG, ex);
+        }
+    }
+
+    private void deliverMessage(JSONObject json)
+    {
+        if (onMessageReceived(json))
+        {
+            //
+            // Message was handled by commservice itself.
+            //
+
+            return;
+        }
+
+        if (! json.has("type"))
+        {
+            //
+            // We cannot deliver messages w/o a type.
+            //
+
+            return;
+        }
+
+        String type = Simple.JSONgetString(json, "type");
+
+        synchronized (messageSubscribers)
+        {
+            if (messageSubscribers.containsKey(type))
+            {
+                ArrayList<CommService.CommServiceCallback> callbacks = messageSubscribers.get(type);
+
+                for (CommService.CommServiceCallback callback : callbacks)
+                {
+                    try
+                    {
+                        callback.onMessageReceived(json);
+                    }
+                    catch (Exception ex)
+                    {
+                        //
+                        // Some uncaught exception happened within client.
+                        //
+
+                        OopsService.log(LOGTAG, ex);
+                    }
+                }
+            }
         }
     }
 
@@ -535,6 +572,11 @@ public class CommService extends Service
             String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
             datagramPacket.setData(body.getBytes());
 
+            String idrem = null;
+            String ident = null;
+            String ackid = null;
+            String uuid;
+
             if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
                     && Simple.JSONgetString(mc.msg, "type").equals("pups"))
             {
@@ -544,7 +586,7 @@ public class CommService extends Service
             if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
                     && Simple.JSONgetString(mc.msg, "type").equals("ping"))
             {
-                String ident = SystemIdentity.identity;
+                ident = SystemIdentity.identity;
 
                 byte[] ping = new byte[ 4 + 16 ];
 
@@ -556,8 +598,8 @@ public class CommService extends Service
 
             if ((mc.enc == MessageClass.CLIENT_ACK) && mc.msg.has("uuid"))
             {
-                String ident = SystemIdentity.identity;
-                String uuid = Simple.JSONgetString(mc.msg, "uuid");
+                ident = SystemIdentity.identity;
+                uuid = Simple.JSONgetString(mc.msg, "uuid");
 
                 byte[] acme = new byte[ 4 + 16 + 16 ];
                 System.arraycopy("ACME".getBytes(), 0, acme, 0, 4);
@@ -573,9 +615,9 @@ public class CommService extends Service
                 // Encrypt message.
                 //
 
-                String ident = SystemIdentity.identity;
-                String remid = Simple.JSONgetString(mc.msg, "idremote");
-                byte[] encrypted = CryptUtils.AESencrypt(remid, body);
+                ident = SystemIdentity.identity;
+                idrem = Simple.JSONgetString(mc.msg, "idremote");
+                byte[] encrypted = CryptUtils.AESencrypt(idrem, body);
 
                 if (encrypted != null)
                 {
@@ -583,7 +625,7 @@ public class CommService extends Service
 
                     System.arraycopy("CRYP".getBytes(), 0, cryp, 0, 4);
                     System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
-                    System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                    System.arraycopy(Simple.getUUIDBytes(idrem), 0, cryp, 20 , 16);
                     System.arraycopy(encrypted, 0, cryp, 36, encrypted.length);
 
                     datagramPacket.setData(cryp);
@@ -599,11 +641,12 @@ public class CommService extends Service
                 //
 
                 String mtype = (mc.enc == MessageClass.CRYPT_WITH_ACK) ? "CACK" : "CARL";
-                String ident = SystemIdentity.identity;
-                String remid = Simple.JSONgetString(mc.msg, "idremote");
-                String ackid = Simple.JSONgetString(mc.msg, "uuid");
 
-                byte[] encrypted = CryptUtils.AESencrypt(remid, body);
+                ident = SystemIdentity.identity;
+                idrem = Simple.JSONgetString(mc.msg, "idremote");
+                ackid = Simple.JSONgetString(mc.msg, "uuid");
+
+                byte[] encrypted = CryptUtils.AESencrypt(idrem, body);
 
                 if (encrypted != null)
                 {
@@ -611,7 +654,7 @@ public class CommService extends Service
 
                     System.arraycopy(mtype.getBytes(), 0, cryp, 0, 4);
                     System.arraycopy(Simple.getUUIDBytes(ident), 0, cryp,  4 , 16);
-                    System.arraycopy(Simple.getUUIDBytes(remid), 0, cryp, 20 , 16);
+                    System.arraycopy(Simple.getUUIDBytes(idrem), 0, cryp, 20 , 16);
                     System.arraycopy(Simple.getUUIDBytes(ackid), 0, cryp, 36 , 16);
                     System.arraycopy(encrypted, 0, cryp, 52, encrypted.length);
 
@@ -630,10 +673,43 @@ public class CommService extends Service
                 // Means, packet is lost in this case.
                 //
 
-                Log.d(LOGTAG, "sendThread: " + datagramPacket.getData().length + "=" + mc.msg.getString("type"));
+                Log.d(LOGTAG, "sendThread"
+                        + ": " + datagramPacket.getData().length
+                        + "=" + mc.msg.getString("type"));
 
-                datagramSocket.setTTL(200);
-                datagramSocket.send(datagramPacket);
+                if (mc.gcm && (idrem != null) && Simple.isGCMInitialized())
+                {
+                    //
+                    // GCM allowed and initialized.
+                    //
+
+                    if (GCMMessageService.sendMessage(idrem, datagramPacket.getData()))
+                    {
+                        if ((mc.enc == MessageClass.CRYPT_WITH_ACK) ||
+                                (mc.enc == MessageClass.CRYPT_RELIABLE))
+                        {
+                            //
+                            // We need to send a server ack message to our clients.
+                            // With GCM we get the server accepted packate response
+                            // when we send the packet upstream.
+                            //
+
+                            JSONObject serverAckMessage = new JSONObject();
+
+                            Simple.JSONput(serverAckMessage, "type", "serverAckMessage");
+                            Simple.JSONput(serverAckMessage, "identity", ident);
+                            Simple.JSONput(serverAckMessage, "idremote", idrem);
+                            Simple.JSONput(serverAckMessage, "uuid", ackid);
+
+                            deliverMessage(serverAckMessage);
+                        }
+                    }
+                }
+                else
+                {
+                    datagramSocket.setTTL(200);
+                    datagramSocket.send(datagramPacket);
+                }
 
                 sleeptime = CommonConfigs.CommServerSleepMin;
             }
@@ -728,7 +804,7 @@ public class CommService extends Service
                         }
                     }
 
-                    messageBacklog.add(new MessageClass(ping, MessageClass.NONE));
+                    messageBacklog.add(new MessageClass(ping, MessageClass.NONE, false));
                 }
             }
         }

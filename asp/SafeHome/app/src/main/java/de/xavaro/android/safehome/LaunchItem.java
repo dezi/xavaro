@@ -39,10 +39,12 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 
+import de.xavaro.android.common.GCMMessageService;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.SystemIdentity;
 
 //
 // Launch item view on home screen.
@@ -1443,6 +1445,10 @@ public class LaunchItem extends FrameLayout implements
         Simple.dumpDirectory("/storage/emulated/0");
         */
 
+        JSONObject message = new JSONObject();
+        Simple.JSONput(message, "text", "Hallo pupsi");
+        Simple.JSONput(message, "identity", SystemIdentity.identity);
 
+        GCMMessageService.sendMessage("0c47a9e4-254b-4533-b900-d5e53c82435b", message);
     }
 }
