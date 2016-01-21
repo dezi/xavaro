@@ -10,7 +10,23 @@ function resolveLanguage($language)
 	if (! isset($GLOBALS[ "languages" ]))
 	{
 		$json = file_get_contents(dirname(__FILE__) . "/languages.json");
-		$GLOBALS[ "languages" ] = json_decdat($json);
+		
+		$languages = json_decdat($json);
+		$GLOBALS[ "languages" ] = array();
+		
+		foreach ($languages as $language)
+		{
+			$parts = explode(", ", $language[ 0 ]);
+			
+			foreach ($parts as $part)
+			{
+				$entry = array();
+				$entry[ 0 ] = trim($part);
+				$entry[ 1 ] = $language[ 1 ];
+				
+				$GLOBALS[ "languages" ][] = $entry;
+			}
+		}
 	}
 	
 	$ccc = null;
@@ -21,7 +37,7 @@ function resolveLanguage($language)
 	{
 		$lc = trim($lc);
 		
-		foreach ($GLOBALS[ "v" ] as $desc)
+		foreach ($GLOBALS[ "languages" ] as $desc)
 		{
 			if (mb_strtolower($desc[ 0 ], 'UTF-8') == mb_strtolower($lc, 'UTF-8'))
 			{
@@ -30,12 +46,6 @@ function resolveLanguage($language)
 			}
 			
 			if (mb_strtolower($desc[ 1 ], 'UTF-8') == mb_strtolower($lc, 'UTF-8'))
-			{
-				$ccc = mb_strtolower($desc[ 1 ], 'UTF-8');
-				break;
-			}
-			
-			if (mb_strtolower($desc[ 2 ], 'UTF-8') == mb_strtolower($lc, 'UTF-8'))
 			{
 				$ccc = mb_strtolower($desc[ 1 ], 'UTF-8');
 				break;

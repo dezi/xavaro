@@ -284,10 +284,11 @@ function saveEPG($epg)
 	
 	$title = $epg[ "title" ];
 
-	if ($title == "Leider keine Programminformationen vorhanden")
+	if (($title == "Leider keine Programminformationen vorhanden") ||
+		($title == "Leider keine Programminformationen verfügbar"))
 	{
 		//
-		// Bogous entry from Kabel Deutschland discarded.
+		// Bogous entries from Kabel Deutschland spackos discarded.
 		//
 		
 		return;
