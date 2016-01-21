@@ -80,7 +80,7 @@ public class ChatManager implements
         Simple.JSONput(sendOnlineStatus, "chatdate", Simple.nowAsISO());
         Simple.JSONput(sendOnlineStatus, "date", Simple.nowAsISO());
 
-        CommService.sendEncrypted(sendOnlineStatus);
+        CommService.sendEncrypted(sendOnlineStatus, true);
     }
 
     public void unsubscribe(String identity, MessageCallback callback)
@@ -97,7 +97,7 @@ public class ChatManager implements
         Simple.JSONput(sendOnlineStatus, "chatdate", Simple.nowAsISO());
         Simple.JSONput(sendOnlineStatus, "date", Simple.nowAsISO());
 
-        CommService.sendEncrypted(sendOnlineStatus);
+        CommService.sendEncrypted(sendOnlineStatus, true);
     }
 
     @Nullable
@@ -134,7 +134,7 @@ public class ChatManager implements
             sendChatMessage.put("message", message);
             sendChatMessage.put("uuid", uuid);
 
-            CommService.sendEncryptedReliable(sendChatMessage);
+            CommService.sendEncryptedReliable(sendChatMessage, true);
 
             updateOutgoingProtocoll(idremote, sendChatMessage, "date");
         }
@@ -196,7 +196,7 @@ public class ChatManager implements
                     recvOnlineStatus.put("chatdate", chatdate);
                     recvOnlineStatus.put("date", Simple.nowAsISO());
 
-                    CommService.sendEncrypted(recvOnlineStatus);
+                    CommService.sendEncrypted(recvOnlineStatus, true);
 
                     return;
                 }
@@ -229,7 +229,7 @@ public class ChatManager implements
                     feedbackChatMessage.put("idremote", idremote);
                     feedbackChatMessage.put("uuid", uuid);
 
-                    CommService.sendEncryptedReliable(feedbackChatMessage);
+                    CommService.sendEncryptedReliable(feedbackChatMessage, true);
 
                     return;
                 }

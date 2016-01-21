@@ -29,6 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -198,6 +200,11 @@ public class Simple
         }
 
         return false;
+    }
+
+    public static boolean isGCMInitialized()
+    {
+        return (CommonStatic.gcm_token != null);
     }
 
     public static void dumpDirectory(String path)
@@ -373,6 +380,27 @@ public class Simple
         }
 
         return bytes;
+    }
+
+    public static String getAllInput(InputStream input)
+    {
+        StringBuilder string = new StringBuilder();
+        byte[] buffer = new byte[ 4096 ];
+        int xfer;
+
+        try
+        {
+            while ((xfer = input.read(buffer)) > 0)
+            {
+                string.append(new String(buffer, 0, xfer));
+            }
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return string.toString();
     }
 
     public static String dezify(String string)

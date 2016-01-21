@@ -1,22 +1,42 @@
 package de.xavaro.android.common;
 
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GcmListenerService;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class GCMMessageService extends GcmListenerService
 {
     private static final String LOGTAG = GCMMessageService.class.getSimpleName();
+
+    private static final ArrayList<GCMMessageServiceCallback> subscribers = new ArrayList<>();
+
+    public interface GCMMessageServiceCallback
+    {
+        void onGCMMessageReceived(byte[] rawMessage);
+    }
+
+    public static void subscribe(GCMMessageServiceCallback callback)
+    {
+        if (! subscribers.contains(callback)) subscribers.add(callback);
+    }
+
+    public static void unsubscribe(GCMMessageServiceCallback callback)
+    {
+        if (subscribers.contains(callback)) subscribers.remove(callback);
+    }
 
     @Override
     public void onMessageReceived(String from, Bundle data)
@@ -32,19 +52,49 @@ public class GCMMessageService extends GcmListenerService
         }
         else
         {
-            // normal downstream message.
+            if (message.startsWith("{\"base64\":"))
+            {
+                try
+                {
+                    JSONObject jmess= new JSONObject(message);
+                    String base64 = jmess.getString("base64");
+                    byte[] rawdata = Base64.decode(base64, 0);
+
+                    for (GCMMessageServiceCallback subscriber : subscribers)
+                    {
+                        subscriber.onGCMMessageReceived(rawdata);
+                    }
+                }
+                catch (JSONException ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
+            }
         }
     }
 
-    public static boolean sendMessage(String receiver, String message)
+    public static boolean sendMessage(String receiver, byte[] message)
     {
+        String base64 = Base64.encodeToString(message,0).trim();
+
+        JSONObject base64message = new JSONObject();
+        Simple.JSONput(base64message, "base64", base64);
+
+        return sendMessage(receiver, base64message);
+    }
+
+    public static boolean sendMessage(String receiver, JSONObject message)
+    {
+        String token = RemoteContacts.getGCMToken(receiver);
+        if (token == null) return false;
+
         try
         {
             JSONObject jData = new JSONObject();
             jData.put("message", message);
 
             JSONObject jGcmData = new JSONObject();
-            jGcmData.put("to",receiver);
+            jGcmData.put("to",token);
             jGcmData.put("data", jData);
 
             URL url = new URL("https://android.googleapis.com/gcm/send");
@@ -58,21 +108,16 @@ public class GCMMessageService extends GcmListenerService
             outputStream.write(jGcmData.toString().getBytes());
 
             InputStream inputStream = conn.getInputStream();
+            String response = Simple.getAllInput(inputStream);
 
-            StringBuilder string = new StringBuilder();
-            byte[] buffer = new byte[ 4096 ];
-            int xfer;
-
-            while ((xfer = inputStream.read(buffer)) > 0)
-            {
-                string.append(new String(buffer, 0, xfer));
-            }
-
+            outputStream.close();
             inputStream.close();
 
-            Log.d(LOGTAG, "sendUpstream" + string.toString());
+            boolean success = response.contains("\"success\":1");
 
-            return true;
+            Log.d(LOGTAG, "sendMessage: " + success + "=" + response);
+
+            return success;
         }
         catch (Exception ex)
         {

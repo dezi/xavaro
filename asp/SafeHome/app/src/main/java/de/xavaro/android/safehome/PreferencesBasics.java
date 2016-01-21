@@ -946,7 +946,7 @@ public class PreferencesBasics
 
                             RemoteContacts.deliverOwnContact(requestOwnerIdentity);
 
-                            CommService.sendEncrypted(requestOwnerIdentity);
+                            CommService.sendEncrypted(requestOwnerIdentity, false);
 
                             return;
                         }
