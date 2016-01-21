@@ -1,8 +1,15 @@
 <?php
 
 include("../include/json.php");
+include("../include/astra.php");
+include("../include/countries.php");
 
-$epgdatabase = "~/.hts/tvheadend/epgdb.v2";
+function errorexit($message)
+{
+	fwrite(STDERR, "$message\n");
+	
+	exit(1);
+}
 
 function readInt($fd)
 {
@@ -117,6 +124,13 @@ function decodeLength($fd, $length, &$json, $level = 0)
 	}
 }
 
+function readHomedir()
+{
+	$env = posix_getpwuid(posix_getuid());
+
+	$GLOBALS[ "homedir" ] = $env[ "dir" ];
+}
+
 function readHostname()
 {
 	$GLOBALS[ "hostname" ] = trim(file_get_contents("/etc/hostname"));
@@ -128,8 +142,11 @@ function readChannels()
 
 	$channeldir = "/home/pi/.hts/tvheadend/channel/config";
 
-	$dfd = opendir($channeldir);
+	echo "Scan: $channeldir\n";
 
+	$dfd = opendir($channeldir);
+	if ($dfd === false) errorexit("Cannot scan $channeldir");
+	
 	while (($entry = readdir($dfd)) !== false)
 	{
 		if ($entry == ".") continue;
@@ -150,8 +167,11 @@ function readTags()
 
 	$tagsdir = "/home/pi/.hts/tvheadend/channel/tag";
 
-	$dfd = opendir($tagsdir);
+	echo "Scan: $tagsdir\n";
 
+	$dfd = opendir($tagsdir);
+	if ($dfd === false) errorexit("Cannot scan $tagsdir");
+	
 	while (($entry = readdir($dfd)) !== false)
 	{
 		if ($entry == ".") continue;
@@ -172,14 +192,21 @@ function readNetworks()
 
 	$networksdir = "/home/pi/.hts/tvheadend/input/dvb/networks";
 
+	echo "Scan: $networksdir\n";
+	
 	$dfd = opendir($networksdir);
+	if ($dfd === false) errorexit("Cannot scan $networksdir");
 
 	while (($entry = readdir($dfd)) !== false)
 	{
 		if ($entry == ".") continue;
 		if ($entry == "..") continue;
 
-		$jsondata = file_get_contents($networksdir . "/" . $entry . "/config");
+		$networksconfig = $networksdir . "/" . $entry . "/config";
+		
+		echo "Read: $networksconfig\n";
+		
+		$jsondata = file_get_contents($networksconfig);
 		$json = json_decdat($jsondata);
 
 		$GLOBALS[ "networks" ][ $entry ] = $json;
@@ -194,12 +221,16 @@ function readMuxes($muxesdir, $networkname)
 {
 	if (! isset($GLOBALS[ "muxes" ])) $GLOBALS[ "muxes" ] = array();
 
+	//echo "Scan: $muxesdir\n";
+
 	$dfd = opendir($muxesdir);
+	if ($dfd === false) errorexit("Cannot scan $muxesdir");
 
 	while (($entry = readdir($dfd)) !== false)
 	{
 		if ($entry == ".") continue;
 		if ($entry == "..") continue;
+
 
 		$jsondata = file_get_contents($muxesdir . "/" . $entry);
 		$json = json_decdat($jsondata);
@@ -216,7 +247,12 @@ function readServices($servicesdir, $networkname)
 {
 	if (! isset($GLOBALS[ "services" ])) $GLOBALS[ "services" ] = array();
 
+	if (! file_exists($servicesdir)) return;
+
+	//echo "Scan: $servicesdir\n";
+	
 	$dfd = opendir($servicesdir);
+	if ($dfd === false) errorexit("Cannot scan $servicesdir");
 
 	while (($entry = readdir($dfd)) !== false)
 	{
@@ -234,17 +270,18 @@ function readServices($servicesdir, $networkname)
 	closedir($dfd);
 }
 
-readTags();
-readChannels();
-readNetworks();
-readHostname();
-
 function saveEPG($epg)
 {
-	$channel  = $epg[ "channel" ];
-	$country  = $epg[ "country" ];
+	$channel  = $epg[ "channel"  ];
+	$country  = $epg[ "country"  ];
+	$language = $epg[ "language" ];
+	$type     = $epg[ "type"     ];
 
-	$actdir  = "../../var/epgdata/" . $country . "/" . $channel; 
+	$isocc = resolveAstraCountry($channel, $country, $language);
+
+	$actdir  = "../../var/epgdata/$type/$isocc/$channel"; 
+	if (! file_exists($actdir)) mkdir($actdir, 0755, true);
+	
 	$actfile = $actdir . "/0000.00.00." . $GLOBALS[ "hostname" ] . ".json"; 
 	
 	if ((! isset($GLOBALS[ "actfile" ])) || ($GLOBALS[ "actfile" ] != $actfile))
@@ -281,7 +318,7 @@ function saveEPG($epg)
 		$cdata[ "provider" ] = isset($epg[ "provider" ]) ? $epg[ "provider" ] : "";
 		$cdata[ "network"  ] = $epg[ "network"  ];
 		$cdata[ "country"  ] = $epg[ "country"  ];
-		$cdata[ "mode"     ] = $epg[ "mode"     ];
+		$cdata[ "type"     ] = $epg[ "type"     ];
 		$cdata[ "file"     ] = $actfile;
 		$cdata[ "dir"      ] = $actdir;
 		
@@ -297,7 +334,7 @@ function saveEPG($epg)
 	unset($epg[ "provider" ]);
 	unset($epg[ "network"  ]);
 	unset($epg[ "country"  ]);
-	unset($epg[ "mode"     ]);
+	unset($epg[ "type"     ]);
 	unset($epg[ "tags"     ]);
 
 	if (isset($epg[ "summary" ]) && isset($epg[ "subtitle" ]) 
@@ -309,8 +346,10 @@ function saveEPG($epg)
 	fwrite($GLOBALS[ "actfd" ],json_encdat($epg) . ",\n");
 }
 
-function readEPG($epgdatabase)
+function readEPG()
 {
+	$epgdatabase = "~/.hts/tvheadend/epgdb.v2";
+
 	if (substr($epgdatabase, 0, 2) == "~/")
 	{	
 		$env = posix_getpwuid(posix_getuid());
@@ -321,8 +360,7 @@ function readEPG($epgdatabase)
 	$fd = fopen($epgdatabase,"r");
 	if ($fd === false)
 	{
-		echo "Cannot open database <$epgdatabase>\n";
-		exit(-1);
+		errorexit("Cannot open database <$epgdatabase>");
 	}
 
 	$count = 0;
@@ -380,25 +418,26 @@ function readEPG($epgdatabase)
 		$service = $channel[ "services" ];
 		$service = $GLOBALS[ "services" ][ $service[ 0 ] ];
 
-		if (isset($service[ "svcname"     ])) $json[ "channel"  ] = $service[ "svcname"     ];
+		$json[ "channel" ] = $service[ "svcname"     ];
+		$json[ "network" ] = $service[ "networkname" ];
+		
 		if (isset($service[ "provider"    ])) $json[ "provider" ] = $service[ "provider"    ];
-		if (isset($service[ "networkname" ])) $json[ "network"  ] = $service[ "networkname" ];
 
 		$json[ "tags" ] = array();
 
-		$mode = "tv";
+		$type = "tv";
 
 		$tags = $channel[ "tags" ];
 
 		for ($inx = 0; $inx < count($tags); $inx++)
 		{
 			$tag = $GLOBALS[ "tags" ][ $tags[ $inx ] ][ "name" ];
-			if ($tag == "Radio") $mode = "radio";
+			if ($tag == "Radio") $type = "rd";
 			$json[ "tags" ][] = $tag;
 		}
 
 		$json[ "tags" ] = implode("|",$json[ "tags" ]);
-		$json[ "mode" ] = $mode;
+		$json[ "type" ] = $type;
 
 		$language = null;
 
@@ -442,7 +481,7 @@ function readEPG($epgdatabase)
 			}
 		}
 
-		$json[ "country"  ] = "ger";
+		$json[ "country"  ] = "xx";
 		$json[ "language" ] = $language;
 
 		$json[ "updated" ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "updated" ]));
@@ -450,14 +489,13 @@ function readEPG($epgdatabase)
 		$json[ "stop"    ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "stop"    ]));
 
 		unset($json[ "id"      ]);
-		unset($json[ "type"    ]);
 		unset($json[ "grabber" ]);
 		unset($json[ "episode" ]);
 		unset($json[ "dvb_eid" ]);
 
 		saveEPG($json);
 
-		echo json_encdat($json) . "\n";	
+		//echo json_encdat($json) . "\n";	
 		
 		//if (++$count >= 1000) break;
 	}
@@ -535,9 +573,18 @@ function splitEPGs()
 	}
 }
 
-readEPG($epgdatabase);
+readHomedir();
+readHostname();
 
-splitEPGs($epgdatabase);
+readTags();
+readChannels();
+readNetworks();
+
+readAstraConfig();
+
+readEPG();
+
+//splitEPGs();
 
 
 
