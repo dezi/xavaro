@@ -1,8 +1,9 @@
 <?php
 
 include("../include/json.php");
-include("../include/astra.php");
 include("../include/countries.php");
+include("../include/languages.php");
+include("../include/astra.php");
 
 function errorexit($message)
 {
@@ -272,11 +273,31 @@ function readServices($servicesdir, $networkname)
 
 function saveEPG($epg)
 {
+	if (! isset($epg[ "title" ])) 
+	{
+		//
+		// Bogous entry w/o title discarded.
+		//
+		
+		return;
+	}
+	
+	$title = $epg[ "title" ];
+
+	if ($title == "Leider keine Programminformationen vorhanden")
+	{
+		//
+		// Bogous entry from Kabel Deutschland discarded.
+		//
+		
+		return;
+	}
+
+	$type     = $epg[ "type"     ];
 	$channel  = $epg[ "channel"  ];
 	$country  = $epg[ "country"  ];
 	$language = $epg[ "language" ];
-	$type     = $epg[ "type"     ];
-
+		
 	$isocc = resolveAstraCountry($channel, $country, $language);
 
 	$actdir  = "../../var/epgdata/$type/$isocc/$channel"; 
@@ -302,7 +323,7 @@ function saveEPG($epg)
 			// Secondary write.
 			//
 			
-			$GLOBALS[ "actfd"   ] = fopen($actfile,"a+");
+			$GLOBALS[ "actfd" ] = fopen($actfile,"a+");
 		}
 		else
 		{
@@ -310,7 +331,7 @@ function saveEPG($epg)
 			// Primary write.
 			//
 			
-			$GLOBALS[ "actfd"   ] = fopen($actfile,"w");
+			$GLOBALS[ "actfd" ] = fopen($actfile,"w");
 		}
 		
 		$cdata = array();
@@ -418,10 +439,10 @@ function readEPG()
 		$service = $channel[ "services" ];
 		$service = $GLOBALS[ "services" ][ $service[ 0 ] ];
 
-		$json[ "channel" ] = $service[ "svcname"     ];
-		$json[ "network" ] = $service[ "networkname" ];
-		
-		if (isset($service[ "provider"    ])) $json[ "provider" ] = $service[ "provider"    ];
+		$json[ "network"  ] = $service[ "networkname" ];
+		$json[ "channel"  ] = $service[ "svcname"     ];
+
+		if (isset($service[ "provider" ])) $json[ "provider" ] = $service[ "provider" ];
 
 		$json[ "tags" ] = array();
 
@@ -480,10 +501,17 @@ function readEPG()
 				break;
 			}
 		}
-
-		$json[ "country"  ] = "xx";
+		
 		$json[ "language" ] = $language;
-
+		$json[ "country"  ] = "xx";
+		
+		//
+		// Remove bogous language from channel name.
+		//
+		
+		$lang = $json[ "language" ];
+		$json[ "channel" ] = trim(str_replace("($lang)","", $json[ "channel" ]));
+		
 		$json[ "updated" ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "updated" ]));
 		$json[ "start"   ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "start"   ]));
 		$json[ "stop"    ] = gmdate("Y-m-d\TH:i:s\Z", gmp_intval($json[ "stop"    ]));
