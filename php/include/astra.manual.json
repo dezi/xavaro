@@ -1,5 +1,59 @@
 [
-  
+  {
+    "name":"Sky Sport News",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":false,
+    "website":"www.sky.de/skysportnewshd",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ss/sky_de_sport_news.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Romance TV Deutschland HD",
+    "free":false,
+    "enc":"Nagravision;Videoguard",
+    "hd":true,
+    "website":"www.romance-tv.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/rr/romance_tv_de.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"0:Undefined",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Comedy Central Deutschland HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.comedycentral.tv",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/cc/comedy_central_us_hd.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"0:Undefined",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
   {
     "name":"TNT Glitz HD",
     "free":false,

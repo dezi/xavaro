@@ -271,6 +271,20 @@ function readServices($servicesdir, $networkname)
 	closedir($dfd);
 }
 
+function stripShit($name)
+{
+	while (preg_match("|(\([^\)]*\))|", $name, $treffer))
+	{
+		$name = str_replace($treffer[ 1 ], "", $name);
+	}
+	
+	$name = trim($name);
+	$name = str_replace("  ", " ", $name);
+	$name = str_replace("  ", " ", $name);
+	
+	return $name;
+}
+
 function unifyChannelName($name, $language, $ishd)
 {
 	//
@@ -345,7 +359,8 @@ function saveChannel($cdata, $adata)
 	
 	$config[ "ishd"    ] = $ishd;
 	$config[ "isolang" ] = $adata[ "isolang" ];
-	$config[ "packs"   ] = $adata[ "packs"   ];
+	
+	if (isset($adata[ "packs" ])) $config[ "packs" ] = $adata[ "packs" ];
 
 	if (isset($cdata[ "tags" ]))
 	{
@@ -374,6 +389,27 @@ function saveChannel($cdata, $adata)
 		addChannelTag($config, "providers", $cdata[ "provider" ]);
 	}
 	
+	//
+	// Cleanup shit.
+	//
+	
+	if (isset($config[ "tags" ]))
+	{
+		for ($inx = 0; $inx < count($config[ "tags" ]); $inx++)
+		{
+			if ($config[ "tags" ][ $inx ] == "TV channels")
+			{
+				unset($config[ "tags" ][ $inx ]);
+				$inx--;
+			}
+		}	
+	}
+	
+	//
+	// Create new array for storing with defined
+	// content ordering.
+	//
+
 	$ordered = array();
 	
 	$ordered[ "name"      ] = $config[ "name"      ];
@@ -415,7 +451,7 @@ function saveEPG($epg)
 	$language = $epg[ "language" ];
 	$ishd     = isset($epg[ "is_hd" ]) ? $epg[ "is_hd" ] : false;
 	
-	$orgname = $channel;
+	$orgname = stripShit($channel);
 	$channel = unifyChannelName($channel, $language, $ishd);
 	$astra   = resolveAstra($orgname, $channel, $language);
 	
