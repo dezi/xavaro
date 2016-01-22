@@ -40,8 +40,7 @@ function resolveAstra($orgname, $name, $language)
 	
 	$cachetag = "$orgname $language";
 	
-	if ((($isknown == false) || ($result == null)) && 
-			! isset($GLOBALS[ "astra.newentry" ][ $cachetag ]))
+	if ((! $isknown) && ! isset($GLOBALS[ "astra.newentry" ][ $cachetag ]))
 	{
 		$GLOBALS[ "astra.newentry" ][ $cachetag ] = true;
 		
@@ -101,8 +100,9 @@ function resolveAstraDoit($name, $language, $mname)
 		return $GLOBALS[ "astra.cache" ][ $cachetag ];
 	}
 
-	$isoccs = array();
+	$astras = array();
 	$anames = array();
+	$isoccs = array();
 	
 	foreach ($GLOBALS[ "astra.config" ] as $channel)
 	{
@@ -110,6 +110,7 @@ function resolveAstraDoit($name, $language, $mname)
 		{
  			$anames[] = $channel[ "name"  ];
  			$isoccs[] = $channel[ "isocc" ];
+ 			$astras[] = $channel;
 		}
 	}
 	
@@ -126,7 +127,7 @@ function resolveAstraDoit($name, $language, $mname)
 				$isocc = $isoccs[ $inx ];
 				$aname = $anames[ $inx ];
 				
-				echo "DUPLICATE => $name => $country => $language :: $isocc $aname\n";
+				echo "DUPLICATE => $name => $language :: $isocc $aname\n";
 			}
 		}
 	}
@@ -137,6 +138,7 @@ function resolveAstraDoit($name, $language, $mname)
 	{
 		$result[ "name"  ] = $anames[ 0 ];
 		$result[ "isocc" ] = $isoccs[ 0 ];
+		$result[ "astra" ] = $astras[ 0 ];
 	}
 	
 	$GLOBALS[ "astra.cache" ][ $cachetag ] = $result;

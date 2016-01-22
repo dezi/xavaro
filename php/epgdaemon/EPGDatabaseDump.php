@@ -300,6 +300,95 @@ function unifyChannelName($name, $language, $ishd)
 	return $name;
 }
 
+function addChannelTag(&$config, $tagname, $tagvalue)
+{
+	if (! isset($config[ $tagname ])) $config[ $tagname ] = array();
+	
+	foreach ($config[ $tagname ] as $inx => $val)
+	{
+		if ($val == $tagvalue) return;
+	}
+	
+	$config[ $tagname ][] = $tagvalue;
+	
+	asort($config[ $tagname ]);
+}
+
+function saveChannel($cdata, $adata)
+{
+	$name  = $cdata[ "name"  ];
+	$type  = $cdata[ "type"  ];
+	$isocc = $cdata[ "isocc" ];
+	$ishd  = $cdata[ "ishd"  ];
+	
+	$actdir  = "../../var/channels/$type/$isocc"; 
+	$actfile = $actdir . "/" . $name . ".json";
+
+	if (! file_exists($actdir)) mkdir($actdir, 0755, true);
+	
+	$config = array();
+	
+	if (file_exists($actfile))
+	{
+		$config = json_decdat(file_get_contents($actfile));
+	}
+	else
+	{
+		//
+		// Preset fields some fields.
+		//
+		
+		$config[ "name"      ] = $name;
+		$config[ "type"      ] = $type;
+		$config[ "isocc"     ] = $isocc;
+	}
+	
+	$config[ "ishd"    ] = $$ishd;
+	$config[ "isolang" ] = $adata[ "isolang" ];
+	$config[ "packs"   ] = $adata[ "packs"   ];
+
+	if (isset($cdata[ "tags" ]))
+	{
+		$tags = explode("|", $cdata[ "tags" ]);
+		
+		foreach ($tags as $tag)
+		{
+			addChannelTag($config, "tags", $tag);
+		}
+	}
+	
+	if (isset($cdata[ "network" ]))
+	{
+		$network = $cdata[ "network" ];
+		
+		if ((substr($network, 0, 5) == "DVT-T") ||
+			(substr($network, 0, 5) == "DVT-C") ||
+			(substr($network, 0, 5) == "DVT-S") )
+		{
+			addChannelTag($config, "tags", substr($network, 0, 5));
+		}		
+	}
+	
+	if (isset($cdata[ "provider" ]))
+	{
+		addChannelTag($config, "providers", $cdata[ "provider" ]);
+	}
+	
+	$ordered = array();
+	
+	$ordered[ "name"      ] = $config[ "name"      ];
+	$ordered[ "type"      ] = $config[ "type"      ];
+	$ordered[ "ishd"      ] = $config[ "ishd"      ];
+	$ordered[ "isocc"     ] = $config[ "isocc"     ];
+	$ordered[ "isolang"   ] = $config[ "isolang"   ];
+	
+	if (isset($config[ "tags"      ])) $ordered[ "tags"      ] = $config[ "tags"      ];
+	if (isset($config[ "packs"     ])) $ordered[ "packs"     ] = $config[ "packs"     ];
+	if (isset($config[ "providers" ])) $ordered[ "providers" ] = $config[ "providers" ];
+
+	file_put_contents($actfile, json_encdat($ordered) . "\n");
+}
+
 function saveEPG($epg)
 {
 	if (! isset($epg[ "title" ])) 
@@ -328,9 +417,9 @@ function saveEPG($epg)
 	
 	$orgname = $channel;
 	$channel = unifyChannelName($channel, $language, $ishd);
-	$result  = resolveAstra($orgname, $channel, $language);
+	$astra   = resolveAstra($orgname, $channel, $language);
 	
-	if ($result == null)
+	if ($astra == null)
 	{
 		//
 		// Do not dump unconsolidated shit to disk.
@@ -339,8 +428,8 @@ function saveEPG($epg)
 		return;
 	}
 	
-	$channel = isset($result[ "name"  ]) ? $result[ "name"  ] : $channel;
-	$isocc   = isset($result[ "isocc" ]) ? $result[ "isocc" ] : "xx";
+	$channel = $astra[ "name"  ];
+	$isocc   = $astra[ "isocc" ];
 	
 	$actdir  = "../../var/epgdata/$type/$isocc/$channel"; 
 	if (! file_exists($actdir)) mkdir($actdir, 0755, true);
@@ -377,15 +466,21 @@ function saveEPG($epg)
 		}
 		
 		$cdata = array();
-		$cdata[ "channel"  ] = $epg[ "channel"  ];
+		$cdata[ "name"     ] = $channel;
+		$cdata[ "isocc"    ] = $isocc;
+		$cdata[ "ishd"     ] = $ishd;
+		$cdata[ "channel"  ] = $epg[ "channel" ];
+		$cdata[ "type"     ] = $epg[ "type"    ];
 		$cdata[ "provider" ] = isset($epg[ "provider" ]) ? $epg[ "provider" ] : "";
-		$cdata[ "network"  ] = $epg[ "network"  ];
-		$cdata[ "country"  ] = $epg[ "country"  ];
-		$cdata[ "type"     ] = $epg[ "type"     ];
+		$cdata[ "network"  ] = $epg[ "network" ];
+		$cdata[ "country"  ] = $epg[ "country" ];
+		$cdata[ "tags"     ] = $epg[ "tags"    ];
 		$cdata[ "file"     ] = $actfile;
 		$cdata[ "dir"      ] = $actdir;
 		
 		$GLOBALS[ "actchannels" ][ $channel ] = $cdata;
+		
+		saveChannel($cdata, $astra[ "astra" ]);
 		
  		echo "Writing $actdir\n";
 	}
