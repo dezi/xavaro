@@ -1,0 +1,393 @@
+[
+  {
+    "name":"Sky Sport 6 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.sky.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ss/sky_de_sport.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"DRadio Dokumente und Debatten",
+    "free":true,
+    "enc":"None",
+    "hd":false,
+    "website":"www.deutschlandradio.de/dokumente-und-debatten.237.de.html",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/radio/dd/deutschlandradio_de_dok_deb.png",
+    "type":"radio",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"0:Undefined"
+  },
+  
+  {
+    "name":"DMAX Austria HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.dmax.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/dd/dmax_at_hd.png",
+    "type":"tv",
+    "country":"Austria, United States",
+    "isocc":"at",
+    "isolang":"ger",
+    "genre":"0:Undefined"
+  },
+  {
+    "name":"WDR Fernsehen Aachen HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/tv",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_aachen_hd.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"WDR Fernsehen Düsseldorf HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/tv",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_dusseldorf_hd.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"WDR Studio Bielefeld HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/bielefeld",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_bielefeld.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },  
+  {
+    "name":"WDR Studio Bonn HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/bonn",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_studio_bonn.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },  
+  {
+    "name":"WDR Studio Dortmund HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/dortmund",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_dortmund.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },  
+  {
+    "name":"WDR Studio Duisburg HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/duisburg",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_studio_duisburg.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"WDR Studio Essen HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/essen",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_essen.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"WDR Studio Münster HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/muenster",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_munster.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"WDR Studio Siegen HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/siegen",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_siegen.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"WDR Studio Wuppertal HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.wdr.de/studio/wuppertal",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ww/wdr_studio_wuppertal.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"Eurosport 360 6 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.eurosport.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_360_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Eurosport 360 1 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.eurosport.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_360_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Eurosport 360 2 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.eurosport.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_360_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Eurosport 360 3 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.eurosport.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_360_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Eurosport 360 4 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.eurosport.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_360_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Eurosport 360 5 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.eurosport.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_360_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Eurosport 360 8 HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.eurosport.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_360_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"N24 Austria HD",
+    "free":false,
+    "enc":"Irdeto;Viaccess;Videoguard",
+    "hd":true,
+    "website":"www.n24.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/nn/n24_de_hd.png",
+    "type":"tv",
+    "country":"Austria",
+    "isocc":"at",
+    "isolang":"ger",
+    "genre":"7:News",
+    "packs":
+    [
+      "13:AustriaSat"
+    ]
+  },
+  {
+    "name":"ORF 2 Wien HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"wien.orf.at",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/oo/orf_2_at_hd.png",
+    "type":"tv",
+    "country":"Austria",
+    "isocc":"at",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "16:ORF Digital"
+    ]
+  },
+
+  {}
+]

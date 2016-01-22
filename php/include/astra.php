@@ -4,12 +4,6 @@ function simplifySearchName($mname)
 {
 	$mname = mb_strtolower($mname, 'UTF-8');
 
-	if (strpos($mname, " hd ") !== false) $mname = str_replace(" hd ", "", $mname) . " hd";
-	if (strpos($mname, " sd ") !== false) $mname = str_replace(" sd ", "", $mname) . " sd";
-	
-	$mname = str_replace(" studio ", " ", $mname);
-	$mname = str_replace(" fernsehen ", " ", $mname);
-	  
 	$mname = str_replace("-", " ", $mname);
 	$mname = str_replace("_", " ", $mname);
 	$mname = str_replace(".", " ", $mname);
@@ -24,48 +18,56 @@ function simplifySearchName($mname)
 	return $mname;
 }
 
-function resolveAstraCountry($name, $country, $language)
+function resolveAstraDump($orgname, $language, $name)
 {
-	if (isset($GLOBALS[ "astra.rules" ][ $name ])) 
+	if (isset($GLOBALS[ "epgnames" ][ $name ])) 
 	{
-		$name = $GLOBALS[ "astra.rules" ][ $name ];
+		$orgname = $name;
+		$name = $GLOBALS[ "epgnames" ][ $name ];
+		
+		echo "RESOLVER: $orgname => $name\n";
+		
+		fwrite($GLOBALS[ "epgdump" ],"\t[ \"$language\", \"$orgname\", \"$name\" ],\n");
+	}
+}
+
+function resolveAstraCountry($orgname, $name, $country, $language)
+{
+	$result = resolveAstraPhases($orgname, $name, $country, $language);
+	
+	if (! isset($GLOBALS[ "astra.resolved.json" ]))
+	{
+		$GLOBALS[ "astra.resolved.json" ] = fopen(dirname(__FILE__) . "/astra.resolved.json","w");
 	}
 	
-	$mname = simplifySearchName($name);
-
-	//
-	// Remove language tag from channel if present.
-	//
+	$cachetag = "$orgname $country $language";
 	
-	$mname = str_replace("($language)", "", $mname);
+	if (! isset($GLOBALS[ "astra.resolved" ][ $cachetag ]))
+	{
+		$GLOBALS[ "astra.resolved" ][ $cachetag ] = true;
+		
+		$padorg = str_pad("\"" . $orgname . "\",", 32, " ");
+		$padnew = "\"" . (($result != null) ? $result[ "name" ] : "") . "\"";
+		
+		$entry = "\t[ \"$language\", $padorg $padnew ],\n";
+		
+		fwrite($GLOBALS[ "astra.resolved.json" ],$entry);
+	}
+	
+	return $result;
+}
+
+function resolveAstraPhases($orgname, $name, $country, $language)
+{
+	$mname = simplifySearchName($name);
 	
 	//
 	// Normal lookup.
 	//
 	
 	$result = resolveAstraCountryDoit($name, $country, $language, $mname);	
-	if ($result != "xx") return $result;
+	if ($result != null) return $result;
 		
-	//
-	// HD add lookup.
-	//
-	
-	if (substr($mname, -2) != "hd")
-	{
-		$result = resolveAstraCountryDoit($name, $country, $language, $mname . "hd");
-		if ($result != "xx") return $result;
-	}
-	
-	//
-	// HD remove lookup.
-	//
-	
-	if (substr($mname, -2) == "hd")
-	{	
-		$result = resolveAstraCountryDoit($name, $country, $language, substr($mname, 0, -2));
-		if ($result != "xx") return $result;
-	}
-	
 	//
 	// Country lookup part 1.
 	//
@@ -75,7 +77,7 @@ function resolveAstraCountry($name, $country, $language)
 	if ($language == "eng") $mname = simplifySearchName($name . " UK");
 
 	$result = resolveAstraCountryDoit($name, $country, $language, $mname);
-	if ($result != "xx") return $result;
+	if ($result != null) return $result;
 
 	//
 	// Country lookup part 2.
@@ -84,16 +86,8 @@ function resolveAstraCountry($name, $country, $language)
 	if ($language == "ger") $mname = simplifySearchName($name . " Deutsch");
 
 	$result = resolveAstraCountryDoit($name, $country, $language, $mname);
-	if ($result != "xx") return $result;
+	if ($result != null) return $result;
 
-	$cachetag = "$name $country $language";
-	
-	if (! isset($GLOBALS[ "nxishow" ][ $cachetag ]))
-	{
-		$GLOBALS[ "nxishow" ][ $cachetag ] = true;
-		echo "UNMATCHED: $name, $country, $language\n";
-	}
-	
 	return $result;
 }
 
@@ -111,29 +105,12 @@ function resolveAstraCountryDoit($name, $country, $language, $mname)
 	
 	foreach ($GLOBALS[ "astra.config" ] as $channel)
 	{
-		if ($mname == $channel[ "mname" ])
+		if (($mname == $channel[ "mname" ]) && ($language == $channel[ "isolang" ]))
 		{
  			$anames[] = $channel[ "name"  ];
  			$isoccs[] = $channel[ "isocc" ];
 		}
 	}
-	
-	/*
-	if (count($isoccs) == 0)
-	{
-		foreach ($GLOBALS[ "astra.config" ] as $channel)
-		{
-			$dist = levenshtein($mname, $channel[ "mname" ]);
-			
-			if ((strlen($mname) > 5) && ($dist <= 1))
-			{
-				$isoccs[] = $channel[ "isocc" ];
-				
-				echo "levenshtein $name => $country => $language :: " . $channel[ "name" ] . "\n";
-			}
-		}
-	}
-	*/
 	
 	if (count($isoccs) > 1)
 	{
@@ -153,31 +130,27 @@ function resolveAstraCountryDoit($name, $country, $language, $mname)
 		}
 	}
 	
-	$result = "xx";
+	$result = null;
 	
 	if (count($isoccs) > 0)
 	{
-		$isocc = $isoccs[ 0 ];
-		$aname = $anames[ 0 ];
-		
-		$result = $isocc;
+		$result[ "name"  ] = $anames[ 0 ];
+		$result[ "isocc" ] = $isoccs[ 0 ];
 	}
 	
 	$GLOBALS[ "channelcache" ][ $cachetag ] = $result;
-	
-	if ($result != "xx")
-	{
-		//echo "POSITIVE => $name => $country => $language :: $result $aname \n";
-	}
-	
+
 	return $result;
 }
 
 function readAstraConfig()
 {
-	$configname = dirname(__FILE__) . "/astra.config.json";
-	$rulesname  = dirname(__FILE__) . "/astra.rules.json";
-
+	$configname     = dirname(__FILE__) . "/astra.config.json";
+	$manualname     = dirname(__FILE__) . "/astra.manual.json";
+	$unresolvedname = dirname(__FILE__) . "/astra.unresolved.json";
+	
+	$GLOBALS[ "unresolved" ] = fopen($unresolvedname,"w");
+	
 	if (! file_exists($configname))
 	{
 		$astraraw = file_get_contents("http://www.astra.de/webservice/v3/channels"
@@ -207,6 +180,24 @@ function readAstraConfig()
 		{
 			$compact = array();
 			
+			//
+			// Unify channel name.
+			//
+			
+			$name = $channel[ "name" ];
+			$ishd = $channel[ "hd"   ];
+	
+			if (strpos($name, " HD ") !== false) $name = str_replace(" HD ", "", $name) . " HD";
+			if (strpos($name, " SD ") !== false) $name = str_replace(" SD ", "", $name) . " SD";
+	
+			if ($ishd && (substr($name, -2) != "HD")) $name .= " HD";
+			
+			$channel[ "name" ] = $name;
+			
+			//
+			// Build compact record.
+			//
+			
 			$compact[ "name"     ]  = $channel[ "name"       ];
 			$compact[ "free"     ]  = $channel[ "free"       ];
 			$compact[ "enc"      ]  = $channel[ "encryption" ];
@@ -216,7 +207,7 @@ function readAstraConfig()
 			$compact[ "logo"     ]  = $channel[ "logo_url"   ];
 			$compact[ "type"     ]  = $channel[ "radio" ] ? "radio" : "tv";
 			$compact[ "country"  ]  = $channel[ "originating_from" ];
-			
+
 			if (resolveCountry($compact[ "country" ]))
 			{
 				$compact[ "isocc" ]  = resolveCountry($compact[ "country" ]);
@@ -295,11 +286,15 @@ function readAstraConfig()
 		}
 	}
 	
-	$astrarules = json_decdat(file_get_contents($rulesname));
-
-	foreach ($astrarules as $rule)
+	$astramanual = json_decdat(file_get_contents($manualname));
+	
+	foreach ($astramanual as $inx => $channel)
 	{
-		$GLOBALS[ "astra.rules" ][ $rule[ 0 ] ] = $rule[ 1 ]; 
+		if (! isset( $channel[ "name" ])) continue;
+		
+		$mname = simplifySearchName($channel[ "name" ]);
+		$channel[ "mname" ] = $mname;
+		$GLOBALS[ "astra.config" ][] = $channel;
 	}
 }
 

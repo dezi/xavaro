@@ -271,6 +271,56 @@ function readServices($servicesdir, $networkname)
 	closedir($dfd);
 }
 
+function unifyChannelName($name, $language, $ishd)
+{
+	if (! isset($GLOBALS[ "epgdump" ])) 
+	{
+		$GLOBALS[ "epgdump" ] = fopen("../include/epgnames.dump.json","w");
+	}
+	
+	if (! isset($GLOBALS[ "epgnames" ]))
+	{
+		$epgnamesfile = "../include/epgnames.json";
+
+		$epgnames = json_decdat(file_get_contents($epgnamesfile));
+ 
+		foreach ($epgnames as $rule)
+		{
+			$GLOBALS[ "epgnames" ][ $rule[ 0 ] ] = $rule[ 1 ]; 
+		}
+	}
+	
+	if (isset($GLOBALS[ "epgnames" ][ $name ])) return $GLOBALS[ "epgnames" ][ $name ];
+
+	//
+	// Put HD/SD markers at end.
+	//
+	
+	if (strpos($name, " HD ") !== false) $name = str_replace(" HD ", "", $name) . " HD";
+	if (strpos($name, " SD ") !== false) $name = str_replace(" SD ", "", $name) . " SD";
+	
+	if ($ishd && (substr($name, -2) != "HD"))
+	{
+		$name .= " HD";
+	}
+	
+	//
+	// Remove content in brackets.
+	//
+	
+	while (preg_match("(*UTF8)|(\([^\)]*\))|", $name, $treffer))
+	{
+		$name = str_replace($treffer[ 1 ], "", $name);
+	}
+	
+	$name = str_replace("  ", " ", $name);
+	$name = str_replace("  ", " ", $name);
+	
+	if (isset($GLOBALS[ "epgnames" ][ $name ])) return $GLOBALS[ "epgnames" ][ $name ];
+
+	return $name;
+}
+
 function saveEPG($epg)
 {
 	if (! isset($epg[ "title" ])) 
@@ -282,10 +332,8 @@ function saveEPG($epg)
 		return;
 	}
 	
-	$title = $epg[ "title" ];
-
-	if (($title == "Leider keine Programminformationen vorhanden") ||
-		($title == "Leider keine Programminformationen verfügbar"))
+	if (($epg[ "title" ] == "Leider keine Programminformationen vorhanden") ||
+		($epg[ "title" ] == "Leider keine Programminformationen verfügbar"))
 	{
 		//
 		// Bogous entries from Kabel Deutschland spackos discarded.
@@ -294,13 +342,20 @@ function saveEPG($epg)
 		return;
 	}
 
-	$type     = $epg[ "type"     ];
 	$channel  = $epg[ "channel"  ];
+	$type     = $epg[ "type"     ];
 	$country  = $epg[ "country"  ];
 	$language = $epg[ "language" ];
-		
-	$isocc = resolveAstraCountry($channel, $country, $language);
-
+	$ishd     = isset($epg[ "is_hd" ]) ? $epg[ "is_hd" ] : false;
+	
+	$orgname = $channel;
+	$channel = unifyChannelName($channel, $language, $ishd);
+	
+	$result = resolveAstraCountry($orgname, $channel, $country, $language);
+	
+	$channel = isset($result[ "name"  ]) ? $result[ "name"  ] : $channel;
+	$isocc   = isset($result[ "isocc" ]) ? $result[ "isocc" ] : "xx";
+	
 	$actdir  = "../../var/epgdata/$type/$isocc/$channel"; 
 	if (! file_exists($actdir)) mkdir($actdir, 0755, true);
 	
