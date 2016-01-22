@@ -24,7 +24,8 @@ function resolveAstra($orgname, $name, $language)
 	
 	if (isset($GLOBALS[ "astra.resolved" ][ $language . "." . $orgname ]))
 	{
-		$name = $GLOBALS[ "astra.resolved" ][ $language . "." . $orgname ];
+		$newname = $GLOBALS[ "astra.resolved" ][ $language . "." . $orgname ];
+		if ($newname != "") $name = $newname;
 		
 		$isknown = true;
 	}
@@ -37,10 +38,10 @@ function resolveAstra($orgname, $name, $language)
 		$GLOBALS[ "astra.newentry.json" ] = fopen($newentry,"w");
 	}
 	
-	$cachetag = "$orgname $country $language";
+	$cachetag = "$orgname $language";
 	
 	if ((($isknown == false) || ($result == null)) && 
-			! isset($GLOBALS[ "astra.resolved" ][ $cachetag ]))
+			! isset($GLOBALS[ "astra.newentry" ][ $cachetag ]))
 	{
 		$GLOBALS[ "astra.newentry" ][ $cachetag ] = true;
 		
@@ -93,7 +94,7 @@ function resolveAstraPhases($orgname, $name, $language)
 
 function resolveAstraDoit($name, $language, $mname)
 {
-	$cachetag = "$mname $country $language";
+	$cachetag = "$mname $language";
 	
 	if (isset($GLOBALS[ "astra.cache" ][ $cachetag ]))
 	{
@@ -307,6 +308,8 @@ function readAstraConfig()
  
 	foreach ($astraresolved as $rule)
 	{
+		if (count($rule) == 0) continue;
+		
 		$GLOBALS[ "astra.resolved" ][ $rule[ 0 ] . "." . $rule[ 1 ] ] = $rule[ 2 ]; 
 	}
 }

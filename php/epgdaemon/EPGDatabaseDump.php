@@ -289,7 +289,7 @@ function unifyChannelName($name, $language, $ishd)
 	// Remove content in brackets.
 	//
 	
-	while (preg_match("(*UTF8)|(\([^\)]*\))|", $name, $treffer))
+	while (preg_match("|(\([^\)]*\))|", $name, $treffer))
 	{
 		$name = str_replace($treffer[ 1 ], "", $name);
 	}
@@ -323,14 +323,21 @@ function saveEPG($epg)
 
 	$channel  = $epg[ "channel"  ];
 	$type     = $epg[ "type"     ];
-	$country  = $epg[ "country"  ];
 	$language = $epg[ "language" ];
 	$ishd     = isset($epg[ "is_hd" ]) ? $epg[ "is_hd" ] : false;
 	
 	$orgname = $channel;
 	$channel = unifyChannelName($channel, $language, $ishd);
+	$result  = resolveAstra($orgname, $channel, $language);
 	
-	$result = resolveAstra($orgname, $channel, $country, $language);
+	if ($result == null)
+	{
+		//
+		// Do not dump unconsolidated shit to disk.
+		//
+		
+		return;
+	}
 	
 	$channel = isset($result[ "name"  ]) ? $result[ "name"  ] : $channel;
 	$isocc   = isset($result[ "isocc" ]) ? $result[ "isocc" ] : "xx";
@@ -379,6 +386,8 @@ function saveEPG($epg)
 		$cdata[ "dir"      ] = $actdir;
 		
 		$GLOBALS[ "actchannels" ][ $channel ] = $cdata;
+		
+ 		echo "Writing $actdir\n";
 	}
 	
 	unset($epg[ "is_hd"         ]);
