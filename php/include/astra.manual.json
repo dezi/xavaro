@@ -1,5 +1,95 @@
 [
   {
+    "name":"A&E Deutschland HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.ae-tv.de",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/ae_de.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"eng",
+    "genre":"4:Films",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Sport 1 US",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":false,
+    "website":"www.sport1.de",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ss/sport1_de_us.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"eng",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Sport 1+",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":false,
+    "website":"tv.sport1.de/sport1plus/index.php",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ss/sport1_de_plus.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"TNT Film HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.tnt-film.de",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/tt/tnt_film_hd.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"eng",
+    "genre":"4:Films",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"TNT Glitz",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":false,
+    "website":"www.glitztv.de",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/tt/tnt_glitz_de.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"eng",
+    "genre":"0:Undefined",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
     "name":"Sky Sport News",
     "free":false,
     "enc":"Videoguard",

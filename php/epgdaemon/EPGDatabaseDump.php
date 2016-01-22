@@ -400,7 +400,6 @@ function saveChannel($cdata, $adata)
 			if ($config[ "tags" ][ $inx ] == "TV channels")
 			{
 				unset($config[ "tags" ][ $inx ]);
-				$inx--;
 			}
 		}	
 	}
