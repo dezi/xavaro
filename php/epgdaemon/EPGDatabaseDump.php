@@ -273,25 +273,6 @@ function readServices($servicesdir, $networkname)
 
 function unifyChannelName($name, $language, $ishd)
 {
-	if (! isset($GLOBALS[ "epgdump" ])) 
-	{
-		$GLOBALS[ "epgdump" ] = fopen("../include/epgnames.dump.json","w");
-	}
-	
-	if (! isset($GLOBALS[ "epgnames" ]))
-	{
-		$epgnamesfile = "../include/epgnames.json";
-
-		$epgnames = json_decdat(file_get_contents($epgnamesfile));
- 
-		foreach ($epgnames as $rule)
-		{
-			$GLOBALS[ "epgnames" ][ $rule[ 0 ] ] = $rule[ 1 ]; 
-		}
-	}
-	
-	if (isset($GLOBALS[ "epgnames" ][ $name ])) return $GLOBALS[ "epgnames" ][ $name ];
-
 	//
 	// Put HD/SD markers at end.
 	//
@@ -316,8 +297,6 @@ function unifyChannelName($name, $language, $ishd)
 	$name = str_replace("  ", " ", $name);
 	$name = str_replace("  ", " ", $name);
 	
-	if (isset($GLOBALS[ "epgnames" ][ $name ])) return $GLOBALS[ "epgnames" ][ $name ];
-
 	return $name;
 }
 
@@ -351,7 +330,7 @@ function saveEPG($epg)
 	$orgname = $channel;
 	$channel = unifyChannelName($channel, $language, $ishd);
 	
-	$result = resolveAstraCountry($orgname, $channel, $country, $language);
+	$result = resolveAstra($orgname, $channel, $country, $language);
 	
 	$channel = isset($result[ "name"  ]) ? $result[ "name"  ] : $channel;
 	$isocc   = isset($result[ "isocc" ]) ? $result[ "isocc" ] : "xx";
@@ -668,39 +647,6 @@ readAstraConfig();
 
 readEPG();
 
-//splitEPGs();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+splitEPGs();
 
 ?>
