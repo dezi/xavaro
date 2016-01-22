@@ -343,7 +343,7 @@ function saveChannel($cdata, $adata)
 		$config[ "isocc"     ] = $isocc;
 	}
 	
-	$config[ "ishd"    ] = $$ishd;
+	$config[ "ishd"    ] = $ishd;
 	$config[ "isolang" ] = $adata[ "isolang" ];
 	$config[ "packs"   ] = $adata[ "packs"   ];
 
@@ -361,9 +361,9 @@ function saveChannel($cdata, $adata)
 	{
 		$network = $cdata[ "network" ];
 		
-		if ((substr($network, 0, 5) == "DVT-T") ||
-			(substr($network, 0, 5) == "DVT-C") ||
-			(substr($network, 0, 5) == "DVT-S") )
+		if ((substr($network, 0, 5) == "DVB-T") ||
+			(substr($network, 0, 5) == "DVB-C") ||
+			(substr($network, 0, 5) == "DVB-S") )
 		{
 			addChannelTag($config, "tags", substr($network, 0, 5));
 		}		
