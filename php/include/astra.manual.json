@@ -1,5 +1,24 @@
 [
   {
+    "name":"Deluxe Music Austria HD",
+    "free":false,
+    "enc":"Nagravision;Videoguard",
+    "hd":true,
+    "website":"www.deluxemusic.tv/tv.html",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/dd/deluxe_music_de_hd.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"5:Music",
+    "packs":
+    [
+      "14:HD+",
+      "15:Sky Deutschland"
+    ]
+  },
+  {
     "name":"Planet HD",
     "free":false,
     "enc":"Cryptoworks;Irdeto;Mediaguard;Nagravision",
