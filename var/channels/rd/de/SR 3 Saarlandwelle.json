@@ -1,9 +1,10 @@
 {
   "name":"SR 3 Saarlandwelle",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "ARD SR",

@@ -1,9 +1,10 @@
 {
   "name":"Sky Sport 2 HD",
   "type":"tv",
-  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

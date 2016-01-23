@@ -1,9 +1,10 @@
 {
   "name":"Disney Junior UK",
   "type":"tv",
-  "ishd":false,
   "isocc":"us",
   "isolang":"eng",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

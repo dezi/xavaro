@@ -1,9 +1,10 @@
 {
   "name":"NDR Fernsehen Hamburg HD",
   "type":"tv",
-  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":true,
   "tags":
   [
     "ARD",

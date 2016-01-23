@@ -1,9 +1,10 @@
 {
   "name":"SWR 4 Rheinland-Pfalz Mainz",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "ARD SWR",

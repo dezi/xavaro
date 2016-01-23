@@ -1,9 +1,10 @@
 {
   "name":"Channel 21",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "BetaDigital",

@@ -1,9 +1,10 @@
 {
   "name":"Bayern 3",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":true,
   "tags":
   [
     "ARD BR",

@@ -1,9 +1,10 @@
 {
   "name":"SR 2 KulturRadio",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":true,
   "tags":
   [
     "ARD SR",

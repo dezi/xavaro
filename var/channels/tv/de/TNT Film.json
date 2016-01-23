@@ -1,9 +1,10 @@
 {
   "name":"TNT Film",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"eng",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

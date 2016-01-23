@@ -1,9 +1,10 @@
 {
   "name":"DRadio Wissen",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "ARD DR",

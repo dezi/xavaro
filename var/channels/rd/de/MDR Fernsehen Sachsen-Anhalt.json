@@ -1,9 +1,9 @@
 {
   "name":"MDR Fernsehen Sachsen-Anhalt",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
   "tags":
   [
     "ARD MDR",

@@ -1,9 +1,10 @@
 {
   "name":"MDR Thüringen",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "ARD MDR",

@@ -1,9 +1,10 @@
 {
   "name":"NDR 1 Niedersachsen",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":true,
   "tags":
   [
     "ARD NDR",

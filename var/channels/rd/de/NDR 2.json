@@ -1,9 +1,10 @@
 {
   "name":"NDR 2",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "ARD NDR",

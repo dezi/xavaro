@@ -1,9 +1,10 @@
 {
   "name":"SWR 2 Baden-Württemberg",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":true,
   "tags":
   [
     "ARD SWR",

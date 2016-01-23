@@ -1,9 +1,10 @@
 {
   "name":"France 5",
   "type":"tv",
-  "ishd":false,
   "isocc":"fr",
   "isolang":"fre",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

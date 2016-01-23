@@ -1,9 +1,10 @@
 {
   "name":"SR Fernsehen",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "ARD",

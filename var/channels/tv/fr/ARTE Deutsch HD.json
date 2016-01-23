@@ -1,9 +1,10 @@
 {
   "name":"ARTE Deutsch HD",
   "type":"tv",
-  "ishd":1,
   "isocc":"fr",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":true,
   "tags":
   [
     "ARD",

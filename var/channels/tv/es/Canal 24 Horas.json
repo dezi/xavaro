@@ -1,9 +1,10 @@
 {
   "name":"Canal 24 Horas",
   "type":"tv",
-  "ishd":false,
   "isocc":"es",
   "isolang":"spa",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

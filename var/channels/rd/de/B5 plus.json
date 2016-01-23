@@ -1,9 +1,10 @@
 {
   "name":"B5 plus",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":true,
   "tags":
   [
     "ARD BR",

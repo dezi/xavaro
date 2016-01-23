@@ -1,9 +1,10 @@
 {
   "name":"TNT Glitz HD",
   "type":"tv",
-  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

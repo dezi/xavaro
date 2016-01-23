@@ -1,9 +1,10 @@
 {
   "name":"WDR Fernsehen Köln",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":true,
   "tags":
   [
     "ARD",

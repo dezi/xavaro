@@ -1,9 +1,10 @@
 {
   "name":"Antenne Brandenburg Potsdam",
   "type":"rd",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "ARD rbb",

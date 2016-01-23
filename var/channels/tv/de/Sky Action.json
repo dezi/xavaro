@@ -1,9 +1,10 @@
 {
   "name":"Sky Action",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

@@ -1,9 +1,10 @@
 {
   "name":"RTR Planeta",
   "type":"tv",
-  "ishd":false,
   "isocc":"ru",
   "isolang":"rus",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

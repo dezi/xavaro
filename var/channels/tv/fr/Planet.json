@@ -1,9 +1,10 @@
 {
   "name":"Planet",
   "type":"tv",
-  "ishd":false,
   "isocc":"fr",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

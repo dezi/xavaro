@@ -1,9 +1,10 @@
 {
   "name":"Sky Sport Austria",
   "type":"tv",
-  "ishd":false,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

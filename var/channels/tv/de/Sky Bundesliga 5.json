@@ -1,9 +1,10 @@
 {
   "name":"Sky Bundesliga 5",
   "type":"tv",
-  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

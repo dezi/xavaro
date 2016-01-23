@@ -1,9 +1,10 @@
 {
   "name":"Planet HD",
   "type":"tv",
-  "ishd":false,
   "isocc":"fr",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "DVB-C",

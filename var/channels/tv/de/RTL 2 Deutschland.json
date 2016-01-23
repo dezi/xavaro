@@ -1,9 +1,10 @@
 {
   "name":"RTL 2 Deutschland",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-C",
