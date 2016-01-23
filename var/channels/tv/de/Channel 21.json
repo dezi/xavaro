@@ -6,12 +6,15 @@
   "isolang":"ger",
   "tags":
   [
+    "BetaDigital",
     "DVB-C",
+    "DVB-S",
     "Digital Free",
     "SDTV"
   ],
   "providers":
   [
+    "BetaDigital",
     "Digital Free"
   ]
 }

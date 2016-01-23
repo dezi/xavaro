@@ -1,12 +1,13 @@
 {
   "name":"Eurosport 1 Germany HD",
   "type":"tv",
-  "ishd":false,
+  "ishd":1,
   "isocc":"fr",
   "isolang":"ger",
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "HDTV",
     "SKY"
   ],

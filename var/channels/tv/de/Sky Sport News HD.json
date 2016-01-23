@@ -1,12 +1,13 @@
 {
   "name":"Sky Sport News HD",
   "type":"tv",
-  "ishd":false,
+  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "HDTV",
     "SDTV",
     "SKY"

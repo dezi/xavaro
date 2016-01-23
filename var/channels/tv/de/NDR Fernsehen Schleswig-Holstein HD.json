@@ -1,13 +1,14 @@
 {
   "name":"NDR Fernsehen Schleswig-Holstein HD",
   "type":"tv",
-  "ishd":false,
+  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
   "tags":
   [
     "ARD",
     "DVB-C",
+    "DVB-S",
     "HDTV"
   ],
   "providers":

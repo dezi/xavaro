@@ -1,12 +1,13 @@
 {
   "name":"Eurosport 360 1 HD",
   "type":"tv",
-  "ishd":false,
+  "ishd":1,
   "isocc":"fr",
   "isolang":"ger",
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "HDTV",
     "SKY"
   ],

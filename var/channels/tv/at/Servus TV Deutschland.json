@@ -7,8 +7,10 @@
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "Digital Free",
-    "SDTV"
+    "SDTV",
+    "ServusTV"
   ],
   "packs":
   [
@@ -16,6 +18,7 @@
   ],
   "providers":
   [
-    "Digital Free"
+    "Digital Free",
+    "ServusTV"
   ]
 }
