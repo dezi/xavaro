@@ -772,7 +772,7 @@ function splitEPGs()
 		}
 		else
 		{
-			rmdir(dirname($tempfile));
+			@rmdir(dirname($tempfile));
 		}
 	}
 }

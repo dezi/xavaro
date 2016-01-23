@@ -1,7 +1,7 @@
 {
   "name":"Sky Sport 5 HD",
   "type":"tv",
-  "ishd":false,
+  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
   "tags":
