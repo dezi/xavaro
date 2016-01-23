@@ -1,25 +1,21 @@
 {
-  "name":"Welt der Wunder TV",
+  "name":"RTL Nitro Austria",
   "type":"tv",
   "ishd":false,
-  "isocc":"de",
+  "isocc":"at",
   "isolang":"ger",
   "tags":
   [
-    "-",
-    "DVB-C",
     "DVB-S",
-    "Digital Free",
+    "RTL",
     "SDTV"
   ],
   "packs":
   [
-    "15:Sky Deutschland",
     "16:ORF Digital"
   ],
   "providers":
   [
-    "-",
-    "Digital Free"
+    "RTL"
   ]
 }

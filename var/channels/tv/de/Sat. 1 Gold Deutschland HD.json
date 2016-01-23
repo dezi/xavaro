@@ -1,0 +1,22 @@
+{
+  "name":"Sat. 1 Gold Deutschland HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "ProSiebenSat.1"
+  ],
+  "packs":
+  [
+    "14:HD+",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "ProSiebenSat.1"
+  ]
+}

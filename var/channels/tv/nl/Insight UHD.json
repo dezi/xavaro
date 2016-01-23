@@ -1,0 +1,22 @@
+{
+  "name":"Insight UHD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"nl",
+  "isolang":"eng",
+  "tags":
+  [
+    "DVB-S",
+    "SDTV",
+    "SES ASTRA"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "SES ASTRA"
+  ]
+}

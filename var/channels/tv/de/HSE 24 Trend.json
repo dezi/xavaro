@@ -1,0 +1,17 @@
+{
+  "name":"HSE 24 Trend",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

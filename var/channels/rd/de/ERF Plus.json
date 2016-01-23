@@ -1,0 +1,21 @@
+{
+  "name":"ERF Plus",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "Radio"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

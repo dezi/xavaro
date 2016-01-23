@@ -1,0 +1,21 @@
+{
+  "name":"Eurosport 3607 HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"fr",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "SKY"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "SKY"
+  ]
+}

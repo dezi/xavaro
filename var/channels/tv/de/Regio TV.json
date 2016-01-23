@@ -1,25 +1,21 @@
 {
-  "name":"Welt der Wunder TV",
+  "name":"Regio TV",
   "type":"tv",
   "ishd":false,
   "isocc":"de",
   "isolang":"ger",
   "tags":
   [
-    "-",
-    "DVB-C",
+    "BetaDigital",
     "DVB-S",
-    "Digital Free",
     "SDTV"
   ],
   "packs":
   [
-    "15:Sky Deutschland",
-    "16:ORF Digital"
+    "6:CanalDigitaal"
   ],
   "providers":
   [
-    "-",
-    "Digital Free"
+    "BetaDigital"
   ]
 }

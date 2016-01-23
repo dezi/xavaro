@@ -1,0 +1,21 @@
+{
+  "name":"Sky Sport Austria HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "SKY"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "SKY"
+  ]
+}

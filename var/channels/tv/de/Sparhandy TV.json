@@ -1,0 +1,17 @@
+{
+  "name":"Sparhandy TV",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

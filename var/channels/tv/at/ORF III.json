@@ -1,25 +1,21 @@
 {
-  "name":"Welt der Wunder TV",
+  "name":"ORF III",
   "type":"tv",
   "ishd":false,
-  "isocc":"de",
+  "isocc":"at",
   "isolang":"ger",
   "tags":
   [
-    "-",
-    "DVB-C",
     "DVB-S",
-    "Digital Free",
+    "ORF",
     "SDTV"
   ],
   "packs":
   [
-    "15:Sky Deutschland",
     "16:ORF Digital"
   ],
   "providers":
   [
-    "-",
-    "Digital Free"
+    "ORF"
   ]
 }

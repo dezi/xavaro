@@ -1,0 +1,21 @@
+{
+  "name":"RTL 4",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"nl",
+  "isolang":"dut",
+  "tags":
+  [
+    "DVB-S",
+    "M7 Group",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal"
+  ],
+  "providers":
+  [
+    "M7 Group"
+  ]
+}

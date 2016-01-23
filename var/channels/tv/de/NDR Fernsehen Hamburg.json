@@ -1,0 +1,17 @@
+{
+  "name":"NDR Fernsehen Hamburg",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-S",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}

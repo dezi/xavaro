@@ -1,0 +1,22 @@
+{
+  "name":"Nickelodeon Nederland",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"nl",
+  "isolang":"dut",
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "CSAT"
+  ]
+}

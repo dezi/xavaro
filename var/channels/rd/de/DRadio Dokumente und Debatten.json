@@ -1,0 +1,17 @@
+{
+  "name":"DRadio Dokumente und Debatten",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "Radio",
+    "ZDFvision"
+  ],
+  "providers":
+  [
+    "ZDFvision"
+  ]
+}

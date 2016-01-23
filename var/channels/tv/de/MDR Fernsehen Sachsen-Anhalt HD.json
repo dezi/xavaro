@@ -1,0 +1,17 @@
+{
+  "name":"MDR Fernsehen Sachsen-Anhalt HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-S",
+    "HDTV"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}

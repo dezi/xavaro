@@ -1,0 +1,22 @@
+{
+  "name":"Eins Plus HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}

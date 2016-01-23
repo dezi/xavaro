@@ -337,9 +337,20 @@ function saveChannel($cdata, $adata)
 	
 	$actdir  = "../../var/channels/$type/$isocc"; 
 	$actfile = $actdir . "/" . $name . ".json";
+	$actlogo = $actdir . "/" . $name . ".png";
 
 	if (! file_exists($actdir)) mkdir($actdir, 0755, true);
 	
+	if ((! file_exists($actlogo)) && isset($adata[ "logo" ]) && $adata[ "logo" ])
+	{
+		$im = ImageCreateFromPNG($adata[ "logo" ]);
+		
+		if ($im)
+		{
+			imagepng($im, $actlogo, 9);
+		}
+	}
+
 	$config = array();
 	
 	if (file_exists($actfile))

@@ -1,0 +1,17 @@
+{
+  "name":"JML Direct Shop",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

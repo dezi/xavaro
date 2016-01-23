@@ -1,25 +1,21 @@
 {
-  "name":"Welt der Wunder TV",
+  "name":"WDR Studio Essen",
   "type":"tv",
   "ishd":false,
   "isocc":"de",
   "isolang":"ger",
   "tags":
   [
-    "-",
-    "DVB-C",
+    "ARD",
     "DVB-S",
-    "Digital Free",
     "SDTV"
   ],
   "packs":
   [
-    "15:Sky Deutschland",
-    "16:ORF Digital"
+    "7:TV Vlaanderen Digitaal"
   ],
   "providers":
   [
-    "-",
-    "Digital Free"
+    "ARD"
   ]
 }

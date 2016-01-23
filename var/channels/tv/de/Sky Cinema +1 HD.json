@@ -1,0 +1,21 @@
+{
+  "name":"Sky Cinema +1 HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "SKY"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "SKY"
+  ]
+}

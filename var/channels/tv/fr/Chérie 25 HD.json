@@ -1,0 +1,25 @@
+{
+  "name":"Chérie 25 HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"fr",
+  "isolang":"fre",
+  "tags":
+  [
+    "Arqiva",
+    "DVB-S",
+    "HDTV",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "12:Orange France",
+    "17:CanalSat France",
+    "18:TNT Sat",
+    "28:SFR"
+  ],
+  "providers":
+  [
+    "Arqiva"
+  ]
+}

@@ -1,25 +1,22 @@
 {
-  "name":"Welt der Wunder TV",
+  "name":"Radio Bremen TV",
   "type":"tv",
   "ishd":false,
   "isocc":"de",
   "isolang":"ger",
   "tags":
   [
-    "-",
-    "DVB-C",
+    "ARD",
     "DVB-S",
-    "Digital Free",
     "SDTV"
   ],
   "packs":
   [
-    "15:Sky Deutschland",
-    "16:ORF Digital"
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal"
   ],
   "providers":
   [
-    "-",
-    "Digital Free"
+    "ARD"
   ]
 }
