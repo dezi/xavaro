@@ -766,7 +766,9 @@ function splitEPGs()
 		if (count($epgdays) > 0)
 		{
 			$epgswrite[ "epgdata" ] = $epgs;
-			$json = file_put_contents($cdata[ "file" ], json_encdat($currfile) . "\n");
+			file_put_contents($currfile, json_encdat($epgswrite) . "\n");
+			
+			echo "Writing " . $currfile . "\n";
 		}
 		else
 		{
