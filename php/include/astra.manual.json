@@ -1,5 +1,96 @@
 [
   {
+    "name":"Planet HD",
+    "free":false,
+    "enc":"Cryptoworks;Irdeto;Mediaguard;Nagravision",
+    "hd":true,
+    "website":"www.planet-tv.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/pp/planet_de_hd.png",
+    "type":"tv",
+    "country":"France, Germany",
+    "isocc":"fr",
+    "isolang":"ger",
+    "genre":"8:Documentary",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "13:AustriaSat"
+    ]
+  },
+  {
+    "name":"Kinowelt TV HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.kinowelt.tv",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/kk/kinowelt_tv_hd.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"4:Films",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"HistoryDeutschland",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":false,
+    "website":"www.history.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/hh/history_de.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"8:Documentary",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"E! Deutschland",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":false,
+    "website":"uk.eonline.com",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/e_global_us.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
+    "name":"Disney XD Deutschland HD",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":true,
+    "website":"www.disneyxd.de",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/dd/disney_xd_us_hd.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"eng",
+    "genre":"6:Children",
+    "packs":
+    [
+      "15:Sky Deutschland"
+    ]
+  },
+  {
     "name":"A&E Deutschland HD",
     "free":false,
     "enc":"Videoguard",
