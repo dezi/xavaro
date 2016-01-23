@@ -335,12 +335,82 @@ function addChannelTag(&$config, $tagname, $tagvalue)
 	asort($config[ $tagname ]);
 }
 
+function isBrainDead($channel)
+{
+	$bdtable = array();
+	$bdtable[] = "NDR Fernsehen Hamburg HD";
+	$bdtable[] = "WDR Fernsehen Köln";
+	$bdtable[] = "ZDF neo";
+	$bdtable[] = "ARTE Deutsch";
+	$bdtable[] = "MDR Fernsehen Sachsen-Anhalt";
+	$bdtable[] = "Das Erste HD";
+	$bdtable[] = "B5 plus";
+	$bdtable[] = "MDR Figaro";
+	$bdtable[] = "NDR Info Spezial";
+	$bdtable[] = "Tagesschau 24";
+	$bdtable[] = "Bayern Plus";
+	$bdtable[] = "Bayern 1";
+	$bdtable[] = "SR 2 KulturRadio";
+	$bdtable[] = "HR Fernsehen";
+	$bdtable[] = "NDR Info";
+	$bdtable[] = "Radio Berlin 88.8";
+	$bdtable[] = "WDR Fernsehen Köln HD";
+	$bdtable[] = "BR Puls";
+	$bdtable[] = "HR 2 Kultur";
+	$bdtable[] = "SWR Fernsehen Rheinland-Pfalz";
+	$bdtable[] = "ZDF info";
+	$bdtable[] = "BR Klassik";
+	$bdtable[] = "Deutschlandradio Kultur";
+	$bdtable[] = "WDR 3";
+	$bdtable[] = "NDR Kultur";
+	$bdtable[] = "1 Live";
+	$bdtable[] = "Bremen Vier";
+	$bdtable[] = "Einsfestival";
+	$bdtable[] = "Das Erste";
+	$bdtable[] = "RTL Deutschland HD";
+	$bdtable[] = "Bayern 2";
+	$bdtable[] = "Bayern 3";
+	$bdtable[] = "Deutschlandfunk";
+	$bdtable[] = "MDR Info";
+	$bdtable[] = "ARTE Deutsch HD";
+	$bdtable[] = "HR Fernsehen HD";
+	$bdtable[] = "ZDF neo HD";
+	$bdtable[] = "KIKA";
+	$bdtable[] = "SWR 2 Baden-Württemberg";
+	$bdtable[] = "RTL Deutschland";
+	$bdtable[] = "ZDF Kultur";
+	$bdtable[] = "NDR 1 Niedersachsen";
+	$bdtable[] = "RBB Berlin HD";
+	$bdtable[] = "KIKA HD";
+	$bdtable[] = "NDR Fernsehen Schleswig-Holstein";
+	$bdtable[] = "ZDF HD";
+	$bdtable[] = "Kulturradio";
+	$bdtable[] = "RBB Berlin";
+	$bdtable[] = "Eins Plus";
+	$bdtable[] = "MDR Fernsehen Sachsen HD";
+	$bdtable[] = "MDR Klassik";
+	$bdtable[] = "WDR 5";
+	$bdtable[] = "MDR 1 Radio Sachsen";
+	$bdtable[] = "B5 aktuell";
+	$bdtable[] = "3sat";
+	$bdtable[] = "3sat HD";
+	$bdtable[] = "ZDF";
+	$bdtable[] = "N-Joy";
+	$bdtable[] = "NDR Fernsehen Schleswig-Holstein HD";
+
+	foreach ($bdtable as $braindead)
+	{
+		if ($braindead == $channel) return true;
+	}
+	
+	return false;
+}
+
 function saveChannel($cdata)
 {
 	$name  = $cdata[ "name"  ];
 	$type  = $cdata[ "type"  ];
 	$isocc = $cdata[ "isocc" ];
-	$ishd  = $cdata[ "ishd"  ];
 	$adata = $cdata[ "astra" ];
 	
 	$actdir  = "../../var/channels/$type/$isocc"; 
@@ -359,8 +429,6 @@ function saveChannel($cdata)
 		}
 	}
 
-	$config = array();
-	
 	if (file_exists($actfile))
 	{
 		$config = json_decdat(file_get_contents($actfile));
@@ -368,19 +436,38 @@ function saveChannel($cdata)
 	else
 	{
 		//
-		// Preset fields some fields.
+		// Preset some fields.
 		//
 		
+		$config = array();
 		$config[ "name"      ] = $name;
 		$config[ "type"      ] = $type;
+		$config[ "isocc"     ] = $isocc;
+		$config[ "isbd"      ] = false;
 	}
 	
-	$config[ "ishd"    ] = $ishd;
-	$config[ "isocc"   ] = $isocc;
 	$config[ "isolang" ] = $adata[ "isolang" ];
+	$config[ "ishd"    ] = $adata[ "hd" ];
+
+	//
+	// Setup brain dead flag. Brain dead means that
+	// channels put items in description together w/o
+	// meaningfull seperator. Means they are to stupid
+	// => brain dead.
+	//
+	
+	$config[ "isbd" ] = $config[ "isbd" ] || isBrainDead($name);
+	
+	/*
+	$lfs = $cdata[ "lfs" ];
+	$bad = $cdata[ "bad" ];
+	
+	if (! isset($config[ "ishbd" ])) $config[ "isbd" ] = false;
+	$config[ "isbd" ] = $config[ "isbd" ] || (($lfs == 0) && ($bad > 10));
+	*/
 	
 	if (isset($adata[ "packs" ])) $config[ "packs" ] = $adata[ "packs" ];
-
+	
 	if (isset($cdata[ "tags" ]))
 	{
 		$tags = explode("|", $cdata[ "tags" ]);
@@ -425,16 +512,17 @@ function saveChannel($cdata)
 	
 	//
 	// Create new array for storing with defined
-	// content ordering.
+	// content ordering not to disturb gitgub.
 	//
 
 	$ordered = array();
 	
-	$ordered[ "name"      ] = $config[ "name"      ];
-	$ordered[ "type"      ] = $config[ "type"      ];
-	$ordered[ "ishd"      ] = $config[ "ishd"      ];
-	$ordered[ "isocc"     ] = $config[ "isocc"     ];
-	$ordered[ "isolang"   ] = $config[ "isolang"   ];
+	$ordered[ "name"    ] = $config[ "name"    ];
+	$ordered[ "type"    ] = $config[ "type"    ];
+	$ordered[ "isocc"   ] = $config[ "isocc"   ];
+	$ordered[ "isolang" ] = $config[ "isolang" ];
+	$ordered[ "ishd"    ] = $config[ "ishd"    ];
+	$ordered[ "isbd"    ] = $config[ "isbd"    ];
 	
 	if (isset($config[ "tags"      ])) $ordered[ "tags"      ] = $config[ "tags"      ];
 	if (isset($config[ "packs"     ])) $ordered[ "packs"     ] = $config[ "packs"     ];
@@ -607,6 +695,12 @@ function defuckEPG(&$epg)
 		$channel = $GLOBALS[ "actchannel" ];
 		$GLOBALS[ "actchannels" ][ $channel ][ "lfs" ] += 1;
 	}
+	
+	if (preg_match_all("|[a-z][A-Z]|", $desc, $treffer))
+	{
+		$channel = $GLOBALS[ "actchannel" ];
+		$GLOBALS[ "actchannels" ][ $channel ][ "bad" ] += count($treffer[ 0 ]);
+	}
 }
 
 function saveEPG($epg)
@@ -633,7 +727,7 @@ function saveEPG($epg)
 	$channel  = $epg[ "channel"  ];
 	$type     = $epg[ "type"     ];
 	$language = $epg[ "language" ];
-	$ishd     = isset($epg[ "is_hd" ]) ? true : false;
+	$ishd     = isset($epg[ "is_hd" ]) ? $epg[ "is_hd" ] : false;
 	
 	$orgname = stripShit($channel);
 	$channel = unifyChannelName($channel, $language, $ishd);
@@ -700,10 +794,9 @@ function saveEPG($epg)
 		$cdata[ "file"     ] = $actfile;
 		$cdata[ "dir"      ] = $actdir;
 		$cdata[ "lfs"      ] = 0;
+		$cdata[ "bad"      ] = 0;
 		
 		$GLOBALS[ "actchannels" ][ $channel ] = $cdata;
-		
-		saveChannel($cdata);
 		
  		echo "Writing $actdir\n";
 	}
@@ -731,7 +824,7 @@ function saveEPG($epg)
 	fwrite($GLOBALS[ "actfd" ],json_encdat($epg) . ",\n");
 }
 
-function readEPG()
+function readEPGs()
 {
 	$epgdatabase = "~/.hts/tvheadend/epgdb.v2";
 
@@ -905,6 +998,8 @@ function splitEPGs()
 {
 	foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 	{
+		saveChannel($cdata);
+
 		$tempfile = $cdata[ "file" ];
 		$currfile = str_replace("0000.00.00","current", $tempfile);
 		
@@ -976,15 +1071,15 @@ readNetworks();
 
 readAstraConfig();
 
-readEPG();
-
+readEPGs();
 splitEPGs();
 
 foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 {
-	$count = $cdata[ "lfs" ];
+	$lfs = $cdata[ "lfs" ];
+	$bad = $cdata[ "bad" ];
 	
-	echo "LF: $channel => $count\n";
+	if (($lfs == 0) && ($bad > 10)) echo "$channel => $bad\n";
 }
 
 ?>

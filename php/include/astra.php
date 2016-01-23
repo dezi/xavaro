@@ -271,20 +271,6 @@ function readAstraConfig()
 	{
 		$mname = simplifySearchName($channel[ "name" ]);
 		$GLOBALS[ "astra.config" ][ $inx ][ "mname" ] = $mname;
-		
-		if (($channel[ "hd" ] == true) && (substr($mname, -2) != "hd"))
-		{
-			$clone = $channel;
-			$clone[ "mname" ] = $mname . "hd";
-			$GLOBALS[ "astra.config" ][] = $clone;
-		}
-		
-		if (($channel[ "hd" ] == false) && (substr($mname, -2) != "sd"))
-		{
-			$clone = $channel;
-			$clone[ "mname" ] = $mname . "sd";
-			$GLOBALS[ "astra.config" ][] = $clone;
-		}
 	}
 	
 	//
