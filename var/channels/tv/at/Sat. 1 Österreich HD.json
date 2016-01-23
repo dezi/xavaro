@@ -1,0 +1,22 @@
+{
+  "name":"Sat. 1 Österreich HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "ProSiebenSat.1"
+  ],
+  "packs":
+  [
+    "13:AustriaSat",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "ProSiebenSat.1"
+  ]
+}

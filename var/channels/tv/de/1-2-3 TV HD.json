@@ -1,0 +1,17 @@
+{
+  "name":"1-2-3 TV HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "HDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

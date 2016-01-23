@@ -1,0 +1,17 @@
+{
+  "name":"QVC Plus Deutschland HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "HDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

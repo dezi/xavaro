@@ -1,0 +1,21 @@
+{
+  "name":"N24 Austria HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "13:AustriaSat"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

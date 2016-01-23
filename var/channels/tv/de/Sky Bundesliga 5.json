@@ -1,7 +1,7 @@
 {
   "name":"Sky Bundesliga 5",
   "type":"tv",
-  "ishd":false,
+  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
   "tags":

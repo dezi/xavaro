@@ -1,0 +1,22 @@
+{
+  "name":"Deutsches Musik Fernsehen",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "MEDIA BROADCAST",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "MEDIA BROADCAST"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name":"Puls 4",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "ProSiebenSat.1",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "ProSiebenSat.1"
+  ]
+}

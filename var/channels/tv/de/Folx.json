@@ -6,7 +6,9 @@
   "isolang":"ger",
   "tags":
   [
+    "-",
     "DVB-C",
+    "DVB-S",
     "Digital Free",
     "SDTV"
   ],
@@ -19,6 +21,7 @@
   ],
   "providers":
   [
+    "-",
     "Digital Free"
   ]
 }

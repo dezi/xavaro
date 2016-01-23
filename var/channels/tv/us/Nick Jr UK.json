@@ -1,0 +1,21 @@
+{
+  "name":"Nick Jr UK",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"us",
+  "isolang":"eng",
+  "tags":
+  [
+    "DVB-S",
+    "MTV Networks Europe",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "4:Sky UK"
+  ],
+  "providers":
+  [
+    "MTV Networks Europe"
+  ]
+}

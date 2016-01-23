@@ -1,0 +1,22 @@
+{
+  "name":"Vox Schweiz",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"ch",
+  "isolang":"ger",
+  "tags":
+  [
+    "CBC",
+    "DVB-S",
+    "RTL",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal"
+  ],
+  "providers":
+  [
+    "CBC"
+  ]
+}

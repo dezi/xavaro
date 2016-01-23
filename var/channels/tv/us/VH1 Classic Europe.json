@@ -1,0 +1,21 @@
+{
+  "name":"VH1 Classic Europe",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"us",
+  "isolang":"eng",
+  "tags":
+  [
+    "DVB-S",
+    "MTV Networks Europe",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "36:MagtiSat"
+  ],
+  "providers":
+  [
+    "MTV Networks Europe"
+  ]
+}

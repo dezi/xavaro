@@ -1,0 +1,17 @@
+{
+  "name":"BR Heimat",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD BR",
+    "DVB-S",
+    "Radio"
+  ],
+  "providers":
+  [
+    "ARD BR"
+  ]
+}

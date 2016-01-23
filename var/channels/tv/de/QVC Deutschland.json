@@ -10,7 +10,8 @@
     "DVB-C",
     "DVB-S",
     "Digital Free",
-    "SDTV"
+    "SDTV",
+    "SES ASTRA"
   ],
   "packs":
   [
@@ -19,6 +20,7 @@
   "providers":
   [
     "BetaDigital",
-    "Digital Free"
+    "Digital Free",
+    "SES ASTRA"
   ]
 }

@@ -7,7 +7,9 @@
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "Digital Free",
+    "Eurociel",
     "Radio"
   ],
   "packs":
@@ -17,6 +19,7 @@
   ],
   "providers":
   [
-    "Digital Free"
+    "Digital Free",
+    "Eurociel"
   ]
 }

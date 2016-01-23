@@ -6,7 +6,9 @@
   "isolang":"ger",
   "tags":
   [
+    "CBC",
     "DVB-C",
+    "DVB-S",
     "KD Home",
     "SDTV"
   ],
@@ -16,6 +18,7 @@
   ],
   "providers":
   [
+    "CBC",
     "KD Home"
   ]
 }

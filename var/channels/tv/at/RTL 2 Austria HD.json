@@ -1,0 +1,22 @@
+{
+  "name":"RTL 2 Austria HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "CBC",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "13:AustriaSat",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "CBC"
+  ]
+}

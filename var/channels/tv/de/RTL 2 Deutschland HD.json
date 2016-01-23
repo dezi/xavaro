@@ -6,7 +6,9 @@
   "isolang":"ger",
   "tags":
   [
+    "CBC",
     "DVB-C",
+    "DVB-S",
     "Digital Free",
     "HDTV"
   ],
@@ -17,6 +19,7 @@
   ],
   "providers":
   [
+    "CBC",
     "Digital Free"
   ]
 }

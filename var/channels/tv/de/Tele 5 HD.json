@@ -6,7 +6,9 @@
   "isolang":"ger",
   "tags":
   [
+    "BetaDigital",
     "DVB-C",
+    "DVB-S",
     "Digital Free",
     "HDTV"
   ],
@@ -18,6 +20,7 @@
   ],
   "providers":
   [
+    "BetaDigital",
     "Digital Free"
   ]
 }

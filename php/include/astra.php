@@ -2,7 +2,7 @@
 
 function simplifySearchName($mname)
 {
-	$mname = mb_strtolower($mname, 'UTF-8');
+	$mname = mb_strtolower($mname, "UTF-8");
 
 	$mname = str_replace("-", " ", $mname);
 	$mname = str_replace("_", " ", $mname);

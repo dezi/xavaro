@@ -1,13 +1,14 @@
 {
   "name":"Blue Movie HD",
   "type":"tv",
-  "ishd":1,
+  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
   "tags":
   [
     "DVB-S",
     "HDTV",
+    "SDTV",
     "SKY"
   ],
   "packs":

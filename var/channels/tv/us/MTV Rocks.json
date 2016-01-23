@@ -1,0 +1,27 @@
+{
+  "name":"MTV Rocks",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"us",
+  "isolang":"eng",
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "MTV Networks Europe",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "13:AustriaSat",
+    "17:CanalSat France",
+    "27:Telesat",
+    "48:Movistar+"
+  ],
+  "providers":
+  [
+    "MTV Networks Europe"
+  ]
+}

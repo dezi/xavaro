@@ -1,0 +1,21 @@
+{
+  "name":"ATV HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "ATV",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "ATV"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name":"Juwelo",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "MEDIA BROADCAST",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "MEDIA BROADCAST"
+  ]
+}

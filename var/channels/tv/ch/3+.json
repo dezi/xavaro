@@ -1,0 +1,17 @@
+{
+  "name":"3+",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"ch",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

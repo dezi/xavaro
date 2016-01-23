@@ -1,0 +1,25 @@
+{
+  "name":"RTL 2 Deutschland",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "CBC",
+    "CSAT",
+    "DVB-S",
+    "Radio",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "CBC"
+  ]
+}

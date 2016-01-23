@@ -1,0 +1,22 @@
+{
+  "name":"Kabel Eins Schweiz",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"ch",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "ProSiebenSat.1",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "ProSiebenSat.1"
+  ]
+}

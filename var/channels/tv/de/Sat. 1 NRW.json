@@ -1,0 +1,17 @@
+{
+  "name":"Sat. 1 NRW",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "ProSiebenSat.1",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "ProSiebenSat.1"
+  ]
+}

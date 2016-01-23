@@ -1,0 +1,17 @@
+{
+  "name":"NDR Blue",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD NDR",
+    "DVB-S",
+    "Radio"
+  ],
+  "providers":
+  [
+    "ARD NDR"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name":"Radio Schlagerparadies",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "MEDIA BROADCAST",
+    "Radio"
+  ],
+  "providers":
+  [
+    "MEDIA BROADCAST"
+  ]
+}

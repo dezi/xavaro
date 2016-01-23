@@ -7,7 +7,9 @@
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "KD Home",
+    "ProSiebenSat.1",
     "SDTV"
   ],
   "packs":
@@ -17,6 +19,7 @@
   ],
   "providers":
   [
-    "KD Home"
+    "KD Home",
+    "ProSiebenSat.1"
   ]
 }

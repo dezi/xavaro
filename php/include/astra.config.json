@@ -1395,73 +1395,6 @@
   },
   
   {
-    "name":"Al Jazeera Channel",
-    "free":true,
-    "enc":"None",
-    "hd":false,
-    "website":"www.aljazeera.net",
-    "language":"Arabic",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera_channel_qa.png",
-    "type":"tv",
-    "country":"Qatar",
-    "isocc":"qa",
-    "isolang":"ara",
-    "genre":"7:News",
-    "packs":
-    [
-      "6:CanalDigitaal",
-      "7:TV Vlaanderen Digitaal",
-      "12:Orange France",
-      "17:CanalSat France",
-      "28:SFR"
-    ]
-  },
-  
-  {
-    "name":"Al Jazeera English",
-    "free":true,
-    "enc":"None",
-    "hd":false,
-    "website":"www.aljazeera.com",
-    "language":"English",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera_english.png",
-    "type":"tv",
-    "country":"Qatar",
-    "isocc":"qa",
-    "isolang":"eng",
-    "genre":"7:News",
-    "packs":
-    [
-      "4:Sky UK",
-      "5:FreeSat"
-    ]
-  },
-  
-  {
-    "name":"Al Jazeera English",
-    "free":true,
-    "enc":"None",
-    "hd":false,
-    "website":"www.aljazeera.com",
-    "language":"English",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera_english.png",
-    "type":"tv",
-    "country":"Qatar",
-    "isocc":"qa",
-    "isolang":"eng",
-    "genre":"7:News",
-    "packs":
-    [
-      "6:CanalDigitaal",
-      "7:TV Vlaanderen Digitaal",
-      "12:Orange France",
-      "17:CanalSat France",
-      "28:SFR",
-      "48:Movistar+"
-    ]
-  },
-  
-  {
     "name":"Alibi Ireland",
     "free":false,
     "enc":"Videoguard",
@@ -1534,6 +1467,73 @@
     "packs":
     [
       "4:Sky UK"
+    ]
+  },
+  
+  {
+    "name":"Aljazeera Channel",
+    "free":true,
+    "enc":"None",
+    "hd":false,
+    "website":"www.aljazeera.net",
+    "language":"Arabic",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera_channel_qa.png",
+    "type":"tv",
+    "country":"Qatar",
+    "isocc":"qa",
+    "isolang":"ara",
+    "genre":"7:News",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "7:TV Vlaanderen Digitaal",
+      "12:Orange France",
+      "17:CanalSat France",
+      "28:SFR"
+    ]
+  },
+  
+  {
+    "name":"Aljazeera English",
+    "free":true,
+    "enc":"None",
+    "hd":false,
+    "website":"www.aljazeera.com",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera_english.png",
+    "type":"tv",
+    "country":"Qatar",
+    "isocc":"qa",
+    "isolang":"eng",
+    "genre":"7:News",
+    "packs":
+    [
+      "4:Sky UK",
+      "5:FreeSat"
+    ]
+  },
+  
+  {
+    "name":"Aljazeera English",
+    "free":true,
+    "enc":"None",
+    "hd":false,
+    "website":"www.aljazeera.com",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/al_jazeera_english.png",
+    "type":"tv",
+    "country":"Qatar",
+    "isocc":"qa",
+    "isolang":"eng",
+    "genre":"7:News",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "7:TV Vlaanderen Digitaal",
+      "12:Orange France",
+      "17:CanalSat France",
+      "28:SFR",
+      "48:Movistar+"
     ]
   },
   
@@ -4502,7 +4502,7 @@
     "hd":true,
     "website":"www.bbc.co.uk/bbcthree",
     "language":"English",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/bb/bbc_three_hd.png",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/bb/bbc_three.png",
     "type":"tv",
     "country":"United Kingdom",
     "isocc":"gb",
@@ -6541,7 +6541,7 @@
     "country":"Ukraine",
     "isocc":"ua",
     "isolang":"ukr",
-    "genre":"0:Undefined"
+    "genre":"10:Business"
   },
   
   {
@@ -12101,12 +12101,12 @@
     "enc":"PowerVu",
     "hd":false,
     "website":"science.discovery.com",
-    "language":"English",
+    "language":"Turkish",
     "logo":"http://www.lyngsat-logo.com/logo/tv/dd/discovery_science_global.png",
     "type":"tv",
     "country":"United States",
     "isocc":"us",
-    "isolang":"eng",
+    "isolang":"tur",
     "genre":"8:Documentary"
   },
   
@@ -12424,12 +12424,12 @@
     "enc":"PowerVu",
     "hd":false,
     "website":"www.yourdiscovery.com",
-    "language":"English",
+    "language":"Turkish",
     "logo":"http://www.lyngsat-logo.com/logo/tv/dd/discovery_world_us.png",
     "type":"tv",
     "country":"United States",
     "isocc":"us",
-    "isolang":"eng",
+    "isolang":"tur",
     "genre":"8:Documentary"
   },
   
@@ -15198,21 +15198,6 @@
   },
   
   {
-    "name":"EuroNews Ukraina",
-    "free":false,
-    "enc":"BISS",
-    "hd":false,
-    "website":"ua.euronews.com",
-    "language":"Ukrainian",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/euronews_fr.png",
-    "type":"tv",
-    "country":"Ukraine, France",
-    "isocc":"ua",
-    "isolang":"ukr",
-    "genre":"7:News"
-  },
-  
-  {
     "name":"Europe 1",
     "free":true,
     "enc":"None",
@@ -15279,6 +15264,25 @@
     "packs":
     [
       "36:MagtiSat"
+    ]
+  },
+  
+  {
+    "name":"Eurosport 1",
+    "free":false,
+    "enc":"Mediaguard;Nagravision",
+    "hd":false,
+    "website":"www.eurosport.com",
+    "language":"Spanish",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ee/eurosport_fr_1.png",
+    "type":"tv",
+    "country":"France",
+    "isocc":"fr",
+    "isolang":"spa",
+    "genre":"1:Sports",
+    "packs":
+    [
+      "48:Movistar+"
     ]
   },
   
@@ -28526,7 +28530,7 @@
     "hd":true,
     "website":"www.net5.nl",
     "language":"Dutch",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/nn/net_5_nl_hd.png",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/nn/net_5_nl.png",
     "type":"tv",
     "country":"Netherlands",
     "isocc":"nl",
@@ -28668,7 +28672,6 @@
       "6:CanalDigitaal",
       "7:TV Vlaanderen Digitaal",
       "12:Orange France",
-      "17:CanalSat France",
       "48:Movistar+"
     ]
   },
@@ -30941,7 +30944,7 @@
     "hd":false,
     "website":"www.ntveurope.net",
     "language":"Bengali",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/nn/ntv_national_tv_uk.png",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/nn/ntv_bd_europe.png",
     "type":"tv",
     "country":"Bangladesh",
     "isocc":"bd",
@@ -32238,7 +32241,7 @@
     "hd":false,
     "website":"www.peacetvurdu.org",
     "language":"Urdu",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/pp/peace_tv_ae.png",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/pp/peace_tv_ae_urdu.png",
     "type":"tv",
     "country":"United Arab Emirates",
     "isocc":"ae",
@@ -32529,7 +32532,7 @@
     "hd":false,
     "website":"www.ctcmedia.ru/business/peretz_int",
     "language":"Russian",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/pp/peretz_tv.png",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/pp/peretz_tv_ru.png",
     "type":"tv",
     "country":"Russia",
     "isocc":"ru",
@@ -37518,7 +37521,7 @@
     "hd":false,
     "website":"rtlradio.de/ukw/satellit",
     "language":"German",
-    "logo":"http://www.lyngsat-logo.com/logo/radio/rr/rtl_radio_de.png",
+    "logo":"http://www.lyngsat-logo.com/logo/radio/rr/rtl_radio_lu.png",
     "type":"radio",
     "country":"Luxembourg",
     "isocc":"lu",
@@ -37538,7 +37541,7 @@
     "hd":false,
     "website":"radio.rtl.lu",
     "language":"Luxembourgish",
-    "logo":"http://www.lyngsat-logo.com/logo/radio/rr/rtl_radio_letzebuerg.png",
+    "logo":"http://www.lyngsat-logo.com/logo/radio/rr/rtl_radio_lu_letzebuerg.png",
     "type":"radio",
     "country":"Luxembourg",
     "isocc":"lu",
@@ -38133,7 +38136,7 @@
     "hd":false,
     "website":"www.extremtv.ru",
     "language":"Russian",
-    "logo":"http://www.lyngsat-logo.com/logo/tv/rr/russkij_extreme.png",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/rr/russian_extreme_ru.png",
     "type":"tv",
     "country":"Russia",
     "isocc":"ru",

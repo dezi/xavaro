@@ -7,11 +7,14 @@
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "Digital Free",
-    "SDTV"
+    "SDTV",
+    "SES ASTRA"
   ],
   "providers":
   [
-    "Digital Free"
+    "Digital Free",
+    "SES ASTRA"
   ]
 }

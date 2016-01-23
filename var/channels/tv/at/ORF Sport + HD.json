@@ -1,0 +1,21 @@
+{
+  "name":"ORF Sport + HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "ORF"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "ORF"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name":"Deluxe Music HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "14:HD+",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

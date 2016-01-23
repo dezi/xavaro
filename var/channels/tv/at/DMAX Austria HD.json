@@ -1,0 +1,17 @@
+{
+  "name":"DMAX Austria HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "HDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

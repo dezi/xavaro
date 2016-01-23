@@ -1,0 +1,22 @@
+{
+  "name":"Bloomberg TV Europe",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"us",
+  "isolang":"eng",
+  "tags":
+  [
+    "DVB-S",
+    "Digital +",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "4:Sky UK",
+    "5:FreeSat"
+  ],
+  "providers":
+  [
+    "DIGITAL +"
+  ]
+}

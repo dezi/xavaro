@@ -12,6 +12,15 @@ function errorexit($message)
 	exit(1);
 }
 
+function readByte($fd)
+{
+	$data = @fread($fd,1);
+	if ($data === false) return -1;
+	
+	$data = unpack("C",$data);
+	return $data[ 1 ];
+}
+
 function readInt($fd)
 {
 	$len = 4;
@@ -20,8 +29,7 @@ function readInt($fd)
 	for ($inx = 0; $inx < $len; $inx++)
 	{ 
 		$data = fread($fd,1);
-
-		if ($data == null) return -1;
+		if ($data === false) return -1;
 
 		$val = ($val << 8) + ord($data[ 0 ]);
 	}
@@ -44,13 +52,6 @@ function readNumber($fd, $len)
 	return $val;
 }
 
-function readByte($fd)
-{
-	$data = fread($fd,1);
-	$data = unpack("C",$data);
-	return $data[ 1 ];
-}
-
 function readString($fd,$len)
 {
 	if ($len == 0) return "";
@@ -69,6 +70,11 @@ function decodeLength($fd, $length, &$json, $level = 0)
 		$nlen = readByte($fd);
 		$dlen = readInt ($fd,4);
 
+		if (($type < 0) || ($nlen < 0) || ($dlen < 0))
+		{
+			errorexit("Database update in progress, exitting...");
+		}
+		
 		$name = readString($fd,$nlen);
 
 		$rest += 6 + $nlen + $dlen;
@@ -79,11 +85,13 @@ function decodeLength($fd, $length, &$json, $level = 0)
 			decodeLength($fd, $dlen, $subj, $level + 1);
 
 			if ($name == "")
+			{
 				$json[] = $subj;
+			}
 			else
+			{
 				$json[ $name ] = $subj;
-
-			//echo "$pad$type $nlen $dlen $name\n";
+			}
 
 			continue;
 		}
@@ -93,11 +101,13 @@ function decodeLength($fd, $length, &$json, $level = 0)
 			$number = readNumber($fd,$dlen);
 
 			if ($name == "")
+			{
 				$json[] = $number;
+			}
 			else
+			{
 			    $json[ $name ] = $number;
-
-			//echo "$pad$type $nlen $dlen $name => " . gmp_strval($number) . "\n";
+			}
 
 			continue;
 		}
@@ -107,21 +117,18 @@ function decodeLength($fd, $length, &$json, $level = 0)
 			$data = readString($fd,$dlen);
 			
 			if ($name == "")
+			{
 				$json[] = $data;
+			}
 			else
+			{
 				$json[ $name ] = $data;
-
-			//echo "$pad$type $nlen $dlen $name => $data\n";
+			}
 
 			continue;
 		}
 
-		$data = readString($fd,$dlen);
-		$dump = "";
-		for ($inx = 0; $inx < strlen($data); $inx++) $dump .= ord($data[ $inx ]) . " ";
-
-		echo "==========================$type $nlen $dlen $name $dump\n";
-		exit(0);
+		errorexit("Database update in progress, exitting...");
 	}
 }
 
@@ -435,6 +442,127 @@ function saveChannel($cdata, $adata)
 	file_put_contents($actfile, json_encdat($ordered) . "\n");
 }
 
+function getMultibyteCharAt($str, $pos)
+{
+	$mb = $str[ $pos ];
+	
+	if (ord($mb) >= 128)
+	{
+		if ((($pos + 1) < strlen($str)) && (ord($str[ $pos + 1 ]) >= 128))
+		{
+			$mb .= $str[ $pos + 1 ];
+		}
+		
+		if ((($pos + 2) < strlen($str)) && (ord($str[ $pos + 2 ]) >= 128))
+		{
+			$mb .= $str[ $pos + 2 ];
+		}
+		
+		if ((($pos + 3) < strlen($str)) && (ord($str[ $pos + 3 ]) >= 128))
+		{
+			$mb .= $str[ $pos + 3 ];
+		}
+	}
+	
+	return $mb;
+}
+
+function getMultibyteCharBefore($str, $pos)
+{
+	if ($pos == 0) return "";
+	
+	$mb = $str[ $pos - 1 ];
+	
+	if (ord($mb) >= 128)
+	{
+		if ((($pos - 2) >= 0) && (ord($str[ $pos - 2 ]) >= 128))
+		{
+			$mb = $str[ $pos - 2 ] . $mb;
+		}
+		
+		if ((($pos - 3) >= 0) && (ord($str[ $pos - 3 ]) >= 128))
+		{
+			$mb = $str[ $pos - 3 ] . $mb;
+		}
+		
+		if ((($pos - 4) >= 0) && (ord($str[ $pos - 4 ]) >= 128))
+		{
+			$mb = $str[ $pos - 4 ] . $mb;
+		}
+	}
+	
+	return $mb;
+}
+
+function defuckEPG(&$epg)
+{
+	if (! isset($epg[ "description" ])) return;
+	
+	$desc = $epg[ "description" ];
+	
+	$encoding = mb_detect_encoding($desc, "UTF-8, ISO-8859-1, ISO-8859-15", true);
+	
+	if (($encoding != "UTF-8") && ($encoding != "ASCII"))
+	{
+  		echo "WRONG ENCODING: " . $epg[ "channel" ] . " => " . $encoding . "\n";
+  		echo "WRONG ENCODING: " . $desc . "\n";
+ 		return;
+	}
+	
+	if (strpos($desc, "\n") === false)
+	{
+		$dirty = false;
+		
+		for ($inx = 0; $inx < strlen($desc); $inx += strlen($mb))
+		{
+			$mb = getMultibyteCharAt($desc, $inx);
+			
+			if (mb_strtolower($mb, "UTF-8") != $mb)
+			{
+				//
+				// Uppercase char.
+				//
+			
+				if (($inx == 0)
+					 || ($desc[ $inx - 1 ] == " ") 
+					 || ($desc[ $inx - 1 ] == "-") 
+					 || ($desc[ $inx - 1 ] == "'") 
+					 || ($desc[ $inx - 1 ] == "(") 
+					 || ($desc[ $inx - 1 ] == "/") 
+					 || ($desc[ $inx - 1 ] == "\"") 
+					 || ($desc[ $inx - 1 ] == "\n"))
+				{
+					//
+					// Everything is ok.
+					//
+				
+					continue;
+				}
+			
+				//
+				// If previous char is uppercase, everything is ok.
+				//
+				
+				$prev = getMultibyteCharBefore($desc, $inx);
+				
+				if (mb_strtolower($prev, "UTF-8") != $prev)
+				{
+					//
+					// Everything is ok.
+					//
+				
+					continue;
+				}
+				
+				$desc = substr($desc, 0, $inx) . " -- " . substr($desc, $inx);
+				$dirty = true;
+			}
+		}
+		
+		if ($dirty) echo "FIXFIX " . $epg[ "channel" ] . " => " . $desc . "\n";
+	}
+}
+
 function saveEPG($epg)
 {
 	if (! isset($epg[ "title" ])) 
@@ -455,6 +583,8 @@ function saveEPG($epg)
 		
 		return;
 	}
+
+	defuckEPG($epg);
 
 	$channel  = $epg[ "channel"  ];
 	$type     = $epg[ "type"     ];

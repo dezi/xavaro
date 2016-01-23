@@ -1,0 +1,17 @@
+{
+  "name":"Shop 24 Direct",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "MEDIA BROADCAST",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "MEDIA BROADCAST"
+  ]
+}

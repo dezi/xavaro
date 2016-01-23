@@ -1,0 +1,21 @@
+{
+  "name":"Sat. 1 Gold Österreich",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-S",
+    "ProSiebenSat.1",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "13:AustriaSat"
+  ],
+  "providers":
+  [
+    "ProSiebenSat.1"
+  ]
+}

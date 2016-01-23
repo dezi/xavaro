@@ -1,0 +1,21 @@
+{
+  "name":"Hope Channel Deutsch HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "-",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "-"
+  ]
+}

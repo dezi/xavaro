@@ -1,0 +1,17 @@
+{
+  "name":"HSE 24 Extra HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "HDTV"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name":"QVC France HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"fr",
+  "isolang":"fre",
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "SES"
+  ],
+  "packs":
+  [
+    "17:CanalSat France"
+  ],
+  "providers":
+  [
+    "SES"
+  ]
+}
