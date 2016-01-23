@@ -335,12 +335,13 @@ function addChannelTag(&$config, $tagname, $tagvalue)
 	asort($config[ $tagname ]);
 }
 
-function saveChannel($cdata, $adata)
+function saveChannel($cdata)
 {
 	$name  = $cdata[ "name"  ];
 	$type  = $cdata[ "type"  ];
 	$isocc = $cdata[ "isocc" ];
 	$ishd  = $cdata[ "ishd"  ];
+	$adata = $cdata[ "astra" ];
 	
 	$actdir  = "../../var/channels/$type/$isocc"; 
 	$actfile = $actdir . "/" . $name . ".json";
@@ -372,10 +373,10 @@ function saveChannel($cdata, $adata)
 		
 		$config[ "name"      ] = $name;
 		$config[ "type"      ] = $type;
-		$config[ "isocc"     ] = $isocc;
 	}
 	
 	$config[ "ishd"    ] = $ishd;
+	$config[ "isocc"   ] = $isocc;
 	$config[ "isolang" ] = $adata[ "isolang" ];
 	
 	if (isset($adata[ "packs" ])) $config[ "packs" ] = $adata[ "packs" ];
@@ -494,7 +495,7 @@ function getMultibyteCharBefore($str, $pos)
 	return $mb;
 }
 
-function defuckEPG(&$epg)
+function defuckEPGOld(&$epg)
 {
 	if (! isset($epg[ "description" ])) return;
 	
@@ -511,6 +512,25 @@ function defuckEPG(&$epg)
 	
 	if (strpos($desc, "\n") === false)
 	{
+		//
+		// Do some debug helping stereotypes.
+		//
+		
+		$desc = str_replace("Produziert in HD","\nProduziert in HD", $desc);
+		
+		//
+		// Replace safe sequences.
+		//
+
+		$desc = str_replace("EinsPlus", "Eins__Plus", $desc);
+		$desc = str_replace("Innen ", "__Innen ", $desc);
+		$desc = str_replace("GmbH", "Gmb__H", $desc);
+		$desc = str_replace("z.B.", "z.__B.", $desc);
+		$desc = str_replace("Kika", "Ki__Ka", $desc);
+		$desc = str_replace("VfL", "Vf__L", $desc);
+		$desc = str_replace("Mac", "Mac__", $desc);
+		$desc = str_replace("Mc", "Mc__", $desc);
+ 
 		$dirty = false;
 		
 		for ($inx = 0; $inx < strlen($desc); $inx += strlen($mb))
@@ -525,7 +545,9 @@ function defuckEPG(&$epg)
 			
 				if (($inx == 0)
 					 || ($desc[ $inx - 1 ] == " ") 
+					 || ($desc[ $inx - 1 ] == ".") 
 					 || ($desc[ $inx - 1 ] == "-") 
+					 || ($desc[ $inx - 1 ] == "_") 
 					 || ($desc[ $inx - 1 ] == "'") 
 					 || ($desc[ $inx - 1 ] == "(") 
 					 || ($desc[ $inx - 1 ] == "/") 
@@ -559,7 +581,31 @@ function defuckEPG(&$epg)
 			}
 		}
 		
+		//    /[a-z][A-Z]
+		
+		$desc = str_replace("Eins__Plus", "EinsPlus", $desc);
+		$desc = str_replace("__Innen ", "Innen ", $desc);
+		$desc = str_replace("z.__B.", "z.B.", $desc);
+		$desc = str_replace("Gmb__H", "GmbH", $desc);
+		$desc = str_replace("Ki__Ka", "Kika", $desc);
+		$desc = str_replace("Vf__L", "VfL", $desc);
+		$desc = str_replace("Mac__", "Mac", $desc);
+		$desc = str_replace("Mc__", "Mc", $desc);
+
 		if ($dirty) echo "FIXFIX " . $epg[ "channel" ] . " => " . $desc . "\n";
+	}
+}
+
+function defuckEPG(&$epg)
+{
+	if (! isset($epg[ "description" ])) return;
+	
+	$desc = $epg[ "description" ];
+	
+	if (strpos($desc, "\n") !== false)
+	{
+		$channel = $GLOBALS[ "actchannel" ];
+		$GLOBALS[ "actchannels" ][ $channel ][ "lfs" ] += 1;
 	}
 }
 
@@ -584,12 +630,10 @@ function saveEPG($epg)
 		return;
 	}
 
-	defuckEPG($epg);
-
 	$channel  = $epg[ "channel"  ];
 	$type     = $epg[ "type"     ];
 	$language = $epg[ "language" ];
-	$ishd     = isset($epg[ "is_hd" ]) ? $epg[ "is_hd" ] : false;
+	$ishd     = isset($epg[ "is_hd" ]) ? true : false;
 	
 	$orgname = stripShit($channel);
 	$channel = unifyChannelName($channel, $language, $ishd);
@@ -622,7 +666,8 @@ function saveEPG($epg)
 
 		if (! file_exists($actdir)) mkdir($actdir, 0755, true);
 		
-		$GLOBALS[ "actfile" ] = $actfile;
+		$GLOBALS[ "actfile"    ] = $actfile;
+		$GLOBALS[ "actchannel" ] = $channel;
 		
 		if (isset($GLOBALS[ "actchannels" ][ $channel ]))
 		{
@@ -651,16 +696,20 @@ function saveEPG($epg)
 		$cdata[ "network"  ] = $epg[ "network" ];
 		$cdata[ "country"  ] = $epg[ "country" ];
 		$cdata[ "tags"     ] = $epg[ "tags"    ];
+		$cdata[ "astra"    ] = $astra[ "astra" ];
 		$cdata[ "file"     ] = $actfile;
 		$cdata[ "dir"      ] = $actdir;
+		$cdata[ "lfs"      ] = 0;
 		
 		$GLOBALS[ "actchannels" ][ $channel ] = $cdata;
 		
-		saveChannel($cdata, $astra[ "astra" ]);
+		saveChannel($cdata);
 		
  		echo "Writing $actdir\n";
 	}
-	
+
+	defuckEPG($epg);
+
 	unset($epg[ "is_hd"         ]);
 	unset($epg[ "is_widescreen" ]);
 	unset($epg[ "is_subtitled"  ]);
@@ -674,7 +723,7 @@ function saveEPG($epg)
 	unset($epg[ "tags"     ]);
 
 	if (isset($epg[ "summary" ]) && isset($epg[ "subtitle" ]) 
-		   && $epg[ "summary" ] == $epg[ "subtitle" ])
+		   && ($epg[ "summary" ] == $epg[ "subtitle" ]))
 	{
 		unset($epg[ "summary" ]);
 	}
@@ -930,5 +979,12 @@ readAstraConfig();
 readEPG();
 
 splitEPGs();
+
+foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
+{
+	$count = $cdata[ "lfs" ];
+	
+	echo "LF: $channel => $count\n";
+}
 
 ?>
