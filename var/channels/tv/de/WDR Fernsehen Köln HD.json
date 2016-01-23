@@ -1,0 +1,17 @@
+{
+  "name":"WDR Fernsehen Köln HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-C",
+    "HDTV"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}
