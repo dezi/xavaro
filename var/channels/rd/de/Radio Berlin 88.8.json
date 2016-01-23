@@ -1,0 +1,22 @@
+{
+  "name":"Radio Berlin 88.8",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD rbb",
+    "DVB-C",
+    "Radio"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "ARD rbb"
+  ]
+}

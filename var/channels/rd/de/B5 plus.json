@@ -1,0 +1,21 @@
+{
+  "name":"B5 plus",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD BR",
+    "DVB-C",
+    "Radio"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "ARD BR"
+  ]
+}

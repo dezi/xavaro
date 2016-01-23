@@ -1,0 +1,17 @@
+{
+  "name":"MDR Klassik",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD MDR",
+    "DVB-C",
+    "Radio"
+  ],
+  "providers":
+  [
+    "ARD MDR"
+  ]
+}

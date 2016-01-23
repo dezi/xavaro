@@ -1,0 +1,17 @@
+{
+  "name":"WDR 3",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD WDR",
+    "DVB-C",
+    "Radio"
+  ],
+  "providers":
+  [
+    "ARD WDR"
+  ]
+}

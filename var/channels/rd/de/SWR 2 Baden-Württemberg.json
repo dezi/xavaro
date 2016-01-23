@@ -1,0 +1,17 @@
+{
+  "name":"SWR 2 Baden-Württemberg",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD SWR",
+    "DVB-C",
+    "Radio"
+  ],
+  "providers":
+  [
+    "ARD SWR"
+  ]
+}

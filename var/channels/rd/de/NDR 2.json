@@ -1,0 +1,21 @@
+{
+  "name":"NDR 2",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD NDR",
+    "DVB-C",
+    "Radio"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal"
+  ],
+  "providers":
+  [
+    "ARD NDR"
+  ]
+}

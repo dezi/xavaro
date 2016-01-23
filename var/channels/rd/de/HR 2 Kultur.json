@@ -1,0 +1,17 @@
+{
+  "name":"HR 2 Kultur",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD HR",
+    "DVB-C",
+    "Radio"
+  ],
+  "providers":
+  [
+    "ARD HR"
+  ]
+}

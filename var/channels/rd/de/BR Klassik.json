@@ -1,0 +1,17 @@
+{
+  "name":"BR Klassik",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD BR",
+    "DVB-C",
+    "Radio"
+  ],
+  "providers":
+  [
+    "ARD BR"
+  ]
+}

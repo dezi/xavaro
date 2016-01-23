@@ -1,0 +1,21 @@
+{
+  "name":"Radio Eins Potsdam",
+  "type":"rd",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD rbb",
+    "DVB-C",
+    "Radio"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal"
+  ],
+  "providers":
+  [
+    "ARD rbb"
+  ]
+}
