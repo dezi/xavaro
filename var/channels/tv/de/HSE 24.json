@@ -1,0 +1,21 @@
+{
+  "name":"HSE 24",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

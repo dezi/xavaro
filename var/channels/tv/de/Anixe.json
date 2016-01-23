@@ -1,0 +1,22 @@
+{
+  "name":"Anixe",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

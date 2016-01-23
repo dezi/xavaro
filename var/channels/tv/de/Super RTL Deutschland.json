@@ -1,0 +1,23 @@
+{
+  "name":"Super RTL Deutschland",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

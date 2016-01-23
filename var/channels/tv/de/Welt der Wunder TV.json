@@ -1,0 +1,22 @@
+{
+  "name":"Welt der Wunder TV",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland",
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

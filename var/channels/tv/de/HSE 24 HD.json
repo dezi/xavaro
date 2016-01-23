@@ -1,0 +1,17 @@
+{
+  "name":"HSE 24 HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "HDTV"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

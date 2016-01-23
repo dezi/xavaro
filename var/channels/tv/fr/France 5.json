@@ -1,0 +1,25 @@
+{
+  "name":"France 5",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"fr",
+  "isolang":"fre",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "12:Orange France",
+    "17:CanalSat France",
+    "18:TNT Sat",
+    "27:Telesat",
+    "28:SFR"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

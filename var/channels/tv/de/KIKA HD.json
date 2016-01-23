@@ -1,0 +1,23 @@
+{
+  "name":"KIKA HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "HDTV",
+    "ZDFvision"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "ZDFvision"
+  ]
+}

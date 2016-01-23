@@ -1,0 +1,22 @@
+{
+  "name":"Planet HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"fr",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "HDTV",
+    "KD Home"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "13:AustriaSat"
+  ],
+  "providers":
+  [
+    "KD Home"
+  ]
+}

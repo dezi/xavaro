@@ -1,0 +1,21 @@
+{
+  "name":"Servus TV Deutschland",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"at",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

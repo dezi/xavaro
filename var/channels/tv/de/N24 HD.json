@@ -1,0 +1,22 @@
+{
+  "name":"N24 HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "14:HD+",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

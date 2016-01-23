@@ -1,0 +1,21 @@
+{
+  "name":"Disney Junior UK",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"us",
+  "isolang":"eng",
+  "tags":
+  [
+    "DVB-C",
+    "Englisch",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "4:Sky UK"
+  ],
+  "providers":
+  [
+    "Englisch"
+  ]
+}

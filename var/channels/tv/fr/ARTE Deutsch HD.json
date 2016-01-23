@@ -1,0 +1,23 @@
+{
+  "name":"ARTE Deutsch HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"fr",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-C",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}

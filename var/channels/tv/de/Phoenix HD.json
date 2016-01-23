@@ -1,0 +1,22 @@
+{
+  "name":"Phoenix HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-C",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}

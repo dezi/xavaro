@@ -1,0 +1,21 @@
+{
+  "name":"RTR Planeta",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"ru",
+  "isolang":"rus",
+  "tags":
+  [
+    "DVB-C",
+    "Russisch",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "36:MagtiSat"
+  ],
+  "providers":
+  [
+    "Russisch"
+  ]
+}

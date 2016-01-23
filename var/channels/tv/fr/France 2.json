@@ -1,0 +1,25 @@
+{
+  "name":"France 2",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"fr",
+  "isolang":"fre",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal",
+    "12:Orange France",
+    "17:CanalSat France",
+    "18:TNT Sat",
+    "28:SFR"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

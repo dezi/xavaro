@@ -1,0 +1,23 @@
+{
+  "name":"DMAX Deutschland HD",
+  "type":"tv",
+  "ishd":1,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "13:AustriaSat",
+    "14:HD+",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

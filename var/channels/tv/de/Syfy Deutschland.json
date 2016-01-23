@@ -1,0 +1,23 @@
+{
+  "name":"Syfy Deutschland",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "KD Home",
+    "SDTV",
+    "SKY"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "KD Home",
+    "SKY"
+  ]
+}

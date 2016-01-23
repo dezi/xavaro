@@ -1,0 +1,17 @@
+{
+  "name":"Channel 21",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "Digital Free",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "Digital Free"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name":"Tagesschau 24",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-C",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}

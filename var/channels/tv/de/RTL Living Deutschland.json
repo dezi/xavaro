@@ -1,0 +1,21 @@
+{
+  "name":"RTL Living Deutschland",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "KD Home",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "KD Home"
+  ]
+}

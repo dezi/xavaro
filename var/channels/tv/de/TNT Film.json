@@ -1,0 +1,21 @@
+{
+  "name":"TNT Film",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"eng",
+  "tags":
+  [
+    "DVB-C",
+    "Englisch",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "Englisch"
+  ]
+}

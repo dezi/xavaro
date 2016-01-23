@@ -1,0 +1,21 @@
+{
+  "name":"Canal 24 Horas",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"es",
+  "isolang":"spa",
+  "tags":
+  [
+    "DVB-C",
+    "Div. Sprachen",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "48:Movistar+"
+  ],
+  "providers":
+  [
+    "Div. Sprachen"
+  ]
+}

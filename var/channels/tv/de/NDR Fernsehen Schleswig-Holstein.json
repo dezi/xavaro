@@ -1,0 +1,21 @@
+{
+  "name":"NDR Fernsehen Schleswig-Holstein",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "ARD",
+    "DVB-C",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "ARD"
+  ]
+}

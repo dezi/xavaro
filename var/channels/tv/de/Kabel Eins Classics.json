@@ -1,0 +1,22 @@
+{
+  "name":"Kabel Eins Classics",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "KD Home",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "13:AustriaSat",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "KD Home"
+  ]
+}
