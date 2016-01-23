@@ -453,15 +453,8 @@ function saveChannel($cdata)
 	// => brain dead.
 	//
 	
-	$config[ "isbd" ] = $config[ "isbd" ] || isBrainDead($name);
-	
-	/*
-	$lfs = $cdata[ "lfs" ];
-	$bad = $cdata[ "bad" ];
-	
 	if (! isset($config[ "ishbd" ])) $config[ "isbd" ] = false;
-	$config[ "isbd" ] = $config[ "isbd" ] || (($lfs == 0) && ($bad > 10));
-	*/
+	$config[ "isbd" ] = $config[ "isbd" ] || isBrainDead($name);
 	
 	if (isset($adata[ "packs" ])) $config[ "packs" ] = $adata[ "packs" ];
 	
@@ -1076,7 +1069,7 @@ foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 	$lfs = $cdata[ "lfs" ];
 	$bad = $cdata[ "bad" ];
 	
-	if (($lfs == 0) && ($bad > 10)) echo "$channel => $bad\n";
+	if (($lfs == 0) && ($bad > 10) && ! isBrainDead($channel)) echo "$channel => $bad\n";
 }
 
 ?>
