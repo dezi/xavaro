@@ -1,0 +1,21 @@
+{
+  "name":"Boomerang Deutschland HD",
+  "type":"tv",
+  "ishd":false,
+  "isocc":"de",
+  "isolang":"ger",
+  "tags":
+  [
+    "DVB-C",
+    "HDTV",
+    "KD Home"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "KD Home"
+  ]
+}
