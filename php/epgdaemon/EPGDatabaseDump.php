@@ -1069,7 +1069,7 @@ foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 	$lfs = $cdata[ "lfs" ];
 	$bad = $cdata[ "bad" ];
 	
-	if (($lfs == 0) && ($bad > 10) && ! isBrainDead($channel)) echo "$channel => $bad\n";
+	if (($lfs == 0) && ($bad > 10) && ! isBrainDead($channel)) echo "BRAINDEAD: $channel => $bad\n";
 }
 
 ?>
