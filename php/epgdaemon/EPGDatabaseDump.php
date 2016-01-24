@@ -1032,6 +1032,7 @@ function splitEPGs()
 
 			$epgwrite[ "epgdata" ] = $epgday;
 			file_put_contents($actfile, json_encdat($epgwrite));
+			uploadEPG($actfile);
 			
 			echo "Writing " . $actfile . "\n";
 		}
@@ -1042,7 +1043,8 @@ function splitEPGs()
 		{
 			$epgswrite[ "epgdata" ] = $epgs;
 			file_put_contents($currfile, json_encdat($epgswrite) . "\n");
-			
+			uploadEPG($currfile);
+
 			echo "Writing " . $currfile . "\n";
 		}
 		else
@@ -1050,6 +1052,27 @@ function splitEPGs()
 			@rmdir(dirname($tempfile));
 		}
 	}
+}
+
+function uploadEPG($epgfile)
+{
+	$parts  = explode("/epgdata/", $epgfile);
+	$upload = $parts[ 1 ];
+	
+	$epgjson = file_get_contents($epgfile);
+	$epglen  = strlen($epgjson);
+	
+	$sock = fsockopen("www.xavaro.de", 80);
+
+	$header = "PUT /epguploader HTTP/1.0\r\n"
+			. "Host: www.xavaro.de\r\n"
+			. "Upload-File: $upload\r\n"
+			. "Content-Length: $epglen\r\n"
+			. "\r\n";
+
+	fwrite($sock,$header);
+	fwrite($sock,$epgjson);
+	fclose($sock);
 }
 
 readHomedir();
