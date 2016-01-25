@@ -78,7 +78,7 @@
 			
 				if ($bestname != null)
 				{
-					symlink($bestname, $symlink);
+					@symlink($bestname, $symlink);
 				}
 			}
 		}
