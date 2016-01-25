@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import de.xavaro.android.common.ChatManager;
+import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
@@ -351,6 +352,19 @@ public class ChatActivity extends AppCompatActivity implements
             textLayout.addView(statusTime, lp);
 
             protoIncoming.put(uuid, textLayout);
+
+            if (! chatMessage.has("read"))
+            {
+                JSONObject feedbackChatMessage = new JSONObject();
+
+                feedbackChatMessage.put("type","readChatMessage");
+                feedbackChatMessage.put("idremote", idremote);
+                feedbackChatMessage.put("uuid", uuid);
+
+                CommService.sendEncryptedReliable(feedbackChatMessage, true);
+
+                ChatManager.getInstance(context).updateIncomingProtocoll(idremote, chatMessage, "read");
+            }
         }
         catch (JSONException ex)
         {

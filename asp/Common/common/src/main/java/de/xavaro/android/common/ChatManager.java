@@ -155,6 +155,8 @@ public class ChatManager implements
 
     public void onMessageReceived(JSONObject message)
     {
+        Log.d(LOGTAG,"========" + message.toString());
+
         try
         {
             if (message.has("type"))
@@ -363,6 +365,35 @@ public class ChatManager implements
         }
     }
 
+    public void updateIncomingProtocoll(String identity, JSONObject message, String status)
+    {
+        String uuid = getMessageUUID(message);
+        if (uuid == null) return;
+
+        JSONObject protocoll = getProtocoll(identity);
+        if (protocoll == null) return;
+
+        try
+        {
+            if (! protocoll.has("incoming")) protocoll.put("incoming", new JSONObject());
+            JSONObject incoming = protocoll.getJSONObject("incoming");
+
+            Log.d(LOGTAG,"==============================updateIncomingProtocoll 1");
+
+            JSONObject proto = incoming.getJSONObject(uuid);
+
+            Log.d(LOGTAG,"==============================updateIncomingProtocoll 2" + proto.toString());
+
+            proto.put(status, Simple.nowAsISO());
+
+            putProtocoll(identity, protocoll);
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+
     private void updateOutgoingProtocoll(String identity, JSONObject message, String status)
     {
         String uuid = getMessageUUID(message);
@@ -458,7 +489,11 @@ public class ChatManager implements
             OopsService.log(LOGTAG, ex);
         }
 
+        Log.d(LOGTAG,"==========================onIncomingMessage: 1");
+
         if (! callbacks.containsKey(identity)) return false;
+
+        Log.d(LOGTAG,"==========================onIncomingMessage: 2");
 
         final String cbidentity = identity;
         final JSONObject cbmessage = message;

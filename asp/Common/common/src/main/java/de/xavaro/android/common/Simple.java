@@ -248,7 +248,7 @@ public class Simple
 
     public static boolean isGCMInitialized()
     {
-        return (CommonStatic.gcm_token != null);
+        return (getGCMapeyki() != null);
     }
 
     public static void dumpDirectory(String path)
