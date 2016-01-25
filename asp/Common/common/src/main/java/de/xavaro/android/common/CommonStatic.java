@@ -12,8 +12,6 @@ public class CommonStatic
 
     //region Google cloud messaging stuff
 
-    public static String gcm_apeyki;
-    public static String gcm_senderId;
     public static String gcm_token;
 
     //enregion Google cloud messaging stuff

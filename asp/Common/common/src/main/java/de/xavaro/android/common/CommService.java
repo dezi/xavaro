@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.app.Activity;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
 import android.app.Service;
@@ -22,10 +23,12 @@ import java.util.Map;
 // via datagramn packets.
 //
 
-public class CommService extends Service implements
-        GCMMessageService.GCMMessageServiceCallback
+public class CommService extends Service
 {
     private static final String LOGTAG = CommService.class.getSimpleName();
+
+    private static boolean isRunning;
+    private static CommService instance;
 
     private static final ArrayList<MessageClass> messageBacklog = new ArrayList<>();
 
@@ -52,6 +55,16 @@ public class CommService extends Service implements
             enc = encrypt;
             gcm = allowGCM;
         }
+    }
+
+    public static CommService getInstance()
+    {
+        return instance;
+    }
+
+    public static boolean getIsRunning()
+    {
+        return isRunning;
     }
 
     private static void sendClientAck(JSONObject message)
@@ -143,10 +156,8 @@ public class CommService extends Service implements
     // Worker background thread.
     //
 
-    private Thread workerSend = null;
-    private Thread workerRecv = null;
-
-    private boolean running = false;
+    private Thread workerSend;
+    private Thread workerRecv;
 
     //region Overriden methods.
 
@@ -155,15 +166,21 @@ public class CommService extends Service implements
     {
         super.onCreate();
 
-        ChatManager.initialize(getApplicationContext());
+        Log.d(LOGTAG,"onCreate: running with " + getApplicationContext().getPackageName());
 
-        running = true;
+        instance = this;
+
+        Simple.setAnyContext(getApplicationContext());
+        SystemIdentity.initialize(getApplicationContext());
+        ChatManager.initialize(getApplicationContext());
     }
 
     @Override
     public void onDestroy()
     {
-        running = false;
+        isRunning = false;
+
+        Log.d(LOGTAG, "onDestroy");
 
         super.onDestroy();
     }
@@ -171,37 +188,38 @@ public class CommService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        running = true;
-
-        if (workerSend == null)
+        if (! isRunning)
         {
-            workerSend = new Thread(new Runnable()
+            if (workerSend == null)
             {
-                @Override
-                public void run()
+                workerSend = new Thread(new Runnable()
                 {
-                    sendThread();
-                }
-            });
+                    @Override
+                    public void run()
+                    {
+                        sendThread();
+                    }
+                });
 
-            workerSend.start();
-        }
+                workerSend.start();
+            }
 
-        if (workerRecv == null)
-        {
-            workerRecv = new Thread(new Runnable()
+            if (workerRecv == null)
             {
-                @Override
-                public void run()
+                workerRecv = new Thread(new Runnable()
                 {
-                    recvThread();
-                }
-            });
+                    @Override
+                    public void run()
+                    {
+                        recvThread();
+                    }
+                });
 
-            workerRecv.start();
+                workerRecv.start();
+            }
+
+            isRunning = true;
         }
-
-        GCMMessageService.subscribe(this);
 
         return Service.START_NOT_STICKY;
     }
@@ -219,7 +237,7 @@ public class CommService extends Service implements
     {
         Log.d(LOGTAG, "recvThread: running");
 
-        while (running)
+        while (isRunning)
         {
             if (datagramSocket == null)
             {
@@ -267,7 +285,7 @@ public class CommService extends Service implements
                 String remoteIdentity = json.getString("identity");
                 String remotePublicKey = json.getString("publicKey");
 
-                IdentityManager.getInstance().put(remoteIdentity, "publicKey", remotePublicKey);
+                IdentityManager.put(remoteIdentity, "publicKey", remotePublicKey);
 
                 Log.d(LOGTAG, "onMessageReceived: requestPublicKeyXChange"
                         + " remoteIdentity=" + remoteIdentity
@@ -292,7 +310,7 @@ public class CommService extends Service implements
                 String privateKey = CryptUtils.RSAgetPrivateKey(getApplicationContext());
                 String passPhrase = CryptUtils.RSADecrypt(privateKey, encoPassPhrase);
 
-                IdentityManager.getInstance().put(remoteIdentity, "passPhrase", passPhrase);
+                IdentityManager.put(remoteIdentity, "passPhrase", passPhrase);
 
                 Log.d(LOGTAG, "onMessageReceived: requestAESpassXChange"
                         + " remoteIdentity=" + remoteIdentity
@@ -342,9 +360,9 @@ public class CommService extends Service implements
         return false;
     }
 
-    public void onGCMMessageReceived(byte[] rawMessage)
+    public void onRawMessageReceived(byte[] rawMessage)
     {
-        Log.d(LOGTAG, "onGCMMessageReceived: received:" + rawMessage.length);
+        Log.d(LOGTAG, "onRawMessageReceived: received:" + rawMessage.length);
 
         decryptPacket(rawMessage, COMMCLASS_GCM);
     }
@@ -394,10 +412,6 @@ public class CommService extends Service implements
                 Simple.JSONput(clientAckMessage, "uuid", ackid);
                 sendClientAck(clientAckMessage);
             }
-
-            //
-            // Process message.
-            //
 
             byte[] rest = new byte[ data.length - 52 ];
             System.arraycopy(data, 52, rest, 0, rest.length);
@@ -538,7 +552,7 @@ public class CommService extends Service implements
     {
         Log.d(LOGTAG, "sendThread: running");
 
-        while (running)
+        while (isRunning)
         {
             if (sleeptime > CommonConfigs.CommServerSleepMax)
             {
@@ -691,14 +705,15 @@ public class CommService extends Service implements
                             //
                             // We need to send a server ack message to our clients.
                             // With GCM we get the server accepted packate response
-                            // when we send the packet upstream.
+                            // when we send the packet upstream. We need to exchange
+                            // remote and local identity, since we fake this message.
                             //
 
                             JSONObject serverAckMessage = new JSONObject();
 
                             Simple.JSONput(serverAckMessage, "type", "serverAckMessage");
-                            Simple.JSONput(serverAckMessage, "identity", ident);
-                            Simple.JSONput(serverAckMessage, "idremote", idrem);
+                            Simple.JSONput(serverAckMessage, "identity", idrem);
+                            Simple.JSONput(serverAckMessage, "idremote", ident);
                             Simple.JSONput(serverAckMessage, "uuid", ackid);
 
                             deliverMessage(serverAckMessage);

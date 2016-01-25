@@ -15,7 +15,7 @@ public class AssistActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_assist);
 
-        Simple.setContext(this);
+        Simple.setAppContext(this);
 
         View contacts = findViewById(R.id.contacts);
 

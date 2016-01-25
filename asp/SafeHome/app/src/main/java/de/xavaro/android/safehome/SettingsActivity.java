@@ -31,10 +31,9 @@ public class SettingsActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
 
-        Simple.setContext((Activity) this);
+        Simple.setAppContext((Activity) this);
 
         SystemIdentity.initialize(this);
-        PersistManager.initialize(this);
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);

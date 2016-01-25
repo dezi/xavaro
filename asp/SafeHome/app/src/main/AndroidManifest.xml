@@ -33,7 +33,8 @@
 
         <service
             android:name="de.xavaro.android.common.CommService"
-            android:exported="false"/>
+            android:exported="false">
+        </service>
 
         <service
             android:name="de.xavaro.android.common.OopsService"
@@ -78,7 +79,6 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.HOME"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -87,7 +87,6 @@
         <activity android:name=".SettingsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
@@ -98,7 +97,6 @@
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.HOME"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>

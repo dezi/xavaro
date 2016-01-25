@@ -910,8 +910,8 @@ public class PreferencesBasics
                             String passPhrase = UUID.randomUUID().toString();
                             String encoPassPhrase = CryptUtils.RSAEncrypt(remotePublicKey, passPhrase);
 
-                            IdentityManager.getInstance().put(remoteIdentity, "publicKey", remotePublicKey);
-                            IdentityManager.getInstance().put(remoteIdentity, "passPhrase", passPhrase);
+                            IdentityManager.put(remoteIdentity, "publicKey", remotePublicKey);
+                            IdentityManager.put(remoteIdentity, "passPhrase", passPhrase);
 
                             JSONObject requestAESpassXChange = new JSONObject();
 

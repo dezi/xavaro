@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -15,32 +16,29 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class GCMMessageService extends GcmListenerService
 {
     private static final String LOGTAG = GCMMessageService.class.getSimpleName();
 
-    private static final ArrayList<GCMMessageServiceCallback> subscribers = new ArrayList<>();
-
-    public interface GCMMessageServiceCallback
+    @Override
+    public void onCreate()
     {
-        void onGCMMessageReceived(byte[] rawMessage);
-    }
+        super.onCreate();
 
-    public static void subscribe(GCMMessageServiceCallback callback)
-    {
-        if (! subscribers.contains(callback)) subscribers.add(callback);
-    }
-
-    public static void unsubscribe(GCMMessageServiceCallback callback)
-    {
-        if (subscribers.contains(callback)) subscribers.remove(callback);
+        startService(new Intent(this, CommService.class));
     }
 
     @Override
     public void onMessageReceived(String from, Bundle data)
     {
+        while (! CommService.getIsRunning())
+        {
+            Log.d(LOGTAG, "onMessageReceived: Waiting for " + CommService.class.getSimpleName());
+
+            Simple.sleep(100);
+        }
+
         String message = data.getString("message");
 
         Log.d(LOGTAG, "From: " + from);
@@ -60,10 +58,7 @@ public class GCMMessageService extends GcmListenerService
                     String base64 = jmess.getString("base64");
                     byte[] rawdata = Base64.decode(base64, 0);
 
-                    for (GCMMessageServiceCallback subscriber : subscribers)
-                    {
-                        subscriber.onGCMMessageReceived(rawdata);
-                    }
+                    CommService.getInstance().onRawMessageReceived(rawdata);
                 }
                 catch (JSONException ex)
                 {
@@ -99,7 +94,7 @@ public class GCMMessageService extends GcmListenerService
 
             URL url = new URL("https://android.googleapis.com/gcm/send");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Authorization", "key=" + Simple.dezify(CommonStatic.gcm_apeyki));
+            conn.setRequestProperty("Authorization", "key=" + Simple.dezify(Simple.getGCMapeyki()));
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
@@ -127,10 +122,10 @@ public class GCMMessageService extends GcmListenerService
         return false;
     }
 
-    private boolean checkPlayServices()
+    public static boolean checkPlayServices()
     {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(Simple.getContext());
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(Simple.getAppContext());
 
         if (resultCode != ConnectionResult.SUCCESS)
         {

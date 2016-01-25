@@ -64,7 +64,7 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Simple.setContext(this);
+        Simple.setAppContext(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
@@ -77,14 +77,30 @@ public class HomeActivity extends AppCompatActivity implements
 
         homeActivity = this;
 
+        //CommonStatic.gcm_apeyki = "HLscZ|HCQc]g}nZG=MKu~3H0?b?7sm1wp_kPcn=";
+        //CommonStatic.gcm_senderId = getString(R.string.gcm_defaultSenderId);
+
+        /*
+        long xxx = Long.parseLong(getString(R.string.gcm_defaultSenderId));
+        Log.d(LOGTAG, "===========================:" + getString(R.string.gcm_defaultSenderId));
+        Log.d(LOGTAG, "===========================:" + xxx);
+        Log.d(LOGTAG, "===========================:" + Simple.dezify(xxx));
+        Log.d(LOGTAG, "===========================:" + Simple.dezify(Simple.dezify(xxx)));
+        */
+
+        SystemIdentity.initialize(this);
+        ArchievementManager.initialize(this);
+        SettingsFragments.initialize(this);
+        DitUndDat.SpeekDat.initialize(this);
+        DitUndDat.SharedPrefs.initialize(this);
+        HealthGroup.initialize(this);
+
         createConfig();
 
         startService(new Intent(this, KioskService.class));
         startService(new Intent(this, CommService.class));
         startService(new Intent(this, OopsService.class));
 
-        CommonStatic.gcm_apeyki = "HLscZ|HCQc]g}nZG=MKu~3H0?b?7sm1wp_kPcn=";
-        CommonStatic.gcm_senderId = getString(R.string.gcm_defaultSenderId);
         startService(new Intent(this, GCMRegistrationService.class));
 
         //
@@ -99,14 +115,6 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
-
-        SystemIdentity.initialize(this);
-        PersistManager.initialize(this);
-        ArchievementManager.initialize(this);
-        SettingsFragments.initialize(this);
-        DitUndDat.SpeekDat.initialize(this);
-        DitUndDat.SharedPrefs.initialize(this);
-        HealthGroup.initialize(this);
     }
 
     @Override

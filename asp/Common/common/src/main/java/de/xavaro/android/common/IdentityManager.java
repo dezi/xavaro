@@ -7,18 +7,7 @@ public class IdentityManager
 {
     private static final String LOGTAG = IdentityManager.class.getSimpleName();
 
-    //region Static singleton methods.
-
-    private static IdentityManager instance;
-
-    public static IdentityManager getInstance()
-    {
-        if (instance == null) instance = new IdentityManager();
-
-        return instance;
-    }
-
-    public JSONObject getIdentity(String identity)
+    public static JSONObject getIdentity(String identity)
     {
         String xpath = "IdentityManager/identities/" + identity;
 
@@ -27,7 +16,7 @@ public class IdentityManager
         return (ident != null) ? ident : new JSONObject();
     }
 
-    public void putIdentity(String identity, JSONObject ident)
+    public static void putIdentity(String identity, JSONObject ident)
     {
         String xpath = "IdentityManager/identities/" + identity;
 
@@ -35,7 +24,7 @@ public class IdentityManager
         PersistManager.flush();
     }
 
-    public void put(String identity, String key, String value)
+    public static void put(String identity, String key, String value)
     {
         try
         {

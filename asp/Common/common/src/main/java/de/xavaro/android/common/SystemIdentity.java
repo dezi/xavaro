@@ -42,6 +42,8 @@ public class SystemIdentity
 
     public static void initialize(Context context)
     {
+        if (identity != null) return;
+
         retrieveFromStorage(context);
         retrieveFromCookies(context);
         retrieveFromContact(context);

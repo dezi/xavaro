@@ -23,11 +23,11 @@ public class PersistManager
     private static Context ctx;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void initialize(Context context)
+    private static void initialize()
     {
         if (settings != null) return;
 
-        ctx = context;
+        ctx = Simple.getAnyContext();
 
         File file = new File(ctx.getFilesDir(), "settings.act.json");
 
@@ -62,6 +62,8 @@ public class PersistManager
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void flush()
     {
+        initialize();
+
         if (! dirty) return;
 
         File tmp = new File(ctx.getFilesDir(), "settings.tmp.json");
@@ -89,6 +91,8 @@ public class PersistManager
 
     private static JSONObject resolveXpath(String[] parts, boolean create) throws JSONException
     {
+        initialize();
+
         JSONObject jo = settings;
 
         for (int inx = 0; inx + 1 < parts.length; inx++)
@@ -107,12 +111,16 @@ public class PersistManager
     @Nullable
     public static String getXpathString(String xpath)
     {
+        initialize();
+
         return getXpathString(xpath, true);
     }
 
     @Nullable
     public static String getXpathString(String xpath, boolean ignore)
     {
+        initialize();
+
         String[] parts = xpath.split("/");
 
         try
@@ -130,11 +138,15 @@ public class PersistManager
 
     public static boolean getXpathBoolean(String xpath)
     {
+        initialize();
+
         return getXpathBoolean(xpath, true);
     }
 
     public static boolean getXpathBoolean(String xpath, boolean ignore)
     {
+        initialize();
+
         String[] parts = xpath.split("/");
 
         try
@@ -152,11 +164,15 @@ public class PersistManager
 
     public static int getXpathInt(String xpath)
     {
+        initialize();
+
         return getXpathInt(xpath, true);
     }
 
     public static int getXpathInt(String xpath, boolean ignore)
     {
+        initialize();
+
         String[] parts = xpath.split("/");
 
         try
@@ -175,12 +191,16 @@ public class PersistManager
     @Nullable
     public static JSONObject getXpathJSONObject(String xpath)
     {
+        initialize();
+
         return getXpathJSONObject(xpath, true);
     }
 
     @Nullable
     public static JSONObject getXpathJSONObject(String xpath, boolean ignore)
     {
+        initialize();
+
         String[] parts = xpath.split("/");
 
         try
@@ -198,6 +218,8 @@ public class PersistManager
 
     public static void putXpath(String xpath, Object value)
     {
+        initialize();
+
         String[] parts = xpath.split("/");
 
         try
@@ -215,6 +237,8 @@ public class PersistManager
 
     public static boolean delXpath(String xpath)
     {
+        initialize();
+
         boolean result = false;
 
         String[] parts = xpath.split("/");

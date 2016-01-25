@@ -132,7 +132,7 @@ public class ProcessManager
 
     private static void getProcMode()
     {
-        Activity context = Simple.getContext();
+        Activity context = Simple.getAppContext();
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> piList = am.getRunningAppProcesses();
 
@@ -154,7 +154,7 @@ public class ProcessManager
         sequence++;
         running = null;
 
-        Activity context = Simple.getContext();
+        Activity context = Simple.getAppContext();
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> piList = am.getRunningAppProcesses();
 

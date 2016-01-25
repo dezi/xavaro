@@ -60,7 +60,7 @@ public class CryptUtils
     {
         try
         {
-            JSONObject ident = IdentityManager.getInstance().getIdentity(identity);
+            JSONObject ident = IdentityManager.getIdentity(identity);
             if (!ident.has("passPhrase")) return null;
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESencrypt(aesKey, message.getBytes());
@@ -78,7 +78,7 @@ public class CryptUtils
     {
         try
         {
-            JSONObject ident = IdentityManager.getInstance().getIdentity(identity);
+            JSONObject ident = IdentityManager.getIdentity(identity);
             if (!ident.has("passPhrase")) return null;
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESdecrypt(aesKey, message);

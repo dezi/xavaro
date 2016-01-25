@@ -1,8 +1,9 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
+
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 
 import android.app.Activity;
 import android.content.Context;
@@ -52,19 +53,62 @@ public class Simple
 
     private static Activity appContext;
     private static Handler appHandler;
+    private static Context anyContext;
 
-    public static void setContext(Activity context)
+    public static void setAppContext(Activity context)
     {
         Simple.appContext = context;
+        Simple.anyContext = context;
         Simple.appHandler = new Handler();
     }
 
-    public static Activity getContext()
+    public static Activity getAppContext()
     {
         return Simple.appContext;
     }
 
+    public static void setAnyContext(Context context)
+    {
+        Simple.anyContext = context;
+    }
+
+    public static Context getAnyContext()
+    {
+        return Simple.anyContext;
+    }
+
     //endregion Initialisation
+
+    //region GCM stuff
+
+    public static long getGCMsendeird()
+    {
+        if (anyContext != null)
+        {
+            if (anyContext.getPackageName().equals("de.xavaro.android.safehome"))
+            {
+                return 2955796475946577539L;
+            }
+        }
+
+        return 0;
+    }
+
+    @Nullable
+    public static String getGCMapeyki()
+    {
+        if (anyContext != null)
+        {
+            if (anyContext.getPackageName().equals("de.xavaro.android.safehome"))
+            {
+                return "HLscZ|HCQc]g}nZG=MKu~3H0?b?7sm1wp_kPcn=";
+            }
+        }
+
+        return null;
+    }
+
+    //endregion GCM stuff
 
     //region Keyboard stuff
 
@@ -401,6 +445,23 @@ public class Simple
         }
 
         return string.toString();
+    }
+
+    public static void sleep(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+
+        }
+        catch (InterruptedException ignore)
+        {
+        }
+    }
+
+    public static long dezify(long number)
+    {
+        return number ^ 0x2905196228051998L;
     }
 
     public static String dezify(String string)

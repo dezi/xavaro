@@ -74,7 +74,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onCreate(savedInstanceState);
 
-        Simple.setContext(this);
+        Simple.setAppContext(this);
 
         context = this;
 

@@ -25,10 +25,12 @@ public class GCMRegistrationService extends IntentService
         {
             InstanceID instanceID = InstanceID.getInstance(this);
 
-            CommonStatic.gcm_token = instanceID.getToken(CommonStatic.gcm_senderId,
+            String senderId = "" + Simple.dezify(Simple.getGCMsendeird());
+
+            CommonStatic.gcm_token = instanceID.getToken(senderId,
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
 
-            Log.d(LOGTAG, "GCM Sender-ID: " + CommonStatic.gcm_senderId);
+            Log.d(LOGTAG, "GCM Sender-ID: " + senderId);
             Log.d(LOGTAG, "GCM Registration Token: " + CommonStatic.gcm_token);
         }
         catch (Exception ex)
