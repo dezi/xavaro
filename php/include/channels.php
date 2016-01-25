@@ -19,7 +19,7 @@ function simplifySearchName($mname)
 	return $mname;
 }
 
-function resolveAstra($orgname, $name, $language)
+function resolveChannel($orgname, $name, $language)
 {
 	$isknown = false;
 	
@@ -31,26 +31,26 @@ function resolveAstra($orgname, $name, $language)
 		$isknown = true;
 	}
 	
-	$result = resolveAstraPhases($orgname, $name, $language);
+	$result = resolveChannelPhases($orgname, $name, $language);
 	
-	if (! isset($GLOBALS[ "astra.newentry.json" ]))
+	if (! isset($GLOBALS[ "channels.newentry.json" ]))
 	{
-		$newentry = dirname(__FILE__) . "/astra.newentry.json";
-		$GLOBALS[ "astra.newentry.json" ] = fopen($newentry,"w");
+		$newentry = dirname(__FILE__) . "/channels.newentry.json";
+		$GLOBALS[ "channels.newentry.json" ] = fopen($newentry,"w");
 	}
 	
 	$cachetag = "$orgname $language";
 	
-	if ((! $isknown) && ! isset($GLOBALS[ "astra.newentry" ][ $cachetag ]))
+	if ((! $isknown) && ! isset($GLOBALS[ "channels.newentry" ][ $cachetag ]))
 	{
-		$GLOBALS[ "astra.newentry" ][ $cachetag ] = true;
+		$GLOBALS[ "channels.newentry" ][ $cachetag ] = true;
 		
 		$padorg = str_pad("\"" . $orgname . "\",", 32, " ");
 		$padnew = "\"" . (($result != null) ? $result[ "name" ] : "") . "\"";
 		
 		$entry = "\t[ \"$language\", $padorg $padnew ],\n";
 		
-		fwrite($GLOBALS[ "astra.newentry.json" ],$entry);
+		fwrite($GLOBALS[ "channels.newentry.json" ],$entry);
 		
 		echo "NEW ENTRY: $orgname => $language\n";
 	}
@@ -58,7 +58,7 @@ function resolveAstra($orgname, $name, $language)
 	return $result;
 }
 
-function resolveAstraPhases($orgname, $name, $language)
+function resolveChannelPhases($orgname, $name, $language)
 {
 	$mname = simplifySearchName($name);
 	
@@ -66,7 +66,7 @@ function resolveAstraPhases($orgname, $name, $language)
 	// Normal lookup.
 	//
 	
-	$result = resolveAstraDoit($name, $language, $mname);	
+	$result = resolveChannelDoit($name, $language, $mname);	
 	if ($result != null) return $result;
 		
 	//
@@ -77,7 +77,7 @@ function resolveAstraPhases($orgname, $name, $language)
 	if ($language == "dut") $mname = simplifySearchName($name . " Nederland");
 	if ($language == "eng") $mname = simplifySearchName($name . " UK");
 
-	$result = resolveAstraDoit($name, $language, $mname);
+	$result = resolveChannelDoit($name, $language, $mname);
 	if ($result != null) return $result;
 
 	//
@@ -86,32 +86,32 @@ function resolveAstraPhases($orgname, $name, $language)
 	
 	if ($language == "ger") $mname = simplifySearchName($name . " Deutsch");
 
-	$result = resolveAstraDoit($name, $language, $mname);
+	$result = resolveChannelDoit($name, $language, $mname);
 	if ($result != null) return $result;
 
 	return $result;
 }
 
-function resolveAstraDoit($name, $language, $mname)
+function resolveChannelDoit($name, $language, $mname)
 {
 	$cachetag = "$mname $language";
 	
-	if (isset($GLOBALS[ "astra.cache" ][ $cachetag ]))
+	if (isset($GLOBALS[ "channels.cache" ][ $cachetag ]))
 	{
-		return $GLOBALS[ "astra.cache" ][ $cachetag ];
+		return $GLOBALS[ "channels.cache" ][ $cachetag ];
 	}
 
-	$astras = array();
+	$cdefs  = array();
 	$anames = array();
 	$isoccs = array();
 	
-	foreach ($GLOBALS[ "channels.astra" ] as $channel)
+	foreach ($GLOBALS[ "channels.config" ] as $channel)
 	{
 		if (($mname == $channel[ "mname" ]) && ($language == $channel[ "isolang" ]))
 		{
+ 			$cdefs[]  = $channel;
  			$anames[] = $channel[ "name"  ];
  			$isoccs[] = $channel[ "isocc" ];
- 			$astras[] = $channel;
 		}
 	}
 	
@@ -137,45 +137,43 @@ function resolveAstraDoit($name, $language, $mname)
 	
 	if (count($isoccs) > 0)
 	{
+		$result[ "cdefs" ] = $cdefs [ 0 ];
 		$result[ "name"  ] = $anames[ 0 ];
 		$result[ "isocc" ] = $isoccs[ 0 ];
-		$result[ "astra" ] = $astras[ 0 ];
 	}
 	
-	$GLOBALS[ "astra.cache" ][ $cachetag ] = $result;
+	$GLOBALS[ "channels.cache" ][ $cachetag ] = $result;
 
 	return $result;
 }
 
-function readAstraConfig()
+function readChannelConfig()
 {
-	$configname   = dirname(__FILE__) . "/channels.astra.json";
-	$manualname   = dirname(__FILE__) . "/astra.manual.json";
+	$configname   = dirname(__FILE__) . "/channels.config.json";
+	$manualname   = dirname(__FILE__) . "/channels.manual.json";
 	$resolvedname = dirname(__FILE__) . "/channels.resolved.json";
 		
 	if (! file_exists($configname))
 	{
-		$astraraw = file_get_contents("http://www.astra.de/webservice/v3/channels"
+		$configraw = file_get_contents("http://www.astra.de/webservice/v3/channels"
 				 . "?limit=9999&page=1&domain_identifier=d3d3LmFzdHJhLmRl"
 				 . "&free=yes&pay=yes");
 
-		$astra = json_decdat($astraraw);
-
-		//file_put_contents("./channels.astra.json", json_encdat($astra)); exit();
+		$config = json_decdat($configraw);
 		
 		$genres = array();
 		
-		foreach ($astra[ "genres" ] as $genre)
+		foreach ($config[ "genres" ] as $genre)
 		{
 			$genres[ $genre[ "id" ] ] = $genre[ "name" ];
 		}
 		
-		foreach ($astra[ "packages" ] as $package)
+		foreach ($config[ "packages" ] as $package)
 		{
 			$packages[ $package[ "id" ] ] = $package[ "name" ];
 		}
 		
-		$channels = $astra[ "channels" ];
+		$channels = $config[ "channels" ];
 		$compacts = array();
 		
 		foreach ($channels as $channel)
@@ -266,36 +264,36 @@ function readAstraConfig()
 		file_put_contents($configname,json_encdat($compacts));
 	}
 	
-	$GLOBALS[ "channels.astra" ] = json_decdat(file_get_contents($configname));
+	$GLOBALS[ "channels.config" ] = json_decdat(file_get_contents($configname));
 	
-	foreach ($GLOBALS[ "channels.astra" ] as $inx => $channel)
+	foreach ($GLOBALS[ "channels.config" ] as $inx => $channel)
 	{
 		$mname = simplifySearchName($channel[ "name" ]);
-		$GLOBALS[ "channels.astra" ][ $inx ][ "mname" ] = $mname;
+		$GLOBALS[ "channels.config" ][ $inx ][ "mname" ] = $mname;
 	}
 	
 	//
 	// Read manual config.
 	//
 	
-	$astramanual = json_decdat(file_get_contents($manualname));
+	$configmanual = json_decdat(file_get_contents($manualname));
 	
-	foreach ($astramanual as $inx => $channel)
+	foreach ($configmanual as $inx => $channel)
 	{
 		if (! isset( $channel[ "name" ])) continue;
 		
 		$mname = simplifySearchName($channel[ "name" ]);
 		$channel[ "mname" ] = $mname;
-		$GLOBALS[ "channels.astra" ][] = $channel;
+		$GLOBALS[ "channels.config" ][] = $channel;
 	}
 	
 	//
 	// Read resolved table.
 	//
 
-	$astraresolved = json_decdat(file_get_contents($resolvedname));
+	$channelsresolved = json_decdat(file_get_contents($resolvedname));
  
-	foreach ($astraresolved as $rule)
+	foreach ($channelsresolved as $rule)
 	{
 		if (count($rule) == 0) continue;
 		

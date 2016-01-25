@@ -8,7 +8,7 @@ include("../include/json.php");
 include("../include/util.php");
 include("../include/countries.php");
 include("../include/languages.php");
-include("../include/astra.php");
+include("../include/channels.php");
 
 function errorexit($message)
 {
@@ -372,7 +372,7 @@ function saveChannel($cdata)
 	$name  = $cdata[ "name"  ];
 	$type  = $cdata[ "type"  ];
 	$isocc = $cdata[ "isocc" ];
-	$adata = $cdata[ "astra" ];
+	$adata = $cdata[ "cdefs" ];
 	
 	$actdir  = "../../var/channels/$type/$isocc"; 
 	$actfile = $actdir . "/" . $name . ".json";
@@ -534,9 +534,9 @@ function saveEPG($epg)
 	
 	$orgname = stripShit($channel);
 	$channel = unifyChannelName($channel, $language, $ishd);
-	$astra   = resolveAstra($orgname, $channel, $language);
+	$result  = resolveChannel($orgname, $channel, $language);
 	
-	if ($astra == null)
+	if ($result == null)
 	{
 		//
 		// Do not dump unconsolidated shit to disk.
@@ -545,8 +545,8 @@ function saveEPG($epg)
 		return;
 	}
 	
-	$channel = $astra[ "name"  ];
-	$isocc   = $astra[ "isocc" ];
+	$channel = $result[ "name"  ];
+	$isocc   = $result[ "isocc" ];
 	
 	$actdir  = "../../var/epgdata/$type/$isocc/$channel"; 
 	if (! file_exists($actdir)) mkdir($actdir, 0755, true);
@@ -593,8 +593,8 @@ function saveEPG($epg)
 		$cdata[ "network"  ] = $epg[ "network" ];
 		$cdata[ "country"  ] = $epg[ "country" ];
 		$cdata[ "tags"     ] = $epg[ "tags"    ];
-		$cdata[ "astra"    ] = $astra[ "astra" ];
-		$cdata[ "isolang"  ] = $astra[ "astra" ][ "isolang" ];
+		$cdata[ "cdefs"    ] = $result[ "cdefs" ];
+		$cdata[ "isolang"  ] = $result[ "cdefs" ][ "isolang" ];
 		$cdata[ "file"     ] = $actfile;
 		$cdata[ "dir"      ] = $actdir;
 		$cdata[ "lfs"      ] = 0;
@@ -816,7 +816,7 @@ function splitEPGs()
 		$tempfile = $cdata[ "file" ];
 		$currfile = str_replace("0000.00.00","current", $tempfile);
 		
-		echo "Splitting " . $tempfile . "\n";
+		echo "Splitting   " . $tempfile . "\n";
 		
 		$json = "[" . substr(file_get_contents($tempfile),0,-2) . "]";
 		
@@ -921,8 +921,7 @@ readHostname();
 readTags();
 readChannels();
 readNetworks();
-
-readAstraConfig();
+readChannelConfig();
 
 readEPGs();
 splitEPGs();
