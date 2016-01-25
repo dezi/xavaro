@@ -2,6 +2,14 @@
 
 include("../include/json.php");
 
+function sortChannels($a, $b)
+{
+	$starta = mb_strtolower($a[ "name" ], "UTF-8");
+	$startb = mb_strtolower($b[ "name" ], "UTF-8");
+	
+	return ($starta > $startb) ? 1 : -1;
+}
+
 function compressChannels()
 {
 	$channelsdir  = "../../var/channels";
@@ -49,6 +57,7 @@ function compressChannels()
 	
 			closedir($co_dfd);		
 		
+			usort($co_arr, "sortChannels");
 			$co_json = json_encdat($co_arr);
 			$co_file = "$countrydir.json.gz";
 			file_put_contents($co_file, gzencode($co_json, 9));
@@ -56,6 +65,7 @@ function compressChannels()
 		
 		closedir($ty_dfd);	
 			
+		usort($ty_arr, "sortChannels");
 		$ty_json = json_encdat($ty_arr);
 		$ty_file = "$typesdir.json.gz";
 		file_put_contents($ty_file, gzencode($ty_json, 9));
@@ -63,6 +73,7 @@ function compressChannels()
 	
 	closedir($ch_dfd);
 				
+	usort($ch_arr, "sortChannels");
 	$ch_json = json_encdat($ch_arr);
 	$ch_file = "$channelsdir.json.gz";
 	file_put_contents($ch_file, gzencode($ch_json, 9));
