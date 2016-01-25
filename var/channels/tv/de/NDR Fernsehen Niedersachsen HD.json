@@ -1,12 +1,14 @@
 {
   "name":"NDR Fernsehen Niedersachsen HD",
   "type":"tv",
-  "ishd":1,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "ARD",
+    "DVB-C",
     "DVB-S",
     "HDTV"
   ],

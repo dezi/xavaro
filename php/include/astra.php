@@ -3,17 +3,18 @@
 function simplifySearchName($mname)
 {
 	$mname = mb_strtolower($mname, "UTF-8");
+	$mname = remove_accents($mname);
 
 	$mname = str_replace("-", " ", $mname);
 	$mname = str_replace("_", " ", $mname);
 	$mname = str_replace(".", " ", $mname);
-	$mname = str_replace("è", "e", $mname);
-	$mname = str_replace(" ",  "", $mname);
-	
+
 	$mname = str_replace("ä", "ae", $mname);
 	$mname = str_replace("ö", "oe", $mname);
 	$mname = str_replace("ü", "ue", $mname);
 	$mname = str_replace("ß", "ss", $mname);
+
+	$mname = str_replace(" ",  "", $mname);
 
 	return $mname;
 }

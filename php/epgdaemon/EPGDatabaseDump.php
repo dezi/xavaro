@@ -1,6 +1,11 @@
 <?php
 
+//
+// Read tvheadend epgdb.v2 database and upload content to servers.
+//
+
 include("../include/json.php");
+include("../include/util.php");
 include("../include/countries.php");
 include("../include/languages.php");
 include("../include/astra.php");
@@ -15,7 +20,7 @@ function errorexit($message)
 function readByte($fd)
 {
 	$data = @fread($fd,1);
-	if ($data === false) return -1;
+	if (($data === false) || (strlen($data) != 1)) return -1;
 	
 	$data = unpack("C",$data);
 	return $data[ 1 ];
@@ -29,7 +34,7 @@ function readInt($fd)
 	for ($inx = 0; $inx < $len; $inx++)
 	{ 
 		$data = fread($fd,1);
-		if ($data === false) return -1;
+		if (($data === false) || (strlen($data) != 1)) return -1;
 
 		$val = ($val << 8) + ord($data[ 0 ]);
 	}
@@ -40,6 +45,7 @@ function readInt($fd)
 function readNumber($fd, $len)
 {
 	$data = fread($fd,$len);
+	if (($data === false) || (strlen($data) != $len)) return -1;
 
 	$val = gmp_init(0);
 
@@ -335,66 +341,20 @@ function addChannelTag(&$config, $tagname, $tagvalue)
 	asort($config[ $tagname ]);
 }
 
-function isBrainDead($channel)
+function isBrainDead($language, $channel)
 {
-	$bdtable = array();
-	$bdtable[] = "3sat HD";
-	$bdtable[] = "3sat";
-	$bdtable[] = "ARTE Deutsch HD";
-	$bdtable[] = "ARTE Deutsch";
-	$bdtable[] = "B5 aktuell";
-	$bdtable[] = "B5 plus";
-	$bdtable[] = "Bayern 1";
-	$bdtable[] = "Bayern 2";
-	$bdtable[] = "Bayern 3";
-	$bdtable[] = "Bayern Plus";
-	$bdtable[] = "BR Klassik";
-	$bdtable[] = "BR Puls";
-	$bdtable[] = "Bremen Vier";
-	$bdtable[] = "Das Erste HD";
-	$bdtable[] = "Das Erste";
-	$bdtable[] = "Deutschlandfunk";
-	$bdtable[] = "Deutschlandradio Kultur";
-	$bdtable[] = "Eins Plus";
-	$bdtable[] = "Einsfestival";
-	$bdtable[] = "HR 2 Kultur";
-	$bdtable[] = "HR Fernsehen HD";
-	$bdtable[] = "HR Fernsehen";
-	$bdtable[] = "KIKA HD";
-	$bdtable[] = "KIKA";
-	$bdtable[] = "Kulturradio";
-	$bdtable[] = "MDR 1 Radio Sachsen";
-	$bdtable[] = "MDR Fernsehen Sachsen HD";
-	$bdtable[] = "MDR Fernsehen Sachsen-Anhalt";
-	$bdtable[] = "MDR Figaro";
-	$bdtable[] = "MDR Info";
-	$bdtable[] = "MDR Klassik";
-	$bdtable[] = "N-Joy";
-	$bdtable[] = "NDR 1 Niedersachsen";
-	$bdtable[] = "NDR Fernsehen Hamburg HD";
-	$bdtable[] = "NDR Fernsehen Schleswig-Holstein HD";
-	$bdtable[] = "NDR Fernsehen Schleswig-Holstein";
-	$bdtable[] = "NDR Info Spezial";
-	$bdtable[] = "NDR Info";
-	$bdtable[] = "NDR Kultur";
-	$bdtable[] = "Radio Berlin 88.8";
-	$bdtable[] = "RBB Berlin HD";
-	$bdtable[] = "RBB Berlin";
-	$bdtable[] = "SR 2 KulturRadio";
-	$bdtable[] = "SWR 2 Baden-Württemberg";
-	$bdtable[] = "SWR Fernsehen Rheinland-Pfalz";
-	$bdtable[] = "Tagesschau 24";
-	$bdtable[] = "WDR 3";
-	$bdtable[] = "WDR 5";
-	$bdtable[] = "WDR Fernsehen Köln HD";
-	$bdtable[] = "WDR Fernsehen Köln";
-	$bdtable[] = "ZDF HD";
-	$bdtable[] = "ZDF info";
-	$bdtable[] = "ZDF Kultur";
-	$bdtable[] = "ZDF neo HD";
-	$bdtable[] = "ZDF neo";
-	$bdtable[] = "ZDF";
+	if (! isset($GLOBALS[ "channels.braindead" ]))
+	{
+		$bdfile  = "../include/channels.braindead.json";
+		$bdtable = json_decdat(file_get_contents($bdfile));
+		
+		$GLOBALS[ "channels.braindead" ] = $bdtable;
+	}
+	
+	$bdtable = $GLOBALS[ "channels.braindead" ];
 
+	$stag = "$language.$channel";
+	
 	foreach ($bdtable as $braindead)
 	{
 		if ($braindead == $channel) return true;
@@ -454,7 +414,7 @@ function saveChannel($cdata)
 	//
 	
 	if (! isset($config[ "ishbd" ])) $config[ "isbd" ] = false;
-	$config[ "isbd" ] = $config[ "isbd" ] || isBrainDead($name);
+	$config[ "isbd" ] = $config[ "isbd" ] || isBrainDead($config[ "isolang" ], $name);
 	
 	if (isset($adata[ "packs" ])) $config[ "packs" ] = $adata[ "packs" ];
 	
@@ -521,159 +481,6 @@ function saveChannel($cdata)
 	file_put_contents($actfile, json_encdat($ordered) . "\n");
 }
 
-function getMultibyteCharAt($str, $pos)
-{
-	$mb = $str[ $pos ];
-	
-	if (ord($mb) >= 128)
-	{
-		if ((($pos + 1) < strlen($str)) && (ord($str[ $pos + 1 ]) >= 128))
-		{
-			$mb .= $str[ $pos + 1 ];
-		}
-		
-		if ((($pos + 2) < strlen($str)) && (ord($str[ $pos + 2 ]) >= 128))
-		{
-			$mb .= $str[ $pos + 2 ];
-		}
-		
-		if ((($pos + 3) < strlen($str)) && (ord($str[ $pos + 3 ]) >= 128))
-		{
-			$mb .= $str[ $pos + 3 ];
-		}
-	}
-	
-	return $mb;
-}
-
-function getMultibyteCharBefore($str, $pos)
-{
-	if ($pos == 0) return "";
-	
-	$mb = $str[ $pos - 1 ];
-	
-	if (ord($mb) >= 128)
-	{
-		if ((($pos - 2) >= 0) && (ord($str[ $pos - 2 ]) >= 128))
-		{
-			$mb = $str[ $pos - 2 ] . $mb;
-		}
-		
-		if ((($pos - 3) >= 0) && (ord($str[ $pos - 3 ]) >= 128))
-		{
-			$mb = $str[ $pos - 3 ] . $mb;
-		}
-		
-		if ((($pos - 4) >= 0) && (ord($str[ $pos - 4 ]) >= 128))
-		{
-			$mb = $str[ $pos - 4 ] . $mb;
-		}
-	}
-	
-	return $mb;
-}
-
-function defuckEPGOld(&$epg)
-{
-	if (! isset($epg[ "description" ])) return;
-	
-	$desc = $epg[ "description" ];
-	
-	$encoding = mb_detect_encoding($desc, "UTF-8, ISO-8859-1, ISO-8859-15", true);
-	
-	if (($encoding != "UTF-8") && ($encoding != "ASCII"))
-	{
-  		echo "WRONG ENCODING: " . $epg[ "channel" ] . " => " . $encoding . "\n";
-  		echo "WRONG ENCODING: " . $desc . "\n";
- 		return;
-	}
-	
-	if (strpos($desc, "\n") === false)
-	{
-		//
-		// Do some debug helping stereotypes.
-		//
-		
-		$desc = str_replace("Produziert in HD","\nProduziert in HD", $desc);
-		
-		//
-		// Replace safe sequences.
-		//
-
-		$desc = str_replace("EinsPlus", "Eins__Plus", $desc);
-		$desc = str_replace("Innen ", "__Innen ", $desc);
-		$desc = str_replace("GmbH", "Gmb__H", $desc);
-		$desc = str_replace("z.B.", "z.__B.", $desc);
-		$desc = str_replace("Kika", "Ki__Ka", $desc);
-		$desc = str_replace("VfL", "Vf__L", $desc);
-		$desc = str_replace("Mac", "Mac__", $desc);
-		$desc = str_replace("Mc", "Mc__", $desc);
- 
-		$dirty = false;
-		
-		for ($inx = 0; $inx < strlen($desc); $inx += strlen($mb))
-		{
-			$mb = getMultibyteCharAt($desc, $inx);
-			
-			if (mb_strtolower($mb, "UTF-8") != $mb)
-			{
-				//
-				// Uppercase char.
-				//
-			
-				if (($inx == 0)
-					 || ($desc[ $inx - 1 ] == " ") 
-					 || ($desc[ $inx - 1 ] == ".") 
-					 || ($desc[ $inx - 1 ] == "-") 
-					 || ($desc[ $inx - 1 ] == "_") 
-					 || ($desc[ $inx - 1 ] == "'") 
-					 || ($desc[ $inx - 1 ] == "(") 
-					 || ($desc[ $inx - 1 ] == "/") 
-					 || ($desc[ $inx - 1 ] == "\"") 
-					 || ($desc[ $inx - 1 ] == "\n"))
-				{
-					//
-					// Everything is ok.
-					//
-				
-					continue;
-				}
-			
-				//
-				// If previous char is uppercase, everything is ok.
-				//
-				
-				$prev = getMultibyteCharBefore($desc, $inx);
-				
-				if (mb_strtolower($prev, "UTF-8") != $prev)
-				{
-					//
-					// Everything is ok.
-					//
-				
-					continue;
-				}
-				
-				$desc = substr($desc, 0, $inx) . " -- " . substr($desc, $inx);
-				$dirty = true;
-			}
-		}
-		
-		//    /[a-z][A-Z]
-		
-		$desc = str_replace("Eins__Plus", "EinsPlus", $desc);
-		$desc = str_replace("__Innen ", "Innen ", $desc);
-		$desc = str_replace("z.__B.", "z.B.", $desc);
-		$desc = str_replace("Gmb__H", "GmbH", $desc);
-		$desc = str_replace("Ki__Ka", "Kika", $desc);
-		$desc = str_replace("Vf__L", "VfL", $desc);
-		$desc = str_replace("Mac__", "Mac", $desc);
-		$desc = str_replace("Mc__", "Mc", $desc);
-
-		if ($dirty) echo "FIXFIX " . $epg[ "channel" ] . " => " . $desc . "\n";
-	}
-}
-
 function defuckEPG(&$epg)
 {
 	if (! isset($epg[ "description" ])) return;
@@ -691,6 +498,8 @@ function defuckEPG(&$epg)
 		$channel = $GLOBALS[ "actchannel" ];
 		$GLOBALS[ "actchannels" ][ $channel ][ "bad" ] += count($treffer[ 0 ]);
 	}
+	
+	$GLOBALS[ "actchannels" ][ $channel ][ "cnt" ] += 1;
 }
 
 function saveEPG($epg)
@@ -785,6 +594,7 @@ function saveEPG($epg)
 		$cdata[ "dir"      ] = $actdir;
 		$cdata[ "lfs"      ] = 0;
 		$cdata[ "bad"      ] = 0;
+		$cdata[ "cnt"      ] = 0;
 		
 		$GLOBALS[ "actchannels" ][ $channel ] = $cdata;
 		
@@ -825,6 +635,16 @@ function readEPGs()
 		$epgdatabase = $env[ "dir" ] . substr($epgdatabase,1);
 	}
 
+	while (true)
+	{
+		$mtime = filemtime($epgdatabase);
+		$utime = time();
+		
+		if (($utime - $mtime) > 60) break;
+		
+		sleep(10);
+	}
+	
 	$fd = fopen($epgdatabase,"r");
 	if ($fd === false)
 	{
@@ -836,17 +656,15 @@ function readEPGs()
 	while (! feof($fd))
 	{
 		$length = readInt($fd, 4);
-		if ($length < 0) break;
-
-		//echo "$length\n";	
-
+		if (feof($fd) || ($length < 0)) break;
+		
 		$json = array();
 		decodeLength($fd, $length, $json);
 
 		if (isset($json[ "__section__" ]))
 		{
 			$section = $json[ "__section__" ];
-			echo json_encdat($json) . "\n";	
+			echo "Parsing: $section\n";	
 
 			continue;
 		}
@@ -1057,10 +875,11 @@ function splitEPGs()
 function uploadEPG($epgfile)
 {
 	$parts  = explode("/epgdata/", $epgfile);
-	$upload = $parts[ 1 ];
+	$upload = $parts[ 1 ] . ".gz";
 	
 	$epgjson = file_get_contents($epgfile);
-	$epglen  = strlen($epgjson);
+	$epggzip = gzencode($epgjson, 9);
+	$epglen  = strlen($epggzip);
 	
 	$sock = fsockopen("www.xavaro.de", 80);
 
@@ -1071,9 +890,11 @@ function uploadEPG($epgfile)
 			. "\r\n";
 
 	fwrite($sock,$header);
-	fwrite($sock,$epgjson);
+	fwrite($sock,$epggzip);
 	fclose($sock);
 }
+
+//uploadEPG("/home/pi/xavaro/var/epgdata/tv/de/ZDF/current.raspi1overdvb-c.json"); exit(0);
 
 readHomedir();
 readHostname();
@@ -1091,8 +912,16 @@ foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 {
 	$lfs = $cdata[ "lfs" ];
 	$bad = $cdata[ "bad" ];
+	$cnt = $cdata[ "cnt" ];
 	
-	if (($lfs == 0) && ($bad > 10) && ! isBrainDead($channel)) echo "BRAINDEAD: $channel => $bad\n";
+	if ($cnt == 0) continue;
+	
+	$percent = floor(($bad / $cnt) * 100);
+	
+	if (($lfs == 0) && ($percent > 80) && ! isBrainDead($cdata[ "isolang" ], $channel)) 
+	{
+		echo "BRAINDEAD: $channel => $percent%\n";
+	}
 }
 
 ?>
