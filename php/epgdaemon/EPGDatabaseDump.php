@@ -44,6 +44,8 @@ function readInt($fd)
 
 function readNumber($fd, $len)
 {
+	if ($len > 8) errorexit("Database update in progress, exitting...");
+
 	$data = fread($fd,$len);
 	if (($data === false) || (strlen($data) != $len)) return -1;
 
@@ -60,6 +62,8 @@ function readNumber($fd, $len)
 
 function readString($fd,$len)
 {
+	if ($len > 32000) errorexit("Database update in progress, exitting...");
+
 	if ($len == 0) return "";
 	return fread($fd,$len);
 }
@@ -74,7 +78,7 @@ function decodeLength($fd, $length, &$json, $level = 0)
 	{
 		$type = readByte($fd);
 		$nlen = readByte($fd);
-		$dlen = readInt ($fd,4);
+		$dlen = readInt ($fd);
 
 		if (($type < 0) || ($nlen < 0) || ($dlen < 0))
 		{
@@ -357,7 +361,7 @@ function isBrainDead($language, $channel)
 	
 	foreach ($bdtable as $braindead)
 	{
-		if ($braindead == $channel) return true;
+		if ($braindead == $stag) return true;
 	}
 	
 	return false;
@@ -487,15 +491,15 @@ function defuckEPG(&$epg)
 	
 	$desc = $epg[ "description" ];
 	
+	$channel = $GLOBALS[ "actchannel" ];
+
 	if (strpos($desc, "\n") !== false)
 	{
-		$channel = $GLOBALS[ "actchannel" ];
 		$GLOBALS[ "actchannels" ][ $channel ][ "lfs" ] += 1;
 	}
 	
 	if (preg_match_all("|[a-z][A-Z]|", $desc, $treffer))
 	{
-		$channel = $GLOBALS[ "actchannel" ];
 		$GLOBALS[ "actchannels" ][ $channel ][ "bad" ] += count($treffer[ 0 ]);
 	}
 	
@@ -590,6 +594,7 @@ function saveEPG($epg)
 		$cdata[ "country"  ] = $epg[ "country" ];
 		$cdata[ "tags"     ] = $epg[ "tags"    ];
 		$cdata[ "astra"    ] = $astra[ "astra" ];
+		$cdata[ "isolang"  ] = $astra[ "astra" ][ "isolang" ];
 		$cdata[ "file"     ] = $actfile;
 		$cdata[ "dir"      ] = $actdir;
 		$cdata[ "lfs"      ] = 0;
@@ -655,7 +660,7 @@ function readEPGs()
 	
 	while (! feof($fd))
 	{
-		$length = readInt($fd, 4);
+		$length = readInt($fd);
 		if (feof($fd) || ($length < 0)) break;
 		
 		$json = array();
@@ -849,10 +854,24 @@ function splitEPGs()
 			$actfile = $cdata[ "dir" ] . "/" . $day . "." . $GLOBALS[ "hostname" ] . ".json"; 
 
 			$epgwrite[ "epgdata" ] = $epgday;
-			file_put_contents($actfile, json_encdat($epgwrite));
-			uploadEPG($actfile);
+			$newcont = json_encdat($epgwrite);
 			
-			echo "Writing " . $actfile . "\n";
+			$isnew = true;
+			
+			if (file_exists($actfile))
+			{
+				$oldcont = file_get_contents($actfile);
+				
+				$isnew = ($oldcont != $newcont);
+			}
+			
+			if ($isnew || true)
+			{
+				file_put_contents($actfile, $newcont);
+				uploadEPG($actfile);
+			}
+				
+			echo "Writing " . ($isnew ? "new" : "old") . " $actfile\n";
 		}
 		
 		unlink($tempfile);
@@ -863,7 +882,7 @@ function splitEPGs()
 			file_put_contents($currfile, json_encdat($epgswrite) . "\n");
 			uploadEPG($currfile);
 
-			echo "Writing " . $currfile . "\n";
+			echo "Writing act " . $currfile . "\n";
 		}
 		else
 		{
@@ -917,10 +936,11 @@ foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 	if ($cnt == 0) continue;
 	
 	$percent = floor(($bad / $cnt) * 100);
+	$isolang = $cdata[ "isolang" ];
 	
-	if (($lfs == 0) && ($percent > 80) && ! isBrainDead($cdata[ "isolang" ], $channel)) 
+	if (($lfs == 0) && ($percent > 80) && ! isBrainDead($isolang, $channel)) 
 	{
-		echo "BRAINDEAD: $channel => $percent%\n";
+		echo "BRAINDEAD: $isolang.$channel => $percent%\n";
 	}
 }
 

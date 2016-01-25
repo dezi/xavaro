@@ -4,7 +4,7 @@
   "isocc":"de",
   "isolang":"ger",
   "ishd":false,
-  "isbd":false,
+  "isbd":true,
   "tags":
   [
     "ARD",
