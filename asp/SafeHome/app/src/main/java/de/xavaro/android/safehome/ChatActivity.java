@@ -25,6 +25,7 @@ import android.os.Bundle;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.ResultSetMetaData;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,6 +34,7 @@ import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 
 @SuppressWarnings("ResourceType")
@@ -81,7 +83,7 @@ public class ChatActivity extends AppCompatActivity implements
         chatManager = ChatManager.getInstance();
 
         idremote = getIntent().getStringExtra("idremote");
-        label = getIntent().getStringExtra("label");
+        label = RemoteContacts.getDisplayName(idremote);
 
         Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.chat_bg_2);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bmp);

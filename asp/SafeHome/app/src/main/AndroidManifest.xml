@@ -114,6 +114,10 @@
             android:name=".ChatActivity"
             android:label="@string/title_activity_chat"
             android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="de.xavaro.android.common.ChatActivity"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
         <receiver android:name=".BootLoader" android:enabled="true" android:exported="false">
             <intent-filter>

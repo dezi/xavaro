@@ -1,8 +1,11 @@
 package de.xavaro.android.safehome;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.support.annotation.Nullable;
+
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 
 import android.graphics.Color;
 import android.speech.tts.TextToSpeech;
@@ -27,6 +30,7 @@ import android.view.View;
 import android.view.Gravity;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -106,7 +110,7 @@ public class LaunchItem extends FrameLayout implements
 
         setVisibility(INVISIBLE);
 
-        layout = new LayoutParams(0,0);
+        layout = new LayoutParams(0, 0);
         setLayoutParams(layout);
 
         icon = new ImageView(context);
@@ -121,7 +125,7 @@ public class LaunchItem extends FrameLayout implements
         label.setTextSize(18f);
         this.addView(label);
 
-        oversize = new LayoutParams(0,0);
+        oversize = new LayoutParams(0, 0);
         oversize.gravity = Gravity.END + Gravity.TOP;
 
         overlay = new FrameLayout(context);
@@ -163,22 +167,22 @@ public class LaunchItem extends FrameLayout implements
         return this.parent;
     }
 
-    public void setSize(int width,int height)
+    public void setSize(int width, int height)
     {
-        layout.width  = width;
+        layout.width = width;
         layout.height = height;
 
-        oversize.width  = layout.width  / 4;
+        oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;
     }
 
-    public void setPosition(int left,int top)
+    public void setPosition(int left, int top)
     {
         layout.leftMargin = left;
-        layout.topMargin  = top;
+        layout.topMargin = top;
     }
 
-    public void setConfig(LaunchGroup parent,JSONObject config)
+    public void setConfig(LaunchGroup parent, JSONObject config)
     {
         this.config = config;
         this.parent = parent;
@@ -200,7 +204,7 @@ public class LaunchItem extends FrameLayout implements
             {
                 packageName = config.getString("packagename");
 
-                GlobalConfigs.weLikeThis(context,packageName);
+                GlobalConfigs.weLikeThis(context, packageName);
             }
 
             if (config.has("icon"))
@@ -213,7 +217,7 @@ public class LaunchItem extends FrameLayout implements
 
                     if (thumbnail != null)
                     {
-                        icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                        icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
                         icon.setVisibility(VISIBLE);
                     }
                 }
@@ -229,7 +233,7 @@ public class LaunchItem extends FrameLayout implements
                 }
             }
 
-            if (! config.has("type"))
+            if (!config.has("type"))
             {
                 if (config.has("audiourl")) type = "audioplayer";
                 if (config.has("videourl")) type = "videoplayer";
@@ -265,7 +269,7 @@ public class LaunchItem extends FrameLayout implements
                         if (subtype.equals("bpm"))
                         {
                             if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this,"bpm");
+                            HealthGroup.subscribeDevice(this, "bpm");
 
                             icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthBPM));
                             icon.setVisibility(VISIBLE);
@@ -274,7 +278,7 @@ public class LaunchItem extends FrameLayout implements
                         if (subtype.equals("scale"))
                         {
                             if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this,"scale");
+                            HealthGroup.subscribeDevice(this, "scale");
 
                             icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthScale));
                             icon.setVisibility(VISIBLE);
@@ -283,7 +287,7 @@ public class LaunchItem extends FrameLayout implements
                         if (subtype.equals("sensor"))
                         {
                             if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this,"sensor");
+                            HealthGroup.subscribeDevice(this, "sensor");
 
                             icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthSensor));
                             icon.setVisibility(VISIBLE);
@@ -292,7 +296,7 @@ public class LaunchItem extends FrameLayout implements
                         if (subtype.equals("glucose"))
                         {
                             if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this,"glucose");
+                            HealthGroup.subscribeDevice(this, "glucose");
 
                             icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthGlucose));
                             icon.setVisibility(VISIBLE);
@@ -308,6 +312,23 @@ public class LaunchItem extends FrameLayout implements
                 if (type.equals("developer"))
                 {
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResTesting));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (type.equals("alertcall"))
+                {
+                    setLongClickable(true);
+
+                    setOnLongClickListener(new View.OnLongClickListener()
+                    {
+                        @Override
+                        public boolean onLongClick(View view)
+                        {
+                            return onMyLongClick();
+                        }
+                    });
+
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResAlertcall));
                     icon.setVisibility(VISIBLE);
                 }
 
@@ -400,7 +421,7 @@ public class LaunchItem extends FrameLayout implements
                         {
                             thumbnail = StaticUtils.getCircleBitmap(thumbnail);
 
-                            icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                            icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
                             icon.setVisibility(VISIBLE);
                             targetIcon = overicon;
                         }
@@ -443,7 +464,7 @@ public class LaunchItem extends FrameLayout implements
                         {
                             thumbnail = StaticUtils.getCircleBitmap(thumbnail);
 
-                            icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                            icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
                             icon.setVisibility(VISIBLE);
                             targetIcon = overicon;
                         }
@@ -484,7 +505,7 @@ public class LaunchItem extends FrameLayout implements
                         {
                             thumbnail = StaticUtils.getCircleBitmap(thumbnail);
 
-                            icon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                            icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
                             icon.setVisibility(VISIBLE);
                             targetIcon = overicon;
                         }
@@ -553,7 +574,7 @@ public class LaunchItem extends FrameLayout implements
 
                 if (thumbnail != null)
                 {
-                    targetIcon.setImageDrawable(new BitmapDrawable(context.getResources(),thumbnail));
+                    targetIcon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
                 }
                 else
                 {
@@ -626,7 +647,7 @@ public class LaunchItem extends FrameLayout implements
         handler.removeCallbacks(playbackResumed);
         handler.removeCallbacks(playbackFinished);
 
-        handler.postDelayed(start,5);
+        handler.postDelayed(start, 5);
     }
 
     //
@@ -734,7 +755,7 @@ public class LaunchItem extends FrameLayout implements
 
     public void setPlaybackPrepare()
     {
-        Log.d(LOGTAG,"setPlaybackPrepare:" + label.getText());
+        Log.d(LOGTAG, "setPlaybackPrepare:" + label.getText());
 
         isPlayingMedia = true;
 
@@ -743,11 +764,11 @@ public class LaunchItem extends FrameLayout implements
 
     public void setPlaybackStartet()
     {
-        Log.d(LOGTAG,"setPlaybackStartet:" + label.getText());
+        Log.d(LOGTAG, "setPlaybackStartet:" + label.getText());
 
         setSpinner(false);
 
-        oversize.width  = layout.width  / 3;
+        oversize.width = layout.width / 3;
         oversize.height = layout.height / 3;
 
         overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
@@ -769,7 +790,7 @@ public class LaunchItem extends FrameLayout implements
     {
         setSpinner(false);
 
-        oversize.width  = layout.width  / 4;
+        oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;
 
         overicon.setVisibility(INVISIBLE);
@@ -819,7 +840,7 @@ public class LaunchItem extends FrameLayout implements
             }
         }
 
-        if (! DitUndDat.InternetState.isConnected)
+        if (!DitUndDat.InternetState.isConnected)
         {
             if (type.equals("webframe")
                     || type.equals("audioplayer")
@@ -851,41 +872,63 @@ public class LaunchItem extends FrameLayout implements
     {
         if (config == null)
         {
-            Toast.makeText(getContext(),"Nix configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
 
         if (type == null)
         {
-            Toast.makeText(getContext(),"Nix <type> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <type> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
 
         // @formatter:off
-        if (type.equals("select_home"  )) { launchSelectHome();   return; }
-        if (type.equals("select_assist")) { launchSelectAssist(); return; }
-        if (type.equals("firewall"     )) { launchFireWall();     return; }
-        if (type.equals("iptelevision" )) { launchIPTelevision(); return; }
-        if (type.equals("ipradio"      )) { launchIPRadio();      return; }
-        if (type.equals("webconfig"    )) { launchWebConfig();    return; }
-        if (type.equals("audioplayer"  )) { launchAudioPlayer();  return; }
-        if (type.equals("videoplayer"  )) { launchVideoPlayer();  return; }
-        if (type.equals("genericapp"   )) { launchGenericApp();   return; }
-        if (type.equals("directory"    )) { launchDirectory();    return; }
-        if (type.equals("developer"    )) { launchDeveloper();    return; }
-        if (type.equals("settings"     )) { launchSettings();     return; }
-        if (type.equals("install"      )) { launchInstall();      return; }
-        if (type.equals("webframe"     )) { launchWebframe();     return; }
-        if (type.equals("whatsapp"     )) { launchWhatsApp();     return; }
-        if (type.equals("phone"        )) { launchPhone();        return; }
-        if (type.equals("xavaro"       )) { launchXavaro();       return; }
-        if (type.equals("skype"        )) { launchSkype();        return; }
-        if (type.equals("health"       )) { launchHealth();       return; }
+        if (type.equals("select_home"  )) { launchSelectHome();     return; }
+        if (type.equals("select_assist")) { launchSelectAssist();   return; }
+        if (type.equals("firewall"     )) { launchFireWall();       return; }
+        if (type.equals("iptelevision" )) { launchIPTelevision();   return; }
+        if (type.equals("ipradio"      )) { launchIPRadio();        return; }
+        if (type.equals("webconfig"    )) { launchWebConfig();      return; }
+        if (type.equals("audioplayer"  )) { launchAudioPlayer();    return; }
+        if (type.equals("videoplayer"  )) { launchVideoPlayer();    return; }
+        if (type.equals("genericapp"   )) { launchGenericApp();     return; }
+        if (type.equals("directory"    )) { launchDirectory();      return; }
+        if (type.equals("developer"    )) { launchDeveloper();      return; }
+        if (type.equals("alertcall"    )) { launchAlertcall(false); return; }
+        if (type.equals("settings"     )) { launchSettings();       return; }
+        if (type.equals("install"      )) { launchInstall();        return; }
+        if (type.equals("webframe"     )) { launchWebframe();       return; }
+        if (type.equals("whatsapp"     )) { launchWhatsApp();       return; }
+        if (type.equals("phone"        )) { launchPhone();          return; }
+        if (type.equals("xavaro"       )) { launchXavaro();         return; }
+        if (type.equals("skype"        )) { launchSkype();          return; }
+        if (type.equals("health"       )) { launchHealth();         return; }
         // @formatter:on
 
-        Toast.makeText(getContext(),"Nix launcher type <" + type + "> configured.",Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Nix launcher type <" + type + "> configured.", Toast.LENGTH_LONG).show();
+    }
+
+    private boolean onMyLongClick()
+    {
+        if (config == null)
+        {
+            Toast.makeText(getContext(), "Nix configured.", Toast.LENGTH_LONG).show();
+
+            return false;
+        }
+
+        if (type == null)
+        {
+            Toast.makeText(getContext(), "Nix <type> configured.", Toast.LENGTH_LONG).show();
+
+            return false;
+        }
+
+        if (type.equals("alertcall"    )) { launchAlertcall(true);    return true; }
+
+        return false;
     }
 
     private void launchSelectHome()
@@ -987,7 +1030,6 @@ public class LaunchItem extends FrameLayout implements
                 {
                     Intent intent = new Intent(context, ChatActivity.class);
                     intent.putExtra("idremote", ident);
-                    intent.putExtra("label", this.label.getText());
                     context.startActivity(intent);
                 }
             }
@@ -1056,9 +1098,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchInstall()
     {
-        if (! config.has("packagename"))
+        if (!config.has("packagename"))
         {
-            Toast.makeText(getContext(),"Nix <packagename> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <packagename> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1094,9 +1136,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchGenericApp()
     {
-        if (! config.has("packagename"))
+        if (!config.has("packagename"))
         {
-            Toast.makeText(getContext(),"Nix <packagename> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <packagename> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1115,9 +1157,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchSettings()
     {
-        if (! config.has("subtype"))
+        if (!config.has("subtype"))
         {
-            Toast.makeText(getContext(),"Nix <subtype> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <subtype> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1145,9 +1187,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchDirectory()
     {
-        if (! config.has("launchgroup"))
+        if (!config.has("launchgroup"))
         {
-            Toast.makeText(getContext(),"Nix <launchgroup> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <launchgroup> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1158,7 +1200,7 @@ public class LaunchItem extends FrameLayout implements
 
             try
             {
-                directory.setConfig(this,config.getJSONObject("launchgroup"));
+                directory.setConfig(this, config.getJSONObject("launchgroup"));
             }
             catch (JSONException ex)
             {
@@ -1206,9 +1248,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchWebConfig()
     {
-        if (! config.has("subtype"))
+        if (!config.has("subtype"))
         {
-            Toast.makeText(getContext(),"Nix <subtype> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <subtype> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1232,9 +1274,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchWebframe()
     {
-        if (! config.has("name"))
+        if (!config.has("name"))
         {
-            Toast.makeText(getContext(),"Nix <name> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <name> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1244,7 +1286,7 @@ public class LaunchItem extends FrameLayout implements
             if (webframe == null)
             {
                 String name = config.getString("name");
-                String url=WebFrame.getConfigUrl(context, name);
+                String url = WebFrame.getConfigUrl(context, name);
 
                 webframe = new WebFrame(context);
                 webframe.setLoadURL(name, url);
@@ -1282,9 +1324,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchVideoPlayer()
     {
-        if (! config.has("videourl"))
+        if (!config.has("videourl"))
         {
-            Toast.makeText(getContext(),"Nix <videourl> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <videourl> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1326,7 +1368,7 @@ public class LaunchItem extends FrameLayout implements
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width,int height)
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
     {
     }
 
@@ -1337,9 +1379,9 @@ public class LaunchItem extends FrameLayout implements
 
     private void launchAudioPlayer()
     {
-        if (! config.has("audiourl"))
+        if (!config.has("audiourl"))
         {
-            Toast.makeText(getContext(),"Nix <audiourl> configured.",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Nix <audiourl> configured.", Toast.LENGTH_LONG).show();
 
             return;
         }
@@ -1363,7 +1405,7 @@ public class LaunchItem extends FrameLayout implements
                 bubble = bubble.getLaunchGroup().getLaunchItem();
             }
 
-            ProxyPlayer.getInstance().setAudioUrl(context,audiourl,this);
+            ProxyPlayer.getInstance().setAudioUrl(context, audiourl, this);
             isPlayingAudio = true;
         }
         catch (Exception ex)
@@ -1411,7 +1453,7 @@ public class LaunchItem extends FrameLayout implements
 
     public void onBluetoothDisconnect(String deviceName)
     {
-        Log.d(LOGTAG,"onBluetoothDisconnect: " + deviceName);
+        Log.d(LOGTAG, "onBluetoothDisconnect: " + deviceName);
 
         handler.removeCallbacks(bluetoothIsConnected);
         handler.post(bluetoothIsDisconnected);
@@ -1434,7 +1476,7 @@ public class LaunchItem extends FrameLayout implements
         */
 
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        File photo = new File(Environment.getExternalStorageDirectory(),  "Pic.jpg");
+        File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
         //Simple.startActivityForResult(intent, 1);
 
@@ -1444,11 +1486,142 @@ public class LaunchItem extends FrameLayout implements
         Simple.dumpDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
         Simple.dumpDirectory("/storage/emulated/0");
         */
-
-        JSONObject message = new JSONObject();
-        Simple.JSONput(message, "text", "Hallo pupsi");
-        Simple.JSONput(message, "identity", SystemIdentity.getIdentity());
-
-        GCMMessageService.sendMessage("0c47a9e4-254b-4533-b900-d5e53c82435b", message);
     }
+
+    private void launchAlertcall(boolean longclick)
+    {
+        Log.d(LOGTAG, "launchAlertcall: " + longclick);
+
+        if (! longclick)
+        {
+            ArchievementManager.show("alertcall.shortclick");
+        }
+        else
+        {
+            alertcallShowDialog();
+        }
+    }
+
+    private static final int ALERTCALL_COUNTDOWN = 0;
+    private static final int ALERTCALL_CANCELED  = 1;
+    private static final int ALERTCALL_EXECUTED  = 2;
+
+    private String alertcallText;
+    private int alertcallSeconds;
+    private int alertcallStatus;
+    private TextView alertcallTextview;
+    private AlertDialog alertcallDialog;
+
+    private void alertcallShowDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Hilfe rufen...");
+
+        alertcallTextview = new TextView(context);
+        alertcallTextview.setPadding(40, 40, 40, 40);
+        alertcallTextview.setTextSize(24f);
+
+        builder.setView(alertcallTextview);
+
+        builder.setPositiveButton("Jetzt sofort", null);
+        builder.setNeutralButton("Abbrechen", null);
+
+        alertcallDialog = builder.create();
+        alertcallDialog.show();
+
+        alertcallDialog.setCancelable(false);
+
+        Button positive = alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positive.setTextSize(24f);
+        positive.setTransformationMethod(null);
+        positive.setOnClickListener(alertOnClickPositive);
+
+        Button neutral = alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+
+        neutral.setTextSize(24f);
+        neutral.setTransformationMethod(null);
+        neutral.setOnClickListener(alertOnClickNeutral);
+
+        alertcallText = "Der Hilferuf wird in %d Sekunden ausgelöst";
+        alertcallStatus = ALERTCALL_COUNTDOWN;
+        alertcallSeconds = 20;
+
+        if (handler == null) handler = new Handler();
+        handler.post(alertcallCountdown);
+    }
+
+    private Runnable alertcallCountdown = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (! alertcallDialog.isShowing()) return;
+
+            if (alertcallSeconds == 0)
+            {
+                String message = "Der Hilferuf wird nun ausgelöst";
+                alertcallTextview.setText(message);
+                DitUndDat.SpeekDat.speak(message);
+
+                alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Ok");
+                alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
+
+                alertcallStatus = ALERTCALL_EXECUTED;
+
+                Log.d(LOGTAG,"=====================> call");
+            }
+            else
+            {
+                String message = String.format(alertcallText, alertcallSeconds);
+
+                alertcallTextview.setText(message);
+                if ((alertcallSeconds % 5) == 0) DitUndDat.SpeekDat.speak(message);
+
+                alertcallSeconds -= 1;
+                handler.postDelayed(alertcallCountdown, 1000);
+            }
+        }
+    };
+
+    View.OnClickListener alertOnClickPositive = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View dialog)
+        {
+            if (alertcallStatus == ALERTCALL_COUNTDOWN)
+            {
+                alertcallSeconds = 0;
+            }
+
+            if (alertcallStatus == ALERTCALL_CANCELED)
+            {
+                alertcallDialog.cancel();
+            }
+
+            if (alertcallStatus == ALERTCALL_EXECUTED)
+            {
+                alertcallDialog.cancel();
+            }
+        }
+    };
+
+    View.OnClickListener alertOnClickNeutral = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View dialog)
+        {
+            handler.removeCallbacks(alertcallCountdown);
+
+            String message = "Der Hilferuf wurde abgebrochen";
+
+            alertcallTextview.setText(message);
+            DitUndDat.SpeekDat.speak(message);
+
+            alertcallStatus = ALERTCALL_CANCELED;
+
+            alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Schliessen");
+            alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
+        }
+    };
 }

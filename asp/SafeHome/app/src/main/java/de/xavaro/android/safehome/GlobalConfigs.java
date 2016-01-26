@@ -76,6 +76,8 @@ public class GlobalConfigs
     public static final int IconResOwner              = R.drawable.owner_512x512;
     public static final int IconResAdministrator      = R.drawable.admin_512x512;
     public static final int IconResCommunity          = R.drawable.community_350x350;
+    public static final int IconResAlertgroup         = R.drawable.alertgroup_300x300;
+    public static final int IconResAlertcall          = R.drawable.alertgroup_300x300;
     public static final int IconResTesting            = R.drawable.testing_256x256;
     public static final int IconResFireWall           = R.drawable.firewall_256x256;
     public static final int IconResPhoneApp           = R.drawable.phone_256x256;

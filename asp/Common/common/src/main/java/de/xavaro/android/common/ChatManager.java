@@ -1,10 +1,17 @@
 package de.xavaro.android.common;
 
+import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 
+import android.support.v4.app.NotificationCompat;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.Context;
+import android.media.RingtoneManager;
 import android.os.Handler;
 import android.util.Log;
+import android.net.Uri;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -229,6 +236,8 @@ public class ChatManager implements CommService.CommServiceCallback
                     feedbackChatMessage.put("uuid", uuid);
 
                     CommService.sendEncryptedReliable(feedbackChatMessage, true);
+
+                    if (! wasread) sendNotification(message);
 
                     return;
                 }
@@ -523,6 +532,38 @@ public class ChatManager implements CommService.CommServiceCallback
                 if (callback != null) callback.onSetMessageStatus(cbuuid, cbstatus);
             }
         });
+    }
+
+    private void sendNotification(JSONObject chatMessage)
+    {
+        String idremote = Simple.JSONgetString(chatMessage,"identity");
+        String sender   = RemoteContacts.getDisplayName(idremote);
+        String message  = Simple.JSONgetString(chatMessage,"message");
+
+        Intent intent = new Intent("de.xavaro.android.common.ChatActivity");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("idremote", idremote);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                Simple.getAnyContext(), 0, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
+        int resid = R.drawable.community_alarm_64x64;
+
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
+
+        nb.setAutoCancel(true);
+        nb.setSmallIcon(resid);
+        nb.setLargeIcon(Simple.getBitmapFromResource(resid));
+        nb.setContentTitle(sender);
+        nb.setContentText(message);
+        nb.setSound(defaultSoundUri);
+        nb.setContentIntent(pendingIntent);
+
+        NotificationManager nm = Simple.getNotificationManager();
+        nm.notify(0, nb.build());
     }
 
     //region Callback interface

@@ -31,7 +31,7 @@ public class SettingsActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
 
-        Simple.setAppContext((Activity) this);
+        Simple.setAppContext(this);
 
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
@@ -66,6 +66,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesBasics.OwnerFragment.getHeader());
         target.add(PreferencesBasics.AdminFragment.getHeader());
         target.add(PreferencesBasics.CommunityFragment.getHeader());
+        target.add(PreferencesBasics.AlertgroupFragment.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";
@@ -218,7 +219,7 @@ public class SettingsActivity extends PreferenceActivity
             Header header = getItem(position);
             int headerType = getHeaderType(header);
 
-            View view = null;
+            View view;
 
             if (convertView == null)
             {

@@ -1,6 +1,11 @@
 {"launchgroup": {
     "launchitems": [
       {
+        "label": "Hilfe rufen",
+        "type": "alertcall",
+        "enable": "alertgroup.enable"
+      },
+      {
         "label": "WhatsApp",
         "type": "whatsapp",
         "enable": "whatsapp.enable"

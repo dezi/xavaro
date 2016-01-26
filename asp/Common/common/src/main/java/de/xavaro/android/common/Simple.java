@@ -1,5 +1,8 @@
 package de.xavaro.android.common;
 
+import android.app.NotificationManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 
 import android.content.SharedPreferences;
@@ -125,15 +128,15 @@ public class Simple
 
     public static void dismissKeyboard(View view)
     {
-        if (appContext == null) return;
+        if (anyContext == null) return;
 
-        InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public static void showKeyboard(View view)
     {
-        if (appContext == null) return;
+        if (anyContext == null) return;
 
         final View runview = view;
 
@@ -142,7 +145,7 @@ public class Simple
             @Override
             public void run()
             {
-                InputMethodManager imm = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(runview, 0);
             }
         }, 500);
@@ -154,11 +157,11 @@ public class Simple
 
     public static boolean isAppInstalled(String packageName)
     {
-        if (appContext == null) return false;
+        if (anyContext == null) return false;
 
         try
         {
-            ApplicationInfo appInfo = appContext.getPackageManager().getApplicationInfo(packageName, 0);
+            ApplicationInfo appInfo = anyContext.getPackageManager().getApplicationInfo(packageName, 0);
 
             return (appInfo != null);
         }
@@ -171,23 +174,23 @@ public class Simple
 
     public static void installAppFromPlaystore(String packagename)
     {
-        if (appContext == null) return;
+        if (anyContext == null) return;
 
         Intent goToMarket = new Intent(Intent.ACTION_VIEW);
         goToMarket.setData(Uri.parse("market://details?id=" + packagename));
 
-        ProcessManager.launchIntent(appContext, goToMarket);
+        ProcessManager.launchIntent(anyContext, goToMarket);
     }
 
     public static void uninstallApp(String packagename)
     {
-        if (appContext == null) return;
+        if (anyContext == null) return;
 
         try
         {
             Uri packageUri = Uri.parse("package:" + packagename);
             Intent unInstall = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
-            appContext.startActivity(unInstall);
+            anyContext.startActivity(unInstall);
         }
         catch (Exception ex)
         {
@@ -207,6 +210,11 @@ public class Simple
     public static boolean equals(String str1, String str2)
     {
         return (str1 != null) && (str2 != null) && str1.equals(str2);
+    }
+
+    public static boolean equalsIgnoreCase(String str1, String str2)
+    {
+        return (str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2);
     }
 
     public static void sleep(long millis)
@@ -237,6 +245,11 @@ public class Simple
         }
 
         return new String(bytes);
+    }
+
+    public static void removePreference(String key)
+    {
+        Simple.getSharedPrefs().edit().remove(key).commit();
     }
 
     public static void removeAllPreferences(String prefix)
@@ -315,50 +328,55 @@ public class Simple
 
     public static SharedPreferences getSharedPrefs()
     {
-        return PreferenceManager.getDefaultSharedPreferences(appContext);
+        return PreferenceManager.getDefaultSharedPreferences(anyContext);
+    }
+
+    public static NotificationManager getNotificationManager()
+    {
+        return (NotificationManager) anyContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     public static String getAppName()
     {
-        return appContext.getString(appContext.getApplicationInfo().labelRes);
+        return anyContext.getString(anyContext.getApplicationInfo().labelRes);
     }
 
     public static String getPackageName()
     {
-        return appContext.getPackageName();
+        return anyContext.getPackageName();
     }
 
     @Nullable
     public static String getMacAddress()
     {
-        if (appContext == null) return null;
+        if (anyContext == null) return null;
 
-        WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         return wInfo.getMacAddress();
     }
 
     public static int getDeviceWidth()
     {
-        if (appContext == null) return 0;
+        if (anyContext == null) return 0;
 
-        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
         return displayMetrics.widthPixels;
     }
 
     public static int getDeviceHeight()
     {
-        if (appContext == null) return 0;
+        if (anyContext == null) return 0;
 
-        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
         return displayMetrics.heightPixels;
     }
 
     public static float getPreferredEditSize()
     {
-        if (appContext == null) return 16f;
+        if (anyContext == null) return 16f;
 
-        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
 
         int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
 
@@ -369,9 +387,9 @@ public class Simple
 
     public static float getPreferredTextSize()
     {
-        if (appContext == null) return 17f;
+        if (anyContext == null) return 17f;
 
-        DisplayMetrics displayMetrics = appContext.getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
 
         int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
 
@@ -382,13 +400,13 @@ public class Simple
 
     public static int getActionBarHeight()
     {
-        if (appContext != null)
+        if (anyContext != null)
         {
             TypedValue tv = new TypedValue();
 
-            if (appContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+            if (anyContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
             {
-                DisplayMetrics dm = appContext.getResources().getDisplayMetrics();
+                DisplayMetrics dm = anyContext.getResources().getDisplayMetrics();
                 return TypedValue.complexToDimensionPixelSize(tv.data, dm);
             }
         }
@@ -398,10 +416,10 @@ public class Simple
 
     public static int getStatusBarHeight()
     {
-        if (appContext != null)
+        if (anyContext != null)
         {
-            int resourceId = appContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
-            if (resourceId > 0) return appContext.getResources().getDimensionPixelSize(resourceId);
+            int resourceId = anyContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0) return anyContext.getResources().getDimensionPixelSize(resourceId);
         }
 
         return 20;
@@ -480,6 +498,11 @@ public class Simple
         }
 
         return string.toString();
+    }
+
+    public static Bitmap getBitmapFromResource(int resid)
+    {
+        return BitmapFactory.decodeResource(anyContext.getResources(), resid);
     }
 
     @Nullable

@@ -57,13 +57,15 @@ public class OopsService extends Service
         }
     }
 
-    public static void log(String tag,Exception exception)
+    public static void log(String tag, Exception exception)
     {
         try
         {
             StackTraceElement[] st = exception.getStackTrace();
 
             Log.e(tag, st[ 0 ].getMethodName() + ": " + exception.getMessage());
+
+            exception.printStackTrace();
 
             JSONObject err = new JSONObject();
 

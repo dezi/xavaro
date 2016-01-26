@@ -1,10 +1,10 @@
 package de.xavaro.android.safehome;
 
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.text.Editable;
@@ -13,9 +13,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,12 +33,15 @@ import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.RemoteContacts;
+import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.PreferenceFragments;
 
 public class PreferencesBasics
 {
+    private static final String LOGTAG = PreferencesBasics.class.getSimpleName();
+
     //region Owner preferences
 
     public static class OwnerFragment extends PreferenceFragments.BasicFragmentStub
@@ -286,7 +287,7 @@ public class PreferencesBasics
             String pincode = String.format("%04d-%04d-%04d",
                     rand.nextInt(9999), rand.nextInt(9999), rand.nextInt(9999));
 
-            if (Simple.getMacAddress().equalsIgnoreCase("38:2D:E8:E1:C2:2A"))
+            if (Simple.equalsIgnoreCase(Simple.getMacAddress(), "38:2D:E8:E1:C2:2A"))
             {
                 //
                 // Dezi's Samsung Tablet
@@ -295,7 +296,7 @@ public class PreferencesBasics
                 pincode = "0000-0000-0001";
             }
 
-            if (Simple.getMacAddress().equalsIgnoreCase("64:BC:0C:18:BB:AC"))
+            if (Simple.equalsIgnoreCase(Simple.getMacAddress(), "64:BC:0C:18:BB:AC"))
             {
                 //
                 // Dezi's LG Phone
@@ -973,4 +974,125 @@ public class PreferencesBasics
     }
 
     //endregion Community preferences
+
+    //region Alertgroup preferences
+
+    public static class AlertgroupFragment extends SettingsFragments.EnablePreferenceFragment
+            implements Preference.OnPreferenceChangeListener
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Notfallgruppe";
+            header.iconRes = GlobalConfigs.IconResAlertgroup;
+            header.fragment = AlertgroupFragment.class.getName();
+
+            return header;
+        }
+
+        public AlertgroupFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResAlertgroup;
+            keyprefix = "alertgroup";
+            masterenable = "Notfallgruppe freischalten";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference lp;
+            NicedPreferences.NiceNumberPreference np;
+
+            //
+            // Confirmed connects.
+            //
+
+            registerRemotes(context, true);
+        }
+
+        private final ArrayList<String> remoteContacts = new ArrayList<>();
+
+        private void registerRemotes(Context context, boolean initial)
+        {
+            String xpath = "RemoteContacts/identities";
+            JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
+            if (rcs == null) return;
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference lp;
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Mitglieder");
+            pc.setEnabled(enabled);
+
+            preferences.add(pc);
+
+            final CharSequence[] prefixText =
+                    { "Inaktiv",    "Eingeladen", "Nimmt teil", "Nimmt nicht teil" };
+
+            final CharSequence[] prefixVals =
+                    { "inactive",   "invited",    "active",     "refused"          };
+
+            Iterator<String> keysIterator = rcs.keys();
+
+            while (keysIterator.hasNext())
+            {
+                String ident = keysIterator.next();
+
+                if (remoteContacts.contains(ident)) continue;
+                remoteContacts.add(ident);
+
+                String prefkey = keyprefix + ".remote";
+                String name = RemoteContacts.getDisplayName(ident);
+
+                lp = new NicedPreferences.NiceListPreference(context);
+                lp.setKey(prefkey + ".member." + ident);
+                lp.setEntries(prefixText);
+                lp.setEntryValues(prefixVals);
+                lp.setDefaultValue("inactive");
+                lp.setTitle(name);
+                lp.setEnabled(enabled);
+
+                lp.setOnPreferenceChangeListener(this);
+
+                preferences.add(lp);
+                if (! initial) getPreferenceScreen().addPreference(lp);
+            }
+        }
+
+        private final Handler handler = new Handler();
+
+        public boolean onPreferenceChange(Preference preference, Object newValue)
+        {
+            Log.d(LOGTAG, "onPreferenceChange:" + preference.getKey() + "=" + newValue.toString());
+
+            handler.postDelayed(exportAlertGroup, 100);
+
+            if (preference instanceof NicedPreferences.NiceListPreference)
+            {
+                return ((NicedPreferences.NiceListPreference) preference)
+                        .onPreferenceChange(preference, newValue);
+            }
+
+            return true;
+        }
+
+        public final Runnable exportAlertGroup = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                RemoteGroups.exportAlertGroup();
+            }
+        };
+    }
+
+    //endregion Alertgroup preferences
 }

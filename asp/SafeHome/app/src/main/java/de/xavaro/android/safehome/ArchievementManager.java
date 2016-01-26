@@ -27,6 +27,10 @@ public class ArchievementManager implements
 
     private static final Handler handler = new Handler();
 
+    private static final int MODE_ARCHIVED = 0;
+    private static final int MODE_REVOKED  = 1;
+    private static final int MODE_RESET    = 2;
+
     public static ArchievementManager instance;
 
     public static ArchievementManager initialize(Context context)
@@ -38,7 +42,11 @@ public class ArchievementManager implements
 
     public static void show(String tag)
     {
+        Log.d(LOGTAG,"show 1: " + tag);
+
         if (instance == null) return;
+
+        Log.d(LOGTAG,"show 2: " + tag);
 
         instance.setTag(tag);
 
@@ -51,7 +59,7 @@ public class ArchievementManager implements
 
         instance.setTag(tag);
 
-        instance.archievedInternal(false);
+        instance.archievedInternal(MODE_ARCHIVED);
     }
 
     public static void revoke(String tag)
@@ -60,7 +68,16 @@ public class ArchievementManager implements
 
         instance.setTag(tag);
 
-        instance.archievedInternal(true);
+        instance.archievedInternal(MODE_REVOKED);
+    }
+
+    public static void reset(String tag)
+    {
+        if (instance == null) return;
+
+        instance.setTag(tag);
+
+        instance.archievedInternal(MODE_RESET);
     }
 
     private Context context;
@@ -78,7 +95,7 @@ public class ArchievementManager implements
 
         config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_archievements);
 
-        if ((config == null) || !config.has("archievements"))
+        if ((config == null) || ! config.has("archievements"))
         {
             Toast.makeText(context, "Keine <archievements> gefunden.", Toast.LENGTH_LONG).show();
 
@@ -124,7 +141,7 @@ public class ArchievementManager implements
         return title;
     }
 
-    private void archievedInternal(boolean revoke)
+    private void archievedInternal(int mode)
     {
         if (config == null) return;
 
@@ -139,10 +156,22 @@ public class ArchievementManager implements
 
         String cpath = currentXpathpref + "/archieved";
         int count = PersistManager.getXpathInt(cpath);
-        PersistManager.putXpath(cpath, revoke ? 0 : ++count);
+        PersistManager.putXpath(cpath, (mode == MODE_ARCHIVED) ? ++count : 0);
 
         String lpath = currentXpathpref + "/lastarchieved";
         PersistManager.putXpath(lpath, Simple.nowAsISO());
+
+        if (mode == MODE_RESET)
+        {
+            cpath = currentXpathpref + "/positive";
+            PersistManager.putXpath(cpath, 0);
+
+            cpath = currentXpathpref + "/archieved";
+            PersistManager.putXpath(cpath, 0);
+
+            cpath = currentXpathpref + "/negative";
+            PersistManager.putXpath(cpath, 0);
+        }
 
         PersistManager.flush();
 

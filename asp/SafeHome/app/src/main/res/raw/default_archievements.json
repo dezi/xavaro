@@ -1,30 +1,42 @@
 {
   "archievements": {
 
-    "howto.open.settings": {
+    "howto.open.settings":
+    {
       "title": "important",
       "message": "Sie können die Einstellungen durch 5 mal schnelles Drücken der Zurück-Taste öffnen.",
       "buttons": "next|noshow"
     },
 
-    "configure.settings.password": {
+    "configure.settings.password":
+    {
       "title": "important",
       "message": "Vergessen Sie nicht, die Einstellungen mit einem Passwort zu sichern.",
       "buttons": "later|noshow|follow",
       "prio": 100
     },
 
-    "configure.settings.homebutton": {
+    "configure.settings.homebutton":
+    {
       "title": "important",
       "message": "Die Anwendung sollte noch mit den Home-Button verknüpft werden.",
       "buttons": "later|noshow|follow",
       "prio": 200
     },
 
-    "configure.settings.assistbutton": {
+    "configure.settings.assistbutton":
+    {
       "title": "important",
       "message": "Die Anwendung sollte noch mit den Assistenz-Button verknüpft werden.",
       "buttons": "later|noshow|follow",
+      "prio": 300
+    },
+
+    "alertcall.shortclick":
+    {
+      "title": "important",
+      "message": "Der Alarmruf kann nur durch einen langen Click ausgelöst werden.",
+      "buttons": "ok|noshow",
       "prio": 300
     }
   }
