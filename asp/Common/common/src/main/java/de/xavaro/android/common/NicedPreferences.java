@@ -585,7 +585,7 @@ public class NicedPreferences
 
             if (isPassword)
             {
-                if (getText().equals(""))
+                if ((getText() == null) || getText().equals(""))
                 {
                     current.setText("Nicht gesetzt");
                     current.setTextColor(Color.RED);
@@ -713,6 +713,8 @@ public class NicedPreferences
         {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP)
             {
+                view.playSoundEffect(android.view.SoundEffectConstants.CLICK);
+
                 if (view.getTag().toString().equals("open"))
                 {
                     ProcessManager.launchApp(getContext(), apkname);
@@ -841,8 +843,6 @@ public class NicedPreferences
         protected void onBindView(View view)
         {
             super.onBindView(view);
-
-            StaticUtils.dumpViewsChildren(view);
 
             //
             // Re-arrange completely shitty checkbox layout.

@@ -462,6 +462,7 @@ public abstract class BlueTooth extends BroadcastReceiver
             {
                 Log.i(LOGTAG, "onConnectionStateChange: device " + devicetag + " connected");
 
+                currentGatt = gatt;
                 currentConnectState = true;
 
                 gattHandler.postDelayed(runDiscoverServices, 0);
@@ -497,45 +498,49 @@ public abstract class BlueTooth extends BroadcastReceiver
 
                 for (BluetoothGattCharacteristic characteristic : characteristics)
                 {
-                    String props = getPropsString(characteristic.getProperties());
+                    if (needlog)
+                    {
+                        String props = getPropsString(characteristic.getProperties());
+                        Log.d(LOGTAG, "  chara=" + characteristic.getUuid() + ":" + props);
 
-                    if (needlog) Log.d(LOGTAG, "  chara=" + characteristic.getUuid() + ":" + props);
+                        List<BluetoothGattDescriptor> descriptors = characteristic.getDescriptors();
+
+                        for (BluetoothGattDescriptor descriptor : descriptors)
+                        {
+                            Log.d(LOGTAG, "    descs=" + descriptor.getUuid());
+                        }
+                    }
+
+                    String uuid = characteristic.getUuid().toString();
 
                     if (isCompatiblePrimary(characteristic))
                     {
                         currentPrimary = characteristic;
-                        Log.d(LOGTAG, "Found primary=" + deviceName + " " + characteristic.getUuid());
+                        Log.d(LOGTAG, "Found primary=" + deviceName + " " + uuid);
                     }
 
                     if (isCompatibleSecondary(characteristic))
                     {
                         currentSecondary = characteristic;
-                        Log.d(LOGTAG, "Found secondary=" + deviceName + " " + characteristic.getUuid());
+                        Log.d(LOGTAG, "Found secondary=" + deviceName + " " + uuid);
                     }
 
                     if (isCompatibleControl(characteristic))
                     {
                         currentControl = characteristic;
-                        Log.d(LOGTAG, "Found control=" + deviceName + " " + characteristic.getUuid());
+                        Log.d(LOGTAG, "Found control=" + deviceName + " " + uuid);
                     }
 
                     if (isCompatibleChanged(characteristic))
                     {
                         currentChanged = characteristic;
-                        Log.d(LOGTAG, "Found changed=" + deviceName + " " + characteristic.getUuid());
+                        Log.d(LOGTAG, "Found changed=" + deviceName + " " + uuid);
                     }
 
                     if (isCompatibleSerial(characteristic))
                     {
                         currentSerial = characteristic;
-                        Log.d(LOGTAG, "Found serial=" + deviceName + " " + characteristic.getUuid());
-                    }
-
-                    List<BluetoothGattDescriptor> descriptors = characteristic.getDescriptors();
-
-                    for (BluetoothGattDescriptor descriptor : descriptors)
-                    {
-                        if (needlog) Log.d(LOGTAG, "    descs=" + descriptor.getUuid());
+                        Log.d(LOGTAG, "Found serial=" + deviceName + " " + uuid);
                     }
                 }
             }
@@ -561,7 +566,8 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
 
         @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
+        public void onCharacteristicWrite(BluetoothGatt gatt,
+                                          BluetoothGattCharacteristic characteristic, int status)
         {
             Log.d(LOGTAG, "onCharacteristicWrite=" + characteristic.getUuid());
             Log.d(LOGTAG, "onCharacteristicWrite=" + status
@@ -575,7 +581,8 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
 
         @Override
-        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status)
+        public void onDescriptorWrite(BluetoothGatt gatt,
+                                      BluetoothGattDescriptor descriptor, int status)
         {
             Log.d(LOGTAG, "onDescriptorWrite=" + descriptor.getUuid());
             Log.d(LOGTAG, "onDescriptorWrite=" + status
@@ -589,7 +596,8 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
 
         @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic)
+        public void onCharacteristicChanged(BluetoothGatt gatt,
+                                            BluetoothGattCharacteristic characteristic)
         {
             Log.d(LOGTAG, "onCharacteristicChanged=" + characteristic.getUuid());
             Log.d(LOGTAG, "onCharacteristicChanged="
@@ -605,7 +613,8 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
 
         @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
+        public void onCharacteristicRead(BluetoothGatt gatt,
+                                         BluetoothGattCharacteristic characteristic, int status)
         {
             Log.d(LOGTAG, "onCharacteristicRead=" + characteristic.getUuid());
             Log.d(LOGTAG, "onCharacteristicRead=" + status
@@ -624,7 +633,8 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
 
         @Override
-        public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status)
+        public void onDescriptorRead(BluetoothGatt gatt,
+                                     BluetoothGattDescriptor descriptor, int status)
         {
             Log.d(LOGTAG, "onDescriptorRead=" + descriptor.getUuid());
             Log.d(LOGTAG, "onDescriptorRead=" + status

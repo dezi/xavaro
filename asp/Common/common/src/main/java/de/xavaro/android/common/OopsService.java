@@ -222,7 +222,7 @@ public class OopsService extends Service
             {
                 String[] packageName = getApplicationContext().getPackageName().split("\\.");
 
-                msg.put("identity",SystemIdentity.identity);
+                msg.put("identity",SystemIdentity.getIdentity());
                 msg.put("app",packageName[ packageName.length - 1 ]);
             }
             catch (JSONException ignore)

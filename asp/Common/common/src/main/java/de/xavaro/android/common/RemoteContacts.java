@@ -3,7 +3,6 @@ package de.xavaro.android.common;
 import android.support.annotation.Nullable;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;

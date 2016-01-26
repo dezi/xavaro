@@ -81,6 +81,17 @@ public class Simple
 
     //region GCM stuff
 
+    public static boolean isGCMInitialized()
+    {
+        return (getGCMapeyki() != null);
+    }
+
+    @Nullable
+    public static String getGCMToken()
+    {
+        return CommonStatic.gcm_token;
+    }
+
     public static long getGCMsendeird()
     {
         if (anyContext != null)
@@ -141,6 +152,23 @@ public class Simple
 
     //region Application stuff
 
+    public static boolean isAppInstalled(String packageName)
+    {
+        if (appContext == null) return false;
+
+        try
+        {
+            ApplicationInfo appInfo = appContext.getPackageManager().getApplicationInfo(packageName, 0);
+
+            return (appInfo != null);
+        }
+        catch (PackageManager.NameNotFoundException ignore)
+        {
+        }
+
+        return false;
+    }
+
     public static void installAppFromPlaystore(String packagename)
     {
         if (appContext == null) return;
@@ -175,6 +203,41 @@ public class Simple
     //endregion Application stuff
 
     //region All purpose simple methods
+
+    public static boolean equals(String str1, String str2)
+    {
+        return (str1 != null) && (str2 != null) && str1.equals(str2);
+    }
+
+    public static void sleep(long millis)
+    {
+        try
+        {
+            Thread.sleep(millis);
+
+        }
+        catch (InterruptedException ignore)
+        {
+        }
+    }
+
+    public static long dezify(long number)
+    {
+        return number ^ 0x2905196228051998L;
+    }
+
+    public static String dezify(String string)
+    {
+        byte[] dezi = { 0x29, 0x05, 0x19, 0x62 };
+        byte[] bytes = string.getBytes();
+
+        for (int inx = 0; inx < bytes.length; inx++)
+        {
+            bytes[ inx ] = (byte) (bytes[ inx ] ^ (0x0f & dezi[ inx % 4 ]));
+        }
+
+        return new String(bytes);
+    }
 
     public static void removeAllPreferences(String prefix)
     {
@@ -229,28 +292,6 @@ public class Simple
         }
     }
 
-    public static boolean isAppInstalled(String packageName)
-    {
-        if (appContext == null) return false;
-
-        try
-        {
-            ApplicationInfo appInfo = appContext.getPackageManager().getApplicationInfo(packageName, 0);
-
-            return (appInfo != null);
-        }
-        catch (PackageManager.NameNotFoundException ignore)
-        {
-        }
-
-        return false;
-    }
-
-    public static boolean isGCMInitialized()
-    {
-        return (getGCMapeyki() != null);
-    }
-
     public static void dumpDirectory(String path)
     {
         dumpDirectory(new File(path));
@@ -295,12 +336,6 @@ public class Simple
         WifiManager wifiManager = (WifiManager) appContext.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         return wInfo.getMacAddress();
-    }
-
-    @Nullable
-    public static String getGCMToken()
-    {
-        return CommonStatic.gcm_token;
     }
 
     public static int getDeviceWidth()
@@ -445,36 +480,6 @@ public class Simple
         }
 
         return string.toString();
-    }
-
-    public static void sleep(long millis)
-    {
-        try
-        {
-            Thread.sleep(millis);
-
-        }
-        catch (InterruptedException ignore)
-        {
-        }
-    }
-
-    public static long dezify(long number)
-    {
-        return number ^ 0x2905196228051998L;
-    }
-
-    public static String dezify(String string)
-    {
-        byte[] dezi = { 0x29, 0x05, 0x19, 0x62 };
-        byte[] bytes = string.getBytes();
-
-        for (int inx = 0; inx < bytes.length; inx++)
-        {
-            bytes[ inx ] = (byte) (bytes[ inx ] ^ (0x0f & dezi[ inx % 4 ]));
-        }
-
-        return new String(bytes);
     }
 
     @Nullable

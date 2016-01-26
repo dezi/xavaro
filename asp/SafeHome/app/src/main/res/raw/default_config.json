@@ -23,7 +23,7 @@
       {
         "label": "Vitaldaten",
         "type": "health",
-        "enable": "health.scale.enable"
+        "enable": "health.enable"
       },
       {
         "label": "Zeitungen",

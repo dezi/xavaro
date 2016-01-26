@@ -47,23 +47,23 @@ public class GCMMessageService extends GcmListenerService
         if (from.startsWith("/topics/"))
         {
             // message received from some topic.
-        }
-        else
-        {
-            if (message.startsWith("{\"base64\":"))
-            {
-                try
-                {
-                    JSONObject jmess= new JSONObject(message);
-                    String base64 = jmess.getString("base64");
-                    byte[] rawdata = Base64.decode(base64, 0);
 
-                    CommService.getInstance().onRawMessageReceived(rawdata);
-                }
-                catch (JSONException ex)
-                {
-                    OopsService.log(LOGTAG, ex);
-                }
+            return;
+        }
+
+        if ((message != null) && message.startsWith("{\"base64\":"))
+        {
+            try
+            {
+                JSONObject jmess= new JSONObject(message);
+                String base64 = jmess.getString("base64");
+                byte[] rawdata = Base64.decode(base64, 0);
+
+                CommService.getInstance().onRawMessageReceived(rawdata);
+            }
+            catch (JSONException ex)
+            {
+                OopsService.log(LOGTAG, ex);
             }
         }
     }

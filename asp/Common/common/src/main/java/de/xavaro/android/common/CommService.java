@@ -1,8 +1,5 @@
 package de.xavaro.android.common;
 
-import android.app.Activity;
-import android.preference.PreferenceManager;
-import android.content.SharedPreferences;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -91,6 +88,7 @@ public class CommService extends Service
         }
     }
 
+    @SuppressWarnings("unused")
     public static void sendEncryptedWithAck(JSONObject message, boolean allowGCM)
     {
         synchronized (messageBacklog)
@@ -156,6 +154,7 @@ public class CommService extends Service
     // Worker background thread.
     //
 
+    private String identity;
     private Thread workerSend;
     private Thread workerRecv;
 
@@ -166,12 +165,13 @@ public class CommService extends Service
     {
         super.onCreate();
 
-        Log.d(LOGTAG,"onCreate: running with " + getApplicationContext().getPackageName());
-
-        instance = this;
+        Log.d(LOGTAG, "onCreate: running with " + getApplicationContext().getPackageName());
 
         Simple.setAnyContext(getApplicationContext());
-        SystemIdentity.initialize(getApplicationContext());
+
+        instance = this;
+        identity = SystemIdentity.getIdentity();
+
         ChatManager.initialize();
     }
 
@@ -329,8 +329,6 @@ public class CommService extends Service
 
             if (type.equals("requestOwnerIdentity"))
             {
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
                 String remoteIdentity = json.getString("identity");
 
                 RemoteContacts.registerContact(json);
@@ -391,10 +389,6 @@ public class CommService extends Service
             byte[] idremBytes = new byte[ 16 ];
             System.arraycopy(data, 4, idremBytes, 0, 16);
             String idrem = Simple.getUUIDString(idremBytes);
-
-            byte[] identBytes = new byte[ 16 ];
-            System.arraycopy(data, 20, identBytes, 0, 16);
-            String ident = Simple.getUUIDString(identBytes);
 
             byte[] ackidBytes = new byte[ 16 ];
             System.arraycopy(data, 36, ackidBytes, 0, 16);
@@ -582,7 +576,7 @@ public class CommService extends Service
             // Add own identity to message and prepare.
             //
 
-            Simple.JSONput(mc.msg, "identity", SystemIdentity.identity);
+            Simple.JSONput(mc.msg, "identity", identity);
             String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
             datagramPacket.setData(body.getBytes());
 
@@ -592,15 +586,15 @@ public class CommService extends Service
             String uuid;
 
             if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
-                    && Simple.JSONgetString(mc.msg, "type").equals("pups"))
+                    && Simple.equals(Simple.JSONgetString(mc.msg, "type"), "pups"))
             {
                 datagramPacket.setData("PUPS".getBytes());
             }
 
             if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
-                    && Simple.JSONgetString(mc.msg, "type").equals("ping"))
+                    && Simple.equals(Simple.JSONgetString(mc.msg, "type"), "ping"))
             {
-                ident = SystemIdentity.identity;
+                ident = identity;
 
                 byte[] ping = new byte[ 4 + 16 ];
 
@@ -612,7 +606,7 @@ public class CommService extends Service
 
             if ((mc.enc == MessageClass.CLIENT_ACK) && mc.msg.has("uuid"))
             {
-                ident = SystemIdentity.identity;
+                ident = identity;
                 uuid = Simple.JSONgetString(mc.msg, "uuid");
 
                 byte[] acme = new byte[ 4 + 16 + 16 ];
@@ -629,7 +623,7 @@ public class CommService extends Service
                 // Encrypt message.
                 //
 
-                ident = SystemIdentity.identity;
+                ident = identity;
                 idrem = Simple.JSONgetString(mc.msg, "idremote");
                 byte[] encrypted = CryptUtils.AESencrypt(idrem, body);
 
@@ -656,7 +650,7 @@ public class CommService extends Service
 
                 String mtype = (mc.enc == MessageClass.CRYPT_WITH_ACK) ? "CACK" : "CARL";
 
-                ident = SystemIdentity.identity;
+                ident = identity;
                 idrem = Simple.JSONgetString(mc.msg, "idremote");
                 ackid = Simple.JSONgetString(mc.msg, "uuid");
 

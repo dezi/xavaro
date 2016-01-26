@@ -1447,7 +1447,7 @@ public class LaunchItem extends FrameLayout implements
 
         JSONObject message = new JSONObject();
         Simple.JSONput(message, "text", "Hallo pupsi");
-        Simple.JSONput(message, "identity", SystemIdentity.identity);
+        Simple.JSONput(message, "identity", SystemIdentity.getIdentity());
 
         GCMMessageService.sendMessage("0c47a9e4-254b-4533-b900-d5e53c82435b", message);
     }

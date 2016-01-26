@@ -77,18 +77,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         homeActivity = this;
 
-        //CommonStatic.gcm_apeyki = "HLscZ|HCQc]g}nZG=MKu~3H0?b?7sm1wp_kPcn=";
-        //CommonStatic.gcm_senderId = getString(R.string.gcm_defaultSenderId);
-
-        /*
-        long xxx = Long.parseLong(getString(R.string.gcm_defaultSenderId));
-        Log.d(LOGTAG, "===========================:" + getString(R.string.gcm_defaultSenderId));
-        Log.d(LOGTAG, "===========================:" + xxx);
-        Log.d(LOGTAG, "===========================:" + Simple.dezify(xxx));
-        Log.d(LOGTAG, "===========================:" + Simple.dezify(Simple.dezify(xxx)));
-        */
-
-        SystemIdentity.initialize(this);
         ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SpeekDat.initialize(this);

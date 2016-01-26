@@ -28,9 +28,9 @@ public class SystemIdentity
 {
     private static final String LOGTAG = SystemIdentity.class.getSimpleName();
 
-    public static String appsname;
-    public static String identity;
-    public static String randomiz;
+    private static String appsname;
+    private static String identity;
+    private static String randomiz;
 
     private static String foundInContact;
     private static String foundInStorage;
@@ -40,9 +40,18 @@ public class SystemIdentity
     // Retrieve UUID or generate a new one.
     //
 
-    public static void initialize(Context context)
+    public static String getIdentity()
+    {
+        if (identity == null) initialize();
+
+        return identity;
+    }
+
+    private static void initialize()
     {
         if (identity != null) return;
+
+        Context context = Simple.getAnyContext();
 
         retrieveFromStorage(context);
         retrieveFromCookies(context);
