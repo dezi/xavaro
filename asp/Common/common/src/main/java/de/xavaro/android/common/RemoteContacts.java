@@ -62,6 +62,12 @@ public class RemoteContacts
     }
 
     @Nullable
+    public static JSONObject getContact(String ident)
+    {
+        return PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
+    }
+
+    @Nullable
     public static String getGCMToken(String ident)
     {
         JSONObject rc = PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);

@@ -1021,6 +1021,26 @@ public class PreferencesBasics
 
         private void registerRemotes(Context context, boolean initial)
         {
+            SharedPreferences sp = Simple.getSharedPrefs();
+
+            String groupidentkey = keyprefix + ".groupidentity";
+            String grouppasspkey = keyprefix + ".passphrase";
+            String grouptypekey  = keyprefix + ".type";
+            String groupnamekey  = keyprefix + ".name";
+
+            if (! sp.contains(grouppasspkey))
+            {
+                String groupident = UUID.randomUUID().toString();
+                String grouppassp = UUID.randomUUID().toString();
+                String groupname = "Notfallgruppe";
+                String grouptype = "alertcall";
+
+                sp.edit().putString(groupidentkey, groupident).apply();
+                sp.edit().putString(grouppasspkey, grouppassp).apply();
+                sp.edit().putString(groupnamekey, groupname).apply();
+                sp.edit().putString(grouptypekey, grouptype).apply();
+            }
+
             String xpath = "RemoteContacts/identities";
             JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
             if (rcs == null) return;
@@ -1049,11 +1069,10 @@ public class PreferencesBasics
                 if (remoteContacts.contains(ident)) continue;
                 remoteContacts.add(ident);
 
-                String prefkey = keyprefix + ".remote";
                 String name = RemoteContacts.getDisplayName(ident);
 
                 lp = new NicedPreferences.NiceListPreference(context);
-                lp.setKey(prefkey + ".member." + ident);
+                lp.setKey(keyprefix + ".member." + ident);
                 lp.setEntries(prefixText);
                 lp.setEntryValues(prefixVals);
                 lp.setDefaultValue("inactive");
@@ -1089,7 +1108,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                RemoteGroups.exportAlertGroup();
+                RemoteGroups.exportGroup(keyprefix);
             }
         };
     }

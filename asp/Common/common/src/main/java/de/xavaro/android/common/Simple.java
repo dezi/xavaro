@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.Date;
@@ -245,6 +246,27 @@ public class Simple
         }
 
         return new String(bytes);
+    }
+
+    public static String getPreferenceString(String prefkey)
+    {
+        return getSharedPrefs().getString(prefkey, null);
+    }
+
+    public static Map<String, Object> getAllPreferences(String prefix)
+    {
+        Map<String, Object> result = new HashMap<>();
+
+        Map<String, ?> prefs = getSharedPrefs().getAll();
+
+        for (Map.Entry<String, ?> entry : prefs.entrySet())
+        {
+            if (! entry.getKey().startsWith(prefix)) continue;
+
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
     }
 
     public static void removePreference(String key)
