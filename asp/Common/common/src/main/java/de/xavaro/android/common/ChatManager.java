@@ -16,8 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ChatManager implements
-        CommService.CommServiceCallback
+public class ChatManager implements CommService.CommServiceCallback
 {
     private static final String LOGTAG = ChatManager.class.getSimpleName();
 
@@ -25,19 +24,19 @@ public class ChatManager implements
 
     private static ChatManager instance;
 
-    public static void initialize(Context context)
+    public static void initialize()
     {
         if (instance == null)
         {
-            instance = new ChatManager(context);
+            instance = new ChatManager(Simple.getAnyContext());
 
             Log.d(LOGTAG,"Initialized");
         }
     }
 
-    public static ChatManager getInstance(Context context)
+    public static ChatManager getInstance()
     {
-        initialize(context);
+        initialize();
 
         return instance;
     }
@@ -155,8 +154,6 @@ public class ChatManager implements
 
     public void onMessageReceived(JSONObject message)
     {
-        Log.d(LOGTAG,"========" + message.toString());
-
         try
         {
             if (message.has("type"))
@@ -378,14 +375,8 @@ public class ChatManager implements
             if (! protocoll.has("incoming")) protocoll.put("incoming", new JSONObject());
             JSONObject incoming = protocoll.getJSONObject("incoming");
 
-            Log.d(LOGTAG,"==============================updateIncomingProtocoll 1");
-
             JSONObject proto = incoming.getJSONObject(uuid);
-
-            Log.d(LOGTAG,"==============================updateIncomingProtocoll 2" + proto.toString());
-
             proto.put(status, Simple.nowAsISO());
-
             putProtocoll(identity, protocoll);
         }
         catch (JSONException ex)
@@ -409,7 +400,7 @@ public class ChatManager implements
 
             JSONObject proto = new JSONObject(message.toString());
 
-            if ((status == "acks") && ! outgoing.has(uuid))
+            if (status.equals("acks") && ! outgoing.has(uuid))
             {
                 //
                 // Multiple server acks regarding this
@@ -436,7 +427,7 @@ public class ChatManager implements
                 proto = outgoing.getJSONObject(uuid);
             }
 
-            if ((status == "acks") && proto.has(status))
+            if (status.equals("acks") && proto.has(status))
             {
                 //
                 // Multiple server acks regarding this
@@ -489,11 +480,7 @@ public class ChatManager implements
             OopsService.log(LOGTAG, ex);
         }
 
-        Log.d(LOGTAG,"==========================onIncomingMessage: 1");
-
         if (! callbacks.containsKey(identity)) return false;
-
-        Log.d(LOGTAG,"==========================onIncomingMessage: 2");
 
         final String cbidentity = identity;
         final JSONObject cbmessage = message;

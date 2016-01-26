@@ -172,7 +172,7 @@ public class CommService extends Service
 
         Simple.setAnyContext(getApplicationContext());
         SystemIdentity.initialize(getApplicationContext());
-        ChatManager.initialize(getApplicationContext());
+        ChatManager.initialize();
     }
 
     @Override

@@ -1,11 +1,11 @@
 package de.xavaro.android.safehome;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
-import android.content.Context;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,8 +45,10 @@ public class ChatActivity extends AppCompatActivity implements
     private final int UI_HIDE = View.SYSTEM_UI_FLAG_FULLSCREEN;
     private final Map<String, FrameLayout> protoIncoming = new HashMap<>();
     private final Map<String, FrameLayout> protoOutgoing = new HashMap<>();
+
     private final Handler handler = new Handler();
 
+    private ChatManager chatManager;
     private String idremote;
     private String label;
 
@@ -58,7 +60,6 @@ public class ChatActivity extends AppCompatActivity implements
     private FrameLayout.LayoutParams scrollviewlp;
     private ScrollView scrollview;
     private LinearLayout scrollcontent;
-    private AppCompatActivity context;
     private LinearLayout lastDiv;
 
     private boolean lastDivIsIncoming;
@@ -77,7 +78,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         Simple.setAppContext(this);
 
-        context = this;
+        chatManager = ChatManager.getInstance();
 
         idremote = getIntent().getStringExtra("idremote");
         label = getIntent().getStringExtra("label");
@@ -93,10 +94,6 @@ public class ChatActivity extends AppCompatActivity implements
 
         setContentView(topscreen);
 
-        lp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                Simple.getActionBarHeight());
-
         toolbar = new DitUndDat.Toolbar(this);
 
         toolbar.title.setText(label);
@@ -105,10 +102,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         topscreen.addView(toolbar);
 
-        scrollviewlp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-
+        scrollviewlp = new FrameLayout.LayoutParams(Simple.MP, Simple.MP);
         scrollviewlp.setMargins(0, Simple.getActionBarHeight() + 8, 0, 0);
 
         scrollview = new ScrollView(this);
@@ -130,7 +124,6 @@ public class ChatActivity extends AppCompatActivity implements
             }
         });
 
-
         topscreen.addView(scrollview);
 
         scrollcontent = new LinearLayout(this);
@@ -139,19 +132,12 @@ public class ChatActivity extends AppCompatActivity implements
 
         scrollview.addView(scrollcontent);
 
-        lp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                Gravity.BOTTOM);
-
         MyFrameLayout inputframe = new MyFrameLayout(this);
-        inputframe.setLayoutParams(lp);
+        inputframe.setLayoutParams(Simple.layoutParamsMW(Gravity.BOTTOM));
 
         topscreen.addView(inputframe);
 
-        lp = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp = new FrameLayout.LayoutParams(Simple.MP,Simple.WC);
         lp.setMargins(8, 8, Simple.getActionBarHeight() + 16, 8);
 
         input = new EditText(this);
@@ -191,6 +177,7 @@ public class ChatActivity extends AppCompatActivity implements
                 Simple.getActionBarHeight(),
                 Simple.getActionBarHeight(),
                 Gravity.END + Gravity.BOTTOM);
+
         lp.setMargins(8, 8, 8, 8);
 
         schwalbe = new ImageView(this);
@@ -221,7 +208,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        ChatManager.getInstance(context).subscribe(idremote, this);
+        chatManager.subscribe(idremote, this);
     }
 
     @Override
@@ -231,7 +218,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onStop();
 
-        ChatManager.getInstance(context).unsubscribe(idremote, this);
+        chatManager.unsubscribe(idremote, this);
     }
 
     @Override
@@ -298,58 +285,39 @@ public class ChatActivity extends AppCompatActivity implements
 
             if ((lastDiv == null) || ! lastDivIsIncoming)
             {
-                lastDiv = new LinearLayout(context);
+                lastDiv = new LinearLayout(this);
                 lastDiv.setOrientation(LinearLayout.VERTICAL);
-                lastDiv.setLayoutParams(new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                lastDiv.setLayoutParams(Simple.layoutParamsMW());
 
                 lastDivIsIncoming = true;
 
                 scrollcontent.addView(lastDiv);
             }
 
-            lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            FrameLayout textDiv = new FrameLayout(context);
-            textDiv.setLayoutParams(lp);
+            FrameLayout textDiv = new FrameLayout(this);
+            textDiv.setLayoutParams(Simple.layoutParamsMW());
             lastDiv.addView(textDiv);
 
-            lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.START);
-
-            FrameLayout textLayout = new FrameLayout(context);
-            textLayout.setLayoutParams(lp);
+            FrameLayout textLayout = new FrameLayout(this);
+            textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
             textLayout.setBackgroundResource(R.drawable.balloon_incoming_normal);
 
             textDiv.addView(textLayout);
 
-            lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            TextView textView = new TextView(context);
+            TextView textView = new TextView(this);
             textView.setPadding(10, 10, 10, 16);
             textView.setTextSize(30f);
             textView.setText(message);
 
             textLayout.addView(textView);
 
-            lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.END | Gravity.BOTTOM);
-
-            TextView statusTime = new TextView(context);
+            TextView statusTime = new TextView(this);
             statusTime.setId(ID_TIME);
             statusTime.setPadding(0, 0, 12, 0);
             statusTime.setText(Simple.getLocal24HTimeFromISO(date));
+            statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.END | Gravity.BOTTOM));
 
-            textLayout.addView(statusTime, lp);
+            textLayout.addView(statusTime);
 
             protoIncoming.put(uuid, textLayout);
 
@@ -363,7 +331,7 @@ public class ChatActivity extends AppCompatActivity implements
 
                 CommService.sendEncryptedReliable(feedbackChatMessage, true);
 
-                ChatManager.getInstance(context).updateIncomingProtocoll(idremote, chatMessage, "read");
+                chatManager.updateIncomingProtocoll(idremote, chatMessage, "read");
             }
         }
         catch (JSONException ex)
@@ -384,37 +352,26 @@ public class ChatActivity extends AppCompatActivity implements
 
             if ((lastDiv == null) || lastDivIsIncoming)
             {
-                lastDiv = new LinearLayout(context);
+                lastDiv = new LinearLayout(this);
                 lastDiv.setOrientation(LinearLayout.VERTICAL);
-                lastDiv.setLayoutParams(new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                lastDiv.setLayoutParams(Simple.layoutParamsMW());
 
                 lastDivIsIncoming = false;
 
                 scrollcontent.addView(lastDiv);
             }
 
-            lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            FrameLayout textDiv = new FrameLayout(context);
-            textDiv.setLayoutParams(lp);
+            FrameLayout textDiv = new FrameLayout(this);
+            textDiv.setLayoutParams(Simple.layoutParamsMW());
             lastDiv.addView(textDiv);
 
-            lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.END);
-
-            FrameLayout textLayout = new FrameLayout(context);
-            textLayout.setLayoutParams(lp);
+            FrameLayout textLayout = new FrameLayout(this);
+            textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
             textLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal);
 
             textDiv.addView(textLayout);
 
-            TextView textView = new TextView(context);
+            TextView textView = new TextView(this);
             textView.setId(ID_TEXT);
             textView.setPadding(10, 10, 24, 16);
             textView.setTextSize(30f);
@@ -423,27 +380,23 @@ public class ChatActivity extends AppCompatActivity implements
             textLayout.addView(textView);
 
             lp = new FrameLayout.LayoutParams(76, 28, Gravity.END | Gravity.BOTTOM);
-            FrameLayout statusFrame = new FrameLayout(context);
+            FrameLayout statusFrame = new FrameLayout(this);
             statusFrame.setLayoutParams(lp);
 
             textLayout.addView(statusFrame);
 
-            lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.START | Gravity.BOTTOM);
-
-            TextView statusTime = new TextView(context);
+            TextView statusTime = new TextView(this);
+            statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.START | Gravity.BOTTOM));
             statusTime.setId(ID_TIME);
             statusTime.setText(Simple.getLocal24HTimeFromISO(date));
 
-            statusFrame.addView(statusTime, lp);
+            statusFrame.addView(statusTime);
 
             lp = new FrameLayout.LayoutParams(38,
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     Gravity.END | Gravity.BOTTOM);
 
-            ImageView statusImage = new ImageView(context);
+            ImageView statusImage = new ImageView(this);
             statusImage.setId(ID_STATUS);
             statusImage.setPadding(4, 4, 4, 4);
 
@@ -465,7 +418,7 @@ public class ChatActivity extends AppCompatActivity implements
                     }
                 });
 
-                uuid = ChatManager.getInstance(context).sendOutgoingMessage(idremote, message);
+                uuid = chatManager.sendOutgoingMessage(idremote, message);
             }
 
             protoOutgoing.put(uuid, textLayout);
@@ -485,7 +438,7 @@ public class ChatActivity extends AppCompatActivity implements
         @Override
         public void onClick(View view)
         {
-            ChatManager.getInstance(context).clearProtocoll(idremote);
+            chatManager.clearProtocoll(idremote);
 
             scrollcontent.removeAllViews();
             protoIncoming.clear();
@@ -670,7 +623,7 @@ public class ChatActivity extends AppCompatActivity implements
             // Check if partner is within chat or not.
             //
 
-            String incomingChat = ChatManager.getInstance(context).getLastChatStatus(idremote);
+            String incomingChat = chatManager.getLastChatStatus(idremote);
 
             String incomingChatType = null;
             String incomingChatDate = null;
@@ -705,7 +658,7 @@ public class ChatActivity extends AppCompatActivity implements
             // Figure out latest last online date.
             //
 
-            String lastOnline = ChatManager.getInstance(context).getLastOnlineDate(idremote);
+            String lastOnline = chatManager.getLastOnlineDate(idremote);
 
             if (incomingLastMessage != null)
             {
