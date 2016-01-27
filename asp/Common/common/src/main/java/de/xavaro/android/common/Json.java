@@ -10,7 +10,23 @@ public class Json
 {
     private static final String LOGTAG = Json.class.getSimpleName();
 
-    @Nullable
+    public static JSONObject fromString(String jsonstr)
+    {
+        if (jsonstr != null)
+        {
+            try
+            {
+                return new JSONObject(jsonstr);
+            }
+            catch (JSONException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+        }
+
+        return new JSONObject();
+    }
+
     public static JSONObject clone(JSONObject json)
     {
         try
@@ -22,12 +38,47 @@ public class Json
             OopsService.log(LOGTAG, ex);
         }
 
-        return null;
+        return new JSONObject();
+    }
+
+    public static JSONArray clone(JSONArray json)
+    {
+        try
+        {
+            return new JSONArray(json.toString());
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return new JSONArray();
     }
 
     public static void remove(JSONObject json, String key)
     {
         json.remove(key);
+    }
+
+    public static boolean equals(JSONObject j1, String k1, JSONObject j2, String k2)
+    {
+        String s1 = getString(j1, k1);
+        String s2 = getString(j2, k2);
+
+        return ((s1 != null) && (s2 != null) && s1.equals(s2));
+    }
+
+    public static boolean equals(JSONObject j1, String k1, JSONObject j2)
+    {
+        String s1 = getString(j1, k1);
+        String s2 = getString(j2, k1);
+
+        return ((s1 != null) && (s2 != null) && s1.equals(s2));
+    }
+
+    public static void copy(JSONObject j1, String k1, JSONObject j2)
+    {
+        put(j1, k1, get(j2, k1));
     }
 
     public static void put(JSONObject json, String key, Object val)
@@ -45,6 +96,21 @@ public class Json
     public static void put(JSONArray json, Object val)
     {
         json.put(val);
+    }
+
+    @Nullable
+    public static Object get(JSONObject json, String key)
+    {
+        try
+        {
+            return json.get(key);
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
     }
 
     @Nullable

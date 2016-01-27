@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -184,7 +185,8 @@ public class PersistManager
         {
             String[] parts = xpath.split("/");
             JSONObject jo = resolveXpath(parts, false);
-            return jo.getJSONObject(parts[ parts.length - 1 ]);
+            jo = jo.getJSONObject(parts[ parts.length - 1 ]);
+            return Json.clone(jo);
         }
         catch (Exception ex)
         {
@@ -194,12 +196,21 @@ public class PersistManager
         return null;
     }
 
+    private static Object cloneIfPossible(Object value)
+    {
+        if (value instanceof JSONArray) return Json.clone((JSONArray) value);
+        if (value instanceof JSONObject) return Json.clone((JSONObject) value);
+
+        return value;
+    }
+
     public static void putXpath(String xpath, Object value)
     {
         try
         {
             String[] parts = xpath.split("/");
             JSONObject jo = resolveXpath(parts, true);
+            value = cloneIfPossible(value);
             jo.put(parts[ parts.length - 1 ], value);
 
             dirty = true;

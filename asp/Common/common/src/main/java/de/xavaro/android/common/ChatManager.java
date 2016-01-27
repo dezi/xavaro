@@ -61,9 +61,9 @@ public class ChatManager implements CommService.CommServiceCallback
         this.context = context;
 
         CommService.subscribeMessage(this, "sendChatMessage");
+
         CommService.subscribeMessage(this, "recvChatMessage");
         CommService.subscribeMessage(this, "readChatMessage");
-
         CommService.subscribeMessage(this, "serverAckMessage");
 
         CommService.subscribeMessage(this, "sendOnlineStatus");
@@ -131,29 +131,16 @@ public class ChatManager implements CommService.CommServiceCallback
         return null;
     }
 
-    public String sendOutgoingMessage(String idremote, String message)
+    public void sendOutgoingMessage(String idremote, JSONObject message)
     {
-        String uuid = UUID.randomUUID().toString();
+        JSONObject sendChatMessage = Json.clone(message);
 
-        try
-        {
-            JSONObject sendChatMessage = new JSONObject();
+        Json.put(sendChatMessage, "type", "sendChatMessage");
+        Json.put(sendChatMessage, "idremote", idremote);
 
-            sendChatMessage.put("type", "sendChatMessage");
-            sendChatMessage.put("idremote", idremote);
-            sendChatMessage.put("message", message);
-            sendChatMessage.put("uuid", uuid);
+        CommService.sendEncryptedReliable(sendChatMessage, true);
 
-            CommService.sendEncryptedReliable(sendChatMessage, true);
-
-            updateOutgoingProtocoll(idremote, sendChatMessage, "date");
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return uuid;
+        updateOutgoingProtocoll(idremote, sendChatMessage, "send");
     }
 
     public void clearProtocoll(String identity)
@@ -233,15 +220,20 @@ public class ChatManager implements CommService.CommServiceCallback
                     String idremote = message.getString("identity");
                     Boolean wasread = onIncomingMessage(message);
 
-                    JSONObject feedbackChatMessage = new JSONObject();
+                    if (! wasread)
+                    {
+                        JSONObject feedbackChatMessage = new JSONObject();
 
-                    feedbackChatMessage.put("type",wasread ? "readChatMessage" : "recvChatMessage");
-                    feedbackChatMessage.put("idremote", idremote);
-                    feedbackChatMessage.put("uuid", uuid);
+                        feedbackChatMessage.put("type", "recvChatMessage");
+                        feedbackChatMessage.put("idremote", idremote);
+                        feedbackChatMessage.put("uuid", uuid);
 
-                    CommService.sendEncryptedReliable(feedbackChatMessage, true);
+                        CommService.sendEncryptedReliable(feedbackChatMessage, true);
 
-                    if (! wasread) sendNotification(message);
+                        updateIncomingProtocoll(idremote, message, "recv");
+
+                        sendNotification(message);
+                    }
 
                     return;
                 }
@@ -250,23 +242,7 @@ public class ChatManager implements CommService.CommServiceCallback
                 {
                     JSONObject rgnew = message.getJSONObject("remotegroup");
 
-                    String groupidentity = rgnew.getString("groupidentity");
-                    JSONObject rg = RemoteGroups.getGroup(groupidentity);
-
-                    if (rg == null)
-                    {
-                        rg = rgnew;
-                    }
-                    else
-                    {
-                        Simple.JSONput(rg, "passphrase", Simple.JSONgetString(rgnew, "passphrase"));
-                        Simple.JSONput(rg, "name", Simple.JSONgetString(rgnew, "name"));
-                    }
-
-                    RemoteGroups.putGroup(rg);
-
-                    Log.d(LOGTAG, "onMessageReceived: groupStatusUpdate:");
-                    Log.d(LOGTAG, rg.toString(2));
+                    RemoteGroups.updateGroup(rgnew, false);
 
                     return;
                 }
@@ -274,46 +250,10 @@ public class ChatManager implements CommService.CommServiceCallback
                 if (type.equals("groupMemberUpdate") && message.has("remotegroup"))
                 {
                     JSONObject rgnew = message.getJSONObject("remotegroup");
-
                     String groupidentity = rgnew.getString("groupidentity");
-                    JSONObject rg = RemoteGroups.getGroup(groupidentity);
-
-                    if (rg == null) return;
-
                     JSONObject updmember = rgnew.getJSONObject("member");
-                    String updmemberident = updmember.getString("identity");
-                    String status = updmember.getString("status");
-                    boolean inactive = (status == null) || status.equals("inactive");
-                    boolean wasold = false;
 
-                    JSONArray members = rg.getJSONArray("members");
-
-                    for (int inx = 0; inx < members.length(); inx++)
-                    {
-                        JSONObject oldmember = members.getJSONObject(inx);
-                        String oldmemberident = oldmember.getString("identity");
-
-                        if (! oldmemberident.equals(updmemberident)) continue;
-
-                        if (inactive)
-                        {
-                            members.remove(inx);
-                        }
-                        else
-                        {
-                            members.put(inx, updmember);
-                        }
-
-                        wasold = true;
-                        break;
-                    }
-
-                    if ((! wasold) && (! inactive)) members.put(updmember);
-
-                    RemoteGroups.putGroup(rg);
-
-                    Log.d(LOGTAG, "onMessageReceived: groupMemberUpdate:");
-                    Log.d(LOGTAG, rg.toString(2));
+                    RemoteGroups.updateMember(groupidentity, updmember, false);
 
                     return;
                 }
@@ -405,46 +345,21 @@ public class ChatManager implements CommService.CommServiceCallback
         if (identity == null) return null;
 
         String filename = context.getPackageName() + ".chatprotocoll." + identity + ".json";
+        String content = Simple.readDatadirFile(filename);
+        JSONObject protocoll = Json.fromString(content);
 
-        try
-        {
-            if (new File(context.getFilesDir(),filename).exists())
-            {
-                FileInputStream inputStream;
-                inputStream = context.openFileInput(filename);
-                int size = (int) inputStream.getChannel().size();
-                byte[] content = new byte[ size ];
-                int xfer = inputStream.read(content);
-                inputStream.close();
+        if (! protocoll.has("incoming")) Json.put(protocoll, "incoming", new JSONObject());
+        if (! protocoll.has("outgoing")) Json.put(protocoll, "outgoing", new JSONObject());
 
-                return new JSONObject(new String(content, 0, xfer));
-            }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return new JSONObject();
+        return protocoll;
     }
 
     private void putProtocoll(String identity, JSONObject protocoll)
     {
-        //Log.d(LOGTAG,"putProtocoll: " + protocoll.toString());
+        if (identity == null) return;
 
         String filename = context.getPackageName() + ".chatprotocoll." + identity + ".json";
-
-        try
-        {
-            FileOutputStream outputStream;
-            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(protocoll.toString(2).getBytes());
-            outputStream.close();
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+        Simple.writeDatadirFile(filename, Json.toPretty(protocoll));
     }
 
     public void updateIncomingProtocoll(String identity, JSONObject message, String status)
@@ -455,22 +370,39 @@ public class ChatManager implements CommService.CommServiceCallback
         JSONObject protocoll = getProtocoll(identity);
         if (protocoll == null) return;
 
-        try
-        {
-            if (! protocoll.has("incoming")) protocoll.put("incoming", new JSONObject());
-            JSONObject incoming = protocoll.getJSONObject("incoming");
+        JSONObject incoming = Json.getObject(protocoll, "incoming");
+        if (incoming == null) return;
 
-            JSONObject proto = incoming.getJSONObject(uuid);
-            proto.put(status, Simple.nowAsISO());
-            putProtocoll(identity, protocoll);
-        }
-        catch (JSONException ex)
+        Log.d(LOGTAG, "updateIncomingProtocoll:" + identity + "=" + status);
+
+        JSONObject proto = null;
+
+        if (incoming.has(uuid))
         {
-            OopsService.log(LOGTAG, ex);
+            proto = Json.getObject(incoming, uuid);
+        }
+        else
+        {
+            if (message.has("type") && Simple.equals(Json.getString(message, "type"), "sendChatMessage"))
+            {
+                proto = Json.clone(message);
+
+                Json.remove(proto, "uuid");
+                Json.remove(proto, "identity");
+                Json.remove(proto, "idremote");
+
+                Json.put(incoming, uuid, proto);
+            }
+        }
+
+        if (proto != null)
+        {
+            Json.put(proto, status, Simple.nowAsISO());
+            putProtocoll(identity, protocoll);
         }
     }
 
-    private void updateOutgoingProtocoll(String identity, JSONObject message, String status)
+    public void updateOutgoingProtocoll(String identity, JSONObject message, String status)
     {
         String uuid = getMessageUUID(message);
         if (uuid == null) return;
@@ -478,57 +410,33 @@ public class ChatManager implements CommService.CommServiceCallback
         JSONObject protocoll = getProtocoll(identity);
         if (protocoll == null) return;
 
-        try
+        JSONObject outgoing = Json.getObject(protocoll, "outgoing");
+        if (outgoing == null) return;
+
+        JSONObject proto = null;
+
+        if (outgoing.has(uuid))
         {
-            if (! protocoll.has("outgoing")) protocoll.put("outgoing", new JSONObject());
-            JSONObject outgoing = protocoll.getJSONObject("outgoing");
-
-            JSONObject proto = new JSONObject(message.toString());
-
-            if (status.equals("acks") && ! outgoing.has(uuid))
-            {
-                //
-                // Multiple server acks regarding this
-                // message also on receiver side from
-                // received and read feedback messages.
-                // We only care for server acks, if the
-                // message is outgoing and already
-                // registered.
-                //
-
-                return;
-            }
-
-            if (! outgoing.has(uuid))
-            {
-                if (proto.has("uuid")) proto.remove("uuid");
-                if (proto.has("identity")) proto.remove("identity");
-                if (proto.has("idremote")) proto.remove("idremote");
-
-                outgoing.put(uuid, proto);
-            }
-            else
-            {
-                proto = outgoing.getJSONObject(uuid);
-            }
-
-            if (status.equals("acks") && proto.has(status))
-            {
-                //
-                // Multiple server acks regarding this
-                // message. We only need the first one.
-                //
-
-                return;
-            }
-
-            proto.put(status, Simple.nowAsISO());
-
-            putProtocoll(identity, protocoll);
+            proto = Json.getObject(outgoing, uuid);
         }
-        catch (JSONException ex)
+        else
         {
-            OopsService.log(LOGTAG, ex);
+            if (message.has("type") && Simple.equals(Json.getString(message, "type"), "sendChatMessage"))
+            {
+                proto = Json.clone(message);
+
+                Json.remove(proto, "uuid");
+                Json.remove(proto, "identity");
+                Json.remove(proto, "idremote");
+
+                Json.put(outgoing, uuid, proto);
+            }
+        }
+
+        if (proto != null)
+        {
+            Json.put(proto, status, Simple.nowAsISO());
+            putProtocoll(identity, protocoll);
         }
     }
 
@@ -543,29 +451,13 @@ public class ChatManager implements CommService.CommServiceCallback
         JSONObject protocoll = getProtocoll(identity);
         if (protocoll == null) return false;
 
-        try
-        {
-            message.put("date", Simple.nowAsISO());
-
-            if (! protocoll.has("incoming")) protocoll.put("incoming", new JSONObject());
-            JSONObject incoming = protocoll.getJSONObject("incoming");
-
-            JSONObject proto = new JSONObject(message.toString());
-
-            if (proto.has("uuid")) proto.remove("uuid");
-            if (proto.has("identity")) proto.remove("identity");
-            if (proto.has("idremote")) proto.remove("idremote");
-
-            incoming.put(uuid, proto);
-
-            putProtocoll(identity, protocoll);
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+        updateIncomingProtocoll(identity, message, "date");
 
         if (! callbacks.containsKey(identity)) return false;
+
+        //
+        // The chat activity is present.
+        //
 
         final String cbidentity = identity;
         final JSONObject cbmessage = message;
@@ -612,7 +504,7 @@ public class ChatManager implements CommService.CommServiceCallback
 
     private void sendNotification(JSONObject chatMessage)
     {
-        String idremote = Simple.JSONgetString(chatMessage,"identity");
+        String idremote = Simple.JSONgetString(chatMessage, "identity");
         String sender   = RemoteContacts.getDisplayName(idremote);
         String message  = Simple.JSONgetString(chatMessage,"message");
 

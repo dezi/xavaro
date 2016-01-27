@@ -190,6 +190,8 @@ public class CommService extends Service
     {
         if (! isRunning)
         {
+            isRunning = true;
+
             if (workerSend == null)
             {
                 workerSend = new Thread(new Runnable()
@@ -217,8 +219,6 @@ public class CommService extends Service
 
                 workerRecv.start();
             }
-
-            isRunning = true;
         }
 
         return Service.START_NOT_STICKY;

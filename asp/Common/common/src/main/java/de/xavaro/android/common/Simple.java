@@ -35,6 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -344,6 +346,50 @@ public class Simple
         {
             Log.d(LOGTAG, "dumpDirectory: => " + file.getAbsoluteFile());
         }
+    }
+
+    @Nullable
+    public static String readDatadirFile(String filename)
+    {
+        try
+        {
+            FileInputStream inputStream;
+            inputStream = anyContext.openFileInput(filename);
+            int size = (int) inputStream.getChannel().size();
+            byte[] content = new byte[ size ];
+            int xfer = inputStream.read(content);
+            inputStream.close();
+
+            return new String(content, 0, xfer);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG,ex);
+        }
+
+        return null;
+    }
+
+    public static boolean writeDatadirFile(String filename, String content)
+    {
+        if (content != null)
+        {
+            try
+            {
+                FileOutputStream outputStream;
+                outputStream = anyContext.openFileOutput(filename, Context.MODE_PRIVATE);
+                outputStream.write(content.getBytes());
+                outputStream.close();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+        }
+
+        return false;
     }
 
     //endregion All purpose simple methods

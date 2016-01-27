@@ -1055,10 +1055,10 @@ public class PreferencesBasics
             preferences.add(pc);
 
             final CharSequence[] prefixText =
-                    { "Inaktiv",    "Eingeladen", "Nimmt teil", "Nimmt nicht teil" };
+                    { "Inaktiv",    "Eingeladen", "Gesperrt" };
 
             final CharSequence[] prefixVals =
-                    { "inactive",   "invited",    "active",     "refused"          };
+                    { "inactive",   "invited",    "locked"   };
 
             Iterator<String> keysIterator = rcs.keys();
 
@@ -1092,7 +1092,7 @@ public class PreferencesBasics
         {
             Log.d(LOGTAG, "onPreferenceChange:" + preference.getKey() + "=" + newValue.toString());
 
-            handler.postDelayed(exportAlertGroup, 100);
+            handler.postDelayed(updateAlertGroup, 100);
 
             if (preference instanceof NicedPreferences.NiceListPreference)
             {
@@ -1103,12 +1103,12 @@ public class PreferencesBasics
             return true;
         }
 
-        public final Runnable exportAlertGroup = new Runnable()
+        public final Runnable updateAlertGroup = new Runnable()
         {
             @Override
             public void run()
             {
-                RemoteGroups.exportGroup(keyprefix);
+                RemoteGroups.updateGroupFromPreferences(keyprefix);
             }
         };
     }

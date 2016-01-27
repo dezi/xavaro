@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -16,126 +15,198 @@ public class RemoteGroups
 
     private static final String xPathRoot = "RemoteGroups/groupidentities";
 
-    public static void exportGroup(String groupprefix)
+    public static void updateGroupFromPreferences(String groupprefix)
     {
-        PersistManager.delXpath(xPathRoot);
-        PersistManager.flush();
+        //PersistManager.delXpath(xPathRoot);
 
-        Log.d(LOGTAG,"exportGroup: " + groupprefix);
+        Log.d(LOGTAG,"updateGroupFromPreferences: " + groupprefix);
 
-            String groupidentity = Simple.getPreferenceString(groupprefix + ".groupidentity");
+        String groupidentity = Simple.getPreferenceString(groupprefix + ".groupidentity");
 
-            JSONObject group = getGroup(groupidentity);
+        JSONObject group = new JSONObject();
 
-            if (group == null)
+        Json.put(group, "groupidentity", groupidentity);
+        Json.put(group, "type", Simple.getPreferenceString(groupprefix + ".type"));
+        Json.put(group, "owner", SystemIdentity.getIdentity());
+        Json.put(group, "passphrase", Simple.getPreferenceString(groupprefix + ".passphrase"));
+        Json.put(group, "name", Simple.getPreferenceString(groupprefix + ".name"));
+
+        updateGroup(group, true);
+
+        //
+        // We add ourselves first and can never exit group.
+        //
+
+        JSONObject ourselves = new JSONObject();
+        RemoteContacts.deliverOwnContact(ourselves);
+        Json.put(ourselves, "identity", SystemIdentity.getIdentity());
+        Json.put(ourselves, "groupstatus", "invited");
+        Json.put(ourselves, "userstatus", "joined");
+
+        updateMember(groupidentity, ourselves, true);
+
+        String keyprefix = groupprefix + ".member.";
+        Map<String, Object> members = Simple.getAllPreferences(keyprefix);
+
+        for (Map.Entry<String, ?> entry : members.entrySet())
+        {
+            String memberpref = entry.getKey();
+            if (! memberpref.startsWith(keyprefix)) continue;
+
+            String memberident = memberpref.substring(keyprefix.length());
+            String memberstatus = (String) entry.getValue();
+
+            if (memberident.equals(SystemIdentity.getIdentity()))
             {
-                group = new JSONObject();
+                //
+                // We do not add ourselves here whatever.
+                //
 
-                Json.put(group, "groupidentity", groupidentity);
-                Json.put(group, "type", Simple.getPreferenceString(groupprefix + ".type"));
-                Json.put(group, "owner", SystemIdentity.getIdentity());
+                continue;
             }
 
-            Json.put(group, "passphrase", Simple.getPreferenceString(groupprefix + ".passphrase"));
-            Json.put(group, "name", Simple.getPreferenceString(groupprefix + ".name"));
+            JSONObject minfo = RemoteContacts.getContact(memberident);
+            if (minfo == null) continue;
 
-            JSONArray jmembers = new JSONArray();
+            Json.put(minfo, "identity", memberident);
+            Json.put(minfo, "groupstatus", memberstatus);
 
-            //
-            // We add ourselves first and can never exit group.
-            //
-
-            JSONObject ourselves = new JSONObject();
-            RemoteContacts.deliverOwnContact(ourselves);
-
-            Json.put(ourselves, "identity", SystemIdentity.getIdentity());
-            Json.put(ourselves, "status", "active");
-            Json.put(jmembers, ourselves);
-
-            String keyprefix = groupprefix + ".member.";
-            Map<String, Object> members = Simple.getAllPreferences(keyprefix);
-
-            for (Map.Entry<String, ?> entry : members.entrySet())
-            {
-                String memberpref = entry.getKey();
-                if (! memberpref.startsWith(keyprefix)) continue;
-
-                String memberident = memberpref.substring(keyprefix.length());
-                String memberstatus = (String) entry.getValue();
-
-                if (memberident.equals(SystemIdentity.getIdentity()))
-                {
-                    //
-                    // We do not add ourselves here whatever.
-                    //
-
-                    continue;
-                }
-
-                JSONObject minfo = RemoteContacts.getContact(memberident);
-                if (minfo == null) continue;
-
-                Json.put(minfo, "identity", memberident);
-                Json.put(minfo, "status", memberstatus);
-                Json.put(jmembers, minfo);
-            }
-
-            Json.put(group, "members", jmembers);
-
-            putGroup(group);
-            publishGroup(groupidentity);
+            updateMember(groupidentity, minfo, true);
+        }
     }
 
-    public static void publishGroup(String groupidentity)
+    public static boolean updateGroup(JSONObject group, boolean publish)
     {
-        Log.d(LOGTAG,"publishGroup: " + groupidentity);
+        String groupidentity = Json.getString(group, "groupidentity");
+        if (groupidentity == null) return false;
 
-        JSONObject rg = getGroup(groupidentity);
-        if (rg == null) return;
+        JSONObject oldgroup = null;
+        boolean dirty = false;
 
-        Log.d(LOGTAG,"publishGroup: found: " + groupidentity);
-
-        //
-        // In the first step we only send the group header
-        // information with an empty members list for update.
-        //
-
-        JSONObject remotegroup = Json.clone(rg);
-        JSONArray members = Json.getArray(remotegroup,"members");
-        Json.remove(remotegroup, "members");
-
-        JSONObject groupStatusUpdate = new JSONObject();
-
-        Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
-        Json.put(groupStatusUpdate, "idremote", groupidentity);
-        Json.put(groupStatusUpdate, "remotegroup", remotegroup);
-
-        Log.d(LOGTAG, "sta:" + Json.toPretty(remotegroup));
-
-        CommService.sendEncrypted(groupStatusUpdate, true);
-
-        //
-        // In the second step we send each member separately.
-        //
-
-        for (int inx = 0; inx < members.length(); inx++)
+        synchronized (LOGTAG)
         {
-            remotegroup = new JSONObject();
-            Json.put(remotegroup, "groupidentity", groupidentity);
+            oldgroup = getGroup(groupidentity);
 
-            JSONObject member = Json.getObject(members, inx);
-            Json.put(remotegroup, "member", member);
+            if (oldgroup == null)
+            {
+                oldgroup = Json.clone(group);
+
+                if (! oldgroup.has("members")) Json.put(oldgroup, "members", new JSONArray());
+
+                dirty = true;
+            }
+            else
+            {
+                if (! Json.equals(oldgroup, "name", group))
+                {
+                    Json.copy(oldgroup, "name", group);
+                    dirty = true;
+                }
+
+                if (! Json.equals(oldgroup, "owner", group))
+                {
+                    Json.copy(oldgroup, "owner", group);
+                    dirty = true;
+                }
+
+                if (! Json.equals(oldgroup, "passphrase", group))
+                {
+                    Json.copy(oldgroup, "passphrase", group);
+                    dirty = true;
+                }
+            }
+
+            if (dirty) putGroup(oldgroup);
+        }
+
+        if (dirty && publish)
+        {
+            JSONObject pubgroup = Json.clone(oldgroup);
+            Json.remove(pubgroup, "members");
+
+            JSONObject groupStatusUpdate = new JSONObject();
+
+            Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
+            Json.put(groupStatusUpdate, "idremote", groupidentity);
+            Json.put(groupStatusUpdate, "remotegroup", pubgroup);
+
+            CommService.sendEncrypted(groupStatusUpdate, true);
+        }
+
+        return true;
+    }
+
+    public static boolean updateMember(String groupidentity, JSONObject member, boolean publish)
+    {
+
+        JSONObject oldgroup = null;
+        JSONObject oldmember = null;
+        boolean dirty = false;
+
+        synchronized (LOGTAG)
+        {
+            oldgroup = getGroup(groupidentity);
+            if (oldgroup == null) return false;
+
+            String ident = Json.getString(member, "identity");
+            if (ident == null) return false;
+
+            String groupstatus = Json.getString(member, "groupstatus");
+            boolean inactive = (groupstatus == null) || groupstatus.equals("inactive");
+            boolean wasold = false;
+
+            JSONArray members = Json.getArray(oldgroup, "members");
+            if (members == null) Json.put(oldgroup, "members", members = new JSONArray());
+
+            for (int inx = 0; inx < members.length(); inx++)
+            {
+                oldmember = Json.getObject(members, inx);
+                if (oldmember == null) continue;
+
+                if (! Simple.equals(Json.getString(oldmember, "identity"), ident)) continue;
+
+                if (! Json.equals(oldmember, "groupstatus", member))
+                {
+                    Json.copy(oldmember, "groupstatus", member);
+                    dirty = true;
+                }
+
+                if (member.has("userstatus") && ! Json.equals(oldmember, "userstatus", member))
+                {
+                    Json.copy(oldmember, "userstatus", member);
+                    dirty = true;
+                }
+
+                wasold = true;
+                break;
+            }
+
+            if ((! wasold) && (! inactive))
+            {
+                Json.put(members, member);
+                oldmember = member;
+                dirty = true;
+            }
+
+            if (dirty) putGroup(oldgroup);
+        }
+
+        if (dirty && publish)
+        {
+            JSONObject pubgroup = new JSONObject();
+            Json.put(pubgroup, "groupidentity", groupidentity);
+            Json.put(pubgroup, "member", oldmember);
 
             JSONObject groupMemberUpdate = new JSONObject();
 
             Json.put(groupMemberUpdate, "type", "groupMemberUpdate");
             Json.put(groupMemberUpdate, "idremote", groupidentity);
-            Json.put(groupMemberUpdate, "remotegroup", remotegroup);
-
-            Log.d(LOGTAG,"mem:" + Json.toPretty(remotegroup));
+            Json.put(groupMemberUpdate, "remotegroup", pubgroup);
 
             CommService.sendEncrypted(groupMemberUpdate, true);
         }
+
+        return true;
     }
 
     public static boolean isGroup(String groupidentity)

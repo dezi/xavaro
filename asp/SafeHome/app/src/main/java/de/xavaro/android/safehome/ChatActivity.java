@@ -31,10 +31,12 @@ import java.sql.ResultSetMetaData;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
@@ -292,165 +294,130 @@ public class ChatActivity extends AppCompatActivity implements
 
     private void createIncomingMessage(JSONObject chatMessage)
     {
-        try
+        String uuid = Json.getString(chatMessage, "uuid");
+        String date = Json.getString(chatMessage, "date");
+        String message = Json.getString(chatMessage, "message");
+
+        if ((incomingLastMessage == null) || (incomingLastMessage.compareTo(date) < 0))
         {
-            String uuid = chatMessage.getString("uuid");
-            String message = chatMessage.getString("message");
-            String date = chatMessage.getString("date");
-
-            if ((incomingLastMessage == null) || (incomingLastMessage.compareTo(date) < 0))
-            {
-                incomingLastMessage = date;
-            }
-
-            if ((lastDiv == null) || ! lastDivIsIncoming)
-            {
-                lastDiv = new LinearLayout(this);
-                lastDiv.setOrientation(LinearLayout.VERTICAL);
-                lastDiv.setLayoutParams(Simple.layoutParamsMW());
-
-                lastDivIsIncoming = true;
-
-                scrollcontent.addView(lastDiv);
-            }
-
-            FrameLayout textDiv = new FrameLayout(this);
-            textDiv.setLayoutParams(Simple.layoutParamsMW());
-            lastDiv.addView(textDiv);
-
-            FrameLayout textLayout = new FrameLayout(this);
-            textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
-            textLayout.setBackgroundResource(R.drawable.balloon_incoming_normal);
-
-            textDiv.addView(textLayout);
-
-            TextView textView = new TextView(this);
-            textView.setPadding(10, 10, 10, 16);
-            textView.setTextSize(30f);
-            textView.setText(message);
-
-            textLayout.addView(textView);
-
-            TextView statusTime = new TextView(this);
-            statusTime.setId(ID_TIME);
-            statusTime.setPadding(0, 0, 12, 0);
-            statusTime.setText(Simple.getLocal24HTimeFromISO(date));
-            statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.END | Gravity.BOTTOM));
-
-            textLayout.addView(statusTime);
-
-            protoIncoming.put(uuid, textLayout);
-
-            if (! chatMessage.has("read"))
-            {
-                JSONObject feedbackChatMessage = new JSONObject();
-
-                feedbackChatMessage.put("type","readChatMessage");
-                feedbackChatMessage.put("idremote", idremote);
-                feedbackChatMessage.put("uuid", uuid);
-
-                CommService.sendEncryptedReliable(feedbackChatMessage, true);
-
-                chatManager.updateIncomingProtocoll(idremote, chatMessage, "read");
-            }
+            incomingLastMessage = date;
         }
-        catch (JSONException ex)
+
+        if ((lastDiv == null) || ! lastDivIsIncoming)
         {
-            OopsService.log(LOGTAG, ex);
+            lastDiv = new LinearLayout(this);
+            lastDiv.setOrientation(LinearLayout.VERTICAL);
+            lastDiv.setLayoutParams(Simple.layoutParamsMW());
+
+            lastDivIsIncoming = true;
+
+            scrollcontent.addView(lastDiv);
+        }
+
+        FrameLayout textDiv = new FrameLayout(this);
+        textDiv.setLayoutParams(Simple.layoutParamsMW());
+        lastDiv.addView(textDiv);
+
+        FrameLayout textLayout = new FrameLayout(this);
+        textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
+        textLayout.setBackgroundResource(R.drawable.balloon_incoming_normal);
+
+        textDiv.addView(textLayout);
+
+        TextView textView = new TextView(this);
+        textView.setPadding(10, 10, 10, 16);
+        textView.setTextSize(30f);
+        textView.setText(message);
+
+        textLayout.addView(textView);
+
+        TextView statusTime = new TextView(this);
+        statusTime.setId(ID_TIME);
+        statusTime.setPadding(0, 0, 12, 0);
+        statusTime.setText(Simple.getLocal24HTimeFromISO(date));
+        statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.END | Gravity.BOTTOM));
+
+        textLayout.addView(statusTime);
+
+        protoIncoming.put(uuid, textLayout);
+
+        if (! chatMessage.has("read"))
+        {
+            JSONObject feedbackChatMessage = new JSONObject();
+
+            Json.put(feedbackChatMessage, "type", "readChatMessage");
+            Json.put(feedbackChatMessage, "idremote", idremote);
+            Json.put(feedbackChatMessage, "uuid", uuid);
+
+            CommService.sendEncryptedReliable(feedbackChatMessage, true);
+
+            chatManager.updateIncomingProtocoll(idremote, chatMessage, "read");
         }
     }
 
-    private String createOutgoingMessage(JSONObject chatMessage)
+    private void createOutgoingMessage(JSONObject chatMessage)
     {
-        try
+        String uuid = Json.getString(chatMessage, "uuid");
+        String date = Json.getString(chatMessage, "date");
+        String message = Json.getString(chatMessage, "message");
+
+        if ((lastDiv == null) || lastDivIsIncoming)
         {
-            String uuid = chatMessage.has("uuid") ? chatMessage.getString("uuid") : null;
-            String message = chatMessage.has("message") ? chatMessage.getString("message") : null;
-            String date = chatMessage.has("date") ? chatMessage.getString("date") : null;
+            lastDiv = new LinearLayout(this);
+            lastDiv.setOrientation(LinearLayout.VERTICAL);
+            lastDiv.setLayoutParams(Simple.layoutParamsMW());
 
-            if (date == null) date = Simple.nowAsISO();
+            lastDivIsIncoming = false;
 
-            if ((lastDiv == null) || lastDivIsIncoming)
-            {
-                lastDiv = new LinearLayout(this);
-                lastDiv.setOrientation(LinearLayout.VERTICAL);
-                lastDiv.setLayoutParams(Simple.layoutParamsMW());
-
-                lastDivIsIncoming = false;
-
-                scrollcontent.addView(lastDiv);
-            }
-
-            FrameLayout textDiv = new FrameLayout(this);
-            textDiv.setLayoutParams(Simple.layoutParamsMW());
-            lastDiv.addView(textDiv);
-
-            FrameLayout textLayout = new FrameLayout(this);
-            textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
-            textLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal);
-
-            textDiv.addView(textLayout);
-
-            TextView textView = new TextView(this);
-            textView.setId(ID_TEXT);
-            textView.setPadding(10, 10, 24, 16);
-            textView.setTextSize(30f);
-            textView.setText(message);
-
-            textLayout.addView(textView);
-
-            lp = new FrameLayout.LayoutParams(76, 28, Gravity.END | Gravity.BOTTOM);
-            FrameLayout statusFrame = new FrameLayout(this);
-            statusFrame.setLayoutParams(lp);
-
-            textLayout.addView(statusFrame);
-
-            TextView statusTime = new TextView(this);
-            statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.START | Gravity.BOTTOM));
-            statusTime.setId(ID_TIME);
-            statusTime.setText(Simple.getLocal24HTimeFromISO(date));
-
-            statusFrame.addView(statusTime);
-
-            lp = new FrameLayout.LayoutParams(38,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    Gravity.END | Gravity.BOTTOM);
-
-            ImageView statusImage = new ImageView(this);
-            statusImage.setId(ID_STATUS);
-            statusImage.setPadding(4, 4, 4, 4);
-
-            if (chatMessage.has("date")) statusImage.setImageResource(R.drawable.message_unsent);
-            if (chatMessage.has("acks")) statusImage.setImageResource(R.drawable.message_got_receipt_from_server);
-            if (chatMessage.has("recv")) statusImage.setImageResource(R.drawable.message_got_receipt_from_target);
-            if (chatMessage.has("read")) statusImage.setImageResource(R.drawable.message_got_read_receipt_from_target);
-
-            statusFrame.addView(statusImage, lp);
-
-            if (uuid == null)
-            {
-                scrollview.post(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        scrollview.fullScroll(ScrollView.FOCUS_DOWN);
-                    }
-                });
-
-                uuid = chatManager.sendOutgoingMessage(idremote, message);
-            }
-
-            protoOutgoing.put(uuid, textLayout);
-
-            return uuid;
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
+            scrollcontent.addView(lastDiv);
         }
 
-        return null;
+        FrameLayout textDiv = new FrameLayout(this);
+        textDiv.setLayoutParams(Simple.layoutParamsMW());
+        lastDiv.addView(textDiv);
+
+        FrameLayout textLayout = new FrameLayout(this);
+        textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
+        textLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal);
+
+        textDiv.addView(textLayout);
+
+        TextView textView = new TextView(this);
+        textView.setId(ID_TEXT);
+        textView.setPadding(10, 10, 24, 16);
+        textView.setTextSize(30f);
+        textView.setText(message);
+
+        textLayout.addView(textView);
+
+        lp = new FrameLayout.LayoutParams(76, 28, Gravity.END | Gravity.BOTTOM);
+        FrameLayout statusFrame = new FrameLayout(this);
+        statusFrame.setLayoutParams(lp);
+
+        textLayout.addView(statusFrame);
+
+        TextView statusTime = new TextView(this);
+        statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.START | Gravity.BOTTOM));
+        statusTime.setId(ID_TIME);
+        statusTime.setText(Simple.getLocal24HTimeFromISO(date));
+
+        statusFrame.addView(statusTime);
+
+        lp = new FrameLayout.LayoutParams(38,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                Gravity.END | Gravity.BOTTOM);
+
+        ImageView statusImage = new ImageView(this);
+        statusImage.setId(ID_STATUS);
+        statusImage.setPadding(4, 4, 4, 4);
+
+        if (chatMessage.has("acks")) statusImage.setImageResource(R.drawable.message_got_receipt_from_server);
+        if (chatMessage.has("recv")) statusImage.setImageResource(R.drawable.message_got_receipt_from_target);
+        if (chatMessage.has("read")) statusImage.setImageResource(R.drawable.message_got_read_receipt_from_target);
+
+        statusFrame.addView(statusImage, lp);
+
+        protoOutgoing.put(uuid, textLayout);
     }
 
     private View.OnClickListener onTrashClick = new View.OnClickListener()
@@ -472,34 +439,35 @@ public class ChatActivity extends AppCompatActivity implements
         @Override
         public void onClick(View view)
         {
-            try
+            if (((int) input.getTag()) == 0) return;
+            if (input.getText().length() == 0) return;
+
+            final String uuid = UUID.randomUUID().toString();
+            final String message = input.getText().toString();
+
+            input.setText("");
+
+            JSONObject chatMessage = new JSONObject();
+            Json.put(chatMessage, "message", message);
+            Json.put(chatMessage, "date", Simple.nowAsISO());
+            Json.put(chatMessage, "uuid", uuid);
+
+            createOutgoingMessage(chatMessage);
+
+            scrollDown();
+
+            chatManager.sendOutgoingMessage(idremote, chatMessage);
+
+            setMessageUnsendRunnable = new Runnable()
             {
-                if (((int) input.getTag()) == 0) return;
-                if (input.getText().length() == 0) return;
-
-                String message = input.getText().toString();
-                input.setText("");
-
-                JSONObject chatMessage = new JSONObject();
-                chatMessage.put("message", message);
-
-                final String uuid = createOutgoingMessage(chatMessage);
-
-                setMessageUnsendRunnable = new Runnable()
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
-                    {
-                        setMessageUnsend(uuid);
-                    }
-                };
+                    setMessageUnsend(uuid);
+                }
+            };
 
-                handler.postDelayed(setMessageUnsendRunnable, 3000);
-            }
-            catch (JSONException ex)
-            {
-                OopsService.log(LOGTAG, ex);
-            }
+            handler.postDelayed(setMessageUnsendRunnable, 3000);
         }
     };
 
@@ -553,8 +521,8 @@ public class ChatActivity extends AppCompatActivity implements
 
         try
         {
-            JSONObject outgoing = protocoll.has("outgoing") ? protocoll.getJSONObject("outgoing") : null;
-            JSONObject incoming = protocoll.has("incoming") ? protocoll.getJSONObject("incoming") : null;
+            JSONObject outgoing = protocoll.getJSONObject("outgoing");
+            JSONObject incoming = protocoll.getJSONObject("incoming");
 
             Iterator<String> outgoingIter = (outgoing != null) ? outgoing.keys() : null;
             Iterator<String> incomingIter = (incoming != null) ? incoming.keys() : null;
@@ -838,6 +806,13 @@ public class ChatActivity extends AppCompatActivity implements
 
         createIncomingMessage(sendChatMessage);
 
+        scrollDown();
+
+        handler.post(displayRemoteStatus);
+    }
+
+    private void scrollDown()
+    {
         scrollview.post(new Runnable()
         {
             @Override
@@ -846,8 +821,6 @@ public class ChatActivity extends AppCompatActivity implements
                 scrollview.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
-
-        handler.post(displayRemoteStatus);
     }
 
     public void onSetMessageStatus(String uuid, String what)
