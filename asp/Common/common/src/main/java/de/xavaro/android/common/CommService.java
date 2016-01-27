@@ -360,8 +360,6 @@ public class CommService extends Service
 
     public void onRawMessageReceived(byte[] rawMessage)
     {
-        Log.d(LOGTAG, "onRawMessageReceived: received:" + rawMessage.length);
-
         decryptPacket(rawMessage, COMMCLASS_GCM);
     }
 

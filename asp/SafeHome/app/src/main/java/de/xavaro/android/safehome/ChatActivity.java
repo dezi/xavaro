@@ -800,11 +800,9 @@ public class ChatActivity extends AppCompatActivity implements
         }
     };
 
-    public void onIncomingMessage(JSONObject sendChatMessage)
+    public void onIncomingMessage(JSONObject message)
     {
-        Log.d(LOGTAG,"onIncomingMessage:" + sendChatMessage.toString());
-
-        createIncomingMessage(sendChatMessage);
+        createIncomingMessage(message);
 
         scrollDown();
 
@@ -825,8 +823,6 @@ public class ChatActivity extends AppCompatActivity implements
 
     public void onSetMessageStatus(String uuid, String what)
     {
-        Log.d(LOGTAG,"onSetMessageStatus: " + uuid + "=" + what);
-
         FrameLayout textLayout = protoOutgoing.get(uuid);
         if (textLayout == null) return;
 
