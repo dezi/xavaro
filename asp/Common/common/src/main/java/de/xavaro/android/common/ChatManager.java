@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.net.Uri;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,6 +68,9 @@ public class ChatManager implements CommService.CommServiceCallback
 
         CommService.subscribeMessage(this, "sendOnlineStatus");
         CommService.subscribeMessage(this, "recvOnlineStatus");
+
+        CommService.subscribeMessage(this, "groupStatusUpdate");
+        CommService.subscribeMessage(this, "groupMemberUpdate");
     }
 
     public void subscribe(String identity, MessageCallback callback)
@@ -238,6 +242,78 @@ public class ChatManager implements CommService.CommServiceCallback
                     CommService.sendEncryptedReliable(feedbackChatMessage, true);
 
                     if (! wasread) sendNotification(message);
+
+                    return;
+                }
+
+                if (type.equals("groupStatusUpdate") && message.has("remotegroup"))
+                {
+                    JSONObject rgnew = message.getJSONObject("remotegroup");
+
+                    String groupidentity = rgnew.getString("groupidentity");
+                    JSONObject rg = RemoteGroups.getGroup(groupidentity);
+
+                    if (rg == null)
+                    {
+                        rg = rgnew;
+                    }
+                    else
+                    {
+                        Simple.JSONput(rg, "passphrase", Simple.JSONgetString(rgnew, "passphrase"));
+                        Simple.JSONput(rg, "name", Simple.JSONgetString(rgnew, "name"));
+                    }
+
+                    RemoteGroups.putGroup(rg);
+
+                    Log.d(LOGTAG, "onMessageReceived: groupStatusUpdate:");
+                    Log.d(LOGTAG, rg.toString(2));
+
+                    return;
+                }
+
+                if (type.equals("groupMemberUpdate") && message.has("remotegroup"))
+                {
+                    JSONObject rgnew = message.getJSONObject("remotegroup");
+
+                    String groupidentity = rgnew.getString("groupidentity");
+                    JSONObject rg = RemoteGroups.getGroup(groupidentity);
+
+                    if (rg == null) return;
+
+                    JSONObject updmember = rgnew.getJSONObject("member");
+                    String updmemberident = updmember.getString("identity");
+                    String status = updmember.getString("status");
+                    boolean inactive = (status == null) || status.equals("inactive");
+                    boolean wasold = false;
+
+                    JSONArray members = rg.getJSONArray("members");
+
+                    for (int inx = 0; inx < members.length(); inx++)
+                    {
+                        JSONObject oldmember = members.getJSONObject(inx);
+                        String oldmemberident = oldmember.getString("identity");
+
+                        if (! oldmemberident.equals(updmemberident)) continue;
+
+                        if (inactive)
+                        {
+                            members.remove(inx);
+                        }
+                        else
+                        {
+                            members.put(inx, updmember);
+                        }
+
+                        wasold = true;
+                        break;
+                    }
+
+                    if ((! wasold) && (! inactive)) members.put(updmember);
+
+                    RemoteGroups.putGroup(rg);
+
+                    Log.d(LOGTAG, "onMessageReceived: groupMemberUpdate:");
+                    Log.d(LOGTAG, rg.toString(2));
 
                     return;
                 }

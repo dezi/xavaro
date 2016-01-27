@@ -1,9 +1,10 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
+
 import android.app.NotificationManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.Nullable;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -29,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -556,6 +558,11 @@ public class Simple
         return null;
     }
 
+    public static void JSONremove(JSONObject json, String key)
+    {
+        json.remove(key);
+    }
+
     public static void JSONput(JSONObject json, String key, Object val)
     {
         try
@@ -574,6 +581,51 @@ public class Simple
         try
         {
             return json.getString(key);
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static JSONArray JSONgetArray(JSONObject json, String key)
+    {
+        try
+        {
+            return json.getJSONArray(key);
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static JSONObject JSONgetObject(JSONObject json, String key)
+    {
+        try
+        {
+            return json.getJSONObject(key);
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static JSONObject JSONgetObject(JSONArray json, int index)
+    {
+        try
+        {
+            return json.getJSONObject(index);
         }
         catch (JSONException ex)
         {

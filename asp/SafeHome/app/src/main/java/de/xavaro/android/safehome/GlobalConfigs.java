@@ -69,6 +69,9 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final int IconResXavaro             = R.drawable.communication_400x400;
+    public static final int IconResCommunication      = R.drawable.communication_400x400;
+    public static final int IconResChatUser           = R.drawable.communication_400x400;
+    public static final int IconResChatGroup          = R.drawable.communication_400x400;
     public static final int IconResSelectHome         = R.drawable.home_512x512;
     public static final int IconResSelectAssist       = R.drawable.assistant_512x512;
     public static final int IconResSettingsAndroid    = R.drawable.settings_android_512x512;

@@ -683,7 +683,8 @@ public class CommService extends Service
 
                 Log.d(LOGTAG, "sendThread"
                         + ": " + datagramPacket.getData().length
-                        + "=" + mc.msg.getString("type"));
+                        + "=" + mc.msg.getString("type")
+                        + " GCM=" + Simple.isGCMInitialized());
 
                 if (mc.gcm && (idrem != null) && Simple.isGCMInitialized())
                 {

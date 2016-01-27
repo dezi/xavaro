@@ -404,8 +404,27 @@ public class LaunchItem extends FrameLayout implements
 
                 if (type.equals("xavaro"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResCommunity));
-                    icon.setVisibility(VISIBLE);
+                    if (config.has("icontype"))
+                    {
+                        String icontype = config.getString("icontype");
+
+                        if (icontype.equals("user"))
+                        {
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatUser));
+                            icon.setVisibility(VISIBLE);
+                        }
+
+                        if (icontype.equals("group"))
+                        {
+                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatGroup));
+                            icon.setVisibility(VISIBLE);
+                        }
+                    }
+                    else
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResCommunication));
+                        icon.setVisibility(VISIBLE);
+                    }
                 }
 
                 if (type.equals("phone"))

@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import android.util.Log;
 import android.os.Handler;
 import android.os.Bundle;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +37,9 @@ import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.RemoteContacts;
+import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SystemIdentity;
 
 @SuppressWarnings("ResourceType")
 public class ChatActivity extends AppCompatActivity implements
@@ -51,7 +55,10 @@ public class ChatActivity extends AppCompatActivity implements
     private final Handler handler = new Handler();
 
     private ChatManager chatManager;
+    private boolean isuser;
+    private boolean isgroup;
     private String idremote;
+    private String groupStatus;
     private String label;
 
     private FrameLayout.LayoutParams lp;
@@ -83,7 +90,18 @@ public class ChatActivity extends AppCompatActivity implements
         chatManager = ChatManager.getInstance();
 
         idremote = getIntent().getStringExtra("idremote");
-        label = RemoteContacts.getDisplayName(idremote);
+
+        if (RemoteContacts.isContact(idremote))
+        {
+            label = RemoteContacts.getDisplayName(idremote);
+            isuser = true;
+        }
+
+        if (RemoteGroups.isGroup(idremote))
+        {
+            label = RemoteGroups.getDisplayName(idremote);
+            isgroup = true;
+        }
 
         Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.chat_bg_2);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), bmp);
@@ -616,129 +634,199 @@ public class ChatActivity extends AppCompatActivity implements
 
     private boolean wasInChat;
 
+    private void displayRemoteUserStatus()
+    {
+        //
+        // Check if partner is within chat or not.
+        //
+
+        String incomingChat = chatManager.getLastChatStatus(idremote);
+
+        String incomingChatType = null;
+        String incomingChatDate = null;
+
+        if (incomingChat != null)
+        {
+            String[] parts = incomingChat.split("=");
+
+            if (parts.length == 2)
+            {
+                incomingChatType = parts[ 0 ];
+                incomingChatDate = parts[ 1 ];
+            }
+        }
+
+        String chatstatus = null;
+
+        if (incomingChatDate != null)
+        {
+            if (incomingChatType.equals("joinchat"))
+            {
+                chatstatus = "jetzt im Chat";
+                wasInChat = true;
+            }
+            else
+            {
+                if (wasInChat) chatstatus = "hat den Chat verlassen";
+            }
+        }
+
+        //
+        // Figure out latest last online date.
+        //
+
+        String lastOnline = chatManager.getLastOnlineDate(idremote);
+
+        if (incomingLastMessage != null)
+        {
+            if (lastOnline == null)
+            {
+                lastOnline = incomingLastMessage;
+            }
+            else
+            {
+                if (incomingLastMessage.compareTo(lastOnline) > 0)
+                {
+                    lastOnline = incomingLastMessage;
+                }
+            }
+        }
+
+        //
+        // Build online message part.
+        //
+
+        String onlinestatus = null;
+
+        if ((lastOnline != null) &&
+                ((incomingChatDate == null) || ! incomingChatType.equals("joinchat")))
+        {
+            int secsago = Simple.getSecondsAgoFromISO(lastOnline);
+
+            if (secsago < 60)
+            {
+                onlinestatus = "ist online";
+            }
+            else
+            {
+                int daysago = Simple.getDaysAgoFromISO(lastOnline);
+
+                if (daysago == 0)
+                {
+                    onlinestatus = "zul. online heute um "
+                            + Simple.getLocal24HTimeFromISO(lastOnline);
+                }
+
+                if (daysago == 1)
+                {
+                    onlinestatus = "zul. online gestern um "
+                            + Simple.getLocal24HTimeFromISO(lastOnline);
+                }
+
+                if (daysago > 1)
+                {
+                    onlinestatus = "zul. online am "
+                            + Simple.getLocalDateFromISO(lastOnline)
+                            + " um "
+                            + Simple.getLocal24HTimeFromISO(lastOnline);
+                }
+            }
+        }
+
+        //
+        // Assemble display status.
+        //
+
+        String status = chatstatus;
+
+        if (onlinestatus != null)
+        {
+            if (status == null)
+            {
+                status = onlinestatus;
+            }
+            else
+            {
+                status += ", " + onlinestatus;
+            }
+        }
+
+        if (status == null) status = "Offline";
+
+        toolbar.subtitle.setText(status);
+    }
+
+    private void displayRemoteGroupStatus()
+    {
+        if (groupStatus != null) return;
+
+        JSONObject group = RemoteGroups.getGroup(idremote);
+
+        if ((group == null) || ! group.has("members"))
+        {
+            groupStatus = "unbekannt";
+            toolbar.subtitle.setText(groupStatus);
+
+            return;
+        }
+
+        try
+        {
+            SharedPreferences sp = Simple.getSharedPrefs();
+            JSONArray members = group.getJSONArray("members");
+
+            groupStatus = "";
+
+            for (int inx = 0; inx < members.length(); inx++)
+            {
+                JSONObject member = members.getJSONObject(inx);
+                String ident = member.getString("identity");
+
+                if (ident.equals(SystemIdentity.getIdentity()))
+                {
+                    //
+                    // Surprise, we are in the group.
+                    //
+
+                    continue;
+                }
+
+                String name = "";
+
+                String nickpref = "community.remote." + ident + ".nickname";
+
+                if (sp.contains(nickpref) && ! sp.getString(nickpref, "").equals(""))
+                {
+                    name = sp.getString(nickpref, "");
+                }
+                else
+                {
+                    if (member.has("ownerFirstName")) name += " " + member.get("ownerFirstName");
+                    if (member.has("ownerGivenName")) name += " " + member.get("ownerGivenName");
+                }
+
+                if (groupStatus.length() > 0) groupStatus+= ", ";
+                groupStatus += name.trim();
+            }
+
+            if (groupStatus.length() > 0) groupStatus+= ", ";
+            groupStatus += "Du";
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        toolbar.subtitle.setText(groupStatus);
+    }
+
     private final Runnable displayRemoteStatus = new Runnable()
     {
         @Override
         public void run()
         {
-            //
-            // Check if partner is within chat or not.
-            //
-
-            String incomingChat = chatManager.getLastChatStatus(idremote);
-
-            String incomingChatType = null;
-            String incomingChatDate = null;
-
-            if (incomingChat != null)
-            {
-                String[] parts = incomingChat.split("=");
-
-                if (parts.length == 2)
-                {
-                    incomingChatType = parts[ 0 ];
-                    incomingChatDate = parts[ 1 ];
-                }
-            }
-
-            String chatstatus = null;
-
-            if (incomingChatDate != null)
-            {
-                if (incomingChatType.equals("joinchat"))
-                {
-                    chatstatus = "jetzt im Chat";
-                    wasInChat = true;
-                }
-                else
-                {
-                    if (wasInChat) chatstatus = "hat den Chat verlassen";
-                }
-            }
-
-            //
-            // Figure out latest last online date.
-            //
-
-            String lastOnline = chatManager.getLastOnlineDate(idremote);
-
-            if (incomingLastMessage != null)
-            {
-                if (lastOnline == null)
-                {
-                    lastOnline = incomingLastMessage;
-                }
-                else
-                {
-                    if (incomingLastMessage.compareTo(lastOnline) > 0)
-                    {
-                        lastOnline = incomingLastMessage;
-                    }
-                }
-            }
-
-            //
-            // Build online message part.
-            //
-
-            String onlinestatus = null;
-
-            if ((lastOnline != null) &&
-                    ((incomingChatDate == null) || ! incomingChatType.equals("joinchat")))
-            {
-                int secsago = Simple.getSecondsAgoFromISO(lastOnline);
-
-                if (secsago < 60)
-                {
-                    onlinestatus = "ist online";
-                }
-                else
-                {
-                    int daysago = Simple.getDaysAgoFromISO(lastOnline);
-
-                    if (daysago == 0)
-                    {
-                        onlinestatus = "zul. online heute um "
-                                + Simple.getLocal24HTimeFromISO(lastOnline);
-                    }
-
-                    if (daysago == 1)
-                    {
-                        onlinestatus = "zul. online gestern um "
-                                + Simple.getLocal24HTimeFromISO(lastOnline);
-                    }
-
-                    if (daysago > 1)
-                    {
-                        onlinestatus = "zul. online am "
-                                + Simple.getLocalDateFromISO(lastOnline)
-                                + " um "
-                                + Simple.getLocal24HTimeFromISO(lastOnline);
-                    }
-                }
-            }
-
-            //
-            // Assemble display status.
-            //
-
-            String status = chatstatus;
-
-            if (onlinestatus != null)
-            {
-                if (status == null)
-                {
-                    status = onlinestatus;
-                }
-                else
-                {
-                    status += ", " + onlinestatus;
-                }
-            }
-
-            if (status == null) status = "Offline";
-
-            toolbar.subtitle.setText(status);
+            if (isuser) displayRemoteUserStatus();
+            if (isgroup) displayRemoteGroupStatus();
 
             handler.postDelayed(displayRemoteStatus, 10000);
         }

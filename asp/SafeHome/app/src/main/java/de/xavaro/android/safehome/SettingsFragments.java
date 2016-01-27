@@ -35,6 +35,8 @@ import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.RemoteContacts;
+import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
@@ -335,40 +337,36 @@ public class SettingsFragments
 
         private void registerRemotes(Context context, boolean initial)
         {
-            String xpath = "RemoteContacts/identities";
-            JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
-            if (rcs == null) return;
-
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference cb;
 
-            Iterator<String> keysIterator = rcs.keys();
+            //
+            // Remote user contacts.
+            //
 
-            while (keysIterator.hasNext())
+            String usersxpath = "RemoteContacts/identities";
+            JSONObject rcs = PersistManager.getXpathJSONObject(usersxpath);
+
+            if (rcs != null)
             {
-                try
+                Iterator<String> keysIterator = rcs.keys();
+
+                while (keysIterator.hasNext())
                 {
                     String ident = keysIterator.next();
 
                     if (remoteContacts.contains(ident)) continue;
                     remoteContacts.add(ident);
 
-                    String prefkey = keyprefix + ".remote";
-                    JSONObject rc = rcs.getJSONObject(ident);
+                    String prefkey = keyprefix + ".remote.users";
 
-                    String name = "";
-                    if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
-                    if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
-                    if (rc.has("appName")) name += "\n" + rc.getString("appName");
-                    if (rc.has("devName")) name += " - " + rc.getString("devName");
-                    name = name.trim();
-                    if (name.length() == 0) name = "Anonymer Benutzer";
+                    String name = RemoteContacts.getDisplayName(ident);
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
                     pc.setTitle(name);
 
                     preferences.add(pc);
-                    if (! initial) getPreferenceScreen().addPreference(pc);
+                    if (!initial) getPreferenceScreen().addPreference(pc);
 
                     cb = new NicedPreferences.NiceListPreference(context);
                     cb.setKey(prefkey + ".chat." + ident);
@@ -378,11 +376,47 @@ public class SettingsFragments
                     cb.setTitle("Nachricht");
 
                     preferences.add(cb);
-                    if (! initial) getPreferenceScreen().addPreference(cb);
+                    if (!initial) getPreferenceScreen().addPreference(cb);
                 }
-                catch (JSONException ex)
+            }
+
+            //
+            // Remote group contacts.
+            //
+
+            String groupsxpath = "RemoteGroups/groupidentities";
+            JSONObject rgs = PersistManager.getXpathJSONObject(groupsxpath);
+
+            if (rgs != null)
+            {
+                Iterator<String> keysIterator = rgs.keys();
+
+                while (keysIterator.hasNext())
                 {
-                    OopsService.log(LOGTAG, ex);
+                    String ident = keysIterator.next();
+
+                    if (remoteContacts.contains(ident)) continue;
+                    remoteContacts.add(ident);
+
+                    String prefkey = keyprefix + ".remote.groups";
+
+                    String name = RemoteGroups.getDisplayName(ident);
+
+                    pc = new NicedPreferences.NiceCategoryPreference(context);
+                    pc.setTitle(name);
+
+                    preferences.add(pc);
+                    if (!initial) getPreferenceScreen().addPreference(pc);
+
+                    cb = new NicedPreferences.NiceListPreference(context);
+                    cb.setKey(prefkey + ".chat." + ident);
+                    cb.setEntries(sendtoText);
+                    cb.setEntryValues(sendtoVals);
+                    cb.setDefaultValue("inact");
+                    cb.setTitle("Nachricht");
+
+                    preferences.add(cb);
+                    if (!initial) getPreferenceScreen().addPreference(cb);
                 }
             }
         }

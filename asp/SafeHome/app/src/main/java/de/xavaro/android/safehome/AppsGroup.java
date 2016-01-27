@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import de.xavaro.android.common.RemoteContacts;
+import de.xavaro.android.common.RemoteGroups;
+import de.xavaro.android.common.Simple;
 
 //
 // Utility namespace for app launch groups.
@@ -36,18 +38,25 @@ public class AppsGroup
                 JSONObject launchgroup = new JSONObject();
                 JSONArray launchitems = new JSONArray();
 
-                Map<String, Object> xavaros = DitUndDat.SharedPrefs.getPrefix("xavaro");
+                SharedPreferences sp = Simple.getSharedPrefs();
+
+                Map<String, Object> xavaros = Simple.getAllPreferences("xavaro");
 
                 for (String prefkey : xavaros.keySet())
                 {
                     Log.d(LOGTAG, "===========" + prefkey + "=" + xavaros.get(prefkey));
                 }
 
-                SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+                //
+                // Xavaro users.
+                //
 
                 for (String prefkey : xavaros.keySet())
                 {
-                    if (! prefkey.startsWith("xavaro.remote.chat"))
+                    String subtype = "chat";
+                    String keyprefix = "xavaro.remote.users." + subtype + ".";
+
+                    if (! prefkey.startsWith(keyprefix))
                     {
                         continue;
                     }
@@ -56,8 +65,7 @@ public class AppsGroup
 
                     if ((what == null) || what.equals("inact")) continue;
 
-                    String ident = prefkey.substring(19);
-                    String subtype = prefkey.substring(14, 18);
+                    String ident = prefkey.substring(keyprefix.length());
                     String label = RemoteContacts.getDisplayName(ident);
 
                     JSONObject whatsentry = new JSONObject();
@@ -65,6 +73,41 @@ public class AppsGroup
                     whatsentry.put("label", label);
                     whatsentry.put("type", "xavaro");
                     whatsentry.put("subtype", subtype);
+                    whatsentry.put("icontype", "user");
+                    whatsentry.put("identity", ident);
+
+                    launchitems.put(whatsentry);
+
+                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + ident + "=" + label);
+                }
+
+                //
+                // Xavaro groups.
+                //
+
+                for (String prefkey : xavaros.keySet())
+                {
+                    String subtype = "chat";
+                    String keyprefix = "xavaro.remote.groups." + subtype + ".";
+
+                    if (! prefkey.startsWith(keyprefix))
+                    {
+                        continue;
+                    }
+
+                    String what = sp.getString(prefkey, null);
+
+                    if ((what == null) || what.equals("inact")) continue;
+
+                    String ident = prefkey.substring(keyprefix.length());
+                    String label = RemoteGroups.getDisplayName(ident);
+
+                    JSONObject whatsentry = new JSONObject();
+
+                    whatsentry.put("label", label);
+                    whatsentry.put("type", "xavaro");
+                    whatsentry.put("subtype", subtype);
+                    whatsentry.put("icontype", "group");
                     whatsentry.put("identity", ident);
 
                     launchitems.put(whatsentry);

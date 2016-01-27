@@ -9,6 +9,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GcmListenerService;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,8 +81,21 @@ public class GCMMessageService extends GcmListenerService
 
     public static boolean sendMessage(String receiver, JSONObject message)
     {
+        JSONArray tokens = null;
+
+        Log.d(LOGTAG,"sendMessage:" + message.toString());
+
         String token = RemoteContacts.getGCMToken(receiver);
-        if (token == null) return false;
+
+        if (token == null)
+        {
+            tokens = RemoteGroups.getGCMTokens(receiver);
+
+            if ((tokens == null) || (tokens.length() == 0))
+            {
+                return false;
+            }
+        }
 
         try
         {
@@ -89,8 +103,16 @@ public class GCMMessageService extends GcmListenerService
             jData.put("message", message);
 
             JSONObject jGcmData = new JSONObject();
-            jGcmData.put("to",token);
             jGcmData.put("data", jData);
+
+            if (tokens != null)
+            {
+                jGcmData.put("registration_ids", tokens);
+            }
+            else
+            {
+                jGcmData.put("to", token);
+            }
 
             URL url = new URL("https://android.googleapis.com/gcm/send");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

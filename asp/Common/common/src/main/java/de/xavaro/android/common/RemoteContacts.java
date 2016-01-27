@@ -61,6 +61,31 @@ public class RemoteContacts
         return false;
     }
 
+    public static boolean isContact(String ident)
+    {
+        return (getContact(ident) != null);
+    }
+
+    @Nullable
+    public static boolean putContact(JSONObject rc)
+    {
+        try
+        {
+            String ident = rc.getString("identity");
+            String xpath = xPathRoot + "/" + ident;
+            PersistManager.putXpath(xpath, rc);
+            PersistManager.flush();
+
+            return true;
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return false;
+    }
+
     @Nullable
     public static JSONObject getContact(String ident)
     {
@@ -91,7 +116,27 @@ public class RemoteContacts
     {
         JSONObject rc = PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
 
-        if (rc != null)
+        if (rc == null)
+        {
+            //
+            // Check if identity is our own. We could be member
+            // in a group which requests the name.
+            //
+
+            if (ident.equals(SystemIdentity.getIdentity()))
+            {
+                SharedPreferences sp = Simple.getSharedPrefs();
+
+                String name = "";
+
+                name += " " + sp.getString("owner.firstname", "");
+                name += " " + sp.getString("owner.givenname", "");
+                name = name.trim();
+
+                if (name.length() > 0) return name;
+            }
+        }
+        else
         {
             try
             {
