@@ -428,14 +428,15 @@ public class CommService extends Service
             System.arraycopy(data, 36, ackidBytes, 0, 16);
             String ackid = Simple.getUUIDString(ackidBytes);
 
-            JSONObject serverAckMessage = new JSONObject();
+            JSONObject feedbackMessage = new JSONObject();
 
-            Simple.JSONput(serverAckMessage, "type", "serverAckMessage");
-            Simple.JSONput(serverAckMessage, "identity", ident);
-            Simple.JSONput(serverAckMessage, "idremote", idrem);
-            Simple.JSONput(serverAckMessage, "uuid", ackid);
+            Simple.JSONput(feedbackMessage, "type", "feedbackMessage");
+            Simple.JSONput(feedbackMessage, "status", "acks");
+            Simple.JSONput(feedbackMessage, "identity", ident);
+            Simple.JSONput(feedbackMessage, "idremote", idrem);
+            Simple.JSONput(feedbackMessage, "uuid", ackid);
 
-            String ackmess = "JSON" + serverAckMessage.toString();
+            String ackmess = "JSON" + feedbackMessage.toString();
 
             data = ackmess.getBytes();
             ptype = new String(data, 0, 4);
@@ -681,8 +682,7 @@ public class CommService extends Service
 
                 Log.d(LOGTAG, "sendThread"
                         + ": " + datagramPacket.getData().length
-                        + "=" + mc.msg.getString("type")
-                        + " GCM=" + Simple.isGCMInitialized());
+                        + "=" + mc.msg.getString("type"));
 
                 if (mc.gcm && (idrem != null) && Simple.isGCMInitialized())
                 {
@@ -702,14 +702,15 @@ public class CommService extends Service
                             // remote and local identity, since we fake this message.
                             //
 
-                            JSONObject serverAckMessage = new JSONObject();
+                            JSONObject feedbackMessage = new JSONObject();
 
-                            Simple.JSONput(serverAckMessage, "type", "serverAckMessage");
-                            Simple.JSONput(serverAckMessage, "identity", idrem);
-                            Simple.JSONput(serverAckMessage, "idremote", ident);
-                            Simple.JSONput(serverAckMessage, "uuid", ackid);
+                            Simple.JSONput(feedbackMessage, "type", "feedbackMessage");
+                            Simple.JSONput(feedbackMessage, "status", "acks");
+                            Simple.JSONput(feedbackMessage, "identity", idrem);
+                            Simple.JSONput(feedbackMessage, "idremote", ident);
+                            Simple.JSONput(feedbackMessage, "uuid", ackid);
 
-                            deliverMessage(serverAckMessage);
+                            deliverMessage(feedbackMessage);
                         }
                     }
                 }

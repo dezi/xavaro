@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.inputmethodservice.InputMethodService;
 import android.support.annotation.Nullable;
 
 import android.app.NotificationManager;
@@ -404,6 +405,11 @@ public class Simple
     public static NotificationManager getNotificationManager()
     {
         return (NotificationManager) anyContext.getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    public static InputMethodManager getInputMethodManager ()
+    {
+        return (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     public static String getAppName()

@@ -2,11 +2,14 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
+import android.text.InputType;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,14 +30,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.ResultSetMetaData;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
 import de.xavaro.android.common.ChatManager;
-import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
@@ -73,12 +74,15 @@ public class ChatActivity extends AppCompatActivity implements
     private LinearLayout scrollcontent;
     private LinearLayout lastDiv;
 
+    private FrameLayout lastTextLayout;
     private boolean lastDivIsIncoming;
-    private String incomingLastMessage;
+    private String incomingLastDate;
+    private String incomingLastIdent;
 
     private final static int ID_TEXT = 1;
     private final static int ID_STATUS = 2;
     private final static int ID_TIME = 3;
+    private final static int ID_USER = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -177,12 +181,11 @@ public class ChatActivity extends AppCompatActivity implements
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent)
             {
-                Log.d(LOGTAG, "onTouch");
-
                 if (((int) input.getTag()) < 2)
                 {
                     if (((int) input.getTag()) == 0) input.setText("");
 
+                    input.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
                     input.setFocusable(true);
                     input.setFocusableInTouchMode(true);
                     input.setTextColor(0xff000000);
@@ -292,24 +295,33 @@ public class ChatActivity extends AppCompatActivity implements
         }
     }
 
+    private String getRemoteName(JSONObject chatMessage)
+    {
+        String identity = Json.getString(chatMessage, "identity");
+        return RemoteContacts.getDisplayName(identity);
+    }
+
     private void createIncomingMessage(JSONObject chatMessage)
     {
         String uuid = Json.getString(chatMessage, "uuid");
         String date = Json.getString(chatMessage, "date");
         String message = Json.getString(chatMessage, "message");
+        String identity = Json.getString(chatMessage, "identity");
 
-        if ((incomingLastMessage == null) || (incomingLastMessage.compareTo(date) < 0))
+        if ((incomingLastDate == null) || (incomingLastDate.compareTo(date) < 0))
         {
-            incomingLastMessage = date;
+            incomingLastDate = date;
         }
 
-        if ((lastDiv == null) || ! lastDivIsIncoming)
+        if ((lastDiv == null) || !lastDivIsIncoming)
         {
             lastDiv = new LinearLayout(this);
             lastDiv.setOrientation(LinearLayout.VERTICAL);
             lastDiv.setLayoutParams(Simple.layoutParamsMW());
 
             lastDivIsIncoming = true;
+            incomingLastIdent = null;
+            lastTextLayout = null;
 
             scrollcontent.addView(lastDiv);
         }
@@ -318,11 +330,29 @@ public class ChatActivity extends AppCompatActivity implements
         textDiv.setLayoutParams(Simple.layoutParamsMW());
         lastDiv.addView(textDiv);
 
-        FrameLayout textLayout = new FrameLayout(this);
+        if (lastTextLayout != null)
+        {
+            lastTextLayout.setBackgroundResource(R.drawable.balloon_incoming_normal_ext);
+        }
+
+        FrameLayout textLayout = lastTextLayout = new FrameLayout(this);
         textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
         textLayout.setBackgroundResource(R.drawable.balloon_incoming_normal);
 
         textDiv.addView(textLayout);
+
+        if (isgroup && ! Simple.equals(identity, incomingLastIdent))
+        {
+            TextView remoteUser = new TextView(this);
+            remoteUser.setId(ID_USER);
+            remoteUser.setPadding(12, 0, 12, 0);
+            remoteUser.setTypeface(null, Typeface.BOLD);
+            remoteUser.setText(getRemoteName(chatMessage));
+            remoteUser.setTextColor(0xff550390);
+            remoteUser.setLayoutParams(Simple.layoutParamsWW(Gravity.START | Gravity.TOP));
+
+            textLayout.addView(remoteUser);
+        }
 
         TextView textView = new TextView(this);
         textView.setPadding(10, 10, 10, 16);
@@ -333,25 +363,21 @@ public class ChatActivity extends AppCompatActivity implements
 
         TextView statusTime = new TextView(this);
         statusTime.setId(ID_TIME);
-        statusTime.setPadding(0, 0, 12, 0);
+        statusTime.setPadding(12, 0, 12, 0);
         statusTime.setText(Simple.getLocal24HTimeFromISO(date));
         statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.END | Gravity.BOTTOM));
 
         textLayout.addView(statusTime);
 
+        incomingLastIdent = identity;
+
         protoIncoming.put(uuid, textLayout);
 
         if (! chatMessage.has("read"))
         {
-            JSONObject feedbackChatMessage = new JSONObject();
-
-            Json.put(feedbackChatMessage, "type", "readChatMessage");
-            Json.put(feedbackChatMessage, "idremote", idremote);
-            Json.put(feedbackChatMessage, "uuid", uuid);
-
-            CommService.sendEncryptedReliable(feedbackChatMessage, true);
-
-            chatManager.updateIncomingProtocoll(idremote, chatMessage, "read");
+            JSONObject feedBack = Json.clone(chatMessage);
+            Json.put(feedBack, "idremote", idremote);
+            chatManager.sendFeedbackMessage(feedBack, "read");
         }
     }
 
@@ -368,6 +394,7 @@ public class ChatActivity extends AppCompatActivity implements
             lastDiv.setLayoutParams(Simple.layoutParamsMW());
 
             lastDivIsIncoming = false;
+            lastTextLayout = null;
 
             scrollcontent.addView(lastDiv);
         }
@@ -376,7 +403,12 @@ public class ChatActivity extends AppCompatActivity implements
         textDiv.setLayoutParams(Simple.layoutParamsMW());
         lastDiv.addView(textDiv);
 
-        FrameLayout textLayout = new FrameLayout(this);
+        if (lastTextLayout != null)
+        {
+            lastTextLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal_ext);
+        }
+
+        FrameLayout textLayout = lastTextLayout = new FrameLayout(this);
         textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
         textLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal);
 
@@ -488,12 +520,29 @@ public class ChatActivity extends AppCompatActivity implements
             super(context, attrs, defStyle);
         }
 
+
+        private int lastTop;
+        private int lastBottom;
+
+        private Runnable resizeOnLayout = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                scrollviewlp.bottomMargin = lastBottom - lastTop;
+                scrollview.setLayoutParams(scrollviewlp);
+                scrollview.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        };
+
         protected void onLayout(boolean changed, int left, int top, int right, int bottom)
         {
             super.onLayout(changed, left, top, right, bottom);
 
-            scrollviewlp.bottomMargin = bottom - top;
-            scrollview.setLayoutParams(scrollviewlp);
+            lastTop = top;
+            lastBottom = bottom;
+
+            handler.post(resizeOnLayout);
         }
     }
 
@@ -645,17 +694,17 @@ public class ChatActivity extends AppCompatActivity implements
 
         String lastOnline = chatManager.getLastOnlineDate(idremote);
 
-        if (incomingLastMessage != null)
+        if (incomingLastDate != null)
         {
             if (lastOnline == null)
             {
-                lastOnline = incomingLastMessage;
+                lastOnline = incomingLastDate;
             }
             else
             {
-                if (incomingLastMessage.compareTo(lastOnline) > 0)
+                if (incomingLastDate.compareTo(lastOnline) > 0)
                 {
-                    lastOnline = incomingLastMessage;
+                    lastOnline = incomingLastDate;
                 }
             }
         }
