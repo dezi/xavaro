@@ -123,7 +123,7 @@ public class RemoteContacts
             // in a group which requests the name.
             //
 
-            if (ident.equals(SystemIdentity.getIdentity()))
+            if (Simple.equals(ident, SystemIdentity.getIdentity()))
             {
                 SharedPreferences sp = Simple.getSharedPrefs();
 
