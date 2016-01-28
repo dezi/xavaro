@@ -105,9 +105,8 @@ public class Json
         {
             return json.get(key);
         }
-        catch (JSONException ex)
+        catch (JSONException ignore)
         {
-            OopsService.log(LOGTAG, ex);
         }
 
         return null;
@@ -120,9 +119,8 @@ public class Json
         {
             return json.getString(key);
         }
-        catch (JSONException ex)
+        catch (JSONException ignore)
         {
-            OopsService.log(LOGTAG, ex);
         }
 
         return null;
@@ -135,9 +133,8 @@ public class Json
         {
             return json.getJSONArray(key);
         }
-        catch (JSONException ex)
+        catch (JSONException ignore)
         {
-            OopsService.log(LOGTAG, ex);
         }
 
         return null;
@@ -150,9 +147,8 @@ public class Json
         {
             return json.getJSONObject(key);
         }
-        catch (JSONException ex)
+        catch (JSONException ignore)
         {
-            OopsService.log(LOGTAG, ex);
         }
 
         return null;
@@ -165,9 +161,8 @@ public class Json
         {
             return json.getJSONObject(index);
         }
-        catch (JSONException ex)
+        catch (JSONException ignore)
         {
-            OopsService.log(LOGTAG, ex);
         }
 
         return null;

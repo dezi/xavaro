@@ -2,13 +2,23 @@ package de.xavaro.android.safehome;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
+import java.security.acl.LastOwnerException;
+
+import de.xavaro.android.common.ChatManager;
+import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Simple;
+
 public class LaunchItemAlertcall extends LaunchItem
+        implements ChatManager.ChatMessageCallback
 {
     private final static String LOGTAG = LaunchItemAlertcall.class.getSimpleName();
 
@@ -64,6 +74,7 @@ public class LaunchItemAlertcall extends LaunchItem
 
     private AlertDialog alertcallDialog;
     private TextView alertcallTextview;
+    private String alertcallUUID;
     private String alertcallText;
     private int alertcallSeconds;
     private int alertcallStatus;
@@ -94,7 +105,6 @@ public class LaunchItemAlertcall extends LaunchItem
         positive.setOnClickListener(alertOnClickPositive);
 
         Button neutral = alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-
         neutral.setTextSize(24f);
         neutral.setTransformationMethod(null);
         neutral.setOnClickListener(alertOnClickNeutral);
@@ -107,6 +117,40 @@ public class LaunchItemAlertcall extends LaunchItem
         handler.post(alertcallCountdown);
     }
 
+    private void alertcallExecute()
+    {
+        SharedPreferences sp = Simple.getSharedPrefs();
+
+        String groupidentity = sp.getString("alertgroup.groupidentity", null);
+
+        if (groupidentity == null)
+        {
+            String message = "Der Hilferuf konnte nicht ausgelöst werden";
+            alertcallTextview.setText(message);
+            DitUndDat.SpeekDat.speak(message);
+
+            // todo
+
+            return;
+        }
+
+        ChatManager.getInstance().subscribe(groupidentity, this);
+
+        alertcallUUID = Simple.getUUID();
+        String alerttext = "Es wird Hilfe benötigt";
+
+        JSONObject alertmessage = new JSONObject();
+        Json.put(alertmessage, "uuid", alertcallUUID);
+        Json.put(alertmessage, "message", alerttext);
+        Json.put(alertmessage, "priority", "alertcall");
+
+        ChatManager.getInstance().sendOutgoingMessage(groupidentity, alertmessage);
+
+        String message = "Der Hilferuf wurde ausgelöst";
+        alertcallTextview.setText(message);
+        DitUndDat.SpeekDat.speak(message);
+    }
+
     private Runnable alertcallCountdown = new Runnable()
     {
         @Override
@@ -116,16 +160,12 @@ public class LaunchItemAlertcall extends LaunchItem
 
             if (alertcallSeconds == 0)
             {
-                String message = "Der Hilferuf wird nun ausgelöst";
-                alertcallTextview.setText(message);
-                DitUndDat.SpeekDat.speak(message);
-
                 alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Ok");
                 alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
 
                 alertcallStatus = ALERTCALL_EXECUTED;
 
-                Log.d(LOGTAG,"=====================> call");
+                alertcallExecute();
             }
             else
             {
@@ -181,4 +221,53 @@ public class LaunchItemAlertcall extends LaunchItem
         }
     };
 
+    private Runnable speekReceivedMessage = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+
+        }
+    };
+
+    private Runnable speekReadMessage = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+
+        }
+    };
+
+    public void onProtocollMessages(JSONObject protocoll)
+    {
+    }
+
+    public void onIncomingMessage(JSONObject message)
+    {
+        Log.d(LOGTAG, "onIncomingMessage:" + message.toString());
+    }
+
+    public void onSetMessageStatus(String uuid, String what)
+    {
+        Log.d(LOGTAG, "onSetMessageStatus:" + uuid + "=" + what);
+
+        if (! alertcallUUID.equals(uuid)) return;
+        if (what.equals("acks")) return;
+
+        if (what.equals("recv"))
+        {
+            handler.postDelayed(speekReceivedMessage,3000);
+        }
+
+        if (what.equals("read"))
+        {
+            handler.removeCallbacks(speekReceivedMessage);
+            handler.post(speekReadMessage);
+        }
+    }
+
+    public void onRemoteStatus()
+    {
+    }
 }

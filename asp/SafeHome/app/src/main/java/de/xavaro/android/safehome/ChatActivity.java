@@ -46,7 +46,7 @@ import de.xavaro.android.common.SystemIdentity;
 @SuppressWarnings("ResourceType")
 public class ChatActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
-        ChatManager.MessageCallback
+        ChatManager.ChatMessageCallback
 {
     private static final String LOGTAG = ChatActivity.class.getSimpleName();
 

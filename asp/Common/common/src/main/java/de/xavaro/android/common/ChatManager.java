@@ -45,7 +45,7 @@ public class ChatManager implements CommService.CommServiceCallback
 
     private final Context context;
     private final Handler handler = new Handler();
-    private final Map<String, MessageCallback> callbacks = new HashMap<>();
+    private final Map<String, ChatMessageCallback> callbacks = new HashMap<>();
     private final Map<String, String> outgoingChatStatus = new HashMap<>();
     private final Map<String, String> incomingChatStatus = new HashMap<>();
     private final Map<String, String> incomingOnlineStatus = new HashMap<>();
@@ -65,7 +65,7 @@ public class ChatManager implements CommService.CommServiceCallback
         CommService.subscribeMessage(this, "groupMemberUpdate");
     }
 
-    public void subscribe(String identity, MessageCallback callback)
+    public void subscribe(String identity, ChatMessageCallback callback)
     {
         if (! callbacks.containsKey(identity)) callbacks.put(identity, callback);
 
@@ -85,7 +85,7 @@ public class ChatManager implements CommService.CommServiceCallback
         CommService.sendEncrypted(sendOnlineStatus, true);
     }
 
-    public void unsubscribe(String identity, MessageCallback callback)
+    public void unsubscribe(String identity, ChatMessageCallback callback)
     {
         if (callbacks.containsKey(identity)) callbacks.remove(identity);
 
@@ -172,7 +172,7 @@ public class ChatManager implements CommService.CommServiceCallback
                     incomingChatStatus.put(idremote, chatstatus + "=" + chatdate);
                     incomingOnlineStatus.put(idremote, date);
 
-                    MessageCallback callback = callbacks.get(idremote);
+                    ChatMessageCallback callback = callbacks.get(idremote);
                     if (callback != null) callback.onRemoteStatus();
 
                     chatstatus = "online";
@@ -212,7 +212,7 @@ public class ChatManager implements CommService.CommServiceCallback
                     incomingChatStatus.put(idremote, chatstatus + "=" + chatdate);
                     incomingOnlineStatus.put(idremote, date);
 
-                    MessageCallback callback = callbacks.get(idremote);
+                    ChatMessageCallback callback = callbacks.get(idremote);
                     if (callback != null) callback.onRemoteStatus();
 
                     return;
@@ -398,7 +398,7 @@ public class ChatManager implements CommService.CommServiceCallback
             @Override
             public void run()
             {
-                MessageCallback callback = callbacks.get(cbidentity);
+                ChatMessageCallback callback = callbacks.get(cbidentity);
                 if (callback != null) callback.onIncomingMessage(cbmessage);
             }
         });
@@ -428,7 +428,7 @@ public class ChatManager implements CommService.CommServiceCallback
             @Override
             public void run()
             {
-                MessageCallback callback = callbacks.get(cbidentity);
+                ChatMessageCallback callback = callbacks.get(cbidentity);
                 if (callback != null) callback.onSetMessageStatus(cbuuid, cbstatus);
             }
         });
@@ -506,7 +506,7 @@ public class ChatManager implements CommService.CommServiceCallback
 
     //region Callback interface
 
-    public interface MessageCallback
+    public interface ChatMessageCallback
     {
         void onProtocollMessages(JSONObject protocoll);
         void onIncomingMessage(JSONObject message);

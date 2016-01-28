@@ -404,6 +404,11 @@ public class Simple
 
     //region All purpose simple getters
 
+    public static String getUUID()
+    {
+        return UUID.randomUUID().toString();
+    }
+
     public static SharedPreferences getSharedPrefs()
     {
         return PreferenceManager.getDefaultSharedPreferences(anyContext);
