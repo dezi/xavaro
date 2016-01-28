@@ -223,6 +223,11 @@ public class Simple
         return (str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2);
     }
 
+    public static boolean startsWith(String str1, String str2)
+    {
+        return (str1 != null) && (str2 != null) && str1.startsWith(str2);
+    }
+
     public static int compareTo(String str1, String str2)
     {
         if ((str1 != null) && (str2 != null)) return str1.compareTo(str2);

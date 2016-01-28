@@ -130,6 +130,8 @@ public class ChatManager implements CommService.CommServiceCallback
         Json.put(chatMessage, "type", "chatMessage");
         Json.put(chatMessage, "idremote", idremote);
 
+        if (! chatMessage.has("date")) Json.put(chatMessage, "date", Simple.nowAsISO());
+
         CommService.sendEncryptedReliable(chatMessage, true);
 
         updateOutgoingProtocoll(idremote, chatMessage, "send");

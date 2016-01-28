@@ -1,21 +1,17 @@
 package de.xavaro.android.safehome;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 
 import android.os.Environment;
 import android.provider.MediaStore;
 
 import android.graphics.Color;
-import android.speech.tts.TextToSpeech;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -28,12 +24,9 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Gravity;
-import android.view.ViewGroup;
 
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,22 +34,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 
-import de.xavaro.android.common.GCMMessageService;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.SystemIdentity;
 
 //
 // Launch item view on home screen.
 //
 
 public class LaunchItem extends FrameLayout implements
-        ProxyPlayer.Callback,
         SurfaceHolder.Callback,
         DitUndDat.InternetState.Callback,
         BlueTooth.BlueToothConnectCallback
@@ -69,7 +58,13 @@ public class LaunchItem extends FrameLayout implements
 
         String type = Json.getString(config, "type");
 
-        if (Simple.equals(type, "alertcall")) item = new LaunchItemAlertcall(context);
+        if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
+        if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
+
+        if (Simple.equals(type, "ipradio"     )) item = new LaunchItemWebmedia(context);
+        if (Simple.equals(type, "iptelevision")) item = new LaunchItemWebmedia(context);
+        if (Simple.equals(type, "audioplayer" )) item = new LaunchItemWebmedia(context);
+        if (Simple.equals(type, "videoplayer" )) item = new LaunchItemWebmedia(context);
 
         if (item == null) item = new LaunchItem(context);
 
@@ -86,6 +81,7 @@ public class LaunchItem extends FrameLayout implements
 
     protected LaunchGroup parent;
     protected JSONObject config;
+    protected String type;
 
     protected TextView label;
     protected ImageView icon;
@@ -93,9 +89,8 @@ public class LaunchItem extends FrameLayout implements
     protected FrameLayout dimmer;
     protected FrameLayout overlay;
     protected ImageView overicon;
+    protected LaunchGroup directory;
 
-    private String type;
-    private LaunchGroup directory;
     private WebFrame webframe;
 
     public LaunchItem(Context context)
@@ -202,13 +197,38 @@ public class LaunchItem extends FrameLayout implements
         this.config = config;
         this.parent = parent;
 
-        if (config.has("label"))
-        {
-            label.setText(Json.getString(config, "label"));
-        }
+        if (config.has("label")) label.setText(Json.getString(config, "label"));
 
         setBackgroundResource(R.drawable.shadow_black_400x400);
         setVisibility(VISIBLE);
+
+        type = Json.getString(config, "type");
+
+        if (config.has("icon"))
+        {
+            String iconname = Json.getString(config, "icon");
+
+            if (Simple.startsWith(iconname, "http://") || Simple.startsWith(iconname, "https://"))
+            {
+                Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconname);
+
+                if (thumbnail != null)
+                {
+                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setVisibility(VISIBLE);
+                }
+            }
+            else
+            {
+                int resourceId = context.getResources().getIdentifier(iconname, "drawable", context.getPackageName());
+
+                if (resourceId > 0)
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, resourceId));
+                    icon.setVisibility(VISIBLE);
+                }
+            }
+        }
 
         this.setConfig();
     }
@@ -228,353 +248,256 @@ public class LaunchItem extends FrameLayout implements
                 GlobalConfigs.weLikeThis(context, packageName);
             }
 
-            if (config.has("icon"))
+            if (type.equals("select_home"))
             {
-                String iconname = config.getString("icon");
+                packageName = DitUndDat.DefaultApps.getDefaultHome(context);
 
-                if (iconname.startsWith("http://") || iconname.startsWith("https://"))
+                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectHome));
+                icon.setVisibility(VISIBLE);
+                targetIcon = overicon;
+            }
+
+            if (type.equals("select_assist"))
+            {
+                packageName = DitUndDat.DefaultApps.getDefaultAssist(context);
+
+                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
+                icon.setVisibility(VISIBLE);
+                targetIcon = overicon;
+            }
+
+            if (type.equals("developer"))
+            {
+                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResTesting));
+                icon.setVisibility(VISIBLE);
+            }
+
+            if (type.equals("settings") && config.has("subtype"))
+            {
+                String subtype = config.getString("subtype");
+
+                if (subtype.equals("safehome"))
                 {
-                    Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconname);
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsSafehome));
+                    icon.setVisibility(VISIBLE);
+                }
 
-                    if (thumbnail != null)
+                if (subtype.equals("android"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsAndroid));
+                    icon.setVisibility(VISIBLE);
+                }
+            }
+
+            if (type.equals("firewall"))
+            {
+                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResFireWall));
+                icon.setVisibility(VISIBLE);
+            }
+
+            if (type.equals("webconfig") && config.has("subtype"))
+            {
+                String subtype = config.getString("subtype");
+
+                if (subtype.equals("newspaper"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigNewspaper));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (subtype.equals("magazine"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigMagazine));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (subtype.equals("pictorial"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigPictorial));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (subtype.equals("shopping"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigShopping));
+                    icon.setVisibility(VISIBLE);
+                }
+
+                if (subtype.equals("erotics"))
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigErotics));
+                    icon.setVisibility(VISIBLE);
+                }
+            }
+
+            if (type.equals("xavaro"))
+            {
+                if (config.has("icontype"))
+                {
+                    String icontype = config.getString("icontype");
+
+                    if (icontype.equals("user"))
                     {
-                        icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatUser));
+                        icon.setVisibility(VISIBLE);
+                    }
+
+                    if (icontype.equals("group"))
+                    {
+                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatGroup));
                         icon.setVisibility(VISIBLE);
                     }
                 }
                 else
                 {
-                    int resourceId = context.getResources().getIdentifier(iconname, "drawable", context.getPackageName());
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResCommunication));
+                    icon.setVisibility(VISIBLE);
+                }
+            }
 
-                    if (resourceId > 0)
+            if (type.equals("phone"))
+            {
+                if (config.has("phonenumber"))
+                {
+                    targetIcon = icon;
+
+                    String phone = config.getString("phonenumber");
+                    Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
+
+                    if (thumbnail != null)
                     {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, resourceId));
+                        thumbnail = StaticUtils.getCircleBitmap(thumbnail);
+
+                        icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
                         icon.setVisibility(VISIBLE);
+                        targetIcon = overicon;
                     }
-                }
-            }
 
-            if (!config.has("type"))
-            {
-                if (config.has("audiourl")) type = "audioplayer";
-                if (config.has("videourl")) type = "videoplayer";
-            }
-            else
-            {
-                type = config.getString("type");
-
-                if (type.equals("select_home"))
-                {
-                    packageName = DitUndDat.DefaultApps.getDefaultHome(context);
-
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectHome));
-                    icon.setVisibility(VISIBLE);
-                    targetIcon = overicon;
-                }
-
-                if (type.equals("select_assist"))
-                {
-                    packageName = DitUndDat.DefaultApps.getDefaultAssist(context);
-
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
-                    icon.setVisibility(VISIBLE);
-                    targetIcon = overicon;
-                }
-
-                if (type.equals("health"))
-                {
                     if (config.has("subtype"))
                     {
                         String subtype = config.getString("subtype");
 
-                        if (subtype.equals("bpm"))
+                        if (subtype.equals("text"))
                         {
-                            if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this, "bpm");
-
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthBPM));
-                            icon.setVisibility(VISIBLE);
+                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppText));
+                            targetIcon.setVisibility(VISIBLE);
                         }
-
-                        if (subtype.equals("scale"))
+                        if (subtype.equals("voip"))
                         {
-                            if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this, "scale");
-
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthScale));
-                            icon.setVisibility(VISIBLE);
+                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppCall));
+                            targetIcon.setVisibility(VISIBLE);
                         }
-
-                        if (subtype.equals("sensor"))
-                        {
-                            if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this, "sensor");
-
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthSensor));
-                            icon.setVisibility(VISIBLE);
-                        }
-
-                        if (subtype.equals("glucose"))
-                        {
-                            if (handler == null) handler = new Handler();
-                            HealthGroup.subscribeDevice(this, "glucose");
-
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealthGlucose));
-                            icon.setVisibility(VISIBLE);
-                        }
-                    }
-                    else
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResHealth));
-                        icon.setVisibility(VISIBLE);
                     }
                 }
-
-                if (type.equals("developer"))
+                else
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResTesting));
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneApp));
                     icon.setVisibility(VISIBLE);
                 }
+            }
 
-                if (type.equals("settings") && config.has("subtype"))
+            if (type.equals("whatsapp"))
+            {
+                GlobalConfigs.likeWhatsApp = true;
+
+                if (config.has("waphonenumber"))
                 {
-                    String subtype = config.getString("subtype");
+                    targetIcon = icon;
 
-                    if (subtype.equals("safehome"))
+                    String phone = config.getString("waphonenumber");
+                    Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
+
+                    if (thumbnail != null)
                     {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsSafehome));
+                        thumbnail = StaticUtils.getCircleBitmap(thumbnail);
+
+                        icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
                         icon.setVisibility(VISIBLE);
-                    }
-
-                    if (subtype.equals("android"))
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsAndroid));
-                        icon.setVisibility(VISIBLE);
-                    }
-                }
-
-                if (type.equals("firewall"))
-                {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResFireWall));
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (type.equals("iptelevision"))
-                {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResIPTelevision));
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (type.equals("ipradio"))
-                {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResIPRadio));
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (type.equals("webconfig") && config.has("subtype"))
-                {
-                    String subtype = config.getString("subtype");
-
-                    if (subtype.equals("newspaper"))
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigNewspaper));
-                        icon.setVisibility(VISIBLE);
-                    }
-
-                    if (subtype.equals("magazine"))
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigMagazine));
-                        icon.setVisibility(VISIBLE);
-                    }
-
-                    if (subtype.equals("pictorial"))
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigPictorial));
-                        icon.setVisibility(VISIBLE);
-                    }
-
-                    if (subtype.equals("shopping"))
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigShopping));
-                        icon.setVisibility(VISIBLE);
-                    }
-
-                    if (subtype.equals("erotics"))
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigErotics));
-                        icon.setVisibility(VISIBLE);
-                    }
-                }
-
-                if (type.equals("xavaro"))
-                {
-                    if (config.has("icontype"))
-                    {
-                        String icontype = config.getString("icontype");
-
-                        if (icontype.equals("user"))
-                        {
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatUser));
-                            icon.setVisibility(VISIBLE);
-                        }
-
-                        if (icontype.equals("group"))
-                        {
-                            icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatGroup));
-                            icon.setVisibility(VISIBLE);
-                        }
-                    }
-                    else
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResCommunication));
-                        icon.setVisibility(VISIBLE);
-                    }
-                }
-
-                if (type.equals("phone"))
-                {
-                    if (config.has("phonenumber"))
-                    {
-                        targetIcon = icon;
-
-                        String phone = config.getString("phonenumber");
-                        Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
-
-                        if (thumbnail != null)
-                        {
-                            thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                            icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
-                            icon.setVisibility(VISIBLE);
-                            targetIcon = overicon;
-                        }
-
-                        if (config.has("subtype"))
-                        {
-                            String subtype = config.getString("subtype");
-
-                            if (subtype.equals("text"))
-                            {
-                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppText));
-                                targetIcon.setVisibility(VISIBLE);
-                            }
-                            if (subtype.equals("voip"))
-                            {
-                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppCall));
-                                targetIcon.setVisibility(VISIBLE);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneApp));
-                        icon.setVisibility(VISIBLE);
-                    }
-                }
-
-                if (type.equals("whatsapp"))
-                {
-                    GlobalConfigs.likeWhatsApp = true;
-
-                    if (config.has("waphonenumber"))
-                    {
-                        targetIcon = icon;
-
-                        String phone = config.getString("waphonenumber");
-                        Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
-
-                        if (thumbnail != null)
-                        {
-                            thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                            icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
-                            icon.setVisibility(VISIBLE);
-                            targetIcon = overicon;
-                        }
-
-                        if (config.has("subtype"))
-                        {
-                            String subtype = config.getString("subtype");
-
-                            if (subtype.equals("chat"))
-                            {
-                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppChat));
-                                targetIcon.setVisibility(VISIBLE);
-                            }
-                            if (subtype.equals("voip"))
-                            {
-                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppVoip));
-                                targetIcon.setVisibility(VISIBLE);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsApp));
-                        icon.setVisibility(VISIBLE);
-                    }
-                }
-
-                if (type.equals("skype"))
-                {
-                    GlobalConfigs.likeSkype = true;
-
-                    if (config.has("skypename"))
-                    {
-                        String skypename = config.getString("skypename");
-                        Bitmap thumbnail = ProfileImages.getSkypeProfileBitmap(context, skypename);
-
-                        if (thumbnail != null)
-                        {
-                            thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                            icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
-                            icon.setVisibility(VISIBLE);
-                            targetIcon = overicon;
-                        }
-
-                        if (config.has("subtype"))
-                        {
-                            String subtype = config.getString("subtype");
-
-                            if (subtype.equals("chat"))
-                            {
-                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeChat));
-                                targetIcon.setVisibility(VISIBLE);
-                            }
-                            if (subtype.equals("voip"))
-                            {
-                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVoip));
-                                targetIcon.setVisibility(VISIBLE);
-                            }
-                            if (subtype.equals("vica"))
-                            {
-                                targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVica));
-                                targetIcon.setVisibility(VISIBLE);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkype));
-                        icon.setVisibility(VISIBLE);
-                    }
-                }
-
-                if (type.equals("webframe"))
-                {
-                    if (config.has("name"))
-                    {
-                        String name = config.getString("name");
-
-                        label.setText(WebFrame.getConfigLabel(context, name));
-                        setVisibility(VISIBLE);
-
-                        icon.setImageDrawable(WebFrame.getConfigIconDrawable(context, name));
-                        icon.setVisibility(VISIBLE);
-
                         targetIcon = overicon;
                     }
+
+                    if (config.has("subtype"))
+                    {
+                        String subtype = config.getString("subtype");
+
+                        if (subtype.equals("chat"))
+                        {
+                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppChat));
+                            targetIcon.setVisibility(VISIBLE);
+                        }
+                        if (subtype.equals("voip"))
+                        {
+                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppVoip));
+                            targetIcon.setVisibility(VISIBLE);
+                        }
+                    }
+                }
+                else
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsApp));
+                    icon.setVisibility(VISIBLE);
+                }
+            }
+
+            if (type.equals("skype"))
+            {
+                GlobalConfigs.likeSkype = true;
+
+                if (config.has("skypename"))
+                {
+                    String skypename = config.getString("skypename");
+                    Bitmap thumbnail = ProfileImages.getSkypeProfileBitmap(context, skypename);
+
+                    if (thumbnail != null)
+                    {
+                        thumbnail = StaticUtils.getCircleBitmap(thumbnail);
+
+                        icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                        icon.setVisibility(VISIBLE);
+                        targetIcon = overicon;
+                    }
+
+                    if (config.has("subtype"))
+                    {
+                        String subtype = config.getString("subtype");
+
+                        if (subtype.equals("chat"))
+                        {
+                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeChat));
+                            targetIcon.setVisibility(VISIBLE);
+                        }
+                        if (subtype.equals("voip"))
+                        {
+                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVoip));
+                            targetIcon.setVisibility(VISIBLE);
+                        }
+                        if (subtype.equals("vica"))
+                        {
+                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVica));
+                            targetIcon.setVisibility(VISIBLE);
+                        }
+                    }
+                }
+                else
+                {
+                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkype));
+                    icon.setVisibility(VISIBLE);
+                }
+            }
+
+            if (type.equals("webframe"))
+            {
+                if (config.has("name"))
+                {
+                    String name = config.getString("name");
+
+                    label.setText(WebFrame.getConfigLabel(context, name));
+                    setVisibility(VISIBLE);
+
+                    icon.setImageDrawable(WebFrame.getConfigIconDrawable(context, name));
+                    icon.setVisibility(VISIBLE);
+
+                    targetIcon = overicon;
                 }
             }
         }
@@ -620,231 +543,6 @@ public class LaunchItem extends FrameLayout implements
     // Flag if media playing is active here.
     //
 
-    private boolean isPlayingMedia;
-    private boolean isPlayingAudio;
-    private boolean isPlayingVideo;
-
-    //
-    // Bubble up launch items for player control.
-    //
-
-    private ArrayList<LaunchItem> isPlayingParents = new ArrayList<>();
-
-    //region ProxyPlayer.Callback interface.
-
-    public void onPlaybackPrepare()
-    {
-        clearAndPost(playbackPrepare);
-    }
-
-    public void onPlaybackStartet()
-    {
-        clearAndPost(playbackStartet);
-    }
-
-    public void onPlaybackPaused()
-    {
-        clearAndPost(playbackPaused);
-    }
-
-    public void onPlaybackResumed()
-    {
-        clearAndPost(playbackResumed);
-    }
-
-    public void onPlaybackFinished()
-    {
-        clearAndPost(playbackFinished);
-    }
-
-    public void onPlaybackMeta(String meta)
-    {
-        Log.d(LOGTAG, "onPlaybackMeta: " + meta);
-    }
-
-    private void clearAndPost(Runnable start)
-    {
-        handler.removeCallbacks(playbackPrepare);
-        handler.removeCallbacks(playbackStartet);
-        handler.removeCallbacks(playbackPaused);
-        handler.removeCallbacks(playbackResumed);
-        handler.removeCallbacks(playbackFinished);
-
-        handler.postDelayed(start, 5);
-    }
-
-    //
-    // Required handlers for thread change.
-    //
-
-    private final Runnable playbackPrepare = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            Log.d(LOGTAG, "playbackPrepare");
-
-            for (LaunchItem li : isPlayingParents)
-            {
-                li.setPlaybackPrepare();
-            }
-
-            if (isPlayingVideo)
-            {
-                VideoSurface.getInstance().onPlaybackPrepare();
-            }
-        }
-    };
-
-    private final Runnable playbackStartet = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            Log.d(LOGTAG, "playbackStartet");
-
-            for (LaunchItem li : isPlayingParents)
-            {
-                li.setPlaybackStartet();
-            }
-
-            if (isPlayingVideo)
-            {
-                VideoSurface.getInstance().onPlaybackStartet();
-            }
-        }
-    };
-
-    private final Runnable playbackPaused = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            Log.d(LOGTAG, "playbackPaused");
-
-            for (LaunchItem li : isPlayingParents)
-            {
-                li.setPlaybackPaused();
-            }
-
-            if (isPlayingVideo)
-            {
-                VideoSurface.getInstance().onPlaybackPaused();
-            }
-        }
-    };
-
-    private final Runnable playbackResumed = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            Log.d(LOGTAG, "playbackResumed");
-
-            for (LaunchItem li : isPlayingParents)
-            {
-                li.setPlaybackResumed();
-            }
-
-            if (isPlayingVideo)
-            {
-                VideoSurface.getInstance().onPlaybackResumed();
-            }
-        }
-    };
-
-    private final Runnable playbackFinished = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            Log.d(LOGTAG, "playbackFinished");
-
-            for (LaunchItem li : isPlayingParents)
-            {
-                li.setPlaybackFinished();
-            }
-
-            if (isPlayingVideo)
-            {
-                VideoSurface.getInstance().onPlaybackFinished();
-            }
-        }
-    };
-
-    //endregion ProxiPlayer callback interface.
-
-    //region Media playback control.
-
-    public void setPlaybackPrepare()
-    {
-        Log.d(LOGTAG, "setPlaybackPrepare:" + label.getText());
-
-        isPlayingMedia = true;
-
-        setSpinner(true);
-    }
-
-    public void setPlaybackStartet()
-    {
-        Log.d(LOGTAG, "setPlaybackStartet:" + label.getText());
-
-        setSpinner(false);
-
-        oversize.width = layout.width / 3;
-        oversize.height = layout.height / 3;
-
-        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
-        overicon.setVisibility(VISIBLE);
-        overlay.setVisibility(VISIBLE);
-    }
-
-    public void setPlaybackPaused()
-    {
-        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_play_190x190));
-    }
-
-    public void setPlaybackResumed()
-    {
-        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
-    }
-
-    public void setPlaybackFinished()
-    {
-        setSpinner(false);
-
-        oversize.width = layout.width / 4;
-        oversize.height = layout.height / 4;
-
-        overicon.setVisibility(INVISIBLE);
-        overlay.setVisibility(INVISIBLE);
-
-        isPlayingMedia = false;
-    }
-
-    private ProgressBar spinner;
-
-    private void setSpinner(boolean visible)
-    {
-        if ((spinner != null) && (spinner.getParent() != null))
-        {
-            ((ViewGroup) spinner.getParent()).removeView(spinner);
-        }
-
-        if (visible)
-        {
-            if (spinner == null)
-            {
-                spinner = new ProgressBar(context, null, android.R.attr.progressBarStyleSmall);
-                spinner.getIndeterminateDrawable().setColorFilter(0xffff0000, PorterDuff.Mode.MULTIPLY);
-                spinner.setPadding(40, 40, 40, 80);
-            }
-
-            this.addView(spinner);
-        }
-    }
-
-    //endregion Media playback control.
 
     public void onInternetChanged()
     {
@@ -874,21 +572,11 @@ public class LaunchItem extends FrameLayout implements
         }
     }
 
-    private void onMyOverlayClick()
+    protected void onMyOverlayClick()
     {
-        if (isPlayingMedia)
-        {
-            ProxyPlayer pp = ProxyPlayer.getInstance();
-
-            if (pp.isPlaying())
-            {
-                pp.playerPause();
-            }
-            else
-            {
-                pp.playerResume();
-            }
-        }
+        //
+        // To be overridden...
+        //
     }
 
     protected void onMyClick()
@@ -911,11 +599,7 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("select_home"  )) { launchSelectHome();     return; }
         if (type.equals("select_assist")) { launchSelectAssist();   return; }
         if (type.equals("firewall"     )) { launchFireWall();       return; }
-        if (type.equals("iptelevision" )) { launchIPTelevision();   return; }
-        if (type.equals("ipradio"      )) { launchIPRadio();        return; }
         if (type.equals("webconfig"    )) { launchWebConfig();      return; }
-        if (type.equals("audioplayer"  )) { launchAudioPlayer();    return; }
-        if (type.equals("videoplayer"  )) { launchVideoPlayer();    return; }
         if (type.equals("genericapp"   )) { launchGenericApp();     return; }
         if (type.equals("directory"    )) { launchDirectory();      return; }
         if (type.equals("developer"    )) { launchDeveloper();      return; }
@@ -926,7 +610,6 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("phone"        )) { launchPhone();          return; }
         if (type.equals("xavaro"       )) { launchXavaro();         return; }
         if (type.equals("skype"        )) { launchSkype();          return; }
-        if (type.equals("health"       )) { launchHealth();         return; }
         // @formatter:on
 
         Toast.makeText(getContext(), "Nix launcher type <" + type + "> configured.", Toast.LENGTH_LONG).show();
@@ -1212,41 +895,6 @@ public class LaunchItem extends FrameLayout implements
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
-    private void launchIPTelevision()
-    {
-        if (directory == null)
-        {
-            directory = new WebStream(context, "webiptv");
-        }
-
-        ((HomeActivity) context).addViewToBackStack(directory);
-    }
-
-    private void launchIPRadio()
-    {
-        if (directory == null)
-        {
-            directory = new WebStream(context, "webradio");
-        }
-
-        ((HomeActivity) context).addViewToBackStack(directory);
-    }
-
-    private void launchHealth()
-    {
-        if (config.has("subtype"))
-        {
-            return;
-        }
-
-        if (directory == null)
-        {
-            directory = new HealthGroup(context);
-        }
-
-        ((HomeActivity) context).addViewToBackStack(directory);
-    }
-
     private void launchWebConfig()
     {
         if (!config.has("subtype"))
@@ -1323,45 +971,6 @@ public class LaunchItem extends FrameLayout implements
         */
     }
 
-    private void launchVideoPlayer()
-    {
-        if (!config.has("videourl"))
-        {
-            Toast.makeText(getContext(), "Nix <videourl> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        if (handler == null) handler = new Handler();
-
-        try
-        {
-            String videourl = config.getString("videourl");
-
-            isPlayingParents = new ArrayList<>();
-
-            LaunchItem bubble = this;
-
-            while (bubble != null)
-            {
-                isPlayingParents.add(bubble);
-
-                if (bubble.getLaunchGroup() == null) break;
-
-                bubble = bubble.getLaunchGroup().getLaunchItem();
-            }
-
-            ProxyPlayer.getInstance().setVideoUrl(context, videourl, this);
-            isPlayingVideo = true;
-
-            VideoSurface.getInstance();
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
@@ -1377,45 +986,6 @@ public class LaunchItem extends FrameLayout implements
     public void surfaceDestroyed(SurfaceHolder holder)
     {
     }
-
-    private void launchAudioPlayer()
-    {
-        if (!config.has("audiourl"))
-        {
-            Toast.makeText(getContext(), "Nix <audiourl> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            String audiourl = config.getString("audiourl");
-
-            if (handler == null) handler = new Handler();
-
-            isPlayingParents = new ArrayList<>();
-
-            LaunchItem bubble = this;
-
-            while (bubble != null)
-            {
-                isPlayingParents.add(bubble);
-
-                if (bubble.getLaunchGroup() == null) break;
-
-                bubble = bubble.getLaunchGroup().getLaunchItem();
-            }
-
-            ProxyPlayer.getInstance().setAudioUrl(context, audiourl, this);
-            isPlayingAudio = true;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    public TextToSpeech ttob;
 
     //region BlueTooth connect states
 

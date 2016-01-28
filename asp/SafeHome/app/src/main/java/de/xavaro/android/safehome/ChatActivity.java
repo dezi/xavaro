@@ -398,6 +398,8 @@ public class ChatActivity extends AppCompatActivity implements
         String date = Json.getString(chatMessage, "date");
         String message = Json.getString(chatMessage, "message");
 
+        if (date == null) date = "??.??";
+
         if ((lastDiv == null) || lastDivIsIncoming)
         {
             lastDiv = new LinearLayout(this);

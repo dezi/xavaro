@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.StaticUtils;
 
@@ -133,9 +134,14 @@ public class WebStream extends LaunchGroup
 
                     for (int inx = 0; inx < channels.length(); inx++)
                     {
-                        JSONObject channel = channels.getJSONObject(inx);
+                        JSONObject channel = Json.clone(channels.getJSONObject(inx));
 
-                        label = channel.getString("label");
+                        if (channel.has("audiourl")) Json.put(channel, "type", "audioplayer");
+                        if (channel.has("videourl")) Json.put(channel, "type", "videoplayer");
+
+                        label = Json.getString(channel, "label");
+                        if (label == null) continue;
+
                         key = ptype + "." + website + ":" + label.replace(" ", "_");
 
                         if (StaticUtils.getSharedPrefsBoolean(context, key))

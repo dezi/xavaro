@@ -241,7 +241,6 @@ public class LaunchItemAlertcall extends LaunchItem
         Log.d(LOGTAG, "onSetMessageStatus:" + uuid + "=" + what);
 
         if (! alertcallUUID.equals(uuid)) return;
-        if (what.equals("acks")) return;
 
         if (what.equals("recv"))
         {
