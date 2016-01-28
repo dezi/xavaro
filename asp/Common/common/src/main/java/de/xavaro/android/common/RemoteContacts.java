@@ -66,7 +66,6 @@ public class RemoteContacts
         return (getContact(ident) != null);
     }
 
-    @Nullable
     public static boolean putContact(JSONObject rc)
     {
         try

@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.text.InputType;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -58,6 +57,7 @@ public class ChatActivity extends AppCompatActivity implements
     private final Handler handler = new Handler();
 
     private ChatManager chatManager;
+    private boolean isinitialized;
     private boolean isuser;
     private boolean isgroup;
     private String idremote;
@@ -227,11 +227,11 @@ public class ChatActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onResume()
+    protected void onStart()
     {
-        Log.d(LOGTAG, "onResume...");
+        Log.d(LOGTAG, "onStart...");
 
-        super.onResume();
+        super.onStart();
 
         chatManager.subscribe(idremote, this);
     }
@@ -308,7 +308,7 @@ public class ChatActivity extends AppCompatActivity implements
         String message = Json.getString(chatMessage, "message");
         String identity = Json.getString(chatMessage, "identity");
 
-        if ((incomingLastDate == null) || (incomingLastDate.compareTo(date) < 0))
+        if ((incomingLastDate == null) || (Simple.compareTo(incomingLastDate,date) < 0))
         {
             incomingLastDate = date;
         }
@@ -520,7 +520,6 @@ public class ChatActivity extends AppCompatActivity implements
             super(context, attrs, defStyle);
         }
 
-
         private int lastTop;
         private int lastBottom;
 
@@ -566,75 +565,71 @@ public class ChatActivity extends AppCompatActivity implements
 
     public void onProtocollMessages(JSONObject protocoll)
     {
+        if (isinitialized) return;
+        isinitialized = true;
+
         Log.d(LOGTAG, "onProtocollMessages: " + protocoll.toString());
 
-        try
+        JSONObject outgoing = Json.getObject(protocoll, "outgoing");
+        JSONObject incoming = Json.getObject(protocoll, "incoming");
+
+        Iterator<String> outgoingIter = (outgoing != null) ? outgoing.keys() : null;
+        Iterator<String> incomingIter = (incoming != null) ? incoming.keys() : null;
+
+        String outgoingUuid = null;
+        String incomingUuid = null;
+
+        while (true)
         {
-            JSONObject outgoing = protocoll.getJSONObject("outgoing");
-            JSONObject incoming = protocoll.getJSONObject("incoming");
-
-            Iterator<String> outgoingIter = (outgoing != null) ? outgoing.keys() : null;
-            Iterator<String> incomingIter = (incoming != null) ? incoming.keys() : null;
-
-            String outgoingUuid = null;
-            String incomingUuid = null;
-
-            while (true)
+            if ((outgoingUuid == null) && (outgoingIter != null) && outgoingIter.hasNext())
             {
-                if ((outgoingUuid == null) && (outgoingIter != null) && outgoingIter.hasNext())
+                outgoingUuid = outgoingIter.next();
+            }
+
+            if ((incomingUuid == null) && (incomingIter != null) && incomingIter.hasNext())
+            {
+                incomingUuid = incomingIter.next();
+            }
+
+            if ((outgoingUuid == null) && (incomingUuid == null)) break;
+
+            boolean nextOutgoing = true;
+            boolean nextIncoming = true;
+
+            if ((outgoingUuid != null) && (incomingUuid != null))
+            {
+                String outgoingDate = Json.getString(Json.getObject(outgoing, outgoingUuid), "date");
+                String incomingDate = Json.getString(Json.getObject(incoming, incomingUuid), "date");
+
+                if (Simple.compareTo(outgoingDate, incomingDate) > 0)
                 {
-                    outgoingUuid = outgoingIter.next();
+                    nextOutgoing = false;
                 }
-
-                if ((incomingUuid == null) && (incomingIter != null) && incomingIter.hasNext())
+                else
                 {
-                    incomingUuid = incomingIter.next();
-                }
-
-                if ((outgoingUuid == null) && (incomingUuid == null)) break;
-
-                boolean nextOutgoing = true;
-                boolean nextIncoming = true;
-
-                if ((outgoingUuid != null) && (incomingUuid != null))
-                {
-                    String outgoingDate = outgoing.getJSONObject(outgoingUuid).getString("date");
-                    String incomingDate = incoming.getJSONObject(incomingUuid).getString("date");
-
-                    if (outgoingDate.compareTo(incomingDate) > 0)
-                    {
-                        nextOutgoing = false;
-                    }
-                    else
-                    {
-                        nextIncoming = false;
-                    }
-                }
-
-                if (nextOutgoing && (outgoingUuid != null))
-                {
-                    JSONObject temp = Simple.JSONClone(outgoing.getJSONObject(outgoingUuid));
-                    Simple.JSONput(temp, "uuid", outgoingUuid);
-
-                    createOutgoingMessage(temp);
-
-                    outgoingUuid = null;
-                }
-
-                if (nextIncoming && (incomingUuid != null))
-                {
-                    JSONObject temp = Simple.JSONClone(incoming.getJSONObject(incomingUuid));
-                    Simple.JSONput(temp, "uuid", incomingUuid);
-
-                    createIncomingMessage(temp);
-
-                    incomingUuid = null;
+                    nextIncoming = false;
                 }
             }
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
+
+            if (nextOutgoing && (outgoingUuid != null))
+            {
+                JSONObject temp = Json.clone(Json.getObject(outgoing,outgoingUuid));
+                Json.put(temp, "uuid", outgoingUuid);
+
+                createOutgoingMessage(temp);
+
+                outgoingUuid = null;
+            }
+
+            if (nextIncoming && (incomingUuid != null))
+            {
+                JSONObject temp = Json.clone(Json.getObject(incoming,incomingUuid));
+                Json.put(temp, "uuid", incomingUuid);
+
+                createIncomingMessage(temp);
+
+                incomingUuid = null;
+            }
         }
 
         scrollview.post(new Runnable()
