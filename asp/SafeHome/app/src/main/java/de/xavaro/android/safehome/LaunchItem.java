@@ -215,9 +215,6 @@ public class LaunchItem extends FrameLayout implements
 
     protected void setConfig()
     {
-        this.config = config;
-        this.parent = parent;
-
         String packageName = null;
         boolean hasProblem = false;
         ImageView targetIcon = icon;

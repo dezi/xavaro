@@ -11,8 +11,6 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
-import java.security.acl.LastOwnerException;
-
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -48,24 +46,14 @@ public class LaunchItemAlertcall extends LaunchItem
     @Override
     protected void onMyClick()
     {
-        launchAlertcallWarn();
+        ArchievementManager.show("alertcall.shortclick");
     }
 
     private boolean onMyLongClick()
     {
-        launchAlertcall();
+        alertcallShowDialog();
 
         return true;
-    }
-
-    private void launchAlertcallWarn()
-    {
-        ArchievementManager.show("alertcall.shortclick");
-    }
-
-    private void launchAlertcall()
-    {
-        alertcallShowDialog();
     }
 
     private static final int ALERTCALL_COUNTDOWN = 0;
