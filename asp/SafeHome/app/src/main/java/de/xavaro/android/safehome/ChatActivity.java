@@ -76,6 +76,7 @@ public class ChatActivity extends AppCompatActivity implements
 
     private FrameLayout lastTextLayout;
     private boolean lastDivIsIncoming;
+    private String lastMessagePriority;
     private String incomingLastDate;
     private String incomingLastIdent;
 
@@ -307,6 +308,7 @@ public class ChatActivity extends AppCompatActivity implements
         String date = Json.getString(chatMessage, "date");
         String message = Json.getString(chatMessage, "message");
         String identity = Json.getString(chatMessage, "identity");
+        String priority = Json.getString(chatMessage, "priority");
 
         if ((incomingLastDate == null) || (Simple.compareTo(incomingLastDate,date) < 0))
         {
@@ -332,12 +334,21 @@ public class ChatActivity extends AppCompatActivity implements
 
         if (lastTextLayout != null)
         {
-            lastTextLayout.setBackgroundResource(R.drawable.balloon_incoming_normal_ext);
+            int bi = Simple.equals(lastMessagePriority, "alertcall")
+                    ? R.drawable.balloon_incoming_alert_ext
+                    : R.drawable.balloon_incoming_normal_ext;
+
+            lastTextLayout.setBackgroundResource(bi);
         }
+
+        int bi = Simple.equals(priority, "alertcall")
+                ? R.drawable.balloon_incoming_alert
+                : R.drawable.balloon_incoming_normal;
 
         FrameLayout textLayout = lastTextLayout = new FrameLayout(this);
         textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
-        textLayout.setBackgroundResource(R.drawable.balloon_incoming_normal);
+        textLayout.setBackgroundResource(bi);
+        lastMessagePriority = priority;
 
         textDiv.addView(textLayout);
 

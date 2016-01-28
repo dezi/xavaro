@@ -413,9 +413,11 @@ public class LaunchGroup extends FrameLayout implements
 
             for (int inx = 0; inx < numItems; inx++)
             {
+                JSONObject lit = lis.getJSONObject(inx);
+
                 if (lis.getJSONObject(inx).has("enable"))
                 {
-                    String key = lis.getJSONObject(inx).getString("enable");
+                    String key = lit.getString("enable");
 
                     if (! StaticUtils.getSharedPrefsBoolean(context, key))
                     {
@@ -423,10 +425,8 @@ public class LaunchGroup extends FrameLayout implements
                     }
                 }
 
-                LaunchItem li = new LaunchItem(context);
+                LaunchItem li = LaunchItem.createLaunchItem(context, this, lit);
                 li.setSize(horzSize, vertSize);
-
-                li.setConfig(this, lis.getJSONObject(inx));
                 launchItems.add(li);
 
                 if (nextSlot >= maxSlots)

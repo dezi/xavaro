@@ -44,6 +44,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.GCMMessageService;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
@@ -62,22 +63,36 @@ public class LaunchItem extends FrameLayout implements
 {
     private final String LOGTAG = "LaunchItem";
 
-    private Context context;
-    private Handler handler;
+    public static LaunchItem createLaunchItem(Context context, LaunchGroup parent, JSONObject config)
+    {
+        LaunchItem item = null;
 
-    private LayoutParams layout;
-    private LayoutParams oversize;
+        String type = Json.getString(config, "type");
 
-    private LaunchGroup parent;
-    private JSONObject config;
-    private JSONObject settings;
+        if (Simple.equals(type, "alertcall")) item = new LaunchItemAlertcall(context);
 
-    private TextView label;
-    private ImageView icon;
+        if (item == null) item = new LaunchItem(context);
 
-    private FrameLayout dimmer;
-    private FrameLayout overlay;
-    private ImageView overicon;
+        item.setConfig(parent, config);
+
+        return item;
+    }
+
+    protected Context context;
+    protected Handler handler;
+
+    protected LayoutParams layout;
+    protected LayoutParams oversize;
+
+    protected LaunchGroup parent;
+    protected JSONObject config;
+
+    protected TextView label;
+    protected ImageView icon;
+
+    protected FrameLayout dimmer;
+    protected FrameLayout overlay;
+    protected ImageView overicon;
 
     private String type;
     private LaunchGroup directory;
@@ -187,19 +202,28 @@ public class LaunchItem extends FrameLayout implements
         this.config = config;
         this.parent = parent;
 
+        if (config.has("label"))
+        {
+            label.setText(Json.getString(config, "label"));
+        }
+
+        setBackgroundResource(R.drawable.shadow_black_400x400);
+        setVisibility(VISIBLE);
+
+        this.setConfig();
+    }
+
+    protected void setConfig()
+    {
+        this.config = config;
+        this.parent = parent;
+
         String packageName = null;
         boolean hasProblem = false;
         ImageView targetIcon = icon;
 
         try
         {
-            if (config.has("label"))
-            {
-                label.setText(config.getString("label"));
-                Log.d(LOGTAG, config.getString("label"));
-                setVisibility(VISIBLE);
-            }
-
             if (config.has("packagename"))
             {
                 packageName = config.getString("packagename");
@@ -312,23 +336,6 @@ public class LaunchItem extends FrameLayout implements
                 if (type.equals("developer"))
                 {
                     icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResTesting));
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (type.equals("alertcall"))
-                {
-                    setLongClickable(true);
-
-                    setOnLongClickListener(new View.OnLongClickListener()
-                    {
-                        @Override
-                        public boolean onLongClick(View view)
-                        {
-                            return onMyLongClick();
-                        }
-                    });
-
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResAlertcall));
                     icon.setVisibility(VISIBLE);
                 }
 
@@ -887,7 +894,7 @@ public class LaunchItem extends FrameLayout implements
         }
     }
 
-    private void onMyClick()
+    protected void onMyClick()
     {
         if (config == null)
         {
@@ -915,7 +922,6 @@ public class LaunchItem extends FrameLayout implements
         if (type.equals("genericapp"   )) { launchGenericApp();     return; }
         if (type.equals("directory"    )) { launchDirectory();      return; }
         if (type.equals("developer"    )) { launchDeveloper();      return; }
-        if (type.equals("alertcall"    )) { launchAlertcall(false); return; }
         if (type.equals("settings"     )) { launchSettings();       return; }
         if (type.equals("install"      )) { launchInstall();        return; }
         if (type.equals("webframe"     )) { launchWebframe();       return; }
@@ -927,27 +933,6 @@ public class LaunchItem extends FrameLayout implements
         // @formatter:on
 
         Toast.makeText(getContext(), "Nix launcher type <" + type + "> configured.", Toast.LENGTH_LONG).show();
-    }
-
-    private boolean onMyLongClick()
-    {
-        if (config == null)
-        {
-            Toast.makeText(getContext(), "Nix configured.", Toast.LENGTH_LONG).show();
-
-            return false;
-        }
-
-        if (type == null)
-        {
-            Toast.makeText(getContext(), "Nix <type> configured.", Toast.LENGTH_LONG).show();
-
-            return false;
-        }
-
-        if (type.equals("alertcall"    )) { launchAlertcall(true);    return true; }
-
-        return false;
     }
 
     private void launchSelectHome()
@@ -1506,141 +1491,4 @@ public class LaunchItem extends FrameLayout implements
         Simple.dumpDirectory("/storage/emulated/0");
         */
     }
-
-    private void launchAlertcall(boolean longclick)
-    {
-        Log.d(LOGTAG, "launchAlertcall: " + longclick);
-
-        if (! longclick)
-        {
-            ArchievementManager.show("alertcall.shortclick");
-        }
-        else
-        {
-            alertcallShowDialog();
-        }
-    }
-
-    private static final int ALERTCALL_COUNTDOWN = 0;
-    private static final int ALERTCALL_CANCELED  = 1;
-    private static final int ALERTCALL_EXECUTED  = 2;
-
-    private String alertcallText;
-    private int alertcallSeconds;
-    private int alertcallStatus;
-    private TextView alertcallTextview;
-    private AlertDialog alertcallDialog;
-
-    private void alertcallShowDialog()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        builder.setTitle("Hilfe rufen...");
-
-        alertcallTextview = new TextView(context);
-        alertcallTextview.setPadding(40, 40, 40, 40);
-        alertcallTextview.setTextSize(24f);
-
-        builder.setView(alertcallTextview);
-
-        builder.setPositiveButton("Jetzt sofort", null);
-        builder.setNeutralButton("Abbrechen", null);
-
-        alertcallDialog = builder.create();
-        alertcallDialog.show();
-
-        alertcallDialog.setCancelable(false);
-
-        Button positive = alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        positive.setTextSize(24f);
-        positive.setTransformationMethod(null);
-        positive.setOnClickListener(alertOnClickPositive);
-
-        Button neutral = alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-
-        neutral.setTextSize(24f);
-        neutral.setTransformationMethod(null);
-        neutral.setOnClickListener(alertOnClickNeutral);
-
-        alertcallText = "Der Hilferuf wird in %d Sekunden ausgelöst";
-        alertcallStatus = ALERTCALL_COUNTDOWN;
-        alertcallSeconds = 20;
-
-        if (handler == null) handler = new Handler();
-        handler.post(alertcallCountdown);
-    }
-
-    private Runnable alertcallCountdown = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            if (! alertcallDialog.isShowing()) return;
-
-            if (alertcallSeconds == 0)
-            {
-                String message = "Der Hilferuf wird nun ausgelöst";
-                alertcallTextview.setText(message);
-                DitUndDat.SpeekDat.speak(message);
-
-                alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Ok");
-                alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
-
-                alertcallStatus = ALERTCALL_EXECUTED;
-
-                Log.d(LOGTAG,"=====================> call");
-            }
-            else
-            {
-                String message = String.format(alertcallText, alertcallSeconds);
-
-                alertcallTextview.setText(message);
-                if ((alertcallSeconds % 5) == 0) DitUndDat.SpeekDat.speak(message);
-
-                alertcallSeconds -= 1;
-                handler.postDelayed(alertcallCountdown, 1000);
-            }
-        }
-    };
-
-    View.OnClickListener alertOnClickPositive = new View.OnClickListener()
-    {
-        @Override
-        public void onClick(View dialog)
-        {
-            if (alertcallStatus == ALERTCALL_COUNTDOWN)
-            {
-                alertcallSeconds = 0;
-            }
-
-            if (alertcallStatus == ALERTCALL_CANCELED)
-            {
-                alertcallDialog.cancel();
-            }
-
-            if (alertcallStatus == ALERTCALL_EXECUTED)
-            {
-                alertcallDialog.cancel();
-            }
-        }
-    };
-
-    View.OnClickListener alertOnClickNeutral = new View.OnClickListener()
-    {
-        @Override
-        public void onClick(View dialog)
-        {
-            handler.removeCallbacks(alertcallCountdown);
-
-            String message = "Der Hilferuf wurde abgebrochen";
-
-            alertcallTextview.setText(message);
-            DitUndDat.SpeekDat.speak(message);
-
-            alertcallStatus = ALERTCALL_CANCELED;
-
-            alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Schliessen");
-            alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
-        }
-    };
 }

@@ -345,8 +345,20 @@ public class ChatManager implements CommService.CommServiceCallback
                 proto = Json.clone(message);
 
                 Json.remove(proto, "uuid");
-                //Json.remove(proto, "identity");
-                //Json.remove(proto, "idremote");
+
+                //
+                // Remove redundant entries from message.
+                //
+
+                if (Simple.equals(Json.getString(proto, "identity"), identity))
+                {
+                    Json.remove(proto, "identity");
+                }
+
+                if (Simple.equals(Json.getString(proto, "idremote"), SystemIdentity.getIdentity()))
+                {
+                    Json.remove(proto, "idremote");
+                }
 
                 Json.put(outgoing, uuid, proto);
             }
@@ -446,22 +458,50 @@ public class ChatManager implements CommService.CommServiceCallback
                 Simple.getAnyContext(), 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        int resid = R.drawable.community_alarm_64x64;
-
         NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
 
+        String priority = Json.getString(chatMessage, "priority");
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        int iconRes = R.drawable.community_notification_64x64;
+
+        if (Simple.equals(priority, "alertcall"))
+        {
+            soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            iconRes = R.drawable.community_alarm_64x64;
+
+            nb.setVibrate(getSOSPattern());
+        }
+
         nb.setAutoCancel(true);
-        nb.setSmallIcon(resid);
-        nb.setLargeIcon(Simple.getBitmapFromResource(resid));
+        nb.setSmallIcon(iconRes);
+        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
         nb.setContentTitle(sender);
         nb.setContentText(message);
-        nb.setSound(defaultSoundUri);
+        nb.setSound(soundUri);
         nb.setContentIntent(pendingIntent);
 
         NotificationManager nm = Simple.getNotificationManager();
         nm.notify(0, nb.build());
+    }
+
+    private long[] getSOSPattern()
+    {
+        int dot = 200;          // Length of a Morse Code "dot" in milliseconds
+        int dash = 500;         // Length of a Morse Code "dash" in milliseconds
+        int short_gap = 200;    // Length of Gap Between dots/dashes
+        int medium_gap = 500;   // Length of Gap Between Letters
+        int long_gap = 1000;    // Length of Gap Between Words
+
+        return new long[]{
+                0,  // Start immediately
+                dot, short_gap, dot, short_gap, dot,    // s
+                medium_gap,
+                dash, short_gap, dash, short_gap, dash, // o
+                medium_gap,
+                dot, short_gap, dot, short_gap, dot,    // s
+                long_gap
+        };
     }
 
     //region Callback interface
