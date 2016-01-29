@@ -8,7 +8,9 @@
   "tags":
   [
     "DVB-C",
+    "DVB-S",
     "Digital Free",
+    "ProSiebenSat.1",
     "SDTV"
   ],
   "packs":
@@ -19,6 +21,7 @@
   ],
   "providers":
   [
-    "Digital Free"
+    "Digital Free",
+    "ProSiebenSat.1"
   ]
 }

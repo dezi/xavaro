@@ -1,0 +1,25 @@
+{
+  "name":"MTV Dance",
+  "type":"tv",
+  "isocc":"us",
+  "isolang":"eng",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "MTV Networks Europe",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "13:AustriaSat",
+    "27:Telesat"
+  ],
+  "providers":
+  [
+    "MTV Networks Europe"
+  ]
+}

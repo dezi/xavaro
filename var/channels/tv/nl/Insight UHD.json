@@ -1,9 +1,10 @@
 {
   "name":"Insight UHD",
   "type":"tv",
-  "ishd":false,
   "isocc":"nl",
   "isolang":"eng",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

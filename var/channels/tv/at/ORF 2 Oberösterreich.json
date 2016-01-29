@@ -1,0 +1,22 @@
+{
+  "name":"ORF 2 Oberösterreich",
+  "type":"tv",
+  "isocc":"at",
+  "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "ORF",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "ORF"
+  ]
+}

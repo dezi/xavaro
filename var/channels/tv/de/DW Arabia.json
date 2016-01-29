@@ -1,0 +1,18 @@
+{
+  "name":"DW Arabia",
+  "type":"tv",
+  "isocc":"de",
+  "isolang":"ara",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "DW",
+    "SDTV"
+  ],
+  "providers":
+  [
+    "DW"
+  ]
+}

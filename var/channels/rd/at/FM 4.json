@@ -1,9 +1,10 @@
 {
   "name":"FM 4",
   "type":"rd",
-  "ishd":false,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

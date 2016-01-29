@@ -1,0 +1,22 @@
+{
+  "name":"Comedy Central Nederland",
+  "type":"tv",
+  "isocc":"nl",
+  "isolang":"dut",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "MTV Networks Europe",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal"
+  ],
+  "providers":
+  [
+    "MTV Networks Europe"
+  ]
+}

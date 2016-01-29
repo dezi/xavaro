@@ -1,9 +1,10 @@
 {
   "name":"ATV HD",
   "type":"tv",
-  "ishd":false,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "ATV",

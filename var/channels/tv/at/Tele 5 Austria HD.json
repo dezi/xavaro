@@ -1,0 +1,24 @@
+{
+  "name":"Tele 5 Austria HD",
+  "type":"tv",
+  "isocc":"at",
+  "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "13:AustriaSat",
+    "14:HD+",
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

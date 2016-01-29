@@ -12,6 +12,7 @@
     "Digital Free",
     "HDTV",
     "MTV Networks",
+    "MTV Networks Europe",
     "SDTV"
   ],
   "packs":
@@ -22,6 +23,7 @@
   "providers":
   [
     "Digital Free",
-    "MTV Networks"
+    "MTV Networks",
+    "MTV Networks Europe"
   ]
 }

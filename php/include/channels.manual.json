@@ -1,5 +1,76 @@
 [
   {
+    "name":"Sat. 1 Rheinland-Pfalz und Hessen",
+    "free":true,
+    "enc":"None",
+    "hd":false,
+    "website":"www.1730live.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ss/sat1_rheinland_pfalz.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment"
+  },
+  {
+    "name":"NickToons Germany",
+    "free":false,
+    "enc":"Videoguard",
+    "hd":false,
+    "website":"www.nick.co.uk",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/nn/nick_toons_de.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"6:Children",
+    "packs":
+    [
+      "4:Sky UK"
+    ]
+  },
+  {
+    "name":"Nickelodeon Austria HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.nick.de",
+    "language":"English",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/nn/nickelodeon_us_hd.png",
+    "type":"tv",
+    "country":"Austria, United States",
+    "isocc":"at",
+    "isolang":"eng",
+    "genre":"6:Children",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  {
+    "name":"Tele 5 Austria HD",
+    "free":false,
+    "enc":"Irdeto;Nagravision;Videoguard",
+    "hd":true,
+    "website":"www.tele5.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/tt/tele5_de_hd.png",
+    "type":"tv",
+    "country":"Austria",
+    "isocc":"at",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "13:AustriaSat",
+      "14:HD+",
+      "15:Sky Deutschland"
+    ]
+  },  
+  {
     "name":"Deluxe Music Austria HD",
     "free":false,
     "enc":"Nagravision;Videoguard",

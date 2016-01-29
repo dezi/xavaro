@@ -1,9 +1,10 @@
 {
   "name":"RTL 2 Austria HD",
   "type":"tv",
-  "ishd":false,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "CBC",

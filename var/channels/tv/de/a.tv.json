@@ -1,17 +1,20 @@
 {
   "name":"a.tv",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
+    "ATV+",
     "BetaDigital",
     "DVB-S",
     "SDTV"
   ],
   "providers":
   [
+    "ATV+",
     "BetaDigital"
   ]
 }

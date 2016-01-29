@@ -1,0 +1,22 @@
+{
+  "name":"Sixx Austria",
+  "type":"tv",
+  "isocc":"at",
+  "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "SDTV",
+    "sevenonemedia"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "sevenonemedia"
+  ]
+}

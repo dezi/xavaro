@@ -1,9 +1,10 @@
 {
   "name":"BB-MV Lokal-TV",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "BetaDigital",

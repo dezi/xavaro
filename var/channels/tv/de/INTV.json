@@ -1,0 +1,22 @@
+{
+  "name":"INTV",
+  "type":"tv",
+  "isocc":"de",
+  "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "BetaDigital",
+    "DVB-S",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "BetaDigital"
+  ]
+}

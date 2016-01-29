@@ -1,9 +1,10 @@
 {
   "name":"Radio Salzburg",
   "type":"rd",
-  "ishd":false,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

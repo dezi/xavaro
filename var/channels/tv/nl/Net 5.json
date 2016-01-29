@@ -1,9 +1,10 @@
 {
   "name":"Net 5",
   "type":"tv",
-  "ishd":false,
   "isocc":"nl",
   "isolang":"dut",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

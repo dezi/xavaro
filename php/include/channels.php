@@ -19,6 +19,28 @@ function simplifySearchName($mname)
 	return $mname;
 }
 
+function isBrainDead($language, $channel)
+{
+	if (! isset($GLOBALS[ "channels.braindead" ]))
+	{
+		$bdfile  = "../include/channels.braindead.json";
+		$bdtable = json_decdat(file_get_contents($bdfile));
+		
+		$GLOBALS[ "channels.braindead" ] = $bdtable;
+	}
+	
+	$bdtable = $GLOBALS[ "channels.braindead" ];
+
+	$stag = "$language.$channel";
+	
+	foreach ($bdtable as $braindead)
+	{
+		if ($braindead == $stag) return true;
+	}
+	
+	return false;
+}
+
 function resolveChannel($orgname, $name, $language)
 {
 	$isknown = false;

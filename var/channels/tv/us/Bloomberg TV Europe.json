@@ -1,9 +1,10 @@
 {
   "name":"Bloomberg TV Europe",
   "type":"tv",
-  "ishd":false,
   "isocc":"us",
   "isolang":"eng",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",
@@ -17,6 +18,7 @@
   ],
   "providers":
   [
+    "Bloomberg TV",
     "DIGITAL +"
   ]
 }

@@ -1,9 +1,10 @@
 {
   "name":"3+",
   "type":"tv",
-  "ishd":false,
   "isocc":"ch",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "BetaDigital",

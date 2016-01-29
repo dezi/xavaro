@@ -1,9 +1,10 @@
 {
   "name":"Sat. 1 Bayern",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

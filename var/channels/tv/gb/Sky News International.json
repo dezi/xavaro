@@ -1,9 +1,10 @@
 {
   "name":"Sky News International",
   "type":"tv",
-  "ishd":false,
   "isocc":"gb",
   "isolang":"eng",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

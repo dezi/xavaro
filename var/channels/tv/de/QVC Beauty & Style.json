@@ -1,9 +1,10 @@
 {
   "name":"QVC Beauty & Style",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "BetaDigital",

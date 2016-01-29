@@ -1,9 +1,10 @@
 {
   "name":"Kabel Eins Schweiz",
   "type":"tv",
-  "ishd":false,
   "isocc":"ch",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

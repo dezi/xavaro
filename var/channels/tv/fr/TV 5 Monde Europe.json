@@ -1,0 +1,25 @@
+{
+  "name":"TV 5 Monde Europe",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "ishd":false,
+  "isbd":true,
+  "tags":
+  [
+    "DVB-S",
+    "Globecast",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "18:TNT Sat",
+    "48:Movistar+"
+  ],
+  "providers":
+  [
+    "GlobeCast"
+  ]
+}

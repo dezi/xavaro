@@ -1,0 +1,23 @@
+{
+  "name":"Kabel Eins Austria",
+  "type":"tv",
+  "isocc":"at",
+  "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "ProSiebenSat.1",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal"
+  ],
+  "providers":
+  [
+    "ProSiebenSat.1"
+  ]
+}

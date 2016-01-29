@@ -1,9 +1,10 @@
 {
   "name":"Cartoon Network Nederland",
   "type":"tv",
-  "ishd":false,
   "isocc":"nl",
   "isolang":"dut",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "CSAT",

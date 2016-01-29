@@ -1,9 +1,10 @@
 {
   "name":"Eurosport 3607 HD",
   "type":"tv",
-  "ishd":1,
   "isocc":"fr",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

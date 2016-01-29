@@ -1,9 +1,10 @@
 {
   "name":"Chérie 25 HD",
   "type":"tv",
-  "ishd":false,
   "isocc":"fr",
   "isolang":"fre",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "Arqiva",

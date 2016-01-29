@@ -1,9 +1,10 @@
 {
   "name":"ORF Sport +",
   "type":"tv",
-  "ishd":false,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

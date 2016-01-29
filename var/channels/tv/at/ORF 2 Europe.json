@@ -1,0 +1,24 @@
+{
+  "name":"ORF 2 Europe",
+  "type":"tv",
+  "isocc":"at",
+  "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "ORF",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "6:CanalDigitaal",
+    "7:TV Vlaanderen Digitaal",
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "ORF"
+  ]
+}

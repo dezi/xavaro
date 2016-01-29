@@ -1,9 +1,10 @@
 {
   "name":"Hope Channel Deutsch HD",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "-",

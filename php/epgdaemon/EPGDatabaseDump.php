@@ -345,28 +345,6 @@ function addChannelTag(&$config, $tagname, $tagvalue)
 	asort($config[ $tagname ]);
 }
 
-function isBrainDead($language, $channel)
-{
-	if (! isset($GLOBALS[ "channels.braindead" ]))
-	{
-		$bdfile  = "../include/channels.braindead.json";
-		$bdtable = json_decdat(file_get_contents($bdfile));
-		
-		$GLOBALS[ "channels.braindead" ] = $bdtable;
-	}
-	
-	$bdtable = $GLOBALS[ "channels.braindead" ];
-
-	$stag = "$language.$channel";
-	
-	foreach ($bdtable as $braindead)
-	{
-		if ($braindead == $stag) return true;
-	}
-	
-	return false;
-}
-
 function saveChannel($cdata)
 {
 	$name  = $cdata[ "name"  ];
@@ -498,7 +476,7 @@ function defuckEPG(&$epg)
 		$GLOBALS[ "actchannels" ][ $channel ][ "lfs" ] += 1;
 	}
 	
-	if (preg_match_all("|[a-z][A-Z]|", $desc, $treffer))
+	if (preg_match_all("|[a-z][A-Z][a-z]|", $desc, $treffer))
 	{
 		$GLOBALS[ "actchannels" ][ $channel ][ "bad" ] += count($treffer[ 0 ]);
 	}
@@ -508,6 +486,11 @@ function defuckEPG(&$epg)
 
 function saveEPG($epg)
 {
+	if ($epg[ "channel"  ] == "Sparhandy TV")
+	{
+ 		echo json_encdat($epg) . "\n";
+	}
+	
 	if (! isset($epg[ "title" ])) 
 	{
 		//
@@ -819,8 +802,14 @@ function splitEPGs()
 		echo "Splitting   " . $tempfile . "\n";
 		
 		$json = "[" . substr(file_get_contents($tempfile),0,-2) . "]";
-		
-		$epgs = json_decdat($json);		
+		$epgs = json_decdat($json);
+		unlink($tempfile);
+
+		if ($epgs == null) 
+		{
+			@rmdir(dirname($tempfile));
+			return;
+		}
 		
 		usort($epgs, "sortEPG");
 		
@@ -871,12 +860,10 @@ function splitEPGs()
 				uploadEPG($actfile);
 			}
 				
-			echo "Writing " . ($isnew ? "new" : "old") . " $actfile\n";
+			if ($isnew) echo "Writing " . ($isnew ? "new" : "old") . " $actfile\n";
 		}
 		
-		unlink($tempfile);
-
-		if (count($epgdays) > 0)
+		if (count($epgs) > 0)
 		{
 			$epgswrite[ "epgdata" ] = $epgs;
 			file_put_contents($currfile, json_encdat($epgswrite) . "\n");
@@ -937,7 +924,7 @@ foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 	$percent = floor(($bad / $cnt) * 100);
 	$isolang = $cdata[ "isolang" ];
 	
-	if (($lfs == 0) && ($percent > 80) && ! isBrainDead($isolang, $channel)) 
+	if (($lfs == 0) && ($percent >= 100) && ! isBrainDead($isolang, $channel)) 
 	{
 		echo "BRAINDEAD: $isolang.$channel => $percent%\n";
 	}

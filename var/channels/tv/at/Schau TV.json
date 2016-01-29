@@ -1,0 +1,22 @@
+{
+  "name":"Schau TV",
+  "type":"tv",
+  "isocc":"at",
+  "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "-",
+    "DVB-S",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "-"
+  ]
+}

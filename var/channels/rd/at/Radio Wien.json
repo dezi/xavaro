@@ -1,9 +1,10 @@
 {
   "name":"Radio Wien",
   "type":"rd",
-  "ishd":false,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":false,
+  "isbd":false,
   "tags":
   [
     "DVB-S",

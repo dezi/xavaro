@@ -1,9 +1,10 @@
 {
   "name":"ORF 2 Salzburg HD",
   "type":"tv",
-  "ishd":1,
   "isocc":"at",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "DVB-S",
