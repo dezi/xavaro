@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
-public class LaunchItemWebStream extends LaunchItem
-    implements ProxyPlayer.Callback
+public class LaunchItemWebStream extends LaunchItem implements ProxyPlayer.Callback
 {
     private final static String LOGTAG = LaunchItemWebStream.class.getSimpleName();
 
@@ -22,10 +21,11 @@ public class LaunchItemWebStream extends LaunchItem
         super(context);
     }
 
-    protected boolean isPlayingAudio;
-    protected boolean isPlayingVideo;
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    private boolean isPlayingAudio;
+    private boolean isPlayingVideo;
 
-    protected ArrayList<LaunchItemWebStream> isPlayingParents = new ArrayList<>();
+    private ArrayList<LaunchItemWebStream> isPlayingParents = new ArrayList<>();
 
     @Override
     protected void setConfig()
@@ -39,8 +39,6 @@ public class LaunchItemWebStream extends LaunchItem
         {
             icon.setImageResource(GlobalConfigs.IconResIPTelevision);
         }
-
-        icon.setVisibility(VISIBLE);
     }
 
     @Override
@@ -117,19 +115,12 @@ public class LaunchItemWebStream extends LaunchItem
 
         while (bubble != null)
         {
-            Log.d(LOGTAG,"=========================" + bubble.toString());
-
             if (bubble instanceof LaunchItemWebStream)
             {
                 isPlayingParents.add((LaunchItemWebStream) bubble);
             }
 
-            Log.d(LOGTAG,"=========================>" + bubble.getLaunchGroup());
-
             if (bubble.getLaunchGroup() == null) break;
-
-            Log.d(LOGTAG,"=========================>>>" + bubble.getLaunchGroup().getLaunchItem());
-
             bubble = bubble.getLaunchGroup().getLaunchItem();
         }
     }
@@ -280,9 +271,9 @@ public class LaunchItemWebStream extends LaunchItem
 
     //region Media playback control.
 
-    protected boolean isPlayingMedia;
+    private boolean isPlayingMedia;
 
-    public void setPlaybackPrepare()
+    private void setPlaybackPrepare()
     {
         Log.d(LOGTAG, "setPlaybackPrepare:" + label.getText());
 
@@ -291,7 +282,7 @@ public class LaunchItemWebStream extends LaunchItem
         setSpinner(true);
     }
 
-    public void setPlaybackStartet()
+    private void setPlaybackStartet()
     {
         Log.d(LOGTAG, "setPlaybackStartet:" + label.getText());
 
@@ -305,17 +296,17 @@ public class LaunchItemWebStream extends LaunchItem
         overlay.setVisibility(VISIBLE);
     }
 
-    public void setPlaybackPaused()
+    private void setPlaybackPaused()
     {
         overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_play_190x190));
     }
 
-    public void setPlaybackResumed()
+    private void setPlaybackResumed()
     {
         overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
     }
 
-    public void setPlaybackFinished()
+    private void setPlaybackFinished()
     {
         setSpinner(false);
 

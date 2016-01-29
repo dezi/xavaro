@@ -40,7 +40,6 @@ public class LaunchItemAlertcall extends LaunchItem
         });
 
         icon.setImageResource(GlobalConfigs.IconResAlertcall);
-        icon.setVisibility(VISIBLE);
     }
 
     @Override
@@ -49,7 +48,8 @@ public class LaunchItemAlertcall extends LaunchItem
         ArchievementManager.show("alertcall.shortclick");
     }
 
-    private boolean onMyLongClick()
+    @Override
+    protected boolean onMyLongClick()
     {
         alertcallShowDialog();
 

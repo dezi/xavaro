@@ -9,7 +9,7 @@ import de.xavaro.android.common.Json;
 public class LaunchItemHealth extends LaunchItem
     implements BlueTooth.BlueToothConnectCallback
 {
-    private final static String LOGTAG = LaunchItemAlertcall.class.getSimpleName();
+    private final static String LOGTAG = LaunchItemHealth.class.getSimpleName();
 
     public LaunchItemHealth(Context context)
     {
@@ -19,53 +19,40 @@ public class LaunchItemHealth extends LaunchItem
     @Override
     protected void setConfig()
     {
-        String subtype = Json.getString(config, "subtype");
+        if (handler == null) handler = new Handler();
 
         if (subtype == null)
         {
             icon.setImageResource(GlobalConfigs.IconResHealth);
-            icon.setVisibility(VISIBLE);
         }
         else
         {
             if (subtype.equals("bpm"))
             {
-                if (handler == null) handler = new Handler();
                 LaunchGroupHealth.subscribeDevice(this, "bpm");
-
                 icon.setImageResource(GlobalConfigs.IconResHealthBPM);
-                icon.setVisibility(VISIBLE);
             }
 
             if (subtype.equals("scale"))
             {
-                if (handler == null) handler = new Handler();
                 LaunchGroupHealth.subscribeDevice(this, "scale");
-
                 icon.setImageResource(GlobalConfigs.IconResHealthScale);
-                icon.setVisibility(VISIBLE);
             }
 
             if (subtype.equals("sensor"))
             {
-                if (handler == null) handler = new Handler();
                 LaunchGroupHealth.subscribeDevice(this, "sensor");
-
                 icon.setImageResource(GlobalConfigs.IconResHealthSensor);
-                icon.setVisibility(VISIBLE);
             }
 
             if (subtype.equals("glucose"))
             {
-                if (handler == null) handler = new Handler();
                 LaunchGroupHealth.subscribeDevice(this, "glucose");
-
                 icon.setImageResource(GlobalConfigs.IconResHealthGlucose);
-                icon.setVisibility(VISIBLE);
             }
-        }
 
-        icon.setVisibility(VISIBLE);
+            overicon.setImageResource(GlobalConfigs.IconResBlueTooth);
+        }
     }
 
     @Override
@@ -76,15 +63,9 @@ public class LaunchItemHealth extends LaunchItem
 
     private void launchHealth()
     {
-        if (config.has("subtype"))
-        {
-            return;
-        }
+        if (subtype != null) return;
 
-        if (directory == null)
-        {
-            directory = new LaunchGroupHealth(context);
-        }
+        if (directory == null) directory = new LaunchGroupHealth(context);
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }
@@ -96,8 +77,6 @@ public class LaunchItemHealth extends LaunchItem
         @Override
         public void run()
         {
-            overicon.setImageResource(GlobalConfigs.IconResBlueTooth);
-            overicon.setVisibility(VISIBLE);
             overlay.setVisibility(VISIBLE);
         }
     };
@@ -107,7 +86,6 @@ public class LaunchItemHealth extends LaunchItem
         @Override
         public void run()
         {
-            overicon.setVisibility(INVISIBLE);
             overlay.setVisibility(INVISIBLE);
         }
     };

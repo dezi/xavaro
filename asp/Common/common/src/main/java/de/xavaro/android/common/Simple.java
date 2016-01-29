@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.content.pm.ResolveInfo;
 import android.inputmethodservice.InputMethodService;
 import android.support.annotation.Nullable;
 
@@ -30,6 +31,7 @@ import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -344,6 +346,11 @@ public class Simple
         }
     }
 
+    public static void makeToast(String text)
+    {
+        Toast.makeText(anyContext, "Nix <type> configured.", Toast.LENGTH_LONG).show();
+    }
+
     public static void dumpDirectory(String path)
     {
         dumpDirectory(new File(path));
@@ -437,6 +444,15 @@ public class Simple
     public static String getPackageName()
     {
         return anyContext.getPackageName();
+    }
+
+    public static String getDefaultEmail()
+    {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("mailto:"));
+        ResolveInfo res = anyContext.getPackageManager().resolveActivity(intent, 0);
+
+        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
     }
 
     @Nullable
@@ -596,6 +612,12 @@ public class Simple
     public static Bitmap getBitmapFromResource(int resid)
     {
         return BitmapFactory.decodeResource(anyContext.getResources(), resid);
+    }
+
+    public static int getIconResourceId(String iconname)
+    {
+        return anyContext.getResources().getIdentifier(
+                iconname, "drawable", anyContext.getPackageName());
     }
 
     @Nullable
