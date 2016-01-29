@@ -57,10 +57,18 @@ public class LaunchItem extends FrameLayout implements
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
 
+        if (Simple.equals(type, "webconfig"   )) item = new LaunchItemWebFrame(context);
+        if (Simple.equals(type, "webframe"    )) item = new LaunchItemWebFrame(context);
+
         if (Simple.equals(type, "ipradio"     )) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "iptelevision")) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "audioplayer" )) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "videoplayer" )) item = new LaunchItemWebStream(context);
+
+        if (Simple.equals(type, "select"      )) item = new LaunchItemAdmin(context);
+        if (Simple.equals(type, "install"     )) item = new LaunchItemAdmin(context);
+        if (Simple.equals(type, "settings"    )) item = new LaunchItemAdmin(context);
+        if (Simple.equals(type, "developer"   )) item = new LaunchItemAdmin(context);
 
         if (item == null) item = new LaunchItem(context);
 
@@ -78,6 +86,7 @@ public class LaunchItem extends FrameLayout implements
     protected LaunchGroup parent;
     protected JSONObject config;
     protected String type;
+    protected String subtype;
 
     protected TextView label;
     protected ImageView icon;
@@ -86,8 +95,6 @@ public class LaunchItem extends FrameLayout implements
     protected FrameLayout overlay;
     protected ImageView overicon;
     protected LaunchGroup directory;
-
-    private WebFrame webframe;
 
     public LaunchItem(Context context)
     {
@@ -114,14 +121,11 @@ public class LaunchItem extends FrameLayout implements
     {
         this.context = context;
 
-        setVisibility(INVISIBLE);
-
         layout = new LayoutParams(0, 0);
         setLayoutParams(layout);
 
         icon = new ImageView(context);
         icon.setPadding(0, 0, 0, 40);
-        icon.setVisibility(INVISIBLE);
         this.addView(icon);
 
         label = new TextView(context);
@@ -198,7 +202,8 @@ public class LaunchItem extends FrameLayout implements
         setBackgroundResource(R.drawable.shadow_black_400x400);
         setVisibility(VISIBLE);
 
-        type = Json.getString(config, "type");
+        type = config.has("type") ? Json.getString(config, "type") : null;
+        subtype = config.has("subtype") ? Json.getString(config, "subtype") : null;
 
         if (config.has("icon"))
         {
@@ -242,88 +247,6 @@ public class LaunchItem extends FrameLayout implements
                 packageName = config.getString("packagename");
 
                 GlobalConfigs.weLikeThis(context, packageName);
-            }
-
-            if (type.equals("select_home"))
-            {
-                packageName = DitUndDat.DefaultApps.getDefaultHome(context);
-
-                icon.setImageResource(GlobalConfigs.IconResSelectHome);
-                icon.setVisibility(VISIBLE);
-                targetIcon = overicon;
-            }
-
-            if (type.equals("select_assist"))
-            {
-                packageName = DitUndDat.DefaultApps.getDefaultAssist(context);
-
-                icon.setImageResource(GlobalConfigs.IconResSelectAssist);
-                icon.setVisibility(VISIBLE);
-                targetIcon = overicon;
-            }
-
-            if (type.equals("developer"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResTesting);
-                icon.setVisibility(VISIBLE);
-            }
-
-            if (type.equals("settings") && config.has("subtype"))
-            {
-                String subtype = config.getString("subtype");
-
-                if (subtype.equals("safehome"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResSettingsSafehome);
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (subtype.equals("android"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResSettingsAndroid);
-                    icon.setVisibility(VISIBLE);
-                }
-            }
-
-            if (type.equals("firewall"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResFireWall);
-                icon.setVisibility(VISIBLE);
-            }
-
-            if (type.equals("webconfig") && config.has("subtype"))
-            {
-                String subtype = config.getString("subtype");
-
-                if (subtype.equals("newspaper"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResWebConfigNewspaper);
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (subtype.equals("magazine"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResWebConfigMagazine);
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (subtype.equals("pictorial"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResWebConfigPictorial);
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (subtype.equals("shopping"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResWebConfigShopping);
-                    icon.setVisibility(VISIBLE);
-                }
-
-                if (subtype.equals("erotics"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResWebConfigErotics);
-                    icon.setVisibility(VISIBLE);
-                }
             }
 
             if (type.equals("xavaro"))
@@ -480,22 +403,6 @@ public class LaunchItem extends FrameLayout implements
                     icon.setVisibility(VISIBLE);
                 }
             }
-
-            if (type.equals("webframe"))
-            {
-                if (config.has("name"))
-                {
-                    String name = config.getString("name");
-
-                    label.setText(WebFrame.getConfigLabel(context, name));
-                    setVisibility(VISIBLE);
-
-                    icon.setImageDrawable(WebFrame.getConfigIconDrawable(context, name));
-                    icon.setVisibility(VISIBLE);
-
-                    targetIcon = overicon;
-                }
-            }
         }
         catch (Exception ex)
         {
@@ -592,16 +499,8 @@ public class LaunchItem extends FrameLayout implements
         }
 
         // @formatter:off
-        if (type.equals("select_home"  )) { launchSelectHome();     return; }
-        if (type.equals("select_assist")) { launchSelectAssist();   return; }
-        if (type.equals("firewall"     )) { launchFireWall();       return; }
-        if (type.equals("webconfig"    )) { launchWebConfig();      return; }
         if (type.equals("genericapp"   )) { launchGenericApp();     return; }
         if (type.equals("directory"    )) { launchDirectory();      return; }
-        if (type.equals("developer"    )) { launchDeveloper();      return; }
-        if (type.equals("settings"     )) { launchSettings();       return; }
-        if (type.equals("install"      )) { launchInstall();        return; }
-        if (type.equals("webframe"     )) { launchWebframe();       return; }
         if (type.equals("whatsapp"     )) { launchWhatsApp();       return; }
         if (type.equals("phone"        )) { launchPhone();          return; }
         if (type.equals("xavaro"       )) { launchXavaro();         return; }
@@ -609,20 +508,6 @@ public class LaunchItem extends FrameLayout implements
         // @formatter:on
 
         Toast.makeText(getContext(), "Nix launcher type <" + type + "> configured.", Toast.LENGTH_LONG).show();
-    }
-
-    private void launchSelectHome()
-    {
-        DitUndDat.DefaultApps.setDefaultHome(context);
-    }
-
-    private void launchSelectAssist()
-    {
-        DitUndDat.DefaultApps.setDefaultAssist(context);
-    }
-
-    private void launchFireWall()
-    {
     }
 
     private void launchPhone()
@@ -776,45 +661,7 @@ public class LaunchItem extends FrameLayout implements
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
-    private void launchInstall()
-    {
-        if (!config.has("packagename"))
-        {
-            Toast.makeText(getContext(), "Nix <packagename> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            String packagename = config.getString("packagename");
-
-            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packagename, 0);
-
-            if (appInfo != null) launchGenericApp();
-        }
-
-        catch (Exception ignore)
-        {
-            //
-            // Package is not installed.
-        }
-
-        try
-        {
-            String packagename = config.getString("packagename");
-
-            Intent goToMarket = new Intent(Intent.ACTION_VIEW);
-            goToMarket.setData(Uri.parse("market://details?id=" + packagename));
-            context.startActivity(goToMarket);
-        }
-        catch (Exception oops)
-        {
-            OopsService.log(LOGTAG, oops);
-        }
-    }
-
-    private void launchGenericApp()
+    protected void launchGenericApp()
     {
         if (!config.has("packagename"))
         {
@@ -832,36 +679,6 @@ public class LaunchItem extends FrameLayout implements
         catch (Exception ex)
         {
             ex.printStackTrace();
-        }
-    }
-
-    private void launchSettings()
-    {
-        if (!config.has("subtype"))
-        {
-            Toast.makeText(getContext(), "Nix <subtype> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            String subtype = config.getString("subtype");
-
-            if (subtype.equals("android"))
-            {
-                ProcessManager.launchApp(context, "com.android.settings");
-            }
-
-            if (subtype.equals("safehome"))
-            {
-                Intent intent = new Intent(context, SettingsActivity.class);
-                context.startActivity(intent);
-            }
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
         }
     }
 
@@ -889,108 +706,5 @@ public class LaunchItem extends FrameLayout implements
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
-    }
-
-    private void launchWebConfig()
-    {
-        if (!config.has("subtype"))
-        {
-            Toast.makeText(getContext(), "Nix <subtype> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            if (directory == null)
-            {
-                String subtype = config.getString("subtype");
-
-                directory = new LaunchGroupWebStream(context, this, "webconfig", subtype);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-
-        ((HomeActivity) context).addViewToBackStack(directory);
-    }
-
-    private void launchWebframe()
-    {
-        if (!config.has("name"))
-        {
-            Toast.makeText(getContext(), "Nix <name> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            if (webframe == null)
-            {
-                String name = config.getString("name");
-                String url = WebFrame.getConfigUrl(context, name);
-
-                webframe = new WebFrame(context);
-                webframe.setLoadURL(name, url);
-            }
-
-            ((HomeActivity) context).addViewToBackStack(webframe);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    private void launchDeveloperException()
-    {
-        try
-        {
-            int x = 0;
-            int y = 2 / x;
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        /*
-        String mypack = StaticUtils.getDefaultEmail(context);
-
-        Log.d(LOGTAG,"Email=" + mypack);
-
-        android.webkit.CookieManager wkCookieManager = android.webkit.CookieManager.getInstance();
-        wkCookieManager.removeAllCookies(null);
-        */
-    }
-
-    private void launchDeveloper()
-    {
-        //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
-
-        //new BlueToothScale(context).getCreateUserFromPreferences();
-
-        //DitUndDat.SpeekDat.speak("Die Sprachausgabe von Android funktioniert prima.");
-
-        /*
-        String xpath = "RemoteContacts/identities";
-        PersistManager.delXpath(xpath);
-        PersistManager.flush();
-        */
-
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
-        //Simple.startActivityForResult(intent, 1);
-
-        /*
-        Log.d(LOGTAG, "launchDeveloper: " + Environment.getExternalStorageDirectory());
-        Log.d(LOGTAG, "launchDeveloper: " + Environment.DIRECTORY_PICTURES);
-        Simple.dumpDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
-        Simple.dumpDirectory("/storage/emulated/0");
-        */
     }
 }

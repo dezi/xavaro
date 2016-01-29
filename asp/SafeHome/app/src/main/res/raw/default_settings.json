@@ -3,11 +3,13 @@
     "launchitems": [
       {
         "label": "Home Button",
-        "type": "select_home"
+        "type": "select",
+        "subtype": "home"
       },
       {
         "label": "Assistenz Button",
-        "type": "select_assist"
+        "type": "select",
+        "subtype": "assist"
       },
       {
         "label": "SafeHome Settings",
@@ -15,7 +17,7 @@
         "subtype": "safehome"
       },
       {
-        "label": "Android Setting",
+        "label": "Android Settings",
         "type": "settings",
         "subtype": "android"
       },

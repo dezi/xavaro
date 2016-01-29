@@ -40,7 +40,6 @@ public class LaunchItemAlertcall extends LaunchItem
         });
 
         icon.setImageResource(GlobalConfigs.IconResAlertcall);
-        icon.setVisibility(VISIBLE);
     }
 
     @Override
