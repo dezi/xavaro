@@ -33,7 +33,7 @@ import de.xavaro.android.common.Simple;
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.Callback
+public class LaunchItem extends FrameLayout
 {
     private final static String LOGTAG = LaunchItem.class.getSimpleName();
 
@@ -64,6 +64,9 @@ public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.C
         if (Simple.equals(type, "install"     )) item = new LaunchItemAdmin(context);
         if (Simple.equals(type, "settings"    )) item = new LaunchItemAdmin(context);
         if (Simple.equals(type, "developer"   )) item = new LaunchItemAdmin(context);
+
+        if (Simple.equals(type, "directory"   )) item = new LaunchItemGeneric(context);
+        if (Simple.equals(type, "genericapp"  )) item = new LaunchItemGeneric(context);
         // @formatter:on
 
         if (item == null) item = new LaunchItem(context);
@@ -156,6 +159,16 @@ public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.C
             }
         });
 
+        setLongClickable(true);
+        setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View view)
+            {
+                return onMyLongClick();
+            }
+        });
+
         overlay.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -164,14 +177,6 @@ public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.C
                 onMyOverlayClick();
             }
         });
-
-        DitUndDat.InternetState.subscribe(this);
-    }
-
-    @Nullable
-    public LaunchGroup getLaunchGroup()
-    {
-        return this.parent;
     }
 
     public void setSize(int width, int height)
@@ -194,12 +199,13 @@ public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.C
         this.config = config;
         this.parent = parent;
 
-        if (config.has("label")) label.setText(Json.getString(config, "label"));
-
-        setBackgroundResource(R.drawable.shadow_black_400x400);
-
         type = config.has("type") ? Json.getString(config, "type") : null;
         subtype = config.has("subtype") ? Json.getString(config, "subtype") : null;
+
+        if (config.has("label"))
+        {
+            label.setText(Json.getString(config, "label"));
+        }
 
         if (config.has("icon"))
         {
@@ -212,7 +218,6 @@ public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.C
                 if (thumbnail != null)
                 {
                     icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
-                    icon.setVisibility(VISIBLE);
                 }
             }
             else
@@ -222,94 +227,51 @@ public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.C
                 if (resourceId > 0)
                 {
                     icon.setImageResource(resourceId);
-                    icon.setVisibility(VISIBLE);
                 }
             }
         }
+
+        if (config.has("packagename"))
+        {
+            String packageName = Json.getString(config, "packagename");
+
+            if (packageName != null)
+            {
+                GlobalConfigs.weLikeThis(packageName);
+                Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+
+                if (appIcon != null)
+                {
+                    icon.setImageDrawable(appIcon);
+                }
+                else
+                {
+                    Bitmap thumbnail = CacheManager.getIconFromAppStore(context, packageName);
+
+                    if (thumbnail != null)
+                    {
+                        icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    }
+                    else
+                    {
+                        icon.setImageResource(R.drawable.stop_512x512);
+                    }
+                }
+            }
+        }
+
+        setBackgroundResource(R.drawable.shadow_black_400x400);
 
         this.setConfig();
     }
 
+    @Nullable
+    public LaunchGroup getLaunchGroup()
+    {
+        return this.parent;
+    }
+
     protected void setConfig()
-    {
-        String packageName = null;
-        boolean hasProblem = false;
-        ImageView targetIcon = icon;
-
-        try
-        {
-            if (config.has("packagename"))
-            {
-                packageName = config.getString("packagename");
-
-                GlobalConfigs.weLikeThis(context, packageName);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-
-        if (packageName != null)
-        {
-            Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
-
-            if (appIcon != null)
-            {
-                targetIcon.setImageDrawable(appIcon);
-            }
-            else
-            {
-                Bitmap thumbnail = CacheManager.getIconFromAppStore(context, packageName);
-
-                if (thumbnail != null)
-                {
-                    targetIcon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
-                }
-                else
-                {
-                    targetIcon.setImageResource(R.drawable.stop_512x512);
-                    hasProblem = true;
-                }
-            }
-
-            targetIcon.setVisibility(VISIBLE);
-        }
-
-        if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
-
-        setBackgroundResource(hasProblem ? R.drawable.shadow_alert_400x400 : R.drawable.shadow_black_400x400);
-    }
-
-    public void onInternetChanged()
-    {
-        if (DitUndDat.InternetState.isWifi)
-        {
-            dimmer.setBackgroundColor(Color.TRANSPARENT);
-
-            return;
-        }
-
-        if (DitUndDat.InternetState.isMobile)
-        {
-            if (type.equals("audioplayer") || type.equals("videoplayer"))
-            {
-                dimmer.setBackgroundColor(0xcccccccc);
-            }
-        }
-
-        if (!DitUndDat.InternetState.isConnected)
-        {
-            if (type.equals("webframe")
-                    || type.equals("audioplayer")
-                    || type.equals("videoplayer"))
-            {
-                dimmer.setBackgroundColor(0xcccccccc);
-            }
-        }
-    }
-
-    protected void onMyOverlayClick()
     {
         //
         // To be overridden...
@@ -318,72 +280,24 @@ public class LaunchItem extends FrameLayout implements DitUndDat.InternetState.C
 
     protected void onMyClick()
     {
-        if (config == null)
-        {
-            Toast.makeText(getContext(), "Nix configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        if (type == null)
-        {
-            Toast.makeText(getContext(), "Nix <type> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        // @formatter:off
-        if (type.equals("genericapp")) { launchGenericApp(); return; }
-        if (type.equals("directory" )) { launchDirectory();  return; }
-        // @formatter:on
-
-        Toast.makeText(getContext(), "Nix launcher type <" + type + "> configured.", Toast.LENGTH_LONG).show();
+        //
+        // To be overridden...
+        //
     }
 
-    protected void launchGenericApp()
+    protected boolean onMyLongClick()
     {
-        if (!config.has("packagename"))
-        {
-            Toast.makeText(getContext(), "Nix <packagename> configured.", Toast.LENGTH_LONG).show();
+        //
+        // To be overridden...
+        //
 
-            return;
-        }
-
-        try
-        {
-            String packagename = config.getString("packagename");
-
-            ProcessManager.launchApp(context, packagename);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+        return false;
     }
 
-    private void launchDirectory()
+    protected void onMyOverlayClick()
     {
-        if (!config.has("launchgroup"))
-        {
-            Toast.makeText(getContext(), "Nix <launchgroup> configured.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        if (directory == null)
-        {
-            directory = new LaunchGroup(context);
-
-            try
-            {
-                directory.setConfig(this, config.getJSONObject("launchgroup"));
-            }
-            catch (JSONException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-
-        ((HomeActivity) context).addViewToBackStack(directory);
+        //
+        // To be overridden...
+        //
     }
 }

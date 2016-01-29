@@ -133,21 +133,6 @@ public class StaticUtils
 
     //endregion
 
-    //
-    // Retrieve package name handling emails.
-    //
-
-    public static String getDefaultEmail(Context context)
-    {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse("mailto:"));
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        return (res.activityInfo == null) ? null : res.activityInfo.packageName;
-    }
-
-    //endregion
-
     //region Nice to have image methods.
 
     //

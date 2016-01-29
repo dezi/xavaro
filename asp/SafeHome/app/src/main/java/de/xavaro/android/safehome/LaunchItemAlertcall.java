@@ -48,7 +48,8 @@ public class LaunchItemAlertcall extends LaunchItem
         ArchievementManager.show("alertcall.shortclick");
     }
 
-    private boolean onMyLongClick()
+    @Override
+    protected boolean onMyLongClick()
     {
         alertcallShowDialog();
 

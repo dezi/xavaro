@@ -7,6 +7,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class GlobalConfigs
@@ -26,9 +27,14 @@ public class GlobalConfigs
     public static boolean likeEmail      = true;
     // @formatter:on
 
-    public static void weLikeThis(Context context,String packagename)
+    public static void weLikeThis(String packagename)
     {
-        if (CommonConfigs.packageEmail == null) CommonConfigs.packageEmail = StaticUtils.getDefaultEmail(context);
+        if (packagename == null) return;
+
+        if (CommonConfigs.packageEmail == null)
+        {
+            CommonConfigs.packageEmail = Simple.getDefaultEmail();
+        }
 
         // @formatter:off
         if (packagename.equals(CommonConfigs.packageWhatsApp  )) likeWhatsApp   = true;
