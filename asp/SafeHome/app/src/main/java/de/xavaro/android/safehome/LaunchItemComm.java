@@ -134,11 +134,11 @@ public class LaunchItemComm extends LaunchItem
 
                     if (Simple.equals(chattype, "user"))
                     {
-                        icon.setImageResource(GlobalConfigs.IconResChatUser);
+                        icon.setImageResource(GlobalConfigs.IconResCommChatUser);
                     }
                     if (Simple.equals(chattype, "group"))
                     {
-                        icon.setImageResource(GlobalConfigs.IconResChatGroup);
+                        icon.setImageResource(GlobalConfigs.IconResCommChatGroup);
                     }
                 }
             }
