@@ -21,10 +21,8 @@ import java.util.ArrayList;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.GCMRegistrationService;
 
 public class HomeActivity extends AppCompatActivity implements
@@ -83,7 +81,7 @@ public class HomeActivity extends AppCompatActivity implements
         SettingsFragments.initialize(this);
         DitUndDat.SpeekDat.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
-        HealthGroup.initialize(this);
+        LaunchGroupHealth.initialize(this);
 
         createConfig();
 

@@ -19,9 +19,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Gravity;
 
@@ -46,9 +44,7 @@ import de.xavaro.android.common.StaticUtils;
 //
 
 public class LaunchItem extends FrameLayout implements
-        SurfaceHolder.Callback,
-        DitUndDat.InternetState.Callback,
-        BlueTooth.BlueToothConnectCallback
+        DitUndDat.InternetState.Callback
 {
     private final String LOGTAG = "LaunchItem";
 
@@ -61,10 +57,10 @@ public class LaunchItem extends FrameLayout implements
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
 
-        if (Simple.equals(type, "ipradio"     )) item = new LaunchItemWebmedia(context);
-        if (Simple.equals(type, "iptelevision")) item = new LaunchItemWebmedia(context);
-        if (Simple.equals(type, "audioplayer" )) item = new LaunchItemWebmedia(context);
-        if (Simple.equals(type, "videoplayer" )) item = new LaunchItemWebmedia(context);
+        if (Simple.equals(type, "ipradio"     )) item = new LaunchItemWebStream(context);
+        if (Simple.equals(type, "iptelevision")) item = new LaunchItemWebStream(context);
+        if (Simple.equals(type, "audioplayer" )) item = new LaunchItemWebStream(context);
+        if (Simple.equals(type, "videoplayer" )) item = new LaunchItemWebStream(context);
 
         if (item == null) item = new LaunchItem(context);
 
@@ -224,7 +220,7 @@ public class LaunchItem extends FrameLayout implements
 
                 if (resourceId > 0)
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, resourceId));
+                    icon.setImageResource(resourceId);
                     icon.setVisibility(VISIBLE);
                 }
             }
@@ -252,7 +248,7 @@ public class LaunchItem extends FrameLayout implements
             {
                 packageName = DitUndDat.DefaultApps.getDefaultHome(context);
 
-                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectHome));
+                icon.setImageResource(GlobalConfigs.IconResSelectHome);
                 icon.setVisibility(VISIBLE);
                 targetIcon = overicon;
             }
@@ -261,14 +257,14 @@ public class LaunchItem extends FrameLayout implements
             {
                 packageName = DitUndDat.DefaultApps.getDefaultAssist(context);
 
-                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSelectAssist));
+                icon.setImageResource(GlobalConfigs.IconResSelectAssist);
                 icon.setVisibility(VISIBLE);
                 targetIcon = overicon;
             }
 
             if (type.equals("developer"))
             {
-                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResTesting));
+                icon.setImageResource(GlobalConfigs.IconResTesting);
                 icon.setVisibility(VISIBLE);
             }
 
@@ -278,20 +274,20 @@ public class LaunchItem extends FrameLayout implements
 
                 if (subtype.equals("safehome"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsSafehome));
+                    icon.setImageResource(GlobalConfigs.IconResSettingsSafehome);
                     icon.setVisibility(VISIBLE);
                 }
 
                 if (subtype.equals("android"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSettingsAndroid));
+                    icon.setImageResource(GlobalConfigs.IconResSettingsAndroid);
                     icon.setVisibility(VISIBLE);
                 }
             }
 
             if (type.equals("firewall"))
             {
-                icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResFireWall));
+                icon.setImageResource(GlobalConfigs.IconResFireWall);
                 icon.setVisibility(VISIBLE);
             }
 
@@ -301,31 +297,31 @@ public class LaunchItem extends FrameLayout implements
 
                 if (subtype.equals("newspaper"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigNewspaper));
+                    icon.setImageResource(GlobalConfigs.IconResWebConfigNewspaper);
                     icon.setVisibility(VISIBLE);
                 }
 
                 if (subtype.equals("magazine"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigMagazine));
+                    icon.setImageResource(GlobalConfigs.IconResWebConfigMagazine);
                     icon.setVisibility(VISIBLE);
                 }
 
                 if (subtype.equals("pictorial"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigPictorial));
+                    icon.setImageResource(GlobalConfigs.IconResWebConfigPictorial);
                     icon.setVisibility(VISIBLE);
                 }
 
                 if (subtype.equals("shopping"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigShopping));
+                    icon.setImageResource(GlobalConfigs.IconResWebConfigShopping);
                     icon.setVisibility(VISIBLE);
                 }
 
                 if (subtype.equals("erotics"))
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWebConfigErotics));
+                    icon.setImageResource(GlobalConfigs.IconResWebConfigErotics);
                     icon.setVisibility(VISIBLE);
                 }
             }
@@ -338,19 +334,19 @@ public class LaunchItem extends FrameLayout implements
 
                     if (icontype.equals("user"))
                     {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatUser));
+                        icon.setImageResource(GlobalConfigs.IconResChatUser);
                         icon.setVisibility(VISIBLE);
                     }
 
                     if (icontype.equals("group"))
                     {
-                        icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResChatGroup));
+                        icon.setImageResource(GlobalConfigs.IconResChatGroup);
                         icon.setVisibility(VISIBLE);
                     }
                 }
                 else
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResCommunication));
+                    icon.setImageResource(GlobalConfigs.IconResCommunication);
                     icon.setVisibility(VISIBLE);
                 }
             }
@@ -379,19 +375,19 @@ public class LaunchItem extends FrameLayout implements
 
                         if (subtype.equals("text"))
                         {
-                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppText));
+                            targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppText);
                             targetIcon.setVisibility(VISIBLE);
                         }
                         if (subtype.equals("voip"))
                         {
-                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneAppCall));
+                            targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppCall);
                             targetIcon.setVisibility(VISIBLE);
                         }
                     }
                 }
                 else
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResPhoneApp));
+                    icon.setImageResource(GlobalConfigs.IconResPhoneApp);
                     icon.setVisibility(VISIBLE);
                 }
             }
@@ -422,19 +418,19 @@ public class LaunchItem extends FrameLayout implements
 
                         if (subtype.equals("chat"))
                         {
-                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppChat));
+                            targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppChat);
                             targetIcon.setVisibility(VISIBLE);
                         }
                         if (subtype.equals("voip"))
                         {
-                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsAppVoip));
+                            targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppVoip);
                             targetIcon.setVisibility(VISIBLE);
                         }
                     }
                 }
                 else
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResWhatsApp));
+                    icon.setImageResource(GlobalConfigs.IconResWhatsApp);
                     icon.setVisibility(VISIBLE);
                 }
             }
@@ -463,24 +459,24 @@ public class LaunchItem extends FrameLayout implements
 
                         if (subtype.equals("chat"))
                         {
-                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeChat));
+                            targetIcon.setImageResource(GlobalConfigs.IconResSkypeChat);
                             targetIcon.setVisibility(VISIBLE);
                         }
                         if (subtype.equals("voip"))
                         {
-                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVoip));
+                            targetIcon.setImageResource(GlobalConfigs.IconResSkypeVoip);
                             targetIcon.setVisibility(VISIBLE);
                         }
                         if (subtype.equals("vica"))
                         {
-                            targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkypeVica));
+                            targetIcon.setImageResource(GlobalConfigs.IconResSkypeVica);
                             targetIcon.setVisibility(VISIBLE);
                         }
                     }
                 }
                 else
                 {
-                    icon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResSkype));
+                    icon.setImageResource(GlobalConfigs.IconResSkype);
                     icon.setVisibility(VISIBLE);
                 }
             }
@@ -524,7 +520,7 @@ public class LaunchItem extends FrameLayout implements
                 }
                 else
                 {
-                    targetIcon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.stop_512x512));
+                    targetIcon.setImageResource(R.drawable.stop_512x512);
                     hasProblem = true;
                 }
             }
@@ -910,7 +906,7 @@ public class LaunchItem extends FrameLayout implements
             {
                 String subtype = config.getString("subtype");
 
-                directory = new WebStream(context, "webconfig", subtype);
+                directory = new LaunchGroupWebStream(context, this, "webconfig", subtype);
             }
         }
         catch (Exception ex)
@@ -970,67 +966,6 @@ public class LaunchItem extends FrameLayout implements
         wkCookieManager.removeAllCookies(null);
         */
     }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder)
-    {
-        ProxyPlayer.getInstance().setDisplay(holder);
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
-    {
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder)
-    {
-    }
-
-    //region BlueTooth connect states
-
-    public final Runnable bluetoothIsConnected = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, GlobalConfigs.IconResBlueTooth));
-            overicon.setVisibility(VISIBLE);
-            overlay.setVisibility(VISIBLE);
-        }
-    };
-
-    public final Runnable bluetoothIsDisconnected = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            overicon.setVisibility(INVISIBLE);
-            overlay.setVisibility(INVISIBLE);
-        }
-    };
-
-    public void onBluetoothConnect(String deviceName)
-    {
-        Log.d(LOGTAG, "onBluetoothConnect: " + deviceName);
-
-        //
-        // Post delayed in case of sleeping devices with
-        // short time idle connect.
-        //
-
-        handler.post(bluetoothIsConnected);
-    }
-
-    public void onBluetoothDisconnect(String deviceName)
-    {
-        Log.d(LOGTAG, "onBluetoothDisconnect: " + deviceName);
-
-        handler.removeCallbacks(bluetoothIsConnected);
-        handler.post(bluetoothIsDisconnected);
-    }
-
-    //endregion BlueTooth connect states
 
     private void launchDeveloper()
     {
