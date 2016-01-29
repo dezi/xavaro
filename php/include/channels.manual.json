@@ -1,5 +1,23 @@
 [
   {
+    "name":"Hope Channel Deutsch",
+    "free":true,
+    "enc":"None",
+    "hd":false,
+    "website":"www.hopechannel.de/tv",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/hh/hope_channel_de.png",
+    "type":"tv",
+    "country":"Germany, United States",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"13:Religious",
+    "packs":
+    [
+      "16:ORF Digital"
+    ]
+  },
+  {
     "name":"Sat. 1 Rheinland-Pfalz und Hessen",
     "free":true,
     "enc":"None",
