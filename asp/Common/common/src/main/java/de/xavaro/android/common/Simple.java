@@ -598,6 +598,12 @@ public class Simple
         return BitmapFactory.decodeResource(anyContext.getResources(), resid);
     }
 
+    public static int getIconResourceId(String iconname)
+    {
+        return anyContext.getResources().getIdentifier(
+                iconname, "drawable", anyContext.getPackageName());
+    }
+
     @Nullable
     public static String getFirstMatch(String regex, String content)
     {

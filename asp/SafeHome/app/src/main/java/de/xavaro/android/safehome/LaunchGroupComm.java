@@ -18,7 +18,7 @@ import de.xavaro.android.common.Simple;
 // Utility namespace for app launch groups.
 //
 
-public class AppsGroup
+public class LaunchGroupComm
 {
     public static class XavaroGroup extends LaunchGroup
     {
@@ -53,8 +53,7 @@ public class AppsGroup
 
                 for (String prefkey : xavaros.keySet())
                 {
-                    String subtype = "chat";
-                    String keyprefix = "xavaro.remote.users." + subtype + ".";
+                    String keyprefix = "xavaro.remote.users.chat.";
 
                     if (! prefkey.startsWith(keyprefix))
                     {
@@ -72,13 +71,13 @@ public class AppsGroup
 
                     whatsentry.put("label", label);
                     whatsentry.put("type", "xavaro");
-                    whatsentry.put("subtype", subtype);
-                    whatsentry.put("icontype", "user");
+                    whatsentry.put("subtype", "chat");
+                    whatsentry.put("chattype", "user");
                     whatsentry.put("identity", ident);
 
                     launchitems.put(whatsentry);
 
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + ident + "=" + label);
+                    Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
                 }
 
                 //
@@ -87,8 +86,7 @@ public class AppsGroup
 
                 for (String prefkey : xavaros.keySet())
                 {
-                    String subtype = "chat";
-                    String keyprefix = "xavaro.remote.groups." + subtype + ".";
+                    String keyprefix = "xavaro.remote.groups.chat.";
 
                     if (! prefkey.startsWith(keyprefix))
                     {
@@ -106,13 +104,13 @@ public class AppsGroup
 
                     whatsentry.put("label", label);
                     whatsentry.put("type", "xavaro");
-                    whatsentry.put("subtype", subtype);
-                    whatsentry.put("icontype", "group");
+                    whatsentry.put("subtype", "chat");
+                    whatsentry.put("chattype", "group");
                     whatsentry.put("identity", ident);
 
                     launchitems.put(whatsentry);
 
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + ident + "=" + label);
+                    Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
                 }
 
                 launchgroup.put("launchitems", launchitems);

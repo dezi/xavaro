@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.os.Environment;
 import android.widget.Toast;
+import android.net.Uri;
 
 import java.io.File;
 
