@@ -416,6 +416,16 @@ public class Simple
 
     //region All purpose simple getters
 
+    public static float getDeviceTextSize(float textsize)
+    {
+        return (textsize / getDeviceDPI()) * 160;
+    }
+
+    public static int getDeviceDPI()
+    {
+        return anyContext.getResources().getDisplayMetrics().densityDpi;
+    }
+
     public static String getUUID()
     {
         return UUID.randomUUID().toString();

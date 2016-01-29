@@ -220,9 +220,9 @@ public class LaunchItem extends FrameLayout
         //
 
         textsize = layout.height / 10;
-        label.setTextSize(textsize);
+        label.setTextSize(Simple.getDeviceTextSize(textsize));
 
-        Log.d(LOGTAG,"================: " + textsize);
+        Log.d(LOGTAG,"================: " + Simple.getDeviceDPI() + "="  + layout.height + "=" + textsize);
 
         //
         // Figure out the layout of this label.
@@ -246,7 +246,7 @@ public class LaunchItem extends FrameLayout
             //
 
             textsize = layout.height / 12;
-            label.setTextSize(textsize);
+            label.setTextSize(Simple.getDeviceTextSize(textsize));
 
             //
             // This might lead to a shitty breaking
