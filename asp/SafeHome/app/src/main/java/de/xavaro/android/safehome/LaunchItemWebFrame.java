@@ -27,7 +27,7 @@ public class LaunchItemWebFrame extends LaunchItem
             {
                 String name = Json.getString(config, "name");
 
-                label.setText(WebFrame.getConfigLabel(context, name));
+                setLabelText(WebFrame.getConfigLabel(context, name));
                 icon.setImageDrawable(WebFrame.getConfigIconDrawable(context, name));
             }
         }

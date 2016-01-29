@@ -15,10 +15,97 @@ public class RemoteGroups
 
     private static final String xPathRoot = "RemoteGroups/groupidentities";
 
+    public static boolean isGroup(String groupidentity)
+    {
+        return (getGroup(groupidentity) != null);
+    }
+
+    public static JSONObject getGroup(String groupidentity)
+    {
+        String xpath = xPathRoot + "/"  + groupidentity;
+        return PersistManager.getXpathJSONObject(xpath);
+    }
+
+    public static boolean putGroup(JSONObject remotegroup)
+    {
+        String groupidentity = Json.getString(remotegroup, "groupidentity");
+        if (groupidentity == null) return false;
+
+        String xpath = xPathRoot + "/"  + groupidentity;
+        PersistManager.putXpath(xpath, remotegroup);
+        PersistManager.flush();
+        return true;
+    }
+
+    @Nullable
+    public static JSONArray getGCMTokens(String groupidentity)
+    {
+        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
+
+        if ((rg != null) && rg.has("members"))
+        {
+            JSONArray members = Json.getArray(rg, "members");
+
+            if (members != null)
+            {
+                JSONArray tokens = new JSONArray();
+
+                for (int inx = 0; inx < members.length(); inx++)
+                {
+                    JSONObject member = Json.getObject(members, inx);
+                    if (member == null) continue;
+
+                    String memberident = Json.getString(member, "identity");
+                    if (memberident == null) continue;
+
+                    if (memberident.equals(SystemIdentity.getIdentity()))
+                    {
+                        //
+                        // Exclude ourselves from recipients list.
+                        //
+
+                        //continue;
+                    }
+
+                    if (member.has("gcmUuid")) tokens.put(Json.getString(member, "gcmUuid"));
+                }
+
+                return tokens;
+            }
+        }
+
+        return null;
+    }
+
+    public static String getDisplayName(String groupidentity)
+    {
+        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
+
+        if (rg != null)
+        {
+            String groupname = "";
+
+            if (rg.has("name")) groupname += " " + Json.getString(rg, "name");
+
+            if (Simple.equals(Json.getString(rg, "type"), "alertcall"))
+            {
+                if (rg.has("owner"))
+                {
+                    String ownername = RemoteContacts.getDisplayName(Json.getString(rg, "owner"));
+                    groupname += " " + "für" + " " + ownername;
+                }
+            }
+
+            return groupname.trim();
+        }
+
+        return "Unbekannt";
+    }
+
+    //region Group updates
+
     public static void updateGroupFromPreferences(String groupprefix)
     {
-        //PersistManager.delXpath(xPathRoot);
-
         Log.d(LOGTAG,"updateGroupFromPreferences: " + groupprefix);
 
         String groupidentity = Simple.getPreferenceString(groupprefix + ".groupidentity");
@@ -138,7 +225,6 @@ public class RemoteGroups
 
     public static boolean updateMember(String groupidentity, JSONObject member, boolean publish)
     {
-
         JSONObject oldgroup = null;
         JSONObject oldmember = null;
         boolean dirty = false;
@@ -209,89 +295,5 @@ public class RemoteGroups
         return true;
     }
 
-    public static boolean isGroup(String groupidentity)
-    {
-        return (getGroup(groupidentity) != null);
-    }
-
-    public static JSONObject getGroup(String groupidentity)
-    {
-        String xpath = xPathRoot + "/"  + groupidentity;
-        return PersistManager.getXpathJSONObject(xpath);
-    }
-
-    public static boolean putGroup(JSONObject remotegroup)
-    {
-        String groupidentity = Json.getString(remotegroup, "groupidentity");
-        if (groupidentity == null) return false;
-
-        String xpath = xPathRoot + "/"  + groupidentity;
-        PersistManager.putXpath(xpath, remotegroup);
-        PersistManager.flush();
-        return true;
-    }
-
-    @Nullable
-    public static JSONArray getGCMTokens(String groupidentity)
-    {
-        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/"  + groupidentity);
-
-        if ((rg != null) && rg.has("members"))
-        {
-            JSONArray members = Json.getArray(rg, "members");
-
-            if (members != null)
-            {
-                JSONArray tokens = new JSONArray();
-
-                for (int inx = 0; inx < members.length(); inx++)
-                {
-                    JSONObject member = Json.getObject(members, inx);
-                    if (member == null) continue;
-
-                    String memberident = Json.getString(member, "identity");
-                    if (memberident == null) continue;
-
-                    if (memberident.equals(SystemIdentity.getIdentity()))
-                    {
-                        //
-                        // Exclude ourselves from recipients list.
-                        //
-
-                        continue;
-                    }
-
-                    if (member.has("gcmUuid")) tokens.put(Json.getString(member, "gcmUuid"));
-                }
-
-                return tokens;
-            }
-        }
-
-        return null;
-    }
-
-    public static String getDisplayName(String groupidentity)
-    {
-        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
-
-        if (rg != null)
-        {
-            String groupname = "";
-
-            if (rg.has("name")) groupname += " " + Json.getString(rg, "name");
-
-            if (rg.has("owner"))
-            {
-                String ownername = RemoteContacts.getDisplayName(Json.getString(rg, "owner"));
-
-                groupname += " ";
-                groupname += "(" + ownername + ")";
-            }
-
-            return groupname.trim();
-        }
-
-        return "Unbekannt";
-    }
+    //endregion Group updates
 }

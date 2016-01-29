@@ -11,6 +11,7 @@ import android.net.Uri;
 
 import java.io.File;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
@@ -120,7 +121,17 @@ public class LaunchItemAdmin extends LaunchItem
 
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packagename, 0);
 
-            if (appInfo != null) launchGenericApp();
+            if (appInfo != null)
+            {
+                //
+                // Package is installed.
+                //
+
+                ProcessManager.launchApp(context, packagename);
+
+                return;
+            }
+
         }
         catch (Exception ignore)
         {

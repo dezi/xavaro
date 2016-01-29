@@ -51,6 +51,7 @@ public class ChatActivity extends AppCompatActivity implements
     private static final String LOGTAG = ChatActivity.class.getSimpleName();
 
     private final int UI_HIDE = View.SYSTEM_UI_FLAG_FULLSCREEN;
+
     private final Map<String, FrameLayout> protoIncoming = new HashMap<>();
     private final Map<String, FrameLayout> protoOutgoing = new HashMap<>();
 
@@ -878,7 +879,7 @@ public class ChatActivity extends AppCompatActivity implements
         });
     }
 
-    public void onSetMessageStatus(String uuid, String what)
+    public void onSetMessageStatus(String idremote, String uuid, String what)
     {
         FrameLayout textLayout = protoOutgoing.get(uuid);
         if (textLayout == null) return;

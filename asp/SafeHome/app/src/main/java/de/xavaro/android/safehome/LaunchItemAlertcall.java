@@ -11,8 +11,11 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 
 public class LaunchItemAlertcall extends LaunchItem
@@ -28,6 +31,10 @@ public class LaunchItemAlertcall extends LaunchItem
     @Override
     protected void setConfig()
     {
+        SharedPreferences sp = Simple.getSharedPrefs();
+
+        groupIdentity = sp.getString("alertgroup.groupIdentity", null);
+
         setLongClickable(true);
 
         setOnLongClickListener(new View.OnLongClickListener()
@@ -60,12 +67,13 @@ public class LaunchItemAlertcall extends LaunchItem
     private static final int ALERTCALL_CANCELED  = 1;
     private static final int ALERTCALL_EXECUTED  = 2;
 
-    private AlertDialog alertcallDialog;
-    private TextView alertcallTextview;
-    private String alertcallUUID;
-    private String alertcallText;
-    private int alertcallSeconds;
-    private int alertcallStatus;
+    private String groupIdentity;
+    private AlertDialog alertDialog;
+    private TextView alertTextview;
+    private String alertMessageUUID;
+    private String alertMessage;
+    private int alertCountdown;
+    private int alertStatus;
 
     private void alertcallShowDialog()
     {
@@ -73,33 +81,33 @@ public class LaunchItemAlertcall extends LaunchItem
 
         builder.setTitle("Hilfe rufen...");
 
-        alertcallTextview = new TextView(context);
-        alertcallTextview.setPadding(40, 40, 40, 40);
-        alertcallTextview.setTextSize(24f);
+        alertTextview = new TextView(context);
+        alertTextview.setPadding(40, 40, 40, 40);
+        alertTextview.setTextSize(24f);
 
-        builder.setView(alertcallTextview);
+        builder.setView(alertTextview);
 
         builder.setPositiveButton("Jetzt sofort", null);
         builder.setNeutralButton("Abbrechen", null);
 
-        alertcallDialog = builder.create();
-        alertcallDialog.show();
+        alertDialog = builder.create();
+        alertDialog.show();
 
-        alertcallDialog.setCancelable(false);
+        alertDialog.setCancelable(false);
 
-        Button positive = alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button positive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
         positive.setTextSize(24f);
         positive.setTransformationMethod(null);
         positive.setOnClickListener(alertOnClickPositive);
 
-        Button neutral = alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+        Button neutral = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
         neutral.setTextSize(24f);
         neutral.setTransformationMethod(null);
         neutral.setOnClickListener(alertOnClickNeutral);
 
-        alertcallText = "Der Hilferuf wird in %d Sekunden ausgelöst";
-        alertcallStatus = ALERTCALL_COUNTDOWN;
-        alertcallSeconds = 20;
+        alertMessage = "Der Hilferuf wird in %d Sekunden ausgelöst";
+        alertStatus = ALERTCALL_COUNTDOWN;
+        alertCountdown = 20;
 
         if (handler == null) handler = new Handler();
         handler.post(alertcallCountdown);
@@ -107,35 +115,20 @@ public class LaunchItemAlertcall extends LaunchItem
 
     private void alertcallExecute()
     {
-        SharedPreferences sp = Simple.getSharedPrefs();
+        ChatManager.getInstance().subscribe(groupIdentity, this);
 
-        String groupidentity = sp.getString("alertgroup.groupidentity", null);
-
-        if (groupidentity == null)
-        {
-            String message = "Der Hilferuf konnte nicht ausgelöst werden";
-            alertcallTextview.setText(message);
-            DitUndDat.SpeekDat.speak(message);
-
-            // todo
-
-            return;
-        }
-
-        ChatManager.getInstance().subscribe(groupidentity, this);
-
-        alertcallUUID = Simple.getUUID();
+        alertMessageUUID = Simple.getUUID();
         String alerttext = "Es wird Hilfe benötigt";
 
         JSONObject alertmessage = new JSONObject();
-        Json.put(alertmessage, "uuid", alertcallUUID);
+        Json.put(alertmessage, "uuid", alertMessageUUID);
         Json.put(alertmessage, "message", alerttext);
         Json.put(alertmessage, "priority", "alertcall");
 
-        ChatManager.getInstance().sendOutgoingMessage(groupidentity, alertmessage);
+        ChatManager.getInstance().sendOutgoingMessage(groupIdentity, alertmessage);
 
         String message = "Der Hilferuf wurde ausgelöst";
-        alertcallTextview.setText(message);
+        alertTextview.setText(message);
         DitUndDat.SpeekDat.speak(message);
     }
 
@@ -144,25 +137,25 @@ public class LaunchItemAlertcall extends LaunchItem
         @Override
         public void run()
         {
-            if (! alertcallDialog.isShowing()) return;
+            if (! alertDialog.isShowing()) return;
 
-            if (alertcallSeconds == 0)
+            if (alertCountdown == 0)
             {
-                alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Ok");
-                alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Ok");
+                alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
 
-                alertcallStatus = ALERTCALL_EXECUTED;
+                alertStatus = ALERTCALL_EXECUTED;
 
                 alertcallExecute();
             }
             else
             {
-                String message = String.format(alertcallText, alertcallSeconds);
+                String message = String.format(alertMessage, alertCountdown);
 
-                alertcallTextview.setText(message);
-                if ((alertcallSeconds % 5) == 0) DitUndDat.SpeekDat.speak(message);
+                alertTextview.setText(message);
+                if ((alertCountdown % 5) == 0) DitUndDat.SpeekDat.speak(message);
 
-                alertcallSeconds -= 1;
+                alertCountdown -= 1;
                 handler.postDelayed(alertcallCountdown, 1000);
             }
         }
@@ -173,19 +166,21 @@ public class LaunchItemAlertcall extends LaunchItem
         @Override
         public void onClick(View dialog)
         {
-            if (alertcallStatus == ALERTCALL_COUNTDOWN)
+            if (alertStatus == ALERTCALL_COUNTDOWN)
             {
-                alertcallSeconds = 0;
+                alertCountdown = 0;
             }
 
-            if (alertcallStatus == ALERTCALL_CANCELED)
+            if (alertStatus == ALERTCALL_CANCELED)
             {
-                alertcallDialog.cancel();
+                alertDialog.cancel();
+
+                ChatManager.getInstance().unsubscribe(groupIdentity, LaunchItemAlertcall.this);
             }
 
-            if (alertcallStatus == ALERTCALL_EXECUTED)
+            if (alertStatus == ALERTCALL_EXECUTED)
             {
-                alertcallDialog.cancel();
+                alertDialog.cancel();
             }
         }
     };
@@ -199,31 +194,53 @@ public class LaunchItemAlertcall extends LaunchItem
 
             String message = "Der Hilferuf wurde abgebrochen";
 
-            alertcallTextview.setText(message);
+            alertTextview.setText(message);
             DitUndDat.SpeekDat.speak(message);
 
-            alertcallStatus = ALERTCALL_CANCELED;
+            alertStatus = ALERTCALL_CANCELED;
 
-            alertcallDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Schliessen");
-            alertcallDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Schliessen");
+            alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setVisibility(INVISIBLE);
         }
     };
 
-    private Runnable speekReceivedMessage = new Runnable()
+    private ArrayList<String> idremotesAlertReceived = new ArrayList<>();
+    private ArrayList<String> idremotesAlertRead  = new ArrayList<>();
+
+    private final Runnable speekFeedbackMessage = new Runnable()
     {
         @Override
         public void run()
         {
+            synchronized (speekFeedbackMessage)
+            {
+                for (String idremote : idremotesAlertReceived)
+                {
+                    if (!idremotesAlertRead.contains(idremote))
+                    {
+                        String message = RemoteContacts.getDisplayName(idremote);
+                        message += " hat ihren Notruf empfangen";
+                        DitUndDat.SpeekDat.speak(message);
 
-        }
-    };
+                        message = alertTextview.getText() + ".\n" + message;
+                        alertTextview.setText(message);
+                    }
+                }
 
-    private Runnable speekReadMessage = new Runnable()
-    {
-        @Override
-        public void run()
-        {
+                idremotesAlertReceived.clear();
 
+                for (String idremote : idremotesAlertRead)
+                {
+                    String message = RemoteContacts.getDisplayName(idremote);
+                    message += " hat ihren Notruf gelesen";
+                    DitUndDat.SpeekDat.speak(message);
+
+                    message = alertTextview.getText() + ".\n" + message;
+                    alertTextview.setText(message);
+                }
+
+                idremotesAlertRead.clear();
+            }
         }
     };
 
@@ -236,21 +253,29 @@ public class LaunchItemAlertcall extends LaunchItem
         Log.d(LOGTAG, "onIncomingMessage:" + message.toString());
     }
 
-    public void onSetMessageStatus(String uuid, String what)
+    public void onSetMessageStatus(String idremote, String uuid, String what)
     {
-        Log.d(LOGTAG, "onSetMessageStatus:" + uuid + "=" + what);
+        if (! alertMessageUUID.equals(uuid)) return;
 
-        if (! alertcallUUID.equals(uuid)) return;
-
-        if (what.equals("recv"))
+        synchronized (speekFeedbackMessage)
         {
-            handler.postDelayed(speekReceivedMessage,3000);
-        }
+            if (what.equals("recv"))
+            {
+                if (!idremotesAlertReceived.contains(idremote))
+                    idremotesAlertReceived.add(idremote);
 
-        if (what.equals("read"))
-        {
-            handler.removeCallbacks(speekReceivedMessage);
-            handler.post(speekReadMessage);
+                handler.removeCallbacks(speekFeedbackMessage);
+                handler.postDelayed(speekFeedbackMessage, 3000);
+            }
+
+            if (what.equals("read"))
+            {
+                if (!idremotesAlertRead.contains(idremote))
+                    idremotesAlertRead.add(idremote);
+
+                handler.removeCallbacks(speekFeedbackMessage);
+                handler.postDelayed(speekFeedbackMessage, 3000);
+            }
         }
     }
 

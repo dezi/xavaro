@@ -14,19 +14,17 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Gravity;
 
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
 
 //
@@ -81,6 +79,8 @@ public class LaunchItem extends FrameLayout
 
     protected LayoutParams layout;
     protected LayoutParams oversize;
+    protected int textsize;
+    protected int padding;
 
     protected LaunchGroup parent;
     protected JSONObject config;
@@ -121,6 +121,8 @@ public class LaunchItem extends FrameLayout
     {
         this.context = context;
 
+        setBackgroundResource(R.drawable.shadow_black_400x400);
+
         layout = new LayoutParams(0, 0);
         setLayoutParams(layout);
 
@@ -129,10 +131,9 @@ public class LaunchItem extends FrameLayout
         this.addView(icon);
 
         label = new TextView(context);
-        label.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-        label.setPadding(5, 5, 5, 5);
+        label.setLayoutParams(Simple.layoutParamsWW(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
+        label.setGravity(Gravity.CENTER_HORIZONTAL);
         label.setTypeface(label.getTypeface(), Typeface.BOLD);
-        label.setTextSize(18f);
         this.addView(label);
 
         oversize = new LayoutParams(0, 0);
@@ -186,12 +187,93 @@ public class LaunchItem extends FrameLayout
 
         oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;
+
+        //
+        // Nine patch background does not scale implicit
+        // padding according to background itself. Bug
+        // in Android. Set padding to some reasonable
+        // value if dimensions are known.
+        //
+
+        padding = layout.width / 12;
+        setPadding(padding, padding, padding, padding);
+
+        //
+        // Now fill in label text if present.
+        //
+
+        if (config.has("label")) setLabelText(Json.getString(config, "label"));
     }
 
     public void setPosition(int left, int top)
     {
         layout.leftMargin = left;
         layout.topMargin = top;
+    }
+
+    public void setLabelText(String text)
+    {
+        label.setText(text);
+
+        //
+        // Set size of text according to height.
+        //
+
+        textsize = layout.height / 10;
+        label.setTextSize(textsize);
+
+        Log.d(LOGTAG,"================: " + textsize);
+
+        //
+        // Figure out the layout of this label.
+        //
+
+        label.setMaxWidth(Integer.MAX_VALUE);
+        label.measure(0, 0);
+        int onlineHeight = label.getMeasuredHeight();
+
+        int laywid = layout.width - padding * 2;
+
+        label.setMaxWidth(laywid);
+        label.measure(0, 0);
+        int layoutHeight = label.getMeasuredHeight();
+
+        if (layoutHeight > onlineHeight)
+        {
+            //
+            // Text will use at least two lines in
+            // layout. Make it a little bit smaller.
+            //
+
+            textsize = layout.height / 12;
+            label.setTextSize(textsize);
+
+            //
+            // This might lead to a shitty breaking
+            // of words. Reduce the width furthermore
+            // as long as the height stays the same.
+            //
+
+            int targetHeight = layoutHeight;
+
+            while (laywid > 0)
+            {
+                label.setMaxWidth(--laywid);
+                label.measure(0, 0);
+                layoutHeight = label.getMeasuredHeight();
+
+                if (layoutHeight > targetHeight)
+                {
+                    //
+                    // We just got another line. Release
+                    // maximum width to last good value.
+                    //
+
+                    label.setMaxWidth(++laywid);
+                    break;
+                }
+            }
+        }
     }
 
     public void setConfig(LaunchGroup parent, JSONObject config)
@@ -201,11 +283,6 @@ public class LaunchItem extends FrameLayout
 
         type = config.has("type") ? Json.getString(config, "type") : null;
         subtype = config.has("subtype") ? Json.getString(config, "subtype") : null;
-
-        if (config.has("label"))
-        {
-            label.setText(Json.getString(config, "label"));
-        }
 
         if (config.has("icon"))
         {
@@ -259,8 +336,6 @@ public class LaunchItem extends FrameLayout
                 }
             }
         }
-
-        setBackgroundResource(R.drawable.shadow_black_400x400);
 
         this.setConfig();
     }

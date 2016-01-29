@@ -985,7 +985,7 @@ public class PreferencesBasics
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Notfallgruppe";
+            header.title = "Hilfegruppe";
             header.iconRes = GlobalConfigs.IconResAlertgroup;
             header.fragment = AlertgroupFragment.class.getName();
 
@@ -998,7 +998,7 @@ public class PreferencesBasics
 
             iconres = GlobalConfigs.IconResAlertgroup;
             keyprefix = "alertgroup";
-            masterenable = "Notfallgruppe freischalten";
+            masterenable = "Hilfegruppe freischalten";
         }
 
         @Override
@@ -1028,18 +1028,19 @@ public class PreferencesBasics
             String grouptypekey  = keyprefix + ".type";
             String groupnamekey  = keyprefix + ".name";
 
-            if (! sp.contains(grouppasspkey))
+            if (! sp.contains(groupidentkey))
             {
                 String groupident = UUID.randomUUID().toString();
                 String grouppassp = UUID.randomUUID().toString();
-                String groupname = "Notfallgruppe";
-                String grouptype = "alertcall";
 
                 sp.edit().putString(groupidentkey, groupident).apply();
                 sp.edit().putString(grouppasspkey, grouppassp).apply();
-                sp.edit().putString(groupnamekey, groupname).apply();
-                sp.edit().putString(grouptypekey, grouptype).apply();
             }
+
+            String groupname = "Hilfegruppe";
+            String grouptype = "alertcall";
+            sp.edit().putString(groupnamekey, groupname).apply();
+            sp.edit().putString(grouptypekey, grouptype).apply();
 
             String xpath = "RemoteContacts/identities";
             JSONObject rcs = PersistManager.getXpathJSONObject(xpath);

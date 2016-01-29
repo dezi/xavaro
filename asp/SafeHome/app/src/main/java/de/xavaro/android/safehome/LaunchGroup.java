@@ -327,6 +327,9 @@ public class LaunchGroup extends FrameLayout implements
             horzStart += horzSpace;
             vertStart += vertSpace / 2;
 
+            Log.d(LOGTAG, "onMeasure:" + width + "=" + height);
+            Log.d(LOGTAG, "onMeasure:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
+
             if (launchItems == null)
             {
                 createLaunchItems();
@@ -341,9 +344,6 @@ public class LaunchGroup extends FrameLayout implements
                     lp.setLayoutParams(lpar);
                 }
             }
-
-            Log.d(LOGTAG, "onMeasure:" + width + "=" + height);
-            Log.d(LOGTAG, "onMeasure:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
         }
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);

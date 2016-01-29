@@ -90,6 +90,8 @@ public class DitUndDat
 
     public static class Toolbar extends FrameLayout
     {
+        private final static String LOGTAG = Toolbar.class.getSimpleName();
+
         public Toolbar(Context context)
         {
             super(context);
@@ -139,7 +141,9 @@ public class DitUndDat
             title.setTextSize(24f);
             title.setSingleLine();
 
-            lp = new FrameLayout.LayoutParams(Simple.WC, abheight - 28, Gravity.TOP);
+            int magic = abheight / 16;
+
+            lp = new FrameLayout.LayoutParams(Simple.WC, abheight / 2 + magic, Gravity.TOP);
             lp.leftMargin = abheight;
 
             addView(title, lp);
@@ -150,7 +154,7 @@ public class DitUndDat
             subtitle.setTextColor(Color.WHITE);
             subtitle.setSingleLine();
 
-            lp = new FrameLayout.LayoutParams(Simple.WC, 28, Gravity.BOTTOM);
+            lp = new FrameLayout.LayoutParams(Simple.WC, abheight / 2 - magic, Gravity.BOTTOM);
             lp.leftMargin = abheight;
 
             addView(subtitle, lp);

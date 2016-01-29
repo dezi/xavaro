@@ -413,6 +413,9 @@ public class ChatManager implements CommService.CommServiceCallback
         String identity = getMessageIdentity(message);
         if (identity == null) return;
 
+        String idremote = Json.getString(message, "identity");
+        if (idremote == null) return;
+
         String uuid = getMessageUUID(message);
         if (uuid == null) return;
 
@@ -424,6 +427,7 @@ public class ChatManager implements CommService.CommServiceCallback
         final String cbuuid = uuid;
         final String cbstatus = status;
         final String cbidentity = identity;
+        final String cbidremote = idremote;
 
         handler.post(new Runnable()
         {
@@ -431,7 +435,7 @@ public class ChatManager implements CommService.CommServiceCallback
             public void run()
             {
                 ChatMessageCallback callback = callbacks.get(cbidentity);
-                if (callback != null) callback.onSetMessageStatus(cbuuid, cbstatus);
+                if (callback != null) callback.onSetMessageStatus(cbidremote, cbuuid, cbstatus);
             }
         });
     }
@@ -453,7 +457,7 @@ public class ChatManager implements CommService.CommServiceCallback
         }
 
         Intent intent = new Intent("de.xavaro.android.common.ChatActivity");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("idremote", idremote);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -512,7 +516,7 @@ public class ChatManager implements CommService.CommServiceCallback
     {
         void onProtocollMessages(JSONObject protocoll);
         void onIncomingMessage(JSONObject message);
-        void onSetMessageStatus(String uuid, String what);
+        void onSetMessageStatus(String idremote, String uuid, String what);
         void onRemoteStatus();
     }
 
