@@ -33,7 +33,7 @@ public class LaunchItemAlertcall extends LaunchItem
     {
         SharedPreferences sp = Simple.getSharedPrefs();
 
-        groupIdentity = sp.getString("alertgroup.groupIdentity", null);
+        groupIdentity = sp.getString("alertgroup.groupidentity", null);
 
         setLongClickable(true);
 
@@ -270,6 +270,9 @@ public class LaunchItemAlertcall extends LaunchItem
 
             if (what.equals("read"))
             {
+                if (!idremotesAlertReceived.contains(idremote))
+                    idremotesAlertReceived.remove(idremote);
+
                 if (!idremotesAlertRead.contains(idremote))
                     idremotesAlertRead.add(idremote);
 

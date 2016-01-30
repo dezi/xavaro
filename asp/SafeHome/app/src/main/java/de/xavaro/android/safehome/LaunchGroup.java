@@ -23,6 +23,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 //
@@ -314,6 +315,8 @@ public class LaunchGroup extends FrameLayout implements
         {
             realWidth  = width;
             realHeight = height;
+
+            if (Simple.hasNavigationBar()) realHeight -= Simple.getNavigationBarHeight();
 
             horzItems = realWidth / horzSize;
             vertItems = realHeight / vertSize;

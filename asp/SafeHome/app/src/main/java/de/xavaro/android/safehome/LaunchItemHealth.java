@@ -4,10 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
-import de.xavaro.android.common.Json;
-
-public class LaunchItemHealth extends LaunchItem
-    implements BlueTooth.BlueToothConnectCallback
+public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothConnectCallback
 {
     private final static String LOGTAG = LaunchItemHealth.class.getSimpleName();
 

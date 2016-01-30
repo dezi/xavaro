@@ -2,6 +2,7 @@ package de.xavaro.android.common;
 
 import android.content.pm.ResolveInfo;
 import android.inputmethodservice.InputMethodService;
+import android.os.Build;
 import android.support.annotation.Nullable;
 
 import android.app.NotificationManager;
@@ -18,6 +19,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -416,6 +418,16 @@ public class Simple
 
     //region All purpose simple getters
 
+    public static boolean hasNavigationBar()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        {
+            return ! ViewConfiguration.get(anyContext).hasPermanentMenuKey();
+        }
+
+        return false;
+    }
+
     public static float getDeviceTextSize(float textsize)
     {
         return (textsize / getDeviceDPI()) * 160;
@@ -519,15 +531,12 @@ public class Simple
 
     public static int getActionBarHeight()
     {
-        if (anyContext != null)
-        {
-            TypedValue tv = new TypedValue();
+        TypedValue tv = new TypedValue();
 
-            if (anyContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-            {
-                DisplayMetrics dm = anyContext.getResources().getDisplayMetrics();
-                return TypedValue.complexToDimensionPixelSize(tv.data, dm);
-            }
+        if (anyContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+        {
+            DisplayMetrics dm = anyContext.getResources().getDisplayMetrics();
+            return TypedValue.complexToDimensionPixelSize(tv.data, dm);
         }
 
         return 64;
@@ -535,13 +544,22 @@ public class Simple
 
     public static int getStatusBarHeight()
     {
-        if (anyContext != null)
-        {
-            int resourceId = anyContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
-            if (resourceId > 0) return anyContext.getResources().getDimensionPixelSize(resourceId);
-        }
+        int resourceId = anyContext.getResources()
+                .getIdentifier("status_bar_height", "dimen", "android");
+
+        if (resourceId > 0) return anyContext.getResources().getDimensionPixelSize(resourceId);
 
         return 20;
+    }
+
+    public static int getNavigationBarHeight()
+    {
+        int resourceId = anyContext.getResources()
+                .getIdentifier("navigation_bar_height", "dimen", "android");
+
+        if (resourceId > 0) return anyContext.getResources().getDimensionPixelSize(resourceId);
+
+        return 64;
     }
 
     @SuppressWarnings("SameReturnValue")
