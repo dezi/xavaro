@@ -193,6 +193,7 @@ public abstract class BlueTooth extends BroadcastReceiver
             if (discoverLE && ((device.getType() == BluetoothDevice.DEVICE_TYPE_LE) ||
                     (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
             {
+                deviceName = device.getName();
                 Log.d(LOGTAG, "onReceive: connectGatt=" + device.getName());
                 device.connectGatt(context, true, gattCallback);
                 discoverBGJobs++;
