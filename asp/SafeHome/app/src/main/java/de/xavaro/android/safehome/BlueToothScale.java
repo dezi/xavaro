@@ -651,11 +651,6 @@ public class BlueToothScale extends BlueTooth
             {
                 gattSchedule.add(new GattAction(getTakeUserMeasurementFromPreferences()));
             }
-
-            //gattSchedule.add(new GattAction(getScaleStatusForUser(0x4711)));
-            //gattSchedule.add(new GattAction(getUserInfo(0x4711)));
-            //gattSchedule.add(new GattAction(getUserMeasurements(0x4711)));
-            //gattSchedule.add(new GattAction(getUnknownMeasurements()));
         }
         catch (JSONException ex)
         {

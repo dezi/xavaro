@@ -1,16 +1,22 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import de.xavaro.android.common.Simple;
 
@@ -57,13 +63,11 @@ public class BlueToothGlucose extends BlueTooth
     {
         Log.d(LOGTAG, "enableDevice: " + deviceName);
 
-        GattAction ga;
-
         //
         // Notify primary.
         //
 
-        ga = new GattAction();
+        GattAction ga = new GattAction();
 
         ga.mode = GattAction.MODE_NOTIFY;
         ga.characteristic = currentPrimary;
@@ -71,17 +75,12 @@ public class BlueToothGlucose extends BlueTooth
         gattSchedule.add(ga);
 
         //
-        // Read time.
+        // Fire initial command.
         //
 
-        ga = new GattAction();
+        schedulePackets(getReadMeterDieID());
 
-        ga.mode = GattAction.MODE_WRITE;
-        ga.characteristic = currentControl;
-        ga.data = getReadMeterTimeCommand();
-        gattSchedule.add(ga);
-
-        fireNext(true);
+        fireNextPacket();
     }
 
     @Override
@@ -89,39 +88,64 @@ public class BlueToothGlucose extends BlueTooth
     {
     }
 
-    private int packets;
+    private static final int COMMAND_READDIEID = 1;
+    private static final int COMMAND_PREMIUMMODE = 2;
+    private static final int COMMAND_READTIME = 3;
+    private static final int COMMAND_READUOM = 4;
+    private static final int COMMAND_READHIGHRANGE = 5;
+    private static final int COMMAND_READLOWRANGE = 6;
+    private static final int COMMAND_READRECORDCOUNT = 7;
+    private static final int COMMAND_READTESTCOUNT = 8;
+    private static final int COMMAND_READGLUCOSERECORD = 9;
+
+    private byte[] incomingMessage;
+    private int incomingNumPackets;
+
+    private ArrayList<byte[]> outgoingPackets = new ArrayList<>();
+    private int command;
 
     @Override
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
 
-        byte opcode = (byte) (rd[ 0 ] & -64);
-        int packetID = rd[ 0 ] & 63;
+        int opcode = rd[ 0 ] & 0xc0;
+        int packet = rd[ 0 ] & 0x3f;
 
-        Log.d(LOGTAG, "parseResponse: opcode " + opcode + ":" + packetID);
+        Log.d(LOGTAG, "parseResponse: opcode " + opcode + ":" + packet);
 
-        if (opcode == -128)
+        if (opcode == 0x80)
         {
-            Log.d(LOGTAG, "ReceiveICDPacket: ACK Received - processing...");
+            Log.d(LOGTAG, "ACK Received - processing...");
+
+            incomingMessage = new byte[ 0 ];
+
+            fireNextPacket();
+
+            return;
         }
 
-        else if (opcode == -64)
+        if (opcode == 0xc0)
         {
-            Log.d(LOGTAG, "ReceiveICDPacket: NACK Received - not processed!");
+            Log.d(LOGTAG, "NACK Received - not processed!");
+
+            return;
         }
 
-        if (opcode == 0 || opcode == 64)
+        if (opcode == 0x00 || opcode == 0x40)
         {
+            int ackpack = packet;
+
             if (opcode == 0)
             {
-                Log.d(LOGTAG, "ReceiveICDPacket: beginSeq Received - processing... " + packetID);
+                Log.d(LOGTAG, "Receive total packets:" + packet);
 
-                packets = packetID;
+                incomingNumPackets = packet;
+                packet = 0;
             }
             else
             {
-                Log.d(LOGTAG, "ReceiveICDPacket: xfer Received - processing..." + packetID);
+                Log.d(LOGTAG, "Receive current packet:" + packet);
             }
 
             GattAction ga = new GattAction();
@@ -129,55 +153,387 @@ public class BlueToothGlucose extends BlueTooth
             ga.mode = GattAction.MODE_WRITE;
             ga.characteristic = currentControl;
 
-            if (packetID + 1 == packets)
+            if ((packet + 1) == incomingNumPackets)
             {
-                ga.data = new byte[]{(byte) (packetID | 0xc0)};
-
+                ga.data = new byte[]{(byte) (ackpack | 0xc0)};
             }
             else
             {
-                ga.data = new byte[]{(byte) (packetID | 0x80)};
+                ga.data = new byte[]{(byte) (ackpack | 0x80)};
             }
 
             gattSchedule.add(ga);
 
             fireNext(false);
 
-            byte[] fertig = new byte[ rd.length - 1 ];
+            byte[] temp = new byte[ incomingMessage.length + rd.length - 1 ];
 
-            System.arraycopy(rd, 1, fertig, 0, rd.length - 1);
+            if (incomingMessage.length > 0)
+            {
+                System.arraycopy(incomingMessage, 0, temp, 0, incomingMessage.length);
+            }
 
-            byte[] result = new BleDataParser().parse(fertig);
+            System.arraycopy(rd, 1, temp , incomingMessage.length, rd.length - 1);
+            incomingMessage = temp;
 
-            int time = (result[ 3 ] << 24) + (result[ 2 ] << 16) + (result[ 1 ] << 8) + result[ 0 ];
-            Log.d(LOGTAG, "parseResponse: result="
-                    + Simple.getHexBytesToString(result)
-                    + "=" + time
-                    + "=" + (new Date().getTime() / 1000));
+            if ((packet + 1) == incomingNumPackets)
+            {
+                Log.d(LOGTAG,"Complete message received: "
+                        +  Simple.getHexBytesToString(incomingMessage));
 
-            Log.d(LOGTAG, "TTTTTTTT= " + Simple.timeStampAsISO(time * 1000L + UNIXTIME_TO_METERTIME_DELTA_MILLIS));
+                if (checkResponse(incomingMessage))
+                {
+                    byte[] payload = extractPayload(incomingMessage);
+                    ArrayList<byte[]> next = parseCommands(payload);
+
+                    //
+                    // Fire next command.
+                    //
+
+                    if (next != null)
+                    {
+                        schedulePackets(next);
+
+                        fireNextPacket();
+                    }
+                }
+            }
         }
     }
 
-    private long UNIXTIME_TO_METERTIME_DELTA_MILLIS = 946684800000L;
+    public static final int defaultLowRange = 70;
+    public static final int defaultHighRange = 180;
+    public static final long UNIXTIME_TO_METERTIME_DELTA_MILLIS = 946684800000L;
 
-    public byte[] getReadMeterTimeCommand()
+    public ArrayList<byte[]> parseCommands(byte[] payload)
     {
-        Log.d(LOGTAG, "getReadMeterTimeCommand");
+        if (command == COMMAND_READDIEID)
+        {
+            parseReadMeterDieID(payload);
+            return getPremiumMode();
+        }
+
+        if (command == COMMAND_PREMIUMMODE)
+        {
+            parsePremiumMode(payload);
+            return getReadMeterUOM();
+        }
+
+        if (command == COMMAND_READUOM)
+        {
+            parseReadMeterUOM(payload);
+            return getReadMeterTime();
+        }
+
+        if (command == COMMAND_READTIME)
+        {
+            parseReadMeterTime(payload);
+            return getReadMeterLowRange();
+        }
+
+        if (command == COMMAND_READLOWRANGE)
+        {
+            parseReadMeterLowRange(payload);
+            return getReadMeterHighRange();
+        }
+
+        if (command == COMMAND_READHIGHRANGE)
+        {
+            parseReadMeterHighRange(payload);
+            return getReadMeterRecordCount();
+        }
+
+        if (command == COMMAND_READRECORDCOUNT)
+        {
+            parseReadMeterRecordCount(payload);
+            return getReadMeterTestCount();
+        }
+
+        if (command == COMMAND_READTESTCOUNT)
+        {
+            parseReadMeterTestCount(payload);
+            return getReadGlucoseRecord(8);
+        }
+
+        if (command == COMMAND_READGLUCOSERECORD)
+        {
+            parseReadGlucoseRecord(payload);
+        }
+
+        return null;
+    }
+
+    public void parseReadGlucoseRecord(byte[] pl)
+    {
+        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: result=" + Simple.getHexBytesToString(pl));
+
+        if (pl[  9 ] != 0)
+            Log.d(LOGTAG, "parseReadGlucoseRecordCommand: Non-Glucose value found =" + pl[ 9 ]);
+        if (pl[  6 ] != 0)
+            Log.d(LOGTAG, "parseReadGlucoseRecordCommand: Control Solution value found =" + pl[ 6 ]);
+        if (pl[ 10 ] != 0)
+            Log.d(LOGTAG, "parseReadGlucoseRecordCommand: Sensor status =" + pl[ 10 ]);
+
+        byte[] timeArray = new byte[ 4 ];
+        System.arraycopy(pl, 0, timeArray, 0, 4);
+        byte[] bgValueArray = new byte[ 2 ];
+        System.arraycopy(pl, 4, bgValueArray, 0, 2);
+
+        // ECF5401E
+        // 77E4401E
+        //
+        float bgValue = byteArrayToInt(bgValueArray);
+        long  timeStamp = byteArrayToInt(timeArray);
+        timeStamp *= 1000L;
+        timeStamp += UNIXTIME_TO_METERTIME_DELTA_MILLIS;
+
+        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: " + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: " + Simple.timeStampAsISO(timeStamp));
+        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: " + bgValue);
+    }
+
+    public void parseReadMeterHighRange(byte[] pl)
+    {
+        int intval = byteArrayToInt(pl);
+
+        Log.d(LOGTAG, "parseReadMeterHighRangeCommand: result=" + intval);
+    }
+    public void parseReadMeterLowRange(byte[] pl)
+    {
+        int intval = byteArrayToInt(pl);
+
+        Log.d(LOGTAG, "parseReadMeterLowRangeCommand: result=" + intval);
+    }
+
+    public void parseReadMeterRecordCount(byte[] pl)
+    {
+        int intval = byteArrayToInt(pl);
+
+        Log.d(LOGTAG, "parseReadMeterRecordCountCommand: result=" + intval + "=" + Simple.getHexBytesToString(pl));
+    }
+
+    public ArrayList<byte[]> getReadMeterRecordCount()
+    {
+        Log.d(LOGTAG, "getReadMeterRecordCountCommand");
+
+        command = COMMAND_READRECORDCOUNT;
 
         byte[] data = new byte[ 2 ];
 
-        data[ 0 ] = (byte) 32;
-        data[ 1 ] = 2;
+        data[ 0 ] = 39;
+        data[ 1 ] = 0;
 
-        Log.d(LOGTAG, "================================> " + Simple.getHexBytesToString(packetBytes(createICDByteArray(data))));
-
-        return packetBytes(createICDByteArray(data));
+        return createTransmitChunks(data);
     }
 
-    public byte[] getReadMeterDieIDCommand()
+    public void parseReadMeterTestCount(byte[] pl)
+    {
+        int intval = byteArrayToInt(pl);
+
+        Log.d(LOGTAG, "parseReadMeterTestCountCommand: result=" + intval);
+    }
+    public void parsePremiumMode(byte[] pl)
+    {
+        Log.d(LOGTAG, "parsePremiumModeCommand:" + Simple.getHexBytesToString(pl));
+    }
+    public void parseReadMeterDieID(byte[] pl)
+    {
+        //
+        // id=1323191058D0C9B7
+        // id=0B035B36FF763569
+        //
+
+        String id = "";
+
+        for (int inx = 0; inx < pl.length; inx += 2)
+        {
+            int utf16 = pl[ inx ] + (pl[ inx + 1 ] << 8);
+
+            if (utf16 > 0) id += (char) utf16;
+        }
+
+        premiumModeClear = Simple.getHexStringToBytes(id);
+
+        Log.d(LOGTAG, "parseReadMeterDieIDCommand: id=" + id + ":" + Simple.getHexBytesToString(pl));
+    }
+    public void parseReadMeterUOM(byte[] pl)
+    {
+        int intval = byteArrayToInt(pl);
+
+        Log.d(LOGTAG, "parseReadMeterUOMCommand: result=" + intval + "=" + ((intval == 0) ? "mg/dL" : "mmol/L"));
+    }
+    public void parseReadMeterTime(byte[] pl)
+    {
+        long timestamp = byteArrayToInt(pl);
+
+        timestamp *= 1000L;
+        timestamp += UNIXTIME_TO_METERTIME_DELTA_MILLIS;
+
+        Log.d(LOGTAG, "parseReadMeterTimeCommand: " + Simple.getHexBytesToString(pl) + "=" + Simple.timeStampAsISO(timestamp));
+    }
+
+    public ArrayList<byte[]> getReadGlucoseRecord(int index)
+    {
+        Log.d(LOGTAG, "getReadGlucoseRecordCommand");
+
+        command = COMMAND_READGLUCOSERECORD;
+
+        byte[] data = new byte[ 3 ];
+
+        data[ 0 ] = (byte) -77;
+        data[ 1 ] = (byte) (index & 0xff);
+        data[ 2 ] = (byte) (index >> 8);
+
+        return createTransmitChunks(data);
+    }
+
+    private ArrayList<byte[]> getReadMeterHighRange()
+    {
+        Log.d(LOGTAG, "getReadMeterHighRangeCommands");
+
+        command = COMMAND_READHIGHRANGE;
+
+        byte[] data = new byte[ 3 ];
+
+        data[ 0 ] = 10;
+        data[ 1 ] = 2;
+        data[ 2 ] = 8;
+
+        return createTransmitChunks(data);
+    }
+
+    private ArrayList<byte[]> getReadMeterLowRange()
+    {
+        Log.d(LOGTAG, "getReadMeterLowRangeCommand");
+
+        command = COMMAND_READLOWRANGE;
+
+        byte[] data = new byte[ 3 ];
+
+        data[ 0 ] = 10;
+        data[ 1 ] = 2;
+        data[ 2 ] = 7;
+
+        return createTransmitChunks(data);
+    }
+
+    private ArrayList<byte[]> getReadMeterTestCount()
+    {
+        Log.d(LOGTAG, "getReadMeterTestCountCommand");
+
+        command = COMMAND_READTESTCOUNT;
+
+        byte[] data = new byte[ 3 ];
+
+        data[ 0 ] = 10;
+        data[ 1 ] = 2;
+        data[ 2 ] = 6;
+
+        return createTransmitChunks(data);
+    }
+
+    private byte[] reverseByteArray(byte[] array)
+    {
+        int len = array.length;
+
+        byte[] reversedArray = new byte[ len ];
+
+        for (int index = 0; index < len; index++)
+        {
+            reversedArray[ (len - index) - 1 ] = array[index];
+        }
+
+        return reversedArray;
+    }
+
+    private byte[] generatePasswordArray(byte[] date)
+    {
+        byte[] invertedArray = new byte[]{date[ 3 ], date[ 2 ], date[ 1 ], date[ 0 ]};
+        byte[] time = new byte[]{invertedArray[ 2 ], invertedArray[ 1 ], invertedArray[ 0 ], invertedArray[ 3 ]};
+        byte[] constant = new byte[]{(byte) -84, (byte) -50, (byte) 85, (byte) -19};
+        byte[] result = new byte[ 4 ];
+
+        for (int inx = 0; inx < time.length; inx++)
+        {
+            result[ inx ] = (byte) (time[ inx ] ^ constant[ inx ]);
+        }
+
+        return new byte[]{result[ 3 ], result[ 2 ], result[ 1 ], result[ 0 ]};
+    }
+
+    @Nullable
+    private byte[] generateEncryptedToken(byte[] clearTextSource)
+    {
+        byte[] premiumModeMasterKey = new byte[]{
+                (byte) 72, (byte) 59, (byte) -45, (byte) -62,
+                (byte) -53, (byte) -33, (byte) 99, (byte) 69,
+                (byte) 22, (byte) 0, (byte) 4, (byte) -26,
+                (byte) -43, (byte) 109, (byte) -108, (byte) -116};
+
+        // 483BD3C2CBDF6345160004E6D56D948C
+
+        byte[] reversedClearText = reverseByteArray(clearTextSource);
+
+        byte[] premiumModeClearText = new byte[ 16 ];
+        System.arraycopy(reversedClearText, 2, premiumModeClearText, 0, 2);
+        System.arraycopy(reversedClearText, 4, premiumModeClearText, 2, 4);
+        System.arraycopy(reversedClearText, 0, premiumModeClearText, 6, 2);
+
+        System.arraycopy(premiumModeClearText, 0, premiumModeClearText, 8, 8);
+
+        try
+        {
+            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            cipher.init(1, new SecretKeySpec(premiumModeMasterKey, "AES"));
+            return cipher.doFinal(premiumModeClearText);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    byte[] premiumModeClear;
+
+    private ArrayList<byte[]> getPremiumMode()
+    {
+        Log.d(LOGTAG, "getPremiumModeCommand");
+
+        command = COMMAND_PREMIUMMODE;
+
+        byte[] token;
+
+        if (premiumModeClear.length == 4)
+        {
+            token = generatePasswordArray(premiumModeClear);
+        }
+        else
+        {
+            token = generateEncryptedToken(premiumModeClear);
+        }
+
+        if (token == null)
+        {
+            Log.d(LOGTAG,"Premium Token not generated!!!!!!!!!!!!!");
+
+            return null;
+        }
+
+        byte[] data = new byte[ token.length + 1 ];
+
+        data[ 0 ] = (byte) 17;
+        System.arraycopy(token, 0, data, 1, token.length);
+
+        return createTransmitChunks(data);
+    }
+
+    private ArrayList<byte[]> getReadMeterDieID()
     {
         Log.d(LOGTAG, "getReadMeterDieIDCommand");
+
+        command = COMMAND_READDIEID;
 
         byte[] data = new byte[ 3 ];
 
@@ -185,223 +541,178 @@ public class BlueToothGlucose extends BlueTooth
         data[ 1 ] = 2;
         data[ 2 ] = 8;
 
-        Log.d(LOGTAG, "================================> " + Simple.getHexBytesToString(packetBytes(createICDByteArray(data))));
-
-        return packetBytes(createICDByteArray(data));
+        return createTransmitChunks(data);
     }
 
-    public byte[] packetBytes(byte[] data)
+    private ArrayList<byte[]> getReadMeterUOM()
     {
-        byte[] pbytes = new byte[ data.length + 1];
+        Log.d(LOGTAG, "getReadMeterUOMCommand");
 
-        pbytes[ 0 ] = 1;
+        command = COMMAND_READUOM;
 
-        System.arraycopy(data, 0, pbytes, 1, data.length);
+        byte[] data = new byte[ 3 ];
 
-        return pbytes;
+        data[ 0 ] = 9;
+        data[ 1 ] = 2;
+        data[ 2 ] = 2;
+
+        return createTransmitChunks(data);
     }
 
-    public byte[] getReadTime()
+    private ArrayList<byte[]> getReadMeterTime()
     {
-        Log.d(LOGTAG, "getReadTime");
+        Log.d(LOGTAG, "getReadMeterTimeCommand");
+
+        command = COMMAND_READTIME;
 
         byte[] data = new byte[ 2 ];
 
-        data[ 0 ] = (byte) 32;
+        data[ 0 ] = 32;
         data[ 1 ] = 2;
 
-        return createICDByteArray(data);
+        return createTransmitChunks(data);
     }
 
-    public static final byte EnablePremMode = (byte) 17;
-    public static final byte ReadWriteParameter = (byte) 30;
-    public static final byte ReadWriteRTC = (byte) 32;
-    public static final byte ReadWriteSerialNo = (byte) 11;
-    public static final byte ack = Byte.MIN_VALUE;
-    public static final byte appParam = (byte) 2;
-    public static final byte beginSeq = (byte) 0;
-    private static final byte controlByte = (byte) 0;
-    private static final byte etx = (byte) 3;
-    public static final byte manufParam = (byte) 1;
-    public static final int maxDataLen = 19;
-    public static final byte nack = (byte) -64;
-    public static final byte opcodeMask = (byte) -64;
-    public static final byte parameterMask = (byte) 63;
-    private static final byte premMode = (byte) 3;
-    private static final byte pubMode = (byte) 4;
-    public static final byte readDeviceInfo = (byte) 6;
-    public static final byte readOperation = (byte) 2;
-    private static final byte stx = (byte) 2;
-    public static final byte userfParam = (byte) 3;
-    public static final byte writeOperation = (byte) 1;
-    public static final byte xfer = (byte) 64;
-
-    public byte[] createICDByteArray(byte[] data)
+    private void fireNextPacket()
     {
-        int index;
-        int size = data.length + 7;
-        byte[] byteArray = new byte[ size];
-        byteArray[0] = stx;
-        byteArray[1] = (byte) size;
-        byteArray[2] = controlByte;
-        byteArray[3] = userfParam;
-        byte[] arr$ = data;
-        int len$ = arr$.length;
-        int i$ = 0;
-        int index2 = 4;
-        while (i$ < len$)
-        {
-            index = index2 + 1;
-            byteArray[index2] = arr$[i$];
-            i$++;
-            index2 = index;
-        }
-        index = index2 + 1;
-        byteArray[index2] = userfParam;
-        byte[] cc = crc16ccitt(byteArray);
-        index2 = index + 1;
-        byteArray[index] = cc[0];
-        index = index2 + 1;
-        byteArray[index2] = cc[1];
-        return byteArray;
+        if (outgoingPackets.size() == 0) return;
+
+        byte[] packet = outgoingPackets.remove(0);
+
+        GattAction ga = new GattAction();
+
+        ga.mode = GattAction.MODE_WRITE;
+        ga.characteristic = currentControl;
+        ga.data = packet;
+
+        gattSchedule.add(ga);
+
+        fireNext(true);
     }
 
-    private static final int POLYNOMIAL_BE = 4129;
-
-    public byte[] crc16ccitt(byte[] byteArray)
+    private void schedulePackets(ArrayList<byte[]> packets)
     {
-        byte[] bytes = Arrays.copyOf(byteArray, byteArray.length - 2);
+        for (byte[] packet : packets) outgoingPackets.add(packet);
+    }
 
-        int crc = 0xffff;
+    private ArrayList<byte[]> createTransmitChunks(byte[] payload)
+    {
+        final byte stx = 2;
+        final byte etx = 3;
+        final byte maxDataLen = 19;
 
-        for (byte item : bytes)
+        //
+        // Add transmit frame wit checksum around payload.
+        //
+
+        int size = payload.length + 7;
+
+        byte[] transmit = new byte[ size ];
+
+        transmit[ 0 ] = stx;
+        transmit[ 1 ] = (byte) size;
+        transmit[ 2 ] = 0;
+        transmit[ 3 ] = etx;
+
+        System.arraycopy(payload, 0, transmit, 4, payload.length);
+
+        transmit[ size - 3 ] = etx;
+        transmit[ size - 2 ] = 0;
+        transmit[ size - 1 ] = 0;
+
+        Simple.getCRC16ccittEmbed(transmit);
+
+        //
+        // Split into packets with maximum 19 bytes
+        // and add packet count header.
+        //
+
+        ArrayList<byte[]> list = new ArrayList<>();
+
+        int maxPackets = (transmit.length / maxDataLen) + 1;
+
+        for (int packetinx = 0; packetinx < maxPackets; packetinx++)
         {
-            for (int i = 0; i < 8; i++)
+            int startPos = packetinx * maxDataLen;
+            int numBytes = Math.min(transmit.length - startPos, maxDataLen);
+
+            byte[] pbytes = new byte[(numBytes + 1)];
+
+            if (packetinx == 0)
             {
-                boolean bitMsg;
-                boolean bit16;
-
-                if (((item >> (7 - i)) & 1) == 1)
-                {
-                    bitMsg = true;
-                } else
-                {
-                    bitMsg = false;
-                }
-                if (((crc >> 15) & 1) == 1)
-                {
-                    bit16 = true;
-                } else
-                {
-                    bit16 = false;
-                }
-                crc <<= 1;
-
-                if ((bit16 ^ bitMsg) != false)
-                {
-                    crc ^= POLYNOMIAL_BE;
-                }
+                pbytes[ 0 ] = (byte) maxPackets;
             }
+            else
+            {
+                pbytes[ 0 ] = (byte) (0x40 | packetinx);
+            }
+
+            System.arraycopy(transmit, startPos, pbytes, 1, numBytes);
+
+            list.add(pbytes);
         }
-        return createByteArray(crc & 0xffff);
+
+        return list;
     }
 
-    public boolean verifyChecksum(byte[] bytes, byte[] crc)
+    private boolean checkResponse(byte[] message)
     {
-        byte[] newCrc = crc16ccitt(bytes);
-        if (newCrc.length != crc.length)
+        if (message[ 1 ] != message.length)
         {
+            Log.d(LOGTAG, "Message length mismatch.");
+
             return false;
         }
-        for (int i = 0; i < newCrc.length; i++)
+
+        if (! Simple.getCRC16ccittVerify(message))
         {
-            if (newCrc[i] != crc[i])
-            {
-                return false;
-            }
+            Log.d(LOGTAG, "Message checksum mismatch.");
+
+            return false;
         }
+
+        if (message[ 4 ] != OK)
+        {
+            Log.d(LOGTAG, "Message response invalid: "
+                    + Integer.toHexString(message[ 4 ])
+                    + " => " + getErrorMessage(message[ 4 ]));
+
+            return false;
+        }
+
         return true;
     }
 
-    private byte[] createByteArray(int value)
+    private byte[] extractPayload(byte[] message)
     {
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        buffer.putInt(value);
-        return new byte[]{buffer.array()[0], buffer.array()[1]};
+        byte[] payload = new byte[ message.length - 8 ];
+
+        System.arraycopy(message, 5, payload, 0, payload.length);
+
+        return payload;
     }
 
-    public class BleDataParser
+    private final static int INVALID_SIZE = 0;
+    private final static int CHECKSUM_ERROR = 1;
+    private final static int NOT_SUPPORTED = 8;
+    private final static int NOT_AUTHORIZED = 7;
+    private final static int INVALID_PARAMETER = 9;
+    private final static int FAILED = 15;
+    private final static int OK = 6;
+
+    private String getErrorMessage(int errorCode)
     {
-        public static final int CHECKSUM_ERROR = 1;
-        public static final int FAILED = 15;
-        public static final int INVALID_PARAMETER = 9;
-        public static final int INVALID_SIZE = 0;
-        public static final int NOT_AUTHORIZED = 7;
-        public static final int NOT_SUPPORTED = 8;
-        public static final int OK = 6;
-
-        public byte[] parse(byte[] message)
+        switch (errorCode)
         {
-            if (message[ 1 ] != message.length)
-            {
-                Log.d(LOGTAG, "Message length and size from message didn't match!");
-                reportError(INVALID_SIZE);
-            }
-            if (!verifyChecksum(message, new byte[]{message[ message.length - 2 ], message[ message.length - 1 ]}))
-            {
-                Log.d(LOGTAG, "Message checksum didn't match with the received checksum!");
-                reportError(CHECKSUM_ERROR);
-            }
-            if (message[4] == OK)
-            {
-                return extractData(message);
-            }
-
-            Log.d(LOGTAG, "Message response is not OK! (" + Integer.toHexString(message[ 4 ]) + ")");
-            reportError(message[4]);
-            return null;
+            case OK: return "OK";
+            case FAILED: return "FAILED";
+            case INVALID_SIZE: return "INVALID SIZE";
+            case NOT_SUPPORTED: return "NOT SUPPORTED";
+            case CHECKSUM_ERROR: return "CHECKSUM ERROR";
+            case NOT_AUTHORIZED: return "NOT AUTHORIZED";
+            case INVALID_PARAMETER: return "INVALID PARAMETER";
         }
 
-        private byte[] extractData(byte[] message)
-        {
-            byte[] data = new byte[(message.length - 8)];
-            int j = INVALID_SIZE;
-            for (int i = 5; i < message.length - 3; i += CHECKSUM_ERROR)
-            {
-                data[j] = message[i];
-                j += CHECKSUM_ERROR;
-            }
-            return data;
-        }
-
-        private void reportError(int errorCode)
-        {
-            String errorMessage;
-            switch (errorCode)
-            {
-                case INVALID_SIZE /*0*/:
-                    errorMessage = "INVALID SIZE VERIFICATION";
-                    break;
-                case CHECKSUM_ERROR /*1*/:
-                    errorMessage = "INVALID CHECKSUM VERIFICATION";
-                    break;
-                case NOT_AUTHORIZED /*7*/:
-                    errorMessage = "OPERATION NOT AUTHORIZED";
-                    break;
-                case NOT_SUPPORTED /*8*/:
-                    errorMessage = "OPERATION NOT SUPPORTED";
-                    break;
-                case INVALID_PARAMETER /*9*/:
-                    errorMessage = "INVALID PARAMETER";
-                    break;
-                case FAILED /*15*/:
-                    errorMessage = "OPERATION FAILED";
-                    break;
-                default:
-                    errorMessage = "UNDEFINED OPERATION";
-                    break;
-            }
-        }
+        return "UNDEFINED OPERATION";
     }
 }

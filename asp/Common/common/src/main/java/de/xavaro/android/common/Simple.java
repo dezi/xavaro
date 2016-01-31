@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -656,6 +657,54 @@ public class Simple
         if (! matcher.find()) return null;
 
         return matcher.group(1);
+    }
+
+    public static byte[] getCRC16ccittCompute(byte[] byteArray, int length)
+    {
+        int crc = 0xffff;
+
+        byte byt;
+        boolean bitbyt;
+        boolean bitcrc;
+
+        for (int inx = 0; inx < length; inx++)
+        {
+            byt = byteArray[ inx ];
+
+            for (int cnt = 0; cnt < 8; cnt++)
+            {
+                bitbyt = (((byt >> (7 - cnt)) & 1) == 1);
+                bitcrc = (((crc >> 15) & 1) == 1);
+
+                crc <<= 1;
+
+                if (bitcrc ^ bitbyt) crc ^= 4129;
+            }
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(crc & 0xffff);
+
+        return new byte[]{buffer.array()[0], buffer.array()[1]};
+    }
+
+    public static byte[] getCRC16ccittEmbed(byte[] byteArray)
+    {
+        byte[] cc = getCRC16ccittCompute(byteArray, byteArray.length - 2);
+
+        byteArray[ byteArray.length - 2 ] = cc[ 0 ];
+        byteArray[ byteArray.length - 1 ] = cc[ 1 ];
+
+        return byteArray;
+    }
+
+    public static boolean getCRC16ccittVerify(byte[] bytes)
+    {
+        byte[] newCrc = getCRC16ccittCompute(bytes, bytes.length - 2);
+
+        return !((newCrc[ 0 ] != bytes[ bytes.length - 2 ]) ||
+                (newCrc[ 1 ] != bytes[ bytes.length - 1 ]));
     }
 
     //endregion All purpose simple getters

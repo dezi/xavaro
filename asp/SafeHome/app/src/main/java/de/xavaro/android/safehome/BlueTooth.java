@@ -852,6 +852,26 @@ public abstract class BlueTooth extends BroadcastReceiver
         return buffer.getInt();
     }
 
+    public static int byteArrayToInt(byte[] data)
+    {
+        return byteArrayToInt(data, true);
+    }
+
+    public static int byteArrayToInt(byte[] data, boolean littleEndian)
+    {
+        int returnValue = 0;
+        int start = littleEndian ? data.length - 1 : 0;
+
+        for (int offset = 0; offset < data.length; offset++)
+        {
+            int index = Math.abs(start - offset);
+
+            returnValue |= (data[ index ] & 255) << (index * 8);
+        }
+
+        return returnValue;
+    }
+
     public static long getTimeStampInMilliSeconds(int timeStampInSeconds)
     {
         return ((long) timeStampInSeconds) * 1000;

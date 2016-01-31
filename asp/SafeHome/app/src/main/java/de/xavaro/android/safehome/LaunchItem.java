@@ -216,13 +216,11 @@ public class LaunchItem extends FrameLayout
         label.setText(text);
 
         //
-        // Set size of text according to height.
+        // Set reasonable size of text according to height.
         //
 
         textsize = layout.height / 10;
         label.setTextSize(Simple.getDeviceTextSize(textsize));
-
-        Log.d(LOGTAG,"================: " + Simple.getDeviceDPI() + "="  + layout.height + "=" + textsize);
 
         //
         // Figure out the layout of this label.
@@ -230,7 +228,7 @@ public class LaunchItem extends FrameLayout
 
         label.setMaxWidth(Integer.MAX_VALUE);
         label.measure(0, 0);
-        int onlineHeight = label.getMeasuredHeight();
+        int onelineHeight = label.getMeasuredHeight();
 
         int laywid = layout.width - padding * 2;
 
@@ -238,7 +236,7 @@ public class LaunchItem extends FrameLayout
         label.measure(0, 0);
         int layoutHeight = label.getMeasuredHeight();
 
-        if (layoutHeight > onlineHeight)
+        if (layoutHeight > onelineHeight)
         {
             //
             // Text will use at least two lines in
@@ -252,6 +250,8 @@ public class LaunchItem extends FrameLayout
             // This might lead to a shitty breaking
             // of words. Reduce the width furthermore
             // as long as the height stays the same.
+            // Means, that all words are evenly on
+            // their corresponding lines.
             //
 
             int targetHeight = layoutHeight;
