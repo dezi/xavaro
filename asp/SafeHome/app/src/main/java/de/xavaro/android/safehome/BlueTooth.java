@@ -42,11 +42,11 @@ public abstract class BlueTooth extends BroadcastReceiver
     protected BluetoothGatt currentGatt;
     protected boolean currentConnectState;
 
-    protected BluetoothGattCharacteristic currentPrimary;
-    protected BluetoothGattCharacteristic currentSecondary;
-    protected BluetoothGattCharacteristic currentChanged;
-    protected BluetoothGattCharacteristic currentControl;
-    protected BluetoothGattCharacteristic currentSerial;
+    public BluetoothGattCharacteristic currentPrimary;
+    public BluetoothGattCharacteristic currentSecondary;
+    public BluetoothGattCharacteristic currentChanged;
+    public BluetoothGattCharacteristic currentControl;
+    public BluetoothGattCharacteristic currentSerial;
 
     protected BlueToothDiscoverCallback discoverCallback;
     protected BlueToothConnectCallback connectCallback;
@@ -236,14 +236,14 @@ public abstract class BlueTooth extends BroadcastReceiver
     protected final Handler gattHandler = new Handler();
     protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
 
-    protected class GattAction
+    public static class GattAction
     {
-        static final int MODE_READ = 1;
-        static final int MODE_WRITE = 2;
-        static final int MODE_NOTIFY = 3;
-        static final int MODE_INDICATE = 4;
-        static final int MODE_DISCONNECT = 5;
-        static final int MODE_NOACTIONREQUIRED = 6;
+        public static final int MODE_READ = 1;
+        public static final int MODE_WRITE = 2;
+        public static final int MODE_NOTIFY = 3;
+        public static final int MODE_INDICATE = 4;
+        public static final int MODE_DISCONNECT = 5;
+        public static final int MODE_NOACTIONREQUIRED = 6;
 
         public GattAction()
         {
@@ -850,26 +850,6 @@ public abstract class BlueTooth extends BroadcastReceiver
         buffer.flip();
 
         return buffer.getInt();
-    }
-
-    public static int byteArrayToInt(byte[] data)
-    {
-        return byteArrayToInt(data, true);
-    }
-
-    public static int byteArrayToInt(byte[] data, boolean littleEndian)
-    {
-        int returnValue = 0;
-        int start = littleEndian ? data.length - 1 : 0;
-
-        for (int offset = 0; offset < data.length; offset++)
-        {
-            int index = Math.abs(start - offset);
-
-            returnValue |= (data[ index ] & 255) << (index * 8);
-        }
-
-        return returnValue;
     }
 
     public static long getTimeStampInMilliSeconds(int timeStampInSeconds)

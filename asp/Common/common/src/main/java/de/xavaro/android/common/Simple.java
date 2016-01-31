@@ -707,6 +707,32 @@ public class Simple
                 (newCrc[ 1 ] != bytes[ bytes.length - 1 ]));
     }
 
+    public static int getIntFromLEByteArray(byte[] data)
+    {
+        return getIntFromByteArray(data, true);
+    }
+
+    public static int getIntFromBEByteArray(byte[] data)
+    {
+        return getIntFromByteArray(data, false);
+    }
+
+    public static int getIntFromByteArray(byte[] data, boolean littleEndian)
+    {
+        int returnValue = 0;
+
+        int start = littleEndian ? data.length - 1 : 0;
+
+        for (int offset = 0; offset < data.length; offset++)
+        {
+            int index = Math.abs(start - offset);
+
+            returnValue |= (data[ index ] & 0xff) << (index << 3);
+        }
+
+        return returnValue;
+    }
+
     //endregion All purpose simple getters
 
     //region JSON stuff
