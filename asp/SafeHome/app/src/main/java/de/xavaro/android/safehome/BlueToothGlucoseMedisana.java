@@ -2,79 +2,68 @@ package de.xavaro.android.safehome;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Simple;
 
-public class BlueToothGlucose1 extends BlueTooth
+public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevice
 {
-    private static final String LOGTAG = BlueToothGlucose1.class.getSimpleName();
+    private static final String LOGTAG = BlueToothGlucoseMedisana.class.getSimpleName();
 
-    public BlueToothGlucose1(Context context)
+    private final BlueTooth parent;
+
+    public BlueToothGlucoseMedisana(BlueTooth parent)
     {
-        super(context);
+        this.parent = parent;
     }
 
-    public BlueToothGlucose1(Context context, String deviceTag)
-    {
-        super(context, deviceTag);
-    }
-
-    @Override
-    protected boolean isCompatibleService(BluetoothGattService service)
+    public boolean isCompatibleService(BluetoothGattService service)
     {
         return service.getUuid().toString().equals("00001808-0000-1000-8000-00805f9b34fb");
     }
 
-    @Override
-    protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
+    public boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
         return characteristic.getUuid().toString().equals("00002a18-0000-1000-8000-00805f9b34fb");
     }
 
-    @Override
-    protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
+    public boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
     {
         return characteristic.getUuid().toString().equals("00002a34-0000-1000-8000-00805f9b34fb");
     }
 
-    @Override
-    protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
+    public boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
     {
         return characteristic.getUuid().toString().equals("00002a52-0000-1000-8000-00805f9b34fb");
     }
 
-    @Override
-    protected void enableDevice()
+    public void enableDevice()
     {
-        Log.d(LOGTAG, "enableDevice: " + deviceName);
-
-        GattAction ga;
+        BlueTooth.GattAction ga;
 
         //
         // Indicate control.
         //
 
-        ga = new GattAction();
+        ga = new BlueTooth.GattAction();
 
-        ga.mode = GattAction.MODE_INDICATE;
-        ga.characteristic = currentControl;
+        ga.mode = BlueTooth.GattAction.MODE_INDICATE;
+        ga.characteristic = parent.currentControl;
 
-        gattSchedule.add(ga);
+        parent.gattSchedule.add(ga);
 
         //
         // Notify primary.
         //
 
-        ga = new GattAction();
+        ga = new BlueTooth.GattAction();
 
-        ga.mode = GattAction.MODE_NOTIFY;
-        ga.characteristic = currentPrimary;
+        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
+        ga.characteristic = parent.currentPrimary;
 
-        gattSchedule.add(ga);
+        parent.gattSchedule.add(ga);
 
         /*
         //
@@ -138,7 +127,7 @@ public class BlueToothGlucose1 extends BlueTooth
 
         */
 
-        fireNext(true);
+        parent.fireNext(true);
     }
 
     @Override
