@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothGattService;
 import android.support.annotation.Nullable;
 
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -14,7 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import de.xavaro.android.common.Simple;
 
-public class BlueToothGlucoseOneTouch
+public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevice
 {
     private static final String LOGTAG = BlueToothGlucoseOneTouch.class.getSimpleName();
 
@@ -25,7 +26,29 @@ public class BlueToothGlucoseOneTouch
         this.parent = parent;
     }
 
-    protected void enableDevice()
+    //region Interface BlueTooth.BlueToothPhysicalDevice
+
+    public boolean isCompatibleService(BluetoothGattService service)
+    {
+        return service.getUuid().toString().equals("af9df7a1-e595-11e3-96b4-0002a5d5c51b");
+    }
+
+    public boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
+    {
+        return characteristic.getUuid().toString().equals("af9df7a3-e595-11e3-96b4-0002a5d5c51b");
+    }
+
+    public boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
+    {
+        return false;
+    }
+
+    public boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
+    {
+        return characteristic.getUuid().toString().equals("af9df7a2-e595-11e3-96b4-0002a5d5c51b");
+    }
+
+    public void enableDevice()
     {
         //
         // Notify primary.
@@ -42,7 +65,7 @@ public class BlueToothGlucoseOneTouch
         // Fire initial command.
         //
 
-        schedulePackets(getReadMeterDieID());
+        schedulePackets(getReadMeterChallenge());
 
         fireNextPacket();
     }
@@ -53,6 +76,36 @@ public class BlueToothGlucoseOneTouch
 
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
+        parseResponseInternal(rd, characteristic);
+    }
+
+    //endregion Interface BlueTooth.BlueToothPhysicalDevice
+
+    //region Device internal implementation
+
+    private static final int COMMAND_READCHALLENGE = 1;
+    private static final int COMMAND_ENABLEFEATURES = 2;
+    private static final int COMMAND_READTIME = 3;
+    private static final int COMMAND_READUNIT = 4;
+    private static final int COMMAND_READHIGHRANGE = 5;
+    private static final int COMMAND_READLOWRANGE = 6;
+    private static final int COMMAND_READRECORDCOUNT = 7;
+    private static final int COMMAND_READTESTCOUNT = 8;
+    private static final int COMMAND_READGLUCOSERECORD = 9;
+
+    private byte[] incomingMessage;
+    private int incomingNumPackets;
+    private byte[] challenge;
+
+    private ArrayList<byte[]> outgoingPackets = new ArrayList<>();
+    private int outgoingCommand;
+
+    public static final int defaultLowRange = 70;
+    public static final int defaultHighRange = 180;
+    public static final long DEVICE_DELTA_SECONDS = 946684800L;
+
+    private void parseResponseInternal(byte[] rd, BluetoothGattCharacteristic characteristic)
+    {
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
 
         int opcode = rd[ 0 ] & 0xc0;
@@ -62,7 +115,7 @@ public class BlueToothGlucoseOneTouch
 
         if (opcode == 0x80)
         {
-            Log.d(LOGTAG, "ACK Received - processing...");
+            Log.d(LOGTAG, "ACK - processing");
 
             incomingMessage = new byte[ 0 ];
 
@@ -73,7 +126,7 @@ public class BlueToothGlucoseOneTouch
 
         if (opcode == 0xc0)
         {
-            Log.d(LOGTAG, "NACK Received - not processed!");
+            Log.d(LOGTAG, "NACK - not processing");
 
             return;
         }
@@ -87,6 +140,7 @@ public class BlueToothGlucoseOneTouch
                 Log.d(LOGTAG, "Receive total packets:" + packet);
 
                 incomingNumPackets = packet;
+
                 packet = 0;
             }
             else
@@ -127,7 +181,7 @@ public class BlueToothGlucoseOneTouch
                 Log.d(LOGTAG,"Complete message received: "
                         +  Simple.getHexBytesToString(incomingMessage));
 
-                if (checkResponse(incomingMessage))
+                if (validateResponse(incomingMessage))
                 {
                     byte[] payload = extractPayload(incomingMessage);
                     ArrayList<byte[]> next = parseCommands(payload);
@@ -147,94 +201,71 @@ public class BlueToothGlucoseOneTouch
         }
     }
 
-    private static final int COMMAND_READDIEID = 1;
-    private static final int COMMAND_PREMIUMMODE = 2;
-    private static final int COMMAND_READTIME = 3;
-    private static final int COMMAND_READUOM = 4;
-    private static final int COMMAND_READHIGHRANGE = 5;
-    private static final int COMMAND_READLOWRANGE = 6;
-    private static final int COMMAND_READRECORDCOUNT = 7;
-    private static final int COMMAND_READTESTCOUNT = 8;
-    private static final int COMMAND_READGLUCOSERECORD = 9;
-
-    private byte[] incomingMessage;
-    private int incomingNumPackets;
-
-    private ArrayList<byte[]> outgoingPackets = new ArrayList<>();
-    private int outgoingCommand;
-
-    public static final int defaultLowRange = 70;
-    public static final int defaultHighRange = 180;
-    public static final long UNIXTIME_TO_METERTIME_DELTA_MILLIS = 946684800000L;
-
     public ArrayList<byte[]> parseCommands(byte[] payload)
     {
-        if (outgoingCommand == COMMAND_READDIEID)
+        if (outgoingCommand == COMMAND_READCHALLENGE)
         {
-            parseReadMeterDieID(payload);
-            return getPremiumMode();
+            parseMeterChallenge(payload);
+            return getEnableFeatures();
         }
 
-        if (outgoingCommand == COMMAND_PREMIUMMODE)
+        if (outgoingCommand == COMMAND_ENABLEFEATURES)
         {
-            parsePremiumMode(payload);
-            return getReadMeterUOM();
+            parseEnableFeatures(payload);
+            return getReadMeterUnit();
         }
 
-        if (outgoingCommand == COMMAND_READUOM)
+        if (outgoingCommand == COMMAND_READUNIT)
         {
-            parseReadMeterUOM(payload);
+            parseMeterUnit(payload);
             return getReadMeterTime();
         }
 
         if (outgoingCommand == COMMAND_READTIME)
         {
-            parseReadMeterTime(payload);
+            parseMeterTime(payload);
             return getReadMeterLowRange();
         }
 
         if (outgoingCommand == COMMAND_READLOWRANGE)
         {
-            parseReadMeterLowRange(payload);
+            parseMeterLowRange(payload);
             return getReadMeterHighRange();
         }
 
         if (outgoingCommand == COMMAND_READHIGHRANGE)
         {
-            parseReadMeterHighRange(payload);
+            parseMeterHighRange(payload);
             return getReadMeterRecordCount();
         }
 
         if (outgoingCommand == COMMAND_READRECORDCOUNT)
         {
-            parseReadMeterRecordCount(payload);
+            parseMeterRecordCount(payload);
             return getReadMeterTestCount();
         }
 
         if (outgoingCommand == COMMAND_READTESTCOUNT)
         {
-            parseReadMeterTestCount(payload);
+            parseMeterTestCount(payload);
             return getReadGlucoseRecord(8);
         }
 
         if (outgoingCommand == COMMAND_READGLUCOSERECORD)
         {
-            parseReadGlucoseRecord(payload);
+            parseGlucoseRecord(payload);
         }
 
         return null;
     }
 
-    public void parseReadGlucoseRecord(byte[] pl)
+    public void parseGlucoseRecord(byte[] pl)
     {
-        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: result=" + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseGlucoseRecord: result=" + Simple.getHexBytesToString(pl));
 
-        if (pl[  9 ] != 0)
-            Log.d(LOGTAG, "parseReadGlucoseRecordCommand: Non-Glucose value found =" + pl[ 9 ]);
-        if (pl[  6 ] != 0)
-            Log.d(LOGTAG, "parseReadGlucoseRecordCommand: Control Solution value found =" + pl[ 6 ]);
-        if (pl[ 10 ] != 0)
-            Log.d(LOGTAG, "parseReadGlucoseRecordCommand: Sensor status =" + pl[ 10 ]);
+        if (pl[  9 ] != 0) Log.d(LOGTAG, "parseGlucoseRecord: Non-Glucose value:" + pl[ 9 ]);
+        if (pl[  6 ] != 0) Log.d(LOGTAG, "parseGlucoseRecord: Control Solution value :" + pl[ 6 ]);
+        if (pl[ 10 ] != 0) Log.d(LOGTAG, "parseGlucoseRecord: Sensor status:" + pl[ 10 ]);
 
         byte[] timeArray = new byte[ 4 ];
         System.arraycopy(pl, 0, timeArray, 0, 4);
@@ -242,66 +273,49 @@ public class BlueToothGlucoseOneTouch
         System.arraycopy(pl, 4, bgValueArray, 0, 2);
 
         float bgValue = Simple.getIntFromLEByteArray(bgValueArray);
+
         long  timeStamp = Simple.getIntFromLEByteArray(timeArray);
+        timeStamp += DEVICE_DELTA_SECONDS;
         timeStamp *= 1000L;
-        timeStamp += UNIXTIME_TO_METERTIME_DELTA_MILLIS;
 
-        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: " + Simple.getHexBytesToString(pl));
-        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: " + Simple.timeStampAsISO(timeStamp));
-        Log.d(LOGTAG, "parseReadGlucoseRecordCommand: " + bgValue);
+        Log.d(LOGTAG, "parseGlucoseRecord: " + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseGlucoseRecord: " + Simple.timeStampAsISO(timeStamp));
+        Log.d(LOGTAG, "parseGlucoseRecord: " + bgValue);
     }
 
-    public void parseReadMeterHighRange(byte[] pl)
+    public void parseMeterHighRange(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
-        Log.d(LOGTAG, "parseReadMeterHighRangeCommand: result=" + intval);
+        Log.d(LOGTAG, "parseMeterHighRange: result=" + intval);
     }
-    public void parseReadMeterLowRange(byte[] pl)
+
+    public void parseMeterLowRange(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
-        Log.d(LOGTAG, "parseReadMeterLowRangeCommand: result=" + intval);
+        Log.d(LOGTAG, "parseMeterLowRange: result=" + intval);
     }
 
-    public void parseReadMeterRecordCount(byte[] pl)
+    public void parseMeterRecordCount(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
-        Log.d(LOGTAG, "parseReadMeterRecordCountCommand: result=" + intval + "=" + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseMeterRecordCount: result=" + intval + "=" + Simple.getHexBytesToString(pl));
     }
 
-    public ArrayList<byte[]> getReadMeterRecordCount()
-    {
-        Log.d(LOGTAG, "getReadMeterRecordCountCommand");
-
-        outgoingCommand = COMMAND_READRECORDCOUNT;
-
-        byte[] data = new byte[ 2 ];
-
-        data[ 0 ] = 39;
-        data[ 1 ] = 0;
-
-        return createTransmitChunks(data);
-    }
-
-    public void parseReadMeterTestCount(byte[] pl)
+    public void parseMeterTestCount(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
-        Log.d(LOGTAG, "parseReadMeterTestCountCommand: result=" + intval);
+        Log.d(LOGTAG, "parseMeterTestCount: result=" + intval);
     }
-    public void parsePremiumMode(byte[] pl)
+    public void parseEnableFeatures(byte[] pl)
     {
-        Log.d(LOGTAG, "parsePremiumModeCommand:" + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseEnableFeatures:" + Simple.getHexBytesToString(pl));
     }
-    public void parseReadMeterDieID(byte[] pl)
+    public void parseMeterChallenge(byte[] pl)
     {
-        //
-        // id=1323191058D0C9B7
-        // id=0B035B36FF763569
-        //
-
         String id = "";
 
         for (int inx = 0; inx < pl.length; inx += 2)
@@ -311,29 +325,31 @@ public class BlueToothGlucoseOneTouch
             if (utf16 > 0) id += (char) utf16;
         }
 
-        premiumModeClear = Simple.getHexStringToBytes(id);
+        challenge = Simple.getHexStringToBytes(id);
 
-        Log.d(LOGTAG, "parseReadMeterDieIDCommand: id=" + id + ":" + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseMeterChallenge: id=" + id + ":" + Simple.getHexBytesToString(pl));
     }
-    public void parseReadMeterUOM(byte[] pl)
+
+    public void parseMeterUnit(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
-        Log.d(LOGTAG, "parseReadMeterUOMCommand: result=" + intval + "=" + ((intval == 0) ? "mg/dL" : "mmol/L"));
+        Log.d(LOGTAG, "parseMeterUnit: result=" + intval + "=" + ((intval == 0) ? "mg/dL" : "mmol/L"));
     }
-    public void parseReadMeterTime(byte[] pl)
+
+    public void parseMeterTime(byte[] pl)
     {
         long timestamp = Simple.getIntFromLEByteArray(pl);
 
+        timestamp += DEVICE_DELTA_SECONDS;
         timestamp *= 1000L;
-        timestamp += UNIXTIME_TO_METERTIME_DELTA_MILLIS;
 
-        Log.d(LOGTAG, "parseReadMeterTimeCommand: " + Simple.getHexBytesToString(pl) + "=" + Simple.timeStampAsISO(timestamp));
+        Log.d(LOGTAG, "parseMeterTime: " + Simple.getHexBytesToString(pl) + "=" + Simple.timeStampAsISO(timestamp));
     }
 
     public ArrayList<byte[]> getReadGlucoseRecord(int index)
     {
-        Log.d(LOGTAG, "getReadGlucoseRecordCommand");
+        Log.d(LOGTAG, "getReadGlucoseRecord");
 
         outgoingCommand = COMMAND_READGLUCOSERECORD;
 
@@ -345,10 +361,24 @@ public class BlueToothGlucoseOneTouch
 
         return createTransmitChunks(data);
     }
+    
+    public ArrayList<byte[]> getReadMeterRecordCount()
+    {
+        Log.d(LOGTAG, "getReadMeterRecordCount");
+
+        outgoingCommand = COMMAND_READRECORDCOUNT;
+
+        byte[] data = new byte[ 2 ];
+
+        data[ 0 ] = 39;
+        data[ 1 ] = 0;
+
+        return createTransmitChunks(data);
+    }
 
     private ArrayList<byte[]> getReadMeterHighRange()
     {
-        Log.d(LOGTAG, "getReadMeterHighRangeCommands");
+        Log.d(LOGTAG, "getReadMeterHighRange");
 
         outgoingCommand = COMMAND_READHIGHRANGE;
 
@@ -363,7 +393,7 @@ public class BlueToothGlucoseOneTouch
 
     private ArrayList<byte[]> getReadMeterLowRange()
     {
-        Log.d(LOGTAG, "getReadMeterLowRangeCommand");
+        Log.d(LOGTAG, "getReadMeterLowRange");
 
         outgoingCommand = COMMAND_READLOWRANGE;
 
@@ -378,7 +408,7 @@ public class BlueToothGlucoseOneTouch
 
     private ArrayList<byte[]> getReadMeterTestCount()
     {
-        Log.d(LOGTAG, "getReadMeterTestCountCommand");
+        Log.d(LOGTAG, "getReadMeterTestCount");
 
         outgoingCommand = COMMAND_READTESTCOUNT;
 
@@ -391,60 +421,39 @@ public class BlueToothGlucoseOneTouch
         return createTransmitChunks(data);
     }
 
-    private byte[] reverseByteArray(byte[] array)
+    private byte[] makeTimePassword(byte[] date)
     {
-        int len = array.length;
+        byte[] fuzzy = new byte[]{ date[ 0 ], date[ 3 ], date[ 2 ], date[ 1 ] };
+        byte[] xorme = new byte[]{ (byte) -19, (byte) 85, (byte) -50, (byte) -84 };
+        byte[] fukit = new byte[ 4 ];
 
-        byte[] reversedArray = new byte[ len ];
-
-        for (int index = 0; index < len; index++)
+        for (int inx = 0; inx < fuzzy.length; inx++)
         {
-            reversedArray[ (len - index) - 1 ] = array[index];
+            fukit[ inx ] = (byte) (fuzzy[ inx ] ^ xorme[ inx ]);
         }
 
-        return reversedArray;
-    }
-
-    private byte[] generatePasswordArray(byte[] date)
-    {
-        byte[] invertedArray = new byte[]{date[ 3 ], date[ 2 ], date[ 1 ], date[ 0 ]};
-        byte[] time = new byte[]{invertedArray[ 2 ], invertedArray[ 1 ], invertedArray[ 0 ], invertedArray[ 3 ]};
-        byte[] constant = new byte[]{(byte) -84, (byte) -50, (byte) 85, (byte) -19};
-        byte[] result = new byte[ 4 ];
-
-        for (int inx = 0; inx < time.length; inx++)
-        {
-            result[ inx ] = (byte) (time[ inx ] ^ constant[ inx ]);
-        }
-
-        return new byte[]{result[ 3 ], result[ 2 ], result[ 1 ], result[ 0 ]};
+        return fukit;
     }
 
     @Nullable
-    private byte[] generateEncryptedToken(byte[] clearTextSource)
+    private byte[] makeCipherToken(byte[] challenge)
     {
-        byte[] premiumModeMasterKey = new byte[]{
-                (byte) 72, (byte) 59, (byte) -45, (byte) -62,
-                (byte) -53, (byte) -33, (byte) 99, (byte) 69,
-                (byte) 22, (byte) 0, (byte) 4, (byte) -26,
-                (byte) -43, (byte) 109, (byte) -108, (byte) -116};
+        String fukit = Simple.dezify("==:@M6J0JGMD?6=7839291L4M0?F011A");
+        byte[] mukit = Simple.getHexStringToBytes(fukit);
 
-        // 483BD3C2CBDF6345160004E6D56D948C
+        byte[] rchallenge = Simple.getReversedBytes(challenge);
+        byte[] fchallenge = new byte[ 16 ];
 
-        byte[] reversedClearText = reverseByteArray(clearTextSource);
-
-        byte[] premiumModeClearText = new byte[ 16 ];
-        System.arraycopy(reversedClearText, 2, premiumModeClearText, 0, 2);
-        System.arraycopy(reversedClearText, 4, premiumModeClearText, 2, 4);
-        System.arraycopy(reversedClearText, 0, premiumModeClearText, 6, 2);
-
-        System.arraycopy(premiumModeClearText, 0, premiumModeClearText, 8, 8);
+        System.arraycopy(rchallenge, 2, fchallenge, 0, 2);
+        System.arraycopy(rchallenge, 4, fchallenge, 2, 4);
+        System.arraycopy(rchallenge, 0, fchallenge, 6, 2);
+        System.arraycopy(fchallenge, 0, fchallenge, 8, 8);
 
         try
         {
             Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
-            cipher.init(1, new SecretKeySpec(premiumModeMasterKey, "AES"));
-            return cipher.doFinal(premiumModeClearText);
+            cipher.init(1, new SecretKeySpec(mukit, "AES"));
+            return cipher.doFinal(fchallenge);
         }
         catch (Exception ex)
         {
@@ -454,28 +463,26 @@ public class BlueToothGlucoseOneTouch
         return null;
     }
 
-    byte[] premiumModeClear;
-
-    private ArrayList<byte[]> getPremiumMode()
+    private ArrayList<byte[]> getEnableFeatures()
     {
-        Log.d(LOGTAG, "getPremiumModeCommand");
+        Log.d(LOGTAG, "getEnableFeatures");
 
-        outgoingCommand = COMMAND_PREMIUMMODE;
+        outgoingCommand = COMMAND_ENABLEFEATURES;
 
         byte[] token;
 
-        if (premiumModeClear.length == 4)
+        if (challenge.length == 4)
         {
-            token = generatePasswordArray(premiumModeClear);
+            token = makeTimePassword(challenge);
         }
         else
         {
-            token = generateEncryptedToken(premiumModeClear);
+            token = makeCipherToken(challenge);
         }
 
         if (token == null)
         {
-            Log.d(LOGTAG,"Premium Token not generated!!!!!!!!!!!!!");
+            Log.d(LOGTAG,"Token not generated!");
 
             return null;
         }
@@ -488,11 +495,11 @@ public class BlueToothGlucoseOneTouch
         return createTransmitChunks(data);
     }
 
-    private ArrayList<byte[]> getReadMeterDieID()
+    private ArrayList<byte[]> getReadMeterChallenge()
     {
-        Log.d(LOGTAG, "getReadMeterDieIDCommand");
+        Log.d(LOGTAG, "getReadMeterChallenge");
 
-        outgoingCommand = COMMAND_READDIEID;
+        outgoingCommand = COMMAND_READCHALLENGE;
 
         byte[] data = new byte[ 3 ];
 
@@ -503,11 +510,11 @@ public class BlueToothGlucoseOneTouch
         return createTransmitChunks(data);
     }
 
-    private ArrayList<byte[]> getReadMeterUOM()
+    private ArrayList<byte[]> getReadMeterUnit()
     {
-        Log.d(LOGTAG, "getReadMeterUOMCommand");
+        Log.d(LOGTAG, "getReadMeterUnit");
 
-        outgoingCommand = COMMAND_READUOM;
+        outgoingCommand = COMMAND_READUNIT;
 
         byte[] data = new byte[ 3 ];
 
@@ -520,7 +527,7 @@ public class BlueToothGlucoseOneTouch
 
     private ArrayList<byte[]> getReadMeterTime()
     {
-        Log.d(LOGTAG, "getReadMeterTimeCommand");
+        Log.d(LOGTAG, "getReadMeterTime");
 
         outgoingCommand = COMMAND_READTIME;
 
@@ -614,7 +621,7 @@ public class BlueToothGlucoseOneTouch
         return list;
     }
 
-    private boolean checkResponse(byte[] message)
+    private boolean validateResponse(byte[] message)
     {
         if (message[ 1 ] != message.length)
         {
@@ -651,11 +658,11 @@ public class BlueToothGlucoseOneTouch
         return payload;
     }
 
-    private final static int INVALID_SIZE = 0;
-    private final static int CHECKSUM_ERROR = 1;
-    private final static int NOT_SUPPORTED = 8;
-    private final static int NOT_AUTHORIZED = 7;
-    private final static int INVALID_PARAMETER = 9;
+    private final static int SIZE_MISMATCH = 0;
+    private final static int CHECKSUM_MISMATCH = 1;
+    private final static int UNSUPPORTED = 8;
+    private final static int UNAUTHORIZED = 7;
+    private final static int INVALID_VALUE = 9;
     private final static int FAILED = 15;
     private final static int OK = 6;
 
@@ -665,13 +672,15 @@ public class BlueToothGlucoseOneTouch
         {
             case OK: return "OK";
             case FAILED: return "FAILED";
-            case INVALID_SIZE: return "INVALID SIZE";
-            case NOT_SUPPORTED: return "NOT SUPPORTED";
-            case CHECKSUM_ERROR: return "CHECKSUM ERROR";
-            case NOT_AUTHORIZED: return "NOT AUTHORIZED";
-            case INVALID_PARAMETER: return "INVALID PARAMETER";
+            case SIZE_MISMATCH: return "INVALID SIZE";
+            case UNSUPPORTED: return "NOT SUPPORTED";
+            case UNAUTHORIZED: return "NOT AUTHORIZED";
+            case INVALID_VALUE: return "INVALID PARAMETER";
+            case CHECKSUM_MISMATCH: return "CHECKSUM ERROR";
         }
 
         return "UNDEFINED OPERATION";
     }
+
+    //endregion Device internal implementation
 }

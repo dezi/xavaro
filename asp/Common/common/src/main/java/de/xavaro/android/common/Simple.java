@@ -733,6 +733,20 @@ public class Simple
         return returnValue;
     }
 
+    public static byte[] getReversedBytes(byte[] array)
+    {
+        int len = array.length;
+
+        byte[] reversedArray = new byte[ len ];
+
+        for (int index = 0; index < len; index++)
+        {
+            reversedArray[ (len - index) - 1 ] = array[index];
+        }
+
+        return reversedArray;
+    }
+
     //endregion All purpose simple getters
 
     //region JSON stuff

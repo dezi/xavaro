@@ -767,6 +767,18 @@ public abstract class BlueTooth extends BroadcastReceiver
         void onBluetoothReceivedData(String deviceName, JSONObject data);
     }
 
+    public interface BlueToothPhysicalDevice
+    {
+        boolean isCompatibleService(BluetoothGattService service);
+        boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic);
+        boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
+        boolean isCompatibleControl(BluetoothGattCharacteristic characteristic);
+
+        void enableDevice();
+        void sendCommand(JSONObject command);
+        void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic);
+    }
+
     //endregion Callback interfaces
 
     //region Conversion helper
