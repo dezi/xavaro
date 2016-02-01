@@ -11,6 +11,10 @@ public class BlueToothGlucose extends BlueTooth
     private static final String LOGTAG = BlueToothGlucose.class.getSimpleName();
 
     private BlueTooth.BlueToothPhysicalDevice oneTouchDevice = new BlueToothGlucoseOneTouch(this);
+    private BlueTooth.BlueToothPhysicalDevice medisanaDevice = new BlueToothGlucoseMedisana(this);
+
+    private boolean isOneTouch;
+    private boolean isMedisana;
 
     public BlueToothGlucose(Context context)
     {
@@ -25,42 +29,54 @@ public class BlueToothGlucose extends BlueTooth
     @Override
     protected boolean isCompatibleService(BluetoothGattService service)
     {
-        return oneTouchDevice.isCompatibleService(service);
+        boolean isOneTouchThis = oneTouchDevice.isCompatibleService(service);
+        boolean isMedisanaThis = medisanaDevice.isCompatibleService(service);
+
+        isOneTouch |= isOneTouchThis;
+        isMedisana |= isMedisanaThis;
+
+        return isOneTouchThis || isMedisanaThis;
     }
 
     @Override
     protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
-        return oneTouchDevice.isCompatiblePrimary(characteristic);
+        return oneTouchDevice.isCompatiblePrimary(characteristic) ||
+                medisanaDevice.isCompatiblePrimary(characteristic);
     }
 
     @Override
     protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
     {
-        return oneTouchDevice.isCompatibleSecondary(characteristic);
+        return oneTouchDevice.isCompatibleSecondary(characteristic) ||
+                medisanaDevice.isCompatibleSecondary(characteristic);
     }
 
     @Override
     protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
     {
-        return oneTouchDevice.isCompatibleControl(characteristic);
+        return oneTouchDevice.isCompatibleControl(characteristic) ||
+                medisanaDevice.isCompatibleControl(characteristic);
     }
 
     @Override
     protected void enableDevice()
     {
-        oneTouchDevice.enableDevice();
+        if (isOneTouch) oneTouchDevice.enableDevice();
+        if (isMedisana) medisanaDevice.enableDevice();
     }
 
     @Override
     public void sendCommand(JSONObject command)
     {
-        oneTouchDevice.sendCommand(command);
+        if (isOneTouch) oneTouchDevice.sendCommand(command);
+        if (isMedisana) medisanaDevice.sendCommand(command);
     }
 
     @Override
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
-        oneTouchDevice.parseResponse(rd, characteristic);
+        if (isOneTouch) oneTouchDevice.parseResponse(rd, characteristic);
+        if (isMedisana) medisanaDevice.parseResponse(rd, characteristic);
     }
 }
