@@ -8,6 +8,8 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
 {
     private final static String LOGTAG = LaunchItemHealth.class.getSimpleName();
 
+    HealthFrame healthFrame;
+
     public LaunchItemHealth(Context context)
     {
         super(context);
@@ -60,11 +62,19 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
 
     private void launchHealth()
     {
-        if (subtype != null) return;
+        if (subtype != null)
+        {
+            healthFrame = new HealthFrame(context);
+            healthFrame.setSubtype(subtype);
 
-        if (directory == null) directory = new LaunchGroupHealth(context);
+            ((HomeActivity) context).addViewToBackStack(healthFrame);
+        }
+        else
+        {
+            if (directory == null) directory = new LaunchGroupHealth(context);
 
-        ((HomeActivity) context).addViewToBackStack(directory);
+            ((HomeActivity) context).addViewToBackStack(directory);
+        }
     }
 
     //region BlueTooth connect states

@@ -1,8 +1,8 @@
 package de.xavaro.android.safehome;
 
-import android.bluetooth.BluetoothGattService;
 import android.support.annotation.Nullable;
 
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.util.Log;
 
@@ -13,7 +13,17 @@ import java.util.ArrayList;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+
+//
+// Health data record format:
+//
+//  utc => UTC timestamp
+//  bgv => Blood glucose value
+//  ngv => Non glucose value
+//  csv => Control solution value
+//
 
 public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevice
 {
@@ -100,9 +110,15 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
     private ArrayList<byte[]> outgoingPackets = new ArrayList<>();
     private int outgoingCommand;
 
-    public static final int defaultLowRange = 70;
-    public static final int defaultHighRange = 180;
-    public static final long DEVICE_DELTA_SECONDS = 946684800L;
+    private static final int defaultLowRange = 70;
+    private static final int defaultHighRange = 180;
+    private static final long DEVICE_DELTA_SECONDS = 946684800L;
+
+    private JSONObject status;
+    private int lastTestCount;
+    private int recordsToRead;
+    private int recordCount;
+    private int testCount;
 
     private void parseResponseInternal(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
@@ -181,21 +197,35 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
                 Log.d(LOGTAG,"Complete message received: "
                         +  Simple.getHexBytesToString(incomingMessage));
 
+                ArrayList<byte[]> next = null;
+
                 if (validateResponse(incomingMessage))
                 {
                     byte[] payload = extractPayload(incomingMessage);
-                    ArrayList<byte[]> next = parseCommands(payload);
-
-                    //
-                    // Fire next command.
-                    //
-
-                    if (next != null)
+                    next = parseCommands(payload);
+                }
+                else
+                {
+                    if (outgoingCommand == COMMAND_READGLUCOSERECORD)
                     {
-                        schedulePackets(next);
+                        //
+                        // Failed command was read record. Try the next
+                        // one if it exists.
+                        //
 
-                        fireNextPacket();
+                        next = getReadGlucoseRecord();
                     }
+                }
+
+                //
+                // Fire next command.
+                //
+
+                if (next != null)
+                {
+                    schedulePackets(next);
+
+                    fireNextPacket();
                 }
             }
         }
@@ -248,12 +278,13 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         if (outgoingCommand == COMMAND_READTESTCOUNT)
         {
             parseMeterTestCount(payload);
-            return getReadGlucoseRecord(8);
+            return getReadGlucoseRecord();
         }
 
         if (outgoingCommand == COMMAND_READGLUCOSERECORD)
         {
             parseGlucoseRecord(payload);
+            return getReadGlucoseRecord();
         }
 
         return null;
@@ -278,9 +309,20 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         timeStamp += DEVICE_DELTA_SECONDS;
         timeStamp *= 1000L;
 
-        Log.d(LOGTAG, "parseGlucoseRecord: " + Simple.getHexBytesToString(pl));
-        Log.d(LOGTAG, "parseGlucoseRecord: " + Simple.timeStampAsISO(timeStamp));
-        Log.d(LOGTAG, "parseGlucoseRecord: " + bgValue);
+        String utciso = Simple.timeStampAsISO(Simple.getLocalTimeToUTC(timeStamp));
+
+        Log.d(LOGTAG, "parseGlucoseRecord: result=LOC=" + Simple.timeStampAsISO(timeStamp));
+        Log.d(LOGTAG, "parseGlucoseRecord: result=UTC=" + utciso);
+        Log.d(LOGTAG, "parseGlucoseRecord: result=" + bgValue);
+
+        JSONObject record = new JSONObject();
+
+        Json.put(record, "utc", utciso);
+        Json.put(record, "bgv", bgValue);
+        Json.put(record, "ngv", pl[  9 ]);
+        Json.put(record, "csv", pl[  6 ]);
+
+        HealthData.addRecord("glucose", record);
     }
 
     public void parseMeterHighRange(byte[] pl)
@@ -299,21 +341,23 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
     public void parseMeterRecordCount(byte[] pl)
     {
-        int intval = Simple.getIntFromLEByteArray(pl);
+        recordCount = Simple.getIntFromLEByteArray(pl);
 
-        Log.d(LOGTAG, "parseMeterRecordCount: result=" + intval + "=" + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseMeterRecordCount: result=" + recordCount);
     }
 
     public void parseMeterTestCount(byte[] pl)
     {
-        int intval = Simple.getIntFromLEByteArray(pl);
+        testCount = Simple.getIntFromLEByteArray(pl);
 
-        Log.d(LOGTAG, "parseMeterTestCount: result=" + intval);
+        Log.d(LOGTAG, "parseMeterTestCount: result=" + testCount);
     }
+
     public void parseEnableFeatures(byte[] pl)
     {
-        Log.d(LOGTAG, "parseEnableFeatures:" + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseEnableFeatures: result=" + Simple.getHexBytesToString(pl));
     }
+
     public void parseMeterChallenge(byte[] pl)
     {
         String id = "";
@@ -327,7 +371,7 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
         challenge = Simple.getHexStringToBytes(id);
 
-        Log.d(LOGTAG, "parseMeterChallenge: id=" + id + ":" + Simple.getHexBytesToString(pl));
+        Log.d(LOGTAG, "parseMeterChallenge: result=" + id + ":" + Simple.getHexBytesToString(pl));
     }
 
     public void parseMeterUnit(byte[] pl)
@@ -344,20 +388,40 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         timestamp += DEVICE_DELTA_SECONDS;
         timestamp *= 1000L;
 
-        Log.d(LOGTAG, "parseMeterTime: " + Simple.getHexBytesToString(pl) + "=" + Simple.timeStampAsISO(timestamp));
+        Log.d(LOGTAG, "parseMeterTime: result=" + Simple.timeStampAsISO(timestamp));
     }
 
-    public ArrayList<byte[]> getReadGlucoseRecord(int index)
+    public ArrayList<byte[]> getReadGlucoseRecord()
     {
         Log.d(LOGTAG, "getReadGlucoseRecord");
+
+        if (status == null) status = HealthData.getStatus("glucose");
+
+        lastTestCount = status.has("lastTestCount") ? Json.getInt(status, "lastTestCount") : 0;
+
+        Log.d(LOGTAG, "getReadGlucoseRecord records=" + recordCount + ":" + testCount);
+
+        if (lastTestCount >= testCount)
+        {
+            Log.d(LOGTAG, "getReadGlucoseRecord no new data");
+
+            return null;
+        }
+
+        Json.put(status, "lastTestCount", ++lastTestCount);
+        Json.put(status, "lastReadDate", Simple.nowAsISO());
+
+        HealthData.putStatus("glucose", status);
+
+        Log.d(LOGTAG, "getReadGlucoseRecord next=" + lastTestCount);
 
         outgoingCommand = COMMAND_READGLUCOSERECORD;
 
         byte[] data = new byte[ 3 ];
 
         data[ 0 ] = (byte) -77;
-        data[ 1 ] = (byte) (index & 0xff);
-        data[ 2 ] = (byte) (index >> 8);
+        data[ 1 ] = (byte) (lastTestCount & 0xff);
+        data[ 2 ] = (byte) (lastTestCount >> 8);
 
         return createTransmitChunks(data);
     }

@@ -287,12 +287,6 @@ public class HomeActivity extends AppCompatActivity implements
         {
             Object lastview = backStack.get(backStack.size() - 1);
 
-            if (lastview instanceof LaunchGroup)
-            {
-                topscreen.removeView((FrameLayout) lastview);
-                backStack.remove(backStack.size() - 1);
-            }
-
             if (lastview instanceof WebFrame)
             {
                 //
@@ -305,6 +299,14 @@ public class HomeActivity extends AppCompatActivity implements
                     topscreen.removeView((FrameLayout) lastview);
                     backStack.remove(backStack.size() - 1);
                 }
+
+                return;
+            }
+
+            if ((lastview instanceof LaunchGroup) || (lastview instanceof LaunchFrame))
+            {
+                topscreen.removeView((FrameLayout) lastview);
+                backStack.remove(backStack.size() - 1);
             }
 
             return;

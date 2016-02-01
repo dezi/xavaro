@@ -27,6 +27,28 @@ public class Json
         return new JSONObject();
     }
 
+    public static JSONObject fromStringObject(String jsonstr)
+    {
+        return fromString(jsonstr);
+    }
+
+    public static JSONArray fromStringArray(String jsonstr)
+    {
+        if (jsonstr != null)
+        {
+            try
+            {
+                return new JSONArray(jsonstr);
+            }
+            catch (JSONException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+        }
+
+        return new JSONArray();
+    }
+
     public static JSONObject clone(JSONObject json)
     {
         try
@@ -113,6 +135,20 @@ public class Json
     }
 
     @Nullable
+    public static int getInt(JSONObject json, String key)
+    {
+        try
+        {
+            return json.getInt(key);
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return 0;
+    }
+
+    @Nullable
     public static String getString(JSONObject json, String key)
     {
         try
@@ -176,6 +212,23 @@ public class Json
             try
             {
                 return jsonObject.toString(2);
+            }
+            catch (JSONException ignored)
+            {
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String toPretty(JSONArray jsonArray)
+    {
+        if (jsonArray != null)
+        {
+            try
+            {
+                return jsonArray.toString(2);
             }
             catch (JSONException ignored)
             {

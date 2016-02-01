@@ -41,6 +41,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -384,6 +385,9 @@ public class Simple
             inputStream.close();
 
             return new String(content, 0, xfer);
+        }
+        catch (FileNotFoundException ignore)
+        {
         }
         catch (Exception ex)
         {
@@ -952,6 +956,23 @@ public class Simple
         now /= 86400 * 1000;
 
         return (int) (now - iso);
+    }
+
+    public static long getLocalTimeToUTC(long timestamp)
+    {
+        try
+        {
+            String isodate = timeStampAsISO(timestamp);
+            SimpleDateFormat df = new SimpleDateFormat(ISO8601DATEFORMAT, Locale.getDefault());
+            df.setTimeZone(TimeZone.getDefault());
+            return df.parse(isodate).getTime();
+        }
+        catch (ParseException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return 0L;
     }
 
     //endregion Date and time
