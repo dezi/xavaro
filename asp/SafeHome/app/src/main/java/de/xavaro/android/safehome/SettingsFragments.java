@@ -229,6 +229,7 @@ public class SettingsFragments
                 public void run()
                 {
                     dialog.setTitle(devicesearch);
+                    dialog.getButton(DialogInterface.BUTTON_NEUTRAL).setEnabled(false);
                 }
             };
 

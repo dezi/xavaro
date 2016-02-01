@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 
 public class HealthScale extends HealthBase
@@ -61,9 +62,15 @@ public class HealthScale extends HealthBase
 
             if (type.equals("UserList"))
             {
-                //
-                // Todo: check number of users and delete if required.
-                //
+                if (mesg.has("actUsers"))
+                {
+                    int actUsers = Json.getInt(mesg, "actUsers");
+
+                    if (actUsers == 0)
+                    {
+                        command.put("command", "getCreateUserFromPreferences");
+                    }
+                }
             }
 
             if (type.equals("UserListArray"))
@@ -103,21 +110,33 @@ public class HealthScale extends HealthBase
                     {
                         command.put("command", "getCreateUserFromPreferences");
                     }
-
-                    blueTooth.sendCommand(command);
-
-                    //
-                    // Above calls have no result. Just load the next command
-                    // to set scale to active user.
-                    //
-
-                    command = new JSONObject();
-                    command.put("command", "getTakeUserMeasurementFromPreferences");
                 }
                 catch (JSONException ex)
                 {
                     OopsService.log(LOGTAG, ex);
                 }
+            }
+
+            if (type.equals("UserDeleted"))
+            {
+            }
+
+            if (type.equals("UserCreated"))
+            {
+                command.put("command", "getTakeUserMeasurementFromPreferences");
+            }
+
+            if (type.equals("UserUpdated"))
+            {
+                command.put("command", "getTakeUserMeasurementFromPreferences");
+            }
+
+            if (type.equals("UserMeasurements"))
+            {
+            }
+
+            if (type.equals("UnknownMeasurements"))
+            {
             }
 
             if (type.equals("TakeUserMeasurement"))
@@ -127,7 +146,6 @@ public class HealthScale extends HealthBase
 
             if (type.equals("LiveMeasurementOnTimestamp"))
             {
-                long uuid = mesg.getLong("uuid");
                 double weight = mesg.getDouble("weight");
                 double impedance = mesg.getDouble("impedance");
 
@@ -155,6 +173,8 @@ public class HealthScale extends HealthBase
                     DitUndDat.SpeekDat.speak("Fettsack");
 
                     DitUndDat.SpeekDat.speak("Vielen Dank für ihre Messung");
+
+                    command.put("command", "getUserMeasurements");
                 }
             }
 

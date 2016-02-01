@@ -8,6 +8,13 @@ import de.xavaro.android.common.Simple;
 
 public class HealthData
 {
+    public static void setLastReadDate(String datatype)
+    {
+        JSONObject status = getStatus(datatype);
+        Json.put(status, "lastReadDate", Simple.nowAsISO());
+        putStatus(datatype, status);
+    }
+
     public static JSONObject getStatus(String datatype)
     {
         JSONObject status = new JSONObject();
@@ -19,10 +26,15 @@ public class HealthData
         return status;
     }
 
-    public static void putStatus(String datatype, JSONObject protocoll)
+    public static void putStatus(String datatype, JSONObject status)
     {
         String filename = Simple.getPackageName() + ".healthdata." + datatype + ".status.json";
-        Simple.writeDatadirFile(filename, Json.toPretty(protocoll));
+        Simple.writeDatadirFile(filename, Json.toPretty(status));
+    }
+
+    public static void clearStatus(String datatype)
+    {
+        putStatus(datatype, new JSONObject());
     }
 
     public static void addRecord(String datatype, JSONObject record)
@@ -37,6 +49,8 @@ public class HealthData
         }
 
         records.put(record);
+
+        if (record.has("utc")) records = Json.sort(records, "utc", true);
 
         putRecords(datatype, records);
     }
@@ -56,5 +70,10 @@ public class HealthData
     {
         String filename = Simple.getPackageName() + ".healthdata." + datatype + ".records.json";
         Simple.writeDatadirFile(filename, Json.toPretty(records));
+    }
+
+    public static void clearRecords(String datatype)
+    {
+        putRecords(datatype, new JSONArray());
     }
 }

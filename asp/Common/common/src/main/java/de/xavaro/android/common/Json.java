@@ -6,6 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class Json
 {
     private static final String LOGTAG = Json.class.getSimpleName();
@@ -245,5 +250,31 @@ public class Json
         //
 
         return json.replace("\\/","/");
+    }
+
+    public static JSONArray sort(JSONArray array, String field, boolean descending)
+    {
+        final String sort = field;
+        final boolean desc = descending;
+
+        class compare implements Comparator<JSONObject>
+        {
+            public int compare(JSONObject a, JSONObject b)
+            {
+                String astr = desc ? getString(b, sort) : getString(a, sort);
+                String bstr = desc ? getString(a, sort) : getString(b, sort);
+
+                return Simple.compareTo(astr, bstr);
+            }
+        }
+
+        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+
+        for (int inx = 0; inx < array.length(); inx++)
+            jsonValues.add(getObject(array, inx));
+
+        Collections.sort(jsonValues, new compare());
+
+        return new JSONArray(jsonValues);
     }
 }

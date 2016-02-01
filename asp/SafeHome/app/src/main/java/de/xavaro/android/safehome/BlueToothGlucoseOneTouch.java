@@ -323,6 +323,21 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         Json.put(record, "csv", pl[  6 ]);
 
         HealthData.addRecord("glucose", record);
+
+        //
+        // Announce last record to user interface.
+        //
+
+        if (lastTestCount == testCount)
+        {
+            JSONObject data = new JSONObject();
+            Json.put(data, "glucose", record);
+
+            if (parent.dataCallback != null)
+            {
+                parent.dataCallback.onBluetoothReceivedData(parent.deviceName, data);
+            }
+        }
     }
 
     public void parseMeterHighRange(byte[] pl)

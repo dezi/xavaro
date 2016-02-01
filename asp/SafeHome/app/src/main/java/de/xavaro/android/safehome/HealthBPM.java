@@ -53,37 +53,21 @@ public class HealthBPM extends HealthBase
         try
         {
             JSONObject mesg = data.getJSONObject("bpm");
-            String type = mesg.getString("type");
 
-            if (type.equals("Measurement"))
+            String date = mesg.getString("utc");
+            int systolic = mesg.getInt("sys");
+            int diastolic = mesg.getInt("dia");
+            int pulse = mesg.getInt("pls");
+
+            if ((lastDate == null) || (lastDate.compareTo(date) <= 0))
             {
-                int systolic = mesg.getInt("systolic");
-                int diastolic = mesg.getInt("diastolic");
-                int pulse = mesg.getInt("pulse");
-                int year = mesg.getInt("year");
-                int month = mesg.getInt("month");
-                int day = mesg.getInt("day");
-                int hour = mesg.getInt("hour");
-                int minute = mesg.getInt("minute");
-                int second = mesg.getInt("second");
+                lastSystolic = systolic;
+                lastDiastolic = diastolic;
+                lastPulse = pulse;
+                lastDate = date;
 
-                String result = mesg.getString("result");
-                String date = new Formatter().format("%04d.%02d.%02d %02d:%02d:%02d",
-                        year, month, day, hour, minute, second).toString();
-
-                if (result.equals("final"))
-                {
-                    if ((lastDate == null) || (lastDate.compareTo(date) <= 0))
-                    {
-                        lastSystolic = systolic;
-                        lastDiastolic = diastolic;
-                        lastPulse = pulse;
-                        lastDate = date;
-
-                        handler.removeCallbacks(messageSpeaker);
-                        handler.postDelayed(messageSpeaker, 500);
-                    }
-                }
+                handler.removeCallbacks(messageSpeaker);
+                handler.postDelayed(messageSpeaker, 500);
             }
         }
         catch (JSONException ex)
