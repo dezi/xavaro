@@ -103,6 +103,8 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     //region Device discovery
 
+    protected final Handler discoverHandler = new Handler();
+
     public boolean isDiscovering;
     public int discoverBGJobs;
 
@@ -128,7 +130,35 @@ public abstract class BlueTooth extends BroadcastReceiver
         context.registerReceiver(this, filter);
 
         bta.startDiscovery();
+
+        discoverHandler.postDelayed(abortDiscoveryRunnable, 30000);
     }
+
+    public void finishDiscovery()
+    {
+        Log.d(LOGTAG,"finishDiscovery");
+
+        isDiscovering = false;
+
+        discoverHandler.removeCallbacks(abortDiscoveryRunnable);
+
+        if (bta.isDiscovering()) bta.cancelDiscovery();
+
+        if (discoverCallback != null)
+        {
+            discoverCallback.onDiscoverFinished();
+            discoverCallback = null;
+        }
+    }
+
+    public Runnable abortDiscoveryRunnable = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            finishDiscovery();
+        }
+    };
 
     @Override
     public void onReceive(Context context, Intent intent)
@@ -161,12 +191,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
             discoverBGJobs--;
 
-            if (isDiscovering && (discoverBGJobs == 0))
-            {
-                isDiscovering = false;
-
-                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
-            }
+            if (isDiscovering && (discoverBGJobs == 0)) finishDiscovery();
 
             return;
         }
@@ -194,6 +219,8 @@ public abstract class BlueTooth extends BroadcastReceiver
                     (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
             {
                 deviceName = device.getName();
+                macAddress = device.getAddress();
+
                 Log.d(LOGTAG, "onReceive: connectGatt=" + device.getName());
                 device.connectGatt(context, true, gattCallback);
                 discoverBGJobs++;
@@ -213,19 +240,9 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onReceive: discoveryfinished");
 
-            if (isDiscovering && (discoverBGJobs == 0))
-            {
-                isDiscovering = false;
-
-                if (discoverCallback != null) discoverCallback.onDiscoverFinished();
-            }
-
-            //
-            // Prepare an easy garbage collection death.
-            //
+            if (isDiscovering && (discoverBGJobs == 0)) finishDiscovery();
 
             context.unregisterReceiver(this);
-            discoverCallback = null;
         }
     }
 
@@ -550,15 +567,12 @@ public abstract class BlueTooth extends BroadcastReceiver
             {
                 if ((discoverCallback != null) && (currentPrimary != null))
                 {
+                    Log.d(LOGTAG,"onServicesDiscovered Found=" + deviceName);
+
                     discoverCallback.onDeviceDiscovered(gatt.getDevice());
                 }
 
-                if (--discoverBGJobs == 0)
-                {
-                    isDiscovering = false;
-
-                    if (discoverCallback != null) discoverCallback.onDiscoverFinished();
-                }
+                if (--discoverBGJobs == 0) finishDiscovery();
             }
             else
             {

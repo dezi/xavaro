@@ -5,12 +5,25 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.xavaro.android.common.OopsService;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
+
+//
+// Health data record format:
+//
+//  utc => UTC timestamp
+//  sys => Systolic blood pressure
+//  dia => Diastolic blood pressure
+//  map => Mean arterial blood pressure
+//  pls => Pulse
+//  usr => User id
+//  flg => Device flags
+//
 
 public class BlueToothBPM extends BlueTooth
 {
@@ -66,53 +79,60 @@ public class BlueToothBPM extends BlueTooth
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
         Log.d(LOGTAG, "parseResponse: " + getMaskString(rd[ 0 ]));
 
-        try
+        boolean isfinal = (characteristic == currentPrimary);
+
+        int offset = 0;
+
+        JSONObject record = new JSONObject();
+
+        float sys = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
+        float dia = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
+        float map = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
+
+        if ((rd[ 0 ] & 0x02) >= 1)
         {
-            JSONObject bpmdata = new JSONObject();
+            int year = unsignedBytesToIntRev(rd[ ++offset ], rd[ ++offset ]);
+            int month = unsignedByteToInt(rd[ ++offset ]);
+            int day = unsignedByteToInt(rd[ ++offset ]);
+            int hour = unsignedByteToInt(rd[ ++offset ]);
+            int minute = unsignedByteToInt(rd[ ++offset ]);
+            int second = unsignedByteToInt(rd[ ++offset ]);
 
-            int offset = 0;
+            Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+            long utc = calendar.getTimeInMillis();
+            Json.put(record, "utc", Simple.timeStampAsISO(utc));
 
-            bpmdata.put("type", "Measurement");
+            Log.d(LOGTAG,"parseResponse result=" + hour + "::" + Simple.timeStampAsISO(utc));
+        }
 
-            bpmdata.put("result", (characteristic == currentPrimary) ? "final" : "intermediate");
+        Json.put(record, "sys", sys);
+        Json.put(record, "dia", dia);
+        Json.put(record, "map", map);
 
-            bpmdata.put("systolic", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
-            bpmdata.put("diastolic", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
-            bpmdata.put("meanap", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
+        if ((rd[ 0 ] & 0x04) >= 1)
+        {
+            Json.put(record, "pls", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
+        }
 
-            if ((rd[ 0 ] & 0x02) >= 1)
-            {
-                bpmdata.put("year", unsignedBytesToIntRev(rd[ ++offset ], rd[ ++offset ]));
-                bpmdata.put("month", unsignedByteToInt(rd[ ++offset ]));
-                bpmdata.put("day", unsignedByteToInt(rd[ ++offset ]));
-                bpmdata.put("hour", unsignedByteToInt(rd[ ++offset ]));
-                bpmdata.put("minute", unsignedByteToInt(rd[ ++offset ]));
-                bpmdata.put("second", unsignedByteToInt(rd[ ++offset ]));
-            }
+        if ((rd[ 0 ] & 0x08) >= 1)
+        {
+            Json.put(record, "usr", unsignedByteToInt(rd[ ++offset ]));
+        }
 
-            if ((rd[ 0 ] & 0x04) >= 1)
-            {
-                bpmdata.put("pulse", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
-            }
+        if ((rd[ 0 ] & 0x10) >= 1)
+        {
+            Json.put(record, "flg", unsignedByteToInt(rd[ ++offset ]));
+        }
 
-            if ((rd[ 0 ] & 0x08) >= 1)
-            {
-                bpmdata.put("user", unsignedByteToInt(rd[ ++offset ]));
-            }
-
-            if ((rd[ 0 ] & 0x10) >= 1)
-            {
-                bpmdata.put("flags", unsignedByteToInt(rd[ ++offset ]));
-            }
+        if (isfinal)
+        {
+            HealthData.addRecord("bpm", record);
+            HealthData.setLastReadDate("bpm");
 
             JSONObject data = new JSONObject();
-            data.put("bpm", bpmdata);
+            Json.put(data, "bpm", record);
 
             if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
         }
     }
 

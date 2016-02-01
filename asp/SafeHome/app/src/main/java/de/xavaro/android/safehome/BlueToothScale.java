@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.Date;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
@@ -40,7 +41,7 @@ public class BlueToothScale extends BlueTooth
         public static final String SANITAS_SBF70 = "SANITAS SBF70";
     }
 
-    protected boolean isCompatibleDevice(String devicename)
+    private boolean isCompatibleDevice(String devicename)
     {
         return (devicename.equalsIgnoreCase(Scales.SBF70) ||
                 devicename.equalsIgnoreCase(Scales.BF710) ||
@@ -167,9 +168,8 @@ public class BlueToothScale extends BlueTooth
 
             gattSchedule.add(0, new GattAction(getAcknowledgementData(rd)));
 
-            fireNext(true);
+            fireNext(false);
         }
-
         //
         // Check if parse result needs to be delivered to callback.
         //
@@ -180,18 +180,46 @@ public class BlueToothScale extends BlueTooth
             // Object is not empty. Deliver to callback.
             //
 
-            try
+            if (dataCallback != null)
             {
-                if (dataCallback != null)
-                {
-                    JSONObject data = new JSONObject();
-                    data.put("scale", cbdata);
+                JSONObject data = new JSONObject();
+                Json.put(data, "scale", cbdata);
 
-                    dataCallback.onBluetoothReceivedData(deviceName, data);
-                }
+                dataCallback.onBluetoothReceivedData(deviceName, data);
             }
-            catch (JSONException ignore)
+
+            //
+            // Store results if any.
+            //
+
+            if (Simple.equals(Json.getString(cbdata, "type"), "UserMeasurementsArray"))
             {
+                if (cbdata.has("array"))
+                {
+                    JSONArray array = Json.getArray(cbdata, "array");
+
+                    for (int inx = 0; inx < array.length(); inx++)
+                    {
+                        JSONObject oldrec = Json.getObject(array, inx);
+                        JSONObject record = new JSONObject();
+
+                        long timeStamp = Json.getInt(oldrec, "timeStamp") * 1000L;
+                        String utciso = Simple.timeStampAsISO(timeStamp);
+
+                        Json.put(record, "utc", utciso);
+                        Json.put(record, "wei", Json.getInt(oldrec, "weight"));
+                        Json.put(record, "imp", Json.getInt(oldrec, "impedance"));
+                        Json.put(record, "fat", Json.getInt(oldrec, "bodyFat"));
+                        Json.put(record, "wat", Json.getInt(oldrec, "water"));
+                        Json.put(record, "mus", Json.getInt(oldrec, "muscle"));
+                        Json.put(record, "bom", Json.getInt(oldrec, "boneMass"));
+                        Json.put(record, "BMR", Json.getInt(oldrec, "BMR"));
+                        Json.put(record, "AMR", Json.getInt(oldrec, "AMR"));
+                        Json.put(record, "BMI", Json.getInt(oldrec, "BMI"));
+
+                        HealthData.addRecord("scale", record);
+                    }
+                }
             }
         }
 
@@ -313,6 +341,30 @@ public class BlueToothScale extends BlueTooth
                 cbdataPut("gender", (unsignedByteToInt(rd[ 11 ]) >= 128) ? "M" : "F");
                 cbdataPut("activityIndex", unsignedByteToInt(rd[ 11 ]) & 0x7f);
             }
+
+            return false;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 49))
+        {
+            cbdataPut("type", "UserCreated");
+            cbdataPut("status", rd[ 3 ]);
+
+            return false;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 50))
+        {
+            cbdataPut("type", "UserDeleted");
+            cbdataPut("status", rd[ 3 ]);
+
+            return false;
+        }
+
+        if ((rd[ 0 ] == -25) && (rd[ 1 ] == -16) && (rd[ 2 ] == 53))
+        {
+            cbdataPut("type", "UserUpdated");
+            cbdataPut("status", rd[ 3 ]);
 
             return false;
         }
@@ -595,8 +647,6 @@ public class BlueToothScale extends BlueTooth
 
                 cbdata = cbtemp;
                 cbtemp = null;
-
-                return false;
             }
 
             return true;
@@ -630,6 +680,16 @@ public class BlueToothScale extends BlueTooth
 
                 gattSchedule.add(new GattAction(getSetDateTime()));
                 gattSchedule.add(new GattAction(getRemoteTimeStamp()));
+            }
+
+            if (what.equals("getDeleteUser"))
+            {
+                gattSchedule.add(new GattAction(getDeleteUser(18193)));
+            }
+
+            if (what.equals("getUserMeasurements"))
+            {
+                gattSchedule.add(new GattAction(getUserMeasurementsFromPreferences()));
             }
 
             if (what.equals("getUserList"))
@@ -842,6 +902,14 @@ public class BlueToothScale extends BlueTooth
         data[ 1 ] = (byte) 51;
 
         return data;
+    }
+
+    public byte[] getUserMeasurementsFromPreferences()
+    {
+        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+        long uuid = Integer.parseInt(sp.getString("health.scale.userid", ""));
+
+        return getUserMeasurements(uuid);
     }
 
     public byte[] getUserMeasurements(long uuid)

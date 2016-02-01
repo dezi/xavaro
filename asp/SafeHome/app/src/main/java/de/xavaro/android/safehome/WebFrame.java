@@ -24,7 +24,7 @@ import de.xavaro.android.common.StaticUtils;
 
 public class WebFrame extends FrameLayout
 {
-    private final static String LOGTAG = "WebFrame";
+    private static final String LOGTAG = WebFrame.class.getSimpleName();
 
     private Context context;
 
