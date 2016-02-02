@@ -922,6 +922,18 @@ public class Simple
         return 0;
     }
 
+    public static String get24HHourFromISO(String isodate)
+    {
+        return get24HHourFromTimeStamp(getTimeStampFromISO(isodate));
+    }
+
+    public static String get24HHourFromTimeStamp(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("HH", Locale.getDefault());
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return df.format(new Date(timeStamp));
+    }
+
     public static String getLocal24HTimeFromISO(String isodate)
     {
         DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());

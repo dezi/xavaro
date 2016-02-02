@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,7 +15,22 @@ import java.util.Date;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
+
+//
+// Health data record format:
+//
+//  utc => UTC timestamp
+//  stp => Number of steps
+//  ext => Exercise time
+//  goa => Goal value
+//  gou => Goal unit (0 = steps, 1 = calories)
+//  std => Width of one step in cm
+//  diu => Distance unit (0 = km, 1 = miles)
+//  cps => Calories burned per 10.000 steps
+//  BMR => Basal metabolic rate
+//  s00 => Activity values per 3 hours fragment
+//  s03 => ...
+//
 
 public class BlueToothSensor extends BlueTooth
 {
@@ -59,6 +73,8 @@ public class BlueToothSensor extends BlueTooth
     @Override
     protected void enableDevice()
     {
+        noFireOnWrite = true;
+
         super.enableDevice();
 
         Log.d(LOGTAG, "enableDevice: " + deviceName);
@@ -69,6 +85,8 @@ public class BlueToothSensor extends BlueTooth
         //
 
         gattSchedule.add(new GattAction(getSetUserSettingWithGoalFromPreferences()));
+
+        fireNext(false);
 
         //
         // Read todays stuff.
@@ -81,43 +99,35 @@ public class BlueToothSensor extends BlueTooth
 
         gattSchedule.add(ga);
 
-        fireNext(true);
+        fireNext(false);
+
+        startSyncSequence();
     }
 
     @Override
     public void sendCommand(JSONObject command)
     {
-        try
+        String what = Json.getString(command,"command");
+
+        if (Simple.equals(what,"getStepHistoryData"))
         {
-            String what = command.getString("command");
+            int day = Json.getInt(command, "day");
 
-            if (what.equals("getStepHistoryData"))
-            {
-                int day = command.getInt("day");
-
-                gattSchedule.add(new GattAction(getStepHistoryData(day)));
-            }
-
-            if (what.equals("getSleepHistoryData"))
-            {
-                int position = command.getInt("position");
-
-                gattSchedule.add(new GattAction(getSleepHistoryData(position)));
-            }
-
-            if (what.equals("getDisconnect"))
-            {
-                gattSchedule.add(new GattAction(GattAction.MODE_DISCONNECT));
-            }
+            gattSchedule.add(new GattAction(getStepHistoryData(day)));
         }
-        catch (JSONException ex)
+
+        if (Simple.equals(what,"getSleepHistoryData"))
         {
-            OopsService.log(LOGTAG, ex);
+            int position = Json.getInt(command, "position");
+
+            gattSchedule.add(new GattAction(getSleepHistoryData(position)));
+        }
+
+        if (Simple.equals(what,"getDisconnect"))
+        {
+            gattSchedule.add(new GattAction(GattAction.MODE_DISCONNECT));
         }
     }
-
-    private final int ACTIVITY_DEEPSLEEP = 16;
-    private final int ACTIVITY_LIGHTSLEEP = 32;
 
     @Override
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
@@ -158,6 +168,8 @@ public class BlueToothSensor extends BlueTooth
                 data[ 3 ] = rd[ 6 ];
 
                 sensordata.put("sleep", convertBytesToInt(data));
+
+                speakResult(sensordata);
             }
 
             if (rd.length == 17)
@@ -228,6 +240,12 @@ public class BlueToothSensor extends BlueTooth
                 Json.remove(record, "type");
 
                 HealthData.addRecord("sensor", record);
+
+                String lastSavedDay = Simple.timeStampAsISO(targetday);
+
+                Json.put(syncStatus, "lastSavedDay", lastSavedDay);
+
+                HealthData.putStatus("sensor", syncStatus);
             }
 
             if (rd.length == 20)
@@ -251,45 +269,17 @@ public class BlueToothSensor extends BlueTooth
                 postime *= 1000L;
                 daytime *= 1000L;
 
-                sensordata.put("utc", Simple.timeStampAsISO(daytime));
+                String activityday  = Simple.timeStampAsISO(daytime);
+                String activityhour = "s" + Simple.get24HHourFromTimeStamp(postime);
 
-                sensordata.put("rct", Simple.nowAsISO());
-                sensordata.put("pos", position);
+                sensordata.put("utc", activityday);
 
                 byte[] sd = new byte[ 18 ];
                 int cnt = 0;
 
                 for (int inx = rd.length - 1; inx >= 2; inx--) sd[ cnt++ ] = rd[ inx ];
-                sensordata.put(Simple.timeStampAsISO(postime), Simple.getHexBytesToString(sd));
 
-                /*
-                //
-                // Detail data is reversed. Make a kind of
-                // runlength encoding on awake sequences.
-                //
-
-                int awake = 0;
-
-                for (int inx = rd.length - 1; inx >= 2; inx--)
-                {
-                    if (rd[ inx ] == -1)
-                    {
-                        awake++;
-                    }
-                    else
-                    {
-                        if (awake > 0)
-                        {
-                            detail.put(-awake);
-                            awake = 0;
-                        }
-
-                        detail.put(rd[ inx ] & 0xff);
-                    }
-                }
-
-                if (awake > 0) detail.put(-awake);
-                */
+                sensordata.put(activityhour, Simple.getHexBytesToString(sd));
 
                 //
                 // Store data.
@@ -299,6 +289,20 @@ public class BlueToothSensor extends BlueTooth
                 Json.remove(record, "type");
 
                 HealthData.addRecord("sensor", record);
+
+                //
+                // Round position time to next 3 hour fragment.
+                //
+
+                postime /= 1000L;
+                postime = (postime / (3 * 3600)) * (3 * 3600);
+                postime *= 1000L;
+
+                String lastSavedAct = Simple.timeStampAsISO(postime);
+
+                Json.put(syncStatus, "lastSavedAct", lastSavedAct);
+
+                HealthData.putStatus("sensor", syncStatus);
             }
 
             JSONObject data = new JSONObject();
@@ -310,6 +314,99 @@ public class BlueToothSensor extends BlueTooth
         {
             OopsService.log(LOGTAG, ex);
         }
+    }
+
+    private void speakResult(JSONObject mesg)
+    {
+        String type = Json.getString(mesg,"type");
+
+        if (Simple.equals(type,"TodaysData"))
+        {
+            int steps = Json.getInt(mesg, "steps");
+
+            DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
+        }
+    }
+
+    private JSONObject syncStatus;
+
+    // private final int ACTIVITY_DEEPSLEEP = 16;
+    // private final int ACTIVITY_LIGHTSLEEP = 32;
+
+    private void startSyncSequence()
+    {
+        syncStatus = HealthData.getStatus("sensor");
+
+        long lastSavedDay = 0;
+        long lastSavedAct = 0;
+
+        if (syncStatus.has("lastSavedDay"))
+        {
+            lastSavedDay = Simple.getTimeStampFromISO(Json.getString(syncStatus, "lastSavedDay"));
+            lastSavedDay /= 1000L;
+            lastSavedDay /= 86400L;
+        }
+
+        if (syncStatus.has("lastSavedAct"))
+        {
+            lastSavedAct = Simple.getTimeStampFromISO(Json.getString(syncStatus, "lastSavedAct"));
+            lastSavedAct /= 1000L;
+            lastSavedAct /= 86400L;
+        }
+
+        //
+        // Get no more than ten days back.
+        //
+
+        long today = new Date().getTime();
+        today /= 1000L;
+        today /= 86400L;
+
+        long todoSavedDay = ((today - lastSavedDay) > 10) ? (today - 10) : lastSavedDay;
+        long todoSavedAct = ((today - lastSavedAct) > 10) ? (today - 10) : lastSavedAct;
+
+        //
+        // Schedule activity days.
+        //
+
+        while (todoSavedDay < today)
+        {
+            todoSavedDay += 1;
+
+            int day = (int) (today - todoSavedDay);
+
+            Log.d(LOGTAG, "startSyncSequence: schedule day:" + day);
+
+            gattSchedule.add(new GattAction(getStepHistoryData(day)));
+        }
+
+        //
+        // Schedule sleep data positions.
+        //
+
+        long todaysecs = new Date().getTime();
+        todaysecs /= 1000L;
+        todaysecs -= today * 86400L;
+
+        int todaypositions = ((int) todaysecs) / 600;
+
+        int position = ((int) (today - todoSavedAct)) * 8 * 18;
+        position += todaypositions;
+
+        while (position > todaypositions)
+        {
+            Log.d(LOGTAG, "startSyncSequence: schedule position:" + position);
+
+            gattSchedule.add(new GattAction(getSleepHistoryData(position)));
+
+            position -= 18;
+        }
+
+        //
+        // Disconnect after sync.
+        //
+
+        gattSchedule.add(new GattAction(GattAction.MODE_DISCONNECT));
     }
 
     private byte[] getSetUserSettingWithGoalFromPreferences()
@@ -339,13 +436,13 @@ public class BlueToothSensor extends BlueTooth
         int goal = sp.getInt(keyprefix + ".goals.steps", 0);
         if (goalUnit == 1) goal = 100 * sp.getInt(keyprefix + ".goals.calories", 0);
 
-        return getSetUserSettingWithGoal(goal, goalUnit, distanceWalkCM, caloriePer10000Steps, BMR, timeFormat, distanceUnit);
+        return getSetUserSettingWithGoal(goal, goalUnit, timeFormat, distanceUnit,
+                distanceWalkCM, caloriePer10000Steps, BMR);
     }
 
-    public byte[] getSetUserSettingWithGoal(
-            int goal, int goalUnit,
-            float distanceWalkCM, float caloriePer10000Steps, float BMR,
-            int timeFormat, int distanceUnit)
+    private byte[] getSetUserSettingWithGoal(
+            int goal, int goalUnit, int timeFormat, int distanceUnit,
+            float distanceWalkCM, float caloriePer10000Steps, float BMR)
     {
         Log.d(LOGTAG,"getSetUserSettingWithGoal");
 
@@ -412,6 +509,7 @@ public class BlueToothSensor extends BlueTooth
         return data;
     }
 
+    @SuppressWarnings("unused")
     public byte[] getSetAlaram(boolean isON, Date alarmTime)
     {
         byte[] temp = new byte[ 4 ];
