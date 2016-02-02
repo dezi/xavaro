@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 
 public class HealthScale extends HealthBase
 {
@@ -35,124 +36,52 @@ public class HealthScale extends HealthBase
 
         if (! data.has("scale")) return;
 
-        try
+        JSONObject mesg = Json.getObject(data, "scale");
+        if (mesg == null) return;
+
+        String type = Json.getString(mesg, "type");
+
+        if (Simple.equals(type, "TakeUserMeasurement"))
         {
-            JSONObject command = new JSONObject();
-            JSONObject mesg = data.getJSONObject("scale");
-            String type = mesg.getString("type");
+            lastRecord = mesg;
+            handler.post(messageSpeaker);
+        }
 
-            if (type.equals("DeviceReady"))
-            {
-                //
-                // Scale is awake and live. Set and get scale time.
-                //
+        if (Simple.equals(type, "LiveMeasurementOnTimestamp"))
+        {
+            lastRecord = mesg;
+            handler.post(messageSpeaker);
+        }
+    }
 
-                command.put("command", "getSetDateTime");
-            }
+    private JSONObject lastRecord;
 
-            if (type.equals("RemoteTimeStamp"))
-            {
-                //
-                // Scale time has now been set proceed with
-                // setting the scale to our user.
-                //
+    private final Runnable messageSpeaker = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (lastRecord == null) return;
 
-                command.put("command", "getUserList");
-            }
+            String type = Json.getString(lastRecord, "type");
 
-            if (type.equals("UserList"))
-            {
-                if (mesg.has("actUsers"))
-                {
-                    int actUsers = Json.getInt(mesg, "actUsers");
-
-                    if (actUsers == 0)
-                    {
-                        command.put("command", "getCreateUserFromPreferences");
-                    }
-                }
-            }
-
-            if (type.equals("UserListArray"))
-            {
-                //
-                // Scale time has now been set proceed with
-                // setting the scale to our user.
-                //
-
-                SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
-                long uuid = Long.parseLong(sp.getString("health.scale.userid", ""));
-                boolean found = false;
-
-                try
-                {
-                    if (mesg.has("array"))
-                    {
-                        JSONArray array = mesg.getJSONArray("array");
-
-                        for (int inx = 0; inx < array.length(); inx++)
-                        {
-                            JSONObject user = array.getJSONObject(inx);
-
-                            if (user.has("uuid") && (user.getLong("uuid") == uuid))
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (found)
-                    {
-                        command.put("command", "getUpdateUserFromPreferences");
-                    }
-                    else
-                    {
-                        command.put("command", "getCreateUserFromPreferences");
-                    }
-                }
-                catch (JSONException ex)
-                {
-                    OopsService.log(LOGTAG, ex);
-                }
-            }
-
-            if (type.equals("UserDeleted"))
-            {
-            }
-
-            if (type.equals("UserCreated"))
-            {
-                command.put("command", "getTakeUserMeasurementFromPreferences");
-            }
-
-            if (type.equals("UserUpdated"))
-            {
-                command.put("command", "getTakeUserMeasurementFromPreferences");
-            }
-
-            if (type.equals("UserMeasurements"))
-            {
-            }
-
-            if (type.equals("UnknownMeasurements"))
-            {
-            }
-
-            if (type.equals("TakeUserMeasurement"))
+            if (Simple.equals(type, "TakeUserMeasurement"))
             {
                 DitUndDat.SpeekDat.speak("Die Waage ist nun für Sie eingestellt");
             }
 
-            if (type.equals("LiveMeasurementOnTimestamp"))
+            if (Simple.equals(type, "LiveMeasurementOnTimestamp"))
             {
-                double weight = mesg.getDouble("weight");
-                double impedance = mesg.getDouble("impedance");
+                double weight = Json.getDouble(lastRecord, "weight");
+                double impedance = Json.getDouble(lastRecord, "impedance");
 
                 if (impedance == 0)
                 {
-                    DitUndDat.SpeekDat.speak("Die Waage kann nur ordentlich arbeiten, wenn sie Barfuss messen");
-                    DitUndDat.SpeekDat.speak("Bitte ziehen sie Schuhe und Strümpfe aus und wiederholen sie die Messung");
+                    DitUndDat.SpeekDat.speak("Die Waage kann nur ordentlich arbeiten, "
+                            + "wenn sie Barfuss messen");
+
+                    DitUndDat.SpeekDat.speak("Bitte ziehen sie Schuhe und Strümpfe aus "
+                            + "und wiederholen sie die Messung");
                 }
                 else
                 {
@@ -169,20 +98,8 @@ public class HealthScale extends HealthBase
                         DitUndDat.SpeekDat.speak("Ihr Gewicht beträgt "
                                 + weithParts[ 0 ] + " Kilogramm");
                     }
-
-                    DitUndDat.SpeekDat.speak("Fettsack");
-
-                    DitUndDat.SpeekDat.speak("Vielen Dank für ihre Messung");
-
-                    command.put("command", "getUserMeasurements");
                 }
             }
-
-            if (command.has("command")) blueTooth.sendCommand(command);
         }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-    }
+    };
 }

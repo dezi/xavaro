@@ -108,7 +108,8 @@ public class BlueToothScale extends BlueTooth
             Log.d(LOGTAG, "disconnectScale: force disconnect");
 
             currentGatt.disconnect();
-            connect();
+
+            gattHandler.postDelayed(connectRunnable, 10000);
         }
     };
 
@@ -159,7 +160,7 @@ public class BlueToothScale extends BlueTooth
         boolean wantsack = parseData(rd);
 
         //
-        // First satisfy multirecord acknowledgement requests.
+        // Satisfy multirecord acknowledgement requests.
         //
 
         if (wantsack)
@@ -170,6 +171,7 @@ public class BlueToothScale extends BlueTooth
 
             fireNext(false);
         }
+
         //
         // Check if parse result needs to be delivered to callback.
         //
@@ -221,9 +223,107 @@ public class BlueToothScale extends BlueTooth
                     }
                 }
             }
+
+            //
+            // Execute next step in sync sequence.
+            //
+
+            nextSyncSequence();
         }
 
         reloadDisconnectTimer();
+    }
+
+    private void nextSyncSequence()
+    {
+        JSONObject nextCommand = new JSONObject();
+
+        String type = Json.getString(cbdata, "type");
+
+        if (Simple.equals(type, "DeviceReady"))
+        {
+            //
+            // Scale is awake and live. Set and get scale time.
+            //
+
+            Json.put(nextCommand, "command", "getSetDateTime");
+        }
+
+        if (Simple.equals(type, "RemoteTimeStamp"))
+        {
+            //
+            // Scale time has now been set proceed with
+            // setting the scale to our user.
+            //
+
+            Json.put(nextCommand, "command", "getUserList");
+        }
+
+        if (Simple.equals(type, "UserList"))
+        {
+            if (cbdata.has("actUsers"))
+            {
+                int actUsers = Json.getInt(cbdata, "actUsers");
+
+                if (actUsers == 0)
+                {
+                    Json.put(nextCommand, "command", "getCreateUserFromPreferences");
+                }
+            }
+        }
+
+        if (Simple.equals(type, "UserListArray"))
+        {
+            //
+            // Scale time has now been set proceed with
+            // setting the scale to our user.
+            //
+
+            SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+            long uuid = Long.parseLong(sp.getString("health.scale.userid", ""));
+            boolean found = false;
+
+            if (cbdata.has("array"))
+            {
+                JSONArray array = Json.getArray(cbdata, "array");
+
+                if (array != null)
+                {
+                    for (int inx = 0; inx < array.length(); inx++)
+                    {
+                        JSONObject user = Json.getObject(array, inx);
+                        if (user == null) continue;
+
+                        if (user.has("uuid") && (Json.getLong(user, "uuid") == uuid))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (found)
+            {
+                Json.put(nextCommand, "command", "getUpdateUserFromPreferences");
+            }
+            else
+            {
+                Json.put(nextCommand, "command", "getCreateUserFromPreferences");
+            }
+        }
+
+        if (Simple.equals(type, "UserCreated"))
+        {
+            Json.put(nextCommand, "command", "getTakeUserMeasurementFromPreferences");
+        }
+
+        if (Simple.equals(type, "UserUpdated"))
+        {
+            Json.put(nextCommand, "command", "getTakeUserMeasurementFromPreferences");
+        }
+
+        if (nextCommand.has("command")) sendCommand(nextCommand);
     }
 
     public boolean parseData(byte[] rd)
@@ -255,7 +355,8 @@ public class BlueToothScale extends BlueTooth
                 Log.d(LOGTAG, "parseData: ScaleSleepWithStatus is sleeping, ignore");
 
                 currentGatt.disconnect();
-                connect();
+
+                gattHandler.postDelayed(connectRunnable, 10000);
 
                 return false;
             }

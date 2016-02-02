@@ -28,6 +28,32 @@ public class HealthSensor extends HealthBase
     @Override
     public void onBluetoothReceivedData(String deviceName, JSONObject data)
     {
-        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
+        Log.d(LOGTAG, "onBluetoothReceivedData: " + data.toString());
+
+        if (! data.has("sensor")) return;
+
+        lastRecord = Json.getObject(data, "sensor");
+
+        handler.post(messageSpeaker);
     }
+
+    private JSONObject lastRecord;
+
+    private Runnable messageSpeaker = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (lastRecord == null) return;
+
+            String type = Json.getString(lastRecord, "type");
+
+            if (Simple.equals(type, "TodaysData"))
+            {
+                int steps = Json.getInt(lastRecord, "steps");
+
+                DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
+            }
+        }
+    };
 }

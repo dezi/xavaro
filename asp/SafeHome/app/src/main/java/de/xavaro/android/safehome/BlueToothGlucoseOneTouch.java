@@ -72,7 +72,7 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         parent.gattSchedule.add(ga);
 
         //
-        // Fire initial command.
+        // Start sync sequence.
         //
 
         schedulePackets(getReadMeterChallenge());
@@ -110,13 +110,13 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
     private ArrayList<byte[]> outgoingPackets = new ArrayList<>();
     private int outgoingCommand;
 
-    private static final int defaultLowRange = 70;
-    private static final int defaultHighRange = 180;
+    //private static final int defaultLowRange = 70;
+    //private static final int defaultHighRange = 180;
+
     private static final long DEVICE_DELTA_SECONDS = 946684800L;
 
     private JSONObject status;
     private int lastTestCount;
-    private int recordsToRead;
     private int recordCount;
     private int testCount;
 
@@ -315,29 +315,34 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         Log.d(LOGTAG, "parseGlucoseRecord: result=UTC=" + utciso);
         Log.d(LOGTAG, "parseGlucoseRecord: result=" + bgValue);
 
-        JSONObject record = new JSONObject();
-
-        Json.put(record, "utc", utciso);
-        Json.put(record, "bgv", bgValue);
-        Json.put(record, "ngv", pl[  9 ]);
-        Json.put(record, "csv", pl[  6 ]);
-
-        HealthData.addRecord("glucose", record);
-
         //
         // Announce last record to user interface.
         //
 
-        if (lastTestCount == testCount)
+        JSONObject result = new JSONObject();
+
+        Json.put(result, "type", "GlucoseRecord");
+
+        Json.put(result, "utc", utciso);
+        Json.put(result, "bgv", bgValue);
+        Json.put(result, "ngv", pl[  9 ]);
+        Json.put(result, "csv", pl[ 6 ]);
+
+        if (parent.dataCallback != null)
         {
             JSONObject data = new JSONObject();
-            Json.put(data, "glucose", record);
+            Json.put(data, "glucose", result);
 
-            if (parent.dataCallback != null)
-            {
-                parent.dataCallback.onBluetoothReceivedData(parent.deviceName, data);
-            }
+            parent.dataCallback.onBluetoothReceivedData(parent.deviceName, data);
         }
+
+        //
+        // Store data.
+        //
+
+        JSONObject record = Json.clone(result);
+        record.remove("type");
+        HealthData.addRecord("glucose", record);
     }
 
     public void parseMeterHighRange(byte[] pl)
@@ -410,7 +415,13 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
     {
         Log.d(LOGTAG, "getReadGlucoseRecord");
 
-        if (status == null) status = HealthData.getStatus("glucose");
+        boolean initial = false;
+
+        if (status == null)
+        {
+            status = HealthData.getStatus("glucose");
+            initial = true;
+        }
 
         lastTestCount = status.has("lastTestCount") ? Json.getInt(status, "lastTestCount") : 0;
 
@@ -418,9 +429,30 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
         if (lastTestCount >= testCount)
         {
-            Log.d(LOGTAG, "getReadGlucoseRecord no new data");
+            if (initial)
+            {
+                //
+                // Reread the last mesurement.
+                //
 
-            return null;
+                lastTestCount = testCount - 1;
+            }
+            else
+            {
+                Log.d(LOGTAG, "getReadGlucoseRecord no new data");
+                status = null;
+
+                //
+                // Force disconnect.
+                //
+
+                parent.gattSchedule.add(new BlueTooth.GattAction(
+                        BlueTooth.GattAction.MODE_DISCONNECT));
+
+                parent.fireNext(false);
+
+                return null;
+            }
         }
 
         Json.put(status, "lastTestCount", ++lastTestCount);

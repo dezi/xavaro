@@ -26,7 +26,7 @@ public abstract class HealthBase implements
         this.blueTooth.setDataCallback(this);
         this.blueTooth.setConnectCallback(this);
 
-        this.blueTooth.connect();
+        this.blueTooth.connectRunnable.run();
     }
 
     public void setConnectCallback(BlueTooth.BlueToothConnectCallback subscriber)

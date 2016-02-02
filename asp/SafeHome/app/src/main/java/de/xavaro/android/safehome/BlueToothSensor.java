@@ -168,8 +168,6 @@ public class BlueToothSensor extends BlueTooth
                 data[ 3 ] = rd[ 6 ];
 
                 sensordata.put("sleep", convertBytesToInt(data));
-
-                speakResult(sensordata);
             }
 
             if (rd.length == 17)
@@ -313,18 +311,6 @@ public class BlueToothSensor extends BlueTooth
         catch (JSONException ex)
         {
             OopsService.log(LOGTAG, ex);
-        }
-    }
-
-    private void speakResult(JSONObject mesg)
-    {
-        String type = Json.getString(mesg,"type");
-
-        if (Simple.equals(type,"TodaysData"))
-        {
-            int steps = Json.getInt(mesg, "steps");
-
-            DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
         }
     }
 

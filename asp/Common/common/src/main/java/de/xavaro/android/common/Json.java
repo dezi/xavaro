@@ -139,12 +139,37 @@ public class Json
         return null;
     }
 
-    @Nullable
+    public static double getDouble(JSONObject json, String key)
+    {
+        try
+        {
+            return json.getDouble(key);
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return 0.0;
+    }
+
     public static int getInt(JSONObject json, String key)
     {
         try
         {
             return json.getInt(key);
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return 0;
+    }
+
+    public static long getLong(JSONObject json, String key)
+    {
+        try
+        {
+            return json.getLong(key);
         }
         catch (JSONException ignore)
         {

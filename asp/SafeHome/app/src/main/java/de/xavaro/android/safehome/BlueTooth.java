@@ -78,13 +78,17 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     }
 
-    public void connect()
+    public Runnable connectRunnable = new Runnable()
     {
-        Log.d(LOGTAG, "connect: device=" + deviceName + " => " + macAddress);
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "connect: device=" + deviceName + " => " + macAddress);
 
-        BluetoothDevice device = bta.getRemoteDevice(macAddress);
-        currentGatt = device.connectGatt(context, true, gattCallback);
-    }
+            BluetoothDevice device = bta.getRemoteDevice(macAddress);
+            currentGatt = device.connectGatt(context, true, gattCallback);
+        }
+    };
 
     public void setConnectCallback(BlueToothConnectCallback callback)
     {
@@ -311,7 +315,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     protected void fireNext(boolean delayed)
     {
-        fireNext(delayed ? 200 : 0);
+        fireNext(delayed ? 300 : 0);
     }
 
     protected void fireNext(int delay)
@@ -397,7 +401,12 @@ public abstract class BlueTooth extends BroadcastReceiver
                 if (ga.mode == GattAction.MODE_DISCONNECT)
                 {
                     currentGatt.disconnect();
-                    connect();
+
+                    //
+                    // Give disconnect penalty time.
+                    //
+
+                    gattHandler.postDelayed(connectRunnable, 30000);
                 }
             }
         }
@@ -616,7 +625,7 @@ public abstract class BlueTooth extends BroadcastReceiver
             Log.d(LOGTAG, "onDescriptorWrite=" + status
                     + "=" + Simple.getHexBytesToString(descriptor.getValue()));
 
-            fireNext(true);
+            fireNext(500);
         }
 
         @Override
