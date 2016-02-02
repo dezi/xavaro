@@ -7,7 +7,9 @@ import org.json.JSONObject;
 
 import java.util.Formatter;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 
 public class HealthBPM extends HealthBase
 {
@@ -27,22 +29,6 @@ public class HealthBPM extends HealthBase
         getInstance().setConnectCallback(subscriber);
     }
 
-    private String lastDate;
-    private int lastSystolic;
-    private int lastDiastolic;
-    private int lastPulse;
-
-    private Runnable messageSpeaker = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            DitUndDat.SpeekDat.speak("Die letzte Messung ergab einen Blutdruck von "
-                    + lastSystolic + " zu " + lastDiastolic + " "
-                    + "Der Puls beträgt " + lastPulse);
-        }
-    };
-
     @Override
     public void onBluetoothReceivedData(String deviceName, JSONObject data)
     {
@@ -50,14 +36,23 @@ public class HealthBPM extends HealthBase
 
         if (! data.has("bpm")) return;
 
-        try
-        {
-            JSONObject mesg = data.getJSONObject("bpm");
+        //
+        // The results come in unordered.
+        //
 
-            String date = mesg.getString("utc");
-            int systolic = mesg.getInt("sys");
-            int diastolic = mesg.getInt("dia");
-            int pulse = mesg.getInt("pls");
+        lastRecord = Json.getObject(data, "bpm");
+        if (lastRecord == null) return;
+
+        String type = Json.getString(lastRecord, "type");
+
+        if (Simple.equals(type, "BPMMeasurement"))
+        {
+            String date = Json.getString(lastRecord, "utc");
+            if (date == null) return;
+
+            int systolic = Json.getInt(lastRecord, "sys");
+            int diastolic = Json.getInt(lastRecord, "dia");
+            int pulse = Json.getInt(lastRecord, "pls");
 
             if ((lastDate == null) || (lastDate.compareTo(date) <= 0))
             {
@@ -70,9 +65,30 @@ public class HealthBPM extends HealthBase
                 handler.postDelayed(messageSpeaker, 500);
             }
         }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
     }
+
+    JSONObject lastRecord;
+
+    int lastSystolic;
+    int lastDiastolic;
+    int lastPulse;
+    String lastDate;
+
+    private Runnable messageSpeaker = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (lastRecord == null) return;
+
+            String type = Json.getString(lastRecord, "type");
+
+            if (Simple.equals(type, "BPMMeasurement"))
+            {
+                DitUndDat.SpeekDat.speak("Die letzte Messung ergab einen Blutdruck von "
+                        + lastSystolic + " zu " + lastDiastolic + " "
+                        + "Der Puls beträgt " + lastPulse);
+            }
+        }
+    };
 }

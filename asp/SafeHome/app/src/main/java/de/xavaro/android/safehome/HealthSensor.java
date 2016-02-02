@@ -33,6 +33,7 @@ public class HealthSensor extends HealthBase
         if (! data.has("sensor")) return;
 
         lastRecord = Json.getObject(data, "sensor");
+        if (lastRecord == null) return;
 
         handler.post(messageSpeaker);
     }

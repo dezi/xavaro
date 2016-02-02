@@ -83,7 +83,9 @@ public class BlueToothBPM extends BlueTooth
 
         int offset = 0;
 
-        JSONObject record = new JSONObject();
+        JSONObject bpmdata = new JSONObject();
+
+        Json.put(bpmdata, "type", "BPMMeasurement");
 
         float sys = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
         float dia = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
@@ -100,39 +102,46 @@ public class BlueToothBPM extends BlueTooth
 
             Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
             long utc = calendar.getTimeInMillis();
-            Json.put(record, "utc", Simple.timeStampAsISO(utc));
+            Json.put(bpmdata, "utc", Simple.timeStampAsISO(utc));
 
             Log.d(LOGTAG,"parseResponse result=" + hour + "::" + Simple.timeStampAsISO(utc));
         }
 
-        Json.put(record, "sys", sys);
-        Json.put(record, "dia", dia);
-        Json.put(record, "map", map);
+        Json.put(bpmdata, "sys", sys);
+        Json.put(bpmdata, "dia", dia);
+        Json.put(bpmdata, "map", map);
 
         if ((rd[ 0 ] & 0x04) >= 1)
         {
-            Json.put(record, "pls", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
+            Json.put(bpmdata, "pls", bytesToFloat(rd[ ++offset ], rd[ ++offset ]));
         }
 
         if ((rd[ 0 ] & 0x08) >= 1)
         {
-            Json.put(record, "usr", unsignedByteToInt(rd[ ++offset ]));
+            Json.put(bpmdata, "usr", unsignedByteToInt(rd[ ++offset ]));
         }
 
         if ((rd[ 0 ] & 0x10) >= 1)
         {
-            Json.put(record, "flg", unsignedByteToInt(rd[ ++offset ]));
+            Json.put(bpmdata, "flg", unsignedByteToInt(rd[ ++offset ]));
         }
 
         if (isfinal)
         {
-            HealthData.addRecord("bpm", record);
-            HealthData.setLastReadDate("bpm");
-
             JSONObject data = new JSONObject();
-            Json.put(data, "bpm", record);
+            Json.put(data, "bpm", bpmdata);
 
             if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
+
+            //
+            // Store data.
+            //
+
+            JSONObject record = Json.clone(bpmdata);
+            Json.remove(record, "type");
+
+            HealthData.addRecord("bpm", record);
+            HealthData.setLastReadDate("bpm");
         }
     }
 
