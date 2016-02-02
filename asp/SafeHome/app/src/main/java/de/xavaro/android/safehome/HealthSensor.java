@@ -5,6 +5,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 
 public class HealthSensor extends HealthBase
@@ -25,6 +26,12 @@ public class HealthSensor extends HealthBase
         getInstance().setConnectCallback(subscriber);
     }
 
+    private static final int maxdaystodo = 10;
+    private static final int maxpositodo = 1440;
+
+    private int actdaystodo;
+    private int actpositodo;
+
     @Override
     public void onBluetoothReceivedData(String deviceName, JSONObject data)
     {
@@ -40,23 +47,44 @@ public class HealthSensor extends HealthBase
 
             if (type.equals("TodaysData"))
             {
-                command.put("command", "getStepHistoryData");
-                command.put("day", 0);
-
                 int steps = mesg.getInt("steps");
 
                 DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
+
+                actdaystodo = 0;
+                actpositodo = 0;
             }
 
             if (type.equals("StepHistoryData"))
             {
-                command.put("command", "getSleepHistoryData");
-                command.put("position", 0);
+                Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
             }
 
             if (type.equals("SleepHistoryData"))
             {
-                command.put("command", "getDisconnect");
+                Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
+            }
+
+            if (actdaystodo < maxdaystodo)
+            {
+                command.put("command", "getStepHistoryData");
+                command.put("day", actdaystodo);
+
+                actdaystodo += 1;
+            }
+            else
+            {
+                if (actpositodo < maxpositodo)
+                {
+                    command.put("command", "getSleepHistoryData");
+                    command.put("position", actpositodo);
+
+                    actpositodo += 18;
+                }
+                else
+                {
+                    command.put("command", "getDisconnect");
+                }
             }
 
             if (command.has("command")) blueTooth.sendCommand(command);

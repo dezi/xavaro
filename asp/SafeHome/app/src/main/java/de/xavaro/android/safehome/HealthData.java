@@ -3,6 +3,8 @@ package de.xavaro.android.safehome;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
@@ -45,7 +47,21 @@ public class HealthData
         {
             JSONObject oldrecord = Json.getObject(records, inx);
 
-            if (Json.equals(record, "utc", oldrecord)) return;
+            if (Json.equals(record, "utc", oldrecord))
+            {
+                Iterator<String> keysIterator = record.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String property = keysIterator.next();
+
+                    Json.put(oldrecord, property, Json.get(record, property));
+                }
+
+                putRecords(datatype, records);
+
+                return;
+            }
         }
 
         records.put(record);

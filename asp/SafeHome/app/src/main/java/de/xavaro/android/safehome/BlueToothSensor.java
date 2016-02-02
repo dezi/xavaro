@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.Date;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
@@ -56,6 +57,34 @@ public class BlueToothSensor extends BlueTooth
     }
 
     @Override
+    protected void enableDevice()
+    {
+        super.enableDevice();
+
+        Log.d(LOGTAG, "enableDevice: " + deviceName);
+
+        //
+        // Initialize sensor device with current
+        // goal data and current time.
+        //
+
+        gattSchedule.add(new GattAction(getSetUserSettingWithGoalFromPreferences()));
+
+        //
+        // Read todays stuff.
+        //
+
+        GattAction ga = new GattAction();
+
+        ga.mode = GattAction.MODE_READ;
+        ga.characteristic = currentSecondary;
+
+        gattSchedule.add(ga);
+
+        fireNext(true);
+    }
+
+    @Override
     public void sendCommand(JSONObject command)
     {
         try
@@ -85,34 +114,6 @@ public class BlueToothSensor extends BlueTooth
         {
             OopsService.log(LOGTAG, ex);
         }
-    }
-
-    @Override
-    protected void enableDevice()
-    {
-        super.enableDevice();
-
-        Log.d(LOGTAG, "enableDevice: " + deviceName);
-
-        //
-        // Initialize sensor device with current
-        // goal data and current time.
-        //
-
-        gattSchedule.add(new GattAction(getSetUserSettingWithGoalFromPreferences()));
-
-        //
-        // Read todays stuff.
-        //
-
-        GattAction ga = new GattAction();
-
-        ga.mode = GattAction.MODE_READ;
-        ga.characteristic = currentSecondary;
-
-        gattSchedule.add(ga);
-
-        fireNext(true);
     }
 
     private final int ACTIVITY_DEEPSLEEP = 16;
@@ -159,20 +160,109 @@ public class BlueToothSensor extends BlueTooth
                 sensordata.put("sleep", convertBytesToInt(data));
             }
 
+            if (rd.length == 17)
+            {
+                //
+                // Step history data.
+                //
+
+                sensordata.put("type", "StepHistoryData");
+
+                int day = rd[ 0 ];
+
+                long targetday = ((new Date().getTime() / 86400000L) - (day + 1)) * 86400000L;
+
+                sensordata.put("utc", Simple.timeStampAsISO(targetday));
+
+                byte[] data = new byte[ 4 ];
+
+                data[ 0 ] = 0;
+                data[ 1 ] = rd[ 3 ];
+                data[ 2 ] = rd[ 2 ];
+                data[ 3 ] = rd[ 1 ];
+
+                sensordata.put("stp", convertBytesToInt(data));
+
+                data[ 0 ] = 0;
+                data[ 1 ] = 0;
+                data[ 2 ] = rd[ 5 ];
+                data[ 3 ] = rd[ 4 ];
+
+                sensordata.put("ext", convertBytesToInt(data));
+
+                data[ 0 ] = 0;
+                data[ 1 ] = (byte) (rd[ 8 ] & 0x7f);
+                data[ 2 ] = rd[ 7 ];
+                data[ 3 ] = rd[ 6 ];
+
+                sensordata.put("goa", convertBytesToInt(data));
+                sensordata.put("gou", ((rd[ 8 ] & 0x80) == 0) ? 0 : 1);
+
+                data[ 0 ] = 0;
+                data[ 1 ] = 0;
+                data[ 2 ] = rd[ 10 ];
+                data[ 3 ] = rd[  9 ];
+
+                sensordata.put("std", convertBytesToInt(data) / 100f);
+                sensordata.put("diu", ((rd[ 13 ] & 0x80) == 0) ? 0 : 1);
+
+                data[ 0 ] = 0;
+                data[ 1 ] = (byte) (rd[ 13 ] & 0x7f);
+                data[ 2 ] = rd[ 12 ];
+                data[ 3 ] = rd[ 11 ];
+
+                sensordata.put("cps", convertBytesToInt(data) / 100f);
+
+                data[ 0 ] = 0;
+                data[ 1 ] = rd[ 16 ];
+                data[ 2 ] = rd[ 15 ];
+                data[ 3 ] = rd[ 14 ];
+
+                sensordata.put("BMR", convertBytesToInt(data) / 100f);
+
+                //
+                // Store data.
+                //
+
+                JSONObject record = Json.clone(sensordata);
+                Json.remove(record, "type");
+
+                HealthData.addRecord("sensor", record);
+            }
+
             if (rd.length == 20)
             {
                 //
                 // Sleep history data.
                 //
 
+                sensordata.put("type", "SleepHistoryData");
+
                 int position = (rd[ 0 ] & 0x7f) + (rd[ 1 ] << 7);
 
-                sensordata.put("type", "SleepHistoryData");
-                sensordata.put("position", position);
-                sensordata.put("recvtime", Simple.nowAsISO());
+                long tenminutes = 10 * 60;
+                long dayminutes = 1440 * 60;
 
-                JSONArray detail = new JSONArray();
+                long postime = ((new Date().getTime() / 1000L) / tenminutes)  * tenminutes;
+                postime -= position * tenminutes;
 
+                long daytime = (postime / dayminutes) * dayminutes;
+
+                postime *= 1000L;
+                daytime *= 1000L;
+
+                sensordata.put("utc", Simple.timeStampAsISO(daytime));
+
+                sensordata.put("rct", Simple.nowAsISO());
+                sensordata.put("pos", position);
+
+                byte[] sd = new byte[ 18 ];
+                int cnt = 0;
+
+                for (int inx = rd.length - 1; inx >= 2; inx--) sd[ cnt++ ] = rd[ inx ];
+                sensordata.put(Simple.timeStampAsISO(postime), Simple.getHexBytesToString(sd));
+
+                /*
                 //
                 // Detail data is reversed. Make a kind of
                 // runlength encoding on awake sequences.
@@ -199,65 +289,16 @@ public class BlueToothSensor extends BlueTooth
                 }
 
                 if (awake > 0) detail.put(-awake);
+                */
 
-                sensordata.put("detail", detail);
-            }
-
-            if (rd.length == 17)
-            {
                 //
-                // Step history data.
+                // Store data.
                 //
 
-                sensordata.put("type", "StepHistoryData");
-                sensordata.put("day", rd[ 0 ]);
+                JSONObject record = Json.clone(sensordata);
+                Json.remove(record, "type");
 
-                byte[] data = new byte[ 4 ];
-
-                data[ 0 ] = 0;
-                data[ 1 ] = rd[ 3 ];
-                data[ 2 ] = rd[ 2 ];
-                data[ 3 ] = rd[ 1 ];
-
-                sensordata.put("steps", convertBytesToInt(data));
-
-                data[ 0 ] = 0;
-                data[ 1 ] = 0;
-                data[ 2 ] = rd[ 5 ];
-                data[ 3 ] = rd[ 4 ];
-
-                sensordata.put("exercisetime", convertBytesToInt(data));
-
-                data[ 0 ] = 0;
-                data[ 1 ] = (byte) (rd[ 8 ] & 0x7f);
-                data[ 2 ] = rd[ 7 ];
-                data[ 3 ] = rd[ 6 ];
-
-                sensordata.put("goal", convertBytesToInt(data));
-
-                data[ 0 ] = 0;
-                data[ 1 ] = 0;
-                data[ 2 ] = rd[ 10 ];
-                data[ 3 ] = rd[  9 ];
-
-                sensordata.put("stepdistance", convertBytesToInt(data) / 100f);
-
-                data[ 0 ] = 0;
-                data[ 1 ] = (byte) (rd[ 13 ] & 0x7f);
-                data[ 2 ] = rd[ 12 ];
-                data[ 3 ] = rd[ 11 ];
-
-                sensordata.put("ca10kstep", convertBytesToInt(data) / 100f);
-
-                data[ 0 ] = 0;
-                data[ 1 ] = rd[ 16 ];
-                data[ 2 ] = rd[ 15 ];
-                data[ 3 ] = rd[ 14 ];
-
-                sensordata.put("BMR", convertBytesToInt(data) / 100f);
-
-                sensordata.put("goalUnit", ((rd[ 8 ] & 0x80) == 0) ? 0 : 1);
-                sensordata.put("distanceUnit", ((rd[ 13 ] & 0x80) == 0) ? 0 : 1);
+                HealthData.addRecord("sensor", record);
             }
 
             JSONObject data = new JSONObject();
