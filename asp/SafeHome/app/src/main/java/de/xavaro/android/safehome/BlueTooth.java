@@ -86,6 +86,7 @@ public abstract class BlueTooth extends BroadcastReceiver
             Log.d(LOGTAG, "connect: device=" + deviceName + " => " + macAddress);
 
             BluetoothDevice device = bta.getRemoteDevice(macAddress);
+
             currentGatt = device.connectGatt(context, true, gattCallback);
         }
     };
@@ -494,7 +495,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
         {
-            Log.i(LOGTAG, "onConnectionStateChange [" + newState + "]");
+            Log.i(LOGTAG, "onConnectionStateChange [" + newState + "] = " + status);
 
             String devicetag = deviceName + " => " + gatt.getDevice().getAddress();
 
@@ -505,7 +506,20 @@ public abstract class BlueTooth extends BroadcastReceiver
                 currentGatt = gatt;
                 currentConnectState = true;
 
-                gattHandler.postDelayed(runDiscoverServices, 0);
+                Log.d(LOGTAG, "onConnectionStateChange===================="
+                        + ":" + currentGatt.getDevice().getAddress()
+                        + "=" + currentGatt.getDevice().getType()
+                        + "=" + currentGatt.getDevice().getName()
+                        + "=" + currentGatt.getDevice().getBondState());
+
+                if (currentPrimary == null)
+                {
+                    gattHandler.postDelayed(runDiscoverServices, 0);
+                }
+                else
+                {
+                    gattHandler.postDelayed(runEnableDevice,0);
+                }
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)

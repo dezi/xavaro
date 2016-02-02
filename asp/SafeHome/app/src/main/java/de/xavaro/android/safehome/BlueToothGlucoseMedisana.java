@@ -44,6 +44,28 @@ public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevi
         BlueTooth.GattAction ga;
 
         //
+        // Notify primary.
+        //
+
+        ga = new BlueTooth.GattAction();
+
+        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
+        ga.characteristic = parent.currentPrimary;
+
+        parent.gattSchedule.add(ga);
+
+        //
+        // Notify secondary.
+        //
+
+        ga = new BlueTooth.GattAction();
+
+        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
+        ga.characteristic = parent.currentSecondary;
+
+        parent.gattSchedule.add(ga);
+
+        //
         // Indicate control.
         //
 
@@ -55,15 +77,19 @@ public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevi
         parent.gattSchedule.add(ga);
 
         //
-        // Notify primary.
+        // Read number of records.
         //
 
         ga = new BlueTooth.GattAction();
 
-        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
-        ga.characteristic = parent.currentPrimary;
+        ga.mode = BlueTooth.GattAction.MODE_WRITE;
+        ga.data = getNumberOfRecords();
+        ga.characteristic = parent.currentControl;
 
         parent.gattSchedule.add(ga);
+
+        /*
+        */
 
         /*
         //
@@ -101,18 +127,6 @@ public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevi
 
         gattSchedule.add(ga);
 
-        //
-        // Read number of records.
-        //
-
-        ga = new GattAction();
-
-        ga.mode = GattAction.MODE_WRITE;
-        ga.data = getNumberOfRecords();
-        ga.characteristic = currentControl;
-
-        gattSchedule.add(ga);
-
         /*
         //
         // Read serial number.
@@ -127,7 +141,7 @@ public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevi
 
         */
 
-        parent.fireNext(true);
+        parent.fireNext(false);
     }
 
     @Override
