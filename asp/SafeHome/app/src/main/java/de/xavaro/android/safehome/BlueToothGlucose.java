@@ -11,7 +11,7 @@ public class BlueToothGlucose extends BlueTooth
     private static final String LOGTAG = BlueToothGlucose.class.getSimpleName();
 
     private BlueTooth.BlueToothPhysicalDevice oneTouchDevice = new BlueToothGlucoseOneTouch(this);
-    private BlueTooth.BlueToothPhysicalDevice medisanaDevice = new BlueToothGlucoseMedisana(this);
+    private BlueTooth.BlueToothPhysicalDevice medisanaDevice = new BlueToothGlucoseGeneric(this);
 
     private boolean isOneTouch;
     private boolean isMedisana;
@@ -63,6 +63,7 @@ public class BlueToothGlucose extends BlueTooth
     protected boolean isSpecialBonding()
     {
         if (deviceName.equals("Accu-Chek")) return true;
+        if (deviceName.equals("MediTouch 2 BT")) return true;
 
         return false;
     }

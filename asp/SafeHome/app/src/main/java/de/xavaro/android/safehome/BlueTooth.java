@@ -424,6 +424,21 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     //region Gatt callback handler
 
+    private void pairDevice(BluetoothDevice device)
+    {
+        Log.d(LOGTAG, "pairDevice: =================" + deviceName);
+
+        try
+        {
+            Method m = device.getClass().getMethod("createBond", (Class[]) null);
+            m.invoke(device, (Object[]) null);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+
     private void unpairDevice(BluetoothDevice device)
     {
         Log.d(LOGTAG, "unpairDevice: =================" + deviceName);
@@ -497,21 +512,24 @@ public abstract class BlueTooth extends BroadcastReceiver
             final int nbs = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
             final int obs = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1);
 
-            Log.d(LOGTAG, "Bond state changed for: " + deviceName + obs + " => " + nbs);
+            Log.d(LOGTAG, "Bond state changed for: " + device.getName() + obs + " => " + nbs);
 
             if (nbs == BluetoothDevice.BOND_BONDED)
             {
-                Log.d(LOGTAG, "bondingReceiver: disconnect after bonding: " + deviceName);
-
                 context.unregisterReceiver(this);
 
-                /*
-                currentGatt.disconnect();
+                if (currentPrimary == null)
+                {
+                    Log.d(LOGTAG, "bondingReceiver: discoverServices after bonding: " + device.getName());
 
-                gattHandler.postDelayed(runConnectGatt, 2000);
-                */
+                    gattHandler.postDelayed(runDiscoverServices, 2000);
+                }
+                else
+                {
+                    Log.d(LOGTAG, "bondingReceiver: enableDevice after bonding: " + device.getName());
 
-                gattHandler.postDelayed(runDiscoverServices,100);
+                    gattHandler.postDelayed(runEnableDevice, 100);
+                }
             }
         }
     };
@@ -538,11 +556,12 @@ public abstract class BlueTooth extends BroadcastReceiver
                         + "=" + currentGatt.getDevice().getName()
                         + "=" + currentGatt.getDevice().getBondState());
 
-                if (isSpecialBonding() && (currentGatt.getDevice().getBondState() == 10))
-                {
-                    gattHandler.postDelayed(runCreateBonding, 0);
-                }
-                else
+                //if (isSpecialBonding() && (currentGatt.getDevice().getBondState() == 10))
+                //{
+                //
+                //
+                //}
+                //else
                 {
                     if (currentPrimary == null)
                     {
@@ -550,7 +569,10 @@ public abstract class BlueTooth extends BroadcastReceiver
                     }
                     else
                     {
-                        gattHandler.postDelayed(runEnableDevice, 0);
+                        if (isSpecialBonding() && (currentGatt.getDevice().getBondState() == 10))
+                        {
+                            gattHandler.postDelayed(runCreateBonding, 0);
+                        }
                     }
                 }
             }
@@ -653,7 +675,21 @@ public abstract class BlueTooth extends BroadcastReceiver
             }
             else
             {
-                if (currentPrimary != null) gattHandler.postDelayed(runEnableDevice, 0);
+                Log.d(LOGTAG,"onServicesDiscovered special:"
+                        + isSpecialBonding()
+                        + " => "
+                        + currentGatt.getDevice().getBondState());
+
+                if (isSpecialBonding() && (currentGatt.getDevice().getBondState() == 10))
+                {
+                    gatt.disconnect();
+
+                    gattHandler.postDelayed(runCreateBonding, 0);
+                }
+                else
+                {
+                    if (currentPrimary != null) gattHandler.postDelayed(runEnableDevice, 0);
+                }
             }
         }
 
@@ -746,7 +782,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         return false;
     }
 
-    //
+    //´+#
     // This method is called as soon, as the device is connected
     // to the gatt service. This allows the subclass to fire an early
     // connection callback as we like a fast haptic feedback to

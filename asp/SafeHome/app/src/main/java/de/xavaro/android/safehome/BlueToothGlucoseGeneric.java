@@ -8,13 +8,13 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.Simple;
 
-public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevice
+public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevice
 {
-    private static final String LOGTAG = BlueToothGlucoseMedisana.class.getSimpleName();
+    private static final String LOGTAG = BlueToothGlucoseGeneric.class.getSimpleName();
 
     private final BlueTooth parent;
 
-    public BlueToothGlucoseMedisana(BlueTooth parent)
+    public BlueToothGlucoseGeneric(BlueTooth parent)
     {
         this.parent = parent;
     }
