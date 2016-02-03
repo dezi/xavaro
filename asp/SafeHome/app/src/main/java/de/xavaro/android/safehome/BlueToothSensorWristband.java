@@ -5,13 +5,13 @@ import android.bluetooth.BluetoothGattService;
 
 import org.json.JSONObject;
 
-public class BlueToothSensorWhristband implements BlueTooth.BlueToothPhysicalDevice
+public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevice
 {
-    private static final String LOGTAG = BlueToothSensorWhristband.class.getSimpleName();
+    private static final String LOGTAG = BlueToothSensorWristband.class.getSimpleName();
 
     private final BlueTooth parent;
 
-    public BlueToothSensorWhristband(BlueTooth parent)
+    public BlueToothSensorWristband(BlueTooth parent)
     {
         this.parent = parent;
     }

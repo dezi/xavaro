@@ -27,7 +27,7 @@ public class BlueToothSensor extends BlueTooth
     private static final String LOGTAG = BlueToothSensor.class.getSimpleName();
 
     private BlueTooth.BlueToothPhysicalDevice sanitasDevice = new BlueToothSensorSanitas(this);
-    private BlueTooth.BlueToothPhysicalDevice whristbandDevice = new BlueToothSensorWhristband(this);
+    private BlueTooth.BlueToothPhysicalDevice whristbandDevice = new BlueToothSensorWristband(this);
 
     private boolean isSanitas;
     private boolean isWhristband;
