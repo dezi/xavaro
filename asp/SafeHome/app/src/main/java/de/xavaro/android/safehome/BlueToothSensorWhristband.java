@@ -38,6 +38,18 @@ public class BlueToothSensorWhristband implements BlueTooth.BlueToothPhysicalDev
 
     public void enableDevice()
     {
+        //
+        // Notify primary.
+        //
+
+        BlueTooth.GattAction ga = new BlueTooth.GattAction();
+
+        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
+        ga.characteristic = parent.currentPrimary;
+
+        parent.gattSchedule.add(ga);
+
+        parent.fireNext(false);
     }
 
     public void sendCommand(JSONObject command)
@@ -47,5 +59,4 @@ public class BlueToothSensorWhristband implements BlueTooth.BlueToothPhysicalDev
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
     }
-
 }
