@@ -43,13 +43,6 @@ public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevi
     {
         BlueTooth.GattAction ga;
 
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_READ;
-        ga.characteristic = parent.currentSerial;
-
-        parent.gattSchedule.add(ga);
-
         //
         // Notify primary.
         //
@@ -94,9 +87,6 @@ public class BlueToothGlucoseMedisana implements BlueTooth.BlueToothPhysicalDevi
         ga.characteristic = parent.currentControl;
 
         parent.gattSchedule.add(ga);
-
-        /*
-        */
 
         /*
         //

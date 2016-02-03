@@ -60,6 +60,14 @@ public class BlueToothGlucose extends BlueTooth
     }
 
     @Override
+    protected boolean isSpecialBonding()
+    {
+        if (deviceName.equals("Accu-Chek")) return true;
+
+        return false;
+    }
+
+    @Override
     protected void enableDevice()
     {
         if (isOneTouch) oneTouchDevice.enableDevice();

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 
 @SuppressWarnings("WeakerAccess")
@@ -58,6 +59,8 @@ public abstract class BlueTooth extends BroadcastReceiver
     {
         this.context = context;
 
+        gattHandler = new Handler(context.getMainLooper());
+
         this.bta = BluetoothAdapter.getDefaultAdapter();
     }
 
@@ -87,19 +90,9 @@ public abstract class BlueTooth extends BroadcastReceiver
 
             BluetoothDevice device = bta.getRemoteDevice(macAddress);
 
-            /*
-            try
-            {
-                Method m = device.getClass().getMethod("removeBond", (Class[]) null);
-                m.invoke(device, (Object[]) null);
-            }
-            catch (Exception ex)
-            {
-                Log.d(LOGTAG, ex.getMessage());
-            }
-            */
+            if (isSpecialBonding()) unpairDevice(device);
 
-            currentGatt = device.connectGatt(context, true, gattCallback);
+            currentGatt = device.connectGatt(Simple.getAppContext(), true, gattCallback);
         }
     };
 
@@ -267,7 +260,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     //region Device communication handling
 
-    protected final Handler gattHandler = new Handler();
+    protected Handler gattHandler;
     protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
 
     public static class GattAction
@@ -414,6 +407,8 @@ public abstract class BlueTooth extends BroadcastReceiver
                 if (ga.mode == GattAction.MODE_DISCONNECT)
                 {
                     currentGatt.disconnect();
+                    currentGatt.close();
+                    currentGatt = null;
 
                     //
                     // Give disconnect penalty time.
@@ -428,6 +423,21 @@ public abstract class BlueTooth extends BroadcastReceiver
     //endregion Device communication handling
 
     //region Gatt callback handler
+
+    private void unpairDevice(BluetoothDevice device)
+    {
+        Log.d(LOGTAG, "unpairDevice: =================" + deviceName);
+
+        try
+        {
+            Method m = device.getClass().getMethod("removeBond", (Class[]) null);
+            m.invoke(device, (Object[]) null);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
 
     private final Runnable runConnectGatt = new Runnable()
     {
@@ -460,20 +470,6 @@ public abstract class BlueTooth extends BroadcastReceiver
         public void run()
         {
             Log.d(LOGTAG, "runDiscoverServices: " + deviceName);
-
-            try
-            {
-                Method localMethod = currentGatt.getClass().getMethod("refresh", new Class[0]);
-                if (localMethod != null)
-                {
-                    boolean bool = ((Boolean) localMethod.invoke(currentGatt, new Object[0])).booleanValue();
-
-                }
-            }
-            catch (Exception localException)
-            {
-                Log.e(LOGTAG, "An exception occured while refreshing device");
-            }
 
             currentGatt.discoverServices();
 
@@ -509,9 +505,13 @@ public abstract class BlueTooth extends BroadcastReceiver
 
                 context.unregisterReceiver(this);
 
+                /*
                 currentGatt.disconnect();
 
                 gattHandler.postDelayed(runConnectGatt, 2000);
+                */
+
+                gattHandler.postDelayed(runDiscoverServices,100);
             }
         }
     };
@@ -521,13 +521,13 @@ public abstract class BlueTooth extends BroadcastReceiver
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
         {
-            Log.i(LOGTAG, "onConnectionStateChange [" + newState + "] = " + status);
+            Log.d(LOGTAG, "onConnectionStateChange [" + newState + "] = " + status);
 
             String devicetag = deviceName + " => " + gatt.getDevice().getAddress();
 
             if (newState == BluetoothProfile.STATE_CONNECTED)
             {
-                Log.i(LOGTAG, "onConnectionStateChange: device " + devicetag + " connected");
+                Log.d(LOGTAG, "onConnectionStateChange: device " + devicetag + " connected");
 
                 currentGatt = gatt;
                 currentConnectState = true;
@@ -538,30 +538,45 @@ public abstract class BlueTooth extends BroadcastReceiver
                         + "=" + currentGatt.getDevice().getName()
                         + "=" + currentGatt.getDevice().getBondState());
 
-                if (currentPrimary == null)
+                if (isSpecialBonding() && (currentGatt.getDevice().getBondState() == 10))
                 {
-                    gattHandler.postDelayed(runDiscoverServices, 0);
+                    gattHandler.postDelayed(runCreateBonding, 0);
                 }
                 else
                 {
-                    gattHandler.postDelayed(runEnableDevice, 0);
+                    if (currentPrimary == null)
+                    {
+                        gattHandler.postDelayed(runDiscoverServices, 400);
+                    }
+                    else
+                    {
+                        gattHandler.postDelayed(runEnableDevice, 0);
+                    }
                 }
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)
             {
-                Log.i(LOGTAG, "onConnectionStateChange: device " + devicetag + " disconnected");
+                Log.d(LOGTAG, "onConnectionStateChange: device " + devicetag + " disconnected");
 
                 currentConnectState = false;
 
                 if (connectCallback != null) connectCallback.onBluetoothDisconnect(deviceName);
+
+                if (isSpecialBonding())
+                {
+                    currentGatt.close();
+                    currentGatt = null;
+
+                    gattHandler.post(connectRunnable);
+                }
             }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status)
         {
-            Log.i(LOGTAG, "onServicesDiscovered=" + (currentGatt == gatt));
+            Log.d(LOGTAG, "onServicesDiscovered=" + (currentGatt == gatt));
 
             List<BluetoothGattService> services = gatt.getServices();
 
@@ -724,6 +739,11 @@ public abstract class BlueTooth extends BroadcastReceiver
     protected boolean isCompatibleSerial(BluetoothGattCharacteristic characteristic)
     {
         return characteristic.getUuid().toString().equals("00002a29-0000-1000-8000-00805f9b34fb");
+    }
+
+    protected boolean isSpecialBonding()
+    {
+        return false;
     }
 
     //
