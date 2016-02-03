@@ -18,13 +18,13 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class BlueTooth extends BroadcastReceiver
@@ -44,8 +44,8 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     public BluetoothGattCharacteristic currentPrimary;
     public BluetoothGattCharacteristic currentSecondary;
-    public BluetoothGattCharacteristic currentChanged;
     public BluetoothGattCharacteristic currentControl;
+    public BluetoothGattCharacteristic currentChanged;
     public BluetoothGattCharacteristic currentSerial;
 
     protected BlueToothDiscoverCallback discoverCallback;
@@ -86,6 +86,18 @@ public abstract class BlueTooth extends BroadcastReceiver
             Log.d(LOGTAG, "connect: device=" + deviceName + " => " + macAddress);
 
             BluetoothDevice device = bta.getRemoteDevice(macAddress);
+
+            /*
+            try
+            {
+                Method m = device.getClass().getMethod("removeBond", (Class[]) null);
+                m.invoke(device, (Object[]) null);
+            }
+            catch (Exception ex)
+            {
+                Log.d(LOGTAG, ex.getMessage());
+            }
+            */
 
             currentGatt = device.connectGatt(context, true, gattCallback);
         }
@@ -449,6 +461,20 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "runDiscoverServices: " + deviceName);
 
+            try
+            {
+                Method localMethod = currentGatt.getClass().getMethod("refresh", new Class[0]);
+                if (localMethod != null)
+                {
+                    boolean bool = ((Boolean) localMethod.invoke(currentGatt, new Object[0])).booleanValue();
+
+                }
+            }
+            catch (Exception localException)
+            {
+                Log.e(LOGTAG, "An exception occured while refreshing device");
+            }
+
             currentGatt.discoverServices();
 
             discoveredDevice();
@@ -518,7 +544,7 @@ public abstract class BlueTooth extends BroadcastReceiver
                 }
                 else
                 {
-                    gattHandler.postDelayed(runEnableDevice,0);
+                    gattHandler.postDelayed(runEnableDevice, 0);
                 }
             }
 
@@ -690,14 +716,14 @@ public abstract class BlueTooth extends BroadcastReceiver
     protected abstract boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
     protected abstract boolean isCompatibleControl(BluetoothGattCharacteristic characteristic);
 
-    protected boolean isCompatibleSerial(BluetoothGattCharacteristic characteristic)
-    {
-        return characteristic.getUuid().toString().equals("00002a25-0000-1000-8000-00805f9b34fb");
-    }
-
     protected boolean isCompatibleChanged(BluetoothGattCharacteristic characteristic)
     {
         return characteristic.getUuid().toString().equals("00002a05-0000-1000-8000-00805f9b34fb");
+    }
+
+    protected boolean isCompatibleSerial(BluetoothGattCharacteristic characteristic)
+    {
+        return characteristic.getUuid().toString().equals("00002a29-0000-1000-8000-00805f9b34fb");
     }
 
     //
