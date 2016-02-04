@@ -16,7 +16,7 @@ import de.xavaro.android.common.Simple;
 //
 // Health data record format:
 //
-//  utc => UTC timestamp
+//  dts => ISO timestamp
 //  sys => Systolic blood pressure
 //  dia => Diastolic blood pressure
 //  map => Mean arterial blood pressure
@@ -102,7 +102,7 @@ public class BlueToothBPM extends BlueTooth
 
             Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
             long utc = calendar.getTimeInMillis();
-            Json.put(bpmdata, "utc", Simple.timeStampAsISO(utc));
+            Json.put(bpmdata, "dts", Simple.timeStampAsISO(utc));
 
             Log.d(LOGTAG,"parseResponse result=" + hour + "::" + Simple.timeStampAsISO(utc));
         }

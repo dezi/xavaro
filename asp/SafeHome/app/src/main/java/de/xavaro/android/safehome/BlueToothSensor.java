@@ -9,7 +9,7 @@ import org.json.JSONObject;
 //
 // Health data record format:
 //
-//  utc => UTC timestamp
+//  dts => ISO timestamp
 //  stp => Number of steps
 //  ext => Exercise time
 //  goa => Goal value

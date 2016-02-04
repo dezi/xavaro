@@ -155,7 +155,7 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
                 long targetday = ((new Date().getTime() / 86400000L) - (day + 1)) * 86400000L;
 
-                sensordata.put("utc", Simple.timeStampAsISO(targetday));
+                sensordata.put("dts", Simple.timeStampAsISO(targetday));
 
                 byte[] data = new byte[ 4 ];
 
@@ -243,7 +243,7 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
                 String activityday  = Simple.timeStampAsISO(daytime);
                 String activityhour = "s" + Simple.get24HHourFromTimeStamp(postime);
 
-                sensordata.put("utc", activityday);
+                sensordata.put("dts", activityday);
 
                 byte[] sd = new byte[ 18 ];
                 int cnt = 0;

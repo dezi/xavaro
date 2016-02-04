@@ -47,7 +47,7 @@ public class HealthData
         {
             JSONObject oldrecord = Json.getObject(records, inx);
 
-            if (Json.equals(record, "utc", oldrecord))
+            if (Json.equals(record, "dts", oldrecord))
             {
                 Iterator<String> keysIterator = record.keys();
 
@@ -66,7 +66,7 @@ public class HealthData
 
         records.put(record);
 
-        if (record.has("utc")) records = Json.sort(records, "utc", true);
+        records = Json.sort(records, "dts", true);
 
         putRecords(datatype, records);
     }

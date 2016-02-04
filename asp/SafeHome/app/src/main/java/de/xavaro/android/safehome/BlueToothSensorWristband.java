@@ -2,13 +2,21 @@ package de.xavaro.android.safehome;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.content.Context;
 import android.util.Log;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.json.JSONObject;
 
-import java.util.Calendar;
+import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Simple;
 
+@SuppressWarnings({"UnusedParameters", "unused"})
 public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevice
 {
     private static final String LOGTAG = BlueToothSensorWristband.class.getSimpleName();
@@ -56,24 +64,10 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         parent.gattSchedule.add(ga);
 
         //
-        // Read version string.
+        // Sync command sequence.
         //
 
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_WRITE;
-        ga.characteristic = parent.currentControl;
-        ga.data = getVersionValue();
-
-        parent.gattSchedule.add(ga);
-
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_WRITE;
-        ga.characteristic = parent.currentControl;
-        ga.data = getDateTimeValue();
-
-        parent.gattSchedule.add(ga);
+        startSync();
 
         parent.fireNext(false);
     }
@@ -84,49 +78,317 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
-        int command = rd[ 0 ] & 0xff;
-
+        parseResponseInternal(rd, characteristic);
     }
 
-    public static final int ctrl_gsensor = 83;
-    public static final int ctrl_key = 81;
-    public static final int ctrl_screen = 80;
-    public static final int delete_activity = 20;
-    public static final int get_activity = 19;
-    public static final int get_activity_count = 16;
-    public static final int get_mac = 8;
-    public static final int get_sensor = 96;
-    public static final int get_sensor_value = 97;
-    public static final int get_version_code = 112;
-    public static final int get_zoon = 65;
-    public static final int receive_activity = 147;
-    public static final int receive_activity_count = 144;
-    public static final int receive_alarm = 131;
-    public static final int receive_date_time = 129;
-    public static final int receive_day_mode = 130;
-    public static final int receive_goal = 139;
-    public static final int receive_language = 138;
-    public static final int receive_press_key = 209;
-    public static final int receive_profile = 140;
-    public static final int receive_set_screen = 208;
-    public static final int receive_time_format = 141;
-    public static final int receive_version_code = 240;
-    public static final int receive_zoon = 193;
-    public static final int set_date_time = 1;
-    public static final int set_day_mode = 2;
-    public static final int set_alarm = 3;
-    public static final int set_body = 12;
-    public static final int set_callin = 32;
-    public static final int set_hour = 13;
-    public static final int set_hv = 82;
-    public static final int set_language = 10;
-    public static final int set_target = 11;
-    public static final int set_time_format = 13;
-    public static final int set_touch_vibration = 84;
-    public static final int set_message = 33;
-    public static final int set_beacon_startstop = 67;
+    private void startSync()
+    {
+        BlueTooth.GattAction ga;
 
-    public static String parseVersion(byte[] rd)
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setDateTime();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setTimeFormat();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setDayMode();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setBody();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setAlarm();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setGoal();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setTouchVibration();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setLanguage();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setUnits();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = setHorzVert();
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+        ga.data = getActivityCount();
+        parent.gattSchedule.add(ga);
+    }
+
+    //region Parse responses.
+
+    public static final int receive_ack_datetime = 129;
+    public static final int receive_ack_daymode = 130;
+    public static final int receive_ack_alarm = 131;
+    public static final int receive_macaddress = 136;
+    public static final int receive_language = 138;
+    public static final int receive_ack_goal = 139;
+    public static final int receive_ack_body = 140;
+    public static final int receive_ack_timeformat = 141;
+    public static final int receive_activity_count = 144;
+    public static final int receive_activity_value = 147;
+    public static final int receive_ack_call = 160;
+    public static final int receive_serialno = 193;
+    public static final int receive_set_screen = 208;
+    public static final int receive_press_key = 209;
+    public static final int receive_ack_touch_vib = 212;
+    public static final int receive_version_code = 240;
+
+    public void parseResponseInternal(byte[] rd, BluetoothGattCharacteristic characteristic)
+    {
+        int command = rd[ 0 ] & 0xff;
+
+        if (command == receive_ack_datetime)
+        {
+            parseAckDateTime(rd);
+            return;
+        }
+
+        if (command == receive_macaddress)
+        {
+            parseMacAddress(rd);
+            return;
+        }
+
+        if (command == receive_activity_count)
+        {
+            parseActivityCount(rd);
+            return;
+        }
+
+        if (command == receive_activity_value)
+        {
+            parseActivityValue(rd);
+            return;
+        }
+
+        if (command == receive_set_screen)
+        {
+            parseSetScreen(rd);
+            return;
+        }
+
+        if (command == receive_press_key)
+        {
+            parsePressKey(rd);
+            return;
+        }
+
+        if (command == receive_version_code)
+        {
+            parseVersion(rd);
+            return;
+        }
+
+        if (command == receive_ack_call)
+        {
+            parseAckCall(rd);
+            return;
+        }
+
+        if (command == receive_ack_daymode)
+        {
+            parseAckDayMode(rd);
+            return;
+        }
+
+        if (command == receive_ack_goal)
+        {
+            parseAckGoal(rd);
+            return;
+        }
+
+        if (command == receive_ack_timeformat)
+        {
+            parseAckTimeFormat(rd);
+            return;
+        }
+
+        if (command == receive_ack_body)
+        {
+            parseAckBody(rd);
+            return;
+        }
+
+        if (command == receive_ack_touch_vib)
+        {
+            parseAckTouchVibrate(rd);
+            return;
+        }
+
+        if (command == receive_ack_alarm)
+        {
+            parseAckAlarm(rd);
+            return;
+        }
+
+        if (command == receive_language)
+        {
+            parseLanguage(rd);
+            return;
+        }
+
+        if (command == receive_serialno)
+        {
+            parseSerialno(rd);
+            return;
+        }
+
+        Log.d(LOGTAG, "parseResponse: command========================================" + command);
+    }
+
+    public void parseSetScreen(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseSetScreen: " + rd[ 2 ]);
+    }
+
+    public void parseLanguage(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseLanguage: " + rd[ 2 ]);
+    }
+
+    public void parsePressKey(byte[] rd)
+    {
+        //
+        // rd[ 2 ] == 1 => camera
+        //
+
+        Log.d(LOGTAG, "parsePressKey: " + rd[ 2 ]);
+    }
+
+    public void parseSerialno(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseSerialno: " + Simple.getHexBytesToString(rd, 2, 4));
+    }
+
+    public void parseMacAddress(byte[] rd)
+    {
+        String macaddress = "";
+
+        for (int inx = 1; inx <= 6; inx++)
+        {
+            if (macaddress.length() > 0) macaddress += ":";
+
+            macaddress += String.format("%02x", rd[ inx ]);
+        }
+
+        Log.d(LOGTAG, "parseMacAddress: " + macaddress);
+    }
+
+    private void parseActivityCount(byte[] rd)
+    {
+        int[] ints = new int[ 20 ];
+
+        for (int inx = 0; inx < 20; inx++)
+        {
+            ints[ inx ] = rd[ inx ] & 0xff;
+        }
+
+        int year = (ints[ 3 ] * 100) + ints[ 4 ];
+
+        Log.d(LOGTAG,"parseActivityCount:"
+                + " sn:" + ints[ 1 ]
+                + " count:" + ints[ 2 ]
+                + " date:" + year + "-" + ints[ 5 ] + "-" + ints[ 6 ]);
+
+        int activitySn = ints[ 1 ];
+        int activityCount = ints[ 2 ];
+
+        BlueTooth.GattAction ga;
+
+        for (int inx = 1; inx <= activityCount; inx++)
+        {
+            ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+            ga.data = getActivityValue((activitySn + inx) % activityCount, 0);
+            parent.gattSchedule.add(ga);
+
+            ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+            ga.data = getActivityValue((activitySn + inx) % activityCount, 6);
+            parent.gattSchedule.add(ga);
+
+            ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+            ga.data = getActivityValue((activitySn + inx) % activityCount, 12);
+            parent.gattSchedule.add(ga);
+
+            ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+            ga.data = getActivityValue((activitySn + inx) % activityCount, 18);
+            parent.gattSchedule.add(ga);
+        }
+
+        parent.fireNext(false);
+    }
+
+    public static void parseActivityValue(byte[] rd)
+    {
+        int[] ints = new int[ 20 ];
+
+        for (int inx = 0; inx < 20; inx++)
+        {
+            ints[ inx ] = rd[ inx ] & 0xff;
+        }
+
+        if (! (ints[ 1 ] == 0xff || ints[ 2 ] == 0xff))
+        {
+            int year = ints[ 2 ] + (ints[ 1 ] * 100);
+            int month = ints[ 3 ];
+            int day = ints[ 4 ];
+            int hour = ints[ 5 ];
+
+            String timestamp = String.format("%04d-%02d-%02dT%02d:00:00", year, month, day, hour);
+            timestamp += TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT);
+
+            String activity = Simple.getHexBytesToString(rd, 6, 12);
+
+            Log.d(LOGTAG,"parseActivityValue:" + timestamp + "=" + activity);
+
+            //
+            // Check out of range dates.
+            //
+
+            long tendaysago = new Date().getTime();
+            tendaysago -= 86400 * 11 * 1000L;
+
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+            df.setTimeZone(TimeZone.getDefault());
+            String maxoldest = df.format(new Date(tendaysago));
+
+            if (timestamp.compareTo(maxoldest) >= 0)
+            {
+                //
+                // Store data.
+                //
+
+                JSONObject record = new JSONObject();
+
+                Json.put(record, "dts", timestamp);
+                Json.put(record, "ada", activity);
+
+                HealthData.addRecord("sensor", record);
+
+                JSONObject status = HealthData.getStatus("sensor");
+                Json.put(status, "lastActivityDate", timestamp);
+                Json.put(status, "lastReadDate", Simple.nowAsISO());
+                HealthData.putStatus("sensor", status);
+            }
+        }
+    }
+
+    private void parseVersion(byte[] rd)
     {
         String version = "";
 
@@ -137,70 +399,168 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
             version += (char) rd[ inx ];
         }
 
-        return version;
+        Log.d(LOGTAG, "parseVersion: " + version);
     }
 
-    public static byte[] getVersionValue()
+    public void parseAckDateTime(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseDateTime: ACK");
+    }
+
+    public void parseAckCall(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckCall: ACK");
+    }
+
+    public void parseAckDayMode(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckDayMode: ACK");
+    }
+
+    public void parseAckGoal(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckGoal: ACK");
+    }
+
+    public void parseAckTimeFormat(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckTimeFormat: ACK");
+    }
+
+    public void parseAckBody(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckBody: ACK");
+    }
+
+    public void parseAckTouchVibrate(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckTouchVibrate: ACK");
+    }
+
+    public void parseAckAlarm(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckAlarm: ACK");
+    }
+
+    //endregion Parse responses
+
+    //region Get commands
+
+    private static final int get_macaddress = 8;
+    private static final int get_activity_count = 16;
+    private static final int get_activity_value = 19;
+    private static final int get_serialno = 65;
+    private static final int get_sensor_type = 96;
+    private static final int get_sensor_value = 97;
+    private static final int get_version_value = 112;
+
+    private byte[] getActivityCount()
     {
         byte[] wd = new byte[ 20 ];
 
-        wd[ 0 ] = 112;
+        wd[ 0 ] = get_activity_count;
 
         return wd;
     }
 
-    public static byte[] getActivityCountValue()
+    private byte[] getActivityValue(int sequence, int hour)
     {
         byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = 16;
-        return wd;
-    }
 
-    public static byte[] getActivityValue(int i, int i2)
-    {
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = (byte) 19;
-        wd[ 1 ] = (byte) i;
-        wd[ 2 ] = (byte) i2;
-        return wd;
-    }
-
-    public static byte[] getAlarmValue(Context context)
-    {
-        int b = 0;
-        int c = 0;
-        int repeatDate = 0;
-
-        byte[] wd = new byte[ 20 ];
-
-        wd[ 0 ] = 3;
-        wd[ 1 ] = (byte) b;
-        wd[ 2 ] = (byte) c;
-        wd[ 3 ] = (byte) repeatDate;
+        wd[ 0 ] = get_activity_value;
+        wd[ 1 ] = (byte) sequence;
+        wd[ 2 ] = (byte) hour;
 
         return wd;
     }
 
-    public static byte[] getCallTerminationValue()
+    private byte[] getMacAddress()
     {
         byte[] wd = new byte[ 20 ];
 
-        wd[ 0 ] = (byte) 32;
-        wd[ 1 ] = (byte) 1;
+        wd[ 0 ] = get_macaddress;
 
         return wd;
     }
 
-    public static byte[] getCallValue(String phone)
+    private byte[] getSensorType()
     {
         byte[] wd = new byte[ 20 ];
 
-        wd[ 0 ] = (byte) 32;
+        wd[ 0 ] = get_sensor_type;
+
+        return wd;
+    }
+
+    private byte[] getSensorValue(byte b)
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = get_sensor_value;
+        wd[ 1 ] = b;
+
+        return wd;
+    }
+
+    private byte[] getVersionValue()
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = get_version_value;
+
+        return wd;
+    }
+
+    private byte[] getSerialno()
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = get_serialno;
+        wd[ 1 ] = 0;
+
+        return wd;
+    }
+
+    //endregion Get commands
+
+    //region Set commands
+
+    private static final int set_date_time = 1;
+    private static final int set_day_mode = 2;
+    private static final int set_alarm = 3;
+    private static final int set_language = 10;
+    private static final int set_goal = 11;
+    private static final int set_body = 12;
+    private static final int set_timeformat = 13;
+    private static final int set_call_number = 32;
+    private static final int set_sms_number = 33;
+    private static final int set_lost_mode = 35;
+    private static final int set_camera = 80;
+    private static final int set_horzvert = 82;
+    private static final int set_touch_vibration = 84;
+    private static final int set_units = 85;
+
+    //region Set action commands
+
+    private byte[] setCallTermination()
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_call_number;
+        wd[ 1 ] = 1;
+
+        return wd;
+    }
+
+    private byte[] setCall(String phone)
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_call_number;
 
         if (phone != null)
         {
-            wd[ 1 ] = (byte) 0;
-            wd[ 2 ] = (byte) phone.getBytes().length;
+            wd[ 1 ] = (byte) phone.getBytes().length;
 
             System.arraycopy(phone.getBytes(), 0, wd, 2, phone.getBytes().length);
         }
@@ -208,16 +568,15 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         return wd;
     }
 
-    public static byte[] getSMSValue(String phone)
+    private byte[] setSMS(String phone)
     {
         byte[] wd = new byte[ 20 ];
 
-        wd[ 0 ] = (byte) 33;
+        wd[ 0 ] = set_sms_number;
 
         if (phone != null)
         {
-            wd[ 1 ] = (byte) 0;
-            wd[ 2 ] = (byte) phone.getBytes().length;
+            wd[ 1 ] = (byte) phone.getBytes().length;
 
             System.arraycopy(phone.getBytes(), 0, wd, 2, phone.getBytes().length);
         }
@@ -225,24 +584,45 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         return wd;
     }
 
-    public static byte[] getCameraValue(int i)
+    private byte[] setCameraSelfie(boolean on)
     {
         byte[] wd = new byte[ 20 ];
 
-        wd[ 0 ] = (byte) 80;
-        wd[ 1 ] = (byte) 1;
-        wd[ 2 ] = (i == 0) ? (byte) 81 : (byte) 80;
+        wd[ 0 ] = set_camera;
+        wd[ 1 ] = 1;
+        wd[ 2 ] = (byte) (on ? 81 : 80);
 
         return wd;
     }
 
-    public static byte[] getDateTimeValue()
+    public static final byte TYPE_LOST_NEARBY = 0;
+    public static final byte TYPE_LOST_DISTANT = 1;
+    public static final byte TYPE_LOST_CRITICAL = 2;
+
+    private byte[] setLostMode(int howlost)
     {
         byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_lost_mode;
+        wd[ 1 ] = (byte) howlost;
+
+        return wd;
+    }
+
+    //endregion Set action commands
+
+    //region Set settings commands
+
+    private byte[] setDateTime()
+    {
+        Log.d(LOGTAG, "setDateTime");
+
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_date_time;
 
         Calendar instance = Calendar.getInstance();
 
-        wd[ 0 ] = (byte) 1;
         wd[ 1 ] = (byte) (instance.get(Calendar.YEAR) / 100);
         wd[ 2 ] = (byte) (instance.get(Calendar.YEAR) % 100);
         wd[ 3 ] = (byte) (instance.get(Calendar.MONTH) + 1);
@@ -254,137 +634,158 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         return wd;
     }
 
-    public static byte[] getDayModeValue(Context context)
+    private byte[] setDayMode()
     {
-        int i = 9;
-        int i2 = 21;
-
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = (byte) 2;
-        wd[ 1 ] = (byte) i;
-        wd[2] = (byte) i2;
-        return wd;
-    }
-
-    public static byte[] getGoalValue()
-    {
-        int i = 10000;
-
-        byte[] wd = new byte[ 20 ];
-        String toBinaryString = Integer.toBinaryString(i);
-        if (toBinaryString != null)
-        {
-            int length = toBinaryString.length();
-            if (length < 16)
-            {
-                int i2 = 0;
-                while (i2 < 16 - length)
-                {
-                    i2 += 1;
-                    toBinaryString = "0" + toBinaryString;
-                }
-            }
-        }
-        String substring = toBinaryString.substring(0, 8);
-        toBinaryString = toBinaryString.substring(8, 16);
-        wd[ 0 ] = (byte) 11;
-        wd[ 1 ] = (byte) 1;
-        wd[2] = (byte) Integer.parseInt(substring, 2);
-        wd[3] = (byte) Integer.parseInt(toBinaryString, 2);
-        return wd;
-    }
-
-    public static byte[] getHVvalue(boolean z)
-    {
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = (byte) 82;
-        wd[ 1 ] = (byte) 1;
-        wd[ 2 ] = (byte) (z ? 1 : 0);
-        return wd;
-    }
-
-    public static byte[] getLanguageValue(Context context)
-    {
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = (byte) 10;
-        wd[ 1 ] = (byte) 1;
-        wd[ 2 ] = (byte) 1;
-        return wd;
-    }
-
-    public static byte[] getLostModeValue(int i)
-    {
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = (byte) 35;
-        wd[ 1 ] = (byte) i;
-        return wd;
-    }
-
-    public static byte[] getProfileValue(Context context)
-    {
-        double DEFAULT_WEIGHT = 70.0d;
-        double DEFAULT_HEIGHT = 175.0d;
-
-        int a = 1;
-        double c = DEFAULT_WEIGHT;
-        double d = DEFAULT_HEIGHT;
+        int daybeg = 6;
+        int dayend = 21;
 
         byte[] wd = new byte[ 20 ];
 
-        wd[ 0 ] = (byte) 12;
-        wd[ 1 ] = (byte) ((int) d);
-        wd[ 2 ] = (byte) ((int) c);
-        wd[ 3 ] = (byte) a;
+        wd[ 0 ] = set_day_mode;
+
+        wd[ 1 ] = (byte) daybeg;
+        wd[ 2 ] = (byte) dayend;
 
         return wd;
     }
 
-    public static byte[] getSensorType()
+    private byte[] setGoal()
     {
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = (byte) 96;
-        return wd;
-    }
+        int goal = 10000;
 
-    public static byte[] getSensorValue(byte b)
-    {
         byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = 97;
-        wd[ 1 ] = b;
-        return wd;
-    }
 
-    public static byte[] getTimeFormatValue(boolean ampm)
-    {
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = 13;
-        wd[ 1 ] = (byte) (ampm ? 0 : 1);
-        return wd;
-    }
-
-    public static byte[] getTouchVibrationvalue(boolean z, int i)
-    {
-        byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = 84;
+        wd[ 0 ] = set_goal;
         wd[ 1 ] = 1;
-        wd[ 1 ] = (byte) (z ? i : 0);
+        wd[ 2 ] = (byte) ((goal >> 8) & 0xff);
+        wd[ 3 ] = (byte) (goal & 0xff);
+
         return wd;
     }
 
-    public static byte[] getUnitValue(int i)
+    private byte[] setTimeFormat()
+    {
+        return setTimeFormat(true);
+    }
+
+    private byte[] setTimeFormat(boolean h24)
     {
         byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = 85;
+
+        wd[ 0 ] = set_timeformat;
+        wd[ 1 ] = (byte) (h24 ? 0 : 1);
+
+        return wd;
+    }
+
+    public static final byte TYPE_GENDER_FEMALE = 0;
+    public static final byte TYPE_GENDER_MALE = 1;
+
+    private byte[] setBody()
+    {
+        int gender = TYPE_GENDER_MALE;
+        int weight = 70;
+        int height = 175;
+
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_body;
+        wd[ 1 ] = (byte) height;
+        wd[ 2 ] = (byte) weight;
+        wd[ 3 ] = (byte) gender;
+
+        return wd;
+    }
+
+    private byte[] setHorzVert()
+    {
+        return setHorzVert(true);
+    }
+
+    private byte[] setHorzVert(boolean horizontal)
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_horzvert;
         wd[ 1 ] = 1;
-        wd[ 2 ] = (byte) i;
+        wd[ 2 ] = (byte) (horizontal ? 0 : 1);
+
         return wd;
     }
 
-    public static byte[] getZoonValue()
+    private byte[] setTouchVibration()
+    {
+        return setTouchVibration(false, 0);
+    }
+
+    private byte[] setTouchVibration(boolean on, int millis)
     {
         byte[] wd = new byte[ 20 ];
-        wd[ 0 ] = 65;
-        wd[ 1 ] = 0;
+
+        wd[ 0 ] = set_touch_vibration;
+        wd[ 1 ] = 1;
+        wd[ 2 ] = (byte) (on ? millis : 0);
+
         return wd;
     }
+
+    private byte[] setAlarm()
+    {
+        int hour = 14;
+        int minute = 12;
+        int daymask = 0x7f;
+
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_alarm;
+        wd[ 1 ] = (byte) hour;
+        wd[ 2 ] = (byte) minute;
+        wd[ 3 ] = (byte) daymask;
+
+        return wd;
+    }
+
+    public static final byte TYPE_LANGUAGE_ENGLISH = 1;
+    public static final byte TYPE_LANGUAGE_SPANISH = 2;
+    public static final byte TYPE_LANGUAGE_FRENCH = 3;
+    public static final byte TYPE_LANGUAGE_PORTUGUESE = 7;
+    public static final byte TYPE_LANGUAGE_RUSSIAN = 33;
+    public static final byte TYPE_LANGUAGE_CHINESE_SIMPLIFIED = 16;
+    public static final byte TYPE_LANGUAGE_CHINESE_TRADITIONAL = 17;
+
+    private byte[] setLanguage()
+    {
+        return setLanguage(TYPE_LANGUAGE_ENGLISH);
+    }
+
+    private byte[] setLanguage(int language)
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_language;
+        wd[ 1 ] = 1;
+        wd[ 2 ] = (byte) language;
+
+        return wd;
+    }
+
+    private byte[] setUnits()
+    {
+        return setUnits(true);
+    }
+
+    private byte[] setUnits(boolean metric)
+    {
+        byte[] wd = new byte[ 20 ];
+
+        wd[ 0 ] = set_units;
+        wd[ 1 ] = 1;
+        wd[ 2 ] = (byte) (metric ? 0 : 1);
+
+        return wd;
+    }
+
+    //endregion Set settings commands
+
+    //endregion Set commands
 }

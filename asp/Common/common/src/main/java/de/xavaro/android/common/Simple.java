@@ -588,17 +588,22 @@ public class Simple
 
     public static String getHexBytesToString(byte[] bytes)
     {
+        return getHexBytesToString(bytes, 0, bytes.length);
+    }
+
+    public static String getHexBytesToString(byte[] bytes, int offset, int length)
+    {
         if (bytes == null) return null;
 
         char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[ bytes.length << 1 ];
+        char[] hexChars = new char[ length << 1 ];
 
-        for (int inx = 0; inx < bytes.length; inx++)
+        for (int inx = offset; inx < (length + offset); inx++)
         {
             //noinspection PointlessArithmeticExpression
-            hexChars[ (inx << 1) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
+            hexChars[ ((inx - offset) << 1) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
             //noinspection PointlessBitwiseExpression
-            hexChars[ (inx << 1) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
+            hexChars[ ((inx - offset) << 1) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
         }
 
         return String.valueOf(hexChars);

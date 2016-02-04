@@ -19,7 +19,7 @@ import de.xavaro.android.common.Simple;
 //
 // Health data record format:
 //
-//  utc => UTC timestamp
+//  dts => ISO timestamp
 //  bgv => Blood glucose value
 //  ngv => Non glucose value
 //  csv => Control solution value
@@ -323,7 +323,7 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
         Json.put(result, "type", "GlucoseRecord");
 
-        Json.put(result, "utc", utciso);
+        Json.put(result, "dts", utciso);
         Json.put(result, "bgv", bgValue);
         Json.put(result, "ngv", pl[  9 ]);
         Json.put(result, "csv", pl[ 6 ]);

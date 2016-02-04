@@ -208,7 +208,7 @@ public class BlueToothScale extends BlueTooth
                         long timeStamp = Json.getInt(oldrec, "timeStamp") * 1000L;
                         String utciso = Simple.timeStampAsISO(timeStamp);
 
-                        Json.put(record, "utc", utciso);
+                        Json.put(record, "dts", utciso);
                         Json.put(record, "wei", Json.getInt(oldrec, "weight"));
                         Json.put(record, "imp", Json.getInt(oldrec, "impedance"));
                         Json.put(record, "fat", Json.getInt(oldrec, "bodyFat"));
