@@ -1,14 +1,10 @@
 package de.xavaro.android.safehome;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 
 public class HealthScale extends HealthBase

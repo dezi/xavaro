@@ -208,9 +208,38 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
     public static final int receive_ack_touch_vib = 212;
     public static final int receive_version_code = 240;
 
+    public static final int TYPE_SCREEN_DISTANCETIME = 0;
+    public static final int TYPE_SCREEN_DATE = 1;
+    public static final int TYPE_SCREEN_DEVICEID = 17;
+    public static final int TYPE_SCREEN_STEPS = 33;
+    public static final int TYPE_SCREEN_BURNEDCALS = 224;
+
     public void parseSetScreen(byte[] rd)
     {
-        Log.d(LOGTAG, "parseSetScreen: " + rd[ 2 ]);
+        Log.d(LOGTAG, "parseSetScreen: " + (rd[ 2 ] & 0xff));
+
+        int screen = rd[ 2 ] & 0xff;
+
+        if (screen == TYPE_SCREEN_DEVICEID)
+        {
+            //
+            // User paged through screens on sensor. Use device
+            // screen as command for starting history update.
+            //
+
+            if (parent.gattSchedule.size() == 0)
+            {
+                parent.callOnBluetoothFakeConnect();
+
+                BlueTooth.GattAction ga;
+
+                ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE, parent.currentControl);
+                ga.data = getActivityCount();
+                parent.gattSchedule.add(ga);
+
+                parent.fireNext(false);
+            }
+        }
     }
 
     public void parseLanguage(byte[] rd)
@@ -308,9 +337,9 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         parent.fireNext(false);
     }
 
-    public static void parseActivityValue(byte[] rd)
+    public void parseActivityValue(byte[] rd)
     {
-        int[] ints = new int[ 5 ];
+        int[] ints = new int[ 6 ];
 
         for (int inx = 0; inx < ints.length; inx++)
         {
@@ -372,6 +401,11 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
             Json.put(status, "lastReadDate", Simple.nowAsISO());
 
             HealthData.putStatus("sensor", status);
+        }
+
+        if (parent.gattSchedule.size() == 0)
+        {
+            parent.callOnBluetoothFakeDisconnect();
         }
     }
 

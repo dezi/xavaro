@@ -101,10 +101,12 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
     {
         Log.d(LOGTAG, "onBluetoothConnect: " + deviceName);
 
-        //
-        // Post delayed in case of sleeping devices with
-        // short time idle connect.
-        //
+        handler.post(bluetoothIsConnected);
+    }
+
+    public void onBluetoothFakeConnect(String deviceName)
+    {
+        Log.d(LOGTAG, "onBluetoothFakeConnect: " + deviceName);
 
         handler.post(bluetoothIsConnected);
     }
@@ -116,6 +118,15 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
         handler.removeCallbacks(bluetoothIsConnected);
         handler.post(bluetoothIsDisconnected);
     }
+
+    public void onBluetoothFakeDisconnect(String deviceName)
+    {
+        Log.d(LOGTAG, "onBluetoothFakeDisconnect: " + deviceName);
+
+        handler.removeCallbacks(bluetoothIsConnected);
+        handler.post(bluetoothIsDisconnected);
+    }
+
 
     //endregion BlueTooth connect states
 }

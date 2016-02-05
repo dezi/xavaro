@@ -1000,10 +1000,22 @@ public abstract class BlueTooth extends BroadcastReceiver
         void onDiscoverFinished();
     }
 
+    public void callOnBluetoothFakeConnect()
+    {
+        if (connectCallback != null) connectCallback.onBluetoothFakeConnect(deviceName);
+    }
+
+    public void callOnBluetoothFakeDisconnect()
+    {
+        if (connectCallback != null) connectCallback.onBluetoothFakeDisconnect(deviceName);
+    }
+
     public interface BlueToothConnectCallback
     {
         void onBluetoothConnect(String deviceName);
         void onBluetoothDisconnect(String deviceName);
+        void onBluetoothFakeConnect(String deviceName);
+        void onBluetoothFakeDisconnect(String deviceName);
     }
 
     public interface BlueToothDataCallback

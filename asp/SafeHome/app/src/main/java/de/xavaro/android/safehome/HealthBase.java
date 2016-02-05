@@ -53,4 +53,14 @@ public abstract class HealthBase implements
 
         if (connectCallback != null) connectCallback.onBluetoothDisconnect(deviceName);
     }
+
+    public void onBluetoothFakeConnect(String deviceName)
+    {
+        if (connectCallback != null) connectCallback.onBluetoothFakeConnect(deviceName);
+    }
+
+    public void onBluetoothFakeDisconnect(String deviceName)
+    {
+        if (connectCallback != null) connectCallback.onBluetoothFakeDisconnect(deviceName);
+    }
 }
