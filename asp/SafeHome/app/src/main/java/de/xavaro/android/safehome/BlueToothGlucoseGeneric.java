@@ -41,40 +41,11 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
 
     public void enableDevice()
     {
+    }
+
+    public void syncSequence()
+    {
         BlueTooth.GattAction ga;
-
-        //
-        // Notify primary.
-        //
-
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
-        ga.characteristic = parent.currentPrimary;
-
-        parent.gattSchedule.add(ga);
-
-        //
-        // Notify secondary.
-        //
-
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
-        ga.characteristic = parent.currentSecondary;
-
-        parent.gattSchedule.add(ga);
-
-        //
-        // Indicate control.
-        //
-
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_INDICATE;
-        ga.characteristic = parent.currentControl;
-
-        parent.gattSchedule.add(ga);
 
         //
         // Read number of records.
@@ -88,65 +59,13 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
 
         parent.gattSchedule.add(ga);
 
-        /*
-        //
-        // Indicate service changed characteristic.
-        //
-
-        ga = new GattAction();
-
-        ga.mode = GattAction.MODE_INDICATE;
-        ga.characteristic = currentChanged;
-
-        gattSchedule.add(ga);
-
-        for (int inx = 0; inx < 20; inx++)
-        {
-            ga = new GattAction();
-
-            ga.mode = GattAction.MODE_READ;
-            ga.characteristic = currentSerial;
-
-            gattSchedule.add(ga);
-        }
-
-
-        /*
-
-        //
-        // Notify secondary.
-        //
-
-        ga = new GattAction();
-
-        ga.mode = GattAction.MODE_NOTIFY;
-        ga.characteristic = currentSecondary;
-
-        gattSchedule.add(ga);
-
-        /*
-        //
-        // Read serial number.
-        //
-
-        ga = new GattAction();
-
-        ga.mode = GattAction.MODE_READ;
-        ga.characteristic = currentSerial;
-
-        gattSchedule.add(ga);
-
-        */
-
         parent.fireNext(false);
     }
 
-    @Override
     public void sendCommand(JSONObject command)
     {
     }
 
-    @Override
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));

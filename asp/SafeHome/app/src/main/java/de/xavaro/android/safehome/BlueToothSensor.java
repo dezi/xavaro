@@ -78,8 +78,17 @@ public class BlueToothSensor extends BlueTooth
     @Override
     protected void enableDevice()
     {
+        super.enableDevice();
+
         if (isSanitas) sanitasDevice.enableDevice();
         if (isWhristband) whristbandDevice.enableDevice();
+    }
+
+    @Override
+    protected void syncSequence()
+    {
+        if (isSanitas) sanitasDevice.syncSequence();
+        if (isWhristband) whristbandDevice.syncSequence();
     }
 
     @Override

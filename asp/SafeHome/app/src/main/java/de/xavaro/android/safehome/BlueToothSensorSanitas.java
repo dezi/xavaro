@@ -49,33 +49,10 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
     public void enableDevice()
     {
         parent.noFireOnWrite = true;
+    }
 
-        parent.enableDevice();
-
-        Log.d(LOGTAG, "enableDevice: " + parent.deviceName);
-
-        //
-        // Initialize sensor device with current
-        // goal data and current time.
-        //
-
-        parent.gattSchedule.add(new BlueTooth.GattAction(getSetUserSettingWithGoalFromPreferences()));
-
-        parent.fireNext(false);
-
-        //
-        // Read todays stuff.
-        //
-
-        BlueTooth.GattAction ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_READ;
-        ga.characteristic = parent.currentSecondary;
-
-        parent.gattSchedule.add(ga);
-
-        parent.fireNext(false);
-
+    public void syncSequence()
+    {
         startSyncSequence();
     }
 
@@ -294,6 +271,26 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
     private void startSyncSequence()
     {
+        //
+        // Initialize sensor device with current
+        // goal data and current time.
+        //
+
+        parent.gattSchedule.add(new BlueTooth.GattAction(getSetUserSettingWithGoal()));
+
+        //
+        // Read todays stuff.
+        //
+
+        BlueTooth.GattAction ga = new BlueTooth.GattAction();
+
+        ga.mode = BlueTooth.GattAction.MODE_READ;
+        ga.characteristic = parent.currentSecondary;
+
+        parent.gattSchedule.add(ga);
+
+        parent.fireNext(false);
+
         syncStatus = HealthData.getStatus("sensor");
 
         long lastSavedDay = 0;
@@ -366,9 +363,11 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
         //
 
         parent.gattSchedule.add(new BlueTooth.GattAction(BlueTooth.GattAction.MODE_DISCONNECT));
+
+        parent.fireNext(false);
     }
 
-    private byte[] getSetUserSettingWithGoalFromPreferences()
+    private byte[] getSetUserSettingWithGoal()
     {
         String keyprefix = "health.sensor";
 

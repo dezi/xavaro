@@ -71,8 +71,17 @@ public class BlueToothGlucose extends BlueTooth
     @Override
     protected void enableDevice()
     {
+        super.enableDevice();
+
         if (isOneTouch) oneTouchDevice.enableDevice();
         if (isMedisana) medisanaDevice.enableDevice();
+    }
+
+    @Override
+    protected void syncSequence()
+    {
+        if (isOneTouch) oneTouchDevice.syncSequence();
+        if (isMedisana) medisanaDevice.syncSequence();
     }
 
     @Override

@@ -60,17 +60,10 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
     public void enableDevice()
     {
-        //
-        // Notify primary.
-        //
+    }
 
-        BlueTooth.GattAction ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
-        ga.characteristic = parent.currentPrimary;
-
-        parent.gattSchedule.add(ga);
-
+    public void syncSequence()
+    {
         //
         // Start sync sequence.
         //

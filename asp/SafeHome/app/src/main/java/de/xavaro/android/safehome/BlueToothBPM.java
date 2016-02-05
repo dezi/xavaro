@@ -66,11 +66,11 @@ public class BlueToothBPM extends BlueTooth
     @Override
     protected void enableDevice()
     {
-        super.enableDevice();
+    }
 
-        Log.d(LOGTAG,"enableDevice: " + deviceName);
-
-        fireNext(true);
+    @Override
+    protected void syncSequence()
+    {
     }
 
     @Override

@@ -885,9 +885,14 @@ public class Simple
     private static final String ISO8601DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String ISO8601DATENOSECS = "yyyy-MM-dd'T'HH:mm'Z'";
 
+    public static long nowAsTimeStamp()
+    {
+        return new Date().getTime();
+    }
+
     public static String nowAsISO()
     {
-        return timeStampAsISO(new Date().getTime());
+        return timeStampAsISO(nowAsTimeStamp());
     }
 
     @Nullable

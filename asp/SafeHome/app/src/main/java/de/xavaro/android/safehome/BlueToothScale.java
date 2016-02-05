@@ -100,6 +100,11 @@ public class BlueToothScale extends BlueTooth
         fireNext(true);
     }
 
+    @Override
+    protected void syncSequence()
+    {
+    }
+
     private Runnable disconnectScale = new Runnable()
     {
         @Override

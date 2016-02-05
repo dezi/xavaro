@@ -28,6 +28,8 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         this.parent = parent;
     }
 
+    //region Interface BlueTooth.BlueToothPhysicalDevice
+
     public boolean isCompatibleService(BluetoothGattService service)
     {
         return service.getUuid().toString().equals("0000fff0-0000-1000-8000-00805f9b34fb");
@@ -50,26 +52,11 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
     public void enableDevice()
     {
-        BlueTooth.GattAction ga;
+    }
 
-        //
-        // Notify primary.
-        //
-
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_NOTIFY;
-        ga.characteristic = parent.currentPrimary;
-
-        parent.gattSchedule.add(ga);
-
-        //
-        // Sync command sequence.
-        //
-
-        startSync();
-
-        parent.fireNext(false);
+    public void syncSequence()
+    {
+        syncSequenceInternal();
     }
 
     public void sendCommand(JSONObject command)
@@ -81,7 +68,11 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         parseResponseInternal(rd, characteristic);
     }
 
-    private void startSync()
+    //endregion Interface BlueTooth.BlueToothPhysicalDevice
+
+    //region Internals
+
+    private void syncSequenceInternal()
     {
         BlueTooth.GattAction ga;
 
@@ -128,9 +119,76 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
         ga.data = getActivityCount();
         parent.gattSchedule.add(ga);
+
+        parent.fireNext(false);
     }
 
-    //region Parse responses.
+    public void parseResponseInternal(byte[] rd, BluetoothGattCharacteristic characteristic)
+    {
+        int command = rd[ 0 ] & 0xff;
+
+        switch (command)
+        {
+            case receive_serialno:
+                parseSerialno(rd);
+                break;
+            case receive_language:
+                parseLanguage(rd);
+                break;
+            case receive_macaddress:
+                parseMacAddress(rd);
+                break;
+            case receive_activity_count:
+                parseActivityCount(rd);
+                break;
+            case receive_activity_value:
+                parseActivityValue(rd);
+                break;
+            case receive_set_screen:
+                parseSetScreen(rd);
+                break;
+            case receive_press_key:
+                parsePressKey(rd);
+                break;
+            case receive_version_code:
+                parseVersion(rd);
+                break;
+            case receive_ack_datetime:
+                parseAckDateTime(rd);
+                break;
+            case receive_ack_call:
+                parseAckCall(rd);
+                break;
+            case receive_ack_daymode:
+                parseAckDayMode(rd);
+                break;
+            case receive_ack_goal:
+                parseAckGoal(rd);
+                break;
+            case receive_ack_timeformat:
+                parseAckTimeFormat(rd);
+                break;
+            case receive_ack_body:
+                parseAckBody(rd);
+                break;
+            case receive_ack_touch_vib:
+                parseAckTouchVibrate(rd);
+                break;
+            case receive_ack_alarm:
+                parseAckAlarm(rd);
+                break;
+            case receive_ack_horzvert:
+                parseAckHorzVert(rd);
+                break;
+            default:
+                Log.d(LOGTAG, "parseResponseInternal: unknown command: " + command);
+                break;
+        }
+    }
+
+    //endregion Internals
+
+    //region Parse responses
 
     public static final int receive_ack_datetime = 129;
     public static final int receive_ack_daymode = 130;
@@ -146,111 +204,9 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
     public static final int receive_serialno = 193;
     public static final int receive_set_screen = 208;
     public static final int receive_press_key = 209;
+    public static final int receive_ack_horzvert = 210;
     public static final int receive_ack_touch_vib = 212;
     public static final int receive_version_code = 240;
-
-    public void parseResponseInternal(byte[] rd, BluetoothGattCharacteristic characteristic)
-    {
-        int command = rd[ 0 ] & 0xff;
-
-        if (command == receive_ack_datetime)
-        {
-            parseAckDateTime(rd);
-            return;
-        }
-
-        if (command == receive_macaddress)
-        {
-            parseMacAddress(rd);
-            return;
-        }
-
-        if (command == receive_activity_count)
-        {
-            parseActivityCount(rd);
-            return;
-        }
-
-        if (command == receive_activity_value)
-        {
-            parseActivityValue(rd);
-            return;
-        }
-
-        if (command == receive_set_screen)
-        {
-            parseSetScreen(rd);
-            return;
-        }
-
-        if (command == receive_press_key)
-        {
-            parsePressKey(rd);
-            return;
-        }
-
-        if (command == receive_version_code)
-        {
-            parseVersion(rd);
-            return;
-        }
-
-        if (command == receive_ack_call)
-        {
-            parseAckCall(rd);
-            return;
-        }
-
-        if (command == receive_ack_daymode)
-        {
-            parseAckDayMode(rd);
-            return;
-        }
-
-        if (command == receive_ack_goal)
-        {
-            parseAckGoal(rd);
-            return;
-        }
-
-        if (command == receive_ack_timeformat)
-        {
-            parseAckTimeFormat(rd);
-            return;
-        }
-
-        if (command == receive_ack_body)
-        {
-            parseAckBody(rd);
-            return;
-        }
-
-        if (command == receive_ack_touch_vib)
-        {
-            parseAckTouchVibrate(rd);
-            return;
-        }
-
-        if (command == receive_ack_alarm)
-        {
-            parseAckAlarm(rd);
-            return;
-        }
-
-        if (command == receive_language)
-        {
-            parseLanguage(rd);
-            return;
-        }
-
-        if (command == receive_serialno)
-        {
-            parseSerialno(rd);
-            return;
-        }
-
-        Log.d(LOGTAG, "parseResponse: command========================================" + command);
-    }
 
     public void parseSetScreen(byte[] rd)
     {
@@ -309,16 +265,29 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         int activitySn = ints[ 1 ];
         int activityCount = ints[ 2 ];
 
-        BlueTooth.GattAction ga;
+        //
+        // Check actuality.
+        //
 
-        for (int inx = 1; inx <= activityCount; inx++)
+        long lastReadDate = 0;
+
+        JSONObject status = HealthData.getStatus("sensor");
+
+        if (status.has("lastReadDate"))
         {
-            ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
-            ga.data = getActivityValue((activitySn + inx) % activityCount, 0);
-            parent.gattSchedule.add(ga);
+            lastReadDate = Simple.getTimeStampFromISO(Json.getString(status, "lastReadDate"));
+        }
+
+        //
+        // Read activity records going backwards in time.
+        //
+
+        for (int inx = activityCount; inx > 0; inx--)
+        {
+            BlueTooth.GattAction ga;
 
             ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
-            ga.data = getActivityValue((activitySn + inx) % activityCount, 6);
+            ga.data = getActivityValue((activitySn + inx) % activityCount, 18);
             parent.gattSchedule.add(ga);
 
             ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
@@ -326,8 +295,14 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
             parent.gattSchedule.add(ga);
 
             ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
-            ga.data = getActivityValue((activitySn + inx) % activityCount, 18);
+            ga.data = getActivityValue((activitySn + inx) % activityCount, 6);
             parent.gattSchedule.add(ga);
+
+            ga = new BlueTooth.GattAction(BlueTooth.GattAction.MODE_WRITE,parent.currentControl);
+            ga.data = getActivityValue((activitySn + inx) % activityCount, 0);
+            parent.gattSchedule.add(ga);
+
+            if ((Simple.nowAsTimeStamp() - lastReadDate) < ((86400L * 1000L) / 2)) break;
         }
 
         parent.fireNext(false);
@@ -335,56 +310,68 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
     public static void parseActivityValue(byte[] rd)
     {
-        int[] ints = new int[ 20 ];
+        int[] ints = new int[ 5 ];
 
-        for (int inx = 0; inx < 20; inx++)
+        for (int inx = 0; inx < ints.length; inx++)
         {
             ints[ inx ] = rd[ inx ] & 0xff;
         }
 
-        if (! (ints[ 1 ] == 0xff || ints[ 2 ] == 0xff))
+        if ((ints[ 1 ] == 0xff) || (ints[ 2 ] == 0xff)) return;
+
+        int year = ints[ 2 ] + (ints[ 1 ] * 100);
+        int month = ints[ 3 ];
+        int day = ints[ 4 ];
+        int hour = ints[ 5 ];
+
+        String timestamp = String.format("%04d-%02d-%02dT%02d:00:00", year, month, day, hour);
+        timestamp += TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT);
+
+        String activity = Simple.getHexBytesToString(rd, 6, 12);
+
+        Log.d(LOGTAG, "parseActivityValue:" + timestamp + "=" + activity);
+
+        //
+        // Check out of range dates.
+        //
+
+        long tendaysago = new Date().getTime();
+        tendaysago -= 86400 * 11 * 1000L;
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        String maxoldest = df.format(new Date(tendaysago));
+
+        if (timestamp.compareTo(maxoldest) >= 0)
         {
-            int year = ints[ 2 ] + (ints[ 1 ] * 100);
-            int month = ints[ 3 ];
-            int day = ints[ 4 ];
-            int hour = ints[ 5 ];
-
-            String timestamp = String.format("%04d-%02d-%02dT%02d:00:00", year, month, day, hour);
-            timestamp += TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT);
-
-            String activity = Simple.getHexBytesToString(rd, 6, 12);
-
-            Log.d(LOGTAG,"parseActivityValue:" + timestamp + "=" + activity);
-
             //
-            // Check out of range dates.
+            // Store data.
             //
 
-            long tendaysago = new Date().getTime();
-            tendaysago -= 86400 * 11 * 1000L;
+            JSONObject record = new JSONObject();
 
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-            df.setTimeZone(TimeZone.getDefault());
-            String maxoldest = df.format(new Date(tendaysago));
+            Json.put(record, "dts", timestamp);
+            Json.put(record, "ada", activity);
 
-            if (timestamp.compareTo(maxoldest) >= 0)
+            HealthData.addRecord("sensor", record);
+
+            //
+            // Update status.
+            //
+
+            JSONObject status = HealthData.getStatus("sensor");
+
+            String lastActivityDate = Json.getString(status, "lastActivityDate");
+
+            if ((lastActivityDate == null) || (timestamp.compareTo(lastActivityDate) >= 0))
             {
-                //
-                // Store data.
-                //
-
-                JSONObject record = new JSONObject();
-
-                Json.put(record, "dts", timestamp);
-                Json.put(record, "ada", activity);
-
-                HealthData.addRecord("sensor", record);
-
-                JSONObject status = HealthData.getStatus("sensor");
-                Json.put(status, "lastActivityDate", timestamp);
-                Json.put(status, "lastReadDate", Simple.nowAsISO());
-                HealthData.putStatus("sensor", status);
+                lastActivityDate = timestamp;
             }
+
+            Json.put(status, "lastActivityDate", lastActivityDate);
+            Json.put(status, "lastReadDate", Simple.nowAsISO());
+
+            HealthData.putStatus("sensor", status);
         }
     }
 
@@ -440,6 +427,11 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
     public void parseAckAlarm(byte[] rd)
     {
         Log.d(LOGTAG, "parseAckAlarm: ACK");
+    }
+
+    public void parseAckHorzVert(byte[] rd)
+    {
+        Log.d(LOGTAG, "parseAckHorzVert: ACK");
     }
 
     //endregion Parse responses
