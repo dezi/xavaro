@@ -52,6 +52,7 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
     public void enableDevice()
     {
+        syncIntentional = false;
     }
 
     public void syncSequence()
@@ -214,6 +215,9 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
     public static final int TYPE_SCREEN_STEPS = 33;
     public static final int TYPE_SCREEN_BURNEDCALS = 224;
 
+    private boolean syncIntentional;
+    private int todaysSteps;
+
     public void parseSetScreen(byte[] rd)
     {
         Log.d(LOGTAG, "parseSetScreen: " + (rd[ 2 ] & 0xff));
@@ -229,6 +233,8 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
             if (parent.gattSchedule.size() == 0)
             {
+                syncIntentional = true;
+
                 parent.callOnBluetoothFakeConnect();
 
                 BlueTooth.GattAction ga;
@@ -334,6 +340,8 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
             if ((Simple.nowAsTimeStamp() - lastReadDate) < ((86400L * 1000L) / 2)) break;
         }
 
+        todaysSteps = 0;
+
         parent.fireNext(false);
     }
 
@@ -356,9 +364,36 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         String timestamp = String.format("%04d-%02d-%02dT%02d:00:00", year, month, day, hour);
         timestamp += TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT);
 
-        String activity = Simple.getHexBytesToString(rd, 6, 12);
+        byte[] todayact = new byte[ 12 ];
+        System.arraycopy(rd, 6, todayact, 0, 12);
+
+        String activity = Simple.getHexBytesToString(todayact);
 
         Log.d(LOGTAG, "parseActivityValue:" + timestamp + "=" + activity);
+
+        //
+        // Check today range dates.
+        //
+
+
+        Calendar instance = Calendar.getInstance();
+
+        String today = String.format("%04d-%02d-%02d",
+                instance.get(Calendar.YEAR),
+                instance.get(Calendar.MONTH) + 1,
+                instance.get(Calendar.DAY_OF_MONTH));
+
+        if (timestamp.startsWith(today))
+        {
+            for (int inx = 0; inx < todayact.length; inx += 2)
+            {
+                if ((todayact[ inx ] & 0xff) == 0xff) continue;
+
+                int steps = ((todayact[ inx ] & 0xff) << 8) + (todayact[ inx + 1 ] & 0xff);
+
+                todaysSteps += steps;
+            }
+        }
 
         //
         // Check out of range dates.
@@ -405,6 +440,30 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
         if (parent.gattSchedule.size() == 0)
         {
+            if (syncIntentional)
+            {
+                //
+                // Send today steps message to user interface.
+                //
+
+                JSONObject sensordata = new JSONObject();
+
+                Json.put(sensordata, "type", "TodaysData");
+                Json.put(sensordata, "steps", todaysSteps);
+
+                JSONObject data = new JSONObject();
+                Json.put(data, "sensor", sensordata);
+
+                if (parent.dataCallback != null)
+                {
+                    parent.dataCallback.onBluetoothReceivedData(parent.deviceName, data);
+                }
+            }
+
+            //
+            // Fake a disconnect.
+            //
+
             parent.callOnBluetoothFakeDisconnect();
         }
     }

@@ -53,7 +53,14 @@ public class HealthSensor extends HealthBase
             {
                 int steps = Json.getInt(lastRecord, "steps");
 
-                DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
+                if (steps == 0)
+                {
+                    DitUndDat.SpeekDat.speak("Sie sind heute noch keine Schritte gegangen");
+                }
+                else
+                {
+                    DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
+                }
             }
         }
     };

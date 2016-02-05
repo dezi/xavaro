@@ -951,6 +951,13 @@ public class Simple
         return df.format(new Date(getTimeStampFromISO(isodate)));
     }
 
+    public static String getLocalDateFromTimeStamp(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(new Date(timeStamp));
+    }
+
     public static String getLocalDateFromISO(String isodate)
     {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
