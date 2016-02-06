@@ -47,7 +47,7 @@ public class HealthBPM extends HealthBase
 
         if (Simple.equals(type, "BPMMeasurement"))
         {
-            String date = Json.getString(lastRecord, "utc");
+            String date = Json.getString(lastRecord, "dts");
             if (date == null) return;
 
             int systolic = Json.getInt(lastRecord, "sys");
@@ -68,11 +68,10 @@ public class HealthBPM extends HealthBase
     }
 
     JSONObject lastRecord;
-
+    String lastDate;
     int lastSystolic;
     int lastDiastolic;
     int lastPulse;
-    String lastDate;
 
     private Runnable messageSpeaker = new Runnable()
     {

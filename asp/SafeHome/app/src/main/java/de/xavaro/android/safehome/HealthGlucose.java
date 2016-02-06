@@ -37,7 +37,7 @@ public class HealthGlucose extends HealthBase
         lastRecord = Json.getObject(data, "glucose");
 
         handler.removeCallbacks(messageSpeaker);
-        handler.postDelayed(messageSpeaker, 500);
+        handler.postDelayed(messageSpeaker, 1000);
     }
 
     private JSONObject lastRecord;

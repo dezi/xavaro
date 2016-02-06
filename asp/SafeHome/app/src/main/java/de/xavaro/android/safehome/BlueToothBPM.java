@@ -66,11 +66,13 @@ public class BlueToothBPM extends BlueTooth
     @Override
     protected void enableDevice()
     {
+        super.enableDevice();
     }
 
     @Override
     protected void syncSequence()
     {
+        fireNext(false);
     }
 
     @Override

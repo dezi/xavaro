@@ -341,8 +341,6 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         }
 
         todaysSteps = 0;
-
-        parent.fireNext(false);
     }
 
     public void parseActivityValue(byte[] rd)
@@ -361,8 +359,10 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         int day = ints[ 4 ];
         int hour = ints[ 5 ];
 
-        String timestamp = String.format("%04d-%02d-%02dT%02d:00:00", year, month, day, hour);
-        timestamp += TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month - 1, day, hour, 0 , 0);
+
+        String timestamp = Simple.timeStampAsISO(calendar.getTimeInMillis());
 
         byte[] todayact = new byte[ 12 ];
         System.arraycopy(rd, 6, todayact, 0, 12);
@@ -375,15 +375,13 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
         // Check today range dates.
         //
 
+        calendar.setTime(new Date());
 
-        Calendar instance = Calendar.getInstance();
+        int nowyear = calendar.get(Calendar.YEAR);
+        int nowmonth = calendar.get(Calendar.MONTH) + 1;
+        int nowday = calendar.get(Calendar.DAY_OF_MONTH);
 
-        String today = String.format("%04d-%02d-%02d",
-                instance.get(Calendar.YEAR),
-                instance.get(Calendar.MONTH) + 1,
-                instance.get(Calendar.DAY_OF_MONTH));
-
-        if (timestamp.startsWith(today))
+        if ((year == nowyear) && (month == nowmonth) && (day == nowday))
         {
             for (int inx = 0; inx < todayact.length; inx += 2)
             {
@@ -401,10 +399,7 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
         long tendaysago = new Date().getTime();
         tendaysago -= 86400 * 11 * 1000L;
-
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-        df.setTimeZone(TimeZone.getDefault());
-        String maxoldest = df.format(new Date(tendaysago));
+        String maxoldest = Simple.timeStampAsISO(tendaysago);
 
         if (timestamp.compareTo(maxoldest) >= 0)
         {
@@ -415,7 +410,7 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
             JSONObject record = new JSONObject();
 
             Json.put(record, "dts", timestamp);
-            Json.put(record, "ada", activity);
+            Json.put(record, "wda", activity);
 
             HealthData.addRecord("sensor", record);
 
@@ -449,7 +444,7 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
                 JSONObject sensordata = new JSONObject();
 
                 Json.put(sensordata, "type", "TodaysData");
-                Json.put(sensordata, "steps", todaysSteps);
+                Json.put(sensordata, "stp", todaysSteps);
 
                 JSONObject data = new JSONObject();
                 Json.put(data, "sensor", sensordata);

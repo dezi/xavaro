@@ -409,14 +409,6 @@ public abstract class BlueTooth extends BroadcastReceiver
                 if (ga.mode == GattAction.MODE_DISCONNECT)
                 {
                     currentGatt.disconnect();
-                    currentGatt.close();
-                    currentGatt = null;
-
-                    //
-                    // Give disconnect penalty time.
-                    //
-
-                    gattHandler.postDelayed(connectRunnable, 30000);
                 }
             }
         }
@@ -455,17 +447,6 @@ public abstract class BlueTooth extends BroadcastReceiver
             OopsService.log(LOGTAG, ex);
         }
     }
-
-    private final Runnable runConnectGatt = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            Log.d(LOGTAG, "runConnectGatt: " + deviceName);
-
-            currentGatt.connect();
-        }
-    };
 
     private final Runnable runCreateBonding = new Runnable()
     {
@@ -696,38 +677,21 @@ public abstract class BlueTooth extends BroadcastReceiver
                         + "=" + currentGatt.getDevice().getName()
                         + "=" + currentGatt.getDevice().getBondState());
 
-                if (currentPrimary == null)
-                {
-                    gattHandler.postDelayed(runDiscoverServices, 400);
-                }
-                else
-                {
-                    if (isSpecialBonding() && (currentGatt.getDevice().getBondState() == 10))
-                    {
-                        gattHandler.postDelayed(runCreateBonding, 0);
-                    }
-                    else
-                    {
-                        gattHandler.postDelayed(runEnableAndSync, 0);
-                    }
-                }
+                gattHandler.postDelayed(runDiscoverServices, 100);
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)
             {
                 Log.d(LOGTAG, "onConnectionStateChange: device " + devicetag + " disconnected");
 
+                gattSchedule.clear();
                 currentConnectState = false;
+                currentGatt.close();
+                currentGatt = null;
 
                 if (connectCallback != null) connectCallback.onBluetoothDisconnect(deviceName);
 
-                if (isSpecialBonding())
-                {
-                    currentGatt.close();
-                    currentGatt = null;
-
-                    gattHandler.post(connectRunnable);
-                }
+                gattHandler.post(connectRunnable);
             }
         }
 
@@ -816,16 +780,7 @@ public abstract class BlueTooth extends BroadcastReceiver
                         + " => "
                         + currentGatt.getDevice().getBondState());
 
-                if (isSpecialBonding() && (currentGatt.getDevice().getBondState() == 10))
-                {
-                    gatt.disconnect();
-
-                    gattHandler.postDelayed(runCreateBonding, 0);
-                }
-                else
-                {
-                    if (currentPrimary != null) gattHandler.postDelayed(runEnableAndSync, 0);
-                }
+                if (currentPrimary != null) gattHandler.postDelayed(runEnableAndSync, 0);
             }
         }
 

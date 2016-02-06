@@ -103,6 +103,17 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
                 sensordata.put("type", "TodaysData");
 
+                Calendar calendar = Calendar.getInstance();
+
+                calendar.setTime(new Date());
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+
+                long targetday = calendar.getTimeInMillis();
+
+                sensordata.put("dts", Simple.timeStampAsISO(targetday));
+
                 byte[] data = new byte[ 4 ];
 
                 data[ 0 ] = 0;
@@ -110,14 +121,23 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
                 data[ 2 ] = rd[ 1 ];
                 data[ 3 ] = rd[ 0 ];
 
-                sensordata.put("steps", BlueTooth.convertBytesToInt(data));
+                sensordata.put("stp", BlueTooth.convertBytesToInt(data));
 
                 data[ 0 ] = 0;
                 data[ 1 ] = 0;
                 data[ 2 ] = rd[ 7 ];
                 data[ 3 ] = rd[ 6 ];
 
-                sensordata.put("sleep", BlueTooth.convertBytesToInt(data));
+                sensordata.put("sle", BlueTooth.convertBytesToInt(data));
+
+                //
+                // Store data.
+                //
+
+                JSONObject record = Json.clone(sensordata);
+                Json.remove(record, "type");
+
+                HealthData.addRecord("sensor", record);
             }
 
             if (rd.length == 17)
@@ -130,7 +150,18 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
                 int day = rd[ 0 ];
 
-                long targetday = ((new Date().getTime() / 86400000L) - (day + 1)) * 86400000L;
+                Calendar calendar = Calendar.getInstance();
+
+                calendar.setTime(new Date());
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+
+                long targetday = calendar.getTimeInMillis();
+
+                targetday /= 1000L;
+                targetday -= (day + 1) * 86400;
+                targetday *= 1000L;
 
                 sensordata.put("dts", Simple.timeStampAsISO(targetday));
 
@@ -207,27 +238,18 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
                 int position = (rd[ 0 ] & 0x7f) + (rd[ 1 ] << 7);
 
                 long tenminutes = 10 * 60;
-                long dayminutes = 1440 * 60;
-
                 long postime = ((new Date().getTime() / 1000L) / tenminutes)  * tenminutes;
                 postime -= position * tenminutes;
-
-                long daytime = (postime / dayminutes) * dayminutes;
-
                 postime *= 1000L;
-                daytime *= 1000L;
 
-                String activityday  = Simple.timeStampAsISO(daytime);
-                String activityhour = "s" + Simple.get24HHourFromTimeStamp(postime);
-
-                sensordata.put("dts", activityday);
+                sensordata.put("dts", Simple.timeStampAsISO(postime));
 
                 byte[] sd = new byte[ 18 ];
-                int cnt = 0;
 
+                int cnt = 0;
                 for (int inx = rd.length - 1; inx >= 2; inx--) sd[ cnt++ ] = rd[ inx ];
 
-                sensordata.put(activityhour, Simple.getHexBytesToString(sd));
+                sensordata.put("sda", Simple.getHexBytesToString(sd));
 
                 //
                 // Store data.
@@ -237,14 +259,6 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
                 Json.remove(record, "type");
 
                 HealthData.addRecord("sensor", record);
-
-                //
-                // Round position time to next 3 hour fragment.
-                //
-
-                postime /= 1000L;
-                postime = (postime / (3 * 3600)) * (3 * 3600);
-                postime *= 1000L;
 
                 String lastSavedAct = Simple.timeStampAsISO(postime);
 
@@ -291,35 +305,41 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
         parent.fireNext(false);
 
+        //
+        // Get sync status.
+        //
+
         syncStatus = HealthData.getStatus("sensor");
 
+        //
+        // Compute time stuff for step day history records.
+        //
+
         long lastSavedDay = 0;
-        long lastSavedAct = 0;
 
         if (syncStatus.has("lastSavedDay"))
         {
             lastSavedDay = Simple.getTimeStampFromISO(Json.getString(syncStatus, "lastSavedDay"));
             lastSavedDay /= 1000L;
-            lastSavedDay /= 86400L;
-        }
-
-        if (syncStatus.has("lastSavedAct"))
-        {
-            lastSavedAct = Simple.getTimeStampFromISO(Json.getString(syncStatus, "lastSavedAct"));
-            lastSavedAct /= 1000L;
-            lastSavedAct /= 86400L;
         }
 
         //
         // Get no more than ten days back.
         //
 
-        long today = new Date().getTime();
-        today /= 1000L;
-        today /= 86400L;
+        Calendar calendar = Calendar.getInstance();
 
-        long todoSavedDay = ((today - lastSavedDay) > 10) ? (today - 10) : lastSavedDay;
-        long todoSavedAct = ((today - lastSavedAct) > 10) ? (today - 10) : lastSavedAct;
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        long today = calendar.getTimeInMillis();
+        today /= 1000L;
+
+        long tendays = 86400 * 10;
+
+        long todoSavedDay = ((today - lastSavedDay) > tendays) ? (today - tendays) : lastSavedDay;
 
         //
         // Schedule activity days.
@@ -327,9 +347,9 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
         while (todoSavedDay < today)
         {
-            todoSavedDay += 1;
+            todoSavedDay += 86400;
 
-            int day = (int) (today - todoSavedDay);
+            int day = (int) ((today - todoSavedDay) / 86400);
 
             Log.d(LOGTAG, "startSyncSequence: schedule day:" + day);
 
@@ -340,22 +360,43 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
         // Schedule sleep data positions.
         //
 
-        long todaysecs = new Date().getTime();
-        todaysecs /= 1000L;
-        todaysecs -= today * 86400L;
+        long lastSavedAct = 0;
 
-        int todaypositions = ((int) todaysecs) / 600;
-
-        int position = ((int) (today - todoSavedAct)) * 8 * 18;
-        position += todaypositions;
-
-        while (position > todaypositions)
+        if (syncStatus.has("lastSavedAct"))
         {
-            Log.d(LOGTAG, "startSyncSequence: schedule position:" + position);
+            lastSavedAct = Simple.getTimeStampFromISO(Json.getString(syncStatus, "lastSavedAct"));
+            lastSavedAct /= 1000L;
+        }
 
-            parent.gattSchedule.add(new BlueTooth.GattAction(getSleepHistoryData(position)));
+        long now = new Date().getTime();
 
-            position -= 18;
+        calendar.setTimeInMillis(now);
+        calendar.set(Calendar.MINUTE, (calendar.get(Calendar.MINUTE) / 10) * 10);
+        calendar.set(Calendar.SECOND, 0);
+
+        long nowtenminutes = calendar.getTimeInMillis() / 1000L;
+
+        calendar.set(Calendar.HOUR_OF_DAY, (calendar.get(Calendar.HOUR_OF_DAY) / 3) * 3);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        long nowthreehours = calendar.getTimeInMillis() / 1000L;
+
+        int startposition = (int) ((nowtenminutes - nowthreehours) / (10 * 60));
+        int lastposition = startposition + (10 * 8 * 18);
+
+        while (lastposition >= startposition)
+        {
+            long positiontime = nowtenminutes - (lastposition * 10 * 60);
+
+            if (positiontime >= lastSavedAct)
+            {
+                Log.d(LOGTAG, "startSyncSequence: schedule position:" + lastposition);
+
+                parent.gattSchedule.add(new BlueTooth.GattAction(getSleepHistoryData(lastposition)));
+            }
+
+            lastposition -= 18;
         }
 
         //

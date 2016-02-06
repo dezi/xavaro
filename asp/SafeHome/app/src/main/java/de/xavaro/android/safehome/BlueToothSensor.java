@@ -11,6 +11,7 @@ import org.json.JSONObject;
 //
 //  dts => ISO timestamp
 //  stp => Number of steps
+//  sle => Sleep time
 //  ext => Exercise time
 //  goa => Goal value
 //  gou => Goal unit (0 = steps, 1 = calories)
@@ -18,8 +19,9 @@ import org.json.JSONObject;
 //  diu => Distance unit (0 = km, 1 = miles)
 //  cps => Calories burned per 10.000 steps
 //  BMR => Basal metabolic rate
-//  s00 => Activity values per 3 hours fragment
-//  s03 => ...
+//
+//  wda => Wristband activity data
+//  sda => Sanitas activity data
 //
 
 public class BlueToothSensor extends BlueTooth

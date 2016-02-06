@@ -903,6 +903,17 @@ public class Simple
         return df.format(new Date(timestamp));
     }
 
+    @Nullable
+    public static String timeStampUTCAsLocalISO(long timestamp)
+    {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String isotime = df.format(new Date(timestamp));
+        isotime += TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT);
+
+        return isotime;
+    }
+
     public static long getTimeStampFromISO(String isodate)
     {
         try

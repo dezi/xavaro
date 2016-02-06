@@ -51,7 +51,7 @@ public class HealthSensor extends HealthBase
 
             if (Simple.equals(type, "TodaysData"))
             {
-                int steps = Json.getInt(lastRecord, "steps");
+                int steps = Json.getInt(lastRecord, "stp");
 
                 if (steps == 0)
                 {

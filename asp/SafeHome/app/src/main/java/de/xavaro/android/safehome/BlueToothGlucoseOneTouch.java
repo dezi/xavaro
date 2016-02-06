@@ -408,13 +408,7 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
     {
         Log.d(LOGTAG, "getReadGlucoseRecord");
 
-        boolean initial = false;
-
-        if (status == null)
-        {
-            status = HealthData.getStatus("glucose");
-            initial = true;
-        }
+        if (status == null) status = HealthData.getStatus("glucose");
 
         lastTestCount = status.has("lastTestCount") ? Json.getInt(status, "lastTestCount") : 0;
 
@@ -422,30 +416,16 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
         if (lastTestCount >= testCount)
         {
-            if (initial)
-            {
-                //
-                // Reread the last mesurement.
-                //
+            Log.d(LOGTAG, "getReadGlucoseRecord no new data");
+            status = null;
 
-                lastTestCount = testCount - 1;
-            }
-            else
-            {
-                Log.d(LOGTAG, "getReadGlucoseRecord no new data");
-                status = null;
+            //
+            // Fake a disconnect.
+            //
 
-                //
-                // Force disconnect.
-                //
+            parent.callOnBluetoothFakeDisconnect();
 
-                parent.gattSchedule.add(new BlueTooth.GattAction(
-                        BlueTooth.GattAction.MODE_DISCONNECT));
-
-                parent.fireNext(false);
-
-                return null;
-            }
+            return null;
         }
 
         Json.put(status, "lastTestCount", ++lastTestCount);

@@ -359,9 +359,7 @@ public class BlueToothScale extends BlueTooth
 
                 Log.d(LOGTAG, "parseData: ScaleSleepWithStatus is sleeping, ignore");
 
-                currentGatt.disconnect();
-
-                gattHandler.postDelayed(connectRunnable, 10000);
+                callOnBluetoothFakeDisconnect();
 
                 return false;
             }
