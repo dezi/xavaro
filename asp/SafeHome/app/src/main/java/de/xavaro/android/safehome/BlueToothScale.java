@@ -320,10 +320,17 @@ public class BlueToothScale extends BlueTooth
 
         if (Simple.equals(type, "UserCreated"))
         {
-            Json.put(nextCommand, "command", "getTakeUserMeasurementFromPreferences");
+            //Json.put(nextCommand, "command", "getTakeUserMeasurementFromPreferences");
+            Json.put(nextCommand, "command", "getUserMeasurements");
         }
 
         if (Simple.equals(type, "UserUpdated"))
+        {
+            //Json.put(nextCommand, "command", "getTakeUserMeasurementFromPreferences");
+            Json.put(nextCommand, "command", "getUserMeasurements");
+        }
+
+        if (Simple.equals(type, "UserMeasurements"))
         {
             Json.put(nextCommand, "command", "getTakeUserMeasurementFromPreferences");
         }
