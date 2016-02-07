@@ -75,6 +75,12 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final int IconResXavaro             = R.drawable.communication_400x400;
+    public static final int IconResMedia              = R.drawable.media_images_512x512;
+    public static final int IconResMediaImage         = R.drawable.media_images_512x512;
+    public static final int IconResMediaAudio         = R.drawable.media_audio_512x512;
+    public static final int IconResMediaVideo         = R.drawable.media_video_318x318;
+    public static final int IconResMediaEbook         = R.drawable.media_ebook_280x280;
+    public static final int IconResMediaCamera        = R.drawable.media_camera_512x512;
     public static final int IconResCommunication      = R.drawable.communication_400x400;
     public static final int IconResCommChatUser       = R.drawable.commchatuser_400x400;
     public static final int IconResCommChatGroup      = R.drawable.commchatgroup_400x400;

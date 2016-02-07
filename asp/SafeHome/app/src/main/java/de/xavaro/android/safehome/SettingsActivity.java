@@ -95,6 +95,15 @@ public class SettingsActivity extends PreferenceActivity
         target.add(HealthPreferences.HealthUnitsFragment.getHeader());
 
         category = new Header();
+        category.title = "Medien";
+        target.add(category);
+
+        target.add(MediaPreferences.MediaImageFragment.getHeader());
+        target.add(MediaPreferences.MediaAudioFragment.getHeader());
+        target.add(MediaPreferences.MediaVideoFragment.getHeader());
+        target.add(MediaPreferences.MediaEbookFragment.getHeader());
+
+        category = new Header();
         category.title = "Internet Media Streaming";
         target.add(category);
 
