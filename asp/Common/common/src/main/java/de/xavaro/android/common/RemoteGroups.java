@@ -7,6 +7,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class RemoteGroups
@@ -115,10 +116,12 @@ public class RemoteGroups
         Json.put(group, "groupidentity", groupidentity);
         Json.put(group, "type", Simple.getPreferenceString(groupprefix + ".type"));
         Json.put(group, "owner", SystemIdentity.getIdentity());
-        Json.put(group, "passphrase", Simple.getPreferenceString(groupprefix + ".passphrase"));
+        Json.put(group, "passPhrase", Simple.getPreferenceString(groupprefix + ".passphrase"));
         Json.put(group, "name", Simple.getPreferenceString(groupprefix + ".name"));
 
-        updateGroup(group, true);
+        boolean dirty = updateGroup(group);
+
+        ArrayList<String> dirtylist = new ArrayList<>();
 
         //
         // We add ourselves first and can never exit group.
@@ -130,7 +133,7 @@ public class RemoteGroups
         Json.put(ourselves, "groupstatus", "invited");
         Json.put(ourselves, "userstatus", "joined");
 
-        updateMember(groupidentity, ourselves, true);
+        if (updateMember(groupidentity, ourselves)) dirtylist.add(SystemIdentity.getIdentity());
 
         String keyprefix = groupprefix + ".member.";
         Map<String, Object> members = Simple.getAllPreferences(keyprefix);
@@ -158,21 +161,77 @@ public class RemoteGroups
             Json.put(minfo, "identity", memberident);
             Json.put(minfo, "groupstatus", memberstatus);
 
-            updateMember(groupidentity, minfo, true);
+            if (updateMember(groupidentity, minfo)) dirtylist.add(memberident);
+        }
+
+        //
+        // Now send final group information to all individual members
+        // to exchange groups passphrase with individual encryption.
+        //
+
+        JSONObject finalGroup = getGroup(groupidentity);
+        JSONArray finalMembers = Json.getArray(finalGroup, "members");
+
+        //if (dirty)
+        {
+            JSONObject pubgroup = Json.clone(finalGroup);
+            Json.remove(pubgroup, "members");
+
+            for (int send = 0; send < finalMembers.length(); send++)
+            {
+                JSONObject finalMember = Json.getObject(finalMembers, send);
+                String fmIdentity = Json.getString(finalMember, "identity");
+                if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
+
+                JSONObject groupStatusUpdate = new JSONObject();
+
+                Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
+                Json.put(groupStatusUpdate, "idremote", fmIdentity);
+                Json.put(groupStatusUpdate, "remotegroup", pubgroup);
+
+                Log.d(LOGTAG, "updateGroup=============>" + fmIdentity);
+
+                CommService.sendEncrypted(groupStatusUpdate, true);
+            }
+        }
+
+        for (int inx = 0; inx < finalMembers.length(); inx++)
+        {
+            JSONObject pubmember = Json.clone(Json.getObject(finalMembers, inx));
+
+            JSONObject pubgroup = new JSONObject();
+            Json.put(pubgroup, "groupidentity", groupidentity);
+            Json.put(pubgroup, "member", pubmember);
+
+            for (int send = 0; send < finalMembers.length(); send++)
+            {
+                JSONObject finalMember = Json.getObject(finalMembers, send);
+                String fmIdentity = Json.getString(finalMember, "identity");
+                if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
+
+                JSONObject groupMemberUpdate = new JSONObject();
+
+                Json.put(groupMemberUpdate, "type", "groupMemberUpdate");
+                Json.put(groupMemberUpdate, "idremote", fmIdentity);
+                Json.put(groupMemberUpdate, "remotegroup", pubgroup);
+
+                Log.d(LOGTAG, "updateMember=============>" + fmIdentity);
+
+                CommService.sendEncrypted(groupMemberUpdate, true);
+            }
         }
     }
 
-    public static boolean updateGroup(JSONObject group, boolean publish)
+    public static boolean updateGroup(JSONObject group)
     {
         String groupidentity = Json.getString(group, "groupidentity");
         if (groupidentity == null) return false;
 
-        JSONObject oldgroup = null;
         boolean dirty = false;
 
         synchronized (LOGTAG)
         {
-            oldgroup = getGroup(groupidentity);
+            JSONObject oldgroup = getGroup(groupidentity);
 
             if (oldgroup == null)
             {
@@ -196,9 +255,9 @@ public class RemoteGroups
                     dirty = true;
                 }
 
-                if (! Json.equals(oldgroup, "passphrase", group))
+                if (! Json.equals(oldgroup, "passPhrase", group))
                 {
-                    Json.copy(oldgroup, "passphrase", group);
+                    Json.copy(oldgroup, "passPhrase", group);
                     dirty = true;
                 }
             }
@@ -206,32 +265,32 @@ public class RemoteGroups
             if (dirty) putGroup(oldgroup);
         }
 
-        if (dirty && publish)
+        //
+        // Make sure, the actual group passphrase is
+        // known in our system identities.
+        //
+
+        if (group.has("passPhrase"))
         {
-            JSONObject pubgroup = Json.clone(oldgroup);
-            Json.remove(pubgroup, "members");
+            String passPhrase = Json.getString(group, "passPhrase");
 
-            JSONObject groupStatusUpdate = new JSONObject();
+            IdentityManager.put(groupidentity, "passPhrase", passPhrase);
 
-            Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
-            Json.put(groupStatusUpdate, "idremote", groupidentity);
-            Json.put(groupStatusUpdate, "remotegroup", pubgroup);
-
-            CommService.sendEncrypted(groupStatusUpdate, true);
+            Simple.makeToast("groupStatusUpdate=" + groupidentity + " => " + passPhrase);
         }
 
-        return true;
+        return dirty;
     }
 
-    public static boolean updateMember(String groupidentity, JSONObject member, boolean publish)
+    public static boolean updateMember(String groupidentity, JSONObject member)
     {
-        JSONObject oldgroup = null;
-        JSONObject oldmember = null;
         boolean dirty = false;
+
+        Simple.makeToast("groupMemberUpdate=" + member.toString());
 
         synchronized (LOGTAG)
         {
-            oldgroup = getGroup(groupidentity);
+            JSONObject oldgroup = getGroup(groupidentity);
             if (oldgroup == null) return false;
 
             String ident = Json.getString(member, "identity");
@@ -246,7 +305,7 @@ public class RemoteGroups
 
             for (int inx = 0; inx < members.length(); inx++)
             {
-                oldmember = Json.getObject(members, inx);
+                JSONObject oldmember = Json.getObject(members, inx);
                 if (oldmember == null) continue;
 
                 if (! Simple.equals(Json.getString(oldmember, "identity"), ident)) continue;
@@ -270,29 +329,13 @@ public class RemoteGroups
             if ((! wasold) && (! inactive))
             {
                 Json.put(members, member);
-                oldmember = member;
                 dirty = true;
             }
 
             if (dirty) putGroup(oldgroup);
         }
 
-        if (dirty && publish)
-        {
-            JSONObject pubgroup = new JSONObject();
-            Json.put(pubgroup, "groupidentity", groupidentity);
-            Json.put(pubgroup, "member", oldmember);
-
-            JSONObject groupMemberUpdate = new JSONObject();
-
-            Json.put(groupMemberUpdate, "type", "groupMemberUpdate");
-            Json.put(groupMemberUpdate, "idremote", groupidentity);
-            Json.put(groupMemberUpdate, "remotegroup", pubgroup);
-
-            CommService.sendEncrypted(groupMemberUpdate, true);
-        }
-
-        return true;
+        return dirty;
     }
 
     //endregion Group updates

@@ -60,6 +60,11 @@ public class PersistManager
         }
     }
 
+    public static JSONObject getRoot()
+    {
+        return settings;
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void flush()
     {

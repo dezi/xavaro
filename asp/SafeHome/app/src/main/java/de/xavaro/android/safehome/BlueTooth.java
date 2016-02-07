@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 
@@ -34,7 +32,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 {
     private static final String LOGTAG = BlueTooth.class.getSimpleName();
 
-    protected boolean needlog = true;
+    protected final boolean needlog = true;
 
     protected final Context context;
     protected final BluetoothAdapter bta;
@@ -48,8 +46,6 @@ public abstract class BlueTooth extends BroadcastReceiver
     public BluetoothGattCharacteristic currentPrimary;
     public BluetoothGattCharacteristic currentSecondary;
     public BluetoothGattCharacteristic currentControl;
-    public BluetoothGattCharacteristic currentChanged;
-    public BluetoothGattCharacteristic currentSerial;
 
     protected BlueToothDiscoverCallback discoverCallback;
     protected BlueToothConnectCallback connectCallback;
@@ -83,7 +79,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     }
 
-    public Runnable connectRunnable = new Runnable()
+    public final Runnable connectRunnable = new Runnable()
     {
         @Override
         public void run()
@@ -119,9 +115,6 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     public boolean isDiscovering;
     public int discoverBGJobs;
-
-    public boolean discoverLE = true;
-    public boolean discoverClassic = false;
 
     public void discover(BlueToothDiscoverCallback callback)
     {
@@ -163,7 +156,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     }
 
-    public Runnable abortDiscoveryRunnable = new Runnable()
+    public final Runnable abortDiscoveryRunnable = new Runnable()
     {
         @Override
         public void run()
@@ -219,15 +212,7 @@ public abstract class BlueTooth extends BroadcastReceiver
                     + "=" + device.getBondState()
                     + "=" + getDeviceTypeString(device.getType()));
 
-            if (discoverClassic && ((device.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC) ||
-                    (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
-            {
-                Log.d(LOGTAG, "onReceive: fetchUuidsWithSdp=" + device.getName());
-                device.fetchUuidsWithSdp();
-                discoverBGJobs++;
-            }
-
-            if (discoverLE && ((device.getType() == BluetoothDevice.DEVICE_TYPE_LE) ||
+            if (((device.getType() == BluetoothDevice.DEVICE_TYPE_LE) ||
                     (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
             {
                 deviceName = device.getName();
@@ -262,7 +247,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     //region Device communication handling
 
-    protected Handler gattHandler;
+    protected final Handler gattHandler;
     protected final ArrayList<GattAction> gattSchedule = new ArrayList<>();
 
     public static class GattAction
@@ -448,6 +433,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     }
 
+    @SuppressWarnings("unused")
     private final Runnable runCreateBonding = new Runnable()
     {
         @Override
@@ -458,11 +444,11 @@ public abstract class BlueTooth extends BroadcastReceiver
             final IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
             context.registerReceiver(bondingReceiver, filter);
 
-            if (currentGatt != null) currentGatt.getDevice().createBond();
+            if (currentGatt != null) pairDevice(currentGatt.getDevice());
         }
     };
 
-    private Runnable runDiscoverServices = new Runnable()
+    private final Runnable runDiscoverServices = new Runnable()
     {
         @Override
         public void run()
@@ -487,7 +473,7 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     };
 
-    private BroadcastReceiver bondingReceiver = new BroadcastReceiver()
+    private final BroadcastReceiver bondingReceiver = new BroadcastReceiver()
     {
         @Override
         public void onReceive(final Context context, final Intent intent)
@@ -517,143 +503,6 @@ public abstract class BlueTooth extends BroadcastReceiver
             }
         }
     };
-
-    protected List<BluetoothGattService> loadBluetoothGattServices(String macAddress)
-    {
-        String macplain = macAddress.replace(":","-");
-        String filename = macplain + ".BluetoothGattServices.json";
-
-        String content = Simple.readDatadirFile(filename);
-        if (content == null) return null;
-        JSONObject parcel = Json.fromString(content);
-        if (parcel == null) return null;
-
-        JSONArray jservices = Json.getArray(parcel, "BluetoothGattServices");
-        if (jservices == null) return null;
-
-        try
-        {
-            List<BluetoothGattService> list = new ArrayList<>();
-
-            for (int srv = 0; srv < jservices.length(); srv++)
-            {
-                JSONObject jservice = Json.getObject(jservices, srv);
-
-                String srvuuidstr = Json.getString(jservice, "uuid");
-                if (srvuuidstr == null) continue;
-                UUID srvuuid = UUID.fromString(srvuuidstr);
-
-                int type = Json.getInt(jservice, "type");
-
-                BluetoothGattService service = new BluetoothGattService(srvuuid, type);
-
-                list.add(service);
-
-                JSONArray jcharacteristics = Json.getArray(jservice, "characteristics");
-                if (jcharacteristics == null) continue;
-
-                for (int chr = 0; chr < jcharacteristics.length(); chr++)
-                {
-                    JSONObject jcharacteristic = Json.getObject(jcharacteristics, chr);
-
-                    String chruuidstr = Json.getString(jcharacteristic, "uuid");
-                    if (chruuidstr == null) continue;
-                    UUID chruuid = UUID.fromString(chruuidstr);
-
-                    int chrproperties = Json.getInt(jcharacteristic, "properties");
-                    int chrpermissions = Json.getInt(jcharacteristic, "permissions");
-
-                    BluetoothGattCharacteristic characteristic
-                            = new BluetoothGattCharacteristic(
-                            chruuid, chrproperties, chrpermissions);
-
-                    service.addCharacteristic(characteristic);
-
-                    JSONArray jdescriptors = Json.getArray(jcharacteristic, "descriptors");
-                    if (jdescriptors == null) continue;
-
-                    for (int dsc = 0; dsc < jdescriptors.length(); dsc++)
-                    {
-                        JSONObject jdescriptor = Json.getObject(jdescriptors, dsc);
-
-                        String dscuuidstr = Json.getString(jdescriptor, "uuid");
-                        if (dscuuidstr == null) continue;
-                        UUID dscuuid = UUID.fromString(dscuuidstr);
-
-                        int dscpermissions = Json.getInt(jdescriptor, "permissions");
-
-                        BluetoothGattDescriptor descriptor
-                                = new BluetoothGattDescriptor(
-                                dscuuid, dscpermissions);
-
-                        characteristic.addDescriptor(descriptor);
-                    }
-                }
-            }
-
-            return list;
-        }
-        catch (NullPointerException ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return null;
-    }
-
-    private void saveBluetoothGattServices(
-            String macAddress, List<BluetoothGattService> services)
-    {
-        String macplain = macAddress.replace(":","-");
-        String filename = macplain + ".BluetoothGattServices.json";
-
-        JSONArray jservices = new JSONArray();
-
-        for (BluetoothGattService service : services)
-        {
-            JSONObject jservice = new JSONObject();
-            Json.put(jservices, jservice);
-
-            Json.put(jservice, "uuid", service.getUuid());
-            Json.put(jservice, "type", service.getType());
-
-            JSONArray jcharacteristics = new JSONArray();
-            Json.put(jservice, "characteristics", jcharacteristics);
-
-            List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
-
-            for (BluetoothGattCharacteristic characteristic : characteristics)
-            {
-                JSONObject jcharacteristic = new JSONObject();
-                Json.put(jcharacteristics, jcharacteristic);
-
-                Json.put(jcharacteristic, "uuid", characteristic.getUuid());
-                Json.put(jcharacteristic, "properties", characteristic.getProperties());
-                Json.put(jcharacteristic, "permissions", characteristic.getPermissions());
-
-                JSONArray jdescriptors = new JSONArray();
-                Json.put(jcharacteristic, "descriptors", jdescriptors);
-
-                List<BluetoothGattDescriptor> descriptors = characteristic.getDescriptors();
-
-                for (BluetoothGattDescriptor descriptor : descriptors)
-                {
-                    JSONObject jdescriptor = new JSONObject();
-                    Json.put(jdescriptors, jdescriptor);
-
-                    Json.put(jdescriptor, "uuid", descriptor.getUuid());
-                    Json.put(jdescriptor, "permissions", descriptor.getPermissions());
-                }
-            }
-        }
-
-        JSONObject parcel = new JSONObject();
-        Json.put(parcel, "BluetoothGattServices", jservices);
-
-        Log.d(LOGTAG, Json.toPretty(parcel));
-
-        Simple.writeDatadirFile(filename, parcel.toString());
-    }
 
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
     {
@@ -704,6 +553,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
             for (BluetoothGattService service : gattServices)
             {
+                //noinspection ConstantConditions
                 if (needlog) Log.d(LOGTAG, "serv=" + service.getUuid());
 
                 if (isCompatibleService(service))
@@ -715,6 +565,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
                 for (BluetoothGattCharacteristic characteristic : characteristics)
                 {
+                    //noinspection ConstantConditions
                     if (needlog)
                     {
                         String props = getPropsString(characteristic.getProperties());
@@ -746,18 +597,6 @@ public abstract class BlueTooth extends BroadcastReceiver
                     {
                         currentControl = characteristic;
                         Log.d(LOGTAG, "Found control=" + deviceName + " " + uuid);
-                    }
-
-                    if (isCompatibleChanged(characteristic))
-                    {
-                        currentChanged = characteristic;
-                        Log.d(LOGTAG, "Found changed=" + deviceName + " " + uuid);
-                    }
-
-                    if (isCompatibleSerial(characteristic))
-                    {
-                        currentSerial = characteristic;
-                        Log.d(LOGTAG, "Found serial=" + deviceName + " " + uuid);
                     }
                 }
             }
@@ -857,16 +696,6 @@ public abstract class BlueTooth extends BroadcastReceiver
     protected abstract boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic);
     protected abstract boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
     protected abstract boolean isCompatibleControl(BluetoothGattCharacteristic characteristic);
-
-    protected boolean isCompatibleChanged(BluetoothGattCharacteristic characteristic)
-    {
-        return characteristic.getUuid().toString().equals("00002a05-0000-1000-8000-00805f9b34fb");
-    }
-
-    protected boolean isCompatibleSerial(BluetoothGattCharacteristic characteristic)
-    {
-        return characteristic.getUuid().toString().equals("00002a29-0000-1000-8000-00805f9b34fb");
-    }
 
     protected boolean isSpecialBonding()
     {

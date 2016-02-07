@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import android.content.Context;
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,6 +63,9 @@ public class CryptUtils
         {
             JSONObject ident = IdentityManager.getIdentity(identity);
             if (!ident.has("passPhrase")) return null;
+
+            Log.d(LOGTAG,"EC++++++++++++++++++++" + identity + "=" + ident.getString("passPhrase"));
+
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESencrypt(aesKey, message.getBytes());
         }
@@ -80,6 +84,9 @@ public class CryptUtils
         {
             JSONObject ident = IdentityManager.getIdentity(identity);
             if (!ident.has("passPhrase")) return null;
+
+            Log.d(LOGTAG,"DC++++++++++++++++++++" + identity + "=" + ident.getString("passPhrase"));
+
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESdecrypt(aesKey, message);
         }

@@ -127,6 +127,5 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
         handler.post(bluetoothIsDisconnected);
     }
 
-
     //endregion BlueTooth connect states
 }

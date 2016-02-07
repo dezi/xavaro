@@ -352,7 +352,19 @@ public class Simple
 
     public static void makeToast(String text)
     {
-        Toast.makeText(anyContext, "Nix <type> configured.", Toast.LENGTH_LONG).show();
+        if (appHandler != null)
+        {
+            final String phtext = text;
+
+            appHandler.post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    Toast.makeText(anyContext, phtext, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     public static void dumpDirectory(String path)

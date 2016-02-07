@@ -367,16 +367,35 @@ public class CommService extends Service
     {
         String ptype = new String(data, 0, 4);
 
+        Log.d(LOGTAG,"++++++++++++++++++++++++++++" + ptype);
+
         if (ptype.equals("CRYP"))
         {
             byte[] idremBytes = new byte[ 16 ];
             System.arraycopy(data, 4, idremBytes, 0, 16);
             String idrem = Simple.getUUIDString(idremBytes);
 
+            byte[] identBytes = new byte[ 16 ];
+            System.arraycopy(data, 20, identBytes, 0, 16);
+            String ident = Simple.getUUIDString(identBytes);
+
             byte[] rest = new byte[ data.length - 36 ];
             System.arraycopy(data, 36, rest, 0, rest.length);
 
-            data = CryptUtils.AESdecrypt(idrem, rest);
+            //
+            // If receiver is not our system identity, this is a
+            // group message. Use group identity for decryption.
+            //
+
+            if (ident.equals(SystemIdentity.getIdentity()))
+            {
+                data = CryptUtils.AESdecrypt(idrem, rest);
+            }
+            else
+            {
+                data = CryptUtils.AESdecrypt(ident, rest);
+            }
+
             if (data == null) return;
 
             ptype = new String(data, 0, 4);
@@ -387,6 +406,10 @@ public class CommService extends Service
             byte[] idremBytes = new byte[ 16 ];
             System.arraycopy(data, 4, idremBytes, 0, 16);
             String idrem = Simple.getUUIDString(idremBytes);
+
+            byte[] identBytes = new byte[ 16 ];
+            System.arraycopy(data, 20, identBytes, 0, 16);
+            String ident = Simple.getUUIDString(identBytes);
 
             byte[] ackidBytes = new byte[ 16 ];
             System.arraycopy(data, 36, ackidBytes, 0, 16);
@@ -408,7 +431,20 @@ public class CommService extends Service
             byte[] rest = new byte[ data.length - 52 ];
             System.arraycopy(data, 52, rest, 0, rest.length);
 
-            data = CryptUtils.AESdecrypt(idrem, rest);
+            //
+            // If receiver is not our system identity, this is a
+            // group message. Use group identity for decryption.
+            //
+
+            if (ident.equals(SystemIdentity.getIdentity()))
+            {
+                data = CryptUtils.AESdecrypt(idrem, rest);
+            }
+            else
+            {
+                data = CryptUtils.AESdecrypt(ident, rest);
+            }
+
             if (data == null) return;
 
             ptype = new String(data, 0, 4);

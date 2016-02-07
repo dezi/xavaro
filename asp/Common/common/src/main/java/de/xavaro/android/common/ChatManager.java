@@ -233,7 +233,7 @@ public class ChatManager implements CommService.CommServiceCallback
                 {
                     JSONObject rgnew = message.getJSONObject("remotegroup");
 
-                    RemoteGroups.updateGroup(rgnew, false);
+                    RemoteGroups.updateGroup(rgnew);
 
                     return;
                 }
@@ -244,7 +244,7 @@ public class ChatManager implements CommService.CommServiceCallback
                     String groupidentity = rgnew.getString("groupidentity");
                     JSONObject updmember = rgnew.getJSONObject("member");
 
-                    RemoteGroups.updateMember(groupidentity, updmember, false);
+                    RemoteGroups.updateMember(groupidentity, updmember);
 
                     return;
                 }

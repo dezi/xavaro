@@ -154,7 +154,7 @@ public class LaunchItemAdmin extends LaunchItem
         }
     }
 
-    private void launchDeveloper()
+    private void launchDeveloper1()
     {
         //DitUndDat.SharedPrefs.sharedPrefs.edit().clear().commit();
 
@@ -179,5 +179,18 @@ public class LaunchItemAdmin extends LaunchItem
         Simple.dumpDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
         Simple.dumpDirectory("/storage/emulated/0");
         */
+    }
+
+    LaunchFrameDeveloper developerFrame;
+
+    private void launchDeveloper()
+    {
+        if (developerFrame == null)
+        {
+            developerFrame = new LaunchFrameDeveloper(context);
+            developerFrame.setSubtype(subtype);
+        }
+
+        ((HomeActivity) context).addViewToBackStack(developerFrame);
     }
 }

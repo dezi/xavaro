@@ -26,20 +26,14 @@ public class IdentityManager
 
     public static void put(String identity, String key, String value)
     {
-        try
+        if ((key != null) && (value != null))
         {
             synchronized (LOGTAG)
             {
                 JSONObject ident = getIdentity(identity);
-
-                ident.put(key, value);
-
+                Json.put(ident, key, value);
                 putIdentity(identity, ident);
             }
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
         }
     }
 }
