@@ -24,8 +24,10 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VersionUtils;
 
 //
 // Launch item view on home screen.
@@ -325,11 +327,11 @@ public class LaunchItem extends FrameLayout
                 }
                 else
                 {
-                    Bitmap thumbnail = CacheManager.getIconFromAppStore(context, packageName);
+                    BitmapDrawable drawable = CacheManager.getIconFromAppStore(context, packageName);
 
-                    if (thumbnail != null)
+                    if (drawable != null)
                     {
-                        icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                        icon.setImageDrawable(drawable);
                     }
                     else
                     {

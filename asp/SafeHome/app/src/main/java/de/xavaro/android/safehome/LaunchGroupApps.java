@@ -114,7 +114,7 @@ public class LaunchGroupApps
                     whatsentry.put("type", "apps");
                     whatsentry.put("subtype", "discounter");
                     whatsentry.put("label", label);
-                    whatsentry.put("apk", apkname);
+                    whatsentry.put("apkname", apkname);
 
                     launchitems.put(whatsentry);
 

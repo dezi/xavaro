@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
@@ -39,6 +40,7 @@ import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.VersionUtils;
 
 public class SettingsFragments
 {
@@ -1365,8 +1367,7 @@ public class SettingsFragments
                             summary += sumarray.getString(inx);
                         }
 
-                        thumbnail = CacheManager.getIconFromAppStore(context, website);
-                        drawable = new BitmapDrawable(context.getResources(),thumbnail);
+                        drawable = CacheManager.getIconFromAppStore(context, website);
                         apkname = website;
                         score = Integer.parseInt(webitem.getString("score"));
                     }

@@ -15,6 +15,7 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VersionUtils;
 
 public class LaunchItemAdmin extends LaunchItem
 {

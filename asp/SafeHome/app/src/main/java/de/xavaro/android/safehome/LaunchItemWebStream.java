@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VersionUtils;
 
 public class LaunchItemWebStream extends LaunchItem implements ProxyPlayer.Callback
 {
@@ -291,19 +292,19 @@ public class LaunchItemWebStream extends LaunchItem implements ProxyPlayer.Callb
         oversize.width = layout.width / 3;
         oversize.height = layout.height / 3;
 
-        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
+        overicon.setImageResource(R.drawable.player_pause_190x190);
         overicon.setVisibility(VISIBLE);
         overlay.setVisibility(VISIBLE);
     }
 
     private void setPlaybackPaused()
     {
-        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_play_190x190));
+        overicon.setImageResource(R.drawable.player_play_190x190);
     }
 
     private void setPlaybackResumed()
     {
-        overicon.setImageDrawable(VersionUtils.getDrawableFromResources(context, R.drawable.player_pause_190x190));
+        overicon.setImageResource(R.drawable.player_pause_190x190);
     }
 
     private void setPlaybackFinished()

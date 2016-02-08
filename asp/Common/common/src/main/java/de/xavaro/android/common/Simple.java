@@ -1,9 +1,9 @@
 package de.xavaro.android.common;
 
-import android.content.pm.ResolveInfo;
-import android.inputmethodservice.InputMethodService;
-import android.os.Build;
 import android.support.annotation.Nullable;
+
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 
 import android.app.NotificationManager;
 import android.graphics.Bitmap;
@@ -19,7 +19,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -167,6 +166,18 @@ public class Simple
 
     //region Application stuff
 
+    @Nullable
+    public static Drawable getIconFromAppStore(String apkname)
+    {
+        return CacheManager.getIconFromAppStore(anyContext, apkname);
+    }
+
+    @Nullable
+    public static Drawable getIconFromApplication(String apkname)
+    {
+        return VersionUtils.getIconFromApplication(anyContext, apkname);
+    }
+
     public static boolean isAppInstalled(String packageName)
     {
         if (anyContext == null) return false;
@@ -186,12 +197,12 @@ public class Simple
 
     public static void installAppFromPlaystore(String packagename)
     {
-        if (anyContext == null) return;
+        if (appContext == null) return;
 
         Intent goToMarket = new Intent(Intent.ACTION_VIEW);
         goToMarket.setData(Uri.parse("market://details?id=" + packagename));
 
-        ProcessManager.launchIntent(anyContext, goToMarket);
+        ProcessManager.launchIntent(appContext, goToMarket);
     }
 
     public static void uninstallApp(String packagename)
@@ -208,6 +219,11 @@ public class Simple
         {
             OopsService.log(LOGTAG, ex);
         }
+    }
+
+    public static void launchApp(String packagename)
+    {
+        ProcessManager.launchApp(appContext, packagename);
     }
 
     public static void startActivityForResult(Intent intent, int tag)
@@ -437,12 +453,7 @@ public class Simple
 
     public static boolean hasNavigationBar()
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        {
-            return ! ViewConfiguration.get(anyContext).hasPermanentMenuKey();
-        }
-
-        return false;
+        return VersionUtils.hasNavigationBar(appContext);
     }
 
     public static float getDeviceTextSize(float textsize)

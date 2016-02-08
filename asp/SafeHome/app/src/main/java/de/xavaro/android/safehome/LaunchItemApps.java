@@ -4,14 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 
+import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.VersionUtils;
 
 public class LaunchItemApps extends LaunchItem
 {
@@ -27,9 +32,40 @@ public class LaunchItemApps extends LaunchItem
     {
         ImageView targetIcon = icon;
 
-        if (subtype.equals("discounter"))
+        if (config.has("apkname"))
         {
-            icon.setImageResource(GlobalConfigs.IconResAppsDiscounter);
+            String apkname = Json.getString(config, "apkname");
+
+            GlobalConfigs.weLikeThis(apkname);
+            Drawable appIcon = Simple.getIconFromApplication(apkname);
+
+            if (appIcon != null)
+            {
+                icon.setImageDrawable(appIcon);
+            }
+            else
+            {
+                Drawable psicon = Simple.getIconFromApplication(CommonConfigs.packagePlaystore);
+                Drawable appicon = Simple.getIconFromAppStore(apkname);
+
+                if ((psicon != null) && (appicon != null))
+                {
+                    icon.setImageDrawable(psicon);
+                    overicon.setImageDrawable(appicon);
+                    overlay.setVisibility(VISIBLE);
+                }
+                else
+                {
+                    icon.setImageResource(R.drawable.stop_512x512);
+                }
+            }
+        }
+        else
+        {
+            if (Simple.equals(subtype, "discounter"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResAppsDiscounter);
+            }
         }
 
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
@@ -43,34 +79,17 @@ public class LaunchItemApps extends LaunchItem
 
     private void launchDiscounter()
     {
-        if (config.has("phonenumber"))
+        if (config.has("apkname"))
         {
-            try
+            String apkname = Json.getString(config, "apkname");
+
+            if (Simple.isAppInstalled(apkname))
             {
-                String phonenumber = config.getString("phonenumber");
-                String subtype = config.has("subtype") ? config.getString("subtype") : "text";
-
-                if (subtype.equals("text"))
-                {
-                    Uri uri = Uri.parse("smsto:" + phonenumber);
-                    Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
-                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    sendIntent.setPackage("com.android.mms");
-                    context.startActivity(Intent.createChooser(sendIntent, ""));
-                }
-
-                if (subtype.equals("voip"))
-                {
-                    Uri uri = Uri.parse("tel:" + phonenumber);
-                    Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
-                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    sendIntent.setPackage("com.android.server.telecom");
-                    context.startActivity(Intent.createChooser(sendIntent, ""));
-                }
+                Simple.launchApp(apkname);
             }
-            catch (Exception ex)
+            else
             {
-                OopsService.log(LOGTAG, ex);
+                Simple.installAppFromPlaystore(apkname);
             }
 
             return;

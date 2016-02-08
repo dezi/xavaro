@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.StaticUtils;
 
 //

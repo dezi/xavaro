@@ -1,31 +1,30 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
+
+import android.support.annotation.Nullable;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import android.graphics.drawable.BitmapDrawable;
 import android.webkit.MimeTypeMap;
+import android.util.Log;
+import android.net.Uri;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.StaticUtils;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class CacheManager
 {
     private final static String LOGTAG = "CacheManager";
 
     @Nullable
-    public static Bitmap getThumbnail(Context context,String filename)
+    public static Bitmap getThumbnail(Context context, String filename)
     {
         File file = new File(context.getCacheDir(), filename);
 
@@ -112,12 +111,12 @@ public class CacheManager
     }
 
     @Nullable
-    public static Bitmap getIconFromAppStore(Context context, String packageName)
+    public static BitmapDrawable getIconFromAppStore(Context context, String packageName)
     {
         String iconfile = "appstore." + packageName + ".thumbnail.png";
 
         Bitmap icon = CacheManager.getThumbnail(context,iconfile);
-        if (icon != null) return icon;
+        if (icon != null) return new BitmapDrawable(context.getResources(), icon);
 
         try
         {
@@ -138,7 +137,9 @@ public class CacheManager
 
             Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
 
-            return CacheManager.cacheThumbnail(context, iconurl, iconfile);
+            icon = CacheManager.cacheThumbnail(context, iconurl, iconfile);
+
+            if (icon != null) return new BitmapDrawable(context.getResources(), icon);
         }
         catch (Exception oops)
         {

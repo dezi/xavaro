@@ -17,6 +17,8 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import de.xavaro.android.common.VersionUtils;
+
 //
 // Video play surface layout connected to HomeActivity.
 //

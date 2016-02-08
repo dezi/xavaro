@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.system.ErrnoException;
 import android.util.DisplayMetrics;
 import android.os.Build;
+import android.view.ViewConfiguration;
 
 //
 // SDK version specific utility methods.
@@ -65,7 +66,7 @@ public class VersionUtils
     // Get best density value for SDK version.
     //
 
-    public static int getBestDensity()
+    private static int getBestDensity()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
@@ -92,5 +93,11 @@ public class VersionUtils
         }
 
         return -1;
+    }
+
+    public static boolean hasNavigationBar(Context context)
+    {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+                && ! ViewConfiguration.get(context).hasPermanentMenuKey();
     }
 }
