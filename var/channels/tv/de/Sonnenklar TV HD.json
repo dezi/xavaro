@@ -1,9 +1,10 @@
 {
   "name":"Sonnenklar TV HD",
   "type":"tv",
-  "ishd":false,
   "isocc":"de",
   "isolang":"ger",
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "BetaDigital",
