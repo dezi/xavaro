@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.content.res.Resources;
 import android.support.annotation.Nullable;
 
 import android.content.pm.ResolveInfo;
@@ -300,7 +301,7 @@ public class Simple
 
         for (Map.Entry<String, ?> entry : prefs.entrySet())
         {
-            if (! entry.getKey().startsWith(prefix)) continue;
+            if ((prefix != null) && ! entry.getKey().startsWith(prefix)) continue;
 
             result.put(entry.getKey(), entry.getValue());
         }
@@ -459,6 +460,37 @@ public class Simple
     public static float getDeviceTextSize(float textsize)
     {
         return (textsize / getDeviceDPI()) * 160;
+    }
+
+    public static String getTransString(int resid)
+    {
+        return appContext.getResources().getString(resid);
+    }
+
+    public static String[] getTransArray(int resid)
+    {
+        return appContext.getResources().getStringArray(resid);
+    }
+
+    public static String getTransTrans(int residkeys, String keyval)
+    {
+        Resources res = anyContext.getResources();
+
+        String resname = res.getResourceEntryName(residkeys);
+        if (! resname.endsWith("_keys")) return keyval;
+
+        resname = resname.substring(0, resname.length() - 4) + "vals";
+        int residvals = res.getIdentifier(resname, "array", anyContext.getPackageName());
+
+        String[] keys = res.getStringArray(residkeys);
+        String[] vals = res.getStringArray(residvals);
+
+        for (int inx = 0; (inx < keys.length) && (inx < vals.length); inx++)
+        {
+            if (keys[ inx ].equals(keyval)) return vals[ inx ];
+        }
+
+        return keyval;
     }
 
     public static int getDeviceDPI()

@@ -226,7 +226,7 @@ public class KioskService extends Service
         {
             Log.d(LOGTAG, "restoreRecentProc: Retry with HOME.");
 
-            Intent intent = new Intent(this, FullscreenActivity.class);
+            Intent intent = new Intent(this, HomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }

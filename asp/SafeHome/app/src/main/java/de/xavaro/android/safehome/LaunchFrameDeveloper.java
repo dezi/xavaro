@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -11,7 +12,7 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.UUID;
+import java.util.Map;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.PersistManager;
@@ -24,7 +25,8 @@ public class LaunchFrameDeveloper extends LaunchFrame
     private String subtype;
     private ScrollView scrollview;
     private TextView jsonListing;
-    private ImageView schwalbe;
+    private ImageView settings;
+    private ImageView preferences;
 
     public LaunchFrameDeveloper(Context context)
     {
@@ -44,47 +46,105 @@ public class LaunchFrameDeveloper extends LaunchFrame
         jsonListing.setTextSize(18f);
         scrollview.addView(jsonListing);
 
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams lp;
+
+        lp = new FrameLayout.LayoutParams(
                 Simple.getActionBarHeight(),
                 Simple.getActionBarHeight(),
                 Gravity.END + Gravity.BOTTOM);
 
         lp.setMargins(8, 8, 8, 8);
 
-        schwalbe = new ImageView(getContext());
-        schwalbe.setLayoutParams(lp);
-        schwalbe.setImageResource(R.drawable.sendmessage_430x430);
+        settings = new ImageView(getContext());
+        settings.setLayoutParams(lp);
+        settings.setImageResource(R.drawable.sendmessage_430x430);
 
-        schwalbe.setLongClickable(true);
-        schwalbe.setOnClickListener(onSchwalbeClick);
-        schwalbe.setOnLongClickListener(onSchwalbeLongClick);
+        settings.setLongClickable(true);
+        settings.setOnClickListener(onSettingsClick);
+        settings.setOnLongClickListener(onSettingsLongClick);
 
-        addView(schwalbe);
+        addView(settings);
+
+        lp = new FrameLayout.LayoutParams(
+                Simple.getActionBarHeight(),
+                Simple.getActionBarHeight(),
+                Gravity.END + Gravity.TOP);
+
+        lp.setMargins(8, 8, 8, 8);
+
+        preferences = new ImageView(getContext());
+        preferences.setLayoutParams(lp);
+        preferences.setImageResource(R.drawable.sendmessage_430x430);
+
+        preferences.setLongClickable(true);
+        preferences.setOnClickListener(onPreferencesClick);
+        preferences.setOnLongClickListener(onPreferencesLongClick);
+
+        addView(preferences);
     }
 
     public void setSubtype(String subtype)
     {
         this.subtype = subtype;
-
-        loadContent();
     }
 
-    private void loadContent()
+    private void loadSettings()
     {
         JSONObject root = PersistManager.getRoot();
         jsonListing.setText(Json.toPretty(root));
     }
 
-    private View.OnClickListener onSchwalbeClick = new View.OnClickListener()
+    private void loadPreferences()
+    {
+        Map<String, Object> prefs = Simple.getAllPreferences(null);
+
+        JSONArray jprefs = new JSONArray();
+
+        for (String prefkey : prefs.keySet())
+        {
+            if (prefkey.startsWith("firewall.")) continue;
+
+            JSONObject jpref = new JSONObject();
+
+            Json.put(jpref, "k", prefkey);
+            Json.put(jpref, "v", prefs.get(prefkey));
+
+            Json.put(jprefs, jpref);
+        }
+
+        jprefs = Json.sort(jprefs, "k", false);
+
+        jsonListing.setText(Json.toPretty(jprefs));
+    }
+
+    private View.OnClickListener onSettingsClick = new View.OnClickListener()
     {
         @Override
         public void onClick(View view)
         {
-            loadContent();
+            loadSettings();
         }
     };
 
-    private View.OnLongClickListener onSchwalbeLongClick = new View.OnLongClickListener()
+    private View.OnLongClickListener onSettingsLongClick = new View.OnLongClickListener()
+    {
+        @Override
+        public boolean onLongClick(View view)
+        {
+            return true;
+        }
+    };
+
+    private View.OnClickListener onPreferencesClick = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            loadPreferences();
+        }
+    };
+
+    private View.OnLongClickListener onPreferencesLongClick = new View.OnLongClickListener()
     {
         @Override
         public boolean onLongClick(View view)

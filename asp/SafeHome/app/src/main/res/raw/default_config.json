@@ -26,6 +26,12 @@
         "enable": "xavaro.enable"
       },
       {
+        "label": "Bilder",
+        "type": "media",
+        "subtype": "image",
+        "enable": "media.image.enable"
+      },
+      {
         "label": "Vitaldaten",
         "type": "health",
         "enable": "health.enable"

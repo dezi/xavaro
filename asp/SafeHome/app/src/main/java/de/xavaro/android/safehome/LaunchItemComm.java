@@ -121,7 +121,6 @@ public class LaunchItemComm extends LaunchItem
             }
             else
             {
-                Log.d(LOGTAG,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
                 icon.setImageResource(GlobalConfigs.IconResWhatsApp);
             }
         }

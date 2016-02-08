@@ -2,8 +2,10 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.preference.PreferenceActivity;
+import android.util.Log;
 
 import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.Simple;
 
 public class MediaPreferences
 {
@@ -28,7 +30,7 @@ public class MediaPreferences
             super();
 
             iconres = GlobalConfigs.IconResMediaImage;
-            keyprefix = "media.images";
+            keyprefix = "media.image";
             masterenable = "Bilder freischalten";
         }
 
@@ -73,53 +75,19 @@ public class MediaPreferences
             pc.setTitle("Bildgalerien");
             preferences.add(pc);
 
-            gp = new NicedPreferences.NiceGalleryPreference(context);
+            String[] keys =  Simple.getTransArray(R.array.pref_media_image_directories_keys);
+            String[] vals =  Simple.getTransArray(R.array.pref_media_image_directories_vals);
 
-            gp.setKey(keyprefix + ".directory.camera");
-            gp.setTitle("Kamera");
-            gp.setEnabled(enabled);
+            for (int inx = 0; (inx < keys.length) && (inx < vals.length); inx++)
+            {
+                gp = new NicedPreferences.NiceGalleryPreference(context);
 
-            preferences.add(gp);
+                gp.setKey(keyprefix + ".directory." + keys[ inx ]);
+                gp.setTitle(vals[ inx ]);
+                gp.setEnabled(enabled);
 
-            gp = new NicedPreferences.NiceGalleryPreference(context);
-
-            gp.setKey(keyprefix + ".directory.camera");
-            gp.setTitle("Screenshots");
-            gp.setEnabled(enabled);
-
-            preferences.add(gp);
-
-            gp = new NicedPreferences.NiceGalleryPreference(context);
-
-            gp.setKey(keyprefix + ".directory.download");
-            gp.setTitle("Download");
-            gp.setEnabled(enabled);
-
-            preferences.add(gp);
-
-            gp = new NicedPreferences.NiceGalleryPreference(context);
-
-            gp.setKey(keyprefix + ".directory.whatsapp");
-            gp.setTitle("Whatsapp");
-            gp.setEnabled(enabled);
-
-            preferences.add(gp);
-
-            gp = new NicedPreferences.NiceGalleryPreference(context);
-
-            gp.setKey(keyprefix + ".directory.family");
-            gp.setTitle("Familie");
-            gp.setEnabled(enabled);
-
-            preferences.add(gp);
-
-            gp = new NicedPreferences.NiceGalleryPreference(context);
-
-            gp.setKey(keyprefix + ".directory.misc");
-            gp.setTitle("Sonstiges");
-            gp.setEnabled(enabled);
-
-            preferences.add(gp);
+                preferences.add(gp);
+            }
         }
     }
 

@@ -48,6 +48,7 @@ public class LaunchItem extends FrameLayout
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
 
         if (Simple.equals(type, "apps"        )) item = new LaunchItemApps(context);
+        if (Simple.equals(type, "media"       )) item = new LaunchItemMedia(context);
 
         if (Simple.equals(type, "phone"       )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "skype"       )) item = new LaunchItemComm(context);

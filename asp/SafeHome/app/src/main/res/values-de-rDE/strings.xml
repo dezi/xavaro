@@ -1,0 +1,12 @@
+<resources>
+
+    <string-array name="pref_media_image_directories_vals">
+        <item>Kamera</item>
+        <item>Screenshots</item>
+        <item>Download</item>
+        <item>WhatsApp</item>
+        <item>Familie</item>
+        <item>Sonstiges</item>
+    </string-array>
+
+</resources>
