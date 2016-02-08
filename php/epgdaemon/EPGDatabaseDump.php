@@ -467,7 +467,8 @@ function defuckEPG(&$epg)
 {
 	if (! isset($epg[ "description" ])) return;
 	
-	$desc = $epg[ "description" ];
+	$desc = str_replace("\\n", "\n", $epg[ "description" ]);
+	$epg[ "description" ] = $desc;
 	
 	$channel = $GLOBALS[ "actchannel" ];
 
