@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.ImageView;
 
 import de.xavaro.android.common.Json;
@@ -120,6 +121,7 @@ public class LaunchItemComm extends LaunchItem
             }
             else
             {
+                Log.d(LOGTAG,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
                 icon.setImageResource(GlobalConfigs.IconResWhatsApp);
             }
         }

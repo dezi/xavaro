@@ -373,6 +373,28 @@ public class NicedPreferences
         }
     }
 
+    public static class NiceGalleryPreference extends NiceListPreference
+    {
+        public NiceGalleryPreference(Context context)
+        {
+            super(context);
+
+            CharSequence[] sendtoText= {
+                    "Nicht aktiviert",
+                    "Home-Bildschirm",
+                    "Bilder-Verzeichnis"};
+
+            CharSequence[] sendtoVals = {
+                    "inact",
+                    "home",
+                    "appdir"};
+
+            this.setEntries(sendtoText);
+            this.setEntryValues(sendtoVals);
+            this.setDefaultValue("inact");
+        }
+    }
+
     public static class NiceListPreference extends ListPreference
             implements Preference.OnPreferenceChangeListener
     {

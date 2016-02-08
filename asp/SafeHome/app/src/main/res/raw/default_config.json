@@ -61,6 +61,12 @@
         "enable": "webconfig.erotics.enable"
       },
       {
+        "label": "Supermärkte",
+        "type": "apps",
+        "subtype": "discounter",
+        "enable": "apps.discounter.enable"
+      },
+      {
         "label": "Test Feature",
         "type": "developer"
       },

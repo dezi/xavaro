@@ -38,9 +38,88 @@ public class MediaPreferences
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceNumberPreference np;
-            NicedPreferences.NiceListPreference lp;
-            NicedPreferences.NiceDatePreference dp;
+            NicedPreferences.NiceCheckboxPreference cp;
+            NicedPreferences.NiceGalleryPreference gp;
+
+            //
+            // Settings.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Einstellungen");
+            preferences.add(pc);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cp.setKey(keyprefix + ".camera");
+            cp.setTitle("Kamera freigeben");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cp.setKey(keyprefix + ".screenshot");
+            cp.setTitle("Screenshot freigeben");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
+
+            //
+            // Galeries.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Bildgalerien");
+            preferences.add(pc);
+
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.camera");
+            gp.setTitle("Kamera");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
+
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.camera");
+            gp.setTitle("Screenshots");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
+
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.download");
+            gp.setTitle("Download");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
+
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.whatsapp");
+            gp.setTitle("Whatsapp");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
+
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.family");
+            gp.setTitle("Familie");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
+
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.misc");
+            gp.setTitle("Sonstiges");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
         }
     }
 
@@ -77,9 +156,30 @@ public class MediaPreferences
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceNumberPreference np;
-            NicedPreferences.NiceListPreference lp;
-            NicedPreferences.NiceDatePreference dp;
+            NicedPreferences.NiceGalleryPreference gp;
+
+            //
+            // Directories.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Audioverzeichnisse");
+            preferences.add(pc);
+
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.music");
+            gp.setTitle("Musik");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
+            gp = new NicedPreferences.NiceGalleryPreference(context);
+
+            gp.setKey(keyprefix + ".directory.spoken");
+            gp.setTitle("Hörbücher");
+            gp.setEnabled(enabled);
+
+            preferences.add(gp);
         }
     }
 

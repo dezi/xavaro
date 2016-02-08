@@ -78,6 +78,15 @@ public class SettingsActivity extends PreferenceActivity
         target.add(SettingsFragments.XavaroFragment.getHeader());
 
         category = new Header();
+        category.title = "Medien";
+        target.add(category);
+
+        target.add(MediaPreferences.MediaImageFragment.getHeader());
+        target.add(MediaPreferences.MediaAudioFragment.getHeader());
+        target.add(MediaPreferences.MediaVideoFragment.getHeader());
+        target.add(MediaPreferences.MediaEbookFragment.getHeader());
+
+        category = new Header();
         category.title = "Apps";
         target.add(category);
 
@@ -93,15 +102,6 @@ public class SettingsActivity extends PreferenceActivity
         target.add(HealthPreferences.HealthSensorFragment.getHeader());
         target.add(HealthPreferences.HealthGlucoseFragment.getHeader());
         target.add(HealthPreferences.HealthUnitsFragment.getHeader());
-
-        category = new Header();
-        category.title = "Medien";
-        target.add(category);
-
-        target.add(MediaPreferences.MediaImageFragment.getHeader());
-        target.add(MediaPreferences.MediaAudioFragment.getHeader());
-        target.add(MediaPreferences.MediaVideoFragment.getHeader());
-        target.add(MediaPreferences.MediaEbookFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";

@@ -1351,7 +1351,6 @@ public class SettingsFragments
                     iconres = 0;
                     summary = null;
                     apkname = null;
-                    drawable = null;
 
                     if (isApps)
                     {
@@ -1392,7 +1391,7 @@ public class SettingsFragments
 
                     if (! webitem.has("channels"))
                     {
-                        key = keyprefix + ".website." + website;
+                        key = keyprefix + (isApps ? ".apk." : ".website.") + website;
 
                         cb = new NicedPreferences.NiceScorePreference(context);
 

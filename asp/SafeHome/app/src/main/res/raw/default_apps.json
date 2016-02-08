@@ -3,7 +3,8 @@
 
     "musthave":
     {
-      "org.wikipedia": {
+      "org.wikipedia":
+      {
         "what": "Wikipedia",
         "score": "15",
 

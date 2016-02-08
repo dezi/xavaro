@@ -78,6 +78,8 @@ public class LaunchGroupWebStream extends LaunchGroup
         return typeroot;
     }
 
+    //endregion Static methods.
+
     private String getPrefPrefix(String type, String subtype)
     {
         if (type.equals("webiptv")) return "iptelevision.channel";
