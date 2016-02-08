@@ -1,7 +1,14 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 public class LaunchItemMedia extends LaunchItem
@@ -16,10 +23,30 @@ public class LaunchItemMedia extends LaunchItem
     @Override
     protected void setConfig()
     {
-        if (config.has("directory"))
+        boolean found = false;
+
+        if (config.has("mediadir"))
         {
+            String mediadir = Json.getString(config, "mediadir");
+            File mediapath = Simple.getMediaPath(mediadir);
+
+            if ((mediapath != null) && mediapath.isDirectory())
+            {
+                JSONArray images = Simple.getDirectorySortedByAge(
+                        mediapath, new Simple.ImageFileFilter());
+
+                if ((images != null) && (images.length() > 0))
+                {
+                    JSONObject newest = Json.getObject(images, images.length() - 1);
+                    String file = Json.getString(newest, "file");
+                    icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(file, 200));
+
+                    found = true;
+                }
+            }
         }
-        else
+
+        if (! found)
         {
             if (Simple.equals(subtype, "image"))
             {
@@ -36,6 +63,12 @@ public class LaunchItemMedia extends LaunchItem
 
     private void launchImage()
     {
+        if (config.has("mediadir"))
+        {
+
+            return;
+        }
+
         if (directory == null) directory = new LaunchGroupMedia.ImageGroup(context);
 
         ((HomeActivity) context).addViewToBackStack(directory);

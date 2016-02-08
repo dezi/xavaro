@@ -1,39 +1,38 @@
 package de.xavaro.android.common;
 
-import android.content.res.Resources;
 import android.support.annotation.Nullable;
 
-import android.content.pm.ResolveInfo;
-import android.graphics.drawable.Drawable;
-
-import android.app.NotificationManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.preference.PreferenceManager;
+import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.util.Log;
-import android.util.TypedValue;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.util.DisplayMetrics;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.net.Uri;
-import android.os.Handler;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
+import android.os.Handler;
+import android.os.Environment;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.net.Uri;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -277,7 +277,7 @@ public class Simple
 
     public static String dezify(String string)
     {
-        byte[] dezi = { 0x29, 0x05, 0x19, 0x62 };
+        byte[] dezi = {0x29, 0x05, 0x19, 0x62};
         byte[] bytes = string.getBytes();
 
         for (int inx = 0; inx < bytes.length; inx++)
@@ -301,7 +301,7 @@ public class Simple
 
         for (Map.Entry<String, ?> entry : prefs.entrySet())
         {
-            if ((prefix != null) && ! entry.getKey().startsWith(prefix)) continue;
+            if ((prefix != null) && !entry.getKey().startsWith(prefix)) continue;
 
             result.put(entry.getKey(), entry.getValue());
         }
@@ -420,7 +420,7 @@ public class Simple
         }
         catch (Exception ex)
         {
-            OopsService.log(LOGTAG,ex);
+            OopsService.log(LOGTAG, ex);
         }
 
         return null;
@@ -477,7 +477,7 @@ public class Simple
         Resources res = anyContext.getResources();
 
         String resname = res.getResourceEntryName(residkeys);
-        if (! resname.endsWith("_keys")) return keyval;
+        if (!resname.endsWith("_keys")) return keyval;
 
         resname = resname.substring(0, resname.length() - 4) + "vals";
         int residvals = res.getIdentifier(resname, "array", anyContext.getPackageName());
@@ -491,6 +491,51 @@ public class Simple
         }
 
         return keyval;
+    }
+
+    public static File getMediaDirType(String dirtype)
+    {
+        return Environment.getExternalStoragePublicDirectory(dirtype);
+    }
+
+    public static File getMediaPath(String mediadir)
+    {
+        if (mediadir.equals("screenshots"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+            return new File(dir, "Screenshots");
+        }
+
+        if (mediadir.equals("camera"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+            return new File(dir, "Camera");
+        }
+
+        if (mediadir.equals("family"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+            return new File(dir, "Family");
+        }
+
+        if (mediadir.equals("misc"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+            return new File(dir, "Miscellanous");
+        }
+
+        if (mediadir.equals("download"))
+        {
+            return getMediaDirType(Environment.DIRECTORY_DOWNLOADS);
+        }
+
+        if (mediadir.equals("whatsapp"))
+        {
+            File dir = Environment.getExternalStorageDirectory();
+            return new File(dir, "WhatsApp/Media/WhatsApp Images");
+        }
+
+        return null;
     }
 
     public static int getDeviceDPI()
@@ -513,7 +558,7 @@ public class Simple
         return (NotificationManager) anyContext.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
-    public static InputMethodManager getInputMethodManager ()
+    public static InputMethodManager getInputMethodManager()
     {
         return (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
     }
@@ -700,6 +745,72 @@ public class Simple
         }
 
         return string.toString();
+    }
+
+    @Nullable
+    public static Drawable getDrawableThumbnailFromFile(String file, int size)
+    {
+        Bitmap myBitmap = getBitmapThumbnailFromFile(file, size);
+        if (myBitmap == null) return null;
+
+        return new BitmapDrawable(appContext.getResources(), myBitmap);
+    }
+
+    @Nullable
+    public static Bitmap getBitmapThumbnailFromFile(String file, int size)
+    {
+        try
+        {
+            BitmapFactory.Options orgsize = new BitmapFactory.Options();
+            orgsize.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(file, orgsize);
+
+            int wid = orgsize.outWidth;
+            int hei = orgsize.outHeight;
+
+            int scale = 1;
+
+            while ((wid > size) && (hei > size))
+            {
+                wid = wid >> 1;
+                hei = hei >> 1;
+                scale = scale << 1;
+            }
+
+            BitmapFactory.Options scalesize = new BitmapFactory.Options();
+            scalesize.inSampleSize = scale;
+            return BitmapFactory.decodeFile(file, scalesize);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getDrawableFromFile(String file)
+    {
+        Bitmap myBitmap = getBitmapFromFile(file);
+        if (myBitmap == null) return null;
+
+        return new BitmapDrawable(appContext.getResources(), myBitmap);
+    }
+
+    @Nullable
+    public static Bitmap getBitmapFromFile(String file)
+    {
+        try
+        {
+            return BitmapFactory.decodeFile(file);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
     }
 
     public static Bitmap getBitmapFromResource(int resid)
@@ -1146,4 +1257,71 @@ public class Simple
     }
 
     //endregion Layout params
+
+    //region Directory stuff
+
+    public static JSONArray getDirectorySortedByAge(File dir, FilenameFilter ff)
+    {
+        if ((dir == null) || ! dir.isDirectory()) return null;
+
+        String[] dirlist = dir.list(ff);
+        if (dirlist == null) return null;
+
+        JSONArray list = new JSONArray();
+
+        for (String name : dirlist)
+        {
+            File file = new File(dir, name);
+
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "file", file.toString());
+            Json.put(entry, "time", timeStampAsISO(file.lastModified()));
+
+            Json.put(list, entry);
+        }
+
+        Json.sort(list, "time", true);
+
+        return list;
+    }
+
+    public static class IsFileFilter implements FilenameFilter
+    {
+        public boolean accept(File dir, String name)
+        {
+            return new File(dir, name).isFile();
+        }
+    }
+
+    public static class IsDirFilter implements FilenameFilter
+    {
+        public boolean accept(File dir, String name)
+        {
+            return new File(dir, name).isDirectory();
+        }
+    }
+
+    public static class ImageFileFilter implements FilenameFilter
+    {
+        private final String[] exts =  new String[] {".jpg", ".png", ".gif", ".jpeg"};
+
+        public boolean accept(File dir, String name)
+        {
+            if (new File(dir, name).isFile())
+            {
+                for (String ext : exts)
+                {
+                    if (name.toLowerCase().endsWith(ext))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }
+
+    //endregion Directory stuff
 }

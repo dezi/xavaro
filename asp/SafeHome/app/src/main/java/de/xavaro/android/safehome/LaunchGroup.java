@@ -99,17 +99,6 @@ public class LaunchGroup extends FrameLayout implements
         setOnTouchListener(this);
 
         configTree = "launchitems";
-
-        /*
-        bubble = new FrameLayout(context);
-        LayoutParams lp = new LayoutParams(200,100);
-        lp.leftMargin = 400;
-        lp.topMargin = 200;
-        bubble.setLayoutParams(lp);
-        //bubble.setBackground(StaticUtils.getflippedDrawable(getContext(), R.drawable.bubble, false, false, 0));
-        bubble.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.bubble));
-        this.addView(bubble);
-        */
     }
 
     private FrameLayout bubble;

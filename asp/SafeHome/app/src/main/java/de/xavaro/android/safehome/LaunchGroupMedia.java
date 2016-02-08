@@ -51,22 +51,21 @@ public class LaunchGroupMedia
                 for (String prefkey : prefs.keySet())
                 {
                     String what = sp.getString(prefkey, "");
-                    String directory = prefkey.substring(keyprefix.length());
+                    String mediadir = prefkey.substring(keyprefix.length());
 
                     if ((what == null) || what.equals("inact")) continue;
 
                     String label = Simple.getTransTrans(
-                            R.array.pref_media_image_directories_keys, directory);
+                            R.array.pref_media_image_directories_keys, mediadir);
 
                     JSONObject whatsentry = new JSONObject();
 
+                    whatsentry.put("label", label);
                     whatsentry.put("type", "media");
                     whatsentry.put("subtype", "image");
-                    whatsentry.put("label", label);
+                    whatsentry.put("mediadir", mediadir);
 
                     launchitems.put(whatsentry);
-
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + "=" + directory);
                 }
 
                 launchgroup.put("launchitems", launchitems);
