@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -28,14 +29,58 @@ public class LaunchGroupMedia
     {
         private static final String LOGTAG = ImageGroup.class.getSimpleName();
 
+        private String mediadir;
+
         public ImageGroup(Context context)
         {
             super(context);
 
-            this.config = getConfig(context);
+            this.config = getConfig();
         }
 
-        private JSONObject getConfig(Context context)
+        public ImageGroup(Context context, String mediadir)
+        {
+            super(context);
+
+            this.mediadir = mediadir;
+            this.config = getImages();
+        }
+
+        private JSONObject getImages()
+        {
+            JSONObject launchgroup = new JSONObject();
+            JSONArray launchitems = new JSONArray();
+
+            File mediapath = Simple.getMediaPath(mediadir);
+
+            JSONArray images = Simple.getDirectorySortedByAge(
+                    mediapath, new Simple.ImageFileFilter(), true);
+
+            if (images != null)
+            {
+                for (int inx = 0; inx < images.length(); inx++)
+                {
+                    JSONObject imageitem = Json.getObject(images, inx);
+                    String imagefile = Json.getString(imageitem, "file");
+                    File file = new File(imagefile);
+
+                    JSONObject launchitem = new JSONObject();
+
+                    Json.put(launchitem, "label", file.getName());
+                    Json.put(launchitem, "type", "media");
+                    Json.put(launchitem, "subtype", "image");
+                    Json.put(launchitem, "mediaitem", imagefile);
+
+                    launchitems.put(launchitem);
+                }
+            }
+
+            Json.put(launchgroup, "launchitems", launchitems);
+
+            return launchgroup;
+        }
+
+        private JSONObject getConfig()
         {
             try
             {
@@ -51,9 +96,9 @@ public class LaunchGroupMedia
                 for (String prefkey : prefs.keySet())
                 {
                     String what = sp.getString(prefkey, "");
-                    String mediadir = prefkey.substring(keyprefix.length());
+                    if (what.equals("inact")) continue;
 
-                    if ((what == null) || what.equals("inact")) continue;
+                    String mediadir = prefkey.substring(keyprefix.length());
 
                     String label = Simple.getTransTrans(
                             R.array.pref_media_image_directories_keys, mediadir);

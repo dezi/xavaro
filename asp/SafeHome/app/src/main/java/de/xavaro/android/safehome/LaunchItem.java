@@ -92,8 +92,9 @@ public class LaunchItem extends FrameLayout
     protected String type;
     protected String subtype;
 
-    protected TextView label;
     protected ImageView icon;
+    protected TextView label;
+    protected String labelText;
 
     protected FrameLayout overlay;
     protected ImageView overicon;
@@ -218,6 +219,8 @@ public class LaunchItem extends FrameLayout
 
     public void setLabelText(String text)
     {
+        if (labelText != null) text = labelText;
+
         label.setText(text);
 
         //

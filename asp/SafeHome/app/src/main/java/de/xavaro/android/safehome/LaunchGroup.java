@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.graphics.Bitmap;
@@ -101,8 +100,6 @@ public class LaunchGroup extends FrameLayout implements
         configTree = "launchitems";
     }
 
-    private FrameLayout bubble;
-
     private void addSliderButtons()
     {
         Bitmap bmp;
@@ -157,7 +154,7 @@ public class LaunchGroup extends FrameLayout implements
             // Kill all clicks between items.
             //
 
-            return false;
+            return true;
         }
 
         int xscreen = (int) motionEvent.getRawX();
@@ -286,7 +283,7 @@ public class LaunchGroup extends FrameLayout implements
     {
         if (changed)
         {
-            Log.d(LOGTAG,"onLayout:" + changed + "=" + left + "=" + top + "=" + right + "=" + bottom);
+            Log.d(LOGTAG,"onLayout:" + "=" + left + "=" + top + "=" + right + "=" + bottom);
 
             positionLaunchItems();
         }
@@ -318,9 +315,6 @@ public class LaunchGroup extends FrameLayout implements
 
             horzStart += horzSpace;
             vertStart += vertSpace / 2;
-
-            Log.d(LOGTAG, "onMeasure:" + width + "=" + height);
-            Log.d(LOGTAG, "onMeasure:" + horzItems + "/" + vertItems + " <=> " + horzSpace + "/" + vertSpace);
 
             if (launchItems == null)
             {

@@ -1260,7 +1260,7 @@ public class Simple
 
     //region Directory stuff
 
-    public static JSONArray getDirectorySortedByAge(File dir, FilenameFilter ff)
+    public static JSONArray getDirectorySortedByAge(File dir, FilenameFilter ff, boolean desc)
     {
         if ((dir == null) || ! dir.isDirectory()) return null;
 
@@ -1281,7 +1281,7 @@ public class Simple
             Json.put(list, entry);
         }
 
-        Json.sort(list, "time", true);
+        Json.sort(list, "time", desc);
 
         return list;
     }

@@ -2,7 +2,10 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.FrameLayout;
+
+import de.xavaro.android.common.Simple;
 
 public class LaunchFrame extends FrameLayout
 {

@@ -20,26 +20,43 @@ public class LaunchItemMedia extends LaunchItem
         super(context);
     }
 
+    private int numberImages;
+
     @Override
     protected void setConfig()
     {
         boolean found = false;
+
+        if (config.has("mediaitem"))
+        {
+            String imagefile = Json.getString(config, "mediaitem");
+            icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(imagefile, 200));
+            found = true;
+        }
 
         if (config.has("mediadir"))
         {
             String mediadir = Json.getString(config, "mediadir");
             File mediapath = Simple.getMediaPath(mediadir);
 
+            if (! mediapath.exists()) mediapath.mkdir();
+
             if ((mediapath != null) && mediapath.isDirectory())
             {
                 JSONArray images = Simple.getDirectorySortedByAge(
-                        mediapath, new Simple.ImageFileFilter());
+                        mediapath, new Simple.ImageFileFilter(), true);
 
                 if ((images != null) && (images.length() > 0))
                 {
-                    JSONObject newest = Json.getObject(images, images.length() - 1);
+                    JSONObject newest = Json.getObject(images, 0);
                     String file = Json.getString(newest, "file");
                     icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(file, 200));
+
+                    numberImages = images.length();
+
+                    labelText = Json.getString(config, "label");
+                    labelText += " (" + numberImages + ")";
+                    setLabelText(labelText);
 
                     found = true;
                 }
@@ -63,13 +80,35 @@ public class LaunchItemMedia extends LaunchItem
 
     private void launchImage()
     {
-        if (config.has("mediadir"))
+        if (config.has("mediaitem"))
         {
-
             return;
         }
 
-        if (directory == null) directory = new LaunchGroupMedia.ImageGroup(context);
+        if (directory == null)
+        {
+            if (config.has("mediadir"))
+            {
+                if (numberImages == 0)
+                {
+                    String message = "Es sind keine Bilder enthalten.";
+                    DitUndDat.SpeekDat.speak(message);
+                    Simple.makeToast(message);
+
+                    return;
+                }
+                else
+                {
+                    String mediadir = Json.getString(config, "mediadir");
+
+                    directory = new LaunchGroupMedia.ImageGroup(context, mediadir);
+                }
+            }
+            else
+            {
+                directory = new LaunchGroupMedia.ImageGroup(context);
+            }
+        }
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }
