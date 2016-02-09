@@ -4,11 +4,13 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +26,7 @@ public class CommSender
     private static int publicPort;
 
     private static ServerSocket serverSocket;
+    private static Thread serverThread;
 
     private static long ipRequestTime;
     private static long gwRequestTime;
@@ -57,7 +60,7 @@ public class CommSender
         long now = new Date().getTime();
 
         //
-        // Create a random port.
+        // Create a server socket and private port.
         //
 
         if (privatePort == 0)
@@ -159,6 +162,24 @@ public class CommSender
         if (sendFiles.size() == 0) return;
 
         //
+        // Start server thread if required.
+        //
+
+        if (serverThread == null)
+        {
+            serverThread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    serverLoop();
+                }
+            });
+
+            serverThread.start();
+        }
+
+        //
         // Setup transfer negotiation packet.
         //
 
@@ -187,6 +208,43 @@ public class CommSender
             CommService.sendEncrypted(fileTransferNeg, true);
 
             transnegRequestTime = now;
+        }
+    }
+
+    private static void serverLoop()
+    {
+        try
+        {
+            //
+            // Proxy HTTP server loop.
+            //
+
+            while (true)
+            {
+                Log.d(LOGTAG, "Waiting on port " + privatePort);
+
+                Socket connect = serverSocket.accept();
+
+                Log.d(LOGTAG, "Accepted connection on port " + privatePort);
+            }
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        try
+        {
+            serverSocket.close();
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+        finally
+        {
+            serverSocket = null;
+            serverThread = null;
         }
     }
 
