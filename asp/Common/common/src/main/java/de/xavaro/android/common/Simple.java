@@ -609,6 +609,64 @@ public class Simple
     }
 
     @Nullable
+    public static String getWifiIPAddress()
+    {
+        if (anyContext == null) return null;
+
+        try
+        {
+            WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+
+            int ip = dhcpInfo.ipAddress;
+
+            if (ip > 0)
+            {
+                return (ip & 0xff) + "." + ((ip >> 8) & 0xff) + "." +
+                        ((ip >> 16) & 0xff) + "." + ((ip >> 24) & 0xff);
+            }
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getWifiName()
+    {
+        if (anyContext == null) return null;
+
+        try
+        {
+            WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+
+            return wifiManager.getConnectionInfo().getSSID().replace("\"", "");
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    public static boolean isSameSubnet(String ip1, String ip2)
+    {
+        if ((ip1 == null) || (ip2 == null)) return false;
+
+        String[] ip1parts = ip1.split("\\.");
+        String[] ip2parts = ip2.split("\\.");
+
+        if (ip1parts.length != ip2parts.length) return false;
+
+        return ip1parts[ 0 ].equals(ip2parts[ 0 ]) &&
+                ip1parts[ 1 ].equals(ip2parts[ 1 ]) &&
+                ip1parts[ 2 ].equals(ip2parts[ 2 ]);
+    }
+
+    @Nullable
     public static String getMacAddress()
     {
         if (anyContext == null) return null;

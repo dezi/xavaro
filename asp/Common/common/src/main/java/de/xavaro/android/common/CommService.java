@@ -172,6 +172,7 @@ public class CommService extends Service
         instance = this;
         identity = SystemIdentity.getIdentity();
 
+        CommSender.initialize();
         ChatManager.initialize();
     }
 
@@ -269,7 +270,8 @@ public class CommService extends Service
     }
 
     //
-    // Messages handled directly by comm service.
+    // Messages handled directly by comm service
+    // or delegate services.
     //
 
     private boolean onMessageReceived(JSONObject json)
@@ -279,6 +281,13 @@ public class CommService extends Service
             if (! json.has("type")) return false;
 
             String type = json.getString("type");
+
+            if (type.equals("fileTransferNeg") || type.equals("fileTransferSetup"))
+            {
+                CommSender.onMessageReceived(json);
+
+                return true;
+            }
 
             if (type.equals("requestPublicKeyXChange"))
             {
@@ -369,10 +378,10 @@ public class CommService extends Service
 
         if (ptype.equals("MYIP"))
         {
-            CommonStatic.myIPaddress = (data[ 4 ] & 0xff) + "." + (data[ 5 ] & 0xff)
+            CommonStatic.publicIPaddress = (data[ 4 ] & 0xff) + "." + (data[ 5 ] & 0xff)
                     + "." + (data[ 6 ] & 0xff) + "." + (data[ 7 ] & 0xff);
 
-            Log.d(LOGTAG,"decryptPacket myip=" + CommonStatic.myIPaddress);
+            Log.d(LOGTAG,"decryptPacket myip=" + CommonStatic.publicIPaddress);
 
             return;
         }

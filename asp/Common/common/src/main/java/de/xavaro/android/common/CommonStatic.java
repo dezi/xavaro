@@ -6,6 +6,8 @@ package de.xavaro.android.common;
 
 import android.util.Log;
 
+import java.net.ServerSocket;
+
 public class CommonStatic
 {
     private static final String LOGTAG = CommonStatic.class.getSimpleName();
@@ -39,10 +41,10 @@ public class CommonStatic
 
     //region Current internet
 
-    public static String myIPaddress;
+    public static String privateIPaddress;
+    public static String publicIPaddress;
     public static String gwIPaddress;
-    public static int natPrivatePort;
-    public static int natPublicPort;
+    public static String wifiName;
 
     //endregion
 }
