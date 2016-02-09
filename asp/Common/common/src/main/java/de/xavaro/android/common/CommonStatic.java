@@ -36,4 +36,13 @@ public class CommonStatic
     }
 
     //endregion Current focus status and active activity
+
+    //region Current internet
+
+    public static String myIPaddress;
+    public static String gwIPaddress;
+    public static int natPrivatePort;
+    public static int natPublicPort;
+
+    //endregion
 }

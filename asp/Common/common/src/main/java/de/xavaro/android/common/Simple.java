@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.net.DhcpInfo;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -580,6 +581,31 @@ public class Simple
         ResolveInfo res = anyContext.getPackageManager().resolveActivity(intent, 0);
 
         return (res.activityInfo == null) ? null : res.activityInfo.packageName;
+    }
+
+    @Nullable
+    public static String getDefaultGatewayAddress()
+    {
+        if (anyContext == null) return null;
+
+        try
+        {
+            WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+
+            int gw = dhcpInfo.gateway;
+
+            if (gw > 0)
+            {
+                return (gw & 0xff) + "." + ((gw >> 8) & 0xff) + "." +
+                        ((gw >> 16) & 0xff) + "." + ((gw >> 24) & 0xff);
+            }
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
     }
 
     @Nullable

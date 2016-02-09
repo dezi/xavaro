@@ -367,7 +367,15 @@ public class CommService extends Service
     {
         String ptype = new String(data, 0, 4);
 
-        Log.d(LOGTAG,"++++++++++++++++++++++++++++" + ptype);
+        if (ptype.equals("MYIP"))
+        {
+            CommonStatic.myIPaddress = (data[ 4 ] & 0xff) + "." + (data[ 5 ] & 0xff)
+                    + "." + (data[ 6 ] & 0xff) + "." + (data[ 7 ] & 0xff);
+
+            Log.d(LOGTAG,"decryptPacket myip=" + CommonStatic.myIPaddress);
+
+            return;
+        }
 
         if (ptype.equals("CRYP"))
         {
@@ -592,6 +600,8 @@ public class CommService extends Service
 
             checkPing();
 
+            CommSender.commTick();
+
             if (! checkSocket()) continue;
 
             //
@@ -619,6 +629,12 @@ public class CommService extends Service
             String ident = null;
             String ackid = null;
             String uuid;
+
+            if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
+                    && Simple.equals(Simple.JSONgetString(mc.msg, "type"), "myip"))
+            {
+                datagramPacket.setData("MYIP".getBytes());
+            }
 
             if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
                     && Simple.equals(Simple.JSONgetString(mc.msg, "type"), "pups"))

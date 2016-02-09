@@ -24,6 +24,7 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.GCMRegistrationService;
+import de.xavaro.android.common.UPNPManager;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener
