@@ -499,44 +499,68 @@ public class Simple
         return Environment.getExternalStoragePublicDirectory(dirtype);
     }
 
-    public static File getMediaPath(String mediadir)
+    public static File getMediaPath(String disposition)
     {
-        if (mediadir.equals("screenshots"))
+        if (disposition.equals("screenshots"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
             return new File(dir, "Screenshots");
         }
 
-        if (mediadir.equals("camera"))
+        if (disposition.equals("camera"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
             return new File(dir, "Camera");
         }
 
-        if (mediadir.equals("family"))
+        if (disposition.equals("family"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
             return new File(dir, "Family");
         }
 
-        if (mediadir.equals("misc"))
+        if (disposition.equals("misc"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
             return new File(dir, "Miscellanous");
         }
 
-        if (mediadir.equals("download"))
+        if (disposition.equals("download"))
         {
             return getMediaDirType(Environment.DIRECTORY_DOWNLOADS);
         }
 
-        if (mediadir.equals("whatsapp"))
+        if (disposition.equals("whatsapp"))
         {
             File dir = Environment.getExternalStorageDirectory();
             return new File(dir, "WhatsApp/Media/WhatsApp Images");
         }
 
         return null;
+    }
+
+    public static String getTempfile(String filename)
+    {
+        return new File(Simple.getAnyContext().getCacheDir(), filename).toString();
+    }
+
+    public static long getFilesize(String filepath)
+    {
+        if (filepath == null) return 0;
+        File file = new File(filepath);
+        if (! file.exists()) return 0;
+
+        return file.length();
+    }
+
+    public static String getFilename(String filepath)
+    {
+        return new File(filepath).getName();
+    }
+
+    public static String getDirectory(String filepath)
+    {
+        return new File(filepath).getParent();
     }
 
     public static int getDeviceDPI()

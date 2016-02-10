@@ -87,6 +87,13 @@ public class Json
         json.remove(key);
     }
 
+    public static boolean equals(JSONObject j1, String k1, String val)
+    {
+        String s1 = getString(j1, k1);
+
+        return ((s1 != null) && s1.equals(val));
+    }
+
     public static boolean equals(JSONObject j1, String k1, JSONObject j2, String k2)
     {
         String s1 = getString(j1, k1);
