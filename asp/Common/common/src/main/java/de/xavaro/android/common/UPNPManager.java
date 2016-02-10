@@ -53,7 +53,4 @@ public class UPNPManager
             OopsService.log(LOGTAG, ex);
         }
     }
-
-
-
 }
