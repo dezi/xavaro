@@ -14,9 +14,11 @@ import java.io.RandomAccessFile;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -252,7 +254,6 @@ public class CommSender
                 Log.d(LOGTAG, "Accepted connection on port " + privatePort);
 
                 FileExchanger server = new FileExchanger(connect);
-
                 server.start();
             }
         }
@@ -431,10 +432,7 @@ public class CommSender
         if (Simple.equals(type, "fileTransferNeg"))
         {
             String uuid = Json.getString(message, "uuid");
-
             if (uuid == null) return;
-
-            Log.d(LOGTAG, "onMessageReceived: " + message.toString());
 
             //
             // Store into receive files list.
@@ -448,6 +446,7 @@ public class CommSender
                 {
                     if (Json.equals(recvFile, "uuid", uuid))
                     {
+                        Json.copy(recvFile, message);
                         dup = true;
                         break;
                     }
@@ -456,9 +455,17 @@ public class CommSender
                 if (! dup) recvFiles.add(message);
             }
 
-            String publicIPremote = Json.getString(message, "publicIP");
-            String privateIPremote = Json.getString(message, "privateIP");
+            String wifiNameremote = Json.getString(message, "wifiName");
             String defaultGWremote = Json.getString(message, "defaultGW");
+            String publicIPremote = Json.getString(message, "publicIP");
+
+            String privIPremote = Json.getString(message, "privateIP");
+            int privPortremote = Json.getInt(message, "privatePort");
+
+            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.publicIPaddress + "=" + publicIPremote);
+            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.privateIPaddress + "=" + privIPremote);
+            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.gwIPaddress + "=" + defaultGWremote);
+            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.wifiName + "=" + wifiNameremote);
 
             //
             // Check if on local network.
@@ -466,13 +473,27 @@ public class CommSender
 
             if (Simple.equals(CommonStatic.publicIPaddress, publicIPremote) &&
                     Simple.equals(CommonStatic.gwIPaddress, defaultGWremote) &&
-                    Simple.isSameSubnet(CommonStatic.privateIPaddress, privateIPremote))
+                    Simple.isSameSubnet(CommonStatic.privateIPaddress, privIPremote))
             {
-                //
-                // Make test call on local port.
-                //
-
                 Log.d(LOGTAG, "onMessageReceived: fileTransferNeg: could be local");
+
+                try
+                {
+                    //
+                    // Try to receive file on local port.
+                    //
+
+                    InetSocketAddress sa = new InetSocketAddress(privIPremote, privPortremote);
+                    Socket clientSocket = new Socket();
+                    clientSocket.connect(sa,1000);
+
+                    FileExchanger client = new FileExchanger(clientSocket, uuid, false);
+                    client.start();
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                }
             }
         }
     }

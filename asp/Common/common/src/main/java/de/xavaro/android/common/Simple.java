@@ -619,7 +619,7 @@ public class Simple
 
             int gw = dhcpInfo.gateway;
 
-            if (gw > 0)
+            if (gw != 0)
             {
                 return (gw & 0xff) + "." + ((gw >> 8) & 0xff) + "." +
                         ((gw >> 16) & 0xff) + "." + ((gw >> 24) & 0xff);
@@ -644,7 +644,7 @@ public class Simple
 
             int ip = dhcpInfo.ipAddress;
 
-            if (ip > 0)
+            if (ip != 0)
             {
                 return (ip & 0xff) + "." + ((ip >> 8) & 0xff) + "." +
                         ((ip >> 16) & 0xff) + "." + ((ip >> 24) & 0xff);

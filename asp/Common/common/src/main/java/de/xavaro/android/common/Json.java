@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class Json
@@ -110,9 +111,21 @@ public class Json
         return ((s1 != null) && (s2 != null) && s1.equals(s2));
     }
 
-    public static void copy(JSONObject j1, String k1, JSONObject j2)
+    public static void copy(JSONObject dst, String key, JSONObject src)
     {
-        put(j1, k1, get(j2, k1));
+        put(dst, key, get(src, key));
+    }
+
+    public static void copy(JSONObject dst, JSONObject src)
+    {
+        Iterator<String> keysIterator = src.keys();
+
+        while (keysIterator.hasNext())
+        {
+            String key = keysIterator.next();
+
+            copy(dst, key, src);
+        }
     }
 
     public static void put(JSONObject json, String key, Object val)
