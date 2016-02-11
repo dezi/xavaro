@@ -17,6 +17,7 @@ import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
 public class LaunchItemAlertcall extends LaunchItem
         implements ChatManager.ChatMessageCallback
@@ -129,7 +130,7 @@ public class LaunchItemAlertcall extends LaunchItem
 
         String message = "Der Hilferuf wurde ausgelöst";
         alertTextview.setText(message);
-        DitUndDat.SpeekDat.speak(message);
+        Speak.speak(message);
     }
 
     private Runnable alertcallCountdown = new Runnable()
@@ -153,7 +154,7 @@ public class LaunchItemAlertcall extends LaunchItem
                 String message = String.format(alertMessage, alertCountdown);
 
                 alertTextview.setText(message);
-                if ((alertCountdown % 5) == 0) DitUndDat.SpeekDat.speak(message);
+                if ((alertCountdown % 5) == 0) Speak.speak(message);
 
                 alertCountdown -= 1;
                 handler.postDelayed(alertcallCountdown, 1000);
@@ -195,7 +196,7 @@ public class LaunchItemAlertcall extends LaunchItem
             String message = "Der Hilferuf wurde abgebrochen";
 
             alertTextview.setText(message);
-            DitUndDat.SpeekDat.speak(message);
+            Speak.speak(message);
 
             alertStatus = ALERTCALL_CANCELED;
 
@@ -220,7 +221,7 @@ public class LaunchItemAlertcall extends LaunchItem
                     {
                         String message = RemoteContacts.getDisplayName(idremote);
                         message += " hat ihren Notruf empfangen";
-                        DitUndDat.SpeekDat.speak(message);
+                        Speak.speak(message);
 
                         message = alertTextview.getText() + ".\n" + message;
                         alertTextview.setText(message);
@@ -233,7 +234,7 @@ public class LaunchItemAlertcall extends LaunchItem
                 {
                     String message = RemoteContacts.getDisplayName(idremote);
                     message += " hat ihren Notruf gelesen";
-                    DitUndDat.SpeekDat.speak(message);
+                    Speak.speak(message);
 
                     message = alertTextview.getText() + ".\n" + message;
                     alertTextview.setText(message);

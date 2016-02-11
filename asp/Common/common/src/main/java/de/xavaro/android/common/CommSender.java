@@ -1,6 +1,12 @@
 package de.xavaro.android.common;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -29,6 +35,8 @@ public class CommSender
     public static final ArrayList<JSONObject> sendFiles = new ArrayList<>();
     public static final ArrayList<JSONObject> recvFiles = new ArrayList<>();
 
+    private static int runningExchangers;
+
     private static int privatePort;
     private static int publicPort;
 
@@ -40,14 +48,10 @@ public class CommSender
     private static long upnpRequestTime;
     private static long natpmpRequestTime;
     private static long transnegRequestTime;
+    private static long receiveRequestTime;
 
     public static void initialize()
     {
-        if (SystemIdentity.getIdentity().equals("dddb5240-66b4-4561-b197-fb921442d283"))
-        {
-            String filename = Simple.getMediaPath("camera") + "/" + "20160115_151407.jpg";
-            sendFile(filename, "family", "0c47a9e4-254b-4533-b900-d5e53c82435b");
-        }
     }
 
     public static void sendFile(String filepath, String disposition, String idremote)
@@ -174,8 +178,70 @@ public class CommSender
             }
         }
 
-        if (sendFiles.size() == 0) return;
+        if (runningExchangers > 0) return;
 
+        //
+        // Setup transfer negotiation packet.
+        //
+
+        if ((now - transnegRequestTime) > 10000)
+        {
+            JSONObject sendFile = null;
+
+            synchronized (sendFiles)
+            {
+                if (sendFiles.size() > 0)
+                {
+                    //
+                    // Round robin.
+                    //
+
+                    sendFile = sendFiles.remove(0);
+                    sendFiles.add(sendFile);
+                }
+            }
+
+            if (sendFile != null)
+            {
+                negotiateTransfer(sendFile);
+
+                transnegRequestTime = now;
+
+                return;
+            }
+        }
+
+        //
+        // Start receive file.
+        //
+
+        if ((now - receiveRequestTime) > 10000)
+        {
+            JSONObject recvFile = null;
+
+            synchronized (recvFiles)
+            {
+                if (recvFiles.size() > 0)
+                {
+                    //
+                    // Round robin.
+                    //
+
+                    recvFile = recvFiles.remove(0);
+                    recvFiles.add(recvFile);
+                }
+            }
+
+            if (recvFile != null)
+            {
+                receiveFile(recvFile);
+                receiveRequestTime = now;
+            }
+        }
+    }
+
+    private static void negotiateTransfer(JSONObject sendFile)
+    {
         //
         // Start server thread if required.
         //
@@ -194,47 +260,30 @@ public class CommSender
             serverThread.start();
         }
 
-        //
-        // Setup transfer negotiation packet.
-        //
+        String uuid = Json.getString(sendFile, "uuid");
+        String idremote = Json.getString(sendFile, "idremote");
+        String filename = Json.getString(sendFile, "filename");
+        String disposition = Json.getString(sendFile, "disposition");
 
-        if ((now - transnegRequestTime) > 10000)
-        {
-            String uuid;
-            String idremote;
-            String filename;
-            String disposition;
+        JSONObject fileTransferNeg = new JSONObject();
 
-            synchronized (sendFiles)
-            {
-                uuid = Json.getString(sendFiles.get(0), "uuid");
-                idremote = Json.getString(sendFiles.get(0), "idremote");
-                filename = Json.getString(sendFiles.get(0), "filename");
-                disposition = Json.getString(sendFiles.get(0), "disposition");
-            }
+        Json.put(fileTransferNeg, "type", "fileTransferNeg");
+        Json.put(fileTransferNeg, "idremote", idremote);
 
-            JSONObject fileTransferNeg = new JSONObject();
+        Json.put(fileTransferNeg, "wifiName", CommonStatic.wifiName);
+        Json.put(fileTransferNeg, "publicIP", CommonStatic.publicIPaddress);
+        Json.put(fileTransferNeg, "privateIP", CommonStatic.privateIPaddress);
+        Json.put(fileTransferNeg, "defaultGW", CommonStatic.gwIPaddress);
+        Json.put(fileTransferNeg, "publicPort", publicPort);
+        Json.put(fileTransferNeg, "privatePort", privatePort);
 
-            Json.put(fileTransferNeg, "type", "fileTransferNeg");
-            Json.put(fileTransferNeg, "idremote", idremote);
+        Json.put(fileTransferNeg, "uuid", uuid);
+        Json.put(fileTransferNeg, "filename", Simple.getFilename(filename));
+        Json.put(fileTransferNeg, "disposition", disposition);
 
-            Json.put(fileTransferNeg, "wifiName", CommonStatic.wifiName);
-            Json.put(fileTransferNeg, "publicIP", CommonStatic.publicIPaddress);
-            Json.put(fileTransferNeg, "privateIP", CommonStatic.privateIPaddress);
-            Json.put(fileTransferNeg, "defaultGW", CommonStatic.gwIPaddress);
-            Json.put(fileTransferNeg, "publicPort", publicPort);
-            Json.put(fileTransferNeg, "privatePort", privatePort);
+        CommService.sendEncrypted(fileTransferNeg, true);
 
-            Json.put(fileTransferNeg, "uuid", uuid);
-            Json.put(fileTransferNeg, "filename", filename);
-            Json.put(fileTransferNeg, "disposition", disposition);
-
-            //Log.d(LOGTAG, "commTick: transneg" + fileTransferNeg.toString());
-
-            CommService.sendEncrypted(fileTransferNeg, true);
-
-            transnegRequestTime = now;
-        }
+        Json.put(sendFile, "fileTransferNeg", true);
     }
 
     private static void serverLoop()
@@ -275,110 +324,6 @@ public class CommSender
             serverSocket = null;
             serverThread = null;
         }
-    }
-
-    private static boolean checkUPNP()
-    {
-        final String DISCOVER_MESSAGE_ROOTDEVICE =
-                "M-SEARCH * HTTP/1.1\r\n" +
-                        "ST: upnp:rootdevice\r\n" +
-                        "MX: 3\r\n" +
-                        "MAN: ssdp:discover\r\n" +
-                        "HOST: 239.255.255.250:1900\r\n" +
-                        "\r\n";
-
-        try
-        {
-            InetAddress multicastAddress = InetAddress.getByName("239.255.255.250");
-
-            final int port = 1900;
-            MulticastSocket socket = new MulticastSocket(port);
-            socket.setReuseAddress(true);
-            socket.setSoTimeout(1000);
-            socket.joinGroup(multicastAddress);
-
-            byte[] txbuf = DISCOVER_MESSAGE_ROOTDEVICE.getBytes();
-            DatagramPacket hi = new DatagramPacket(txbuf, txbuf.length, multicastAddress, port);
-            socket.send(hi);
-
-            Log.d(LOGTAG, "checkUPNP: SSDP discover sent");
-
-            while (true)
-            {
-                byte[] rxbuf = new byte[ 8192 ];
-                DatagramPacket packet = new DatagramPacket(rxbuf, rxbuf.length);
-                socket.receive(packet);
-
-                Log.d(LOGTAG, "checkUPNP: SSDP discover=" + rxbuf.length);
-            }
-        }
-        catch (Exception ignore)
-        {
-            Log.d(LOGTAG,"checkUpnp: not available");
-        }
-
-        return false;
-    }
-
-    private static boolean checkNATPMP()
-    {
-        try
-        {
-            DatagramSocket dgramSock = new DatagramSocket();
-            dgramSock.setSoTimeout(1000);
-
-            InetAddress gwip = InetAddress.getByName(CommonStatic.gwIPaddress);
-
-            byte[] pareqdata = new byte[] { 0, 0 };
-            DatagramPacket pareq = new DatagramPacket(pareqdata, pareqdata.length, gwip, 5351);
-            dgramSock.send(pareq);
-
-            byte[] paresbuf = new byte[ 12 ];
-            DatagramPacket pares = new DatagramPacket(paresbuf, paresbuf.length);
-            dgramSock.receive(pares);
-
-            CommonStatic.publicIPaddress
-                    = (paresbuf[  8 ] & 0xff) + "."
-                    + (paresbuf[  9 ] & 0xff) + "."
-                    + (paresbuf[ 10 ] & 0xff) + "."
-                    + (paresbuf[ 11 ] & 0xff);
-
-            Log.d(LOGTAG, "checkNATPMP: paresponse:" + Simple.getHexBytesToString(pares.getData()));
-            Log.d(LOGTAG, "checkNATPMP: public-ip:" + CommonStatic.publicIPaddress);
-
-            byte[] pmreqdata = new byte[] {
-                    0, // version
-                    2, // udp (for tcp choose 2)
-                    0, 0, // reserved
-                    (byte) ((privatePort >> 8) & 0xff),
-                    (byte) (privatePort & 0xff),
-                    0x47, 0x11, // public port
-                    0, 0, 0, 60 // time to live for mapping
-                    };
-
-            DatagramPacket pmreq = new DatagramPacket(pmreqdata, pmreqdata.length, gwip, 5351);
-            dgramSock.send(pmreq);
-
-            byte[] pmresbuf = new byte[ 12 ];
-            DatagramPacket pmres = new DatagramPacket(pmresbuf, pmresbuf.length);
-            dgramSock.receive(pmres);
-
-            int pri = ((pmresbuf[  8 ] & 0xff) << 8) + (pmresbuf[  9 ] & 0xff);
-            int pub = ((pmresbuf[ 10 ] & 0xff) << 8) + (pmresbuf[ 11 ] & 0xff);
-
-            Log.d(LOGTAG, "checkNATPMP: pmresponse:" + Simple.getHexBytesToString(pmres.getData()));
-            Log.d(LOGTAG, "checkNATPMP: priv-port:" + pri + " pub-port:" + pub);
-
-            publicPort = pub;
-
-            return true;
-        }
-        catch (Exception ignore)
-        {
-            Log.d(LOGTAG,"checkNATPMP: not available");
-        }
-
-        return false;
     }
 
     @Nullable
@@ -425,7 +370,7 @@ public class CommSender
 
     public static void onMessageReceived(JSONObject message)
     {
-        if (! message.has("type")) return;
+        if (!message.has("type")) return;
 
         String type = Json.getString(message, "type");
 
@@ -452,55 +397,132 @@ public class CommSender
                     }
                 }
 
-                if (! dup) recvFiles.add(message);
-            }
-
-            String wifiNameremote = Json.getString(message, "wifiName");
-            String defaultGWremote = Json.getString(message, "defaultGW");
-            String publicIPremote = Json.getString(message, "publicIP");
-
-            String privIPremote = Json.getString(message, "privateIP");
-            int privPortremote = Json.getInt(message, "privatePort");
-
-            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.publicIPaddress + "=" + publicIPremote);
-            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.privateIPaddress + "=" + privIPremote);
-            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.gwIPaddress + "=" + defaultGWremote);
-            Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.wifiName + "=" + wifiNameremote);
-
-            //
-            // Check if on local network.
-            //
-
-            if (Simple.equals(CommonStatic.publicIPaddress, publicIPremote) &&
-                    Simple.equals(CommonStatic.gwIPaddress, defaultGWremote) &&
-                    Simple.isSameSubnet(CommonStatic.privateIPaddress, privIPremote))
-            {
-                Log.d(LOGTAG, "onMessageReceived: fileTransferNeg: could be local");
-
-                try
-                {
-                    //
-                    // Try to receive file on local port.
-                    //
-
-                    InetSocketAddress sa = new InetSocketAddress(privIPremote, privPortremote);
-                    Socket clientSocket = new Socket();
-                    clientSocket.connect(sa,1000);
-
-                    FileExchanger client = new FileExchanger(clientSocket, uuid, false);
-                    client.start();
-                }
-                catch (Exception ex)
-                {
-                    ex.printStackTrace();
-                }
+                if (!dup) recvFiles.add(message);
             }
         }
     }
 
+    private static void receiveFile(JSONObject recvFile)
+    {
+        String uuid = Json.getString(recvFile, "uuid");
+        String wifiNameremote = Json.getString(recvFile, "wifiName");
+        String defaultGWremote = Json.getString(recvFile, "defaultGW");
+        String publicIPremote = Json.getString(recvFile, "publicIP");
+
+        String privIPremote = Json.getString(recvFile, "privateIP");
+        int privPortremote = Json.getInt(recvFile, "privatePort");
+
+        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.publicIPaddress + "=" + publicIPremote);
+        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.privateIPaddress + "=" + privIPremote);
+        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.gwIPaddress + "=" + defaultGWremote);
+        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.wifiName + "=" + wifiNameremote);
+
+        //
+        // Check if on local network.
+        //
+
+        if (Simple.equals(CommonStatic.publicIPaddress, publicIPremote) &&
+                Simple.equals(CommonStatic.gwIPaddress, defaultGWremote) &&
+                Simple.isSameSubnet(CommonStatic.privateIPaddress, privIPremote))
+        {
+            Log.d(LOGTAG, "onMessageReceived: fileTransferNeg: could be local");
+
+            try
+            {
+                //
+                // Try to receive file on local port.
+                //
+
+                InetSocketAddress sa = new InetSocketAddress(privIPremote, privPortremote);
+                Socket clientSocket = new Socket();
+                clientSocket.connect(sa, 1000);
+
+                FileExchanger client = new FileExchanger(clientSocket, uuid, false);
+                client.start();
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private static void notifySend(String uuid)
+    {
+        JSONObject sendFile = getSendFile(uuid, true);
+        if (sendFile == null) return;
+
+        String idremote = Json.getString(sendFile, "idremote");
+        String name = RemoteContacts.getDisplayName(idremote);
+
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        int iconRes = R.drawable.community_notification_64x64;
+
+        nb.setAutoCancel(true);
+        nb.setSmallIcon(iconRes);
+        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
+        nb.setContentTitle("Bild versendet");
+        nb.setContentText("Ein Bild wurde erfolgreich an " + name + " versendet.");
+        nb.setSound(soundUri);
+
+        NotificationManager nm = Simple.getNotificationManager();
+        nm.notify(0, nb.build());
+    }
+
+    private static void notifyReceived(String uuid)
+    {
+        JSONObject recvFile = getRecvFile(uuid, true);
+        if (recvFile == null) return;
+
+        String idremote = Json.getString(recvFile, "identity");
+        String filename = Json.getString(recvFile, "filename");
+        String disposition = Json.getString(recvFile, "disposition");
+
+        if ((idremote == null) || (filename == null) || (disposition == null)) return;
+
+        String name = RemoteContacts.getDisplayName(idremote);
+
+        File tempfile = new File(Simple.getTempfile(uuid + ".tmp"));
+        File mediapath = Simple.getMediaPath(disposition);
+        File mediafile = new File(mediapath,filename);
+
+        if (! mediapath.exists()) mediapath.mkdir();
+
+        Log.d(LOGTAG,"notifyReceived: disposition:" + disposition);
+        Log.d(LOGTAG,"notifyReceived: from:" + tempfile.toString());
+        Log.d(LOGTAG,"notifyReceived: toto:" + mediafile.toString());
+
+        if (! tempfile.renameTo(mediafile))
+        {
+            // todo clobber shit.
+
+            if (Simple.fileCopy(tempfile, mediafile))
+            {
+                tempfile.delete();
+            }
+        }
+
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        int iconRes = R.drawable.community_notification_64x64;
+
+        nb.setAutoCancel(true);
+        nb.setSmallIcon(iconRes);
+        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
+        nb.setContentTitle("Bild empfange");
+        nb.setContentText("Ein Bild wurde erfolgreich von " + name + " empfangen.");
+        nb.setSound(soundUri);
+
+        NotificationManager nm = Simple.getNotificationManager();
+        nm.notify(0, nb.build());
+    }
+
     private static class FileExchanger extends Thread
     {
-        private final String LOGTAG = FileExchanger.class.getSimpleName();
+        private final static String LOGTAG = FileExchanger.class.getSimpleName();
 
         private int chunkSize = 8192;
 
@@ -539,6 +561,11 @@ public class CommSender
         @Override
         public void run()
         {
+            synchronized (sendFiles)
+            {
+                runningExchangers++;
+            }
+
             try
             {
                 boolean ok1 = isServer ? getHeaders() : putHeaders();
@@ -547,105 +574,106 @@ public class CommSender
                 if (! (ok1 && ok2))
                 {
                     logDat("headers failed");
-
-                    return;
                 }
-
-                byte[] chunkBuffer = new byte[ chunkSize ];
-                RandomAccessFile fd = null;
-
-                if (requestMethod.equals("XPUT"))
+                else
                 {
-                    JSONObject sendFile = getSendFile(requestUuid, false);
+                    byte[] chunkBuffer = new byte[ chunkSize ];
+                    RandomAccessFile fd = null;
 
-                    if (sendFile == null)
+                    if (requestMethod.equals("XPUT"))
                     {
-                        logDat("no sendFile");
+                        JSONObject sendFile = getSendFile(requestUuid, false);
 
-                        return;
-                    }
-
-                    String filepath = Json.getString(sendFile, "filepath");
-
-                    if (filepath == null)
-                    {
-                        logDat("no file spec");
-
-                        return;
-                    }
-
-                    fd = new RandomAccessFile(filepath, "r");
-                    if (contentLength > 0) fd.seek(contentLength);
-                    long xsize = fd.length() - contentLength;
-                    long xfer = 0;
-
-                    while (xfer < xsize)
-                    {
-                        long chunk = xsize - xfer;
-                        if (chunk > chunkSize) chunk = chunkSize;
-
-                        int yfer = fd.read(chunkBuffer, 0, (int) chunk);
-                        if (yfer < 0) break;
-
-                        // todo AES encrypt.
-
-                        Log.d(LOGTAG,"uploading: " + filepath + "=" + xfer);
-
-                        requestOutput.write(chunkBuffer, 0, yfer);
-
-                        xfer += yfer;
-                    }
-                }
-
-                if (requestMethod.equals("XGET"))
-                {
-                    JSONObject recvFile = getRecvFile(requestUuid, false);
-
-                    if (recvFile == null)
-                    {
-                        logDat("no recvFile");
-
-                        return;
-                    }
-
-                    String filepath = Simple.getTempfile(requestUuid + ".tmp");
-
-                    fd = new RandomAccessFile(filepath, "rw");
-                    if (fd.length() > 0) fd.seek(fd.length());
-                    long xsize = contentLength - fd.length();
-                    long xfer = 0;
-
-                    while (xfer < xsize)
-                    {
-                        long chunk = xsize - xfer;
-                        if (chunk > chunkSize) chunk = chunkSize;
-
-                        //
-                        // Must read complete chunk or until eof
-                        // for AES decryption.
-                        //
-
-                        int yfer = 0;
-
-                        while (yfer < chunk)
+                        if (sendFile != null)
                         {
-                            int part = requestInput.read(chunkBuffer, yfer, (int) (chunk - yfer));
-                            if (part < 0) break;
+                            String filepath = Json.getString(sendFile, "filepath");
+                            fd = new RandomAccessFile(filepath, "r");
+                            if (contentLength > 0) fd.seek(contentLength);
+                            long xsize = fd.length() - contentLength;
+                            long xfer = 0;
 
-                            yfer += part;
+                            while (xfer < xsize)
+                            {
+                                long chunk = xsize - xfer;
+                                if (chunk > chunkSize) chunk = chunkSize;
+
+                                int yfer = fd.read(chunkBuffer, 0, (int) chunk);
+                                if (yfer < 0) break;
+
+                                // todo AES encrypt.
+
+                                Log.d(LOGTAG, "uploading: " + filepath + "=" + xfer);
+
+                                requestOutput.write(chunkBuffer, 0, yfer);
+
+                                xfer += yfer;
+                            }
+
+                            fd.close();
+
+                            if (xfer == xsize)
+                            {
+                                Log.d(LOGTAG, "File send:" + requestUuid);
+
+                                notifySend(requestUuid);
+                            }
                         }
+                    }
 
-                        // todo AES decrypt.
+                    if (requestMethod.equals("XGET"))
+                    {
+                        JSONObject recvFile = getRecvFile(requestUuid, false);
 
-                        Log.d(LOGTAG,"downloading: " + filepath + "=" + xfer);
+                        if (recvFile != null)
+                        {
+                            String filepath = Simple.getTempfile(requestUuid + ".tmp");
 
-                        fd.write(chunkBuffer, 0, (int) yfer);
+                            fd = new RandomAccessFile(filepath, "rw");
+                            if (fd.length() > 0) fd.seek(fd.length());
+                            long xsize = contentLength - fd.length();
+                            long xfer = 0;
 
-                        xfer += yfer;
+                            while (xfer < xsize)
+                            {
+                                long chunk = xsize - xfer;
+                                if (chunk > chunkSize) chunk = chunkSize;
+
+                                //
+                                // Must read complete chunk or until eof
+                                // for AES decryption.
+                                //
+
+                                int yfer = 0;
+
+                                while (yfer < chunk)
+                                {
+                                    int rest = (int) (chunk - yfer);
+                                    int part = requestInput.read(chunkBuffer, yfer, rest);
+                                    if (part < 0) break;
+
+                                    yfer += part;
+                                }
+
+                                // todo AES decrypt.
+
+                                Log.d(LOGTAG, "downloading: " + filepath + "=" + xfer);
+
+                                fd.write(chunkBuffer, 0, (int) yfer);
+
+                                xfer += yfer;
+                            }
+
+                            fd.close();
+
+                            if (xfer == xsize)
+                            {
+                                Log.d(LOGTAG, "File received:" + requestUuid);
+
+                                notifyReceived(requestUuid);
+                            }
+                        }
                     }
                 }
-
-                if (fd != null) fd.close();
 
                 requestInput.close();
                 requestOutput.close();
@@ -653,6 +681,11 @@ public class CommSender
             catch (Exception ex)
             {
                 OopsService.log(LOGTAG, ex);
+            }
+
+            synchronized (sendFiles)
+            {
+                runningExchangers--;
             }
         }
 
@@ -735,4 +768,112 @@ public class CommSender
             return true;
         }
     }
+
+    //region Firewall stuff.
+
+    private static boolean checkUPNP()
+    {
+        final String DISCOVER_MESSAGE_ROOTDEVICE =
+                "M-SEARCH * HTTP/1.1\r\n" +
+                        "ST: upnp:rootdevice\r\n" +
+                        "MX: 3\r\n" +
+                        "MAN: ssdp:discover\r\n" +
+                        "HOST: 239.255.255.250:1900\r\n" +
+                        "\r\n";
+
+        try
+        {
+            InetAddress multicastAddress = InetAddress.getByName("239.255.255.250");
+
+            final int port = 1900;
+            MulticastSocket socket = new MulticastSocket(port);
+            socket.setReuseAddress(true);
+            socket.setSoTimeout(1000);
+            socket.joinGroup(multicastAddress);
+
+            byte[] txbuf = DISCOVER_MESSAGE_ROOTDEVICE.getBytes();
+            DatagramPacket hi = new DatagramPacket(txbuf, txbuf.length, multicastAddress, port);
+            socket.send(hi);
+
+            Log.d(LOGTAG, "checkUPNP: SSDP discover sent");
+
+            while (true)
+            {
+                byte[] rxbuf = new byte[ 8192 ];
+                DatagramPacket packet = new DatagramPacket(rxbuf, rxbuf.length);
+                socket.receive(packet);
+
+                Log.d(LOGTAG, "checkUPNP: SSDP discover=" + rxbuf.length);
+            }
+        }
+        catch (Exception ignore)
+        {
+            Log.d(LOGTAG,"checkUpnp: not available");
+        }
+
+        return false;
+    }
+
+    private static boolean checkNATPMP()
+    {
+        try
+        {
+            DatagramSocket dgramSock = new DatagramSocket();
+            dgramSock.setSoTimeout(1000);
+
+            InetAddress gwip = InetAddress.getByName(CommonStatic.gwIPaddress);
+
+            byte[] pareqdata = new byte[] { 0, 0 };
+            DatagramPacket pareq = new DatagramPacket(pareqdata, pareqdata.length, gwip, 5351);
+            dgramSock.send(pareq);
+
+            byte[] paresbuf = new byte[ 12 ];
+            DatagramPacket pares = new DatagramPacket(paresbuf, paresbuf.length);
+            dgramSock.receive(pares);
+
+            CommonStatic.publicIPaddress
+                    = (paresbuf[  8 ] & 0xff) + "."
+                    + (paresbuf[  9 ] & 0xff) + "."
+                    + (paresbuf[ 10 ] & 0xff) + "."
+                    + (paresbuf[ 11 ] & 0xff);
+
+            Log.d(LOGTAG, "checkNATPMP: paresponse:" + Simple.getHexBytesToString(pares.getData()));
+            Log.d(LOGTAG, "checkNATPMP: public-ip:" + CommonStatic.publicIPaddress);
+
+            byte[] pmreqdata = new byte[] {
+                    0, // version
+                    2, // udp (for tcp choose 2)
+                    0, 0, // reserved
+                    (byte) ((privatePort >> 8) & 0xff),
+                    (byte) (privatePort & 0xff),
+                    0x47, 0x11, // public port
+                    0, 0, 0, 60 // time to live for mapping
+            };
+
+            DatagramPacket pmreq = new DatagramPacket(pmreqdata, pmreqdata.length, gwip, 5351);
+            dgramSock.send(pmreq);
+
+            byte[] pmresbuf = new byte[ 12 ];
+            DatagramPacket pmres = new DatagramPacket(pmresbuf, pmresbuf.length);
+            dgramSock.receive(pmres);
+
+            int pri = ((pmresbuf[  8 ] & 0xff) << 8) + (pmresbuf[  9 ] & 0xff);
+            int pub = ((pmresbuf[ 10 ] & 0xff) << 8) + (pmresbuf[ 11 ] & 0xff);
+
+            Log.d(LOGTAG, "checkNATPMP: pmresponse:" + Simple.getHexBytesToString(pmres.getData()));
+            Log.d(LOGTAG, "checkNATPMP: priv-port:" + pri + " pub-port:" + pub);
+
+            publicPort = pub;
+
+            return true;
+        }
+        catch (Exception ignore)
+        {
+            Log.d(LOGTAG,"checkNATPMP: not available");
+        }
+
+        return false;
+    }
+
+    //endregion Firewall stuff.
 }

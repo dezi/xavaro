@@ -100,7 +100,7 @@ public class LaunchGroupMedia
 
                     String mediadir = prefkey.substring(keyprefix.length());
 
-                    String label = Simple.getTransTrans(
+                    String label = Simple.getTransVal(
                             R.array.pref_media_image_directories_keys, mediadir);
 
                     JSONObject whatsentry = new JSONObject();

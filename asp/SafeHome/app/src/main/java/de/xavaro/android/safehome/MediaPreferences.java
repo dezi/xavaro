@@ -1,10 +1,18 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 
 public class MediaPreferences
@@ -34,6 +42,8 @@ public class MediaPreferences
             masterenable = "Bilder freischalten";
         }
 
+        private ArrayList<NicedPreferences.NiceCheckboxPreference> contacts = new ArrayList<>();
+
         @Override
         public void registerAll(Context context)
         {
@@ -42,6 +52,7 @@ public class MediaPreferences
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceCheckboxPreference cp;
             NicedPreferences.NiceGalleryPreference gp;
+            NicedPreferences.NiceSwitchPreference sp;
 
             //
             // Settings.
@@ -87,6 +98,60 @@ public class MediaPreferences
                 gp.setEnabled(enabled);
 
                 preferences.add(gp);
+            }
+
+            //
+            // Send images.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Einfaches Versenden");
+            preferences.add(pc);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".simplesend.enable");
+            sp.setTitle("Freischalten");
+            sp.setEnabled(enabled);
+
+            sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    for (NicedPreferences.NiceCheckboxPreference cb : contacts)
+                    {
+                        cb.setEnabled((boolean) newValue);
+                    }
+
+                    return true;
+                }
+            });
+
+            preferences.add(sp);
+
+            boolean simpleenabled = Simple.getSharedPrefBoolean(sp.getKey());
+
+            JSONObject rcs = RemoteContacts.getAllContacts();
+
+            if (rcs != null)
+            {
+                Iterator<String> keysIterator = rcs.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String ident = keysIterator.next();
+                    String name = RemoteContacts.getDisplayName(ident);
+
+                    cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+                    cp.setKey(keyprefix + ".simplesend.contact." + ident);
+                    cp.setTitle(name);
+                    cp.setEnabled(enabled && simpleenabled);
+
+                    contacts.add(cp);
+                    preferences.add(cp);
+                }
             }
         }
     }

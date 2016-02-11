@@ -80,7 +80,6 @@ public class HomeActivity extends AppCompatActivity implements
         ArchievementManager.reset("alertcall.shortclick");
 
         SettingsFragments.initialize(this);
-        DitUndDat.SpeekDat.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
         LaunchGroupHealth.initialize(this);
 

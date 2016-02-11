@@ -422,8 +422,7 @@ public class PreferencesBasics
 
         private void registerRemotes(Context context, boolean update)
         {
-            String xpath = "RemoteContacts/identities";
-            JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
+            JSONObject rcs = RemoteContacts.getAllContacts();
             if (rcs == null) return;
 
             Iterator<String> keysIterator = rcs.keys();

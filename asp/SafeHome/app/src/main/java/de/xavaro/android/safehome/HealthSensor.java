@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
 public class HealthSensor extends HealthBase
 {
@@ -55,11 +56,11 @@ public class HealthSensor extends HealthBase
 
                 if (steps == 0)
                 {
-                    DitUndDat.SpeekDat.speak("Sie sind heute noch keine Schritte gegangen");
+                    Speak.speak("Sie sind heute noch keine Schritte gegangen");
                 }
                 else
                 {
-                    DitUndDat.SpeekDat.speak("Sie sind heute " + steps + " Schritte gegangen");
+                    Speak.speak("Sie sind heute " + steps + " Schritte gegangen");
                 }
             }
         }

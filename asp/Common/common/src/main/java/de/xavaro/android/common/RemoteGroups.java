@@ -109,15 +109,15 @@ public class RemoteGroups
     {
         Log.d(LOGTAG,"updateGroupFromPreferences: " + groupprefix);
 
-        String groupidentity = Simple.getPreferenceString(groupprefix + ".groupidentity");
+        String groupidentity = Simple.getSharedPrefString(groupprefix + ".groupidentity");
 
         JSONObject group = new JSONObject();
 
         Json.put(group, "groupidentity", groupidentity);
-        Json.put(group, "type", Simple.getPreferenceString(groupprefix + ".type"));
+        Json.put(group, "type", Simple.getSharedPrefString(groupprefix + ".type"));
         Json.put(group, "owner", SystemIdentity.getIdentity());
-        Json.put(group, "passPhrase", Simple.getPreferenceString(groupprefix + ".passphrase"));
-        Json.put(group, "name", Simple.getPreferenceString(groupprefix + ".name"));
+        Json.put(group, "passPhrase", Simple.getSharedPrefString(groupprefix + ".passphrase"));
+        Json.put(group, "name", Simple.getSharedPrefString(groupprefix + ".name"));
 
         boolean dirty = updateGroup(group);
 

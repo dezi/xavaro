@@ -7,9 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
 
+import de.xavaro.android.common.CommSender;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
 public class LaunchItemMedia extends LaunchItem
 {
@@ -31,6 +36,7 @@ public class LaunchItemMedia extends LaunchItem
         {
             String imagefile = Json.getString(config, "mediaitem");
             icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(imagefile, 200));
+
             found = true;
         }
 
@@ -39,26 +45,33 @@ public class LaunchItemMedia extends LaunchItem
             String mediadir = Json.getString(config, "mediadir");
             File mediapath = Simple.getMediaPath(mediadir);
 
-            if (! mediapath.exists()) mediapath.mkdir();
-
-            if ((mediapath != null) && mediapath.isDirectory())
+            if (mediapath != null)
             {
-                JSONArray images = Simple.getDirectorySortedByAge(
-                        mediapath, new Simple.ImageFileFilter(), true);
-
-                if ((images != null) && (images.length() > 0))
+                if (! mediapath.exists())
                 {
-                    JSONObject newest = Json.getObject(images, 0);
-                    String file = Json.getString(newest, "file");
-                    icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(file, 200));
+                    //noinspection ResultOfMethodCallIgnored
+                    mediapath.mkdir();
+                }
 
-                    numberImages = images.length();
+                if (mediapath.isDirectory())
+                {
+                    JSONArray images = Simple.getDirectorySortedByAge(
+                            mediapath, new Simple.ImageFileFilter(), true);
 
-                    labelText = Json.getString(config, "label");
-                    labelText += " (" + numberImages + ")";
-                    setLabelText(labelText);
+                    if ((images != null) && (images.length() > 0))
+                    {
+                        JSONObject newest = Json.getObject(images, 0);
+                        String file = Json.getString(newest, "file");
+                        icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(file, 200));
 
-                    found = true;
+                        numberImages = images.length();
+
+                        labelText = Json.getString(config, "label");
+                        labelText += " (" + numberImages + ")";
+                        setLabelText(labelText);
+
+                        found = true;
+                    }
                 }
             }
         }
@@ -73,6 +86,63 @@ public class LaunchItemMedia extends LaunchItem
     }
 
     @Override
+    protected boolean onMyLongClick()
+    {
+        Log.d(LOGTAG, "onMyLongClick---------------------");
+
+        if (Simple.equals(subtype, "image") && config.has("mediaitem"))
+        {
+            if (Simple.getSharedPrefBoolean("media.image.simplesend.enable"))
+            {
+                String imagefile = Json.getString(config, "mediaitem");
+
+                String prefix = "media.image.simplesend.contact.";
+                Map<String, Object> contacts = Simple.getAllPreferences(prefix);
+
+                ArrayList<String> receivers = new ArrayList<>();
+
+                for (Map.Entry<String, Object> entry : contacts.entrySet())
+                {
+                    if (! (entry.getValue() instanceof Boolean)) continue;
+                    if (! (boolean) entry.getValue()) continue;
+
+                    String prefkey = entry.getKey();
+                    String idremote = prefkey.substring(prefix.length(),prefkey.length());
+
+                    String name = RemoteContacts.getDisplayName(idremote);
+
+                    Log.d(LOGTAG,"==========================" + prefkey + "=" + idremote);
+
+                    CommSender.sendFile(imagefile, "incoming", idremote);
+
+                    receivers.add(name);
+                }
+
+                if (receivers.size() > 0)
+                {
+                    String receivermsg = "";
+
+                    for (int inx = 0; inx < receivers.size(); inx++)
+                    {
+                        if ((inx > 0) && ((inx + 1) < receivers.size())) receivermsg += ", ";
+
+                        if ((inx > 0) && ((inx + 1) == receivers.size()))
+                        {
+                            receivermsg += " " + Simple.getTrans(R.string.simple_and) + " ";
+                        }
+
+                        receivermsg += receivers.get(inx);
+                    }
+
+                    Speak.speak(Simple.getTrans(R.string.launch_media_simple_send, receivermsg));
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     protected void onMyClick()
     {
         if (Simple.equals(subtype, "image")) launchImage();
@@ -82,6 +152,8 @@ public class LaunchItemMedia extends LaunchItem
     {
         if (config.has("mediaitem"))
         {
+            // todo display image.
+
             return;
         }
 
@@ -92,8 +164,7 @@ public class LaunchItemMedia extends LaunchItem
                 if (numberImages == 0)
                 {
                     String message = "Es sind keine Bilder enthalten.";
-                    DitUndDat.SpeekDat.speak(message);
-                    Simple.makeToast(message);
+                    Speak.speak(message);
 
                     return;
                 }

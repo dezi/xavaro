@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
 public class HealthGlucose extends HealthBase
 {
@@ -63,7 +64,7 @@ public class HealthGlucose extends HealthBase
                     speak = "Die letzte Messung wurde mit Kontrollflüssigkeit durchgeführt";
                 if (ngv != 0) speak = "Die letzte Messung war fehlerhaft";
 
-                DitUndDat.SpeekDat.speak(speak);
+                Speak.speak(speak);
             }
 
             lastRecord = null;

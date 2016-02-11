@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import android.content.SharedPreferences;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -109,6 +110,11 @@ public class RemoteContacts
         }
 
         return null;
+    }
+
+    public static JSONObject getAllContacts()
+    {
+        return PersistManager.getXpathJSONObject(xPathRoot);
     }
 
     public static String getDisplayName(String ident)

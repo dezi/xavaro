@@ -46,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
@@ -289,46 +290,6 @@ public class Simple
         return new String(bytes);
     }
 
-    public static String getPreferenceString(String prefkey)
-    {
-        return getSharedPrefs().getString(prefkey, null);
-    }
-
-    public static Map<String, Object> getAllPreferences(String prefix)
-    {
-        Map<String, Object> result = new HashMap<>();
-
-        Map<String, ?> prefs = getSharedPrefs().getAll();
-
-        for (Map.Entry<String, ?> entry : prefs.entrySet())
-        {
-            if ((prefix != null) && !entry.getKey().startsWith(prefix)) continue;
-
-            result.put(entry.getKey(), entry.getValue());
-        }
-
-        return result;
-    }
-
-    public static void removePreference(String key)
-    {
-        Simple.getSharedPrefs().edit().remove(key).commit();
-    }
-
-    public static void removeAllPreferences(String prefix)
-    {
-        SharedPreferences sp = getSharedPrefs();
-
-        Map<String, ?> prefs = sp.getAll();
-
-        for (Map.Entry<String, ?> entry : prefs.entrySet())
-        {
-            if (!entry.getKey().startsWith(prefix)) continue;
-
-            sp.edit().remove(entry.getKey()).apply();
-        }
-    }
-
     public static View removeFromParent(View view)
     {
         ((ViewGroup) view.getParent()).removeView(view);
@@ -463,9 +424,14 @@ public class Simple
         return (textsize / getDeviceDPI()) * 160;
     }
 
-    public static String getTransString(int resid)
+    public static String getTrans(int resid)
     {
         return appContext.getResources().getString(resid);
+    }
+
+    public static String getTrans(int resid, Object... args)
+    {
+        return String.format(getTrans(resid), args);
     }
 
     public static String[] getTransArray(int resid)
@@ -473,7 +439,7 @@ public class Simple
         return appContext.getResources().getStringArray(resid);
     }
 
-    public static String getTransTrans(int residkeys, String keyval)
+    public static String getTransVal(int residkeys, String keyval)
     {
         Resources res = anyContext.getResources();
 
@@ -494,11 +460,63 @@ public class Simple
         return keyval;
     }
 
+    public static boolean fileCopy(File src, File dst)
+    {
+        boolean result = false;
+
+        InputStream in = null;
+        OutputStream out = null;
+
+        try
+        {
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
+
+            byte[] buf = new byte[ 8192 ];
+            int len;
+
+            while ((len = in.read(buf)) > 0)
+            {
+                out.write(buf, 0, len);
+            }
+
+            result = true;
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        if (in != null)
+        {
+            try
+            {
+                in.close();
+            }
+            catch (IOException ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+        }
+
+        try
+        {
+            if (out != null) out.close();
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return result;
+    }
+
     public static File getMediaDirType(String dirtype)
     {
         return Environment.getExternalStoragePublicDirectory(dirtype);
     }
 
+    @Nullable
     public static File getMediaPath(String disposition)
     {
         if (disposition.equals("screenshots"))
@@ -517,6 +535,12 @@ public class Simple
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
             return new File(dir, "Family");
+        }
+
+        if (disposition.equals("incoming"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+            return new File(dir, "Incoming");
         }
 
         if (disposition.equals("misc"))
@@ -571,11 +595,6 @@ public class Simple
     public static String getUUID()
     {
         return UUID.randomUUID().toString();
-    }
-
-    public static SharedPreferences getSharedPrefs()
-    {
-        return PreferenceManager.getDefaultSharedPreferences(anyContext);
     }
 
     public static NotificationManager getNotificationManager()
@@ -665,7 +684,6 @@ public class Simple
         try
         {
             WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
-            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
 
             return wifiManager.getConnectionInfo().getSSID().replace("\"", "");
         }
@@ -683,6 +701,7 @@ public class Simple
         String[] ip1parts = ip1.split("\\.");
         String[] ip2parts = ip2.split("\\.");
 
+        //noinspection SimplifiableIfStatement
         if (ip1parts.length != ip2parts.length) return false;
 
         return ip1parts[ 0 ].equals(ip2parts[ 0 ]) &&
@@ -1432,4 +1451,64 @@ public class Simple
     }
 
     //endregion Directory stuff
+
+    //region Preference stuff
+
+    public static SharedPreferences getSharedPrefs()
+    {
+        return PreferenceManager.getDefaultSharedPreferences(anyContext);
+    }
+
+    public static int getSharedPrefInt(String key)
+    {
+        return getSharedPrefs().getInt(key, 0);
+    }
+
+    @Nullable
+    public static String getSharedPrefString(String key)
+    {
+        return getSharedPrefs().getString(key, null);
+    }
+
+    public static boolean getSharedPrefBoolean(String key)
+    {
+        return getSharedPrefs().getBoolean(key, false);
+    }
+
+    public static Map<String, Object> getAllPreferences(String prefix)
+    {
+        Map<String, Object> result = new HashMap<>();
+
+        Map<String, ?> prefs = getSharedPrefs().getAll();
+
+        for (Map.Entry<String, ?> entry : prefs.entrySet())
+        {
+            if ((prefix != null) && !entry.getKey().startsWith(prefix)) continue;
+
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+    }
+
+    public static void removePreference(String key)
+    {
+        Simple.getSharedPrefs().edit().remove(key).commit();
+    }
+
+    public static void removeAllPreferences(String prefix)
+    {
+        SharedPreferences sp = getSharedPrefs();
+
+        Map<String, ?> prefs = sp.getAll();
+
+        for (Map.Entry<String, ?> entry : prefs.entrySet())
+        {
+            if (!entry.getKey().startsWith(prefix)) continue;
+
+            sp.edit().remove(entry.getKey()).apply();
+        }
+    }
+
+    //endregion Preference stuff
 }

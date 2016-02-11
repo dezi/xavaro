@@ -1,6 +1,9 @@
 <resources>
 
+    <string name="simple_and">und</string>
+
     <string-array name="pref_media_image_directories_vals">
+        <item>Bildeingang</item>
         <item>Kamera</item>
         <item>Screenshots</item>
         <item>Download</item>
@@ -8,5 +11,7 @@
         <item>Familie</item>
         <item>Sonstiges</item>
     </string-array>
+
+    <string name="launch_media_simple_send">Das Bild wird an %s versendet.</string>
 
 </resources>

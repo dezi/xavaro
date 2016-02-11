@@ -10,6 +10,7 @@ import java.util.Formatter;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
 public class HealthBPM extends HealthBase
 {
@@ -84,7 +85,7 @@ public class HealthBPM extends HealthBase
 
             if (Simple.equals(type, "BPMMeasurement"))
             {
-                DitUndDat.SpeekDat.speak("Die letzte Messung ergab einen Blutdruck von "
+                Speak.speak("Die letzte Messung ergab einen Blutdruck von "
                         + lastSystolic + " zu " + lastDiastolic + " "
                         + "Der Puls beträgt " + lastPulse);
             }

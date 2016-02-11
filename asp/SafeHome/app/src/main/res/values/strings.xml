@@ -2,7 +2,10 @@
 
     <string name="app_name" translatable="false">SafeHome</string>
 
+    <string name="simple_and">and</string>
+
     <string-array name="pref_media_image_directories_keys">
+        <item>incoming</item>
         <item>camera</item>
         <item>screenshots</item>
         <item>download</item>
@@ -12,6 +15,7 @@
     </string-array>
 
     <string-array name="pref_media_image_directories_vals">
+        <item>Incoming</item>
         <item>Camera</item>
         <item>Screenshots</item>
         <item>Download</item>
@@ -19,5 +23,7 @@
         <item>Family</item>
         <item>Miscelanous</item>
     </string-array>
+
+    <string name="launch_media_simple_send">The image will be send to %s.</string>
 
 </resources>

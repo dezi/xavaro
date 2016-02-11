@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
 public class HealthScale extends HealthBase
 {
@@ -63,7 +64,7 @@ public class HealthScale extends HealthBase
 
             if (Simple.equals(type, "TakeUserMeasurement"))
             {
-                DitUndDat.SpeekDat.speak("Die Waage ist nun für Sie eingestellt");
+                Speak.speak("Die Waage ist nun für Sie eingestellt");
             }
 
             if (Simple.equals(type, "LiveMeasurementOnTimestamp"))
@@ -73,10 +74,10 @@ public class HealthScale extends HealthBase
 
                 if (impedance == 0)
                 {
-                    DitUndDat.SpeekDat.speak("Die Waage kann nur ordentlich arbeiten, "
+                    Speak.speak("Die Waage kann nur ordentlich arbeiten, "
                             + "wenn sie Barfuss messen");
 
-                    DitUndDat.SpeekDat.speak("Bitte ziehen sie Schuhe und Strümpfe aus "
+                    Speak.speak("Bitte ziehen sie Schuhe und Strümpfe aus "
                             + "und wiederholen sie die Messung");
                 }
                 else
@@ -85,13 +86,13 @@ public class HealthScale extends HealthBase
 
                     if (weithParts.length == 2)
                     {
-                        DitUndDat.SpeekDat.speak("Ihr Gewicht beträgt "
+                        Speak.speak("Ihr Gewicht beträgt "
                                 + weithParts[ 0 ] + " Komma "
                                 + weithParts[ 1 ] + " Kilogramm");
                     }
                     else
                     {
-                        DitUndDat.SpeekDat.speak("Ihr Gewicht beträgt "
+                        Speak.speak("Ihr Gewicht beträgt "
                                 + weithParts[ 0 ] + " Kilogramm");
                     }
                 }
