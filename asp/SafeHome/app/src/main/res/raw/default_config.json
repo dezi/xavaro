@@ -6,6 +6,10 @@
         "enable": "alertgroup.enable"
       },
       {
+        "label": "Heute",
+        "type": "today"
+      },
+      {
         "label": "WhatsApp",
         "type": "whatsapp",
         "enable": "whatsapp.enable"
@@ -16,7 +20,7 @@
         "enable": "skype.enable"
       },
       {
-        "label": "Telefonie",
+        "label": "Telefon",
         "type": "phone",
         "enable": "phone.enable"
       },

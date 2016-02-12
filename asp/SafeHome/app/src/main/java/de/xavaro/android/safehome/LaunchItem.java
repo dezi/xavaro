@@ -44,6 +44,7 @@ public class LaunchItem extends FrameLayout
         String type = Json.getString(config, "type");
 
         // @formatter:off
+        if (Simple.equals(type, "today"       )) item = new LaunchItemToday(context);
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
 

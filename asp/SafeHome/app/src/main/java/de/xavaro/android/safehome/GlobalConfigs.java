@@ -75,6 +75,7 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final int IconResXavaro             = R.drawable.communication_400x400;
+    public static final int IconResToday              = R.drawable.newsfeed_512x512;
     public static final int IconResMedia              = R.drawable.media_images_512x512;
     public static final int IconResMediaImage         = R.drawable.media_images_512x512;
     public static final int IconResMediaAudio         = R.drawable.media_audio_512x512;
