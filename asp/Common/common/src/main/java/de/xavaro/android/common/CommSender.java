@@ -1,8 +1,6 @@
 package de.xavaro.android.common;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.annotation.Nullable;
@@ -12,7 +10,6 @@ import android.util.Log;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,7 +21,6 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
@@ -33,8 +29,8 @@ public class CommSender
 {
     private static final String LOGTAG = CommSender.class.getSimpleName();
 
-    public static final ArrayList<JSONObject> sendFiles = new ArrayList<>();
-    public static final ArrayList<JSONObject> recvFiles = new ArrayList<>();
+    private static final ArrayList<JSONObject> sendFiles = new ArrayList<>();
+    private static final ArrayList<JSONObject> recvFiles = new ArrayList<>();
 
     private static int runningExchangers;
 
@@ -48,12 +44,8 @@ public class CommSender
     private static long gwRequestTime;
     private static long upnpRequestTime;
     private static long natpmpRequestTime;
-    private static long transnegRequestTime;
+    private static long sendRequestTime;
     private static long receiveRequestTime;
-
-    public static void initialize()
-    {
-    }
 
     public static void sendFile(String filepath, String disposition, String idremote)
     {
@@ -179,13 +171,20 @@ public class CommSender
             }
         }
 
-        if (runningExchangers > 0) return;
+        if (runningExchangers > 0)
+        {
+            //
+            // Do only one job at a time.
+            //
+
+            return;
+        }
 
         //
-        // Setup transfer negotiation packet.
+        // Handle file sending packets.
         //
 
-        if ((now - transnegRequestTime) > 10000)
+        if ((now - sendRequestTime) > 10000)
         {
             JSONObject sendFile = null;
 
@@ -204,16 +203,28 @@ public class CommSender
 
             if (sendFile != null)
             {
-                negotiateTransfer(sendFile);
+                if (sendFile.has("fileTransferUploaded"))
+                {
+                    negotiateUpload(sendFile);
+                }
+                else
+                if (sendFile.has("fileTransferResponse"))
+                {
+                    uploadFile(sendFile);
+                }
+                else
+                {
+                    negotiateTransferRequest(sendFile);
+                }
 
-                transnegRequestTime = now;
+                sendRequestTime = now;
 
                 return;
             }
         }
 
         //
-        // Start receive file.
+        // Handle file receiving packets.
         //
 
         if ((now - receiveRequestTime) > 10000)
@@ -235,13 +246,21 @@ public class CommSender
 
             if (recvFile != null)
             {
-                receiveFile(recvFile);
+                if (recvFile.has("fileTransferUploaded"))
+                {
+                    downloadFile(recvFile);
+                }
+                else
+                {
+                    receiveFile(recvFile);
+                }
+
                 receiveRequestTime = now;
             }
         }
     }
 
-    private static void negotiateTransfer(JSONObject sendFile)
+    private static void negotiateTransferRequest(JSONObject sendFile)
     {
         //
         // Start server thread if required.
@@ -266,35 +285,69 @@ public class CommSender
         String filename = Json.getString(sendFile, "filename");
         String disposition = Json.getString(sendFile, "disposition");
 
-        JSONObject fileTransferNeg = new JSONObject();
+        JSONObject fileTransferRequest = new JSONObject();
 
-        Json.put(fileTransferNeg, "type", "fileTransferNeg");
-        Json.put(fileTransferNeg, "idremote", idremote);
+        Json.put(fileTransferRequest, "type", "fileTransferRequest");
+        Json.put(fileTransferRequest, "idremote", idremote);
 
-        Json.put(fileTransferNeg, "wifiName", CommonStatic.wifiName);
-        Json.put(fileTransferNeg, "publicIP", CommonStatic.publicIPaddress);
-        Json.put(fileTransferNeg, "privateIP", CommonStatic.privateIPaddress);
-        Json.put(fileTransferNeg, "defaultGW", CommonStatic.gwIPaddress);
-        Json.put(fileTransferNeg, "publicPort", publicPort);
-        Json.put(fileTransferNeg, "privatePort", privatePort);
+        Json.put(fileTransferRequest, "wifiName", CommonStatic.wifiName);
+        Json.put(fileTransferRequest, "publicIP", CommonStatic.publicIPaddress);
+        Json.put(fileTransferRequest, "privateIP", CommonStatic.privateIPaddress);
+        Json.put(fileTransferRequest, "defaultGW", CommonStatic.gwIPaddress);
+        Json.put(fileTransferRequest, "publicPort", publicPort);
+        Json.put(fileTransferRequest, "privatePort", privatePort);
 
-        Json.put(fileTransferNeg, "uuid", uuid);
-        Json.put(fileTransferNeg, "filename", Simple.getFilename(filename));
-        Json.put(fileTransferNeg, "disposition", disposition);
+        Json.put(fileTransferRequest, "uuid", uuid);
+        Json.put(fileTransferRequest, "filename", Simple.getFilename(filename));
+        Json.put(fileTransferRequest, "disposition", disposition);
 
-        CommService.sendEncrypted(fileTransferNeg, true);
+        CommService.sendEncrypted(fileTransferRequest, true);
 
-        Json.put(sendFile, "fileTransferNeg", true);
+        Json.put(sendFile, "fileTransferRequest", true);
+    }
+
+    private static void negotiateTransferResponse(JSONObject recvFile)
+    {
+        Log.d(LOGTAG, "receiveFile: fileTransferRequest: respond with own public");
+
+        JSONObject fileTransferResponse = Json.clone(recvFile);
+
+        Json.put(fileTransferResponse, "type", "fileTransferResponse");
+        Json.put(fileTransferResponse, "publicIP", CommonStatic.publicIPaddress);
+        Json.put(fileTransferResponse, "publicPort", publicPort);
+
+        CommService.sendEncrypted(fileTransferResponse, true);
+
+        Json.put(recvFile, "fileTransferResponse", true);
+    }
+
+    private static void negotiateUpload(JSONObject sendFile)
+    {
+        JSONObject fileTransferUploaded = Json.clone(sendFile);
+
+        Json.put(fileTransferUploaded, "type", "fileTransferUploaded");
+
+        CommService.sendEncrypted(fileTransferUploaded, true);
+
+        Json.put(sendFile, "fileTransferUploaded", true);
+    }
+
+    private static void negotiateDownload(JSONObject recvFile)
+    {
+        JSONObject fileTransferDownloaded = Json.clone(recvFile);
+
+        Json.put(fileTransferDownloaded, "type", "fileTransferDownloaded");
+
+        CommService.sendEncrypted(fileTransferDownloaded, true);
+
+        Json.put(recvFile, "fileTransferDownloaded", true);
     }
 
     private static void serverLoop()
     {
         try
         {
-            //
-            // Proxy HTTP server loop.
-            //
-
+            //noinspection InfiniteLoopStatement
             while (true)
             {
                 Log.d(LOGTAG, "Waiting on port " + privatePort);
@@ -328,7 +381,7 @@ public class CommSender
     }
 
     @Nullable
-    public static JSONObject getRecvFile(String uuid, boolean remove)
+    private static JSONObject getRecvFile(String uuid, boolean remove)
     {
         if (uuid == null) return null;
 
@@ -349,7 +402,7 @@ public class CommSender
     }
 
     @Nullable
-    public static JSONObject getSendFile(String uuid, boolean remove)
+    private static JSONObject getSendFile(String uuid, boolean remove)
     {
         if (uuid == null) return null;
 
@@ -371,11 +424,11 @@ public class CommSender
 
     public static void onMessageReceived(JSONObject message)
     {
-        if (!message.has("type")) return;
+        if (! message.has("type")) return;
 
         String type = Json.getString(message, "type");
 
-        if (Simple.equals(type, "fileTransferNeg"))
+        if (Simple.equals(type, "fileTransferRequest"))
         {
             String uuid = Json.getString(message, "uuid");
             if (uuid == null) return;
@@ -401,6 +454,149 @@ public class CommSender
                 if (!dup) recvFiles.add(message);
             }
         }
+
+        if (Simple.equals(type, "fileTransferResponse"))
+        {
+            String uuid = Json.getString(message, "uuid");
+            if (uuid == null) return;
+
+            JSONObject sendFile = getSendFile(uuid, false);
+            if (sendFile == null) return;
+
+            String remotePublicIP = Json.getString(message, "publicIP");
+            int remotePublicPort = Json.getInt(message, "publicPort");
+
+            //
+            // Add obtained info to sendFile packet.
+            //
+
+            Json.put(sendFile, "fileTransferResponse", true);
+            Json.put(sendFile, "remotePublicIP", remotePublicIP);
+            Json.put(sendFile, "remotePublicPort", remotePublicPort);
+        }
+
+        if (Simple.equals(type, "fileTransferUploaded"))
+        {
+            String uuid = Json.getString(message, "uuid");
+            if (uuid == null) return;
+
+            JSONObject recvFile = getRecvFile(uuid, false);
+            if (recvFile == null) return;
+
+            //
+            // Add obtained info to recvFile packet.
+            //
+
+            Json.put(recvFile, "fileTransferUploaded", true);
+        }
+
+        if (Simple.equals(type, "fileTransferDownloaded"))
+        {
+            String uuid = Json.getString(message, "uuid");
+            if (uuid == null) return;
+
+            JSONObject sendFile = getSendFile(uuid, false);
+            if (sendFile == null) return;
+
+            notifyDownload(uuid);
+        }
+    }
+
+    private static void downloadFile(JSONObject recvFile)
+    {
+        String uuid = Json.getString(recvFile, "uuid");
+
+        Log.d(LOGTAG, "downloadFile: try share server");
+
+        try
+        {
+            //
+            // Try to download file from share server.
+            //
+
+            InetSocketAddress sa = new InetSocketAddress(
+                    CommonConfigs.ShareServerName,
+                    CommonConfigs.ShareServerPort);
+
+            Socket clientSocket = new Socket();
+            clientSocket.connect(sa, 2000);
+
+            FileExchanger client = new FileExchanger(clientSocket, uuid, false);
+            client.setHostname(CommonConfigs.ShareServerName);
+
+            client.start();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    private static void uploadFile(JSONObject sendFile)
+    {
+        String uuid = Json.getString(sendFile, "uuid");
+
+        String publicIPremote = Json.getString(sendFile, "publicIPRemote");
+        int publicPortremote = Json.getInt(sendFile, "publicPortRemote");
+
+        boolean started = false;
+
+        if ((publicIPremote != null) && (publicPortremote > 0))
+        {
+            Log.d(LOGTAG, "uploadFile: try public remote");
+
+            try
+            {
+                //
+                // Try to upload file on remotes public port.
+                //
+
+                InetSocketAddress sa = new InetSocketAddress(publicIPremote, publicPortremote);
+                Socket clientSocket = new Socket();
+                clientSocket.connect(sa, 2000);
+
+                FileExchanger client = new FileExchanger(clientSocket, uuid, true);
+                client.start();
+
+                started = true;
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+        if (! started)
+        {
+            Log.d(LOGTAG, "uploadFile: try share server");
+
+            try
+            {
+                //
+                // Try to upload file onto server.
+                //
+
+                InetSocketAddress sa = new InetSocketAddress(
+                        CommonConfigs.ShareServerName,
+                        CommonConfigs.ShareServerPort);
+
+                Socket clientSocket = new Socket();
+                clientSocket.connect(sa, 2000);
+
+                FileExchanger client = new FileExchanger(clientSocket, uuid, true);
+                client.setHostname(CommonConfigs.ShareServerName);
+
+                client.start();
+
+                started = true;
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+        if (started) Log.d(LOGTAG, "uploadFile: upload started");
     }
 
     private static void receiveFile(JSONObject recvFile)
@@ -415,10 +611,10 @@ public class CommSender
         String privIPremote = Json.getString(recvFile, "privateIP");
         int privPortremote = Json.getInt(recvFile, "privatePort");
 
-        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.publicIPaddress + "=" + publicIPremote);
-        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.privateIPaddress + "=" + privIPremote);
-        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.gwIPaddress + "=" + defaultGWremote);
-        Log.d(LOGTAG, "onMessageReceived: " + CommonStatic.wifiName + "=" + wifiNameremote);
+        Log.d(LOGTAG, "receiveFile: " + CommonStatic.publicIPaddress + "=" + publicIPremote);
+        Log.d(LOGTAG, "receiveFile: " + CommonStatic.privateIPaddress + "=" + privIPremote);
+        Log.d(LOGTAG, "receiveFile: " + CommonStatic.gwIPaddress + "=" + defaultGWremote);
+        Log.d(LOGTAG, "receiveFile: " + CommonStatic.wifiName + "=" + wifiNameremote);
 
         //
         // Check if on local network.
@@ -426,17 +622,16 @@ public class CommSender
 
         boolean started = false;
 
-        /*
         if (Simple.equals(CommonStatic.publicIPaddress, publicIPremote) &&
                 Simple.equals(CommonStatic.gwIPaddress, defaultGWremote) &&
                 Simple.isSameSubnet(CommonStatic.privateIPaddress, privIPremote))
         {
-            Log.d(LOGTAG, "onMessageReceived: fileTransferNeg: could be local");
+            Log.d(LOGTAG, "receiveFile: could be local");
 
             try
             {
                 //
-                // Try to receive file on local port.
+                // Try to receive file on private port.
                 //
 
                 InetSocketAddress sa = new InetSocketAddress(privIPremote, privPortremote);
@@ -453,16 +648,15 @@ public class CommSender
                 ex.printStackTrace();
             }
         }
-        */
 
         if ((! started) && (publicIPremote != null) && (publicPortremote > 0))
         {
-            Log.d(LOGTAG, "onMessageReceived: fileTransferNeg: try public remote");
+            Log.d(LOGTAG, "receiveFile: try public remote");
 
             try
             {
                 //
-                // Try to receive file on local port.
+                // Try to receive file on public port.
                 //
 
                 InetSocketAddress sa = new InetSocketAddress(publicIPremote, publicPortremote);
@@ -480,12 +674,12 @@ public class CommSender
             }
         }
 
-
+        if (! started) negotiateTransferResponse(recvFile);
     }
 
-    private static void notifySend(String uuid)
+    private static void notifySend(String uuid, boolean isupload)
     {
-        JSONObject sendFile = getSendFile(uuid, true);
+        JSONObject sendFile = getSendFile(uuid, ! isupload);
         if (sendFile == null) return;
 
         String idremote = Json.getString(sendFile, "idremote");
@@ -502,16 +696,44 @@ public class CommSender
         nb.setContentTitle("Bild versendet");
         nb.setContentText("Ein Bild wurde erfolgreich an " + name + " versendet.");
         nb.setSound(soundUri);
-        nb.setNumber(99);
 
         NotificationManager nm = Simple.getNotificationManager();
         nm.notify(0, nb.build());
     }
 
-    private static void notifyReceived(String uuid)
+    private static void notifyDownload(String uuid)
+    {
+        JSONObject sendFile = getSendFile(uuid, true);
+        if (sendFile == null) return;
+
+        String idremote = Json.getString(sendFile, "idremote");
+
+        if (idremote == null) return;
+
+        String name = RemoteContacts.getDisplayName(idremote);
+
+        NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        int iconRes = R.drawable.community_notification_64x64;
+
+        nb.setAutoCancel(true);
+        nb.setSmallIcon(iconRes);
+        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
+        nb.setContentTitle("Bild empfangen");
+        nb.setContentText("Ein Bild wurde erfolgreich von " + name + " empfangen.");
+        nb.setSound(soundUri);
+
+        NotificationManager nm = Simple.getNotificationManager();
+        nm.notify(0, nb.build());
+    }
+
+    private static void notifyReceived(String uuid, boolean isdownload)
     {
         JSONObject recvFile = getRecvFile(uuid, true);
         if (recvFile == null) return;
+
+        if (isdownload) negotiateDownload(recvFile);
 
         String idremote = Json.getString(recvFile, "identity");
         String filename = Json.getString(recvFile, "filename");
@@ -525,18 +747,39 @@ public class CommSender
         File mediapath = Simple.getMediaPath(disposition);
         File mediafile = new File(mediapath,filename);
 
-        if (! mediapath.exists()) mediapath.mkdir();
+        if (! mediapath.exists())
+        {
+            //noinspection ResultOfMethodCallIgnored
+            mediapath.mkdir();
+        }
 
-        Log.d(LOGTAG,"notifyReceived: disposition:" + disposition);
         Log.d(LOGTAG,"notifyReceived: from:" + tempfile.toString());
         Log.d(LOGTAG,"notifyReceived: toto:" + mediafile.toString());
 
+        if (mediafile.exists())
+        {
+            //
+            // Clobber file name.
+            //
+
+            String clobpath = mediafile.getParent();
+            String clobfile = mediafile.getName();
+            String clobname = Simple.getFileNameOnly(clobfile);
+            String clobfext = Simple.getFileExtensionOnly(clobfile);
+
+            for (int inx = 1; ; inx++)
+            {
+                mediafile = new File(clobpath, clobname + " (" +  inx + ")" + clobfext);
+
+                if (! mediafile.exists()) break;
+            }
+        }
+
         if (! tempfile.renameTo(mediafile))
         {
-            // todo clobber shit.
-
             if (Simple.fileCopy(tempfile, mediafile))
             {
+                //noinspection ResultOfMethodCallIgnored
                 tempfile.delete();
             }
         }
@@ -566,8 +809,11 @@ public class CommSender
         private InputStream requestInput;
         private OutputStream requestOutput;
 
-        private boolean isServer;
+        private final boolean isServer;
+        private boolean isSender;
+        private boolean isRelay;
 
+        private String hostname;
         private String requestMethod;
         private String requestUuid;
         private long contentLength;
@@ -583,16 +829,18 @@ public class CommSender
         public FileExchanger(Socket connect, String uuid, boolean sender) throws IOException
         {
             this.isServer = false;
+            this.isSender = sender;
             this.requestUuid = uuid;
-            this.requestMethod = sender ? "XPUT" : "XGET";
+            this.requestMethod = isSender ? "XPUT" : "XGET";
 
             requestInput = connect.getInputStream();
             requestOutput = connect.getOutputStream();
         }
 
-        private void logDat(String message)
+        public void setHostname(String hostname)
         {
-            OopsService.log(LOGTAG, message + ": " + requestMethod + "=" + requestUuid);
+            this.isRelay = true;
+            this.hostname = hostname;
         }
 
         @Override
@@ -610,12 +858,11 @@ public class CommSender
 
                 if (! (ok1 && ok2))
                 {
-                    logDat("headers failed");
+                    Log.d(LOGTAG, "Headers failed:" + requestUuid);
                 }
                 else
                 {
                     byte[] chunkBuffer = new byte[ chunkSize ];
-                    RandomAccessFile fd = null;
 
                     if (requestMethod.equals("XPUT"))
                     {
@@ -624,10 +871,12 @@ public class CommSender
                         if (sendFile != null)
                         {
                             String filepath = Json.getString(sendFile, "filepath");
-                            fd = new RandomAccessFile(filepath, "r");
+                            RandomAccessFile fd = new RandomAccessFile(filepath, "r");
                             if (contentLength > 0) fd.seek(contentLength);
                             long xsize = fd.length() - contentLength;
                             long xfer = 0;
+
+                            Log.d(LOGTAG, "File sending:" + requestUuid + "=" + xsize);
 
                             while (xfer < xsize)
                             {
@@ -652,7 +901,7 @@ public class CommSender
                             {
                                 Log.d(LOGTAG, "File send:" + requestUuid);
 
-                                notifySend(requestUuid);
+                                notifySend(requestUuid, isRelay);
                             }
                         }
                     }
@@ -664,11 +913,12 @@ public class CommSender
                         if (recvFile != null)
                         {
                             String filepath = Simple.getTempfile(requestUuid + ".tmp");
-
-                            fd = new RandomAccessFile(filepath, "rw");
+                            RandomAccessFile fd = new RandomAccessFile(filepath, "rw");
                             if (fd.length() > 0) fd.seek(fd.length());
                             long xsize = contentLength - fd.length();
                             long xfer = 0;
+
+                            Log.d(LOGTAG, "File receiving:" + requestUuid + "=" + xsize);
 
                             while (xfer < xsize)
                             {
@@ -693,7 +943,7 @@ public class CommSender
 
                                 // todo AES decrypt.
 
-                                fd.write(chunkBuffer, 0, (int) yfer);
+                                fd.write(chunkBuffer, 0, yfer);
 
                                 xfer += yfer;
                             }
@@ -704,7 +954,7 @@ public class CommSender
                             {
                                 Log.d(LOGTAG, "File received:" + requestUuid);
 
-                                notifyReceived(requestUuid);
+                                notifyReceived(requestUuid, isRelay);
                             }
                         }
                     }
@@ -730,7 +980,7 @@ public class CommSender
 
             if (requestMethod.equals("XPUT"))
             {
-                header += "XGET\r\n";
+                header += "XGET /sharehandler HTTP/1.0\r\n";
 
                 JSONObject sendFile = getSendFile(requestUuid, false);
                 String filepath = Json.getString(sendFile, "filepath");
@@ -742,7 +992,7 @@ public class CommSender
 
             if (requestMethod.equals("XGET"))
             {
-                header += "XPUT\r\n";
+                header += "XPUT /sharehandler HTTP/1.0\r\n";
 
                 JSONObject recvFile = getRecvFile(requestUuid, false);
                 if (recvFile == null) return false;
@@ -752,17 +1002,22 @@ public class CommSender
                 header += "Content-Length: " + Simple.getFilesize(filepath) + "\r\n";
             }
 
+            if (hostname != null) header += "Host: " + hostname + "\r\n";
+
             header += "XRequest-Chunk: " + chunkSize + "\r\n";
             header += "XRequest-UUID: " + requestUuid + "\r\n";
             header += "\r\n";
 
             requestOutput.write(header.getBytes("UTF-8"));
 
+            Log.d(LOGTAG, "putHeaders: " + header.replace("\r\n","_"));
+
             Log.d(LOGTAG, "putHeaders: " + requestMethod + "=" + requestUuid + "=" + contentLength);
 
             return true;
         }
 
+        @SuppressWarnings("SameReturnValue")
         private boolean getHeaders() throws Exception
         {
             byte[] buffer = new byte[ 32000 ];
@@ -796,7 +1051,7 @@ public class CommSender
                 }
             }
 
-            if (requestMethod == null) requestMethod = lines[ 0 ];
+            if (requestMethod == null) requestMethod = lines[ 0 ].substring(0,4);
 
             Log.d(LOGTAG,"getHeaders: " + requestMethod + "=" + requestUuid + "=" + contentLength);
 
@@ -832,6 +1087,7 @@ public class CommSender
 
             Log.d(LOGTAG, "checkUPNP: SSDP discover sent");
 
+            //noinspection InfiniteLoopStatement
             while (true)
             {
                 byte[] rxbuf = new byte[ 8192 ];
@@ -843,7 +1099,7 @@ public class CommSender
         }
         catch (Exception ignore)
         {
-            Log.d(LOGTAG,"checkUpnp: not available");
+            Log.d(LOGTAG,"checkUPNP: not available");
         }
 
         return false;

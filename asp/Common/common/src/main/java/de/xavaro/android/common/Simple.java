@@ -588,6 +588,26 @@ public class Simple
         return file.length();
     }
 
+    public static String getFileNameOnly(String clobfile)
+    {
+        if (clobfile.lastIndexOf('.') >= 0)
+        {
+            return clobfile.substring(0, clobfile.lastIndexOf('.'));
+        }
+
+        return clobfile;
+    }
+
+    public static String getFileExtensionOnly(String clobfile)
+    {
+        if (clobfile.lastIndexOf('.') >= 0)
+        {
+            return clobfile.substring(clobfile.lastIndexOf('.'), clobfile.length());
+        }
+
+        return "";
+    }
+
     public static String getFilename(String filepath)
     {
         return new File(filepath).getName();

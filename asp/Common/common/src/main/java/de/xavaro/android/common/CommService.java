@@ -172,7 +172,6 @@ public class CommService extends Service
         instance = this;
         identity = SystemIdentity.getIdentity();
 
-        CommSender.initialize();
         ChatManager.initialize();
     }
 
@@ -282,7 +281,10 @@ public class CommService extends Service
 
             String type = json.getString("type");
 
-            if (type.equals("fileTransferNeg") || type.equals("fileTransferSetup"))
+            if (type.equals("fileTransferRequest")
+                    || type.equals("fileTransferResponse")
+                    || type.equals("fileTransferUploaded")
+                    || type.equals("fileTransferDownloaded"))
             {
                 CommSender.onMessageReceived(json);
 
