@@ -13,6 +13,8 @@
     </string-array>
 
     <string name="launch_media_simple_send">Das Bild wird an %s versendet.</string>
+    <string name="launch_media_simple_yousend">Sie haben ein Bild an %s gesendet.</string>
+    <string name="launch_media_simple_yousend_du">Du hast ein Bild an %s gesendet.</string>
 
     <string name="comm_sender_sent_image">Bild versendet</string>
     <string name="comm_sender_receive_image">Bild empfangen</string>

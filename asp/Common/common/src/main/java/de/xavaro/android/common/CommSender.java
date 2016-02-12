@@ -679,6 +679,10 @@ public class CommSender
 
     private static void notify(String title, String message)
     {
+        JSONObject actmess = new JSONObject();
+        Json.put(actmess, "message", message);
+        ActivityManager.onIncomingMessage(actmess);
+
         NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
 
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -771,8 +775,8 @@ public class CommSender
             }
         }
 
-        Log.d(LOGTAG,"notifyReceived: from:" + tempfile.toString());
-        Log.d(LOGTAG,"notifyReceived: toto:" + mediafile.toString());
+        Log.d(LOGTAG, "notifyReceived: from:" + tempfile.toString());
+        Log.d(LOGTAG, "notifyReceived: toto:" + mediafile.toString());
 
         if (! tempfile.renameTo(mediafile))
         {
@@ -999,7 +1003,7 @@ public class CommSender
 
             requestOutput.write(header.getBytes("UTF-8"));
 
-            Log.d(LOGTAG, "putHeaders: " + header.replace("\r\n","_"));
+            Log.d(LOGTAG, "putHeaders: " + header.replace("\r\n", "_"));
 
             Log.d(LOGTAG, "putHeaders: " + requestMethod + "=" + requestUuid + "=" + contentLength);
 

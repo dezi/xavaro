@@ -10,13 +10,8 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import de.xavaro.android.common.CommonConfigs;
-import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.VersionUtils;
 
 public class LaunchItemApps extends LaunchItem
 {

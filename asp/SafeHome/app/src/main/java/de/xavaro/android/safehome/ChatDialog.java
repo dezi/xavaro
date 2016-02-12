@@ -69,6 +69,11 @@ public class ChatDialog extends ScrollView
 
     private void initialize()
     {
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(Simple.MP, Simple.MP);
+        lp.setMargins(0, 16, 0, 16);
+
+        setLayoutParams(lp);
+
         scrollcontent = new LinearLayout(getContext());
         scrollcontent.setOrientation(LinearLayout.VERTICAL);
         scrollcontent.setPadding(16, 0, 16, 0);

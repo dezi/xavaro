@@ -30,7 +30,7 @@
         "enable": "xavaro.enable"
       },
       {
-        "label": "Bilder",
+        "label": "Fotos",
         "type": "media",
         "subtype": "image",
         "enable": "media.image.enable"
@@ -71,7 +71,7 @@
         "enable": "webconfig.erotics.enable"
       },
       {
-        "label": "Supermärkte",
+        "label": "Prospekte",
         "type": "apps",
         "subtype": "discounter",
         "enable": "apps.discounter.enable"

@@ -25,6 +25,7 @@
     </string-array>
 
     <string name="launch_media_simple_send">The image will be send to %s.</string>
+    <string name="launch_media_simple_yousend">You send an image to %s.</string>
 
     <string name="comm_sender_sent_image">Image sent</string>
     <string name="comm_sender_receive_image">Image received</string>

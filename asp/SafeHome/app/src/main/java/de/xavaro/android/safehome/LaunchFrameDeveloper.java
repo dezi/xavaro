@@ -27,7 +27,7 @@ import de.xavaro.android.common.Simple;
 
 public class LaunchFrameDeveloper extends LaunchFrame
 {
-    private static final String LOGTAG = HealthFrame.class.getSimpleName();
+    private static final String LOGTAG = LaunchFrameDeveloper.class.getSimpleName();
 
     private String subtype;
     private ListView listview;

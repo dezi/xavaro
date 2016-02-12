@@ -29,7 +29,15 @@ public class LaunchItemToday extends LaunchItem
         // @formatter:on
     }
 
+    LaunchFrameToday todayFrame;
+
     private void launchToday()
     {
+        if (todayFrame == null)
+        {
+            todayFrame = new LaunchFrameToday(context);
+        }
+
+        ((HomeActivity) context).addViewToBackStack(todayFrame);
     }
 }

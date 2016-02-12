@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
+import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.CommSender;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.RemoteContacts;
@@ -88,8 +89,6 @@ public class LaunchItemMedia extends LaunchItem
     @Override
     protected boolean onMyLongClick()
     {
-        Log.d(LOGTAG, "onMyLongClick---------------------");
-
         if (Simple.equals(subtype, "image") && config.has("mediaitem"))
         {
             if (Simple.getSharedPrefBoolean("media.image.simplesend.enable"))
@@ -110,8 +109,6 @@ public class LaunchItemMedia extends LaunchItem
                     String idremote = prefkey.substring(prefix.length(),prefkey.length());
 
                     String name = RemoteContacts.getDisplayName(idremote);
-
-                    Log.d(LOGTAG,"==========================" + prefkey + "=" + idremote);
 
                     CommSender.sendFile(imagefile, "incoming", idremote);
 
@@ -134,7 +131,14 @@ public class LaunchItemMedia extends LaunchItem
                         receivermsg += receivers.get(inx);
                     }
 
-                    Speak.speak(Simple.getTrans(R.string.launch_media_simple_send, receivermsg));
+                    String dm = Simple.getTrans(R.string.launch_media_simple_send, receivermsg);
+                    Speak.speak(dm);
+
+                    String am = Simple.getTrans(R.string.launch_media_simple_yousend, receivermsg);
+
+                    JSONObject actmess = new JSONObject();
+                    Json.put(actmess, "message", am);
+                    ActivityManager.onOutgoingMessage(actmess);
                 }
             }
         }
