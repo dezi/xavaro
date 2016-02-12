@@ -208,14 +208,14 @@ public class CommSender
                     negotiateUpload(sendFile);
                 }
                 else
-                if (sendFile.has("fileTransferResponse"))
-                {
-                    uploadFile(sendFile);
-                }
-                else
-                {
-                    negotiateTransferRequest(sendFile);
-                }
+                    if (sendFile.has("fileTransferResponse"))
+                    {
+                        uploadFile(sendFile);
+                    }
+                    else
+                    {
+                        negotiateTransferRequest(sendFile);
+                    }
 
                 sendRequestTime = now;
 
@@ -424,7 +424,7 @@ public class CommSender
 
     public static void onMessageReceived(JSONObject message)
     {
-        if (! message.has("type")) return;
+        if (!message.has("type")) return;
 
         String type = Json.getString(message, "type");
 
@@ -566,7 +566,7 @@ public class CommSender
             }
         }
 
-        if (! started)
+        if (!started)
         {
             Log.d(LOGTAG, "uploadFile: try share server");
 
@@ -649,7 +649,7 @@ public class CommSender
             }
         }
 
-        if ((! started) && (publicIPremote != null) && (publicPortremote > 0))
+        if ((!started) && (publicIPremote != null) && (publicPortremote > 0))
         {
             Log.d(LOGTAG, "receiveFile: try public remote");
 
@@ -674,17 +674,11 @@ public class CommSender
             }
         }
 
-        if (! started) negotiateTransferResponse(recvFile);
+        if (!started) negotiateTransferResponse(recvFile);
     }
 
-    private static void notifySend(String uuid, boolean isupload)
+    private static void notify(String title, String message)
     {
-        JSONObject sendFile = getSendFile(uuid, ! isupload);
-        if (sendFile == null) return;
-
-        String idremote = Json.getString(sendFile, "idremote");
-        String name = RemoteContacts.getDisplayName(idremote);
-
         NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
 
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -693,12 +687,27 @@ public class CommSender
         nb.setAutoCancel(true);
         nb.setSmallIcon(iconRes);
         nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
-        nb.setContentTitle("Bild versendet");
-        nb.setContentText("Ein Bild wurde erfolgreich an " + name + " versendet.");
+        nb.setContentTitle(title);
+        nb.setContentText(message);
         nb.setSound(soundUri);
 
         NotificationManager nm = Simple.getNotificationManager();
         nm.notify(0, nb.build());
+    }
+
+    private static void notifySend(String uuid, boolean isupload)
+    {
+        JSONObject sendFile = getSendFile(uuid, !isupload);
+        if (sendFile == null) return;
+
+        String idremote = Json.getString(sendFile, "idremote");
+        String name = RemoteContacts.getDisplayName(idremote);
+
+        String title = Simple.getTrans(R.string.comm_sender_sent_image);
+        String message = Simple.getTrans(R.string.comm_sender_download_image_name, name);
+        if (isupload) message = Simple.getTrans(R.string.comm_sender_upload_image_name, name);
+
+        notify(title, message);
     }
 
     private static void notifyDownload(String uuid)
@@ -712,20 +721,10 @@ public class CommSender
 
         String name = RemoteContacts.getDisplayName(idremote);
 
-        NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
+        String title = Simple.getTrans(R.string.comm_sender_receive_image);
+        String message = Simple.getTrans(R.string.comm_sender_download_image_name, name);
 
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        int iconRes = R.drawable.community_notification_64x64;
-
-        nb.setAutoCancel(true);
-        nb.setSmallIcon(iconRes);
-        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
-        nb.setContentTitle("Bild empfangen");
-        nb.setContentText("Ein Bild wurde erfolgreich von " + name + " empfangen.");
-        nb.setSound(soundUri);
-
-        NotificationManager nm = Simple.getNotificationManager();
-        nm.notify(0, nb.build());
+        notify(title, message);
     }
 
     private static void notifyReceived(String uuid, boolean isdownload)
@@ -753,9 +752,6 @@ public class CommSender
             mediapath.mkdir();
         }
 
-        Log.d(LOGTAG,"notifyReceived: from:" + tempfile.toString());
-        Log.d(LOGTAG,"notifyReceived: toto:" + mediafile.toString());
-
         if (mediafile.exists())
         {
             //
@@ -775,6 +771,9 @@ public class CommSender
             }
         }
 
+        Log.d(LOGTAG,"notifyReceived: from:" + tempfile.toString());
+        Log.d(LOGTAG,"notifyReceived: toto:" + mediafile.toString());
+
         if (! tempfile.renameTo(mediafile))
         {
             if (Simple.fileCopy(tempfile, mediafile))
@@ -784,20 +783,10 @@ public class CommSender
             }
         }
 
-        NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
+        String title = Simple.getTrans(R.string.comm_sender_receive_image);
+        String message = Simple.getTrans(R.string.comm_sender_receive_image_name, name);
 
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        int iconRes = R.drawable.community_notification_64x64;
-
-        nb.setAutoCancel(true);
-        nb.setSmallIcon(iconRes);
-        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
-        nb.setContentTitle("Bild empfangen");
-        nb.setContentText("Ein Bild wurde erfolgreich von " + name + " empfangen.");
-        nb.setSound(soundUri);
-
-        NotificationManager nm = Simple.getNotificationManager();
-        nm.notify(0, nb.build());
+        notify(title, message);
     }
 
     private static class FileExchanger extends Thread

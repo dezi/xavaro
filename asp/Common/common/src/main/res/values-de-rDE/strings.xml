@@ -14,4 +14,13 @@
 
     <string name="launch_media_simple_send">Das Bild wird an %s versendet.</string>
 
+    <string name="comm_sender_sent_image">Bild versendet</string>
+    <string name="comm_sender_receive_image">Bild empfangen</string>
+    <string name="comm_sender_receive_image_name">%s hat Ihnen ein Bild gesendet.</string>
+    <string name="comm_sender_receive_image_name_du">%s hat Dir ein Bild gesendet.</string>
+    <string name="comm_sender_upload_image_name">Ihr Bild wurde für %s hinterlegt.</string>
+    <string name="comm_sender_upload_image_name_du">Dein Bild wurde für %s hinterlegt.</string>
+    <string name="comm_sender_download_image_name">%s hat Ihr Bild empfangen.</string>
+    <string name="comm_sender_download_image_name_du">%s hat Dein Bild empfangen.</string>
+
 </resources>

@@ -424,14 +424,25 @@ public class Simple
         return (textsize / getDeviceDPI()) * 160;
     }
 
-    public static String getTrans(int resid)
-    {
-        return appContext.getResources().getString(resid);
-    }
-
     public static String getTrans(int resid, Object... args)
     {
-        return String.format(getTrans(resid), args);
+        //
+        // Check for You can say You to me.
+        //
+
+        Resources res = anyContext.getResources();
+
+        int residdu = 0;
+
+        if (Simple.equals(Simple.getSharedPrefString("owner.siezen"), "duzen"))
+        {
+            String resname = res.getResourceEntryName(resid) + "_du";
+            residdu = res.getIdentifier(resname, "string", anyContext.getPackageName());
+        }
+
+        String message = res.getString(residdu > 0 ? residdu : resid);
+
+        return String.format(message, args);
     }
 
     public static String[] getTransArray(int resid)
