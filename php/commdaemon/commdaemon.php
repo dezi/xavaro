@@ -2,30 +2,6 @@
 
 include("../include/json.php");
 
-/*
-$pupsi = "hallo";
-
-class My extends Thread
-{
-    function run()
-    {
-        for($i=1;$i<10;$i++)
-        {
-            echo Thread::getCurrentThreadId() .  "\n";
-            
-			var_dump($this->xxxx);
-            
-            sleep(2);
-        }
-    }
-}
-
-    $pool = new My();
-    $pool->start();
-
-echo "---------------------------------------\n";
-*/
-
 if (! ($sock = socket_create(AF_INET, SOCK_DGRAM, 0)))
 {
 	$errorcode = socket_last_error();
@@ -141,6 +117,24 @@ while (1)
 		continue;
 	}
 	
+	if (substr($buf, 0, 4) == "MYIP")
+	{
+		echo "$remote_ip : $remote_port -- " . substr($buf, 0, 4) . "\n";
+		
+		$myip = "MYIP";
+		
+		$parts = explode(".",$remote_ip);
+		
+		$myip .= chr($parts[ 0 ]);
+		$myip .= chr($parts[ 1 ]);
+		$myip .= chr($parts[ 2 ]);
+		$myip .= chr($parts[ 3 ]);
+		
+		socket_sendto($sock, $myip, strlen($myip), 0, $remote_ip, $remote_port);
+
+		continue;
+	}
+
 	if (substr($buf, 0, 4) == "PING")
 	{
 		$idsender = substr($buf,4);
@@ -153,7 +147,7 @@ while (1)
 		
 		continue;
 	}
-	
+		
 	if (substr($buf, 0, 4) == "ACME")
 	{
 		$idsender = substr($buf,  4, 16);
