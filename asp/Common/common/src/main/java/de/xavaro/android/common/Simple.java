@@ -516,7 +516,17 @@ public class Simple
         return Environment.getExternalStoragePublicDirectory(dirtype);
     }
 
-    @Nullable
+    public static void makeDirectory(File path)
+    {
+        //noinspection ResultOfMethodCallIgnored
+        path.mkdirs();
+    }
+
+    public static void makeDirectory(String path)
+    {
+        makeDirectory(new File(path));
+    }
+
     public static File getMediaPath(String disposition)
     {
         if (disposition.equals("screenshots"))
@@ -560,7 +570,8 @@ public class Simple
             return new File(dir, "WhatsApp/Media/WhatsApp Images");
         }
 
-        return null;
+        File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+        return new File(dir, "Miscellanous");
     }
 
     public static String getTempfile(String filename)

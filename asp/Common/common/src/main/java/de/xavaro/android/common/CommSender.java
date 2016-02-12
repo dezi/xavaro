@@ -27,6 +27,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 public class CommSender
 {
@@ -407,7 +408,9 @@ public class CommSender
         String uuid = Json.getString(recvFile, "uuid");
         String wifiNameremote = Json.getString(recvFile, "wifiName");
         String defaultGWremote = Json.getString(recvFile, "defaultGW");
+
         String publicIPremote = Json.getString(recvFile, "publicIP");
+        int publicPortremote = Json.getInt(recvFile, "publicPort");
 
         String privIPremote = Json.getString(recvFile, "privateIP");
         int privPortremote = Json.getInt(recvFile, "privatePort");
@@ -421,6 +424,9 @@ public class CommSender
         // Check if on local network.
         //
 
+        boolean started = false;
+
+        /*
         if (Simple.equals(CommonStatic.publicIPaddress, publicIPremote) &&
                 Simple.equals(CommonStatic.gwIPaddress, defaultGWremote) &&
                 Simple.isSameSubnet(CommonStatic.privateIPaddress, privIPremote))
@@ -439,12 +445,42 @@ public class CommSender
 
                 FileExchanger client = new FileExchanger(clientSocket, uuid, false);
                 client.start();
+
+                started = true;
             }
             catch (Exception ex)
             {
                 ex.printStackTrace();
             }
         }
+        */
+
+        if ((! started) && (publicIPremote != null) && (publicPortremote > 0))
+        {
+            Log.d(LOGTAG, "onMessageReceived: fileTransferNeg: try public remote");
+
+            try
+            {
+                //
+                // Try to receive file on local port.
+                //
+
+                InetSocketAddress sa = new InetSocketAddress(publicIPremote, publicPortremote);
+                Socket clientSocket = new Socket();
+                clientSocket.connect(sa, 2000);
+
+                FileExchanger client = new FileExchanger(clientSocket, uuid, false);
+                client.start();
+
+                started = true;
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+
     }
 
     private static void notifySend(String uuid)
@@ -466,6 +502,7 @@ public class CommSender
         nb.setContentTitle("Bild versendet");
         nb.setContentText("Ein Bild wurde erfolgreich an " + name + " versendet.");
         nb.setSound(soundUri);
+        nb.setNumber(99);
 
         NotificationManager nm = Simple.getNotificationManager();
         nm.notify(0, nb.build());
@@ -512,7 +549,7 @@ public class CommSender
         nb.setAutoCancel(true);
         nb.setSmallIcon(iconRes);
         nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
-        nb.setContentTitle("Bild empfange");
+        nb.setContentTitle("Bild empfangen");
         nb.setContentText("Ein Bild wurde erfolgreich von " + name + " empfangen.");
         nb.setSound(soundUri);
 
@@ -602,9 +639,9 @@ public class CommSender
 
                                 // todo AES encrypt.
 
-                                Log.d(LOGTAG, "uploading: " + filepath + "=" + xfer);
-
                                 requestOutput.write(chunkBuffer, 0, yfer);
+
+                                Simple.sleep(100);
 
                                 xfer += yfer;
                             }
@@ -655,8 +692,6 @@ public class CommSender
                                 }
 
                                 // todo AES decrypt.
-
-                                Log.d(LOGTAG, "downloading: " + filepath + "=" + xfer);
 
                                 fd.write(chunkBuffer, 0, (int) yfer);
 
@@ -840,14 +875,17 @@ public class CommSender
             Log.d(LOGTAG, "checkNATPMP: paresponse:" + Simple.getHexBytesToString(pares.getData()));
             Log.d(LOGTAG, "checkNATPMP: public-ip:" + CommonStatic.publicIPaddress);
 
+            int pubTry = 10000 + new Random().nextInt(40000);
+
             byte[] pmreqdata = new byte[] {
                     0, // version
                     2, // udp (for tcp choose 2)
                     0, 0, // reserved
                     (byte) ((privatePort >> 8) & 0xff),
                     (byte) (privatePort & 0xff),
-                    0x47, 0x11, // public port
-                    0, 0, 0, 60 // time to live for mapping
+                    (byte) ((pubTry >> 8) & 0xff),
+                    (byte) (pubTry & 0xff),
+                    0, 0, 10, 0 // time to live for mapping
             };
 
             DatagramPacket pmreq = new DatagramPacket(pmreqdata, pmreqdata.length, gwip, 5351);
