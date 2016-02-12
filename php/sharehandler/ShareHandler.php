@@ -33,10 +33,9 @@
 		{
 			if ($fd = fopen($lpath,"a"))
 			{
-				while ($data = fread($input,64 * 1024))
+				while (($data = fread($input,64 * 1024)) != false)
 				{
-					$xfer = strlen($data);
-					$yfer = fwrite($fd,$data);
+					fwrite($fd,$data);
 				}
 
 				fclose($fd);
@@ -69,16 +68,23 @@
 			{
 				fseek($fd, $rlen);
 				
-				while ($data = fread($fd,64 * 1024))
+				while (($data = fread($fd,64 * 1024)) != false)
 				{
-					$xfer = strlen($data);
-					$yfer = fwrite($output,$data);
+					fwrite($output,$data);
 				}
 
 				fclose($fd);
 			}
 
 			fclose($output);
+			
+			//
+			// Delete file after download.
+			//
+
+			@unlink($lpath);
+
+			error_log("ShareHandler RM: XPUT $lpath");
 		}
     }
 ?>
