@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
@@ -107,28 +108,30 @@ public class LaunchFrameToday extends LaunchFrame
 
     public void onIncomingMessage(JSONObject message)
     {
-        final JSONObject hmessage = message;
+        final JSONObject pmessage = message;
 
-        getHandler().post(new Runnable()
+        post(new Runnable()
         {
             @Override
             public void run()
             {
-                scrollview.createIncomingMessage(hmessage);
+                scrollview.createIncomingMessage(pmessage);
+                scrollview.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
 
     public void onOutgoingMessage(JSONObject message)
     {
-        final JSONObject hmessage = message;
+        final JSONObject pmessage = message;
 
-        getHandler().post(new Runnable()
+        post(new Runnable()
         {
             @Override
             public void run()
             {
-                scrollview.createOutgoingMessage(hmessage);
+                scrollview.createOutgoingMessage(pmessage);
+                scrollview.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
     }
