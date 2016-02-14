@@ -455,16 +455,6 @@ public class StaticUtils
         out.close();
     }
 
-    @Nullable
-    public static String findDat(String regex, String content)
-    {
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(content);
-        if (! matcher.find()) return null;
-
-        return matcher.group(1);
-    }
-
     public static boolean getSharedPrefsBoolean(Context context, String key)
     {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);

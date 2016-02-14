@@ -4,12 +4,8 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.util.Log;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import org.json.JSONObject;
 
@@ -310,7 +306,7 @@ public class BlueToothSensorWristband implements BlueTooth.BlueToothPhysicalDevi
 
         if (status.has("lastReadDate"))
         {
-            lastReadDate = Simple.getTimeStampFromISO(Json.getString(status, "lastReadDate"));
+            lastReadDate = Simple.getTimeStamp(Json.getString(status, "lastReadDate"));
         }
 
         //

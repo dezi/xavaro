@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Random;
 
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 //
@@ -837,9 +838,9 @@ public class ProxyPlayer extends Thread
 
                     String line = lines[ inx ].substring(18);
 
-                    String width = StaticUtils.findDat("RESOLUTION=([0-9]*)x", line);
-                    String height = StaticUtils.findDat("RESOLUTION=[0-9]*x([0-9]*)", line);
-                    String bandwith = StaticUtils.findDat("BANDWIDTH=([0-9]*)", line);
+                    String width = Simple.getMatch("RESOLUTION=([0-9]*)x", line);
+                    String height = Simple.getMatch("RESOLUTION=[0-9]*x([0-9]*)", line);
+                    String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
                     String streamurl = lines[ ++inx ];
 
                     if ((bandwith == null) || (streamurl == null))
@@ -1021,8 +1022,8 @@ public class ProxyPlayer extends Thread
                 {
                     requestIsPartial = true;
 
-                    String from = StaticUtils.findDat("bytes=([0-9]*)-", line);
-                    String toto = StaticUtils.findDat("bytes=[0-9]*-([0-9]*)", line);
+                    String from = Simple.getMatch("bytes=([0-9]*)-", line);
+                    String toto = Simple.getMatch("bytes=[0-9]*-([0-9]*)", line);
 
                     if ((from != null) && (from.length() > 0)) partialFrom = Long.parseLong(from);
                     if ((toto != null) && (toto.length() > 0)) partialToto = Long.parseLong(toto);

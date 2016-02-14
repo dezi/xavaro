@@ -135,13 +135,13 @@ public class LaunchItem extends FrameLayout
 
         icon = new ImageView(context);
         icon.setPadding(0, 0, 0, 40);
-        this.addView(icon);
+        addView(icon);
 
         label = new TextView(context);
         label.setLayoutParams(Simple.layoutParamsWW(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
         label.setGravity(Gravity.CENTER_HORIZONTAL);
         label.setTypeface(label.getTypeface(), Typeface.BOLD);
-        this.addView(label);
+        addView(label);
 
         oversize = new LayoutParams(0, 0);
         oversize.gravity = Gravity.END + Gravity.TOP;
@@ -149,14 +149,14 @@ public class LaunchItem extends FrameLayout
         overlay = new FrameLayout(context);
         overlay.setLayoutParams(oversize);
         overlay.setVisibility(INVISIBLE);
-        this.addView(overlay);
+        addView(overlay);
 
         overicon = new DitUndDat.ImageAntiAliasView(context);
         overlay.addView(overicon);
 
         dimmer = new FrameLayout(context);
         dimmer.setBackgroundColor(Color.TRANSPARENT);
-        this.addView(dimmer);
+        addView(dimmer);
 
         setOnClickListener(new View.OnClickListener()
         {
@@ -346,13 +346,13 @@ public class LaunchItem extends FrameLayout
             }
         }
 
-        this.setConfig();
+        setConfig();
     }
 
     @Nullable
     public LaunchGroup getLaunchGroup()
     {
-        return this.parent;
+        return parent;
     }
 
     protected void setConfig()

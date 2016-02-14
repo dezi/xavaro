@@ -513,7 +513,7 @@ public class ChatActivity extends AppCompatActivity implements
         if ((lastOnline != null) &&
                 ((incomingChatDate == null) || ! incomingChatType.equals("joinchat")))
         {
-            int secsago = Simple.getSecondsAgoFromISO(lastOnline);
+            int secsago = Simple.getSecondsAgo(lastOnline);
 
             if (secsago < 60)
             {
@@ -521,26 +521,26 @@ public class ChatActivity extends AppCompatActivity implements
             }
             else
             {
-                int daysago = Simple.getDaysAgoFromISO(lastOnline);
+                int daysago = Simple.getDaysAgo(lastOnline);
 
                 if (daysago == 0)
                 {
                     onlinestatus = "zul. online heute um "
-                            + Simple.getLocal24HTimeFromISO(lastOnline);
+                            + Simple.getLocal24HTime(lastOnline);
                 }
 
                 if (daysago == 1)
                 {
                     onlinestatus = "zul. online gestern um "
-                            + Simple.getLocal24HTimeFromISO(lastOnline);
+                            + Simple.getLocal24HTime(lastOnline);
                 }
 
                 if (daysago > 1)
                 {
                     onlinestatus = "zul. online am "
-                            + Simple.getLocalDateFromISO(lastOnline)
+                            + Simple.getLocalDate(lastOnline)
                             + " um "
-                            + Simple.getLocal24HTimeFromISO(lastOnline);
+                            + Simple.getLocal24HTime(lastOnline);
                 }
             }
         }

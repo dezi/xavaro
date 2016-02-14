@@ -677,10 +677,11 @@ public class CommSender
         if (!started) negotiateTransferResponse(recvFile);
     }
 
-    private static void notify(String title, String message)
+    private static void notify(String title, String message, String mediapath)
     {
         JSONObject actmess = new JSONObject();
         Json.put(actmess, "message", message);
+        Json.put(actmess, "mediapath", mediapath);
         ActivityManager.onIncomingMessage(actmess);
 
         NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
@@ -704,14 +705,18 @@ public class CommSender
         JSONObject sendFile = getSendFile(uuid, !isupload);
         if (sendFile == null) return;
 
+        String filepath = Json.getString(sendFile, "filepath");
         String idremote = Json.getString(sendFile, "idremote");
+
+        if (idremote == null) return;
+
         String name = RemoteContacts.getDisplayName(idremote);
 
         String title = Simple.getTrans(R.string.comm_sender_sent_image);
         String message = Simple.getTrans(R.string.comm_sender_download_image_name, name);
         if (isupload) message = Simple.getTrans(R.string.comm_sender_upload_image_name, name);
 
-        notify(title, message);
+        notify(title, message, filepath);
     }
 
     private static void notifyDownload(String uuid)
@@ -719,6 +724,7 @@ public class CommSender
         JSONObject sendFile = getSendFile(uuid, true);
         if (sendFile == null) return;
 
+        String filepath = Json.getString(sendFile, "filepath");
         String idremote = Json.getString(sendFile, "idremote");
 
         if (idremote == null) return;
@@ -728,7 +734,7 @@ public class CommSender
         String title = Simple.getTrans(R.string.comm_sender_receive_image);
         String message = Simple.getTrans(R.string.comm_sender_download_image_name, name);
 
-        notify(title, message);
+        notify(title, message, filepath);
     }
 
     private static void notifyReceived(String uuid, boolean isdownload)
@@ -790,7 +796,7 @@ public class CommSender
         String title = Simple.getTrans(R.string.comm_sender_receive_image);
         String message = Simple.getTrans(R.string.comm_sender_receive_image_name, name);
 
-        notify(title, message);
+        notify(title, message, mediafile.toString());
     }
 
     private static class FileExchanger extends Thread

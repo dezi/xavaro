@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -55,6 +56,7 @@ public class ChatDialog extends ScrollView
     private FrameLayout lastTextLayout;
     private boolean lastDivIsIncoming;
     private String lastMessagePriority;
+    private String lastDate;
     private String incomingLastDate;
     private String incomingLastIdent;
 
@@ -66,6 +68,7 @@ public class ChatDialog extends ScrollView
     private final static int ID_STATUS = 2;
     private final static int ID_TIME = 3;
     private final static int ID_USER = 4;
+    private final static int ID_THUMBS = 5;
 
     private void initialize()
     {
@@ -104,6 +107,98 @@ public class ChatDialog extends ScrollView
         lastDiv = null;
     }
 
+    private void checkDate(String date)
+    {
+        if ((lastDate == null) || ! Simple.equals(lastDate, Simple.getLocalDateLong(date)))
+        {
+            lastDate = Simple.getLocalDateLong(date);
+
+            lastDiv = new LinearLayout(getContext());
+            lastDiv.setOrientation(LinearLayout.VERTICAL);
+            lastDiv.setLayoutParams(Simple.layoutParamsMW());
+            scrollcontent.addView(lastDiv);
+
+            FrameLayout textDiv = new FrameLayout(getContext());
+            textDiv.setLayoutParams(Simple.layoutParamsMW());
+            lastDiv.addView(textDiv);
+
+            TextView textView = new TextView(getContext());
+            textView.setLayoutParams(Simple.layoutParamsWW(Gravity.CENTER));
+            textView.setBackgroundResource(R.drawable.balloon_outgoing_pressed_ext);
+            textView.setPadding(20, 10, 36, 10);
+            textView.setTextSize(24f);
+            textView.setText(lastDate);
+
+            textDiv.addView(textView);
+
+            lastDiv = null;
+        }
+    }
+
+    private boolean accumulateMessage(String message, String date)
+    {
+        if (lastTextLayout == null) return false;
+
+        TextView textView = (TextView) lastTextLayout.findViewById(ID_TEXT);
+        TextView timeView = (TextView) lastTextLayout.findViewById(ID_TIME);
+
+        if ((textView == null) || (timeView == null) ||
+            ! message.equals(textView.getText())) return false;
+
+        String time = timeView.getText().toString();
+        String n24h = Simple.getLocal24HTime(date);
+        String sand = Simple.getTrans(R.string.simple_and);
+
+        if (! time.contains(n24h)) time += ", " + n24h;
+        time = time.replace(" " + sand + " ", ", ");
+
+        if (time.lastIndexOf(',') > 0)
+        {
+            time = time.substring(0, time.lastIndexOf(',')) + " " + sand
+                    + time.substring(time.lastIndexOf(',') + 1, time.length());
+        }
+
+        timeView.setText(time);
+
+        return true;
+    }
+
+    public void checkMediaPath(JSONObject chatMessage)
+    {
+        if (lastTextLayout == null) return;
+
+        String mediapath = Json.getString(chatMessage, "mediapath");
+        if (mediapath == null) return;
+
+        int size = 80;
+
+        LinearLayout thumbnails = (LinearLayout) lastTextLayout.findViewById(ID_THUMBS);
+
+        if (thumbnails == null)
+        {
+            TextView textView = (TextView) lastTextLayout.findViewById(ID_TEXT);
+
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) textView.getLayoutParams();
+            lp.setMargins(0, size - 10, 0, 0);
+
+            thumbnails = new LinearLayout(getContext());
+            thumbnails.setOrientation(LinearLayout.HORIZONTAL);
+            thumbnails.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, size));
+            thumbnails.setPadding(8, 8, 8, 8);
+            thumbnails.setId(ID_THUMBS);
+
+            lastTextLayout.addView(thumbnails);
+        }
+
+        ImageView thumbnail = new ImageView(getContext());
+        thumbnail.setLayoutParams(new FrameLayout.LayoutParams(size - 16, size - 16));
+        thumbnail.setPadding(2, 2, 2, 2);
+        thumbnail.setImageDrawable(Simple.getDrawableSquare(mediapath, size - 20));
+
+
+        thumbnails.addView(thumbnail);
+    }
+
     public void createIncomingMessage(JSONObject chatMessage)
     {
         String uuid = Json.getString(chatMessage, "uuid");
@@ -116,6 +211,8 @@ public class ChatDialog extends ScrollView
         {
             incomingLastDate = date;
         }
+
+        checkDate(date);
 
         if ((lastDiv == null) || !lastDivIsIncoming)
         {
@@ -130,9 +227,18 @@ public class ChatDialog extends ScrollView
             scrollcontent.addView(lastDiv);
         }
 
+        if (accumulateMessage(message, date))
+        {
+            checkMediaPath(chatMessage);
+
+            return;
+        }
+
         FrameLayout textDiv = new FrameLayout(getContext());
         textDiv.setLayoutParams(Simple.layoutParamsMW());
         lastDiv.addView(textDiv);
+
+        if (! accumulateMessage(message, date))
 
         if (lastTextLayout != null)
         {
@@ -147,14 +253,14 @@ public class ChatDialog extends ScrollView
                 ? R.drawable.balloon_incoming_alert
                 : R.drawable.balloon_incoming_normal;
 
-        FrameLayout textLayout = lastTextLayout = new FrameLayout(getContext());
-        textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
-        textLayout.setBackgroundResource(bi);
+        lastTextLayout = new FrameLayout(getContext());
+        lastTextLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
+        lastTextLayout.setBackgroundResource(bi);
         lastMessagePriority = priority;
 
-        textDiv.addView(textLayout);
+        textDiv.addView(lastTextLayout);
 
-        if (isgroup && ! Simple.equals(identity, incomingLastIdent))
+        if (isgroup && !Simple.equals(identity, incomingLastIdent))
         {
             TextView remoteUser = new TextView(getContext());
             remoteUser.setId(ID_USER);
@@ -164,27 +270,36 @@ public class ChatDialog extends ScrollView
             remoteUser.setTextColor(0xff550390);
             remoteUser.setLayoutParams(Simple.layoutParamsWW(Gravity.START | Gravity.TOP));
 
-            textLayout.addView(remoteUser);
+            lastTextLayout.addView(remoteUser);
         }
 
         TextView textView = new TextView(getContext());
         textView.setPadding(10, 10, 10, 16);
+        textView.setId(ID_TEXT);
         textView.setTextSize(30f);
         textView.setText(message);
 
-        textLayout.addView(textView);
+        lastTextLayout.addView(textView);
+
+        lp = new FrameLayout.LayoutParams(Simple.MP, 28, Gravity.BOTTOM);
+        FrameLayout statusFrame = new FrameLayout(getContext());
+        statusFrame.setLayoutParams(lp);
+
+        lastTextLayout.addView(statusFrame);
 
         TextView statusTime = new TextView(getContext());
         statusTime.setId(ID_TIME);
         statusTime.setPadding(12, 0, 12, 0);
-        statusTime.setText(Simple.getLocal24HTimeFromISO(date));
-        statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.END | Gravity.BOTTOM));
+        statusTime.setText(Simple.getLocal24HTime(date));
+        statusTime.setLayoutParams(Simple.layoutParamsMW(Gravity.END | Gravity.BOTTOM));
 
-        textLayout.addView(statusTime);
+        lastTextLayout.addView(statusTime);
+
+        checkMediaPath(chatMessage);
 
         incomingLastIdent = identity;
 
-        protoIncoming.put(uuid, textLayout);
+        protoIncoming.put(uuid, lastTextLayout);
     }
 
     public void createOutgoingMessage(JSONObject chatMessage)
@@ -193,7 +308,7 @@ public class ChatDialog extends ScrollView
         String date = Json.getString(chatMessage, "date");
         String message = Json.getString(chatMessage, "message");
 
-        if (date == null) date = "??.??";
+        checkDate(date);
 
         if ((lastDiv == null) || lastDivIsIncoming)
         {
@@ -207,6 +322,13 @@ public class ChatDialog extends ScrollView
             scrollcontent.addView(lastDiv);
         }
 
+        if (accumulateMessage(message, date))
+        {
+            checkMediaPath(chatMessage);
+
+            return;
+        }
+
         FrameLayout textDiv = new FrameLayout(getContext());
         textDiv.setLayoutParams(Simple.layoutParamsMW());
         lastDiv.addView(textDiv);
@@ -216,11 +338,11 @@ public class ChatDialog extends ScrollView
             lastTextLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal_ext);
         }
 
-        FrameLayout textLayout = lastTextLayout = new FrameLayout(getContext());
-        textLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
-        textLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal);
+        lastTextLayout = new FrameLayout(getContext());
+        lastTextLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
+        lastTextLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal);
 
-        textDiv.addView(textLayout);
+        textDiv.addView(lastTextLayout);
 
         TextView textView = new TextView(getContext());
         textView.setId(ID_TEXT);
@@ -228,19 +350,19 @@ public class ChatDialog extends ScrollView
         textView.setTextSize(30f);
         textView.setText(message);
 
-        textLayout.addView(textView);
+        lastTextLayout.addView(textView);
 
-        lp = new FrameLayout.LayoutParams(76, 28, Gravity.END | Gravity.BOTTOM);
+        lp = new FrameLayout.LayoutParams(Simple.MP, 28, Gravity.BOTTOM);
         FrameLayout statusFrame = new FrameLayout(getContext());
         statusFrame.setLayoutParams(lp);
 
-        textLayout.addView(statusFrame);
+        lastTextLayout.addView(statusFrame);
 
         TextView statusTime = new TextView(getContext());
-        statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.START | Gravity.BOTTOM));
+        statusTime.setLayoutParams(Simple.layoutParamsWW(Gravity.END | Gravity.BOTTOM));
         statusTime.setId(ID_TIME);
-        statusTime.setText(Simple.getLocal24HTimeFromISO(date));
-
+        statusTime.setPadding(0, 0, 24, 0);
+        statusTime.setText(Simple.getLocal24HTime(date));
         statusFrame.addView(statusTime);
 
         lp = new FrameLayout.LayoutParams(38,
@@ -251,13 +373,18 @@ public class ChatDialog extends ScrollView
         statusImage.setId(ID_STATUS);
         statusImage.setPadding(4, 4, 4, 4);
 
-        if (chatMessage.has("acks")) statusImage.setImageResource(R.drawable.message_got_receipt_from_server);
-        if (chatMessage.has("recv")) statusImage.setImageResource(R.drawable.message_got_receipt_from_target);
-        if (chatMessage.has("read")) statusImage.setImageResource(R.drawable.message_got_read_receipt_from_target);
+        if (chatMessage.has("acks"))
+            statusImage.setImageResource(R.drawable.message_got_receipt_from_server);
+        if (chatMessage.has("recv"))
+            statusImage.setImageResource(R.drawable.message_got_receipt_from_target);
+        if (chatMessage.has("read"))
+            statusImage.setImageResource(R.drawable.message_got_read_receipt_from_target);
 
         statusFrame.addView(statusImage, lp);
 
-        protoOutgoing.put(uuid, textLayout);
+        checkMediaPath(chatMessage);
+
+        protoOutgoing.put(uuid, lastTextLayout);
     }
 
     private String getRemoteName(JSONObject chatMessage)

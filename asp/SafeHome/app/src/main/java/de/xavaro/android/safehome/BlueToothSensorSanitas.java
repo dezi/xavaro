@@ -319,7 +319,7 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
         if (syncStatus.has("lastSavedDay"))
         {
-            lastSavedDay = Simple.getTimeStampFromISO(Json.getString(syncStatus, "lastSavedDay"));
+            lastSavedDay = Simple.getTimeStamp(Json.getString(syncStatus, "lastSavedDay"));
             lastSavedDay /= 1000L;
         }
 
@@ -364,7 +364,7 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
 
         if (syncStatus.has("lastSavedAct"))
         {
-            lastSavedAct = Simple.getTimeStampFromISO(Json.getString(syncStatus, "lastSavedAct"));
+            lastSavedAct = Simple.getTimeStamp(Json.getString(syncStatus, "lastSavedAct"));
             lastSavedAct /= 1000L;
         }
 

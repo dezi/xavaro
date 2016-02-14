@@ -424,6 +424,16 @@ public class Simple
         return (textsize / getDeviceDPI()) * 160;
     }
 
+    @Nullable
+    public static String getMatch(String regex, String content)
+    {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+        if (! matcher.find()) return null;
+
+        return matcher.group(1);
+    }
+    
     public static String getTrans(int resid, Object... args)
     {
         //
@@ -917,16 +927,30 @@ public class Simple
     }
 
     @Nullable
-    public static Drawable getDrawableThumbnailFromFile(String file, int size)
+    public static Drawable getDrawableSquare(String file, int size)
     {
-        Bitmap myBitmap = getBitmapThumbnailFromFile(file, size);
+        Bitmap bm = getBitmapThumbnail(file, size);
+        if (bm == null) return null;
+
+        int ssize = (bm.getHeight() <= bm.getWidth()) ? bm.getHeight() : bm.getWidth();
+        int offsx = (bm.getWidth() - ssize) / 2;
+        int offsy = (bm.getHeight() - ssize) / 2;
+
+        Bitmap fb = Bitmap.createBitmap(bm, offsx, offsy, ssize, ssize);
+        return new BitmapDrawable(appContext.getResources(), fb);
+    }
+
+    @Nullable
+    public static Drawable getDrawableThumbnail(String file, int size)
+    {
+        Bitmap myBitmap = getBitmapThumbnail(file, size);
         if (myBitmap == null) return null;
 
         return new BitmapDrawable(appContext.getResources(), myBitmap);
     }
 
     @Nullable
-    public static Bitmap getBitmapThumbnailFromFile(String file, int size)
+    public static Bitmap getBitmapThumbnail(String file, int size)
     {
         try
         {
@@ -1249,7 +1273,7 @@ public class Simple
         return isotime;
     }
 
-    public static long getTimeStampFromISO(String isodate)
+    public static long getTimeStamp(String isodate)
     {
         try
         {
@@ -1278,42 +1302,63 @@ public class Simple
         return 0;
     }
 
-    public static String get24HHourFromISO(String isodate)
+    public static String getDay(long timeStamp)
     {
-        return get24HHourFromTimeStamp(getTimeStampFromISO(isodate));
+        DateFormat df = new SimpleDateFormat("EEEE", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(timeStamp);
     }
 
-    public static String get24HHourFromTimeStamp(long timeStamp)
+    public static String get24HHour(String isodate)
+    {
+        return get24HHour(getTimeStamp(isodate));
+    }
+
+    public static String get24HHour(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("HH", Locale.getDefault());
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         return df.format(new Date(timeStamp));
     }
 
-    public static String getLocal24HTimeFromISO(String isodate)
+    public static String getLocal24HTime(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
         df.setTimeZone(TimeZone.getDefault());
-        return df.format(new Date(getTimeStampFromISO(isodate)));
+        return df.format(timeStamp);
     }
 
-    public static String getLocalDateFromTimeStamp(long timeStamp)
+    public static String getLocal24HTime(String isodate)
+    {
+        DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(new Date(getTimeStamp(isodate)));
+    }
+
+    public static String getLocalDate(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         df.setTimeZone(TimeZone.getDefault());
         return df.format(new Date(timeStamp));
     }
 
-    public static String getLocalDateFromISO(String isodate)
+    public static String getLocalDate(String isodate)
     {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         df.setTimeZone(TimeZone.getDefault());
-        return df.format(new Date(getTimeStampFromISO(isodate)));
+        return df.format(new Date(getTimeStamp(isodate)));
     }
 
-    public static int getSecondsAgoFromISO(String isodate)
+    public static String getLocalDateLong(String isodate)
     {
-        long iso = getTimeStampFromISO(isodate);
+        DateFormat df = new SimpleDateFormat("dd. MMMM yyyy", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(new Date(getTimeStamp(isodate)));
+    }
+
+    public static int getSecondsAgo(String isodate)
+    {
+        long iso = getTimeStamp(isodate);
         long now = new Date().getTime();
 
         iso /= 1000;
@@ -1322,9 +1367,9 @@ public class Simple
         return (int) (now - iso);
     }
 
-    public static int getDaysAgoFromISO(String isodate)
+    public static int getDaysAgo(String isodate)
     {
-        long iso = getTimeStampFromISO(isodate);
+        long iso = getTimeStamp(isodate);
         long now = new Date().getTime();
 
         iso /= 86400 * 1000;

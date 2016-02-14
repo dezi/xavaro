@@ -36,7 +36,7 @@ public class LaunchItemMedia extends LaunchItem
         if (config.has("mediaitem"))
         {
             String imagefile = Json.getString(config, "mediaitem");
-            icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(imagefile, 200));
+            icon.setImageDrawable(Simple.getDrawableSquare(imagefile, 200));
 
             found = true;
         }
@@ -63,7 +63,7 @@ public class LaunchItemMedia extends LaunchItem
                     {
                         JSONObject newest = Json.getObject(images, 0);
                         String file = Json.getString(newest, "file");
-                        icon.setImageDrawable(Simple.getDrawableThumbnailFromFile(file, 200));
+                        icon.setImageDrawable(Simple.getDrawableSquare(file, 200));
 
                         numberImages = images.length();
 
@@ -138,6 +138,7 @@ public class LaunchItemMedia extends LaunchItem
 
                     JSONObject actmess = new JSONObject();
                     Json.put(actmess, "message", am);
+                    Json.put(actmess, "mediapath", imagefile);
                     ActivityManager.onOutgoingMessage(actmess);
                 }
             }
