@@ -79,6 +79,16 @@ public abstract class BlueTooth extends BroadcastReceiver
         }
     }
 
+    public void close()
+    {
+        if (currentGatt != null)
+        {
+            currentGatt.disconnect();
+            currentGatt.close();
+            currentGatt = null;
+        }
+    }
+
     public final Runnable connectRunnable = new Runnable()
     {
         @Override

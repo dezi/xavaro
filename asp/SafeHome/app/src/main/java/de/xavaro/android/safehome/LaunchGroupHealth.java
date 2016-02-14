@@ -1,62 +1,175 @@
 package de.xavaro.android.safehome;
 
+import android.support.annotation.Nullable;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Map;
+import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Simple;
 
 public class LaunchGroupHealth extends LaunchGroup
 {
     private static final String LOGTAG = LaunchGroupHealth.class.getSimpleName();
 
-    public static void initialize(Context context)
+    public LaunchGroupHealth(Context context)
     {
-        Log.d(LOGTAG,"initialize");
+        super(context);
+    }
 
-        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+    public static JSONArray getConfig()
+    {
+        JSONArray home = new JSONArray();
+        JSONArray adir = new JSONArray();
 
-        if (sp.getBoolean("health.bpm.enable", false))
+        if (Simple.getSharedPrefBoolean("health.bpm.enable"))
         {
-            String bpmDevice = sp.getString("health.bpm.device",null);
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "subtype", "bpm");
+            Json.put(entry, "label", "Blutdruck");
+            Json.put(entry, "order", 1000);
+
+            Json.put(Simple.sharedPrefEquals("health.bpm.icon", "home") ? home : adir, entry);
+        }
+
+        if (Simple.getSharedPrefBoolean("health.scale.enable"))
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "subtype", "scale");
+            Json.put(entry, "label", "Gewicht");
+            Json.put(entry, "order", 1010);
+
+            Json.put(Simple.sharedPrefEquals("health.scale.icon", "home") ? home : adir, entry);
+        }
+
+        if (Simple.getSharedPrefBoolean("health.sensor.enable"))
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "subtype", "sensor");
+            Json.put(entry, "label", "Aktivität");
+            Json.put(entry, "order", 1020);
+
+            Json.put(Simple.sharedPrefEquals("health.sensor.icon", "home") ? home : adir, entry);
+        }
+
+        if (Simple.getSharedPrefBoolean("health.glucose.enable"))
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "subtype", "glucose");
+            Json.put(entry, "label", "Blutzucker");
+            Json.put(entry, "order", 1030);
+
+            Json.put(Simple.sharedPrefEquals("health.glucose.icon", "home") ? home : adir, entry);
+        }
+
+        if (adir.length() > 0)
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "label", "Vitaldaten");
+            Json.put(entry, "order", 1100);
+
+            Json.put(entry, "launchitems", adir);
+            Json.put(home, entry);
+        }
+
+        reConfigure();
+
+        return home;
+    }
+
+    @Nullable
+    private static String getDevice(String subtype)
+    {
+        if (Simple.getSharedPrefBoolean("health." + subtype + ".enable"))
+        {
+            String bpmDevice = Simple.getSharedPrefString("health." + subtype + ".device");
 
             if ((bpmDevice != null) && ! bpmDevice.equals("unknown"))
             {
-                HealthBPM.getInstance().setBlueTooth(new BlueToothBPM(context, bpmDevice));
+                return bpmDevice;
             }
         }
 
-        if (sp.getBoolean("health.scale.enable", false))
-        {
-            String scaleDevice = sp.getString("health.scale.device",null);
+        return null;
+    }
 
-            if ((scaleDevice != null) && ! scaleDevice.equals("unknown"))
+    private static void reConfigure()
+    {
+        Context context = Simple.getAppContext();
+
+        if (getDevice("bpm") != null)
+        {
+            if (! HealthBPM.getInstance().isConfigured())
             {
-                HealthScale.getInstance().setBlueTooth(new BlueToothScale(context, scaleDevice));
+                HealthBPM.getInstance().setBlueTooth(
+                        new BlueToothBPM(context, getDevice("bpm")));
+            }
+        }
+        else
+        {
+            if (HealthBPM.getInstance().isConfigured())
+            {
+                HealthBPM.getInstance().setBlueTooth(null);
             }
         }
 
-        if (sp.getBoolean("health.sensor.enable", false))
+        if (getDevice("scale") != null)
         {
-            String sensorDevice = sp.getString("health.sensor.device",null);
-
-            if ((sensorDevice != null) && ! sensorDevice.equals("unknown"))
+            if (! HealthScale.getInstance().isConfigured())
             {
-                HealthSensor.getInstance().setBlueTooth(new BlueToothSensor(context, sensorDevice));
+                HealthScale.getInstance().setBlueTooth(
+                        new BlueToothScale(context, getDevice("scale")));
+            }
+        }
+        else
+        {
+            if (HealthScale.getInstance().isConfigured())
+            {
+                HealthScale.getInstance().setBlueTooth(null);
             }
         }
 
-        if (sp.getBoolean("health.glucose.enable", false))
+        if (getDevice("sensor") != null)
         {
-            String glucoseDevice = sp.getString("health.glucose.device",null);
-
-            if ((glucoseDevice != null) && ! glucoseDevice.equals("unknown"))
+            if (! HealthSensor.getInstance().isConfigured())
             {
-                HealthGlucose.getInstance().setBlueTooth(new BlueToothGlucose(context, glucoseDevice));
+                HealthSensor.getInstance().setBlueTooth(
+                        new BlueToothSensor(context, getDevice("sensor")));
+            }
+        }
+        else
+        {
+            if (HealthSensor.getInstance().isConfigured())
+            {
+                HealthSensor.getInstance().setBlueTooth(null);
+            }
+        }
+
+        if (getDevice("glucose") != null)
+        {
+            if (! HealthGlucose.getInstance().isConfigured())
+            {
+                HealthGlucose.getInstance().setBlueTooth(
+                        new BlueToothGlucose(context, getDevice("glucose")));
+            }
+        }
+        else
+        {
+            if (HealthGlucose.getInstance().isConfigured())
+            {
+                HealthGlucose.getInstance().setBlueTooth(null);
             }
         }
     }
@@ -82,81 +195,5 @@ public class LaunchGroupHealth extends LaunchGroup
         {
             HealthGlucose.subscribe(subscriber);
         }
-    }
-
-    public LaunchGroupHealth(Context context)
-    {
-        super(context);
-
-        this.config = getConfig();
-    }
-
-    private JSONObject getConfig()
-    {
-        try
-        {
-            JSONObject launchgroup = new JSONObject();
-            JSONArray launchitems = new JSONArray();
-
-            SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
-            Map<String, Object> hp = DitUndDat.SharedPrefs.getPrefix("health.");
-
-            for (String prefkey : hp.keySet())
-            {
-                if (prefkey.equals("health.bpm.enable") && sp.getBoolean("health.bpm.enable",false))
-                {
-                    JSONObject entry = new JSONObject();
-
-                    entry.put("type", "health");
-                    entry.put("label", "Blutdruck");
-                    entry.put("subtype", "bpm");
-
-                    launchitems.put(entry);
-                }
-
-                if (prefkey.equals("health.scale.enable") && sp.getBoolean("health.scale.enable",false))
-                {
-                    JSONObject entry = new JSONObject();
-
-                    entry.put("type", "health");
-                    entry.put("label", "Gewicht");
-                    entry.put("subtype", "scale");
-
-                    launchitems.put(entry);
-                }
-
-                if (prefkey.equals("health.sensor.enable") && sp.getBoolean("health.sensor.enable",false))
-                {
-                    JSONObject entry = new JSONObject();
-
-                    entry.put("type", "health");
-                    entry.put("label", "Aktivität");
-                    entry.put("subtype", "sensor");
-
-                    launchitems.put(entry);
-                }
-
-                if (prefkey.equals("health.glucose.enable") && sp.getBoolean("health.glucose.enable",false))
-                {
-                    JSONObject entry = new JSONObject();
-
-                    entry.put("type", "health");
-                    entry.put("label", "Blutzucker");
-                    entry.put("subtype", "glucose");
-
-                    launchitems.put(entry);
-                }
-            }
-
-            launchgroup.put("launchitems", launchitems);
-
-            return launchgroup;
-        }
-        catch (JSONException ex)
-        {
-            ex.printStackTrace();
-        }
-
-        return new JSONObject();
     }
 }

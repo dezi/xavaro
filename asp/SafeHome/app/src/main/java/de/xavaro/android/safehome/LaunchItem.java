@@ -67,10 +67,11 @@ public class LaunchItem extends FrameLayout
         if (Simple.equals(type, "select"      )) item = new LaunchItemAdmin(context);
         if (Simple.equals(type, "install"     )) item = new LaunchItemAdmin(context);
         if (Simple.equals(type, "settings"    )) item = new LaunchItemAdmin(context);
-        if (Simple.equals(type, "developer"   )) item = new LaunchItemAdmin(context);
 
         if (Simple.equals(type, "directory"   )) item = new LaunchItemGeneric(context);
         if (Simple.equals(type, "genericapp"  )) item = new LaunchItemGeneric(context);
+
+        if (Simple.equals(type, "developer"   )) item = new LaunchItemDeveloper(context);
         // @formatter:on
 
         if (item == null) item = new LaunchItem(context);

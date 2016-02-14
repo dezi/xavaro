@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import de.xavaro.android.common.Json;
+
 public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothConnectCallback
 {
     private final static String LOGTAG = LaunchItemHealth.class.getSimpleName();
@@ -71,7 +73,11 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
         }
         else
         {
-            if (directory == null) directory = new LaunchGroupHealth(context);
+            if (directory == null)
+            {
+                directory = new LaunchGroupHealth(context);
+                directory.setConfig(this, Json.getArray(config, "launchitems"));
+            }
 
             ((HomeActivity) context).addViewToBackStack(directory);
         }

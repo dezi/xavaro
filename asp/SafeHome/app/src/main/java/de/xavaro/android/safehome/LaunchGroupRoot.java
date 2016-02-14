@@ -23,13 +23,17 @@ public class LaunchGroupRoot extends LaunchGroup
     public static JSONObject getConfig()
     {
         //
-        // Aquire all current available items.
+        // Aquire all currently configured items.
         //
 
         ArrayList<JSONArray> configs = new ArrayList<>();
 
         configs.add(LaunchItemToday.getConfig());
         configs.add(LaunchItemAlertcall.getConfig());
+        configs.add(LaunchGroupHealth.getConfig());
+        configs.add(LaunchGroupComm.PhoneGroup.getConfig());
+
+        configs.add(LaunchGroupDeveloper.getConfig());
 
         //
         // Integrate all configs into one list.

@@ -19,14 +19,30 @@ public abstract class HealthBase implements
 
     protected final Handler handler = new Handler();
 
+    public boolean isConfigured()
+    {
+        return (blueTooth != null);
+    }
+
     public void setBlueTooth(BlueTooth blueTooth)
     {
-        this.blueTooth = blueTooth;
+        if (blueTooth == null)
+        {
+            if (this.blueTooth != null)
+            {
+                this.blueTooth.close();
+                this.blueTooth = null;
+            }
+        }
+        else
+        {
+            this.blueTooth = blueTooth;
 
-        this.blueTooth.setDataCallback(this);
-        this.blueTooth.setConnectCallback(this);
+            this.blueTooth.setDataCallback(this);
+            this.blueTooth.setConnectCallback(this);
 
-        this.blueTooth.connectRunnable.run();
+            this.blueTooth.connectRunnable.run();
+        }
     }
 
     public void setConnectCallback(BlueTooth.BlueToothConnectCallback subscriber)

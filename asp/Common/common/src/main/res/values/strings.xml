@@ -4,6 +4,16 @@
 
     <string name="simple_and">and</string>
 
+    <string-array name="pref_health_where_keys">
+        <item>home</item>
+        <item>folder</item>
+    </string-array>
+
+    <string-array name="pref_health_where_vals">
+        <item>Home-Screen</item>
+        <item>Vital-Folder</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_keys">
         <item>incoming</item>
         <item>camera</item>

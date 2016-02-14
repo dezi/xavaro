@@ -197,7 +197,11 @@ public class LaunchItemComm extends LaunchItem
             return;
         }
 
-        if (directory == null)  directory = new LaunchGroupComm.PhoneGroup(context);
+        if (directory == null)
+        {
+            directory = new LaunchGroupComm.PhoneGroup(context);
+            directory.setConfig(this, Json.getArray(config, "launchitems"));
+        }
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }

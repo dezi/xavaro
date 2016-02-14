@@ -1551,6 +1551,11 @@ public class Simple
         return getSharedPrefs().getInt(key, 0);
     }
 
+    public static boolean sharedPrefEquals(String key, String equals)
+    {
+        return equals(getSharedPrefs().getString(key, null), equals);
+    }
+
     @Nullable
     public static String getSharedPrefString(String key)
     {
@@ -1578,7 +1583,7 @@ public class Simple
         return result;
     }
 
-    public static void removePreference(String key)
+    public static void removeSharedPref(String key)
     {
         Simple.getSharedPrefs().edit().remove(key).commit();
     }

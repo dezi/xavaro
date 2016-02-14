@@ -22,6 +22,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
@@ -442,6 +443,15 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 
     public void setConfig(LaunchItem parent, JSONObject config)
     {
+        this.parent = parent;
+        this.config = config;
+    }
+
+    public void setConfig(LaunchItem parent, JSONArray launchitems)
+    {
+        JSONObject config = new JSONObject();
+        Json.put(config, "launchitems", launchitems);
+
         this.parent = parent;
         this.config = config;
     }

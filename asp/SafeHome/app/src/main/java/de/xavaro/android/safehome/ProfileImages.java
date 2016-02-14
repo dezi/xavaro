@@ -40,10 +40,12 @@ public class ProfileImages
     //
 
     @Nullable
-    public static String getDisplayFromPhoneOrSkype(Context context, String identtag)
+    public static String getDisplayFromPhoneOrSkype(String identtag)
     {
         boolean ismatch;
         String display;
+
+        Context context = Simple.getAnyContext();
 
         if (contacts == null)
         {

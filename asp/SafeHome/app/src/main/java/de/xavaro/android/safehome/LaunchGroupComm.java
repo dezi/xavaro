@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
@@ -130,61 +131,60 @@ public class LaunchGroupComm
     {
         private static final String LOGTAG = PhoneGroup.class.getSimpleName();
 
+        public static JSONArray getConfig()
+        {
+            JSONArray home = new JSONArray();
+            JSONArray adir = new JSONArray();
+
+            SharedPreferences sp = Simple.getSharedPrefs();
+            Map<String, Object> prefs = Simple.getAllPreferences("phone");
+
+            for (String prefkey : prefs.keySet())
+            {
+                if (!(prefkey.startsWith("phone.text") || prefkey.startsWith("phone.voip")))
+                {
+                    continue;
+                }
+
+                String what = sp.getString(prefkey, null);
+
+                if ((what == null) || what.equals("inact")) continue;
+
+                String phonenumber = prefkey.substring(11);
+                String subtype = prefkey.substring(6, 10);
+                String label = ProfileImages.getDisplayFromPhoneOrSkype(phonenumber);
+
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", label);
+                Json.put(entry, "type", "phone");
+                Json.put(entry, "subtype", subtype);
+                Json.put(entry, "phonenumber", phonenumber);
+                Json.put(entry, "order", 600);
+
+                Json.put(Simple.sharedPrefEquals(prefkey, "home") ? home : adir, entry);
+
+                Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + phonenumber + "=" + label);
+            }
+
+            if (adir.length() > 0)
+            {
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "phone");
+                Json.put(entry, "label", "Telefon");
+                Json.put(entry, "order", 650);
+
+                Json.put(entry, "launchitems", adir);
+                Json.put(home, entry);
+            }
+
+            return home;
+        }
+
         public PhoneGroup(Context context)
         {
             super(context);
-
-            this.config = getConfig(context);
-        }
-
-        private JSONObject getConfig(Context context)
-        {
-            try
-            {
-                JSONObject launchgroup = new JSONObject();
-                JSONArray launchitems = new JSONArray();
-
-                Map<String, Object> skypes = DitUndDat.SharedPrefs.getPrefix("phone");
-
-                SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
-
-                for (String prefkey : skypes.keySet())
-                {
-                    if (!(prefkey.startsWith("phone.text") || prefkey.startsWith("phone.voip")))
-                    {
-                        continue;
-                    }
-
-                    String what = sp.getString(prefkey, null);
-
-                    if ((what == null) || what.equals("inact")) continue;
-
-                    String phonenumber = prefkey.substring(11);
-                    String subtype = prefkey.substring(6, 10);
-                    String label = ProfileImages.getDisplayFromPhoneOrSkype(context, phonenumber);
-
-                    JSONObject whatsentry = new JSONObject();
-
-                    whatsentry.put("label", label);
-                    whatsentry.put("type", "phone");
-                    whatsentry.put("subtype", subtype);
-                    whatsentry.put("phonenumber", phonenumber);
-
-                    launchitems.put(whatsentry);
-
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + phonenumber + "=" + label);
-                }
-
-                launchgroup.put("launchitems", launchitems);
-
-                return launchgroup;
-            }
-            catch (JSONException ex)
-            {
-                ex.printStackTrace();
-            }
-
-            return new JSONObject();
         }
     }
 
@@ -225,7 +225,7 @@ public class LaunchGroupComm
 
                     String skypename = prefkey.substring(11);
                     String subtype = prefkey.substring(6, 10);
-                    String label = ProfileImages.getDisplayFromPhoneOrSkype(context, skypename);
+                    String label = ProfileImages.getDisplayFromPhoneOrSkype(skypename);
 
                     JSONObject whatsentry = new JSONObject();
 
@@ -287,7 +287,7 @@ public class LaunchGroupComm
 
                     String waphonenumber = prefkey.substring(14);
                     String subtype = prefkey.substring(9, 13);
-                    String label = ProfileImages.getDisplayFromPhoneOrSkype(context, waphonenumber);
+                    String label = ProfileImages.getDisplayFromPhoneOrSkype(waphonenumber);
 
                     JSONObject whatsentry = new JSONObject();
 

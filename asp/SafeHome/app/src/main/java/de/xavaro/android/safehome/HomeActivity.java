@@ -76,7 +76,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
-        LaunchGroupHealth.initialize(this);
 
         startService(new Intent(this, KioskService.class));
         startService(new Intent(this, CommService.class));
@@ -96,10 +95,6 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
-
-        launchGroup = new LaunchGroupRoot(this);
-        launchGroup.setConfig(null, LaunchGroupRoot.getConfig());
-        topscreen.addView(launchGroup);
     }
 
     @Override
@@ -144,6 +139,20 @@ public class HomeActivity extends AppCompatActivity implements
         super.onStart();
 
         Log.d(LOGTAG, "onStart...");
+
+        if ((launchGroup == null) || CommonStatic.settingschanged)
+        {
+            if (launchGroup != null)
+            {
+                topscreen.removeAllViews();
+                backStack.clear();
+                launchGroup = null;
+            }
+
+            launchGroup = new LaunchGroupRoot(this);
+            launchGroup.setConfig(null, LaunchGroupRoot.getConfig());
+            topscreen.addView(launchGroup);
+        }
 
         UpdateManager.selfUpdate(this, false);
         DitUndDat.InternetState.subscribe(this);

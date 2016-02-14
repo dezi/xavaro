@@ -33,6 +33,7 @@ import java.util.Map;
 
 import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
@@ -84,11 +85,14 @@ public class SettingsFragments
 
             boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
 
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference lp;
+
             //
             // Bluetooth device selection preference
             //
 
-            NicedPreferences.NiceCategoryPreference pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("BlueTooth Geräteauswahl");
             preferences.add(pc);
 
@@ -125,6 +129,24 @@ public class SettingsFragments
             }
 
             preferences.add(devicePref);
+
+            //
+            // Icon location preference.
+            //
+
+            String[] keys =  Simple.getTransArray(R.array.pref_health_where_keys);
+            String[] vals =  Simple.getTransArray(R.array.pref_health_where_vals);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".icon");
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("home");
+            lp.setTitle("Anzeigen");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
         }
 
         private final Handler handler = new Handler();
@@ -325,10 +347,6 @@ public class SettingsFragments
         {
             super.registerAll(context);
 
-            NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceListPreference lp;
-            NicedPreferences.NiceNumberPreference np;
-
             //
             // Confirmed connects.
             //
@@ -520,7 +538,6 @@ public class SettingsFragments
 
     //region Contacts preferences stub
 
-    @SuppressWarnings("WeakerAccess")
     public static class ContactsFragmentStub extends EnablePreferenceFragment
     {
         protected boolean isPhone;
@@ -549,25 +566,52 @@ public class SettingsFragments
                 "notinst",
                 "ready"};
 
+        private void putNumberType(JSONObject numbers, String type, String orignumber)
+        {
+            if (orignumber == null) return;
+            String nospacenum = orignumber.replace(" ", "");
+
+            if (nospacenum.endsWith("@s.whatsapp.net"))
+            {
+                nospacenum = "+" + nospacenum.replace("@s.whatsapp.net", "");
+            }
+
+            JSONObject number;
+
+            if (! numbers.has(nospacenum))
+            {
+                number = new JSONObject();
+                Json.put(numbers, nospacenum, number);
+            }
+            else
+            {
+                number = Json.getObject(numbers, nospacenum);
+            }
+
+            Json.put(number, type, nospacenum);
+        }
+
         @Override
-        @SuppressWarnings("ConstantConditions")
         public void registerAll(Context context)
         {
             super.registerAll(context);
 
-            boolean enabled = sharedPrefs.getBoolean(keyprefix + ".enable", false);
+            NicedPreferences.NiceCategoryPreference nc;
+            NicedPreferences.NiceListPreference lp;
+
+            boolean enabled = Simple.getSharedPrefBoolean(keyprefix + ".enable");
 
             if (installpack != null)
             {
-                NicedPreferences.NiceListPreference ip = new NicedPreferences.NiceListPreference(context);
+                lp = new NicedPreferences.NiceListPreference(context);
 
                 boolean installed = Simple.isAppInstalled(installpack);
 
-                ip.setEntries(installText);
-                ip.setEntryValues(installVals);
-                ip.setKey(keyprefix + ".installed");
-                ip.setTitle(installtext);
-                ip.setEnabled(enabled);
+                lp.setEntries(installText);
+                lp.setEntryValues(installVals);
+                lp.setKey(keyprefix + ".installed");
+                lp.setTitle(installtext);
+                lp.setEnabled(enabled);
 
                 //
                 // This is nice about Java. No clue how it is done!
@@ -575,7 +619,7 @@ public class SettingsFragments
 
                 final String installName = installpack;
 
-                ip.setOnclick(new Runnable()
+                lp.setOnclick(new Runnable()
                 {
                     @Override
                     public void run()
@@ -584,235 +628,242 @@ public class SettingsFragments
                     }
                 });
 
-                sharedPrefs.edit().putString(ip.getKey(), installed ? "ready" : "notinst").apply();
+                sharedPrefs.edit().putString(lp.getKey(), installed ? "ready" : "notinst").apply();
 
-                preferences.add(ip);
-                activekeys.add(ip.getKey());
+                preferences.add(lp);
+                activekeys.add(lp.getKey());
             }
 
-            try
+            JSONObject contacts = ContactsHandler.getJSONData(context);
+            Iterator<String> keysIterator = contacts.keys();
+
+            while (keysIterator.hasNext())
             {
-                JSONObject contacts = ContactsHandler.getJSONData(context);
-                Iterator<String> keysIterator = contacts.keys();
+                //
+                // We are in a contact.
+                //
 
-                while (keysIterator.hasNext())
+                String cid = keysIterator.next();
+                JSONArray items = Json.getArray(contacts, cid);
+                if (items == null) continue;
+
+                String name = null;
+                JSONObject numbers = new JSONObject();
+
+                for (int inx = 0; inx < items.length(); inx++)
                 {
-                    String cid = keysIterator.next();
+                    JSONObject item = Json.getObject(items, inx);
+                    if ((item == null) || ! item.has("KIND")) continue;
+                    String kind = Json.getString(item, "KIND");
 
-                    //
-                    // We are in a contact.
-                    //
-
-                    String name = null;
-                    String chatphone = null;
-                    String voipphone = null;
-                    String vicaphone = null;
-
-                    JSONArray items = contacts.getJSONArray(cid);
-
-                    for (int inx = 0; inx < items.length(); inx++)
+                    if (Simple.equals(kind, "StructuredName"))
                     {
-                        JSONObject item = items.getJSONObject(inx);
+                        //
+                        // Workaround for Skype which puts
+                        // nickname as display name and
+                        // duplicates it into given name.
+                        //
 
-                        if (!item.has("KIND")) continue;
+                        String disp = Json.getString(item, "DISPLAY_NAME");
+                        String gina = Json.getString(item, "GIVEN_NAME");
 
-                        String kind = item.getString("KIND");
+                        if ((name == null) || ! Simple.equals(disp, gina)) name = disp;
+                    }
 
-                        if (kind.equals("StructuredName"))
+                    if (Simple.equals(kind, "Phone") && ! isSkype)
+                    {
+                        //
+                        // There are sometimes duplicate entries with
+                        // number with space and w/o spaces. We prefer
+                        // the numbers with spaces.
+                        //
+
+                        String isspacenum = Json.getString(item, "NUMBER");
+                        if (isspacenum == null) continue;
+                        String nospacenum = isspacenum.replace(" ", "");
+
+                        JSONObject number;
+
+                        if (! numbers.has(nospacenum))
                         {
-                            //
-                            // Workaround for Skype which puts
-                            // nickname as display name and
-                            // duplicates it into given name.
-                            //
-
-                            String disp = item.getString("DISPLAY_NAME");
-                            String gina = item.getString("GIVEN_NAME");
-
-                            if ((name == null) || ! disp.equals(gina)) name = disp;
+                            number = new JSONObject();
+                            Json.put(numbers, nospacenum, number);
+                        }
+                        else
+                        {
+                            number = Json.getObject(numbers, nospacenum);
                         }
 
-                        if (isPhone)
+                        if (number == null) continue;
+
+                        if (isspacenum.contains(" ") || ! number.has("nicephone"))
                         {
-                            if (kind.equals("Phone"))
-                            {
-                                String number = item.getString("NUMBER");
-
-                                //if (number.startsWith("+")) voipphone = number;
-
-                                voipphone = number;
-                            }
-                        }
-
-                        if (isSkype)
-                        {
-                            if (kind.equals("@com.skype.android.chat.action"))
-                            {
-                                chatphone = item.getString("DATA1");
-                            }
-
-                            if (kind.equals("@com.skype.android.skypecall.action"))
-                            {
-                                voipphone = item.getString("DATA1");
-                            }
-
-                            if (kind.equals("@com.skype.android.videocall.action"))
-                            {
-                                vicaphone = item.getString("DATA1");
-                            }
-                        }
-
-                        if (isWhatsApp)
-                        {
-                            if (kind.equals("@vnd.com.whatsapp.profile"))
-                            {
-                                chatphone = item.getString("DATA1");
-                            }
-
-                            if (kind.equals("@vnd.com.whatsapp.voip.call"))
-                            {
-                                voipphone = item.getString("DATA1");
-                            }
+                            Json.put(number, "nicephone", isspacenum);
+                            Json.put(number, "label", Json.getString(item, "LABEL"));
+                            Json.put(number, "type", Json.getInt(item, "TYPE"));
                         }
                     }
 
-                    if ((chatphone == null) && (voipphone == null) && (vicaphone == null)) continue;
+                    if (isPhone)
+                    {
+                        if (Simple.equals(kind, "Phone"))
+                        {
+                            putNumberType(numbers, "voipphone", Json.getString(item, "NUMBER"));
+                            putNumberType(numbers, "textphone", Json.getString(item, "NUMBER"));
+                        }
+                    }
 
-                    //
-                    // Check how many different nicknames / phonenumbers.
-                    //
+                    if (isSkype)
+                    {
+                        if (Simple.equals(kind, "@com.skype.android.chat.action"))
+                        {
+                            putNumberType(numbers, "chatphone", Json.getString(item, "DATA1"));
+                        }
 
-                    if (chatphone != null) chatphone = chatphone.replaceAll("@s.whatsapp.net", "");
-                    if (voipphone != null) voipphone = voipphone.replaceAll("@s.whatsapp.net", "");
-                    if (vicaphone != null) vicaphone = vicaphone.replaceAll("@s.whatsapp.net", "");
+                        if (Simple.equals(kind, "@com.skype.android.skypecall.action"))
+                        {
+                            putNumberType(numbers, "voipphone", Json.getString(item, "DATA1"));
+                        }
 
-                    ArrayList<String> check = new ArrayList<>();
+                        if (Simple.equals(kind, "@com.skype.android.videocall.action"))
+                        {
+                            putNumberType(numbers, "vicaphone", Json.getString(item, "DATA1"));
+                        }
+                    }
 
-                    if ((chatphone != null) && ! check.contains(chatphone)) check.add(chatphone);
-                    if ((voipphone != null) && ! check.contains(voipphone)) check.add(voipphone);
-                    if ((vicaphone != null) && ! check.contains(vicaphone)) check.add(vicaphone);
+                    if (isWhatsApp)
+                    {
+                        if (Simple.equals(kind, "@vnd.com.whatsapp.profile"))
+                        {
+                            putNumberType(numbers, "chatphone", Json.getString(item, "DATA1"));
+                        }
 
-                    boolean alike = (check.size() == 1);
+                        if (Simple.equals(kind, "@vnd.com.whatsapp.voip.call"))
+                        {
+                            putNumberType(numbers, "voipphone", Json.getString(item, "DATA1"));
+                        }
+                    }
+                }
 
-                    //
-                    // Build contacts category preference.
+                //
+                // Build contacts category preference.
 
-                    String cattitle = name;
+                Iterator<String> numbersIterator = numbers.keys();
 
-                    if (alike) cattitle += " (" + check.get(0) + ")";
+                boolean first = true;
+                boolean multi = false;
 
-                    NicedPreferences.NiceCategoryPreference nc = new NicedPreferences.NiceCategoryPreference(context);
-                    nc.setTitle(cattitle);
-                    nc.setEnabled(enabled);
-                    preferences.add(nc);
+                while (numbersIterator.hasNext())
+                {
+                    String nospacenumber = numbersIterator.next();
+                    JSONObject number = Json.getObject(numbers, nospacenumber);
+                    if (number == null) continue;
+
+                    Log.d(LOGTAG, number.toString());
+
+                    String nicephone = Json.getString(number, "nicephone");
+                    String voipphone = Json.getString(number, "voipphone");
+                    String textphone = Json.getString(number, "textphone");
+                    String vicaphone = Json.getString(number, "vicaphone");
+                    String chatphone = Json.getString(number, "chatphone");
+
+                    if ((voipphone == null) && (textphone == null) &&
+                            (vicaphone == null) && (chatphone == null)) continue;
+
+                    if (isSkype) nicephone = vicaphone;
+
+                    if (first)
+                    {
+                        multi = numbersIterator.hasNext();
+                        first = false;
+
+                        nc = new NicedPreferences.NiceCategoryPreference(context);
+                        nc.setTitle(name + (multi ? "" : " " + nicephone));
+                        nc.setEnabled(enabled);
+                        preferences.add(nc);
+                    }
 
                     if (chatphone != null)
                     {
                         String key = keyprefix + ".chat." + chatphone;
-                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
+                        lp = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(destText);
-                        cb.setEntryValues(destVals);
-                        cb.setDefaultValue("inact");
-                        cb.setKey(key);
-                        cb.setTitle("Nachricht" + (alike ? "" : " " + chatphone));
-                        cb.setEnabled(enabled);
+                        lp.setEntries(destText);
+                        lp.setEntryValues(destVals);
+                        lp.setDefaultValue("inact");
+                        lp.setKey(key);
+                        lp.setTitle("Nachricht" + (multi ? " " + nicephone : ""));
+                        lp.setEnabled(enabled);
 
-                        preferences.add(cb);
-                        activekeys.add(cb.getKey());
-
-                        if (!sharedPrefs.contains(key))
-                        {
-                            sharedPrefs.edit().putString(key, "inact").apply();
-                        }
+                        preferences.add(lp);
+                        activekeys.add(lp.getKey());
                     }
 
-                    if ((voipphone != null) && isPhone)
+                    if (textphone != null)
                     {
                         String key = keyprefix + ".text." + voipphone;
-                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
+                        lp = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(destText);
-                        cb.setEntryValues(destVals);
-                        cb.setDefaultValue("inact");
-                        cb.setKey(key);
-                        cb.setTitle("SMS" + (alike ? "" : " " + voipphone));
-                        cb.setEnabled(enabled);
+                        lp.setEntries(destText);
+                        lp.setEntryValues(destVals);
+                        lp.setDefaultValue("inact");
+                        lp.setKey(key);
+                        lp.setTitle("SMS" + (multi ? " " + nicephone : ""));
+                        lp.setEnabled(enabled);
 
-                        preferences.add(cb);
-                        activekeys.add(cb.getKey());
-
-                        if (!sharedPrefs.contains(key))
-                        {
-                            sharedPrefs.edit().putString(key, "inact").apply();
-                        }
+                        preferences.add(lp);
+                        activekeys.add(lp.getKey());
                     }
 
                     if (voipphone != null)
                     {
                         String key = keyprefix + ".voip." + voipphone;
-                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
+                        lp = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(destText);
-                        cb.setEntryValues(destVals);
-                        cb.setDefaultValue("inact");
-                        cb.setKey(key);
-                        cb.setTitle("Anruf" + (alike ? "" : " " + voipphone));
-                        cb.setEnabled(enabled);
+                        lp.setEntries(destText);
+                        lp.setEntryValues(destVals);
+                        lp.setDefaultValue("inact");
+                        lp.setKey(key);
+                        lp.setTitle("Anruf" + (multi ? " " + nicephone : ""));
+                        lp.setEnabled(enabled);
 
-                        preferences.add(cb);
-                        activekeys.add(cb.getKey());
-
-                        if (!sharedPrefs.contains(key))
-                        {
-                            sharedPrefs.edit().putString(key, "inact").apply();
-                        }
+                        preferences.add(lp);
+                        activekeys.add(lp.getKey());
                     }
 
                     if (vicaphone != null)
                     {
                         String key = keyprefix + ".vica." + vicaphone;
-                        NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
+                        lp = new NicedPreferences.NiceListPreference(context);
 
-                        cb.setEntries(destText);
-                        cb.setEntryValues(destVals);
-                        cb.setDefaultValue("inact");
-                        cb.setKey(key);
-                        cb.setTitle("Videoanruf" + (alike ? "" : " " + vicaphone));
-                        cb.setEnabled(enabled);
+                        lp.setEntries(destText);
+                        lp.setEntryValues(destVals);
+                        lp.setDefaultValue("inact");
+                        lp.setKey(key);
+                        lp.setTitle("Videoanruf" + (multi ? " " + nicephone : ""));
+                        lp.setEnabled(enabled);
 
-                        preferences.add(cb);
-                        activekeys.add(cb.getKey());
-
-                        if (!sharedPrefs.contains(key))
-                        {
-                            sharedPrefs.edit().putString(key, "inact").apply();
-                        }
+                        preferences.add(lp);
+                        activekeys.add(lp.getKey());
                     }
                 }
-
-                //
-                // Remove disabled or obsoleted preferences.
-                //
-
-                String websiteprefix = keyprefix + ".";
-
-                Map<String, ?> exists = sharedPrefs.getAll();
-
-                for (Map.Entry<String, ?> entry : exists.entrySet())
-                {
-                    if (! entry.getKey().startsWith(websiteprefix)) continue;
-
-                    if (activekeys.contains(entry.getKey())) continue;
-
-                    sharedPrefs.edit().remove(entry.getKey()).apply();
-
-                    Log.d(LOGTAG, "registerAll: obsolete:" + entry.getKey() + "=" + entry.getValue());
-                }
             }
-            catch (JSONException ex)
+
+            //
+            // Remove disabled or obsoleted preferences.
+            //
+
+            String websiteprefix = keyprefix + ".";
+
+            Map<String, ?> exists = sharedPrefs.getAll();
+
+            for (Map.Entry<String, ?> entry : exists.entrySet())
             {
-                ex.printStackTrace();
+                if (!entry.getKey().startsWith(websiteprefix)) continue;
+
+                if (activekeys.contains(entry.getKey())) continue;
+
+                Simple.removeSharedPref(entry.getKey());
             }
         }
     }

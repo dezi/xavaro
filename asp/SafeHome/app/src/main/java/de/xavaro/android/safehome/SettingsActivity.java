@@ -46,6 +46,7 @@ public class SettingsActivity extends PreferenceActivity
         super.onWindowFocusChanged(hasFocus);
 
         CommonStatic.setFocused(SettingsActivity.class.getSimpleName(), hasFocus);
+        CommonStatic.settingschanged = true;
     }
 
     @Override

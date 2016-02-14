@@ -24,6 +24,7 @@ public class CommonStatic
     public static boolean focused;
     public static boolean initialized;
     public static boolean lostfocus;
+    public static boolean settingschanged;
 
     public static void setFocused(String activity, boolean hasFocus)
     {

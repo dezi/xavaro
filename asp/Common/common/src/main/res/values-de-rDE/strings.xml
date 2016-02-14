@@ -2,6 +2,11 @@
 
     <string name="simple_and">und</string>
 
+    <string-array name="pref_health_where_vals">
+        <item>Home-Bildschirm</item>
+        <item>Vital-Ordner</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_vals">
         <item>Bildeingang</item>
         <item>Kamera</item>
