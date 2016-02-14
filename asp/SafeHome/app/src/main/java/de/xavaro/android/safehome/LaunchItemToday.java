@@ -1,21 +1,35 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 public class LaunchItemToday extends LaunchItem
 {
     private final static String LOGTAG = LaunchItemToday.class.getSimpleName();
+
+    public static JSONArray getConfig()
+    {
+        JSONArray launchitems = new JSONArray();
+
+        JSONObject launchitem = new JSONObject();
+
+        Json.put(launchitem, "type", "today");
+        Json.put(launchitem, "label", Simple.getTrans(R.string.today_label));
+        Json.put(launchitem, "order", 200);
+
+        Json.put(launchitems, launchitem);
+
+        return launchitems;
+    }
 
     public LaunchItemToday(Context context)
     {

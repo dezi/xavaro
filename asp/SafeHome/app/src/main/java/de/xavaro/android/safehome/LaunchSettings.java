@@ -4,9 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputType;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;

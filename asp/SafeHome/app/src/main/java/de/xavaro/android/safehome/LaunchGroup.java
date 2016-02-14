@@ -29,10 +29,9 @@ import de.xavaro.android.common.StaticUtils;
 // Launch item view on home screen.
 //
 
-public class LaunchGroup extends FrameLayout implements
-        View.OnTouchListener
+public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 {
-    protected final String LOGTAG = "LaunchGroup";
+    private static final String LOGTAG = LaunchGroup.class.getSimpleName();
 
     protected Context context;
 

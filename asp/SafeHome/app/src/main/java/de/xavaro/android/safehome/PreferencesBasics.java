@@ -174,7 +174,7 @@ public class PreferencesBasics
 
             et.setKey("admin.home.button");
             et.setTitle("Home-Button");
-            et.setText(DitUndDat.DefaultApps.getDefaultHomeLabel(context));
+            et.setText(DefaultApps.getDefaultHomeLabel(context));
             et.setOnclick(selectHome);
 
             if (sharedPrefs.getString(et.getKey(), "").equals(StaticUtils.getAppName(context)))
@@ -192,10 +192,10 @@ public class PreferencesBasics
 
             et.setKey("admin.assist.button");
             et.setTitle("Assistenz-Button");
-            et.setText(DitUndDat.DefaultApps.getDefaultAssistLabel(context));
+            et.setText(DefaultApps.getDefaultAssistLabel(context));
             et.setOnclick(selectAssist);
 
-            if (sharedPrefs.getString(et.getKey(),"").equals(DitUndDat.DefaultApps.getAppLable(context)))
+            if (sharedPrefs.getString(et.getKey(),"").equals(DefaultApps.getAppLable(context)))
             {
                 ArchievementManager.archieved("configure.settings.assistbutton");
             }
@@ -225,7 +225,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                DitUndDat.DefaultApps.setDefaultHome(context);
+                DefaultApps.setDefaultHome(context);
             }
         };
 
@@ -234,7 +234,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                DitUndDat.DefaultApps.setDefaultAssist(context);
+                DefaultApps.setDefaultAssist(context);
             }
         };
     }

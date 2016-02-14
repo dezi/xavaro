@@ -638,7 +638,9 @@ public class SettingsFragments
                             {
                                 String number = item.getString("NUMBER");
 
-                                if (number.startsWith("+")) voipphone = number;
+                                //if (number.startsWith("+")) voipphone = number;
+
+                                voipphone = number;
                             }
                         }
 

@@ -35,14 +35,14 @@ public class LaunchItemAdmin extends LaunchItem
 
             if (subtype.equals("home"))
             {
-                packageName = DitUndDat.DefaultApps.getDefaultHome(context);
+                packageName = DefaultApps.getDefaultHome(context);
 
                 icon.setImageResource(GlobalConfigs.IconResSelectHome);
             }
 
             if (subtype.equals("assist"))
             {
-                packageName = DitUndDat.DefaultApps.getDefaultAssist(context);
+                packageName = DefaultApps.getDefaultAssist(context);
 
                 icon.setImageResource(GlobalConfigs.IconResSelectAssist);
             }
@@ -89,8 +89,8 @@ public class LaunchItemAdmin extends LaunchItem
 
     private void launchSelect()
     {
-        if (Simple.equals(subtype, "home"  )) DitUndDat.DefaultApps.setDefaultHome(context);
-        if (Simple.equals(subtype, "assist")) DitUndDat.DefaultApps.setDefaultAssist(context);
+        if (Simple.equals(subtype, "home"  )) DefaultApps.setDefaultHome(context);
+        if (Simple.equals(subtype, "assist")) DefaultApps.setDefaultAssist(context);
     }
 
     private void launchSettings()

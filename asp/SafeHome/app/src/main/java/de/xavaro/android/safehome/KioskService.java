@@ -201,7 +201,7 @@ public class KioskService extends Service
             if (what.equals("android")) blockit = false;
         }
 
-        if (blockit && DitUndDat.DefaultApps.isDefaultHome(this))
+        if (blockit && DefaultApps.isDefaultHome(this))
         {
             restoreRecentProc();
         }

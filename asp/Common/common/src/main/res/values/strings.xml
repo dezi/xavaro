@@ -33,4 +33,8 @@
     <string name="comm_sender_upload_image_name">You image was deposited for %s.</string>
     <string name="comm_sender_download_image_name">%s has received Your image.</string>
 
+    <string name="alertcall_label">Assistance</string>
+
+    <string name="today_label">Today</string>
+
 </resources>

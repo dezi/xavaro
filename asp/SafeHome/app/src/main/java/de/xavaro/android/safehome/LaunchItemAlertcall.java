@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -23,6 +24,24 @@ public class LaunchItemAlertcall extends LaunchItem
         implements ChatManager.ChatMessageCallback
 {
     private final static String LOGTAG = LaunchItemAlertcall.class.getSimpleName();
+
+    public static JSONArray getConfig()
+    {
+        JSONArray launchitems = new JSONArray();
+
+        if (Simple.getSharedPrefBoolean("alertgroup.enable"))
+        {
+            JSONObject launchitem = new JSONObject();
+
+            Json.put(launchitem, "type", "alertcall");
+            Json.put(launchitem, "label", Simple.getTrans(R.string.alertcall_label));
+            Json.put(launchitem, "order", 100);
+
+            Json.put(launchitems, launchitem);
+        }
+
+        return launchitems;
+    }
 
     public LaunchItemAlertcall(Context context)
     {

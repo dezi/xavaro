@@ -25,4 +25,8 @@
     <string name="comm_sender_download_image_name">%s hat Ihr Bild empfangen.</string>
     <string name="comm_sender_download_image_name_du">%s hat Dein Bild empfangen.</string>
 
+    <string name="alertcall_label">Assistenz</string>
+
+    <string name="today_label">Heute</string>
+
 </resources>

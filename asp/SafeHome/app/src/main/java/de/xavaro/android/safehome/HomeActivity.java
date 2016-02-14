@@ -29,21 +29,19 @@ import de.xavaro.android.common.UPNPManager;
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener
 {
-    private final String LOGTAG = "HomeActivity";
+    private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
-    public static KioskService kioskService;
-
-    public static HomeActivity homeActivity;
+    public static HomeActivity instance;
 
     public static HomeActivity getInstance()
     {
-        return homeActivity;
+        return instance;
     }
 
-    private LaunchGroup launchGroup;
     private JSONObject config;
     private FrameLayout topscreen;
     private FrameLayout videoSurface;
+    private LaunchGroupRoot launchGroup;
 
     private boolean wasPaused = false;
     private boolean lostFocus = true;
@@ -68,13 +66,10 @@ public class HomeActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        instance = this;
+
         topscreen = (FrameLayout) findViewById(R.id.top_screen);
         topscreen.setSystemUiVisibility(UI_HIDE);
-
-        launchGroup = new LaunchGroup(this);
-        topscreen.addView(launchGroup);
-
-        homeActivity = this;
 
         ArchievementManager.initialize(this);
         ArchievementManager.reset("alertcall.shortclick");
@@ -82,8 +77,6 @@ public class HomeActivity extends AppCompatActivity implements
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
         LaunchGroupHealth.initialize(this);
-
-        createConfig();
 
         startService(new Intent(this, KioskService.class));
         startService(new Intent(this, CommService.class));
@@ -103,6 +96,10 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
+
+        launchGroup = new LaunchGroupRoot(this);
+        launchGroup.setConfig(null, LaunchGroupRoot.getConfig());
+        topscreen.addView(launchGroup);
     }
 
     @Override
@@ -266,7 +263,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void executeOnBackPressed()
     {
-        if (! DitUndDat.DefaultApps.isDefaultHome(this))
+        if (! DefaultApps.isDefaultHome(this))
         {
             //
             // Finally release user to system.
@@ -362,27 +359,6 @@ public class HomeActivity extends AppCompatActivity implements
             {
 
             }
-        }
-    }
-
-    private void createConfig()
-    {
-        config = StaticUtils.readRawTextResourceJSON(this, R.raw.default_config);
-
-        if ((config == null) || ! config.has("launchgroup"))
-        {
-            Toast.makeText(this, "Keine <launchgroup> gefunden.", Toast.LENGTH_LONG).show();
-
-            return;
-        }
-
-        try
-        {
-            launchGroup.setConfig(null,config.getJSONObject("launchgroup"));
-        }
-        catch (JSONException ex)
-        {
-            ex.printStackTrace();
         }
     }
 }

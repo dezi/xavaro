@@ -322,4 +322,30 @@ public class Json
 
         return new JSONArray(jsonValues);
     }
+
+    public static JSONArray sortInteger(JSONArray array, String field, boolean descending)
+    {
+        final String sort = field;
+        final boolean desc = descending;
+
+        class compare implements Comparator<JSONObject>
+        {
+            public int compare(JSONObject a, JSONObject b)
+            {
+                int aval = desc ? getInt(b, sort) : getInt(a, sort);
+                int bval = desc ? getInt(a, sort) : getInt(b, sort);
+
+                return aval - bval;
+            }
+        }
+
+        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+
+        for (int inx = 0; inx < array.length(); inx++)
+            jsonValues.add(getObject(array, inx));
+
+        Collections.sort(jsonValues, new compare());
+
+        return new JSONArray(jsonValues);
+    }
 }

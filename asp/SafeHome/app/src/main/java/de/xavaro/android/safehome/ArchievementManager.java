@@ -368,12 +368,12 @@ public class ArchievementManager implements
     {
         if (currentTag.equals("configure.settings.homebutton"))
         {
-            DitUndDat.DefaultApps.setDefaultHome(context);
+            DefaultApps.setDefaultHome(context);
         }
 
         if (currentTag.equals("configure.settings.assistbutton"))
         {
-            DitUndDat.DefaultApps.setDefaultAssist(context);
+            DefaultApps.setDefaultAssist(context);
         }
     }
 }
