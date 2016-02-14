@@ -326,8 +326,6 @@ public class LaunchGroupComm
                 if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
                 if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
 
-                Json.put(Simple.sharedPrefEquals(prefkey, "home") ? home : adir, entry);
-
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + waphonenumber + "=" + label);
             }
 
