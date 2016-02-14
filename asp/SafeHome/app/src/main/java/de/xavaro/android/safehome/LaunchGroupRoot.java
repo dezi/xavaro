@@ -20,6 +20,45 @@ public class LaunchGroupRoot extends LaunchGroup
         super(context);
     }
 
+    public static void insertDuplicateMerge(JSONArray launchitems, JSONObject newlaunchitem)
+    {
+        if (newlaunchitem.has("launchitems"))
+        {
+            String newtype = Json.getString(newlaunchitem, "type");
+            String newsubtype = Json.getString(newlaunchitem, "subtype");
+
+            for (int inx = 0; inx < launchitems.length(); inx++)
+            {
+                JSONObject oldlaunchitem = Json.getObject(launchitems, inx);
+                if ((oldlaunchitem == null) || !oldlaunchitem.has("launchitems")) continue;
+
+                String oldtype = Json.getString(oldlaunchitem, "type");
+                String oldsubtype = Json.getString(oldlaunchitem, "subtype");
+
+                if (!Simple.equals(oldtype, newtype)) continue;
+                if (!Simple.equals(oldsubtype, newsubtype)) continue;
+
+                //
+                // Merge launchitems.
+                //
+
+                JSONArray oldlaunchitems = Json.getArray(oldlaunchitem, "launchitems");
+                JSONArray newlaunchitems = Json.getArray(newlaunchitem, "launchitems");
+
+                if ((oldlaunchitems == null) || (newlaunchitems == null)) return;
+
+                for (int cnt = 0; cnt < newlaunchitems.length(); cnt++)
+                {
+                    Json.put(oldlaunchitems, Json.getObject(newlaunchitems, cnt));
+                }
+
+                return;
+            }
+        }
+
+        Json.put(launchitems, newlaunchitem);
+    }
+
     public static JSONObject getConfig()
     {
         //
@@ -31,7 +70,10 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchItemToday.getConfig());
         configs.add(LaunchItemAlertcall.getConfig());
         configs.add(LaunchGroupHealth.getConfig());
+
         configs.add(LaunchGroupComm.PhoneGroup.getConfig());
+        configs.add(LaunchGroupComm.SkypeGroup.getConfig());
+        configs.add(LaunchGroupComm.WhatsappGroup.getConfig());
 
         configs.add(LaunchGroupDeveloper.getConfig());
 
@@ -47,7 +89,7 @@ public class LaunchGroupRoot extends LaunchGroup
             {
                 JSONObject launchitem = Json.getObject(config, inx);
 
-                Json.put(launchitems, launchitem);
+                insertDuplicateMerge(launchitems, launchitem);
             }
         }
 

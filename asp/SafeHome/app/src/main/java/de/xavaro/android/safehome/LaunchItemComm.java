@@ -146,8 +146,12 @@ public class LaunchItemComm extends LaunchItem
             else
             {
                 icon.setImageResource(GlobalConfigs.IconResCommunication);
-                icon.setVisibility(VISIBLE);
             }
+        }
+
+        if (type.equals("contacts"))
+        {
+            icon.setImageResource(GlobalConfigs.IconResContacts);
         }
 
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
@@ -160,6 +164,7 @@ public class LaunchItemComm extends LaunchItem
         if (type.equals("skype"   )) launchSkype();
         if (type.equals("xavaro"  )) launchXavaro();
         if (type.equals("whatsapp")) launchWhatsApp();
+        if (type.equals("contacts")) launchContacts();
     }
 
     private void launchPhone()
@@ -245,7 +250,11 @@ public class LaunchItemComm extends LaunchItem
             return;
         }
 
-        if (directory == null) directory = new LaunchGroupComm.SkypeGroup(context);
+        if (directory == null)
+        {
+            directory = new LaunchGroupComm.SkypeGroup(context);
+            directory.setConfig(this, Json.getArray(config, "launchitems"));
+        }
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }
@@ -271,7 +280,11 @@ public class LaunchItemComm extends LaunchItem
             return;
         }
 
-        if (directory == null) directory = new LaunchGroupComm.WhatsappGroup(context);
+        if (directory == null)
+        {
+            directory = new LaunchGroupComm.WhatsappGroup(context);
+            directory.setConfig(this, Json.getArray(config, "launchitems"));
+        }
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }
@@ -299,7 +312,22 @@ public class LaunchItemComm extends LaunchItem
             return;
         }
 
-        if (directory == null) directory = new LaunchGroupComm.XavaroGroup(context);
+        if (directory == null)
+        {
+            directory = new LaunchGroupComm.XavaroGroup(context);
+            directory.setConfig(this, Json.getArray(config, "launchitems"));
+        }
+
+        ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
+    private void launchContacts()
+    {
+        if (directory == null)
+        {
+            directory = new LaunchGroup(context);
+            directory.setConfig(this, Json.getArray(config, "launchitems"));
+        }
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }

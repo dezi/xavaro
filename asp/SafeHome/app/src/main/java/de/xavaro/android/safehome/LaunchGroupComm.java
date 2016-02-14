@@ -131,10 +131,16 @@ public class LaunchGroupComm
     {
         private static final String LOGTAG = PhoneGroup.class.getSimpleName();
 
+        public PhoneGroup(Context context)
+        {
+            super(context);
+        }
+
         public static JSONArray getConfig()
         {
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
+            JSONArray cdir = new JSONArray();
 
             SharedPreferences sp = Simple.getSharedPrefs();
             Map<String, Object> prefs = Simple.getAllPreferences("phone");
@@ -162,7 +168,9 @@ public class LaunchGroupComm
                 Json.put(entry, "phonenumber", phonenumber);
                 Json.put(entry, "order", 600);
 
-                Json.put(Simple.sharedPrefEquals(prefkey, "home") ? home : adir, entry);
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
+                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
 
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + phonenumber + "=" + label);
             }
@@ -179,12 +187,19 @@ public class LaunchGroupComm
                 Json.put(home, entry);
             }
 
-            return home;
-        }
+            if (cdir.length() > 0)
+            {
+                JSONObject entry = new JSONObject();
 
-        public PhoneGroup(Context context)
-        {
-            super(context);
+                Json.put(entry, "type", "contacts");
+                Json.put(entry, "label", "Kontakte");
+                Json.put(entry, "order", 950);
+
+                Json.put(entry, "launchitems", cdir);
+                Json.put(home, entry);
+            }
+
+            return home;
         }
     }
 
@@ -195,60 +210,74 @@ public class LaunchGroupComm
         public SkypeGroup(Context context)
         {
             super(context);
-
-            this.config = getConfig(context);
         }
 
-        private JSONObject getConfig(Context context)
+        public static JSONArray getConfig()
         {
-            try
+            JSONArray home = new JSONArray();
+            JSONArray adir = new JSONArray();
+            JSONArray cdir = new JSONArray();
+
+            SharedPreferences sp = Simple.getSharedPrefs();
+            Map<String, Object> prefs = Simple.getAllPreferences("skype");
+
+            for (String prefkey : prefs.keySet())
             {
-                JSONObject launchgroup = new JSONObject();
-                JSONArray launchitems = new JSONArray();
-
-                Map<String, Object> skypes = DitUndDat.SharedPrefs.getPrefix("skype");
-
-                SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
-
-                for (String prefkey : skypes.keySet())
+                if (!(prefkey.startsWith("skype.voip")
+                        || prefkey.startsWith("skype.chat")
+                        || prefkey.startsWith("skype.vica")))
                 {
-                    if (!(prefkey.startsWith("skype.voip")
-                            || prefkey.startsWith("skype.chat")
-                            || prefkey.startsWith("skype.vica")))
-                    {
-                        continue;
-                    }
-
-                    String what = sp.getString(prefkey, null);
-
-                    if ((what == null) || what.equals("inact")) continue;
-
-                    String skypename = prefkey.substring(11);
-                    String subtype = prefkey.substring(6, 10);
-                    String label = ProfileImages.getDisplayFromPhoneOrSkype(skypename);
-
-                    JSONObject whatsentry = new JSONObject();
-
-                    whatsentry.put("label", label);
-                    whatsentry.put("type", "skype");
-                    whatsentry.put("subtype", subtype);
-                    whatsentry.put("skypename", skypename);
-
-                    launchitems.put(whatsentry);
-
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + skypename + "=" + label);
+                    continue;
                 }
 
-                launchgroup.put("launchitems", launchitems);
+                String what = sp.getString(prefkey, null);
 
-                return launchgroup;
+                if ((what == null) || what.equals("inact")) continue;
+
+                String skypename = prefkey.substring(11);
+                String subtype = prefkey.substring(6, 10);
+                String label = ProfileImages.getDisplayFromPhoneOrSkype(skypename);
+
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", label);
+                Json.put(entry, "type", "skype");
+                Json.put(entry, "subtype", subtype);
+                Json.put(entry, "skypename", skypename);
+                Json.put(entry, "order", 800);
+
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
+                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + skypename + "=" + label);
             }
-            catch (JSONException ex)
+
+            if (adir.length() > 0)
             {
-                ex.printStackTrace();
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "skype");
+                Json.put(entry, "label", "Skype");
+                Json.put(entry, "order", 850);
+
+                Json.put(entry, "launchitems", adir);
+                Json.put(home, entry);
             }
 
-            return new JSONObject();
+            if (cdir.length() > 0)
+            {
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "contacts");
+                Json.put(entry, "label", "Kontakte");
+                Json.put(entry, "order", 950);
+
+                Json.put(entry, "launchitems", cdir);
+                Json.put(home, entry);
+            }
+
+            return home;
         }
     }
 
@@ -259,58 +288,74 @@ public class LaunchGroupComm
         public WhatsappGroup(Context context)
         {
             super(context);
-
-            this.config = getConfig(context);
         }
 
-        private JSONObject getConfig(Context context)
+        public static JSONArray getConfig()
         {
-            try
+            JSONArray home = new JSONArray();
+            JSONArray adir = new JSONArray();
+            JSONArray cdir = new JSONArray();
+
+            SharedPreferences sp = Simple.getSharedPrefs();
+            Map<String, Object> prefs = Simple.getAllPreferences("whatsapp");
+
+            for (String prefkey : prefs.keySet())
             {
-                JSONObject launchgroup = new JSONObject();
-                JSONArray launchitems = new JSONArray();
-
-                Map<String, Object> whatapps = DitUndDat.SharedPrefs.getPrefix("whatsapp");
-
-                SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
-
-                for (String prefkey : whatapps.keySet())
+                if (!(prefkey.startsWith("whatsapp.voip") || prefkey.startsWith("whatsapp.chat")))
                 {
-                    if (!(prefkey.startsWith("whatsapp.voip") || prefkey.startsWith("whatsapp.chat")))
-                    {
-                        continue;
-                    }
-
-                    String what = sp.getString(prefkey, null);
-
-                    if ((what == null) || what.equals("inact")) continue;
-
-                    String waphonenumber = prefkey.substring(14);
-                    String subtype = prefkey.substring(9, 13);
-                    String label = ProfileImages.getDisplayFromPhoneOrSkype(waphonenumber);
-
-                    JSONObject whatsentry = new JSONObject();
-
-                    whatsentry.put("label", label);
-                    whatsentry.put("type", "whatsapp");
-                    whatsentry.put("subtype", subtype);
-                    whatsentry.put("waphonenumber", waphonenumber);
-
-                    launchitems.put(whatsentry);
-
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + waphonenumber + "=" + label);
+                    continue;
                 }
 
-                launchgroup.put("launchitems", launchitems);
+                String what = sp.getString(prefkey, null);
 
-                return launchgroup;
+                if ((what == null) || what.equals("inact")) continue;
+
+                String waphonenumber = prefkey.substring(14);
+                String subtype = prefkey.substring(9, 13);
+                String label = ProfileImages.getDisplayFromPhoneOrSkype(waphonenumber);
+
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", label);
+                Json.put(entry, "type", "whatsapp");
+                Json.put(entry, "subtype", subtype);
+                Json.put(entry, "waphonenumber", waphonenumber);
+                Json.put(entry, "order", 750);
+
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
+                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Json.put(Simple.sharedPrefEquals(prefkey, "home") ? home : adir, entry);
+
+                Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + waphonenumber + "=" + label);
             }
-            catch (JSONException ex)
+
+            if (adir.length() > 0)
             {
-                ex.printStackTrace();
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "whatsapp");
+                Json.put(entry, "label", "WhatsApp");
+                Json.put(entry, "order", 750);
+
+                Json.put(entry, "launchitems", adir);
+                Json.put(home, entry);
             }
 
-            return new JSONObject();
+            if (cdir.length() > 0)
+            {
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "contacts");
+                Json.put(entry, "label", "Kontakte");
+                Json.put(entry, "order", 950);
+
+                Json.put(entry, "launchitems", cdir);
+                Json.put(home, entry);
+            }
+
+            return home;
         }
     }
 }
