@@ -20,7 +20,41 @@ public class LaunchItemDeveloper extends LaunchItem
     @Override
     protected void setConfig()
     {
-        icon.setImageResource(GlobalConfigs.IconResTesting);
+
+        if (subtype != null)
+        {
+            if (Simple.equals(subtype, "settings"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResPersist);
+            }
+
+            if (Simple.equals(subtype, "preferences"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResSettingsSafehome);
+            }
+
+            if (Simple.equals(subtype, "contacts"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResContacts);
+            }
+
+            if (Simple.equals(subtype, "temporary"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResStorageTemp);
+            }
+
+            if (Simple.equals(subtype, "sdcard"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResStorageSDCard);
+            }
+
+            overicon.setImageResource(GlobalConfigs.IconResTesting);
+            overlay.setVisibility(VISIBLE);
+        }
+        else
+        {
+            icon.setImageResource(GlobalConfigs.IconResTesting);
+        }
     }
 
     @Override

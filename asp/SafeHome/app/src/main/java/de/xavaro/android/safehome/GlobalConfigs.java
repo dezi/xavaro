@@ -74,6 +74,9 @@ public class GlobalConfigs
     //region Global icons
 
     // @formatter:off
+    public static final int IconResStorageTemp        = R.drawable.storage_temp_420x420;
+    public static final int IconResStorageSDCard      = R.drawable.storage_sdcard_420x420;
+    public static final int IconResPersist            = R.drawable.persist_256x256;
     public static final int IconResContacts           = R.drawable.contacts_340x340;
     public static final int IconResXavaro             = R.drawable.communication_400x400;
     public static final int IconResToday              = R.drawable.today_512x512;

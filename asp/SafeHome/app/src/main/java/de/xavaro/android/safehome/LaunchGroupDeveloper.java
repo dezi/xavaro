@@ -27,14 +27,6 @@ public class LaunchGroupDeveloper extends LaunchGroup
         entry = new JSONObject();
 
         Json.put(entry, "type", "developer");
-        Json.put(entry, "subtype", "preferences");
-        Json.put(entry, "label", "Preferences");
-        Json.put(entry, "order", 4000);
-        Json.put(adir, entry);
-
-        entry = new JSONObject();
-
-        Json.put(entry, "type", "developer");
         Json.put(entry, "subtype", "settings");
         Json.put(entry, "label", "Settings");
         Json.put(entry, "order", 4000);
@@ -43,8 +35,32 @@ public class LaunchGroupDeveloper extends LaunchGroup
         entry = new JSONObject();
 
         Json.put(entry, "type", "developer");
+        Json.put(entry, "subtype", "preferences");
+        Json.put(entry, "label", "Preferences");
+        Json.put(entry, "order", 4000);
+        Json.put(adir, entry);
+
+        entry = new JSONObject();
+
+        Json.put(entry, "type", "developer");
         Json.put(entry, "subtype", "contacts");
         Json.put(entry, "label", "Contacts");
+        Json.put(entry, "order", 4000);
+        Json.put(adir, entry);
+
+        entry = new JSONObject();
+
+        Json.put(entry, "type", "developer");
+        Json.put(entry, "subtype", "sdcard");
+        Json.put(entry, "label", "SD-Card");
+        Json.put(entry, "order", 4000);
+        Json.put(adir, entry);
+
+        entry = new JSONObject();
+
+        Json.put(entry, "type", "developer");
+        Json.put(entry, "subtype", "temporary");
+        Json.put(entry, "label", "Temporary");
         Json.put(entry, "order", 4000);
         Json.put(adir, entry);
 

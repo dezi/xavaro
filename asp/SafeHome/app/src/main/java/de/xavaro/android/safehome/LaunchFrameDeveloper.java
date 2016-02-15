@@ -17,6 +17,7 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Map;
 
 import de.xavaro.android.common.Json;
@@ -46,7 +47,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         lp = new FrameLayout.LayoutParams(
                 Simple.getActionBarHeight(),
                 Simple.getActionBarHeight(),
-                Gravity.END + Gravity.TOP);
+                Gravity.END + Gravity.BOTTOM);
 
         lp.setMargins(8, 8, 8, 8);
 
@@ -73,6 +74,8 @@ public class LaunchFrameDeveloper extends LaunchFrame
         if (Simple.equals(subtype,"contacts")) loadContacts();
         if (Simple.equals(subtype,"settings")) loadSettings();
         if (Simple.equals(subtype,"preferences")) loadPreferences();
+        if (Simple.equals(subtype,"temporary")) loadStorageTemp();
+        if (Simple.equals(subtype,"sdcard")) loadStorageSDCard();
     }
 
     private View.OnClickListener onUpdateClick = new View.OnClickListener()
@@ -99,7 +102,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         {
             scrollview = new ScrollView(getContext());
             scrollview.setBackgroundColor(0xffffc080);
-            addView(scrollview);
+            addView(scrollview, 0);
 
             jsonListing = new TextView(getContext());
             jsonListing.setPadding(16, 16, 16, 16);
@@ -112,13 +115,78 @@ public class LaunchFrameDeveloper extends LaunchFrame
         jsonListing.setText(Json.toPretty(root));
     }
 
+    private void recurseDirectories(File dir, int plen)
+    {
+        File[] list = dir.listFiles();
+
+        for (File item : list)
+        {
+            String path = item.toString();
+            JSONObject jfile = new JSONObject();
+            Json.put(jfile, "k", "..." + path.substring(plen));
+            jsonprefs.put(jfile);
+
+            if (item.isDirectory()) recurseDirectories(item, plen);
+        }
+    }
+
+    private void loadStorage(File root)
+    {
+        Log.d(LOGTAG, "loadStorage: " + root.toString());
+
+        if (listview == null)
+        {
+            listview = new ListView(getContext());
+            listview.setBackgroundColor(0xffffc080);
+
+            addView(listview, 0);
+        }
+
+        jsonprefs = new JSONArray();
+
+        recurseDirectories(root, root.toString().length());
+
+        jsonprefs = Json.sort(jsonprefs, "k", false);
+
+        jsonAdapter = new JSONAdapter();
+        listview.setAdapter(jsonAdapter);
+        listview.setOnItemClickListener(jsonAdapter);
+    }
+
+    void deleteRecursive(File fileOrDirectory)
+    {
+        if (fileOrDirectory.isDirectory())
+        {
+            for (File child : fileOrDirectory.listFiles())
+            {
+                deleteRecursive(child);
+            }
+        }
+
+        fileOrDirectory.delete();
+    }
+
+    private void loadStorageTemp()
+    {
+        File temp = Simple.getAnyContext().getCacheDir();
+
+        deleteRecursive(new File(temp, "org.chromium.android_webview"));
+
+        loadStorage(temp);
+    }
+
+    private void loadStorageSDCard()
+    {
+        loadStorage(Simple.getAnyContext().getFilesDir());
+    }
+
     private void loadContacts()
     {
         if (scrollview == null)
         {
             scrollview = new ScrollView(getContext());
             scrollview.setBackgroundColor(0xffffc080);
-            addView(scrollview);
+            addView(scrollview, 0);
 
             jsonListing = new TextView(getContext());
             jsonListing.setPadding(16, 16, 16, 16);
@@ -138,7 +206,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
             listview = new ListView(getContext());
             listview.setBackgroundColor(0xffffc080);
 
-            addView(listview);
+            addView(listview, 0);
         }
 
         Map<String, Object> prefs = Simple.getAllPreferences(null);
@@ -192,6 +260,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
             TextView itemView = new TextView(getContext());
             itemView.setLayoutParams(Simple.layoutParamsMW());
+            itemView.setPadding(20, 0, 20, 0);
             itemView.setTextSize(18f);
 
             layout.addView(itemView);
@@ -205,7 +274,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         {
             JSONObject item = getItem(position);
 
-            ((TextView) view.getChildAt(0)).setText(Json.toPretty(item));
+            ((TextView) view.getChildAt(0)).setText(Json.defuck(Json.toPretty(item)));
         }
 
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
