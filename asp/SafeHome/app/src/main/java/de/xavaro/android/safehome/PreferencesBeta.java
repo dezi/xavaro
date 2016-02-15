@@ -84,7 +84,7 @@ public class PreferencesBeta
             lp.setEntries(vals);
             lp.setEntryValues(keys);
             lp.setDefaultValue("folder");
-            lp.setTitle("Preferences");
+            lp.setTitle("Contacts");
             lp.setEnabled(enabled);
 
             preferences.add(lp);

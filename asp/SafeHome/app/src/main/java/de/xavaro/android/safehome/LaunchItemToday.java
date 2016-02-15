@@ -46,7 +46,7 @@ public class LaunchItemToday extends LaunchItem
         timeView = new TextView(getContext());
         timeView.setLayoutParams(Simple.layoutParamsMM());
         timeView.setPadding(0, 0, 0, icon.getPaddingBottom());
-        timeView.setTextSize(44f);
+        timeView.setTextSize(Simple.getDeviceTextSize(44f));
         timeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
         timeView.setTextColor(Color.WHITE);
         timeView.setTypeface(null, Typeface.BOLD);
