@@ -6,30 +6,29 @@ import android.content.DialogInterface;
 import android.text.InputType;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.StaticUtils;
 
-public class LaunchSettings extends LaunchGroup implements
+public class LaunchGroupPreferences extends LaunchGroup implements
         DialogInterface.OnClickListener
 {
-    private static final String LOGTAG = LaunchSettings.class.getSimpleName();
+    private static final String LOGTAG = LaunchGroupPreferences.class.getSimpleName();
 
-    private static LaunchSettings instance;
+    private static LaunchGroupPreferences instance;
 
-    public static LaunchSettings getInstance(Context context)
+    public static LaunchGroupPreferences getInstance(Context context)
     {
-        if (instance == null) instance = new LaunchSettings(context);
+        if (instance == null) instance = new LaunchGroupPreferences(context);
 
         return instance;
     }
 
     private JSONObject settings;
 
-    public LaunchSettings(Context context)
+    public LaunchGroupPreferences(Context context)
     {
         super(context);
 

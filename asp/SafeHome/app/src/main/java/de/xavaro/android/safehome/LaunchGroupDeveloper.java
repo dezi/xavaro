@@ -24,45 +24,58 @@ public class LaunchGroupDeveloper extends LaunchGroup
         JSONArray adir = new JSONArray();
         JSONObject entry;
 
-        entry = new JSONObject();
+        if (Simple.getSharedPrefBoolean("developer.enable"))
+        {
+            entry = new JSONObject();
 
-        Json.put(entry, "type", "developer");
-        Json.put(entry, "subtype", "settings");
-        Json.put(entry, "label", "Settings");
-        Json.put(entry, "order", 4000);
-        Json.put(adir, entry);
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "settings");
+            Json.put(entry, "label", "Settings");
+            Json.put(entry, "order", 4000);
 
-        entry = new JSONObject();
+            if (Simple.sharedPrefEquals("developer.browser.settings", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.settings", "folder")) adir.put(entry);
 
-        Json.put(entry, "type", "developer");
-        Json.put(entry, "subtype", "preferences");
-        Json.put(entry, "label", "Preferences");
-        Json.put(entry, "order", 4000);
-        Json.put(adir, entry);
+            entry = new JSONObject();
 
-        entry = new JSONObject();
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "preferences");
+            Json.put(entry, "label", "Preferences");
+            Json.put(entry, "order", 4000);
 
-        Json.put(entry, "type", "developer");
-        Json.put(entry, "subtype", "contacts");
-        Json.put(entry, "label", "Contacts");
-        Json.put(entry, "order", 4000);
-        Json.put(adir, entry);
+            if (Simple.sharedPrefEquals("developer.browser.preferences", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.preferences", "folder")) adir.put(entry);
 
-        entry = new JSONObject();
+            entry = new JSONObject();
 
-        Json.put(entry, "type", "developer");
-        Json.put(entry, "subtype", "sdcard");
-        Json.put(entry, "label", "SD-Card");
-        Json.put(entry, "order", 4000);
-        Json.put(adir, entry);
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "contacts");
+            Json.put(entry, "label", "Contacts");
+            Json.put(entry, "order", 4000);
 
-        entry = new JSONObject();
+            if (Simple.sharedPrefEquals("developer.browser.contacts", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.contacts", "folder")) adir.put(entry);
 
-        Json.put(entry, "type", "developer");
-        Json.put(entry, "subtype", "temporary");
-        Json.put(entry, "label", "Temporary");
-        Json.put(entry, "order", 4000);
-        Json.put(adir, entry);
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "sdcard");
+            Json.put(entry, "label", "SD-Card");
+            Json.put(entry, "order", 4000);
+
+            if (Simple.sharedPrefEquals("developer.browser.sdcard", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.sdcard", "folder")) adir.put(entry);
+
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "temporary");
+            Json.put(entry, "label", "Temporary");
+            Json.put(entry, "order", 4000);
+
+            if (Simple.sharedPrefEquals("developer.browser.temporary", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.temporary", "folder")) adir.put(entry);
+        }
 
         if (adir.length() > 0)
         {

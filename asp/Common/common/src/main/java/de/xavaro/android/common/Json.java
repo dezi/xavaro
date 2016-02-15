@@ -213,6 +213,20 @@ public class Json
     }
 
     @Nullable
+    public static String getString(JSONArray json, int index)
+    {
+        try
+        {
+            return json.getString(index);
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static JSONArray getArray(JSONObject json, String key)
     {
         try

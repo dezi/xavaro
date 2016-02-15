@@ -2,7 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.preference.PreferenceActivity;
 
-public class WebPreferences
+public class PreferencesWebFrame
 {
     //region Webframe newspaper preferences
 

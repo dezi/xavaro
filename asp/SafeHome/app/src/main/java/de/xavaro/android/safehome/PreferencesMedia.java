@@ -14,7 +14,7 @@ import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 
-public class MediaPreferences
+public class PreferencesMedia
 {
     //region Media image preferences
 

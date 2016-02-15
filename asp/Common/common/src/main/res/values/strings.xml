@@ -14,6 +14,18 @@
         <item>Vital-Folder</item>
     </string-array>
 
+    <string-array name="pref_beta_where_keys">
+        <item>inact</item>
+        <item>home</item>
+        <item>folder</item>
+    </string-array>
+
+    <string-array name="pref_beta_where_vals">
+        <item>None</item>
+        <item>Home</item>
+        <item>Folder</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_keys">
         <item>incoming</item>
         <item>camera</item>

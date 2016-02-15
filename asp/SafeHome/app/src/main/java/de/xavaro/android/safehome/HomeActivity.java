@@ -11,9 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -22,9 +20,7 @@ import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.GCMRegistrationService;
-import de.xavaro.android.common.UPNPManager;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener
@@ -339,7 +335,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         if (backPressedCount >= 4)
         {
-            LaunchSettings.getInstance(this).open();
+            LaunchGroupPreferences.getInstance(this).open();
         }
         else
         {

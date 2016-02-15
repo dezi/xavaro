@@ -1,10 +1,8 @@
 package de.xavaro.android.safehome;
 
-import android.app.Activity;
 import android.preference.PreferenceActivity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -19,8 +17,6 @@ import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.SystemIdentity;
-import de.xavaro.android.common.PersistManager;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -73,19 +69,19 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Kommunikation";
         target.add(category);
 
-        target.add(SettingsFragments.PhoneFragment.getHeader());
-        target.add(SettingsFragments.SkypeFragment.getHeader());
-        target.add(SettingsFragments.WhatsAppFragment.getHeader());
-        target.add(SettingsFragments.XavaroFragment.getHeader());
+        target.add(PreferencesComm.PhoneFragment.getHeader());
+        target.add(PreferencesComm.SkypeFragment.getHeader());
+        target.add(PreferencesComm.WhatsAppFragment.getHeader());
+        target.add(PreferencesComm.XavaroFragment.getHeader());
 
         category = new Header();
         category.title = "Medien";
         target.add(category);
 
-        target.add(MediaPreferences.MediaImageFragment.getHeader());
-        target.add(MediaPreferences.MediaAudioFragment.getHeader());
-        target.add(MediaPreferences.MediaVideoFragment.getHeader());
-        target.add(MediaPreferences.MediaEbookFragment.getHeader());
+        target.add(PreferencesMedia.MediaImageFragment.getHeader());
+        target.add(PreferencesMedia.MediaAudioFragment.getHeader());
+        target.add(PreferencesMedia.MediaVideoFragment.getHeader());
+        target.add(PreferencesMedia.MediaEbookFragment.getHeader());
 
         category = new Header();
         category.title = "Apps";
@@ -97,37 +93,42 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Vitaldaten";
         target.add(category);
 
-        target.add(HealthPreferences.HealthPersonalFragment.getHeader());
-        target.add(HealthPreferences.HealthBPMFragment.getHeader());
-        target.add(HealthPreferences.HealthScaleFragment.getHeader());
-        target.add(HealthPreferences.HealthSensorFragment.getHeader());
-        target.add(HealthPreferences.HealthGlucoseFragment.getHeader());
-        target.add(HealthPreferences.HealthUnitsFragment.getHeader());
+        target.add(PreferencesHealth.HealthPersonalFragment.getHeader());
+        target.add(PreferencesHealth.HealthBPMFragment.getHeader());
+        target.add(PreferencesHealth.HealthScaleFragment.getHeader());
+        target.add(PreferencesHealth.HealthSensorFragment.getHeader());
+        target.add(PreferencesHealth.HealthGlucoseFragment.getHeader());
+        target.add(PreferencesHealth.HealthUnitsFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";
         target.add(category);
 
-        target.add(SettingsFragments.IPTelevisionFragment.getHeader());
-        target.add(SettingsFragments.IPRadioFragment.getHeader());
+        target.add(PreferencesWebStream.IPTelevisionFragment.getHeader());
+        target.add(PreferencesWebStream.IPRadioFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Online Content";
         target.add(category);
 
-        target.add(SettingsFragments.SafetyFragment.getHeader());
-
-        target.add(WebPreferences.WebConfigNewspaperFragment.getHeader());
-        target.add(WebPreferences.WebConfigMagazineFragment.getHeader());
-        target.add(WebPreferences.WebConfigPictorialFragment.getHeader());
-        target.add(WebPreferences.WebConfigShoppingFragment.getHeader());
-        target.add(WebPreferences.WebConfigEroticsFragment.getHeader());
+        target.add(PreferencesWebFrame.WebConfigNewspaperFragment.getHeader());
+        target.add(PreferencesWebFrame.WebConfigMagazineFragment.getHeader());
+        target.add(PreferencesWebFrame.WebConfigPictorialFragment.getHeader());
+        target.add(PreferencesWebFrame.WebConfigShoppingFragment.getHeader());
+        target.add(PreferencesWebFrame.WebConfigEroticsFragment.getHeader());
 
         category = new Header();
         category.title = "Firewall";
         target.add(category);
 
-        target.add(SettingsFragments.DomainsFragment.getHeader());
+        target.add(PreferencesFirewall.SafetyFragment.getHeader());
+        target.add(PreferencesFirewall.DomainsFragment.getHeader());
+
+        category = new Header();
+        category.title = "Betaversion";
+        target.add(category);
+
+        target.add(PreferencesBeta.DeveloperFragment.getHeader());
 
         setHeaders(target);
     }

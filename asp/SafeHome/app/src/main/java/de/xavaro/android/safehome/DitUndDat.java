@@ -250,9 +250,6 @@ public class DitUndDat
             new PreferencesBasics.OwnerFragment().registerAll(context);
             new PreferencesBasics.AdminFragment().registerAll(context);
             new PreferencesBasics.CommunityFragment().registerAll(context);
-
-            SettingsFragments.SafetyFragment.registerAll(context);
-            SettingsFragments.DomainsFragment.registerAll(context);
         }
 
         public static Map<String, Object> getPrefix(String prefix)

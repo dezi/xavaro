@@ -1,13 +1,24 @@
 package de.xavaro.android.safehome;
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Handler;
 import android.preference.PreferenceActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.Simple;
 
-public class HealthPreferences
+public class PreferencesHealth
 {
     //region Health Person preferences
 
@@ -214,7 +225,7 @@ public class HealthPreferences
 
     //region Health BPM preferences
 
-    public static class HealthBPMFragment extends SettingsFragments.BlueToothFragment
+    public static class HealthBPMFragment extends BlueToothFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -311,7 +322,7 @@ public class HealthPreferences
 
     //region Health Scale preferences
 
-    public static class HealthScaleFragment extends SettingsFragments.BlueToothFragment
+    public static class HealthScaleFragment extends BlueToothFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -389,7 +400,7 @@ public class HealthPreferences
 
     //region Health Sensor preferences
 
-    public static class HealthSensorFragment extends SettingsFragments.BlueToothFragment
+    public static class HealthSensorFragment extends BlueToothFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -483,7 +494,7 @@ public class HealthPreferences
 
     //region Health Glucose preferences
 
-    public static class HealthGlucoseFragment extends SettingsFragments.BlueToothFragment
+    public static class HealthGlucoseFragment extends BlueToothFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -526,4 +537,253 @@ public class HealthPreferences
     }
 
     //endregion Health Glucose preferences
+
+    //region BlueTooth preferences stub
+
+    public static class BlueToothFragment extends SettingsFragments.EnablePreferenceFragment
+            implements
+            DialogInterface.OnClickListener,
+            BlueTooth.BlueToothDiscoverCallback
+    {
+        private static final String LOGTAG = BlueToothFragment.class.getSimpleName();
+
+        protected String devicetitle;
+        protected String devicesearch;
+
+        protected boolean isBPM;
+        protected boolean isScale;
+        protected boolean isSensor;
+        protected boolean isGlucose;
+
+        private final BlueToothFragment self = this;
+        private Context context;
+
+        private NicedPreferences.NiceListPreference devicePref;
+
+        final ArrayList<String> recentText = new ArrayList<>();
+        final ArrayList<String> recentVals = new ArrayList<>();
+
+        @Override
+        public void registerAll(Context context)
+        {
+            this.context = context;
+
+            super.registerAll(context);
+
+            boolean enabled = Simple.getSharedPrefBoolean(keyprefix + ".enable");
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference lp;
+
+            //
+            // Bluetooth device selection preference
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("BlueTooth Geräteauswahl");
+            preferences.add(pc);
+
+            devicePref = new NicedPreferences.NiceListPreference(context);
+
+            devicePref.setKey(keyprefix + ".device");
+
+            recentText.add("Nicht gesetzt");
+            recentVals.add("unknown");
+
+            String btDevice = Simple.getSharedPrefString(devicePref.getKey());
+
+            if ((btDevice != null) && ! btDevice.equals("unknown"))
+            {
+                String[] btDeviceparts = btDevice.split(" => ");
+
+                if (btDeviceparts.length == 2)
+                {
+                    recentText.add(btDeviceparts[ 0 ]);
+                    recentVals.add(btDevice);
+                }
+            }
+
+            devicePref.setEntries(recentText);
+            devicePref.setEntryValues(recentVals);
+            devicePref.setDefaultValue("unknown");
+            devicePref.setTitle(devicetitle);
+            devicePref.setEnabled(enabled);
+
+            devicePref.setOnclick(discoverDialog);
+
+            preferences.add(devicePref);
+
+            //
+            // Icon location preference.
+            //
+
+            String[] keys =  Simple.getTransArray(R.array.pref_health_where_keys);
+            String[] vals =  Simple.getTransArray(R.array.pref_health_where_vals);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".icon");
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("home");
+            lp.setTitle("Anzeigen");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+        }
+
+        private final Handler handler = new Handler();
+        private AlertDialog dialog;
+
+        public final Runnable cancelDialog = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                dialog.cancel();
+            }
+        };
+
+        public final Runnable discoverDialog = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle(devicetitle);
+
+                builder.setNegativeButton("Abbrechen", self);
+                builder.setNeutralButton("Nach Geräten suchen", self);
+
+                dialog = builder.create();
+
+                String btDevice = Simple.getSharedPrefString(keyprefix + ".device");
+                if (btDevice == null) btDevice = "unknown";
+
+                RadioGroup rg = new RadioGroup(context);
+                rg.setOrientation(RadioGroup.VERTICAL);
+                rg.setPadding(40, 10, 0, 0);
+
+                for (int inx = 0; inx < recentText.size(); inx++)
+                {
+                    RadioButton rb = new RadioButton(context);
+
+                    rb.setId(4711 + inx);
+                    rb.setTextSize(18f);
+                    rb.setPadding(0, 10, 0, 10);
+
+                    //
+                    // Display unknown as text option, selected devices
+                    // with name and mac address to get better overwiev
+                    // for user.
+                    //
+
+                    rb.setText((inx == 0) ? recentText.get(inx) : recentVals.get(inx));
+
+                    rb.setTag(recentVals.get(inx));
+                    rb.setChecked(recentVals.get(inx).equals(btDevice));
+
+                    rb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+                    {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean checked)
+                        {
+                            if (checked)
+                            {
+                                Simple.getSharedPrefs().edit().putString(keyprefix + ".device",
+                                        (String) compoundButton.getTag()).apply();
+
+                                devicePref.onPreferenceChange(devicePref, compoundButton.getTag());
+                            }
+
+                            handler.postDelayed(cancelDialog, 200);
+                        }
+                    });
+
+                    rg.addView(rb);
+                }
+
+                dialog.setView(rg);
+                dialog.show();
+
+                //
+                // Set neutral button handler to avoid closing
+                // of list preference dialog.
+                //
+
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        if (isBPM) new BlueToothBPM(context).discover(self);
+                        if (isScale) new BlueToothScale(context).discover(self);
+                        if (isSensor) new BlueToothSensor(context).discover(self);
+                        if (isGlucose) new BlueToothGlucose(context).discover(self);
+                    }
+                });
+            }
+        };
+
+        public void onDiscoverStarted()
+        {
+            Log.d(LOGTAG,"onDiscoverStarted");
+
+            Runnable runner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    dialog.setTitle(devicesearch);
+                    dialog.getButton(DialogInterface.BUTTON_NEUTRAL).setEnabled(false);
+                }
+            };
+
+            handler.post(runner);
+        }
+
+        public void onDiscoverFinished()
+        {
+            Log.d(LOGTAG, "onDiscoverFinished");
+
+            Runnable runner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    dialog.cancel();
+                    discoverDialog.run();
+                }
+            };
+
+            handler.post(runner);
+        }
+
+        public void onDeviceDiscovered(BluetoothDevice device)
+        {
+            Log.d(LOGTAG, "onDeviceDiscovered: " + device.getName());
+
+            String newEntry = device.getName();
+            String newValue = device.getName() + " => " + device.getAddress();
+
+            if (! recentText.contains(newEntry))
+            {
+                recentText.add(newEntry);
+                recentVals.add(newValue);
+            }
+
+            devicePref.setEntries(recentText);
+            devicePref.setEntryValues(recentVals);
+        }
+
+        public void onClick(DialogInterface dialog, int which)
+        {
+            if (which == DialogInterface.BUTTON_NEGATIVE)
+            {
+                dialog.cancel();
+            }
+        }
+    }
+
+    //endregion BlueTooth preferences stub
 }

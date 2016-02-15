@@ -99,7 +99,8 @@ public class GlobalConfigs
     public static final int IconResAlertgroup         = R.drawable.alertgroup_300x300;
     public static final int IconResAlertcall          = R.drawable.alertgroup_300x300;
     public static final int IconResTesting            = R.drawable.testing_256x256;
-    public static final int IconResFireWall           = R.drawable.firewall_256x256;
+    public static final int IconResFireWallSafety     = R.drawable.firewall_safety_256x256;
+    public static final int IconResFireWallDomains    = R.drawable.firewall_domains_256x256;
     public static final int IconResPhoneApp           = R.drawable.phone_256x256;
     public static final int IconResPhoneAppText       = R.drawable.phone_text_256x256;
     public static final int IconResPhoneAppCall       = R.drawable.phone_voip_256x256;

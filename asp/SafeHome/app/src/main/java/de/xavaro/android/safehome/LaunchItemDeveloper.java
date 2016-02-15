@@ -20,7 +20,6 @@ public class LaunchItemDeveloper extends LaunchItem
     @Override
     protected void setConfig()
     {
-
         if (subtype != null)
         {
             if (Simple.equals(subtype, "settings"))
@@ -38,14 +37,14 @@ public class LaunchItemDeveloper extends LaunchItem
                 icon.setImageResource(GlobalConfigs.IconResContacts);
             }
 
-            if (Simple.equals(subtype, "temporary"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResStorageTemp);
-            }
-
             if (Simple.equals(subtype, "sdcard"))
             {
                 icon.setImageResource(GlobalConfigs.IconResStorageSDCard);
+            }
+
+            if (Simple.equals(subtype, "temporary"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResStorageTemp);
             }
 
             overicon.setImageResource(GlobalConfigs.IconResTesting);

@@ -7,6 +7,12 @@
         <item>Vital-Ordner</item>
     </string-array>
 
+    <string-array name="pref_beta_where_vals">
+        <item>Kein</item>
+        <item>Home</item>
+        <item>Ordner</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_vals">
         <item>Bildeingang</item>
         <item>Kamera</item>

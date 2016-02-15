@@ -123,7 +123,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         {
             String path = item.toString();
             JSONObject jfile = new JSONObject();
-            Json.put(jfile, "k", "..." + path.substring(plen));
+            Json.put(jfile, "k", "~" + path.substring(plen));
             jsonprefs.put(jfile);
 
             if (item.isDirectory()) recurseDirectories(item, plen);
@@ -281,10 +281,33 @@ public class LaunchFrameDeveloper extends LaunchFrame
         {
             Log.d(LOGTAG, "onItemClick: " + getItem(position).toString());
 
-            JSONObject pref = getItem(position);
-            String key = Json.getString(pref, "k");
+            if (Simple.equals(subtype, "preferences"))
+            {
+                JSONObject pref = getItem(position);
+                String key = Json.getString(pref, "k");
 
-            Simple.removeSharedPref(key);
+                Simple.removeSharedPref(key);
+            }
+
+            if (Simple.equals(subtype, "temporary"))
+            {
+                JSONObject pref = getItem(position);
+                String key = Json.getString(pref, "k");
+
+                File file = new File(Simple.getAnyContext().getCacheDir(), key.substring(2));
+                Log.d(LOGTAG, "onItemClick: delete=" + file.toString());
+                deleteRecursive(file);
+            }
+
+            if (Simple.equals(subtype, "sdcard"))
+            {
+                JSONObject pref = getItem(position);
+                String key = Json.getString(pref, "k");
+
+                File file = new File(Simple.getAnyContext().getFilesDir(), key.substring(2));
+                Log.d(LOGTAG, "onItemClick: delete=" + file.toString());
+                deleteRecursive(file);
+            }
         }
     }
 }

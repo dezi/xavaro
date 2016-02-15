@@ -1543,6 +1543,11 @@ public class Simple
 
     //region Preference stuff
 
+    public static boolean sharedPrefEquals(String key, String equals)
+    {
+        return equals(getSharedPrefs().getString(key, null), equals);
+    }
+
     public static SharedPreferences getSharedPrefs()
     {
         return PreferenceManager.getDefaultSharedPreferences(anyContext);
@@ -1553,9 +1558,9 @@ public class Simple
         return getSharedPrefs().getInt(key, 0);
     }
 
-    public static boolean sharedPrefEquals(String key, String equals)
+    public static boolean getSharedPrefBoolean(String key)
     {
-        return equals(getSharedPrefs().getString(key, null), equals);
+        return getSharedPrefs().getBoolean(key, false);
     }
 
     @Nullable
@@ -1564,9 +1569,9 @@ public class Simple
         return getSharedPrefs().getString(key, null);
     }
 
-    public static boolean getSharedPrefBoolean(String key)
+    public static void setSharedPrefString(String key, String value)
     {
-        return getSharedPrefs().getBoolean(key, false);
+        getSharedPrefs().edit().putString(key, value).apply();
     }
 
     public static Map<String, Object> getAllPreferences(String prefix)
