@@ -984,7 +984,7 @@ public class PreferencesBasics
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Hilfegruppe";
+            header.title = "Assistenz";
             header.iconRes = GlobalConfigs.IconResAlertgroup;
             header.fragment = AlertgroupFragment.class.getName();
 
@@ -997,7 +997,7 @@ public class PreferencesBasics
 
             iconres = GlobalConfigs.IconResAlertgroup;
             keyprefix = "alertgroup";
-            masterenable = "Hilfegruppe freischalten";
+            masterenable = "Assistenz freischalten";
         }
 
         @Override
@@ -1036,7 +1036,7 @@ public class PreferencesBasics
                 sp.edit().putString(grouppasspkey, grouppassp).apply();
             }
 
-            String groupname = "Hilfegruppe";
+            String groupname = "Assistenz";
             String grouptype = "alertcall";
             sp.edit().putString(groupnamekey, groupname).apply();
             sp.edit().putString(grouptypekey, grouptype).apply();

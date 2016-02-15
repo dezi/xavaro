@@ -99,7 +99,7 @@ public class LaunchItemAlertcall extends LaunchItem
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        builder.setTitle("Hilfe rufen...");
+        builder.setTitle("Assistenz rufen...");
 
         alertTextview = new TextView(context);
         alertTextview.setPadding(40, 40, 40, 40);
@@ -125,7 +125,7 @@ public class LaunchItemAlertcall extends LaunchItem
         neutral.setTransformationMethod(null);
         neutral.setOnClickListener(alertOnClickNeutral);
 
-        alertMessage = "Der Hilferuf wird in %d Sekunden ausgelöst";
+        alertMessage = "Der Assistenzruf wird in %d Sekunden ausgelöst";
         alertStatus = ALERTCALL_COUNTDOWN;
         alertCountdown = 20;
 
@@ -138,7 +138,7 @@ public class LaunchItemAlertcall extends LaunchItem
         ChatManager.getInstance().subscribe(groupIdentity, this);
 
         alertMessageUUID = Simple.getUUID();
-        String alerttext = "Es wird Hilfe benötigt";
+        String alerttext = "Es wird Assistenz benötigt";
 
         JSONObject alertmessage = new JSONObject();
         Json.put(alertmessage, "uuid", alertMessageUUID);
@@ -147,7 +147,7 @@ public class LaunchItemAlertcall extends LaunchItem
 
         ChatManager.getInstance().sendOutgoingMessage(groupIdentity, alertmessage);
 
-        String message = "Der Hilferuf wurde ausgelöst";
+        String message = "Der Assistenzruf wurde ausgelöst";
         alertTextview.setText(message);
         Speak.speak(message);
     }
@@ -212,7 +212,7 @@ public class LaunchItemAlertcall extends LaunchItem
         {
             handler.removeCallbacks(alertcallCountdown);
 
-            String message = "Der Hilferuf wurde abgebrochen";
+            String message = "Der Assistenzruf wurde abgebrochen";
 
             alertTextview.setText(message);
             Speak.speak(message);
@@ -239,7 +239,7 @@ public class LaunchItemAlertcall extends LaunchItem
                     if (!idremotesAlertRead.contains(idremote))
                     {
                         String message = RemoteContacts.getDisplayName(idremote);
-                        message += " hat ihren Notruf empfangen";
+                        message += " hat ihren Assistenzruf empfangen";
                         Speak.speak(message);
 
                         message = alertTextview.getText() + ".\n" + message;
@@ -252,7 +252,7 @@ public class LaunchItemAlertcall extends LaunchItem
                 for (String idremote : idremotesAlertRead)
                 {
                     String message = RemoteContacts.getDisplayName(idremote);
-                    message += " hat ihren Notruf gelesen";
+                    message += " hat ihren Assistenzruf gelesen";
                     Speak.speak(message);
 
                     message = alertTextview.getText() + ".\n" + message;

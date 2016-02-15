@@ -28,102 +28,111 @@ public class LaunchGroupComm
         public XavaroGroup(Context context)
         {
             super(context);
-
-            this.config = getConfig(context);
         }
 
-        private JSONObject getConfig(Context context)
+        public static JSONArray getConfig()
         {
-            try
+            JSONArray home = new JSONArray();
+            JSONArray adir = new JSONArray();
+            JSONArray cdir = new JSONArray();
+
+            SharedPreferences sp = Simple.getSharedPrefs();
+            Map<String, Object> prefs = Simple.getAllPreferences("xavaro");
+
+            //
+            // Xavaro users.
+            //
+
+            for (String prefkey : prefs.keySet())
             {
-                JSONObject launchgroup = new JSONObject();
-                JSONArray launchitems = new JSONArray();
+                String keyprefix = "xavaro.remote.users.chat.";
 
-                SharedPreferences sp = Simple.getSharedPrefs();
+                if (!prefkey.startsWith(keyprefix)) continue;
 
-                Map<String, Object> xavaros = Simple.getAllPreferences("xavaro");
+                String what = sp.getString(prefkey, null);
 
-                for (String prefkey : xavaros.keySet())
-                {
-                    Log.d(LOGTAG, "===========" + prefkey + "=" + xavaros.get(prefkey));
-                }
+                if ((what == null) || what.equals("inact")) continue;
 
-                //
-                // Xavaro users.
-                //
+                String ident = prefkey.substring(keyprefix.length());
+                String label = RemoteContacts.getDisplayName(ident);
 
-                for (String prefkey : xavaros.keySet())
-                {
-                    String keyprefix = "xavaro.remote.users.chat.";
+                JSONObject entry = new JSONObject();
 
-                    if (! prefkey.startsWith(keyprefix))
-                    {
-                        continue;
-                    }
+                Json.put(entry, "label", label);
+                Json.put(entry, "type", "xavaro");
+                Json.put(entry, "subtype", "chat");
+                Json.put(entry, "chattype", "user");
+                Json.put(entry, "identity", ident);
+                Json.put(entry, "order", 500);
 
-                    String what = sp.getString(prefkey, null);
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
+                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
 
-                    if ((what == null) || what.equals("inact")) continue;
-
-                    String ident = prefkey.substring(keyprefix.length());
-                    String label = RemoteContacts.getDisplayName(ident);
-
-                    JSONObject whatsentry = new JSONObject();
-
-                    whatsentry.put("label", label);
-                    whatsentry.put("type", "xavaro");
-                    whatsentry.put("subtype", "chat");
-                    whatsentry.put("chattype", "user");
-                    whatsentry.put("identity", ident);
-
-                    launchitems.put(whatsentry);
-
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
-                }
-
-                //
-                // Xavaro groups.
-                //
-
-                for (String prefkey : xavaros.keySet())
-                {
-                    String keyprefix = "xavaro.remote.groups.chat.";
-
-                    if (! prefkey.startsWith(keyprefix))
-                    {
-                        continue;
-                    }
-
-                    String what = sp.getString(prefkey, null);
-
-                    if ((what == null) || what.equals("inact")) continue;
-
-                    String ident = prefkey.substring(keyprefix.length());
-                    String label = RemoteGroups.getDisplayName(ident);
-
-                    JSONObject whatsentry = new JSONObject();
-
-                    whatsentry.put("label", label);
-                    whatsentry.put("type", "xavaro");
-                    whatsentry.put("subtype", "chat");
-                    whatsentry.put("chattype", "group");
-                    whatsentry.put("identity", ident);
-
-                    launchitems.put(whatsentry);
-
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
-                }
-
-                launchgroup.put("launchitems", launchitems);
-
-                return launchgroup;
-            }
-            catch (JSONException ex)
-            {
-                ex.printStackTrace();
+                Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
             }
 
-            return new JSONObject();
+            //
+            // Xavaro groups.
+            //
+
+            for (String prefkey : prefs.keySet())
+            {
+                String keyprefix = "xavaro.remote.groups.chat.";
+
+                if (! prefkey.startsWith(keyprefix)) continue;
+
+                String what = sp.getString(prefkey, null);
+
+                if ((what == null) || what.equals("inact")) continue;
+
+                String ident = prefkey.substring(keyprefix.length());
+                String label = RemoteGroups.getDisplayName(ident);
+                String gtype = RemoteGroups.getGroupType(ident);
+
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", label);
+                Json.put(entry, "type", "xavaro");
+                Json.put(entry, "subtype", "chat");
+                Json.put(entry, "chattype", "group");
+                Json.put(entry, "grouptype", gtype);
+                Json.put(entry, "identity", ident);
+
+                Json.put(entry, "order", Simple.equals(gtype, "alertcall") ? 200 : 550);
+
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
+                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
+            }
+
+            if (adir.length() > 0)
+            {
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "xavaro");
+                Json.put(entry, "label", "Chats");
+                Json.put(entry, "order", 550);
+
+                Json.put(entry, "launchitems", adir);
+                Json.put(home, entry);
+            }
+
+            if (cdir.length() > 0)
+            {
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "contacts");
+                Json.put(entry, "label", "Kontakte");
+                Json.put(entry, "order", 950);
+
+                Json.put(entry, "launchitems", cdir);
+                Json.put(home, entry);
+            }
+
+            return home;
         }
     }
 

@@ -129,15 +129,18 @@ public class LaunchItemComm extends LaunchItem
         {
             if (config.has("subtype"))
             {
-                if (config.has("chattype"))
+                if (Json.equals(config, "chattype", "user"))
                 {
-                    String chattype = Json.getString(config, "chattype");
+                    icon.setImageResource(GlobalConfigs.IconResCommChatUser);
+                }
 
-                    if (Simple.equals(chattype, "user"))
+                if (Json.equals(config, "chattype", "group"))
+                {
+                    if (Json.equals(config, "grouptype", "alertcall"))
                     {
-                        icon.setImageResource(GlobalConfigs.IconResCommChatUser);
+                        icon.setImageResource(GlobalConfigs.IconResCommChatAlert);
                     }
-                    if (Simple.equals(chattype, "group"))
+                    else
                     {
                         icon.setImageResource(GlobalConfigs.IconResCommChatGroup);
                     }

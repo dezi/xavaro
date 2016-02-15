@@ -78,6 +78,15 @@ public class RemoteGroups
         return null;
     }
 
+    public static String getGroupType(String groupidentity)
+    {
+        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
+
+        if ((rg != null) && rg.has("type")) return Json.getString(rg, "type");
+
+        return "unknown";
+    }
+
     public static String getDisplayName(String groupidentity)
     {
         JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);

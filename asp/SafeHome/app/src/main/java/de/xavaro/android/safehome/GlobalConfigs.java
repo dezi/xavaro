@@ -89,6 +89,7 @@ public class GlobalConfigs
     public static final int IconResCommunication      = R.drawable.communication_400x400;
     public static final int IconResCommChatUser       = R.drawable.commchatuser_400x400;
     public static final int IconResCommChatGroup      = R.drawable.commchatgroup_400x400;
+    public static final int IconResCommChatAlert      = R.drawable.commchatalert_300x300;
     public static final int IconResSelectHome         = R.drawable.home_512x512;
     public static final int IconResSelectAssist       = R.drawable.assistant_512x512;
     public static final int IconResSettingsAndroid    = R.drawable.settings_android_512x512;
