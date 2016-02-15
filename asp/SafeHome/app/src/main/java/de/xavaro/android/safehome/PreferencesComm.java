@@ -79,6 +79,8 @@ public class PreferencesComm
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference cb;
 
+            activekeys.clear();
+
             //
             // Remote user contacts.
             //
@@ -115,6 +117,8 @@ public class PreferencesComm
                     cb.setTitle("Nachricht");
 
                     preferences.add(cb);
+                    activekeys.add(cb.getKey());
+
                     if (!initial) getPreferenceScreen().addPreference(cb);
                 }
             }
@@ -155,9 +159,27 @@ public class PreferencesComm
                     cb.setTitle("Nachricht");
 
                     preferences.add(cb);
+                    activekeys.add(cb.getKey());
+
                     if (!initial) getPreferenceScreen().addPreference(cb);
                 }
             }
+
+            //
+            // Remove disabled or obsoleted preferences.
+            //
+
+            String websiteprefix = keyprefix + ".";
+
+            Map<String, ?> exists = Simple.getAllPreferences(keyprefix + ".remote.");
+
+            for (Map.Entry<String, ?> entry : exists.entrySet())
+            {
+                if (activekeys.contains(entry.getKey())) continue;
+
+                Simple.removeSharedPref(entry.getKey());
+            }
+
         }
     }
 

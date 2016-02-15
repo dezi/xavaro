@@ -1,5 +1,7 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,5 +37,17 @@ public class IdentityManager
                 putIdentity(identity, ident);
             }
         }
+    }
+
+    public static void removeIdentityFinally(String identity)
+    {
+        if (identity == null) return;
+
+        Log.w(LOGTAG, "removeFinally: " + identity);
+
+        String xpath = "IdentityManager/identities/" + identity;
+
+        PersistManager.delXpath(xpath);
+        PersistManager.flush();
     }
 }

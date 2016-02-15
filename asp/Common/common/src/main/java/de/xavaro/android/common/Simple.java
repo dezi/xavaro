@@ -1592,6 +1592,8 @@ public class Simple
 
     public static void removeSharedPref(String key)
     {
+        Log.w(LOGTAG, "removeSharedPref: " + key);
+
         Simple.getSharedPrefs().edit().remove(key).commit();
     }
 

@@ -69,12 +69,42 @@ public class LaunchGroupDeveloper extends LaunchGroup
             entry = new JSONObject();
 
             Json.put(entry, "type", "developer");
-            Json.put(entry, "subtype", "temporary");
-            Json.put(entry, "label", "Temporary");
+            Json.put(entry, "subtype", "cache");
+            Json.put(entry, "label", "Cache");
             Json.put(entry, "order", 4000);
 
-            if (Simple.sharedPrefEquals("developer.browser.temporary", "home")) home.put(entry);
-            if (Simple.sharedPrefEquals("developer.browser.temporary", "folder")) adir.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.cache", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.cache", "folder")) adir.put(entry);
+
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "rcontacts");
+            Json.put(entry, "label", "Remote Contacts");
+            Json.put(entry, "order", 4000);
+
+            if (Simple.sharedPrefEquals("developer.browser.rcontacts", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.rcontacts", "folder")) adir.put(entry);
+
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "rgroups");
+            Json.put(entry, "label", "Remote Groups");
+            Json.put(entry, "order", 4000);
+
+            if (Simple.sharedPrefEquals("developer.browser.rgroups", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.rgroups", "folder")) adir.put(entry);
+
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "identities");
+            Json.put(entry, "label", "Identities");
+            Json.put(entry, "order", 4000);
+
+            if (Simple.sharedPrefEquals("developer.browser.identities", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.identities", "folder")) adir.put(entry);
         }
 
         if (adir.length() > 0)

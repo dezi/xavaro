@@ -378,6 +378,8 @@ public class CommService extends Service
     {
         String ptype = new String(data, 0, 4);
 
+        Log.d(LOGTAG, "=========================>" + ptype);
+
         if (ptype.equals("MYIP"))
         {
             CommonStatic.publicIPaddress = (data[ 4 ] & 0xff) + "." + (data[ 5 ] & 0xff)
@@ -457,10 +459,14 @@ public class CommService extends Service
 
             if (ident.equals(SystemIdentity.getIdentity()))
             {
+                Log.d(LOGTAG, "=========================> ischat");
+
                 data = CryptUtils.AESdecrypt(idrem, rest);
             }
             else
             {
+                Log.d(LOGTAG, "=========================> isgroup");
+
                 data = CryptUtils.AESdecrypt(ident, rest);
             }
 

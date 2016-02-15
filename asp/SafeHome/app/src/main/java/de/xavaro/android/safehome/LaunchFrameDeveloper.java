@@ -18,10 +18,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.Map;
 
+import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.RemoteContacts;
+import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 
 public class LaunchFrameDeveloper extends LaunchFrame
@@ -71,11 +75,14 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
     private void reload()
     {
+        if (Simple.equals(subtype,"cache")) loadStorageCache();
+        if (Simple.equals(subtype,"sdcard")) loadStorageSDCard();
         if (Simple.equals(subtype,"contacts")) loadContacts();
         if (Simple.equals(subtype,"settings")) loadSettings();
         if (Simple.equals(subtype,"preferences")) loadPreferences();
-        if (Simple.equals(subtype,"temporary")) loadStorageTemp();
-        if (Simple.equals(subtype,"sdcard")) loadStorageSDCard();
+        if (Simple.equals(subtype,"rcontacts")) loadRemoteContacts();
+        if (Simple.equals(subtype,"rgroups")) loadRemoteGroups();
+        if (Simple.equals(subtype,"identities")) loadIdentities();
     }
 
     private View.OnClickListener onUpdateClick = new View.OnClickListener()
@@ -151,6 +158,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         jsonAdapter = new JSONAdapter();
         listview.setAdapter(jsonAdapter);
         listview.setOnItemClickListener(jsonAdapter);
+        listview.setOnItemLongClickListener(jsonAdapter);
     }
 
     void deleteRecursive(File fileOrDirectory)
@@ -166,13 +174,13 @@ public class LaunchFrameDeveloper extends LaunchFrame
         fileOrDirectory.delete();
     }
 
-    private void loadStorageTemp()
+    private void loadStorageCache()
     {
-        File temp = Simple.getAnyContext().getCacheDir();
+        File cache = Simple.getAnyContext().getCacheDir();
 
-        deleteRecursive(new File(temp, "org.chromium.android_webview"));
+        deleteRecursive(new File(cache, "org.chromium.android_webview"));
 
-        loadStorage(temp);
+        loadStorage(cache);
     }
 
     private void loadStorageSDCard()
@@ -197,6 +205,110 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
         JSONObject root = ContactsHandler.getJSONData(getContext());
         jsonListing.setText(Json.toPretty(root));
+    }
+
+    private void loadRemoteContacts()
+    {
+        if (listview == null)
+        {
+            listview = new ListView(getContext());
+            listview.setBackgroundColor(0xffffc080);
+
+            addView(listview, 0);
+        }
+
+        jsonprefs = new JSONArray();
+
+        JSONObject records = PersistManager.getXpathJSONObject("RemoteContacts/identities");
+
+        if (records != null)
+        {
+            Iterator<String> keysIterator = records.keys();
+
+            while (keysIterator.hasNext())
+            {
+                String identity = keysIterator.next();
+                JSONObject record = Json.getObject(records, identity);
+                if (record == null) continue;
+
+                Json.put(record, "identity", identity);
+                Json.put(jsonprefs, record);
+            }
+        }
+
+        jsonAdapter = new JSONAdapter();
+        listview.setAdapter(jsonAdapter);
+        listview.setOnItemClickListener(jsonAdapter);
+        listview.setOnItemLongClickListener(jsonAdapter);
+    }
+
+    private void loadRemoteGroups()
+    {
+        if (listview == null)
+        {
+            listview = new ListView(getContext());
+            listview.setBackgroundColor(0xffffc080);
+
+            addView(listview, 0);
+        }
+
+        jsonprefs = new JSONArray();
+
+        JSONObject records = PersistManager.getXpathJSONObject("RemoteGroups/groupidentities");
+
+        if (records != null)
+        {
+            Iterator<String> keysIterator = records.keys();
+
+            while (keysIterator.hasNext())
+            {
+                String uuid = keysIterator.next();
+                JSONObject record = Json.getObject(records, uuid);
+                if (record == null) continue;
+
+                Json.put(jsonprefs, record);
+            }
+        }
+
+        jsonAdapter = new JSONAdapter();
+        listview.setAdapter(jsonAdapter);
+        listview.setOnItemClickListener(jsonAdapter);
+        listview.setOnItemLongClickListener(jsonAdapter);
+    }
+
+    private void loadIdentities()
+    {
+        if (listview == null)
+        {
+            listview = new ListView(getContext());
+            listview.setBackgroundColor(0xffffc080);
+
+            addView(listview, 0);
+        }
+
+        jsonprefs = new JSONArray();
+
+        JSONObject records = PersistManager.getXpathJSONObject("IdentityManager/identities");
+
+        if (records != null)
+        {
+            Iterator<String> keysIterator = records.keys();
+
+            while (keysIterator.hasNext())
+            {
+                String identity = keysIterator.next();
+                JSONObject record = Json.getObject(records, identity);
+                if (record == null) continue;
+
+                Json.put(record, "identity", identity);
+                Json.put(jsonprefs, record);
+            }
+        }
+
+        jsonAdapter = new JSONAdapter();
+        listview.setAdapter(jsonAdapter);
+        listview.setOnItemClickListener(jsonAdapter);
+        listview.setOnItemLongClickListener(jsonAdapter);
     }
 
     private void loadPreferences()
@@ -230,9 +342,12 @@ public class LaunchFrameDeveloper extends LaunchFrame
         jsonAdapter = new JSONAdapter();
         listview.setAdapter(jsonAdapter);
         listview.setOnItemClickListener(jsonAdapter);
+        listview.setOnItemLongClickListener(jsonAdapter);
     }
 
-    private class JSONAdapter extends BaseAdapter implements AdapterView.OnItemClickListener
+    private class JSONAdapter extends BaseAdapter implements
+            AdapterView.OnItemClickListener,
+            AdapterView.OnItemLongClickListener
     {
         public JSONAdapter()
         {
@@ -279,7 +394,12 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
-            Log.d(LOGTAG, "onItemClick: " + getItem(position).toString());
+
+        }
+
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+        {
+            Log.d(LOGTAG, "onItemLongClick: " + getItem(position).toString());
 
             if (Simple.equals(subtype, "preferences"))
             {
@@ -289,7 +409,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
                 Simple.removeSharedPref(key);
             }
 
-            if (Simple.equals(subtype, "temporary"))
+            if (Simple.equals(subtype, "cache"))
             {
                 JSONObject pref = getItem(position);
                 String key = Json.getString(pref, "k");
@@ -308,6 +428,32 @@ public class LaunchFrameDeveloper extends LaunchFrame
                 Log.d(LOGTAG, "onItemClick: delete=" + file.toString());
                 deleteRecursive(file);
             }
+
+            if (Simple.equals(subtype, "rgroups"))
+            {
+                JSONObject pref = getItem(position);
+                String groupidentity = Json.getString(pref, "groupidentity");
+
+                RemoteGroups.removeGroupFinally(groupidentity);
+            }
+
+            if (Simple.equals(subtype, "rcontacts"))
+            {
+                JSONObject pref = getItem(position);
+                String identity = Json.getString(pref, "identity");
+
+                RemoteContacts.removeContactFinally(identity);
+            }
+
+            if (Simple.equals(subtype, "identities"))
+            {
+                JSONObject pref = getItem(position);
+                String identity = Json.getString(pref, "identity");
+
+                IdentityManager.removeIdentityFinally(identity);
+            }
+
+            return true;
         }
     }
 }

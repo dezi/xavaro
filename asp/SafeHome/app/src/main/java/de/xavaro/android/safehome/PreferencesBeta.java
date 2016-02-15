@@ -103,12 +103,48 @@ public class PreferencesBeta
 
             lp = new NicedPreferences.NiceListPreference(context);
 
-            lp.setKey(keyprefix + ".browser.temporary");
-            lp.setIcon(GlobalConfigs.IconResStorageTemp);
+            lp.setKey(keyprefix + ".browser.cache");
+            lp.setIcon(GlobalConfigs.IconResStorageCache);
             lp.setEntries(vals);
             lp.setEntryValues(keys);
             lp.setDefaultValue("folder");
-            lp.setTitle("Temporary");
+            lp.setTitle("Cache");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.rcontacts");
+            lp.setIcon(GlobalConfigs.IconResCommChatUser);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Remote Contacts");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.rgroups");
+            lp.setIcon(GlobalConfigs.IconResCommChatGroup);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Remote Groups");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.identities");
+            lp.setIcon(GlobalConfigs.IconResAdministrator);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Identities");
             lp.setEnabled(enabled);
 
             preferences.add(lp);

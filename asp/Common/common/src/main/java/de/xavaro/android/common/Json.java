@@ -88,6 +88,11 @@ public class Json
         json.remove(key);
     }
 
+    public static void remove(JSONArray json, int index)
+    {
+        json.remove(index);
+    }
+
     public static boolean equals(JSONObject j1, String k1, String val)
     {
         String s1 = getString(j1, k1);

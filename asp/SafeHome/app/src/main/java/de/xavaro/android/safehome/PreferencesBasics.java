@@ -392,18 +392,12 @@ public class PreferencesBasics
 
         private void removeRemoteContact(String idremote)
         {
-            SharedPreferences sp = Simple.getSharedPrefs();
-
             for (int inx = 0; inx < preferences.size(); inx++)
             {
                 Preference pref = preferences.get(inx);
 
                 if ((pref.getKey() != null) && pref.getKey().contains(idremote))
                 {
-                    Log.d(LOGTAG, "removeRemoteContact:" + pref.getKey());
-
-                    sp.edit().remove(pref.getKey()).apply();
-
                     root.removePreference(pref);
                     preferences.remove(pref);
 
@@ -411,13 +405,13 @@ public class PreferencesBasics
                 }
             }
 
-            String xpath = "RemoteContacts/identities/" + idremote;
-            PersistManager.delXpath(xpath);
-            PersistManager.flush();
-
-            Log.d(LOGTAG,"removeRemoteContact:" + idremote);
-
             remoteContacts.remove(idremote);
+
+            //
+            // Wipe from system.
+            //
+
+            RemoteContacts.removeContactFinally(idremote);
         }
 
         private void registerRemotes(Context context, boolean update)

@@ -1,12 +1,16 @@
 package de.xavaro.android.common;
 
+import android.preference.Preference;
 import android.support.annotation.Nullable;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Map;
 
 public class RemoteContacts
 {
@@ -169,5 +173,47 @@ public class RemoteContacts
         }
 
         return "Unbekannt";
+    }
+
+    public static void removeContactFinally(String identity)
+    {
+        if (identity == null) return;
+
+        Log.w(LOGTAG, "removeFinally: " + identity);
+
+        //
+        // Remove from remote groups.
+        //
+
+        RemoteGroups.removeMemberFinally(identity);
+
+        //
+        // Remove from preferences.
+        //
+
+        Map<String, ?> prefs = Simple.getSharedPrefs().getAll();
+
+        for (Map.Entry<String, ?> entry : prefs.entrySet())
+        {
+            if (entry.getKey().contains(identity))
+            {
+                Simple.removeSharedPref(entry.getKey());
+
+                Log.w(LOGTAG, "removeFinally: pref=" + entry.getKey());
+            }
+        }
+
+        //
+        // Remove from remote contacts.
+        //
+
+        PersistManager.delXpath(xPathRoot + "/" + identity);
+        PersistManager.flush();
+
+        //
+        // Remove from identities.
+        //
+
+        IdentityManager.removeIdentityFinally(identity);
     }
 }

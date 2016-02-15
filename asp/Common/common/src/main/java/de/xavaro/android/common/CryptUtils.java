@@ -56,13 +56,25 @@ public class CryptUtils
         return Simple.getUUIDBytes(uuid);
     }
 
+    private static boolean AESCheckIdent(String identity, JSONObject ident)
+    {
+        if (!ident.has("passPhrase"))
+        {
+            Log.d(LOGTAG, "AESDumpInfo: passPhrase missing: " + identity + "=" + ident.toString());
+
+            return false;
+        }
+
+        return true;
+    }
+
     @Nullable
     public static byte[] AESencrypt(String identity, String message)
     {
         try
         {
             JSONObject ident = IdentityManager.getIdentity(identity);
-            if (!ident.has("passPhrase")) return null;
+            if (! AESCheckIdent(identity, ident)) return null;
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESencrypt(aesKey, message.getBytes());
         }
@@ -80,7 +92,7 @@ public class CryptUtils
         try
         {
             JSONObject ident = IdentityManager.getIdentity(identity);
-            if (!ident.has("passPhrase")) return null;
+            if (! AESCheckIdent(identity, ident)) return null;
             byte[] aesKey = AESmakeKey(ident.getString("passPhrase"));
             return AESdecrypt(aesKey, message);
         }

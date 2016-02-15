@@ -3,10 +3,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.VersionUtils;
 
 public class LaunchItemDeveloper extends LaunchItem
 {
@@ -42,9 +39,24 @@ public class LaunchItemDeveloper extends LaunchItem
                 icon.setImageResource(GlobalConfigs.IconResStorageSDCard);
             }
 
-            if (Simple.equals(subtype, "temporary"))
+            if (Simple.equals(subtype, "cache"))
             {
-                icon.setImageResource(GlobalConfigs.IconResStorageTemp);
+                icon.setImageResource(GlobalConfigs.IconResStorageCache);
+            }
+
+            if (Simple.equals(subtype, "rcontacts"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResCommChatUser);
+            }
+
+            if (Simple.equals(subtype, "rgroups"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResCommChatGroup);
+            }
+
+            if (Simple.equals(subtype, "identities"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResAdministrator);
             }
 
             overicon.setImageResource(GlobalConfigs.IconResTesting);

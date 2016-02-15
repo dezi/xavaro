@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 public class RemoteGroups
@@ -348,4 +349,81 @@ public class RemoteGroups
     }
 
     //endregion Group updates
+
+    public static void removeGroupFinally(String groupidentity)
+    {
+        PersistManager.delXpath(xPathRoot + "/" + groupidentity);
+        PersistManager.flush();
+
+        Log.w(LOGTAG, "removeFinally: group=" + groupidentity);
+    }
+
+    public static void removeMemberFinally(String identity)
+    {
+        if (identity == null) return;
+
+        Log.w(LOGTAG, "removeFinally: " + identity);
+
+        JSONObject groups = PersistManager.getXpathJSONObject(xPathRoot);
+        if (groups == null) return;
+
+        Iterator<String> keysIterator = groups.keys();
+
+        while (keysIterator.hasNext())
+        {
+            String groupidentity = keysIterator.next();
+
+            JSONObject group = Json.getObject(groups, groupidentity);
+            if (group == null) continue;
+
+            String owner = Json.getString(group, "owner");
+            if ((owner != null) && owner.equals(identity))
+            {
+                //
+                // Remove group from preferences.
+                //
+
+                Map<String, ?> prefs = Simple.getSharedPrefs().getAll();
+
+                for (Map.Entry<String, ?> entry : prefs.entrySet())
+                {
+                    if (entry.getKey().contains(groupidentity))
+                    {
+                        Simple.removeSharedPref(entry.getKey());
+
+                        Log.w(LOGTAG, "removeFinally: pref=" + entry.getKey());
+                    }
+                }
+
+                //
+                // Remove group.
+                //
+
+                removeGroupFinally(groupidentity);
+
+                continue;
+            }
+
+            //
+            // Check members of group.
+            //
+
+            JSONArray members = Json.getArray(group, "members");
+            if (members == null) continue;
+
+            for (int inx = 0; inx < members.length(); inx++)
+            {
+                JSONObject member = Json.getObject(members, inx);
+                if (member == null) continue;
+
+                if (Json.equals(member, "identity", identity))
+                {
+                    Json.remove(members, inx--);
+                    putGroup(group);
+
+                    Log.w(LOGTAG, "removeFinally: member=" + groupidentity + "=" + identity);
+                }
+            }
+        }
+    }
 }
