@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.xavaro.android.common.NicedPreferences;
-import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 
