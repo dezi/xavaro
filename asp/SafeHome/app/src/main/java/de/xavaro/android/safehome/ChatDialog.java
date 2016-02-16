@@ -126,7 +126,7 @@ public class ChatDialog extends ScrollView
             textView.setLayoutParams(Simple.layoutParamsWW(Gravity.CENTER));
             textView.setBackgroundResource(R.drawable.balloon_outgoing_pressed_ext);
             textView.setPadding(20, 10, 36, 10);
-            textView.setTextSize(24f);
+            textView.setTextSize(Simple.getDeviceTextSize(24f));
             textView.setText(lastDate);
 
             textDiv.addView(textView);
@@ -276,7 +276,7 @@ public class ChatDialog extends ScrollView
         TextView textView = new TextView(getContext());
         textView.setPadding(10, 10, 10, 16);
         textView.setId(ID_TEXT);
-        textView.setTextSize(30f);
+        textView.setTextSize(Simple.getDeviceTextSize(30f));
         textView.setText(message);
 
         lastTextLayout.addView(textView);
@@ -347,7 +347,7 @@ public class ChatDialog extends ScrollView
         TextView textView = new TextView(getContext());
         textView.setId(ID_TEXT);
         textView.setPadding(10, 10, 24, 16);
-        textView.setTextSize(30f);
+        textView.setTextSize(Simple.getDeviceTextSize(30f));
         textView.setText(message);
 
         lastTextLayout.addView(textView);

@@ -2,6 +2,12 @@
 
     <string name="simple_and">und</string>
 
+    <string-array name="pref_alertgroup_vals">
+        <item>Inaktiv</item>
+        <item>Eingeladen</item>
+        <item>Gesperrt</item>
+    </string-array>
+
     <string-array name="pref_health_where_vals">
         <item>Home-Bildschirm</item>
         <item>Vital-Ordner</item>

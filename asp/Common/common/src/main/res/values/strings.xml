@@ -14,6 +14,18 @@
         <item>Vital-Folder</item>
     </string-array>
 
+    <string-array name="pref_alertgroup_keys">
+        <item>inactive</item>
+        <item>invited</item>
+        <item>locked</item>
+    </string-array>
+
+    <string-array name="pref_alertgroup_vals">
+        <item>Inactive</item>
+        <item>Invited</item>
+        <item>Locked</item>
+    </string-array>
+
     <string-array name="pref_beta_where_keys">
         <item>inact</item>
         <item>home</item>

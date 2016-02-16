@@ -53,7 +53,7 @@ public class LaunchItemToday extends LaunchItem
 
         addView(timeView);
 
-        post(updateTime);
+        updateTime.run();
     }
 
     @Override

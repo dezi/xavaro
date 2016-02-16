@@ -113,7 +113,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
             jsonListing = new TextView(getContext());
             jsonListing.setPadding(16, 16, 16, 16);
-            jsonListing.setTextSize(18f);
+            jsonListing.setTextSize(Simple.getDeviceTextSize(18f));
 
             scrollview.addView(jsonListing);
         }
@@ -198,7 +198,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
             jsonListing = new TextView(getContext());
             jsonListing.setPadding(16, 16, 16, 16);
-            jsonListing.setTextSize(18f);
+            jsonListing.setTextSize(Simple.getDeviceTextSize(18f));
 
             scrollview.addView(jsonListing);
         }
@@ -376,7 +376,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
             TextView itemView = new TextView(getContext());
             itemView.setLayoutParams(Simple.layoutParamsMW());
             itemView.setPadding(20, 0, 20, 0);
-            itemView.setTextSize(18f);
+            itemView.setTextSize(Simple.getDeviceTextSize(18f));
 
             layout.addView(itemView);
 

@@ -1035,24 +1035,16 @@ public class PreferencesBasics
             sp.edit().putString(groupnamekey, groupname).apply();
             sp.edit().putString(grouptypekey, grouptype).apply();
 
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference lp;
+            NicedPreferences.NiceEditTextPreference ep;
+
+            String[] prefixText = Simple.getTransArray(R.array.pref_alertgroup_vals);
+            String[] prefixVals = Simple.getTransArray(R.array.pref_alertgroup_keys);
+
             String xpath = "RemoteContacts/identities";
             JSONObject rcs = PersistManager.getXpathJSONObject(xpath);
             if (rcs == null) return;
-
-            NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceListPreference lp;
-
-            pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Mitglieder");
-            pc.setEnabled(enabled);
-
-            preferences.add(pc);
-
-            final CharSequence[] prefixText =
-                    { "Inaktiv",    "Eingeladen", "Gesperrt" };
-
-            final CharSequence[] prefixVals =
-                    { "inactive",   "invited",    "locked"   };
 
             Iterator<String> keysIterator = rcs.keys();
 
@@ -1065,18 +1057,34 @@ public class PreferencesBasics
 
                 String name = RemoteContacts.getDisplayName(ident);
 
+                pc = new NicedPreferences.NiceCategoryPreference(context);
+                pc.setTitle(name);
+                pc.setEnabled(enabled);
+
+                preferences.add(pc);
+
                 lp = new NicedPreferences.NiceListPreference(context);
                 lp.setKey(keyprefix + ".member." + ident);
                 lp.setEntries(prefixText);
                 lp.setEntryValues(prefixVals);
                 lp.setDefaultValue("inactive");
-                lp.setTitle(name);
+                lp.setTitle("Als Mitglied");
                 lp.setEnabled(enabled);
 
                 lp.setOnPreferenceChangeListener(this);
 
                 preferences.add(lp);
                 if (! initial) getPreferenceScreen().addPreference(lp);
+
+                ep = new NicedPreferences.NiceEditTextPreference(context);
+                ep.setKey(keyprefix + ".skypecallback." + ident);
+                ep.setTitle("Skype Rückruf");
+                ep.setEnabled(enabled);
+
+                ep.setOnPreferenceChangeListener(this);
+
+                preferences.add(ep);
+                if (! initial) getPreferenceScreen().addPreference(ep);
             }
         }
 
