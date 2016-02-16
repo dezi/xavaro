@@ -1309,7 +1309,7 @@ public class Simple
         return 0;
     }
 
-    public static String getDay(long timeStamp)
+    public static String getLocalDay(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("EEEE", Locale.getDefault());
         df.setTimeZone(TimeZone.getDefault());

@@ -36,6 +36,7 @@ public class LaunchItemToday extends LaunchItem
         super(context);
     }
 
+    private TextView dayView;
     private TextView timeView;
 
     @Override
@@ -43,9 +44,19 @@ public class LaunchItemToday extends LaunchItem
     {
         icon.setImageResource(GlobalConfigs.IconResToday);
 
+        dayView = new TextView(getContext());
+        dayView.setLayoutParams(Simple.layoutParamsMW());
+        dayView.setPadding(0, 20, 0, 0);
+        dayView.setTextSize(Simple.getDeviceTextSize(22f));
+        dayView.setGravity(Gravity.CENTER_HORIZONTAL);
+        dayView.setTextColor(Color.WHITE);
+        dayView.setTypeface(null, Typeface.BOLD);
+
+        addView(dayView);
+
         timeView = new TextView(getContext());
         timeView.setLayoutParams(Simple.layoutParamsMM());
-        timeView.setPadding(0, 0, 0, icon.getPaddingBottom());
+        timeView.setPadding(0, 20, 0, icon.getPaddingBottom());
         timeView.setTextSize(Simple.getDeviceTextSize(44f));
         timeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
         timeView.setTextColor(Color.WHITE);
@@ -69,7 +80,9 @@ public class LaunchItemToday extends LaunchItem
         @Override
         public void run()
         {
-            timeView.setText(Simple.getLocal24HTime(Simple.nowAsTimeStamp()));
+            long now = Simple.nowAsTimeStamp();
+            dayView.setText(Simple.getLocalDay(now));
+            timeView.setText(Simple.getLocal24HTime(now));
 
             postDelayed(updateTime, 1000);
         }

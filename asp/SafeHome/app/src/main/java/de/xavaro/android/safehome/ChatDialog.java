@@ -172,25 +172,19 @@ public class ChatDialog extends ScrollView
 
         if (thumbnails == null)
         {
-            TextView textView = (TextView) lastTextLayout.findViewById(ID_TEXT);
-
-            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) textView.getLayoutParams();
-            lp.setMargins(0, size - 10, 0, 0);
-
             thumbnails = new LinearLayout(getContext());
+            thumbnails.setId(ID_THUMBS);
             thumbnails.setOrientation(LinearLayout.HORIZONTAL);
             thumbnails.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, size));
             thumbnails.setPadding(8, 8, 8, 8);
-            thumbnails.setId(ID_THUMBS);
 
-            lastTextLayout.addView(thumbnails);
+            lastTextLayout.addView(thumbnails, 0);
         }
 
         ImageView thumbnail = new ImageView(getContext());
         thumbnail.setLayoutParams(new FrameLayout.LayoutParams(size - 16, size - 16));
         thumbnail.setPadding(2, 2, 2, 2);
         thumbnail.setImageDrawable(Simple.getDrawableSquare(mediapath, size - 20));
-
 
         thumbnails.addView(thumbnail);
     }
