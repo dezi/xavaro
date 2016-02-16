@@ -125,6 +125,28 @@ public class RemoteGroups
         return "Unbekannt";
     }
 
+    @Nullable
+    public static String getSkypeCallback(String groupidentity, String memberidentity)
+    {
+        JSONObject group = getGroup(groupidentity);
+        if (group == null) return null;
+
+        JSONArray members = Json.getArray(group, "members");
+        if (members == null) return null;
+
+        for (int inx = 0; inx < members.length(); inx++)
+        {
+            JSONObject member = Json.getObject(members, inx);
+
+            if (Json.equals(member, "identity", memberidentity))
+            {
+                return Json.getString(member, "skypecallback");
+            }
+        }
+
+        return null;
+    }
+
     //region Group updates
 
     public static void updateGroupFromPreferences(String groupprefix)

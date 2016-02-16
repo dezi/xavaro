@@ -99,15 +99,8 @@ public class PreferencesBasics
 
             lp = new NicedPreferences.NiceListPreference(context);
 
-            final CharSequence[] siezenText =
-                    {
-                            "gesiezt werden",
-                            "geduzt werden",
-                            "Hamburger Sie",
-                            "Münchner Du"
-                    };
-
-            final CharSequence[] siezenVals = { "siezen", "duzen", "hamsie", "mucdu" };
+            final CharSequence[] siezenText = { "gesiezt werden", "geduzt werden"};
+            final CharSequence[] siezenVals = { "siezen", "duzen" };
 
             lp.setKey("owner.siezen");
             lp.setEntries(siezenText);

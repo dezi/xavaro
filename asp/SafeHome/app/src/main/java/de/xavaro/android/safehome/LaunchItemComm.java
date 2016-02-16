@@ -5,13 +5,18 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.ImageView;
+import android.util.Log;
 
+import org.json.JSONObject;
+
+import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.SystemIdentity;
 
 public class LaunchItemComm extends LaunchItem
 {
@@ -158,6 +163,14 @@ public class LaunchItemComm extends LaunchItem
         }
 
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
+    }
+
+    @Override
+    protected boolean onMyLongClick()
+    {
+        if (type.equals("xavaro")) launchXavaroLong();
+
+        return true;
     }
 
     @Override
@@ -322,6 +335,43 @@ public class LaunchItemComm extends LaunchItem
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
+    }
+
+    private boolean launchXavaroLong()
+    {
+        if (config.has("grouptype"))
+        {
+            if (Json.equals(config, "grouptype", "alertcall"))
+            {
+                //
+                // Check if user is allowed to initiate a
+                // skype call back from the remote side.
+                //
+
+                String groupidentity = Json.getString(config, "identity");
+                String identity = SystemIdentity.getIdentity();
+                String skypecallback = RemoteGroups.getSkypeCallback(groupidentity, identity);
+
+                if (skypecallback != null)
+                {
+                    String groupowner = RemoteGroups.getGroupOwner(groupidentity);
+
+                    JSONObject skypecall = new JSONObject();
+
+                    Json.put(skypecall, "type", "skypeCallback");
+                    Json.put(skypecall, "idremote", groupowner);
+                    Json.put(skypecall, "groupidentity", groupidentity);
+                    Json.put(skypecall, "skypecallback", skypecallback);
+
+                    CommService.sendEncryptedReliable(skypecall, true);
+
+                    Simple.makeToast("Der Skype Rückruf wurde übertragen. "
+                            + "Bitte einen Moment Gelduld.");
+                }
+            }
+        }
+
+        return false;
     }
 
     private void launchContacts()

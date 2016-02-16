@@ -55,6 +55,7 @@ public class ChatManager implements CommService.CommServiceCallback
         this.context = context;
 
         CommService.subscribeMessage(this, "chatMessage");
+        CommService.subscribeMessage(this, "skypeCallback");
 
         CommService.subscribeMessage(this, "feedbackMessage");
 
@@ -163,6 +164,27 @@ public class ChatManager implements CommService.CommServiceCallback
             if (message.has("type"))
             {
                 String type = Json.getString(message, "type");
+
+                if (Simple.equals(type, "skypeCallback"))
+                {
+                    String idremote = message.getString("identity");
+                    String groupidentity = message.getString("groupidentity");
+                    String skypecallback = message.getString("skypecallback");
+
+                    String localskype = RemoteGroups.getSkypeCallback(groupidentity, idremote);
+
+                    if (Simple.equals(skypecallback, localskype))
+                    {
+                        Uri uri = Uri.parse("skype:" + skypecallback + "?call&video=true");
+
+                        Intent skype = new Intent(Intent.ACTION_VIEW);
+                        skype.setData(uri);
+                        skype.setPackage("com.skype.raider");
+                        Simple.getAppContext().startActivity(skype);
+                    }
+
+                    return;
+                }
 
                 if (Simple.equals(type, "sendOnlineStatus"))
                 {
