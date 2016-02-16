@@ -29,7 +29,6 @@ public class SettingsActivity extends PreferenceActivity
 
         Simple.setAppContext(this);
 
-        ArchievementManager.initialize(this);
         SettingsFragments.initialize(this);
         DitUndDat.SharedPrefs.initialize(this);
     }

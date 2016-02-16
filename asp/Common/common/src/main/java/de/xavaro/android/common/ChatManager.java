@@ -373,6 +373,11 @@ public class ChatManager implements CommService.CommServiceCallback
         }
     }
 
+    public void fakeIncomingMessage(JSONObject message)
+    {
+        onIncomingMessage(message);
+    }
+
     private boolean onIncomingMessage(JSONObject message)
     {
         String identity = getMessageIdentity(message);

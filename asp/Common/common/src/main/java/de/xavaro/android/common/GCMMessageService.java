@@ -42,8 +42,6 @@ public class GCMMessageService extends GcmListenerService
 
         String message = data.getString("message");
 
-        Log.d(LOGTAG, "====================>" + message);
-
         if (from.startsWith("/topics/"))
         {
             // message received from some topic.
@@ -81,8 +79,6 @@ public class GCMMessageService extends GcmListenerService
     public static boolean sendMessage(String receiver, JSONObject message)
     {
         JSONArray tokens = null;
-
-        Log.d(LOGTAG,"sendMessage:" + message.toString());
 
         String token = RemoteContacts.getGCMToken(receiver);
 
@@ -132,8 +128,6 @@ public class GCMMessageService extends GcmListenerService
             inputStream.close();
 
             boolean success = response.contains("\"success\":1");
-
-            Log.d(LOGTAG, "sendMessage: " + success + "=" + response);
 
             return success;
         }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 
@@ -67,7 +68,6 @@ public class HomeActivity extends AppCompatActivity implements
         topscreen = (FrameLayout) findViewById(R.id.top_screen);
         topscreen.setSystemUiVisibility(UI_HIDE);
 
-        ArchievementManager.initialize(this);
         ArchievementManager.reset("alertcall.shortclick");
 
         SettingsFragments.initialize(this);

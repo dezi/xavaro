@@ -25,73 +25,76 @@ public class ArchievementManager implements
 {
     private static final String LOGTAG = ArchievementManager.class.getSimpleName();
 
+    private static final String xpathRoot = "ArchievementManager/archievements/";
     private static final Handler handler = new Handler();
 
     private static final int MODE_ARCHIVED = 0;
     private static final int MODE_REVOKED  = 1;
     private static final int MODE_RESET    = 2;
 
-    public static ArchievementManager instance;
+    private static JSONObject config;
 
-    public static ArchievementManager initialize(Context context)
+    public static boolean show(String tag)
     {
-        if (instance == null) instance = new ArchievementManager(context);
-
-        return instance;
-    }
-
-    public static void show(String tag)
-    {
-        Log.d(LOGTAG,"show 1: " + tag);
-
-        if (instance == null) return;
-
-        Log.d(LOGTAG,"show 2: " + tag);
-
-        instance.setTag(tag);
-
-        handler.postDelayed(instance.showRunnable, 100);
+        return new ArchievementManager(tag).showCheck();
     }
 
     public static void archieved(String tag)
     {
-        if (instance == null) return;
-
-        instance.setTag(tag);
-
-        instance.archievedInternal(MODE_ARCHIVED);
+        archievedInternal(tag, MODE_ARCHIVED);
     }
 
     public static void revoke(String tag)
     {
-        if (instance == null) return;
-
-        instance.setTag(tag);
-
-        instance.archievedInternal(MODE_REVOKED);
+        archievedInternal(tag, MODE_REVOKED);
     }
 
     public static void reset(String tag)
     {
-        if (instance == null) return;
-
-        instance.setTag(tag);
-
-        instance.archievedInternal(MODE_RESET);
+        archievedInternal(tag, MODE_RESET);
     }
 
-    private Context context;
-    private JSONObject config;
-
-    private String currentTag;
-    private String currentPositive;
-    private String currentNegative;
-    private String currentNeutralb;
-    private String currentXpathpref;
-
-    public ArchievementManager(Context context)
+    private static void archievedInternal(String tag, int mode)
     {
-        this.context = context;
+        if (config == null) readConfig();
+        if (config == null) return;
+
+        if (! config.has(tag))
+        {
+            OopsService.log(LOGTAG, "archievedInternal: archievement <" + tag + "> not found.");
+
+            return;
+        }
+
+        String currentXpathpref = xpathRoot + tag;
+
+        String cpath = currentXpathpref + "/archieved";
+        int count = PersistManager.getXpathInt(cpath);
+        PersistManager.putXpath(cpath, (mode == MODE_ARCHIVED) ? ++count : 0);
+
+        String lpath = currentXpathpref + "/lastarchieved";
+        PersistManager.putXpath(lpath, Simple.nowAsISO());
+
+        if (mode == MODE_RESET)
+        {
+            cpath = currentXpathpref + "/positive";
+            PersistManager.putXpath(cpath, 0);
+
+            cpath = currentXpathpref + "/archieved";
+            PersistManager.putXpath(cpath, 0);
+
+            cpath = currentXpathpref + "/negative";
+            PersistManager.putXpath(cpath, 0);
+        }
+
+        PersistManager.flush();
+
+        Log.d(LOGTAG, "archievedInternal: " + tag);
+    }
+
+    private static void readConfig()
+    {
+        Context context = Simple.getAnyContext();
 
         config = StaticUtils.readRawTextResourceJSON(context, R.raw.default_archievements);
 
@@ -112,9 +115,19 @@ public class ArchievementManager implements
         }
     }
 
-    private void setTag(String tag)
+    private Context context;
+
+    private String currentTag;
+    private String currentPositive;
+    private String currentNegative;
+    private String currentNeutralb;
+    private String currentXpathpref;
+
+    public ArchievementManager(String tag)
     {
         currentTag = tag;
+        context = Simple.getAppContext();
+        if (config == null) readConfig();
     }
 
     @Nullable
@@ -139,43 +152,6 @@ public class ArchievementManager implements
         if (tag.equals("noshow")) title = "Nicht mehr anzeigen";
 
         return title;
-    }
-
-    private void archievedInternal(int mode)
-    {
-        if (config == null) return;
-
-        if (!config.has(currentTag))
-        {
-            OopsService.log(LOGTAG, "archievedInternal: archievement <" + currentTag + "> not found.");
-
-            return;
-        }
-
-        currentXpathpref = "ArchievementManager/archievements/" + currentTag;
-
-        String cpath = currentXpathpref + "/archieved";
-        int count = PersistManager.getXpathInt(cpath);
-        PersistManager.putXpath(cpath, (mode == MODE_ARCHIVED) ? ++count : 0);
-
-        String lpath = currentXpathpref + "/lastarchieved";
-        PersistManager.putXpath(lpath, Simple.nowAsISO());
-
-        if (mode == MODE_RESET)
-        {
-            cpath = currentXpathpref + "/positive";
-            PersistManager.putXpath(cpath, 0);
-
-            cpath = currentXpathpref + "/archieved";
-            PersistManager.putXpath(cpath, 0);
-
-            cpath = currentXpathpref + "/negative";
-            PersistManager.putXpath(cpath, 0);
-        }
-
-        PersistManager.flush();
-
-        Log.d(LOGTAG,"archievedInternal: " + currentTag);
     }
 
     @Nullable
@@ -222,6 +198,56 @@ public class ArchievementManager implements
         return besttag;
     }
 
+    private boolean showCheck()
+    {
+        if (config == null) return false;
+
+        if (currentTag.endsWith("*"))
+        {
+            currentTag = pickBestTag(currentTag);
+            if (currentTag == null) return false;
+        }
+
+        if (! config.has(currentTag))
+        {
+            OopsService.log(LOGTAG,"showInternal: archievement <" + currentTag + "> not found.");
+
+            return false;
+        }
+
+        currentPositive = null;
+        currentNegative = null;
+        currentNeutralb = null;
+        currentXpathpref = "ArchievementManager/archievements/" + currentTag;
+
+        try
+        {
+            JSONObject archie = config.getJSONObject(currentTag);
+            String[] buttons = archie.getString("buttons").split("\\|");
+
+            if (buttons.length > 0) currentPositive = buttons[ 0 ];
+            if (buttons.length > 1) currentNegative = buttons[ 1 ];
+            if (buttons.length > 2) currentNeutralb = buttons[ 2 ];
+
+            if ((currentNegative != null) && currentNegative.equals("noshow"))
+            {
+                int archieved = PersistManager.getXpathInt(currentXpathpref + "/archieved");
+                if (archieved > 0) return false;
+
+                int noshows = PersistManager.getXpathInt(currentXpathpref + "/negative");
+                if (noshows > 0) return false;
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        handler.postDelayed(showRunnable, 100);
+
+        return true;
+    }
+
     private final Runnable showRunnable = new Runnable()
     {
         @Override
@@ -233,50 +259,12 @@ public class ArchievementManager implements
 
     private void showInternal()
     {
-        if (config == null) return;
-
-        if (currentTag.endsWith("*"))
-        {
-            currentTag = pickBestTag(currentTag);
-            if (currentTag == null) return;
-        }
-
-        if (! config.has(currentTag))
-        {
-            OopsService.log(LOGTAG,"showInternal: archievement <" + currentTag + "> not found.");
-
-            return;
-        }
-
-        currentPositive = null;
-        currentNegative = null;
-        currentNeutralb = null;
-        currentXpathpref = "ArchievementManager/archievements/" + currentTag;
-
         try
         {
             JSONObject archie = config.getJSONObject(currentTag);
 
             String title = getTitle(archie.getString("title"));
             String message = archie.getString("message");
-            String[] buttons = archie.getString("buttons").split("\\|");
-
-            JSONObject jo = PersistManager.getXpathJSONObject(currentXpathpref);
-            if (jo != null) Log.d(LOGTAG,"showInternal: " + currentTag + "=" + jo.toString());
-            Log.d(LOGTAG,"========================================");
-
-            if (buttons.length > 0) currentPositive = buttons[ 0 ];
-            if (buttons.length > 1) currentNegative = buttons[ 1 ];
-            if (buttons.length > 2) currentNeutralb = buttons[ 2 ];
-
-            if ((currentNegative != null) && currentNegative.equals("noshow"))
-            {
-                int archieved = PersistManager.getXpathInt(currentXpathpref + "/archieved");
-                if (archieved > 0) return;
-
-                int noshows = PersistManager.getXpathInt(currentXpathpref + "/negative");
-                if (noshows > 0) return;
-            }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
@@ -351,7 +339,7 @@ public class ArchievementManager implements
 
         if ((which == DialogInterface.BUTTON_NEUTRAL) && currentNeutralb.equals("follow"))
         {
-            handler.postDelayed(instance.followRunnable, 100);
+            handler.postDelayed(followRunnable, 100);
         }
     }
 

@@ -18,6 +18,7 @@ import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SystemIdentity;
 
 public class PreferencesComm
 {
@@ -140,6 +141,20 @@ public class PreferencesComm
 
                     if (remoteContacts.contains(ident)) continue;
                     remoteContacts.add(ident);
+
+                    String grouptype = RemoteGroups.getGroupType(ident);
+                    String groupowner = RemoteGroups.getGroupOwner(ident);
+
+                    if (Simple.equals(grouptype, "alertcall") &&
+                            Simple.equals(groupowner, SystemIdentity.getIdentity()))
+                    {
+                        //
+                        // This alertgroup is owned by the owner. The chat dialog
+                        // will always be available under the alerter icon.
+                        //
+
+                        continue;
+                    }
 
                     String prefkey = keyprefix + ".remote.groups";
 

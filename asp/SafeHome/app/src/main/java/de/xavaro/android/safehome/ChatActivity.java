@@ -25,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -35,6 +36,7 @@ import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
+import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.SystemIdentity;
 
 @SuppressWarnings("ResourceType")
@@ -52,6 +54,7 @@ public class ChatActivity extends AppCompatActivity implements
     private boolean isinitialized;
     private boolean isuser;
     private boolean isgroup;
+    private boolean isalert;
     private String idremote;
     private String groupStatus;
     private String label;
@@ -200,6 +203,24 @@ public class ChatActivity extends AppCompatActivity implements
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         topscreen.setOnSystemUiVisibilityChangeListener(this);
+
+        if (getIntent().hasExtra("alertcall"))
+        {
+            isalert = getIntent().getBooleanExtra("alertcall", false);
+
+            if (! isalert)
+            {
+                //
+                // Tell user how to fire an alert call.
+                //
+
+                ArchievementManager.show("alertcall.shortclick");
+            }
+            else
+            {
+                alertMessageUUID = getIntent().getStringExtra("alertMessageUUID");
+            }
+        }
     }
 
     @Override
@@ -675,5 +696,95 @@ public class ChatActivity extends AppCompatActivity implements
     public void onSetMessageStatus(String idremote, String uuid, String what)
     {
         scrollview.onSetMessageStatus(idremote, uuid, what);
+
+        if (isalert) checkAlertMessageStatus(idremote, uuid, what);
     }
+
+    //region Alert call handling
+
+    private final ArrayList<String> idremotesAlertReceived = new ArrayList<>();
+    private final ArrayList<String> idremotesAlertRead  = new ArrayList<>();
+    private String alertMessageUUID;
+
+    private final Runnable speekFeedbackMessage = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            synchronized (speekFeedbackMessage)
+            {
+                for (String idremote : idremotesAlertReceived)
+                {
+                    if (!idremotesAlertRead.contains(idremote))
+                    {
+                        String message = RemoteContacts.getDisplayName(idremote);
+                        message += " hat ihren Assistenzruf empfangen";
+                        Speak.speak(message);
+
+                        JSONObject chatMessage = new JSONObject();
+
+                        Json.put(chatMessage, "message", message);
+                        Json.put(chatMessage, "date", Simple.nowAsISO());
+                        Json.put(chatMessage, "uuid", Simple.getUUID());
+                        Json.put(chatMessage, "identity", idremote);
+                        Json.put(chatMessage, "idremote", ChatActivity.this.idremote);
+
+                        ChatManager.getInstance().fakeIncomingMessage(chatMessage);
+                    }
+                }
+
+                idremotesAlertReceived.clear();
+
+                for (String idremote : idremotesAlertRead)
+                {
+                    String message = RemoteContacts.getDisplayName(idremote);
+                    message += " hat ihren Assistenzruf gelesen";
+                    Speak.speak(message);
+
+                    JSONObject chatMessage = new JSONObject();
+
+                    Json.put(chatMessage, "message", message);
+                    Json.put(chatMessage, "date", Simple.nowAsISO());
+                    Json.put(chatMessage, "uuid", Simple.getUUID());
+                    Json.put(chatMessage, "identity", idremote);
+                    Json.put(chatMessage, "idremote", ChatActivity.this.idremote);
+
+                    ChatManager.getInstance().fakeIncomingMessage(chatMessage);
+                }
+
+                idremotesAlertRead.clear();
+            }
+        }
+    };
+
+    public void checkAlertMessageStatus(String idremote, String uuid, String what)
+    {
+        if (! alertMessageUUID.equals(uuid)) return;
+
+        synchronized (speekFeedbackMessage)
+        {
+            if (what.equals("recv"))
+            {
+                if (!idremotesAlertReceived.contains(idremote))
+                    idremotesAlertReceived.add(idremote);
+
+                handler.removeCallbacks(speekFeedbackMessage);
+                handler.postDelayed(speekFeedbackMessage, 3000);
+            }
+
+            if (what.equals("read"))
+            {
+                if (!idremotesAlertReceived.contains(idremote))
+                    idremotesAlertReceived.remove(idremote);
+
+                if (!idremotesAlertRead.contains(idremote))
+                    idremotesAlertRead.add(idremote);
+
+                handler.removeCallbacks(speekFeedbackMessage);
+                handler.postDelayed(speekFeedbackMessage, 3000);
+            }
+        }
+    }
+
+    //endregion Alert call handling
 }

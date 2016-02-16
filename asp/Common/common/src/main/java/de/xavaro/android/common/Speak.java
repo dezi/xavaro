@@ -62,6 +62,10 @@ public class Speak extends UtteranceProgressListener
 
             isInited = true;
         }
+        else
+        {
+            Log.d(LOGTAG, "onInit: failed app=" + Simple.getAppContext());
+        }
     }
 
     @Override

@@ -421,6 +421,11 @@ public class Simple
         return VersionUtils.hasNavigationBar(appContext);
     }
 
+    public static int getDP(int pixels)
+    {
+        return (int) ((pixels / (float) getDeviceDPI()) * 160);
+    }
+
     public static float getDeviceTextSize(float textsize)
     {
         return (textsize / getDeviceDPI()) * 160;

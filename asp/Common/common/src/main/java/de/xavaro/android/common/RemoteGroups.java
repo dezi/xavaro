@@ -7,7 +7,6 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -28,6 +27,7 @@ public class RemoteGroups
         return PersistManager.getXpathJSONObject(xpath);
     }
 
+    @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
     public static boolean putGroup(JSONObject remotegroup)
     {
         String groupidentity = Json.getString(remotegroup, "groupidentity");
@@ -36,6 +36,7 @@ public class RemoteGroups
         String xpath = xPathRoot + "/"  + groupidentity;
         PersistManager.putXpath(xpath, remotegroup);
         PersistManager.flush();
+
         return true;
     }
 
@@ -66,7 +67,7 @@ public class RemoteGroups
                         // Exclude ourselves from recipients list.
                         //
 
-                        //continue;
+                        continue;
                     }
 
                     if (member.has("gcmUuid")) tokens.put(Json.getString(member, "gcmUuid"));
@@ -79,13 +80,24 @@ public class RemoteGroups
         return null;
     }
 
+    @Nullable
     public static String getGroupType(String groupidentity)
     {
         JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
 
         if ((rg != null) && rg.has("type")) return Json.getString(rg, "type");
 
-        return "unknown";
+        return null;
+    }
+
+    @Nullable
+    public static String getGroupOwner(String groupidentity)
+    {
+        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
+
+        if ((rg != null) && rg.has("owner")) return Json.getString(rg, "owner");
+
+        return null;
     }
 
     public static String getDisplayName(String groupidentity)
@@ -131,8 +143,6 @@ public class RemoteGroups
 
         boolean dirty = updateGroup(group);
 
-        ArrayList<String> dirtylist = new ArrayList<>();
-
         //
         // We add ourselves first and can never exit group.
         //
@@ -143,7 +153,7 @@ public class RemoteGroups
         Json.put(ourselves, "groupstatus", "invited");
         Json.put(ourselves, "userstatus", "joined");
 
-        if (updateMember(groupidentity, ourselves)) dirtylist.add(SystemIdentity.getIdentity());
+        updateMember(groupidentity, ourselves);
 
         String keyprefix = groupprefix + ".member.";
         Map<String, Object> members = Simple.getAllPreferences(keyprefix);
@@ -155,6 +165,10 @@ public class RemoteGroups
 
             String memberident = memberpref.substring(keyprefix.length());
             String memberstatus = (String) entry.getValue();
+
+            String skypecallbackpref = groupprefix + ".skypecallback." + memberident;
+            String skypecallback = Simple.getSharedPrefString(skypecallbackpref);
+            if (skypecallback == null) skypecallback = "";
 
             if (memberident.equals(SystemIdentity.getIdentity()))
             {
@@ -170,8 +184,9 @@ public class RemoteGroups
 
             Json.put(minfo, "identity", memberident);
             Json.put(minfo, "groupstatus", memberstatus);
+            Json.put(minfo, "skypecallback", skypecallback);
 
-            if (updateMember(groupidentity, minfo)) dirtylist.add(memberident);
+            updateMember(groupidentity, minfo);
         }
 
         //
@@ -182,52 +197,55 @@ public class RemoteGroups
         JSONObject finalGroup = getGroup(groupidentity);
         JSONArray finalMembers = Json.getArray(finalGroup, "members");
 
-        //if (dirty)
+        if (finalMembers != null)
         {
-            JSONObject pubgroup = Json.clone(finalGroup);
-            Json.remove(pubgroup, "members");
-
-            for (int send = 0; send < finalMembers.length(); send++)
+            if (dirty)
             {
-                JSONObject finalMember = Json.getObject(finalMembers, send);
-                String fmIdentity = Json.getString(finalMember, "identity");
-                if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
+                JSONObject pubgroup = Json.clone(finalGroup);
+                Json.remove(pubgroup, "members");
 
-                JSONObject groupStatusUpdate = new JSONObject();
+                for (int send = 0; send < finalMembers.length(); send++)
+                {
+                    JSONObject finalMember = Json.getObject(finalMembers, send);
+                    String fmIdentity = Json.getString(finalMember, "identity");
+                    if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
 
-                Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
-                Json.put(groupStatusUpdate, "idremote", fmIdentity);
-                Json.put(groupStatusUpdate, "remotegroup", pubgroup);
+                    JSONObject groupStatusUpdate = new JSONObject();
 
-                Log.d(LOGTAG, "updateGroup=============>" + fmIdentity);
+                    Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
+                    Json.put(groupStatusUpdate, "idremote", fmIdentity);
+                    Json.put(groupStatusUpdate, "remotegroup", pubgroup);
 
-                CommService.sendEncrypted(groupStatusUpdate, true);
+                    Log.d(LOGTAG, "updateGroup=============>" + fmIdentity);
+
+                    CommService.sendEncrypted(groupStatusUpdate, true);
+                }
             }
-        }
 
-        for (int inx = 0; inx < finalMembers.length(); inx++)
-        {
-            JSONObject pubmember = Json.clone(Json.getObject(finalMembers, inx));
-
-            JSONObject pubgroup = new JSONObject();
-            Json.put(pubgroup, "groupidentity", groupidentity);
-            Json.put(pubgroup, "member", pubmember);
-
-            for (int send = 0; send < finalMembers.length(); send++)
+            for (int inx = 0; inx < finalMembers.length(); inx++)
             {
-                JSONObject finalMember = Json.getObject(finalMembers, send);
-                String fmIdentity = Json.getString(finalMember, "identity");
-                if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
+                JSONObject pubmember = Json.clone(Json.getObject(finalMembers, inx));
 
-                JSONObject groupMemberUpdate = new JSONObject();
+                JSONObject pubgroup = new JSONObject();
+                Json.put(pubgroup, "groupidentity", groupidentity);
+                Json.put(pubgroup, "member", pubmember);
 
-                Json.put(groupMemberUpdate, "type", "groupMemberUpdate");
-                Json.put(groupMemberUpdate, "idremote", fmIdentity);
-                Json.put(groupMemberUpdate, "remotegroup", pubgroup);
+                for (int send = 0; send < finalMembers.length(); send++)
+                {
+                    JSONObject finalMember = Json.getObject(finalMembers, send);
+                    String fmIdentity = Json.getString(finalMember, "identity");
+                    if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
 
-                Log.d(LOGTAG, "updateMember=============>" + fmIdentity);
+                    JSONObject groupMemberUpdate = new JSONObject();
 
-                CommService.sendEncrypted(groupMemberUpdate, true);
+                    Json.put(groupMemberUpdate, "type", "groupMemberUpdate");
+                    Json.put(groupMemberUpdate, "idremote", fmIdentity);
+                    Json.put(groupMemberUpdate, "remotegroup", pubgroup);
+
+                    Log.d(LOGTAG, "updateMember=============>" + fmIdentity);
+
+                    CommService.sendEncrypted(groupMemberUpdate, true);
+                }
             }
         }
     }
@@ -326,7 +344,13 @@ public class RemoteGroups
                     dirty = true;
                 }
 
-                if (member.has("userstatus") && ! Json.equals(oldmember, "userstatus", member))
+                if (! Json.equals(oldmember, "skypecallback", member))
+                {
+                    Json.copy(oldmember, "skypecallback", member);
+                    dirty = true;
+                }
+
+                if (! Json.equals(oldmember, "userstatus", member))
                 {
                     Json.copy(oldmember, "userstatus", member);
                     dirty = true;
