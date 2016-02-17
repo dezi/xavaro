@@ -34,6 +34,16 @@ public class SettingsActivity extends PreferenceActivity
     }
 
     @Override
+    protected void onResume()
+    {
+        Log.d(LOGTAG, "onResume...");
+
+        super.onResume();
+
+        Simple.setAppContext(this);
+    }
+
+    @Override
     public void onWindowFocusChanged(boolean hasFocus)
     {
         Log.d(LOGTAG, "onWindowFocusChanged=" + hasFocus);

@@ -234,6 +234,16 @@ public class ChatActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume()
+    {
+        Log.d(LOGTAG, "onResume...");
+
+        super.onResume();
+
+        Simple.setAppContext(this);
+    }
+
+    @Override
     protected void onStop()
     {
         Log.d(LOGTAG, "onStop...");

@@ -163,6 +163,8 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onResume();
 
+        Simple.setAppContext(this);
+
         if (wasPaused && ! lostFocus)
         {
             //

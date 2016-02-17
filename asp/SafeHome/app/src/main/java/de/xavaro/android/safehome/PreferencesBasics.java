@@ -1072,6 +1072,7 @@ public class PreferencesBasics
                 ep = new NicedPreferences.NiceEditTextPreference(context);
                 ep.setKey(keyprefix + ".skypecallback." + ident);
                 ep.setTitle("Skype Rückruf");
+                ep.setEmptyText("Inaktiv");
                 ep.setEnabled(enabled);
 
                 ep.setOnPreferenceChangeListener(this);

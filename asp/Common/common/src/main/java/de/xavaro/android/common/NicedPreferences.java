@@ -575,6 +575,7 @@ public class NicedPreferences
         private boolean isPassword;
         private boolean isUppercase;
         private Runnable onClickRunner;
+        private String emptytext;
 
         public NiceEditTextPreference(Context context)
         {
@@ -619,8 +620,20 @@ public class NicedPreferences
             }
             else
             {
-                current.setText(text);
+                if ((emptytext != null) && ((getText() == null) || getText().equals("")))
+                {
+                    current.setText(emptytext);
+                }
+                else
+                {
+                    current.setText(text);
+                }
             }
+        }
+
+        public void setEmptyText(String text)
+        {
+            emptytext = text;
         }
 
         public void setIsPassword()
