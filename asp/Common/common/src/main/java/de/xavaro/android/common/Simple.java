@@ -13,6 +13,8 @@ import android.content.res.Resources;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -418,7 +420,10 @@ public class Simple
 
     public static boolean hasNavigationBar()
     {
-        return VersionUtils.hasNavigationBar(appContext);
+        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
+
+        return ! (hasBackKey && hasHomeKey);
     }
 
     public static int getDP(int pixels)

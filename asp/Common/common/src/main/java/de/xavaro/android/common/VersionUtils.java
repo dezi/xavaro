@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.system.ErrnoException;
 import android.util.DisplayMetrics;
 import android.os.Build;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.ViewConfiguration;
 
 //
@@ -93,11 +95,5 @@ public class VersionUtils
         }
 
         return -1;
-    }
-
-    public static boolean hasNavigationBar(Context context)
-    {
-        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-                && ! ViewConfiguration.get(context).hasPermanentMenuKey();
     }
 }
