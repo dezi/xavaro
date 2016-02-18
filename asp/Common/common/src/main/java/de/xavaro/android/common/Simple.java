@@ -671,6 +671,18 @@ public class Simple
         return anyContext.getString(anyContext.getApplicationInfo().labelRes);
     }
 
+    public static String getOwnerName()
+    {
+        String prefix = getSharedPrefString("owner.prefix");
+        String first = getSharedPrefString("owner.firstname");
+        String given = getSharedPrefString("owner.givenname");
+
+        if ((first != null) && (given != null)) return first + " " + given;
+        if ((prefix != null) && (given != null)) return prefix + " " + given;
+
+        return (given != null) ? given : "Unbekannt";
+    }
+
     public static String getPackageName()
     {
         return anyContext.getPackageName();

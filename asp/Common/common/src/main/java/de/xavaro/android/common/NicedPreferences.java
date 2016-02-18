@@ -14,7 +14,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.SwitchPreference;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -284,6 +284,170 @@ public class NicedPreferences
             {
                 actValue = value;
                 notifyChanged();
+            }
+        }
+    }
+
+    public static class NiceDualpickPreference extends NiceDialogPreference
+    {
+        private NumberPicker numberPicker1;
+        private NumberPicker numberPicker2;
+
+        private int actValue1;
+        private int actValue2;
+        private int minValue1 = Integer.MIN_VALUE;
+        private int minValue2 = Integer.MIN_VALUE;
+        private int maxValue1 = Integer.MAX_VALUE;
+        private int maxValue2 = Integer.MAX_VALUE;
+
+        private int stepValue1 = 1;
+        private int stepValue2 = 1;
+        private String[] stepValues1;
+        private String[] stepValues2;
+
+        public NiceDualpickPreference(Context context)
+        {
+            super(context);
+
+            setPositiveButtonText(android.R.string.ok);
+            setNegativeButtonText(android.R.string.cancel);
+        }
+
+        public void setMinMaxValue1(int min, int max, int step)
+        {
+            minValue1 = min;
+            maxValue1 = max;
+            stepValue1 = step;
+        }
+
+        public void setMinMaxValue2(int min, int max, int step)
+        {
+            minValue2 = min;
+            maxValue2 = max;
+            stepValue2 = step;
+        }
+
+        @Override
+        protected View onCreateDialogView()
+        {
+            numberPicker1 = new NumberPicker(getContext());
+
+            numberPicker1.setMinValue(minValue1);
+            numberPicker1.setMaxValue(maxValue1);
+            numberPicker1.setValue(actValue1);
+
+            if (stepValue1 != 1)
+            {
+                int steps = (maxValue1 - minValue1) / stepValue1;
+
+                if (steps < 100)
+                {
+                    stepValues1 = new String[ steps ];
+
+                    for (int inx = 0; inx < steps; inx++)
+                    {
+                        stepValues1[ inx ] = "" + (minValue1 + (inx * stepValue1));
+                    }
+
+                    numberPicker1.setMinValue(0);
+                    numberPicker1.setMaxValue(stepValues1.length - 1);
+                    numberPicker1.setValue((actValue1 - minValue1) / stepValue1);
+                    numberPicker1.setDisplayedValues(stepValues1);
+                }
+            }
+
+            numberPicker1.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+            numberPicker2 = new NumberPicker(getContext());
+
+            numberPicker2.setMinValue(minValue2);
+            numberPicker2.setMaxValue(maxValue2);
+            numberPicker2.setValue(actValue2);
+
+            if (stepValue2 != 1)
+            {
+                int steps = (maxValue2 - minValue2) / stepValue2;
+
+                if (steps < 100)
+                {
+                    stepValues2 = new String[ steps ];
+
+                    for (int inx = 0; inx < steps; inx++)
+                    {
+                        stepValues2[ inx ] = "" + (minValue2 + (inx * stepValue2));
+                    }
+
+                    numberPicker2.setMinValue(0);
+                    numberPicker2.setMaxValue(stepValues2.length - 1);
+                    numberPicker2.setValue((actValue2 - minValue2) / stepValue2);
+                    numberPicker2.setDisplayedValues(stepValues2);
+                }
+            }
+
+            numberPicker2.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+            LinearLayout view = new LinearLayout(getContext());
+            view.setOrientation(LinearLayout.HORIZONTAL);
+            view.setLayoutParams(Simple.layoutParamsMW());
+            view.setGravity(Gravity.CENTER);
+            view.addView(numberPicker1);
+            view.addView(numberPicker2);
+
+            return view;
+        }
+
+        @Override
+        protected void onDialogClosed(boolean positiveResult)
+        {
+            if (positiveResult)
+            {
+                if ((stepValues1 == null) || (stepValues2 == null))
+                {
+                    setValue(numberPicker1.getValue() + ":" + numberPicker2.getValue());
+                }
+                else
+                {
+                    String val1 = stepValues1[ numberPicker1.getValue() ];
+                    String val2 = stepValues2[ numberPicker2.getValue() ];
+                    setValue(val1 + ":" + val2);
+                }
+            }
+        }
+
+        @Override
+        protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
+        {
+            setValue(restoreValue ? getPersistedString((String) defaultValue) : (String) defaultValue);
+        }
+
+        @Override
+        public void setValue(String value)
+        {
+            super.setValue(value);
+
+            if (shouldPersist()) persistString(value);
+
+            try
+            {
+                String[] parts = value.split(":");
+
+                if (parts.length == 2)
+                {
+                    int value1 = Integer.parseInt(parts[ 0 ]);
+                    int value2 = Integer.parseInt(parts[ 1 ]);
+
+                    if ((value1 != actValue1) || (value2 != actValue2))
+                    {
+                        actValue1 = value1;
+                        actValue2 = value2;
+
+                        notifyChanged();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
             }
         }
     }

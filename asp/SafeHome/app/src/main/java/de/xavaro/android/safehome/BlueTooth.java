@@ -348,63 +348,72 @@ public abstract class BlueTooth extends BroadcastReceiver
         @Override
         public void run()
         {
-            synchronized (fireNextRunnable)
+            try
             {
-                fireNextPending = false;
-
-                if (gattSchedule.size() == 0) return;
-
-                GattAction ga = gattSchedule.remove(0);
-
-                if (ga.mode == GattAction.MODE_NOACTIONREQUIRED)
+                synchronized (fireNextRunnable)
                 {
-                    fireNext(false);
-                    return;
+                    fireNextPending = false;
+
+                    if (gattSchedule.size() == 0) return;
+
+                    GattAction ga = gattSchedule.remove(0);
+
+                    if (ga.mode == GattAction.MODE_NOACTIONREQUIRED)
+                    {
+                        fireNext(false);
+                        return;
+                    }
+
+                    if (ga.characteristic == null) ga.characteristic = currentPrimary;
+                    if (ga.mode == 0) ga.mode = GattAction.MODE_WRITE;
+
+                    if (ga.mode == GattAction.MODE_READ)
+                    {
+                        Log.d(LOGTAG, "fireNext: read:" + ga.characteristic.getUuid());
+                        currentGatt.readCharacteristic(ga.characteristic);
+                    }
+
+                    if (ga.mode == GattAction.MODE_WRITE)
+                    {
+                        Log.d(LOGTAG, "fireNext: write:" + ga.characteristic.getUuid() + "=" + Simple.getHexBytesToString(ga.data));
+                        ga.characteristic.setValue(ga.data);
+                        currentGatt.writeCharacteristic(ga.characteristic);
+                    }
+
+                    if (ga.mode == GattAction.MODE_NOTIFY)
+                    {
+                        Log.d(LOGTAG, "fireNext: notify:" + ga.characteristic.getUuid());
+                        currentGatt.setCharacteristicNotification(ga.characteristic, true);
+
+                        UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
+                        BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
+                        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+
+                        currentGatt.writeDescriptor(descriptor);
+                    }
+
+                    if (ga.mode == GattAction.MODE_INDICATE)
+                    {
+                        Log.d(LOGTAG, "fireNext: indicate:" + ga.characteristic.getUuid());
+                        currentGatt.setCharacteristicNotification(ga.characteristic, true);
+
+                        UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
+                        BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
+                        descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+                        currentGatt.writeDescriptor(descriptor);
+                    }
+
+                    if (ga.mode == GattAction.MODE_DISCONNECT)
+                    {
+                        currentGatt.disconnect();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
 
-                if (ga.characteristic == null) ga.characteristic = currentPrimary;
-                if (ga.mode == 0) ga.mode = GattAction.MODE_WRITE;
-
-                if (ga.mode == GattAction.MODE_READ)
-                {
-                    Log.d(LOGTAG, "fireNext: read:" + ga.characteristic.getUuid());
-                    currentGatt.readCharacteristic(ga.characteristic);
-                }
-
-                if (ga.mode == GattAction.MODE_WRITE)
-                {
-                    Log.d(LOGTAG, "fireNext: write:" + ga.characteristic.getUuid() + "=" + Simple.getHexBytesToString(ga.data));
-                    ga.characteristic.setValue(ga.data);
-                    currentGatt.writeCharacteristic(ga.characteristic);
-                }
-
-                if (ga.mode == GattAction.MODE_NOTIFY)
-                {
-                    Log.d(LOGTAG, "fireNext: notify:" + ga.characteristic.getUuid());
-                    currentGatt.setCharacteristicNotification(ga.characteristic, true);
-
-                    UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
-                    BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
-                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-
-                    currentGatt.writeDescriptor(descriptor);
-                }
-
-                if (ga.mode == GattAction.MODE_INDICATE)
-                {
-                    Log.d(LOGTAG, "fireNext: indicate:" + ga.characteristic.getUuid());
-                    currentGatt.setCharacteristicNotification(ga.characteristic, true);
-
-                    UUID descuuid = UUID.fromString(NOTIFY_DESCRIPTOR);
-                    BluetoothGattDescriptor descriptor = ga.characteristic.getDescriptor(descuuid);
-                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-                    currentGatt.writeDescriptor(descriptor);
-                }
-
-                if (ga.mode == GattAction.MODE_DISCONNECT)
-                {
-                    currentGatt.disconnect();
-                }
+                gattSchedule.clear();
             }
         }
     };

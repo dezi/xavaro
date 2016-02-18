@@ -71,4 +71,8 @@
 
     <string name="today_label">Today</string>
 
+    <string name="healt_bpm_value">%1$s has a bloodpressure of %2$s with a puls of %3$s.</string>
+    <string name="healt_bpm_lowpb">The bloodpressure is dangerously high.</string>
+    <string name="healt_bpm_highbp">The bloodpressure is dangerously low.</string>
+
 </resources>

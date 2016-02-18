@@ -498,7 +498,7 @@ public class ChatManager implements CommService.CommServiceCallback
         Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         int iconRes = R.drawable.community_notification_64x64;
 
-        if (Simple.equals(priority, "alertcall"))
+        if (Simple.equals(priority, "alertcall") || Simple.equals(priority, "alertinfo"))
         {
             soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             iconRes = R.drawable.community_alarm_64x64;

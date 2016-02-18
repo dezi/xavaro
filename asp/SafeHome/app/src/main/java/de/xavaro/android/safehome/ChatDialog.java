@@ -232,14 +232,16 @@ public class ChatDialog extends ScrollView
 
         if (lastTextLayout != null)
         {
-            int bi = Simple.equals(lastMessagePriority, "alertcall")
+            int bi = (Simple.equals(lastMessagePriority, "alertcall") ||
+                    Simple.equals(lastMessagePriority, "alertinfo"))
                     ? R.drawable.balloon_incoming_alert_ext
                     : R.drawable.balloon_incoming_normal_ext;
 
             lastTextLayout.setBackgroundResource(bi);
         }
 
-        int bi = Simple.equals(priority, "alertcall")
+        int bi = (Simple.equals(priority, "alertcall") ||
+                Simple.equals(priority, "alertinfo"))
                 ? R.drawable.balloon_incoming_alert
                 : R.drawable.balloon_incoming_normal;
 

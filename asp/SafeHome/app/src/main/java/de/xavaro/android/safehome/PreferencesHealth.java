@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.View;
@@ -260,6 +261,8 @@ public class PreferencesHealth
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference lp;
             NicedPreferences.NiceCheckboxPreference cb;
+            NicedPreferences.NiceDualpickPreference dp;
+            NicedPreferences.NiceSwitchPreference sp;
 
             //
             // User.
@@ -313,6 +316,66 @@ public class PreferencesHealth
                     + "die Batterien gewechselt werden. Wenn der Anwender nicht "
                     + "in der Lage ist, Datum und Uhrzeit wieder korrekt einzustellen "
                     + "empfiehlt sich diese Option.");
+
+            preferences.add(cb);
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Warnungen");
+            preferences.add(pc);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".alert.enable");
+            sp.setTitle("Aktivieren");
+            sp.setEnabled(enabled);
+
+            sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    for (Preference pref : preferences)
+                    {
+                        if (pref.getKey() == null) continue;
+                        if (pref.getKey().equals(keyprefix + ".alert.enable")) continue;
+                        if (! pref.getKey().startsWith(keyprefix + ".alert.")) continue;
+
+                        pref.setEnabled((boolean) newValue);
+                    }
+
+                    return true;
+                }
+            });
+
+            preferences.add(sp);
+
+            dp = new NicedPreferences.NiceDualpickPreference(context);
+
+            dp.setKey(keyprefix + ".alert.highbp");
+            dp.setMinMaxValue1(100, 250, 10);
+            dp.setMinMaxValue2(70, 140, 10);
+            dp.setDefaultValue("160:100");
+            dp.setTitle("Zu hoher Blutdruck");
+            dp.setEnabled(enabled);
+
+            preferences.add(dp);
+
+            dp = new NicedPreferences.NiceDualpickPreference(context);
+
+            dp.setKey(keyprefix + ".alert.lowbp");
+            dp.setMinMaxValue1(60, 110, 10);
+            dp.setMinMaxValue2(60, 80, 10);
+            dp.setDefaultValue("80:60");
+            dp.setTitle("Zu niedriger Blutdruck");
+            dp.setEnabled(enabled);
+
+            preferences.add(dp);
+
+            cb = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cb.setKey(keyprefix + ".alert.alertgroup");
+            cb.setTitle("Assistenz informieren");
+            cb.setEnabled(enabled);
 
             preferences.add(cb);
         }
@@ -540,6 +603,7 @@ public class PreferencesHealth
 
     //region BlueTooth preferences stub
 
+    @SuppressWarnings("WeakerAccess")
     public static class BlueToothFragment extends SettingsFragments.EnablePreferenceFragment
             implements
             DialogInterface.OnClickListener,
