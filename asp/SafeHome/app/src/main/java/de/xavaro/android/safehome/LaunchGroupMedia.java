@@ -14,6 +14,7 @@ import java.util.Map;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
@@ -34,8 +35,6 @@ public class LaunchGroupMedia
         public ImageGroup(Context context)
         {
             super(context);
-
-            this.config = getConfig();
         }
 
         public ImageGroup(Context context, String mediadir)
@@ -80,49 +79,55 @@ public class LaunchGroupMedia
             return launchgroup;
         }
 
-        private JSONObject getConfig()
+        public static JSONArray getConfig()
         {
-            try
+            JSONArray home = new JSONArray();
+            JSONArray adir = new JSONArray();
+
+            if (Simple.getSharedPrefBoolean("media.image.enable"))
             {
-                JSONObject launchgroup = new JSONObject();
-                JSONArray launchitems = new JSONArray();
-
-                SharedPreferences sp = Simple.getSharedPrefs();
-
                 String keyprefix = "media.image.directory.";
 
+                SharedPreferences sp = Simple.getSharedPrefs();
                 Map<String, Object> prefs = Simple.getAllPreferences(keyprefix);
 
                 for (String prefkey : prefs.keySet())
                 {
-                    String what = sp.getString(prefkey, "");
-                    if (what.equals("inact")) continue;
+                    String what = sp.getString(prefkey, null);
+                    if ((what == null) || what.equals("inact")) continue;
 
                     String mediadir = prefkey.substring(keyprefix.length());
 
                     String label = Simple.getTransVal(
                             R.array.pref_media_image_directories_keys, mediadir);
 
-                    JSONObject whatsentry = new JSONObject();
+                    JSONObject entry = new JSONObject();
 
-                    whatsentry.put("label", label);
-                    whatsentry.put("type", "media");
-                    whatsentry.put("subtype", "image");
-                    whatsentry.put("mediadir", mediadir);
+                    Json.put(entry, "label", label);
+                    Json.put(entry, "type", "media");
+                    Json.put(entry, "subtype", "image");
+                    Json.put(entry, "mediadir", mediadir);
+                    Json.put(entry, "order", 800);
 
-                    launchitems.put(whatsentry);
+                    if (Simple.equals(what, "home")) home.put(entry);
+                    if (Simple.equals(what, "images")) adir.put(entry);
                 }
-
-                launchgroup.put("launchitems", launchitems);
-
-                return launchgroup;
             }
-            catch (JSONException ex)
+
+            if (adir.length() > 0)
             {
-                ex.printStackTrace();
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", "Fotoalben");
+                Json.put(entry, "type", "media");
+                Json.put(entry, "subtype", "image");
+                Json.put(entry, "order", 850);
+
+                Json.put(entry, "launchitems", adir);
+                Json.put(home, entry);
             }
 
-            return new JSONObject();
+            return home;
         }
     }
 }

@@ -61,21 +61,29 @@ public class PreferencesMedia
             pc.setTitle("Einstellungen");
             preferences.add(pc);
 
-            cp = new NicedPreferences.NiceCheckboxPreference(context);
+            sp = new NicedPreferences.NiceSwitchPreference(context);
 
-            cp.setKey(keyprefix + ".camera");
-            cp.setTitle("Kamera freigeben");
-            cp.setEnabled(enabled);
+            sp.setKey(keyprefix + ".camera");
+            sp.setTitle("Kamera");
+            sp.setEnabled(enabled);
 
-            preferences.add(cp);
+            preferences.add(sp);
 
-            cp = new NicedPreferences.NiceCheckboxPreference(context);
+            sp = new NicedPreferences.NiceSwitchPreference(context);
 
-            cp.setKey(keyprefix + ".screenshot");
-            cp.setTitle("Screenshot freigeben");
-            cp.setEnabled(enabled);
+            sp.setKey(keyprefix + ".screenshot");
+            sp.setTitle("Screenshots");
+            sp.setEnabled(enabled);
 
-            preferences.add(cp);
+            preferences.add(sp);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".delete");
+            sp.setTitle("Löschen");
+            sp.setEnabled(enabled);
+
+            preferences.add(sp);
 
             //
             // Galeries.

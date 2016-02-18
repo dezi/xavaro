@@ -545,13 +545,13 @@ public class NicedPreferences
 
             CharSequence[] sendtoText= {
                     "Nicht aktiviert",
-                    "Home-Bildschirm",
-                    "Bilder-Verzeichnis"};
+                    "Home",
+                    "Fotoalben"};
 
             CharSequence[] sendtoVals = {
                     "inact",
                     "home",
-                    "appdir"};
+                    "images"};
 
             this.setEntries(sendtoText);
             this.setEntryValues(sendtoVals);

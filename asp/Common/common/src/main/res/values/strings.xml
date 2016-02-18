@@ -46,20 +46,32 @@
         <item>whatsapp</item>
         <item>family</item>
         <item>misc</item>
+        <item>recycler</item>
     </string-array>
 
     <string-array name="pref_media_image_directories_vals">
-        <item>Incoming</item>
+        <item>Images</item>
         <item>Camera</item>
         <item>Screenshots</item>
         <item>Download</item>
         <item>WhatsApp</item>
         <item>Family</item>
         <item>Miscelanous</item>
+        <item>Trash</item>
     </string-array>
 
-    <string name="launch_media_simple_send">The image will be send to %s.</string>
-    <string name="launch_media_simple_yousend">You send an image to %s.</string>
+    <string name="launch_media_image_simple_send">The image will be send to %s.</string>
+    <string name="launch_media_image_simple_yousend">You send an image to %s.</string>
+
+    <string-array name="launch_media_image_longclick_keys">
+        <item>send</item>
+        <item>delete</item>
+    </string-array>
+
+    <string-array name="launch_media_image_longclick_vals">
+        <item>Forward</item>
+        <item>Delete</item>
+    </string-array>
 
     <string name="comm_sender_sent_image">Image sent</string>
     <string name="comm_sender_receive_image">Image received</string>

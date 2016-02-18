@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import de.xavaro.android.common.ActivityManager;
+import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommSender;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.RemoteContacts;
@@ -89,6 +90,44 @@ public class LaunchItemMedia extends LaunchItem
     @Override
     protected boolean onMyLongClick()
     {
+        if (config.has("mediaitem"))
+        {
+            Map<String, String> options = Simple.getTransMap(
+                    R.array.launch_media_image_longclick_keys);
+            if (options == null) return false;
+
+            if (! Simple.getSharedPrefBoolean("media.image.delete"))
+            {
+                options.remove("delete");
+            }
+
+            if (! Simple.getSharedPrefBoolean("media.image.simplesend.enable"))
+            {
+                options.remove("send");
+            }
+
+            if (options.size() > 0)
+            {
+                Chooser chooser = new Chooser("Dieses Bild", options);
+                chooser.setOnChooserResult(this);
+                chooser.setDefault("send");
+                chooser.showDialog();
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onChooserResult(String key)
+    {
+        Log.d(LOGTAG, "==============================>" + key);
+    }
+
+    protected boolean onMyLongClickCallback()
+    {
         if (Simple.equals(subtype, "image") && config.has("mediaitem"))
         {
             if (Simple.getSharedPrefBoolean("media.image.simplesend.enable"))
@@ -117,22 +156,22 @@ public class LaunchItemMedia extends LaunchItem
 
                 if (receivers.size() > 0)
                 {
-                    String receivermsg = "";
+                    String rmsg = "";
 
                     for (int inx = 0; inx < receivers.size(); inx++)
                     {
-                        if ((inx > 0) && ((inx + 1) < receivers.size())) receivermsg += ", ";
+                        if ((inx > 0) && ((inx + 1) < receivers.size())) rmsg += ", ";
 
                         if ((inx > 0) && ((inx + 1) == receivers.size()))
                         {
-                            receivermsg += " " + Simple.getTrans(R.string.simple_and) + " ";
+                            rmsg += " " + Simple.getTrans(R.string.simple_and) + " ";
                         }
 
-                        receivermsg += receivers.get(inx);
+                        rmsg += receivers.get(inx);
                     }
 
-                    String sm = Simple.getTrans(R.string.launch_media_simple_send, receivermsg);
-                    String am = Simple.getTrans(R.string.launch_media_simple_yousend, receivermsg);
+                    String sm = Simple.getTrans(R.string.launch_media_image_simple_send, rmsg);
+                    String am = Simple.getTrans(R.string.launch_media_image_simple_yousend, rmsg);
 
                     Speak.speak(sm);
                     ActivityManager.recordActivity(am, imagefile);
@@ -179,6 +218,7 @@ public class LaunchItemMedia extends LaunchItem
             else
             {
                 directory = new LaunchGroupMedia.ImageGroup(context);
+                directory.setConfig(this, Json.getArray(config, "launchitems"));
             }
         }
 

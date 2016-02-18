@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.net.DhcpInfo;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -54,8 +55,15 @@ import java.nio.ByteOrder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.Date;
 import java.util.Locale;
@@ -470,6 +478,40 @@ public class Simple
     public static String[] getTransArray(int resid)
     {
         return appContext.getResources().getStringArray(resid);
+    }
+
+    public static List<String> getTransList(int resid)
+    {
+        String[] array = getTransArray(resid);
+        List<String> list = new ArrayList<>();
+
+        for (int inx = 0; inx < array.length; inx++) list.add(array[ inx ]);
+
+        return list;
+    }
+
+    @Nullable
+    public static Map<String, String> getTransMap(int residkeys)
+    {
+        Resources res = appContext.getResources();
+
+        String resname = res.getResourceEntryName(residkeys);
+        if (!resname.endsWith("_keys")) return null;
+
+        resname = resname.substring(0, resname.length() - 4) + "vals";
+        int residvals = res.getIdentifier(resname, "array", anyContext.getPackageName());
+
+        String[] keys = res.getStringArray(residkeys);
+        String[] vals = res.getStringArray(residvals);
+
+        Map<String, String> map = new LinkedHashMap<String, String>();
+
+        for (int inx = 0; inx < Math.min(keys.length, vals.length); inx++)
+        {
+            map.put(keys[ inx ], vals[ inx ]);
+        }
+
+        return map;
     }
 
     public static String getTransVal(int residkeys, String keyval)

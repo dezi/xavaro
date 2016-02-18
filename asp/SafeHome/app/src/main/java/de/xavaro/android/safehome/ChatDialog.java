@@ -350,6 +350,7 @@ public class ChatDialog extends ScrollView
         lastTextLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
         lastTextLayout.setBackgroundResource(bi);
         textDiv.addView(lastTextLayout);
+        lastMessagePriority = priority;
 
         TextView textView = new TextView(getContext());
         textView.setLayoutParams(Simple.layoutParamsWW());

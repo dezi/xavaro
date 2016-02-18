@@ -104,6 +104,15 @@ public class LaunchFrameToday extends LaunchFrame
                 incomingUuid = null;
             }
         }
+
+        post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                scrollview.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
     }
 
     public void onIncomingMessage(JSONObject message)

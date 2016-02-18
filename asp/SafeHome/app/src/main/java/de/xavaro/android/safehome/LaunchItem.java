@@ -25,6 +25,7 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.CacheManager;
+import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VersionUtils;
@@ -33,7 +34,7 @@ import de.xavaro.android.common.VersionUtils;
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout
+public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCallback
 {
     private final static String LOGTAG = LaunchItem.class.getSimpleName();
 
@@ -381,6 +382,13 @@ public class LaunchItem extends FrameLayout
     }
 
     protected void onMyOverlayClick()
+    {
+        //
+        // To be overridden...
+        //
+    }
+
+    public void onChooserResult(String key)
     {
         //
         // To be overridden...
