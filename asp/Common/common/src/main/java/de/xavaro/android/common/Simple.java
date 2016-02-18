@@ -1421,6 +1421,16 @@ public class Simple
     public static final int MP = ViewGroup.LayoutParams.MATCH_PARENT;
     public static final int WC = ViewGroup.LayoutParams.WRAP_CONTENT;
 
+    public static LinearLayout.LayoutParams layoutParamsXX(int width, int height)
+    {
+        return new LinearLayout.LayoutParams(width, height);
+    }
+
+    public static LinearLayout.LayoutParams layoutParamsXX(int width, int height, int gravity)
+    {
+        return new LinearLayout.LayoutParams(width, height, gravity);
+    }
+
     public static ViewGroup.LayoutParams layoutParamsWW()
     {
         return new ViewGroup.LayoutParams(WC, WC);

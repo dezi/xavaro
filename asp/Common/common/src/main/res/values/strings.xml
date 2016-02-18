@@ -71,8 +71,10 @@
 
     <string name="today_label">Today</string>
 
-    <string name="healt_bpm_value">%1$s has a bloodpressure of %2$s with a puls of %3$s.</string>
-    <string name="healt_bpm_lowpb">The bloodpressure is dangerously high.</string>
-    <string name="healt_bpm_highbp">The bloodpressure is dangerously low.</string>
+    <string name="healt_bpm_spoken">The last reading resulted in a blood pressure of %1$d to %2$d The pulse was %3$d</string>
+    <string name="healt_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s.</string>
+    <string name="healt_bpm_lowpb">The blood pressure is alarming high.</string>
+    <string name="healt_bpm_highbp">The blood pressure is alarming low.</string>
+    <string name="healt_bpm_activity">You have a blood pressure of %1$d to %2$d. The pulse is %3$d.</string>
 
 </resources>

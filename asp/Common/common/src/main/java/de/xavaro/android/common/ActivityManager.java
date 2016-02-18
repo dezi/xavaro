@@ -50,9 +50,84 @@ public class ActivityManager
         Simple.writeDatadirFile(filename, Json.toPretty(protocoll));
     }
 
-    public static void onOutgoingMessage(JSONObject message)
+    public static void recordActivity(int resid)
     {
-        getInstance().onMessage(message, false);
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", Simple.getTrans(resid));
+
+        recordActivity(jmessage);
+    }
+
+    public static void recordActivity(String message)
+    {
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", message);
+
+        recordActivity(jmessage);
+    }
+
+    public static void recordActivity(String message, int iconres)
+    {
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", message);
+        Json.put(jmessage, "iconres", iconres);
+
+        recordActivity(jmessage);
+    }
+
+    public static void recordActivity(String message, String mediapath)
+    {
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", message);
+        Json.put(jmessage, "mediapath", mediapath);
+
+        recordActivity(jmessage);
+    }
+
+    public static void recordActivity(JSONObject jmessage)
+    {
+        getInstance().onMessage(jmessage, false);
+    }
+
+    public static void recordAlert(int resid)
+    {
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", Simple.getTrans(resid));
+
+        recordAlert(jmessage);
+    }
+
+    public static void recordAlert(String message)
+    {
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", message);
+
+        recordAlert(jmessage);
+    }
+
+    public static void recordAlert(String message, int iconres)
+    {
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", message);
+        Json.put(jmessage, "iconres", iconres);
+
+        recordAlert(jmessage);
+    }
+
+    public static void recordAlert(String message, String mediapath)
+    {
+        JSONObject jmessage = new JSONObject();
+        Json.put(jmessage, "message", message);
+        Json.put(jmessage, "mediapath", mediapath);
+
+        recordAlert(jmessage);
+    }
+
+    public static void recordAlert(JSONObject jmessage)
+    {
+        Json.put(jmessage, "priority", "alertinfo");
+
+        getInstance().onMessage(jmessage, false);
     }
 
     public static void onIncomingMessage(JSONObject message)

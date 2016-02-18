@@ -226,6 +226,7 @@ public class ChatDialog extends ScrollView
 
         FrameLayout textDiv = new FrameLayout(getContext());
         textDiv.setLayoutParams(Simple.layoutParamsMW());
+        textDiv.setPadding(0, 0, Simple.getDeviceWidth() / 8, 0);
         lastDiv.addView(textDiv);
 
         if (! accumulateMessage(message, date))
@@ -300,6 +301,7 @@ public class ChatDialog extends ScrollView
         String uuid = Json.getString(chatMessage, "uuid");
         String date = Json.getString(chatMessage, "date");
         String message = Json.getString(chatMessage, "message");
+        String priority = Json.getString(chatMessage, "priority");
 
         checkDate(date);
 
@@ -324,19 +326,29 @@ public class ChatDialog extends ScrollView
 
         FrameLayout textDiv = new FrameLayout(getContext());
         textDiv.setLayoutParams(Simple.layoutParamsMW());
+        textDiv.setPadding(Simple.getDeviceWidth() / 8, 0, 0, 0);
         lastDiv.addView(textDiv);
 
         if (lastTextLayout != null)
         {
-            lastTextLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal_ext);
+            int bi = (Simple.equals(lastMessagePriority, "alertcall") ||
+                    Simple.equals(lastMessagePriority, "alertinfo"))
+                    ? R.drawable.balloon_outgoing_alert_ext
+                    : R.drawable.balloon_outgoing_normal_ext;
+
+            lastTextLayout.setBackgroundResource(bi);
         }
+
+        int bi = (Simple.equals(priority, "alertcall") ||
+                Simple.equals(priority, "alertinfo"))
+                ? R.drawable.balloon_outgoing_alert
+                : R.drawable.balloon_outgoing_normal;
 
         lastTextLayout = new LinearLayout(getContext());
         lastTextLayout.setOrientation(LinearLayout.VERTICAL);
         lastTextLayout.setGravity(Gravity.END);
         lastTextLayout.setLayoutParams(Simple.layoutParamsWW(Gravity.END));
-        lastTextLayout.setBackgroundResource(R.drawable.balloon_outgoing_normal);
-
+        lastTextLayout.setBackgroundResource(bi);
         textDiv.addView(lastTextLayout);
 
         TextView textView = new TextView(getContext());
@@ -345,7 +357,6 @@ public class ChatDialog extends ScrollView
         textView.setPadding(12, 0, 24, 0);
         textView.setTextSize(Simple.getDeviceTextSize(30f));
         textView.setText(message);
-
         lastTextLayout.addView(textView);
 
         LinearLayout statusFrame = new LinearLayout(getContext());
@@ -355,7 +366,7 @@ public class ChatDialog extends ScrollView
         lastTextLayout.addView(statusFrame);
 
         TextView statusTime = new TextView(getContext());
-        statusTime.setLayoutParams(Simple.layoutParamsWM());
+        statusTime.setLayoutParams(Simple.layoutParamsWW());
         statusTime.setGravity(Gravity.BOTTOM);
         statusTime.setId(ID_TIME);
         statusTime.setPadding(12, 0, 0, 0);
@@ -364,6 +375,7 @@ public class ChatDialog extends ScrollView
         statusFrame.addView(statusTime);
 
         ImageView statusImage = new ImageView(getContext());
+        statusImage.setLayoutParams(Simple.layoutParamsXX(30, 20));
         statusImage.setId(ID_STATUS);
         statusImage.setPadding(4, 0, 4, 4);
 

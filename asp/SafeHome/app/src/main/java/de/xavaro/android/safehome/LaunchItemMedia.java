@@ -131,15 +131,11 @@ public class LaunchItemMedia extends LaunchItem
                         receivermsg += receivers.get(inx);
                     }
 
-                    String dm = Simple.getTrans(R.string.launch_media_simple_send, receivermsg);
-                    Speak.speak(dm);
-
+                    String sm = Simple.getTrans(R.string.launch_media_simple_send, receivermsg);
                     String am = Simple.getTrans(R.string.launch_media_simple_yousend, receivermsg);
 
-                    JSONObject actmess = new JSONObject();
-                    Json.put(actmess, "message", am);
-                    Json.put(actmess, "mediapath", imagefile);
-                    ActivityManager.onOutgoingMessage(actmess);
+                    Speak.speak(sm);
+                    ActivityManager.recordActivity(am, imagefile);
                 }
             }
         }

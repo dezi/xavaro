@@ -46,8 +46,11 @@
 
     <string name="today_label">Heute</string>
 
-    <string name="healt_bpm_value">%1$s hat einen Blutdruck von %2$s bei einem Puls von %3$s.</string>
+    <string name="healt_bpm_spoken">Die letzte Messung ergab einen Blutdruck von %1$d zu %2$d Der Puls beträgt %3$d</string>
+    <string name="healt_bpm_alert">%1$s hat einen Blutdruck von %2$s bei einem Puls von %3$s.</string>
     <string name="healt_bpm_lowpb">Der Blutdruck ist bedenklich niedrig.</string>
     <string name="healt_bpm_highbp">Der Blutdruck ist bedenklich hoch.</string>
+    <string name="healt_bpm_activity">Sie haben einen Blutdruck von %1$d zu %2$d. Ihr Puls ist %3$d.</string>
+    <string name="healt_bpm_activity_du">Du hast einen Blutdruck von %1$d zu %2$d. Dein Puls ist %3$d.</string>
 
 </resources>

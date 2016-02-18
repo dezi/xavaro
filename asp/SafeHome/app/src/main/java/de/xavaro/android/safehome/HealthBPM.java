@@ -2,11 +2,9 @@ package de.xavaro.android.safehome;
 
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Formatter;
-
+import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
@@ -56,12 +54,12 @@ public class HealthBPM extends HealthBase
             int diastolic = Json.getInt(lastRecord, "dia");
             int pulse = Json.getInt(lastRecord, "pls");
 
-            if ((lastDate == null) || (lastDate.compareTo(date) <= 0))
+            if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
             {
-                lastSystolic = systolic;
-                lastDiastolic = diastolic;
-                lastPulse = pulse;
-                lastDate = date;
+                lastSys = systolic;
+                lastDia = diastolic;
+                lastPls = pulse;
+                lastDts = date;
 
                 handler.removeCallbacks(messageSpeaker);
                 handler.postDelayed(messageSpeaker, 500);
@@ -70,19 +68,19 @@ public class HealthBPM extends HealthBase
     }
 
     JSONObject lastRecord;
-    String lastDate;
-    int lastSystolic;
-    int lastDiastolic;
-    int lastPulse;
+    String lastDts;
+    int lastSys;
+    int lastDia;
+    int lastPls;
 
     private void informAssistance(int resid)
     {
-        long last = Simple.getTimeStamp(lastDate);
+        long last = Simple.getTimeStamp(lastDts);
         long now = Simple.nowAsTimeStamp();
 
         if ((now - last) > 1000 * 1000)
         {
-            Log.d(LOGTAG,"informAssistance: outdated:" + lastDate);
+            Log.d(LOGTAG,"informAssistance: outdated:" + lastDts);
             return;
         }
 
@@ -93,10 +91,10 @@ public class HealthBPM extends HealthBase
         if (groupIdentity == null) return;
 
         String name = Simple.getOwnerName();
-        String bval = lastSystolic + ":" + lastDiastolic;
-        String puls = "" + lastPulse;
+        String bval = lastSys + ":" + lastDia;
+        String puls = "" + lastPls;
 
-        String text = Simple.getTrans(R.string.healt_bpm_value, name, bval, puls)
+        String text = Simple.getTrans(R.string.healt_bpm_alert, name, bval, puls)
                 + " " + Simple.getTrans(resid);
 
         JSONObject assistMessage = new JSONObject();
@@ -115,9 +113,11 @@ public class HealthBPM extends HealthBase
         String type = Json.getString(lastRecord, "type");
         if (!Simple.equals(type, "BPMMeasurement")) return;
 
-        Speak.speak("Die letzte Messung ergab einen Blutdruck von "
-                + lastSystolic + " zu " + lastDiastolic + " "
-                + "Der Puls beträgt " + lastPulse);
+        String sm = Simple.getTrans(R.string.healt_bpm_spoken, lastSys, lastDia, lastPls);
+        String am = Simple.getTrans(R.string.healt_bpm_activity, lastSys, lastDia, lastPls);
+
+        Speak.speak(sm);
+        ActivityManager.recordActivity(am);
 
         if (!Simple.getSharedPrefBoolean("health.bpm.alert.enable")) return;
 
@@ -130,10 +130,11 @@ public class HealthBPM extends HealthBase
                 String[] lp = low.split(":");
 
                 if ((lp.length == 2) &&
-                        ((Integer.parseInt(lp[ 0 ]) >= lastSystolic) ||
-                                (Integer.parseInt(lp[ 1 ]) >= lastDiastolic)))
+                        ((Integer.parseInt(lp[ 0 ]) >= lastSys) ||
+                                (Integer.parseInt(lp[ 1 ]) >= lastDia)))
                 {
                     Speak.speak(Simple.getTrans(R.string.healt_bpm_lowpb));
+                    ActivityManager.recordAlert(R.string.healt_bpm_lowpb);
                     informAssistance(R.string.healt_bpm_lowpb);
                 }
             }
@@ -152,10 +153,11 @@ public class HealthBPM extends HealthBase
                 String[] hp = high.split(":");
 
                 if ((hp.length == 2) &&
-                        ((Integer.parseInt(hp[ 0 ]) >= lastSystolic) ||
-                                (Integer.parseInt(hp[ 1 ]) >= lastDiastolic)))
+                        ((Integer.parseInt(hp[ 0 ]) >= lastSys) ||
+                                (Integer.parseInt(hp[ 1 ]) >= lastDia)))
                 {
                     Speak.speak(Simple.getTrans(R.string.healt_bpm_highbp));
+                    ActivityManager.recordAlert(R.string.healt_bpm_highbp);
                     informAssistance(R.string.healt_bpm_highbp);
                 }
             }
