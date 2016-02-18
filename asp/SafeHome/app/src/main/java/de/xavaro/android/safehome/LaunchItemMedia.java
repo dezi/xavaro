@@ -123,63 +123,61 @@ public class LaunchItemMedia extends LaunchItem
     @Override
     public void onChooserResult(String key)
     {
-        Log.d(LOGTAG, "==============================>" + key);
+        if (Simple.equals(key, "send")) onSendImage();
+        if (Simple.equals(key, "delete")) onDeleteImage();
     }
 
-    protected boolean onMyLongClickCallback()
+    private void onDeleteImage()
     {
-        if (Simple.equals(subtype, "image") && config.has("mediaitem"))
+
+    }
+
+    private void onSendImage()
+    {
+        String imagefile = Json.getString(config, "mediaitem");
+
+        String prefix = "media.image.simplesend.contact.";
+        Map<String, Object> contacts = Simple.getAllPreferences(prefix);
+
+        ArrayList<String> receivers = new ArrayList<>();
+
+        for (Map.Entry<String, Object> entry : contacts.entrySet())
         {
-            if (Simple.getSharedPrefBoolean("media.image.simplesend.enable"))
-            {
-                String imagefile = Json.getString(config, "mediaitem");
+            if (!(entry.getValue() instanceof Boolean)) continue;
+            if (!(boolean) entry.getValue()) continue;
 
-                String prefix = "media.image.simplesend.contact.";
-                Map<String, Object> contacts = Simple.getAllPreferences(prefix);
+            String prefkey = entry.getKey();
+            String idremote = prefkey.substring(prefix.length(), prefkey.length());
 
-                ArrayList<String> receivers = new ArrayList<>();
+            String name = RemoteContacts.getDisplayName(idremote);
 
-                for (Map.Entry<String, Object> entry : contacts.entrySet())
-                {
-                    if (! (entry.getValue() instanceof Boolean)) continue;
-                    if (! (boolean) entry.getValue()) continue;
+            CommSender.sendFile(imagefile, "incoming", idremote);
 
-                    String prefkey = entry.getKey();
-                    String idremote = prefkey.substring(prefix.length(),prefkey.length());
-
-                    String name = RemoteContacts.getDisplayName(idremote);
-
-                    CommSender.sendFile(imagefile, "incoming", idremote);
-
-                    receivers.add(name);
-                }
-
-                if (receivers.size() > 0)
-                {
-                    String rmsg = "";
-
-                    for (int inx = 0; inx < receivers.size(); inx++)
-                    {
-                        if ((inx > 0) && ((inx + 1) < receivers.size())) rmsg += ", ";
-
-                        if ((inx > 0) && ((inx + 1) == receivers.size()))
-                        {
-                            rmsg += " " + Simple.getTrans(R.string.simple_and) + " ";
-                        }
-
-                        rmsg += receivers.get(inx);
-                    }
-
-                    String sm = Simple.getTrans(R.string.launch_media_image_simple_send, rmsg);
-                    String am = Simple.getTrans(R.string.launch_media_image_simple_yousend, rmsg);
-
-                    Speak.speak(sm);
-                    ActivityManager.recordActivity(am, imagefile);
-                }
-            }
+            receivers.add(name);
         }
 
-        return false;
+        if (receivers.size() > 0)
+        {
+            String rmsg = "";
+
+            for (int inx = 0; inx < receivers.size(); inx++)
+            {
+                if ((inx > 0) && ((inx + 1) < receivers.size())) rmsg += ", ";
+
+                if ((inx > 0) && ((inx + 1) == receivers.size()))
+                {
+                    rmsg += " " + Simple.getTrans(R.string.simple_and) + " ";
+                }
+
+                rmsg += receivers.get(inx);
+            }
+
+            String sm = Simple.getTrans(R.string.launch_media_image_simple_send, rmsg);
+            String am = Simple.getTrans(R.string.launch_media_image_simple_yousend, rmsg);
+
+            Speak.speak(sm);
+            ActivityManager.recordActivity(am, imagefile);
+        }
     }
 
     @Override

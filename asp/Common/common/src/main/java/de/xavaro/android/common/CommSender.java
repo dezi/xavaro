@@ -308,11 +308,10 @@ public class CommSender
 
     private static void negotiateTransferResponse(JSONObject recvFile)
     {
-        Log.d(LOGTAG, "receiveFile: fileTransferRequest: respond with own public");
-
         JSONObject fileTransferResponse = Json.clone(recvFile);
 
         Json.put(fileTransferResponse, "type", "fileTransferResponse");
+        Json.put(fileTransferResponse, "idremote", Json.getString(recvFile, "identity"));
         Json.put(fileTransferResponse, "publicIP", CommonStatic.publicIPaddress);
         Json.put(fileTransferResponse, "publicPort", publicPort);
 
