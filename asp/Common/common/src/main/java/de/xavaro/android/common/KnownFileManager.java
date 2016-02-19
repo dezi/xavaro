@@ -7,14 +7,14 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-public class NewFileManager
+public class KnownFileManager
 {
-    private static final String LOGTAG = NewFileManager.class.getSimpleName();
+    private static final String LOGTAG = KnownFileManager.class.getSimpleName();
 
     private static JSONObject filestats;
     private static boolean dirty;
 
-    public static int checkDirectoryContent(String basedir, JSONArray files)
+    public static int checkDirectory(String basedir, JSONArray files)
     {
         if (files == null) return 0;
 
@@ -43,6 +43,7 @@ public class NewFileManager
                 if (oldfiles.has(name))
                 {
                     oldfiles.remove(name);
+                    Json.put(newfiles, name, time);
                 }
                 else
                 {
@@ -55,11 +56,12 @@ public class NewFileManager
             }
         }
 
+        Json.put(filestats, basedir, newfiles);
+
         int delcount = (oldfiles != null) ? oldfiles.length() : 0;
 
         if ((delcount > 0) || (newcount > 0) || initial)
         {
-            Json.put(filestats, basedir, newfiles);
             dirty = true;
         }
 
@@ -68,10 +70,12 @@ public class NewFileManager
         return newcount;
     }
 
-    public static void markFileAsOld(String basedir, String filepath)
+    public static void putKnownFileStatus(String filepath)
     {
         Simple.removePost(freeMemory);
         getStorage();
+
+        String basedir = new File(filepath).getParent();
 
         if (filestats.has(basedir))
         {
@@ -86,6 +90,27 @@ public class NewFileManager
         }
 
         Simple.makePost(freeMemory, 10 * 1000);
+    }
+
+    public static boolean getKnownFileStatus(String filepath)
+    {
+        boolean known = false;
+
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        String basedir = new File(filepath).getParent();
+        String filename = new File(filepath).getName();
+
+        if (filestats.has(basedir))
+        {
+            JSONObject oldfiles = Json.getObject(filestats, basedir);
+            if (oldfiles != null) known = oldfiles.has(filename);
+        }
+
+        Simple.makePost(freeMemory, 10 * 1000);
+
+        return known;
     }
 
     private static final Runnable freeMemory = new Runnable()

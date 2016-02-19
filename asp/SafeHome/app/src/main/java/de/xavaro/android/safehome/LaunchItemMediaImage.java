@@ -15,7 +15,7 @@ import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommSender;
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.NewFileManager;
+import de.xavaro.android.common.KnownFileManager;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
@@ -43,6 +43,15 @@ public class LaunchItemMediaImage extends LaunchItemMedia
         {
             String imagefile = Json.getString(config, "mediaitem");
             icon.setImageDrawable(Simple.getDrawableSquare(imagefile, 200));
+
+            boolean known = KnownFileManager.getKnownFileStatus(imagefile);
+
+            if (! known)
+            {
+                overicon.setImageResource(R.drawable.circle_green_256x256);
+                overtext.setText("neu");
+                overlay.setVisibility(VISIBLE);
+            }
 
             found = true;
         }
@@ -80,9 +89,18 @@ public class LaunchItemMediaImage extends LaunchItemMedia
                         found = true;
                     }
 
-                    newImages = NewFileManager.checkDirectoryContent(mediapath.toString(), images);
+                    newImages = KnownFileManager.checkDirectory(mediapath.toString(), images);
 
-                    Log.d(LOGTAG, "===========================> new=" + newImages);
+                    if (newImages == 0)
+                    {
+                        overlay.setVisibility(INVISIBLE);
+                    }
+                    else
+                    {
+                        overicon.setImageResource(R.drawable.circle_green_256x256);
+                        overtext.setText("" + newImages);
+                        overlay.setVisibility(VISIBLE);
+                    }
                 }
             }
         }
@@ -101,7 +119,7 @@ public class LaunchItemMediaImage extends LaunchItemMedia
     {
         super.onFileObserverEvent(event, path);
 
-        if (event == FileObserver.CREATE)
+        if ((event == FileObserver.CREATE) || (event == FileObserver.DELETE))
         {
             //
             // Update collection thumbnail image if required.
@@ -222,6 +240,15 @@ public class LaunchItemMediaImage extends LaunchItemMedia
     {
         if (config.has("mediaitem"))
         {
+            String imagefile = Json.getString(config, "mediaitem");
+            boolean known = KnownFileManager.getKnownFileStatus(imagefile);
+
+            if (! known)
+            {
+                KnownFileManager.putKnownFileStatus(imagefile);
+                overlay.setVisibility(INVISIBLE);
+            }
+
             // todo display image.
 
             return;
@@ -241,7 +268,6 @@ public class LaunchItemMediaImage extends LaunchItemMedia
                 else
                 {
                     String mediadir = Json.getString(config, "mediadir");
-
                     directory = new LaunchGroupMediaImage(context, mediadir);
                 }
             }

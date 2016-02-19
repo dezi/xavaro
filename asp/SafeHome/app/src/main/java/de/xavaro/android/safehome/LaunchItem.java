@@ -104,6 +104,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
 
     protected FrameLayout overlay;
     protected ImageView overicon;
+    protected TextView overtext;
     protected FrameLayout dimmer;
 
     protected LaunchGroup directory;
@@ -158,6 +159,15 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
 
         overicon = new DitUndDat.ImageAntiAliasView(context);
         overlay.addView(overicon);
+
+        overtext = new TextView(context);
+        overtext.setLayoutParams(Simple.layoutParamsMM());
+        overtext.setGravity(Gravity.CENTER);
+        overtext.setTextSize(Simple.getDeviceTextSize(24f));
+        overtext.setPadding(2, 0, 0, 4);
+        overtext.setTextColor(Color.WHITE);
+        overtext.setTypeface(null, Typeface.BOLD);
+        overlay.addView(overtext);
 
         dimmer = new FrameLayout(context);
         dimmer.setBackgroundColor(Color.TRANSPARENT);
