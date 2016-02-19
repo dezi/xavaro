@@ -40,6 +40,37 @@ public class PreferencesBeta
 
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference lp;
+            NicedPreferences.NiceEditTextPreference ep;
+
+            //
+            // Webapp preferences.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Webapps");
+
+            preferences.add(pc);
+
+            ep = new NicedPreferences.NiceEditTextPreference(context);
+
+            ep.setKey(keyprefix + ".webapps.httpserver");
+            ep.setTitle("HTTP-Server");
+            ep.setEnabled(enabled);
+
+            preferences.add(ep);
+
+            ep = new NicedPreferences.NiceEditTextPreference(context);
+
+            ep.setKey(keyprefix + ".webapps.httpport");
+            ep.setDefaultValue("8000");
+            ep.setTitle("HTTP-Port");
+            ep.setEnabled(enabled);
+
+            preferences.add(ep);
+
+            //
+            // Browser preferences.
+            //
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Browser");
