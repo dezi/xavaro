@@ -38,6 +38,18 @@
         <item>Folder</item>
     </string-array>
 
+    <string-array name="pref_webapps_where_keys">
+        <item>inact</item>
+        <item>home</item>
+        <item>folder</item>
+    </string-array>
+
+    <string-array name="pref_webapps_where_vals">
+        <item>Inactive</item>
+        <item>Home-Screen</item>
+        <item>Webapp-Folder</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_keys">
         <item>incoming</item>
         <item>camera</item>

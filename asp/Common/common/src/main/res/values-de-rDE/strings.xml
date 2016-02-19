@@ -19,6 +19,12 @@
         <item>Ordner</item>
     </string-array>
 
+    <string-array name="pref_webapps_where_vals">
+        <item>Inaktive</item>
+        <item>Home-Screen</item>
+        <item>Webapp-Ordner</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_vals">
         <item>Fotos</item>
         <item>Kamera</item>

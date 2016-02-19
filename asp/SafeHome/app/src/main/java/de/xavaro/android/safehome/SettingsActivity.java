@@ -84,6 +84,12 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesComm.XavaroFragment.getHeader());
 
         category = new Header();
+        category.title = "Webapps";
+        target.add(category);
+
+        target.add(PreferencesWebApps.WebappFragment.getHeader());
+
+        category = new Header();
         category.title = "Medien";
         target.add(category);
 

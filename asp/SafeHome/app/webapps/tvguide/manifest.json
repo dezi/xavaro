@@ -1,0 +1,17 @@
+{
+  "manifest": {
+
+    "label": "Fernsehprogramm",
+    "appname": "tvguide",
+    "appicon": "tvguide_175x175.png",
+
+    "files": [
+      "main.js"
+    ],
+
+    "permissions": [
+      "localdstorage",
+      "gps"
+    ]
+  }
+}
