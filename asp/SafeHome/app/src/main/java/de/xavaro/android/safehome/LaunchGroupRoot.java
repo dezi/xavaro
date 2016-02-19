@@ -76,7 +76,7 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchGroupComm.WhatsappGroup.getConfig());
         configs.add(LaunchGroupComm.XavaroGroup.getConfig());
 
-        configs.add(LaunchGroupMedia.ImageGroup.getConfig());
+        configs.add(LaunchGroupMediaImage.getConfig());
 
         configs.add(LaunchGroupDeveloper.getConfig());
 

@@ -39,6 +39,11 @@ public class LaunchItemDeveloper extends LaunchItem
                 icon.setImageResource(GlobalConfigs.IconResStorageSDCard);
             }
 
+            if (Simple.equals(subtype, "known"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResStorageKnown);
+            }
+
             if (Simple.equals(subtype, "cache"))
             {
                 icon.setImageResource(GlobalConfigs.IconResStorageCache);

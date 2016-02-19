@@ -553,7 +553,7 @@ public class CommSender
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            OopsService.log(LOGTAG, ex);
         }
     }
 
@@ -667,9 +667,9 @@ public class CommSender
 
                 started = true;
             }
-            catch (Exception ex)
+            catch (Exception ignore)
             {
-                ex.printStackTrace();
+                Log.d(LOGTAG,"receiveFile: local not available");
             }
         }
 
@@ -692,9 +692,9 @@ public class CommSender
 
                 started = true;
             }
-            catch (Exception ex)
+            catch (Exception ignore)
             {
-                ex.printStackTrace();
+                Log.d(LOGTAG,"receiveFile: public not available");
             }
         }
 

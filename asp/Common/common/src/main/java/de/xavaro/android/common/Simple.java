@@ -358,6 +358,21 @@ public class Simple
         }
     }
 
+    public static void makePost(Runnable runnable)
+    {
+        if (appHandler != null) appHandler.post(runnable);
+    }
+
+    public static void makePost(Runnable runnable, int delay)
+    {
+        if (appHandler != null) appHandler.postDelayed(runnable, delay);
+    }
+
+    public static void removePost(Runnable runnable)
+    {
+        if (appHandler != null) appHandler.removeCallbacks(runnable);
+    }
+
     public static void dumpDirectory(String path)
     {
         dumpDirectory(new File(path));
@@ -647,6 +662,16 @@ public class Simple
 
         File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
         return new File(dir, "Miscellanous");
+    }
+
+    public static File getFilesDir()
+    {
+        return Simple.getAnyContext().getFilesDir();
+    }
+
+    public static File getCacheDir()
+    {
+        return Simple.getAnyContext().getCacheDir();
     }
 
     public static String getTempfile(String filename)
@@ -990,6 +1015,47 @@ public class Simple
         }
 
         return string.toString();
+    }
+
+    @Nullable
+    public static String getFileContent(File file)
+    {
+        try
+        {
+            InputStream in = new FileInputStream(file);
+            int len = (int) file.length();
+            byte[] buf = new byte[ len ];
+
+            int xfer = 0;
+            while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
+            in.close();
+
+            return new String(buf);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    public static boolean putFileContent(File file, String content)
+    {
+        try
+        {
+            OutputStream out = new FileOutputStream(file);
+            out.write(content.getBytes());
+            out.close();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return false;
     }
 
     @Nullable
@@ -1571,9 +1637,7 @@ public class Simple
             Json.put(list, entry);
         }
 
-        Json.sort(list, "time", desc);
-
-        return list;
+        return Json.sort(list, "time", desc);
     }
 
     public static class IsFileFilter implements FilenameFilter

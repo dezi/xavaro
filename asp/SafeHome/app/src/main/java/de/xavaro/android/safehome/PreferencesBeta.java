@@ -103,6 +103,18 @@ public class PreferencesBeta
 
             lp = new NicedPreferences.NiceListPreference(context);
 
+            lp.setKey(keyprefix + ".browser.known");
+            lp.setIcon(GlobalConfigs.IconResStorageKnown);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Known");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
             lp.setKey(keyprefix + ".browser.cache");
             lp.setIcon(GlobalConfigs.IconResStorageCache);
             lp.setEntries(vals);

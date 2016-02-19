@@ -43,6 +43,8 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
         LaunchItem item = null;
 
         String type = Json.getString(config, "type");
+        String subtype = Json.getString(config, "subtype");
+        String suty = type + ((subtype == null) ? "" : "/" + subtype);
 
         // @formatter:off
         if (Simple.equals(type, "today"       )) item = new LaunchItemToday(context);
@@ -50,7 +52,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
 
         if (Simple.equals(type, "apps"        )) item = new LaunchItemApps(context);
-        if (Simple.equals(type, "media"       )) item = new LaunchItemMedia(context);
+        if (Simple.equals(suty, "media/image" )) item = new LaunchItemMediaImage(context);
 
         if (Simple.equals(type, "phone"       )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "skype"       )) item = new LaunchItemComm(context);

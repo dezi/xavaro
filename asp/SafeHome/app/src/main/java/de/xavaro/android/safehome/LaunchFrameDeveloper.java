@@ -77,6 +77,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
     {
         if (Simple.equals(subtype,"cache")) loadStorageCache();
         if (Simple.equals(subtype,"sdcard")) loadStorageSDCard();
+        if (Simple.equals(subtype,"known")) loadStorageKnown();
         if (Simple.equals(subtype,"contacts")) loadContacts();
         if (Simple.equals(subtype,"settings")) loadSettings();
         if (Simple.equals(subtype,"preferences")) loadPreferences();
@@ -120,6 +121,26 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
         JSONObject root = PersistManager.getRoot();
         jsonListing.setText(Json.toPretty(root));
+    }
+
+    private void loadStorageKnown()
+    {
+        if (scrollview == null)
+        {
+            scrollview = new ScrollView(getContext());
+            scrollview.setBackgroundColor(0xffffc080);
+            addView(scrollview, 0);
+
+            jsonListing = new TextView(getContext());
+            jsonListing.setPadding(16, 16, 16, 16);
+            jsonListing.setTextSize(Simple.getDeviceTextSize(18f));
+
+            scrollview.addView(jsonListing);
+        }
+
+        File file = new File(Simple.getFilesDir(), "filestats.act.json");
+        String json = Simple.getFileContent(file);
+        jsonListing.setText(json);
     }
 
     private void recurseDirectories(File dir, int plen)

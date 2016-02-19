@@ -69,6 +69,16 @@ public class LaunchGroupDeveloper extends LaunchGroup
             entry = new JSONObject();
 
             Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "known");
+            Json.put(entry, "label", "Known");
+            Json.put(entry, "order", 4000);
+
+            if (Simple.sharedPrefEquals("developer.browser.known", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.known", "folder")) adir.put(entry);
+
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "developer");
             Json.put(entry, "subtype", "cache");
             Json.put(entry, "label", "Cache");
             Json.put(entry, "order", 4000);
