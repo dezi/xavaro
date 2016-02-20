@@ -33,6 +33,12 @@ public class LaunchItemWebApp extends LaunchItem
         if (type.equals("webapp")) launchWebapp();
     }
 
+    @Override
+    public void onBackKeyExecuted()
+    {
+        if (subtype != null) webappFrame = null;
+    }
+
     private LaunchFrameWebApp webappFrame;
 
     private void launchWebapp()
@@ -43,6 +49,7 @@ public class LaunchItemWebApp extends LaunchItem
             {
                 webappFrame = new LaunchFrameWebApp(context);
                 webappFrame.setWebAppName(subtype);
+                webappFrame.setParent(this);
             }
 
             ((HomeActivity) context).addViewToBackStack(webappFrame);

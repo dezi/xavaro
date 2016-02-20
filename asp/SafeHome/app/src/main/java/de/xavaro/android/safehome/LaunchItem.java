@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Gravity;
 
@@ -402,6 +403,13 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
     }
 
     public void onChooserResult(String key)
+    {
+        //
+        // To be overridden...
+        //
+    }
+
+    public void onBackKeyExecuted()
     {
         //
         // To be overridden...

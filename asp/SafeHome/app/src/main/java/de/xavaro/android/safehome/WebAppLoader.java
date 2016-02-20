@@ -44,7 +44,7 @@ public class WebAppLoader extends WebViewClient
 
         if (url.equals(rootUrl))
         {
-            String initialHTML = "<!DOCTYPE HTML>\n"
+            String initialHTML = "<!doctype html>\n"
                     + "<html>\n"
                     + "<head>\n"
                     + "\t<title>" + webappname + "</title>\n"

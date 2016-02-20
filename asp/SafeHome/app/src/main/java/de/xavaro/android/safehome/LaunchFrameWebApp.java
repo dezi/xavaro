@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -60,5 +61,11 @@ public class LaunchFrameWebApp extends LaunchFrame
         addView(webview);
 
         webview.loadUrl(rootUrl);
+    }
+
+    @Override
+    public void onBackKeyExecuted()
+    {
+        if (parent != null) parent.onBackKeyExecuted();
     }
 }
