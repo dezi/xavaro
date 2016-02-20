@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -337,6 +338,15 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    public void deleteLaunchItem(LaunchItem item)
+    {
+        if (! launchItems.contains(item)) return;
+
+        ((ViewGroup) item.getParent()).removeView(item);
+        launchItems.remove(item);
+        positionLaunchItems();
+    }
+
     protected void positionLaunchItems()
     {
         int col = 0;
@@ -348,8 +358,6 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         for (LaunchItem li : launchItems)
         {
             li.setPosition(xpos, ypos);
-
-            //Log.d(LOGTAG, "LI " + xpos + "/" + ypos);
 
             xpos += horzSize + horzSpace;
 

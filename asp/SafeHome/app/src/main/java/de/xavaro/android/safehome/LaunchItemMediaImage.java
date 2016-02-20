@@ -178,6 +178,8 @@ public class LaunchItemMediaImage extends LaunchItemMedia
 
         if (mediafile.delete())
         {
+            parent.deleteLaunchItem(this);
+
             Log.d(LOGTAG, "onDeleteImage: deleted=" + mediaitem);
         }
     }
