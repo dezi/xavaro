@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 
-import android.util.Log;
 import android.view.View;
 import android.view.Gravity;
 
@@ -60,8 +59,9 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
         if (Simple.equals(type, "whatsapp"    )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "contacts"    )) item = new LaunchItemComm(context);
 
-        if (Simple.equals(type, "webconfig"   )) item = new LaunchItemWebFrame(context);
+        if (Simple.equals(type, "webapp"      )) item = new LaunchItemWebApp(context);
         if (Simple.equals(type, "webframe"    )) item = new LaunchItemWebFrame(context);
+        if (Simple.equals(type, "webconfig"   )) item = new LaunchItemWebFrame(context);
 
         if (Simple.equals(type, "ipradio"     )) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "iptelevision")) item = new LaunchItemWebStream(context);
@@ -236,6 +236,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
     public void setLabelText(String text)
     {
         if (labelText != null) text = labelText;
+        if (text == null) return;
 
         label.setText(text);
 
