@@ -104,6 +104,11 @@ public class Simple
         return Simple.anyContext;
     }
 
+    public static Resources getResources()
+    {
+        return Simple.anyContext.getResources();
+    }
+
     //endregion Initialisation
 
     //region GCM stuff

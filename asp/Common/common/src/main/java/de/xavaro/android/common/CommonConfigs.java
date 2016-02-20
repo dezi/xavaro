@@ -53,5 +53,10 @@ public class CommonConfigs
     public static final int    ShareServerPort     = 80;
     // @formatter:on
 
+    // @formatter:off
+    public static final String WebappsServerName   = "www.xavaro.de";
+    public static final int    WebappsServerPort   = 80;
+    // @formatter:on
+
     //endregion
 }

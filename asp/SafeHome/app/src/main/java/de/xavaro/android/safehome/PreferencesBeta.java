@@ -41,6 +41,7 @@ public class PreferencesBeta
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference lp;
             NicedPreferences.NiceEditTextPreference ep;
+            NicedPreferences.NiceCheckboxPreference cp;
 
             //
             // Webapp preferences.
@@ -50,6 +51,14 @@ public class PreferencesBeta
             pc.setTitle("Webapps");
 
             preferences.add(pc);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cp.setKey(keyprefix + ".webapps.httpbypass");
+            cp.setTitle("HTTP-Bypass");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
 
             ep = new NicedPreferences.NiceEditTextPreference(context);
 
