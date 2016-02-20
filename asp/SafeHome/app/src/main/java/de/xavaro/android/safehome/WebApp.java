@@ -38,6 +38,11 @@ public class WebApp
             httpport = Simple.getSharedPrefString("developer.webapps.httpport");
         }
 
+        if ((httpport == null) || httpport.equals("80"))
+        {
+            return "http://" + httpserver + "/webapps/" + webappname + "/";
+        }
+
         return "http://" + httpserver + ":" + httpport + "/webapps/" + webappname + "/";
     }
 

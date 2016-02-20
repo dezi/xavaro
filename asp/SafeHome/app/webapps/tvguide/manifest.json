@@ -10,7 +10,7 @@
     ],
 
     "permissions": [
-      "localdstorage",
+      "localdomstorage",
       "gps"
     ]
   }
