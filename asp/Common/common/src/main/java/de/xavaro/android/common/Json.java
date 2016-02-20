@@ -3,7 +3,6 @@ package de.xavaro.android.common;
 import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class Json
             {
                 return new JSONObject(jsonstr);
             }
-            catch (JSONException ex)
+            catch (Exception ex)
             {
                 OopsService.log(LOGTAG, ex);
             }
@@ -46,7 +45,7 @@ public class Json
             {
                 return new JSONArray(jsonstr);
             }
-            catch (JSONException ex)
+            catch (Exception ex)
             {
                 OopsService.log(LOGTAG, ex);
             }
@@ -61,7 +60,7 @@ public class Json
         {
             return new JSONObject(json.toString());
         }
-        catch (JSONException ex)
+        catch (Exception ex)
         {
             OopsService.log(LOGTAG, ex);
         }
@@ -75,7 +74,7 @@ public class Json
         {
             return new JSONArray(json.toString());
         }
-        catch (JSONException ex)
+        catch (Exception ex)
         {
             OopsService.log(LOGTAG, ex);
         }
@@ -139,7 +138,7 @@ public class Json
         {
             json.put(key, val);
         }
-        catch (JSONException ex)
+        catch (Exception ex)
         {
             OopsService.log(LOGTAG, ex);
         }
@@ -157,7 +156,7 @@ public class Json
         {
             return json.get(key);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -170,7 +169,7 @@ public class Json
         {
             return json.getDouble(key);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -183,7 +182,7 @@ public class Json
         {
             return json.getInt(key);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -196,7 +195,7 @@ public class Json
         {
             return json.getLong(key);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -210,7 +209,7 @@ public class Json
         {
             return json.getString(key);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -224,7 +223,7 @@ public class Json
         {
             return json.getString(index);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -238,7 +237,7 @@ public class Json
         {
             return json.getJSONArray(key);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -252,7 +251,7 @@ public class Json
         {
             return json.getJSONObject(key);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -266,7 +265,7 @@ public class Json
         {
             return json.getJSONObject(index);
         }
-        catch (JSONException ignore)
+        catch (Exception ignore)
         {
         }
 
@@ -282,7 +281,7 @@ public class Json
             {
                 return jsonObject.toString(2);
             }
-            catch (JSONException ignored)
+            catch (Exception ignored)
             {
             }
         }
@@ -299,7 +298,7 @@ public class Json
             {
                 return jsonArray.toString(2);
             }
-            catch (JSONException ignored)
+            catch (Exception ignored)
             {
             }
         }
