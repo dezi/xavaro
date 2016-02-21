@@ -2,10 +2,11 @@ tvguide.constans =
 {
     titlebarHeight : 80,
     senderbarWidth : 80,
-    timelineHeight : 20
+    timelineHeight : 20,
+    senderHeight   : 50
 }
 
-tvguide.getSenderList = function
+tvguide.getSenderList = function()
 {
     // http://epg.xavaro.de/channels/tv/de/ZDF.json
     // http://epg.xavaro.de/channels/tv/de/ZDF.png
@@ -18,7 +19,29 @@ tvguide.getSenderList = function
 
     tvguide.senderList =
     [
-        "tv/de/ZDF"
+        "tv/de/ZDF",
+        "tv/de/Folx",
+        "tv/de/N24",
+        "tv/de/N-TV",
+        "tv/de/NDR Fernsehen Hamburg",
+        "tv/de/Phoenix",
+        "tv/de/TV Allgäu",
+        "tv/de/Sport 1",
+        "tv/de/Tele 5",
+        "tv/de/WDR Studio Dortmund",
+        "tv/de/Sky Select 9",
+        "tv/de/Sky Nostalgie",
+        "tv/de/RTL Passion",
+        "tv/de/Romance TV Deutschland",
+        "tv/de/QVC Deutschland",
+        "tv/de/Pearl TV",
+        "tv/de/NDR Fernsehen Hamburg",
+        "tv/de/Nickelodeon Deutschland HD",
+        "tv/de/MTV Germany HD",
+        "tv/de/MDR Fernsehen Thüringen HD",
+        "tv/de/Kinowelt TV",
+        "tv/de/Juwelo",
+        "tv/de/Das Erste"
     ];
 }
 
@@ -101,9 +124,12 @@ tvguide.createFrameSetup = function()
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
-    div.style.bottom = "0px";
+//    div.style.bottom = "0px";
+    div.style.bottom = "400px";
     div.style.width = tvguide.constans.senderbarWidth + "px";
     div.style.backgroundColor = "#000000";
+    div.style.overflow = "hidden";
+
     tvguide.content1.appendChild(div);
 
     tvguide.senderbar = div;
@@ -142,4 +168,52 @@ tvguide.createFrameSetup = function()
     tvguide.epgdata = div;
 }
 
+tvguide.createSenderBar = function()
+{
+    // tvguide.senderList
+
+    for(var index in tvguide.senderList)
+    {
+        console.log("----------------> " + tvguide.senderList[ index ]);
+
+        var div = document.createElement("div");
+        div.style.position = "absolute";
+        div.style.top      = tvguide.constans.timelineHeight + tvguide.constans.senderHeight * index + "px";
+        div.style.height   = tvguide.constans.senderHeight + "px";
+        div.style.width    = tvguide.constans.senderbarWidth + "px";
+        div.style.left     = "0px";
+        div.style.right    = "0px";
+
+        var divPadding = document.createElement("div");
+//        divPadding.style.position = "absolute";
+        divPadding.style.padding = "5px";
+        divPadding.style.backgroundColor = "#ed1a79";
+
+        var image = document.createElement("img");
+
+        image.src = encodeURI(
+            "http://" + tvguide.manifest.appserver +
+            "/channels/" + tvguide.senderList[ index ] + ".png"
+        );
+
+        console.log(image.src);
+
+        image.style.top    = "0px";
+        image.style.left   = "0px";
+        image.style.right  = "0px";
+        image.style.bottom = "0px";
+        image.style.height = tvguide.constans.senderHeight + "px";
+
+
+        divPadding.appendChild(image)
+        div.appendChild(divPadding)
+
+        // tvguide.topdiv = div;
+        tvguide.senderbar.appendChild(div);
+    }
+}
+
+
 tvguide.createFrameSetup();
+tvguide.getSenderList();
+tvguide.createSenderBar();
