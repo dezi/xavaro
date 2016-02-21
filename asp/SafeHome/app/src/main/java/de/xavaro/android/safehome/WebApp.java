@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
@@ -107,6 +108,12 @@ public class WebApp
         }
 
         return null;
+    }
+
+    @Nullable
+    public static JSONArray getPreloads(String webappname)
+    {
+        return Json.getArray(getManifest(webappname), "preload");
     }
 
     @Nullable
