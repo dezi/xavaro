@@ -9,6 +9,7 @@
   [
     "ARD",
     "DVB-S",
+    "DVB-T",
     "SDTV"
   ],
   "packs":
@@ -17,6 +18,7 @@
   ],
   "providers":
   [
-    "ARD"
+    "ARD",
+    "NDR"
   ]
 }

@@ -10,7 +10,9 @@
     "BetaDigital",
     "DVB-C",
     "DVB-S",
+    "DVB-T",
     "Digital Free",
+    "MEDIA BROADCAST",
     "SDTV",
     "SES ASTRA"
   ],
@@ -22,6 +24,7 @@
   [
     "BetaDigital",
     "Digital Free",
+    "MEDIA BROADCAST",
     "SES ASTRA"
   ]
 }

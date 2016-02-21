@@ -1,5 +1,5 @@
 {
-  "name":"1-2-3 TV",
+  "name":"Hope Channel Deutsch",
   "type":"tv",
   "isocc":"de",
   "isolang":"ger",
@@ -7,22 +7,16 @@
   "isbd":false,
   "tags":
   [
-    "BetaDigital",
-    "DVB-C",
-    "DVB-S",
     "DVB-T",
-    "Digital Free",
     "MEDIA BROADCAST",
     "SDTV"
   ],
   "packs":
   [
-    "7:TV Vlaanderen Digitaal"
+    "16:ORF Digital"
   ],
   "providers":
   [
-    "BetaDigital",
-    "Digital Free",
     "MEDIA BROADCAST"
   ]
 }

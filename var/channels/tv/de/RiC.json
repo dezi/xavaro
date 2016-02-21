@@ -9,6 +9,8 @@
   [
     "-",
     "DVB-S",
+    "DVB-T",
+    "MEDIA BROADCAST",
     "SDTV"
   ],
   "packs":
@@ -19,6 +21,7 @@
   ],
   "providers":
   [
-    "-"
+    "-",
+    "MEDIA BROADCAST"
   ]
 }
