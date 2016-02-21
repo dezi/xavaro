@@ -8,7 +8,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.util.Log;
 
+import org.json.JSONArray;
+
 import java.io.ByteArrayInputStream;
+
+import de.xavaro.android.common.Json;
 
 public class WebAppLoader extends WebViewClient
 {
@@ -39,23 +43,45 @@ public class WebAppLoader extends WebViewClient
     {
         String url = request.getUrl().toString();
 
-        Log.d(LOGTAG, "shouldInterceptRequest newapi=" + url);
-        Log.d(LOGTAG, "shouldInterceptRequest   root=" + rootUrl);
-
         if (url.equals(rootUrl))
         {
+            String preloadmeta = "";
+
+            JSONArray preloads = WebApp.getPreloads(webappname);
+
+            if (preloads != null)
+            {
+                for (int inx = 0; inx < preloads.length(); inx++)
+                {
+                    preloadmeta += "\t<script src=\""
+                            + Json.getString(preloads, inx)
+                            + "\"></script>\n";
+                }
+            }
+
             String initialHTML = "<!doctype html>\n"
                     + "<html>\n"
                     + "<head>\n"
                     + "\t<title>" + webappname + "</title>\n"
                     + "\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
+                    + "\t<script>" + webappname + " = {};</script>\n"
+                    + preloadmeta
                     + "</head>\n"
                     + "<body><script src=\"main.js\"></script></body>\n"
                     + "</html>\n";
 
+            Log.d(LOGTAG, initialHTML);
+
             ByteArrayInputStream bais = new ByteArrayInputStream(initialHTML.getBytes());
             return new WebResourceResponse("text/html", "UTF-8", bais);
         }
+
+        if (url.endsWith("favicon.ico"))
+        {
+            return new WebResourceResponse("text/plain", "utf-8", null);
+        }
+
+        Log.d(LOGTAG, "shouldInterceptRequest newapi=" + url);
 
         return null;
     }

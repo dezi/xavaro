@@ -48,7 +48,7 @@ public class PreferencesBeta
             //
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Webapps");
+            pc.setTitle("Appserver");
 
             preferences.add(pc);
 
@@ -76,6 +76,28 @@ public class PreferencesBeta
             ep.setEnabled(enabled);
 
             preferences.add(ep);
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Webapps");
+
+            preferences.add(pc);
+
+            String webappname = "testing";
+
+            String[] appkeys =  Simple.getTransArray(R.array.pref_webapps_where_keys);
+            String[] appvals =  Simple.getTransArray(R.array.pref_webapps_where_vals);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey("webapps" + ".appdef.mode." + webappname);
+            lp.setEntries(appvals);
+            lp.setEntryValues(appkeys);
+            lp.setDefaultValue("inact");
+            lp.setIcon(WebApp.getAppIcon(webappname));
+            lp.setTitle(WebApp.getLabel(webappname));
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
 
             //
             // Browser preferences.

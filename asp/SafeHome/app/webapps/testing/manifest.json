@@ -1,0 +1,22 @@
+{
+  "manifest": {
+
+    "label": "Testing",
+    "appname": "testing",
+    "appicon": "testing_512x512.png",
+
+    "preload": [
+      "util.js"
+    ],
+
+    "files": [
+      "main.js",
+      "util.js"
+    ],
+
+    "permissions": [
+      "localdomstorage",
+      "gps"
+    ]
+  }
+}
