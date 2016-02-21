@@ -72,7 +72,6 @@ tvguide.onTouchStart = function(event)
     tvguide.touch.startY = touchobj.clientY;
     tvguide.touch.target = target;
 
-
     event.preventDefault();
 }
 
@@ -83,7 +82,7 @@ tvguide.onTouchMove = function(event)
     //console.log("onTouchMove:" + touchobj.clientX + "/" + touchobj.clientY);
 
     // hier senderbarScroll am offsetTop rumdüdeln.-...
-    
+
     event.preventDefault();
 }
 
