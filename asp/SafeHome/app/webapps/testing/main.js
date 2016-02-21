@@ -1,3 +1,3 @@
-console.log("==================da bin ich...");
+console.log("==================main.js loaded...");
 
 testing.alertest();

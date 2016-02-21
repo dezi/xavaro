@@ -9,6 +9,7 @@ import android.webkit.WebViewClient;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 
@@ -45,7 +46,20 @@ public class WebAppLoader extends WebViewClient
 
         if (url.equals(rootUrl))
         {
+            String preloadjava = "";
             String preloadmeta = "";
+
+            preloadjava = "<script>" + webappname + " = {};</script>\n";
+
+            JSONObject manifest = WebApp.getManifest(webappname);
+
+            if (manifest != null)
+            {
+                preloadjava += "<script>"
+                        + webappname + ".manifest = \n"
+                        + Json.toPretty(manifest) + ";\n"
+                        + "</script>\n";
+            }
 
             JSONArray preloads = WebApp.getPreloads(webappname);
 
@@ -53,7 +67,7 @@ public class WebAppLoader extends WebViewClient
             {
                 for (int inx = 0; inx < preloads.length(); inx++)
                 {
-                    preloadmeta += "\t<script src=\""
+                    preloadmeta += "<script src=\""
                             + Json.getString(preloads, inx)
                             + "\"></script>\n";
                 }
@@ -62,9 +76,9 @@ public class WebAppLoader extends WebViewClient
             String initialHTML = "<!doctype html>\n"
                     + "<html>\n"
                     + "<head>\n"
-                    + "\t<title>" + webappname + "</title>\n"
-                    + "\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
-                    + "\t<script>" + webappname + " = {};</script>\n"
+                    + "<title>" + webappname + "</title>\n"
+                    + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
+                    + preloadjava
                     + preloadmeta
                     + "</head>\n"
                     + "<body><script src=\"main.js\"></script></body>\n"
