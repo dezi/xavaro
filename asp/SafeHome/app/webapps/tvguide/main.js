@@ -54,7 +54,24 @@ tvguide.onTouchStart = function(event)
 {
     var touchobj = event.changedTouches[ 0 ];
 
-    console.log("onTouchStart:" + touchobj.clientX + "/" + touchobj.clientY);
+    console.log("onTouchStart:" + touchobj.target.id + "=" + touchobj.clientX + "/" + touchobj.clientY);
+    console.log("onTouchStart:" + touchobj.target.innerHTML);
+
+    tvguide.touch = {};
+
+//
+// target =  touchobj.target;
+// while (target && target.id != "senderbarScroll")
+//{ target = target.parent;}
+// if (!target) return // war nix
+//
+// =====> dieses element muss gescrollt werden.
+//
+
+    tvguide.touch.startX = touchobj.clientX;
+    tvguide.touch.startY = touchobj.clientY;
+    tvguide.touch.target = target;
+
 
     event.preventDefault();
 }
@@ -63,8 +80,10 @@ tvguide.onTouchMove = function(event)
 {
     var touchobj = event.changedTouches[ 0 ];
 
-    console.log("onTouchMove:" + touchobj.clientX + "/" + touchobj.clientY);
+    //console.log("onTouchMove:" + touchobj.clientX + "/" + touchobj.clientY);
 
+    // hier senderbarScroll am offsetTop rumdüdeln.-...
+    
     event.preventDefault();
 }
 
@@ -88,6 +107,7 @@ tvguide.createFrameSetup = function()
     document.body.style.padding = '0px';
 
     var div = document.createElement("div");
+    div.id = "topdiv";
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
@@ -99,6 +119,7 @@ tvguide.createFrameSetup = function()
     tvguide.topdiv = div;
 
     var div = document.createElement("div");
+    div.id = "titlebar";
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
@@ -110,6 +131,7 @@ tvguide.createFrameSetup = function()
     tvguide.titlebar = div;
 
     var div = document.createElement("div");
+    div.id = "content1";
     div.style.position = "absolute";
     div.style.top = tvguide.constans.titlebarHeight + "px";
     div.style.left = "0px";
@@ -121,6 +143,7 @@ tvguide.createFrameSetup = function()
     tvguide.content1 = div;
 
     var div = document.createElement("div");
+    div.id = "senderbar";
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
@@ -135,6 +158,7 @@ tvguide.createFrameSetup = function()
     tvguide.senderbar = div;
 
     var div = document.createElement("div");
+    div.id = "content2";
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = tvguide.constans.senderbarWidth + "px";
@@ -146,6 +170,7 @@ tvguide.createFrameSetup = function()
     tvguide.content2 = div;
 
     var div = document.createElement("div");
+    div.id = "timeline";
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
@@ -157,6 +182,7 @@ tvguide.createFrameSetup = function()
     tvguide.timeline = div;
 
     var div = document.createElement("div");
+    div.id = "epgdata";
     div.style.position = "absolute";
     div.style.top = tvguide.constans.timelineHeight + "px";
     div.style.left = "0px";
@@ -198,6 +224,7 @@ tvguide.createSenderBar = function()
 
         console.log(image.src);
 
+        image.id = tvguide.senderList[ index ];
         image.style.top    = "0px";
         image.style.left   = "0px";
         image.style.right  = "0px";
@@ -211,6 +238,16 @@ tvguide.createSenderBar = function()
         // tvguide.topdiv = div;
         tvguide.senderbar.appendChild(div);
     }
+
+//
+// senderbarScroll
+// senderbarScroll.style.height = x * iconheight;
+// senderbarScroll.clientHeight = x * iconheight;
+// senderbarScroll.clientWidth
+// senderbarScroll.offsetTop
+// senderbarScroll.offsetLeft
+
+    console.log("===============> senderbar height=" + tvguide.senderbar.clientHeight);
 }
 
 
