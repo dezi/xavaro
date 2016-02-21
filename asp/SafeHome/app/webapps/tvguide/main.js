@@ -17,32 +17,44 @@ tvguide.getSenderList = function()
     //
     //
 
-    tvguide.senderList =
-    [
-        "tv/de/ZDF",
-        "tv/de/Folx",
-        "tv/de/N24",
-        "tv/de/N-TV",
-        "tv/de/NDR Fernsehen Hamburg",
-        "tv/de/Phoenix",
-        "tv/de/TV Allgäu",
-        "tv/de/Sport 1",
-        "tv/de/Tele 5",
-        "tv/de/WDR Studio Dortmund",
-        "tv/de/Sky Select 9",
-        "tv/de/Sky Nostalgie",
-        "tv/de/RTL Passion",
-        "tv/de/Romance TV Deutschland",
-        "tv/de/QVC Deutschland",
-        "tv/de/Pearl TV",
-        "tv/de/NDR Fernsehen Hamburg",
-        "tv/de/Nickelodeon Deutschland HD",
-        "tv/de/MTV Germany HD",
-        "tv/de/MDR Fernsehen Thüringen HD",
-        "tv/de/Kinowelt TV",
-        "tv/de/Juwelo",
-        "tv/de/Das Erste"
-    ];
+    var obj = JSON.parse(extras.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
+
+    tvguide.senderList = [];
+
+    for(var index in obj)
+    {
+        tvguide.senderList
+        .push("tv/de/" + obj[ index ].name);
+    }
+
+    console.log(tvguide.getSenderList);
+
+//    tvguide.senderList =
+//    [
+//        "tv/de/ZDF",
+//        "tv/de/Folx",
+//        "tv/de/N24",
+//        "tv/de/N-TV",
+//        "tv/de/NDR Fernsehen Hamburg",
+//        "tv/de/Phoenix",
+//        "tv/de/TV Allgäu",
+//        "tv/de/Sport 1",
+//        "tv/de/Tele 5",
+//        "tv/de/WDR Studio Dortmund",
+//        "tv/de/Sky Select 9",
+//        "tv/de/Sky Nostalgie",
+//        "tv/de/RTL Passion",
+//        "tv/de/Romance TV Deutschland",
+//        "tv/de/QVC Deutschland",
+//        "tv/de/Pearl TV",
+//        "tv/de/NDR Fernsehen Hamburg",
+//        "tv/de/Nickelodeon Deutschland HD",
+//        "tv/de/MTV Germany HD",
+//        "tv/de/MDR Fernsehen Thüringen HD",
+//        "tv/de/Kinowelt TV",
+//        "tv/de/Juwelo",
+//        "tv/de/Das Erste"
+//    ];
 }
 
 tvguide.onOrientationChange = function()
