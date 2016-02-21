@@ -59,17 +59,25 @@ tvguide.onTouchStart = function(event)
 
     tvguide.touch = {};
 
-//
-// target =  touchobj.target;
-// while (target && target.id != "senderbarScroll")
-//{ target = target.parent;}
-// if (!target) return // war nix
-//
+
+    target =  touchobj.target;
+
+    while (target && target.id != "senderbarScroll")
+    {
+        target = target.parentElement;
+    }
+
+    if (!target) return // war nix
+
 // =====> dieses element muss gescrollt werden.
 //
 
     tvguide.touch.startX = touchobj.clientX;
     tvguide.touch.startY = touchobj.clientY;
+
+    tvguide.touch.offsetTop  = target.offsetTop;
+    tvguide.touch.offsetLeft = target.offsetLeft;
+
     tvguide.touch.target = target;
 
     event.preventDefault();
@@ -82,6 +90,9 @@ tvguide.onTouchMove = function(event)
     //console.log("onTouchMove:" + touchobj.clientX + "/" + touchobj.clientY);
 
     // hier senderbarScroll am offsetTop rumdüdeln.-...
+//    senderbarScroll.offsetTop = tvguide.touch.startY - touchobj.clientY;
+    deltay = touchobj.clientY - tvguide.touch.startY;
+    tvguide.touch.target.style.top = (tvguide.touch.offsetTop + deltay) + "px";
 
     event.preventDefault();
 }
@@ -146,8 +157,7 @@ tvguide.createFrameSetup = function()
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
-//    div.style.bottom = "0px";
-    div.style.bottom = "400px";
+    div.style.bottom = "0px";
     div.style.width = tvguide.constans.senderbarWidth + "px";
     div.style.backgroundColor = "#000000";
     div.style.overflow = "hidden";
@@ -195,12 +205,19 @@ tvguide.createFrameSetup = function()
 
 tvguide.createSenderBar = function()
 {
-    // tvguide.senderList
+    var div = document.createElement("div");
+    div.id = "senderbarScroll";
+    div.style.position = "absolute";
+    div.style.top   = "0px";
+    div.style.left  = "0px";
+    div.style.right = "0px";
+
+    tvguide.senderbar.appendChild(div);
+
+    tvguide.senderbarScroll = div;
 
     for(var index in tvguide.senderList)
     {
-        console.log("----------------> " + tvguide.senderList[ index ]);
-
         var div = document.createElement("div");
         div.style.position = "absolute";
         div.style.top      = tvguide.constans.timelineHeight + tvguide.constans.senderHeight * index + "px";
@@ -221,8 +238,6 @@ tvguide.createSenderBar = function()
             "/channels/" + tvguide.senderList[ index ] + ".png"
         );
 
-        console.log(image.src);
-
         image.id = tvguide.senderList[ index ];
         image.style.top    = "0px";
         image.style.left   = "0px";
@@ -235,9 +250,10 @@ tvguide.createSenderBar = function()
         div.appendChild(divPadding)
 
         // tvguide.topdiv = div;
-        tvguide.senderbar.appendChild(div);
+        tvguide.senderbarScroll.appendChild(div);
     }
 
+    senderbarScroll.clientHeight = tvguide.senderList.length * tvguide.constans.senderHeight;
 //
 // senderbarScroll
 // senderbarScroll.style.height = x * iconheight;
