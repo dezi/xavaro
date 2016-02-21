@@ -1,0 +1,577 @@
+-rw-r--r--  1 pi pi   212 Jan 29 12:52 1-2-3 TV HD.json
+-rw-r--r--  1 pi pi  4299 Jan 23 15:48 1-2-3 TV HD.png
+-rw-r--r--  1 pi pi   314 Feb 18 14:17 1-2-3 TV.json
+-rw-r--r--  1 pi pi  3675 Jan 23 15:42 1-2-3 TV.png
+-rw-r--r--  1 pi pi   299 Feb 18 14:12 13th Street Deutschland HD.json
+-rw-r--r--  1 pi pi  3256 Jan 23 15:24 13th Street Deutschland HD.png
+-rw-r--r--  1 pi pi   284 Feb 18 14:15 3sat HD.json
+-rw-r--r--  1 pi pi  2195 Jan 23 15:40 3sat HD.png
+-rw-r--r--  1 pi pi   314 Feb 18 14:18 3sat.json
+-rw-r--r--  1 pi pi  2634 Jan 23 15:45 3sat.png
+-rw-r--r--  1 pi pi   346 Feb 18 14:15 Animax Deutschland.json
+-rw-r--r--  1 pi pi  3747 Jan 23 15:40 Animax Deutschland.png
+-rw-r--r--  1 pi pi   309 Feb 18 14:12 Anixe HD.json
+-rw-r--r--  1 pi pi  3467 Jan 23 15:35 Anixe HD.png
+-rw-r--r--  1 pi pi   328 Jan 29 12:52 Anixe.json
+-rw-r--r--  1 pi pi  3467 Jan 23 15:47 Anixe.png
+-rw-r--r--  1 pi pi   282 Feb 18 14:17 ARD Alpha.json
+-rw-r--r--  1 pi pi  3017 Jan 23 15:43 ARD Alpha.png
+-rw-r--r--  1 pi pi   313 Jan 29 12:53 AstroTV.json
+-rw-r--r--  1 pi pi  3157 Jan 23 15:49 AstroTV.png
+-rw-r--r--  1 pi pi   230 Feb 18 14:15 a.tv.json
+-rw-r--r--  1 pi pi  3816 Jan 23 16:58 a.tv.png
+-rw-r--r--  1 pi pi   265 Jan 29 12:51 Bayerisches Fernsehen Nord HD.json
+-rw-r--r--  1 pi pi  2428 Jan 23 15:46 Bayerisches Fernsehen Nord HD.png
+-rw-r--r--  1 pi pi   212 Jan 29 12:52 Bayerisches Fernsehen Nord.json
+-rw-r--r--  1 pi pi  5914 Jan 23 15:48 Bayerisches Fernsehen Nord.png
+-rw-r--r--  1 pi pi   300 Feb 18 14:16 Bayerisches Fernsehen Süd HD.json
+-rw-r--r--  1 pi pi  2428 Jan 23 15:42 Bayerisches Fernsehen Süd HD.png
+-rw-r--r--  1 pi pi   298 Jan 29 12:53 Bayerisches Fernsehen Süd.json
+-rw-r--r--  1 pi pi  5914 Jan 23 15:51 Bayerisches Fernsehen Süd.png
+-rw-r--r--  1 pi pi   216 Feb 18 14:13 BB-MV Lokal-TV.json
+-rw-r--r--  1 pi pi  5567 Jan 23 15:37 BB-MV Lokal-TV.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:18 Beate Uhse TV.json
+-rw-r--r--  1 pi pi  4322 Jan 23 15:44 Beate Uhse TV.png
+-rw-r--r--  1 pi pi   211 Feb 18 14:13 Beauty TV.json
+-rw-r--r--  1 pi pi   290 Feb 18 14:18 Bibel TV HD.json
+-rw-r--r--  1 pi pi  3422 Jan 28 15:01 Bibel TV HD.png
+-rw-r--r--  1 pi pi   333 Feb 18 14:12 Bibel TV.json
+-rw-r--r--  1 pi pi  3992 Jan 23 15:35 Bibel TV.png
+-rw-r--r--  1 pi pi   242 Jan 29 12:53 Blue Movie 1.json
+-rw-r--r--  1 pi pi  6938 Jan 23 15:51 Blue Movie 1.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:17 Blue Movie 2.json
+-rw-r--r--  1 pi pi  6960 Jan 23 15:43 Blue Movie 2.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:18 Blue Movie 3.json
+-rw-r--r--  1 pi pi  6578 Jan 23 15:45 Blue Movie 3.png
+-rw-r--r--  1 pi pi   268 Feb  8 17:48 Blue Movie HD.json
+-rw-r--r--  1 pi pi  9974 Jan 23 15:40 Blue Movie HD.png
+-rw-r--r--  1 pi pi   262 Jan 28 15:01 Boomerang Deutschland HD.json
+-rw-r--r--  1 pi pi  3574 Jan 28 15:01 Boomerang Deutschland HD.png
+-rw-r--r--  1 pi pi   265 Feb 18 14:14 Channel 21.json
+-rw-r--r--  1 pi pi  3506 Jan 23 15:38 Channel 21.png
+-rw-r--r--  1 pi pi   264 Feb 18 14:16 Classica Deutschland.json
+-rw-r--r--  1 pi pi  2025 Jan 23 15:40 Classica Deutschland.png
+-rw-r--r--  1 pi pi   423 Feb 18 14:14 Comedy Central Deutschland.json
+-rw-r--r--  1 pi pi  4678 Jan 23 15:39 Comedy Central Deutschland.png
+-rw-r--r--  1 pi pi   327 Jan 29 12:51 Das Erste HD.json
+-rw-r--r--  1 pi pi  2046 Jan 23 15:45 Das Erste HD.png
+-rw-r--r--  1 pi pi   307 Jan 29 12:52 Das Erste.json
+-rw-r--r--  1 pi pi  2043 Jan 23 15:47 Das Erste.png
+-rw-r--r--  1 pi pi   283 Feb 18 14:18 Deluxe Music Austria HD.json
+-rw-r--r--  1 pi pi  6625 Jan 23 15:45 Deluxe Music Austria HD.png
+-rw-r--r--  1 pi pi   275 Feb 18 14:14 Deluxe Music HD.json
+-rw-r--r--  1 pi pi  6625 Jan 23 15:39 Deluxe Music HD.png
+-rw-r--r--  1 pi pi   367 Feb 18 14:13 Deluxe Music.json
+-rw-r--r--  1 pi pi  6342 Jan 23 15:37 Deluxe Music.png
+-rw-r--r--  1 pi pi   312 Jan 29 12:52 Deutsches Musik Fernsehen.json
+-rw-r--r--  1 pi pi  3861 Jan 23 15:48 Deutsches Musik Fernsehen.png
+-rw-r--r--  1 pi pi   315 Feb 18 14:14 Discovery Channel Deutschland HD.json
+-rw-r--r--  1 pi pi  2371 Jan 23 15:38 Discovery Channel Deutschland HD.png
+-rw-r--r--  1 pi pi   342 Jan 29 12:53 Disney Channel Deutschland HD.json
+-rw-r--r--  1 pi pi  5203 Jan 23 15:51 Disney Channel Deutschland HD.png
+-rw-r--r--  1 pi pi   358 Jan 29 12:54 Disney Channel Deutschland.json
+-rw-r--r--  1 pi pi  5230 Jan 23 15:51 Disney Channel Deutschland.png
+-rw-r--r--  1 pi pi   274 Feb 18 14:13 Disney Cinemagic Deutschland HD.json
+-rw-r--r--  1 pi pi  7068 Jan 23 15:37 Disney Cinemagic Deutschland HD.png
+-rw-r--r--  1 pi pi   301 Feb 18 14:12 Disney Junior Deutschland HD.json
+-rw-r--r--  1 pi pi  3076 Jan 23 15:24 Disney Junior Deutschland HD.png
+-rw-r--r--  1 pi pi   353 Jan 29 12:53 DMAX Deutschland HD.json
+-rw-r--r--  1 pi pi  2378 Jan 23 15:51 DMAX Deutschland HD.png
+-rw-r--r--  1 pi pi   371 Feb 18 14:13 DMAX Deutschland.json
+-rw-r--r--  1 pi pi  1865 Jan 23 15:37 DMAX Deutschland.png
+-rw-r--r--  1 pi pi   193 Jan 29 12:51 DW Arabia.json
+-rw-r--r--  1 pi pi  6787 Jan 29 11:18 DW Arabia.png
+-rw-r--r--  1 pi pi   186 Jan 29 12:53 DW.json
+-rw-r--r--  1 pi pi  6787 Jan 28 16:01 DW.png
+-rw-r--r--  1 pi pi   247 Feb 18 14:16 E! Deutschland HD.json
+-rw-r--r--  1 pi pi  2417 Jan 23 15:42 E! Deutschland HD.png
+-rw-r--r--  1 pi pi   300 Jan 29 12:53 Einsfestival HD.json
+-rw-r--r--  1 pi pi  3390 Jan 23 15:49 Einsfestival HD.png
+-rw-r--r--  1 pi pi   310 Feb 18 14:17 Einsfestival.json
+-rw-r--r--  1 pi pi  3484 Jan 23 15:42 Einsfestival.png
+-rw-r--r--  1 pi pi   274 Jan 29 12:54 Eins Plus HD.json
+-rw-r--r--  1 pi pi  3149 Jan 23 15:52 Eins Plus HD.png
+-rw-r--r--  1 pi pi   307 Feb 18 14:15 Eins Plus.json
+-rw-r--r--  1 pi pi  3552 Jan 23 15:40 Eins Plus.png
+-rw-r--r--  1 pi pi   361 Feb 18 14:16 Folx.json
+-rw-r--r--  1 pi pi  4887 Jan 23 17:02 Folx.png
+-rw-r--r--  1 pi pi   270 Feb 18 14:13 Franken Fernsehen.json
+-rw-r--r--  1 pi pi  4460 Jan 23 16:37 Franken Fernsehen.png
+-rw-r--r--  1 pi pi   255 Feb 18 14:12 GoldStar TV.json
+-rw-r--r--  1 pi pi  5300 Jan 23 15:25 GoldStar TV.png
+-rw-r--r--  1 pi pi   255 Feb 18 14:18 Heimatkanal.json
+-rw-r--r--  1 pi pi  6938 Jan 23 15:44 Heimatkanal.png
+-rw-r--r--  1 pi pi   294 Jan 29 12:52 HistoryDeutschland HD.json
+-rw-r--r--  1 pi pi  5776 Jan 23 15:48 HistoryDeutschland HD.png
+-rw-r--r--  1 pi pi   257 Jan 28 15:01 HistoryDeutschland.json
+-rw-r--r--  1 pi pi  4727 Jan 28 15:01 HistoryDeutschland.png
+-rw-r--r--  1 pi pi   245 Feb 18 14:14 Hope Channel Deutsch HD.json
+-rw-r--r--  1 pi pi  6148 Jan 23 16:55 Hope Channel Deutsch HD.png
+-rw-r--r--  1 pi pi   263 Jan 29 12:53 HR Fernsehen HD.json
+-rw-r--r--  1 pi pi  3372 Jan 23 15:48 HR Fernsehen HD.png
+-rw-r--r--  1 pi pi   284 Feb 18 14:17 HR Fernsehen.json
+-rw-r--r--  1 pi pi  3652 Jan 23 15:43 HR Fernsehen.png
+-rw-r--r--  1 pi pi   216 Feb 18 14:12 HSE 24 Extra HD.json
+-rw-r--r--  1 pi pi  2940 Jan 23 15:35 HSE 24 Extra HD.png
+-rw-r--r--  1 pi pi   267 Jan 28 15:01 HSE 24 Extra.json
+-rw-r--r--  1 pi pi  4830 Jan 28 15:01 HSE 24 Extra.png
+-rw-r--r--  1 pi pi   263 Feb 18 14:18 HSE 24 HD.json
+-rw-r--r--  1 pi pi  3908 Jan 23 15:44 HSE 24 HD.png
+-rw-r--r--  1 pi pi   312 Jan 29 12:53 HSE 24.json
+-rw-r--r--  1 pi pi  6922 Jan 23 15:51 HSE 24.png
+-rw-r--r--  1 pi pi   214 Feb 18 14:14 HSE 24 Trend.json
+-rw-r--r--  1 pi pi  2959 Jan 23 15:38 HSE 24 Trend.png
+-rw-r--r--  1 pi pi   257 Jan 29 12:52 INTV.json
+-rw-r--r--  1 pi pi  3601 Jan 28 16:00 INTV.png
+-rw-r--r--  1 pi pi   217 Feb 18 14:15 JML Direct Shop.json
+-rw-r--r--  1 pi pi  7067 Jan 23 15:40 JML Direct Shop.png
+-rw-r--r--  1 pi pi   281 Feb 18 14:13 Jukebox.json
+-rw-r--r--  1 pi pi  3819 Jan 23 15:37 Jukebox.png
+-rw-r--r--  1 pi pi   250 Feb 18 14:17 Junior.json
+-rw-r--r--  1 pi pi  4691 Jan 23 15:43 Junior.png
+-rw-r--r--  1 pi pi   267 Feb 18 14:13 Juwelo.json
+-rw-r--r--  1 pi pi  3203 Jan 23 15:37 Juwelo.png
+-rw-r--r--  1 pi pi   336 Feb 18 14:15 Kabel Eins Classics.json
+-rw-r--r--  1 pi pi  2147 Jan 23 16:58 Kabel Eins Classics.png
+-rw-r--r--  1 pi pi   344 Feb 18 14:16 Kabel Eins Deutschland HD.json
+-rw-r--r--  1 pi pi  2095 Jan 23 17:00 Kabel Eins Deutschland HD.png
+-rw-r--r--  1 pi pi   383 Feb 18 14:16 Kabel Eins Deutschland.json
+-rw-r--r--  1 pi pi  2009 Jan 23 17:02 Kabel Eins Deutschland.png
+-rw-r--r--  1 pi pi   316 Feb 18 14:12 KIKA HD.json
+-rw-r--r--  1 pi pi  5805 Jan 23 15:25 KIKA HD.png
+-rw-r--r--  1 pi pi   314 Jan 29 12:52 KIKA.json
+-rw-r--r--  1 pi pi  7266 Jan 23 15:48 KIKA.png
+-rw-r--r--  1 pi pi   252 Jan 28 15:01 Kinowelt TV HD.json
+-rw-r--r--  1 pi pi  2842 Jan 28 15:01 Kinowelt TV HD.png
+-rw-r--r--  1 pi pi   285 Feb 18 14:18 Kinowelt TV.json
+-rw-r--r--  1 pi pi  3264 Jan 23 15:45 Kinowelt TV.png
+-rw-r--r--  1 pi pi   214 Jan 29 12:52 ManouLenz TV.json
+-rw-r--r--  1 pi pi  5105 Jan 23 15:48 ManouLenz TV.png
+-rw-r--r--  1 pi pi   216 Feb 18 14:16 MDR Fernsehen Sachsen-Anhalt HD.json
+-rw-r--r--  1 pi pi  3380 Jan 23 15:42 MDR Fernsehen Sachsen-Anhalt HD.png
+-rw-r--r--  1 pi pi   300 Feb 18 14:15 MDR Fernsehen Sachsen-Anhalt.json
+-rw-r--r--  1 pi pi  3176 Jan 23 15:42 MDR Fernsehen Sachsen-Anhalt.png
+-rw-r--r--  1 pi pi   272 Jan 29 12:53 MDR Fernsehen Sachsen HD.json
+-rw-r--r--  1 pi pi  3380 Jan 23 15:51 MDR Fernsehen Sachsen HD.png
+-rw-r--r--  1 pi pi   258 Feb 18 14:17 MDR Fernsehen Sachsen.json
+-rw-r--r--  1 pi pi  3176 Jan 23 15:43 MDR Fernsehen Sachsen.png
+-rw-r--r--  1 pi pi   263 Feb 18 14:14 MDR Fernsehen Thüringen HD.json
+-rw-r--r--  1 pi pi  3380 Jan 23 15:37 MDR Fernsehen Thüringen HD.png
+-rw-r--r--  1 pi pi   258 Jan 23 17:20 MDR Thüringen.json
+-rw-r--r--  1 pi pi  3742 Jan 23 15:39 MDR Thüringen.png
+-rw-r--r--  1 pi pi   216 Feb 18 14:15 Mediaspar TV HD.json
+-rw-r--r--  1 pi pi  2707 Jan 23 15:40 Mediaspar TV HD.png
+-rw-r--r--  1 pi pi   214 Jan 29 12:53 Mediaspar TV.json
+-rw-r--r--  1 pi pi  2707 Jan 23 15:48 Mediaspar TV.png
+-rw-r--r--  1 pi pi   267 Feb 18 14:12 MGM Channel Deutschland.json
+-rw-r--r--  1 pi pi  7861 Jan 23 15:25 MGM Channel Deutschland.png
+-rw-r--r--  1 pi pi   247 Feb 18 14:13 MGMDeutschland HD.json
+-rw-r--r--  1 pi pi  5824 Jan 23 15:37 MGMDeutschland HD.png
+-rw-r--r--  1 pi pi   258 Jan 29 12:54 Motorvision TV.json
+-rw-r--r--  1 pi pi  4959 Jan 23 15:51 Motorvision TV.png
+-rw-r--r--  1 pi pi   327 Feb 15 11:16 MTV Germany HD.json
+-rw-r--r--  1 pi pi  2086 Jan 23 15:45 MTV Germany HD.png
+-rw-r--r--  1 pi pi   287 Feb 18 14:14 München TV.json
+-rw-r--r--  1 pi pi  4106 Jan 23 16:57 München TV.png
+-rw-r--r--  1 pi pi   319 Feb 18 14:13 N24 HD.json
+-rw-r--r--  1 pi pi  3621 Jan 23 15:37 N24 HD.png
+-rw-r--r--  1 pi pi   338 Feb 18 14:17 N24.json
+-rw-r--r--  1 pi pi  3760 Jan 23 17:03 N24.png
+-rw-r--r--  1 pi pi   268 Feb 18 14:12 Nat Geo Wild Deutschland.json
+-rw-r--r--  1 pi pi  3748 Jan 23 15:25 Nat Geo Wild Deutschland.png
+-rw-r--r--  1 pi pi   272 Feb 18 14:15 NDR Fernsehen Hamburg HD.json
+-rw-r--r--  1 pi pi  3853 Jan 23 15:40 NDR Fernsehen Hamburg HD.png
+-rw-r--r--  1 pi pi   206 Feb 18 14:16 NDR Fernsehen Hamburg.json
+-rw-r--r--  1 pi pi  3264 Jan 23 15:42 NDR Fernsehen Hamburg.png
+-rw-r--r--  1 pi pi   275 Jan 29 12:53 NDR Fernsehen Mecklenburg-Vorpommern HD.json
+-rw-r--r--  1 pi pi  3853 Jan 23 15:49 NDR Fernsehen Mecklenburg-Vorpommern HD.png
+-rw-r--r--  1 pi pi   222 Jan 29 12:52 NDR Fernsehen Mecklenburg-Vorpommern.json
+-rw-r--r--  1 pi pi  3264 Jan 23 15:47 NDR Fernsehen Mecklenburg-Vorpommern.png
+-rw-r--r--  1 pi pi   301 Feb 18 14:16 NDR Fernsehen Niedersachsen HD.json
+-rw-r--r--  1 pi pi  3853 Jan 23 15:42 NDR Fernsehen Niedersachsen HD.png
+-rw-r--r--  1 pi pi   299 Feb 18 14:13 NDR Fernsehen Niedersachsen.json
+-rw-r--r--  1 pi pi  3264 Jan 23 15:37 NDR Fernsehen Niedersachsen.png
+-rw-r--r--  1 pi pi   232 Feb 18 14:13 NDR Fernsehen Schleswig-Holstein HD.json
+-rw-r--r--  1 pi pi  3853 Jan 23 15:37 NDR Fernsehen Schleswig-Holstein HD.png
+-rw-r--r--  1 pi pi   281 Jan 29 12:53 NDR Fernsehen Schleswig-Holstein.json
+-rw-r--r--  1 pi pi  3264 Jan 23 15:51 NDR Fernsehen Schleswig-Holstein.png
+-rw-r--r--  1 pi pi   341 Jan 29 12:53 Nickelodeon Deutschland HD.json
+-rw-r--r--  1 pi pi  2124 Jan 28 15:01 Nickelodeon Deutschland HD.png
+-rw-r--r--  1 pi pi   270 Jan 29 12:51 NickToons Germany.json
+-rw-r--r--  1 pi pi  2080 Jan 29 11:18 NickToons Germany.png
+-rw-r--r--  1 pi pi   304 Feb 18 14:18 N-TV HD.json
+-rw-r--r--  1 pi pi  3705 Jan 23 17:04 N-TV HD.png
+-rw-r--r--  1 pi pi   317 Feb 18 14:14 N-TV.json
+-rw-r--r--  1 pi pi  5532 Jan 23 15:38 N-TV.png
+-rw-r--r--  1 pi pi   212 Jan 29 12:51 Pearl TV HD.json
+-rw-r--r--  1 pi pi  4210 Jan 29 11:18 Pearl TV HD.png
+-rw-r--r--  1 pi pi   210 Feb 18 14:13 Pearl TV.json
+-rw-r--r--  1 pi pi  4718 Jan 23 15:37 Pearl TV.png
+-rw-r--r--  1 pi pi   276 Feb 18 14:15 Phoenix HD.json
+-rw-r--r--  1 pi pi  3250 Jan 23 15:39 Phoenix HD.png
+-rw-r--r--  1 pi pi   306 Jan 29 12:53 Phoenix.json
+-rw-r--r--  1 pi pi  2756 Jan 23 15:51 Phoenix.png
+-rw-r--r--  1 pi pi   344 Feb 18 14:17 Pro Sieben Deutschland HD.json
+-rw-r--r--  1 pi pi  1474 Jan 23 17:04 Pro Sieben Deutschland HD.png
+-rw-r--r--  1 pi pi   383 Feb 18 14:12 Pro Sieben Deutschland.json
+-rw-r--r--  1 pi pi  1130 Jan 23 16:35 Pro Sieben Deutschland.png
+-rw-r--r--  1 pi pi   247 Jan 29 12:52 Pro Sieben Fun HD.json
+-rw-r--r--  1 pi pi  2308 Jan 23 15:47 Pro Sieben Fun HD.png
+-rw-r--r--  1 pi pi   296 Feb 17 10:48 Pro Sieben Maxx Deutschland HD.json
+-rw-r--r--  1 pi pi  2446 Jan 23 16:56 Pro Sieben Maxx Deutschland HD.png
+-rw-r--r--  1 pi pi   388 Jan 29 12:53 Pro Sieben Maxx Deutschland.json
+-rw-r--r--  1 pi pi  2267 Jan 28 15:01 Pro Sieben Maxx Deutschland.png
+-rw-r--r--  1 pi pi   222 Feb 18 14:15 QVC Beauty & Style HD.json
+-rw-r--r--  1 pi pi  6011 Jan 23 15:40 QVC Beauty & Style HD.png
+-rw-r--r--  1 pi pi   220 Feb 18 14:16 QVC Beauty & Style.json
+-rw-r--r--  1 pi pi  6011 Jan 23 15:41 QVC Beauty & Style.png
+-rw-r--r--  1 pi pi   323 Jan 29 12:53 QVC Deutschland HD.json
+-rw-r--r--  1 pi pi  5339 Jan 23 15:49 QVC Deutschland HD.png
+-rw-r--r--  1 pi pi   355 Jan 29 12:52 QVC Deutschland.json
+-rw-r--r--  1 pi pi  5331 Jan 23 15:48 QVC Deutschland.png
+-rw-r--r--  1 pi pi   224 Feb 18 14:18 QVC Plus Deutschland HD.json
+-rw-r--r--  1 pi pi  4402 Jan 23 15:45 QVC Plus Deutschland HD.png
+-rw-r--r--  1 pi pi   271 Feb 18 14:18 QVC Plus Deutschland.json
+-rw-r--r--  1 pi pi  5544 Jan 23 15:45 QVC Plus Deutschland.png
+-rw-r--r--  1 pi pi   275 Feb 18 14:15 Radio Bremen TV.json
+-rw-r--r--  1 pi pi  2604 Jan 23 15:40 Radio Bremen TV.png
+-rw-r--r--  1 pi pi   261 Feb 18 14:17 RBB Berlin HD.json
+-rw-r--r--  1 pi pi  2061 Jan 23 15:42 RBB Berlin HD.png
+-rw-r--r--  1 pi pi   282 Feb 18 14:12 RBB Berlin.json
+-rw-r--r--  1 pi pi  2405 Jan 23 15:26 RBB Berlin.png
+-rw-r--r--  1 pi pi   254 Jan 29 12:51 RBB Brandenburg HD.json
+-rw-r--r--  1 pi pi  2061 Jan 23 15:46 RBB Brandenburg HD.png
+-rw-r--r--  1 pi pi   252 Feb 18 14:18 RBB Brandenburg.json
+-rw-r--r--  1 pi pi  2405 Jan 23 15:45 RBB Brandenburg.png
+-rw-r--r--  1 pi pi   252 Feb 18 14:12 Regio TV.json
+-rw-r--r--  1 pi pi  3813 Jan 23 15:24 Regio TV.png
+-rw-r--r--  1 pi pi   256 Feb 18 14:14 RFO.json
+-rw-r--r--  1 pi pi  3325 Jan 23 16:56 RFO.png
+-rw-r--r--  1 pi pi   284 Feb 18 14:18 RiC.json
+-rw-r--r--  1 pi pi  4963 Jan 23 17:05 RiC.png
+-rw-r--r--  1 pi pi   263 Jan 28 15:01 Romance TV Deutschland HD.json
+-rw-r--r--  1 pi pi  4566 Jan 28 15:01 Romance TV Deutschland HD.png
+-rw-r--r--  1 pi pi   296 Feb 18 14:19 Romance TV Deutschland.json
+-rw-r--r--  1 pi pi  4566 Jan 23 15:45 Romance TV Deutschland.png
+-rw-r--r--  1 pi pi   317 Feb 18 14:16 RTL 2 Deutschland HD.json
+-rw-r--r--  1 pi pi  2056 Jan 23 17:02 RTL 2 Deutschland HD.png
+-rw-r--r--  1 pi pi   321 Jan 28 15:01 RTL 2 Deutschland.json
+-rw-r--r--  1 pi pi  1965 Jan 28 15:01 RTL 2 Deutschland.png
+-rw-r--r--  1 pi pi   254 Feb 18 14:14 RTL Crime Deutschland HD.json
+-rw-r--r--  1 pi pi  2590 Jan 23 15:38 RTL Crime Deutschland HD.png
+-rw-r--r--  1 pi pi   265 Feb 18 14:18 RTL Crime Deutschland.json
+-rw-r--r--  1 pi pi  2590 Jan 23 15:44 RTL Crime Deutschland.png
+-rw-r--r--  1 pi pi   315 Jan 29 12:53 RTL Deutschland HD.json
+-rw-r--r--  1 pi pi  2144 Jan 28 15:01 RTL Deutschland HD.png
+-rw-r--r--  1 pi pi   354 Feb 18 14:13 RTL Deutschland.json
+-rw-r--r--  1 pi pi  2328 Jan 23 15:37 RTL Deutschland.png
+-rw-r--r--  1 pi pi   296 Jan 29 12:53 RTL Living Deutschland.json
+-rw-r--r--  1 pi pi  2366 Jan 23 15:51 RTL Living Deutschland.png
+-rw-r--r--  1 pi pi   321 Feb 18 14:16 RTL Nitro Deutschland HD.json
+-rw-r--r--  1 pi pi  2902 Jan 23 17:02 RTL Nitro Deutschland HD.png
+-rw-r--r--  1 pi pi   360 Feb 18 14:18 RTL Nitro Deutschland.json
+-rw-r--r--  1 pi pi  3510 Jan 23 15:45 RTL Nitro Deutschland.png
+-rw-r--r--  1 pi pi   255 Feb 18 14:14 RTL Passion.json
+-rw-r--r--  1 pi pi  2395 Jan 23 15:38 RTL Passion.png
+-rw-r--r--  1 pi pi   221 Feb 18 14:15 Sat. 1 Bayern.json
+-rw-r--r--  1 pi pi  6465 Jan 23 16:58 Sat. 1 Bayern.png
+-rw-r--r--  1 pi pi   340 Feb 18 14:14 Sat. 1 Deutschland HD.json
+-rw-r--r--  1 pi pi  4215 Jan 23 16:55 Sat. 1 Deutschland HD.png
+-rw-r--r--  1 pi pi   379 Feb 18 14:12 Sat. 1 Deutschland.json
+-rw-r--r--  1 pi pi  6465 Jan 23 16:34 Sat. 1 Deutschland.png
+-rw-r--r--  1 pi pi   332 Feb 18 14:12 Sat. 1 Emotions.json
+-rw-r--r--  1 pi pi  3328 Jan 23 15:35 Sat. 1 Emotions.png
+-rw-r--r--  1 pi pi   292 Jan 29 12:53 Sat. 1 Gold Deutschland HD.json
+-rw-r--r--  1 pi pi  2397 Jan 23 15:51 Sat. 1 Gold Deutschland HD.png
+-rw-r--r--  1 pi pi   361 Feb 18 14:18 Sat. 1 Gold Deutschland.json
+-rw-r--r--  1 pi pi  4421 Jan 23 17:06 Sat. 1 Gold Deutschland.png
+-rw-r--r--  1 pi pi   245 Jan 29 12:52 Sat. 1 Hamburg and Schleswig-Holstein.json
+-rw-r--r--  1 pi pi  6465 Jan 28 16:00 Sat. 1 Hamburg and Schleswig-Holstein.png
+-rw-r--r--  1 pi pi   239 Jan 29 12:53 Sat. 1 Niedersachsen und Bremen.json
+-rw-r--r--  1 pi pi  6465 Jan 28 16:01 Sat. 1 Niedersachsen und Bremen.png
+-rw-r--r--  1 pi pi   218 Feb 18 14:12 Sat. 1 NRW.json
+-rw-r--r--  1 pi pi  6465 Jan 23 16:35 Sat. 1 NRW.png
+-rw-r--r--  1 pi pi   241 Jan 29 12:51 Sat. 1 Rheinland-Pfalz und Hessen.json
+-rw-r--r--  1 pi pi  6465 Jan 29 12:51 Sat. 1 Rheinland-Pfalz und Hessen.png
+-rw-r--r--  1 pi pi   224 Jan 29 12:53 Shop 24 Direct.json
+-rw-r--r--  1 pi pi  3864 Jan 23 15:49 Shop 24 Direct.png
+-rw-r--r--  1 pi pi   338 Feb 18 14:18 Sixx Deutschland HD.json
+-rw-r--r--  1 pi pi  3099 Jan 23 17:04 Sixx Deutschland HD.png
+-rw-r--r--  1 pi pi   377 Feb 18 14:18 Sixx Deutschland.json
+-rw-r--r--  1 pi pi  3226 Jan 23 15:45 Sixx Deutschland.png
+-rw-r--r--  1 pi pi   239 Feb 18 14:15 Sky 3D HD.json
+-rw-r--r--  1 pi pi  3292 Jan 23 15:40 Sky 3D HD.png
+-rw-r--r--  1 pi pi   256 Feb 18 14:16 Sky Action HD.json
+-rw-r--r--  1 pi pi  3044 Jan 23 15:40 Sky Action HD.png
+-rw-r--r--  1 pi pi   254 Jan 29 12:53 Sky Action.json
+-rw-r--r--  1 pi pi  3428 Jan 23 15:49 Sky Action.png
+-rw-r--r--  1 pi pi   248 Feb 18 14:12 Sky Atlantic +1 HD.json
+-rw-r--r--  1 pi pi  3114 Jan 23 15:25 Sky Atlantic +1 HD.png
+-rw-r--r--  1 pi pi   258 Feb 18 14:17 Sky Atlantic HD.json
+-rw-r--r--  1 pi pi  3114 Jan 23 15:43 Sky Atlantic HD.png
+-rw-r--r--  1 pi pi   256 Feb 18 14:15 Sky Atlantic.json
+-rw-r--r--  1 pi pi  3114 Jan 23 15:39 Sky Atlantic.png
+-rw-r--r--  1 pi pi   250 Jan 29 12:53 Sky Bundesliga 10 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:51 Sky Bundesliga 10 HD.png
+-rw-r--r--  1 pi pi   247 Jan 29 12:53 Sky Bundesliga 10.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:49 Sky Bundesliga 10.png
+-rw-r--r--  1 pi pi   262 Jan 29 12:53 Sky Bundesliga 1 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:49 Sky Bundesliga 1 HD.png
+-rw-r--r--  1 pi pi   260 Jan 29 12:53 Sky Bundesliga 1.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:49 Sky Bundesliga 1.png
+-rw-r--r--  1 pi pi   262 Jan 29 12:53 Sky Bundesliga 2 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:49 Sky Bundesliga 2 HD.png
+-rw-r--r--  1 pi pi   246 Feb 18 14:12 Sky Bundesliga 2.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:25 Sky Bundesliga 2.png
+-rw-r--r--  1 pi pi   262 Jan 29 12:53 Sky Bundesliga 3 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:51 Sky Bundesliga 3 HD.png
+-rw-r--r--  1 pi pi   246 Feb 18 14:16 Sky Bundesliga 3.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:42 Sky Bundesliga 3.png
+-rw-r--r--  1 pi pi   262 Jan 29 12:53 Sky Bundesliga 4 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:49 Sky Bundesliga 4 HD.png
+-rw-r--r--  1 pi pi   246 Feb 18 14:18 Sky Bundesliga 4.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:45 Sky Bundesliga 4.png
+-rw-r--r--  1 pi pi   280 Feb 18 14:16 Sky Bundesliga 5.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:39 Sky Bundesliga 5.png
+-rw-r--r--  1 pi pi   249 Jan 29 12:51 Sky Bundesliga 6 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:45 Sky Bundesliga 6 HD.png
+-rw-r--r--  1 pi pi   246 Feb 18 14:14 Sky Bundesliga 6.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:38 Sky Bundesliga 6.png
+-rw-r--r--  1 pi pi   249 Jan 29 12:53 Sky Bundesliga 7 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:49 Sky Bundesliga 7 HD.png
+-rw-r--r--  1 pi pi   246 Feb 18 14:14 Sky Bundesliga 7.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:39 Sky Bundesliga 7.png
+-rw-r--r--  1 pi pi   249 Jan 29 12:52 Sky Bundesliga 8 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:47 Sky Bundesliga 8 HD.png
+-rw-r--r--  1 pi pi   246 Jan 29 12:53 Sky Bundesliga 8.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:51 Sky Bundesliga 8.png
+-rw-r--r--  1 pi pi   249 Jan 29 12:53 Sky Bundesliga 9 HD.json
+-rw-r--r--  1 pi pi  2958 Jan 23 15:49 Sky Bundesliga 9 HD.png
+-rw-r--r--  1 pi pi   246 Feb 18 14:14 Sky Bundesliga 9.json
+-rw-r--r--  1 pi pi  3129 Jan 23 15:38 Sky Bundesliga 9.png
+-rw-r--r--  1 pi pi   246 Jan 29 12:52 Sky Cinema +1 HD.json
+-rw-r--r--  1 pi pi  2805 Jan 23 15:47 Sky Cinema +1 HD.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:12 Sky Cinema +1.json
+-rw-r--r--  1 pi pi  3293 Jan 23 15:24 Sky Cinema +1.png
+-rw-r--r--  1 pi pi   247 Feb 18 14:16 Sky Cinema +24 HD.json
+-rw-r--r--  1 pi pi  2725 Jan 23 15:41 Sky Cinema +24 HD.png
+-rw-r--r--  1 pi pi   258 Jan 29 12:53 Sky Cinema +24.json
+-rw-r--r--  1 pi pi  3310 Jan 23 15:49 Sky Cinema +24.png
+-rw-r--r--  1 pi pi   256 Jan 29 12:51 Sky Cinema HD.json
+-rw-r--r--  1 pi pi  3206 Jan 23 15:46 Sky Cinema HD.png
+-rw-r--r--  1 pi pi   254 Jan 29 12:53 Sky Cinema.json
+-rw-r--r--  1 pi pi  3589 Jan 23 15:51 Sky Cinema.png
+-rw-r--r--  1 pi pi   254 Jan 29 12:53 Sky Comedy.json
+-rw-r--r--  1 pi pi  3339 Jan 23 15:51 Sky Comedy.png
+-rw-r--r--  1 pi pi   255 Feb 18 14:13 Sky Emotion.json
+-rw-r--r--  1 pi pi  3244 Jan 23 15:37 Sky Emotion.png
+-rw-r--r--  1 pi pi   243 Feb 18 14:12 SkyFanZone HD.json
+-rw-r--r--  1 pi pi  2194 Jan 23 15:25 SkyFanZone HD.png
+-rw-r--r--  1 pi pi   254 Feb 18 14:13 Sky Hits HD.json
+-rw-r--r--  1 pi pi  3386 Jan 23 15:37 Sky Hits HD.png
+-rw-r--r--  1 pi pi   252 Feb 18 14:15 Sky Hits.json
+-rw-r--r--  1 pi pi  3840 Jan 23 15:39 Sky Hits.png
+-rw-r--r--  1 pi pi   241 Jan 29 12:52 Sky Info HD.json
+-rw-r--r--  1 pi pi  4057 Jan 23 15:47 Sky Info HD.png
+-rw-r--r--  1 pi pi   253 Feb 18 14:13 Sky Krimi.json
+-rw-r--r--  1 pi pi  4362 Jan 23 15:37 Sky Krimi.png
+-rw-r--r--  1 pi pi   257 Jan 29 12:53 Sky Nostalgie.json
+-rw-r--r--  1 pi pi  3047 Jan 23 15:51 Sky Nostalgie.png
+-rw-r--r--  1 pi pi   242 Jan 29 12:53 Sky Select 1.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:49 Sky Select 1.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:15 Sky Select 2.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:39 Sky Select 2.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:12 Sky Select 3.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:25 Sky Select 3.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:13 Sky Select 4.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:37 Sky Select 4.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:14 Sky Select 5.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:39 Sky Select 5.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:13 Sky Select 6.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:37 Sky Select 6.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:15 Sky Select 7.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:40 Sky Select 7.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:14 Sky Select 8.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:38 Sky Select 8.png
+-rw-r--r--  1 pi pi   242 Jan 29 12:51 Sky Select 9.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:46 Sky Select 9.png
+-rw-r--r--  1 pi pi   243 Feb 18 14:15 Sky Select HD.json
+-rw-r--r--  1 pi pi  2698 Jan 23 15:40 Sky Select HD.png
+-rw-r--r--  1 pi pi   254 Feb  8 17:48 Sky Select.json
+-rw-r--r--  1 pi pi  2846 Jan 23 15:42 Sky Select.png
+-rw-r--r--  1 pi pi   245 Feb 18 14:14 Sky Sport 10 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:39 Sky Sport 10 HD.png
+-rw-r--r--  1 pi pi   242 Feb 18 14:17 Sky Sport 10.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:43 Sky Sport 10.png
+-rw-r--r--  1 pi pi   245 Feb 18 14:15 Sky Sport 11 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:40 Sky Sport 11 HD.png
+-rw-r--r--  1 pi pi   242 Jan 29 12:51 Sky Sport 11.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:45 Sky Sport 11.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:17 Sky Sport 1 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:43 Sky Sport 1 HD.png
+-rw-r--r--  1 pi pi   255 Feb 18 14:14 Sky Sport 1.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:38 Sky Sport 1.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:13 Sky Sport 2 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:37 Sky Sport 2 HD.png
+-rw-r--r--  1 pi pi   255 Feb 18 14:14 Sky Sport 2.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:39 Sky Sport 2.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:13 Sky Sport 3 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:37 Sky Sport 3 HD.png
+-rw-r--r--  1 pi pi   241 Feb 18 14:14 Sky Sport 3.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:38 Sky Sport 3.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:16 Sky Sport 4 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:42 Sky Sport 4 HD.png
+-rw-r--r--  1 pi pi   241 Feb 18 14:16 Sky Sport 4.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:40 Sky Sport 4.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:15 Sky Sport 5 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:40 Sky Sport 5 HD.png
+-rw-r--r--  1 pi pi   241 Feb 18 14:18 Sky Sport 5.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:45 Sky Sport 5.png
+-rw-r--r--  1 pi pi   244 Feb 18 14:13 Sky Sport 6 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:37 Sky Sport 6 HD.png
+-rw-r--r--  1 pi pi   241 Feb 18 14:18 Sky Sport 6.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:45 Sky Sport 6.png
+-rw-r--r--  1 pi pi   244 Feb 18 14:12 Sky Sport 7 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:26 Sky Sport 7 HD.png
+-rw-r--r--  1 pi pi   241 Feb 18 14:17 Sky Sport 7.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:43 Sky Sport 7.png
+-rw-r--r--  1 pi pi   244 Feb 18 14:15 Sky Sport 8 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:40 Sky Sport 8 HD.png
+-rw-r--r--  1 pi pi   241 Jan 29 12:52 Sky Sport 8.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:48 Sky Sport 8.png
+-rw-r--r--  1 pi pi   244 Feb 18 14:15 Sky Sport 9 HD.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:39 Sky Sport 9 HD.png
+-rw-r--r--  1 pi pi   241 Jan 29 12:52 Sky Sport 9.json
+-rw-r--r--  1 pi pi  3376 Jan 23 15:47 Sky Sport 9.png
+-rw-r--r--  1 pi pi   272 Jan 29 12:53 Sky Sport News HD.json
+-rw-r--r--  1 pi pi  2915 Jan 23 15:51 Sky Sport News HD.png
+-rw-r--r--  1 pi pi   266 Jan 29 12:53 Sky Sport News.json
+-rw-r--r--  1 pi pi  3092 Jan 23 15:49 Sky Sport News.png
+-rw-r--r--  1 pi pi   259 Feb  8 17:50 Sonnenklar TV HD.json
+-rw-r--r--  1 pi pi  3506 Jan 23 15:45 Sonnenklar TV HD.png
+-rw-r--r--  1 pi pi   342 Feb  8 17:45 Sonnenklar TV.json
+-rw-r--r--  1 pi pi  3125 Jan 23 15:25 Sonnenklar TV.png
+-rw-r--r--  1 pi pi   219 Jan 29 12:53 Sophia TV Deutsch.json
+-rw-r--r--  1 pi pi  6977 Jan 23 15:49 Sophia TV Deutsch.png
+-rw-r--r--  1 pi pi   214 Feb 18 14:18 Sparhandy TV.json
+-rw-r--r--  1 pi pi  2496 Jan 23 15:45 Sparhandy TV.png
+-rw-r--r--  1 pi pi   251 Jan 29 12:53 Spiegel Geschichte HD.json
+-rw-r--r--  1 pi pi  2691 Jan 23 15:49 Spiegel Geschichte HD.png
+-rw-r--r--  1 pi pi   262 Jan 29 12:52 Spiegel Geschichte.json
+-rw-r--r--  1 pi pi  3885 Jan 23 15:48 Spiegel Geschichte.png
+-rw-r--r--  1 pi pi   323 Feb 18 14:18 Sport 1 HD.json
+-rw-r--r--  1 pi pi   284 Feb 18 14:14 Sport 1+ HD.json
+-rw-r--r--  1 pi pi  2952 Jan 23 15:45 Sport 1 HD.png
+-rw-r--r--  1 pi pi  2722 Jan 23 15:37 Sport 1+ HD.png
+-rw-r--r--  1 pi pi   362 Feb 18 14:14 Sport 1.json
+-rw-r--r--  1 pi pi   247 Jan 28 15:01 Sport 1+.json
+-rw-r--r--  1 pi pi  3311 Jan 23 15:38 Sport 1.png
+-rw-r--r--  1 pi pi  3159 Jan 28 15:01 Sport 1+.png
+-rw-r--r--  1 pi pi   284 Feb 18 14:12 SR Fernsehen.json
+-rw-r--r--  1 pi pi  3003 Jan 23 15:25 SR Fernsehen.png
+-rw-r--r--  1 pi pi   321 Jan 29 12:52 Super RTL Deutschland HD.json
+-rw-r--r--  1 pi pi  2207 Jan 28 15:01 Super RTL Deutschland HD.png
+-rw-r--r--  1 pi pi   360 Feb 18 14:13 Super RTL Deutschland.json
+-rw-r--r--  1 pi pi  2353 Jan 23 15:37 Super RTL Deutschland.png
+-rw-r--r--  1 pi pi   294 Feb 18 14:16 SWR Fernsehen Baden-Württemberg HD.json
+-rw-r--r--  1 pi pi  2657 Jan 23 15:42 SWR Fernsehen Baden-Württemberg HD.png
+-rw-r--r--  1 pi pi   292 Jan 29 12:51 SWR Fernsehen Baden-Württemberg.json
+-rw-r--r--  1 pi pi  2861 Jan 23 15:46 SWR Fernsehen Baden-Württemberg.png
+-rw-r--r--  1 pi pi   268 Feb 18 14:12 SWR Fernsehen Rheinland-Pfalz HD.json
+-rw-r--r--  1 pi pi  2657 Jan 23 15:25 SWR Fernsehen Rheinland-Pfalz HD.png
+-rw-r--r--  1 pi pi   301 Jan 29 12:52 SWR Fernsehen Rheinland-Pfalz.json
+-rw-r--r--  1 pi pi  2756 Jan 23 15:48 SWR Fernsehen Rheinland-Pfalz.png
+-rw-r--r--  1 pi pi   290 Feb 18 14:18 Syfy Deutschland.json
+-rw-r--r--  1 pi pi  5320 Jan 23 15:45 Syfy Deutschland.png
+-rw-r--r--  1 pi pi   278 Feb 18 14:18 Tagesschau 24 HD.json
+-rw-r--r--  1 pi pi  3540 Jan 23 15:44 Tagesschau 24 HD.png
+-rw-r--r--  1 pi pi   279 Feb 18 14:15 Tagesschau 24.json
+-rw-r--r--  1 pi pi  3242 Jan 23 15:40 Tagesschau 24.png
+-rw-r--r--  1 pi pi   286 Jan 29 12:52 TecTime TV.json
+-rw-r--r--  1 pi pi  3742 Jan 23 15:47 TecTime TV.png
+-rw-r--r--  1 pi pi   343 Feb 18 14:13 Tele 5 HD.json
+-rw-r--r--  1 pi pi  3584 Jan 23 15:37 Tele 5 HD.png
+-rw-r--r--  1 pi pi   361 Feb 18 14:14 Tele 5.json
+-rw-r--r--  1 pi pi  4075 Jan 23 15:39 Tele 5.png
+-rw-r--r--  1 pi pi   274 Feb 18 14:12 TLC Germany HD.json
+-rw-r--r--  1 pi pi  3114 Jan 23 15:24 TLC Germany HD.png
+-rw-r--r--  1 pi pi   343 Jan 29 12:51 TLC Germany.json
+-rw-r--r--  1 pi pi  3616 Jan 23 15:46 TLC Germany.png
+-rw-r--r--  1 pi pi   249 Jan 28 15:01 TNT Film.json
+-rw-r--r--  1 pi pi  5138 Jan 28 15:01 TNT Film.png
+-rw-r--r--  1 pi pi   285 Feb 18 14:12 TNT Glitz HD.json
+-rw-r--r--  1 pi pi  2839 Jan 23 15:24 TNT Glitz HD.png
+-rw-r--r--  1 pi pi   263 Feb 18 14:16 TV Allgäu.json
+-rw-r--r--  1 pi pi  2575 Jan 23 17:01 TV Allgäu.png
+-rw-r--r--  1 pi pi   215 Feb 18 14:12 TVA Ostbayern.json
+-rw-r--r--  1 pi pi  6007 Jan 23 16:35 TVA Ostbayern.png
+-rw-r--r--  1 pi pi   216 Feb 18 14:15 TV Oberfranken.json
+-rw-r--r--  1 pi pi  4889 Jan 23 16:58 TV Oberfranken.png
+-rw-r--r--  1 pi pi   262 Feb 18 14:13 Universal Channel Deutschland HD.json
+-rw-r--r--  1 pi pi  6461 Jan 23 15:37 Universal Channel Deutschland HD.png
+-rw-r--r--  1 pi pi   315 Feb 18 14:15 Vox Deutschland HD.json
+-rw-r--r--  1 pi pi  2623 Jan 23 16:59 Vox Deutschland HD.png
+-rw-r--r--  1 pi pi   354 Jan 29 12:53 Vox Deutschland.json
+-rw-r--r--  1 pi pi  3254 Jan 23 15:49 Vox Deutschland.png
+-rw-r--r--  1 pi pi   259 Jan 29 12:54 WDR Fernsehen Aachen HD.json
+-rw-r--r--  1 pi pi  4404 Jan 23 15:51 WDR Fernsehen Aachen HD.png
+-rw-r--r--  1 pi pi   257 Jan 29 12:54 WDR Fernsehen Aachen.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:52 WDR Fernsehen Aachen.png
+-rw-r--r--  1 pi pi   264 Jan 29 12:52 WDR Fernsehen Düsseldorf HD.json
+-rw-r--r--  1 pi pi  4404 Jan 23 15:47 WDR Fernsehen Düsseldorf HD.png
+-rw-r--r--  1 pi pi   262 Jan 29 12:52 WDR Fernsehen Düsseldorf.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:47 WDR Fernsehen Düsseldorf.png
+-rw-r--r--  1 pi pi   219 Feb 18 14:16 WDR Fernsehen Köln HD.json
+-rw-r--r--  1 pi pi  4404 Jan 23 15:41 WDR Fernsehen Köln HD.png
+-rw-r--r--  1 pi pi   291 Jan 29 12:52 WDR Fernsehen Köln.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:48 WDR Fernsehen Köln.png
+-rw-r--r--  1 pi pi   259 Feb 18 14:18 WDR Studio Bielefeld HD.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:45 WDR Studio Bielefeld HD.png
+-rw-r--r--  1 pi pi   257 Jan 29 12:53 WDR Studio Bielefeld.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:48 WDR Studio Bielefeld.png
+-rw-r--r--  1 pi pi   254 Feb 18 14:18 WDR Studio Bonn HD.json
+-rw-r--r--  1 pi pi  4272 Jan 23 15:45 WDR Studio Bonn HD.png
+-rw-r--r--  1 pi pi   252 Feb 18 14:13 WDR Studio Bonn.json
+-rw-r--r--  1 pi pi  4272 Jan 23 15:26 WDR Studio Bonn.png
+-rw-r--r--  1 pi pi   258 Feb 18 14:17 WDR Studio Dortmund HD.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:43 WDR Studio Dortmund HD.png
+-rw-r--r--  1 pi pi   256 Feb 18 14:14 WDR Studio Dortmund.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:39 WDR Studio Dortmund.png
+-rw-r--r--  1 pi pi   258 Feb 18 14:17 WDR Studio Duisburg HD.json
+-rw-r--r--  1 pi pi  4272 Jan 23 15:42 WDR Studio Duisburg HD.png
+-rw-r--r--  1 pi pi   256 Feb 18 14:16 WDR Studio Duisburg.json
+-rw-r--r--  1 pi pi  4272 Jan 23 15:40 WDR Studio Duisburg.png
+-rw-r--r--  1 pi pi   255 Feb 18 14:16 WDR Studio Essen HD.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:42 WDR Studio Essen HD.png
+-rw-r--r--  1 pi pi   253 Jan 29 12:53 WDR Studio Essen.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:49 WDR Studio Essen.png
+-rw-r--r--  1 pi pi   258 Jan 29 12:51 WDR Studio Münster HD.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:46 WDR Studio Münster HD.png
+-rw-r--r--  1 pi pi   256 Feb 18 14:14 WDR Studio Münster.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:38 WDR Studio Münster.png
+-rw-r--r--  1 pi pi   256 Jan 29 12:51 WDR Studio Siegen HD.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:47 WDR Studio Siegen HD.png
+-rw-r--r--  1 pi pi   254 Feb 18 14:17 WDR Studio Siegen.json
+-rw-r--r--  1 pi pi  4235 Jan 23 15:43 WDR Studio Siegen.png
+-rw-r--r--  1 pi pi   259 Feb 18 14:15 WDR Studio Wuppertal HD.json
+-rw-r--r--  1 pi pi  4272 Jan 23 15:40 WDR Studio Wuppertal HD.png
+-rw-r--r--  1 pi pi   257 Feb 18 14:15 WDR Studio Wuppertal.json
+-rw-r--r--  1 pi pi  4272 Jan 23 15:40 WDR Studio Wuppertal.png
+-rw-r--r--  1 pi pi   320 Feb 18 14:12 Welt der Wunder TV.json
+-rw-r--r--  1 pi pi  5976 Jan 23 15:26 Welt der Wunder TV.png
+-rw-r--r--  1 pi pi   333 Jan 29 12:52 ZDF HD.json
+-rw-r--r--  1 pi pi  4104 Jan 23 15:47 ZDF HD.png
+-rw-r--r--  1 pi pi   308 Feb 18 14:17 ZDF info HD.json
+-rw-r--r--  1 pi pi  3153 Jan 23 15:42 ZDF info HD.png
+-rw-r--r--  1 pi pi   318 Feb 18 14:18 ZDF info.json
+-rw-r--r--  1 pi pi  3459 Jan 23 15:43 ZDF info.png
+-rw-r--r--  1 pi pi   313 Feb 18 14:18 ZDF.json
+-rw-r--r--  1 pi pi   309 Feb 18 14:18 ZDF Kultur HD.json
+-rw-r--r--  1 pi pi  2795 Jan 23 15:45 ZDF Kultur HD.png
+-rw-r--r--  1 pi pi   320 Feb 18 14:13 ZDF Kultur.json
+-rw-r--r--  1 pi pi  3043 Jan 23 15:37 ZDF Kultur.png
+-rw-r--r--  1 pi pi   319 Feb 18 14:17 ZDF neo HD.json
+-rw-r--r--  1 pi pi  3075 Jan 23 15:43 ZDF neo HD.png
+-rw-r--r--  1 pi pi   317 Feb 18 14:14 ZDF neo.json
+-rw-r--r--  1 pi pi  3332 Jan 23 15:39 ZDF neo.png
+-rw-r--r--  1 pi pi  4389 Jan 23 15:44 ZDF.png

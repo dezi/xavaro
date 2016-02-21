@@ -1,10 +1,25 @@
-tvguide = new Object();
-
 tvguide.constans =
 {
     titlebarHeight : 80,
     senderbarWidth : 80,
     timelineHeight : 20
+}
+
+tvguide.getSenderList = function
+{
+    // http://epg.xavaro.de/channels/tv/de/ZDF.json
+    // http://epg.xavaro.de/channels/tv/de/ZDF.png
+    // <img src="http://epg.xavaro.de/channels/tv/de/ZDF.png"/>
+    //
+    // image = document.createElement("img");
+    // image.src = "http://epg.xavaro.de/channels/tv/de/ZDF.png";
+    //
+    //
+
+    tvguide.senderList =
+    [
+        "tv/de/ZDF"
+    ];
 }
 
 tvguide.onOrientationChange = function()
