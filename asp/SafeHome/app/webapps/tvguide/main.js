@@ -1,5 +1,12 @@
 tvguide = new Object();
 
+tvguide.constans =
+{
+    titlebarHeight : 80,
+    senderbarWidth : 80,
+    timelineHeight : 20
+}
+
 tvguide.onOrientationChange = function()
 {
     console.log(window.orientation);
@@ -57,7 +64,7 @@ tvguide.createFrameSetup = function()
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
-    div.style.height = "80px";
+    div.style.height = tvguide.constans.titlebarHeight + "px";
     div.style.right = "0px";
     div.style.backgroundColor = "#8080ff";
     tvguide.topdiv.appendChild(div);
@@ -66,7 +73,7 @@ tvguide.createFrameSetup = function()
 
     var div = document.createElement("div");
     div.style.position = "absolute";
-    div.style.top = "80px";
+    div.style.top = tvguide.constans.titlebarHeight + "px";
     div.style.left = "0px";
     div.style.bottom = "0px";
     div.style.right = "0px";
@@ -80,7 +87,7 @@ tvguide.createFrameSetup = function()
     div.style.top = "0px";
     div.style.left = "0px";
     div.style.bottom = "0px";
-    div.style.width = "80px";
+    div.style.width = tvguide.constans.senderbarWidth + "px";
     div.style.backgroundColor = "#000000";
     tvguide.content1.appendChild(div);
 
@@ -89,7 +96,7 @@ tvguide.createFrameSetup = function()
     var div = document.createElement("div");
     div.style.position = "absolute";
     div.style.top = "0px";
-    div.style.left = "80px";
+    div.style.left = tvguide.constans.senderbarWidth + "px";
     div.style.bottom = "0px";
     div.style.right = "0px";
     div.style.backgroundColor = "#ffff00";
@@ -101,7 +108,7 @@ tvguide.createFrameSetup = function()
     div.style.position = "absolute";
     div.style.top = "0px";
     div.style.left = "0px";
-    div.style.height = "20px";
+    div.style.height = tvguide.constans.timelineHeight + "px";
     div.style.right = "0px";
     div.style.backgroundColor = "#ff00ff";
     tvguide.content2.appendChild(div);
@@ -110,7 +117,7 @@ tvguide.createFrameSetup = function()
 
     var div = document.createElement("div");
     div.style.position = "absolute";
-    div.style.top = "20px";
+    div.style.top = tvguide.constans.timelineHeight + "px";
     div.style.left = "0px";
     div.style.bottom = "0px";
     div.style.right = "0px";
