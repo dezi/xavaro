@@ -127,17 +127,35 @@ public class WebApp
             connection.connect();
 
             int length = connection.getContentLength();
-            byte[] buffer = new byte[ length ];
-
             InputStream input = connection.getInputStream();
-
-            int xfer;
+            byte[] buffer;
             int total = 0;
 
-            while (total < length)
+            if (length > 0)
             {
-                xfer = input.read(buffer, total, length - total);
-                total += xfer;
+                buffer = new byte[ length ];
+
+                for (int xfer = 0; total < length; total += xfer)
+                {
+                    xfer = input.read(buffer, total, length - total);
+                }
+            }
+            else
+            {
+                byte[] chunk = new byte[ 32 * 1024 ];
+
+                buffer = new byte[ 0 ];
+
+                for (int xfer = 0; ; total += xfer)
+                {
+                    xfer = input.read(chunk, 0, chunk.length);
+                    if (xfer <= 0) break;
+
+                    byte[] temp = new byte[ buffer.length + xfer ];
+                    System.arraycopy(buffer, 0, temp, 0, buffer.length);
+                    System.arraycopy(chunk, 0, temp, buffer.length, xfer);
+                    buffer = temp;
+                }
             }
 
             input.close();
