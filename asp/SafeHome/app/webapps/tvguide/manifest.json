@@ -13,10 +13,6 @@
     "permissions": [
       "localdomstorage",
       "gps"
-    ],
-
-    "cachedef": [
-      { "pattern": ".*current\\.json\\.gz", "intervall": 24 }
     ]
   }
 }

@@ -19,10 +19,11 @@
       "gps"
     ],
 
-    "cachedef": [
-      { "pattern": ".*\\.js", "intervall": 24 },
-      { "pattern": ".*\\.png", "intervall": 24 },
-      { "pattern": ".*current\\.json\\.gz", "intervall": 24 }
+    "cachedefs": [
+      { "interval": 24, "pattern": ".*\\.js" },
+      { "interval": 24, "pattern": ".*\\.png" },
+      { "interval": 24, "pattern": ".*\\.json" },
+      { "interval": 24, "pattern": ".*current\\.json\\.gz" }
     ]
   }
 }

@@ -19,13 +19,38 @@ public class WebAppCache
     private static JSONObject webappcache;
     private static boolean dirty;
 
-    @Nullable
-    public static byte[] getCacheFile(String webappname, String url, int interval)
+    //
+    // Small response class for transporting content, mimetype and encoding.
+    // Encoding is by default UTF-8 and we do not want anything else.
+    //
+
+    public static class WebAppCacheResponse
+    {
+        String mimetype;
+        String encoding;
+        byte[] content;
+
+        public WebAppCacheResponse(String mimetype, String encoding, byte[] content)
+        {
+            this.mimetype = mimetype;
+            this.encoding = encoding;
+            this.content = content;
+        }
+    }
+
+    //
+    // Get content from cache. If intervall is greater zero reflect age of cached
+    // item and get a fresh copy if required. If intervall equals zero, always get
+    // a fresh copy from server and store for offline usage.
+    //
+
+    public static WebAppCacheResponse getCacheFile(String webappname, String url, int interval)
     {
         Simple.removePost(freeMemory);
         getStorage();
 
         byte[] content = null;
+        String mimetype = null;
 
         if (! webappcache.has(webappname)) Json.put(webappcache, webappname, new JSONObject());
         JSONObject cachefiles = Json.getObject(webappcache, webappname);
@@ -33,7 +58,7 @@ public class WebAppCache
         if (cachefiles == null)
         {
             Simple.makePost(freeMemory, 10 * 1000);
-            return null;
+            return new WebAppCacheResponse(null, null, null);
         }
 
         File cachedir = new File(Simple.getCacheDir(), "webappcache/" + webappname);
@@ -46,7 +71,7 @@ public class WebAppCache
         JSONObject cachefile = null;
         String uuid = null;
 
-        if (cachefiles.has(url))
+        if ((interval > 0) && cachefiles.has(url))
         {
             cachefile = Json.getObject(cachefiles, url);
 
@@ -67,6 +92,7 @@ public class WebAppCache
                     //
 
                     content = Simple.readBinaryFile(cfile);
+                    mimetype = Json.getString(cachefile, "mime");
 
                     Log.d(LOGTAG,"getCacheFile: HIT=" + url);
                 }
@@ -147,6 +173,7 @@ public class WebAppCache
             // Set now date as last usage date of this item.
             //
 
+            mimetype = Json.getString(cachefile, "mime");
             Json.put(cachefile, "luse", Simple.nowAsISO());
             dirty = true;
         }
@@ -157,7 +184,7 @@ public class WebAppCache
 
         Simple.makePost(freeMemory, 10 * 1000);
 
-        return content;
+        return new WebAppCacheResponse(mimetype, "UTF-8", content);
     }
 
     @Nullable
@@ -168,7 +195,7 @@ public class WebAppCache
             URL url = new URL(src);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            if (cachefile.has("lmod"))
+            if ((cachefile != null) && cachefile.has("lmod"))
             {
                 //
                 // Only fetch the file if it was modified.
@@ -191,28 +218,32 @@ public class WebAppCache
                 return null;
             }
 
-            //
-            // Retrieve last modified date string and content type from headers.
-            //
-
-            Map<String, List<String>> headers = connection.getHeaderFields();
-
-            for (String headerKey : headers.keySet())
+            if (cachefile != null)
             {
-                if (headerKey == null) continue;
+                //
+                // Retrieve last modified date string and content type
+                // from headers and put into cache descriptor.
+                //
 
-                for (String headerValue : headers.get(headerKey))
+                Map<String, List<String>> headers = connection.getHeaderFields();
+
+                for (String headerKey : headers.keySet())
                 {
-                    if (headerKey.equalsIgnoreCase("Last-Modified"))
-                    {
-                        Json.put(cachefile, "lmod", headerValue);
-                        dirty = true;
-                    }
+                    if (headerKey == null) continue;
 
-                    if (headerKey.equalsIgnoreCase("Content-Type"))
+                    for (String headerValue : headers.get(headerKey))
                     {
-                        Json.put(cachefile, "mime", headerValue);
-                        dirty = true;
+                        if (headerKey.equalsIgnoreCase("Last-Modified"))
+                        {
+                            Json.put(cachefile, "lmod", headerValue);
+                            dirty = true;
+                        }
+
+                        if (headerKey.equalsIgnoreCase("Content-Type"))
+                        {
+                            Json.put(cachefile, "mime", headerValue);
+                            dirty = true;
+                        }
                     }
                 }
             }
@@ -255,8 +286,15 @@ public class WebAppCache
 
             input.close();
 
-            Json.put(cachefile, "lget", Simple.nowAsISO());
-            dirty = true;
+            if (cachefile != null)
+            {
+                //
+                // Put fetch date into cache descriptor.
+                //
+
+                Json.put(cachefile, "lget", Simple.nowAsISO());
+                dirty = true;
+            }
 
             return buffer;
         }
@@ -333,5 +371,4 @@ public class WebAppCache
             OopsService.log(LOGTAG,ex);
         }
     }
-
 }

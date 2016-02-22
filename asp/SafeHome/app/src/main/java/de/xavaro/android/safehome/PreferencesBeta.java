@@ -80,7 +80,7 @@ public class PreferencesBeta
 
             cp = new NicedPreferences.NiceCheckboxPreference(context);
 
-            cp.setKey(keyprefix + ".webapps.datacachdisable");
+            cp.setKey(keyprefix + ".webapps.datacachedisable");
             cp.setTitle("DATA-Cache disable");
             cp.setEnabled(enabled);
 

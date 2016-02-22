@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
+import java.security.acl.LastOwnerException;
 
 import de.xavaro.android.common.Json;
 
@@ -19,16 +20,19 @@ public class WebAppLoader extends WebViewClient
 {
     private static final String LOGTAG = WebAppLoader.class.getSimpleName();
 
-    private final String rootUrl;
     private final String webappname;
+    private final String rootUrl;
+    private final JSONArray cachedefs;
 
-    public WebAppLoader(String rootUrl, String webappname)
+    public WebAppLoader(String webappname)
     {
-        this.rootUrl = rootUrl;
         this.webappname = webappname;
+
+        rootUrl = WebApp.getHTTPRoot(webappname);
+        cachedefs = Json.getArray(WebApp.getManifest(webappname), "cachedefs");
     }
 
-    //region Overridden methods.
+    //region Overridden methods
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url)
@@ -42,19 +46,128 @@ public class WebAppLoader extends WebViewClient
     @SuppressLint("NewApi")
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request)
     {
-        return shouldInterceptRequest(view, request.getUrl().toString());
+        return getRequest(request.getUrl().toString());
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public WebResourceResponse shouldInterceptRequest(WebView view, String url)
     {
+        return getRequest(url);
+    }
+
+    //endregion Overridden methods
+
+    public byte[] getRequestData(String url)
+    {
+        int interval = getIntervalForUrl(url);
+
+        if (interval < 0)
+        {
+            //
+            // Unknown cache policy for url in manifest, deny anyway.
+            //
+
+            return null;
+        }
+
+        if (url.startsWith(rootUrl))
+        {
+            if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass"))
+            {
+                //
+                // Developer mode. Always load webapp components w/o cache.
+                //
+
+                interval = 0;
+            }
+        }
+        else
+        {
+            Log.d(LOGTAG, "==========>" + interval + "=" + url);
+
+            if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable"))
+            {
+                //
+                // Developer mode. Always load data components w/o cache.
+                //
+
+                interval = 0;
+            }
+        }
+
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, url, interval);
+        if (wcr.content == null) return null;
+
+        return wcr.content;
+    }
+
+    public WebResourceResponse getRequest(String url)
+    {
         if (url.equals(rootUrl)) return loadRootHTML();
         if (url.endsWith("favicon.ico")) return denyLoad();
 
-        Log.d(LOGTAG, "shouldInterceptRequest: " + url);
+        Log.d(LOGTAG, "getRequest: " + url);
 
-        return null;
+        int interval = getIntervalForUrl(url);
+
+        if (interval < 0)
+        {
+            //
+            // Unknown cache policy for url in manifest, deny anyway.
+            //
+
+            return denyLoad();
+        }
+
+        if (url.startsWith(rootUrl))
+        {
+            if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass"))
+            {
+                //
+                // Developer mode. Always load webapp components w/o cache.
+                //
+
+                interval = 0;
+            }
+        }
+        else
+        {
+            Log.d(LOGTAG, "==========>" + interval + "=" + url);
+
+            if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable"))
+            {
+                //
+                // Developer mode. Always load data components w/o cache.
+                //
+
+                interval = 0;
+            }
+        }
+
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, url, interval);
+        if (wcr.content == null) return denyLoad();
+
+        return new WebResourceResponse(wcr.mimetype, wcr.encoding,
+                new ByteArrayInputStream(wcr.content));
+    }
+
+    private int getIntervalForUrl(String url)
+    {
+        if (cachedefs != null)
+        {
+            for (int inx = 0; inx < cachedefs.length(); inx++)
+            {
+                JSONObject cachedef = Json.getObject(cachedefs, inx);
+
+                String pattern = Json.getString(cachedef, "pattern");
+                int interval = Json.getInt(cachedef, "interval");
+
+                if ((pattern != null) && url.matches(pattern)) return interval;
+            }
+        }
+
+        return -1;
     }
 
     private WebResourceResponse denyLoad()
@@ -107,6 +220,4 @@ public class WebAppLoader extends WebViewClient
         ByteArrayInputStream bais = new ByteArrayInputStream(initialHTML.getBytes());
         return new WebResourceResponse("text/html", "UTF-8", bais);
     }
-
-    //endregion
 }

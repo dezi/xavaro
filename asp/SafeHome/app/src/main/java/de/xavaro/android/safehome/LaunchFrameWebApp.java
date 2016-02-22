@@ -17,11 +17,6 @@ public class LaunchFrameWebApp extends LaunchFrame
 {
     private static final String LOGTAG = LaunchFrameWebApp.class.getSimpleName();
 
-    private String webappname;
-    private WebAppLoader webAppLoader;
-    private WebView webview;
-    private String rootUrl;
-
     public LaunchFrameWebApp(Context context)
     {
         this(context, null, 0);
@@ -40,16 +35,13 @@ public class LaunchFrameWebApp extends LaunchFrame
     @SuppressLint("SetJavaScriptEnabled")
     public void setWebAppName(String webappname)
     {
-        this.webappname = webappname;
-
-        rootUrl = WebApp.getHTTPRoot(webappname);
-
-        webAppLoader = new WebAppLoader(rootUrl, webappname);
-
-        webview = new WebView(getContext());
-
+        WebView webview = new WebView(getContext());
         webview.setBackgroundColor(0xff8888ff);
-        webview.setWebViewClient(webAppLoader);
+        addView(webview);
+
+        WebAppLoader webapploader = new WebAppLoader(webappname);
+
+        webview.setWebViewClient(webapploader);
         webview.setWebChromeClient(new WebChromeClient());
 
         webview.getSettings().setJavaScriptEnabled(true);
@@ -59,14 +51,11 @@ public class LaunchFrameWebApp extends LaunchFrame
         webview.getSettings().setSupportZoom(false);
         webview.getSettings().setAppCacheEnabled(false);
         webview.getSettings().setDatabaseEnabled(false);
-
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-        webview.addJavascriptInterface(new WebAppExtras(webappname), "extras");
+        webview.addJavascriptInterface(new WebAppExtras(webappname, webapploader), "extras");
 
-        addView(webview);
-
-        webview.loadUrl(rootUrl);
+        webview.loadUrl(WebApp.getHTTPRoot(webappname));
     }
 
     @Override

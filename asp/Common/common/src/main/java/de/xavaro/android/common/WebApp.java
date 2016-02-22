@@ -51,7 +51,7 @@ public class WebApp
     public static JSONObject getManifest(String webappname)
     {
         String manifestsrc = getHTTPRoot(webappname) + "manifest.json";
-        String manifest = WebApp.getContent(webappname, manifestsrc);
+        String manifest = WebApp.getStringContent(webappname, manifestsrc);
         JSONObject jmanifest = Json.fromString(manifest);
         jmanifest = Json.getObject(jmanifest, "manifest");
 
@@ -74,13 +74,20 @@ public class WebApp
     }
 
     @Nullable
-    public static Drawable getImage(String webappname, String src)
+    public static JSONArray getPreloads(String webappname)
     {
-        byte[] content = WebAppCache.getCacheFile(webappname, src, 24);
+        return Json.getArray(getManifest(webappname), "preload");
+    }
 
-        if (content != null)
+    @Nullable
+    private static Drawable getImage(String webappname, String src)
+    {
+        int interval = Simple.getSharedPrefBoolean("developer.webapps.httpbypass") ? 0 : 24;
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
+
+        if (wcr.content != null)
         {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(content, 0, content.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(wcr.content, 0, wcr.content.length);
             return new BitmapDrawable(Simple.getResources(), bitmap);
         }
 
@@ -88,16 +95,11 @@ public class WebApp
     }
 
     @Nullable
-    public static JSONArray getPreloads(String webappname)
+    public static String getStringContent(String webappname, String src)
     {
-        return Json.getArray(getManifest(webappname), "preload");
-    }
+        int interval = Simple.getSharedPrefBoolean("developer.webapps.httpbypass") ? 0 : 24;
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
-    @Nullable
-    public static String getContent(String webappname, String src)
-    {
-        byte[] content = WebAppCache.getCacheFile(webappname, src, 24);
-
-        return (content == null) ? null : new String(content);
+        return (wcr.content == null) ? null : new String(wcr.content);
     }
 }
