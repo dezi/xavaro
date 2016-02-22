@@ -51,7 +51,7 @@ public class WebApp
     public static JSONObject getManifest(String webappname)
     {
         String manifestsrc = getHTTPRoot(webappname) + "manifest.json";
-        String manifest = WebApp.getContent(manifestsrc);
+        String manifest = WebApp.getContent(webappname, manifestsrc);
         JSONObject jmanifest = Json.fromString(manifest);
         jmanifest = Json.getObject(jmanifest, "manifest");
 
@@ -70,41 +70,18 @@ public class WebApp
         String appiconpng = Json.getString(getManifest(webappname), "appicon");
         String appiconsrc = getHTTPRoot(webappname) + appiconpng;
 
-        return getImage(appiconsrc);
+        return getImage(webappname, appiconsrc);
     }
 
     @Nullable
-    public static Drawable getImage(String src)
+    public static Drawable getImage(String webappname, String src)
     {
-        try
+        byte[] content = WebAppCache.getCacheFile(webappname, src, 24);
+
+        if (content != null)
         {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-
-            int length = connection.getContentLength();
-            byte[] buffer = new byte[ length ];
-
-            InputStream input = connection.getInputStream();
-
-            int xfer;
-            int total = 0;
-
-            while (total < length)
-            {
-                xfer = input.read(buffer, total, length - total);
-                total += xfer;
-            }
-
-            input.close();
-
-            Bitmap bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(content, 0, content.length);
             return new BitmapDrawable(Simple.getResources(), bitmap);
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
         }
 
         return null;
@@ -117,56 +94,10 @@ public class WebApp
     }
 
     @Nullable
-    public static String getContent(String src)
+    public static String getContent(String webappname, String src)
     {
-        try
-        {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
+        byte[] content = WebAppCache.getCacheFile(webappname, src, 24);
 
-            int length = connection.getContentLength();
-            InputStream input = connection.getInputStream();
-            byte[] buffer;
-            int total = 0;
-
-            if (length > 0)
-            {
-                buffer = new byte[ length ];
-
-                for (int xfer = 0; total < length; total += xfer)
-                {
-                    xfer = input.read(buffer, total, length - total);
-                }
-            }
-            else
-            {
-                byte[] chunk = new byte[ 32 * 1024 ];
-
-                buffer = new byte[ 0 ];
-
-                for (int xfer = 0; ; total += xfer)
-                {
-                    xfer = input.read(chunk, 0, chunk.length);
-                    if (xfer <= 0) break;
-
-                    byte[] temp = new byte[ buffer.length + xfer ];
-                    System.arraycopy(buffer, 0, temp, 0, buffer.length);
-                    System.arraycopy(chunk, 0, temp, buffer.length, xfer);
-                    buffer = temp;
-                }
-            }
-
-            input.close();
-
-            return new String(buffer);
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return null;
+        return (content == null) ? null : new String(content);
     }
 }

@@ -78,6 +78,14 @@ public class PreferencesBeta
 
             preferences.add(ep);
 
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cp.setKey(keyprefix + ".webapps.datacachdisable");
+            cp.setTitle("DATA-Cache disable");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
+
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Webapps");
 
@@ -118,18 +126,6 @@ public class PreferencesBeta
 
             lp = new NicedPreferences.NiceListPreference(context);
 
-            lp.setKey(keyprefix + ".browser.settings");
-            lp.setIcon(GlobalConfigs.IconResPersist);
-            lp.setEntries(vals);
-            lp.setEntryValues(keys);
-            lp.setDefaultValue("folder");
-            lp.setTitle("Settings");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
-
-            lp = new NicedPreferences.NiceListPreference(context);
-
             lp.setKey(keyprefix + ".browser.preferences");
             lp.setIcon(GlobalConfigs.IconResSettingsSafehome);
             lp.setEntries(vals);
@@ -142,48 +138,36 @@ public class PreferencesBeta
 
             lp = new NicedPreferences.NiceListPreference(context);
 
+            lp.setKey(keyprefix + ".browser.settings");
+            lp.setIcon(GlobalConfigs.IconResPersist);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Settings");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.identities");
+            lp.setIcon(GlobalConfigs.IconResAdministrator);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Identities");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
             lp.setKey(keyprefix + ".browser.contacts");
             lp.setIcon(GlobalConfigs.IconResContacts);
             lp.setEntries(vals);
             lp.setEntryValues(keys);
             lp.setDefaultValue("folder");
             lp.setTitle("Contacts");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
-
-            lp = new NicedPreferences.NiceListPreference(context);
-
-            lp.setKey(keyprefix + ".browser.sdcard");
-            lp.setIcon(GlobalConfigs.IconResStorageSDCard);
-            lp.setEntries(vals);
-            lp.setEntryValues(keys);
-            lp.setDefaultValue("folder");
-            lp.setTitle("SD-Card");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
-
-            lp = new NicedPreferences.NiceListPreference(context);
-
-            lp.setKey(keyprefix + ".browser.known");
-            lp.setIcon(GlobalConfigs.IconResStorageKnown);
-            lp.setEntries(vals);
-            lp.setEntryValues(keys);
-            lp.setDefaultValue("folder");
-            lp.setTitle("Known");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
-
-            lp = new NicedPreferences.NiceListPreference(context);
-
-            lp.setKey(keyprefix + ".browser.cache");
-            lp.setIcon(GlobalConfigs.IconResStorageCache);
-            lp.setEntries(vals);
-            lp.setEntryValues(keys);
-            lp.setDefaultValue("folder");
-            lp.setTitle("Cache");
             lp.setEnabled(enabled);
 
             preferences.add(lp);
@@ -214,12 +198,48 @@ public class PreferencesBeta
 
             lp = new NicedPreferences.NiceListPreference(context);
 
-            lp.setKey(keyprefix + ".browser.identities");
-            lp.setIcon(GlobalConfigs.IconResAdministrator);
+            lp.setKey(keyprefix + ".browser.sdcard");
+            lp.setIcon(GlobalConfigs.IconResStorageSDCard);
             lp.setEntries(vals);
             lp.setEntryValues(keys);
             lp.setDefaultValue("folder");
-            lp.setTitle("Identities");
+            lp.setTitle("SD-Card");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.cache");
+            lp.setIcon(GlobalConfigs.IconResStorageCache);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Cache");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.known");
+            lp.setIcon(GlobalConfigs.IconResStorageKnown);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Known");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.webappcache");
+            lp.setIcon(GlobalConfigs.IconResWebApps);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Webapp Cache");
             lp.setEnabled(enabled);
 
             preferences.add(lp);

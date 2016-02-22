@@ -396,6 +396,50 @@ public class Simple
     }
 
     @Nullable
+    public static byte[] readBinaryFile(File filename)
+    {
+        try
+        {
+            FileInputStream inputStream = new FileInputStream(filename);
+            int size = (int) inputStream.getChannel().size();
+            byte[] content = new byte[ size ];
+            int xfer = inputStream.read(content);
+            inputStream.close();
+
+            return content;
+        }
+        catch (FileNotFoundException ignore)
+        {
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    public static boolean writeBinaryFile(File filename, byte[] content)
+    {
+        if (content != null)
+        {
+            try
+            {
+                FileOutputStream outputStream = new FileOutputStream(filename);
+                outputStream.write(content);
+                outputStream.close();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+        }
+
+        return false;
+    }
+    @Nullable
     public static String readDatadirFile(String filename)
     {
         try

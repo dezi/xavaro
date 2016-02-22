@@ -17,6 +17,12 @@
     "permissions": [
       "localdomstorage",
       "gps"
+    ],
+
+    "cachedef": [
+      { "pattern": ".*\\.js", "intervall": 24 },
+      { "pattern": ".*\\.png", "intervall": 24 },
+      { "pattern": ".*current\\.json\\.gz", "intervall": 24 }
     ]
   }
 }

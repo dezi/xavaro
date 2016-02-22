@@ -29,24 +29,15 @@ public class LaunchItemDeveloper extends LaunchItem
                 icon.setImageResource(GlobalConfigs.IconResSettingsSafehome);
             }
 
+            if (Simple.equals(subtype, "identities"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResAdministrator);
+            }
+
+
             if (Simple.equals(subtype, "contacts"))
             {
                 icon.setImageResource(GlobalConfigs.IconResContacts);
-            }
-
-            if (Simple.equals(subtype, "sdcard"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResStorageSDCard);
-            }
-
-            if (Simple.equals(subtype, "known"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResStorageKnown);
-            }
-
-            if (Simple.equals(subtype, "cache"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResStorageCache);
             }
 
             if (Simple.equals(subtype, "rcontacts"))
@@ -59,9 +50,24 @@ public class LaunchItemDeveloper extends LaunchItem
                 icon.setImageResource(GlobalConfigs.IconResCommChatGroup);
             }
 
-            if (Simple.equals(subtype, "identities"))
+            if (Simple.equals(subtype, "sdcard"))
             {
-                icon.setImageResource(GlobalConfigs.IconResAdministrator);
+                icon.setImageResource(GlobalConfigs.IconResStorageSDCard);
+            }
+
+            if (Simple.equals(subtype, "cache"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResStorageCache);
+            }
+
+            if (Simple.equals(subtype, "known"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResStorageKnown);
+            }
+
+            if (Simple.equals(subtype, "webappcache"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResWebApps);
             }
 
             overicon.setImageResource(GlobalConfigs.IconResTesting);

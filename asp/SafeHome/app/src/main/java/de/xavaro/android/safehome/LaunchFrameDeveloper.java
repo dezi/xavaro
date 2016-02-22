@@ -75,15 +75,22 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
     private void reload()
     {
+        if (Simple.equals(subtype,"preferences")) loadPreferences();
+        if (Simple.equals(subtype,"settings")) loadSettings();
+        if (Simple.equals(subtype,"identities")) loadIdentities();
+
+        if (Simple.equals(subtype,"contacts")) loadContacts();
+
+        if (Simple.equals(subtype,"rcontacts")) loadRemoteContacts();
+        if (Simple.equals(subtype,"rgroups")) loadRemoteGroups();
+
         if (Simple.equals(subtype,"cache")) loadStorageCache();
         if (Simple.equals(subtype,"sdcard")) loadStorageSDCard();
         if (Simple.equals(subtype,"known")) loadStorageKnown();
-        if (Simple.equals(subtype,"contacts")) loadContacts();
-        if (Simple.equals(subtype,"settings")) loadSettings();
-        if (Simple.equals(subtype,"preferences")) loadPreferences();
-        if (Simple.equals(subtype,"rcontacts")) loadRemoteContacts();
-        if (Simple.equals(subtype,"rgroups")) loadRemoteGroups();
-        if (Simple.equals(subtype,"identities")) loadIdentities();
+
+        if (Simple.equals(subtype,"webappcache")) loadWebappCache();
+
+
     }
 
     private View.OnClickListener onUpdateClick = new View.OnClickListener()
@@ -139,6 +146,26 @@ public class LaunchFrameDeveloper extends LaunchFrame
         }
 
         File file = new File(Simple.getFilesDir(), "filestats.act.json");
+        String json = Simple.getFileContent(file);
+        jsonListing.setText(json);
+    }
+
+    private void loadWebappCache()
+    {
+        if (scrollview == null)
+        {
+            scrollview = new ScrollView(getContext());
+            scrollview.setBackgroundColor(0xffffc080);
+            addView(scrollview, 0);
+
+            jsonListing = new TextView(getContext());
+            jsonListing.setPadding(16, 16, 16, 16);
+            jsonListing.setTextSize(Simple.getDeviceTextSize(18f));
+
+            scrollview.addView(jsonListing);
+        }
+
+        File file = new File(Simple.getFilesDir(), "webappcache.act.json");
         String json = Simple.getFileContent(file);
         jsonListing.setText(json);
     }

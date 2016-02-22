@@ -15,7 +15,7 @@
       "gps"
     ],
 
-    "cacheupt": [
+    "cachedef": [
       { "pattern": ".*current\\.json\\.gz", "intervall": 24 }
     ]
   }
