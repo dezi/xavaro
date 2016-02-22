@@ -13,6 +13,10 @@
     "permissions": [
       "localdomstorage",
       "gps"
+    ],
+
+    "cacheupt": [
+      { "pattern": ".*current\\.json\\.gz", "intervall": 24 }
     ]
   }
 }

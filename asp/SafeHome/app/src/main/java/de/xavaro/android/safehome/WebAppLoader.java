@@ -42,8 +42,13 @@ public class WebAppLoader extends WebViewClient
     @SuppressLint("NewApi")
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request)
     {
-        String url = request.getUrl().toString();
+        return shouldInterceptRequest(view, request.getUrl().toString());
+    }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public WebResourceResponse shouldInterceptRequest(WebView view, String url)
+    {
         if (url.equals(rootUrl))
         {
             String preloadjava = "";
@@ -95,16 +100,7 @@ public class WebAppLoader extends WebViewClient
             return new WebResourceResponse("text/plain", "utf-8", null);
         }
 
-        Log.d(LOGTAG, "shouldInterceptRequest newapi=" + url);
-
-        return null;
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public WebResourceResponse shouldInterceptRequest(WebView view, String url)
-    {
-        Log.d(LOGTAG, "shouldInterceptRequest oldapi=" + url);
+        Log.d(LOGTAG, "shouldInterceptRequest: " + url);
 
         return null;
     }
