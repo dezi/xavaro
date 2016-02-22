@@ -14,6 +14,7 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.WebApp;
 
 public class PreferencesWebApps
 {

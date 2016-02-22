@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.WebApp;
 
 public class LaunchItemWebApp extends LaunchItem
 {

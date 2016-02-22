@@ -9,6 +9,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import de.xavaro.android.common.WebApp;
+import de.xavaro.android.common.WebAppExtras;
+import de.xavaro.android.common.WebAppLoader;
+
 public class LaunchFrameWebApp extends LaunchFrame
 {
     private static final String LOGTAG = LaunchFrameWebApp.class.getSimpleName();
