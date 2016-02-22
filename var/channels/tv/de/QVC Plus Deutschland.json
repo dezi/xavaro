@@ -9,13 +9,16 @@
   [
     "DVB-C",
     "DVB-S",
+    "DVB-T",
     "Digital Free",
+    "MEDIA BROADCAST",
     "SDTV",
     "SES ASTRA"
   ],
   "providers":
   [
     "Digital Free",
+    "MEDIA BROADCAST",
     "SES ASTRA"
   ]
 }

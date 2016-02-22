@@ -10,7 +10,9 @@
     "BetaDigital",
     "DVB-C",
     "DVB-S",
+    "DVB-T",
     "Digital Free",
+    "MEDIA BROADCAST",
     "SDTV"
   ],
   "packs":
@@ -21,6 +23,7 @@
   "providers":
   [
     "BetaDigital",
-    "Digital Free"
+    "Digital Free",
+    "MEDIA BROADCAST"
   ]
 }

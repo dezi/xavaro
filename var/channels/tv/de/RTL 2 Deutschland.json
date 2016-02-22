@@ -7,7 +7,9 @@
   "isbd":false,
   "tags":
   [
+    "CBC",
     "DVB-C",
+    "DVB-T",
     "Digital Free",
     "SDTV"
   ],
@@ -19,6 +21,7 @@
   ],
   "providers":
   [
+    "CBC",
     "Digital Free"
   ]
 }

@@ -9,10 +9,13 @@
   [
     "BetaDigital",
     "DVB-S",
+    "DVB-T",
+    "MEDIA BROADCAST",
     "SDTV"
   ],
   "providers":
   [
-    "BetaDigital"
+    "BetaDigital",
+    "MEDIA BROADCAST"
   ]
 }

@@ -9,10 +9,12 @@
   [
     "ARD",
     "DVB-S",
+    "DVB-T",
     "SDTV"
   ],
   "providers":
   [
-    "ARD"
+    "ARD",
+    "NDR"
   ]
 }
