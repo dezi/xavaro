@@ -18,12 +18,14 @@ public class WebAppLoader extends WebViewClient
     private static final String LOGTAG = WebAppLoader.class.getSimpleName();
 
     private final String webappname;
+    private final String mode;
     private final String rootUrl;
     private final JSONArray cachedefs;
 
-    public WebAppLoader(String webappname)
+    public WebAppLoader(String webappname, String mode)
     {
         this.webappname = webappname;
+        this.mode = mode;
 
         rootUrl = WebApp.getHTTPRoot(webappname);
         cachedefs = Json.getArray(WebApp.getManifest(webappname), "cachedefs");
@@ -192,7 +194,7 @@ public class WebAppLoader extends WebViewClient
                 + preloadjava
                 + preloadmeta
                 + "</head>\n"
-                + "<body><script src=\"main.js\"></script></body>\n"
+                + "<body><script src=\"" + mode + ".js\"></script></body>\n"
                 + "</html>\n";
 
         //Log.d(LOGTAG, initialHTML);

@@ -176,6 +176,19 @@ public class Json
         return 0.0;
     }
 
+    public static boolean getBoolean(JSONObject json, String key)
+    {
+        try
+        {
+            return json.getBoolean(key);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return false;
+    }
+
     public static int getInt(JSONObject json, String key)
     {
         try

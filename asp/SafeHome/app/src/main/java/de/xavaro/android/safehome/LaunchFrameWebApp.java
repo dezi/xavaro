@@ -3,14 +3,12 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.FrameLayout;
 
 import de.xavaro.android.common.WebApp;
-import de.xavaro.android.common.WebAppExtras;
+import de.xavaro.android.common.WebAppRequest;
 import de.xavaro.android.common.WebAppLoader;
 
 public class LaunchFrameWebApp extends LaunchFrame
@@ -32,30 +30,13 @@ public class LaunchFrameWebApp extends LaunchFrame
         super(context, attrs, defStyle);
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     public void setWebAppName(String webappname)
     {
         WebView webview = new WebView(getContext());
         webview.setBackgroundColor(0xff8888ff);
         addView(webview);
 
-        WebAppLoader webapploader = new WebAppLoader(webappname);
-
-        webview.setWebViewClient(webapploader);
-        webview.setWebChromeClient(new WebChromeClient());
-
-        webview.getSettings().setJavaScriptEnabled(true);
-        webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webview.getSettings().setSupportMultipleWindows(true);
-        webview.getSettings().setDomStorageEnabled(false);
-        webview.getSettings().setSupportZoom(false);
-        webview.getSettings().setAppCacheEnabled(false);
-        webview.getSettings().setDatabaseEnabled(false);
-        webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-
-        webview.addJavascriptInterface(new WebAppExtras(webappname, webview, webapploader), "extras");
-
-        webview.loadUrl(WebApp.getHTTPRoot(webappname));
+        WebApp.loadWebView(webview, webappname, "main");
     }
 
     @Override

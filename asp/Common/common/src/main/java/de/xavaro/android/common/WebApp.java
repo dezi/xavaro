@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 
 import android.graphics.Bitmap;
@@ -7,6 +8,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,10 +30,6 @@ public class WebApp
 
     public static String getHTTPRoot(String webappname)
     {
-        //
-        // http://192.168.2.101/webapps/tvguide/manifest.json
-        //
-
         String httpserver = CommonConfigs.WebappsServerName;
         String httpport = "" + CommonConfigs.WebappsServerPort;
 
@@ -101,5 +101,40 @@ public class WebApp
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
         return (wcr.content == null) ? null : new String(wcr.content);
+    }
+
+    @Nullable
+    public static boolean hasPreferences(String webappname)
+    {
+        return Json.getBoolean(getManifest(webappname), "preferences");
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    public static void loadWebView(WebView webview, String webappname, String mode)
+    {
+        WebAppLoader webapploader = new WebAppLoader(webappname, mode);
+
+        webview.setWebViewClient(webapploader);
+        webview.setWebChromeClient(new WebChromeClient());
+
+        webview.getSettings().setJavaScriptEnabled(true);
+        webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        webview.getSettings().setSupportMultipleWindows(true);
+        webview.getSettings().setDomStorageEnabled(false);
+        webview.getSettings().setSupportZoom(false);
+        webview.getSettings().setAppCacheEnabled(false);
+        webview.getSettings().setDatabaseEnabled(false);
+        webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+        Object request = new WebAppRequest(webappname, webview, webapploader);
+        webview.addJavascriptInterface(request, "WebAppRequest");
+
+        Object utility = new WebAppUtility();
+        webview.addJavascriptInterface(utility, "WebAppUtility");
+
+        Object prefs = new WebAppPrefs(webappname);
+        webview.addJavascriptInterface(prefs, "WebAppPrefs");
+
+        webview.loadUrl(WebApp.getHTTPRoot(webappname));
     }
 }

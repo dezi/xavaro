@@ -5,21 +5,22 @@
     "appname": "tvguide",
     "appicon": "tvguide_175x175.png",
     "appserver": "epg.xavaro.de",
+    "preferences": true,
 
     "files": [
-      "main.js"
+      "main.js",
+      "pref.js"
     ],
 
     "permissions": [
-      "localdomstorage",
-      "gps"
+      "request"
     ],
 
     "cachedefs": [
       { "interval": 24, "pattern": ".*\\.js" },
-      { "interval":  1, "pattern": ".*\\.png" },
-      { "interval":  1, "pattern": ".*\\.json" },
-      { "interval":  1, "pattern": ".*\\.json\\.gz" }
+      { "interval": 72, "pattern": ".*\\.png" },
+      { "interval": 24, "pattern": ".*\\.json" },
+      { "interval": 24, "pattern": ".*\\.json\\.gz" }
     ]
   }
 }

@@ -5,15 +5,15 @@ import android.util.Log;
 import android.webkit.WebView;
 
 @SuppressWarnings("unused")
-public class WebAppExtras
+public class WebAppRequest
 {
-    private static final String LOGTAG = WebAppCache.class.getSimpleName();
+    private static final String LOGTAG = WebAppRequest.class.getSimpleName();
 
     private final String webappname;
     private final WebView webview;
     private final WebAppLoader webapploader;
 
-    public WebAppExtras(String webappname, WebView webview, WebAppLoader webapploader)
+    public WebAppRequest(String webappname, WebView webview, WebAppLoader webapploader)
     {
         this.webappname = webappname;
         this.webview = webview;

@@ -4,6 +4,7 @@
     "label": "Testing",
     "appname": "testing",
     "appicon": "testing_512x512.png",
+    "apppref": "pref.js",
 
     "preload": [
       "util.js"
@@ -21,9 +22,9 @@
 
     "cachedefs": [
       { "interval": 24, "pattern": ".*\\.js" },
-      { "interval":  1, "pattern": ".*\\.png" },
-      { "interval":  1, "pattern": ".*\\.json" },
-      { "interval":  1, "pattern": ".*\\.json\\.gz" }
+      { "interval": 72, "pattern": ".*\\.png" },
+      { "interval": 24, "pattern": ".*\\.json" },
+      { "interval": 24, "pattern": ".*\\.json\\.gz" }
     ]
   }
 }

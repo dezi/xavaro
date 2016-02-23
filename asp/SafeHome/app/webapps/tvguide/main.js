@@ -17,7 +17,7 @@ tvguide.getSenderList = function()
     //
     //
 
-    var obj = JSON.parse(extras.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
+    var obj = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
 
     tvguide.senderList = [];
 

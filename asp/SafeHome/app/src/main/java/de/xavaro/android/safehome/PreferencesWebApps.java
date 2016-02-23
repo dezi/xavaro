@@ -3,9 +3,12 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 
 import org.json.JSONObject;
 
@@ -18,6 +21,7 @@ import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.WebApp;
+import de.xavaro.android.common.WebAppPrefs;
 
 public class PreferencesWebApps
 {
@@ -55,6 +59,7 @@ public class PreferencesWebApps
         }
 
         private String webappname;
+        private WebView webprefs;
 
         public WebappFragment()
         {
@@ -90,7 +95,80 @@ public class PreferencesWebApps
             lp.setIcon(WebApp.getAppIcon(webappname));
             lp.setTitle("Aktiviert");
 
+            lp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    ((NicedPreferences.NiceListPreference) preference).onPreferenceChange(
+                            preference, newValue);
+
+                    onEnableStateChanged((String) newValue);
+
+                    return true;
+                }
+            });
+
+            onEnableStateChanged(Simple.getSharedPrefString(lp.getKey()));
+
             preferences.add(lp);
+
+            if ((webprefs == null) && WebApp.hasPreferences(webappname))
+            {
+                webprefs = new WebView(Simple.getAppContext());
+                WebApp.loadWebView(webprefs, webappname, "pref");
+
+                Object builder = new WebAppPrefBuilder();
+                webprefs.addJavascriptInterface(builder, "WebAppPrefBuilder");
+            }
+        }
+
+        public void onEnableStateChanged(String mode)
+        {
+            Log.d(LOGTAG, "==========================>" + mode);
+        }
+
+        private class WebAppPrefBuilder
+        {
+            private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
+
+            @JavascriptInterface
+            public void addPreference(String json)
+            {
+                JSONObject pref = Json.fromString(json);
+                if (pref == null) return;
+
+                String key = Json.getString(pref, "key");
+                String type = Json.getString(pref, "type");
+                String title = Json.getString(pref, "title");
+
+                if (Simple.equals(type, "category"))
+                {
+                    NicedPreferences.NiceCategoryPreference cp =
+                            new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
+
+                    cp.setTitle(title);
+                    preferences.add(cp);
+                    getPreferenceScreen().addPreference(cp);
+                }
+
+                if (key == null) return;
+
+                key = keyprefix + ".pref." + webappname + "." + key;
+
+                if (Simple.equals(type, "switch"))
+                {
+                    NicedPreferences.NiceSwitchPreference cp =
+                            new NicedPreferences.NiceSwitchPreference(Simple.getAppContext());
+
+                    cp.setKey(key);
+                    cp.setTitle(title);
+                    preferences.add(cp);
+                    getPreferenceScreen().addPreference(cp);
+                }
+
+                Log.d(LOGTAG, "addPreference: " + json);
+            }
         }
     }
 
