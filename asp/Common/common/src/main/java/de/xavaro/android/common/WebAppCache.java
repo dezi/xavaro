@@ -182,9 +182,6 @@ public class WebAppCache
                 //
 
                 Log.d(LOGTAG, "getCacheFile: NOM=" + url);
-
-                Json.put(cachefile, "lget", Simple.nowAsISO());
-                dirty = true;
             }
         }
 
@@ -237,7 +234,19 @@ public class WebAppCache
             if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED)
             {
                 //
-                // Outdated file is still valid.
+                // Outdated file is still valid. Mark with recent fetch date.
+                //
+
+                Json.put(cachefile, "lget", Simple.nowAsISO());
+                dirty = true;
+
+                return null;
+            }
+
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+            {
+                //
+                // File cannot be loaded.
                 //
 
                 return null;

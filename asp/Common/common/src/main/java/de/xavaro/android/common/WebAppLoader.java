@@ -12,9 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
-import java.security.acl.LastOwnerException;
-
-import de.xavaro.android.common.Json;
 
 public class WebAppLoader extends WebViewClient
 {
@@ -60,44 +57,18 @@ public class WebAppLoader extends WebViewClient
 
     public byte[] getRequestData(String url)
     {
-        int interval = getIntervalForUrl(url);
-
-        Log.d(LOGTAG, "getRequestData:" + url);
+        int interval = getCacheIntervalForUrl(url);
 
         if (interval < 0)
         {
             //
             // Unknown cache policy for url in manifest, deny anyway.
             //
-            Log.d(LOGTAG, "getRequestData: nix:" + url);
 
             return null;
         }
 
-        if (url.startsWith(rootUrl))
-        {
-            if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass"))
-            {
-                //
-                // Developer mode. Always load webapp components w/o cache.
-                //
-
-                interval = 0;
-            }
-        }
-        else
-        {
-            Log.d(LOGTAG, "==========>" + interval + "=" + url);
-
-            if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable"))
-            {
-                //
-                // Developer mode. Always load data components w/o cache.
-                //
-
-                interval = 0;
-            }
-        }
+        Log.d(LOGTAG, "getRequestData:" + url);
 
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, url, interval);
         if (wcr.content == null) return null;
@@ -105,12 +76,12 @@ public class WebAppLoader extends WebViewClient
         return wcr.content;
     }
 
-    public WebResourceResponse getRequest(String url)
+    private WebResourceResponse getRequest(String url)
     {
         if (url.equals(rootUrl)) return loadRootHTML();
         if (url.endsWith("favicon.ico")) return denyLoad();
 
-        int interval = getIntervalForUrl(url);
+        int interval = getCacheIntervalForUrl(url);
 
         if (interval < 0)
         {
@@ -121,29 +92,6 @@ public class WebAppLoader extends WebViewClient
             return denyLoad();
         }
 
-        if (url.startsWith(rootUrl))
-        {
-            if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass"))
-            {
-                //
-                // Developer mode. Always load webapp components w/o cache.
-                //
-
-                interval = 0;
-            }
-        }
-        else
-        {
-            if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable"))
-            {
-                //
-                // Developer mode. Always load data components w/o cache.
-                //
-
-                interval = 0;
-            }
-        }
-
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, url, interval);
         if (wcr.content == null) return denyLoad();
 
@@ -151,8 +99,10 @@ public class WebAppLoader extends WebViewClient
                 new ByteArrayInputStream(wcr.content));
     }
 
-    private int getIntervalForUrl(String url)
+    private int getCacheIntervalForUrl(String url)
     {
+        int interval = -1;
+
         if (cachedefs != null)
         {
             for (int inx = 0; inx < cachedefs.length(); inx++)
@@ -160,13 +110,46 @@ public class WebAppLoader extends WebViewClient
                 JSONObject cachedef = Json.getObject(cachedefs, inx);
 
                 String pattern = Json.getString(cachedef, "pattern");
-                int interval = Json.getInt(cachedef, "interval");
 
-                if ((pattern != null) && url.matches(pattern)) return interval;
+                if ((pattern != null) && url.matches(pattern))
+                {
+                    interval = Json.getInt(cachedef, "interval");
+                    break;
+                }
             }
         }
 
-        return -1;
+        if (interval >= 0)
+        {
+            if (url.startsWith(rootUrl))
+            {
+                if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass"))
+                {
+                    //
+                    // Developer mode. Always load webapp components w/o cache.
+                    //
+
+                    interval = 0;
+                }
+            }
+            else
+            {
+                if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable"))
+                {
+                    //
+                    // Developer mode. Always load data components w/o cache.
+                    //
+
+                    interval = 0;
+                }
+            }
+        }
+        else
+        {
+            Log.e(LOGTAG, "getCacheIntervalForUrl: unknown cache policy:" + url);
+        }
+
+        return interval;
     }
 
     private WebResourceResponse denyLoad()
@@ -176,10 +159,8 @@ public class WebAppLoader extends WebViewClient
 
     private WebResourceResponse loadRootHTML()
     {
-        String preloadjava = "";
         String preloadmeta = "";
-
-        preloadjava = "<script>" + webappname + " = {};</script>\n";
+        String preloadjava = "<script>" + webappname + " = {};</script>\n";
 
         JSONObject manifest = WebApp.getManifest(webappname);
 
@@ -214,7 +195,7 @@ public class WebAppLoader extends WebViewClient
                 + "<body><script src=\"main.js\"></script></body>\n"
                 + "</html>\n";
 
-        Log.d(LOGTAG, initialHTML);
+        //Log.d(LOGTAG, initialHTML);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(initialHTML.getBytes());
         return new WebResourceResponse("text/html", "UTF-8", bais);
