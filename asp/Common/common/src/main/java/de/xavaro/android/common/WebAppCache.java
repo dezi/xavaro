@@ -100,7 +100,7 @@ public class WebAppCache
                 long now = Simple.nowAsTimeStamp();
                 long age = (now - get) / 1000;
 
-                if (age <= (interval * 3600))
+                if (age < (interval * 3600))
                 {
                     //
                     // Entry is within age.
@@ -148,7 +148,7 @@ public class WebAppCache
 
         if (content == null)
         {
-            content = getContentFromServer(url, cachefile);
+            content = getContentFromServer(webappname, url, cachefile);
 
             if ((content != null) && (uuid != null))
             {
@@ -209,7 +209,7 @@ public class WebAppCache
     }
 
     @Nullable
-    private static byte[] getContentFromServer(String src, JSONObject cachefile)
+    private static byte[] getContentFromServer(String webappname, String src, JSONObject cachefile)
     {
         try
         {
@@ -226,6 +226,8 @@ public class WebAppCache
                 connection.setRequestProperty("If-Modified-Since", lastmodified);
             }
 
+            connection.setRequestProperty("Referer", webappname);
+            connection.setRequestProperty("User-Agent", "Xavaro-" + Simple.getAppName());
             connection.setConnectTimeout(4000);
             connection.setUseCaches(false);
             connection.setDoInput(true);
@@ -498,7 +500,7 @@ public class WebAppCache
         {
             Log.d(LOGTAG, "commTick: wait=" + webappname + "=" + ival + "=" + secondsdue + "=" + url);
 
-            nextLoadTime = (Simple.nowAsTimeStamp() / 1000) + 10;
+            nextLoadTime = (Simple.nowAsTimeStamp() / 1000) + secondsdue;
         }
         else
         {

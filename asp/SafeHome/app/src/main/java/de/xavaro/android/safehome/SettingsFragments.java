@@ -367,46 +367,25 @@ public class SettingsFragments
     //region EnablePreferenceFragment stub
 
     @SuppressWarnings("WeakerAccess")
-    public static class EnablePreferenceFragment extends PreferenceFragment
+    public static class EnablePreferenceFragment extends BasePreferenceFragment
     {
-        protected final ArrayList<Preference> preferences = new ArrayList<>();
-        protected final ArrayList<String> activekeys = new ArrayList<>();
-
-        protected String keyprefix;
         protected String masterenable;
-        protected boolean enabled;
-
+        protected Drawable icondraw;
         protected int iconres;
 
         public void registerAll(Context context)
         {
-            preferences.clear();
-
             EnableSwitchPreference sw = new EnableSwitchPreference(context);
 
             sw.setKey(keyprefix + ".enable");
             sw.setTitle(masterenable);
-            sw.setIcon(VersionUtils.getDrawableFromResources(context, iconres));
             sw.setDefaultValue(false);
+            sw.setIcon((iconres > 0) ? Simple.getDrawable(iconres) : icondraw);
 
             preferences.add(sw);
-
             activekeys.add(sw.getKey());
 
-            enabled = DitUndDat.SharedPrefs.sharedPrefs.getBoolean(keyprefix + ".enable", false);
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
-            registerAll(getActivity());
-
-            for (Preference pref : preferences) root.addPreference(pref);
+            enabled = Simple.getSharedPrefBoolean(keyprefix + ".enable");
         }
 
         protected class EnableSwitchPreference extends SwitchPreference
@@ -437,4 +416,36 @@ public class SettingsFragments
     }
 
     //endregion EnablePreferenceFragment stub
+
+    //region BasePreferenceFragment stub
+
+    @SuppressWarnings("WeakerAccess")
+    public static class BasePreferenceFragment extends PreferenceFragment
+    {
+        protected final ArrayList<Preference> preferences = new ArrayList<>();
+        protected final ArrayList<String> activekeys = new ArrayList<>();
+
+        protected String keyprefix;
+        protected boolean enabled;
+
+        public void registerAll(Context context)
+        {
+            preferences.clear();
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+        }
+    }
+
+    //endregion BasePreferenceFragment stub
 }

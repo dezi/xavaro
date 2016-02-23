@@ -12,3 +12,9 @@ testing.ZDF = extras.loadSync("http://epg.xavaro.de/epgdata/tv/de/ZDF/current.js
 var pre = document.createElement("pre");
 document.body.appendChild(pre);
 pre.innerHTML = testing.ZDF;
+
+json = { a:23, b:24, c:15 };
+
+extras.callback("hallo");
+extras.jsonfunz("pipa");
+

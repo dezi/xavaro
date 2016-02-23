@@ -26,32 +26,29 @@ public class LaunchGroupWebApps extends LaunchGroup
         JSONArray adir = new JSONArray();
         JSONObject entry;
 
-        if (Simple.getSharedPrefBoolean("webapps.enable"))
+        //
+        // "webapps.mode." + webappname
+        // "webapps.mode.tvguide"
+        //
+
+        String prefix = "webapps.mode.";
+
+        Map<String, Object> webapps = Simple.getAllPreferences(prefix);
+
+        for (String prefkey : webapps.keySet())
         {
-            //
-            // "webapps.appdef.mode." + webappname
-            // "webapps.appdef.mode.tvguide"
-            //
+            String webappname = prefkey.substring(prefix.length());
 
-            String prefix = "webapps.appdef.mode.";
+            entry = new JSONObject();
 
-            Map<String, Object> webapps = Simple.getAllPreferences(prefix);
+            Json.put(entry, "type", "webapp");
+            Json.put(entry, "subtype", webappname);
+            Json.put(entry, "order", 1000);
 
-            for (String prefkey : webapps.keySet())
-            {
-                String webappname = prefkey.substring(prefix.length());
+            String mode = (String) webapps.get(prefkey);
 
-                entry = new JSONObject();
-
-                Json.put(entry, "type", "webapp");
-                Json.put(entry, "subtype", webappname);
-                Json.put(entry, "order", 1000);
-
-                String mode = (String) webapps.get(prefkey);
-
-                if (Simple.equals(mode, "home")) home.put(entry);
-                if (Simple.equals(mode, "folder")) adir.put(entry);
-            }
+            if (Simple.equals(mode, "home")) home.put(entry);
+            if (Simple.equals(mode, "folder")) adir.put(entry);
         }
 
         if (adir.length() > 0)

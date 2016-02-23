@@ -45,7 +45,7 @@
     </string-array>
 
     <string-array name="pref_webapps_where_vals">
-        <item>Inactive</item>
+        <item>No</item>
         <item>Home-Screen</item>
         <item>Webapp-Folder</item>
     </string-array>

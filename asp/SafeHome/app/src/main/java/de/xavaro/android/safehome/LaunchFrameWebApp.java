@@ -53,7 +53,7 @@ public class LaunchFrameWebApp extends LaunchFrame
         webview.getSettings().setDatabaseEnabled(false);
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-        webview.addJavascriptInterface(new WebAppExtras(webappname, webapploader), "extras");
+        webview.addJavascriptInterface(new WebAppExtras(webappname, webview, webapploader), "extras");
 
         webview.loadUrl(WebApp.getHTTPRoot(webappname));
     }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WebApp;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -61,6 +62,14 @@ public class SettingsActivity extends PreferenceActivity
     }
 
     @Override
+    public void onHeaderClick(Header header, int position)
+    {
+        Log.d(LOGTAG, "onHeaderClick: " + header.title + "=" + header.fragmentArguments);
+
+        super.onHeaderClick(header, position);
+    }
+
+    @Override
     public void onBuildHeaders(List<Header> target)
     {
         Header category;
@@ -87,7 +96,7 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Webapps";
         target.add(category);
 
-        target.add(PreferencesWebApps.WebappFragment.getHeader());
+        PreferencesWebApps.WebappFragment.getHeaders(target);
 
         category = new Header();
         category.title = "Medien";
@@ -303,9 +312,28 @@ public class SettingsActivity extends PreferenceActivity
             // because the view may be recycled.
             //
 
-            if ((holder.icon != null) && (header.iconRes != 0))
+            if (holder.icon != null)
             {
-                holder.icon.setImageResource(header.iconRes);
+                if (header.iconRes != 0)
+                {
+                    holder.icon.setImageResource(header.iconRes);
+                }
+                else
+                {
+                    //
+                    // Check if we have a webapp here.
+                    //
+
+                    if (header.fragmentArguments != null)
+                    {
+                        String webappname = header.fragmentArguments.getString("webappname");
+
+                        if (webappname != null)
+                        {
+                            holder.icon.setImageDrawable(WebApp.getAppIcon(webappname));
+                        }
+                    }
+                }
             }
 
             holder.title.setText(header.getTitle(getContext().getResources()));

@@ -1170,6 +1170,12 @@ public class Simple
     }
 
     @Nullable
+    public static Drawable getDrawable(int iconres)
+    {
+        return VersionUtils.getDrawableFromResources(anyContext, iconres);
+    }
+
+    @Nullable
     public static Drawable getDrawableFromFile(String file)
     {
         Bitmap myBitmap = getBitmapFromFile(file);

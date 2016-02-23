@@ -98,7 +98,7 @@ public class PreferencesBeta
 
             lp = new NicedPreferences.NiceListPreference(context);
 
-            lp.setKey("webapps" + ".appdef.mode." + webappname);
+            lp.setKey("webapps" + ".mode." + webappname);
             lp.setEntries(appvals);
             lp.setEntryValues(appkeys);
             lp.setDefaultValue("inact");
