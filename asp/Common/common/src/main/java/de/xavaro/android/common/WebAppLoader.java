@@ -62,11 +62,14 @@ public class WebAppLoader extends WebViewClient
     {
         int interval = getIntervalForUrl(url);
 
+        Log.d(LOGTAG, "getRequestData:" + url);
+
         if (interval < 0)
         {
             //
             // Unknown cache policy for url in manifest, deny anyway.
             //
+            Log.d(LOGTAG, "getRequestData: nix:" + url);
 
             return null;
         }
@@ -107,8 +110,6 @@ public class WebAppLoader extends WebViewClient
         if (url.equals(rootUrl)) return loadRootHTML();
         if (url.endsWith("favicon.ico")) return denyLoad();
 
-        Log.d(LOGTAG, "getRequest: " + url);
-
         int interval = getIntervalForUrl(url);
 
         if (interval < 0)
@@ -133,8 +134,6 @@ public class WebAppLoader extends WebViewClient
         }
         else
         {
-            Log.d(LOGTAG, "==========>" + interval + "=" + url);
-
             if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable"))
             {
                 //
@@ -215,7 +214,7 @@ public class WebAppLoader extends WebViewClient
                 + "<body><script src=\"main.js\"></script></body>\n"
                 + "</html>\n";
 
-        //Log.d(LOGTAG, initialHTML);
+        Log.d(LOGTAG, initialHTML);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(initialHTML.getBytes());
         return new WebResourceResponse("text/html", "UTF-8", bais);

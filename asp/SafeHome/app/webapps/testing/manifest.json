@@ -23,7 +23,7 @@
       { "interval": 24, "pattern": ".*\\.js" },
       { "interval": 24, "pattern": ".*\\.png" },
       { "interval": 24, "pattern": ".*\\.json" },
-      { "interval": 24, "pattern": ".*current\\.json\\.gz" }
+      { "interval": 24, "pattern": ".*\\.json\\.gz" }
     ]
   }
 }

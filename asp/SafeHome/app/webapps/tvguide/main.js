@@ -71,7 +71,6 @@ tvguide.onTouchStart = function(event)
 
     tvguide.touch = {};
 
-
     target =  touchobj.target;
 
     while (target && target.id != "senderbarScroll")
@@ -276,7 +275,6 @@ tvguide.createSenderBar = function()
 
     console.log("===============> senderbar height=" + tvguide.senderbar.clientHeight);
 }
-
 
 tvguide.createFrameSetup();
 tvguide.getSenderList();
