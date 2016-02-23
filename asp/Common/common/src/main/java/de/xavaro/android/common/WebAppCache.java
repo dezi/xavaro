@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -97,10 +96,11 @@ public class WebAppCache
             {
                 File cfile = new File(cachedir, uuid);
 
-                long age = Simple.getTimeStamp(lget);
+                long get = Simple.getTimeStamp(lget);
                 long now = Simple.nowAsTimeStamp();
+                long age = (now - get) / 1000;
 
-                if ((now - age) <= (interval * 3600 * 1000L))
+                if (age <= (interval * 3600))
                 {
                     //
                     // Entry is within age.
@@ -109,7 +109,7 @@ public class WebAppCache
                     content = Simple.readBinaryFile(cfile);
                     mimetype = Json.getString(cachefile, "mime");
 
-                    Log.d(LOGTAG,"getCacheFile: HIT=" + url);
+                    Log.d(LOGTAG,"getCacheFile: HIT=" + age + "=" + url);
                 }
                 else
                 {
@@ -398,6 +398,7 @@ public class WebAppCache
     }
 
     private static long nextLoadTime;
+    private static JSONObject nextLoadItem;
 
     @Nullable
     private static JSONObject getNextLoadItem()
@@ -409,6 +410,7 @@ public class WebAppCache
         long todaysecs = (nowsecs / 86400) * 86400;
 
         JSONObject nextItem = null;
+        long nextDue = Long.MAX_VALUE;
 
         Iterator<String> webappsIter = webappcache.keys();
 
@@ -429,32 +431,79 @@ public class WebAppCache
 
                 int ival = Json.getInt(cachefile, "ival");
                 if (ival == 0) continue;
-
-                //
-                // Last moad must be older than half of the intervall.
-                //
+                int ivalsecs = ival * 3600;
+                int time = Json.getInt(cachefile, "time") % ivalsecs;
 
                 String lget = Json.getString(cachefile, "lget");
                 long lastLoad = (lget == null) ? todaysecs : (Simple.getTimeStamp(lget) / 1000);
-
-                int time = Json.getInt(cachefile, "time");
                 long nextLoad = ((lastLoad / 86400) * 86400) + time;
 
-                long overdue = nowsecs - nextLoad;
+                while (nextLoad < nowsecs) nextLoad += ivalsecs;
+                if ((nextLoad - lastLoad) <= ivalsecs) nextLoad += ivalsecs;
+
+                long secstoload = nextLoad - nowsecs;
+
+                if (secstoload < nextDue)
+                {
+                    nextItem = new JSONObject();
+
+                    Json.put(nextItem, "webappname", webappname);
+                    Json.put(nextItem, "nextload", Simple.timeStampAsISO(nextLoad * 1000L));
+                    Json.put(nextItem, "ival", ival);
+                    Json.put(nextItem, "url", url);
+
+                    nextDue = secstoload;
+                }
             }
         }
+
+        Simple.makePost(freeMemory, 10 * 1000);
 
         return nextItem;
     }
 
-    public static void autoUpdate()
+    public static void commTick()
     {
-        if (nextLoadTime == 0)
+        if (nextLoadTime > (Simple.nowAsTimeStamp() / 1000)) return;
+
+        if (nextLoadItem == null)
         {
+            nextLoadItem = getNextLoadItem();
+
+            if (nextLoadItem == null)
+            {
+                nextLoadTime = (Simple.nowAsTimeStamp() / 1000) + 20;
+
+                return;
+            }
         }
 
+        long nextload = Simple.getTimeStamp(Json.getString(nextLoadItem, "nextload"));
+        String webappname = Json.getString(nextLoadItem, "webappname");
+        String url = Json.getString(nextLoadItem, "url");
+        int ival = Json.getInt(nextLoadItem, "ival");
 
-        long now = Simple.nowAsTimeStamp();
+        long secondsdue = (nextload - Simple.nowAsTimeStamp()) / 1000;
 
+        if (secondsdue > 0)
+        {
+            Log.d(LOGTAG, "commTick: wait=" + webappname + "=" + ival + "=" + secondsdue + "=" + url);
+
+            nextLoadTime = (Simple.nowAsTimeStamp() / 1000) + 10;
+        }
+        else
+        {
+            if ((url != null) && ! url.startsWith("http:"))
+            {
+                url = WebApp.getHTTPRoot(webappname) + url;
+            }
+
+            Log.d(LOGTAG, "commTick: load=" + webappname + "=" + ival + "=" + secondsdue + "=" + url);
+
+            getCacheFile(webappname, url, ival);
+
+            nextLoadItem = null;
+            nextLoadTime = 0;
+        }
     }
 }

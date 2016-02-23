@@ -612,6 +612,7 @@ public class CommService extends Service
             checkPing();
 
             CommSender.commTick();
+            WebAppCache.commTick();
 
             if (! checkSocket()) continue;
 
