@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +28,9 @@ public class WebAppCache
 
     public static class WebAppCacheResponse
     {
-        String mimetype;
-        String encoding;
-        byte[] content;
+        public final String mimetype;
+        public final String encoding;
+        public final byte[] content;
 
         public WebAppCacheResponse(String mimetype, String encoding, byte[] content)
         {
@@ -49,6 +51,18 @@ public class WebAppCache
         Simple.removePost(freeMemory);
         getStorage();
 
+        //
+        // Modify webapp server urls to be w/o web server root
+        // to allow cache writing independendly of developer.
+        //
+
+        String cacheurl = url;
+
+        if (url.startsWith(WebApp.getHTTPRoot(webappname)))
+        {
+            cacheurl = url.substring(WebApp.getHTTPRoot(webappname).length());
+        }
+
         byte[] content = null;
         String mimetype = null;
 
@@ -65,20 +79,21 @@ public class WebAppCache
 
         if (! cachedir.exists())
         {
+            //noinspection ResultOfMethodCallIgnored
             cachedir.mkdirs();
         }
 
-        JSONObject cachefile = null;
-        String uuid = null;
+        JSONObject cachefile;
+        String uuid;
 
-        if ((interval > 0) && cachefiles.has(url))
+        if (cachefiles.has(cacheurl))
         {
-            cachefile = Json.getObject(cachefiles, url);
+            cachefile = Json.getObject(cachefiles, cacheurl);
 
             uuid = Json.getString(cachefile, "uuid");
             String lget = Json.getString(cachefile, "lget");
 
-            if ((uuid != null) && (lget != null))
+            if ((interval > 0) && (uuid != null) && (lget != null))
             {
                 File cfile = new File(cachedir, uuid);
 
@@ -111,16 +126,22 @@ public class WebAppCache
                 }
             }
         }
-
-        if (cachefile == null)
+        else
         {
             cachefile = new JSONObject();
             uuid = Simple.getUUID();
 
+            //
+            // Create a new cache entry with final uuid, current
+            // intervall and a random update time to ensure even
+            // distributed cache updates on application servers.
+            //
+
             Json.put(cachefile, "uuid", uuid);
             Json.put(cachefile, "ival", interval);
+            Json.put(cachefile, "time", Simple.getRandom(0, 86400));
 
-            Json.put(cachefiles, url, cachefile);
+            Json.put(cachefiles, cacheurl, cachefile);
 
             dirty = true;
         }
@@ -157,7 +178,7 @@ public class WebAppCache
             {
                 //
                 // The content is revalidated for the next interval
-                // since not modified on server.
+                // since not modified on server or unavailable.
                 //
 
                 Log.d(LOGTAG, "getCacheFile: NOM=" + url);
@@ -170,10 +191,13 @@ public class WebAppCache
         if (content != null)
         {
             //
-            // Set now date as last usage date of this item.
+            // Set now date as last usage date of this item. Also
+            // write current intervall to reflect developer and
+            // non developer settings.
             //
 
             mimetype = Json.getString(cachefile, "mime");
+            Json.put(cachefile, "ival", interval);
             Json.put(cachefile, "luse", Simple.nowAsISO());
             dirty = true;
         }
@@ -205,6 +229,7 @@ public class WebAppCache
                 connection.setRequestProperty("If-Modified-Since", lastmodified);
             }
 
+            connection.setConnectTimeout(4000);
             connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.connect();
@@ -261,7 +286,7 @@ public class WebAppCache
             {
                 buffer = new byte[ length ];
 
-                for (int xfer = 0; total < length; total += xfer)
+                for (int xfer; total < length; total += xfer)
                 {
                     xfer = input.read(buffer, total, length - total);
                 }
@@ -272,7 +297,7 @@ public class WebAppCache
 
                 buffer = new byte[ 0 ];
 
-                for (int xfer = 0; ; total += xfer)
+                for (int xfer; ; total += xfer)
                 {
                     xfer = input.read(chunk, 0, chunk.length);
                     if (xfer <= 0) break;
@@ -370,5 +395,66 @@ public class WebAppCache
         {
             OopsService.log(LOGTAG,ex);
         }
+    }
+
+    private static long nextLoadTime;
+
+    @Nullable
+    private static JSONObject getNextLoadItem()
+    {
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        long nowsecs = Simple.nowAsTimeStamp() / 1000;
+        long todaysecs = (nowsecs / 86400) * 86400;
+
+        JSONObject nextItem = null;
+
+        Iterator<String> webappsIter = webappcache.keys();
+
+        while (webappsIter.hasNext())
+        {
+            String webappname = webappsIter.next();
+
+            JSONObject cachefiles = Json.getObject(webappcache, webappname);
+            if (cachefiles == null) continue;
+
+            Iterator<String> cachefilesIter = cachefiles.keys();
+
+            while (cachefilesIter.hasNext())
+            {
+                String url = cachefilesIter.next();
+                JSONObject cachefile = Json.getObject(cachefiles, url);
+                if (cachefile == null) continue;
+
+                int ival = Json.getInt(cachefile, "ival");
+                if (ival == 0) continue;
+
+                //
+                // Last moad must be older than half of the intervall.
+                //
+
+                String lget = Json.getString(cachefile, "lget");
+                long lastLoad = (lget == null) ? todaysecs : (Simple.getTimeStamp(lget) / 1000);
+
+                int time = Json.getInt(cachefile, "time");
+                long nextLoad = ((lastLoad / 86400) * 86400) + time;
+
+                long overdue = nowsecs - nextLoad;
+            }
+        }
+
+        return nextItem;
+    }
+
+    public static void autoUpdate()
+    {
+        if (nextLoadTime == 0)
+        {
+        }
+
+
+        long now = Simple.nowAsTimeStamp();
+
     }
 }

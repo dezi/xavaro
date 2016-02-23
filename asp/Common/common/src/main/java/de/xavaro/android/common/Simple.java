@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
@@ -770,6 +771,11 @@ public class Simple
     public static int getDeviceDPI()
     {
         return anyContext.getResources().getDisplayMetrics().densityDpi;
+    }
+
+    public static int getRandom(int min, int max)
+    {
+        return new Random().nextInt(max - min) + min;
     }
 
     public static String getUUID()

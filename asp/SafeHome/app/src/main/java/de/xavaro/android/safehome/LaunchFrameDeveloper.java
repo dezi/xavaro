@@ -89,8 +89,6 @@ public class LaunchFrameDeveloper extends LaunchFrame
         if (Simple.equals(subtype,"known")) loadStorageKnown();
 
         if (Simple.equals(subtype,"webappcache")) loadWebappCache();
-
-
     }
 
     private View.OnClickListener onUpdateClick = new View.OnClickListener()
@@ -107,6 +105,8 @@ public class LaunchFrameDeveloper extends LaunchFrame
         @Override
         public boolean onLongClick(View view)
         {
+            if (Simple.equals(subtype,"webappcache")) clearWebappCache();
+
             return true;
         }
     };
@@ -150,6 +150,20 @@ public class LaunchFrameDeveloper extends LaunchFrame
         jsonListing.setText(json);
     }
 
+    private void clearWebappCache()
+    {
+        Log.d(LOGTAG, "clearWebappCache: ...");
+
+        File file = new File(Simple.getCacheDir(), "webappcache");
+        removeDirectories(file);
+
+        JSONObject empty = new JSONObject();
+        File act = new File(Simple.getFilesDir(), "webappcache.act.json");
+        Simple.putFileContent(act, Json.toPretty(empty));
+
+        loadWebappCache();
+    }
+
     private void loadWebappCache()
     {
         if (scrollview == null)
@@ -168,6 +182,18 @@ public class LaunchFrameDeveloper extends LaunchFrame
         File file = new File(Simple.getFilesDir(), "webappcache.act.json");
         String json = Simple.getFileContent(file);
         jsonListing.setText(json);
+    }
+
+    private void removeDirectories(File dir)
+    {
+        File[] list = dir.listFiles();
+
+        for (File item : list)
+        {
+            if (item.isDirectory()) removeDirectories(item);
+
+            item.delete();
+        }
     }
 
     private void recurseDirectories(File dir, int plen)

@@ -17,9 +17,9 @@
 
     "cachedefs": [
       { "interval": 24, "pattern": ".*\\.js" },
-      { "interval": 24, "pattern": ".*\\.png" },
-      { "interval": 24, "pattern": ".*\\.json" },
-      { "interval": 24, "pattern": ".*\\.json\\.gz" }
+      { "interval":  1, "pattern": ".*\\.png" },
+      { "interval":  1, "pattern": ".*\\.json" },
+      { "interval":  1, "pattern": ".*\\.json\\.gz" }
     ]
   }
 }
