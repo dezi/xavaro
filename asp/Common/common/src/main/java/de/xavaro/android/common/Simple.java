@@ -1768,6 +1768,12 @@ public class Simple
         return getSharedPrefs().getString(key, null);
     }
 
+    @Nullable
+    public static Set<String> getSharedPrefStringSet(String key)
+    {
+        return getSharedPrefs().getStringSet(key, null);
+    }
+
     public static void setSharedPrefString(String key, String value)
     {
         getSharedPrefs().edit().putString(key, value).apply();

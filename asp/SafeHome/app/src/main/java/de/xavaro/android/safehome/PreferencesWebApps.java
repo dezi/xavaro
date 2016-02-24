@@ -3,9 +3,11 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -13,8 +15,10 @@ import android.webkit.WebView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
@@ -145,26 +149,79 @@ public class PreferencesWebApps
 
                 key = keyprefix + ".pref." + webappname + "." + key;
 
+                NicedPreferences.NiceCategoryPreference ct;
+                NicedPreferences.NiceSwitchPreference sp;
+                NicedPreferences.NiceCheckboxPreference cp;
+                NicedPreferences.NiceEditTextPreference ep;
+                NicedPreferences.NiceListPreference lp;
+                NicedPreferences.NiceMultiListPreference mp;
+
                 if (Simple.equals(type, "category"))
                 {
-                    NicedPreferences.NiceCategoryPreference cp =
-                            new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
+                    ct = new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
 
-                    cp.setKey(key);
-                    cp.setTitle(title);
-                    preferences.add(cp);
-                    getPreferenceScreen().addPreference(cp);
+                    ct.setKey(key);
+                    ct.setTitle(title);
+                    preferences.add(ct);
+                    getPreferenceScreen().addPreference(ct);
                 }
 
                 if (Simple.equals(type, "switch"))
                 {
-                    NicedPreferences.NiceSwitchPreference cp =
-                            new NicedPreferences.NiceSwitchPreference(Simple.getAppContext());
+                     sp = new NicedPreferences.NiceSwitchPreference(Simple.getAppContext());
+
+                    sp.setKey(key);
+                    sp.setTitle(title);
+                    sp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
+                    preferences.add(sp);
+                    getPreferenceScreen().addPreference(sp);
+                }
+
+                if (Simple.equals(type, "check"))
+                {
+                    cp = new NicedPreferences.NiceCheckboxPreference(Simple.getAppContext());
 
                     cp.setKey(key);
                     cp.setTitle(title);
+                    cp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                     preferences.add(cp);
                     getPreferenceScreen().addPreference(cp);
+                }
+
+                if (Simple.equals(type, "edit"))
+                {
+                    ep = new NicedPreferences.NiceEditTextPreference(Simple.getAppContext());
+
+                    ep.setKey(key);
+                    ep.setTitle(title);
+                    ep.setDefaultValue(Json.getString(pref, "defvalue"));
+                    preferences.add(ep);
+                    getPreferenceScreen().addPreference(ep);
+                }
+
+                if (Simple.equals(type, "list"))
+                {
+                    lp = new NicedPreferences.NiceListPreference(Simple.getAppContext());
+
+                    lp.setKey(key);
+                    lp.setTitle(title);
+                    lp.setEntries(Json.getArray(pref, "vals"));
+                    lp.setEntryValues(Json.getArray(pref, "keys"));
+                    lp.setDefaultValue(Json.getString(pref, "defvalue"));
+                    preferences.add(lp);
+                    getPreferenceScreen().addPreference(lp);
+                }
+
+                if (Simple.equals(type, "multi"))
+                {
+                    mp = new NicedPreferences.NiceMultiListPreference(Simple.getAppContext());
+
+                    mp.setKey(key);
+                    mp.setTitle(title);
+                    mp.setEntries(Json.getArray(pref, "vals"));
+                    mp.setEntryValues(Json.getArray(pref, "keys"));
+                    preferences.add(mp);
+                    getPreferenceScreen().addPreference(mp);
                 }
             }
 

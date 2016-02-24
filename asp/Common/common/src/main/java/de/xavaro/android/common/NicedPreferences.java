@@ -11,6 +11,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.SwitchPreference;
@@ -26,11 +27,14 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.util.Log;
 
+import org.json.JSONArray;
+
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
 public class NicedPreferences
 {
@@ -559,6 +563,171 @@ public class NicedPreferences
         }
     }
 
+    public static class NiceMultiListPreference extends MultiSelectListPreference
+            implements Preference.OnPreferenceChangeListener
+    {
+        private TextView current;
+        private boolean disabled;
+        private CharSequence[] entries;
+        private CharSequence[] values;
+
+        public NiceMultiListPreference(Context context)
+        {
+            super(context);
+
+            setOnPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void setEntries(CharSequence[] entries)
+        {
+            super.setEntries(entries);
+            this.entries = entries;
+        }
+
+        public void setEntries(ArrayList<String> entries)
+        {
+            String[] intern = new String[ entries.size() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = entries.get(inx);
+            }
+
+            super.setEntries(intern);
+            this.entries = intern;
+        }
+
+        public void setEntries(JSONArray entries)
+        {
+            String[] intern = new String[ entries.length() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = Json.getString(entries, inx);
+            }
+
+            super.setEntries(intern);
+            this.entries = intern;
+        }
+
+        @Override
+        public void setEntryValues(CharSequence[] values)
+        {
+            super.setEntryValues(values);
+            this.values = values;
+        }
+
+        public void setEntryValues(ArrayList<String> values)
+        {
+            String[] intern = new String[ values.size() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = values.get(inx);
+            }
+
+            super.setEntryValues(intern);
+            this.values = intern;
+        }
+
+        public void setEntryValues(JSONArray values)
+        {
+            String[] intern = new String[ values.length() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = Json.getString(values, inx);
+            }
+
+            super.setEntryValues(intern);
+            this.values = intern;
+        }
+
+        @Override
+        public void setEnabled(boolean enabled)
+        {
+            super.setEnabled(enabled);
+
+            disabled = ! enabled;
+
+            if (current != null)
+            {
+                current.setTextColor(disabled
+                        ? CommonConfigs.PreferenceTextDisabledColor
+                        : CommonConfigs.PreferenceTextEnabledColor);
+            }
+        }
+
+        private String getDisplayValue(Set<String> dvalues)
+        {
+            String display = "";
+
+            if (values != null)
+            {
+                for (int inx = 0; inx < values.length; inx++)
+                {
+                    for (String dvalue : dvalues)
+                    {
+                        if (values[ inx ].equals(dvalue))
+                        {
+                            if (display.length() > 0) display += ", ";
+                            display += (String) entries[ inx ];
+                        }
+                    }
+                }
+            }
+
+            return display;
+        }
+
+        public boolean onPreferenceChange(Preference preference, Object obj)
+        {
+            Log.d(LOGTAG, "onPreferenceChange: " + obj);
+
+            if (current != null) current.setText(getDisplayValue((Set<String>) obj));
+
+            return true;
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            if (current == null)
+            {
+                current = new TextView(getContext());
+                current.setGravity(Gravity.END);
+                current.setTextSize(18f);
+
+                current.setTextColor(disabled
+                        ? CommonConfigs.PreferenceTextDisabledColor
+                        : CommonConfigs.PreferenceTextEnabledColor);
+
+                current.setText(getDisplayValue(Simple.getSharedPrefStringSet(getKey())));
+            }
+
+            if (current.getParent() != null)
+            {
+                //
+                // Der inder calls bind view every now and then because
+                // of bad programming. So check if textview is child
+                // of obsoleted view and remove before processing.
+                //
+
+                ((LinearLayout) current.getParent()).removeView(current);
+            }
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.END);
+
+            ((LinearLayout) view).addView(current, lp);
+        }
+    }
+
     public static class NiceListPreference extends ListPreference
             implements Preference.OnPreferenceChangeListener
     {
@@ -583,6 +752,13 @@ public class NicedPreferences
             if (defaultValue instanceof String) persistString((String) defaultValue);
         }
 
+        @Override
+        public void setEntries(CharSequence[] entries)
+        {
+            super.setEntries(entries);
+            this.entries = entries;
+        }
+
         public void setEntries(ArrayList<String> entries)
         {
             String[] intern = new String[ entries.size() ];
@@ -596,11 +772,24 @@ public class NicedPreferences
             this.entries = intern;
         }
 
-        @Override
-        public void setEntries(CharSequence[] entries)
+        public void setEntries(JSONArray entries)
         {
-            super.setEntries(entries);
-            this.entries = entries;
+            String[] intern = new String[ entries.length() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = Json.getString(entries, inx);
+            }
+
+            super.setEntries(intern);
+            this.entries = intern;
+        }
+
+        @Override
+        public void setEntryValues(CharSequence[] values)
+        {
+            super.setEntryValues(values);
+            this.values = values;
         }
 
         public void setEntryValues(ArrayList<String> values)
@@ -616,11 +805,17 @@ public class NicedPreferences
             this.values = intern;
         }
 
-        @Override
-        public void setEntryValues(CharSequence[] values)
+        public void setEntryValues(JSONArray values)
         {
-            super.setEntryValues(values);
-            this.values = values;
+            String[] intern = new String[ values.length() ];
+
+            for (int inx = 0; inx < intern.length; inx++)
+            {
+                intern[ inx ] = Json.getString(values, inx);
+            }
+
+            super.setEntryValues(intern);
+            this.values = intern;
         }
 
         @Override
@@ -669,7 +864,6 @@ public class NicedPreferences
             onClickRunner.run();
         }
 
-        @Override
         public boolean onPreferenceChange(Preference preference, Object obj)
         {
             if (current != null) current.setText(getDisplayValue((String) obj));
