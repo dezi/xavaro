@@ -384,9 +384,10 @@ function saveChannel($cdata)
 		$config[ "isocc"     ] = $isocc;
 		$config[ "isbd"      ] = false;
 	}
-	
+ 
 	$config[ "isolang" ] = $adata[ "isolang" ];
 	$config[ "ishd"    ] = $adata[ "hd" ];
+	$config[ "isen"    ] = ($adata[ "free" ] == false);
 
 	//
 	// Setup brain dead flag. Brain dead means that
@@ -453,6 +454,7 @@ function saveChannel($cdata)
 	$ordered[ "type"    ] = $config[ "type"    ];
 	$ordered[ "isocc"   ] = $config[ "isocc"   ];
 	$ordered[ "isolang" ] = $config[ "isolang" ];
+	$ordered[ "isen"    ] = $config[ "isen"    ];
 	$ordered[ "ishd"    ] = $config[ "ishd"    ];
 	$ordered[ "isbd"    ] = $config[ "isbd"    ];
 	
