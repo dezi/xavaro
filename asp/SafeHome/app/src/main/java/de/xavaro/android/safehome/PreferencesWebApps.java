@@ -10,6 +10,7 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -132,29 +133,28 @@ public class PreferencesWebApps
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
 
-            @JavascriptInterface
-            public void addPreference(String json)
+            private void addPreference(JSONObject pref)
             {
-                JSONObject pref = Json.fromString(json);
                 if (pref == null) return;
 
                 String key = Json.getString(pref, "key");
                 String type = Json.getString(pref, "type");
                 String title = Json.getString(pref, "title");
 
+                if (key == null) return;
+
+                key = keyprefix + ".pref." + webappname + "." + key;
+
                 if (Simple.equals(type, "category"))
                 {
                     NicedPreferences.NiceCategoryPreference cp =
                             new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
 
+                    cp.setKey(key);
                     cp.setTitle(title);
                     preferences.add(cp);
                     getPreferenceScreen().addPreference(cp);
                 }
-
-                if (key == null) return;
-
-                key = keyprefix + ".pref." + webappname + "." + key;
 
                 if (Simple.equals(type, "switch"))
                 {
@@ -166,8 +166,30 @@ public class PreferencesWebApps
                     preferences.add(cp);
                     getPreferenceScreen().addPreference(cp);
                 }
+            }
 
+            private void addPreferences(JSONArray prefs)
+            {
+                if (prefs == null) return;
+
+                for (int inx = 0; inx < prefs.length(); inx++)
+                {
+                    addPreference(Json.getObject(prefs, inx));
+                }
+            }
+
+            @JavascriptInterface
+            public void addPreference(String json)
+            {
                 Log.d(LOGTAG, "addPreference: " + json);
+                addPreference(Json.fromString(json));
+            }
+
+            @JavascriptInterface
+            public void addPreferences(String json)
+            {
+                Log.d(LOGTAG, "addPreferences: " + json);
+                addPreferences(Json.fromStringArray(json));
             }
         }
     }
