@@ -1,24 +1,175 @@
-console.log("==================main.js loaded...");
+testing.onClickNext = function(event)
+{
+    if (testing.dimmer && testing.dimmer.parentElement)
+    {
+        testing.dimmer.parentElement.removeChild(testing.dimmer);
+    }
 
-//testing.alertest();
+    testing.loadNextInfo();
 
-//console.log("==================" + extras.loadSync("http://epg.xavaro.de/channels/tv/de/ZDF.json"));
+    event.stopPropagation();
+}
 
-//testing.channels = WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz");
-//console.log("==================" + testing.channels.length);
+testing.onClickCancel = function(event)
+{
+    if (testing.dimmer && testing.dimmer.parentElement)
+    {
+        testing.dimmer.parentElement.removeChild(testing.dimmer);
+    }
 
-//testing.ZDF = WebAppRequest.loadSync("http://epg.xavaro.de/epgdata/tv/de/ZDF/current.json.gz");
+    event.stopPropagation();
+}
 
-/*
-var pre = document.createElement("pre");
-document.body.appendChild(pre);
-pre.innerHTML = testing.channels;
+testing.onClickOk = function(event)
+{
+    if (testing.dimmer && testing.dimmer.parentElement)
+    {
+        testing.dimmer.parentElement.removeChild(testing.dimmer);
+    }
 
-json = { a:23, b:24, c:15 };
+    if (! testing.saveInfo())
+    {
+        alert("Das war nix!!!")
+    }
+    else
+    {
+        testing.loadNextInfo();
+    }
 
-WebAppRequest.callback("hallo");
-WebAppRequest.jsonfunz("pipa");
-*/
+    event.stopPropagation();
+}
+
+WebAppIntercept.onUserHrefClick = function(url)
+{
+    //
+    // http://images.google.de/imgres
+    //  ?imgurl=http%3A%2F%2Fwww.rosenheim24.de%2Fbilder%2F2013%2F05%2F14%2F2905337%2F1841037453-rosenheim-cops-dreh-staffel-g77aNPPwiMG.jpg
+    //  &imgrefurl=http%3A%2F%2Fwww.rosenheim24.de%2Ftv-kino%2Frosenheim-cops-dreh-staffel-rosenheim24-2905337.html
+    //  &h=747&w=1000
+    //  &tbnid=wvleiuf4g-D5aM%3A&q=Rosenheim%20Cops&docid=zQCaOGaSj5-_NM
+    //  &ei=trPOVoLWKoq56AT336DADg
+    //  &tbm=isch&iact=rc&uact=3&page=1&start=0&ndsp=11
+    //  &ved=0ahUKEwiCidqtuJLLAhWKHJoKHfcvCOgQrQMIKTAB
+    //
+
+    var imgurl = url.match(/imgurl=([^&]*)/);
+    imgurl = imgurl && imgurl.length ? imgurl[ 1 ] : null;
+    if (! imgurl) return false;
+    imgurl = decodeURIComponent(imgurl);
+
+    var width = url.match(/&w=([^&]*)/);
+    width = width && width.length ? width[ 1 ] : null;
+    if (! width) return false;
+
+    var height = url.match(/&h=([^&]*)/);
+    height = height && height.length ? height[ 1 ] : null;
+    if (! height) return false;
+
+    width = parseInt(width);
+    height = parseInt(height);
+
+    testing.info.imgurl = imgurl;
+
+    var aspect = width / height;
+
+    var dwid = width;
+    var dhei = height;
+
+    if (dwid > 500)
+    {
+        dwid = 500;
+        dhei = Math.round(dwid / aspect);
+    }
+
+    dwid +=  20;
+    dhei += 100;
+
+    var div                   = document.createElement("div");
+    div.id                    = "dimmer";
+    div.style.position        = "absolute";
+    div.style.top             = "0px";
+    div.style.left            = "0px";
+    div.style.right           = "0px";
+    div.style.bottom          = "0px";
+    div.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+    div.onclick               = testing.onClickCancel;
+
+    testing.content1.appendChild(testing.dimmer = div);
+
+    var cwid = testing.dimmer.clientWidth;
+    var chei = testing.dimmer.clientHeight;
+
+    console.log(dwid + "=" + dhei + "=" + cwid + "=" + chei);
+
+    var div                   = document.createElement("div");
+    div.id                    = "okdiv";
+    div.style.position        = "absolute";
+    div.style.top             = ((chei - dhei) / 2) + "px";
+    div.style.left            = ((cwid - dwid) / 2) + "px";
+    div.style.width           = dwid + "px";
+    div.style.height          = dhei + "px";
+    div.style.fontSize        = "28px";
+    div.style.fontWeight      = "bold";
+    div.style.backgroundColor = "#ffffff";
+
+    testing.dimmer.appendChild(testing.okdiv = div);
+
+    var img            = document.createElement("img");
+    img.id             = "imgdiv";
+    img.style.position = "absolute";
+    img.style.top      = "10px";
+    img.style.left     = "10px";
+    img.style.width    = (dwid - 20) + "px";
+    img.style.height   = "auto";
+    img.src            = imgurl;
+
+    testing.okdiv.appendChild(testing.imgdiv = img);
+
+    var div            = document.createElement("div");
+    div.id             = "dimdiv";
+    div.style.position = "absolute";
+    div.style.left     = "10px";
+    div.style.right    = "10px";
+    div.style.bottom   = "10px";
+    div.style.height   = "50px";
+    div.innerHTML      = width + "x" + height;
+
+    testing.okdiv.appendChild(testing.dimdiv = div);
+
+    var div            = document.createElement("div");
+    div.id             = "butdiv";
+    div.style.color    = "#448844";
+    div.style.position = "absolute";
+    div.style.right    = "10px";
+    div.style.bottom   = "10px";
+    div.style.height   = "50px";
+
+    testing.okdiv.appendChild(testing.butdiv = div);
+
+    var span                = document.createElement("span");
+    span.id                 = "cancelbutton";
+    span.style.paddingLeft  = "20px";
+    span.style.paddingRight = "20px";
+    span.style.marginLeft   = "10px";
+    span.style.marginRight  = "10px";
+    span.innerHTML          = "Cancel";
+    span.onclick            = testing.onClickCancel;
+
+    testing.butdiv.appendChild(span);
+
+    var span                = document.createElement("span");
+    span.id                 = "okbutton";
+    span.style.paddingLeft  = "20px";
+    span.style.paddingRight = "20px";
+    span.style.marginLeft   = "10px";
+    span.style.marginRight  = "10px";
+    span.innerHTML          = "Ok";
+    span.onclick            = testing.onClickOk;
+
+    testing.butdiv.appendChild(span);
+
+    return false;
+}
 
 testing.createFrameSetup = function()
 {
@@ -53,9 +204,24 @@ testing.createFrameSetup = function()
     div.style.right           = "0px";
     div.style.height          = "80px";
     div.style.backgroundColor = "#8080ff";
-    testing.titlebar          = div;
 
-    testing.topdiv.appendChild(div);
+    testing.topdiv.appendChild(testing.titlebar = div);
+
+    var div                   = document.createElement("div");
+    div.id                    = "nextbutton";
+    div.style.position        = "absolute";
+    div.style.top             = "0px";
+    div.style.width           = "80px";
+    div.style.right           = "0px";
+    div.style.bottom          = "0px";
+    div.style.fontSize        = "60px";
+    div.style.fontWeight      = "bold";
+    div.style.textAlign       = "center";
+    div.style.color           = "#cccccc";
+    div.innerHTML             = ">>";
+    div.onclick               = testing.onClickNext;
+
+    testing.titlebar.appendChild(testing.nextbutton = div);
 
     //
     // topdiv.content1
@@ -69,9 +235,8 @@ testing.createFrameSetup = function()
     div.style.right           = "0px";
     div.style.bottom          = "0px";
     div.style.backgroundColor = "#ff8000";
-    testing.content1          = div;
 
-    testing.topdiv.appendChild(div);
+    testing.topdiv.appendChild(testing.content1 = div);
 
     var div                   = document.createElement("iframe");
     div.id                    = "iframe";
@@ -81,12 +246,52 @@ testing.createFrameSetup = function()
     div.style.width           = "100%";
     div.style.height          = "100%";
     div.style.border          = "0px solid black";
-    testing.iframe            = div;
 
-    testing.content1.appendChild(div);
+    testing.content1.appendChild(testing.iframe = div);
+}
+
+testing.loadInfoList = function()
+{
+    testing.acttype = "tv";
+    testing.actcountry = "de";
+
+    testing.actjson = "http://epg.xavaro.de/epginfo/"
+        + testing.acttype + "/"
+        + testing.actcountry + ".json";
+
+    testing.infolist = JSON.parse(WebAppRequest.loadSync(testing.actjson));
+}
+
+testing.loadNextInfo = function()
+{
+    var info = testing.infolist.shift();
+    var search = "http://www.google.de/search?tbm=isch&q=";
+
+    testing.info = {};
+    testing.info.name = info.t;
+    testing.info.search = info.t;
+
+    if (testing.info.name.startsWith("@movie "))
+    {
+        testing.info.name = testing.info.name.substring(7);
+        testing.info.search = "Film: " + testing.info.name;
+    }
+
+    testing.iframe.src = search + encodeURIComponent(testing.info.search);
+}
+
+testing.saveInfo = function()
+{
+    var saveInfo = {};
+
+    saveInfo.type    = testing.acttype;
+    saveInfo.country = testing.actcountry;
+    saveInfo.name    = testing.info.name;
+    saveInfo.imgurl  = testing.info.imgurl;
+
+    return WebAppRequest.saveSync("http://epg.xavaro.de/pgmuploader", JSON.stringify(saveInfo));
 }
 
 testing.createFrameSetup();
-
-//testing.iframe.src = "http://www.google.de/search?q=test&prmd=ivn&source=lnms&tbm=isch&sa=X&client=tablet-android-samsung&biw=768&bih=1024";
-testing.iframe.src = "http://www.google.de/search?tbm=isch&q=Rosenheim%20Cops";
+testing.loadInfoList();
+testing.loadNextInfo();

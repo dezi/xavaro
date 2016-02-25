@@ -36,10 +36,14 @@
       { "interval": -1, "pattern": "http://.*?\\.gstatic\\.com/.*" },
       { "interval": -3, "pattern": "http://images\\.google\\.de/.*" },
 
+      { "interval":  0, "pattern": ".*/epginfo/.*" },
+
       { "interval": 24, "pattern": ".*\\.js" },
       { "interval": 72, "pattern": ".*\\.png" },
       { "interval": 24, "pattern": ".*\\.json" },
-      { "interval": 24, "pattern": ".*\\.json\\.gz" }
+      { "interval": 24, "pattern": ".*\\.json\\.gz" },
+
+      { "interval": -1, "pattern": ".*" }
     ]
   }
 }
