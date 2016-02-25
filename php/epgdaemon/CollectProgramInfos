@@ -10,8 +10,10 @@ function sortInfos($a, $b)
 	return ($a > $b) ? -1 : 1;
 }
 
-function readPrograms($channeldir)
+function readPrograms($countrydir, $channeldir)
 {
+	$pgminfodir = str_replace("epgdata", "pgminfo", $countrydir);
+	
 	$cd_dfd = opendir($channeldir);
 	$cd_arr = array();
 
@@ -36,6 +38,15 @@ function readPrograms($channeldir)
 			$title = preg_replace("/\\([^)]*\\)/", "", $title);
 			$title = str_replace("  ", " ", $title);
 			$title = trim($title);
+			
+			$name = str_replace("/", "_", $title);
+			$pgminfofile = $pgminfodir . "/" . $name . ".orig.jpg";
+			
+			if (file_exists($pgminfofile))
+			{
+				echo "Exists => $pgminfofile\n";
+				continue;
+			}
 			
 			if (($year = identifyMovie($title)) != false) $title = "@movie " . $title;
 
@@ -120,7 +131,7 @@ function collectInfos()
 				$channeldir = "$countrydir/$channel";
 				echo "$channeldir\n";
 
-				$se_arr = readPrograms($channeldir);
+				$se_arr = readPrograms($countrydir, $channeldir);
 				
 				integrateInfos($co_arr, $se_arr);
 				integrateInfos($ty_arr, $se_arr);
