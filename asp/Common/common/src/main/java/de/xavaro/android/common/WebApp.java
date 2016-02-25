@@ -112,10 +112,11 @@ public class WebApp
     @SuppressLint("SetJavaScriptEnabled")
     public static void loadWebView(WebView webview, String webappname, String mode)
     {
-        WebAppLoader webapploader = new WebAppLoader(webappname, mode);
-
-        webview.setWebViewClient(webapploader);
         webview.setWebChromeClient(new WebChromeClient());
+        String agent = webview.getSettings().getUserAgentString().replace("Chrome","");
+
+        WebAppLoader webapploader = new WebAppLoader(webappname, agent, mode);
+        webview.setWebViewClient(webapploader);
 
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
