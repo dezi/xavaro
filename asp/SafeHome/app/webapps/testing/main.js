@@ -266,12 +266,15 @@ testing.loadInfoList = function()
 
 testing.loadNextInfo = function()
 {
-    var info = testing.infolist.shift();
-    var search = "http://www.google.de/search?tbm=isch&q=";
+    var which = Math.floor(Math.random() * testing.infolist.length);
+    var info = testing.infolist.splice(which);
+    info = info[ 0 ];
 
     testing.info = {};
     testing.info.name = info.t;
     testing.info.search = info.t;
+
+    var search = "http://www.google.de/search?tbm=isch&q=";
 
     if (testing.info.name.startsWith("@movie "))
     {
