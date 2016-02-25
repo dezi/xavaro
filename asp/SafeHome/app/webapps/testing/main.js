@@ -260,6 +260,8 @@ testing.loadInfoList = function()
         + testing.actcountry + ".json";
 
     testing.infolist = JSON.parse(WebAppRequest.loadSync(testing.actjson));
+
+    for (var inx = 0; inx < 300; inx++) testing.infolist.shift();
 }
 
 testing.loadNextInfo = function()
