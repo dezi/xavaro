@@ -130,6 +130,9 @@ public class WebApp
         Object request = new WebAppRequest(webappname, webview, webapploader);
         webview.addJavascriptInterface(request, "WebAppRequest");
 
+        Object intercept = new WebAppIntercept();
+        webview.addJavascriptInterface(intercept, "WebAppIntercept");
+
         Object utility = new WebAppUtility();
         webview.addJavascriptInterface(utility, "WebAppUtility");
 

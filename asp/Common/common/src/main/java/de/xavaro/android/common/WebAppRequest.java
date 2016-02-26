@@ -4,6 +4,11 @@ import android.webkit.JavascriptInterface;
 import android.util.Log;
 import android.webkit.WebView;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 @SuppressWarnings("unused")
 public class WebAppRequest
 {
@@ -29,24 +34,31 @@ public class WebAppRequest
     }
 
     @JavascriptInterface
-    public void jsonfunz(String json)
+    public boolean saveSync(String src, String json)
     {
-        Log.d(LOGTAG, "=====================> " + json.toString());
-    }
-
-    @JavascriptInterface
-    public void callback(String src)
-    {
-        String text = "pupsi=" + src;
-        final String js = "console.log(\"" + text + "\");";
-
-        webview.post(new Runnable()
+        try
         {
-            @Override
-            public void run()
-            {
-                webview.evaluateJavascript(js, null);
-            }
-        });
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setRequestMethod("PUT");
+            connection.setDoOutput(true);
+
+            OutputStream out = connection.getOutputStream();
+            out.write(json.getBytes());
+            out.close();
+
+            int result = connection.getResponseCode();
+
+            Log.d(LOGTAG, "================>" + result + "=" + src);
+
+            return (result == 200);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return false;
     }
 }

@@ -17,6 +17,13 @@ public class WebAppLoader extends WebViewClient
 {
     private static final String LOGTAG = WebAppLoader.class.getSimpleName();
 
+    public static final int LOADER_CACHE_WRITEONLY = 0;
+    public static final int LOADER_CACHE_STRIPHEADERS = -1;
+    public static final int LOADER_NATIVE = -2;
+    public static final int LOADER_INTERCEPT = -3;
+    public static final int LOADER_DENY = -4;
+    public static final int LOADER_UNKNOWN = -5;
+
     private final String webappname;
     private final String agent;
     private final String mode;
@@ -47,14 +54,14 @@ public class WebAppLoader extends WebViewClient
     @SuppressLint("NewApi")
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request)
     {
-        return getRequest(request.getUrl().toString());
+        return getRequest(view, request.getUrl().toString());
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public WebResourceResponse shouldInterceptRequest(WebView view, String url)
     {
-        return getRequest(url);
+        return getRequest(view, url);
     }
 
     //endregion Overridden methods
@@ -81,16 +88,34 @@ public class WebAppLoader extends WebViewClient
         return wcr.content;
     }
 
-    private WebResourceResponse getRequest(String url)
+    private WebResourceResponse getRequest(WebView view, String url)
     {
         if (url.equals(rootUrl)) return loadRootHTML();
         if (url.endsWith("favicon.ico")) return denyLoad();
 
         int interval = getCacheIntervalForUrl(url);
+
         if (interval <= LOADER_DENY) return denyLoad();
+
         if (interval == LOADER_NATIVE) return null;
 
-        if (interval == LOADER_INTERCEPT) return null;
+        if (interval == LOADER_INTERCEPT)
+        {
+            final WebView rview = view;
+            final String rurl = url;
+
+            view.post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    String script = "WebAppIntercept.onUserHrefClick(\"" + rurl + "\");";
+                    rview.evaluateJavascript(script, null);
+                }
+            });
+
+            return null;
+        }
 
         WebAppCache.WebAppCacheResponse wcr;
         wcr = WebAppCache.getCacheFile(webappname, url, interval, agent);
@@ -99,13 +124,6 @@ public class WebAppLoader extends WebViewClient
         return new WebResourceResponse(wcr.mimetype, wcr.encoding,
                 new ByteArrayInputStream(wcr.content));
     }
-
-    public static final int LOADER_CACHE_WRITEONLY = 0;
-    public static final int LOADER_CACHE_STRIPHEADERS = -1;
-    public static final int LOADER_NATIVE = -2;
-    public static final int LOADER_INTERCEPT = -3;
-    public static final int LOADER_DENY = -4;
-    public static final int LOADER_UNKNOWN = -5;
 
     private int getCacheIntervalForUrl(String url)
     {
