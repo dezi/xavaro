@@ -10,6 +10,22 @@ testing.onClickNext = function(event)
     event.stopPropagation();
 }
 
+testing.onClickNext100 = function(event)
+{
+    if (testing.dimmer && testing.dimmer.parentElement)
+    {
+        testing.dimmer.parentElement.removeChild(testing.dimmer);
+    }
+
+    var hundert = (testing.infolist.length < 1000) ? testing.infolist : 1000;
+
+    while (hundert-- > 0) testing.infolist.shift();
+
+    testing.loadNextInfo();
+
+    event.stopPropagation();
+}
+
 testing.onClickTitle = function(event)
 {
     if (testing.dimmer && testing.dimmer.parentElement)
@@ -18,7 +34,7 @@ testing.onClickTitle = function(event)
     }
 
     var search = "http://www.google.de/search?tbm=isch&q=";
-    var query = testing.info.search + " " + testing.title.innerHTML;
+    var query = testing.info.search + " " + testing.info.sender;
 
     testing.iframe.src = search + encodeURIComponent(query);
 
@@ -73,6 +89,7 @@ WebAppIntercept.onUserHrefClick = function(url)
     imgurl = imgurl && imgurl.length ? imgurl[ 1 ] : null;
     if (! imgurl) return false;
     imgurl = decodeURIComponent(imgurl);
+    if (imgurl.startsWith("https://")) imgurl = "http" + imgurl.substring(5);
 
     var width = url.match(/&w=([^&]*)/);
     width = width && width.length ? width[ 1 ] : null;
@@ -143,7 +160,6 @@ WebAppIntercept.onUserHrefClick = function(url)
     img.style.left     = "10px";
     img.style.width    = (dwid - 20) + "px";
     img.style.height   = "auto";
-    img.src            = imgurl;
 
     testing.okdiv.appendChild(testing.imgdiv = img);
 
@@ -189,6 +205,9 @@ WebAppIntercept.onUserHrefClick = function(url)
     span.onclick            = testing.onClickOk;
 
     testing.butdiv.appendChild(span);
+
+    testing.imgdiv = imgurl;
+    console.log("============================>" + imgurl);
 
     return false;
 }
@@ -272,6 +291,7 @@ testing.createFrameSetup = function()
     div.style.color           = "#cccccc";
     div.innerHTML             = ">>";
     div.onclick               = testing.onClickNext;
+    div.ondblclick            = testing.onClickNext100;
 
     testing.titlebar.appendChild(testing.nextbutton = div);
 
@@ -309,9 +329,10 @@ testing.loadInfoList = function()
 
     testing.actjson = "http://epg.xavaro.de/epginfo/"
         + testing.acttype + "/"
-        + testing.actcountry + ".json";
+        + testing.actcountry
+        + ".json";
 
-    testing.infolist = JSON.parse(WebAppRequest.loadSync(testing.actjson));
+    testing.infolist = JSON.parse(WebAppRequest.loadSync(encodeURI(testing.actjson)));
 }
 
 testing.loadNextInfo = function()
@@ -320,14 +341,21 @@ testing.loadNextInfo = function()
     //var info = testing.infolist.splice(which, 1);
     //info = info[ 0 ];
 
+    if (testing.infolist.length == 0)
+    {
+        alert("Fertig...");
+        return;
+    }
+
     var info = testing.infolist.shift();
 
     testing.info = {};
     testing.info.name = info.t;
     testing.info.search = info.t;
+    testing.info.sender = info.s;
 
     testing.counter.innerHTML = testing.infolist.length;
-    testing.title.innerHTML = info.s;
+    testing.title.innerHTML = testing.info.sender + " (" + info.c + ")";
 
     var search = "http://www.google.de/search?tbm=isch&q=";
 
