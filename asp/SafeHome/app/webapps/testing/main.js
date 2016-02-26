@@ -10,6 +10,21 @@ testing.onClickNext = function(event)
     event.stopPropagation();
 }
 
+testing.onClickTitle = function(event)
+{
+    if (testing.dimmer && testing.dimmer.parentElement)
+    {
+        testing.dimmer.parentElement.removeChild(testing.dimmer);
+    }
+
+    var search = "http://www.google.de/search?tbm=isch&q=";
+    var query = testing.info.search + " " + testing.title.innerHTML;
+
+    testing.iframe.src = search + encodeURIComponent(query);
+
+    event.stopPropagation();
+}
+
 testing.onClickCancel = function(event)
 {
     if (testing.dimmer && testing.dimmer.parentElement)
@@ -43,8 +58,10 @@ WebAppIntercept.onUserHrefClick = function(url)
 {
     //
     // http://images.google.de/imgres
-    //  ?imgurl=http%3A%2F%2Fwww.rosenheim24.de%2Fbilder%2F2013%2F05%2F14%2F2905337%2F1841037453-rosenheim-cops-dreh-staffel-g77aNPPwiMG.jpg
-    //  &imgrefurl=http%3A%2F%2Fwww.rosenheim24.de%2Ftv-kino%2Frosenheim-cops-dreh-staffel-rosenheim24-2905337.html
+    //  ?imgurl=http%3A%2F%2Fwww.rosenheim24.de%2Fbilder%2F2013%2F05%2F14%2F2905337
+    //          %2F1841037453-rosenheim-cops-dreh-staffel-g77aNPPwiMG.jpg
+    //  &imgrefurl=http%3A%2F%2Fwww.rosenheim24.de%2Ftv-kino%2Frosenheim-cops-
+    //             dreh-staffel-rosenheim24-2905337.html
     //  &h=747&w=1000
     //  &tbnid=wvleiuf4g-D5aM%3A&q=Rosenheim%20Cops&docid=zQCaOGaSj5-_NM
     //  &ei=trPOVoLWKoq56AT336DADg
@@ -213,6 +230,36 @@ testing.createFrameSetup = function()
     testing.topdiv.appendChild(testing.titlebar = div);
 
     var div                   = document.createElement("div");
+    div.id                    = "counter";
+    div.style.position        = "absolute";
+    div.style.top             = "24px";
+    div.style.left            = "8px";
+    div.style.width           = "100px";
+    div.style.bottom          = "0px";
+    div.style.fontSize        = "28px";
+    div.style.fontWeight      = "bold";
+    div.style.textAlign       = "center";
+    div.style.color           = "#444444";
+
+    testing.titlebar.appendChild(testing.counter = div);
+
+
+    var div                   = document.createElement("div");
+    div.id                    = "title";
+    div.style.position        = "absolute";
+    div.style.top             = "20px";
+    div.style.left            = "80px";
+    div.style.right           = "80px";
+    div.style.bottom          = "0px";
+    div.style.fontSize        = "34px";
+    div.style.fontWeight      = "bold";
+    div.style.textAlign       = "center";
+    div.style.color           = "#444444";
+    div.onclick               = testing.onClickTitle;
+
+    testing.titlebar.appendChild(testing.title = div);
+
+    var div                   = document.createElement("div");
     div.id                    = "nextbutton";
     div.style.position        = "absolute";
     div.style.top             = "0px";
@@ -265,19 +312,22 @@ testing.loadInfoList = function()
         + testing.actcountry + ".json";
 
     testing.infolist = JSON.parse(WebAppRequest.loadSync(testing.actjson));
-
-    for (var inx = 0; inx < 300; inx++) testing.infolist.shift();
 }
 
 testing.loadNextInfo = function()
 {
-    var which = Math.floor(Math.random() * testing.infolist.length);
-    var info = testing.infolist.splice(which, 1);
-    info = info[ 0 ];
+    //var which = Math.floor(Math.random() * testing.infolist.length);
+    //var info = testing.infolist.splice(which, 1);
+    //info = info[ 0 ];
+
+    var info = testing.infolist.shift();
 
     testing.info = {};
     testing.info.name = info.t;
     testing.info.search = info.t;
+
+    testing.counter.innerHTML = testing.infolist.length;
+    testing.title.innerHTML = info.s;
 
     var search = "http://www.google.de/search?tbm=isch&q=";
 
