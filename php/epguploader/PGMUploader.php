@@ -51,7 +51,10 @@
 		$orig = $lpath . ".orig.jpg";
 		$thmb = $lpath . ".thmb.jpg";
 		
-		$jpeg = @file_get_contents($imgurl);
+		$agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1";
+		$options  = array("http" => array("user_agent" => $agent, "referer" => $imgurl));
+		$context  = stream_context_create($options);
+		$jpeg = @file_get_contents($imgurl, false, $context);
 		
 		if ($jpeg != false)
 		{

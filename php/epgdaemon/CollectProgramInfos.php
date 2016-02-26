@@ -43,6 +43,9 @@ function readPrograms($countrydir, $channeldir)
 
 	$channel = basename($channeldir);
 	
+	if (substr($channel, -3) == " HD") $channel = substr($channel, 0, -3);
+	if (substr($channel, -12) == " Deutschland") $channel = substr($channel, 0, -12);
+	
 	while (($epgfile = readdir($cd_dfd)) !== false)
 	{
 		if (($epgfile == ".") || ($epgfile == "..")) continue;
