@@ -65,6 +65,11 @@ WebAppIntercept.onUserHrefClick = function(url)
     height = height && height.length ? height[ 1 ] : null;
     if (! height) return false;
 
+    if (testing.dimmer && testing.dimmer.parentElement)
+    {
+        testing.dimmer.parentElement.removeChild(testing.dimmer);
+    }
+
     width = parseInt(width);
     height = parseInt(height);
 
@@ -267,7 +272,7 @@ testing.loadInfoList = function()
 testing.loadNextInfo = function()
 {
     var which = Math.floor(Math.random() * testing.infolist.length);
-    var info = testing.infolist.splice(which);
+    var info = testing.infolist.splice(which, 1);
     info = info[ 0 ];
 
     testing.info = {};
