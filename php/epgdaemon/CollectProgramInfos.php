@@ -25,23 +25,18 @@ function checkSingleByteSpecial($title)
 
 function checkUnwanted($title)
 {
-	if ($title == "Thema:") return true;
-	if ($title == "Magazin") return true;
-	if ($title == "Technik") return true;
-	if ($title == "Quickie") return true;
-	if ($title == "Bilderbuch") return true;
-	
 	return false;
 }
 
 function readPrograms($countrydir, $channeldir)
 {
+	$channel = basename($channeldir);
+	if (substr($channel, 0, 4) == "Sky ") return array();
+	
 	$pgminfodir = str_replace("epgdata", "pgminfo", $countrydir);
 	
 	$cd_dfd = opendir($channeldir);
 	$cd_arr = array();
-
-	$channel = basename($channeldir);
 	
 	if (substr($channel, -3) == " HD") $channel = substr($channel, 0, -3);
 	if (substr($channel, -12) == " Deutschland") $channel = substr($channel, 0, -12);
@@ -50,8 +45,10 @@ function readPrograms($countrydir, $channeldir)
 	{
 		if (($epgfile == ".") || ($epgfile == "..")) continue;
 
-		if (strlen($epgfile) !=	18) continue;
-		if (substr($epgfile, -8) !=	".json.gz") continue;
+		//if (strlen($epgfile) !=	18) continue;
+		//if (substr($epgfile, -8) !=	".json.gz") continue;
+		
+		if ($epgfile != "current.json.gz") continue;
 			 
 		$epgfile = "$channeldir/$epgfile";
 		echo "$epgfile\n";
