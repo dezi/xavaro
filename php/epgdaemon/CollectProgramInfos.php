@@ -10,6 +10,30 @@ function sortInfos($a, $b)
 	return ($a > $b) ? -1 : 1;
 }
 
+function checkSingleByteSpecial($title)
+{
+	$sbyte = false;
+	
+	$title = str_replace(chr(0xe2) . chr(0x85) . chr(0x9b), "Ü", $title);
+	$title = str_replace(chr(0xc4) . chr(0xa6), "ä", $title);
+	$title = str_replace(chr(0xc4) . chr(0xb3), "ö", $title);
+	$title = str_replace(chr(0xc3) . chr(0xbe), "ü", $title);
+	$title = str_replace(chr(0xe2) . chr(0x85) . chr(0x9e), "ß", $title);
+		
+	return $title;
+}
+
+function checkUnwanted($title)
+{
+	if ($title == "Thema:") return true;
+	if ($title == "Magazin") return true;
+	if ($title == "Technik") return true;
+	if ($title == "Quickie") return true;
+	if ($title == "Bilderbuch") return true;
+	
+	return false;
+}
+
 function readPrograms($countrydir, $channeldir)
 {
 	$pgminfodir = str_replace("epgdata", "pgminfo", $countrydir);
@@ -17,6 +41,8 @@ function readPrograms($countrydir, $channeldir)
 	$cd_dfd = opendir($channeldir);
 	$cd_arr = array();
 
+	$channel = basename($channeldir);
+	
 	while (($epgfile = readdir($cd_dfd)) !== false)
 	{
 		if (($epgfile == ".") || ($epgfile == "..")) continue;
@@ -39,6 +65,10 @@ function readPrograms($countrydir, $channeldir)
 			$title = str_replace("  ", " ", $title);
 			$title = trim($title);
 			
+			$title = checkSingleByteSpecial($title);
+			
+			if (checkUnwanted($title)) continue;
+			
 			$name = str_replace("/", "_", $title);
 			$pgminfofile = $pgminfodir . "/" . $name . ".orig.jpg";
 			
@@ -52,6 +82,9 @@ function readPrograms($countrydir, $channeldir)
 
 			if (! isset($cd_arr[ $title ])) $cd_arr[ $title ] = 0;
 			$cd_arr[ $title ] += 1;
+			
+			if (! isset($GLOBALS[ "ttoc" ])) $GLOBALS[ "ttoc" ] = array();
+			$GLOBALS[ "ttoc" ][ $title ] = $channel;
 		}
 	}
 
@@ -84,6 +117,7 @@ function writeInfos($filename, $infos)
 		$item = array();
 		$item[ "t" ] = $title;
 		$item[ "c" ] = $count;
+		$item[ "s" ] = $GLOBALS[ "ttoc" ][ $title ];
 		
 		$array[] = $item;
 	}

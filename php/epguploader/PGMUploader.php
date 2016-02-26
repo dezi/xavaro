@@ -51,7 +51,7 @@
 		$orig = $lpath . ".orig.jpg";
 		$thmb = $lpath . ".thmb.jpg";
 		
-		$jpeg = file_get_contents($imgurl);
+		$jpeg = @file_get_contents($imgurl);
 		
 		if ($jpeg != false)
 		{
