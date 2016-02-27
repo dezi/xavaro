@@ -482,9 +482,20 @@ function defuckEPG(&$epg)
 {
 	if (! isset($epg[ "description" ])) return;
 	
-	$epg[ "title"       ] = deMoronizeEPG($epg[ "title"       ]);
-	$epg[ "subtitle"    ] = deMoronizeEPG($epg[ "subtitle"    ]);
-	$epg[ "description" ] = deMoronizeEPG($epg[ "description" ]);
+	if (isset($epg[ "title" ])) 
+	{
+		$epg[ "title" ] = deMoronizeEPG($epg[ "title" ]);
+	}
+	
+	if (isset($epg[ "subtitle" ])) 
+	{
+		$epg[ "subtitle" ] = deMoronizeEPG($epg[ "subtitle" ]);
+	}
+	
+	if (isset($epg[ "description" ])) 
+	{
+		$epg[ "description" ] = deMoronizeEPG($epg[ "description" ]);
+	}
 	
 	$desc = str_replace("\\n", "\n", $epg[ "description" ]);
 	$epg[ "description" ] = $desc;

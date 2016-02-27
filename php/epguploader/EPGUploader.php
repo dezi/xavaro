@@ -62,6 +62,7 @@
 				{
 					if (($name == ".") || ($name == "..")) continue;
 
+					if ($name == "$prefix.json.gz") continue;
 					if (substr($name, -8) != ".json.gz") continue;
 					if (substr($name, 0, strlen($prefix)) != $prefix) continue;
 				
