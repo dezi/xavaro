@@ -48,7 +48,7 @@ function removeEnd($title, $start)
 
 function chopTitleName($title)
 {
-	if (startsWith($title, "Tagesschau - Vor 20 Jahren")) return removeEnd($title, $start);
+	if (startsWith($title, $start = "Tagesschau - Vor 20 Jahren")) return removeEnd($title, $start);
 	
 	return $title;
 }
@@ -70,10 +70,8 @@ function readPrograms($countrydir, $channeldir)
 	{
 		if (($epgfile == ".") || ($epgfile == "..")) continue;
 
-		//if (strlen($epgfile) !=	18) continue;
-		//if (substr($epgfile, -8) !=	".json.gz") continue;
-		
-		if ($epgfile != "current.json.gz") continue;
+		if ((strlen($epgfile) != 18) && ($epgfile != "current.json.gz")) continue;
+		if (substr($epgfile, -8) !=	".json.gz") continue;
 			 
 		$epgfile = "$channeldir/$epgfile";
 		echo "$epgfile\n";
@@ -130,7 +128,7 @@ function readPrograms($countrydir, $channeldir)
 					$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
 				}
 				
-				echo "Exists => $pgminfofile\n";
+				//echo "Exists => $pgminfofile\n";
 				continue;
 			}
 			
