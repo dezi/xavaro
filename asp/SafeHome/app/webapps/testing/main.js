@@ -329,8 +329,8 @@ testing.loadInfoList = function()
 
     testing.actjson = "http://epg.xavaro.de/epginfo/"
         + testing.acttype + "/"
-        + testing.actcountry
-        + ".json";
+        + testing.actcountry + "/"
+        + "Super RTL Deutschland.json";
 
     testing.infolist = JSON.parse(WebAppRequest.loadSync(encodeURI(testing.actjson)));
 }
