@@ -465,9 +465,37 @@ function saveChannel($cdata)
 	file_put_contents($actfile, json_encdat($ordered) . "\n");
 }
 
+function deMoronizeEPG($string)
+{
+	$string = str_replace(chr(0xc4) . chr(0xa6), "ä", $string);
+	$string = str_replace(chr(0xc4) . chr(0xb3), "ö", $string);
+	$string = str_replace(chr(0xc3) . chr(0xbe), "ü", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x99), "Ä", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9a), "Ö", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9b), "Ü", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9e), "ß", $string);
+		
+	return $string;
+}
+
 function defuckEPG(&$epg)
 {
 	if (! isset($epg[ "description" ])) return;
+	
+	if (isset($epg[ "title" ])) 
+	{
+		$epg[ "title" ] = deMoronizeEPG($epg[ "title" ]);
+	}
+	
+	if (isset($epg[ "subtitle" ])) 
+	{
+		$epg[ "subtitle" ] = deMoronizeEPG($epg[ "subtitle" ]);
+	}
+	
+	if (isset($epg[ "description" ])) 
+	{
+		$epg[ "description" ] = deMoronizeEPG($epg[ "description" ]);
+	}
 	
 	$desc = str_replace("\\n", "\n", $epg[ "description" ]);
 	$epg[ "description" ] = $desc;
@@ -598,6 +626,7 @@ function saveEPG($epg)
 	unset($epg[ "is_widescreen" ]);
 	unset($epg[ "is_subtitled"  ]);
 	
+	unset($epg[ "language" ]);
 	unset($epg[ "updated"  ]);
 	unset($epg[ "channel"  ]);
 	unset($epg[ "provider" ]);

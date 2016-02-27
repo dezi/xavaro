@@ -47,6 +47,12 @@ public class WebAppCache
 
     public static WebAppCacheResponse getCacheFile(String webappname, String url, int interval)
     {
+        return getCacheFile(webappname, url, interval, null);
+    }
+
+    public static WebAppCacheResponse getCacheFile(
+            String webappname, String url, int interval, String agent)
+    {
         Simple.removePost(freeMemory);
         getStorage();
 
@@ -61,9 +67,6 @@ public class WebAppCache
         {
             cacheurl = url.substring(WebApp.getHTTPRoot(webappname).length());
         }
-
-        byte[] content = null;
-        String mimetype = null;
 
         if (! webappcache.has(webappname)) Json.put(webappcache, webappname, new JSONObject());
         JSONObject cachefiles = Json.getObject(webappcache, webappname);
@@ -82,6 +85,8 @@ public class WebAppCache
             cachedir.mkdirs();
         }
 
+        byte[] content = null;
+        String mimetype = null;
         JSONObject cachefile;
         String uuid;
 
@@ -109,7 +114,7 @@ public class WebAppCache
                     content = Simple.readBinaryFile(cfile);
                     mimetype = Json.getString(cachefile, "mime");
 
-                    Log.d(LOGTAG,"getCacheFile: HIT=" + age + "=" + url);
+                    Log.d(LOGTAG,"getCacheFile: HIT=" + age + "=" + mimetype + "=" + url);
                 }
                 else
                 {
@@ -141,14 +146,20 @@ public class WebAppCache
             Json.put(cachefile, "ival", interval);
             Json.put(cachefile, "time", Simple.getRandom(0, 86400));
 
-            Json.put(cachefiles, cacheurl, cachefile);
+            if (interval >= 0)
+            {
+                //
+                // Register offline copy with cache.
+                //
 
-            dirty = true;
+                Json.put(cachefiles, cacheurl, cachefile);
+                dirty = true;
+            }
         }
 
         if (content == null)
         {
-            content = getContentFromServer(webappname, url, cachefile);
+            content = getContentFromServer(webappname, url, cachefile, interval < 0 ? agent : null);
 
             if ((content != null) && (uuid != null))
             {
@@ -159,8 +170,9 @@ public class WebAppCache
 
                 File cfile = new File(cachedir, uuid);
                 Simple.writeBinaryFile(cfile, content);
+                mimetype = Json.getString(cachefile, "mime");
 
-                Log.d(LOGTAG, "getCacheFile: GET=" + url);
+                Log.d(LOGTAG, "getCacheFile: GET=" + mimetype + "=" + url);
             }
         }
 
@@ -181,7 +193,7 @@ public class WebAppCache
                 // since not modified on server or unavailable.
                 //
 
-                Log.d(LOGTAG, "getCacheFile: NOM=" + url);
+                Log.d(LOGTAG, "getCacheFile: NOM=" + mimetype + "=" + url);
             }
         }
 
@@ -194,9 +206,13 @@ public class WebAppCache
             //
 
             mimetype = Json.getString(cachefile, "mime");
-            Json.put(cachefile, "ival", interval);
-            Json.put(cachefile, "luse", Simple.nowAsISO());
-            dirty = true;
+
+            if (interval >= 0)
+            {
+                Json.put(cachefile, "ival", interval);
+                Json.put(cachefile, "luse", Simple.nowAsISO());
+                dirty = true;
+            }
         }
         else
         {
@@ -205,11 +221,29 @@ public class WebAppCache
 
         Simple.makePost(freeMemory, 10 * 1000);
 
-        return new WebAppCacheResponse(mimetype, "UTF-8", content);
+        //
+        // Adjust mimetype and encoding.
+        //
+
+        String encoding = "UTF-8";
+
+        if ((mimetype != null) && mimetype.contains("; charset="))
+        {
+            String[] mparts = mimetype.split("; charset=");
+
+            if (mparts.length == 2)
+            {
+                mimetype = mparts[ 0 ];
+                encoding = mparts[ 1 ];
+            }
+        }
+
+        return new WebAppCacheResponse(mimetype, encoding, content);
     }
 
     @Nullable
-    private static byte[] getContentFromServer(String webappname, String src, JSONObject cachefile)
+    private static byte[] getContentFromServer(
+            String webappname, String src, JSONObject cachefile, String agent)
     {
         try
         {
@@ -226,8 +260,20 @@ public class WebAppCache
                 connection.setRequestProperty("If-Modified-Since", lastmodified);
             }
 
-            connection.setRequestProperty("Referer", webappname);
-            connection.setRequestProperty("User-Agent", "Xavaro-" + Simple.getAppName());
+            if (agent == null)
+            {
+                //
+                // Set simple agent and referer for our own server logs.
+                //
+
+                connection.setRequestProperty("Referer", webappname);
+                connection.setRequestProperty("User-Agent", "Xavaro-" + Simple.getAppName());
+            }
+            else
+            {
+                connection.setRequestProperty("User-Agent", agent);
+            }
+
             connection.setConnectTimeout(4000);
             connection.setUseCaches(false);
             connection.setDoInput(true);

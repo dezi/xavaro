@@ -20,11 +20,30 @@
       "gps"
     ],
 
+    //
+    // Interval (positive values hours before cache refresh):
+    //
+    //  0 : Write cache for offline use
+    // -1 : Strip server headers crossdomain
+    // -2 : Load native by chrome
+    // -3 : Intercept load
+    // -4 : Deny load
+    //
+
     "cachedefs": [
+      { "interval": -1, "pattern": "http://www\\.google\\.de/search.*" },
+      { "interval": -1, "pattern": "http://www\\.google\\.de/.*" },
+      { "interval": -1, "pattern": "http://.*?\\.gstatic\\.com/.*" },
+      { "interval": -3, "pattern": "http://images\\.google\\.de/.*" },
+
+      { "interval":  0, "pattern": ".*/epginfo/.*" },
+
       { "interval": 24, "pattern": ".*\\.js" },
       { "interval": 72, "pattern": ".*\\.png" },
       { "interval": 24, "pattern": ".*\\.json" },
-      { "interval": 24, "pattern": ".*\\.json\\.gz" }
+      { "interval": 24, "pattern": ".*\\.json\\.gz" },
+
+      { "interval": -1, "pattern": ".*" }
     ]
   }
 }

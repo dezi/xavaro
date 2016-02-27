@@ -1,3 +1,6 @@
 epgdata
+epginfo
+pgminfo
 shares
+*.json
 *.json.gz

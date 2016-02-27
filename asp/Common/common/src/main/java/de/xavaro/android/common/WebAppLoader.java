@@ -17,14 +17,23 @@ public class WebAppLoader extends WebViewClient
 {
     private static final String LOGTAG = WebAppLoader.class.getSimpleName();
 
+    public static final int LOADER_CACHE_WRITEONLY = 0;
+    public static final int LOADER_CACHE_STRIPHEADERS = -1;
+    public static final int LOADER_NATIVE = -2;
+    public static final int LOADER_INTERCEPT = -3;
+    public static final int LOADER_DENY = -4;
+    public static final int LOADER_UNKNOWN = -5;
+
     private final String webappname;
+    private final String agent;
     private final String mode;
     private final String rootUrl;
     private final JSONArray cachedefs;
 
-    public WebAppLoader(String webappname, String mode)
+    public WebAppLoader(String webappname, String agent, String mode)
     {
         this.webappname = webappname;
+        this.agent = agent;
         this.mode = mode;
 
         rootUrl = WebApp.getHTTPRoot(webappname);
@@ -36,7 +45,7 @@ public class WebAppLoader extends WebViewClient
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url)
     {
-        Log.d(LOGTAG, "shouldOverrideUrlLoading=" + url);
+        Log.d(LOGTAG, "shouldOverrideUrlLoading url=" + url);
 
         return true;
     }
@@ -45,14 +54,14 @@ public class WebAppLoader extends WebViewClient
     @SuppressLint("NewApi")
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request)
     {
-        return getRequest(request.getUrl().toString());
+        return getRequest(view, request.getUrl().toString());
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public WebResourceResponse shouldInterceptRequest(WebView view, String url)
     {
-        return getRequest(url);
+        return getRequest(view, url);
     }
 
     //endregion Overridden methods
@@ -72,29 +81,44 @@ public class WebAppLoader extends WebViewClient
 
         Log.d(LOGTAG, "getRequestData:" + url);
 
-        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, url, interval);
+        WebAppCache.WebAppCacheResponse wcr;
+        wcr = WebAppCache.getCacheFile(webappname, url, interval, agent);
         if (wcr.content == null) return null;
 
         return wcr.content;
     }
 
-    private WebResourceResponse getRequest(String url)
+    private WebResourceResponse getRequest(WebView view, String url)
     {
         if (url.equals(rootUrl)) return loadRootHTML();
         if (url.endsWith("favicon.ico")) return denyLoad();
 
         int interval = getCacheIntervalForUrl(url);
 
-        if (interval < 0)
-        {
-            //
-            // Unknown cache policy for url in manifest, deny anyway.
-            //
+        if (interval <= LOADER_DENY) return denyLoad();
 
-            return denyLoad();
+        if (interval == LOADER_NATIVE) return null;
+
+        if (interval == LOADER_INTERCEPT)
+        {
+            final WebView rview = view;
+            final String rurl = url;
+
+            view.post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    String script = "WebAppIntercept.onUserHrefClick(\"" + rurl + "\");";
+                    rview.evaluateJavascript(script, null);
+                }
+            });
+
+            return null;
         }
 
-        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, url, interval);
+        WebAppCache.WebAppCacheResponse wcr;
+        wcr = WebAppCache.getCacheFile(webappname, url, interval, agent);
         if (wcr.content == null) return denyLoad();
 
         return new WebResourceResponse(wcr.mimetype, wcr.encoding,
@@ -103,7 +127,7 @@ public class WebAppLoader extends WebViewClient
 
     private int getCacheIntervalForUrl(String url)
     {
-        int interval = -1;
+        int interval = LOADER_UNKNOWN;
 
         if (cachedefs != null)
         {
@@ -131,7 +155,7 @@ public class WebAppLoader extends WebViewClient
                     // Developer mode. Always load webapp components w/o cache.
                     //
 
-                    interval = 0;
+                    interval = LOADER_CACHE_WRITEONLY;
                 }
             }
             else
@@ -142,11 +166,12 @@ public class WebAppLoader extends WebViewClient
                     // Developer mode. Always load data components w/o cache.
                     //
 
-                    interval = 0;
+                    interval = LOADER_CACHE_WRITEONLY;
                 }
             }
         }
-        else
+
+        if (interval == LOADER_UNKNOWN)
         {
             Log.e(LOGTAG, "getCacheIntervalForUrl: unknown cache policy:" + url);
         }

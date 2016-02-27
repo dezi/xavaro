@@ -45,40 +45,51 @@
 				if (substr($file, 0, 7) == "current")
 				{
 					$prefix = substr($file, 0, 7);
+					$symlink = "$dir/$prefix.json.gz";
+					
+					@unlink($symlink);
+					@symlink($file, $symlink);
+					
+					error_log($symlink . " => " . $file);
 				}
 				else
 				{
 					$prefix = substr($file, 0, 10);
-				}
+					$symlink = "$dir/$prefix.json.gz";
 				
-				$symlink = "$dir/$prefix.json.gz";
-
-				$dfd = opendir($dir);
+					$dfd = opendir($dir);
 			
-				$bestname = null;
-				$bestsize = 0;
+					$bestname = null;
+					$bestsize = 0;
 			
-				while (($name = readdir($dfd)) !== false)
-				{
-					if (($name == ".") || ($name == "..")) continue;
-
-					if (substr($name, -8) != ".json.gz") continue;
-					if (substr($name, 0, strlen($prefix)) != $prefix) continue;
-				
-					$size = filesize("$dir/$name");
-				
-					if ($size > $bestsize)
+					while (($name = readdir($dfd)) !== false)
 					{
-						$bestname = $name;
-						$bestsize = $size;
+						if (($name == ".") || ($name == "..")) continue;
+
+						if ($name == "$prefix.json.gz") continue;
+						if (substr($name, -8) != ".json.gz") continue;
+						if (substr($name, 0, strlen($prefix)) != $prefix) continue;
+				
+						$size = filesize("$dir/$name");
+					
+						error_log($size . "=" . "$dir/$name");
+
+						if ($size > $bestsize)
+						{
+							$bestname = $name;
+							$bestsize = $size;
+						}
 					}
-				}
 			
-				closedir($dfd);
+					closedir($dfd);
 			
-				if ($bestname != null)
-				{
-					@symlink($bestname, $symlink);
+					if ($bestname != null)
+					{
+						@unlink($symlink);
+						@symlink($bestname, $symlink);
+						
+						error_log($symlink . " => " . $bestname . " => " . $bestsize);
+					}
 				}
 			}
 		}
