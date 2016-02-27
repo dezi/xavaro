@@ -206,7 +206,7 @@ WebAppIntercept.onUserHrefClick = function(url)
 
     testing.butdiv.appendChild(span);
 
-    testing.imgdiv = imgurl;
+    testing.imgdiv.src = imgurl;
     console.log("============================>" + imgurl);
 
     return false;
