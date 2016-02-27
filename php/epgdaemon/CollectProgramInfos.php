@@ -38,12 +38,12 @@ function deMoronizeEPG($string)
 
 function startsWith($title, $start)
 {
-	return (substring($title, 0, strlen($start)) == $start);
+	return (substr($title, 0, strlen($start)) == $start);
 }
 
 function removeEnd($title, $start)
 {
-	return substring($title, 0, strlen($start));
+	return substr($title, 0, strlen($start));
 }
 
 function chopTitleName($title)
@@ -89,9 +89,20 @@ function readPrograms($countrydir, $channeldir)
 			
 			unset($val[ "language" ]);
 			
-			$val[ "title"       ] = deMoronizeEPG($val[ "title"       ]);
-			$val[ "subtitle"    ] = deMoronizeEPG($val[ "subtitle"    ]);
-			$val[ "description" ] = deMoronizeEPG($val[ "description" ]);
+			if (isset($val[ "title" ]))
+			{
+				$val[ "title" ] = deMoronizeEPG($val[ "title" ]);
+			}
+			
+			if (isset($val[ "subtitle" ]))
+			{
+				$val[ "subtitle" ] = deMoronizeEPG($val[ "subtitle" ]);
+			}
+			
+			if (isset($val[ "description" ]))
+			{
+				$val[ "description" ] = deMoronizeEPG($val[ "description" ]);
+			}
 
 			$epgs[ "epgdata" ][ $inx ] = $val;
 			

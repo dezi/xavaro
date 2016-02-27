@@ -72,8 +72,6 @@
 				
 						$size = filesize("$dir/$name");
 					
-						error_log($size . "=" . "$dir/$name");
-
 						if ($size > $bestsize)
 						{
 							$bestname = $name;
