@@ -23,9 +23,34 @@ function checkSingleByteSpecial($title)
 	return $title;
 }
 
-function checkUnwanted($title)
+function deMoronizeEPG($string)
 {
-	return false;
+	$string = str_replace(chr(0xc4) . chr(0xa6), "ä", $string);
+	$string = str_replace(chr(0xc4) . chr(0xb3), "ö", $string);
+	$string = str_replace(chr(0xc3) . chr(0xbe), "ü", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x99), "Ä", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9a), "Ö", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9b), "Ü", $string);
+	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9e), "ß", $string);
+		
+	return $string;
+}
+
+function startsWith($title, $start)
+{
+	return (substring($title, 0, strlen($start)) == $start);
+}
+
+function removeEnd($title, $start)
+{
+	return substring($title, 0, strlen($start));
+}
+
+function chopTitleName($title)
+{
+	if (startsWith($title, "Tagesschau - Vor 20 Jahren")) return removeEnd($title, $start);
+	
+	return $title;
 }
 
 function readPrograms($countrydir, $channeldir)
@@ -55,25 +80,45 @@ function readPrograms($countrydir, $channeldir)
 		
 		$epgs = json_decdat(gzinflate(substr(file_get_contents($epgfile),10,-8)));
 		if (! isset($epgs[ "epgdata" ])) continue;
-		$epgs = $epgs[ "epgdata" ];
 		
-		foreach ($epgs as $inx => $val)
+		foreach ($epgs[ "epgdata" ] as $inx => $val)
 		{
+			//
+			// Corrections.
+			//
+			
+			unset($val[ "language" ]);
+			
+			$val[ "title"       ] = deMoronizeEPG($val[ "title"       ]);
+			$val[ "subtitle"    ] = deMoronizeEPG($val[ "subtitle"    ]);
+			$val[ "description" ] = deMoronizeEPG($val[ "description" ]);
+
+			$epgs[ "epgdata" ][ $inx ] = $val;
+			
+			//
+			// Check if title image exists.
+			//
+			
 			$title = $val[ "title" ];
 			
 			$title = preg_replace("/\\([^)]*\\)/", "", $title);
 			$title = str_replace("  ", " ", $title);
 			$title = trim($title);
 			
-			$title = checkSingleByteSpecial($title);
-			
-			if (checkUnwanted($title)) continue;
-			
-			$name = str_replace("/", "_", $title);
+			$realtitle = chopTitleName($title);
+					
+			$name = str_replace("/", "_", $realtitle);
 			$pgminfofile = $pgminfodir . "/" . $name . ".orig.jpg";
 			
 			if (file_exists($pgminfofile))
 			{
+				$epgs[ "epgdata" ][ $inx ][ "img" ] = true;
+				
+				if ($realtitle != $title)
+				{
+					$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
+				}
+				
 				echo "Exists => $pgminfofile\n";
 				continue;
 			}
@@ -86,6 +131,8 @@ function readPrograms($countrydir, $channeldir)
 			if (! isset($GLOBALS[ "ttoc" ])) $GLOBALS[ "ttoc" ] = array();
 			$GLOBALS[ "ttoc" ][ $title ] = $channel;
 		}
+		
+		file_put_contents($epgfile, gzencode(json_encdat($epgs), 9));
 	}
 
 	closedir($cd_dfd);	

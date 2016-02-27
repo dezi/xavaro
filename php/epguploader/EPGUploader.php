@@ -66,7 +66,9 @@
 					if (substr($name, 0, strlen($prefix)) != $prefix) continue;
 				
 					$size = filesize("$dir/$name");
-				
+					
+					error_log($size . "=" . "$dir/$name");
+
 					if ($size > $bestsize)
 					{
 						$bestname = $name;
@@ -78,6 +80,9 @@
 			
 				if ($bestname != null)
 				{
+					error_log($bestsize . "=" . "$bestname");
+					
+					@unlink($symlink);
 					@symlink($bestname, $symlink);
 				}
 			}
