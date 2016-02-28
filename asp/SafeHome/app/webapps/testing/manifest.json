@@ -4,7 +4,18 @@
     "label": "Testing",
     "appname": "testing",
     "appicon": "testing_512x512.png",
-    "apppref": "pref.js",
+    "preferences": false,
+
+    "permissions": [
+      "request",
+      "intercept",
+      "utility",
+      "prefs"
+    ],
+
+    "weblibs": [
+      "simple"
+    ],
 
     "preload": [
       "util.js"
@@ -13,11 +24,6 @@
     "files": [
       "main.js",
       "util.js"
-    ],
-
-    "permissions": [
-      "localdomstorage",
-      "gps"
     ],
 
     //

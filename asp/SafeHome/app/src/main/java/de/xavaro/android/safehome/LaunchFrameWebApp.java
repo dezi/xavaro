@@ -33,7 +33,7 @@ public class LaunchFrameWebApp extends LaunchFrame
     public void setWebAppName(String webappname)
     {
         WebView webview = new WebView(getContext());
-        webview.setBackgroundColor(0xff8888ff);
+        webview.setBackgroundColor(0xffffffff);
         addView(webview);
 
         WebApp.loadWebView(webview, webappname, "main");

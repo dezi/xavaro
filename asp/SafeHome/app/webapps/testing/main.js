@@ -1,9 +1,33 @@
+testing.channels = {};
+testing.channels.standard = [];
+
+testing.channels.standard.push("tv/de/Das Erste");
+testing.channels.standard.push("tv/de/ZDF");
+testing.channels.standard.push("tv/de/RTL Deutschland");
+testing.channels.standard.push("tv/de/Pro Sieben Deutschland");
+testing.channels.standard.push("tv/de/Kabel Eins Deutschland");
+testing.channels.standard.push("tv/de/Vox Deutschland");
+testing.channels.standard.push("tv/de/Sat. 1 Deutschland");
+testing.channels.standard.push("tv/de/RTL 2 Deutschland");
+testing.channels.standard.push("tv/de/Tele 5");
+testing.channels.standard.push("tv/de/Sixx Deutschland");
+testing.channels.standard.push("tv/de/Eins Plus");
+
+/*
+testing.channels.standard.push("tv/de/3sat");
+testing.channels.standard.push("tv/de/ZDF info");
+testing.channels.standard.push("tv/de/ZDF Kultur");
+testing.channels.standard.push("tv/de/ZDF neo");
+testing.channels.standard.push("tv/de/NDR Fernsehen Hamburg");
+testing.channels.standard.push("tv/de/WDR Fernsehen Köln");
+testing.channels.standard.push("tv/de/MDR Fernsehen Sachsen-Anhalt");
+testing.channels.standard.push("tv/de/Einsfestival");
+testing.channels.standard.push("tv/de/Bayerisches Fernsehen Nord");
+*/
+
 testing.onClickNext = function(event)
 {
-    if (testing.dimmer && testing.dimmer.parentElement)
-    {
-        testing.dimmer.parentElement.removeChild(testing.dimmer);
-    }
+    WebLibSimple.detachElement(testing.dimmer);
 
     testing.loadNextInfo();
 
@@ -12,12 +36,9 @@ testing.onClickNext = function(event)
 
 testing.onClickNext100 = function(event)
 {
-    if (testing.dimmer && testing.dimmer.parentElement)
-    {
-        testing.dimmer.parentElement.removeChild(testing.dimmer);
-    }
+    WebLibSimple.detachElement(testing.dimmer);
 
-    var hundert = (testing.infolist.length < 1000) ? testing.infolist : 1000;
+    var hundert = (testing.infolist.length < 100) ? testing.infolist : 100;
 
     while (hundert-- > 0) testing.infolist.shift();
 
@@ -28,10 +49,7 @@ testing.onClickNext100 = function(event)
 
 testing.onClickTitle = function(event)
 {
-    if (testing.dimmer && testing.dimmer.parentElement)
-    {
-        testing.dimmer.parentElement.removeChild(testing.dimmer);
-    }
+    WebLibSimple.detachElement(testing.dimmer);
 
     var search = "http://www.google.de/search?tbm=isch&q=";
     var query = testing.info.search + " " + testing.info.sender;
@@ -43,20 +61,14 @@ testing.onClickTitle = function(event)
 
 testing.onClickCancel = function(event)
 {
-    if (testing.dimmer && testing.dimmer.parentElement)
-    {
-        testing.dimmer.parentElement.removeChild(testing.dimmer);
-    }
+    WebLibSimple.detachElement(testing.dimmer);
 
     event.stopPropagation();
 }
 
 testing.onClickOk = function(event)
 {
-    if (testing.dimmer && testing.dimmer.parentElement)
-    {
-        testing.dimmer.parentElement.removeChild(testing.dimmer);
-    }
+    WebLibSimple.detachElement(testing.dimmer);
 
     if (! testing.saveInfo())
     {
@@ -72,6 +84,8 @@ testing.onClickOk = function(event)
 
 WebAppIntercept.onUserHrefClick = function(url)
 {
+    WebLibSimple.detachElement(testing.dimmer);
+
     //
     // http://images.google.de/imgres
     //  ?imgurl=http%3A%2F%2Fwww.rosenheim24.de%2Fbilder%2F2013%2F05%2F14%2F2905337
@@ -91,6 +105,16 @@ WebAppIntercept.onUserHrefClick = function(url)
     imgurl = decodeURIComponent(imgurl);
     if (imgurl.startsWith("https://")) imgurl = "http" + imgurl.substring(5);
 
+    testing.info.imgurl = imgurl;
+
+    var imgrefurl = url.match(/imgrefurl=([^&]*)/);
+    imgrefurl = imgrefurl && imgrefurl.length ? imgrefurl[ 1 ] : null;
+    if (! imgrefurl) return false;
+    imgrefurl = decodeURIComponent(imgrefurl);
+    if (imgrefurl.startsWith("https://")) imgrefurl = "http" + imgrefurl.substring(5);
+
+    testing.info.imgrefurl = imgrefurl;
+
     var width = url.match(/&w=([^&]*)/);
     width = width && width.length ? width[ 1 ] : null;
     if (! width) return false;
@@ -99,15 +123,8 @@ WebAppIntercept.onUserHrefClick = function(url)
     height = height && height.length ? height[ 1 ] : null;
     if (! height) return false;
 
-    if (testing.dimmer && testing.dimmer.parentElement)
-    {
-        testing.dimmer.parentElement.removeChild(testing.dimmer);
-    }
-
     width = parseInt(width);
     height = parseInt(height);
-
-    testing.info.imgurl = imgurl;
 
     var aspect = width / height;
 
@@ -123,236 +140,114 @@ WebAppIntercept.onUserHrefClick = function(url)
     dwid +=  20;
     dhei += 100;
 
-    var div                   = document.createElement("div");
-    div.id                    = "dimmer";
-    div.style.position        = "absolute";
-    div.style.top             = "0px";
-    div.style.left            = "0px";
-    div.style.right           = "0px";
-    div.style.bottom          = "0px";
-    div.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
-    div.onclick               = testing.onClickCancel;
+    testing.dimmer = WebLibSimple.createDiv(0, 0, 0, 0, "dimmer", testing.content1);
+    WebLibSimple.setBGColor(testing.dimmer, "#99000000");
+    testing.dimmer.onclick = testing.onClickCancel;
 
-    testing.content1.appendChild(testing.dimmer = div);
+    var cwid  = testing.dimmer.clientWidth;
+    var chei  = testing.dimmer.clientHeight;
+    var cleft = ((cwid - dwid) / 2);
+    var ctop  = ((chei - dhei) / 2);
 
-    var cwid = testing.dimmer.clientWidth;
-    var chei = testing.dimmer.clientHeight;
+    testing.okdiv = WebLibSimple.createDivWidHei(cleft, ctop, dwid, dhei, "okdiv", testing.dimmer);
+    WebLibSimple.setBGColor(testing.okdiv, "#ffffff");
 
-    console.log(dwid + "=" + dhei + "=" + cwid + "=" + chei);
+    testing.imgdiv = WebLibSimple.createImgWidHei(10, 10, dwid - 20, "auto", "imgdiv", testing.okdiv);
 
-    var div                   = document.createElement("div");
-    div.id                    = "okdiv";
-    div.style.position        = "absolute";
-    div.style.top             = ((chei - dhei) / 2) + "px";
-    div.style.left            = ((cwid - dwid) / 2) + "px";
-    div.style.width           = dwid + "px";
-    div.style.height          = dhei + "px";
-    div.style.fontSize        = "28px";
-    div.style.fontWeight      = "bold";
-    div.style.backgroundColor = "#ffffff";
+    testing.sizediv = WebLibSimple.createDivHeight(10, 10, null, -50, "sizediv", testing.okdiv);
+    WebLibSimple.setFontSpecs(testing.sizediv, 28, "bold", "#000000");
+    testing.sizediv.innerHTML = width + "x" + height;
 
-    testing.dimmer.appendChild(testing.okdiv = div);
+    testing.buttdiv = WebLibSimple.createDivHeight(null , 10, 10, -50, "butdiv", testing.okdiv);
+    WebLibSimple.setFontSpecs(testing.buttdiv, 28, "bold", "#448844");
 
-    var img            = document.createElement("img");
-    img.id             = "imgdiv";
-    img.style.position = "absolute";
-    img.style.top      = "10px";
-    img.style.left     = "10px";
-    img.style.width    = (dwid - 20) + "px";
-    img.style.height   = "auto";
+    testing.cancelbutton = WebLibSimple.createSpanPadded(25, 0, 25, 0, "cancelbutton", testing.buttdiv);
+    testing.cancelbutton.innerHTML = "Cancel";
+    testing.cancelbutton.onclick = testing.onClickCancel;
 
-    testing.okdiv.appendChild(testing.imgdiv = img);
-
-    var div            = document.createElement("div");
-    div.id             = "dimdiv";
-    div.style.position = "absolute";
-    div.style.left     = "10px";
-    div.style.right    = "10px";
-    div.style.bottom   = "10px";
-    div.style.height   = "50px";
-    div.innerHTML      = width + "x" + height;
-
-    testing.okdiv.appendChild(testing.dimdiv = div);
-
-    var div            = document.createElement("div");
-    div.id             = "butdiv";
-    div.style.color    = "#448844";
-    div.style.position = "absolute";
-    div.style.right    = "10px";
-    div.style.bottom   = "10px";
-    div.style.height   = "50px";
-
-    testing.okdiv.appendChild(testing.butdiv = div);
-
-    var span                = document.createElement("span");
-    span.id                 = "cancelbutton";
-    span.style.paddingLeft  = "20px";
-    span.style.paddingRight = "20px";
-    span.style.marginLeft   = "10px";
-    span.style.marginRight  = "10px";
-    span.innerHTML          = "Cancel";
-    span.onclick            = testing.onClickCancel;
-
-    testing.butdiv.appendChild(span);
-
-    var span                = document.createElement("span");
-    span.id                 = "okbutton";
-    span.style.paddingLeft  = "20px";
-    span.style.paddingRight = "20px";
-    span.style.marginLeft   = "10px";
-    span.style.marginRight  = "10px";
-    span.innerHTML          = "Ok";
-    span.onclick            = testing.onClickOk;
-
-    testing.butdiv.appendChild(span);
+    testing.okbutton = WebLibSimple.createSpanPadded(25, 0, 25, 0, "okbutton", testing.buttdiv);
+    testing.okbutton.innerHTML = "Ok";
+    testing.okbutton.onclick = testing.onClickOk;
 
     testing.imgdiv.src = imgurl;
-    console.log("============================>" + imgurl);
-
-    return false;
 }
 
 testing.createFrameSetup = function()
 {
-    document.body.style.margin = '0px';
-    document.body.style.padding = '0px';
+    testing.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
 
     //
-    // topdiv
+    // Titlebar setup.
     //
 
-    var div                   = document.createElement("div");
-    div.id                    = "topdiv";
-    div.style.position        = "absolute";
-    div.style.top             = "0px";
-    div.style.left            = "0px";
-    div.style.right           = "0px";
-    div.style.bottom          = "0px";
-    div.style.backgroundColor = "#80ff00";
-    testing.topdiv            = div;
+    testing.titlebar = WebLibSimple.createDivHeight(0, 0, 0, 80, "titlebar", testing.topdiv);
+    WebLibSimple.setBGColor(testing.titlebar, "#8080ff");
 
-    document.body.appendChild(div);
+    testing.counter = WebLibSimple.createDivWidth(8, 24, 100, 0, "counter", testing.titlebar);
+    WebLibSimple.setFontSpecs(testing.counter, 28, "bold", "#444444");
+    testing.counter.style.textAlign = "center";
 
-    //
-    // topdiv.titlebar
-    //
+    testing.title = WebLibSimple.createDiv(80, 20, 80, 0, "title", testing.titlebar);
+    WebLibSimple.setFontSpecs(testing.title, 34, "bold", "#444444");
+    testing.title.style.textAlign = "center";
+    testing.title.onclick = testing.onClickTitle;
 
-    var div                   = document.createElement("div");
-    div.id                    = "titlebar";
-    div.style.position        = "absolute";
-    div.style.top             = "0px";
-    div.style.left            = "0px";
-    div.style.right           = "0px";
-    div.style.height          = "80px";
-    div.style.backgroundColor = "#8080ff";
-
-    testing.topdiv.appendChild(testing.titlebar = div);
-
-    var div                   = document.createElement("div");
-    div.id                    = "counter";
-    div.style.position        = "absolute";
-    div.style.top             = "24px";
-    div.style.left            = "8px";
-    div.style.width           = "100px";
-    div.style.bottom          = "0px";
-    div.style.fontSize        = "28px";
-    div.style.fontWeight      = "bold";
-    div.style.textAlign       = "center";
-    div.style.color           = "#444444";
-
-    testing.titlebar.appendChild(testing.counter = div);
-
-
-    var div                   = document.createElement("div");
-    div.id                    = "title";
-    div.style.position        = "absolute";
-    div.style.top             = "20px";
-    div.style.left            = "80px";
-    div.style.right           = "80px";
-    div.style.bottom          = "0px";
-    div.style.fontSize        = "34px";
-    div.style.fontWeight      = "bold";
-    div.style.textAlign       = "center";
-    div.style.color           = "#444444";
-    div.onclick               = testing.onClickTitle;
-
-    testing.titlebar.appendChild(testing.title = div);
-
-    var div                   = document.createElement("div");
-    div.id                    = "nextbutton";
-    div.style.position        = "absolute";
-    div.style.top             = "0px";
-    div.style.width           = "80px";
-    div.style.right           = "0px";
-    div.style.bottom          = "0px";
-    div.style.fontSize        = "60px";
-    div.style.fontWeight      = "bold";
-    div.style.textAlign       = "center";
-    div.style.color           = "#cccccc";
-    div.innerHTML             = ">>";
-    div.onclick               = testing.onClickNext;
-    div.ondblclick            = testing.onClickNext100;
-
-    testing.titlebar.appendChild(testing.nextbutton = div);
+    testing.nextbutton = WebLibSimple.createDivWidth(0, 0, -80, 0, "nextbutton", testing.titlebar);
+    WebLibSimple.setFontSpecs(testing.nextbutton, 60, "bold", "#cccccc");
+    testing.nextbutton.style.textAlign = "center";
+    testing.nextbutton.innerHTML = ">>";
+    testing.nextbutton.onclick = testing.onClickNext;
+    testing.nextbutton.ondblclick = testing.onClickNext100;
 
     //
-    // topdiv.content1
+    // Content setup.
     //
 
-    var div                   = document.createElement("div");
-    div.id                    = "content1";
-    div.style.position        = "absolute";
-    div.style.top             = "80px";
-    div.style.left            = "0px";
-    div.style.right           = "0px";
-    div.style.bottom          = "0px";
-    div.style.backgroundColor = "#ff8000";
+    testing.content1 = WebLibSimple.createDiv(0, 80, 0, 0, "content1", testing.topdiv);
 
-    testing.topdiv.appendChild(testing.content1 = div);
-
-    var div                   = document.createElement("iframe");
-    div.id                    = "iframe";
-    div.style.position        = "absolute";
-    div.style.top             = "0px";
-    div.style.left            = "0px";
-    div.style.width           = "100%";
-    div.style.height          = "100%";
-    div.style.border          = "0px solid black";
-
-    testing.content1.appendChild(testing.iframe = div);
+    testing.iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", testing.content1);
+    testing.iframe.style.border = "0px solid black";
 }
 
 testing.loadInfoList = function()
 {
-    testing.acttype = "tv";
-    testing.actcountry = "de";
+    var loadroot = "http://epg.xavaro.de/epginfo/";
+    var loadchannels = testing.channels[ "standard" ];
 
-    testing.actjson = "http://epg.xavaro.de/epginfo/"
-        + testing.acttype + "/"
-        + testing.actcountry + "/"
-        + "Super RTL Deutschland.json";
+    testing.infolist = [];
 
-    testing.infolist = JSON.parse(WebAppRequest.loadSync(encodeURI(testing.actjson)));
+    for (var inx = 0; inx < loadchannels.length; inx++)
+    {
+        var loadurl = loadroot + loadchannels[ inx ] + ".json";
+        var infolist = JSON.parse(WebAppRequest.loadSync(encodeURI(loadurl)));
+
+        for (var cnt = 0; cnt < infolist.length; cnt++)
+        {
+            infolist[ cnt ].type = loadchannels[ inx ].substring(0,2);
+            infolist[ cnt ].country = loadchannels[ inx ].substring(3,5);
+
+            testing.infolist.push(infolist[ cnt ]);
+        }
+    }
 }
 
 testing.loadNextInfo = function()
 {
-    //var which = Math.floor(Math.random() * testing.infolist.length);
-    //var info = testing.infolist.splice(which, 1);
-    //info = info[ 0 ];
-
     if (testing.infolist.length == 0)
     {
         alert("Fertig...");
+
         return;
     }
 
     var info = testing.infolist.shift();
 
     testing.info = {};
+    testing.info.type = info.type;
     testing.info.name = info.t;
     testing.info.search = info.t;
     testing.info.sender = info.s;
+    testing.info.country = info.country;
 
     testing.counter.innerHTML = testing.infolist.length;
     testing.title.innerHTML = testing.info.sender + " (" + info.c + ")";
@@ -372,10 +267,11 @@ testing.saveInfo = function()
 {
     var saveInfo = {};
 
-    saveInfo.type    = testing.acttype;
-    saveInfo.country = testing.actcountry;
-    saveInfo.name    = testing.info.name;
-    saveInfo.imgurl  = testing.info.imgurl;
+    saveInfo.name      = testing.info.name;
+    saveInfo.type      = testing.info.type;
+    saveInfo.country   = testing.info.country;
+    saveInfo.imgurl    = testing.info.imgurl;
+    saveInfo.imgrefurl = testing.info.imgrefurl;
 
     return WebAppRequest.saveSync("http://epg.xavaro.de/pgmuploader", JSON.stringify(saveInfo));
 }
