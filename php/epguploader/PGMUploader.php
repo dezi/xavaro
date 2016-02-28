@@ -41,7 +41,8 @@
 		$name = $message[ "name" ];
 		$imgurl = $message[ "imgurl" ];
 		$country = $message[ "country" ];
-		
+		$imgrefurl = isset($message[ "imgrefurl" ]) ? $message[ "imgrefurl" ] : $imgurl;
+
 		$name = str_replace("/", "_", $name);
 		
 		$lpath = "/home/xavaro/var/pgminfo/$type/$country";
@@ -52,7 +53,7 @@
 		$thmb = $lpath . ".thmb.jpg";
 		
 		$agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1";
-		$options  = array("http" => array("user_agent" => $agent, "referer" => $imgurl));
+		$options  = array("http" => array("user_agent" => $agent, "referer" => $imgrefurl));
 		$context  = stream_context_create($options);
 		$jpeg = file_get_contents($imgurl, false, $context);
 		
