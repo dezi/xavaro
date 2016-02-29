@@ -32,7 +32,7 @@ function deMoronizeEPG($string)
 	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9a), "Ö", $string);
 	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9b), "Ü", $string);
 	$string = str_replace(chr(0xe2) . chr(0x85) . chr(0x9e), "ß", $string);
-		
+
 	return $string;
 }
 
