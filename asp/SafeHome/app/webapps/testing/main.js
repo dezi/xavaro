@@ -207,6 +207,74 @@ testing.createFrameSetup = function()
 
     testing.iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", testing.content1);
     testing.iframe.style.border = "0px solid black";
+    testing.iframe.style.display = "none";
+
+    testing.selector = WebLibSimple.createDiv(0, 0, 0, null, "selector", testing.content1);
+    WebLibSimple.setBGColor(testing.selector, "#ffffff");
+    WebLibSimple.setFontSpecs(testing.selector, 18, "bold", "#444444");
+}
+
+testing.loadChannelList = function()
+{
+    var channels = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
+
+    testing.channels = {};
+
+    for (var inx = 0; inx < channels.length; inx++)
+    {
+        var channel = channels[ inx ];
+        if (channel.isen) continue;
+
+        var name = channel.name;
+        if (name.startsWith("Sky ")) continue;
+
+        if (name.endsWith(" HD")) name = name.substring(0, name.length - 3);
+        if (name.endsWith(" Deutschland")) name = name.substring(0, name.length - 12);
+
+        if (testing.channels[ name ]) continue;
+        testing.channels[ name ] = channel;
+
+        var imgurl = "http://epg.xavaro.de/channels/"
+            + channel.type + "/"
+            + channel.isocc + "/"
+            + channel.name + ".png";
+
+        var channelspan = document.createElement("div");
+        channelspan.style.position = "relative";
+        channelspan.style.display = "inline-block";
+        channelspan.style.width = "50%";
+        channelspan.style.height = "74px";
+
+        testing.selector.appendChild(channelspan);
+
+        var channelimg = document.createElement("img");
+        channelimg.style.position = "absolute";
+        channelimg.style.top = "0px";
+        channelimg.style.left = "8px";
+        channelimg.style.width = "66px";
+        channelimg.style.height = "50px";
+        channelimg.src = imgurl;
+
+        channelspan.appendChild(channelimg);
+
+        var channeldiv = document.createElement("div");
+        channeldiv.style.position = "absolute";
+        channeldiv.style.top = "18px";
+        channeldiv.style.left = "80px";
+        channeldiv.style.right = "40px";
+        channeldiv.innerHTML = name;
+
+        channelspan.appendChild(channeldiv);
+
+        var channelcheck = document.createElement("input");
+        channelcheck.type="checkbox";
+        channelcheck.style.position = "absolute";
+        channelcheck.style.top = "16px";
+        channelcheck.style.right = "20px";
+        channelcheck.innerHTML = "#";
+
+        channelspan.appendChild(channelcheck);
+    }
 }
 
 testing.loadInfoList = function()
@@ -277,5 +345,7 @@ testing.saveInfo = function()
 }
 
 testing.createFrameSetup();
-testing.loadInfoList();
-testing.loadNextInfo();
+testing.loadChannelList();
+
+//testing.loadInfoList();
+//testing.loadNextInfo();
