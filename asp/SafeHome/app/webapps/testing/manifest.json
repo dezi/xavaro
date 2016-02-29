@@ -14,16 +14,15 @@
     ],
 
     "weblibs": [
-      "simple"
+      "simple",
+      "touch"
     ],
 
     "preload": [
-      "util.js"
     ],
 
     "files": [
-      "main.js",
-      "util.js"
+      "main.js"
     ],
 
     //

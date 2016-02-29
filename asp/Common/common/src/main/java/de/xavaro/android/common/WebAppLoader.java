@@ -28,6 +28,7 @@ public class WebAppLoader extends WebViewClient
     private final String agent;
     private final String mode;
     private final String rootUrl;
+    private final String appRootUrl;
     private final JSONArray cachedefs;
 
     public WebAppLoader(String webappname, String agent, String mode)
@@ -36,7 +37,8 @@ public class WebAppLoader extends WebViewClient
         this.agent = agent;
         this.mode = mode;
 
-        rootUrl = WebApp.getHTTPAppRoot(webappname);
+        rootUrl = WebApp.getHTTPRoot();
+        appRootUrl = WebApp.getHTTPAppRoot(webappname);
         cachedefs = Json.getArray(WebApp.getManifest(webappname), "cachedefs");
     }
 
@@ -90,7 +92,7 @@ public class WebAppLoader extends WebViewClient
 
     private WebResourceResponse getRequest(WebView view, String url)
     {
-        if (url.equals(rootUrl)) return loadRootHTML();
+        if (url.equals(appRootUrl)) return loadRootHTML();
         if (url.endsWith("favicon.ico")) return denyLoad();
 
         int interval = getCacheIntervalForUrl(url);
@@ -206,7 +208,7 @@ public class WebAppLoader extends WebViewClient
             for (int inx = 0; inx < weblibs.length(); inx++)
             {
                 preloadmeta += "<script src=\""
-                        + WebApp.getHTTPLibRoot() + Json.getString(weblibs, inx)
+                        + WebApp.getHTTPLibRoot() + Json.getString(weblibs, inx) + ".js"
                         + "\"></script>\n";
             }
         }
