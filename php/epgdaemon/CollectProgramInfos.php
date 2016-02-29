@@ -49,6 +49,7 @@ function removeEnd($title, $start)
 function chopTitleName($title)
 {
 	if (startsWith($title, $start = "Tagesschau - Vor 20 Jahren")) return removeEnd($title, $start);
+	if (startsWith($title, $start = "Sportclub live - 3. Liga")) return removeEnd($title, $start);
 	
 	return $title;
 }
@@ -134,11 +135,11 @@ function readPrograms($countrydir, $channeldir)
 			
 			if (($year = identifyMovie($title)) != false) $title = "@movie " . $title;
 
-			if (! isset($cd_arr[ $title ])) $cd_arr[ $title ] = 0;
-			$cd_arr[ $title ] += 1;
+			if (! isset($cd_arr[ $realtitle ])) $cd_arr[ $realtitle ] = 0;
+			$cd_arr[ $realtitle ] += 1;
 			
 			if (! isset($GLOBALS[ "ttoc" ])) $GLOBALS[ "ttoc" ] = array();
-			$GLOBALS[ "ttoc" ][ $title ] = $channel;
+			$GLOBALS[ "ttoc" ][ $realtitle ] = $channel;
 		}
 		
 		file_put_contents($epgfile, gzencode(json_encdat($epgs), 9));
