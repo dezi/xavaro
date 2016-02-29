@@ -36,7 +36,7 @@ public class WebAppLoader extends WebViewClient
         this.agent = agent;
         this.mode = mode;
 
-        rootUrl = WebApp.getHTTPRoot(webappname);
+        rootUrl = WebApp.getHTTPAppRoot(webappname);
         cachedefs = Json.getArray(WebApp.getManifest(webappname), "cachedefs");
     }
 
@@ -199,7 +199,19 @@ public class WebAppLoader extends WebViewClient
                     + "</script>\n";
         }
 
-        JSONArray preloads = WebApp.getPreloads(webappname);
+        JSONArray weblibs = Json.getArray(manifest, "weblibs");
+
+        if (weblibs != null)
+        {
+            for (int inx = 0; inx < weblibs.length(); inx++)
+            {
+                preloadmeta += "<script src=\""
+                        + WebApp.getHTTPLibRoot() + Json.getString(weblibs, inx)
+                        + "\"></script>\n";
+            }
+        }
+
+        JSONArray preloads = Json.getArray(manifest, "preload");
 
         if (preloads != null)
         {
@@ -219,10 +231,16 @@ public class WebAppLoader extends WebViewClient
                 + preloadjava
                 + preloadmeta
                 + "</head>\n"
-                + "<body><script src=\"" + mode + ".js\"></script></body>\n"
+                + "<body>\n"
+                + "<script>\n"
+                + "document.body.style.margin = '0px';\n"
+                + "document.body.style.padding = '0px';\n"
+                + "</script>\n"
+                + "<script src=\"" + mode + ".js\"></script>\n"
+                + "</body>\n"
                 + "</html>\n";
 
-        //Log.d(LOGTAG, initialHTML);
+        Log.d(LOGTAG, initialHTML);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(initialHTML.getBytes());
         return new WebResourceResponse("text/html", "UTF-8", bais);

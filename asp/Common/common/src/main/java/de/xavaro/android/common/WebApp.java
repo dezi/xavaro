@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -15,20 +14,13 @@ import android.webkit.WebView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import de.xavaro.android.common.CommonConfigs;
-import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.Simple;
+import java.util.ArrayList;
 
 public class WebApp
 {
     private static final String LOGTAG = WebApp.class.getSimpleName();
 
-    public static String getHTTPRoot(String webappname)
+    public static String getHTTPRoot()
     {
         String httpserver = CommonConfigs.WebappsServerName;
         String httpport = "" + CommonConfigs.WebappsServerPort;
@@ -41,16 +33,26 @@ public class WebApp
 
         if ((httpport == null) || httpport.equals("80"))
         {
-            return "http://" + httpserver + "/webapps/" + webappname + "/";
+            return "http://" + httpserver;
         }
 
-        return "http://" + httpserver + ":" + httpport + "/webapps/" + webappname + "/";
+        return "http://" + httpserver + ":" + httpport;
+    }
+
+    public static String getHTTPAppRoot(String webappname)
+    {
+        return getHTTPRoot() + "/webapps/" + webappname + "/";
+    }
+
+    public static String getHTTPLibRoot()
+    {
+        return getHTTPRoot() + "/weblibs/";
     }
 
     @Nullable
     public static JSONObject getManifest(String webappname)
     {
-        String manifestsrc = getHTTPRoot(webappname) + "manifest.json";
+        String manifestsrc = getHTTPAppRoot(webappname) + "manifest.json";
         String manifest = WebApp.getStringContent(webappname, manifestsrc);
         JSONObject jmanifest = Json.fromString(manifest);
         jmanifest = Json.getObject(jmanifest, "manifest");
@@ -68,7 +70,7 @@ public class WebApp
     public static Drawable getAppIcon(String webappname)
     {
         String appiconpng = Json.getString(getManifest(webappname), "appicon");
-        String appiconsrc = getHTTPRoot(webappname) + appiconpng;
+        String appiconsrc = getHTTPAppRoot(webappname) + appiconpng;
 
         return getImage(webappname, appiconsrc);
     }
@@ -77,6 +79,23 @@ public class WebApp
     public static JSONArray getPreloads(String webappname)
     {
         return Json.getArray(getManifest(webappname), "preload");
+    }
+
+    public static ArrayList<String> getPermissions(String webappname)
+    {
+        ArrayList<String> list = new ArrayList<>();
+
+        JSONArray array = Json.getArray(getManifest(webappname), "permissions");
+
+        if (array != null)
+        {
+            for (int inx = 0; inx < array.length(); inx++)
+            {
+                list.add(Json.getString(array, inx));
+            }
+        }
+
+        return list;
     }
 
     @Nullable
@@ -103,7 +122,6 @@ public class WebApp
         return (wcr.content == null) ? null : new String(wcr.content);
     }
 
-    @Nullable
     public static boolean hasPreferences(String webappname)
     {
         return Json.getBoolean(getManifest(webappname), "preferences");
@@ -113,32 +131,72 @@ public class WebApp
     public static void loadWebView(WebView webview, String webappname, String mode)
     {
         webview.setWebChromeClient(new WebChromeClient());
+
+        //
+        // Remove "Chrome" form user agent string because
+        // Google will not go into mobile style if set.
+        //
+
         String agent = webview.getSettings().getUserAgentString().replace("Chrome","");
 
         WebAppLoader webapploader = new WebAppLoader(webappname, agent, mode);
         webview.setWebViewClient(webapploader);
 
+        //
+        // Default settings in webview,
+        //
+
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webview.getSettings().setSupportMultipleWindows(true);
-        webview.getSettings().setDomStorageEnabled(false);
         webview.getSettings().setSupportZoom(false);
         webview.getSettings().setAppCacheEnabled(false);
-        webview.getSettings().setDatabaseEnabled(false);
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-        Object request = new WebAppRequest(webappname, webview, webapploader);
-        webview.addJavascriptInterface(request, "WebAppRequest");
+        //
+        // Permission setting in webview.
+        //
 
-        Object intercept = new WebAppIntercept();
-        webview.addJavascriptInterface(intercept, "WebAppIntercept");
+        ArrayList<String> permissions = getPermissions(webappname);
 
-        Object utility = new WebAppUtility();
-        webview.addJavascriptInterface(utility, "WebAppUtility");
+        if (permissions.contains("domstorage"))
+        {
+            webview.getSettings().setDomStorageEnabled(false);
+        }
 
-        Object prefs = new WebAppPrefs(webappname);
-        webview.addJavascriptInterface(prefs, "WebAppPrefs");
+        if (permissions.contains("database"))
+        {
+            webview.getSettings().setDatabaseEnabled(false);
+        }
 
-        webview.loadUrl(WebApp.getHTTPRoot(webappname));
+        //
+        // Native add ons via permissions.
+        //
+
+        if (permissions.contains("request"))
+        {
+            Object request = new WebAppRequest(webappname, webview, webapploader);
+            webview.addJavascriptInterface(request, "WebAppRequest");
+        }
+
+        if (permissions.contains("intercept"))
+        {
+            Object intercept = new WebAppIntercept();
+            webview.addJavascriptInterface(intercept, "WebAppIntercept");
+        }
+
+        if (permissions.contains("utility"))
+        {
+            Object utility = new WebAppUtility();
+            webview.addJavascriptInterface(utility, "WebAppUtility");
+        }
+
+        if (permissions.contains("prefs"))
+        {
+            Object prefs = new WebAppPrefs(webappname);
+            webview.addJavascriptInterface(prefs, "WebAppPrefs");
+        }
+
+        webview.loadUrl(WebApp.getHTTPAppRoot(webappname));
     }
 }

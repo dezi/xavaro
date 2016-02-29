@@ -63,9 +63,9 @@ public class WebAppCache
 
         String cacheurl = url;
 
-        if (url.startsWith(WebApp.getHTTPRoot(webappname)))
+        if (url.startsWith(WebApp.getHTTPAppRoot(webappname)))
         {
-            cacheurl = url.substring(WebApp.getHTTPRoot(webappname).length());
+            cacheurl = url.substring(WebApp.getHTTPAppRoot(webappname).length());
         }
 
         if (! webappcache.has(webappname)) Json.put(webappcache, webappname, new JSONObject());
@@ -552,7 +552,7 @@ public class WebAppCache
         {
             if ((url != null) && ! url.startsWith("http:"))
             {
-                url = WebApp.getHTTPRoot(webappname) + url;
+                url = WebApp.getHTTPAppRoot(webappname) + url;
             }
 
             Log.d(LOGTAG, "commTick: load=" + webappname + "=" + ival + "=" + secondsdue + "=" + url);
