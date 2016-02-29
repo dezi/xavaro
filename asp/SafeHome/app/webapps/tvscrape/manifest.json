@@ -1,9 +1,9 @@
 {
   "manifest": {
 
-    "label": "Testing",
-    "appname": "testing",
-    "appicon": "testing_512x512.png",
+    "label": "TV-Scraper",
+    "appname": "tvscrape",
+    "appicon": "tvscrape_175x175.png",
     "preferences": false,
 
     "permissions": [

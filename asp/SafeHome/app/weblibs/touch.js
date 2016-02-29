@@ -32,6 +32,7 @@ WebLibTouch.onTouchStart = function(event)
         return;
     }
 
+    touch.moves = 0;
     touch.initial = true;
 
     touch.startX = touchobj.clientX;
@@ -67,6 +68,8 @@ WebLibTouch.onTouchMove = function(event)
     var touchobj = event.changedTouches[ 0 ];
 
     if (! (touch.starget || touch.ctarget)) return;
+
+    touch.moves += 1;
 
     WebLibTouch.computeOffsets(touchobj);
 
@@ -176,8 +179,19 @@ WebLibTouch.computeOffsets = function(touchobj)
     touch.clientX = touchobj.clientX;
     touch.clientY = touchobj.clientY;
 
-    touch.deltaX = touchobj.clientX - touch.startX;
-    touch.deltaY = touchobj.clientY - touch.startY;
+    touch.speedX = Math.abs((touchobj.clientX - touch.startX) / touch.moves);
+    touch.speedY = Math.abs((touchobj.clientY - touch.startY) / touch.moves);
+
+    if (touch.speedX < 1.0) touch.speedX = 1.0;
+    if (touch.speedY < 1.0) touch.speedY = 1.0;
+    if (touch.speedX > 5.0) touch.speedX = 5.0;
+    if (touch.speedY > 5.0) touch.speedY = 5.0;
+
+    touch.speedX = 2.0;
+    touch.speedY = 2.0;
+
+    touch.deltaX = (touchobj.clientX - touch.startX) * touch.speedX;
+    touch.deltaY = (touchobj.clientY - touch.startY) * touch.speedY;
 
     if (touch.starget)
     {
