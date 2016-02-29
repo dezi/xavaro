@@ -1,6 +1,7 @@
 testing.channels = {};
 testing.channels.standard = [];
 
+/*
 testing.channels.standard.push("tv/de/Das Erste");
 testing.channels.standard.push("tv/de/ZDF");
 testing.channels.standard.push("tv/de/RTL Deutschland");
@@ -12,8 +13,6 @@ testing.channels.standard.push("tv/de/RTL 2 Deutschland");
 testing.channels.standard.push("tv/de/Tele 5");
 testing.channels.standard.push("tv/de/Sixx Deutschland");
 testing.channels.standard.push("tv/de/Eins Plus");
-
-/*
 testing.channels.standard.push("tv/de/3sat");
 testing.channels.standard.push("tv/de/ZDF info");
 testing.channels.standard.push("tv/de/ZDF Kultur");
@@ -25,22 +24,20 @@ testing.channels.standard.push("tv/de/Einsfestival");
 testing.channels.standard.push("tv/de/Bayerisches Fernsehen Nord");
 */
 
-testing.onClickNext = function(event)
+testing.onClickSelect = function(event)
 {
     WebLibSimple.detachElement(testing.dimmer);
 
-    testing.loadNextInfo();
+    testing.iframe.style.display = "none";
+    testing.selector.style.display = "block";
 
     event.stopPropagation();
 }
 
-testing.onClickNext100 = function(event)
+
+testing.onClickNext = function(event)
 {
     WebLibSimple.detachElement(testing.dimmer);
-
-    var hundert = (testing.infolist.length < 100) ? testing.infolist : 100;
-
-    while (hundert-- > 0) testing.infolist.shift();
 
     testing.loadNextInfo();
 
@@ -186,6 +183,7 @@ testing.createFrameSetup = function()
     testing.counter = WebLibSimple.createDivWidth(8, 24, 100, 0, "counter", testing.titlebar);
     WebLibSimple.setFontSpecs(testing.counter, 28, "bold", "#444444");
     testing.counter.style.textAlign = "center";
+    testing.counter.onclick = testing.onClickSelect;
 
     testing.title = WebLibSimple.createDiv(80, 20, 80, 0, "title", testing.titlebar);
     WebLibSimple.setFontSpecs(testing.title, 34, "bold", "#444444");
@@ -197,25 +195,82 @@ testing.createFrameSetup = function()
     testing.nextbutton.style.textAlign = "center";
     testing.nextbutton.innerHTML = ">>";
     testing.nextbutton.onclick = testing.onClickNext;
-    testing.nextbutton.ondblclick = testing.onClickNext100;
 
     //
     // Content setup.
     //
 
     testing.content1 = WebLibSimple.createDiv(0, 80, 0, 0, "content1", testing.topdiv);
-
-    testing.iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", testing.content1);
-    testing.iframe.style.border = "0px solid black";
-    testing.iframe.style.display = "none";
+    WebLibSimple.setBGColor(testing.content1, "#888888");
+    testing.content1.style.overflow = "hidden";
 
     testing.selector = WebLibSimple.createDiv(0, 0, 0, null, "selector", testing.content1);
     WebLibSimple.setBGColor(testing.selector, "#ffffff");
     WebLibSimple.setFontSpecs(testing.selector, 18, "bold", "#444444");
+    testing.selector.scrollVertical = true;
+
+    testing.iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", testing.content1);
+    testing.iframe.style.border = "0px solid black";
+    testing.iframe.style.display = "none";
+}
+
+testing.onChannelClick = function(channelspan)
+{
+    console.log("onChannelClick");
+
+    var channel = channelspan.channel;
+    var channelpath = channel.type + "/" + channel.isocc + "/" + channel.name + ".json";
+
+    if (channelspan.channelcheck.checked)
+    {
+        for (var inx = 0; inx < testing.infolist.length; inx++)
+        {
+            if (testing.infolist[ inx ].channelpath == channelpath)
+            {
+                testing.infolist.splice(inx--, 1);
+            }
+        }
+
+        channelspan.channelcheck.checked = false;
+    }
+    else
+    {
+        var loadurl = "http://epg.xavaro.de/epginfo/" + channelpath;
+        var loadlist = JSON.parse(WebAppRequest.loadSync(encodeURI(loadurl)));
+
+        for (var inx = 0; inx < loadlist.length; inx++)
+        {
+            if (testing.infodups[ loadlist[ inx ].t ]) continue;
+
+            loadlist[ inx ].type = channel.type;
+            loadlist[ inx ].country = channel.isocc;
+            loadlist[ inx ].channelpath = channelpath;
+
+            testing.infolist.push(loadlist[ inx ]);
+        }
+
+        channelspan.channelcheck.checked = true;
+    }
+
+    //
+    // Rebuild duplicate check list.
+    //
+
+    testing.infodups = {};
+
+    for (var inx = 0; inx < testing.infolist.length; inx++)
+    {
+        testing.infodups[ testing.infolist[ inx ].t ] = true;
+    }
+
+    testing.counter.innerHTML = testing.infolist.length;
 }
 
 testing.loadChannelList = function()
 {
+    testing.infolist = [];
+    testing.infodups = {};
+
     var channels = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
 
     testing.channels = {};
@@ -244,12 +299,13 @@ testing.loadChannelList = function()
         channelspan.style.display = "inline-block";
         channelspan.style.width = "50%";
         channelspan.style.height = "74px";
+        channelspan.onTouchClick = testing.onChannelClick;
 
         testing.selector.appendChild(channelspan);
 
         var channelimg = document.createElement("img");
         channelimg.style.position = "absolute";
-        channelimg.style.top = "0px";
+        channelimg.style.top = "12px";
         channelimg.style.left = "8px";
         channelimg.style.width = "66px";
         channelimg.style.height = "50px";
@@ -259,8 +315,8 @@ testing.loadChannelList = function()
 
         var channeldiv = document.createElement("div");
         channeldiv.style.position = "absolute";
-        channeldiv.style.top = "18px";
-        channeldiv.style.left = "80px";
+        channeldiv.style.top = "26px";
+        channeldiv.style.left = "84px";
         channeldiv.style.right = "40px";
         channeldiv.innerHTML = name;
 
@@ -269,33 +325,14 @@ testing.loadChannelList = function()
         var channelcheck = document.createElement("input");
         channelcheck.type="checkbox";
         channelcheck.style.position = "absolute";
-        channelcheck.style.top = "16px";
+        channelcheck.style.top = "26px";
         channelcheck.style.right = "20px";
         channelcheck.innerHTML = "#";
 
         channelspan.appendChild(channelcheck);
-    }
-}
 
-testing.loadInfoList = function()
-{
-    var loadroot = "http://epg.xavaro.de/epginfo/";
-    var loadchannels = testing.channels[ "standard" ];
-
-    testing.infolist = [];
-
-    for (var inx = 0; inx < loadchannels.length; inx++)
-    {
-        var loadurl = loadroot + loadchannels[ inx ] + ".json";
-        var infolist = JSON.parse(WebAppRequest.loadSync(encodeURI(loadurl)));
-
-        for (var cnt = 0; cnt < infolist.length; cnt++)
-        {
-            infolist[ cnt ].type = loadchannels[ inx ].substring(0,2);
-            infolist[ cnt ].country = loadchannels[ inx ].substring(3,5);
-
-            testing.infolist.push(infolist[ cnt ]);
-        }
+        channelspan.channel = channel;
+        channelspan.channelcheck = channelcheck;
     }
 }
 
@@ -303,9 +340,15 @@ testing.loadNextInfo = function()
 {
     if (testing.infolist.length == 0)
     {
-        alert("Fertig...");
+        testing.iframe.style.display = "none";
+        testing.selector.style.display = "block";
 
         return;
+    }
+    else
+    {
+        testing.iframe.style.display = "block";
+        testing.selector.style.display = "none";
     }
 
     var info = testing.infolist.shift();
@@ -346,6 +389,3 @@ testing.saveInfo = function()
 
 testing.createFrameSetup();
 testing.loadChannelList();
-
-//testing.loadInfoList();
-//testing.loadNextInfo();

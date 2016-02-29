@@ -1,3 +1,7 @@
+//
+// Simple utility library.
+//
+
 WebLibSimple = {};
 
 //
