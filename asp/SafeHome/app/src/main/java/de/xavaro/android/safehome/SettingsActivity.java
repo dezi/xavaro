@@ -78,6 +78,8 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Wichtige Einstellungen";
         target.add(category);
 
+        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
+
         target.add(PreferencesBasics.OwnerFragment.getHeader());
         target.add(PreferencesBasics.AdminFragment.getHeader());
         target.add(PreferencesBasics.CommunityFragment.getHeader());
@@ -123,7 +125,6 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesHealth.HealthSensorFragment.getHeader());
         target.add(PreferencesHealth.HealthGlucoseFragment.getHeader());
         target.add(PreferencesHealth.HealthUnitsFragment.getHeader());
-        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";

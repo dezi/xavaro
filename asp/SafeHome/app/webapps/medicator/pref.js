@@ -5,17 +5,30 @@ medicator.buildBasicPreference = function()
     medicator.prefs = [];
 
     var pref = {};
-    pref.key = "select",
-    pref.type = "search",
+    pref.key = "select";
+    pref.type = "search";
     pref.title = "Medikation hinzufügen";
     medicator.prefs.push(pref);
 
-    WebAppPrefBuilder.addPreferences(JSON.stringify(medicator.prefs));
+    WebAppPrefBuilder.updatePreferences(JSON.stringify(medicator.prefs));
+}
+
+medicator.removeLastSearch = function()
+{
+    for (var inx = 0; inx < medicator.prefs.length; inx++)
+    {
+        if (medicator.prefs[ inx ].search)
+        {
+            medicator.prefs.splice(inx--, 1);
+        }
+    }
 }
 
 WebAppPrefBuilder.onSearchRequest = function(prefkey, query)
 {
     console.log("WebAppPrefBuilder.onSearchRequest:" + prefkey + "=" + query);
+
+    medicator.removeLastSearch();
 
     var regex = new RegExp(".*" + query + ".*", "gi");
     var results = medicator.medis.match(regex);
@@ -25,8 +38,6 @@ WebAppPrefBuilder.onSearchRequest = function(prefkey, query)
         return;
     }
 
-    console.log("Treffer=" + results.length);
-
     for (var inx = 0; inx < results.length; inx++)
     {
         var result = results[ inx ];
@@ -35,8 +46,16 @@ WebAppPrefBuilder.onSearchRequest = function(prefkey, query)
         var dkurz = result.substring(result.length - 3);
         var dlang = medicator.form[ dkurz ];
 
-        console.log(mname + "=" + dlang);
+        var pref = {};
+        pref.key = "search.result." + result;
+        pref.type = "check";
+        pref.title = mname;
+        pref.summary = dlang;
+        pref.search = true;
+        medicator.prefs.push(pref);
     }
+
+    WebAppPrefBuilder.updatePreferences(JSON.stringify(medicator.prefs));
 }
 
 medicator.buildBasicPreference();

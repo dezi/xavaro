@@ -17,6 +17,7 @@ import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.SwitchPreference;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -1345,7 +1346,7 @@ public class NicedPreferences
             super.onBindView(view);
 
             view.setPadding(20, 20, 20, 20);
-            view.setBackgroundColor(0xccccccff);
+            view.setBackgroundColor(0xcccccccc);
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
             title.setTextSize(20f);
@@ -1358,19 +1359,23 @@ public class NicedPreferences
             this.callback = callback;
         }
 
-        private final Handler handler = new Handler();
+        private SearchCallback callback;
         private AlertDialog dialog;
         private EditText search;
-        private SearchCallback callback;
+        private String query;
 
-        public void onPositiveClick()
+        public void onSearchClick()
         {
+            query = search.getText().toString().trim();
+
             if (callback != null)
             {
-                callback.onSearchRequest(getKey(), search.getText().toString());
-                dialog.cancel();
-                dialog = null;
+                callback.onSearchRequest(getKey(), query);
             }
+
+            dialog.cancel();
+            dialog = null;
+            search = null;
         }
 
         @Override
@@ -1388,25 +1393,30 @@ public class NicedPreferences
             LinearLayout content = new LinearLayout(getContext());
             content.setOrientation(LinearLayout.HORIZONTAL);
             content.setPadding(20, 8, 20, 8);
-            content.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            content.setLayoutParams(Simple.layoutParamsMM());
 
             search = new EditText(getContext());
+            search.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+            search.setLayoutParams(Simple.layoutParamsMM());
+            search.setText((query == null) ? "" : query);
+            search.setSelection(search.length());
             content.addView(search);
 
             dialog.setView(content);
             dialog.show();
 
+            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            negative.setTextSize(24f);
+
             Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positive.setTextSize(24f);
-            positive.setTransformationMethod(null);
+
             positive.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    onPositiveClick();
+                    onSearchClick();
                 }
             });
         }

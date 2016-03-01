@@ -422,8 +422,8 @@ public class SettingsFragments
     @SuppressWarnings("WeakerAccess")
     public static class BasePreferenceFragment extends PreferenceFragment
     {
-        protected final ArrayList<Preference> preferences = new ArrayList<>();
-        protected final ArrayList<String> activekeys = new ArrayList<>();
+        protected ArrayList<Preference> preferences = new ArrayList<>();
+        protected ArrayList<String> activekeys = new ArrayList<>();
 
         protected String keyprefix;
         protected boolean enabled;

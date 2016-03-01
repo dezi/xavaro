@@ -1,32 +1,27 @@
 package de.xavaro.android.safehome;
 
+import android.support.annotation.Nullable;
+import android.webkit.JavascriptInterface;
+
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.WebApp;
-import de.xavaro.android.common.WebAppPrefs;
 
 public class PreferencesWebApps
 {
@@ -85,7 +80,6 @@ public class PreferencesWebApps
         {
             super.registerAll(context);
 
-            NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference lp;
 
             String[] keys =  Simple.getTransArray(R.array.pref_webapps_where_keys);
@@ -133,20 +127,22 @@ public class PreferencesWebApps
             Log.d(LOGTAG, "==========================>" + mode);
         }
 
+        @SuppressWarnings("unused")
         private class WebAppPrefBuilder implements
                 NicedPreferences.NiceSearchPreference.SearchCallback
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
 
-            private void addPreference(JSONObject pref)
+            private Preference createPreference(JSONObject pref)
             {
-                if (pref == null) return;
+                if (pref == null) return null;
 
                 String key = Json.getString(pref, "key");
                 String type = Json.getString(pref, "type");
                 String title = Json.getString(pref, "title");
+                String summary = Json.getString(pref, "summary");
 
-                if (key == null) return;
+                if (key == null) return null;
 
                 key = keyprefix + ".pref." + webappname + "." + key;
 
@@ -158,108 +154,122 @@ public class PreferencesWebApps
                 NicedPreferences.NiceListPreference lp;
                 NicedPreferences.NiceMultiListPreference mp;
 
+                Preference ap = null;
+
                 if (Simple.equals(type, "search"))
                 {
-                    qp = new NicedPreferences.NiceSearchPreference(Simple.getAppContext());
+                    ap = qp = new NicedPreferences.NiceSearchPreference(Simple.getAppContext());
 
-                    qp.setKey(key);
-                    qp.setTitle(title);
                     qp.setSearchCallback(this);
-                    preferences.add(qp);
-                    getPreferenceScreen().addPreference(qp);
                 }
 
                 if (Simple.equals(type, "category"))
                 {
-                    ct = new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
-
-                    ct.setKey(key);
-                    ct.setTitle(title);
-                    preferences.add(ct);
-                    getPreferenceScreen().addPreference(ct);
+                    //noinspection UnusedAssignment
+                    ap = ct = new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
                 }
 
                 if (Simple.equals(type, "switch"))
                 {
-                     sp = new NicedPreferences.NiceSwitchPreference(Simple.getAppContext());
+                    ap = sp = new NicedPreferences.NiceSwitchPreference(Simple.getAppContext());
 
-                    sp.setKey(key);
-                    sp.setTitle(title);
                     sp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
-                    preferences.add(sp);
-                    getPreferenceScreen().addPreference(sp);
                 }
 
                 if (Simple.equals(type, "check"))
                 {
-                    cp = new NicedPreferences.NiceCheckboxPreference(Simple.getAppContext());
+                    ap = cp = new NicedPreferences.NiceCheckboxPreference(Simple.getAppContext());
 
-                    cp.setKey(key);
-                    cp.setTitle(title);
                     cp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
-                    preferences.add(cp);
-                    getPreferenceScreen().addPreference(cp);
                 }
 
                 if (Simple.equals(type, "edit"))
                 {
-                    ep = new NicedPreferences.NiceEditTextPreference(Simple.getAppContext());
+                    ap = ep = new NicedPreferences.NiceEditTextPreference(Simple.getAppContext());
 
-                    ep.setKey(key);
-                    ep.setTitle(title);
                     ep.setDefaultValue(Json.getString(pref, "defvalue"));
-                    preferences.add(ep);
-                    getPreferenceScreen().addPreference(ep);
                 }
 
                 if (Simple.equals(type, "list"))
                 {
-                    lp = new NicedPreferences.NiceListPreference(Simple.getAppContext());
+                    ap = lp = new NicedPreferences.NiceListPreference(Simple.getAppContext());
 
-                    lp.setKey(key);
-                    lp.setTitle(title);
                     lp.setEntries(Json.getArray(pref, "vals"));
                     lp.setEntryValues(Json.getArray(pref, "keys"));
                     lp.setDefaultValue(Json.getString(pref, "defvalue"));
-                    preferences.add(lp);
-                    getPreferenceScreen().addPreference(lp);
                 }
 
                 if (Simple.equals(type, "multi"))
                 {
-                    mp = new NicedPreferences.NiceMultiListPreference(Simple.getAppContext());
+                    ap = mp = new NicedPreferences.NiceMultiListPreference(Simple.getAppContext());
 
-                    mp.setKey(key);
-                    mp.setTitle(title);
                     mp.setEntries(Json.getArray(pref, "vals"));
                     mp.setEntryValues(Json.getArray(pref, "keys"));
-                    preferences.add(mp);
-                    getPreferenceScreen().addPreference(mp);
                 }
+
+                if (ap != null)
+                {
+                    ap.setKey(key);
+                    ap.setTitle(title);
+                    ap.setSummary(summary);
+                }
+
+                return ap;
             }
 
-            private void addPreferences(JSONArray prefs)
+            @Nullable
+            private Preference preferenceExists(String key)
             {
+                for (Preference pref : preferences)
+                {
+                    if (Simple.equals(key, pref.getKey()))
+                    {
+                        return pref;
+                    }
+                }
+
+                return null;
+            }
+
+            @JavascriptInterface
+            public void updatePreferences(String json)
+            {
+                JSONArray prefs = Json.fromStringArray(json);
                 if (prefs == null) return;
+
+                getPreferenceScreen().removeAll();
+
+                ArrayList<Preference> newprefs = new ArrayList<>();
+
+                //
+                // Migrate first enable preference.
+                //
+
+                newprefs.add(preferences.remove(0));
+                getPreferenceScreen().addPreference(newprefs.get(0));
+
+                //
+                // Update or create preferences.
+                //
 
                 for (int inx = 0; inx < prefs.length(); inx++)
                 {
-                    addPreference(Json.getObject(prefs, inx));
+                    JSONObject pref = Json.getObject(prefs, inx);
+                    if (pref == null) continue;
+
+                    String key = Json.getString(pref, "key");
+                    if (key == null) continue;
+
+                    Preference apref = preferenceExists(key);
+
+                    if (apref == null) apref = createPreference(pref);
+                    if (apref == null) continue;
+
+                    newprefs.add(apref);
+                    getPreferenceScreen().addPreference(apref);
                 }
-            }
 
-            @JavascriptInterface
-            public void addPreference(String json)
-            {
-                Log.d(LOGTAG, "addPreference: " + json);
-                addPreference(Json.fromString(json));
-            }
-
-            @JavascriptInterface
-            public void addPreferences(String json)
-            {
-                Log.d(LOGTAG, "addPreferences: " + json);
-                addPreferences(Json.fromStringArray(json));
+                preferences = newprefs;
             }
 
             public void onSearchRequest(String prefkey, String query)

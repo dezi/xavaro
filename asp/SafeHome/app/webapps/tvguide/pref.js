@@ -62,7 +62,7 @@ tvguide.buildBasicPreference = function()
     pref.vals = [ "SD", "HD", "Free-TV", "Pay-TV", "Inland",   "Ausland", "Sky", "Antenne", "Kabel", "Satellit" ];
     tvguide.prefs.push(pref);
 
-    WebAppPrefBuilder.addPreferences(JSON.stringify(tvguide.prefs));
+    WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
 }
 
 tvguide.buildBasicPreference();
