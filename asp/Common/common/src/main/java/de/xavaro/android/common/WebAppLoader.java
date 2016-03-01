@@ -149,9 +149,11 @@ public class WebAppLoader extends WebViewClient
 
         if (interval >= 0)
         {
+            String wifiname = Simple.getWifiName();
+
             if (url.startsWith(rootUrl))
             {
-                if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass"))
+                if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
                 {
                     //
                     // Developer mode. Always load webapp components w/o cache.
@@ -162,7 +164,7 @@ public class WebAppLoader extends WebViewClient
             }
             else
             {
-                if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable"))
+                if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable." + wifiname))
                 {
                     //
                     // Developer mode. Always load data components w/o cache.

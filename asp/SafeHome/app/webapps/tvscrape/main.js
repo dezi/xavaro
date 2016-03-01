@@ -3,27 +3,24 @@ tvscrape.channels.standard = [];
 
 tvscrape.channels.standard.push("tv/de/Das Erste");
 tvscrape.channels.standard.push("tv/de/ZDF");
+tvscrape.channels.standard.push("tv/de/Sat. 1 Deutschland");
 tvscrape.channels.standard.push("tv/de/RTL Deutschland");
 tvscrape.channels.standard.push("tv/de/Pro Sieben Deutschland");
 tvscrape.channels.standard.push("tv/de/Kabel Eins Deutschland");
 tvscrape.channels.standard.push("tv/de/Vox Deutschland");
-tvscrape.channels.standard.push("tv/de/Sat. 1 Deutschland");
 tvscrape.channels.standard.push("tv/de/RTL 2 Deutschland");
 tvscrape.channels.standard.push("tv/de/Tele 5");
 tvscrape.channels.standard.push("tv/de/Sixx Deutschland");
 tvscrape.channels.standard.push("tv/de/Eins Plus");
 tvscrape.channels.standard.push("tv/de/3sat");
 tvscrape.channels.standard.push("tv/de/NDR Fernsehen Hamburg");
-
-/*
+tvscrape.channels.standard.push("tv/de/WDR Fernsehen Köln");
+tvscrape.channels.standard.push("tv/de/MDR Fernsehen Sachsen-Anhalt");
+tvscrape.channels.standard.push("tv/de/Bayerisches Fernsehen Nord");
 tvscrape.channels.standard.push("tv/de/ZDF info");
 tvscrape.channels.standard.push("tv/de/ZDF Kultur");
 tvscrape.channels.standard.push("tv/de/ZDF neo");
-tvscrape.channels.standard.push("tv/de/WDR Fernsehen Köln");
-tvscrape.channels.standard.push("tv/de/MDR Fernsehen Sachsen-Anhalt");
 tvscrape.channels.standard.push("tv/de/Einsfestival");
-tvscrape.channels.standard.push("tv/de/Bayerisches Fernsehen Nord");
-*/
 
 tvscrape.onClickSelect = function(event)
 {
@@ -286,12 +283,51 @@ tvscrape.onChannelClick = function(channelspan)
     tvscrape.counter.innerHTML = tvscrape.infolist.length;
 }
 
+tvscrape.sortChannelList = function(a, b)
+{
+    if (a.prio == b.prio) return 0;
+    return (a.prio < b.prio) ? -1 : 1;
+}
+
 tvscrape.loadChannelList = function()
 {
     tvscrape.infolist = [];
     tvscrape.infodups = {};
 
+    //
+    // Read and sort channels by priority.
+    //
+
     var channels = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
+
+    for (var inx = 0; inx < channels.length; inx++)
+    {
+        var channel = channels[ inx ];
+
+        var name = channel.name;
+        if (name.endsWith(" HD")) name = name.substring(0, name.length - 3);
+
+        var channeltag = channel.type + "/" + channel.isocc + "/" + name;
+
+        channels[ inx ].prio = 9999;
+        channels[ inx ].selected = false;
+
+        for (var cnt = 0; cnt < tvscrape.channels.standard.length; cnt++)
+        {
+            if (tvscrape.channels.standard[ cnt ] == channeltag)
+            {
+                channels[ inx ].prio = cnt;
+                channels[ inx ].selected = true;
+                break;
+            }
+        }
+    }
+
+    channels.sort(tvscrape.sortChannelList);
+
+    //
+    // Create channel content.
+    //
 
     tvscrape.channels = {};
 
@@ -330,10 +366,12 @@ tvscrape.loadChannelList = function()
         channeldiv.innerHTML = name;
 
         var channelcheck = WebLibSimple.createAny("input", null, 26, 20, null, null, channelspan);
-        channelcheck.type="checkbox";
+        channelcheck.type = "checkbox";
 
         channelspan.channel = channel;
         channelspan.channelcheck = channelcheck;
+
+        if (channel.selected) tvscrape.onChannelClick(channelspan);
     }
 }
 

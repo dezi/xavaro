@@ -3,6 +3,8 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.preference.PreferenceActivity;
 
+import java.util.Map;
+
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebApp;
@@ -45,46 +47,62 @@ public class PreferencesBeta
             NicedPreferences.NiceCheckboxPreference cp;
 
             //
-            // Webapp preferences.
+            // Webapp server preferences.
             //
 
-            pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Appserver");
+            String wifiprefix = keyprefix + ".webapps.httpbypass.";
 
-            preferences.add(pc);
+            //
+            // Make sure, our current wifi is in list.
+            //
 
-            cp = new NicedPreferences.NiceCheckboxPreference(context);
+            String mywifi = Simple.getWifiName();
+            String mywifipref = wifiprefix + mywifi;
+            Simple.setSharedPrefBoolean(mywifipref, Simple.getSharedPrefBoolean(mywifipref));
 
-            cp.setKey(keyprefix + ".webapps.httpbypass");
-            cp.setTitle("HTTP-Bypass");
-            cp.setEnabled(enabled);
+            Map<String, Object> wifiprefs = Simple.getAllPreferences(wifiprefix);
 
-            preferences.add(cp);
+            for (String pref : wifiprefs.keySet())
+            {
+                String wifiname = pref.substring(wifiprefix.length());
 
-            ep = new NicedPreferences.NiceEditTextPreference(context);
+                pc = new NicedPreferences.NiceCategoryPreference(context);
+                pc.setTitle("WLAN" + " \"" + wifiname + "\"");
+                preferences.add(pc);
 
-            ep.setKey(keyprefix + ".webapps.httpserver");
-            ep.setTitle("HTTP-Server");
-            ep.setEnabled(enabled);
+                cp = new NicedPreferences.NiceCheckboxPreference(context);
 
-            preferences.add(ep);
+                cp.setKey(keyprefix + ".webapps.httpbypass." + wifiname);
+                cp.setTitle("HTTP-Bypass");
+                cp.setEnabled(enabled);
 
-            ep = new NicedPreferences.NiceEditTextPreference(context);
+                preferences.add(cp);
 
-            ep.setKey(keyprefix + ".webapps.httpport");
-            ep.setDefaultValue("8000");
-            ep.setTitle("HTTP-Port");
-            ep.setEnabled(enabled);
+                ep = new NicedPreferences.NiceEditTextPreference(context);
 
-            preferences.add(ep);
+                ep.setKey(keyprefix + ".webapps.httpserver." + wifiname);
+                ep.setTitle("HTTP-Server");
+                ep.setEnabled(enabled);
 
-            cp = new NicedPreferences.NiceCheckboxPreference(context);
+                preferences.add(ep);
 
-            cp.setKey(keyprefix + ".webapps.datacachedisable");
-            cp.setTitle("DATA-Cache disable");
-            cp.setEnabled(enabled);
+                ep = new NicedPreferences.NiceEditTextPreference(context);
 
-            preferences.add(cp);
+                ep.setKey(keyprefix + ".webapps.httpport." + wifiname);
+                ep.setDefaultValue("8000");
+                ep.setTitle("HTTP-Port");
+                ep.setEnabled(enabled);
+
+                preferences.add(ep);
+
+                cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+                cp.setKey(keyprefix + ".webapps.datacachedisable." + wifiname);
+                cp.setTitle("DATA-Cache disable");
+                cp.setEnabled(enabled);
+
+                preferences.add(cp);
+            }
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Webapps");

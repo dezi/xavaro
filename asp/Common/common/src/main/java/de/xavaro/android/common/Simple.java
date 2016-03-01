@@ -1,7 +1,5 @@
 package de.xavaro.android.common;
 
-import android.net.DhcpInfo;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -14,8 +12,6 @@ import android.content.res.Resources;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,10 +25,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.os.Handler;
 import android.os.Environment;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.net.DhcpInfo;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -56,15 +55,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.Date;
 import java.util.Locale;
@@ -82,6 +78,7 @@ public class Simple
     private static Activity appContext;
     private static Handler appHandler;
     private static Context anyContext;
+    private static WifiManager wifiManager;
 
     public static void setAppContext(Activity context)
     {
@@ -550,7 +547,7 @@ public class Simple
         String[] array = getTransArray(resid);
         List<String> list = new ArrayList<>();
 
-        for (int inx = 0; inx < array.length; inx++) list.add(array[ inx ]);
+        for (String string : array) list.add(string);
 
         return list;
     }
@@ -569,7 +566,7 @@ public class Simple
         String[] keys = res.getStringArray(residkeys);
         String[] vals = res.getStringArray(residvals);
 
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
 
         for (int inx = 0; inx < Math.min(keys.length, vals.length); inx++)
         {
@@ -831,7 +828,11 @@ public class Simple
 
         try
         {
-            WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            if (wifiManager == null)
+            {
+                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            }
+
             DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
 
             int gw = dhcpInfo.gateway;
@@ -856,7 +857,11 @@ public class Simple
 
         try
         {
-            WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            if (wifiManager == null)
+            {
+                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            }
+
             DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
 
             int ip = dhcpInfo.ipAddress;
@@ -881,7 +886,10 @@ public class Simple
 
         try
         {
-            WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            if (wifiManager == null)
+            {
+                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+            }
 
             return wifiManager.getConnectionInfo().getSSID().replace("\"", "");
         }
@@ -1777,6 +1785,11 @@ public class Simple
     public static void setSharedPrefString(String key, String value)
     {
         getSharedPrefs().edit().putString(key, value).apply();
+    }
+
+    public static void setSharedPrefBoolean(String key, boolean value)
+    {
+        getSharedPrefs().edit().putBoolean(key, value).apply();
     }
 
     public static Map<String, Object> getAllPreferences(String prefix)
