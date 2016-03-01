@@ -2,11 +2,13 @@ package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
@@ -19,7 +21,9 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -1324,6 +1328,92 @@ public class NicedPreferences
             if (onLongClickRunner != null) onLongClickRunner.run();
 
             return false;
+        }
+    }
+
+    public static class NiceSearchPreference extends PreferenceCategory implements
+            View.OnClickListener
+    {
+        public NiceSearchPreference(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            view.setPadding(20, 20, 20, 20);
+            view.setBackgroundColor(0xccccccff);
+
+            TextView title = (TextView) view.findViewById(android.R.id.title);
+            title.setTextSize(20f);
+
+            view.setOnClickListener(this);
+        }
+
+        public void setSearchCallback(SearchCallback callback)
+        {
+            this.callback = callback;
+        }
+
+        private final Handler handler = new Handler();
+        private AlertDialog dialog;
+        private EditText search;
+        private SearchCallback callback;
+
+        public void onPositiveClick()
+        {
+            if (callback != null)
+            {
+                callback.onSearchRequest(getKey(), search.getText().toString());
+                dialog.cancel();
+                dialog = null;
+            }
+        }
+
+        @Override
+        public void onClick(View view)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle(getTitle());
+
+            builder.setNegativeButton("Abbrechen", null);
+
+            builder.setPositiveButton("Suchen", null);
+
+            dialog = builder.create();
+
+            LinearLayout content = new LinearLayout(getContext());
+            content.setOrientation(LinearLayout.HORIZONTAL);
+            content.setPadding(20, 8, 20, 8);
+            content.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            search = new EditText(getContext());
+            content.addView(search);
+
+            dialog.setView(content);
+            dialog.show();
+
+            Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positive.setTextSize(24f);
+            positive.setTransformationMethod(null);
+            positive.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    onPositiveClick();
+                }
+            });
+        }
+
+        public interface SearchCallback
+        {
+            void onSearchRequest(String prefkey, String query);
         }
     }
 }

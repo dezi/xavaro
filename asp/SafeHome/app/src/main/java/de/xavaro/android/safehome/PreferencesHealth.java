@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -18,9 +19,30 @@ import java.util.Random;
 
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WebApp;
 
 public class PreferencesHealth
 {
+    //region Health medicator preferences
+
+    public static class HealthMedicatorFragment extends PreferencesWebApps.WebappFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = WebApp.getLabel("medicator");
+            header.fragment = PreferencesWebApps.WebappFragment.class.getName();
+            header.fragmentArguments = new Bundle();
+            header.fragmentArguments.putString("webappname", "medicator");
+
+            return header;
+        }
+    }
+
+    //endregion Health medicator preferences
+
     //region Health Person preferences
 
     public static class HealthPersonalFragment extends SettingsFragments.EnablePreferenceFragment

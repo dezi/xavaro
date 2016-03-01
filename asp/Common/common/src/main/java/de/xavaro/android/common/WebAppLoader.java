@@ -70,6 +70,11 @@ public class WebAppLoader extends WebViewClient
 
     public byte[] getRequestData(String url)
     {
+        if ((! url.startsWith("http://")) && (! url.startsWith("http://")))
+        {
+            url = appRootUrl + url;
+        }
+
         int interval = getCacheIntervalForUrl(url);
 
         if (interval < 0)

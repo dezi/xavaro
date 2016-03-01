@@ -1,0 +1,33 @@
+{
+  "manifest": {
+
+    "label": "Medikation",
+    "appname": "medicator",
+    "appicon": "medicator_512x512.png",
+    "preferences": true,
+
+    "permissions": [
+      "request",
+      "intercept",
+      "utility",
+      "prefs"
+    ],
+
+    "weblibs": [
+      "simple",
+      "touch"
+    ],
+
+    "preload": [
+      "form.js"
+    ],
+
+    "cachedefs": [
+      { "interval": 24, "pattern": ".*\\.js" },
+      { "interval": 72, "pattern": ".*\\.png" },
+      { "interval": 24, "pattern": ".*\\.csv" },
+      { "interval": 24, "pattern": ".*\\.json" },
+      { "interval": 24, "pattern": ".*\\.json\\.gz" }
+    ]
+  }
+}

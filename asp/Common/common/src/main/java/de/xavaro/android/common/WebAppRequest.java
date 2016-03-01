@@ -28,6 +28,7 @@ public class WebAppRequest
     @JavascriptInterface
     public String loadSync(String src)
     {
+
         byte[] content = webapploader.getRequestData(src);
         if (content == null) Log.d(LOGTAG, "loadSync: FAILED " + webappname + "=" + src);
         return (content == null) ? null : new String(content);

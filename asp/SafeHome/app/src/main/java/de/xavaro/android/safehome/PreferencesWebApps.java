@@ -133,7 +133,8 @@ public class PreferencesWebApps
             Log.d(LOGTAG, "==========================>" + mode);
         }
 
-        private class WebAppPrefBuilder
+        private class WebAppPrefBuilder implements
+                NicedPreferences.NiceSearchPreference.SearchCallback
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
 
@@ -149,12 +150,24 @@ public class PreferencesWebApps
 
                 key = keyprefix + ".pref." + webappname + "." + key;
 
+                NicedPreferences.NiceSearchPreference qp;
                 NicedPreferences.NiceCategoryPreference ct;
                 NicedPreferences.NiceSwitchPreference sp;
                 NicedPreferences.NiceCheckboxPreference cp;
                 NicedPreferences.NiceEditTextPreference ep;
                 NicedPreferences.NiceListPreference lp;
                 NicedPreferences.NiceMultiListPreference mp;
+
+                if (Simple.equals(type, "search"))
+                {
+                    qp = new NicedPreferences.NiceSearchPreference(Simple.getAppContext());
+
+                    qp.setKey(key);
+                    qp.setTitle(title);
+                    qp.setSearchCallback(this);
+                    preferences.add(qp);
+                    getPreferenceScreen().addPreference(qp);
+                }
 
                 if (Simple.equals(type, "category"))
                 {
@@ -247,6 +260,14 @@ public class PreferencesWebApps
             {
                 Log.d(LOGTAG, "addPreferences: " + json);
                 addPreferences(Json.fromStringArray(json));
+            }
+
+            public void onSearchRequest(String prefkey, String query)
+            {
+                String script = "WebAppPrefBuilder.onSearchRequest"
+                        + "(\"" + prefkey + "\", \"" + query + "\");";
+
+                webprefs.evaluateJavascript(script, null);
             }
         }
     }
