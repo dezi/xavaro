@@ -17,11 +17,25 @@ WebAppPrefBuilder.onSearchRequest = function(prefkey, query)
 {
     console.log("WebAppPrefBuilder.onSearchRequest:" + prefkey + "=" + query);
 
-    var result = medicator.medis.match(/Nebo.*/gi);
+    var regex = new RegExp(".*" + query + ".*", "gi");
+    var results = medicator.medis.match(regex);
 
-    for (var inx = 0; inx < result.length; inx++)
+    if (results == null)
     {
-        console.log(result[ inx ]);
+        return;
+    }
+
+    console.log("Treffer=" + results.length);
+
+    for (var inx = 0; inx < results.length; inx++)
+    {
+        var result = results[ inx ];
+
+        var mname = result.substring(0,result.length - 4);
+        var dkurz = result.substring(result.length - 3);
+        var dlang = medicator.form[ dkurz ];
+
+        console.log(mname + "=" + dlang);
     }
 }
 
