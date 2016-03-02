@@ -1815,9 +1815,11 @@ public class Simple
 
     public static void removeSharedPref(String key)
     {
-        Log.w(LOGTAG, "removeSharedPref: " + key);
-
-        Simple.getSharedPrefs().edit().remove(key).commit();
+        if (Simple.getSharedPrefs().contains(key))
+        {
+            Log.w(LOGTAG, "removeSharedPref: " + key);
+            Simple.getSharedPrefs().edit().remove(key).commit();
+        }
     }
 
     public static void removeAllPreferences(String prefix)

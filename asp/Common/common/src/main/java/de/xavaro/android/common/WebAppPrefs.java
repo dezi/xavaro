@@ -82,6 +82,12 @@ public class WebAppPrefs
     }
 
     @JavascriptInterface
+    public void removePref(String key)
+    {
+        Simple.removeSharedPref(keyprefix + key);
+    }
+
+    @JavascriptInterface
     public void removeAllPrefs(String prefix)
     {
         String preprefix = keyprefix + ((prefix == null) ? "" : prefix);

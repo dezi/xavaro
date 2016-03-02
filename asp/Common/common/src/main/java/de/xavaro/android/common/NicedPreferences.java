@@ -668,7 +668,7 @@ public class NicedPreferences
         {
             String display = "";
 
-            if (values != null)
+            if ((values != null) && (dvalues != null))
             {
                 for (int inx = 0; inx < values.length; inx++)
                 {

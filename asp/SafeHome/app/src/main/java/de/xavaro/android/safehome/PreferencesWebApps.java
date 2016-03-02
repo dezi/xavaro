@@ -186,6 +186,7 @@ public class PreferencesWebApps
                 NicedPreferences.NiceEditTextPreference ep;
                 NicedPreferences.NiceListPreference lp;
                 NicedPreferences.NiceMultiListPreference mp;
+                NicedPreferences.NiceNumberPreference np;
 
                 Preference ap = null;
 
@@ -238,6 +239,19 @@ public class PreferencesWebApps
 
                     mp.setEntries(Json.getArray(pref, "vals"));
                     mp.setEntryValues(Json.getArray(pref, "keys"));
+                }
+
+                if (Simple.equals(type, "number"))
+                {
+                    ap = np = new NicedPreferences.NiceNumberPreference(Simple.getAppContext());
+
+                    int min = Json.getInt(pref, "min");
+                    int max = Json.getInt(pref, "max");
+                    int step = Json.getInt(pref, "step");
+
+                    np.setMinMaxValue(min, max, step);
+                    np.setUnit(Json.getString(pref, "unit"));
+                    np.setDefaultValue(Json.getInt(pref, "defvalue"));
                 }
 
                 if (ap != null)
