@@ -203,7 +203,8 @@ public class WebAppLoader extends WebViewClient
         if (manifest != null)
         {
             preloadjava += "<script>"
-                    + webappname + ".manifest = \n"
+                    + "WebApp = {};\n"
+                    + "WebApp.manifest = \n"
                     + Json.toPretty(manifest) + ";\n"
                     + "</script>\n";
         }

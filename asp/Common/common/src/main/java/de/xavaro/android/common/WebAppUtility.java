@@ -14,6 +14,18 @@ public class WebAppUtility
     @JavascriptInterface
     public String getLocaleCountry()
     {
-        return Locale.getDefault().getCountry().toLowerCase();
+        return Locale.getDefault().getCountry();
+    }
+
+    @JavascriptInterface
+    public String getLocaleLanguage()
+    {
+        return Locale.getDefault().getLanguage();
+    }
+
+    @JavascriptInterface
+    public String getLocale()
+    {
+        return Locale.getDefault().getLanguage() + "-r" + Locale.getDefault().getCountry();
     }
 }

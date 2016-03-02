@@ -283,11 +283,11 @@ medicator.buildMedication = function(medication)
     var pref = {};
     pref.key = "medication.days." + medication;
     pref.type = "list",
-    pref.title = "Einnahmetage";
+    pref.title = WebLibStrings.getTrans("medication.days");
     pref.defvalue = "every";
 
-    pref.keys = [ "every",   "weekdays",             "intervall"      ];
-    pref.vals = [ "Täglich", "Bestimmte Wochentage", "Tagesintervall" ];
+    pref.keys = WebLibStrings.getTrans("medication.days.keys");
+    pref.vals = WebLibStrings.getTrans("medication.days.vals");
 
     medicator.prefs.push(pref);
 
