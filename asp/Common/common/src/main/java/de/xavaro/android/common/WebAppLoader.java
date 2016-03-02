@@ -249,7 +249,7 @@ public class WebAppLoader extends WebViewClient
                 + "</body>\n"
                 + "</html>\n";
 
-        Log.d(LOGTAG, initialHTML);
+        //Log.d(LOGTAG, initialHTML);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(initialHTML.getBytes());
         return new WebResourceResponse("text/html", "UTF-8", bais);

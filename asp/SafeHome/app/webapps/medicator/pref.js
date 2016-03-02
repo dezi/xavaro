@@ -266,6 +266,16 @@ medicator.buildMedication = function(medication)
         medicator.buildDosisPref(medication, "dose4");
    }
 
+    if (time == "weekly")
+    {
+        medicator.buildDosisPref(medication, "doseweekly");
+    }
+
+    if (time == "monthly")
+    {
+        medicator.buildDosisPref(medication, "dosemonthly");
+    }
+
     //
     // Special days selection.
     //

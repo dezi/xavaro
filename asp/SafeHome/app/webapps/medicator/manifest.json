@@ -14,12 +14,18 @@
     ],
 
     "weblibs": [
+      "strings",
       "simple",
       "touch"
     ],
 
     "preload": [
       "form.js"
+    ],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
     ],
 
     "cachedefs": [
