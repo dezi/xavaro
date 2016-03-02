@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.webkit.JavascriptInterface;
 
@@ -58,6 +59,8 @@ public class PreferencesWebApps
             }
         }
 
+        private final Handler handler = new Handler();
+        private String webappkeyprefix;
         private String webappname;
         private WebView webprefs;
 
@@ -69,8 +72,9 @@ public class PreferencesWebApps
         @Override
         public void onCreate(Bundle savedInstanceState)
         {
-            webappname = getArguments().getString("webappname");
             keyprefix = "webapps";
+            webappname = getArguments().getString("webappname");
+            webappkeyprefix = keyprefix + ".pref." + webappname + ".";
 
             super.onCreate(savedInstanceState);
         }
@@ -129,9 +133,38 @@ public class PreferencesWebApps
 
         @SuppressWarnings("unused")
         private class WebAppPrefBuilder implements
+                Preference.OnPreferenceChangeListener,
                 NicedPreferences.NiceSearchPreference.SearchCallback
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
+
+            public boolean onPreferenceChange(Preference preference, Object obj)
+            {
+                Log.d(LOGTAG, "onPreferenceChange:" + preference.getKey());
+
+                if (preference instanceof Preference.OnPreferenceChangeListener)
+                {
+                    Preference.OnPreferenceChangeListener pcl;
+                    pcl = (Preference.OnPreferenceChangeListener) preference;
+                    pcl.onPreferenceChange(preference, obj);
+                }
+
+                final String key = preference.getKey().substring(webappkeyprefix.length());
+
+                handler.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        String script = "WebAppPrefBuilder.onPreferenceChanged"
+                                + "(\"" + key + "\");";
+
+                        webprefs.evaluateJavascript(script, null);
+                    }
+                });
+
+                return true;
+            }
 
             private Preference createPreference(JSONObject pref)
             {
@@ -144,7 +177,7 @@ public class PreferencesWebApps
 
                 if (key == null) return null;
 
-                key = keyprefix + ".pref." + webappname + "." + key;
+                key = webappkeyprefix + key;
 
                 NicedPreferences.NiceSearchPreference qp;
                 NicedPreferences.NiceCategoryPreference ct;
@@ -165,8 +198,8 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "category"))
                 {
-                    //noinspection UnusedAssignment
                     ap = ct = new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
+                    ct.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "switch"))
@@ -212,6 +245,7 @@ public class PreferencesWebApps
                     ap.setKey(key);
                     ap.setTitle(title);
                     ap.setSummary(summary);
+                    ap.setOnPreferenceChangeListener(this);
                 }
 
                 return ap;

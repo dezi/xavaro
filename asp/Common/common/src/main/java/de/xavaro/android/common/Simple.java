@@ -1787,6 +1787,11 @@ public class Simple
         getSharedPrefs().edit().putString(key, value).apply();
     }
 
+    public static void setSharedPrefInt(String key, int value)
+    {
+        getSharedPrefs().edit().putInt(key, value).apply();
+    }
+
     public static void setSharedPrefBoolean(String key, boolean value)
     {
         getSharedPrefs().edit().putBoolean(key, value).apply();
