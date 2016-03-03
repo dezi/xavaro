@@ -1,6 +1,6 @@
 {
   "medication.days" : "Medication Days",
-  "medication.days.keys" : [ "every", "weekdays",          "intervall"      ],
+  "medication.days.keys" : [ "every", "weekdays",          "interval"       ],
   "medication.days.vals" : [ "Daily", "Selected Weekdays", "Interval Days"  ],
 
   "EOL" : true

@@ -205,5 +205,6 @@ medicator.form =
     "ZBU":"Zahnbürste",
     "ZGE":"Zahngel",
     "ZKA":"Zerbeisskapseln",
-    "ZPA":"Zahnpasta"
+    "ZPA":"Zahnpasta",
+    "ZZA":"Aktivität"
 };

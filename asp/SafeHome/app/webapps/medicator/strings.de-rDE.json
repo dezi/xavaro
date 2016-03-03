@@ -1,5 +1,5 @@
 {
-  "medication.days" : "Einnahmetagepupsi",
+  "medication.days" : "Einnahmetage",
   "medication.days.vals" : [ "Täglich", "Bestimmte Wochentage", "Tagesintervall" ],
 
   "EOL" : true

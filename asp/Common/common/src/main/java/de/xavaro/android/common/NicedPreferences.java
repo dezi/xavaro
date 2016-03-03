@@ -83,7 +83,7 @@ public class NicedPreferences
             }
             catch (java.text.ParseException ex)
             {
-                return new GregorianCalendar(2000, 0, 1);
+                return new GregorianCalendar();
             }
         }
 
@@ -161,7 +161,7 @@ public class NicedPreferences
         {
             if (this.dateString == null)
             {
-                setDate(formatter().format(new GregorianCalendar(2000, 0, 1).getTime()));
+                setDate(formatter().format(new GregorianCalendar().getTime()));
             }
 
             return this.dateString;

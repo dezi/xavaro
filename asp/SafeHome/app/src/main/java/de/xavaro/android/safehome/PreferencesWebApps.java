@@ -187,8 +187,14 @@ public class PreferencesWebApps
                 NicedPreferences.NiceListPreference lp;
                 NicedPreferences.NiceMultiListPreference mp;
                 NicedPreferences.NiceNumberPreference np;
+                NicedPreferences.NiceDatePreference dp;
 
                 Preference ap = null;
+
+                if (Simple.equals(type, "date"))
+                {
+                    ap = dp = new NicedPreferences.NiceDatePreference(Simple.getAppContext());
+                }
 
                 if (Simple.equals(type, "search"))
                 {

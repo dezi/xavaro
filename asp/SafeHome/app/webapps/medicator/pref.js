@@ -10,6 +10,30 @@ medicator.buildAllPreferences = function()
 
     medicator.prefs = [];
 
+    var pref = {};
+    pref.key = "activity.category";
+    pref.type = "category";
+    pref.title = "Aktivitäten";
+    medicator.prefs.push(pref);
+
+    var pref = {};
+    pref.key = "activity.bloodpressure";
+    pref.type = "switch";
+    pref.title = "Blutdruck messen";
+    medicator.prefs.push(pref);
+
+    var pref = {};
+    pref.key = "activity.glucose";
+    pref.type = "switch";
+    pref.title = "Blutzucker messen";
+    medicator.prefs.push(pref);
+
+    var pref = {};
+    pref.key = "activity.weight";
+    pref.type = "switch";
+    pref.title = "Wiegen";
+    medicator.prefs.push(pref);
+
     for (var key in medicator.currentprefs)
     {
         if (key.startsWith("medication.enable."))
@@ -80,6 +104,17 @@ medicator.buildMedication = function(medication)
     WebAppPrefs.setPrefBoolean(pref.key, true);
 
     //
+    // Start date of medication.
+    //
+
+    var pref = {};
+    pref.key = "medication.date." + medication;
+    pref.type = "date",
+    pref.title = "Startdatum";
+
+    medicator.prefs.push(pref);
+
+    //
     // Medication duration ongoing or number of days.
     //
 
@@ -125,13 +160,13 @@ medicator.buildMedication = function(medication)
     pref.keys = [
         "daily1", "daily2", "daily3", "daily4",
         "every6", "every8", "every12",
-        "weekly", "monthly"
+        "weekly", "monthly", "needed"
         ];
 
     pref.vals = [
         "Täglich 1x", "Täglich 2x", "Täglich 3x", "Täglich 4x",
         "Alle 6 Stunden", "Alle 8 Stunden", "Alle 12 Stunden",
-        "Wöchentlich", "Monatlich"
+        "Wöchentlich", "Monatlich", "Bei Bedarf"
         ];
 
     medicator.prefs.push(pref);
@@ -276,67 +311,102 @@ medicator.buildMedication = function(medication)
         medicator.buildDosisPref(medication, "dosemonthly");
     }
 
+    if (time == "needed")
+    {
+        medicator.buildDosisPref(medication, "doseneeded");
+    }
+
     //
     // Special days selection.
     //
 
-    var pref = {};
-    pref.key = "medication.days." + medication;
-    pref.type = "list",
-    pref.title = WebLibStrings.getTrans("medication.days");
-    pref.defvalue = "every";
-
-    pref.keys = WebLibStrings.getTrans("medication.days.keys");
-    pref.vals = WebLibStrings.getTrans("medication.days.vals");
-
-    medicator.prefs.push(pref);
-
-    var days = WebAppPrefs.getPrefString(pref.key);
-
-    if (days == "weekdays")
+    if (time != "needed")
     {
         var pref = {};
-        pref.key = "medication.wdays." + medication;
-        pref.type = "multi";
-        pref.title = "Wochentage";
+        pref.key = "medication.days." + medication;
+        pref.type = "list",
+        pref.title = WebLibStrings.getTrans("medication.days");
+        pref.defvalue = "every";
 
-        pref.keys = [ "1",  "2",  "3",  "4",  "5",  "6",  "7"  ];
-        pref.vals = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
-
-        medicator.prefs.push(pref);
-   }
-
-    if (days == "intervall")
-    {
-        var pref = {};
-        pref.key = "medication.idays." + medication;
-        pref.type = "multi";
-        pref.title = "Intervall";
-
-        pref.keys = [
-            "2",    "3",   "4",
-            "5",    "6",   "7",
-            "8",    "9",  "10",
-            "11",  "12",  "13",
-            "14"
-            ];
-
-        pref.vals = [
-             "2. Tag",  "3. Tag",  "4. Tag",
-             "5. Tag",  "6. Tag",  "7. Tag",
-             "8. Tag",  "9. Tag", "10. Tag",
-            "11. Tag", "12. Tag", "13. Tag",
-            "14. Tag"
-            ];
+        pref.keys = WebLibStrings.getTrans("medication.days.keys");
+        pref.vals = WebLibStrings.getTrans("medication.days.vals");
 
         medicator.prefs.push(pref);
+
+        var days = WebAppPrefs.getPrefString(pref.key);
+
+        if (days == "weekdays")
+        {
+            var pref = {};
+            pref.key = "medication.wdays." + medication;
+            pref.type = "multi";
+            pref.title = "Wochentage";
+
+            pref.keys = [ "1",  "2",  "3",  "4",  "5",  "6",  "7"  ];
+            pref.vals = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+
+            medicator.prefs.push(pref);
+       }
+
+        if (days == "interval")
+        {
+            var pref = {};
+            pref.key = "medication.idays." + medication;
+            pref.type = "multi";
+            pref.title = "Intervall";
+
+            pref.keys = [
+                "2",    "3",   "4",
+                "5",    "6",   "7",
+                "8",    "9",  "10",
+                "11",  "12",  "13",
+                "14"
+                ];
+
+            pref.vals = [
+                 "2. Tag",  "3. Tag",  "4. Tag",
+                 "5. Tag",  "6. Tag",  "7. Tag",
+                 "8. Tag",  "9. Tag", "10. Tag",
+                "11. Tag", "12. Tag", "13. Tag",
+                "14. Tag"
+                ];
+
+            medicator.prefs.push(pref);
+        }
     }
-
+    
     WebAppPrefBuilder.updatePreferences(JSON.stringify(medicator.prefs));
 }
 
 WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
 {
+    if (prefkey.startsWith("activity."))
+    {
+        var medication = null;
+
+        if (prefkey == "activity.bloodpressure") medication = "Blutdruck messen"
+        if (prefkey == "activity.glucose") medication = "Blutzucker messen"
+        if (prefkey == "activity.weight") medication = "Wiegen"
+
+        if (medication)
+        {
+            var key = "medication.enable." + medication + ",ZZA";
+
+            if (WebAppPrefs.getPrefBoolean(prefkey))
+            {
+                 WebAppPrefs.setPrefBoolean(key, true);
+            }
+            else
+            {
+                WebAppPrefs.removePref(key);
+            }
+
+            medicator.buildAllPreferences();
+
+            return;
+        }
+    }
+
     if (prefkey.startsWith("search.result."))
     {
         var enabled = WebAppPrefs.getPrefBoolean(prefkey);
