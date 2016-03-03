@@ -1,6 +1,9 @@
 {
-  "medication.days" : "Einnahmetage",
-  "medication.days.vals" : [ "Täglich", "Bestimmte Wochentage", "Tagesintervall" ],
+  "medication.days" : "Rhythmus",
+  "medication.days.vals" : [ "Täglich", "Bestimmte Wochentage", "Tagesintervall", "Wöchentlich", "Monatlich", "Bei Bedarf" ],
+
+  "medication.mode.pills.vals" : [ "Erste Einnahme", "Zweite Einnahme", "Dritte Einnahme", "Vierte Einnahme", "Bei Bedarf"  ],
+  "medication.mode.measure.vals" : [ "Erste Messung", "Zweite Messung", "Dritte Messung", "Vierte Messung"  ],
 
   "EOL" : true
 }

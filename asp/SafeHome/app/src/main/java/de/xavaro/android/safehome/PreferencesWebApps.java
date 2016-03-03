@@ -1,7 +1,9 @@
 package de.xavaro.android.safehome;
 
 import android.os.Handler;
+import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 
 import android.content.Context;
@@ -10,10 +12,13 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.webkit.WebView;
 import android.util.Log;
+import android.widget.ListView;
+import android.widget.ScrollView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -138,6 +143,7 @@ public class PreferencesWebApps
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
 
+            @Override
             public boolean onPreferenceChange(Preference preference, Object obj)
             {
                 Log.d(LOGTAG, "onPreferenceChange:" + preference.getKey());
@@ -291,8 +297,7 @@ public class PreferencesWebApps
                 JSONArray prefs = Json.fromStringArray(json);
                 if (prefs == null) return;
 
-                getPreferenceScreen().removeAll();
-
+                PreferenceScreen prefscreen = getPreferenceScreen();
                 ArrayList<Preference> newprefs = new ArrayList<>();
 
                 //
@@ -300,11 +305,16 @@ public class PreferencesWebApps
                 //
 
                 newprefs.add(preferences.remove(0));
-                getPreferenceScreen().addPreference(newprefs.get(0));
 
                 //
-                // Update or create preferences.
+                // Update or create preferences. Try to keep all
+                // unchanged preferences alive until the first
+                // change happens. This is done to keep the
+                // scolling position of the preference screen
+                // intact if possible.
                 //
+
+                boolean gameover = false;
 
                 for (int inx = 0; inx < prefs.length(); inx++)
                 {
@@ -313,22 +323,54 @@ public class PreferencesWebApps
 
                     String key = Json.getString(pref, "key");
                     if (key == null) continue;
+                    String realkey = webappkeyprefix + key;
 
-                    Preference apref = preferenceExists(key);
+                    if ((preferences.size() > 0) && ! gameover)
+                    {
+                        Preference apref = preferences.get(0);
 
-                    if (apref == null) apref = createPreference(pref);
-                    if (apref == null) continue;
+                        if (Simple.equals(apref.getKey(), realkey))
+                        {
+                            preferences.remove(0);
+                            newprefs.add(apref);
+                            continue;
+                        }
+                        else
+                        {
+                            gameover = true;
+                        }
+                    }
 
-                    newprefs.add(apref);
-                    getPreferenceScreen().addPreference(apref);
+                    Preference npref = createPreference(pref);
+
+                    if (npref != null)
+                    {
+                        newprefs.add(npref);
+                        prefscreen.addPreference(npref);
+                    }
+                }
+
+                while (preferences.size() > 0)
+                {
+                    prefscreen.removePreference(preferences.remove(0));
                 }
 
                 preferences = newprefs;
             }
 
+            public void onSearchCancel(String prefkey)
+            {
+                String script = "if (WebAppPrefBuilder.onSearchCancel) "
+                        + "WebAppPrefBuilder.onSearchCancel"
+                        + "(\"" + prefkey + "\");";
+
+                webprefs.evaluateJavascript(script, null);
+            }
+
             public void onSearchRequest(String prefkey, String query)
             {
-                String script = "WebAppPrefBuilder.onSearchRequest"
+                String script = "if (WebAppPrefBuilder.onSearchRequest) "
+                        + "WebAppPrefBuilder.onSearchRequest"
                         + "(\"" + prefkey + "\", \"" + query + "\");";
 
                 webprefs.evaluateJavascript(script, null);

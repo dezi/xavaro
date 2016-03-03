@@ -1,7 +1,13 @@
 {
-  "medication.days" : "Medication Days",
-  "medication.days.keys" : [ "every", "weekdays",          "interval"       ],
-  "medication.days.vals" : [ "Daily", "Selected Weekdays", "Interval Days"  ],
+  "medication.days" : "Interval",
+  "medication.days.keys" : [ "daily", "weekdays",          "interval",      "weekly",      "monthly",   "ondemand"  ],
+  "medication.days.vals" : [ "Daily", "Selected Weekdays", "Interval Days", "Wöchentlich", "Monatlich", "Bei Bedarf" ],
+
+  "medication.mode.pills.keys" : [ "time1",          "time2",           "time3",           "time4",           "ondemand"    ],
+  "medication.mode.pills.vals" : [ "Erste Einnahme", "Zweite Einnahme", "Dritte Einnahme", "Vierte Einnahme", "Bei Bedarf"  ],
+
+  "medication.mode.measure.keys" : [ "time1",         "time2",          "time3",          "time4"           ],
+  "medication.mode.measure.vals" : [ "Erste Messung", "Zweite Messung", "Dritte Messung", "Vierte Messung"  ],
 
   "EOL" : true
 }

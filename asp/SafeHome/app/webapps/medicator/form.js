@@ -206,5 +206,6 @@ medicator.form =
     "ZGE":"Zahngel",
     "ZKA":"Zerbeisskapseln",
     "ZPA":"Zahnpasta",
-    "ZZA":"Aktivität"
+    "ZZM":"Aktivität - Messung",
+    "ZZW":"Aktivität - Wiegen"
 };

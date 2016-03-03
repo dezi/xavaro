@@ -1294,7 +1294,8 @@ public class NicedPreferences
         }
     }
 
-    public static class NiceCategoryPreference extends PreferenceCategory implements
+    public static class NiceCategoryPreference extends Preference implements
+            View.OnClickListener,
             View.OnLongClickListener
     {
         public NiceCategoryPreference(Context context)
@@ -1302,7 +1303,14 @@ public class NicedPreferences
             super(context);
         }
 
-        private Runnable onLongClickRunner;
+        protected Runnable onClickRunner;
+        protected Runnable onLongClickRunner;
+        protected ImageView actionIcon;
+
+        public void setOnClick(Runnable onclick)
+        {
+            onClickRunner = onclick;
+        }
 
         public void setOnLongClick(Runnable onclick)
         {
@@ -1314,13 +1322,71 @@ public class NicedPreferences
         {
             super.onBindView(view);
 
-            view.setPadding(20, 20, 20, 20);
+            //
+            // Re-arrange completely preference layout.
+            //
+            // Step one: move all items into new horizontal linear layout.
+            //
+
+            LinearLayout newlayout = new LinearLayout(getContext());
+            newlayout.setLayoutParams(Simple.layoutParamsMW());
+            newlayout.setOrientation(LinearLayout.HORIZONTAL);
+            newlayout.setPadding(16, 0, 0, 0);
+
+            while (((ViewGroup) view).getChildCount() > 0)
+            {
+                newlayout.addView(Simple.removeFromParent(((ViewGroup) view).getChildAt(0)));
+            }
+
+            ((ViewGroup) view).addView(newlayout);
+
+            //
+            // Step two: fuck top level layout to be vertical match parent.
+            // Also add a little bit of fucking padding at bottom.
+            //
+
+            ((LinearLayout) view).setOrientation(LinearLayout.VERTICAL);
+            view.setPadding(0, 0, 0, 8);
+
+            //
+            // Step three: remove summary from horizontal layout and add
+            // to top layout now beeing vertical.
+            //
+
+            TextView summary = (TextView) view.findViewById(android.R.id.summary);
+            summary.setPadding(16, 0, 16, 0);
+            summary.setMaxLines(50);
+
+            ((ViewGroup) view).addView(Simple.removeFromParent(summary));
+
+            //
+            // Step four set category dependant values. Change color, add a space view
+            // and adjust text size and color.
+            //
+
             view.setBackgroundColor(0xcccccccc);
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setTextSize(20f);
+            title.setPadding(0, 6, 0, 0);
+            title.setTextSize(Simple.getDeviceTextSize(24f));
 
+            //
+            // Add an action icon.
+            //
+
+            actionIcon = new ImageView(getContext());
+            actionIcon.setLayoutParams(Simple.layoutParamsXX(Simple.WC, Simple.MP));
+            actionIcon.setPadding(10, 16, 10, 10);
+            ((LinearLayout) ((ViewGroup) view).getChildAt(0)).addView(actionIcon);
+
+            view.setOnClickListener(this);
             view.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view)
+        {
+            if (onClickRunner != null) onClickRunner.run();
         }
 
         @Override
@@ -1332,8 +1398,7 @@ public class NicedPreferences
         }
     }
 
-    public static class NiceSearchPreference extends PreferenceCategory implements
-            View.OnClickListener
+    public static class NiceSearchPreference extends NiceCategoryPreference
     {
         public NiceSearchPreference(Context context)
         {
@@ -1345,13 +1410,7 @@ public class NicedPreferences
         {
             super.onBindView(view);
 
-            view.setPadding(20, 20, 20, 20);
-            view.setBackgroundColor(0xcccccccc);
-
-            TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setTextSize(20f);
-
-            view.setOnClickListener(this);
+            actionIcon.setImageResource(android.R.drawable.ic_menu_search);
         }
 
         public void setSearchCallback(SearchCallback callback)
@@ -1363,6 +1422,18 @@ public class NicedPreferences
         private AlertDialog dialog;
         private EditText search;
         private String query;
+
+        public void onCancelClick()
+        {
+            if (callback != null)
+            {
+                callback.onSearchCancel(getKey());
+            }
+
+            dialog.cancel();
+            dialog = null;
+            search = null;
+        }
 
         public void onSearchClick()
         {
@@ -1408,6 +1479,15 @@ public class NicedPreferences
             Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
             negative.setTextSize(24f);
 
+            negative.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    onCancelClick();
+                }
+            });
+
             Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positive.setTextSize(24f);
 
@@ -1423,6 +1503,7 @@ public class NicedPreferences
 
         public interface SearchCallback
         {
+            void onSearchCancel(String prefkey);
             void onSearchRequest(String prefkey, String query);
         }
     }
