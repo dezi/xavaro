@@ -1,24 +1,20 @@
 package de.xavaro.android.safehome;
 
-import android.os.Handler;
-import android.preference.PreferenceScreen;
-import android.support.annotation.Nullable;
-import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.support.annotation.Nullable;
 
-import android.content.Context;
-import android.os.Bundle;
+import android.preference.PreferenceScreen;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.content.Context;
 import android.webkit.WebView;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
-import android.widget.ListView;
-import android.widget.ScrollView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -180,6 +176,7 @@ public class PreferencesWebApps
                 String type = Json.getString(pref, "type");
                 String title = Json.getString(pref, "title");
                 String summary = Json.getString(pref, "summary");
+                boolean enabled = (! Json.has(pref, "enabled")) || Json.getBoolean(pref, "enabled");
 
                 if (key == null) return null;
 
@@ -271,6 +268,7 @@ public class PreferencesWebApps
                     ap.setKey(key);
                     ap.setTitle(title);
                     ap.setSummary(summary);
+                    ap.setEnabled(enabled);
                     ap.setOnPreferenceChangeListener(this);
                 }
 
@@ -291,12 +289,8 @@ public class PreferencesWebApps
                 return null;
             }
 
-            @JavascriptInterface
-            public void updatePreferences(String json)
+            private void updatePreferences(JSONArray prefs)
             {
-                JSONArray prefs = Json.fromStringArray(json);
-                if (prefs == null) return;
-
                 PreferenceScreen prefscreen = getPreferenceScreen();
                 ArrayList<Preference> newprefs = new ArrayList<>();
 
@@ -321,6 +315,9 @@ public class PreferencesWebApps
                     JSONObject pref = Json.getObject(prefs, inx);
                     if (pref == null) continue;
 
+                    boolean enabled = (! Json.has(pref, "enabled"))
+                            || Json.getBoolean(pref, "enabled");
+
                     String key = Json.getString(pref, "key");
                     if (key == null) continue;
                     String realkey = webappkeyprefix + key;
@@ -331,6 +328,7 @@ public class PreferencesWebApps
 
                         if (Simple.equals(apref.getKey(), realkey))
                         {
+                            apref.setEnabled(enabled);
                             preferences.remove(0);
                             newprefs.add(apref);
                             continue;
@@ -356,6 +354,24 @@ public class PreferencesWebApps
                 }
 
                 preferences = newprefs;
+            }
+
+            @JavascriptInterface
+            public void updatePreferences(String json)
+            {
+                final JSONArray prefs = Json.fromStringArray(json);
+
+                if (prefs != null)
+                {
+                    handler.post(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            updatePreferences(prefs);
+                        }
+                    });
+                }
             }
 
             public void onSearchCancel(String prefkey)

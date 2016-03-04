@@ -163,6 +163,11 @@ public class Json
         return null;
     }
 
+    public static boolean has(JSONObject json, String key)
+    {
+        return json.has(key);
+    }
+
     public static double getDouble(JSONObject json, String key)
     {
         try

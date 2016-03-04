@@ -418,6 +418,7 @@ public class NicedPreferences
                 {
                     String val1 = stepValues1[ numberPicker1.getValue() ];
                     String val2 = stepValues2[ numberPicker2.getValue() ];
+
                     setValue(val1 + ":" + val2);
                 }
             }

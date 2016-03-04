@@ -40,7 +40,25 @@ medicator.buildAllPreferences = function()
 
     for (var key in medicator.currentprefs)
     {
-        if (key.startsWith("medication.enable.") && (key.endsWith("ZZM") || key.endsWith("ZZW")))
+        if (key.startsWith("medication.enable.") && key.endsWith("ZZB"))
+        {
+            var medication = key.substring(18);
+            medicator.buildMedication(medication);
+        }
+    }
+
+    for (var key in medicator.currentprefs)
+    {
+        if (key.startsWith("medication.enable.") && key.endsWith("ZZG"))
+        {
+            var medication = key.substring(18);
+            medicator.buildMedication(medication);
+        }
+    }
+
+    for (var key in medicator.currentprefs)
+    {
+        if (key.startsWith("medication.enable.") && key.endsWith("ZZW"))
         {
             var medication = key.substring(18);
             medicator.buildMedication(medication);
@@ -53,7 +71,8 @@ medicator.buildAllPreferences = function()
 
     for (var key in medicator.currentprefs)
     {
-        if (key.startsWith("medication.enable.") && ! (key.endsWith("ZZM") || key.endsWith("ZZW")))
+        if (key.startsWith("medication.enable.") &&
+            ! (key.endsWith("ZZB") || key.endsWith("ZZG") || key.endsWith("ZZW")))
         {
             var medication = key.substring(18);
             medicator.buildMedication(medication);
@@ -87,7 +106,7 @@ medicator.getActivityText = function(medication, which)
 
     var key = "medication.mode.pills.keys";
 
-    if ((mediform == "ZZM") || (mediform == "ZZW"))
+    if ((mediform == "ZZB") || (mediform == "ZZG") || (mediform == "ZZW"))
     {
         key = "medication.mode.measure.keys";
     }
@@ -95,7 +114,7 @@ medicator.getActivityText = function(medication, which)
     return WebLibStrings.getTransTrans(key, which);
 }
 
-medicator.buildTimePref = function(medication, whichtime)
+medicator.buildTimePref = function(medication, whichtime, enabled)
 {
     var pref = {};
     pref.key = "medication." + whichtime + "." + medication;
@@ -105,16 +124,17 @@ medicator.buildTimePref = function(medication, whichtime)
     pref.max = 24;
     pref.step = 1;
     pref.unit = "Uhr";
+    pref.enabled = enabled;
 
     medicator.prefs.push(pref);
 
     return pref;
 }
 
-medicator.buildDosisPref = function(medication, whichtime, whichdose)
+medicator.buildDosisPref = function(medication, whichtime, whichdose, enabled)
 {
     var mediform = medication.substring(medication.length - 3);
-    if ((mediform == "ZZM") || (mediform == "ZZW")) return;
+    if ((mediform == "ZZB") || (mediform == "ZZG") || (mediform == "ZZW")) return;
 
     var dosetext = (whichdose == "ondemand") ? "tägliche Höchstdosis" : "Dosis";
 
@@ -123,6 +143,7 @@ medicator.buildDosisPref = function(medication, whichtime, whichdose)
     pref.type = "list";
     pref.title = medicator.getActivityText(medication, whichtime) + " " + dosetext;
     pref.defvalue = "1";
+    pref.enabled = enabled;
 
     pref.keys = [ "1/4", "1/3", "1/2", "1", "1 1/2", "2", "2 1/2", "3", "4" ];
     pref.vals = [ "1/4", "1/3", "1/2", "1", "1 1/2", "2", "2 1/2", "3", "4" ];
@@ -153,17 +174,6 @@ medicator.buildMedication = function(medication)
     WebAppPrefs.setPrefBoolean(pref.key, true);
 
     //
-    // Start date of medication.
-    //
-
-    var pref = {};
-    pref.key = "medication.date." + medication;
-    pref.type = "date",
-    pref.title = "Startdatum";
-
-    medicator.prefs.push(pref);
-
-    //
     // Medication duration.
     //
 
@@ -173,13 +183,15 @@ medicator.buildMedication = function(medication)
     pref.title = "Zeitraum";
     pref.defvalue = "ongoing";
 
-    pref.keys = [ "ongoing",        "numdays" ];
-    pref.vals = [ "Kontinuierlich", "Begrenzt" ];
+    pref.keys = [ "ongoing",        "numdays",  "paused"   ];
+    pref.vals = [ "Kontinuierlich", "Begrenzt", "Pausiert" ];
 
     medicator.prefs.push(pref);
 
     var dura = WebAppPrefs.getPrefString(pref.key);
     if (! dura) dura = pref.defvalue;
+
+    var enabled = (dura != "paused");
 
     if (dura == "numdays")
     {
@@ -193,9 +205,22 @@ medicator.buildMedication = function(medication)
         pref.step = 1;
         pref.defvalue = 14;
         pref.unit = "Tage";
+        pref.enabled = enabled;
 
         medicator.prefs.push(pref);
     }
+
+    //
+    // Start date of medication.
+    //
+
+    var pref = {};
+    pref.key = "medication.date." + medication;
+    pref.type = "date",
+    pref.title = "Startdatum";
+    pref.enabled = enabled;
+
+    medicator.prefs.push(pref);
 
     //
     // Special days selection.
@@ -206,6 +231,7 @@ medicator.buildMedication = function(medication)
     pref.type = "list",
     pref.title = WebLibStrings.getTrans("medication.days");
     pref.defvalue = "daily";
+    pref.enabled = enabled;
 
     pref.keys = WebLibStrings.getTrans("medication.days.keys");
     pref.vals = WebLibStrings.getTrans("medication.days.vals");
@@ -221,6 +247,7 @@ medicator.buildMedication = function(medication)
         pref.key = "medication.wdays." + medication;
         pref.type = "multi";
         pref.title = "Wochentage";
+        pref.enabled = enabled;
 
         pref.keys = [ "1",  "2",  "3",  "4",  "5",  "6",  "7"  ];
         pref.vals = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
@@ -234,6 +261,7 @@ medicator.buildMedication = function(medication)
         pref.key = "medication.idays." + medication;
         pref.type = "list";
         pref.title = "Intervall";
+        pref.enabled = enabled;
 
         pref.keys = [
             "2",    "3",   "4",
@@ -270,6 +298,7 @@ medicator.buildMedication = function(medication)
         pref.type = "list",
         pref.title = "Zeiten";
         pref.defvalue = "daily1";
+        pref.enabled = enabled;
 
         pref.keys = [
             "daily1", "daily2", "daily3", "daily4",
@@ -288,59 +317,59 @@ medicator.buildMedication = function(medication)
 
         if ((times == "daily1") || (times == "daily2") || (times == "daily3") || (times == "daily4"))
         {
-            var pref = medicator.buildTimePref(medication, "time1");
+            var pref = medicator.buildTimePref(medication, "time1", enabled);
             pref.defvalue = (times == "daily4") ? 6 : 8;
-            medicator.buildDosisPref(medication, "time1", "dose1");
+            medicator.buildDosisPref(medication, "time1", "dose1", enabled);
         }
 
         if ((times == "daily2") || (times == "daily3") || (times == "daily4"))
         {
-            var pref = medicator.buildTimePref(medication, "time2");
+            var pref = medicator.buildTimePref(medication, "time2", enabled);
             pref.defvalue = (times == "daily4") ? 12 : (times == "daily3") ? 16 : 20;
-            medicator.buildDosisPref(medication, "time2", "dose2");
+            medicator.buildDosisPref(medication, "time2", "dose2", enabled);
         }
 
         if ((times == "daily3") || (times == "daily4"))
         {
-            var pref = medicator.buildTimePref(medication, "time3");
+            var pref = medicator.buildTimePref(medication, "time3", enabled);
             pref.defvalue = (times == "daily4") ? 18 : 22;
-            medicator.buildDosisPref(medication, "time3", "dose3");
+            medicator.buildDosisPref(medication, "time3", "dose3", enabled);
         }
 
         if (times == "daily4")
         {
-            var pref = medicator.buildTimePref(medication, "time4");
+            var pref = medicator.buildTimePref(medication, "time4", enabled);
             pref.defvalue = 0;
-            medicator.buildDosisPref(medication, "time4", "dose4");
+            medicator.buildDosisPref(medication, "time4", "dose4", enabled);
         }
 
         if ((times == "every6") || (times == "every8") || (times == "every12"))
         {
-            var pref = medicator.buildTimePref(medication, "time1");
+            var pref = medicator.buildTimePref(medication, "time1", enabled);
             pref.defvalue = (times == "every6") ? 6 : 8;
             medicator.prefs.push(pref);
-            medicator.buildDosisPref(medication, "time1", "dose1");
+            medicator.buildDosisPref(medication, "time1", "dose1", enabled);
         }
 
         if ((times == "every6") || (times == "every8") || (times == "every12"))
         {
-            var pref = medicator.buildTimePref(medication, "time2");
+            var pref = medicator.buildTimePref(medication, "time2", enabled);
             pref.defvalue = (times == "every6") ? 12 : (times == "every8") ? 16 : 20;
-            medicator.buildDosisPref(medication, "time2", "dose2");
+            medicator.buildDosisPref(medication, "time2", "dose2", enabled);
         }
 
         if ((times == "every6") || (times == "every8"))
         {
-            var pref = medicator.buildTimePref(medication, "time3");
+            var pref = medicator.buildTimePref(medication, "time3", enabled);
             pref.defvalue = (times == "every6") ? 18 : 24;
-            medicator.buildDosisPref(medication, "time3", "dose3");
+            medicator.buildDosisPref(medication, "time3", "dose3", enabled);
         }
 
         if (times == "every6")
         {
-            var pref = medicator.buildTimePref(medication, "time4");
+            var pref = medicator.buildTimePref(medication, "time4", enabled);
             pref.defvalue = 0;
-            medicator.buildDosisPref(medication, "time4", "dose4");
+            medicator.buildDosisPref(medication, "time4", "dose4", enabled);
         }
     }
 }
@@ -353,8 +382,8 @@ WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
     {
         var medication = null;
 
-        if (prefkey == "activity.bloodpressure") medication = "Blutdruck messen,ZZM"
-        if (prefkey == "activity.glucose") medication = "Blutzucker messen,ZZM"
+        if (prefkey == "activity.bloodpressure") medication = "Blutdruck messen,ZZB"
+        if (prefkey == "activity.glucose") medication = "Blutzucker messen,ZZG"
         if (prefkey == "activity.weight") medication = "Wiegen,ZZW"
 
         if (medication)
