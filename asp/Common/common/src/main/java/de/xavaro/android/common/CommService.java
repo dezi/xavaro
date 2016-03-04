@@ -613,6 +613,7 @@ public class CommService extends Service
 
             CommSender.commTick();
             WebAppCache.commTick();
+            EventManager.commTick();
 
             if (! checkSocket()) continue;
 

@@ -10,6 +10,7 @@
       "request",
       "intercept",
       "utility",
+      "events",
       "prefs"
     ],
 
@@ -20,6 +21,7 @@
     ],
 
     "preload": [
+      "plan.js",
       "form.js"
     ],
 

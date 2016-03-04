@@ -70,6 +70,11 @@ public class LaunchItemDeveloper extends LaunchItem
                 icon.setImageResource(GlobalConfigs.IconResWebApps);
             }
 
+            if (Simple.equals(subtype, "events"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResEvents);
+            }
+
             overicon.setImageResource(GlobalConfigs.IconResTesting);
             overlay.setVisibility(VISIBLE);
         }

@@ -273,3 +273,37 @@ WebLibSimple.detachElement = function(elem)
 {
     if (elem && elem.parentElement) elem.parentElement.removeChild(elem);
 }
+
+WebLibSimple.padNum = function(num, size)
+{
+    var str = "" + num;
+    while (str.length < size) str = "0" + str;
+    return str;
+}
+
+WebLibSimple.getPickerDate = function(pickerdate)
+{
+    if (pickerdate)
+    {
+        var parts = pickerdate.split(".");
+
+        if (parts.length == 3)
+        {
+            var year  = parseInt(parts[ 0 ], 10);
+            var month = parseInt(parts[ 1 ], 10) - 1;
+            var day   = parseInt(parts[ 2 ], 10);
+
+            return new Date(year, month, day);
+        }
+    }
+
+    return null;
+}
+
+WebLibSimple.getTodayDate = function()
+{
+    var today = new Date();
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    return today;
+}

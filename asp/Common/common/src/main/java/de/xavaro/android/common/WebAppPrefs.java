@@ -4,9 +4,11 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 public class WebAppPrefs
@@ -75,7 +77,23 @@ public class WebAppPrefs
 
         for (String key : prefs.keySet())
         {
-            Json.put(jprefs, key.substring(keyprefix.length()), prefs.get(key));
+            Object pref = prefs.get(key);
+
+            if (pref instanceof Set)
+            {
+                JSONArray joset = new JSONArray();
+
+                for (Object obj : (Set) pref)
+                {
+                    Json.put(joset, obj);
+                }
+
+                Json.put(jprefs, key.substring(keyprefix.length()), joset);
+            }
+            else
+            {
+                Json.put(jprefs, key.substring(keyprefix.length()), pref);
+            }
         }
 
         return jprefs.toString();

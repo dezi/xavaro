@@ -16,8 +16,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -135,7 +137,8 @@ public class PreferencesWebApps
         @SuppressWarnings("unused")
         private class WebAppPrefBuilder implements
                 Preference.OnPreferenceChangeListener,
-                NicedPreferences.NiceSearchPreference.SearchCallback
+                NicedPreferences.NiceSearchPreference.SearchCallback,
+                NicedPreferences.NiceDeletePreference.DeleteCallback
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
 
@@ -191,13 +194,9 @@ public class PreferencesWebApps
                 NicedPreferences.NiceMultiListPreference mp;
                 NicedPreferences.NiceNumberPreference np;
                 NicedPreferences.NiceDatePreference dp;
+                NicedPreferences.NiceDeletePreference xp;
 
                 Preference ap = null;
-
-                if (Simple.equals(type, "date"))
-                {
-                    ap = dp = new NicedPreferences.NiceDatePreference(Simple.getAppContext());
-                }
 
                 if (Simple.equals(type, "search"))
                 {
@@ -206,10 +205,27 @@ public class PreferencesWebApps
                     qp.setSearchCallback(this);
                 }
 
+                if (Simple.equals(type, "delete"))
+                {
+                    ap = xp = new NicedPreferences.NiceDeletePreference(Simple.getAppContext());
+
+                    xp.setDeleteCallback(this);
+
+                    xp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
+                }
+
                 if (Simple.equals(type, "category"))
                 {
                     ap = ct = new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
+
                     ct.setDefaultValue(Json.getBoolean(pref, "defvalue"));
+                }
+
+                if (Simple.equals(type, "date"))
+                {
+                    ap = dp = new NicedPreferences.NiceDatePreference(Simple.getAppContext());
+
+                    dp.setDefaultValue(Json.getString(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "switch"))
@@ -248,6 +264,7 @@ public class PreferencesWebApps
 
                     mp.setEntries(Json.getArray(pref, "vals"));
                     mp.setEntryValues(Json.getArray(pref, "keys"));
+                    mp.setDefaultValue(Json.toSet(Json.getArray(pref, "defvalue")));
                 }
 
                 if (Simple.equals(type, "number"))
@@ -376,6 +393,8 @@ public class PreferencesWebApps
 
             public void onSearchCancel(String prefkey)
             {
+                prefkey = prefkey.substring(webappkeyprefix.length());
+
                 String script = "if (WebAppPrefBuilder.onSearchCancel) "
                         + "WebAppPrefBuilder.onSearchCancel"
                         + "(\"" + prefkey + "\");";
@@ -385,9 +404,22 @@ public class PreferencesWebApps
 
             public void onSearchRequest(String prefkey, String query)
             {
+                prefkey = prefkey.substring(webappkeyprefix.length());
+
                 String script = "if (WebAppPrefBuilder.onSearchRequest) "
                         + "WebAppPrefBuilder.onSearchRequest"
                         + "(\"" + prefkey + "\", \"" + query + "\");";
+
+                webprefs.evaluateJavascript(script, null);
+            }
+
+            public void onDeleteRequest(String prefkey)
+            {
+                prefkey = prefkey.substring(webappkeyprefix.length());
+
+                String script = "if (WebAppPrefBuilder.onDeleteRequest) "
+                        + "WebAppPrefBuilder.onDeleteRequest"
+                        + "(\"" + prefkey + "\");";
 
                 webprefs.evaluateJavascript(script, null);
             }

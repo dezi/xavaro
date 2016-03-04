@@ -8,8 +8,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class Json
 {
@@ -322,6 +324,27 @@ public class Json
         }
 
         return null;
+    }
+
+    public static Set<String> toSet(JSONArray jsonArray)
+    {
+        Set<String> set = new HashSet<>();
+
+        if (jsonArray != null)
+        {
+            try
+            {
+                for (int inx = 0; inx < jsonArray.length(); inx++)
+                {
+                    set.add(jsonArray.getString(inx));
+                }
+            }
+            catch (Exception ignored)
+            {
+            }
+        }
+
+        return set;
     }
 
     public static String defuck(String json)

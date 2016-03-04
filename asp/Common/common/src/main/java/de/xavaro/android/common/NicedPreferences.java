@@ -8,14 +8,12 @@ import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.SwitchPreference;
 import android.text.InputType;
 import android.view.Gravity;
@@ -60,10 +58,9 @@ public class NicedPreferences
         @Override
         protected View onCreateDialogView()
         {
-            this.datePicker = new DatePicker(getContext());
-
             Calendar calendar = getDate();
 
+            datePicker = new DatePicker(getContext());
             datePicker.init(calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
                     calendar.get(Calendar.DAY_OF_MONTH),
@@ -113,34 +110,36 @@ public class NicedPreferences
         @Override
         protected void onSetInitialValue(boolean restoreValue, Object def)
         {
+            Log.d(LOGTAG, "onSetInitialValue:" + restoreValue + "=" + def);
+
             if (restoreValue)
             {
-                this.dateString = getPersistedString(defaultValue());
-                setTheDate(this.dateString);
+                dateString = getPersistedString(defaultValue());
+                setTheDate(dateString);
             }
             else
             {
-                boolean wasNull = this.dateString == null;
-
                 setDate((String) def);
-
-                if (!wasNull) persistDate(this.dateString);
+                persistString((String) def);
             }
         }
 
         public void onDateChanged(DatePicker view, int year, int month, int day)
         {
             Calendar selected = new GregorianCalendar(year, month, day);
-            this.changedValueCanBeNull = formatter().format(selected.getTime());
+            changedValueCanBeNull = formatter().format(selected.getTime());
         }
 
         @Override
         protected void onDialogClosed(boolean shouldSave)
         {
-            if (shouldSave && this.changedValueCanBeNull != null)
+            if (shouldSave && changedValueCanBeNull != null)
             {
-                setTheDate(this.changedValueCanBeNull);
-                this.changedValueCanBeNull = null;
+                setTheDate(changedValueCanBeNull);
+
+                callChangeListener(changedValueCanBeNull);
+
+                changedValueCanBeNull = null;
             }
         }
 
@@ -155,6 +154,14 @@ public class NicedPreferences
             persistString(s);
 
             if (current != null) current.setText(summaryFormatter().format(getDate().getTime()));
+        }
+
+        @Override
+        public void setDefaultValue(Object defaultValue)
+        {
+            super.setDefaultValue(defaultValue);
+
+            if (defaultValue instanceof String) this.dateString = (String) defaultValue;
         }
 
         private String defaultValue()
@@ -262,14 +269,12 @@ public class NicedPreferences
         {
             if (positiveResult)
             {
-                if (stepValues == null)
-                {
-                    setValue(numberPicker.getValue());
-                }
-                else
-                {
-                    setValue(Integer.parseInt(stepValues[ numberPicker.getValue() ]));
-                }
+                int newvalue = numberPicker.getValue();
+
+                if (stepValues != null) newvalue = Integer.parseInt(stepValues[ newvalue ]);
+
+                setValue(newvalue);
+                callChangeListener(newvalue);
             }
         }
 
@@ -410,17 +415,22 @@ public class NicedPreferences
         {
             if (positiveResult)
             {
+                String newvalue;
+
                 if ((stepValues1 == null) || (stepValues2 == null))
                 {
-                    setValue(numberPicker1.getValue() + ":" + numberPicker2.getValue());
+                    newvalue = numberPicker1.getValue() + ":" + numberPicker2.getValue();
                 }
                 else
                 {
                     String val1 = stepValues1[ numberPicker1.getValue() ];
                     String val2 = stepValues2[ numberPicker2.getValue() ];
 
-                    setValue(val1 + ":" + val2);
+                    newvalue = val1 + ":" + val2;
                 }
+
+                setValue(newvalue);
+                callChangeListener(newvalue);
             }
         }
 
@@ -478,7 +488,7 @@ public class NicedPreferences
         public void setEnabled(boolean enabled)
         {
             super.setEnabled(enabled);
-            this.disabled = ! enabled;
+            this.disabled = !enabled;
 
             if (current != null)
             {
@@ -1396,6 +1406,87 @@ public class NicedPreferences
             if (onLongClickRunner != null) onLongClickRunner.run();
 
             return false;
+        }
+    }
+
+    public static class NiceDeletePreference extends NiceCategoryPreference
+    {
+        public NiceDeletePreference(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            actionIcon.setImageResource(android.R.drawable.ic_menu_delete);
+        }
+
+        public void setDeleteCallback(DeleteCallback callback)
+        {
+            this.callback = callback;
+        }
+
+        private DeleteCallback callback;
+        private AlertDialog dialog;
+
+        @Override
+        public void onClick(View view)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle(getTitle());
+
+            builder.setNegativeButton("Abbrechen", null);
+            builder.setPositiveButton("Löschen", null);
+
+            dialog = builder.create();
+            dialog.show();
+
+            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            negative.setTextSize(24f);
+
+            negative.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    onCancelClick();
+                }
+            });
+
+            Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positive.setTextSize(24f);
+
+            positive.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    onDeleteClick();
+                }
+            });
+        }
+
+        public void onCancelClick()
+        {
+            dialog.cancel();
+            dialog = null;
+        }
+
+        public void onDeleteClick()
+        {
+            if (callback != null) callback.onDeleteRequest(getKey());
+
+            dialog.cancel();
+            dialog = null;
+        }
+
+
+        public interface DeleteCallback
+        {
+            void onDeleteRequest(String prefkey);
         }
     }
 

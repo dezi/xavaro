@@ -198,6 +198,12 @@ public class WebApp
             webview.addJavascriptInterface(prefs, "WebAppPrefs");
         }
 
+        if (permissions.contains("events"))
+        {
+            Object events = new WebAppEvents(webappname);
+            webview.addJavascriptInterface(events, "WebAppEvents");
+        }
+
         webview.loadUrl(WebApp.getHTTPAppRoot(webappname));
     }
 }

@@ -261,6 +261,18 @@ public class PreferencesBeta
             lp.setEnabled(enabled);
 
             preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.events");
+            lp.setIcon(GlobalConfigs.IconResEvents);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Events");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
         }
     }
 }

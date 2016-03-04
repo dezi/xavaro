@@ -4,6 +4,12 @@ medicator.buildAllPreferences = function()
 {
     //WebAppPrefs.removeAllPrefs("");
 
+    if (medicator.planEventsTimer)
+    {
+        clearTimeout(medicator.planEventsTimer);
+        medicator.planEventsTimer = null;
+    }
+
     medicator.currentprefs = JSON.parse(WebAppPrefs.getAllPrefs());
 
     medicator.cleanupSearchPrefs();
@@ -79,7 +85,27 @@ medicator.buildAllPreferences = function()
         }
     }
 
+    //
+    // Remove unused preferences.
+    //
+
+    for (var inx in medicator.prefs)
+    {
+        var key = medicator.prefs[ inx ].key;
+        medicator.currentprefs[ key ] = null;
+        console.log("aktive=" + key);
+    }
+
+    for (var key in medicator.currentprefs)
+    {
+        if (! medicator.currentprefs[ key ]) continue;
+        WebAppPrefs.removePref(key);
+        console.log("inaktive=" + key);
+    }
+
     WebAppPrefBuilder.updatePreferences(JSON.stringify(medicator.prefs));
+
+    medicator.planEventsTimer = setTimeout(medicator.planEvents, 1000);
 }
 
 medicator.removeLastSearch = function()
@@ -158,6 +184,9 @@ medicator.buildMedication = function(medication)
     var mname = medication.substring(0,medication.length - 4);
     var dkurz = medication.substring(medication.length - 3);
     var dlang = medicator.form[ dkurz ];
+    var htype = "delete";
+
+    if ((dkurz == "ZZB") || (dkurz == "ZZG") || (dkurz == "ZZW")) htype = "category";
 
     //
     // Medication category header. The header will not store
@@ -166,7 +195,7 @@ medicator.buildMedication = function(medication)
 
     var pref = {};
     pref.key = "medication.enable." + medication;
-    pref.type = "category";
+    pref.type = htype;
     pref.title = mname;
     pref.summary = dlang;
     medicator.prefs.push(pref);
@@ -214,10 +243,19 @@ medicator.buildMedication = function(medication)
     // Start date of medication.
     //
 
+    var now = new Date();
+    var today = WebLibSimple.padNum(now.getFullYear(), 4)
+              + "."
+              + WebLibSimple.padNum(now.getMonth() + 1, 2)
+              + "."
+              + WebLibSimple.padNum(now. getDate(), 2)
+              ;
+
     var pref = {};
     pref.key = "medication.date." + medication;
     pref.type = "date",
     pref.title = "Startdatum";
+    pref.defvalue = today;
     pref.enabled = enabled;
 
     medicator.prefs.push(pref);
@@ -244,13 +282,15 @@ medicator.buildMedication = function(medication)
     if (days == "weekdays")
     {
         var pref = {};
+
+        pref.keys = [ "w1", "w2", "w3", "w4", "w5", "w6", "w7" ];
+        pref.vals = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+
         pref.key = "medication.wdays." + medication;
         pref.type = "multi";
         pref.title = "Wochentage";
+        pref.defvalue = pref.keys;
         pref.enabled = enabled;
-
-        pref.keys = [ "1",  "2",  "3",  "4",  "5",  "6",  "7"  ];
-        pref.vals = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
 
         medicator.prefs.push(pref);
    }
@@ -261,6 +301,7 @@ medicator.buildMedication = function(medication)
         pref.key = "medication.idays." + medication;
         pref.type = "list";
         pref.title = "Intervall";
+        pref.defvalue = "2";
         pref.enabled = enabled;
 
         pref.keys = [
@@ -431,6 +472,13 @@ WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
         WebAppPrefs.removePref("medication.time3." + medication);
         WebAppPrefs.removePref("medication.time4." + medication);
     }
+
+    medicator.buildAllPreferences();
+}
+
+WebAppPrefBuilder.onDeleteRequest = function(prefkey)
+{
+    WebAppPrefs.removePref(prefkey);
 
     medicator.buildAllPreferences();
 }

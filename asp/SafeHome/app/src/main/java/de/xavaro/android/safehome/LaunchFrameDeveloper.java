@@ -89,6 +89,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         if (Simple.equals(subtype,"known")) loadStorageKnown();
 
         if (Simple.equals(subtype,"webappcache")) loadWebappCache();
+        if (Simple.equals(subtype,"events")) loadEvents();
     }
 
     private View.OnClickListener onUpdateClick = new View.OnClickListener()
@@ -105,6 +106,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         @Override
         public boolean onLongClick(View view)
         {
+            if (Simple.equals(subtype,"events")) clearEvents();
             if (Simple.equals(subtype,"webappcache")) clearWebappCache();
 
             return true;
@@ -180,6 +182,37 @@ public class LaunchFrameDeveloper extends LaunchFrame
         }
 
         File file = new File(Simple.getFilesDir(), "webappcache.act.json");
+        String json = Simple.getFileContent(file);
+        jsonListing.setText(json);
+    }
+
+    private void clearEvents()
+    {
+        Log.d(LOGTAG, "clearEvents: ...");
+
+        JSONObject empty = new JSONObject();
+        File act = new File(Simple.getFilesDir(), "events.act.json");
+        Simple.putFileContent(act, Json.toPretty(empty));
+
+        loadEvents();
+    }
+
+    private void loadEvents()
+    {
+        if (scrollview == null)
+        {
+            scrollview = new ScrollView(getContext());
+            scrollview.setBackgroundColor(0xffffc080);
+            addView(scrollview, 0);
+
+            jsonListing = new TextView(getContext());
+            jsonListing.setPadding(16, 16, 16, 16);
+            jsonListing.setTextSize(Simple.getDeviceTextSize(18f));
+
+            scrollview.addView(jsonListing);
+        }
+
+        File file = new File(Simple.getFilesDir(), "events.act.json");
         String json = Simple.getFileContent(file);
         jsonListing.setText(json);
     }
