@@ -133,7 +133,8 @@ public class EventManager
         // Check for passed events.
         //
 
-        String now = Simple.nowAsISO();
+        long millis = (Simple.nowAsTimeStamp() / (1000 * 86400)) * (1000 * 86400);
+        String today = Simple.timeStampAsISO(millis);
 
         JSONObject passed = Json.getObject(eventcache, "passed");
         JSONObject coming = Json.getObject(eventcache, "coming");
@@ -167,7 +168,7 @@ public class EventManager
                     continue;
                 }
 
-                if (Simple.compareTo(date, now) < 0)
+                if (Simple.compareTo(date, today) < 0)
                 {
                     Json.put(evgpassed, event);
                     Json.remove(evgcoming, inx--);

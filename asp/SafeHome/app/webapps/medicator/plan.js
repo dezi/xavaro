@@ -20,7 +20,7 @@ medicator.planEvents = function()
     console.log("medicator.planEvents done");
 }
 
-medicator.planEvent = function(date, hour, medication, dose)
+medicator.planEvent = function(date, hour, medication, dose, ondemand)
 {
     if (! WebLibSimple.isNumber(hour)) return;
 
@@ -39,9 +39,13 @@ medicator.planEvent = function(date, hour, medication, dose)
 
     event.date = datetime;
     event.medication = medication;
-    if (dose) event.dose = dose;
 
-    console.log("Event: " + datetime.toLocaleString() + "=" + dose + "=" + medication);
+    if (dose)
+    {
+        ondemand ? event.ondemand = dose : event.dose = dose;
+    }
+
+    //console.log("Event: " + datetime.toLocaleString() + "=" + dose + "=" + medication);
 
     medicator.currentevents.push(event);
 }
@@ -75,8 +79,8 @@ medicator.planMedication = function(medication)
         ende = new Date(date.getTime() + numdays * 86400 * 1000);
     }
 
-    console.log("Startdate=" + date.toLocaleString());
-    console.log("Endedate=" + ende.toLocaleString());
+    //console.log("Startdate=" + date.toLocaleString());
+    //console.log("Endedate=" + ende.toLocaleString());
 
     var days = medicator.currentprefs[ "medication.days." + medication ];
     if (! days) return;
@@ -88,7 +92,7 @@ medicator.planMedication = function(medication)
     var now = new Date(new Date().getTime() + 60 * 1000);
     var today = WebLibSimple.getTodayDate();
 
-    console.log("Todaydate=" + today.toLocaleString());
+    //console.log("Todaydate=" + today.toLocaleString());
 
     var plandays = [];
 
@@ -186,21 +190,29 @@ medicator.planMedication = function(medication)
 
     for (var inx = 0; inx < plandays.length; inx++)
     {
-        var hour = medicator.currentprefs[ "medication.time1." + medication ];
-        var dose = medicator.currentprefs[ "medication.dose1." + medication ];
-        medicator.planEvent(plandays[ inx ], hour, medication, dose);
+        if (days == "ondemand")
+        {
+            var dose = medicator.currentprefs[ "medication.ondemand." + medication ];
+            medicator.planEvent(plandays[ inx ], 0, medication, dose, true);
+        }
+        else
+        {
+            var hour = medicator.currentprefs[ "medication.time1." + medication ];
+            var dose = medicator.currentprefs[ "medication.dose1." + medication ];
+            medicator.planEvent(plandays[ inx ], hour, medication, dose);
 
-        var hour = medicator.currentprefs[ "medication.time2." + medication ];
-        var dose = medicator.currentprefs[ "medication.dose2." + medication ];
-        medicator.planEvent(plandays[ inx ], hour, medication, dose);
+            var hour = medicator.currentprefs[ "medication.time2." + medication ];
+            var dose = medicator.currentprefs[ "medication.dose2." + medication ];
+            medicator.planEvent(plandays[ inx ], hour, medication, dose);
 
-        var hour = medicator.currentprefs[ "medication.time3." + medication ];
-        var dose = medicator.currentprefs[ "medication.dose3." + medication ];
-        medicator.planEvent(plandays[ inx ], hour, medication, dose);
+            var hour = medicator.currentprefs[ "medication.time3." + medication ];
+            var dose = medicator.currentprefs[ "medication.dose3." + medication ];
+            medicator.planEvent(plandays[ inx ], hour, medication, dose);
 
-        var hour = medicator.currentprefs[ "medication.time4." + medication ];
-        var dose = medicator.currentprefs[ "medication.dose4." + medication ];
-        medicator.planEvent(plandays[ inx ], hour, medication, dose);
+            var hour = medicator.currentprefs[ "medication.time4." + medication ];
+            var dose = medicator.currentprefs[ "medication.dose4." + medication ];
+            medicator.planEvent(plandays[ inx ], hour, medication, dose);
+        }
     }
 }
 

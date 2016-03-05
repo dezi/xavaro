@@ -72,8 +72,8 @@ WebLibLaunch.createLaunchItem = function(config)
     WebLibSimple.setFontSpecs(li.labelElem, 24, "bold", "#777777");
     li.labelElem.innerHTML = config.label;
 
-    var overwid = - (wl.horzSize >> 2);
-    var overhei = + (wl.vertSize >> 2);
+    var overwid = - Math.floor(wl.horzSize / 3);
+    var overhei = + Math.floor(wl.vertSize / 3);
 
     li.overDivElem = WebLibSimple.createDivWidHei(0, 0, overwid, overhei, null, li.divElem);
     li.overImgElem = WebLibSimple.createImgWidHei(0, 0, "100%", "100%", null, li.overDivElem);

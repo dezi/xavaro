@@ -12,6 +12,14 @@ medicator.buildAllPreferences = function()
 
     medicator.currentprefs = JSON.parse(WebAppPrefs.getAllPrefs());
 
+    for (var key in medicator.currentprefs)
+    {
+        if (! medicator.currentprefs[ key ]) continue;
+        if (key.indexOf("Viagra") <= 0) continue;
+
+        console.log("Viagra=" + key);
+    }
+
     medicator.cleanupSearchPrefs();
 
     medicator.prefs = [];

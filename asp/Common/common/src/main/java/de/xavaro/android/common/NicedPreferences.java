@@ -110,8 +110,6 @@ public class NicedPreferences
         @Override
         protected void onSetInitialValue(boolean restoreValue, Object def)
         {
-            Log.d(LOGTAG, "onSetInitialValue:" + restoreValue + "=" + def);
-
             if (restoreValue)
             {
                 dateString = getPersistedString(defaultValue());
