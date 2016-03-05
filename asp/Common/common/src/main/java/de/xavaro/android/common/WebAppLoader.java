@@ -72,7 +72,14 @@ public class WebAppLoader extends WebViewClient
     {
         if ((! url.startsWith("http://")) && (! url.startsWith("http://")))
         {
-            url = appRootUrl + url;
+            if (url.startsWith("weblibs/"))
+            {
+                url = rootUrl + url;
+            }
+            else
+            {
+                url = appRootUrl + url;
+            }
         }
 
         int interval = getCacheIntervalForUrl(url);

@@ -78,19 +78,19 @@ WebLibSimple.createAnyWidth = function(type, leftorright, top, width, bottom, id
 
 WebLibSimple.createAnyHeight = function(type, left, toporbottom, right, height, id, parent)
 {
-     var div = document.createElement(type);
-     div.style.position = "absolute";
+    var div = document.createElement(type);
+    div.style.position = "absolute";
 
     //
     // If value is null the property is not set at all, which
     // makes the element fit its content on that axis.
     //
 
-     if (left  !== null) div.style.left  = WebLibSimple.addPixel(left);
-     if (right !== null) div.style.right = WebLibSimple.addPixel(right);
+    if (left  !== null) div.style.left  = WebLibSimple.addPixel(left);
+    if (right !== null) div.style.right = WebLibSimple.addPixel(right);
 
-     if (height !== null)
-     {
+    if (height !== null)
+    {
         if (WebLibSimple.isNumber(height))
         {
             if (height < 0)
@@ -113,30 +113,77 @@ WebLibSimple.createAnyHeight = function(type, left, toporbottom, right, height, 
             div.style.top = WebLibSimple.addPixel(toporbottom);
             div.style.height = WebLibSimple.addPixel(height);
         }
-     }
+    }
 
-     if (id) div.id = id;
+    if (id) div.id = id;
 
-     if (parent) parent.appendChild(div);
+    if (parent) parent.appendChild(div);
 
-     return div;
+    return div;
 }
 
-WebLibSimple.createAnyWidHei = function(type, left, top, width, height, id, parent)
+WebLibSimple.createAnyWidHei = function(type, leftorright, toporbottom, width, height, id, parent)
 {
-     var div = document.createElement(type);
-     div.style.position = "absolute";
+    var div = document.createElement(type);
+    div.style.position = "absolute";
 
-     if (left   !== null) div.style.left   = WebLibSimple.addPixel(left);
-     if (top    !== null) div.style.top    = WebLibSimple.addPixel(top);
-     if (width  !== null) div.style.width  = WebLibSimple.addPixel(width);
-     if (height !== null) div.style.height = WebLibSimple.addPixel(height);
+    if (width !== null)
+    {
+        if (WebLibSimple.isNumber(width))
+        {
+            if (width < 0)
+            {
+                div.style.right = WebLibSimple.addPixel(leftorright);
+                div.style.width = WebLibSimple.addPixel(-width);
+            }
+            else
+            {
+                div.style.left = WebLibSimple.addPixel(leftorright);
+                div.style.width = WebLibSimple.addPixel(width);
+            }
+        }
+        else
+        {
+            //
+            // Height could be "auto" on images.
+            //
 
-     if (id) div.id = id;
+            div.style.left = WebLibSimple.addPixel(leftorright);
+            div.style.width = WebLibSimple.addPixel(width);
+        }
+    }
 
-     if (parent) parent.appendChild(div);
+    if (height !== null)
+    {
+        if (WebLibSimple.isNumber(height))
+        {
+            if (height < 0)
+            {
+                div.style.bottom = WebLibSimple.addPixel(toporbottom);
+                div.style.height = WebLibSimple.addPixel(-height);
+            }
+            else
+            {
+                div.style.top = WebLibSimple.addPixel(toporbottom);
+                div.style.height = WebLibSimple.addPixel(height);
+            }
+        }
+        else
+        {
+            //
+            // Height could be "auto" on images.
+            //
 
-     return div;
+            div.style.top = WebLibSimple.addPixel(toporbottom);
+            div.style.height = WebLibSimple.addPixel(height);
+        }
+    }
+
+    if (id) div.id = id;
+
+    if (parent) parent.appendChild(div);
+
+    return div;
 }
 
 //
@@ -187,6 +234,10 @@ WebLibSimple.createImgWidHei = function(left, top, width, height, id, parent)
     return WebLibSimple.createAnyWidHei("img", left, top, width, height, id, parent);
 }
 
+WebLibSimple.getNixPixImg = function()
+{
+    return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
+}
 //
 // Basic SPAN creation.
 //
@@ -219,10 +270,10 @@ WebLibSimple.setBGColor = function(elem, color)
         // Hex color with alpha like android.
         //
 
-        var a = parseInt(color.substring(1,3)) / 256.0;
-        var r = parseInt(color.substring(3,5));
-        var g = parseInt(color.substring(5,7));
-        var b = parseInt(color.substring(7,9));
+        var a = parseInt(color.substring(1,3), 16) / 256.0;
+        var r = parseInt(color.substring(3,5), 16);
+        var g = parseInt(color.substring(5,7), 16);
+        var b = parseInt(color.substring(7,9), 16);
 
         var rgba = "rgba(" + r + "," + g + "," + b + "," + a + ")";
 

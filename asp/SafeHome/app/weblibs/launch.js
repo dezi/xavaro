@@ -10,7 +10,6 @@ WebLibLaunch.createFrame = function()
 
     wl.bgcol = "#ffffffee";
     wl.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
-    WebLibSimple.setBGColor(wl.topDiv, "#88880000");
 
     wl.horzSize = WebAppUtility.getLaunchItemSize();
     wl.vertSize = WebAppUtility.getLaunchItemSize();
@@ -19,10 +18,10 @@ WebLibLaunch.createFrame = function()
     wl.launchItems = [];
     wl.launchPages = [];
 
-    WebLibLaunch.onOrientationChange();
+    WebLibLaunch.onResize();
 }
 
-WebLibLaunch.onOrientationChange = function()
+WebLibLaunch.onResize = function()
 {
     var wl = WebLibLaunch;
 
@@ -41,7 +40,9 @@ WebLibLaunch.onOrientationChange = function()
     wl.horzStart += wl.horzSpace;
     wl.vertStart += wl.vertSpace / 2;
 
-    console.log("Orientation: " + orientation + "=" + wl.realWidth + "/" + wl.realHeight + " " + wl.horzItems + ":" + wl.vertItems);
+    console.log("Resize: " + orientation + "=" + wl.realWidth + "/" + wl.realHeight + " " + wl.horzItems + ":" + wl.vertItems);
+
+    wl.positionLaunchItems();
 }
 
 WebLibLaunch.createLaunchItem = function(config)
@@ -49,9 +50,34 @@ WebLibLaunch.createLaunchItem = function(config)
     var wl = WebLibLaunch;
 
     var li = WebLibSimple.createDivWidHei(0, 0, wl.horzSize, wl.vertSize);
-    WebLibSimple.setBGColor(li, "#80008000");
     wl.launchItems.push(li);
     li.config = config;
+
+    li.style.backgroundSize = WebLibSimple.addPixel(wl.horzSize);
+
+    var url = "url('/weblibs/launch/shadow_black_400x400.png')";
+    if (config.frame) url = "url('/weblibs/launch/shadow_" + config.frame + "_400x400.png')";
+
+    li.style.backgroundImage = url;
+
+    li.divElem = WebLibSimple.createDiv(0, 0, 0, 0, null, li);
+    li.divElem.style.margin = WebLibSimple.addPixel(18);
+
+    li.imgDivElem = WebLibSimple.createDiv(20, 0, 20, 40, null, li.divElem);
+
+    li.iconImgElem = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", null, li.imgDivElem);
+    li.iconImgElem.src = config.icon;
+
+    li.labelElem = WebLibSimple.createAny("center", 0, null, 0, 0, null, li.divElem);
+    WebLibSimple.setFontSpecs(li.labelElem, 24, "bold", "#777777");
+    li.labelElem.innerHTML = config.label;
+
+    var overwid = - (wl.horzSize >> 2);
+    var overhei = + (wl.vertSize >> 2);
+
+    li.overDivElem = WebLibSimple.createDivWidHei(0, 0, overwid, overhei, null, li.divElem);
+    li.overImgElem = WebLibSimple.createImgWidHei(0, 0, "100%", "100%", null, li.overDivElem);
+    li.overImgElem.src = config.overicon ? config.overicon : WebLibSimple.getNixPixImg();
 
     wl.positionLaunchItems();
 }
@@ -69,8 +95,6 @@ WebLibLaunch.positionLaunchItems = function()
 
     for (var linx in wl.launchItems)
     {
-        var li = wl.launchItems[ linx ];
-
         if (wl.launchPages.length < (pag + 1))
         {
             var lp = WebLibSimple.createDiv(0, 0, 0, 0, null, wl.topDiv);
@@ -78,10 +102,12 @@ WebLibLaunch.positionLaunchItems = function()
             wl.launchPages.push(lp);
         }
 
-        WebLibSimple.attachElement(li, wl.launchPages[ pag ]);
+        var li = wl.launchItems[ linx ];
 
         li.style.left = WebLibSimple.addPixel(xpos);
         li.style.top  = WebLibSimple.addPixel(ypos);
+
+        WebLibSimple.attachElement(li, wl.launchPages[ pag ]);
 
         xpos += wl.horzSize + wl.horzSpace;
 
@@ -105,4 +131,4 @@ WebLibLaunch.positionLaunchItems = function()
     }
 }
 
-addEventListener("orientationchange", WebLibLaunch.onOrientationChange);
+addEventListener("resize", WebLibLaunch.onResize);
