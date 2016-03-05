@@ -33,17 +33,16 @@ medicator.planEvent = function(date, hour, medication, dose, ondemand)
     var day = date.getDate();
 
     var datetime = new Date(year, month, day, hour, 0, 0);
-    if (datetime.getTime() < new Date().getTime()) return;
+    //if (datetime.getTime() < new Date().getTime()) return;
 
     var event = {};
 
     event.date = datetime;
     event.medication = medication;
 
-    if (dose)
-    {
-        ondemand ? event.ondemand = dose : event.dose = dose;
-    }
+    if (dose) event.dose = dose;
+
+    if (ondemand) event.ondemand = ondemand;
 
     //console.log("Event: " + datetime.toLocaleString() + "=" + dose + "=" + medication);
 
@@ -89,7 +88,6 @@ medicator.planMedication = function(medication)
     // Start plan in one minutes distance.
     //
 
-    var now = new Date(new Date().getTime() + 60 * 1000);
     var today = WebLibSimple.getTodayDate();
 
     //console.log("Todaydate=" + today.toLocaleString());

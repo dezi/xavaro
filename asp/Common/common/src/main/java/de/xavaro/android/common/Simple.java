@@ -55,6 +55,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1442,8 +1444,9 @@ public class Simple
 
     //region Date and time
 
-    private static final String ISO8601DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-    private static final String ISO8601DATENOSECS = "yyyy-MM-dd'T'HH:mm'Z'";
+    private static final String ISO8601DATENOSECS   = "yyyy-MM-dd'T'HH:mm'Z'";
+    private static final String ISO8601DATEFORMAT   = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static final String ISO8601DATEFORMATMS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     public static long nowAsTimeStamp()
     {
@@ -1453,6 +1456,26 @@ public class Simple
     public static String nowAsISO()
     {
         return timeStampAsISO(nowAsTimeStamp());
+    }
+
+    public static long todayAsTimeStamp()
+    {
+        long now = (nowAsTimeStamp() / (1000 * 86400)) * (1000 * 86400);
+
+        Calendar calendar = new GregorianCalendar();
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        calendar = new GregorianCalendar(year, month, day);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static String todayAsISO()
+    {
+        return timeStampAsISO(todayAsTimeStamp());
     }
 
     @Nullable
@@ -1492,6 +1515,19 @@ public class Simple
         try
         {
             SimpleDateFormat df = new SimpleDateFormat(ISO8601DATENOSECS, Locale.getDefault());
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return df.parse(isodate).getTime();
+        }
+        catch (ParseException ex)
+        {
+            //
+            // Date missing seconds?
+            //
+        }
+
+        try
+        {
+            SimpleDateFormat df = new SimpleDateFormat(ISO8601DATEFORMATMS, Locale.getDefault());
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
             return df.parse(isodate).getTime();
         }

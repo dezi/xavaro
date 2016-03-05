@@ -2,6 +2,7 @@ package de.xavaro.android.common;
 
 import android.webkit.JavascriptInterface;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ public class WebAppEvents
     {
         this.webappname = webappname;
 
-        keyprefix = "webapps." + webappname;
+        keyprefix = "webapps." + this.webappname;
     }
 
     @JavascriptInterface
@@ -31,5 +32,17 @@ public class WebAppEvents
     public void putComingEvents(String events)
     {
         EventManager.putComingEvents(keyprefix, Json.fromStringArray(events));
+    }
+
+    @JavascriptInterface
+    public String getPassedEvents()
+    {
+        return EventManager.getPassedEvents(keyprefix).toString();
+    }
+
+    @JavascriptInterface
+    public void putPassedEvents(String events)
+    {
+        EventManager.putPassedEvents(keyprefix, Json.fromStringArray(events));
     }
 }

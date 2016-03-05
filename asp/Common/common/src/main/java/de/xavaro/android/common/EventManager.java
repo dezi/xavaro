@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.acl.LastOwnerException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class EventManager
         JSONObject coming = Json.getObject(eventcache, "coming");
 
         return ((coming != null) && coming.has(eventgroup))
-                ? Json.getArray(eventcache, eventgroup)
+                ? Json.getArray(coming, eventgroup)
                 : new JSONArray();
     }
 
@@ -44,6 +45,32 @@ public class EventManager
 
         JSONObject coming = Json.getObject(eventcache, "coming");
         Json.put(coming, eventgroup, Json.sort(events, "date", false));
+        dirty = true;
+
+        Simple.makePost(freeMemory, 10 * 1000);
+    }
+
+    public static JSONArray getPassedEvents(String eventgroup)
+    {
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        Simple.makePost(freeMemory, 10 * 1000);
+
+        JSONObject passed = Json.getObject(eventcache, "passed");
+
+        return ((passed != null) && passed.has(eventgroup))
+                ? Json.getArray(passed, eventgroup)
+                : new JSONArray();
+    }
+
+    public static void putPassedEvents(String eventgroup, JSONArray events)
+    {
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        JSONObject passed = Json.getObject(eventcache, "passed");
+        Json.put(passed, eventgroup, Json.sort(events, "date", false));
         dirty = true;
 
         Simple.makePost(freeMemory, 10 * 1000);
@@ -133,8 +160,7 @@ public class EventManager
         // Check for passed events.
         //
 
-        long millis = (Simple.nowAsTimeStamp() / (1000 * 86400)) * (1000 * 86400);
-        String today = Simple.timeStampAsISO(millis);
+        long today = Simple.todayAsTimeStamp();
 
         JSONObject passed = Json.getObject(eventcache, "passed");
         JSONObject coming = Json.getObject(eventcache, "coming");
@@ -168,8 +194,10 @@ public class EventManager
                     continue;
                 }
 
-                if (Simple.compareTo(date, today) < 0)
+                if (Simple.getTimeStamp(date) < today)
                 {
+                    Log.d(LOGTAG, "=======================passed:" + date + "=" + Simple.timeStampAsISO(today));
+
                     Json.put(evgpassed, event);
                     Json.remove(evgcoming, inx--);
                     dirty = true;
