@@ -10,6 +10,8 @@ public class CommonConfigs
 {
     //region Colors and styles
 
+    public static final int LaunchItemSize = 220;
+
     // @formatter:off
     public static final int PreferenceTextEnabledColor  = 0xff444444;
     public static final int PreferenceTextDisabledColor = 0x88888888;

@@ -57,7 +57,7 @@ public class GlobalConfigs
 
     //endregion
 
-    //region Colors and styles
+    //region Colors, styles and sizes.
 
     // @formatter:off
     public static final int LaunchPageBackgroundColor   = 0xffffffee;

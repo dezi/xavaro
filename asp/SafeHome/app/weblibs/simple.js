@@ -274,6 +274,18 @@ WebLibSimple.detachElement = function(elem)
     if (elem && elem.parentElement) elem.parentElement.removeChild(elem);
 }
 
+WebLibSimple.attachElement = function(elem, parent)
+{
+    if (elem && elem.parentElement)
+    {
+        if (elem.parentElement == parent) return;
+
+        elem.parentElement.removeChild(elem);
+    }
+
+    parent.appendChild(elem)
+}
+
 WebLibSimple.padNum = function(num, size)
 {
     var str = "" + num;

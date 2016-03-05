@@ -200,6 +200,6 @@ WebLibTouch.computeOffsets = function(touchobj)
     }
 }
 
-window.addEventListener("touchstart", WebLibTouch.onTouchStart);
-window.addEventListener("touchmove", WebLibTouch.onTouchMove);
-window.addEventListener("touchend", WebLibTouch.onTouchEnd);
+addEventListener("touchstart", WebLibTouch.onTouchStart);
+addEventListener("touchmove", WebLibTouch.onTouchMove);
+addEventListener("touchend", WebLibTouch.onTouchEnd);

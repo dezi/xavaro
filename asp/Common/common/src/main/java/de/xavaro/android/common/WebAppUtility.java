@@ -12,6 +12,12 @@ public class WebAppUtility
     private static final String LOGTAG = WebAppUtility.class.getSimpleName();
 
     @JavascriptInterface
+    public String getLocale()
+    {
+        return Locale.getDefault().getLanguage() + "-r" + Locale.getDefault().getCountry();
+    }
+
+    @JavascriptInterface
     public String getLocaleCountry()
     {
         return Locale.getDefault().getCountry();
@@ -24,8 +30,8 @@ public class WebAppUtility
     }
 
     @JavascriptInterface
-    public String getLocale()
+    public int getLaunchItemSize()
     {
-        return Locale.getDefault().getLanguage() + "-r" + Locale.getDefault().getCountry();
+        return CommonConfigs.LaunchItemSize;
     }
 }

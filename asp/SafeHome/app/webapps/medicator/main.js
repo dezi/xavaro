@@ -1,9 +1,10 @@
+//
+// Medicator main page.
+//
 
+WebLibLaunch.createFrame();
 
-
-
-var medis = WebAppRequest.loadSync("medi.csv");
-
-var pre = document.createElement("pre");
-document.body.appendChild(pre);
-pre.innerHTML = medis;
+for (var inx = 0; inx < 10; inx++)
+{
+    WebLibLaunch.createLaunchItem();
+}

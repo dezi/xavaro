@@ -16,6 +16,7 @@
 
     "weblibs": [
       "strings",
+      "launch",
       "simple",
       "touch"
     ],
