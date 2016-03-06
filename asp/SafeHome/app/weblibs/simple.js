@@ -8,6 +8,14 @@ WebLibSimple = {};
 // Basic HTML creation.
 //
 
+WebLibSimple.createAnyAppend = function(type, parent)
+{
+    var div = document.createElement(type);
+    parent.appendChild(div);
+
+    return div;
+}
+
 WebLibSimple.createAny = function(type, left, top, right, bottom, id, parent)
 {
     var div = document.createElement(type);
@@ -335,6 +343,16 @@ WebLibSimple.attachElement = function(elem, parent)
     }
 
     parent.appendChild(elem)
+}
+
+WebLibSimple.findTarget = function(target, targetid)
+{
+    while (target && (target.id != targetid))
+    {
+        target = target.parentElement;
+    }
+
+    return target;
 }
 
 WebLibSimple.padNum = function(num, size)

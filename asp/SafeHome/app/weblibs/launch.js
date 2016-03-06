@@ -49,15 +49,14 @@ WebLibLaunch.createLaunchItem = function(config)
 {
     var wl = WebLibLaunch;
 
-    var li = WebLibSimple.createDivWidHei(0, 0, wl.horzSize, wl.vertSize);
+    var li = WebLibSimple.createDivWidHei(0, 0, wl.horzSize, wl.vertSize, "launchItem");
     wl.launchItems.push(li);
     li.config = config;
-
-    li.style.backgroundSize = WebLibSimple.addPixel(wl.horzSize);
 
     var url = "url('/weblibs/launch/shadow_black_400x400.png')";
     if (config.frame) url = "url('/weblibs/launch/shadow_" + config.frame + "_400x400.png')";
 
+    li.style.backgroundSize = WebLibSimple.addPixel(wl.horzSize);
     li.style.backgroundImage = url;
 
     li.divElem = WebLibSimple.createDiv(0, 0, 0, 0, null, li);
@@ -78,6 +77,8 @@ WebLibLaunch.createLaunchItem = function(config)
     li.overDivElem = WebLibSimple.createDivWidHei(0, 0, overwid, overhei, null, li.divElem);
     li.overImgElem = WebLibSimple.createImgWidHei(0, 0, "100%", "100%", null, li.overDivElem);
     li.overImgElem.src = config.overicon ? config.overicon : WebLibSimple.getNixPixImg();
+
+    if (config.onclick) li.onclick = config.onclick;
 
     wl.positionLaunchItems();
 }

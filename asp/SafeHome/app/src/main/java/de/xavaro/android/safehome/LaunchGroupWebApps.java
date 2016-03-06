@@ -43,7 +43,7 @@ public class LaunchGroupWebApps extends LaunchGroup
 
             Json.put(entry, "type", "webapp");
             Json.put(entry, "subtype", webappname);
-            Json.put(entry, "order", 1000);
+            Json.put(entry, "order", 400);
 
             String mode = (String) webapps.get(prefkey);
 

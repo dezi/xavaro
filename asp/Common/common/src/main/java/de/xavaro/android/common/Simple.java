@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.media.AudioManager;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -12,6 +13,7 @@ import android.content.res.Resources;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.view.SoundEffectConstants;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -484,6 +486,15 @@ public class Simple
         }
 
         return false;
+    }
+
+    public static void makeClick()
+    {
+        if (appContext != null)
+        {
+            AudioManager am = (AudioManager) appContext.getSystemService(Context.AUDIO_SERVICE);
+            am.playSoundEffect(SoundEffectConstants.CLICK);
+        }
     }
 
     //endregion All purpose simple methods
