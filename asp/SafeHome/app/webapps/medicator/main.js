@@ -2,12 +2,10 @@
 // Medicator main page.
 //
 
-WebLibLaunch.createFrame();
-
 medicator.onClickTaken = function(event)
 {
     var config = medicator.currentConfig
-    if (! (config || config.medisets)) return;
+    if (! (config && config.medisets)) return;
 
     var alltaken = true;
 
@@ -47,10 +45,23 @@ medicator.onClickTaken = function(event)
     return true;
 }
 
+medicator.onClickMeasured = function(event)
+{
+    var config = medicator.currentConfig
+    if (! (config && config.medisets)) return;
+
+    var formkey = config.formkey;
+    var launchitem = medicator.lauchis[ formkey ];
+    var overicon = WebLibLaunch.getOverIconImgElem(launchitem);
+    overicon.src = "indicator_ok_480x480.png";
+
+    return true;
+}
+
 medicator.onClickEverything = function(event)
 {
     var config = medicator.currentConfig
-    if (! (config || config.medisets)) return;
+    if (! (config && config.medisets)) return;
 
     for (var inx = 0; inx < config.medisets.length; inx++)
     {
@@ -79,9 +90,9 @@ medicator.onClickDoseItem = function(event)
     event.stopPropagation();
 
     var target = WebLibSimple.findTarget(event.target, "medication");
-    if (! (target || target.mediset)) return;
+    if (! (target && target.mediset)) return;
 
-    console.log("medicator.onClickDoseItem:");
+    console.log("medicator.onClickDoseItem:" + JSON.stringify(target.mediset));
 
     target.mediset.checkBox.checked = ! target.mediset.checkBox.checked;
 
@@ -110,48 +121,197 @@ medicator.onCheckOkButtonEnable = function()
     WebLibDialog.setOkButtonEnable(onechecked);
 }
 
+medicator.onBloodPressureKeypress = function(event)
+{
+    var whatSpan = WebLibSimple.findTarget(event.target, "whatSpan");
+    if (! whatSpan) return;
+
+    var systolic = parseInt(whatSpan.systolicEdit.value);
+    whatSpan.systolicEdit.style.color = (systolic > 260) ? "#ff0000" : "#444444";
+
+    var diastolic = parseInt(whatSpan.diastolicEdit.value);
+    whatSpan.diastolicEdit.style.color = (diastolic > 260) ? "#ff0000" : "#444444";
+
+    var puls = parseInt(whatSpan.pulsEdit.value);
+    whatSpan.pulsEdit.style.color = (puls > 260) ? "#ff0000" : "#444444";
+
+    var okok = (systolic <= 260) && (diastolic <= 260) && (puls <= 260);
+
+    WebLibDialog.setOkButtonEnable(okok);
+}
+
+medicator.onBloodGlucoseKeypress = function(event)
+{
+    var whatSpan = WebLibSimple.findTarget(event.target, "whatSpan");
+    if (! whatSpan) return;
+
+    var glucose = parseInt(whatSpan.glucoseEdit.value);
+    whatSpan.glucoseEdit.style.color = (glucose > 260) ? "#ff0000" : "#444444";
+
+    var okok = (glucose <= 260);
+
+    WebLibDialog.setOkButtonEnable(okok);
+}
+
+medicator.onWeightKeypress = function(event)
+{
+    var whatSpan = WebLibSimple.findTarget(event.target, "whatSpan");
+    if (! whatSpan) return;
+
+    var weight = parseInt(whatSpan.weightEdit.value);
+    whatSpan.weightEdit.style.color = (weight > 260) ? "#ff0000" : "#444444";
+
+    var okok = (weight <= 260);
+
+    WebLibDialog.setOkButtonEnable(okok);
+}
+
 medicator.onClickEventItem = function(event)
 {
     event.stopPropagation();
 
     var target = WebLibSimple.findTarget(event.target, "launchItem");
-    if (! (target || target.config)) return;
+    if (! (target && target.config)) return;
 
     WebAppUtility.makeClick();
 
     medicator.currentConfig = liconfig = target.config;
     medicator.currentDialog = dlconfig = {};
 
-    dlconfig.title = "Medikamente einnehmen";
     dlconfig.content = document.createElement("span");
 
     for (var inx = 0; inx < liconfig.medisets.length; inx++)
     {
         var mediset = liconfig.medisets[ inx ];
 
+        var div = WebLibSimple.createAnyAppend("div", dlconfig.content);
+        WebLibSimple.setFontSpecs(div, 22, "bold", "#444444");
+        div.style.paddingTop = WebLibSimple.addPixel(12);
+        div.style.paddingBottom = WebLibSimple.addPixel(12);
+        div.mediset = mediset;
+        div.id = "medication";
+
         if (mediset.mediform == "ZZB")
         {
             dlconfig.title = "Blutdruck messen";
+
+            var whatSpan = WebLibSimple.createAnyAppend("div", div);
+            whatSpan.style.display = "inline-block";
+            whatSpan.id = "whatSpan";
+
+            var systolicDiv = WebLibSimple.createAnyAppend("div", whatSpan);
+            systolicDiv.style.padding = WebLibSimple.addPixel(8);
+
+            var systolicEdit = WebLibSimple.createAnyAppend("input", systolicDiv);
+            WebLibSimple.setFontSpecs(systolicEdit, 28, "bold", "#444444");
+            systolicEdit.onkeyup = medicator.onBloodPressureKeypress;
+            systolicEdit.style.textAlign = "center";
+            systolicEdit.style.width = "80px";
+            systolicEdit.autofocus = true;
+            systolicEdit.type = "number";
+
+            var systolicSpan = WebLibSimple.createAnyAppend("span", systolicDiv);
+            systolicSpan.style.paddingLeft = WebLibSimple.addPixel(16);
+            systolicSpan.innerHTML = "Systolisch";
+
+            var diastolicDiv = WebLibSimple.createAnyAppend("div", whatSpan);
+            diastolicDiv.style.padding = WebLibSimple.addPixel(8);
+
+            var diastolicEdit = WebLibSimple.createAnyAppend("input", diastolicDiv);
+            WebLibSimple.setFontSpecs(diastolicEdit, 28, "bold", "#444444");
+            diastolicEdit.onkeyup = medicator.onBloodPressureKeypress;
+            diastolicEdit.style.textAlign = "center";
+            diastolicEdit.style.width = "80px";
+            diastolicEdit.type = "number";
+
+            var diastolicSpan = WebLibSimple.createAnyAppend("span", diastolicDiv);
+            diastolicSpan.style.paddingLeft = WebLibSimple.addPixel(16);
+            diastolicSpan.innerHTML = "Diastolisch";
+
+            var pulsDiv = WebLibSimple.createAnyAppend("div", whatSpan);
+            pulsDiv.style.padding = WebLibSimple.addPixel(8);
+
+            var pulsEdit = WebLibSimple.createAnyAppend("input", pulsDiv);
+            WebLibSimple.setFontSpecs(pulsEdit, 28, "bold", "#444444");
+            pulsEdit.onkeyup = medicator.onBloodPressureKeypress;
+            pulsEdit.style.textAlign = "center";
+            pulsEdit.style.width = "80px";
+            pulsEdit.type = "number";
+
+            var pulsSpan = WebLibSimple.createAnyAppend("span", pulsDiv);
+            pulsSpan.style.paddingLeft = WebLibSimple.addPixel(16);
+            pulsSpan.innerHTML = "Puls";
+
+            whatSpan.systolicEdit = systolicEdit;
+            whatSpan.diastolicEdit = diastolicEdit;
+            whatSpan.pulsEdit = pulsEdit;
+
+            dlconfig.okEnabled = false;
+            dlconfig.onClickOk = medicator.onClickMeasured;
         }
         else
         if (mediset.mediform == "ZZG")
         {
             dlconfig.title = "Blutzucker messen";
+
+            var whatSpan = WebLibSimple.createAnyAppend("div", div);
+            whatSpan.style.display = "inline-block";
+            whatSpan.id = "whatSpan";
+
+            var glucoseDiv = WebLibSimple.createAnyAppend("div", whatSpan);
+            glucoseDiv.style.padding = WebLibSimple.addPixel(8);
+
+            var glucoseEdit = WebLibSimple.createAnyAppend("input", glucoseDiv);
+            WebLibSimple.setFontSpecs(glucoseEdit, 28, "bold", "#444444");
+            glucoseEdit.onkeyup = medicator.onBloodGlucoseKeypress;
+            glucoseEdit.style.textAlign = "center";
+            glucoseEdit.style.width = "80px";
+            glucoseEdit.autofocus = true;
+            glucoseEdit.type = "number";
+
+            var glucoseSpan = WebLibSimple.createAnyAppend("span", glucoseDiv);
+            glucoseSpan.style.paddingLeft = WebLibSimple.addPixel(16);
+            glucoseSpan.innerHTML = "Glucosewert";
+
+            whatSpan.glucoseEdit = glucoseEdit;
+
+            dlconfig.okEnabled = false;
+            dlconfig.onClickOk = medicator.onClickMeasured;
         }
         else
         if (mediset.mediform == "ZZW")
         {
             dlconfig.title = "Wiegen";
+
+            var whatSpan = WebLibSimple.createAnyAppend("div", div);
+            whatSpan.style.display = "inline-block";
+            whatSpan.id = "whatSpan";
+
+            var weightDiv = WebLibSimple.createAnyAppend("div", whatSpan);
+            weightDiv.style.padding = WebLibSimple.addPixel(8);
+
+            var weightEdit = WebLibSimple.createAnyAppend("input", weightDiv);
+            WebLibSimple.setFontSpecs(weightEdit, 28, "bold", "#444444");
+            weightEdit.onkeyup = medicator.onWeightKeypress;
+            weightEdit.style.textAlign = "center";
+            weightEdit.style.width = "80px";
+            weightEdit.autofocus = true;
+            weightEdit.type = "number";
+
+            var weightSpan = WebLibSimple.createAnyAppend("span", weightDiv);
+            weightSpan.style.paddingLeft = WebLibSimple.addPixel(16);
+            weightSpan.innerHTML = "Gewicht";
+
+            whatSpan.weightEdit = weightEdit;
+
+            dlconfig.okEnabled = false;
+            dlconfig.onClickOk = medicator.onClickMeasured;
         }
         else
         {
-            var div = WebLibSimple.createAnyAppend("div", dlconfig.content);
-            WebLibSimple.setFontSpecs(div, 22, "bold", "#444444");
-            div.style.paddingTop = WebLibSimple.addPixel(12);
-            div.style.paddingBottom = WebLibSimple.addPixel(12);
+            dlconfig.title = "Medikamente einnehmen";
+
             div.onclick = medicator.onClickDoseItem;
-            div.mediset = mediset;
-            div.id = "medication";
 
             var checkSpan = WebLibSimple.createAnyAppend("span", div);
             checkSpan.style.display = "inline-block";
@@ -181,10 +341,11 @@ medicator.onClickEventItem = function(event)
             dlconfig.onClickOther = medicator.onClickEverything;
 
             dlconfig.ok = "Eingenommen";
-            dlconfig.okEnabled = false;
-            dlconfig.onClickOk = medicator.onClickTaken;
-        }
-    }
+
+             dlconfig.okEnabled = false;
+             dlconfig.onClickOk = medicator.onClickTaken;
+       }
+   }
 
     WebLibDialog.createDialog(dlconfig);
 }
@@ -389,4 +550,5 @@ medicator.createEvents = function()
     }
 }
 
+WebLibLaunch.createFrame();
 medicator.createEvents();
