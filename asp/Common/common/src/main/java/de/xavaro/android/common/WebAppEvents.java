@@ -35,6 +35,12 @@ public class WebAppEvents
     }
 
     @JavascriptInterface
+    public void updateComingEvent(String event)
+    {
+        EventManager.updateComingEvent(keyprefix, Json.fromStringObject(event));
+    }
+
+    @JavascriptInterface
     public String getPassedEvents()
     {
         return EventManager.getPassedEvents(keyprefix).toString();

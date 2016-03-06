@@ -39,17 +39,14 @@ medicator.planEvent = function(date, hour, medication, dose, ondemand)
 
     event.date = datetime;
     event.medication = medication;
-
     if (dose) event.dose = dose;
 
     if (ondemand)
     {
         event.ondemand     = true;
-        event.ondemandmax  = medicator.currentprefs[ "medication.ondemandmax." + medication ];
+        event.ondemandmax  = medicator.currentprefs[ "medication.ondemandmax."  + medication ];
         event.ondemanddose = medicator.currentprefs[ "medication.ondemanddose." + medication ];
     }
-
-    //console.log("Event: " + datetime.toLocaleString() + "=" + dose + "=" + medication);
 
     medicator.currentevents.push(event);
 }

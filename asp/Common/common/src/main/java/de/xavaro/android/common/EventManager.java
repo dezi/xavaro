@@ -50,6 +50,43 @@ public class EventManager
         Simple.makePost(freeMemory, 10 * 1000);
     }
 
+    public static void updateComingEvent(String eventgroup, JSONObject event)
+    {
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        JSONObject coming = Json.getObject(eventcache, "coming");
+        JSONArray events = Json.getArray(coming, eventgroup);
+
+        if (events != null)
+        {
+            for (int inx = 0; inx < events.length(); inx++)
+            {
+                JSONObject oldevent = Json.getObject(events, inx);
+
+                if (Json.equals(oldevent, "date", event) &&
+                        Json.equals(oldevent, "medication", event))
+                {
+                    //
+                    // Integrate all values from event into old event,
+                    //
+
+                    Iterator<String> eventkeys = event.keys();
+
+                    while (eventkeys.hasNext())
+                    {
+                        String eventkey = eventkeys.next();
+                        Json.copy(oldevent, eventkey, event);
+                    }
+
+                    dirty = true;
+                }
+            }
+        }
+
+        Simple.makePost(freeMemory, 10 * 1000);
+    }
+
     public static JSONArray getPassedEvents(String eventgroup)
     {
         Simple.removePost(freeMemory);

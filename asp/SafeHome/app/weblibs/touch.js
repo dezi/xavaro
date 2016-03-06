@@ -25,12 +25,7 @@ WebLibTouch.onTouchStart = function(event)
         target = target.parentElement;
     }
 
-    if (! (touch.starget || touch.ctarget))
-    {
-        console.log("not for me...");
-
-        return;
-    }
+    if (! (touch.starget || touch.ctarget)) return;
 
     touch.moves = 0;
     touch.initial = true;
