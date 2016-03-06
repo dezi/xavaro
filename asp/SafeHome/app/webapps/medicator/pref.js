@@ -170,7 +170,7 @@ medicator.buildDosisPref = function(medication, whichtime, whichdose, enabled)
     var mediform = medication.substring(medication.length - 3);
     if ((mediform == "ZZB") || (mediform == "ZZG") || (mediform == "ZZW")) return;
 
-    var dosetext = (whichdose == "ondemand") ? "tägliche Höchstdosis" : "Dosis";
+    var dosetext = (whichdose == "ondemandmax") ? "tägliche Höchstdosis" : "Dosis";
 
     var pref = {};
     pref.key = "medication." + whichdose + "." + medication;
@@ -179,8 +179,16 @@ medicator.buildDosisPref = function(medication, whichtime, whichdose, enabled)
     pref.defvalue = "1";
     pref.enabled = enabled;
 
-    pref.keys = [ "1/4", "1/3", "1/2", "1", "1 1/2", "2", "2 1/2", "3", "4" ];
-    pref.vals = [ "1/4", "1/3", "1/2", "1", "1 1/2", "2", "2 1/2", "3", "4" ];
+    if (whichdose == "ondemanddose")
+    {
+        pref.keys = [ "0.25", "0.33", "0.5", "1" ];
+        pref.vals = [ "1/4",  "1/3",  "1/2", "1" ];
+    }
+    else
+    {
+        pref.keys = [ "0.25", "0.33", "0.5", "1", "1.5",   "2", "2.5",   "3", "4", "5", "6" ];
+        pref.vals = [ "1/4",  "1/3",  "1/2", "1", "1 1/2", "2", "2 1/2", "3", "4", "5", "6" ];
+    }
 
     medicator.prefs.push(pref);
 
@@ -337,7 +345,9 @@ medicator.buildMedication = function(medication)
 
     if (days == "ondemand")
     {
-        medicator.buildDosisPref(medication, "ondemand", "ondemand");
+        medicator.buildDosisPref(medication, "ondemand", "ondemanddose");
+        medicator.buildDosisPref(medication, "ondemand", "ondemandmax");
+
     }
 
     if (days != "ondemand")

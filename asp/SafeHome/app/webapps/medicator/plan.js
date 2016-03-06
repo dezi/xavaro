@@ -42,7 +42,12 @@ medicator.planEvent = function(date, hour, medication, dose, ondemand)
 
     if (dose) event.dose = dose;
 
-    if (ondemand) event.ondemand = ondemand;
+    if (ondemand)
+    {
+        event.ondemand     = true;
+        event.ondemandmax  = medicator.currentprefs[ "medication.ondemandmax." + medication ];
+        event.ondemanddose = medicator.currentprefs[ "medication.ondemanddose." + medication ];
+    }
 
     //console.log("Event: " + datetime.toLocaleString() + "=" + dose + "=" + medication);
 
@@ -190,8 +195,7 @@ medicator.planMedication = function(medication)
     {
         if (days == "ondemand")
         {
-            var dose = medicator.currentprefs[ "medication.ondemand." + medication ];
-            medicator.planEvent(plandays[ inx ], 0, medication, dose, true);
+            medicator.planEvent(plandays[ inx ], 0, medication, 0, true);
         }
         else
         {

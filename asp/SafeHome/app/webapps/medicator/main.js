@@ -4,6 +4,67 @@
 
 WebLibLaunch.createFrame();
 
+medicator.onClickTaken = function(event)
+{
+    var config = medicator.currentConfig
+    if (! (config || config.medisets)) return;
+
+    var alltaken = true;
+
+    for (var inx = 0; inx < config.medisets.length; inx++)
+    {
+        var taken = config.medisets[ inx ].checkBox &&
+                    config.medisets[ inx ].checkBox.checked;
+
+        var pillimgs = config.medisets[ inx ].pillimgs;
+
+        if (pillimgs)
+        {
+            for (var cnt = 0; cnt < pillimgs.length; cnt++)
+            {
+                pillimgs[ cnt ].src = taken
+                    ? "pill_taken_100x100.png" :
+                    WebLibSimple.getNixPixImg();
+            }
+        }
+
+        config.medisets[ inx ].taken = taken;
+        alltaken = alltaken && taken;
+    }
+
+    //
+    // Adjust overlay image.
+    //
+
+    if (! config.ondemand)
+    {
+        var formkey = config.formkey;
+        var launchitem = medicator.lauchis[ formkey ];
+        var overicon = WebLibLaunch.getOverIconImgElem(launchitem);
+        overicon.src = alltaken ? "indicator_ok_480x480.png" : "indicator_no_480x480.png";
+    }
+
+    return true;
+}
+
+medicator.onClickEverything = function(event)
+{
+    var config = medicator.currentConfig
+    if (! (config || config.medisets)) return;
+
+    for (var inx = 0; inx < config.medisets.length; inx++)
+    {
+        if (config.medisets[ inx ].checkBox)
+        {
+            config.medisets[ inx ].checkBox.checked = true;
+        }
+    }
+
+    WebLibDialog.setOkButtonEnable(true);
+
+    return false;
+}
+
 medicator.onClickDoseCheckbox = function(event)
 {
     event.stopPropagation();
@@ -86,7 +147,8 @@ medicator.onClickEventItem = function(event)
         {
             var div = WebLibSimple.createAnyAppend("div", dlconfig.content);
             WebLibSimple.setFontSpecs(div, 22, "bold", "#444444");
-            div.style.paddingBottom = WebLibSimple.addPixel(16);
+            div.style.paddingTop = WebLibSimple.addPixel(12);
+            div.style.paddingBottom = WebLibSimple.addPixel(12);
             div.onclick = medicator.onClickDoseItem;
             div.mediset = mediset;
             div.id = "medication";
@@ -100,6 +162,7 @@ medicator.onClickEventItem = function(event)
             mediset.checkBox = WebLibSimple.createAnyAppend("input", checkSpan);
             mediset.checkBox.type = "checkbox";
             mediset.checkBox.onclick = medicator.onClickDoseCheckbox;
+            mediset.checkBox.checked = (mediset.taken == true);
 
             var whatSpan = WebLibSimple.createAnyAppend("div", div);
             whatSpan.style.display = "inline-block";
@@ -113,12 +176,47 @@ medicator.onClickEventItem = function(event)
 
             mediformDiv.innerHTML = medicator.form[ mediset.mediform ];
 
+            dlconfig.other = "Alles";
+            dlconfig.otherEnabled = true;
+            dlconfig.onClickOther = medicator.onClickEverything;
+
             dlconfig.ok = "Eingenommen";
             dlconfig.okEnabled = false;
+            dlconfig.onClickOk = medicator.onClickTaken;
         }
     }
 
     WebLibDialog.createDialog(dlconfig);
+}
+
+medicator.computePillPositions = function(launchitem)
+{
+    if (medicator.pillpositions) return;
+
+    medicator.pillimg =
+    [
+        "form/pill0.png", "form/pill1.png", "form/pill2.png", "form/pill3.png",
+        "form/pill4.png", "form/pill5.png", "form/pill6.png", "form/pill7.png",
+        "form/pill8.png", "form/pill9.png"
+    ];
+
+    var icondiv = WebLibLaunch.getIconDivElem(launchitem);
+    var iconwid = icondiv.clientWidth;
+
+    medicator.pillsize = Math.floor(iconwid / 5);
+
+    medicator.pillpositions =
+    [
+        [ 2, 2 ],
+        [ 1, 1 ], [ 1, 3 ], [ 3, 1 ], [ 3, 3 ],
+        [ 1, 2 ], [ 2, 1 ], [ 2, 3 ], [ 3, 2 ]
+    ];
+
+    for (var inx = 0; inx < medicator.pillpositions.length; inx++)
+    {
+        medicator.pillpositions[ inx ][ 0 ] *= medicator.pillsize;
+        medicator.pillpositions[ inx ][ 1 ] *= medicator.pillsize;
+    }
 }
 
 medicator.createEvents = function()
@@ -135,7 +233,8 @@ medicator.createEvents = function()
     console.log("today=" + today);
     console.log("midni=" + midni);
 
-    var configs = {};
+    medicator.configs = configs = {};
+    medicator.lauchis = lauchis = {};
 
     for (var inx in medicator.comingEvents)
     {
@@ -156,6 +255,7 @@ medicator.createEvents = function()
         if (ondemand) label = "Bei Bedarf";
 
         var icon = "health_frame_490x490.png";
+
         if (mediform == "ZZB") icon = "health_bpm_256x256.png";
         if (mediform == "ZZG") icon = "health_glucose_512x512.png";
         if (mediform == "ZZW") icon = "health_scale_280x280.png";
@@ -180,30 +280,112 @@ medicator.createEvents = function()
             }
         }
 
+        //
+        // The formkey collects medication event into the same
+        // time slot, while activity events are kept separate.
+        //
+
         var formkey = event.date + ":" + (mediform.startsWith("ZZ") ? mediform : "AAA");
 
         if (! configs[ formkey ])
         {
             var config = {};
+
             config.icon = icon;
             config.label = label;
+            config.formkey = formkey;
             config.overicon = overicon;
+            config.ondemand = ondemand;
             config.onclick = medicator.onClickEventItem;
             config.medisets = [];
+            config.pillslots = 0;
+            config.pillindex = 0;
 
             configs[ formkey ] = config;
+            lauchis[ formkey ] = WebLibLaunch.createLaunchItem(config);
 
-            WebLibLaunch.createLaunchItem(config);
+            //
+            // Pill positions depend on the size of the launch item.
+            // They are computed when the first item is created.
+            //
+
+            medicator.computePillPositions(lauchis[ formkey ]);
         }
 
-        var mediset = {};
+        if (mediform.startsWith("ZZ"))
+        {
+            //
+            // Activity medications have only one mediset.
+            //
 
-        mediset.medication = medication;
-        mediset.mediform = mediform;
-        mediset.ondemand = ondemand;
-        mediset.dose = dose;
+            var mediset = {};
 
-        configs[ formkey ].medisets.push(mediset);
+            mediset.medication = medication;
+            mediset.mediform = mediform;
+
+            configs[ formkey ].medisets.push(mediset);
+        }
+        else
+        {
+            //
+            // On demand doses can be taken in the smallest split size.
+            //
+
+            var loopmax  = (ondemand ? event.ondemandmax  : dose);
+            var loopdose = (ondemand ? event.ondemanddose : dose);
+
+            //
+            // Take care for pill parts rounding a la 0.33 pill dose.
+            //
+
+            while (loopmax > 0.1)
+            {
+                var mediset = {};
+
+                mediset.medication = medication;
+                mediset.mediform = mediform;
+                mediset.ondemand = ondemand;
+                mediset.dose = loopdose;
+
+                configs[ formkey ].medisets.push(mediset);
+
+                mediset.pillimgs = [];
+
+                if (config.pillslots < medicator.pillpositions.length)
+                {
+                    var icondiv = WebLibLaunch.getIconDivElem(lauchis[ formkey ]);
+                    var iconwid = icondiv.clientWidth;
+                    var iconhei = icondiv.clientHeight;
+
+                    var dose = parseFloat(mediset.dose);
+
+                    while ((dose > 0) && (config.pillslots < medicator.pillpositions.length))
+                    {
+                        var pilldiv = WebLibSimple.createDivWidHei(
+                            medicator.pillpositions[ config.pillslots ][ 0 ],
+                            medicator.pillpositions[ config.pillslots ][ 1 ],
+                            medicator.pillsize,
+                            medicator.pillsize,
+                            null, icondiv);
+
+                        var pillimg = WebLibSimple.createImgWidHei(0, 0, "110%", "100%", null, pilldiv);
+                        pillimg.src = "form/pill" + config.pillindex + ".png";
+
+                        var pillweg = WebLibSimple.createImgWidHei(0, 0, "100%", "100%", null, pilldiv);
+                        pillweg.src = WebLibSimple.getNixPixImg();
+
+                        mediset.pillimgs.push(pillweg);
+
+                        config.pillslots++;
+                        dose -= 1.0;
+                    }
+                }
+
+                loopmax -= loopdose;
+            }
+
+            config.pillindex++;
+        }
     }
 }
 

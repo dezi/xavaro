@@ -45,6 +45,16 @@ WebLibLaunch.onResize = function()
     wl.positionLaunchItems();
 }
 
+WebLibLaunch.getIconDivElem = function(launchitem)
+{
+    return launchitem.imgDivElem;
+}
+
+WebLibLaunch.getOverIconImgElem = function(launchitem)
+{
+    return launchitem.overImgElem;
+}
+
 WebLibLaunch.createLaunchItem = function(config)
 {
     var wl = WebLibLaunch;
@@ -59,28 +69,30 @@ WebLibLaunch.createLaunchItem = function(config)
     li.style.backgroundSize = WebLibSimple.addPixel(wl.horzSize);
     li.style.backgroundImage = url;
 
-    li.divElem = WebLibSimple.createDiv(0, 0, 0, 0, null, li);
+    li.divElem = WebLibSimple.createDiv(0, 0, 0, 0, "divElem", li);
     li.divElem.style.margin = WebLibSimple.addPixel(18);
 
-    li.imgDivElem = WebLibSimple.createDiv(20, 0, 20, 40, null, li.divElem);
+    li.imgDivElem = WebLibSimple.createDiv(20, 0, 20, 40, "imgDivElem", li.divElem);
 
-    li.iconImgElem = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", null, li.imgDivElem);
+    li.iconImgElem = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", "iconImgElem", li.imgDivElem);
     li.iconImgElem.src = config.icon;
 
-    li.labelElem = WebLibSimple.createAny("center", 0, null, 0, 0, null, li.divElem);
+    li.labelElem = WebLibSimple.createAny("center", 0, null, 0, 0, "labelElem", li.divElem);
     WebLibSimple.setFontSpecs(li.labelElem, 24, "bold", "#777777");
     li.labelElem.innerHTML = config.label;
 
     var overwid = - Math.floor(wl.horzSize / 3);
     var overhei = + Math.floor(wl.vertSize / 3);
 
-    li.overDivElem = WebLibSimple.createDivWidHei(0, 0, overwid, overhei, null, li.divElem);
-    li.overImgElem = WebLibSimple.createImgWidHei(0, 0, "100%", "100%", null, li.overDivElem);
+    li.overDivElem = WebLibSimple.createDivWidHei(0, 0, overwid, overhei, "overDivElem", li.divElem);
+    li.overImgElem = WebLibSimple.createImgWidHei(0, 0, "100%", "100%", "overImgElem", li.overDivElem);
     li.overImgElem.src = config.overicon ? config.overicon : WebLibSimple.getNixPixImg();
 
     if (config.onclick) li.onclick = config.onclick;
 
     wl.positionLaunchItems();
+
+    return li;
 }
 
 WebLibLaunch.positionLaunchItems = function()
