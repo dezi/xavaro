@@ -26,12 +26,11 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-
         Simple.setAppContext(this);
 
+        super.onCreate(savedInstanceState);
+
         SettingsFragments.initialize(this);
-        DitUndDat.SharedPrefs.initialize(this);
     }
 
     @Override

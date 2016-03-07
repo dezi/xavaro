@@ -242,10 +242,34 @@ WebLibSimple.createImgWidHei = function(left, top, width, height, id, parent)
     return WebLibSimple.createAnyWidHei("img", left, top, width, height, id, parent);
 }
 
+//
+// Image stuff.
+//
+
+WebLibSimple.setImageSource = function(img, source)
+{
+    if (img)
+    {
+        if (source)
+        {
+            //
+            // Avoid reloading of image.
+            //
+
+            if (! (img.src && img.src.endsWith(source))) img.src = source;
+        }
+        else
+        {
+            img.src = WebLibSimple.getNixPixImg();
+        }
+    }
+}
+
 WebLibSimple.getNixPixImg = function()
 {
     return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
 }
+
 //
 // Basic SPAN creation.
 //
@@ -353,6 +377,24 @@ WebLibSimple.findTarget = function(target, targetid)
     }
 
     return target;
+}
+
+WebLibSimple.findFocus = function(target)
+{
+    for (var inx = 0; inx < target.children.length; inx++)
+    {
+        var child = target.children[ inx ];
+
+        if (child.autofocus)
+        {
+            child.focus();
+            return true;
+        }
+
+        if (WebLibSimple.findFocus(child)) return true;
+    }
+
+    return false;
 }
 
 WebLibSimple.padNum = function(num, size)

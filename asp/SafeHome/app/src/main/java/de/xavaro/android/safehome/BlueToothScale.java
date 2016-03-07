@@ -284,7 +284,7 @@ public class BlueToothScale extends BlueTooth
             // setting the scale to our user.
             //
 
-            SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+            SharedPreferences sp = Simple.getSharedPrefs();
             long uuid = Long.parseLong(sp.getString("health.scale.userid", ""));
             boolean found = false;
 
@@ -910,7 +910,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getMakeUserFromPreferences(int command)
     {
-        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+        SharedPreferences sp = Simple.getSharedPrefs();
         long uuid = Integer.parseInt(sp.getString("health.scale.userid", ""));
         String initials = sp.getString("health.scale.initials", "");
         int height = sp.getInt("health.user.size", 0);
@@ -983,7 +983,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getTakeUserMeasurementFromPreferences()
     {
-        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+        SharedPreferences sp = Simple.getSharedPrefs();
         long uuid = Integer.parseInt(sp.getString("health.scale.userid", ""));
 
         return getTakeUserMeasurement(uuid);
@@ -1017,7 +1017,7 @@ public class BlueToothScale extends BlueTooth
 
     public byte[] getUserMeasurementsFromPreferences()
     {
-        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+        SharedPreferences sp = Simple.getSharedPrefs();
         long uuid = Integer.parseInt(sp.getString("health.scale.userid", ""));
 
         return getUserMeasurements(uuid);

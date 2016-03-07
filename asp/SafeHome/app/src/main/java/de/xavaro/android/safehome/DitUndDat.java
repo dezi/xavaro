@@ -233,44 +233,6 @@ public class DitUndDat
 
     //endregion public static class StreamOptions
 
-    //region public static class SharedPrefs
-
-    public static class SharedPrefs
-    {
-        public static SharedPreferences sharedPrefs;
-
-        public static void initialize(Context context)
-        {
-            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-            //
-            // Register all dynamic preferences.
-            //
-
-            new PreferencesBasics.OwnerFragment().registerAll(context);
-            new PreferencesBasics.AdminFragment().registerAll(context);
-            new PreferencesBasics.CommunityFragment().registerAll(context);
-        }
-
-        public static Map<String, Object> getPrefix(String prefix)
-        {
-            Map<String, Object> result = new HashMap<>();
-
-            Map<String, ?> prefs = sharedPrefs.getAll();
-
-            for (Map.Entry<String, ?> entry : prefs.entrySet())
-            {
-                if (! entry.getKey().startsWith(prefix)) continue;
-
-                result.put(entry.getKey(), entry.getValue());
-            }
-
-            return result;
-        }
-    }
-
-    //endregion public static class SharedPrefs
-
     //region public static class Animator extends Animation
 
     public static class Animator extends Animation

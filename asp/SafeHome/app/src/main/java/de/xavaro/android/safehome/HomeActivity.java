@@ -71,7 +71,6 @@ public class HomeActivity extends AppCompatActivity implements
         ArchievementManager.reset("alertcall.shortclick");
 
         SettingsFragments.initialize(this);
-        DitUndDat.SharedPrefs.initialize(this);
 
         startService(new Intent(this, KioskService.class));
         startService(new Intent(this, CommService.class));

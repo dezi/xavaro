@@ -10,6 +10,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class LaunchGroupPreferences extends LaunchGroup implements
@@ -55,7 +56,7 @@ public class LaunchGroupPreferences extends LaunchGroup implements
 
     public void open()
     {
-        if (DitUndDat.SharedPrefs.sharedPrefs.getString("admin.password","").equals(""))
+        if (Simple.getSharedPrefString("admin.password") == null)
         {
             ((HomeActivity) context).addViewToBackStack(this);
 
@@ -94,10 +95,10 @@ public class LaunchGroupPreferences extends LaunchGroup implements
 
     public void onClick(DialogInterface dialog, int which)
     {
-        String pwreal = DitUndDat.SharedPrefs.sharedPrefs.getString("admin.password", "");
+        String pwreal = Simple.getSharedPrefString("admin.password");
         String pwuser = pwedit.getText().toString();
 
-        if ((which == DialogInterface.BUTTON_POSITIVE) && pwreal.equals(pwuser))
+        if ((which == DialogInterface.BUTTON_POSITIVE) && Simple.equals(pwreal, pwuser))
         {
             ((HomeActivity) context).addViewToBackStack(this);
 

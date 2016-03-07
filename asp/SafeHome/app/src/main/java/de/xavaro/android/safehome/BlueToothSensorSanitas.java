@@ -422,7 +422,7 @@ public class BlueToothSensorSanitas implements BlueTooth.BlueToothPhysicalDevice
         float distanceWalkCM = 103.00f;
         float caloriePer10000Steps = 474.75f;
 
-        SharedPreferences sp = DitUndDat.SharedPrefs.sharedPrefs;
+        SharedPreferences sp = Simple.getSharedPrefs();
 
         String timeFormatString = sp.getString(keyprefix + ".units.timedisp", "24h");
         String distanceUnitString = sp.getString(keyprefix + ".units.distance", "m");

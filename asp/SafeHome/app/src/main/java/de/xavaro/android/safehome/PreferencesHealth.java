@@ -467,14 +467,14 @@ public class PreferencesHealth
             dt.setTitle("User-ID");
             dt.setEnabled(enabled);
 
-            if (! DitUndDat.SharedPrefs.sharedPrefs.contains(dt.getKey()))
+            if (! Simple.getSharedPrefs().contains(dt.getKey()))
             {
                 //
                 // Initially compute user id.
                 //
 
-                int userid = new Random().nextInt();
-                DitUndDat.SharedPrefs.sharedPrefs.edit().putString(dt.getKey(), "" + userid).apply();
+                String userid = "" + new Random().nextInt();
+                Simple.setSharedPrefString(dt.getKey(), userid);
             }
 
             preferences.add(dt);

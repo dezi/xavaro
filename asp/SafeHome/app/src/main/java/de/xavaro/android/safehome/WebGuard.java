@@ -26,6 +26,7 @@ import java.util.Map;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 //
@@ -190,7 +191,7 @@ public class WebGuard extends WebViewClient
                     // Add restricted domains from firewall.
                     //
 
-                    Map<String, Object> domains = DitUndDat.SharedPrefs.getPrefix("firewall.domains.");
+                    Map<String, Object> domains = Simple.getAllPreferences("firewall.domains.");
 
                     for (String prefkey : domains.keySet())
                     {

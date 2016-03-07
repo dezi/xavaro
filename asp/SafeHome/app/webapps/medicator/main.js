@@ -290,10 +290,14 @@ medicator.createNumberInput = function(parent, value, title, focus)
     WebLibSimple.setFontSpecs(numberInput, 28, "bold", "#444444");
     numberInput.style.textAlign = "center";
     numberInput.style.width = "80px";
-    numberInput.autofocus = focus;
     numberInput.type = "number";
     numberInput.value = value;
-    numberInput.select();
+
+    if (focus)
+    {
+        numberInput.autofocus = true;
+        numberInput.select();
+    }
 
     var titleSpan = WebLibSimple.createAnyAppend("span", inputDiv);
     titleSpan.style.paddingLeft = WebLibSimple.addPixel(16);
@@ -311,8 +315,8 @@ medicator.onClickEventItem = function(event)
 
     WebAppUtility.makeClick();
 
-    medicator.currentConfig = liconfig = target.config;
-    medicator.currentDialog = dlconfig = {};
+    var liconfig = medicator.currentConfig = target.config;
+    var dlconfig = medicator.currentDialog = {};
 
     dlconfig.content = document.createElement("span");
 
@@ -480,19 +484,7 @@ medicator.updateEvents = function()
 
         var launchitem = medicator.lauchis[ formkey ];
         var overimg = WebLibLaunch.getOverIconImgElem(launchitem);
-
-        if (overicon)
-        {
-            //
-            // Avoid reloading of image.
-            //
-
-            if (! (overimg.src && overimg.src.endsWith(overicon))) overimg.src = overicon;
-        }
-        else
-        {
-            overimg.src = WebLibSimple.getNixPixImg();
-        }
+        WebLibSimple.setImageSource(overimg, overicon)
     }
 
     setTimeout(medicator.updateEvents, 30000);

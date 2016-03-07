@@ -8,10 +8,10 @@ WebLibDialog.setOkButtonEnable = function(enable)
 {
     var wld = WebLibDialog;
 
-    if (wld.topDiv && wld.topDiv.okButton)
+    if (wld.currentDialog.okButton)
     {
-        wld.topDiv.okButton.style.color = (enable ? "#448844" : "#cccccc");
-        wld.topDiv.okButton.isenabled = enable;
+        wld.currentDialog.okButton.style.color = (enable ? "#448844" : "#cccccc");
+        wld.currentDialog.okButton.isenabled = enable;
     }
 }
 
@@ -34,9 +34,9 @@ WebLibDialog.onClickOk = function(event)
 
         if (close)
         {
-            WebLibSimple.detachElement(wld.topDiv);
+            WebLibSimple.detachElement(wld.currentDialog.topDiv);
             wld.currentConfig = null;
-            wld.topDiv = null;
+            wld.currentDialog = null;
         }
     }
 }
@@ -60,26 +60,25 @@ WebLibDialog.onClickOther = function(event)
 
         if (close)
         {
-            WebLibSimple.detachElement(wld.topDiv);
+            WebLibSimple.detachElement(wld.currentDialog.topDiv);
             wld.currentConfig = null;
-            wld.topDiv = null;
-        }
+            wld.currentDialog = null;
+       }
     }
 }
 
 WebLibDialog.onClickCancel = function(event)
 {
-    //console.log("onClickCancel:" + event.target);
-
     event.stopPropagation();
 
     WebAppUtility.makeClick();
 
     var wld = WebLibDialog;
 
-    WebLibSimple.detachElement(wld.topDiv);
+    WebLibSimple.detachElement(wld.currentDialog.topDiv);
+
     wld.currentConfig = null;
-    wld.topDiv = null;
+    wld.currentDialog = null;
 }
 
 WebLibDialog.onClickIgnore = function(event)
@@ -94,60 +93,63 @@ WebLibDialog.createDialog = function(config)
     var wld = WebLibDialog;
 
     wld.currentConfig = config;
+    wld.currentDialog = dialog = {};
 
-    wld.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, null, document.body);
-    WebLibSimple.setBGColor(wld.topDiv, "#99000000");
-    wld.topDiv.onclick = wld.onClickCancel;
+    dialog.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, null, document.body);
+    WebLibSimple.setBGColor(dialog.topDiv, "#99000000");
+    dialog.topDiv.onclick = wld.onClickCancel;
 
-    wld.topDiv.centerDiv = WebLibSimple.createDivWidHei("50%", "50%", 0, 0, null, wld.topDiv);
+    dialog.centerDiv = WebLibSimple.createDivWidHei("50%", "50%", 0, 0, null, dialog.topDiv);
 
-    wld.topDiv.dialogDiv = WebLibSimple.createAnyAppend("div", wld.topDiv.centerDiv);
-    WebLibSimple.setBGColor(wld.topDiv.dialogDiv, "#ffffff");
-    wld.topDiv.dialogDiv.style.display = "inline-block";
-    wld.topDiv.dialogDiv.style.padding = WebLibSimple.addPixel(20);
-    wld.topDiv.dialogDiv.onclick = WebLibDialog.onClickIgnore;
+    dialog.dialogDiv = WebLibSimple.createAnyAppend("div", dialog.centerDiv);
+    WebLibSimple.setBGColor(dialog.dialogDiv, "#ffffff");
+    dialog.dialogDiv.style.display = "inline-block";
+    dialog.dialogDiv.style.padding = WebLibSimple.addPixel(20);
+    dialog.dialogDiv.onclick = WebLibDialog.onClickIgnore;
 
-    wld.topDiv.titleDiv = WebLibSimple.createAnyAppend("div", wld.topDiv.dialogDiv);
-    wld.topDiv.titleDiv.style.paddingBottom = WebLibSimple.addPixel(28);
-    WebLibSimple.setFontSpecs(wld.topDiv.titleDiv, 28, "bold", "#444444");
-    wld.topDiv.titleDiv.innerHTML = config.title;
+    dialog.titleDiv = WebLibSimple.createAnyAppend("div", dialog.dialogDiv);
+    dialog.titleDiv.style.paddingBottom = WebLibSimple.addPixel(28);
+    WebLibSimple.setFontSpecs(dialog.titleDiv, 28, "bold", "#444444");
+    dialog.titleDiv.innerHTML = config.title;
 
-    wld.topDiv.contentDiv = WebLibSimple.createAnyAppend("div", wld.topDiv.dialogDiv);
-    wld.topDiv.contentDiv.style.paddingBottom = WebLibSimple.addPixel(20);
-    if (config.content) wld.topDiv.contentDiv.appendChild(config.content);
+    dialog.contentDiv = WebLibSimple.createAnyAppend("div", dialog.dialogDiv);
+    dialog.contentDiv.style.paddingBottom = WebLibSimple.addPixel(20);
+    if (config.content) dialog.contentDiv.appendChild(config.content);
 
-    wld.topDiv.buttDiv = WebLibSimple.createAnyAppend("div", wld.topDiv.dialogDiv);
-    WebLibSimple.setFontSpecs(wld.topDiv.buttDiv, 24, "bold", "#448844");
-    wld.topDiv.buttDiv.style.textAlign = "right";
+    dialog.buttDiv = WebLibSimple.createAnyAppend("div", dialog.dialogDiv);
+    WebLibSimple.setFontSpecs(dialog.buttDiv, 24, "bold", "#448844");
+    dialog.buttDiv.style.textAlign = "right";
 
-    wld.topDiv.cancelButton = WebLibSimple.createSpanPadded(10, 0, 50, 0, null, wld.topDiv.buttDiv);
-    wld.topDiv.cancelButton.innerHTML = (config.cancel ? config.cancel : "Abbrechen").toUpperCase();
-    wld.topDiv.cancelButton.onclick = WebLibDialog.onClickCancel;
+    dialog.cancelButton = WebLibSimple.createSpanPadded(10, 0, 50, 0, null, dialog.buttDiv);
+    dialog.cancelButton.innerHTML = (config.cancel ? config.cancel : "Abbrechen").toUpperCase();
+    dialog.cancelButton.onclick = WebLibDialog.onClickCancel;
 
     if (config.other)
     {
-        wld.topDiv.otherButton = WebLibSimple.createSpanPadded(25, 0, 0, 0, null, wld.topDiv.buttDiv);
-        wld.topDiv.otherButton.innerHTML = config.other.toUpperCase();
-        wld.topDiv.otherButton.style.color = (config.otherEnabled ? "#448844" : "#cccccc");
-        wld.topDiv.otherButton.isenabled = (config.otherEnabled == true);
-        wld.topDiv.otherButton.onclick = WebLibDialog.onClickOther;
+        dialog.otherButton = WebLibSimple.createSpanPadded(25, 0, 0, 0, null, dialog.buttDiv);
+        dialog.otherButton.innerHTML = config.other.toUpperCase();
+        dialog.otherButton.style.color = (config.otherEnabled ? "#448844" : "#cccccc");
+        dialog.otherButton.isenabled = (config.otherEnabled == true);
+        dialog.otherButton.onclick = WebLibDialog.onClickOther;
     }
 
-    wld.topDiv.okButton = WebLibSimple.createSpanPadded(25, 0, 25, 0, null, wld.topDiv.buttDiv);
-    wld.topDiv.okButton.innerHTML = (config.ok ? config.ok : "Ok").toUpperCase();
-    wld.topDiv.okButton.style.color = (config.okEnabled ? "#448844" : "#cccccc");
-    wld.topDiv.okButton.isenabled = (config.okEnabled == true);
-    wld.topDiv.okButton.onclick = WebLibDialog.onClickOk;
+    dialog.okButton = WebLibSimple.createSpanPadded(25, 0, 25, 0, null, dialog.buttDiv);
+    dialog.okButton.innerHTML = (config.ok ? config.ok : "Ok").toUpperCase();
+    dialog.okButton.style.color = (config.okEnabled ? "#448844" : "#cccccc");
+    dialog.okButton.isenabled = (config.okEnabled == true);
+    dialog.okButton.onclick = WebLibDialog.onClickOk;
 
     //
     // Position dialog div ontop of the center div makes
     // it stay centered when orientation changes.
     //
 
-    var dwid  = wld.topDiv.dialogDiv.clientWidth;
-    var dhei  = wld.topDiv.dialogDiv.clientHeight;
+    var dwid  = dialog.dialogDiv.clientWidth;
+    var dhei  = dialog.dialogDiv.clientHeight;
 
-    wld.topDiv.dialogDiv.style.position = "absolute";
-    wld.topDiv.dialogDiv.style.left = WebLibSimple.addPixel(- (dwid >> 1));
-    wld.topDiv.dialogDiv.style.top  = WebLibSimple.addPixel(- (dhei >> 1));
+    dialog.dialogDiv.style.position = "absolute";
+    dialog.dialogDiv.style.left = WebLibSimple.addPixel(- (dwid >> 1));
+    dialog.dialogDiv.style.top  = WebLibSimple.addPixel(- (dhei >> 1));
+
+    WebLibSimple.findFocus(dialog.topDiv);
 }
