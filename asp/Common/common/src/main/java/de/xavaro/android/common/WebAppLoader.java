@@ -72,7 +72,7 @@ public class WebAppLoader extends WebViewClient
     {
         if ((! url.startsWith("http://")) && (! url.startsWith("http://")))
         {
-            if (url.startsWith("weblibs/"))
+            if (url.startsWith("/weblibs/"))
             {
                 url = rootUrl + url;
             }
