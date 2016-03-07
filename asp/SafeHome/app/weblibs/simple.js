@@ -384,7 +384,5 @@ WebLibSimple.getPickerDate = function(pickerdate)
 WebLibSimple.getTodayDate = function()
 {
     var today = new Date();
-    today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-    return today;
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate());
 }

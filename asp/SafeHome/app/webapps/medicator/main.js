@@ -4,8 +4,6 @@
 
 medicator.updateMedisetEvent = function(mediset)
 {
-    console.log("medicator.updateMedisetEvent: want=" + JSON.stringify(mediset));
-
     var eventdate = mediset.date;
     var medication = mediset.medication + "," + mediset.mediform;
 
@@ -33,8 +31,6 @@ medicator.updateMedisetEvent = function(mediset)
         if (mediset.glucose  ) event.glucose   = mediset.glucose;
         if (mediset.systolic ) event.systolic  = mediset.systolic;
         if (mediset.diastolic) event.diastolic = mediset.diastolic;
-
-        console.log("medicator.updateMedisetEvent: have=" + JSON.stringify(event));
 
         WebAppEvents.updateComingEvent(JSON.stringify(event));
     }
@@ -155,6 +151,7 @@ medicator.onClickMeasured = function(event)
     var config = medicator.currentConfig
     if (! (config && config.medisets)) return;
 
+    config.taken = true;
     config.medisets[ 0 ].taken = true;
     config.medisets[ 0 ].takendate = new Date().toISOString();
 
@@ -171,9 +168,7 @@ medicator.onClickMeasured = function(event)
     var formkey = config.formkey;
     var launchitem = medicator.lauchis[ formkey ];
     var overicon = WebLibLaunch.getOverIconImgElem(launchitem);
-
     overicon.src = "indicator_ok_480x480.png";
-    config.taken = true;
 
     return true;
 }
@@ -369,7 +364,7 @@ medicator.onClickEventItem = function(event)
                 dlconfig.title = "Wiegen";
 
                 whatSpan.weightEdit = medicator.createNumberInput(whatSpan, mediset.weight, "Gewicht", true);
-                whatSpan.weightEdit.onkeyup = medicator.onBloodGlucoseKeypress;
+                whatSpan.weightEdit.onkeyup = medicator.onWeightKeypress;
             }
         }
         else
@@ -485,7 +480,19 @@ medicator.updateEvents = function()
 
         var launchitem = medicator.lauchis[ formkey ];
         var overimg = WebLibLaunch.getOverIconImgElem(launchitem);
-        overimg.src = overicon ? overicon : WebLibSimple.getNixPixImg();
+
+        if (overicon)
+        {
+            //
+            // Avoid reloading of image.
+            //
+
+            if (! (overimg.src && overimg.src.endsWith(overicon))) overimg.src = overicon;
+        }
+        else
+        {
+            overimg.src = WebLibSimple.getNixPixImg();
+        }
     }
 
     setTimeout(medicator.updateEvents, 30000);
@@ -527,8 +534,8 @@ medicator.createEvents = function()
     today = new Date(today).toISOString();
     midni = new Date(midni).toISOString();
 
-    medicator.configs = configs = {};
-    medicator.lauchis = lauchis = {};
+    var configs = medicator.configs = {};
+    var lauchis = medicator.lauchis = {};
 
     for (var inx in medicator.comingEvents)
     {
