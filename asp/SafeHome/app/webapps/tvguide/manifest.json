@@ -7,14 +7,22 @@
     "appserver": "epg.xavaro.de",
     "preferences": true,
 
-    "files": [
-      "main.js",
-      "pref.js"
-    ],
-
     "permissions": [
       "request",
-      "utility"
+      "utility",
+      "prefs"
+    ],
+
+    "weblibs": [
+      "simple",
+      "touch"
+    ],
+
+    "preload": [
+    ],
+
+    "files": [
+      "main.js"
     ],
 
     "cachedefs": [
