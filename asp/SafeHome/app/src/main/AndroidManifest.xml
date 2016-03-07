@@ -18,6 +18,7 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
+        android:name="de.xavaro.android.safehome.ApplicationBase"
         android:allowBackup="true"
         android:clearTaskOnLaunch="true"
         android:icon="@mipmap/ic_launcher"
@@ -84,14 +85,17 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <activity android:name=".SettingsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <activity android:name=".AssistActivity">
         </activity>
+
         <activity
             android:name=".FakeHome"
             android:enabled="false">
@@ -101,6 +105,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".FakeAssist"
             android:enabled="false">
@@ -110,6 +115,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ChatActivity"
             android:theme="@style/AppTheme">
@@ -118,6 +124,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <receiver android:name=".BootLoader" android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>

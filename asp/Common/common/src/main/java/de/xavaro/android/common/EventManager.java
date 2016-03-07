@@ -185,6 +185,17 @@ public class EventManager
         }
     }
 
+    private static void notifyEvents(String eventgroupkey, JSONArray events)
+    {
+        Log.d(LOGTAG, "==================>notifyEvents=>" + eventgroupkey + "=" + events.length());
+
+        if (eventgroupkey.startsWith("webapps."))
+        {
+            String webappname = eventgroupkey.substring(8);
+            WebApp.handleEvent(webappname, Json.clone(events));
+        }
+    }
+
     private static long nextLoadTime;
 
     public static void commTick()
@@ -199,6 +210,7 @@ public class EventManager
         // Check for passed events.
         //
 
+        long now = Simple.nowAsTimeStamp();
         long today = Simple.todayAsTimeStamp();
 
         JSONObject passed = Json.getObject(eventcache, "passed");
@@ -215,6 +227,7 @@ public class EventManager
 
             JSONArray evgcoming = Json.getArray(coming, eventgroupkey);
             JSONArray evgpassed = Json.getArray(passed, eventgroupkey);
+            JSONArray evgfiring = new JSONArray();
 
             if (evgcoming == null) Json.put(coming, eventgroupkey, evgcoming = new JSONArray());
             if (evgpassed == null) Json.put(passed, eventgroupkey, evgpassed = new JSONArray());
@@ -233,10 +246,20 @@ public class EventManager
                     continue;
                 }
 
-                if (Simple.getTimeStamp(date) < today)
+                long timestamp = Simple.getTimeStamp(date);
+
+                if (timestamp < today)
                 {
                     Json.put(evgpassed, event);
                     Json.remove(evgcoming, inx--);
+                    dirty = true;
+                    continue;
+                }
+
+                if (timestamp < now)
+                {
+                    Json.put(event, "notified", Simple.nowAsISO());
+                    Json.put(evgfiring, event);
                     dirty = true;
                 }
             }
@@ -246,6 +269,8 @@ public class EventManager
                 Json.put(coming, eventgroupkey, Json.sort(evgcoming, "date", false));
                 Json.put(passed, eventgroupkey, Json.sort(evgpassed, "date", false));
             }
+
+            if (evgfiring.length() > 0) notifyEvents(eventgroupkey, evgfiring);
         }
 
         Simple.makePost(freeMemory, 10 * 1000);

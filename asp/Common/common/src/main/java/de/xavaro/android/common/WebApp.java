@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -15,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WebApp
 {
@@ -127,82 +130,60 @@ public class WebApp
         return Json.getBoolean(getManifest(webappname), "preferences");
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    public static void loadWebView(WebView webview, String webappname, String mode)
+    private static final Map<String, WebAppView> eventWebApps = new HashMap<>();
+
+    public static void handleEventUI(String webappname, JSONArray events)
     {
-        webview.setWebChromeClient(new WebChromeClient());
+        WebAppView eventWebApp = null;
 
-        //
-        // Remove "Chrome" form user agent string because
-        // Google will not go into mobile style if set.
-        //
-
-        String agent = webview.getSettings().getUserAgentString().replace("Chrome","");
-
-        WebAppLoader webapploader = new WebAppLoader(webappname, agent, mode);
-        webview.setWebViewClient(webapploader);
-
-        //
-        // Default settings in webview,
-        //
-
-        webview.getSettings().setJavaScriptEnabled(true);
-        webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webview.getSettings().setSupportMultipleWindows(true);
-        webview.getSettings().setSupportZoom(false);
-        webview.getSettings().setAppCacheEnabled(false);
-        webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-
-        //
-        // Permission setting in webview.
-        //
-
-        ArrayList<String> permissions = getPermissions(webappname);
-
-        if (permissions.contains("domstorage"))
+        synchronized (eventWebApps)
         {
-            webview.getSettings().setDomStorageEnabled(false);
+            if (eventWebApps.containsKey(webappname))
+            {
+                eventWebApp = eventWebApps.get(webappname);
+            }
+            else
+            {
+                Log.d(LOGTAG, "handleEventUI: request event webapp start:" + webappname);
+
+                eventWebApp = new WebAppView(Simple.getAppContext());
+                eventWebApp.loadWebView(webappname, "event");
+
+                eventWebApps.put(webappname, eventWebApp);
+            }
         }
 
-        if (permissions.contains("database"))
+        if (eventWebApp.events != null)
         {
-            webview.getSettings().setDatabaseEnabled(false);
+            eventWebApp.events.scheduleEventsNotification(events);
         }
+    }
 
-        //
-        // Native add ons via permissions.
-        //
+    public static void handleEvent(String webappname, JSONArray events)
+    {
+        final String fwebappname = webappname;
+        final JSONArray fevents = events;
 
-        if (permissions.contains("request"))
+        Simple.makePost(new Runnable()
         {
-            Object request = new WebAppRequest(webappname, webview, webapploader);
-            webview.addJavascriptInterface(request, "WebAppRequest");
-        }
+            @Override
+            public void run()
+            {
+                handleEventUI(fwebappname, fevents);
+            }
+        });
+    }
 
-        if (permissions.contains("intercept"))
+    public static void requestUnload(String webappname, int resultcode)
+    {
+        synchronized (eventWebApps)
         {
-            Object intercept = new WebAppIntercept();
-            webview.addJavascriptInterface(intercept, "WebAppIntercept");
-        }
+            Log.d(LOGTAG, "requestUnload: request event webapp unload:" + webappname);
 
-        if (permissions.contains("utility"))
-        {
-            Object utility = new WebAppUtility();
-            webview.addJavascriptInterface(utility, "WebAppUtility");
+            if (eventWebApps.containsKey(webappname))
+            {
+                eventWebApps.remove(webappname);
+            }
         }
-
-        if (permissions.contains("prefs"))
-        {
-            Object prefs = new WebAppPrefs(webappname);
-            webview.addJavascriptInterface(prefs, "WebAppPrefs");
-        }
-
-        if (permissions.contains("events"))
-        {
-            Object events = new WebAppEvents(webappname);
-            webview.addJavascriptInterface(events, "WebAppEvents");
-        }
-
-        webview.loadUrl(WebApp.getHTTPAppRoot(webappname));
     }
 }

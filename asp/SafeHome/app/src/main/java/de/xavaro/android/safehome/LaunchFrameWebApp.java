@@ -10,6 +10,7 @@ import android.webkit.WebView;
 import de.xavaro.android.common.WebApp;
 import de.xavaro.android.common.WebAppRequest;
 import de.xavaro.android.common.WebAppLoader;
+import de.xavaro.android.common.WebAppView;
 
 public class LaunchFrameWebApp extends LaunchFrame
 {
@@ -32,11 +33,11 @@ public class LaunchFrameWebApp extends LaunchFrame
 
     public void setWebAppName(String webappname)
     {
-        WebView webview = new WebView(getContext());
+        WebAppView webview = new WebAppView(getContext());
         webview.setBackgroundColor(0xffffffff);
-        addView(webview);
+        webview.loadWebView(webappname, "main");
 
-        WebApp.loadWebView(webview, webappname, "main");
+        addView(webview);
     }
 
     @Override

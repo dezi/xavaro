@@ -8,10 +8,11 @@
     "events": true,
 
     "permissions": [
-      "request",
       "intercept",
+      "request",
       "utility",
       "events",
+      "speak",
       "prefs"
     ],
 

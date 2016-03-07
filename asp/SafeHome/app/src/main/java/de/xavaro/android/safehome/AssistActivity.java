@@ -12,8 +12,8 @@ public class AssistActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_assist);
 
+        setContentView(R.layout.activity_assist);
         Simple.setAppContext(this);
     }
 }
