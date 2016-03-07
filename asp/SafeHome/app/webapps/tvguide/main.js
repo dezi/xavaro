@@ -3,7 +3,8 @@ tvguide.constanst =
     titlebarHeight : 80,
     senderbarWidth : 80,
     senderHeight   : 64,
-    timelineHeight : 60
+    timelineHeight : 60,
+    hoursPix       : 360
 }
 
 tvguide.getSenderList = function()
@@ -84,36 +85,37 @@ tvguide.createFrameSetup = function()
     WebLibSimple.setBGColor(tvguide.content1, "#ff8000");
 
     //
-    // topdiv.content1.senderbar
+    // topdiv.timeline
     //
 
-    tvguide.senderbar = WebLibSimple.createDivWidth(0, 0, tvguide.constanst.senderbarWidth, 0, "senderbar", tvguide.content1);
-    tvguide.senderbar.style.overflow = "hidden";
-
-    WebLibSimple.setBGColor(tvguide.senderbar, "#000000");
-
-
-    //
-    // topdiv.content1.content2
-    //
-
-    tvguide.content2 = WebLibSimple.createDiv(tvguide.constanst.senderbarWidth, 0, 0, 0, "content2", tvguide.content1);
-    WebLibSimple.setBGColor(tvguide.content2, "#ffff00");
-
-    //
-    // topdiv.content1.content2.timeline
-    //
-
-    tvguide.timeline = WebLibSimple.createDivHeight(0, 0, 0, tvguide.constanst.timelineHeight, "timeline", tvguide.content2);
+    tvguide.timeline = WebLibSimple.createDivHeight(0, 0, 0, tvguide.constanst.timelineHeight, "timeline", tvguide.content1);
     tvguide.timeline.style.overflow = "hidden";
 
     WebLibSimple.setBGColor(tvguide.timeline, "#ff00ff");
 
     //
-    // topdiv.content1.content2.epgdata
+    // topdiv.content2
     //
 
-    tvguide.epgdata = WebLibSimple.createDiv(0, tvguide.constanst.timelineHeight, 0, 0, "epgdata", tvguide.content2);
+    tvguide.content2 = WebLibSimple.createDiv(0, tvguide.constanst.timelineHeight, 0, 0, "content2", tvguide.content1);
+    WebLibSimple.setBGColor(tvguide.content2, "#ffff00");
+
+    //
+    // topdiv.senderbar
+    //
+
+    tvguide.senderbar = WebLibSimple.createDivWidth(0, 0, tvguide.constanst.senderbarWidth, 0, "senderbar", tvguide.content2);
+    tvguide.senderbar.style.overflow = "hidden";
+
+    WebLibSimple.setBGColor(tvguide.senderbar, "#000000");
+
+    //
+    // topdiv.epgdata
+    //
+
+    tvguide.epgdata = WebLibSimple.createDiv(tvguide.constanst.senderbarWidth, 0, 0, 0, "epgdata", tvguide.content2);
+    tvguide.epgdata.style.overflow = "hidden";
+
     WebLibSimple.setBGColor(tvguide.epgdata, "#ffffff");
 }
 
@@ -152,9 +154,8 @@ tvguide.createSenderBar = function()
 tvguide.createTimeLine = function()
 {
     var hours = 48;
-    var hoursPix = 360
 
-    tvguide.timelineScroll = WebLibSimple.createDivWidth(0, 0, (hours * hoursPix), 0, "timelineScroll", tvguide.timeline);
+    tvguide.timelineScroll = WebLibSimple.createDivWidth(0, 0, (hours * tvguide.constanst.hoursPix), 0, "timelineScroll", tvguide.timeline);
     tvguide.timelineScroll.scrollHorizontal = true;
 //    tvguide.timelineScroll.style.backgroundColor = "#ffff00";
 
@@ -163,8 +164,8 @@ tvguide.createTimeLine = function()
         var timeDiv = WebLibSimple.createAnyAppend("div", tvguide.timelineScroll);
         timeDiv.style.backgroundColor = "#6ff9ec";
         timeDiv.style.position = "absolute";
-        timeDiv.style.width    = hoursPix + "px";
-        timeDiv.style.left     = (hoursPix * inx) +"px";
+        timeDiv.style.width    = tvguide.constanst.hoursPix + "px";
+        timeDiv.style.left     = (tvguide.constanst.hoursPix * inx) +"px";
         timeDiv.style.top      = "0px";
         timeDiv.style.bottom   = "0px";
 
@@ -173,8 +174,36 @@ tvguide.createTimeLine = function()
     }
 
     console.log("===============> tvguide.timelineScroll Width=" + tvguide.timelineScroll.clientWidth);
-    console.log("===============> tvguide.timelineScroll tvguide.timeline.clientWidth=" + tvguide.timeline.clientWidth);
-    console.log("===============> tvguide.timelineScroll hourSize=" + hourSize);
+}
+
+tvguide.createEpgData = function()
+{
+    tvguide.epgScroll = WebLibSimple.createDiv(0, 0, 0, 0, "epgScroll", tvguide.epgdata);
+    tvguide.epgScroll.scrollHorizontal = true;
+    tvguide.epgScroll.scrollVertical   = true;
+    WebLibSimple.setBGColor(tvguide.epgScroll, "#9e5151");
+
+    var time = 48 * 60;
+    var startTime = 0;
+    var minPix = tvguide.constanst.hoursPix / 60;
+
+    while (startTime < time)
+    {
+        var randomTvShowTime = Math.floor(Math.random() * 100);
+
+        var randomTvShow = WebLibSimple.createDivWidHei(
+                        startTime * minPix,
+                        0,
+                        (startTime + randomTvShowTime) * minPix,
+                        tvguide.constanst.senderHeight,
+                        null, tvguide.epgScroll);
+
+        randomTvShow.style.margin = "4px";
+        randomTvShow.style.border = "1px solid black";
+
+        startTime += randomTvShowTime;
+        console.log("============> startTime: " + startTime + "=" + startTime * minPix);
+    }
 }
 
 
@@ -182,3 +211,4 @@ tvguide.createFrameSetup();
 tvguide.getSenderList();
 tvguide.createSenderBar();
 tvguide.createTimeLine();
+tvguide.createEpgData();
