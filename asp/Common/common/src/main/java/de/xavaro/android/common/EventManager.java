@@ -174,6 +174,8 @@ public class EventManager
                 if (act.exists()) ok &= act.renameTo(bak);
                 if (tmp.exists()) ok &= tmp.renameTo(act);
 
+                dirty = false;
+
                 Log.d(LOGTAG, "putStorage: ok=" + ok);
             }
         }
@@ -233,8 +235,6 @@ public class EventManager
 
                 if (Simple.getTimeStamp(date) < today)
                 {
-                    Log.d(LOGTAG, "=======================passed:" + date + "=" + Simple.timeStampAsISO(today));
-
                     Json.put(evgpassed, event);
                     Json.remove(evgcoming, inx--);
                     dirty = true;

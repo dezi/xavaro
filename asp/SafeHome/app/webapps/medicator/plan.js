@@ -33,7 +33,7 @@ medicator.planEvent = function(date, hour, medication, dose, ondemand)
     var day = date.getDate();
 
     var datetime = new Date(year, month, day, hour, 0, 0);
-    //if (datetime.getTime() < new Date().getTime()) return;
+    if (datetime.getTime() < new Date().getTime()) return;
 
     var event = {};
 
@@ -70,7 +70,7 @@ medicator.planMedication = function(medication)
     date = WebLibSimple.getPickerDate(date);
     if (! date) return;
 
-    var ende = new Date(new Date().getTime() + 60 * 86400 * 1000);
+    var ende = new Date(new Date().getTime() + 4 * 86400 * 1000);
 
     if (dura == "numdays")
     {

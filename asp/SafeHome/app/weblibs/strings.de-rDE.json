@@ -1,6 +1,10 @@
 {
+  "simple.at" : "um",
   "simple.today" : "heute",
+  "simple.tomorrow" : "morgen",
   "simple.yesterday" : "gestern",
+
+  "simple.day.vals" : [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" ],
 
   "EOL" : true
 }

@@ -76,12 +76,6 @@ public class WebApp
         return getImage(webappname, appiconsrc);
     }
 
-    @Nullable
-    public static JSONArray getPreloads(String webappname)
-    {
-        return Json.getArray(getManifest(webappname), "preload");
-    }
-
     public static ArrayList<String> getPermissions(String webappname)
     {
         ArrayList<String> list = new ArrayList<>();
@@ -121,6 +115,11 @@ public class WebApp
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
         return (wcr.content == null) ? null : new String(wcr.content);
+    }
+
+    public static boolean hasEvents(String webappname)
+    {
+        return Json.getBoolean(getManifest(webappname), "events");
     }
 
     public static boolean hasPreferences(String webappname)

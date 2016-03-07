@@ -326,7 +326,6 @@ medicator.onClickEventItem = function(event)
 
         var div = WebLibSimple.createAnyAppend("div", dlconfig.content);
         WebLibSimple.setFontSpecs(div, 22, "bold", "#444444");
-        div.style.paddingTop = WebLibSimple.addPixel(12);
         div.style.paddingBottom = WebLibSimple.addPixel(12);
         div.mediset = mediset;
         div.id = "medication";
@@ -370,11 +369,23 @@ medicator.onClickEventItem = function(event)
                 whatSpan.weightEdit = medicator.createNumberInput(whatSpan, mediset.weight, "Gewicht", true);
                 whatSpan.weightEdit.onkeyup = medicator.onWeightKeypress;
             }
-        }
+
+            if (mediset.taken && mediset.takendate)
+            {
+                var takendateDiv = WebLibSimple.createAnyAppend("div", whatSpan);
+                WebLibSimple.setFontSpecs(takendateDiv, 16, null, "#888888");
+                takendateDiv.style.paddingLeft = WebLibSimple.addPixel(8);
+                takendateDiv.style.paddingTop = WebLibSimple.addPixel(16);
+
+                var nicedate = WebLibSimple.getNiceDate(mediset.takendate)
+                takendateDiv.innerHTML = "Gemessen" + " " + nicedate;
+            }
+       }
         else
         {
             dlconfig.title = "Medikamente einnehmen";
 
+            div.style.paddingTop = WebLibSimple.addPixel(12);
             div.onclick = medicator.onClickDoseItem;
 
             var checkSpan = WebLibSimple.createAnyAppend("span", div);
@@ -401,7 +412,11 @@ medicator.onClickEventItem = function(event)
 
             if (mediset.taken && mediset.takendate)
             {
-                mediformDiv.innerHTML += " " + new Date(mediset.takendate).toLocaleString();
+                var takendateDiv = WebLibSimple.createAnyAppend("div", whatSpan);
+                WebLibSimple.setFontSpecs(takendateDiv, 16, null, "#888888");
+
+                var nicedate = WebLibSimple.getNiceDate(mediset.takendate)
+                takendateDiv.innerHTML = "Eingenommen" + " " + nicedate;
             }
 
             dlconfig.other = "Alles";
@@ -596,7 +611,7 @@ medicator.createEvents = function()
             {
                 config.taken = true;
                 mediset.taken = true;
-                mediset.takendate = event.taken.date;
+                mediset.takendate = event.takendate;
 
                 mediset.puls      = event.puls;
                 mediset.weight    = event.weight;

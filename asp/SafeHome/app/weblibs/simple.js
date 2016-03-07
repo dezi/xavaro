@@ -423,6 +423,39 @@ WebLibSimple.getPickerDate = function(pickerdate)
     return null;
 }
 
+WebLibSimple.getNiceDate = function(date)
+{
+    var work = new Date(date);
+    var workmilli = work.getTime();
+
+    var today = WebLibSimple.getTodayDate().getTime();
+    var yester = today - 86400 * 1000;
+    var midnig = today + 86400 * 1000;
+    var tomoro = midnig + 86400 * 1000;
+
+    var nicedate = null;
+
+    if ((yester <= work) && (work < today )) nicedate = WebLibStrings.getTrans("simple.yesterday");
+    if ((today  <= work) && (work < midnig)) nicedate = WebLibStrings.getTrans("simple.today");
+    if ((midnig <= work) && (work < tomoro)) nicedate = WebLibStrings.getTrans("simple.tomorrow");
+
+    if (! nicedate)
+    {
+        var prefix = WebLibStrings.getTransTrans("simple.day.keys", (work.getDay() + 6) % 7);
+
+        nicedate = prefix + ", "
+                 + WebLibSimple.padNum(work.getDate(), 2) + "."
+                 + WebLibSimple.padNum(work.getMonth() + 1, 2) + "."
+                 + WebLibSimple.padNum(work. getFullYear(), 4);
+    }
+
+    nicedate += " " + WebLibStrings.getTrans("simple.at");
+    nicedate += " " + WebLibSimple.padNum(work.getHours(), 2);
+    nicedate += ":" + WebLibSimple.padNum(work.getMinutes(), 2);
+
+    return nicedate;
+}
+
 WebLibSimple.getTodayDate = function()
 {
     var today = new Date();

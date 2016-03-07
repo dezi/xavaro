@@ -1,6 +1,11 @@
 {
+  "simple.at" : "at",
   "simple.today" : "today",
+  "simple.tomorrow" : "tomorrow",
   "simple.yesterday" : "yesterday",
+
+  "simple.day.keys" : [ "0", "1", "2", "3", "4", "5", "6" ],
+  "simple.day.vals" : [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
 
   "EOL" : true
 }

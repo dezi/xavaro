@@ -445,6 +445,8 @@ public class WebAppCache
                 if (act.exists()) ok &= act.renameTo(bak);
                 if (tmp.exists()) ok &= tmp.renameTo(act);
 
+                dirty = false;
+
                 Log.d(LOGTAG, "putStorage: ok=" + ok);
             }
         }

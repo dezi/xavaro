@@ -221,7 +221,8 @@ public class CommService extends Service
             }
         }
 
-        return Service.START_NOT_STICKY;
+        //return Service.START_NOT_STICKY;
+        return Service.START_STICKY;
     }
 
     //endregion
