@@ -26,6 +26,7 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.WebApp;
+import de.xavaro.android.common.WebAppView;
 
 public class PreferencesWebApps
 {
@@ -65,7 +66,7 @@ public class PreferencesWebApps
         private final Handler handler = new Handler();
         private String webappkeyprefix;
         private String webappname;
-        private WebView webprefs;
+        private WebAppView webprefs;
 
         public WebappFragment()
         {
@@ -121,8 +122,8 @@ public class PreferencesWebApps
 
             if ((webprefs == null) && WebApp.hasPreferences(webappname))
             {
-                webprefs = new WebView(Simple.getAppContext());
-                WebApp.loadWebView(webprefs, webappname, "pref");
+                webprefs = new WebAppView(Simple.getAppContext());
+                webprefs.loadWebView(webappname, "pref");
 
                 Object builder = new WebAppPrefBuilder();
                 webprefs.addJavascriptInterface(builder, "WebAppPrefBuilder");

@@ -9,7 +9,6 @@
 
     "permissions": [
       "request",
-      "intercept",
       "utility",
       "events",
       "prefs"

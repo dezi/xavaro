@@ -1,10 +1,12 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 @SuppressWarnings("unused")
@@ -20,6 +22,32 @@ public class WebAppEvents
         this.webappname = webappname;
 
         keyprefix = "webapps." + this.webappname;
+    }
+
+    private final ArrayList<JSONArray> eventSchedule = new ArrayList<>();
+
+    public void scheduleEventsNotification(JSONArray events)
+    {
+        Log.d(LOGTAG, "scheduleEventsNotification: " + webappname);
+
+        synchronized (eventSchedule)
+        {
+            eventSchedule.add(events);
+        }
+    }
+
+    @JavascriptInterface
+    public String getCurrentEvents()
+    {
+        synchronized (eventSchedule)
+        {
+            if (eventSchedule.size() > 0)
+            {
+                return eventSchedule.remove(0).toString();
+            }
+        }
+
+        return new JSONArray().toString();
     }
 
     @JavascriptInterface
