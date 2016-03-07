@@ -1,5 +1,3 @@
-console.log("==================Kann losgehen....");
-
 medicator.getNextEvents = function()
 {
     var events = JSON.parse(WebAppEvents.getCurrentEvents());
@@ -47,7 +45,9 @@ medicator.getNextEvents = function()
         console.log("config=" + JSON.stringify(config));
     }
 
-    setTimeout(medicator.getNextEvents, 1000);
+    //WebAppSpeak.speak("De Javascripten kann nun sprechen");
+
+    setTimeout(medicator.getNextEvents, 10000);
 }
 
-setTimeout(medicator.getNextEvents, 1000);
+medicator.getNextEvents();

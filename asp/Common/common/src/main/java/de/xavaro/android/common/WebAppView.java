@@ -16,6 +16,7 @@ public class WebAppView extends WebView
     }
 
     public WebAppPrefs prefs;
+    public WebAppSpeak speak;
     public WebAppEvents events;
     public WebAppRequest request;
     public WebAppUtility utility;
@@ -75,7 +76,7 @@ public class WebAppView extends WebView
 
         if (permissions.contains("intercept"))
         {
-            intercept = new WebAppIntercept();
+            intercept = new WebAppIntercept(webappname);
             addJavascriptInterface(intercept, "WebAppIntercept");
         }
 
@@ -89,6 +90,12 @@ public class WebAppView extends WebView
         {
             prefs = new WebAppPrefs(webappname);
             addJavascriptInterface(prefs, "WebAppPrefs");
+        }
+
+        if (permissions.contains("speak"))
+        {
+            speak = new WebAppSpeak();
+            addJavascriptInterface(speak, "WebAppSpeak");
         }
 
         if (permissions.contains("events"))

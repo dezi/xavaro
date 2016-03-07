@@ -144,6 +144,8 @@ public class WebApp
             }
             else
             {
+                Log.d(LOGTAG, "handleEventUI: request event webapp start:" + webappname);
+
                 eventWebApp = new WebAppView(Simple.getAppContext());
                 eventWebApp.loadWebView(webappname, "event");
 
@@ -170,5 +172,18 @@ public class WebApp
                 handleEventUI(fwebappname, fevents);
             }
         });
+    }
+
+    public static void requestUnload(String webappname, int resultcode)
+    {
+        synchronized (eventWebApps)
+        {
+            Log.d(LOGTAG, "requestUnload: request event webapp unload:" + webappname);
+
+            if (eventWebApps.containsKey(webappname))
+            {
+                eventWebApps.remove(webappname);
+            }
+        }
     }
 }
