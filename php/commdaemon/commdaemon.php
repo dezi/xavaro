@@ -1,5 +1,7 @@
 <?php
 
+set_time_limit(0);
+
 include("../include/json.php");
 
 if (! ($sock = socket_create(AF_INET, SOCK_DGRAM, 0)))

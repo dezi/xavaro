@@ -1,5 +1,7 @@
 <?php
 
+set_time_limit(0);
+
 include("../include/json.php");
 include("../moviefinder/moviefinder.php");
 
@@ -255,5 +257,5 @@ function collectInfos()
 }
 
 collectInfos();
-
+echo "Done...\n";
 ?>

@@ -4,6 +4,8 @@
 // Read tvheadend epgdb.v2 database and upload content to servers.
 //
 
+set_time_limit(0);
+
 include("../include/json.php");
 include("../include/util.php");
 include("../include/countries.php");
@@ -517,11 +519,6 @@ function defuckEPG(&$epg)
 
 function saveEPG($epg)
 {
-	if ($epg[ "channel"  ] == "Sparhandy TV")
-	{
- 		echo json_encdat($epg) . "\n";
-	}
-	
 	if (! isset($epg[ "title" ])) 
 	{
 		//
@@ -840,7 +837,7 @@ function splitEPGs()
 		if ($epgs == null) 
 		{
 			@rmdir(dirname($tempfile));
-			return;
+			continue;
 		}
 		
 		usort($epgs, "sortEPG");
@@ -932,8 +929,6 @@ function uploadEPG($epgfile)
 	fclose($sock);
 }
 
-//uploadEPG("/home/pi/xavaro/var/epgdata/tv/de/ZDF/current.raspi1overdvb-c.json"); exit(0);
-
 readHomedir();
 readHostname();
 
@@ -961,5 +956,7 @@ foreach ($GLOBALS[ "actchannels" ] as $channel => $cdata)
 		echo "BRAINDEAD: $isolang.$channel => $percent%\n";
 	}
 }
+
+echo "Done...\n";
 
 ?>

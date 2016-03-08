@@ -1,5 +1,7 @@
 <?php
 
+set_time_limit(0);
+
 include("../include/json.php");
 
 function sortChannels($a, $b)
@@ -80,5 +82,6 @@ function compressChannels()
 }
 
 compressChannels();
+echo "Done...\n";
 
 ?>
