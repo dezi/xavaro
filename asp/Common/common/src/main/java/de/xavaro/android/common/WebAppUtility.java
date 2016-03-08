@@ -40,6 +40,18 @@ public class WebAppUtility
     }
 
     @JavascriptInterface
+    public String getOwnerSiezen()
+    {
+        return Simple.getSharedPrefString("owner.siezen");
+    }
+
+    @JavascriptInterface
+    public String getOwnerName()
+    {
+        return Simple.getOwnerName();
+    }
+
+    @JavascriptInterface
     public void makeClick()
     {
         Simple.makeClick();

@@ -187,7 +187,7 @@ public class EventManager
 
     private static void notifyEvents(String eventgroupkey, JSONArray events)
     {
-        Log.d(LOGTAG, "==================>notifyEvents=>" + eventgroupkey + "=" + events.length());
+        Log.d(LOGTAG, "notifyEvents:" + eventgroupkey + "=" + events.length());
 
         if (eventgroupkey.startsWith("webapps."))
         {
@@ -256,9 +256,8 @@ public class EventManager
                     continue;
                 }
 
-                if (timestamp < now)
+                if ((timestamp < now) && ! event.has("completed"))
                 {
-                    Json.put(event, "notified", Simple.nowAsISO());
                     Json.put(evgfiring, event);
                     dirty = true;
                 }

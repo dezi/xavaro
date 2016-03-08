@@ -8,12 +8,13 @@
     "events": true,
 
     "permissions": [
-      "intercept",
-      "request",
-      "utility",
-      "events",
+      "prefs",
       "speak",
-      "prefs"
+      "events",
+      "utility",
+      "request",
+      "intercept",
+      "assistance"
     ],
 
     "weblibs": [

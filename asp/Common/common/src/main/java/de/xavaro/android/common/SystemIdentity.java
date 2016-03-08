@@ -59,21 +59,21 @@ public class SystemIdentity
 
         try
         {
-            if (foundInStorage != null)
+            if ((foundInStorage != null) && (identity == null))
             {
                 appsname = foundInContact.split(":")[ 0 ];
                 identity = foundInContact.split(":")[ 1 ];
                 randomiz = foundInContact.split(":")[ 2 ];
             }
-            else
-            if (foundInCookies != null)
+
+            if ((foundInCookies != null) && (identity == null))
             {
                 appsname = foundInCookies.split(":")[ 0 ];
                 identity = foundInCookies.split(":")[ 1 ];
                 randomiz = foundInCookies.split(":")[ 2 ];
             }
-            else
-            if (foundInContact != null)
+
+            if ((foundInContact != null) && (identity == null))
             {
                 String[] packageName = context.getPackageName().split("\\.");
 
@@ -117,9 +117,7 @@ public class SystemIdentity
         }
 
         if (foundInStorage == null) storeIntoStorage(context);
-
         if (foundInContact == null) storeIntoContact(context);
-
         if (foundInCookies == null) storeIntoCookies(context);
 
         storeIntoCookies(context);

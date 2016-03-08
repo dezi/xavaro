@@ -5,5 +5,16 @@
   "medication.mode.pills.vals" : [ "Erste Einnahme", "Zweite Einnahme", "Dritte Einnahme", "Vierte Einnahme", "Bei Bedarf"  ],
   "medication.mode.measure.vals" : [ "Erste Messung", "Zweite Messung", "Dritte Messung", "Vierte Messung"  ],
 
+  "events.take.pills" : "Sie müssen noch Ihre Medikamente einnehmen",
+  "events.take.pills.du" : "Du musst noch Deine Medikamente einnehmen",
+  "events.take.weight" : "Sie müssen sich noch wiegen",
+  "events.take.weight.du" : "Du musst Dich noch wiegen",
+  "events.take.bloodglucose" : "Sie müssen noch Ihren Blutzucker messen",
+  "events.take.bloodglucose.du" : "Du musst noch Deinen Blutzucker messen",
+  "events.take.bloodpressure" : "Sie müssen noch Ihren Blutdruck messen",
+  "events.take.bloodpressure.du" : "Du musst noch Deinen Blutdruck messen",
+
+  "events.didnotyettake.pills" : "%$1s hat seine Medikamente noch nicht genommen.",
+
   "EOL" : true
 }

@@ -9,5 +9,12 @@
   "medication.mode.measure.keys" : [ "time1",         "time2",          "time3",          "time4"           ],
   "medication.mode.measure.vals" : [ "Erste Messung", "Zweite Messung", "Dritte Messung", "Vierte Messung"  ],
 
+  "events.take.pills" : "You have to take Your medication",
+  "events.take.weight" : "You have to weigh yourself",
+  "events.take.bloodglucose" : "You have to measure Your blood sugar",
+  "events.take.bloodpressure" : "You have to measure Your blood pressure",
+
+  "events.didnotyettake.pills" : "%$1s did not yet take his medication.",
+
   "EOL" : true
 }

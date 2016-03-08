@@ -77,12 +77,12 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Wichtige Einstellungen";
         target.add(category);
 
-        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
-
         target.add(PreferencesBasics.OwnerFragment.getHeader());
         target.add(PreferencesBasics.AdminFragment.getHeader());
         target.add(PreferencesBasics.CommunityFragment.getHeader());
         target.add(PreferencesBasics.AlertgroupFragment.getHeader());
+
+        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";

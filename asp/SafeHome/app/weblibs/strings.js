@@ -57,9 +57,23 @@ WebLibStrings.loadLocale = function()
     }
 }
 
-WebLibStrings.getTrans = function(key)
+WebLibStrings.getTrans = function(key, arg1, arg2, arg3, arg4)
 {
-    return WebLibStrings.strings[ key ];
+    var text = WebLibStrings.strings[ key ];
+
+    if (WebAppUtility.getOwnerSiezen() == "duzen")
+    {
+        var duzkey = key + ".du";
+
+        if (WebLibStrings.strings[ duzkey ]) text = WebLibStrings.strings[ duzkey ];
+    }
+
+    if (text && (arg1 !== null) && ! Array.isArray(text)) text = text.replace("%$1s", arg1);
+    if (text && (arg2 !== null) && ! Array.isArray(text)) text = text.replace("%$2s", arg2);
+    if (text && (arg3 !== null) && ! Array.isArray(text)) text = text.replace("%$3s", arg3);
+    if (text && (arg4 !== null) && ! Array.isArray(text)) text = text.replace("%$4s", arg4);
+
+    return text;
 }
 
 WebLibStrings.getTransMap = function(key)

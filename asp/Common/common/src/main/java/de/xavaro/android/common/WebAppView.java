@@ -21,6 +21,7 @@ public class WebAppView extends WebView
     public WebAppRequest request;
     public WebAppUtility utility;
     public WebAppIntercept intercept;
+    public WebAppAssistance assistance;
 
     @SuppressLint("SetJavaScriptEnabled")
     public void loadWebView(String webappname, String mode)
@@ -68,16 +69,22 @@ public class WebAppView extends WebView
         // Native add ons via permissions.
         //
 
-        if (permissions.contains("request"))
+        if (permissions.contains("assistance"))
         {
-            request = new WebAppRequest(webappname, this, webapploader);
-            addJavascriptInterface(request, "WebAppRequest");
+            assistance = new WebAppAssistance();
+            addJavascriptInterface(assistance, "WebAppAssistance");
         }
 
         if (permissions.contains("intercept"))
         {
             intercept = new WebAppIntercept(webappname);
             addJavascriptInterface(intercept, "WebAppIntercept");
+        }
+
+        if (permissions.contains("request"))
+        {
+            request = new WebAppRequest(webappname, this, webapploader);
+            addJavascriptInterface(request, "WebAppRequest");
         }
 
         if (permissions.contains("utility"))

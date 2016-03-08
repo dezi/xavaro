@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WebAppCache
 {
@@ -95,6 +97,7 @@ public class WebAppCache
             cachefile = Json.getObject(cachefiles, cacheurl);
 
             uuid = Json.getString(cachefile, "uuid");
+            mimetype = Json.getString(cachefile, "mime");
             String lget = Json.getString(cachefile, "lget");
 
             if ((interval > 0) && (uuid != null) && (lget != null))
@@ -248,6 +251,7 @@ public class WebAppCache
         try
         {
             URL url = new URL(src);
+
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             if ((cachefile != null) && cachefile.has("lmod"))

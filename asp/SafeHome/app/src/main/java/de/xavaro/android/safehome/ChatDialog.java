@@ -397,6 +397,7 @@ public class ChatDialog extends ScrollView
     private String getRemoteName(JSONObject chatMessage)
     {
         String identity = Json.getString(chatMessage, "identity");
+        Log.d(LOGTAG,"getRemoteName===================================:" + identity);
         return RemoteContacts.getDisplayName(identity);
     }
 
