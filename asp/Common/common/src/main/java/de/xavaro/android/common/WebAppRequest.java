@@ -57,7 +57,7 @@ public class WebAppRequest
 
                 Log.d(LOGTAG, "loadAsync: LOAD " + webappname + "=" + src + "=" + content.length);
 
-                final String cbscript = "WebAppRequest.onAsyncLoad(\"" + src + "\","
+                final String cbscript = "WebAppRequest.onLoadAsyncJSON(\"" + src + "\","
                         + new String(content) + ");";
 
                 Runnable callback = new Runnable()
@@ -75,7 +75,7 @@ public class WebAppRequest
     };
 
     @JavascriptInterface
-    public void loadAsync(String src)
+    public void loadAsyncJSON(String src)
     {
         Simple.removePost(loadAsyncRunner);
 

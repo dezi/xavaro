@@ -113,10 +113,10 @@ tvguide.createFrameSetup = function()
     // topdiv.epgdata
     //
 
-    tvguide.epgdata = WebLibSimple.createDiv(tvguide.constanst.senderbarWidth, 0, 0, 0, "epgdata", tvguide.content2);
-    tvguide.epgdata.style.overflow = "hidden";
+    tvguide.epgbody = WebLibSimple.createDiv(tvguide.constanst.senderbarWidth, 0, 0, 0, "epgdata", tvguide.content2);
+    tvguide.epgbody.style.overflow = "hidden";
 
-    WebLibSimple.setBGColor(tvguide.epgdata, "#ffffff");
+    WebLibSimple.setBGColor(tvguide.epgbody, "#ffffff");
 }
 
 tvguide.createSenderBar = function()
@@ -157,7 +157,6 @@ tvguide.createTimeLine = function()
 
     tvguide.timelineScroll = WebLibSimple.createDivWidth(0, 0, (hours * tvguide.constanst.hoursPix), 0, "timelineScroll", tvguide.timeline);
     tvguide.timelineScroll.scrollHorizontal = true;
-//    tvguide.timelineScroll.style.backgroundColor = "#ffff00";
 
     for(var inx = 0; inx < hours; inx++)
     {
@@ -176,12 +175,9 @@ tvguide.createTimeLine = function()
     console.log("===============> tvguide.timelineScroll Width=" + tvguide.timelineScroll.clientWidth);
 }
 
-tvguide.createEpgData = function()
+tvguide.createEpgProgram = function(sender, epgdata)
 {
-    tvguide.epgScroll = WebLibSimple.createDiv(0, 0, 0, 0, "epgScroll", tvguide.epgdata);
-    tvguide.epgScroll.scrollHorizontal = true;
-    tvguide.epgScroll.scrollVertical   = true;
-    WebLibSimple.setBGColor(tvguide.epgScroll, "#9e5151");
+    console.log("Create sender: " + sender + " ==> " + tvguide.senderList[ sender ]);
 
     var time = 48 * 60;
     var startTime = 0;
@@ -191,24 +187,56 @@ tvguide.createEpgData = function()
     {
         var randomTvShowTime = Math.floor(Math.random() * 100);
 
-        var randomTvShow = WebLibSimple.createDivWidHei(
+        var programDiv = WebLibSimple.createDivWidHei(
                         startTime * minPix,
-                        0,
+                        tvguide.constanst.senderHeight * sender,
                         (startTime + randomTvShowTime) * minPix,
                         tvguide.constanst.senderHeight,
                         null, tvguide.epgScroll);
 
-        randomTvShow.style.margin = "4px";
-        randomTvShow.style.border = "1px solid black";
+        programDiv.style.position = "absolute";
+        programDiv.style.backgroundColor = "#ffff00";
 
+        var paddingDiv = WebLibSimple.createDiv(0, 0, 0, 0, null, programDiv);
+        paddingDiv.style.marginLeft   = "2px";
+        paddingDiv.style.marginTop    = "2px";
+        paddingDiv.style.marginRight  = "0px";
+        paddingDiv.style.marginBottom = "2px";
+
+        paddingDiv.style.border = "1px solid black";
+        paddingDiv.style.backgroundColor = "#ff0000";
+
+//        console.log("============> startTime: " + startTime * minPix + "=>" + (startTime + randomTvShowTime) * minPix);
         startTime += randomTvShowTime;
-        console.log("============> startTime: " + startTime + "=" + startTime * minPix);
     }
 }
 
+tvguide.createEpgBodyScroll = function()
+{
+    tvguide.epgScroll = WebLibSimple.createDivWidth(0, 0, 48 * tvguide.constanst.hoursPix, 0, "epgScroll", tvguide.epgbody);
+    tvguide.epgScroll.scrollHorizontal = true;
+    tvguide.epgScroll.scrollVertical   = true;
+
+    WebLibSimple.setBGColor(tvguide.epgScroll, "#9e5151");
+
+    /*
+    for (var sender in tvguide.senderList)
+    {
+        tvguide.createEpgProgram(sender, null);
+    }
+    */
+
+    WebAppRequest.loadAsyncJSON("http://epg.xavaro.de/epgdata/tv/de/ZDF/current.json.gz");
+}
+
+WebAppRequest.onLoadAsyncJSON = function(src, data)
+{
+    console.log("WebAppRequest.onAsyncLoad:" + src + "=" + data.epgdata.length);
+}
 
 tvguide.createFrameSetup();
 tvguide.getSenderList();
+
 tvguide.createSenderBar();
 tvguide.createTimeLine();
-tvguide.createEpgData();
+tvguide.createEpgBodyScroll();
