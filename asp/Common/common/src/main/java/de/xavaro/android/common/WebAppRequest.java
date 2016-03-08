@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public class WebAppRequest
@@ -25,12 +26,72 @@ public class WebAppRequest
         this.webapploader = webapploader;
     }
 
+    private final ArrayList<String> asyncRequests = new ArrayList<>();
+
+    private final Runnable loadAsyncRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            while (true)
+            {
+                String src = null;
+
+                synchronized (asyncRequests)
+                {
+                    if (asyncRequests.size() > 0)
+                    {
+                        src = asyncRequests.remove(0);
+                    }
+                }
+
+                if (src == null) break;
+
+                byte[] content = webapploader.getRequestData(src);
+
+                if (content == null)
+                {
+                    Log.d(LOGTAG, "loadAsync: FAIL " + webappname + "=" + src);
+                    continue;
+                }
+
+                Log.d(LOGTAG, "loadAsync: LOAD " + webappname + "=" + src + "=" + content.length);
+
+                final String cbscript = "WebAppRequest.onAsyncLoad(\"" + src + "\","
+                        + new String(content) + ");";
+
+                Runnable callback = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        webview.evaluateJavascript(cbscript, null);
+                    }
+                };
+
+                Simple.makePost(callback);
+            }
+        }
+    };
+
+    @JavascriptInterface
+    public void loadAsync(String src)
+    {
+        Simple.removePost(loadAsyncRunner);
+
+        synchronized (asyncRequests)
+        {
+            asyncRequests.add(src);
+        }
+
+        Simple.makePost(loadAsyncRunner, 40);
+    }
+
     @JavascriptInterface
     public String loadSync(String src)
     {
-
         byte[] content = webapploader.getRequestData(src);
-        if (content == null) Log.d(LOGTAG, "loadSync: FAILED " + webappname + "=" + src);
+        if (content == null) Log.d(LOGTAG, "loadSync: FAIL " + webappname + "=" + src);
         return (content == null) ? null : new String(content);
     }
 
