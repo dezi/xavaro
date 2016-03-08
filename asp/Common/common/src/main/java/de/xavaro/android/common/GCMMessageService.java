@@ -92,6 +92,11 @@ public class GCMMessageService extends GcmListenerService
 
                 return false;
             }
+
+            for (int inx = 0; inx < tokens.length(); inx++)
+            {
+                Log.d(LOGTAG, "=======================sendMessage:" + receiver + "=" + Json.getString(tokens, inx));
+            }
         }
 
         try
