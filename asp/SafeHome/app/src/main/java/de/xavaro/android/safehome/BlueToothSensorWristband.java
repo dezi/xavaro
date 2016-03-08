@@ -9,6 +9,7 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 

@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.UUID;
 
+import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
