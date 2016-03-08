@@ -60,6 +60,7 @@ public class WebAppRequest
                 final String cbscript = "WebAppRequest.onLoadAsyncJSON(\"" + src + "\","
                         + new String(content) + ");";
 
+                /*
                 Runnable callback = new Runnable()
                 {
                     @Override
@@ -70,6 +71,9 @@ public class WebAppRequest
                 };
 
                 Simple.makePost(callback);
+                */
+
+                webview.evaluateJavascript(cbscript, null);
             }
         }
     };

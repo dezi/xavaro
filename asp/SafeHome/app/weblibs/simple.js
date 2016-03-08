@@ -404,6 +404,21 @@ WebLibSimple.padNum = function(num, size)
     return str;
 }
 
+WebLibSimple.substring = function(str, start, ende)
+{
+    if (start !== null && (ende === null))
+    {
+        if (start < 0) return str.substring(0, str.length + start);
+
+        return str.substring(start);
+    }
+
+    if (ende < 0) return str.substring(start, str.length + ende);
+
+    return substring(start, ende);
+}
+
+
 WebLibSimple.getPickerDate = function(pickerdate)
 {
     if (pickerdate)
