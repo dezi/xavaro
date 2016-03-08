@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.Date;
 
+import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;

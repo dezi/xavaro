@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 

@@ -26,6 +26,11 @@ medicator.getNextEvents = function()
 
     var configs = {};
 
+    medicator.pillsreminder = false;
+    medicator.weightreminder = false;
+    medicator.bloodglucosereminder = false;
+    medicator.bloodpressurereminder = false;
+
     for (var inx = 0; inx < events.length; inx++)
     {
         var event = events[ inx ];
@@ -84,6 +89,7 @@ medicator.getNextEvents = function()
         if (alltaken)
         {
             medicator.completeConfig(config);
+
             continue;
         }
 
@@ -106,61 +112,135 @@ medicator.remindConfig = function(config)
     var nowtime = new Date().getTime();
     var remtime = remindeddate ? new Date(remindeddate).getTime() : 0;
 
-    if ((remtime + (medicator.remindIntervall * 1000)) < nowtime)
+    if ((remtime + (medicator.remindIntervall * 1000)) >= nowtime) return;
+
+    if (config.events[ 0 ].alerted)
     {
-        if (config.mediflat == "AAA")
-        {
-            WebAppSpeak.speak(WebLibStrings.getTrans("events.take.pills"));
-
-            if ((reminded + 1) >= medicator.remindMaximum)
-            {
-                var name = WebAppUtility.getOwnerName();
-                var text = WebLibStrings.getTrans("events.didnotyettake.pills", name);
-
-                WebAppAssistance.informAssistance(text);
-            }
-        }
-
-        if (config.mediflat == "ZZB")
-        {
-            WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodpressure"));
-        }
-
-        if (config.mediform == "ZZG")
-        {
-            WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodglucose"));
-        }
-
-        if (config.mediflat == "ZZW")
-        {
-            WebAppSpeak.speak(WebLibStrings.getTrans("events.take.weight"));
-        }
-
         //
-        // Update reminded date and count.
+        // The assistance has already been informed,
+        // so do nothing for now.
         //
 
-        for (var inx in config.events)
+        return;
+    }
+
+    var assistanceInformed = false;
+
+    if ((config.mediflat == "AAA") && ! medicator.pillsreminder)
+    {
+        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.pills"));
+
+        if ((reminded + 1) >= medicator.remindMaximum)
         {
-            var event = config.events[ inx ];
+            var name = WebAppUtility.getOwnerName();
+            var text = WebLibStrings.getTrans("events.didnotyettake.pills", name);
 
-            event.reminded = event.reminded ? event.reminded + 1 : 1;
-            event.remindeddate = new Date().toISOString();
+            WebAppAssistance.informAssistance(text);
 
-            if (event.reminded >= medicator.remindMaximum)
-            {
-                event.completed = true;
-            }
-
-            WebAppEvents.updateComingEvent(JSON.stringify(event));
-
-            console.log("reminded=" + JSON.stringify(event));
+            assistanceInformed = true;
         }
+
+        medicator.pillsreminder = true;
+    }
+
+    if ((config.mediflat == "ZZB") && ! medicator.bloodpressurereminder)
+    {
+        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodpressure"));
+
+        medicator.bloodpressurereminder = true;
+    }
+
+    if ((config.mediform == "ZZG") && ! medicator.bloodglucosereminder)
+    {
+        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodglucose"));
+
+        medicator.bloodglucosereminder = true;
+    }
+
+    if ((config.mediflat == "ZZW") && ! medicator.weightreminder)
+    {
+        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.weight"));
+
+        medicator.weightreminder = true;
+    }
+
+    //
+    // Update reminded date and count.
+    //
+
+    for (var inx in config.events)
+    {
+        var event = config.events[ inx ];
+
+        if (assistanceInformed)
+        {
+            event.alerted = 1;
+            event.alerteddate = new Date().toISOString();
+        }
+
+        event.reminded = event.reminded ? event.reminded + 1 : 1;
+        event.remindeddate = new Date().toISOString();
+
+        if ((event.reminded >= medicator.remindMaximum) && ! assistanceInformed)
+        {
+            //
+            // Complete only on non imimportant events. Alerted
+            // events will repeatedly return until user has performed
+            // required action.
+            //
+
+            event.completed = true;
+        }
+
+        WebAppEvents.updateComingEvent(JSON.stringify(event));
+
+        console.log("reminded=" + JSON.stringify(event));
     }
 }
 
 medicator.completeConfig = function(config)
 {
+    //
+    // Check if assistance was alerted. If so inform,
+    // that the medication has been taken in the meantime.
+    //
+
+    if (config.events[ 0 ].alerted)
+    {
+        var tkey = null;
+
+        if ((config.mediflat == "AAA") && ! medicator.pillsreminder)
+        {
+            tkey = "events.didnowtake.pills";
+            medicator.pillsreminder = true;
+        }
+
+        if ((config.mediflat == "ZZB") && ! medicator.bloodpressurereminder)
+        {
+            tkey = "events.didnowtake.bloodpressure";
+            medicator.bloodpressurereminder = true;
+        }
+
+        if ((config.mediform == "ZZG") && ! medicator.bloodglucosereminder)
+        {
+            tkey = "events.didnowtake.bloodglucose";
+            medicator.bloodglucosereminder = true;
+        }
+
+        if ((config.mediflat == "ZZW") && ! medicator.weightreminder)
+        {
+            tkey = "events.didnowtake.weight";
+            medicator.weightreminder = true;
+        }
+
+        if (tkey)
+        {
+            var name = WebAppUtility.getOwnerName();
+            var text = WebLibStrings.getTrans(tkey, name);
+            WebAppAssistance.informAssistance(text);
+        }
+    }
+
     //
     // Mark events as completed.
     //

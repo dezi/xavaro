@@ -18,6 +18,7 @@ public class WebAppView extends WebView
     public WebAppPrefs prefs;
     public WebAppSpeak speak;
     public WebAppEvents events;
+    public WebAppHealth health;
     public WebAppRequest request;
     public WebAppUtility utility;
     public WebAppIntercept intercept;
@@ -68,6 +69,12 @@ public class WebAppView extends WebView
         //
         // Native add ons via permissions.
         //
+
+        if (permissions.contains("health"))
+        {
+            health = new WebAppHealth();
+            addJavascriptInterface(health, "WebAppHealth");
+        }
 
         if (permissions.contains("assistance"))
         {

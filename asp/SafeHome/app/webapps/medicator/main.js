@@ -36,6 +36,42 @@ medicator.updateMedisetEvent = function(mediset)
     }
 }
 
+medicator.updateHealthData = function(mediset)
+{
+    if (! mediset.taken) return;
+
+    var record = {};
+
+    //
+    // Taken data.
+    //
+
+    if (mediset.takendate) record.dts = mediset.takendate;
+    if (mediset.takendose) record.dos = mediset.takendose;
+
+    record.med = mediset.medication;
+    record.frm = mediset.mediform;
+    record.man = true;
+
+    //
+    // Measurement data.
+    //
+
+    if (mediset.puls     ) record.pls = mediset.puls;
+    if (mediset.weight   ) record.wei = mediset.weight;
+    if (mediset.glucose  ) record.bgv = mediset.glucose;
+    if (mediset.systolic ) record.sys = mediset.systolic;
+    if (mediset.diastolic) record.dia = mediset.diastolic;
+
+    var type = "medication";
+
+    if (mediset.mediform == "ZZB") type = "bpm";
+    if (mediset.mediform == "ZZG") type = "glucose";
+    if (mediset.mediform == "ZZW") type = "scale";
+
+    WebAppHealth.addRecord(type, JSON.stringify(record));
+}
+
 medicator.onClickTaken = function(event)
 {
     var config = medicator.currentConfig
@@ -106,6 +142,7 @@ medicator.onClickTaken = function(event)
         }
         else
         {
+            medicator.updateHealthData(mediset);
             medicator.updateMedisetEvent(mediset);
         }
 
@@ -126,6 +163,8 @@ medicator.onClickTaken = function(event)
 
             ondemands[ eventkey ].taken = true;
             ondemands[ eventkey ].takendose += "";
+
+            medicator.updateHealthData(ondemands[ eventkey ]);
             medicator.updateMedisetEvent(ondemands[ eventkey ]);
         }
     }
@@ -163,6 +202,7 @@ medicator.onClickMeasured = function(event)
     if (whatSpan.systolic) config.medisets[ 0 ].systolic = whatSpan.systolic;
     if (whatSpan.diastolic) config.medisets[ 0 ].diastolic = whatSpan.diastolic;
 
+    medicator.updateHealthData(config.medisets[ 0 ]);
     medicator.updateMedisetEvent(config.medisets[ 0 ]);
 
     var formkey = config.formkey;

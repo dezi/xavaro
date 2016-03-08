@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
