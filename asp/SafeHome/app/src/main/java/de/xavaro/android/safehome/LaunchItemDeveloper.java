@@ -81,6 +81,12 @@ public class LaunchItemDeveloper extends LaunchItem
         else
         {
             icon.setImageResource(GlobalConfigs.IconResTesting);
+
+            if (directory == null)
+            {
+                directory = new LaunchGroupDeveloper(context);
+                directory.setConfig(this, Json.getArray(config, "launchitems"));
+            }
         }
     }
 
@@ -106,12 +112,6 @@ public class LaunchItemDeveloper extends LaunchItem
         }
         else
         {
-            if (directory == null)
-            {
-                directory = new LaunchGroupDeveloper(context);
-                directory.setConfig(this, Json.getArray(config, "launchitems"));
-            }
-
             ((HomeActivity) context).addViewToBackStack(directory);
         }
     }

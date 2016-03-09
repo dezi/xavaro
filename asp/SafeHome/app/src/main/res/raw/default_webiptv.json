@@ -150,13 +150,13 @@
 
       "label": "WDR Fernsehen",
       "url": "http://www.wdr.de//",
-      "icon": "http://pbs.twimg.com/profile_images/454236824987127809/zU-6n863_400x400.jpeg",
+      "icon": "http://pbs.twimg.com/profile_images/695941207625695234/gdP_FW0R_400x400.jpg",
 
       "channels": [
         {
           "label": "WDR Fernsehen",
           "default": true,
-          "icon": "http://pbs.twimg.com/profile_images/454236824987127809/zU-6n863_400x400.jpeg",
+          "icon": "http://pbs.twimg.com/profile_images/695941207625695234/gdP_FW0R_400x400.jpg",
           "videourl": "http://www.metafilegenerator.de/WDR/WDR_FS/m3u8/wdrfernsehen.m3u8"
         }
       ]
@@ -266,13 +266,13 @@
 
       "label": "SWR Fernsehen",
       "url": "http://www.swr.de//",
-      "icon": "http://pbs.twimg.com/profile_images/431393657673904128/-e76FW06_400x400.jpeg",
+      "icon": "http://pbs.twimg.com/profile_images/690218928631578624/y9xyrl_L_400x400.jpg",
 
       "channels": [
         {
           "label": "SWR Fernsehen",
           "default": true,
-          "icon": "http://pbs.twimg.com/profile_images/431393657673904128/-e76FW06_400x400.jpeg",
+          "icon": "http://pbs.twimg.com/profile_images/690218928631578624/y9xyrl_L_400x400.jpg",
           "videourl": "http://swrbw-lh.akamaihd.net/i/swrbw_live@196738/master.m3u8"
         }
       ]

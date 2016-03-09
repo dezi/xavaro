@@ -98,7 +98,6 @@ public class HomeActivity extends AppCompatActivity implements
         super.onPostCreate(savedInstanceState);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         topscreen.setOnSystemUiVisibilityChangeListener(this);
     }
 
@@ -153,6 +152,29 @@ public class HomeActivity extends AppCompatActivity implements
         DitUndDat.InternetState.subscribe(this);
 
         ArchievementManager.show("howto.open.settings");
+
+        //
+        // Check for launch intent.
+        //
+
+        Intent intent = getIntent();
+
+        if (Simple.equals(intent.getAction(), "de.xavaro.android.safehome.LAUNCHITEM"))
+        {
+            final String type = intent.getStringExtra("type");
+            final String subtype = intent.getStringExtra("subtype");
+
+            final Runnable runner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    launchGroup.activateLaunchItem(type, subtype);
+                }
+            };
+
+            handler.postDelayed(runner, 100);
+        }
     }
 
     @Override

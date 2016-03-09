@@ -196,7 +196,7 @@ public class EventManager
         }
     }
 
-    private static long nextLoadTime;
+    private static long nextLoadTime = 30 + Simple.nowAsTimeStamp() / 1000;
 
     public static void commTick()
     {

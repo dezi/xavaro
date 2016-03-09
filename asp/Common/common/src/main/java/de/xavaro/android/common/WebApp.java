@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import android.graphics.Bitmap;
@@ -134,6 +135,8 @@ public class WebApp
 
     public static void handleEventUI(String webappname, JSONArray events)
     {
+        Log.d(LOGTAG, "handleEventUI:" + webappname + "=" + events.length());
+
         WebAppView eventWebApp = null;
 
         synchronized (eventWebApps)
@@ -161,17 +164,50 @@ public class WebApp
 
     public static void handleEvent(String webappname, JSONArray events)
     {
+        Log.d(LOGTAG, "handleEvent:" + webappname + "=" + events.length());
+
+        int postdelay = 0;
+
+        if (! CommonStatic.focused)
+        {
+            Log.d(LOGTAG, "handleEvent: Application is offline");
+
+            //
+            // Create launch intent for Safehome.
+            //
+
+            try
+            {
+                Intent intent = new Intent("de.xavaro.android.safehome.LAUNCHITEM");
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("type", "webapp");
+                intent.putExtra("subtype", webappname);
+
+                Simple.getAnyContext().startActivity(intent);
+
+                postdelay = 5000;
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+
+                return;
+            }
+        }
+
         final String fwebappname = webappname;
         final JSONArray fevents = events;
 
-        Simple.makePost(new Runnable()
+        final Runnable runner = new Runnable()
         {
             @Override
             public void run()
             {
                 handleEventUI(fwebappname, fevents);
             }
-        });
+        };
+
+        Simple.makePost(runner, postdelay);
     }
 
     public static void requestUnload(String webappname, int resultcode)

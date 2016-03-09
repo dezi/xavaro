@@ -250,7 +250,6 @@ public class SettingsFragments
                         pc = new NicedPreferences.NiceCategoryPreference(context);
 
                         pc.setTitle(label);
-                        pc.setIcon(drawable);
 
                         preferences.add(pc);
 
