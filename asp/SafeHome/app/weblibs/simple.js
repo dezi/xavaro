@@ -415,7 +415,7 @@ WebLibSimple.substring = function(str, start, ende)
 
     if (ende < 0) return str.substring(start, str.length + ende);
 
-    return substring(start, ende);
+    return str.substring(start, ende);
 }
 
 

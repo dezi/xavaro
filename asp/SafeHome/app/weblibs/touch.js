@@ -31,6 +31,7 @@ WebLibTouch.onTouchStart = function(event)
 
     touch.moves = 0;
     touch.initial = true;
+    touch.target  = touchobj.target;
 
     touch.startX = touchobj.clientX;
     touch.startY = touchobj.clientY;
@@ -53,7 +54,7 @@ WebLibTouch.onTouchStart = function(event)
     if (touch.ctarget)
     {
         touch.bgcolor = touch.ctarget.style.backgroundColor;
-        touch.ctarget.style.backgroundColor = "#dddddd";
+        //touch.ctarget.style.backgroundColor = "#dddddd";
     }
 
     event.preventDefault();
@@ -162,7 +163,7 @@ WebLibTouch.onTouchEnd = function(event)
     if (touch.ctarget)
     {
         touch.ctarget.style.backgroundColor = touch.bgcolor;
-        touch.ctarget.onTouchClick(touch.ctarget);
+        touch.ctarget.onTouchClick(touch.ctarget, touch.target);
     }
 
     event.preventDefault();
