@@ -218,7 +218,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                DefaultApps.setDefaultHome(context);
+                DefaultApps.setDefaultHome(getContext());
             }
         };
 
@@ -227,7 +227,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                DefaultApps.setDefaultAssist(context);
+                DefaultApps.setDefaultAssist(getContext());
             }
         };
     }
@@ -481,7 +481,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle(sendPinPref.getTitle());
 
                 builder.setPositiveButton("Abbrechen", clickListener);
@@ -490,7 +490,7 @@ public class PreferencesBasics
 
                 dialog = builder.create();
 
-                pincode = new TextView(context);
+                pincode = new TextView(getContext());
                 pincode.setTextSize(Simple.getPreferredEditSize());
                 pincode.setPadding(40, 24, 0, 0);
                 pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
@@ -510,7 +510,7 @@ public class PreferencesBasics
             {
                 String[] actpincode = sharedPrefs.getString(recvPinPref.getKey(), "").split("-");
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle(recvPinPref.getTitle());
 
                 builder.setPositiveButton("Abbrechen", clickListener);
@@ -518,18 +518,18 @@ public class PreferencesBasics
 
                 dialog = builder.create();
 
-                LinearLayout ll = new LinearLayout(context);
+                LinearLayout ll = new LinearLayout(getContext());
                 ll.setOrientation(LinearLayout.VERTICAL);
                 ll.setPadding(40, 24, 0, 0);
 
-                LinearLayout lp = new LinearLayout(context);
+                LinearLayout lp = new LinearLayout(getContext());
                 lp.setOrientation(LinearLayout.HORIZONTAL);
                 ll.addView(lp);
 
                 InputFilter[] filters = new InputFilter[ 1 ];
                 filters[ 0 ] = new InputFilter.LengthFilter(4);
 
-                pinPart1 = new EditText(context);
+                pinPart1 = new EditText(getContext());
                 pinPart1.setMinEms(3);
                 pinPart1.setTextSize(Simple.getPreferredEditSize());
                 pinPart1.setFilters(filters);
@@ -561,12 +561,12 @@ public class PreferencesBasics
                     }
                 });
 
-                TextView sep1 = new TextView(context);
+                TextView sep1 = new TextView(getContext());
                 sep1.setTextSize(Simple.getPreferredEditSize());
                 sep1.setText(" – ");
                 lp.addView(sep1);
 
-                pinPart2 = new EditText(context);
+                pinPart2 = new EditText(getContext());
                 pinPart2.setMinEms(3);
                 pinPart2.setTextSize(Simple.getPreferredEditSize());
                 pinPart2.setFilters(filters);
@@ -598,12 +598,12 @@ public class PreferencesBasics
                     }
                 });
 
-                TextView sep2 = new TextView(context);
+                TextView sep2 = new TextView(getContext());
                 sep2.setTextSize(Simple.getPreferredEditSize());
                 sep2.setText(" – ");
                 lp.addView(sep2);
 
-                pinPart3 = new EditText(context);
+                pinPart3 = new EditText(getContext());
                 pinPart3.setMinEms(3);
                 pinPart3.setTextSize(Simple.getPreferredEditSize());
                 pinPart3.setFilters(filters);
@@ -644,7 +644,7 @@ public class PreferencesBasics
                     }
                 });
 
-                pinName = new TextView(context);
+                pinName = new TextView(getContext());
                 pinName.setPadding(0, 16, 0, 0);
                 pinName.setTextSize(Simple.getPreferredEditSize());
 
@@ -768,7 +768,7 @@ public class PreferencesBasics
             public void run()
             {
                 RemoteContacts.registerContact(remoteContact);
-                registerRemotes(context, true);
+                registerRemotes(getContext(), true);
             }
         };
 
@@ -847,7 +847,7 @@ public class PreferencesBasics
                             JSONObject requestPublicKeyXChange = new JSONObject();
 
                             requestPublicKeyXChange.put("type", "requestPublicKeyXChange");
-                            requestPublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(context));
+                            requestPublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(Simple.getAnyContext()));
                             requestPublicKeyXChange.put("idremote", remoteIdentity);
 
                             CommService.sendMessage(requestPublicKeyXChange);

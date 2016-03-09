@@ -85,7 +85,7 @@ public class LaunchItemWebFrame extends LaunchItem
             {
                 String subtype = config.getString("subtype");
 
-                directory = new LaunchGroupWebStream(context, this, "webconfig", subtype);
+                directory = new LaunchGroupWebFrame(context, this, "webconfig", subtype);
             }
         }
         catch (Exception ex)

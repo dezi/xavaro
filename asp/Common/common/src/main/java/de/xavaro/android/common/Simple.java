@@ -1,6 +1,5 @@
 package de.xavaro.android.common;
 
-import android.media.AudioManager;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -13,7 +12,7 @@ import android.content.res.Resources;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.view.SoundEffectConstants;
+import android.media.AudioManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,6 +26,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.view.SoundEffectConstants;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.os.Handler;
@@ -441,6 +441,7 @@ public class Simple
 
         return false;
     }
+
     @Nullable
     public static String readDatadirFile(String filename)
     {
@@ -506,7 +507,7 @@ public class Simple
         boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
         boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
 
-        return ! (hasBackKey && hasHomeKey);
+        return !(hasBackKey && hasHomeKey);
     }
 
     public static int getDP(int pixels)
@@ -524,11 +525,11 @@ public class Simple
     {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
-        if (! matcher.find()) return null;
+        if (!matcher.find()) return null;
 
         return matcher.group(1);
     }
-    
+
     public static String getTrans(int resid, Object... args)
     {
         //
@@ -743,7 +744,7 @@ public class Simple
     {
         if (filepath == null) return 0;
         File file = new File(filepath);
-        if (! file.exists()) return 0;
+        if (!file.exists()) return 0;
 
         return file.length();
     }
@@ -1236,7 +1237,7 @@ public class Simple
     {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
-        if (! matcher.find()) return null;
+        if (!matcher.find()) return null;
 
         return matcher.group(1);
     }
@@ -1268,7 +1269,7 @@ public class Simple
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         buffer.putInt(crc & 0xffff);
 
-        return new byte[]{buffer.array()[0], buffer.array()[1]};
+        return new byte[]{buffer.array()[ 0 ], buffer.array()[ 1 ]};
     }
 
     public static byte[] getCRC16ccittEmbed(byte[] byteArray)
@@ -1323,7 +1324,7 @@ public class Simple
 
         for (int index = 0; index < len; index++)
         {
-            reversedArray[ (len - index) - 1 ] = array[index];
+            reversedArray[ (len - index) - 1 ] = array[ index ];
         }
 
         return reversedArray;
@@ -1448,15 +1449,15 @@ public class Simple
         // I hate slash escaping.
         //
 
-        return json.replace("\\/","/");
+        return json.replace("\\/", "/");
     }
 
     //endregion JSON stuff
 
     //region Date and time
 
-    private static final String ISO8601DATENOSECS   = "yyyy-MM-dd'T'HH:mm'Z'";
-    private static final String ISO8601DATEFORMAT   = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static final String ISO8601DATENOSECS = "yyyy-MM-dd'T'HH:mm'Z'";
+    private static final String ISO8601DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String ISO8601DATEFORMATMS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     public static long nowAsTimeStamp()
@@ -1734,7 +1735,7 @@ public class Simple
 
     public static JSONArray getDirectorySortedByAge(File dir, FilenameFilter ff, boolean desc)
     {
-        if ((dir == null) || ! dir.isDirectory()) return null;
+        if ((dir == null) || !dir.isDirectory()) return null;
 
         String[] dirlist = dir.list(ff);
         if (dirlist == null) return null;
@@ -1774,7 +1775,7 @@ public class Simple
 
     public static class ImageFileFilter implements FilenameFilter
     {
-        private final String[] exts =  new String[] {".jpg", ".png", ".gif", ".jpeg"};
+        private final String[] exts = new String[]{".jpg", ".png", ".gif", ".jpeg"};
 
         public boolean accept(File dir, String name)
         {
@@ -1860,6 +1861,11 @@ public class Simple
         return result;
     }
 
+    public static boolean hasSharedPref(String key)
+    {
+        return Simple.getSharedPrefs().contains(key);
+    }
+
     public static void removeSharedPref(String key)
     {
         if (Simple.getSharedPrefs().contains(key))
@@ -1884,4 +1890,19 @@ public class Simple
     }
 
     //endregion Preference stuff
+
+    public static String getLocale()
+    {
+        return Locale.getDefault().getLanguage() + "-r" + Locale.getDefault().getCountry();
+    }
+
+    public static String getLocaleCountry()
+    {
+        return Locale.getDefault().getCountry();
+    }
+
+    public static String getLocaleLanguage()
+    {
+        return Locale.getDefault().getLanguage();
+    }
 }

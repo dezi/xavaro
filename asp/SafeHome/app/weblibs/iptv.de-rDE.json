@@ -1,0 +1,310 @@
+{
+  "www.daserste.de": {
+    "label": "Das Erste",
+    "url": "http://www.daserste.de/",
+    "icon": "http://pbs.twimg.com/profile_images/3703504586/476e31af9c092cec3dd5f5e3d120f696_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "Das Erste",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/3703504586/476e31af9c092cec3dd5f5e3d120f696_400x400.jpeg",
+        "videourl": "http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/master.m3u8"
+      }
+    ]
+  },
+
+  "www.tagesschau.de": {
+    "label": "Tagesschau",
+    "url": "http://www.tagesschau.de/",
+    "icon": "http://pbs.twimg.com/profile_images/531688614640365568/U84uXoIT_400x400.png",
+
+    "channels": [
+      {
+        "label": "Tagesschau",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/531688614640365568/U84uXoIT_400x400.png",
+        "videourl": "http://tagesschau-lh.akamaihd.net/i/tagesschau_1@119231/master.m3u8"
+      }
+    ]
+  },
+
+  "www.zdf.de": {
+    "label": "ZDF",
+    "url": "http://www.zdf.de/",
+    "icon": "http://pbs.twimg.com/profile_images/609771341718388738/TdrV1KOa_400x400.png",
+
+    "channels": [
+      {
+        "label": "ZDF",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/609771341718388738/TdrV1KOa_400x400.png",
+        "videourl": "http://zdf1314-lh.akamaihd.net/i/de14_v1@392878/master.m3u8"
+      },
+      {
+        "label": "ZDF.kultur",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/1867262018/kultur_profilbild2_400x400.jpg",
+        "videourl": "http://zdf1112-lh.akamaihd.net/i/de11_v1@392881/master.m3u8"
+      },
+      {
+        "label": "ZDF info",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/603477029095366657/LuJjvT8-_400x400.png",
+        "videourl": "http://zdf1112-lh.akamaihd.net/i/de12_v1@392882/master.m3u8"
+      },
+      {
+        "label": "ZDF_neo",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/464706383225446400/GtZ6aQYq_400x400.png",
+        "videourl": "http://zdf1314-lh.akamaihd.net/i/de13_v1@392877/master.m3u8"
+      },
+      {
+        "label": "3sat",
+        "default": true,
+        "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2306126/timg644x363blob/12550745",
+        "videourl": "http://zdf0910-lh.akamaihd.net/i/dach10_v1@392872/master.m3u8?dw=0"
+      },
+      {
+        "label": "phoenix",
+        "default": true,
+        "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2492878/timg644x363blob/12166545",
+        "videourl": "http://zdf-hds-de-f.zdf.de/i/de09_v1@87012/master.m3u8?dw=0"
+      }
+    ]
+  },
+
+  "www.hr-online.de": {
+
+    "label": "hr Fernsehen",
+    "url": "http://www.hr-online.de/",
+    "icon": "http://pbs.twimg.com/profile_images/628137082884653057/HoVaWPix_400x400.png",
+
+    "channels": [
+      {
+        "label": "hr Fernsehen",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/628137082884653057/HoVaWPix_400x400.png",
+        "videourl": "http://live1_hr-lh.akamaihd.net/i/hr_fernsehen@75910/master.m3u8"
+      }
+    ]
+  },
+
+  "www.arte.tv": {
+
+    "label": "arte",
+    "url": "http://www.arte.tv/",
+    "icon": "http://pbs.twimg.com/profile_images/666906868929929216/LVNSvBVx_400x400.png",
+
+    "channels": [
+      {
+        "label": "arte",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/666906868929929216/LVNSvBVx_400x400.png",
+        "videourl": "http://delive.artestras.cshls.lldns.net/artestras/contrib/delive.m3u8"
+      }
+    ]
+  },
+
+  "www.kika.de": {
+
+    "label": "kika",
+    "url": "http://www.kika.de/",
+    "icon": "http://www.designtagebuch.de/wp-content/uploads/mediathek/2011/12/kika-logo.jpg",
+
+    "channels": [
+      {
+        "label": "kika",
+        "default": true,
+        "icon": "http://www.designtagebuch.de/wp-content/uploads/mediathek/2011/12/kika-logo.jpg",
+        "videourl": "http://kika_geo-lh.akamaihd.net/i/livetvkika_de@75114/master.m3u8"
+      }
+    ]
+  },
+
+  "www.br.de": {
+
+    "label": "BR",
+    "url": "http://www.br.de/",
+    "icon": "http://pbs.twimg.com/profile_images/504577238432362496/E-4conTW_400x400.png",
+
+    "channels": [
+      {
+        "label": "BR",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/504577238432362496/E-4conTW_400x400.png",
+        "videourl": "http://livestreams.br.de/i/bfssued_germany@119890/master.m3u8"
+      },
+      {
+        "label": "ARD alpha",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/476743729668034560/HC_Q8-Uh_400x400.png",
+        "videourl": "http://livestreams.br.de/i/bralpha_germany@119899/master.m3u8"
+      }
+    ]
+  },
+
+  "www.wdr.de": {
+
+    "label": "WDR Fernsehen",
+    "url": "http://www.wdr.de//",
+    "icon": "http://pbs.twimg.com/profile_images/695941207625695234/gdP_FW0R_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "WDR Fernsehen",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/695941207625695234/gdP_FW0R_400x400.jpg",
+        "videourl": "http://www.metafilegenerator.de/WDR/WDR_FS/m3u8/wdrfernsehen.m3u8"
+      }
+    ]
+  },
+
+  "www.ndr.de": {
+
+    "label": "NDR",
+    "url": "http://www.ndr.de/",
+    "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "NDR Region MV",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
+        "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_hh@119223/master.m3u8"
+      },
+      {
+        "label": "NDR Region NDS",
+        "default": false,
+        "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
+        "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_nds@119224/master.m3u8"
+      },
+      {
+        "label": "NDR Region SH",
+        "default": false,
+        "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
+        "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_sh@119225/master.m3u8"
+      },
+      {
+        "label": "NDR Hamburg",
+        "default": false,
+        "icon": "http://pbs.twimg.com/profile_images/529617003351269377/KAwqofTC_400x400.jpeg",
+        "videourl": "http://ndr_fs-lh.akamaihd.net/i/ndrfs_hh@119223/master.m3u8"
+      }
+    ]
+  },
+
+  "www.mdr.de": {
+
+    "label": "MDR",
+    "url": "http://www.mdr.de/",
+    "icon": "http://pbs.twimg.com/profile_images/1815194206/twitter-icon-mdr-180_400x400.png",
+
+    "channels": [
+      {
+        "label": "MDR Sachsen-Anh.",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/2289426760/87rpk2wht21idumo1y1y_400x400.jpeg",
+        "videourl": "http://mdr_sa_hls-lh.akamaihd.net/i/livetvmdrsachsenanhalt_de@106901/master.m3u8"
+      },
+      {
+        "label": "MDR Sachsen",
+        "default": false,
+        "icon": "http://pbs.twimg.com/profile_images/378800000138150931/d92409ca2af26ec19aed923504bd3a01_400x400.jpeg",
+        "videourl": "http://mdr_sachsen_hls-lh.akamaihd.net/i/livetvmdrsachsen_de@106902/master.m3u8"
+      },
+      {
+        "label": "MDR Thüringen",
+        "default": false,
+        "icon": "http://pbs.twimg.com/profile_images/3383550528/b224302de066b7d89803ff44913103dd_400x400.jpeg",
+        "videourl": "http://mdr_th_hls-lh.akamaihd.net/i/livetvmdrthueringen_de@106903/master.m3u8"
+      }
+    ]
+  },
+
+  "www.rbb-online.de": {
+
+    "label": "rbb Fernsehen",
+    "url": "http://www.rbb-online.de/",
+    "icon": "http://pbs.twimg.com/profile_images/461089900394082304/oZnbRxRt_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "rbb Berlin",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/461089900394082304/oZnbRxRt_400x400.jpeg",
+        "videourl": "http://rbb_live-lh.akamaihd.net/i/rbb_berlin@108248/master.m3u8"
+      },
+      {
+        "label": "rbb Brandenburg",
+        "default": false,
+        "icon": "http://pbs.twimg.com/profile_images/461089900394082304/oZnbRxRt_400x400.jpeg",
+        "videourl": "http://rbb_live-lh.akamaihd.net/i/rbb_brandenburg@107638/master.m3u8"
+      }
+    ]
+  },
+
+  "www.sr.de": {
+
+    "label": "SR Fernsehen",
+    "url": "http://www.sr.de/",
+    "icon": "http://pbs.twimg.com/profile_images/460794791693778944/T8dr5hFO_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "SR Fernsehen",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/460794791693778944/T8dr5hFO_400x400.jpeg",
+        "videourl": "http://livestream.sr-online.de/live.m3u8"
+      }
+    ]
+  },
+
+  "www.swr.de": {
+
+    "label": "SWR Fernsehen",
+    "url": "http://www.swr.de//",
+    "icon": "http://pbs.twimg.com/profile_images/690218928631578624/y9xyrl_L_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "SWR Fernsehen",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/690218928631578624/y9xyrl_L_400x400.jpg",
+        "videourl": "http://swrbw-lh.akamaihd.net/i/swrbw_live@196738/master.m3u8"
+      }
+    ]
+  },
+
+  "www.n24.de": {
+
+    "label": "N24",
+    "url": "http://www.n24.de/",
+    "icon": "http://pbs.twimg.com/profile_images/2455474765/oo5ltd4p48q2xo3svj04_400x400.png",
+
+    "channels": [
+      {
+        "label": "N24",
+        "default": true,
+        "icon": "http://pbs.twimg.com/profile_images/2455474765/oo5ltd4p48q2xo3svj04_400x400.png",
+        "videourl": "http://n24-live.hls.adaptive.level3.net/hls-live/n24-pssimn24live/_definst_/live.m3u8"
+      }
+    ]
+  },
+
+  "www.alex-berlin.de": {
+
+    "label": "ALEX Berlin",
+    "url": "http://www.alex-berlin.de/",
+    "icon": "http://pbs.twimg.com/profile_images/479636878870589440/l2dGkfZb_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "ALEX Berlin",
+        "default": false,
+        "icon": "http://pbs.twimg.com/profile_images/479636878870589440/l2dGkfZb_400x400.jpeg",
+        "videourl": "http://alex-stream.rosebud-media.de:80/live/alexlivetv.smil/playlist.m3u8"
+      }
+    ]
+  }
+}

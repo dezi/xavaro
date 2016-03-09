@@ -96,17 +96,11 @@ public class Json
 
     public static boolean equals(JSONObject j1, String k1, String val)
     {
+        if ((k1 == null) && (val == null)) return true;
+
         String s1 = getString(j1, k1);
 
-        return ((s1 != null) && s1.equals(val));
-    }
-
-    public static boolean equals(JSONObject j1, String k1, JSONObject j2, String k2)
-    {
-        String s1 = getString(j1, k1);
-        String s2 = getString(j2, k2);
-
-        return ((s1 != null) && (s2 != null) && s1.equals(s2));
+        return ((s1 == null) && (val == null)) || ((s1 != null) && s1.equals(val));
     }
 
     public static boolean equals(JSONObject j1, String k1, JSONObject j2)
@@ -361,7 +355,7 @@ public class Json
         final String sort = field;
         final boolean desc = descending;
 
-        class compare implements Comparator<JSONObject>
+        class comparedat implements Comparator<JSONObject>
         {
             public int compare(JSONObject a, JSONObject b)
             {
@@ -372,12 +366,12 @@ public class Json
             }
         }
 
-        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+        List<JSONObject> jsonValues = new ArrayList<>();
 
         for (int inx = 0; inx < array.length(); inx++)
             jsonValues.add(getObject(array, inx));
 
-        Collections.sort(jsonValues, new compare());
+        Collections.sort(jsonValues, new comparedat());
 
         return new JSONArray(jsonValues);
     }
@@ -387,7 +381,7 @@ public class Json
         final String sort = field;
         final boolean desc = descending;
 
-        class compare implements Comparator<JSONObject>
+        class comparedat implements Comparator<JSONObject>
         {
             public int compare(JSONObject a, JSONObject b)
             {
@@ -398,12 +392,12 @@ public class Json
             }
         }
 
-        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+        List<JSONObject> jsonValues = new ArrayList<>();
 
         for (int inx = 0; inx < array.length(); inx++)
             jsonValues.add(getObject(array, inx));
 
-        Collections.sort(jsonValues, new compare());
+        Collections.sort(jsonValues, new comparedat());
 
         return new JSONArray(jsonValues);
     }

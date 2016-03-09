@@ -1,17 +1,13 @@
 package de.xavaro.android.common;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.support.annotation.Nullable;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -100,7 +96,9 @@ public class WebApp
     @Nullable
     private static Drawable getImage(String webappname, String src)
     {
-        int interval = Simple.getSharedPrefBoolean("developer.webapps.httpbypass") ? 0 : 24;
+        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
+        int interval =  Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
         if (wcr.content != null)
@@ -113,15 +111,17 @@ public class WebApp
     }
 
     @Nullable
-    public static String getStringContent(String webappname, String src)
+    private static String getStringContent(String webappname, String src)
     {
-        int interval = Simple.getSharedPrefBoolean("developer.webapps.httpbypass") ? 0 : 24;
+        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
+        int interval =  Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
         return (wcr.content == null) ? null : new String(wcr.content);
     }
 
-    public static boolean hasEvents(String webappname)
+    private static boolean hasEvents(String webappname)
     {
         return Json.getBoolean(getManifest(webappname), "events");
     }
@@ -133,11 +133,17 @@ public class WebApp
 
     private static final Map<String, WebAppView> eventWebApps = new HashMap<>();
 
-    public static void handleEventUI(String webappname, JSONArray events)
+    private static void handleEventUI(String webappname, JSONArray events)
     {
         Log.d(LOGTAG, "handleEventUI:" + webappname + "=" + events.length());
 
-        WebAppView eventWebApp = null;
+        if (! hasEvents(webappname))
+        {
+            OopsService.log(LOGTAG, "handleEventUI: no event.js:" + webappname);
+            return;
+        }
+
+        WebAppView eventWebApp;
 
         synchronized (eventWebApps)
         {
@@ -214,7 +220,7 @@ public class WebApp
     {
         synchronized (eventWebApps)
         {
-            Log.d(LOGTAG, "requestUnload: request event webapp unload:" + webappname);
+            Log.d(LOGTAG, "requestUnload:" + webappname + "=" + resultcode);
 
             if (eventWebApps.containsKey(webappname))
             {

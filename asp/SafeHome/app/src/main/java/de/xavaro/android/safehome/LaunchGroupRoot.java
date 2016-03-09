@@ -76,6 +76,9 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchGroupComm.WhatsappGroup.getConfig());
         configs.add(LaunchGroupComm.XavaroGroup.getConfig());
 
+        configs.add(LaunchGroupWebStream.getConfig("iptv"));
+        configs.add(LaunchGroupWebStream.getConfig("iprd"));
+
         configs.add(LaunchGroupWebApps.getConfig());
 
         configs.add(LaunchGroupMediaImage.getConfig());
@@ -90,6 +93,8 @@ public class LaunchGroupRoot extends LaunchGroup
 
         for (JSONArray config : configs)
         {
+            if (config == null) continue;
+
             for (int inx = 0; inx < config.length(); inx++)
             {
                 JSONObject launchitem = Json.getObject(config, inx);

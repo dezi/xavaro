@@ -31,25 +31,28 @@ public class LaunchItemWebStream extends LaunchItem implements ProxyPlayer.Callb
     @Override
     protected void setConfig()
     {
-        if (Simple.equals(type, "ipradio"))
+        if (subtype == null)
         {
-            icon.setImageResource(GlobalConfigs.IconResIPRadio);
-        }
+            if (Simple.equals(type, "iprd"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResIPRadio);
+            }
 
-        if (Simple.equals(type, "iptelevision"))
-        {
-            icon.setImageResource(GlobalConfigs.IconResIPTelevision);
+            if (Simple.equals(type, "iptv"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResIPTelevision);
+            }
         }
     }
 
     @Override
     protected void onMyClick()
     {
-        if (type.equals("ipradio"      )) launchIPRadio();
-        if (type.equals("iptelevision" )) launchIPTelevision();
+        if (type.equals("iprd")) launchIPRadio();
+        if (type.equals("iptv")) launchIPTelevision();
 
-        if (type.equals("audioplayer"  )) launchAudioPlayer();
-        if (type.equals("videoplayer"  )) launchVideoPlayer();
+        if (type.equals("audioplayer")) launchAudioPlayer();
+        if (type.equals("videoplayer")) launchVideoPlayer();
     }
 
     @Override
@@ -72,13 +75,23 @@ public class LaunchItemWebStream extends LaunchItem implements ProxyPlayer.Callb
 
     private void launchIPTelevision()
     {
-        if (directory == null) directory = new LaunchGroupWebStream(context, this, "webiptv");
+        if (directory == null)
+        {
+            directory = new LaunchGroupWebStream(context, this);
+            directory.setConfig(this, Json.getArray(config, "launchitems"));
+        }
+
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
     private void launchIPRadio()
     {
-        if (directory == null) directory = new LaunchGroupWebStream(context, this, "webradio");
+        if (directory == null)
+        {
+            directory = new LaunchGroupWebStream(context, this);
+            directory.setConfig(this, Json.getArray(config, "launchitems"));
+        }
+
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
