@@ -95,7 +95,7 @@ medicator.getNextEvents = function()
             continue;
         }
 
-        action = action || medicator.remindConfig(config);
+        if (medicator.remindConfig(config)) action = true;
     }
 
     if (action) WebAppSpeak.vibrate();
