@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
@@ -40,16 +39,12 @@ public class WebGuard extends WebViewClient
     //region Internal variables.
 
     private final static String LOGTAG = "WebGuard";
-
-    private Context context;
-
-    private Uri currentUri;
-    private String currentUrl;
-
-    private JSONObject config;
-
     private final ArrayList<String> subdomains = new ArrayList<>();
 
+    private Context context;
+    private Uri currentUri;
+    private String currentUrl;
+    private JSONObject config;
     private boolean wasBackAction;
 
     //endregion

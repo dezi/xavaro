@@ -2,27 +2,19 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.FrameLayout;
+import android.util.AttributeSet;
+import android.util.Log;
 
 import org.json.JSONObject;
-
-//
-// User agent: Mozilla/5.0 (Linux; Android 5.0.2; SM-T555 Build/LRX22G; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/46.0.2490.76 Safari/537.36
-//
 
 public class LaunchFrameWebFrame extends LaunchFrame
 {
     private static final String LOGTAG = LaunchFrameWebFrame.class.getSimpleName();
 
-    private JSONObject config;
     private WebView webview;
     private WebGuard webguard;
-
-    //region Region: Constructor logic.
 
     public LaunchFrameWebFrame(Context context)
     {
@@ -50,12 +42,6 @@ public class LaunchFrameWebFrame extends LaunchFrame
     {
         setBackgroundColor(0xffffffee);
 
-        FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT);
-
-        setLayoutParams(layout);
-
         webguard = new WebGuard();
         webguard.setContext(context);
 
@@ -75,27 +61,12 @@ public class LaunchFrameWebFrame extends LaunchFrame
         addView(webview);
     }
 
-    //endregion
-
     public void setLoadURL(JSONObject config, String website, String url)
     {
         webguard.setCurrent(config, url, website);
         webguard.setFeatures(webview);
 
         webview.loadUrl(url);
-    }
-
-    @Override
-    public void onBackKeyExecuted()
-    {
-        Log.d(LOGTAG, "onBackKeyExecuted");
-
-        //
-        // Bubble event up to launchitem
-        // to get deallocated.
-        //
-
-        this.parent.onBackKeyExecuted();
     }
 
     public boolean doBackPressed()
