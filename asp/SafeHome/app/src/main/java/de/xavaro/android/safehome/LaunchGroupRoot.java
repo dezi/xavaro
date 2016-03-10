@@ -79,6 +79,12 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchGroupWebStream.getConfig("iptv"));
         configs.add(LaunchGroupWebStream.getConfig("iprd"));
 
+        configs.add(LaunchGroupWebFrame.getConfig("ioc", "newspaper"));
+        configs.add(LaunchGroupWebFrame.getConfig("ioc", "pictorial"));
+        configs.add(LaunchGroupWebFrame.getConfig("ioc", "magazine"));
+        configs.add(LaunchGroupWebFrame.getConfig("ioc", "shopping"));
+        configs.add(LaunchGroupWebFrame.getConfig("ioc", "erotics"));
+
         configs.add(LaunchGroupWebApps.getConfig());
 
         configs.add(LaunchGroupMediaImage.getConfig());

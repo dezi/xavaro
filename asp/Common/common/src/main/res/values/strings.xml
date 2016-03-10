@@ -16,6 +16,36 @@
         <item>Folder</item>
     </string-array>
 
+    <string-array name="pref_ioc_where_keys">
+        <item>inact</item>
+        <item>home</item>
+        <item>folder</item>
+        <item>inetdir</item>
+    </string-array>
+
+    <string-array name="pref_ioc_where_vals">
+        <item>None</item>
+        <item>Home</item>
+        <item>Folder</item>
+        <item>Internet</item>
+    </string-array>
+
+    <string-array name="pref_ioc_subtype_keys">
+        <item>newspaper</item>
+        <item>magazine</item>
+        <item>pictorial</item>
+        <item>shopping</item>
+        <item>erotics</item>
+    </string-array>
+
+    <string-array name="pref_ioc_subtype_vals">
+        <item>Newspaper</item>
+        <item>Magazine</item>
+        <item>Pictorial</item>
+        <item>Shopping</item>
+        <item>Erotics</item>
+    </string-array>
+
     <string-array name="pref_health_where_keys">
         <item>home</item>
         <item>folder</item>

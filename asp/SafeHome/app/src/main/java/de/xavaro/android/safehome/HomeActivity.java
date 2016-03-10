@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 
@@ -312,14 +311,14 @@ public class HomeActivity extends AppCompatActivity implements
         {
             Object lastview = backStack.get(backStack.size() - 1);
 
-            if (lastview instanceof WebFrame)
+            if (lastview instanceof LaunchFrameWebFrame)
             {
                 //
                 // Give web browser option to do
                 // internal back press.
                 //
 
-                if (((WebFrame) lastview).doBackPressed())
+                if (((LaunchFrameWebFrame) lastview).doBackPressed())
                 {
                     topscreen.removeView((FrameLayout) lastview);
                     backStack.remove(backStack.size() - 1);

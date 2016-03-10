@@ -10,6 +10,19 @@ public class WebLib
     private static final String LOGTAG = WebLib.class.getSimpleName();
 
     @Nullable
+    public static JSONObject getConfig(String weblib)
+    {
+        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
+        int interval = Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+
+        String src = WebApp.getHTTPLibRoot() + weblib + ".json";
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);
+        if (wcr.content == null) return null;
+
+        return Json.fromStringObject(new String(wcr.content));
+    }
+
+    @Nullable
     public static JSONObject getLocaleConfig(String weblib)
     {
         String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();

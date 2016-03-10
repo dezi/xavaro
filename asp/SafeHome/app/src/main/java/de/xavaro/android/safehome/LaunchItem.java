@@ -64,6 +64,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
         if (Simple.equals(type, "webframe"    )) item = new LaunchItemWebFrame(context);
         if (Simple.equals(type, "webconfig"   )) item = new LaunchItemWebFrame(context);
 
+        if (Simple.equals(type, "ioc"         )) item = new LaunchItemWebFrame(context);
         if (Simple.equals(type, "iptv"        )) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "iprd"        )) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "audioplayer" )) item = new LaunchItemWebStream(context);

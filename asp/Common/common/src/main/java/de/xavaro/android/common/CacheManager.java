@@ -74,7 +74,8 @@ public class CacheManager
 
         if (! file.exists())
         {
-            Log.d(LOGTAG,"cacheThumbnail: fetch " + filename);
+            Log.d(LOGTAG,"cacheThumbnail: fetch " + file.toString());
+            Log.d(LOGTAG,"cacheThumbnail:   url " + src);
 
             try
             {

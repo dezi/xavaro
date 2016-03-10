@@ -73,7 +73,6 @@ tvscrape.onClickTitle = function(event)
         sender = sender.replace("Nord", " ");
 
         sender = sender.replace("Das Erste", "DasErste");
-
         sender = sender.replace("Sat. 1", "Sat1");
         sender = sender.replace("Pro Sieben", "Pro7");
         sender = sender.replace("Kabel Eins", "Kabel1");

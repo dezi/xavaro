@@ -8,6 +8,21 @@
         <item>Ordner</item>
     </string-array>
 
+    <string-array name="pref_ioc_where_vals">
+        <item>Inaktiv</item>
+        <item>Home</item>
+        <item>Ordner</item>
+        <item>Internet</item>
+    </string-array>
+
+    <string-array name="pref_ioc_subtype_vals">
+        <item>Zeitungen</item>
+        <item>Magazine</item>
+        <item>Illustrierte</item>
+        <item>Shopping</item>
+        <item>Erotisches</item>
+    </string-array>
+
     <string-array name="pref_alertgroup_vals">
         <item>Inaktiv</item>
         <item>Eingeladen</item>
