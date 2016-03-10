@@ -161,23 +161,93 @@ tvguide.createFrameSetup = function()
     tvguide.senderbar.style.overflow = "hidden";
 
     WebLibSimple.setBGColor(tvguide.senderbar, tvguide.constants.senderbarColor);
+}
+
+tvguide.createDescriptionSetup = function()
+{
+    tvguide.description = {};
 
     //
-    // tvguide.description
+    // tvguide.description.topdiv
     //
 
-    tvguide.description = WebLibSimple.createDivWidth(
+    tvguide.description.topdiv = WebLibSimple.createDivWidth(
         "100%",
         0,
         "50%",
         0,
-        "description",
+        "description.topdiv",
         tvguide.content1
     );
 
-    tvguide.description.style.zIndex = "3";
+    tvguide.description.topdiv.style.zIndex = "3";
+    tvguide.description.position = 100;
 
-    WebLibSimple.setBGColor(tvguide.description, tvguide.constants.descriptionColor);
+    WebLibSimple.setBGColor(tvguide.description.topdiv, tvguide.constants.descriptionColor);
+
+    //
+    // tvguide.description.titlebar
+    //
+
+    tvguide.description.titlebar = WebLibSimple.createDivHeight(
+        0,
+        0,
+        0,
+        40,
+        "description.titlebar",
+        tvguide.description.topdiv
+    );
+
+    WebLibSimple.setBGColor(tvguide.description.titlebar, "#000000");
+
+    tvguide.description.title = WebLibSimple.createDiv(
+        40,
+        40 / 4,
+        40,
+        0,
+        "description.title",
+        tvguide.description.titlebar
+    );
+
+    tvguide.description.title.style.textAlign = "center";
+    tvguide.description.title.innerHTML       = tvguide.constants.title;
+
+    WebLibSimple.setFontSpecs(tvguide.description.title, 20, "bold", "#ffffff");
+
+    //
+    // tvguide.description.content
+    //
+
+    tvguide.description.content = WebLibSimple.createDiv(
+        0,
+        40,
+        0,
+        0,
+        "description.content",
+        tvguide.description.topdiv
+    );
+
+    WebLibSimple.setBGColor(tvguide.description.content, "#ffffff");
+    WebLibSimple.setFontSpecs(tvguide.description.content, 20, "bold", "#000000");
+
+    //
+    // tvguide.description.margin
+    //
+
+/*
+    tvguide.description.tmp = WebLibSimple.createDiv(
+        0,
+        0,
+        0,
+        0,
+        "description.margin",
+        tvguide.description.content
+    );
+
+    tvguide.description.tmp.margin = "30px";
+
+    WebLibSimple.setBGColor(tvguide.description.tmp, "#ff00ff");
+*/
 }
 
 tvguide.getSenderList = function()
@@ -352,15 +422,41 @@ tvguide.createEpgProgram = function(channel, epgdata)
 
 tvguide.animateInfoIn = function()
 {
-    var actpos = tvguide.description.style.left;
+    var actpos = tvguide.description.topdiv.style.left;
     actpos = parseInt(WebLibSimple.substring(actpos, 0, -1));
+    tvguide.description.position = actpos;
 
     if (actpos > 50)
     {
         actpos = actpos - 1;
-        tvguide.description.style.left = actpos + "%";
+        tvguide.description.topdiv.style.left = actpos + "%";
 
+        tvguide.animateInfoRunning = true;
         tvguide.animateInfo = setTimeout(tvguide.animateInfoIn, 5);
+    }
+    else
+    {
+        tvguide.animateInfoRunning = false;
+    }
+}
+
+tvguide.animateInfoOut = function()
+{
+    var actpos = tvguide.description.topdiv.style.left;
+    actpos = parseInt(WebLibSimple.substring(actpos, 0, -1));
+    tvguide.description.position = actpos;
+
+    if (actpos < 100)
+    {
+        actpos = actpos + 1;
+        tvguide.description.topdiv.style.left = actpos + "%";
+
+        tvguide.animateInfoRunning = true;
+        tvguide.animateInfo = setTimeout(tvguide.animateInfoOut, 5);
+    }
+    else
+    {
+        tvguide.animateInfoRunning = false;
     }
 }
 
@@ -368,12 +464,31 @@ tvguide.onEPGTouchClick = function(target, element)
 {
     console.log("tvguide.onEPGTouchClick: element " + element.epg.title);
 
-    WebLibSimple.setBGColor(element, "#747474");
+    // WebLibSimple.setBGColor(element, "#747474");
 
-    var tmp = WebLibSimple.createAnyAppend("h2", tvguide.description);
-    tmp.textContent = element.epg.start + " : " + element.epg.stop;
+    tvguide.description.title.innerHTML = element.epg.title;
+    tvguide.description.content.innerHTML = element.epg.description;
+//    tvguide.description.tmp2.innerHTML = element.epg.description;
 
-//    tvguide.animateInfoIn();
+    if (tvguide.animateInfoRunning)
+    {
+        console.log("=========> STOP");
+
+        clearTimeout(tvguide.animateInfo);
+        tvguide.animateInfoRunning = false;
+    }
+    else
+    {
+        if (! tvguide.animateInfoRunning && tvguide.description.position <= 100)
+        {
+            tvguide.animateInfoIn();
+        }
+
+        if (! tvguide.animateInfoRunning && tvguide.description.position >= 50)
+        {
+            tvguide.animateInfoOut();
+        }
+    }
 }
 
 tvguide.createEpgBodyScroll = function()
@@ -531,6 +646,12 @@ tvguide.main = function()
     //
 
     tvguide.createFrameSetup();
+
+    //
+    // Description view
+    //
+
+    tvguide.createDescriptionSetup();
 
     //
     // sender list
