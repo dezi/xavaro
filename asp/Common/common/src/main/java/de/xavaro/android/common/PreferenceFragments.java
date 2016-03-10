@@ -30,6 +30,8 @@ public class PreferenceFragments
     {
         protected String type;
         protected String subtype;
+        protected int resIdKeys = R.array.pref_where_keys;
+        protected int resIdVals = R.array.pref_where_vals;
 
         @Override
         protected void registerAll(Context context)
@@ -40,7 +42,7 @@ public class PreferenceFragments
             if (config == null) return;
 
             NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceScorePreference cb;
+            NicedPreferences.NiceListPreference lp;
 
             Iterator<String> keysIterator = config.keys();
 
@@ -103,6 +105,7 @@ public class PreferenceFragments
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
                     pc.setTitle(label);
+                    pc.setEnabled(enabled);
                     preferences.add(pc);
 
                     for (int inx = 0; inx < channels.length(); inx++)
@@ -117,21 +120,26 @@ public class PreferenceFragments
                         Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl);
                         BitmapDrawable drawable = new BitmapDrawable(context.getResources(), thumbnail);
 
-                        cb = new NicedPreferences.NiceScorePreference(context);
+                        lp = new NicedPreferences.NiceListPreference(context);
 
                         String key = keyprefix + ".channel:" + website + ":" + label;
 
-                        cb.setKey(key);
-                        cb.setTitle(label);
-                        cb.setIcon(drawable);
-                        cb.setSummary(summary);
-                        cb.setEnabled(enabled);
+                        lp.setKey(key);
+                        lp.setTitle(label);
+                        lp.setIcon(drawable);
+                        lp.setSummary(summary);
+                        lp.setEntries(resIdVals);
+                        lp.setEntryValues(resIdKeys);
+                        lp.setEnabled(enabled);
 
-                        preferences.add(cb);
-                        activekeys.add(cb.getKey());
+                        preferences.add(lp);
+                        activekeys.add(lp.getKey());
 
-                        boolean def = channel.has("default") && Json.getBoolean(channel, "default");
-                        if (! Simple.hasSharedPref(key)) Simple.setSharedPrefBoolean(key, def);
+                        if (! Simple.hasSharedPref(key))
+                        {
+                            boolean def = Json.getBoolean(channel, "default");
+                            Simple.setSharedPrefString(key, def ? "folder" : "inact");
+                        }
                     }
                 }
             }
@@ -195,11 +203,7 @@ public class PreferenceFragments
             for (Preference pref : preferences)
             {
                 if (pref == enabler) continue;
-
-                if (pref instanceof NicedPreferences.NiceCheckboxPreference)
-                {
-                    pref.setEnabled((boolean) obj);
-                }
+                pref.setEnabled((boolean) obj);
             }
 
             return true;

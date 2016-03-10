@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -489,6 +490,10 @@ public class Simple
         return false;
     }
 
+    //endregion All purpose simple methods
+
+    //region Haptic feedback
+
     public static void makeClick()
     {
         if (appContext != null)
@@ -498,7 +503,35 @@ public class Simple
         }
     }
 
-    //endregion All purpose simple methods
+    public static void makeVibration()
+    {
+        if (anyContext != null)
+        {
+            long pattern[] = {0, 200, 100, 300, 400};
+
+            Vibrator vibrator = (Vibrator) anyContext.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(pattern, -1);
+        }
+    }
+
+    public static void unmuteSpeech()
+    {
+        if (anyContext != null)
+        {
+            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+
+            int maxvol = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            int curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+            while (curvol < (maxvol / 2))
+            {
+                am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+                curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            }
+        }
+    }
+
+    //endregion Haptic feedback
 
     //region All purpose simple getters
 
@@ -1810,24 +1843,52 @@ public class Simple
 
     public static int getSharedPrefInt(String key)
     {
-        return getSharedPrefs().getInt(key, 0);
+        try
+        {
+            return getSharedPrefs().getInt(key, 0);
+        }
+        catch (Exception ex)
+        {
+            return 0;
+        }
     }
 
     public static boolean getSharedPrefBoolean(String key)
     {
-        return getSharedPrefs().getBoolean(key, false);
+        try
+        {
+            return getSharedPrefs().getBoolean(key, false);
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
 
     @Nullable
     public static String getSharedPrefString(String key)
     {
-        return getSharedPrefs().getString(key, null);
+        try
+        {
+            return getSharedPrefs().getString(key, null);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     @Nullable
     public static Set<String> getSharedPrefStringSet(String key)
     {
-        return getSharedPrefs().getStringSet(key, null);
+        try
+        {
+            return getSharedPrefs().getStringSet(key, null);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     public static void setSharedPrefString(String key, String value)

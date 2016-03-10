@@ -799,6 +799,13 @@ public class NicedPreferences
             this.entries = intern;
         }
 
+        public void setEntries(int resid)
+        {
+            String[] entries = Simple.getTransArray(resid);
+            super.setEntries(entries);
+            this.entries = entries;
+        }
+
         @Override
         public void setEntryValues(CharSequence[] values)
         {
@@ -830,6 +837,13 @@ public class NicedPreferences
 
             super.setEntryValues(intern);
             this.values = intern;
+        }
+
+        public void setEntryValues(int resid)
+        {
+            String[] entries = Simple.getTransArray(resid);
+            super.setEntryValues(entries);
+            this.values = entries;
         }
 
         @Override

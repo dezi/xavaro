@@ -1,7 +1,8 @@
 package de.xavaro.android.common;
 
-import android.util.Log;
 import android.webkit.JavascriptInterface;
+
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -9,6 +10,14 @@ import org.json.JSONObject;
 public class WebAppAssistance
 {
     private static final String LOGTAG = WebAppAssistance.class.getSimpleName();
+
+    @JavascriptInterface
+    public boolean hasAssistance()
+    {
+        if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return false;
+        String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
+        return (groupIdentity != null);
+    }
 
     @JavascriptInterface
     public void informAssistance(String text)

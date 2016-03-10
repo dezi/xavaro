@@ -63,9 +63,10 @@ public class LaunchGroupWebStream extends LaunchGroup
 
                 String key = type + ".channel:" + website + ":" + label;
 
-                if (! Simple.getSharedPrefBoolean(key)) continue;
+                String mode = Simple.getSharedPrefString(key);
 
-                adir.put(channel);
+                if (Simple.equals(mode, "home")) home.put(channel);
+                if (Simple.equals(mode, "folder")) adir.put(channel);
             }
         }
 
@@ -74,7 +75,7 @@ public class LaunchGroupWebStream extends LaunchGroup
             JSONObject entry = new JSONObject();
 
             Json.put(entry, "type", type);
-            Json.put(entry, "label", type);
+            Json.put(entry, "label", type.equals("iptv") ? "Fernsehen" : "Radio");
             Json.put(entry, "order", 1050);
 
             Json.put(entry, "launchitems", adir);
