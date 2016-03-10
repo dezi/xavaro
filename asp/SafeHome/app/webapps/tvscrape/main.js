@@ -61,7 +61,32 @@ tvscrape.onClickTitle = function(event)
     }
     else
     {
-        tvscrape.info.search += " " + tvscrape.info.sender;
+        var sender = tvscrape.info.sender;
+
+        sender = sender.replace("Fernsehen", " ");
+        sender = sender.replace("Hamburg", " ");
+        sender = sender.replace("Sachsen-Anhalt", " ");
+        sender = sender.replace("Köln", " ");
+        sender = sender.replace("Berlin", " ");
+        sender = sender.replace("Brandenburg", " ");
+        sender = sender.replace("Bayerisches", "BR");
+        sender = sender.replace("Nord", " ");
+
+        sender = sender.replace("Das Erste", "DasErste");
+
+        sender = sender.replace("Sat. 1", "Sat1");
+        sender = sender.replace("Pro Sieben", "Pro7");
+        sender = sender.replace("Kabel Eins", "Kabel1");
+        sender = sender.replace("RTL 2", "RTL2");
+        sender = sender.replace("Eins Plus", "EinsPlus");
+        sender = sender.replace("ZDF info", "ZDFinfo");
+        sender = sender.replace("ZDF Kultur", "ZDFKultur");
+        sender = sender.replace("ZDF neo", "ZDFneo");
+
+        sender = sender.replace("  ", " ");
+        sender = sender.replace("  ", " ");
+
+        tvscrape.info.search += " " + sender;
         tvscrape.info.issender = true;
     }
 
