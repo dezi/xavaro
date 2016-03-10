@@ -15,7 +15,8 @@
 
     "weblibs": [
       "simple",
-      "touch"
+      "touch",
+      "strings"
     ],
 
     "preload": [
