@@ -441,40 +441,6 @@
           ]
         }
       }
-    },
-
-    "www.xvideos.com": {
-      "url": "http://www.xvideos.com/",
-      "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
-      "label": "Xvideos",
-      "subtype": "erotics",
-      "enabled": false,
-
-      "webguard": {
-        "mingle": {
-          "replace": [
-
-          ]
-        }
-      }
-    },
-
-    "m.xnxx.com": {
-      "url": "http://m.xnxx.com/",
-      "icon": "http://pbs.twimg.com/profile_images/464827677543645185/KPUHcUMO_400x400.jpeg",
-      "label": "XNXX.COM",
-      "subtype": "erotics",
-      "enabled": false,
-
-      "webguard": {
-        "mingle": {
-          "replace": [
-            { "regex": "(?s)\\<topnav\\>.*?\\<\\/topnav\\>", "replace": "<br/><br/><br/><br/><br/><br/>" },
-            { "regex": "(?s)\\<topadblock\\>.*?\\<\\/topadblock\\>", "replace": "" },
-            { "regex": "(?s)\\<bottomadblock\\>.*?\\<\\/bottomadblock\\>", "replace": "" }
-          ]
-        }
-      }
     }
   }
 }

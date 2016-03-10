@@ -7,7 +7,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,8 +29,8 @@ public class PreferenceFragments
     {
         protected String type;
         protected String subtype;
-        protected int resIdKeys = R.array.pref_where_keys;
-        protected int resIdVals = R.array.pref_where_vals;
+        protected int residKeys = R.array.pref_where_keys;
+        protected int residVals = R.array.pref_where_vals;
 
         @Override
         protected void registerAll(Context context)
@@ -58,7 +57,7 @@ public class PreferenceFragments
                     continue;
                 }
 
-                if (!Json.equals(webitem, "subtype", subtype))
+                if (! Json.equals(webitem, "subtype", subtype))
                 {
                     continue;
                 }
@@ -68,35 +67,32 @@ public class PreferenceFragments
 
                 if (! webitem.has("channels"))
                 {
-                    /*
-                    key = keyprefix + (isApps ? ".apk." : ".website.") + website;
+                    String iconurl = Json.getString(webitem, "icon");
+                    if (iconurl == null) continue;
 
-                    cb = new NicedPreferences.NiceScorePreference(context);
+                    Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl);
+                    BitmapDrawable drawable = new BitmapDrawable(context.getResources(), thumbnail);
 
-                    cb.setKey(key);
-                    cb.setTitle(label);
-                    cb.setEnabled(enabled);
-                    cb.setScore(score);
-                    cb.setAPKName(apkname);
+                    String key = keyprefix + ".website:" + website;
 
-                    if (iconres != 0) cb.setIcon(iconres);
-                    if (drawable != null) cb.setIcon(drawable);
-                    if (summary != null) cb.setSummary(summary);
+                    lp = new NicedPreferences.NiceListPreference(context);
 
-                    preferences.add(cb);
-                    activekeys.add(cb.getKey());
+                    lp.setKey(key);
+                    lp.setTitle(label);
+                    lp.setIcon(drawable);
+                    lp.setSummary(summary);
+                    lp.setEntries(residVals);
+                    lp.setEntryValues(residKeys);
+                    lp.setEnabled(enabled);
 
-                    boolean def = webitem.has("default") && webitem.getBoolean("default");
+                    preferences.add(lp);
+                    activekeys.add(lp.getKey());
 
-                    if (def && ! sharedPrefs.contains(key))
+                    if (! Simple.hasSharedPref(key))
                     {
-                        //
-                        // Initially commit shared preference.
-                        //
-
-                        sharedPrefs.edit().putBoolean(key, true).apply();
+                        boolean def = Json.getBoolean(webitem, "default");
+                        Simple.setSharedPrefString(key, def ? "folder" : "inact");
                     }
-                    */
                 }
                 else
                 {
@@ -128,8 +124,8 @@ public class PreferenceFragments
                         lp.setTitle(label);
                         lp.setIcon(drawable);
                         lp.setSummary(summary);
-                        lp.setEntries(resIdVals);
-                        lp.setEntryValues(resIdKeys);
+                        lp.setEntries(residVals);
+                        lp.setEntryValues(residKeys);
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);
