@@ -113,13 +113,14 @@ function readPrograms($countrydir, $channeldir)
 			
 			$title = $val[ "title" ];
 			
-			$title = preg_replace("/\\([^)]*\\)/", "", $title);
-			$title = str_replace("  ", " ", $title);
-			$title = trim($title);
-			
-			$realtitle = chopTitleName($title);
+			$realtitle = $title;
+			$realtitle = preg_replace("/\\([^)]*\\)/", "", $realtitle);
+			$realtitle = trim($realtitle);
+			$realtitle = chopTitleName($realtitle);
+			$realtitle = str_replace("  ", " ", $realtitle);
+			$realtitle = str_replace("/", "_", $realtitle);
 					
-			$name = str_replace("/", "_", $realtitle);
+			$name = $realtitle;
 			$pgminfofile = $pgminfodir . "/" . $name . ".orig.jpg";
 			
 			if (file_exists($pgminfofile))
