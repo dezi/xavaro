@@ -126,6 +126,9 @@ function readPrograms($countrydir, $channeldir)
 			{
 				$epgs[ "epgdata" ][ $inx ][ "img" ] = true;
 				
+				$info = getimagesize($pgminfofile);
+				$epgs[ "epgdata" ][ $inx ][ "imgsize" ] = $info[ 0 ] . "x" . $info[ 1 ];
+
 				if ($realtitle != $title)
 				{
 					$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
