@@ -52,6 +52,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
@@ -713,6 +716,12 @@ public class Simple
 
     public static File getMediaPath(String disposition)
     {
+        if (disposition.equals("recordings"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_MOVIES);
+            return dir; //new File(dir, "Recordings");
+        }
+
         if (disposition.equals("screenshots"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
@@ -1125,6 +1134,17 @@ public class Simple
         }
 
         return string.toString();
+    }
+
+    public static void mkdirs(File file)
+    {
+        if (! file.exists())
+        {
+            if (! file.mkdirs())
+            {
+                OopsService.log(LOGTAG, "Cannot create directory: " + file.toString());
+            }
+        }
     }
 
     @Nullable
@@ -1965,5 +1985,34 @@ public class Simple
     public static String getLocaleLanguage()
     {
         return Locale.getDefault().getLanguage();
+    }
+
+    //
+    // Opens a HTTP connection and resolves illegal underscores in host names.
+    //
+
+    public static HttpURLConnection openUnderscoreConnection(String src) throws Exception
+    {
+        URL url = new URL(src);
+
+        String host = null;
+
+        if (url.getHost().contains("_"))
+        {
+            host = url.getHost();
+
+            InetAddress ip = InetAddress.getByName(host);
+            src = src.replace(host, ip.getHostAddress());
+            url = new URL(src);
+        }
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        if (host != null) connection.setRequestProperty("Host", host);
+
+        connection.setUseCaches(false);
+        connection.setDoInput(true);
+        connection.connect();
+
+        return connection;
     }
 }

@@ -194,6 +194,11 @@ public class EventManager
             String webappname = eventgroupkey.substring(8);
             WebApp.handleEvent(webappname, Json.clone(events));
         }
+
+        if (eventgroupkey.equals("media.recorder"))
+        {
+            MediaRecorder.handleEvent(Json.clone(events));
+        }
     }
 
     private static long nextLoadTime = 30 + Simple.nowAsTimeStamp() / 1000;
