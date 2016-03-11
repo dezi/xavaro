@@ -1,19 +1,6 @@
 medicator.remindMaximum = 3;
 medicator.remindIntervall = 60;
 
-medicator.requestUnload = function()
-{
-    if (medicator.getNextEventsTimer)
-    {
-        clearTimeout(medicator.getNextEventsTimer);
-        medicator.getNextEventsTimer = null;
-    }
-
-    console.log("medicator.requestUnload");
-
-    WebAppIntercept.requestUnload(0);
-}
-
 medicator.getNextEvents = function()
 {
     if (medicator.requestUnloadTimer)
@@ -25,6 +12,11 @@ medicator.getNextEvents = function()
     var events = JSON.parse(WebAppEvents.getCurrentEvents());
 
     var configs = {};
+
+    //
+    // Preset event types to avoid reminding the same
+    // type of medication twice in one run.
+    //
 
     medicator.pillsreminder = false;
     medicator.weightreminder = false;
@@ -97,6 +89,19 @@ medicator.getNextEvents = function()
     medicator.requestUnloadTimer = setTimeout(medicator.requestUnload, 100 * 1000);
 }
 
+medicator.requestUnload = function()
+{
+    if (medicator.getNextEventsTimer)
+    {
+        clearTimeout(medicator.getNextEventsTimer);
+        medicator.getNextEventsTimer = null;
+    }
+
+    console.log("medicator.requestUnload");
+
+    WebAppIntercept.requestUnload(0);
+}
+
 medicator.remindConfig = function(config)
 {
     //
@@ -116,7 +121,8 @@ medicator.remindConfig = function(config)
     {
         //
         // The assistance has already been informed,
-        // so do nothing for now.
+        // so do nothing for now and wait for medication
+        // beeing taken to inform assistance of that.
         //
 
         return action;
@@ -186,8 +192,8 @@ medicator.remindConfig = function(config)
         if ((event.reminded >= medicator.remindMaximum) && ! assistanceInformed)
         {
             //
-            // Complete only on non imimportant events. Alerted
-            // events will repeatedly return until user has performed
+            // Complete only on non important events. Alerted events
+            // will repeatedly return until user has performed
             // required action.
             //
 
