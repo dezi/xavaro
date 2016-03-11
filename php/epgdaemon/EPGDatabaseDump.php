@@ -643,14 +643,7 @@ function saveEPG($epg)
 
 function readEPGs()
 {
-	$epgdatabase = "~/.hts/tvheadend/epgdb.v2";
-
-	if (substr($epgdatabase, 0, 2) == "~/")
-	{	
-		$env = posix_getpwuid(posix_getuid());
-
-		$epgdatabase = $env[ "dir" ] . substr($epgdatabase,1);
-	}
+	$epgdatabase = $GLOBALS[ "homedir" ] . "/.hts/tvheadend/epgdb.v2";
 
 	while (true)
 	{
