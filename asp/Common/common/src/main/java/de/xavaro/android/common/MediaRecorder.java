@@ -7,6 +7,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,13 +29,13 @@ public class MediaRecorder
         JSONObject event = new JSONObject();
         events.put(event);
 
-        Json.put(event, "start", "2016-03-11T09:25:00Z");
-        Json.put(event, "stop", "2016-03-11T10:50:00Z");
+        Json.put(event, "start", "2016-03-11T19:15:00Z");
+        Json.put(event, "stop", "2016-03-11T19:16:00Z");
         Json.put(event, "channel", "ZDF HD");
         Json.put(event, "country", "de");
         Json.put(event, "type", "tv");
 
-        //handleEvent(events);
+        handleEvent(events);
     }
 
     public static void handleEvent(JSONArray events)
@@ -46,16 +47,16 @@ public class MediaRecorder
             JSONObject event = Json.getObject(events, inx);
             if (event == null) continue;
 
+            String type  = Json.getString(event, "type");
+            String country = Json.getString(event, "country");
+            String channel = Json.getString(event, "channel");
             String starttime = Json.getString(event, "start");
             String stoptime = Json.getString(event, "stop");
-            String channel = Json.getString(event, "channel");
-            String country = Json.getString(event, "country");
-            String type  = Json.getString(event, "type");
 
-            if ((starttime == null) || (stoptime == null) ||
-                    (channel == null) || (country == null) || (type == null))
+            if ((type == null) || (country == null) || (channel == null)
+                    || (starttime == null) || (stoptime == null))
             {
-                completeEvent(event);
+                completeEvent(event, false);
                 continue;
             }
 
@@ -67,7 +68,7 @@ public class MediaRecorder
 
                 if (! setupIPTVStream(recording))
                 {
-                    completeEvent(event);
+                    completeEvent(event, false);
                     continue;
                 }
 
@@ -108,9 +109,11 @@ public class MediaRecorder
         return -1;
     }
 
-    private static void completeEvent(JSONObject event)
+    private static void completeEvent(JSONObject event, boolean success)
     {
         Json.put(event, "completed", true);
+        Json.put(event, "success", success);
+
         EventManager.updateComingEvent(eventgroupkey, event);
     }
 
@@ -121,11 +124,27 @@ public class MediaRecorder
         {
             while (recordingsList.size() > 0)
             {
+                String now = Simple.nowAsISO();
+
                 JSONObject recording;
 
                 synchronized (recordingsList)
                 {
                     recording = recordingsList.remove(0);
+                }
+
+                String stoptime = Json.getString(recording, "stop");
+
+                if ((stoptime != null) && (now.compareTo(stoptime) > 0))
+                {
+                    Log.d(LOGTAG, "recorderThread: einer fettig....");
+
+                    completeEvent(recording, true);
+                    continue;
+                }
+
+                synchronized (recordingsList)
+                {
                     recordingsList.add(recording);
                 }
 
@@ -197,6 +216,11 @@ public class MediaRecorder
 
             if (foundlastchunk)
             {
+                //
+                // The recording is old. Append all new chunks
+                // to media file.
+                //
+
                 appendIPTVStream(recordstatus, mediafile, line);
                 Json.putFileContent(metafile, metadata);
 
@@ -208,6 +232,11 @@ public class MediaRecorder
 
         if (! foundlastchunk)
         {
+            //
+            // The recording is new. Append the very last chunk
+            // to initialize recording.
+            //
+
             appendIPTVStream(recordstatus, mediafile, lastline);
             Json.putFileContent(metafile, metadata);
         }
@@ -225,8 +254,8 @@ public class MediaRecorder
             HttpURLConnection connection = Simple.openUnderscoreConnection(lastchunk);
             InputStream input = connection.getInputStream();
 
-            FileOutputStream output = new FileOutputStream(mediafile);
-            output.getChannel().truncate(lastSizeLong);
+            RandomAccessFile output = new RandomAccessFile(mediafile, "rw");
+            output.seek(lastSizeLong);
 
             byte[] buffer = new byte[ 32 * 1024 ];
             int xfer;
@@ -246,6 +275,7 @@ public class MediaRecorder
             Log.d(LOGTAG, "appendIPTVStream: mediafile=" + mediafile.toString());
             Log.d(LOGTAG, "appendIPTVStream: lastchunk=" + lastchunk);
             Log.d(LOGTAG, "appendIPTVStream: size=" + lastSizeLong);
+            Log.d(LOGTAG, "appendIPTVStream: real=" + mediafile.length());
         }
         catch (Exception ex)
         {
@@ -273,7 +303,7 @@ public class MediaRecorder
         if (iptvplaylist == null) return false;
 
         File mediadir = Simple.getMediaPath("recordings");
-        Simple.mkdirs(mediadir);
+        Simple.makeDirectory(mediadir);
 
         String basename = starttime + "." + type + "." + country + "." + channel;
         basename = basename.replace(":", "-");
