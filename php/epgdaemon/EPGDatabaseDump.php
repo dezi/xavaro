@@ -160,7 +160,7 @@ function readChannels()
 {
 	if (! isset($GLOBALS[ "channels" ])) $GLOBALS[ "channels" ] = array();
 
-	$channeldir = "/home/pi/.hts/tvheadend/channel/config";
+	$channeldir = $GLOBALS[ "homedir" ] . "/.hts/tvheadend/channel/config";
 
 	echo "Scan: $channeldir\n";
 
@@ -185,7 +185,7 @@ function readTags()
 {
 	if (! isset($GLOBALS[ "tags" ])) $GLOBALS[ "tags" ] = array();
 
-	$tagsdir = "/home/pi/.hts/tvheadend/channel/tag";
+	$tagsdir = $GLOBALS[ "homedir" ] . "/.hts/tvheadend/channel/tag";
 
 	echo "Scan: $tagsdir\n";
 
@@ -210,7 +210,7 @@ function readNetworks()
 {
 	if (! isset($GLOBALS[ "networks" ])) $GLOBALS[ "networks" ] = array();
 
-	$networksdir = "/home/pi/.hts/tvheadend/input/dvb/networks";
+	$networksdir = $GLOBALS[ "homedir" ] . "/.hts/tvheadend/input/dvb/networks";
 
 	echo "Scan: $networksdir\n";
 	
