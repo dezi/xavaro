@@ -29,6 +29,7 @@ public class WebAppEvents
     public void scheduleEventsNotification(JSONArray events)
     {
         Log.d(LOGTAG, "scheduleEventsNotification: " + webappname);
+        Log.d(LOGTAG, "scheduleEventsNotification: " + Json.defuck(events.toString()));
 
         synchronized (eventSchedule)
         {

@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +17,16 @@ import java.util.Set;
 public class Json
 {
     private static final String LOGTAG = Json.class.getSimpleName();
+
+    public static JSONObject getFileContent(File jsonfile)
+    {
+        return fromString(Simple.getFileContent(jsonfile));
+    }
+
+    public static void putFileContent(File jsonfile, JSONObject content)
+    {
+        Simple.putFileContent(jsonfile, Json.toPretty(content));
+    }
 
     public static JSONObject fromString(String jsonstr)
     {

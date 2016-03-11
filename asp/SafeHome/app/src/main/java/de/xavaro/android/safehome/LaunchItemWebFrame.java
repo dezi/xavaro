@@ -44,6 +44,11 @@ public class LaunchItemWebFrame extends LaunchItem
             {
                 icon.setImageResource(GlobalConfigs.IconResWebConfigErotics);
             }
+
+            if (Simple.equals(subtype, "inetdir"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResWebConfigInternet);
+            }
         }
     }
 

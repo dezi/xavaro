@@ -56,6 +56,7 @@ public class LaunchGroupWebFrame extends LaunchGroup
 
             Json.put(webitem, "type", type);
             Json.put(webitem, "name", website);
+            Json.put(webitem, "order", 500);
 
             String mode = Simple.getSharedPrefString(key);
 
@@ -71,7 +72,7 @@ public class LaunchGroupWebFrame extends LaunchGroup
             Json.put(entry, "type", type);
             Json.put(entry, "subtype", subtype);
             Json.put(entry, "label", Simple.getTransVal(R.array.pref_ioc_subtype_keys, subtype));
-            Json.put(entry, "order", 1050);
+            Json.put(entry, "order", 550);
 
             Json.put(entry, "launchitems", adir);
             Json.put(home, entry);
@@ -81,9 +82,10 @@ public class LaunchGroupWebFrame extends LaunchGroup
         {
             JSONObject entry = new JSONObject();
 
-            Json.put(entry, "type", "type");
+            Json.put(entry, "type", type);
+            Json.put(entry, "subtype", "inetdir");
             Json.put(entry, "label", "Internet");
-            Json.put(entry, "order", 1075);
+            Json.put(entry, "order", 575);
 
             Json.put(entry, "launchitems", cdir);
             Json.put(home, entry);

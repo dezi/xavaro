@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.MediaRecorder;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
@@ -174,6 +175,8 @@ public class HomeActivity extends AppCompatActivity implements
 
             handler.postDelayed(runner, 100);
         }
+
+        MediaRecorder.testDat();
     }
 
     @Override
@@ -250,6 +253,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void addViewToBackStack(Object view)
     {
+        // todo check parent...
+
         topscreen.addView((FrameLayout) view);
         backStack.add(view);
 

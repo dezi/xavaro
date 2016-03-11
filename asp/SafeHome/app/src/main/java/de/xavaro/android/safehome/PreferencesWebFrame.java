@@ -31,6 +31,8 @@ public class PreferencesWebFrame
             iconres = GlobalConfigs.IconResWebConfigNewspaper;
             keyprefix = type + "." + subtype;
             masterenable = "Online Zeitungen freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -61,6 +63,8 @@ public class PreferencesWebFrame
             iconres = GlobalConfigs.IconResWebConfigMagazine;
             keyprefix = type + "." + subtype;
             masterenable = "Online Magazine freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -91,6 +95,8 @@ public class PreferencesWebFrame
             iconres = GlobalConfigs.IconResWebConfigPictorial;
             keyprefix = type + "." + subtype;
             masterenable = "Online Illustrierte freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -121,6 +127,8 @@ public class PreferencesWebFrame
             iconres = GlobalConfigs.IconResWebConfigShopping;
             keyprefix = type + "." + subtype;
             masterenable = "Online Shopping freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -151,6 +159,8 @@ public class PreferencesWebFrame
             iconres = GlobalConfigs.IconResWebConfigErotics;
             keyprefix = type + "." + subtype;
             masterenable = "Online Erotisches freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 

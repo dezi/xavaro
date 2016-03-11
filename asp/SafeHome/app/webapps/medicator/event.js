@@ -35,15 +35,6 @@ medicator.getNextEvents = function()
     {
         var event = events[ inx ];
 
-        if (event.ondemand)
-        {
-            //
-            // Ondemand medication is ignored.
-            //
-
-            continue;
-        }
-
         //
         // The formkey collects medication event into the same
         // time slot, while activity events are kept separate.
@@ -80,15 +71,17 @@ medicator.getNextEvents = function()
         console.log("config=" + JSON.stringify(config));
 
         var alltaken = true;
+        var ondemand = true;
 
         for (var inx in config.events)
         {
             var event = config.events[ inx ];
 
             alltaken = alltaken && event.taken;
+            ondemand = ondemand && event.ondemand;
         }
 
-        if (alltaken)
+        if (alltaken || ondemand)
         {
             medicator.completeConfig(config);
 
