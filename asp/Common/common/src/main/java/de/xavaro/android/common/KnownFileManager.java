@@ -14,6 +14,11 @@ public class KnownFileManager
     private static JSONObject filestats;
     private static boolean dirty;
 
+    public static int checkDirectory(File basedir, JSONArray files)
+    {
+        return checkDirectory(basedir.getAbsolutePath(), files);
+    }
+
     public static int checkDirectory(String basedir, JSONArray files)
     {
         if (files == null) return 0;

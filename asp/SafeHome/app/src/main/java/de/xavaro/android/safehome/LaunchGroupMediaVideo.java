@@ -12,46 +12,46 @@ import java.util.Map;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
-public class LaunchGroupMediaImage extends LaunchGroupMedia
+public class LaunchGroupMediaVideo extends LaunchGroupMedia
 {
-    private static final String LOGTAG = LaunchGroupMediaImage.class.getSimpleName();
+    private static final String LOGTAG = LaunchGroupMediaVideo.class.getSimpleName();
 
-    public LaunchGroupMediaImage(Context context)
+    public LaunchGroupMediaVideo(Context context)
     {
         super(context);
     }
 
-    public LaunchGroupMediaImage(Context context, String mediadir)
+    public LaunchGroupMediaVideo(Context context, String mediadir)
     {
         super(context, mediadir);
-        this.config = getImages();
+        this.config = getVideos();
     }
 
-    private JSONObject getImages()
+    private JSONObject getVideos()
     {
         JSONObject launchgroup = new JSONObject();
         JSONArray launchitems = new JSONArray();
 
         File mediapath = Simple.getMediaPath(mediadir);
 
-        JSONArray images = Simple.getDirectorySortedByAge(
-                mediapath, new Simple.ImageFileFilter(), true);
+        JSONArray videos = Simple.getDirectorySortedByAge(
+                mediapath, new Simple.VideoFileFilter(), true);
 
-        if (images != null)
+        if (videos != null)
         {
-            for (int inx = 0; inx < images.length(); inx++)
+            for (int inx = 0; inx < videos.length(); inx++)
             {
-                JSONObject imageitem = Json.getObject(images, inx);
-                String imagefile = Json.getString(imageitem, "file");
-                if (imagefile == null) continue;
-                File file = new File(imagefile);
+                JSONObject videoitem = Json.getObject(videos, inx);
+                String videofile = Json.getString(videoitem, "file");
+                if (videofile == null) continue;
+                File file = new File(videofile);
 
                 JSONObject launchitem = new JSONObject();
 
                 Json.put(launchitem, "label", file.getName());
                 Json.put(launchitem, "type", "media");
-                Json.put(launchitem, "subtype", "image");
-                Json.put(launchitem, "mediaitem", imagefile);
+                Json.put(launchitem, "subtype", "video");
+                Json.put(launchitem, "mediaitem", videofile);
 
                 launchitems.put(launchitem);
             }
@@ -67,9 +67,9 @@ public class LaunchGroupMediaImage extends LaunchGroupMedia
         JSONArray home = new JSONArray();
         JSONArray adir = new JSONArray();
 
-        if (Simple.getSharedPrefBoolean("media.image.enable"))
+        if (Simple.getSharedPrefBoolean("media.video.enable"))
         {
-            String keyprefix = "media.image.directory.";
+            String keyprefix = "media.video.directory.";
 
             SharedPreferences sp = Simple.getSharedPrefs();
             Map<String, Object> prefs = Simple.getAllPreferences(keyprefix);
@@ -82,18 +82,18 @@ public class LaunchGroupMediaImage extends LaunchGroupMedia
                 String mediadir = prefkey.substring(keyprefix.length());
 
                 String label = Simple.getTransVal(
-                        R.array.pref_media_image_directories_keys, mediadir);
+                        R.array.pref_media_video_directories_keys, mediadir);
 
                 JSONObject entry = new JSONObject();
 
                 Json.put(entry, "label", label);
                 Json.put(entry, "type", "media");
-                Json.put(entry, "subtype", "image");
+                Json.put(entry, "subtype", "video");
                 Json.put(entry, "mediadir", mediadir);
                 Json.put(entry, "order", 800);
 
                 if (Simple.equals(what, "home")) home.put(entry);
-                if (Simple.equals(what, "images")) adir.put(entry);
+                if (Simple.equals(what, "videos")) adir.put(entry);
             }
         }
 
@@ -101,9 +101,9 @@ public class LaunchGroupMediaImage extends LaunchGroupMedia
         {
             JSONObject entry = new JSONObject();
 
-            Json.put(entry, "label", "Fotoalben");
+            Json.put(entry, "label", "Filme");
             Json.put(entry, "type", "media");
-            Json.put(entry, "subtype", "image");
+            Json.put(entry, "subtype", "video");
             Json.put(entry, "order", 850);
 
             Json.put(entry, "launchitems", adir);

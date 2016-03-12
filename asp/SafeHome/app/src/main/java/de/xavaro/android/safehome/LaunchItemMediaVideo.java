@@ -2,29 +2,29 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 
-import de.xavaro.android.common.KnownFileManager;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.KnownFileManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
 
-public class LaunchItemMediaImage extends LaunchItemMedia
+public class LaunchItemMediaVideo extends LaunchItemMedia
 {
-    private final static String LOGTAG = LaunchItemMediaImage.class.getSimpleName();
+    private final static String LOGTAG = LaunchItemMediaVideo.class.getSimpleName();
 
-    public LaunchItemMediaImage(Context context)
+    public LaunchItemMediaVideo(Context context)
     {
         super(context);
 
-        mediatype = "image";
+        mediatype = "video";
     }
 
     @Override
     protected void onMyClick()
     {
-        if (Simple.equals(subtype, "image")) launchImage();
+        if (Simple.equals(subtype, "video")) launchVideo();
     }
 
-    private void launchImage()
+    private void launchVideo()
     {
         if (config.has("mediaitem"))
         {
@@ -37,7 +37,7 @@ public class LaunchItemMediaImage extends LaunchItemMedia
                 overlay.setVisibility(INVISIBLE);
             }
 
-            // todo display image.
+            // todo display video.
 
             return;
         }
@@ -48,7 +48,7 @@ public class LaunchItemMediaImage extends LaunchItemMedia
             {
                 if (numberItems == 0)
                 {
-                    String message = "Es sind keine Bilder enthalten.";
+                    String message = "Es sind keine Videos enthalten.";
                     Speak.speak(message);
 
                     return;
@@ -56,12 +56,12 @@ public class LaunchItemMediaImage extends LaunchItemMedia
                 else
                 {
                     String mediadir = Json.getString(config, "mediadir");
-                    directory = new LaunchGroupMediaImage(context, mediadir);
+                    directory = new LaunchGroupMediaVideo(context, mediadir);
                 }
             }
             else
             {
-                directory = new LaunchGroupMediaImage(context);
+                directory = new LaunchGroupMediaVideo(context);
                 directory.setConfig(this, Json.getArray(config, "launchitems"));
             }
         }

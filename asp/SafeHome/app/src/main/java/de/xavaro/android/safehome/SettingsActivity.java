@@ -118,8 +118,8 @@ public class SettingsActivity extends PreferenceActivity
         target.add(category);
 
         target.add(PreferencesMedia.MediaImageFragment.getHeader());
-        target.add(PreferencesMedia.MediaAudioFragment.getHeader());
         target.add(PreferencesMedia.MediaVideoFragment.getHeader());
+        target.add(PreferencesMedia.MediaAudioFragment.getHeader());
         target.add(PreferencesMedia.MediaEbookFragment.getHeader());
 
         category = new Header();
