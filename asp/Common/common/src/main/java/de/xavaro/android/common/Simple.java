@@ -705,8 +705,13 @@ public class Simple
 
     public static void makeDirectory(File path)
     {
-        //noinspection ResultOfMethodCallIgnored
-        path.mkdirs();
+        if (! path.exists())
+        {
+            if (! path.mkdirs())
+            {
+                OopsService.log(LOGTAG, "Cannot create directory: " + path.toString());
+            }
+        }
     }
 
     public static void makeDirectory(String path)
@@ -719,7 +724,7 @@ public class Simple
         if (disposition.equals("recordings"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_MOVIES);
-            return dir; //new File(dir, "Recordings");
+            return new File(dir, "Recordings");
         }
 
         if (disposition.equals("screenshots"))
@@ -1134,17 +1139,6 @@ public class Simple
         }
 
         return string.toString();
-    }
-
-    public static void mkdirs(File file)
-    {
-        if (! file.exists())
-        {
-            if (! file.mkdirs())
-            {
-                OopsService.log(LOGTAG, "Cannot create directory: " + file.toString());
-            }
-        }
     }
 
     @Nullable

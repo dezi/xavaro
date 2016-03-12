@@ -1,13 +1,9 @@
 package de.xavaro.android.common;
 
-import android.util.Log;
 import android.webkit.JavascriptInterface;
-
+import android.util.Log;
 import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Map;
 
 @SuppressWarnings("unused")
 public class WebAppEvents
