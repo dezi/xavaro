@@ -32,14 +32,14 @@ public class MediaRecorder
         JSONObject event = new JSONObject();
         events.put(event);
 
-        Json.put(event, "date", "2016-03-12T08:11:00Z");
-        Json.put(event, "start", "2016-03-12T08:11:00Z");
-        Json.put(event, "stop", "2016-03-12T08:30:00Z");
-        Json.put(event, "channel", "ZDF HD");
+        Json.put(event, "date", "2016-03-12T16:30:00Z");
+        Json.put(event, "start", "2016-03-12T17:16:00Z");
+        Json.put(event, "stop", "2016-03-12T17:50:00Z");
+        Json.put(event, "channel", "Das Erste HD");
         Json.put(event, "country", "de");
         Json.put(event, "type", "tv");
 
-        //handleEvent(events);
+        handleEvent(events);
     }
 
     public static void handleEvent(JSONArray events)

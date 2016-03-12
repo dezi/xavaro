@@ -18,7 +18,9 @@ import android.widget.TextView;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import de.xavaro.android.common.Animator;
 import de.xavaro.android.common.VersionUtils;
+import de.xavaro.android.common.VideoQuality;
 
 //
 // Video play surface layout connected to HomeActivity.
@@ -186,24 +188,24 @@ public class VideoSurface extends FrameLayout implements
             int options = pp.getAvailableQualities();
             int select = 0;
 
-            if ((view == qualityLQButton) && (options & DitUndDat.VideoQuality.LQ) != 0)
+            if ((view == qualityLQButton) && (options & VideoQuality.LQ) != 0)
             {
-                select = DitUndDat.VideoQuality.LQ;
+                select = VideoQuality.LQ;
             }
 
-            if ((view == qualitySDButton) && (options & DitUndDat.VideoQuality.SD) != 0)
+            if ((view == qualitySDButton) && (options & VideoQuality.SD) != 0)
             {
-                select = DitUndDat.VideoQuality.SD;
+                select = VideoQuality.SD;
             }
 
-            if ((view == qualityHQButton) && (options & DitUndDat.VideoQuality.HQ) != 0)
+            if ((view == qualityHQButton) && (options & VideoQuality.HQ) != 0)
             {
-                select = DitUndDat.VideoQuality.HQ;
+                select = VideoQuality.HQ;
             }
 
-            if ((view == qualityHDButton) && (options & DitUndDat.VideoQuality.HD) != 0)
+            if ((view == qualityHDButton) && (options & VideoQuality.HD) != 0)
             {
-                select = DitUndDat.VideoQuality.HD;
+                select = VideoQuality.HD;
             }
 
             if (select > 0)
@@ -253,40 +255,40 @@ public class VideoSurface extends FrameLayout implements
         int ena = GlobalConfigs.VideoSurfaceEnabledButton;
         int sel = GlobalConfigs.VideoSurfaceSelectedButton;
 
-        if ((options & DitUndDat.VideoQuality.LQ) == 0)
+        if ((options & VideoQuality.LQ) == 0)
         {
             setButtonTextColor(qualityLQButton,dis);
         }
         else
         {
-            setButtonTextColor(qualityLQButton,(current == DitUndDat.VideoQuality.LQ) ? sel : ena);
+            setButtonTextColor(qualityLQButton,(current == VideoQuality.LQ) ? sel : ena);
         }
 
-        if ((options & DitUndDat.VideoQuality.SD) == 0)
+        if ((options & VideoQuality.SD) == 0)
         {
             setButtonTextColor(qualitySDButton,dis);
         }
         else
         {
-            setButtonTextColor(qualitySDButton,(current == DitUndDat.VideoQuality.SD) ? sel : ena);
+            setButtonTextColor(qualitySDButton,(current == VideoQuality.SD) ? sel : ena);
         }
 
-        if ((options & DitUndDat.VideoQuality.HQ) == 0)
+        if ((options & VideoQuality.HQ) == 0)
         {
             setButtonTextColor(qualityHQButton,dis);
         }
         else
         {
-            setButtonTextColor(qualityHQButton,(current == DitUndDat.VideoQuality.HQ) ? sel : ena);
+            setButtonTextColor(qualityHQButton,(current == VideoQuality.HQ) ? sel : ena);
         }
 
-        if ((options & DitUndDat.VideoQuality.HD) == 0)
+        if ((options & VideoQuality.HD) == 0)
         {
             setButtonTextColor(qualityHDButton,dis);
         }
         else
         {
-            setButtonTextColor(qualityHDButton,(current == DitUndDat.VideoQuality.HD) ? sel : ena);
+            setButtonTextColor(qualityHDButton,(current == VideoQuality.HD) ? sel : ena);
         }
     }
 
@@ -374,7 +376,7 @@ public class VideoSurface extends FrameLayout implements
                     }
                     else
                     {
-                        DitUndDat.Animator animator = new DitUndDat.Animator();
+                        Animator animator = new Animator();
 
                         animator.setDuration(500);
                         animator.setLayout(surfaceLayout, normalParams, fullScreenParams);
@@ -441,7 +443,7 @@ public class VideoSurface extends FrameLayout implements
             }
         }
     };
-    
+
     //endregion
 
     //region SurfaceHolder.Callback interface.
@@ -478,7 +480,7 @@ public class VideoSurface extends FrameLayout implements
             ((ViewGroup) spinner.getParent()).removeView(spinner);
         }
 
-        if (visible)
+        if (visible && ! ProxyPlayer.getInstance().isLocalFile())
         {
             if (spinner == null)
             {
@@ -510,6 +512,8 @@ public class VideoSurface extends FrameLayout implements
         playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
 
         setButtonStates();
+
+        Log.d(LOGTAG, "======================duration=" + ProxyPlayer.getInstance().getMediaPlayer().getDuration());
     }
 
     public void onPlaybackPaused()

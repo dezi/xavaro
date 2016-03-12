@@ -27,6 +27,7 @@ import java.util.Random;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.VideoQuality;
 
 //
 // Proxy media player class with icy metadata detection
@@ -151,6 +152,16 @@ public class ProxyPlayer extends Thread
     public void setDisplay(SurfaceHolder holder)
     {
         mediaPlayer.setDisplay(holder);
+    }
+
+    public MediaPlayer getMediaPlayer()
+    {
+        return mediaPlayer;
+    }
+
+    public boolean isLocalFile()
+    {
+        return mediaIsAudio || mediaIsAudio;
     }
 
     //endregion
@@ -910,7 +921,7 @@ public class ProxyPlayer extends Thread
                     so.bandWidth = Integer.parseInt(bandwith);
                     so.streamUrl = streamurl;
 
-                    so.quality = DitUndDat.VideoQuality.deriveQuality(so.height);
+                    so.quality = VideoQuality.deriveQuality(so.height);
 
                     streamOptions.add(so);
 
@@ -926,7 +937,7 @@ public class ProxyPlayer extends Thread
 
                 DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
                 so.streamUrl = requestUrl;
-                so.quality = DitUndDat.VideoQuality.LQ;
+                so.quality = VideoQuality.LQ;
 
                 streamOptions.add(so);
             }

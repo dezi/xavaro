@@ -266,7 +266,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements ProxyPlayer.Cal
             ((ViewGroup) spinner.getParent()).removeView(spinner);
         }
 
-        if (visible)
+        if (visible && ! ProxyPlayer.getInstance().isLocalFile())
         {
             if (spinner == null)
             {
