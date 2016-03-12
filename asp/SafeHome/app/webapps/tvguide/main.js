@@ -1,7 +1,6 @@
 tvguide.constants =
 {
-    title                    : "Title",
-    loadHours                : 48 * 2,
+    loadHours                : 24 * 1,
     timelineInterval         : 15,
 
     today                    : Math.floor(WebLibSimple.getTodayDate().getTime() / 1000 / 60),
@@ -75,7 +74,7 @@ tvguide.createFrameSetup = function()
     );
 
     tvguide.title.style.textAlign = "center";
-    tvguide.title.innerHTML       = tvguide.constants.title;
+    tvguide.title.innerHTML       = WebLibSimple.getNiceDay(tvguide.constants.today * 1000 * 60);
 
     WebLibSimple.setFontSpecs(tvguide.title, 34, "bold", "#ffffff");
 
@@ -163,93 +162,6 @@ tvguide.createFrameSetup = function()
     WebLibSimple.setBGColor(tvguide.senderbar, tvguide.constants.senderbarColor);
 }
 
-tvguide.createDescriptionSetup = function()
-{
-    tvguide.description = {};
-
-    //
-    // tvguide.description.topdiv
-    //
-
-    tvguide.description.topdiv = WebLibSimple.createDivWidth(
-        "100%",
-        0,
-        "50%",
-        0,
-        "description.topdiv",
-        tvguide.content1
-    );
-
-    tvguide.description.topdiv.style.zIndex = "3";
-    tvguide.description.position = 100;
-
-    WebLibSimple.setBGColor(tvguide.description.topdiv, tvguide.constants.descriptionColor);
-
-    //
-    // tvguide.description.titlebar
-    //
-
-    tvguide.description.titlebar = WebLibSimple.createDivHeight(
-        0,
-        0,
-        0,
-        40,
-        "description.titlebar",
-        tvguide.description.topdiv
-    );
-
-    WebLibSimple.setBGColor(tvguide.description.titlebar, "#000000");
-
-    tvguide.description.title = WebLibSimple.createDiv(
-        40,
-        40 / 4,
-        40,
-        0,
-        "description.title",
-        tvguide.description.titlebar
-    );
-
-    tvguide.description.title.style.textAlign = "center";
-    tvguide.description.title.innerHTML       = tvguide.constants.title;
-
-    WebLibSimple.setFontSpecs(tvguide.description.title, 20, "bold", "#ffffff");
-
-    //
-    // tvguide.description.content
-    //
-
-    tvguide.description.content = WebLibSimple.createDiv(
-        0,
-        40,
-        0,
-        0,
-        "description.content",
-        tvguide.description.topdiv
-    );
-
-    WebLibSimple.setBGColor(tvguide.description.content, "#ffffff");
-    WebLibSimple.setFontSpecs(tvguide.description.content, 20, "bold", "#000000");
-
-    //
-    // tvguide.description.margin
-    //
-
-/*
-    tvguide.description.tmp = WebLibSimple.createDiv(
-        0,
-        0,
-        0,
-        0,
-        "description.margin",
-        tvguide.description.content
-    );
-
-    tvguide.description.tmp.margin = "30px";
-
-    WebLibSimple.setBGColor(tvguide.description.tmp, "#ff00ff");
-*/
-}
-
 tvguide.getSenderList = function()
 {
 //    var obj = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
@@ -326,10 +238,9 @@ tvguide.createSenderBar = function()
         var image = WebLibSimple.createAnyAppend("img", paddingDiv);
         image.style.height = "100%";
         image.style.width  = "100%";
-        image.src          = encodeURI(
-            "http://" + WebApp.manifest.appserver   + "/channels/"
-                      + tvguide.senderList[ index ] + ".png"
-        );
+
+        image.src = encodeURI("http://" + WebApp.manifest.appserver   + "/channels/"
+            + tvguide.senderList[ index ] + ".png");
     }
 }
 
@@ -417,77 +328,6 @@ tvguide.createEpgProgram = function(channel, epgdata)
 
         paddingDiv.epg       = epgdata[ programIndex ]
         paddingDiv.innerHTML = paddingDiv.epg.title;
-    }
-}
-
-tvguide.animateInfoIn = function()
-{
-    var actpos = tvguide.description.topdiv.style.left;
-    actpos = parseInt(WebLibSimple.substring(actpos, 0, -1));
-    tvguide.description.position = actpos;
-
-    if (actpos > 50)
-    {
-        actpos = actpos - 1;
-        tvguide.description.topdiv.style.left = actpos + "%";
-
-        tvguide.animateInfoRunning = true;
-        tvguide.animateInfo = setTimeout(tvguide.animateInfoIn, 5);
-    }
-    else
-    {
-        tvguide.animateInfoRunning = false;
-    }
-}
-
-tvguide.animateInfoOut = function()
-{
-    var actpos = tvguide.description.topdiv.style.left;
-    actpos = parseInt(WebLibSimple.substring(actpos, 0, -1));
-    tvguide.description.position = actpos;
-
-    if (actpos < 100)
-    {
-        actpos = actpos + 1;
-        tvguide.description.topdiv.style.left = actpos + "%";
-
-        tvguide.animateInfoRunning = true;
-        tvguide.animateInfo = setTimeout(tvguide.animateInfoOut, 5);
-    }
-    else
-    {
-        tvguide.animateInfoRunning = false;
-    }
-}
-
-tvguide.onEPGTouchClick = function(target, element)
-{
-    console.log("tvguide.onEPGTouchClick: element " + element.epg.title);
-
-    // WebLibSimple.setBGColor(element, "#747474");
-
-    tvguide.description.title.innerHTML = element.epg.title;
-    tvguide.description.content.innerHTML = element.epg.description;
-//    tvguide.description.tmp2.innerHTML = element.epg.description;
-
-    if (tvguide.animateInfoRunning)
-    {
-        console.log("=========> STOP");
-
-        clearTimeout(tvguide.animateInfo);
-        tvguide.animateInfoRunning = false;
-    }
-    else
-    {
-        if (! tvguide.animateInfoRunning && tvguide.description.position <= 100)
-        {
-            tvguide.animateInfoIn();
-        }
-
-        if (! tvguide.animateInfoRunning && tvguide.description.position >= 50)
-        {
-            tvguide.animateInfoOut();
-        }
     }
 }
 
