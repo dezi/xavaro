@@ -1,11 +1,10 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -16,6 +15,8 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.util.AttributeSet;
+import android.util.Log;
 
 import de.xavaro.android.common.VersionUtils;
 
@@ -43,6 +44,7 @@ public class VideoSurface extends FrameLayout implements
     }
 
     private LayoutParams normalParams;
+    private LayoutParams fullScreenParams;
 
     private FrameLayout surfaceLayout;
     private SurfaceView surfaceView;
@@ -92,6 +94,10 @@ public class VideoSurface extends FrameLayout implements
         normalParams = new LayoutParams(400, 240);
         normalParams.leftMargin = 40;
         normalParams.topMargin  = 400;
+
+        fullScreenParams = new LayoutParams(400, 240);
+        fullScreenParams.leftMargin = 40;
+        fullScreenParams.topMargin  = 400;
 
         topArea = new FrameLayout(context);
         topArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 80));
@@ -352,7 +358,8 @@ public class VideoSurface extends FrameLayout implements
                     int newWidth = parentWidth;
                     int newHeight = newWidth * yRatio / xRatio;
 
-                    LayoutParams fullScreenParams = new LayoutParams(newWidth,newHeight);
+                    fullScreenParams.width = newWidth;
+                    fullScreenParams.height = newHeight;
                     fullScreenParams.leftMargin = (parentWidth - newWidth) / 2;
                     fullScreenParams.topMargin = (parentHeight - newHeight) / 2;
 
@@ -387,6 +394,54 @@ public class VideoSurface extends FrameLayout implements
         return true;
     }
 
+    //endregion
+
+    //region Orientation change handling.
+
+    private boolean orientationChanged = false;
+
+    @Override
+    protected void onConfigurationChanged(Configuration config)
+    {
+        super.onConfigurationChanged(config);
+
+        orientationChanged = true;
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+    {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if (changed && isFullscreen && orientationChanged)
+        {
+            getHandler().post(adjustFullscreen);
+
+        }
+
+        orientationChanged = false;
+    }
+
+    private final Runnable adjustFullscreen = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (isFullscreen)
+            {
+                int newWidth = getWidth();
+                int newHeight = newWidth * yRatio / xRatio;
+
+                fullScreenParams.width = newWidth;
+                fullScreenParams.height = newHeight;
+                fullScreenParams.leftMargin = (getWidth() - newWidth) / 2;
+                fullScreenParams.topMargin = (getHeight() - newHeight) / 2;
+
+                surfaceLayout.setLayoutParams(fullScreenParams);
+            }
+        }
+    };
+    
     //endregion
 
     //region SurfaceHolder.Callback interface.

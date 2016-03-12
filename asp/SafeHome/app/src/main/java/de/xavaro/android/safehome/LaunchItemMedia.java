@@ -23,7 +23,7 @@ import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
 
-public abstract class LaunchItemMedia extends LaunchItem
+public abstract class LaunchItemMedia extends LaunchItemProxyPlayer
 {
     private final static String LOGTAG = LaunchItemMedia.class.getSimpleName();
 
@@ -100,7 +100,7 @@ public abstract class LaunchItemMedia extends LaunchItem
         if (config.has("mediaitem"))
         {
             String mediaitem = Json.getString(config, "mediaitem");
-            icon.setImageDrawable(Simple.getDrawableSquare(mediaitem, 200));
+            icon.setImageDrawable(getBestImage(mediaitem));
 
             boolean known = KnownFileManager.getKnownFileStatus(mediaitem);
 
@@ -134,7 +134,6 @@ public abstract class LaunchItemMedia extends LaunchItem
                     {
                         JSONObject newest = Json.getObject(items, 0);
                         String file = Json.getString(newest, "file");
-
                         icon.setImageDrawable(getBestImage(file));
 
                         numberItems = items.length();
@@ -223,11 +222,20 @@ public abstract class LaunchItemMedia extends LaunchItem
 
         File mediafile = new File(mediaitem);
 
+        if (Simple.isVideo(mediafile.getAbsolutePath()))
+        {
+            File jpegfile = Simple.changeExtension(mediafile, ".jpg");
+            File jsonfile = Simple.changeExtension(mediafile, ".json");
+
+            if (jpegfile.delete()) Log.d(LOGTAG, "onDeleteMediaItem: del=" + jpegfile.toString());
+            if (jsonfile.delete()) Log.d(LOGTAG, "onDeleteMediaItem: del=" + jsonfile.toString());
+        }
+
         if (mediafile.delete())
         {
             parent.deleteLaunchItem(this);
 
-            Log.d(LOGTAG, "onDeleteMediaItem: deleted=" + mediaitem);
+            Log.d(LOGTAG, "onDeleteMediaItem: del=" + mediaitem);
         }
     }
 
@@ -282,5 +290,4 @@ public abstract class LaunchItemMedia extends LaunchItem
             ActivityManager.recordActivity(am, mediaitem);
         }
     }
-
 }

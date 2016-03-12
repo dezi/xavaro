@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.os.Handler;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.KnownFileManager;
@@ -37,7 +38,12 @@ public class LaunchItemMediaVideo extends LaunchItemMedia
                 overlay.setVisibility(INVISIBLE);
             }
 
-            // todo display video.
+            if (handler == null) handler = new Handler();
+
+            ProxyPlayer.getInstance().setVideoFile(context, mediaitem, this);
+            isPlayingVideo = true;
+
+            bubbleControls();
 
             return;
         }
