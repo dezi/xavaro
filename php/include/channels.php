@@ -306,7 +306,8 @@ function readChannelConfig()
 		
 		$mname = simplifySearchName($channel[ "name" ]);
 		$channel[ "mname" ] = $mname;
-		$GLOBALS[ "channels.config" ][] = $channel;
+		
+		array_unshift($GLOBALS[ "channels.config" ], $channel);
 	}
 	
 	//
