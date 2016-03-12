@@ -1,6 +1,36 @@
-tvguide.descriptionConstants =
-{
+tvguide.descriptionConstants = {}
 
+tvguide.createTimeBox = function()
+{
+    //
+    // tvguide.description.timeBox
+    //
+
+    tvguide.description.timeBox = WebLibSimple.createAnyAppend("div", tvguide.description.content);
+    tvguide.description.timeBox.style.position = "relative";
+
+    WebLibSimple.setBGColor(tvguide.description.timeBox, "#00ff00");
+    WebLibSimple.setFontSpecs(tvguide.description.timeBox, 20, "normal", "#000000");
+
+    //
+    // tvguide.description.timeBoxDay
+    //
+
+    tvguide.description.timeBoxDay = WebLibSimple.createAnyAppend("span", tvguide.description.timeBox);
+    tvguide.description.timeBoxDay.style.display = "inline-block";
+    tvguide.description.timeBoxDay.style.width = "50%";
+    tvguide.description.timeBoxDay.style.textAlign = "left";
+    WebLibSimple.setBGColor(tvguide.description.timeBoxDay, "#ff00ff");
+
+    //
+    // tvguide.description.timeBoxTime
+    //
+
+    tvguide.description.timeBoxTime = WebLibSimple.createAnyAppend("span", tvguide.description.timeBox);
+    tvguide.description.timeBoxTime.style.display = "inline-block";
+    tvguide.description.timeBoxTime.style.width = "50%";
+    tvguide.description.timeBoxTime.style.textAlign = "right";
+    WebLibSimple.setBGColor(tvguide.description.timeBoxTime, "#ffff00");
 }
 
 tvguide.createInfoBox = function()
@@ -32,9 +62,14 @@ tvguide.createInfoBox = function()
 
     tvguide.description.pic = WebLibSimple.createAnyAppend("img", tvguide.description.content);
     tvguide.description.pic.style.borderRadius = "10px";
-    tvguide.description.pic.style.cssFloat = "left";
 
-    WebLibSimple.setBGColor(tvguide.description.pic, "#ffffff");
+//    WebLibSimple.setBGColor(tvguide.description.pic, "#00ff00");
+
+    //
+    // time boxes
+    //
+
+    tvguide.createTimeBox();
 
     //
     // tvguide.description.infoBox
@@ -121,7 +156,12 @@ tvguide.onEPGTouchClick = function(target, element)
     console.log("tvguide.onEPGTouchClick: element " + element.epg.title);
 
     tvguide.description.titlebar.innerHTML = element.epg.title;
-    tvguide.description.infoBox.innerHTML  = JSON.stringify(element.epg);
+    tvguide.description.infoBox.innerHTML  = "Duration:" + Math.floor(WebLibSimple.getDuration(element.epg.start, element.epg.stop) / 1000 / 60)
+        + " ---> " + JSON.stringify(element.epg);
+
+    tvguide.description.timeBoxDay.innerHTML  = WebLibSimple.getNiceDay(element.epg.start) + ":";
+    tvguide.description.timeBoxTime.innerHTML = WebLibSimple.getNiceTime(element.epg.start) + " - "
+                                              + WebLibSimple.getNiceTime(element.epg.stop);
 
     if (element.epg.subtitle)
     {
@@ -135,6 +175,7 @@ tvguide.onEPGTouchClick = function(target, element)
 
 //        tvguide.description.pic.style.width = "20%";
 //        tvguide.description.pic.style.height = "50%";
+//        tvguide.description.pic.style.cssFloat = "left";
 
         var imgSrc = element.epg.title;
 
