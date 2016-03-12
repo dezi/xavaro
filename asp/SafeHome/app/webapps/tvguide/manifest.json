@@ -20,6 +20,7 @@
     ],
 
     "preload": [
+      "Description.js"
     ],
 
     "files": [
@@ -29,6 +30,7 @@
     "cachedefs": [
       { "interval": 24, "pattern": ".*\\.js" },
       { "interval": 72, "pattern": ".*\\.png" },
+      { "interval": 72, "pattern": ".*\\.jpg" },
       { "interval": 24, "pattern": ".*\\.json" },
       { "interval": 24, "pattern": ".*\\.json\\.gz" }
     ]
