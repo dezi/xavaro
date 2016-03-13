@@ -306,7 +306,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
         if (streamOptions != null)
         {
-            for (VideoStreamOptions so : streamOptions)
+            for (VideoStreams so : streamOptions)
             {
                 mask |= so.quality;
             }
@@ -486,7 +486,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
     private String desiredNextFragment;
     private int desiredQuality;
 
-    private ArrayList<VideoStreamOptions> streamOptions;
+    private ArrayList<VideoStreams> streamOptions;
     private int currentOption;
 
     private boolean mediaPrepared;
@@ -935,7 +935,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                     streamurl = resolveRelativeUrl(requestUrl, streamurl);
 
-                    VideoStreamOptions so = new VideoStreamOptions();
+                    VideoStreams so = new VideoStreams();
 
                     so.width = (width == null) ? 0 : Integer.parseInt(width);
                     so.height = (height == null) ? 0 : Integer.parseInt(height);
@@ -957,7 +957,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 // Nothing found, so add original url as stream.
                 //
 
-                VideoStreamOptions so = new VideoStreamOptions();
+                VideoStreams so = new VideoStreams();
                 so.streamUrl = requestUrl;
                 so.quality = VideoQuality.LQ;
 
@@ -978,7 +978,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 for (int inx = 0; inx < streamOptions.size(); inx++)
                 {
-                    VideoStreamOptions so = streamOptions.get( inx );
+                    VideoStreams so = streamOptions.get( inx );
 
                     if ((so.quality <= desiredQuality)
                             && (so.quality >= currentQuality)

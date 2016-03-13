@@ -1,6 +1,6 @@
 package de.xavaro.android.common;
 
-public class VideoStreamOptions
+public class VideoStreams
 {
     public String streamUrl;
 
