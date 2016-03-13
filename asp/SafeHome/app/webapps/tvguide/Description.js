@@ -1,6 +1,6 @@
 tvguide.descriptionConstants =
 {
-    containerBG : "#ffffff",
+    containerBG : "#ffffffff",
     containerRadius : "4px",
     boxPaddingTop : "10px"
 }
@@ -37,13 +37,20 @@ tvguide.createPic = function()
 
     tvguide.description.PicContainer = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.PicContainer.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
+    tvguide.description.PicContainer.style.position = "relative";
 
+    //
+    // padd container
+    //
+
+    tvguide.description.PicPaddContainer = WebLibSimple.createAnyAppend("div", tvguide.description.PicContainer);
+    tvguide.description.PicPaddContainer.style.paddingBottom = "4px";
 
     //
     // tvguide.description.pic
     //
 
-    tvguide.description.pic = WebLibSimple.createAnyAppend("img", tvguide.description.PicContainer);
+    tvguide.description.pic = WebLibSimple.createAnyAppend("img", tvguide.description.PicPaddContainer);
     tvguide.description.pic.style.borderRadius = "10px";
 }
 
@@ -250,32 +257,66 @@ tvguide.animateInfoOut = function()
 
 tvguide.onEPGTouchClick = function(target, element)
 {
+    if (! element.epg.title) return;
+
     console.log("tvguide.onEPGTouchClick: element " + element.epg.title);
 
+    tvguide.descriptionScroll.style.top = "0px";
+
     tvguide.description.titlebar.innerHTML = element.epg.title;
-//    tvguide.description.infoBox.innerHTML  = JSON.stringify(element.epg);
     tvguide.description.infoBoxContainer.innerHTML = element.epg.description;
 
     tvguide.description.timeBoxDay.innerHTML  = WebLibSimple.getNiceDay(element.epg.start) + ":";
-    tvguide.description.timeBoxTime.innerHTML = WebLibSimple.getNiceTime(element.epg.start) + " - "
-                                              + WebLibSimple.getNiceTime(element.epg.stop);
 
-    tvguide.description.DurationBoxTime.innerHTML = Math.floor(WebLibSimple.getDuration(element.epg.start, element.epg.stop) / 1000 / 60)
-        + "min";
+    tvguide.description.timeBoxTime.innerHTML =
+        WebLibSimple.getNiceTime(element.epg.start) + "-" + WebLibSimple.getNiceTime(element.epg.stop);
+
+    tvguide.description.DurationBoxTime.innerHTML =
+        Math.floor(WebLibSimple.getDuration(element.epg.start, element.epg.stop) / 1000 / 60) + "min";
 
     if (element.epg.subtitle)
     {
         tvguide.description.subtitlebar.innerHTML = element.epg.subtitle;
     }
+    else
+    {
+        tvguide.description.subtitlebar.innerHTML = null;
+    }
 
     if (element.epg.img)
     {
-        tvguide.description.pic.style.width = "100%";
-        tvguide.description.pic.style.height = "auto";
+        var size = element.epg.imgsize.split("x");
 
-//        tvguide.description.pic.style.width = "20%";
-//        tvguide.description.pic.style.height = "50%";
-//        tvguide.description.pic.style.cssFloat = "left";
+        var imgWidth  = parseInt(size[0]);
+        var imgHeight = parseInt(size[1]);
+
+        var partentWidth = tvguide.description.topdiv.clientWidth;
+
+        console.log("--> partentWidth/2: " + partentWidth / 2);
+        console.log("--> imgSize: " + element.epg.imgsize);
+
+        // nuke
+
+        if (imgWidth > imgHeight && imgWidth > partentWidth / 2)
+        {
+            tvguide.description.pic.style.width = "100%";
+            tvguide.description.pic.style.height = "auto";
+
+            tvguide.description.PicPaddContainer.style.paddingRight = "0px";
+        }
+        else
+        {
+            tvguide.description.pic.style.width = "100%";
+            tvguide.description.pic.style.height = "auto";
+
+            tvguide.description.PicPaddContainer.style.paddingRight  = "8px";
+
+            tvguide.description.PicContainer.style.float = "left";
+            tvguide.description.PicContainer.style.width = "40%";
+
+            tvguide.description.timeBox.style.marginLeft = "40%";
+            tvguide.description.DurationBox.style.marginLeft = "40%";
+        }
 
         var imgSrc = element.epg.title;
 
@@ -284,11 +325,17 @@ tvguide.onEPGTouchClick = function(target, element)
             imgSrc = element.epg.imgname;
         }
 
-        tvguide.description.pic.src = encodeURI("http://" + WebApp.manifest.appserver +
-            "/pgminfo/tv/de/" + imgSrc + ".orig.jpg");
+        tvguide.description.pic.src = WebLibSimple.getNixPixImg();
+
+        tvguide.description.pic.src = "http://" + WebApp.manifest.appserver +
+            "/pgminfo/tv/de/" + encodeURIComponent(imgSrc) + ".orig.jpg";
+
+        console.log("--> Get picture: " + tvguide.description.pic.src);
     }
     else
     {
+        tvguide.description.pic.src = WebLibSimple.getNixPixImg();
+
         tvguide.description.pic.style.width = "0%";
         tvguide.description.pic.style.height = "0%";
     }

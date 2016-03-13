@@ -518,9 +518,8 @@ WebLibSimple.getNiceTime = function(date)
 {
     var work = new Date(date);
 
-    // hh:mm:ss
     var nicedate = WebLibSimple.padNum(work.getHours(),   2) + ":"
-             + WebLibSimple.padNum(work.getMinutes(), 2);
+                 + WebLibSimple.padNum(work.getMinutes(), 2);
 //             + WebLibSimple.padNum(work.getSeconds(), 2);
 
     return nicedate;
