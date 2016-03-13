@@ -1,6 +1,6 @@
 tvguide.descriptionConstants =
 {
-    containerBG : "#ffffff",
+    containerBG : "#ff00ff",
     containerRadius : "4px",
     boxPaddingTop : "10px"
 }
@@ -37,13 +37,22 @@ tvguide.createPic = function()
 
     tvguide.description.PicContainer = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.PicContainer.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
+    tvguide.description.PicContainer.style.position = "relative";
 
+    //
+    // padd container
+    //
+
+    tvguide.description.PicPaddContainer = WebLibSimple.createAnyAppend("div", tvguide.description.PicContainer);
+
+    tvguide.description.PicPaddContainer.style.paddingRight  = "8px";
+    tvguide.description.PicPaddContainer.style.paddingBottom = "4px";
 
     //
     // tvguide.description.pic
     //
 
-    tvguide.description.pic = WebLibSimple.createAnyAppend("img", tvguide.description.PicContainer);
+    tvguide.description.pic = WebLibSimple.createAnyAppend("img", tvguide.description.PicPaddContainer);
     tvguide.description.pic.style.borderRadius = "10px";
 }
 
@@ -82,6 +91,7 @@ tvguide.createDurationBox = function()
     titleBox.style.display   = "inline-block";
     titleBox.style.width     = "50%";
     titleBox.style.textAlign = "left";
+    titleBox.style.backgroundColor = "#778899";
 
     titleBox.innerHTML = "Duration:";
 
@@ -97,6 +107,7 @@ tvguide.createDurationBox = function()
     timeBox.style.display   = "inline-block";
     timeBox.style.width     = "50%";
     timeBox.style.textAlign = "right";
+    timeBox.style.backgroundColor = "#123456";
 }
 
 tvguide.createTimeBox = function()
@@ -119,7 +130,7 @@ tvguide.createTimeBox = function()
     container.style.position = "relative";
     container.style.borderRadius = tvguide.descriptionConstants.containerRadius;
 
-    WebLibSimple.setBGColor(container, tvguide.descriptionConstants.containerBG);
+    WebLibSimple.setBGColor(container, "#00ff00");
     WebLibSimple.setFontSpecs(container, 20, "normal", "#000000");
 
     //
@@ -270,12 +281,18 @@ tvguide.onEPGTouchClick = function(target, element)
 
     if (element.epg.img)
     {
+//        tvguide.description.pic.style.width = "100%";
+//        tvguide.description.pic.style.height = "auto";
+
+        tvguide.description.PicContainer.style.width = "40%";
+
+        tvguide.description.DurationBox.style.marginLeft = "40%"
+        tvguide.description.timeBox.style.marginLeft = "40%"
+
+        tvguide.description.PicContainer.style.float = "left";
+
         tvguide.description.pic.style.width = "100%";
         tvguide.description.pic.style.height = "auto";
-
-//        tvguide.description.pic.style.width = "20%";
-//        tvguide.description.pic.style.height = "50%";
-//        tvguide.description.pic.style.cssFloat = "left";
 
         var imgSrc = element.epg.title;
 
@@ -284,8 +301,12 @@ tvguide.onEPGTouchClick = function(target, element)
             imgSrc = element.epg.imgname;
         }
 
-        tvguide.description.pic.src = encodeURI("http://" + WebApp.manifest.appserver +
-            "/pgminfo/tv/de/" + imgSrc + ".orig.jpg");
+        tvguide.description.pic.src = WebLibSimple.getNixPixImg();
+
+        tvguide.description.pic.src = "http://" + WebApp.manifest.appserver +
+            "/pgminfo/tv/de/" + encodeURIComponent(imgSrc) + ".orig.jpg";
+
+        console.log("--> Get picture: " + tvguide.description.pic.src);
     }
     else
     {
