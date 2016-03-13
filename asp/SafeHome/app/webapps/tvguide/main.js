@@ -18,7 +18,7 @@ tvguide.constants =
     content1Color            : "#dedede",
     content2Color            : "#acacac",
     senderImgDivColor        : "#ffffff",
-    senderbarColor           : "#585858",
+    senderbarColor           : "#dedede",
     epgdataColor             : "#dedede",
     epgScrollColor           : "#ffffff",
     epgScrollStyleColor      : "#ffffff",
@@ -200,14 +200,7 @@ tvguide.getSenderList = function()
 
 tvguide.createSenderBar = function()
 {
-    tvguide.senderbarScroll = WebLibSimple.createDivHeight(
-        0,
-        0,
-        0,
-        null,
-        "senderbarScroll",
-        tvguide.senderbar
-    );
+    tvguide.senderbarScroll = WebLibSimple.createDivHeight(0, 0, 0, null, "senderbarScroll", tvguide.senderbar);
 
     tvguide.senderbarScroll.scrollVertical = true;
     tvguide.senderbarScroll.onTouchScroll  = tvguide.onSenderBarScroll;
@@ -246,6 +239,10 @@ tvguide.createSenderBar = function()
 
 tvguide.createTimeLine = function()
 {
+    var timelineInterval = tvguide.constants.timelineInterval;
+    var hoursPix = tvguide.constants.hoursPix;
+    var minPix   = hoursPix / 60;
+
     tvguide.timelineScroll = WebLibSimple.createDivWidth(
         0,
         0,
@@ -255,17 +252,18 @@ tvguide.createTimeLine = function()
         tvguide.timeline
     );
 
-    tvguide.timelineScroll.scrollHorizontal = true;
-    tvguide.timelineScroll.onTouchScroll    = tvguide.onTimeLineScroll;
     tvguide.timelineScroll.style.color      = tvguide.constants.timelineScrollStyleColor;
     tvguide.timelineScroll.style.fontWeight = tvguide.constants.timelineScrollfontWeight;
 
-    for(var min = 0; min < (tvguide.constants.loadHours * 60); min += tvguide.constants.timelineInterval)
+    tvguide.timelineScroll.scrollHorizontal = true;
+    tvguide.timelineScroll.onTouchScroll    = tvguide.onTimeLineScroll;
+
+    for(var min = 0; min < (tvguide.constants.loadHours * 60); min += timelineInterval)
     {
         var timelineDiv = WebLibSimple.createDivWidth(
-            (tvguide.constants.hoursPix / 60 * min),
+            minPix * min,
             0,
-            tvguide.constants.hoursPix / 60 * tvguide.constants.timelineInterval,
+            minPix * timelineInterval,
             0,
             null,
             tvguide.timelineScroll
@@ -273,8 +271,7 @@ tvguide.createTimeLine = function()
 
         WebLibSimple.setBGColor(timelineDiv, tvguide.constants.timelineDivColor);
 
-
-        if (min % (tvguide.constants.timelineInterval * 2))
+        if (min % (timelineInterval * 2))
         {
             var timeSpan = WebLibSimple.createAnyAppend("span", timelineDiv);
             timeSpan.style.border = "1px dotted #e00073";
@@ -294,32 +291,31 @@ tvguide.createTimeLine = function()
 
 tvguide.createEpgProgram = function(channel, epgdata)
 {
-    console.log("Create channel: " + channel + " ==> " + epgdata.length);
-
     var senderIndex = tvguide.senderList.indexOf(channel);
     var minPix = tvguide.constants.hoursPix / 60;
 
     for (var programIndex in epgdata)
     {
-        var startTime = Math.floor((new Date(epgdata[ programIndex ].start).getTime() / 1000 / 60) - tvguide.constants.today);
-        var stopTime  = Math.floor((new Date(epgdata[ programIndex ].stop ).getTime() / 1000 / 60) - tvguide.constants.today);
+        var startDate = new Date(epgdata[ programIndex ].start).getTime() / 1000 / 60;
+        var stopDate  = new Date(epgdata[ programIndex ].stop ).getTime() / 1000 / 60;
+
+        var startTime = Math.floor(startDate - tvguide.constants.today);
+        var stopTime  = Math.floor(stopDate  - tvguide.constants.today);
+
         var duration  = stopTime - startTime;
 
         var programDiv = WebLibSimple.createDivWidHei(
-                        startTime * minPix,
-                        tvguide.constants.senderHeight * senderIndex,
-                        duration * minPix,
-                        tvguide.constants.senderHeight,
-                        null, tvguide.epgScroll);
-
-        programDiv.style.position = "absolute";
+            startTime * minPix,
+            tvguide.constants.senderHeight * senderIndex,
+            duration * minPix,
+            tvguide.constants.senderHeight,
+            null, tvguide.epgScroll);
 
         var paddingDiv = WebLibSimple.createDiv(0, 0, 0, 0, null, programDiv);
         paddingDiv.style.marginLeft   = "4px";
         paddingDiv.style.marginTop    = "2px";
         paddingDiv.style.marginRight  = "0px";
         paddingDiv.style.marginBottom = "2px";
-
         paddingDiv.style.padding      = "8px";
         paddingDiv.style.borderRadius = "8px";
 
@@ -339,8 +335,7 @@ tvguide.createEpgBodyScroll = function()
         tvguide.constants.loadHours * tvguide.constants.hoursPix,
         tvguide.senderbarScroll.clientHeight,
         "epgScroll",
-        tvguide.epgbody
-    );
+        tvguide.epgbody);
 
     tvguide.epgScroll.style.color      = tvguide.constants.epgScrollStyleColor;
     tvguide.epgScroll.style.fontWeight = tvguide.constants.epgScrollfontWeight;
@@ -358,8 +353,7 @@ tvguide.createEpgBodyScroll = function()
         var epgurl = encodeURI(
             tvguide.constants.epgDataSrcPrefix +
             tvguide.senderList[ sender ] +
-            tvguide.constants.epgDataSrcPostfix
-        );
+            tvguide.constants.epgDataSrcPostfix);
 
         WebAppRequest.loadAsyncJSON(epgurl);
     }
@@ -367,20 +361,22 @@ tvguide.createEpgBodyScroll = function()
 
 tvguide.PastLineTimeout = function()
 {
-    var minPix = tvguide.constants.hoursPix / 60;
+    var updateInterval = 3;
+    var minPix = tvguide.constants.hoursPix / (60 * updateInterval);
 
-    var actpos = tvguide.PastLine.style.width;
-    actpos     = parseInt(WebLibSimple.substring(actpos, 0, -2));
+    console.log("--> Update PastLine: " + minPix);
+
+    var actpos = tvguide.PastLine.clientWidth;
     actpos     = actpos + minPix;
 
     tvguide.PastLine.style.width = actpos + "px";
 
-    tvguide.animatePastLine = setTimeout(tvguide.PastLineTimeout, 1000 * 60);
+    tvguide.animatePastLine = setTimeout(tvguide.PastLineTimeout, 1000 * (60 / updateInterval));
 }
 
 tvguide.createPastLine = function()
 {
-    var now         = Math.floor( new Date().getTime() / 1000 / 60);
+    var now         = Math.floor(new Date().getTime() / 1000 / 60);
     var minPix      = tvguide.constants.hoursPix / 60;
     var nowPosition = minPix * (tvguide.constants.today - now);
     var padding     = tvguide.constants.timelineInterval * 4 * minPix;
@@ -422,8 +418,11 @@ WebAppRequest.onLoadAsyncJSON = function(src, data)
     var channel = WebLibSimple.substring(
         decodeURI(src),
         tvguide.constants.epgDataSrcPrefix.length,
-        -tvguide.constants.epgDataSrcPostfix.length
-    );
+        -tvguide.constants.epgDataSrcPostfix.length);
+
+    //
+    // todo
+    //
 
     var epgdata = [];
 
