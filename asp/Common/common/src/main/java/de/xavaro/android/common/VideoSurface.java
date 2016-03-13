@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -32,7 +32,7 @@ public class VideoSurface extends FrameLayout implements
         SeekBar.OnSeekBarChangeListener,
         SurfaceHolder.Callback,
         View.OnTouchListener,
-        ProxyPlayer.Callback
+        VideoProxy.Callback
 
 {
     private static final String LOGTAG = VideoSurface.class.getSimpleName();
@@ -43,7 +43,7 @@ public class VideoSurface extends FrameLayout implements
     {
         if (videoSurface == null)
         {
-            videoSurface = new VideoSurface(HomeActivity.getInstance());
+            videoSurface = new VideoSurface(Simple.getAppContext());
         }
 
         return videoSurface;
@@ -130,7 +130,7 @@ public class VideoSurface extends FrameLayout implements
             @Override
             public void onClick(View view)
             {
-                ProxyPlayer.getInstance().playerReset();
+                VideoProxy.getInstance().playerReset();
             }
         });
 
@@ -147,11 +147,11 @@ public class VideoSurface extends FrameLayout implements
             {
                 if (isPlaying)
                 {
-                    ProxyPlayer.getInstance().playerPause();
+                    VideoProxy.getInstance().playerPause();
                 }
                 else
                 {
-                    ProxyPlayer.getInstance().playerResume();
+                    VideoProxy.getInstance().playerResume();
                 }
             }
         });
@@ -199,7 +199,7 @@ public class VideoSurface extends FrameLayout implements
         @Override
         public void onClick(View view)
         {
-            ProxyPlayer pp = ProxyPlayer.getInstance();
+            VideoProxy pp = VideoProxy.getInstance();
 
             int options = pp.getAvailableQualities();
             int select = 0;
@@ -242,7 +242,7 @@ public class VideoSurface extends FrameLayout implements
         TextView textview = new TextView(context);
         textview.setTypeface(null, Typeface.BOLD);
         textview.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-        textview.setTextColor(GlobalConfigs.VideoSurfaceDisabledButton);
+        textview.setTextColor(CommonConfigs.VideoSurfaceDisabledButton);
         textview.setPadding(0, 5, 0, 0);
         textview.setTextSize(32f);
         textview.setText(text);
@@ -262,14 +262,14 @@ public class VideoSurface extends FrameLayout implements
 
     private void setButtonStates()
     {
-        ProxyPlayer pp = ProxyPlayer.getInstance();
+        VideoProxy pp = VideoProxy.getInstance();
 
         int current = pp.getCurrentQuality();
         int options = pp.getAvailableQualities();
 
-        int dis = GlobalConfigs.VideoSurfaceDisabledButton;
-        int ena = GlobalConfigs.VideoSurfaceEnabledButton;
-        int sel = GlobalConfigs.VideoSurfaceSelectedButton;
+        int dis = CommonConfigs.VideoSurfaceDisabledButton;
+        int ena = CommonConfigs.VideoSurfaceEnabledButton;
+        int sel = CommonConfigs.VideoSurfaceSelectedButton;
 
         if ((options & VideoQuality.LQ) == 0)
         {
@@ -313,7 +313,7 @@ public class VideoSurface extends FrameLayout implements
         @Override
         public void run()
         {
-            int position = ProxyPlayer.getInstance().getCurrentPosition();
+            int position = VideoProxy.getInstance().getCurrentPosition();
             if (position >= 0) videoControl.setCurrentPosition(position);
 
             Log.d(LOGTAG, "progessReader:" + position);
@@ -328,7 +328,7 @@ public class VideoSurface extends FrameLayout implements
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
-        if (fromUser) ProxyPlayer.getInstance().setCurrentPosition(progress);
+        if (fromUser) VideoProxy.getInstance().setCurrentPosition(progress);
     }
 
     @Override
@@ -505,7 +505,7 @@ public class VideoSurface extends FrameLayout implements
     {
         Log.d(LOGTAG, "surfaceCreated");
 
-        ProxyPlayer.getInstance().setDisplay(holder);
+        VideoProxy.getInstance().setDisplay(holder);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width,int height)
@@ -517,7 +517,7 @@ public class VideoSurface extends FrameLayout implements
     {
         Log.d(LOGTAG, "surfaceDestroyed");
 
-        ProxyPlayer.getInstance().setDisplay(null);
+        VideoProxy.getInstance().setDisplay(null);
     }
 
     //endregion SurfaceHolder.Callback interface
@@ -533,7 +533,7 @@ public class VideoSurface extends FrameLayout implements
             ((ViewGroup) spinner.getParent()).removeView(spinner);
         }
 
-        if (visible && ! ProxyPlayer.getInstance().isLocalFile())
+        if (visible && ! VideoProxy.getInstance().isLocalFile())
         {
             if (spinner == null)
             {
@@ -564,14 +564,14 @@ public class VideoSurface extends FrameLayout implements
 
         setButtonStates();
 
-        boolean islocal = ProxyPlayer.getInstance().isLocalFile();
+        boolean islocal = VideoProxy.getInstance().isLocalFile();
         Log.d(LOGTAG, "onPlaybackStartet:" + islocal);
 
         videoControl.setVisibility(islocal ? VISIBLE : INVISIBLE);
 
         if (islocal)
         {
-            videoControl.setDuration(ProxyPlayer.getInstance().getDuration());
+            videoControl.setDuration(VideoProxy.getInstance().getDuration());
 
             removeCallbacks(progessReader);
             post(progessReader);
@@ -605,7 +605,8 @@ public class VideoSurface extends FrameLayout implements
         isPlaying = false;
         setSpinner(false);
 
-        HomeActivity.getInstance().removeVideoSurface();
+        //todo
+        //HomeActivity.getInstance().removeVideoSurface();
     }
 
     public void onPlaybackMeta(String meta)

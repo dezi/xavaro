@@ -16,6 +16,10 @@ public class CommonConfigs
     public static final int PreferenceTextEnabledColor  = 0xff444444;
     public static final int PreferenceTextDisabledColor = 0x88888888;
     public static final int PreferenceTextButtonColor   = 0xff43932f;
+
+    public static final int VideoSurfaceDisabledButton  = 0x88888884;
+    public static final int VideoSurfaceEnabledButton   = 0xddddddd6;
+    public static final int VideoSurfaceSelectedButton  = 0xfffffff8;
     // @formatter:on
 
     //endregion

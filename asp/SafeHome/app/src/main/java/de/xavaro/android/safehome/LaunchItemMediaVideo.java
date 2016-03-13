@@ -7,6 +7,7 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.KnownFileManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
+import de.xavaro.android.common.VideoProxy;
 
 public class LaunchItemMediaVideo extends LaunchItemMedia
 {
@@ -40,7 +41,7 @@ public class LaunchItemMediaVideo extends LaunchItemMedia
 
             if (handler == null) handler = new Handler();
 
-            ProxyPlayer.getInstance().setVideoFile(context, mediaitem, this);
+            VideoProxy.getInstance().setVideoFile(context, mediaitem, this);
             isPlayingVideo = true;
 
             bubbleControls();

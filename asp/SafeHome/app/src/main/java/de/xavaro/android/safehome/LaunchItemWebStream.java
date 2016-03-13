@@ -2,12 +2,10 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
-
-import java.util.ArrayList;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VideoProxy;
 
 public class LaunchItemWebStream extends LaunchItemProxyPlayer
 {
@@ -74,7 +72,7 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
         String audiourl = Json.getString(config, "audiourl");
         if (audiourl == null) return;
 
-        ProxyPlayer.getInstance().setAudioUrl(context, audiourl, this);
+        VideoProxy.getInstance().setAudioUrl(context, audiourl, this);
         isPlayingAudio = true;
 
         bubbleControls();
@@ -87,7 +85,7 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
         String videourl = Json.getString(config, "videourl");
         if (videourl == null) return;
 
-        ProxyPlayer.getInstance().setVideoUrl(context, videourl, this);
+        VideoProxy.getInstance().setVideoUrl(context, videourl, this);
         isPlayingVideo = true;
 
         bubbleControls();

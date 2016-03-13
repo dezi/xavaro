@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 
@@ -34,22 +34,22 @@ import de.xavaro.android.common.VideoQuality;
 // in audio streams.
 //
 @SuppressWarnings("InfiniteLoopStatement")
-public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteListener
+public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteListener
 {
-    private static final String LOGTAG = ProxyPlayer.class.getSimpleName();
+    private static final String LOGTAG = VideoProxy.class.getSimpleName();
 
     //region Contructor and static instance startup.
 
-    private static ProxyPlayer proxiPlayer;
+    private static VideoProxy proxiPlayer;
 
-    public static ProxyPlayer getInstance()
+    public static VideoProxy getInstance()
     {
-        if (proxiPlayer == null) proxiPlayer = new ProxyPlayer();
+        if (proxiPlayer == null) proxiPlayer = new VideoProxy();
 
         return proxiPlayer;
     }
 
-    private ProxyPlayer()
+    private VideoProxy()
     {
         //
         // Initialize and start proxy server.
@@ -311,7 +311,7 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
 
         if (streamOptions != null)
         {
-            for (DitUndDat.StreamOptions so : streamOptions)
+            for (VideoStreamOptions so : streamOptions)
             {
                 mask |= so.quality;
             }
@@ -491,7 +491,7 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
     private String desiredNextFragment;
     private int desiredQuality;
 
-    private ArrayList<DitUndDat.StreamOptions> streamOptions;
+    private ArrayList<VideoStreamOptions> streamOptions;
     private int currentOption;
 
     private boolean mediaPrepared;
@@ -562,8 +562,6 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
 
                 if (requestUrl != null)
                 {
-                    Log.d(LOGTAG, "#########################=" + mediaPrepared + " " + partialFrom + "=>" + partialToto);
-
                     if (requestIsPartial && ! mediaPrepared)
                     {
                         //
@@ -942,7 +940,7 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
 
                     streamurl = resolveRelativeUrl(requestUrl, streamurl);
 
-                    DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
+                    VideoStreamOptions so = new VideoStreamOptions();
 
                     so.width = (width == null) ? 0 : Integer.parseInt(width);
                     so.height = (height == null) ? 0 : Integer.parseInt(height);
@@ -964,7 +962,7 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
                 // Nothing found, so add original url as stream.
                 //
 
-                DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
+                VideoStreamOptions so = new VideoStreamOptions();
                 so.streamUrl = requestUrl;
                 so.quality = VideoQuality.LQ;
 
@@ -985,7 +983,7 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
 
                 for (int inx = 0; inx < streamOptions.size(); inx++)
                 {
-                    DitUndDat.StreamOptions so = streamOptions.get( inx );
+                    VideoStreamOptions so = streamOptions.get( inx );
 
                     if ((so.quality <= desiredQuality)
                             && (so.quality >= currentQuality)

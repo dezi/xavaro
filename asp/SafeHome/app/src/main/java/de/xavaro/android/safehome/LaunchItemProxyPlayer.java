@@ -2,17 +2,16 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
-import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 
-import de.xavaro.android.common.Json;
-import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VideoProxy;
+import de.xavaro.android.common.VideoSurface;
 
-public class LaunchItemProxyPlayer extends LaunchItem implements ProxyPlayer.Callback
+public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Callback
 {
     private final static String LOGTAG = LaunchItemProxyPlayer.class.getSimpleName();
 
@@ -32,7 +31,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements ProxyPlayer.Cal
     {
         if (isPlayingMedia)
         {
-            ProxyPlayer pp = ProxyPlayer.getInstance();
+            VideoProxy pp = VideoProxy.getInstance();
 
             if (pp.isPlaying())
             {
@@ -268,7 +267,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements ProxyPlayer.Cal
             ((ViewGroup) spinner.getParent()).removeView(spinner);
         }
 
-        if (visible && ! ProxyPlayer.getInstance().isLocalFile())
+        if (visible && ! VideoProxy.getInstance().isLocalFile())
         {
             if (spinner == null)
             {
