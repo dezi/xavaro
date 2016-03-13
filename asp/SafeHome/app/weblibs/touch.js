@@ -41,6 +41,9 @@ WebLibTouch.onTouchStart = function(event)
 
     if (touch.starget)
     {
+        touch.scrollVertical   = touch.starget.scrollVertical   || touch.starget.scrollBoth;
+        touch.scrollHorizontal = touch.starget.scrollHorizontal || touch.starget.scrollBoth;
+
         touch.offsetTop  = touch.starget.offsetTop;
         touch.offsetLeft = touch.starget.offsetLeft;
 
@@ -50,39 +53,20 @@ WebLibTouch.onTouchStart = function(event)
         touch.parentWidth  = touch.starget.parentElement.clientWidth;
         touch.parentHeight = touch.starget.parentElement.clientHeight;
 
-        /*
-        console.log("=======pupsi=====" + touch.clientWidth + "/" + touch.clientHeight);
-        console.log("=======pupsi=====" + touch.parentWidth + "/" + touch.parentHeight);
-
-        if (touch.starget.scrollHorizontal) console.log("=======pupsi=====horz");
-        if (touch.starget.scrollVertical) console.log("=======pupsi=====vert");
-
-        if (touch.starget.scrollBoth)
+        if (touch.scrollVertical && (touch.clientHeight < touch.parentHeight))
         {
-            touch.starget.scrollBoth = false;
-            touch.starget.scrollHorizontal = true;
-            touch.starget.scrollVertical   = true;
+            touch.scrollVertical = false;
         }
 
-        if (touch.starget.scrollHorizontal && (touch.clientWidth < touch.parentWidth))
+        if (touch.scrollHorizontal && (touch.clientWidth < touch.parentWidth))
         {
-            touch.starget.scrollHorizontal = false;
+            touch.scrollHorizontal = false;
         }
 
-        if (touch.starget.scrollVertical && (touch.clientHeight < touch.parentHeight))
-        {
-            touch.starget.scrollVertical = false;
-        }
-
-        if (touch.starget.scrollHorizontal) console.log("=======pupsi=====horz");
-        if (touch.starget.scrollVertical) console.log("=======pupsi=====vert");
-
-
-        if (! (touch.starget.scrollVertical || touch.starget.scrollHorizontal))
+        if (! (touch.scrollVertical || touch.scrollHorizontal))
         {
             touch.starget = null;
         }
-        */
     }
 
     if (touch.ctarget)
@@ -212,13 +196,13 @@ WebLibTouch.setOffsets = function()
         var callbackNewX = null;
         var callbackNewY = null;
 
-        if ((touch.starget.scrollHorizontal || touch.starget.scrollBoth) && ! touch.disableHorizontal)
+        if (touch.scrollHorizontal && ! touch.disableHorizontal)
         {
             callbackNewX = touch.newX;
             touch.starget.style.left = touch.newX + "px";
         }
 
-        if ((touch.starget.scrollVertical || touch.starget.scrollBoth)  && ! touch.disableVertical)
+        if (touch.scrollVertical && ! touch.disableVertical)
         {
             callbackNewY = touch.newY;
             touch.starget.style.top = touch.newY + "px";

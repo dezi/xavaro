@@ -15,5 +15,4 @@ public class VideoQuality
 
         return HD;
     }
-
 }
