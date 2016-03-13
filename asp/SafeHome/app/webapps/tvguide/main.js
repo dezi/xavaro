@@ -322,8 +322,14 @@ tvguide.createEpgProgram = function(channel, epgdata)
         paddingDiv.style.border          = tvguide.constants.programBoder;
         paddingDiv.style.backgroundColor = tvguide.constants.programBGColor;
 
-        paddingDiv.epg       = epgdata[ programIndex ]
-        paddingDiv.innerHTML = paddingDiv.epg.title;
+        paddingDiv.epg         = epgdata[ programIndex ]
+
+        var cparts = channel.split("/");
+        paddingDiv.epg.type    = cparts[0];
+        paddingDiv.epg.country = cparts[1];
+        paddingDiv.epg.channel = cparts[2];
+
+        paddingDiv.innerHTML   = paddingDiv.epg.title;
     }
 }
 
@@ -363,8 +369,6 @@ tvguide.PastLineTimeout = function()
 {
     var updateInterval = 3;
     var minPix = tvguide.constants.hoursPix / (60 * updateInterval);
-
-    console.log("--> Update PastLine: " + minPix);
 
     var actpos = tvguide.PastLine.clientWidth;
     actpos     = actpos + minPix;

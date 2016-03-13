@@ -29,7 +29,7 @@ public class WebAppMedia
     }
 
     @JavascriptInterface
-    public void addRecordings(String event)
+    public void addRecording(String event)
     {
         EventManager.addComingEvent(keyprefix, Json.fromStringObject(event));
     }

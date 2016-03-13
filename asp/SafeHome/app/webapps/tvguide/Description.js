@@ -261,6 +261,8 @@ tvguide.onEPGTouchClick = function(target, element)
 
     console.log("tvguide.onEPGTouchClick: element " + element.epg.title);
 
+    tvguide.description.epg = element.epg;
+
     tvguide.descriptionScroll.style.top = "0px";
 
     tvguide.description.titlebar.innerHTML = element.epg.title;
@@ -340,6 +342,15 @@ tvguide.onEPGTouchClick = function(target, element)
         tvguide.description.pic.style.height = "0%";
     }
 
+    tvguide.description.button = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+    tvguide.description.button.style.width  = "100%";
+    tvguide.description.button.style.height = "100px";
+    tvguide.description.button.innerHTML    = "Hallo";
+
+    tvguide.description.button.onTouchClick = tvguide.record;
+
+    WebLibSimple.setBGColor(tvguide.description.button, "#ff0000");
+
     if (tvguide.animateInfoRunning)
     {
         console.log("=========> STOP");
@@ -360,4 +371,14 @@ tvguide.onEPGTouchClick = function(target, element)
             tvguide.animateInfoOut();
         }
     }
+}
+
+tvguide.record = function()
+{
+    var epg = tvguide.description.epg;
+    epg.date = epg.start;
+
+    WebAppMedia.addRecording(JSON.stringify(epg));
+
+    console.log(JSON.stringify(tvguide.description.epg));
 }

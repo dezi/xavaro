@@ -10,6 +10,7 @@
     "permissions": [
       "request",
       "utility",
+      "media",
       "prefs"
     ],
 
