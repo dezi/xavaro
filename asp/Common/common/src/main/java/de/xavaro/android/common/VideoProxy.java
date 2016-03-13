@@ -24,11 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.VideoQuality;
-
 //
 // Proxy media player class with icy metadata detection
 // in audio streams.

@@ -22,9 +22,11 @@ import de.xavaro.android.common.MediaRecorder;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
+import de.xavaro.android.common.VideoSurface;
 
 public class HomeActivity extends AppCompatActivity implements
-        View.OnSystemUiVisibilityChangeListener
+        View.OnSystemUiVisibilityChangeListener,
+        VideoSurface.VideoSurfaceHandler
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
@@ -277,7 +279,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void removeVideoSurface()
     {
-        if (videoSurface != null)
+        if ((videoSurface != null) &&  (videoSurface.getParent() == topscreen))
         {
             topscreen.removeView(videoSurface);
             videoSurface = null;

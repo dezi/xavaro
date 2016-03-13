@@ -19,11 +19,6 @@ import android.widget.TextView;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import de.xavaro.android.common.Animator;
-import de.xavaro.android.common.VersionUtils;
-import de.xavaro.android.common.VideoControl;
-import de.xavaro.android.common.VideoQuality;
-
 //
 // Video play surface layout connected to HomeActivity.
 //
@@ -308,7 +303,7 @@ public class VideoSurface extends FrameLayout implements
         }
     }
 
-    private final Runnable progessReader = new Runnable()
+    private final Runnable progressReader = new Runnable()
     {
         @Override
         public void run()
@@ -316,10 +311,8 @@ public class VideoSurface extends FrameLayout implements
             int position = VideoProxy.getInstance().getCurrentPosition();
             if (position >= 0) videoControl.setCurrentPosition(position);
 
-            Log.d(LOGTAG, "progessReader:" + position);
-
-            removeCallbacks(progessReader);
-            postDelayed(progessReader, 1000);
+            removeCallbacks(progressReader);
+            postDelayed(progressReader, 1000);
         }
     };
 
@@ -573,8 +566,8 @@ public class VideoSurface extends FrameLayout implements
         {
             videoControl.setDuration(VideoProxy.getInstance().getDuration());
 
-            removeCallbacks(progessReader);
-            post(progessReader);
+            removeCallbacks(progressReader);
+            post(progressReader);
         }
     }
 
@@ -605,8 +598,14 @@ public class VideoSurface extends FrameLayout implements
         isPlaying = false;
         setSpinner(false);
 
-        //todo
-        //HomeActivity.getInstance().removeVideoSurface();
+        removeCallbacks(progressReader);
+
+        Context activity = Simple.getAppContext();
+
+        if (activity instanceof VideoSurfaceHandler)
+        {
+            ((VideoSurfaceHandler) activity).removeVideoSurface();
+        }
     }
 
     public void onPlaybackMeta(String meta)
@@ -615,4 +614,10 @@ public class VideoSurface extends FrameLayout implements
     }
 
     //endregion ProxyPlayer.Callback interface
+
+    public interface VideoSurfaceHandler
+    {
+        void addVideoSurface(FrameLayout video);
+        void removeVideoSurface();
+    }
 }
