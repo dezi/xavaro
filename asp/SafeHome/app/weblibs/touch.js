@@ -49,6 +49,40 @@ WebLibTouch.onTouchStart = function(event)
 
         touch.parentWidth  = touch.starget.parentElement.clientWidth;
         touch.parentHeight = touch.starget.parentElement.clientHeight;
+
+        /*
+        console.log("=======pupsi=====" + touch.clientWidth + "/" + touch.clientHeight);
+        console.log("=======pupsi=====" + touch.parentWidth + "/" + touch.parentHeight);
+
+        if (touch.starget.scrollHorizontal) console.log("=======pupsi=====horz");
+        if (touch.starget.scrollVertical) console.log("=======pupsi=====vert");
+
+        if (touch.starget.scrollBoth)
+        {
+            touch.starget.scrollBoth = false;
+            touch.starget.scrollHorizontal = true;
+            touch.starget.scrollVertical   = true;
+        }
+
+        if (touch.starget.scrollHorizontal && (touch.clientWidth < touch.parentWidth))
+        {
+            touch.starget.scrollHorizontal = false;
+        }
+
+        if (touch.starget.scrollVertical && (touch.clientHeight < touch.parentHeight))
+        {
+            touch.starget.scrollVertical = false;
+        }
+
+        if (touch.starget.scrollHorizontal) console.log("=======pupsi=====horz");
+        if (touch.starget.scrollVertical) console.log("=======pupsi=====vert");
+
+
+        if (! (touch.starget.scrollVertical || touch.starget.scrollHorizontal))
+        {
+            touch.starget = null;
+        }
+        */
     }
 
     if (touch.ctarget)
@@ -144,9 +178,6 @@ WebLibTouch.onTouchEnd = function(event)
 
     if (touch.starget)
     {
-        if (touch.newX > 0) touch.newX = 0;
-        if (touch.newY > 0) touch.newY = 0;
-
         if ((touch.newX + touch.clientWidth) < touch.parentWidth)
         {
             touch.newX = touch.parentWidth - touch.clientWidth;
@@ -156,6 +187,9 @@ WebLibTouch.onTouchEnd = function(event)
         {
             touch.newY = touch.parentHeight - touch.clientHeight;
         }
+
+        if (touch.newX > 0) touch.newX = 0;
+        if (touch.newY > 0) touch.newY = 0;
 
         WebLibTouch.setOffsets();
     }

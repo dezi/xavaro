@@ -11,7 +11,7 @@ tvguide.createTitleBar = function()
     // tvguide.description.titlebar
     //
 
-    tvguide.description.titlebar = WebLibSimple.createAnyAppend("div", tvguide.description.content);
+    tvguide.description.titlebar = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.titlebar.style.textAlign = "center";
 
     WebLibSimple.setBGColor(tvguide.description.titlebar, "#ffffff");
@@ -21,7 +21,7 @@ tvguide.createTitleBar = function()
     // tvguide.description.subtitlebar
     //
 
-    tvguide.description.subtitlebar = WebLibSimple.createAnyAppend("div", tvguide.description.content);
+    tvguide.description.subtitlebar = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.subtitlebar.style.textAlign = "center";
     tvguide.description.subtitlebar.style.fontStyle = "italic";
 
@@ -35,7 +35,7 @@ tvguide.createPic = function()
     // pic container
     //
 
-    tvguide.description.PicContainer = WebLibSimple.createAnyAppend("div", tvguide.description.content);
+    tvguide.description.PicContainer = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.PicContainer.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
 
@@ -53,7 +53,7 @@ tvguide.createDurationBox = function()
     // tvguide.description.DurationBox
     //
 
-    tvguide.description.DurationBox = WebLibSimple.createAnyAppend("div", tvguide.description.content);
+    tvguide.description.DurationBox = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.DurationBox.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
     //
@@ -105,7 +105,7 @@ tvguide.createTimeBox = function()
     // tvguide.description.timeBox
     //
 
-    tvguide.description.timeBox = WebLibSimple.createAnyAppend("div", tvguide.description.content);
+    tvguide.description.timeBox = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.timeBox.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
     //
@@ -153,7 +153,7 @@ tvguide.createInfoBox = function()
     // tvguide.description.infoBox
     //
 
-    tvguide.description.infoBox = WebLibSimple.createAnyAppend("div", tvguide.description.content);
+    tvguide.description.infoBox = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     tvguide.description.infoBox.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
     //
@@ -190,8 +190,12 @@ tvguide.createDescriptionSetup = function()
 
     WebLibSimple.setBGColor(tvguide.description.content, "#ffffff");
 
-//    tvguide.descriptionScroll = WebLibSimple.createDivHeight(0, 0, 0, null, "descriptionScroll", tvguide.description.content);
-//    tvguide.descriptionScroll.scrollVertical = true;
+    //
+    // Scroll
+    //
+
+    tvguide.descriptionScroll = WebLibSimple.createDivHeight(0, 0, 0, null, "descriptionScroll", tvguide.description.content);
+    tvguide.descriptionScroll.scrollVertical = true;
 
     //
     // content setup
