@@ -155,6 +155,16 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
         mediaPlayer.setDisplay(holder);
     }
 
+    public int getDuration()
+    {
+        if ((mediaPlayer != null) && mediaPrepared && isLocalFile())
+        {
+            return mediaPlayer.getDuration();
+        }
+
+        return -1;
+    }
+
     public int getCurrentPosition()
     {
         if ((mediaPlayer != null) && mediaPrepared && isLocalFile())
@@ -171,11 +181,6 @@ public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteLis
         {
             mediaPlayer.seekTo(position);
         }
-    }
-
-    public MediaPlayer getMediaPlayer()
-    {
-        return mediaPlayer;
     }
 
     public boolean isLocalFile()

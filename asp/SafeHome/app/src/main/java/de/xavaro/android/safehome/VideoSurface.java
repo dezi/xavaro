@@ -82,6 +82,7 @@ public class VideoSurface extends FrameLayout implements
     }
 
     private FrameLayout topArea;
+    private FrameLayout bottomArea;
 
     private FrameLayout playButton;
 
@@ -105,11 +106,18 @@ public class VideoSurface extends FrameLayout implements
         fullScreenParams.topMargin  = 400;
 
         topArea = new FrameLayout(context);
-        topArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 80));
+        topArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 80, Gravity.TOP));
         topArea.setPadding(10, 10, 10, 10);
         topArea.setVisibility(INVISIBLE);
 
         this.addView(topArea);
+
+        bottomArea = new FrameLayout(context);
+        bottomArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 80, Gravity.BOTTOM));
+        bottomArea.setPadding(10, 10, 10, 10);
+        bottomArea.setVisibility(INVISIBLE);
+
+        this.addView(bottomArea);
 
         FrameLayout offButton = new FrameLayout(context);
         offButton.setLayoutParams(new LayoutParams(60, 60, Gravity.START + Gravity.TOP));
@@ -183,7 +191,7 @@ public class VideoSurface extends FrameLayout implements
         videoControl = new VideoControl(context);
         videoControl.setOnSeekBarChangeListener(this);
         videoControl.setVisibility(INVISIBLE);
-        this.addView(videoControl);
+        bottomArea.addView(videoControl);
     }
 
     private final View.OnClickListener qualityButtonOnClick = new View.OnClickListener()
@@ -320,7 +328,7 @@ public class VideoSurface extends FrameLayout implements
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
-        ProxyPlayer.getInstance().setCurrentPosition(progress);
+        if (fromUser) ProxyPlayer.getInstance().setCurrentPosition(progress);
     }
 
     @Override
@@ -349,6 +357,7 @@ public class VideoSurface extends FrameLayout implements
         public void run()
         {
             topArea.setVisibility(VISIBLE);
+            bottomArea.setVisibility(VISIBLE);
         }
     };
 
@@ -411,6 +420,7 @@ public class VideoSurface extends FrameLayout implements
                     if (isFullscreen)
                     {
                         topArea.setVisibility(INVISIBLE);
+                        bottomArea.setVisibility(INVISIBLE);
 
                         surfaceLayout.setLayoutParams(normalParams);
                         setBackgroundColor(Color.TRANSPARENT);
@@ -561,6 +571,8 @@ public class VideoSurface extends FrameLayout implements
 
         if (islocal)
         {
+            videoControl.setDuration(ProxyPlayer.getInstance().getDuration());
+
             removeCallbacks(progessReader);
             post(progessReader);
         }
