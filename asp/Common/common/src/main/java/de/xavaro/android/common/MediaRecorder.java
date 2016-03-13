@@ -39,7 +39,7 @@ public class MediaRecorder
         Json.put(event, "country", "de");
         Json.put(event, "type", "tv");
 
-        handleEvent(events);
+        //handleEvent(events);
     }
 
     public static void handleEvent(JSONArray events)
@@ -344,9 +344,13 @@ public class MediaRecorder
 
         File metafile = new File(mediadir, basename + ".json");
         File mediafile = new File(mediadir, basename + (type.equals("tv") ? ".mp4" : ".mp3"));
+        File previewfile = new File(mediadir, basename + ".jpg");
 
         Json.put(recording, "metafile", metafile.toString());
         Json.put(recording, "mediafile", mediafile.toString());
+
+        if (type.equals("tv")) Json.put(recording, "previewfile", previewfile.toString());
+
         Json.put(recording, "iptvchannel", iptvchannel);
         Json.put(recording, "iptvplaylist", iptvplaylist);
 

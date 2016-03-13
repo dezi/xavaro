@@ -50,6 +50,27 @@ public class EventManager
         Simple.makePost(freeMemory, 10 * 1000);
     }
 
+    public static void addComingEvent(String eventgroup, JSONObject event)
+    {
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        JSONObject coming = Json.getObject(eventcache, "coming");
+
+        if (coming != null)
+        {
+            if (!coming.has(eventgroup)) Json.put(coming, eventgroup, new JSONArray());
+            JSONArray events = Json.getArray(coming, eventgroup);
+
+            Json.put(events, event);
+
+            Json.put(coming, eventgroup, Json.sort(events, "date", false));
+            dirty = true;
+        }
+
+        Simple.makePost(freeMemory, 10 * 1000);
+    }
+
     public static void updateComingEvent(String eventgroup, JSONObject event)
     {
         Simple.removePost(freeMemory);

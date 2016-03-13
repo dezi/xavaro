@@ -1146,15 +1146,18 @@ public class Simple
     {
         try
         {
-            InputStream in = new FileInputStream(file);
-            int len = (int) file.length();
-            byte[] buf = new byte[ len ];
+            if (file.exists())
+            {
+                InputStream in = new FileInputStream(file);
+                int len = (int) file.length();
+                byte[] buf = new byte[ len ];
 
-            int xfer = 0;
-            while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
-            in.close();
+                int xfer = 0;
+                while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
+                in.close();
 
-            return new String(buf);
+                return new String(buf);
+            }
         }
         catch (Exception ex)
         {

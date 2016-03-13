@@ -1,4 +1,7 @@
-alert("nix hier....");
+//
+// Testing webapp.
+//
 
-//com.ifap.arzneiaktuell
-//com.medisafe.android.client
+testing.recordings = WebAppMedia.getRecordedItems();
+testing.pre = WebLibSimple.createAnyAppend("pre", document.body);
+testing.pre.innerHTML = testing.recordings;
