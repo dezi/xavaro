@@ -33,8 +33,8 @@ public class MediaRecorder
         events.put(event);
 
         Json.put(event, "date", "2016-03-12T16:30:00Z");
-        Json.put(event, "start", "2016-03-12T17:16:00Z");
-        Json.put(event, "stop", "2016-03-12T17:50:00Z");
+        Json.put(event, "start", "2016-03-12T18:16:00Z");
+        Json.put(event, "stop", "2016-03-12T18:30:00Z");
         Json.put(event, "channel", "Das Erste HD");
         Json.put(event, "country", "de");
         Json.put(event, "type", "tv");

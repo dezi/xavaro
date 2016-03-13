@@ -34,7 +34,7 @@ import de.xavaro.android.common.VideoQuality;
 // in audio streams.
 //
 @SuppressWarnings("InfiniteLoopStatement")
-public class ProxyPlayer extends Thread
+public class ProxyPlayer extends Thread implements MediaPlayer.OnSeekCompleteListener
 {
     private static final String LOGTAG = ProxyPlayer.class.getSimpleName();
 
@@ -76,6 +76,7 @@ public class ProxyPlayer extends Thread
 
         handler = new Handler();
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnSeekCompleteListener(this);
     }
 
     //endregion
@@ -154,6 +155,24 @@ public class ProxyPlayer extends Thread
         mediaPlayer.setDisplay(holder);
     }
 
+    public int getCurrentPosition()
+    {
+        if ((mediaPlayer != null) && mediaPrepared && isLocalFile())
+        {
+            return mediaPlayer.getCurrentPosition();
+        }
+
+        return -1;
+    }
+
+    public void setCurrentPosition(int position)
+    {
+        if ((mediaPlayer != null) && mediaPrepared && isLocalFile())
+        {
+            mediaPlayer.seekTo(position);
+        }
+    }
+
     public MediaPlayer getMediaPlayer()
     {
         return mediaPlayer;
@@ -161,10 +180,15 @@ public class ProxyPlayer extends Thread
 
     public boolean isLocalFile()
     {
-        return mediaIsAudio || mediaIsAudio;
+        return mediaIsVideo || mediaIsAudio;
     }
 
     //endregion
+
+    public void onSeekComplete (MediaPlayer mp)
+    {
+        Log.d(LOGTAG,"onSeekComplete:");
+    }
 
     //region Control methods.
 

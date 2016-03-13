@@ -125,6 +125,8 @@ public class LaunchItemProxyPlayer extends LaunchItem implements ProxyPlayer.Cal
             if (isPlayingVideo)
             {
                 VideoSurface.getInstance().onPlaybackPrepare();
+
+                HomeActivity.getInstance().addVideoSurface(VideoSurface.getInstance());
             }
         }
     };

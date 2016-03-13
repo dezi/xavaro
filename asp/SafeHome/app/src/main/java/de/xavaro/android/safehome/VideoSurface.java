@@ -14,12 +14,14 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import de.xavaro.android.common.Animator;
 import de.xavaro.android.common.VersionUtils;
+import de.xavaro.android.common.VideoControl;
 import de.xavaro.android.common.VideoQuality;
 
 //
@@ -27,9 +29,11 @@ import de.xavaro.android.common.VideoQuality;
 //
 
 public class VideoSurface extends FrameLayout implements
+        SeekBar.OnSeekBarChangeListener,
         SurfaceHolder.Callback,
         View.OnTouchListener,
         ProxyPlayer.Callback
+
 {
     private static final String LOGTAG = VideoSurface.class.getSimpleName();
 
@@ -49,8 +53,6 @@ public class VideoSurface extends FrameLayout implements
     private LayoutParams fullScreenParams;
 
     private FrameLayout surfaceLayout;
-    private SurfaceView surfaceView;
-    private SurfaceHolder surfaceHolder;
 
     private boolean isFullscreen;
     private boolean isPlaying;
@@ -82,12 +84,13 @@ public class VideoSurface extends FrameLayout implements
     private FrameLayout topArea;
 
     private FrameLayout playButton;
-    private FrameLayout offButton;
 
     private FrameLayout qualityLQButton;
     private FrameLayout qualitySDButton;
     private FrameLayout qualityHQButton;
     private FrameLayout qualityHDButton;
+
+    private VideoControl videoControl;
 
     private void myInit(Context context)
     {
@@ -108,7 +111,7 @@ public class VideoSurface extends FrameLayout implements
 
         this.addView(topArea);
 
-        offButton = new FrameLayout(context);
+        FrameLayout offButton = new FrameLayout(context);
         offButton.setLayoutParams(new LayoutParams(60, 60, Gravity.START + Gravity.TOP));
         offButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_shutdown_190x190));
 
@@ -169,13 +172,18 @@ public class VideoSurface extends FrameLayout implements
         outer.addView(qualityLQButton);
 
         surfaceLayout = new FrameLayout(context);
-        surfaceView = new SurfaceView(context);
-        surfaceHolder = surfaceView.getHolder();
+        SurfaceView surfaceView = new SurfaceView(context);
+        SurfaceHolder surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceLayout.addView(surfaceView);
         surfaceLayout.setOnTouchListener(this);
 
         this.addView(surfaceLayout, normalParams);
+
+        videoControl = new VideoControl(context);
+        videoControl.setOnSeekBarChangeListener(this);
+        videoControl.setVisibility(INVISIBLE);
+        this.addView(videoControl);
     }
 
     private final View.OnClickListener qualityButtonOnClick = new View.OnClickListener()
@@ -292,7 +300,42 @@ public class VideoSurface extends FrameLayout implements
         }
     }
 
-    //region View.OnTouchListener interface.
+    private final Runnable progessReader = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            int position = ProxyPlayer.getInstance().getCurrentPosition();
+            if (position >= 0) videoControl.setCurrentPosition(position);
+
+            Log.d(LOGTAG, "progessReader:" + position);
+
+            removeCallbacks(progessReader);
+            postDelayed(progessReader, 1000);
+        }
+    };
+
+    //region SeekBar.OnSeekBarChangeListener interface
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+    {
+        ProxyPlayer.getInstance().setCurrentPosition(progress);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar)
+    {
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar)
+    {
+    }
+
+    //endregion SeekBar.OnSeekBarChangeListener interface
+
+    //region View.OnTouchListener interface
 
     private int xStartMargin;
     private int yStartMargin;
@@ -396,9 +439,9 @@ public class VideoSurface extends FrameLayout implements
         return true;
     }
 
-    //endregion
+    //endregion View.OnTouchListener interface
 
-    //region Orientation change handling.
+    //region Orientation change handling
 
     private boolean orientationChanged = false;
 
@@ -444,9 +487,9 @@ public class VideoSurface extends FrameLayout implements
         }
     };
 
-    //endregion
+    //endregion Orientation change handling
 
-    //region SurfaceHolder.Callback interface.
+    //region SurfaceHolder.Callback interface
 
     public void surfaceCreated(SurfaceHolder holder)
     {
@@ -467,9 +510,9 @@ public class VideoSurface extends FrameLayout implements
         ProxyPlayer.getInstance().setDisplay(null);
     }
 
-    //endregion
+    //endregion SurfaceHolder.Callback interface
 
-    //region ProxyPlayer.Callback interface.
+    //region ProxyPlayer.Callback interface
 
     private ProgressBar spinner;
 
@@ -497,8 +540,6 @@ public class VideoSurface extends FrameLayout implements
     {
         Log.d(LOGTAG, "onPlaybackPrepare");
 
-        HomeActivity.getInstance().addVideoSurface(this);
-
         setSpinner(true);
     }
 
@@ -513,7 +554,16 @@ public class VideoSurface extends FrameLayout implements
 
         setButtonStates();
 
-        Log.d(LOGTAG, "======================duration=" + ProxyPlayer.getInstance().getMediaPlayer().getDuration());
+        boolean islocal = ProxyPlayer.getInstance().isLocalFile();
+        Log.d(LOGTAG, "onPlaybackStartet:" + islocal);
+
+        videoControl.setVisibility(islocal ? VISIBLE : INVISIBLE);
+
+        if (islocal)
+        {
+            removeCallbacks(progessReader);
+            post(progessReader);
+        }
     }
 
     public void onPlaybackPaused()
@@ -551,5 +601,5 @@ public class VideoSurface extends FrameLayout implements
         Log.d(LOGTAG,"onPlaybackMeta");
     }
 
-    //endregion
+    //endregion ProxyPlayer.Callback interface
 }
