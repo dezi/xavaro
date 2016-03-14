@@ -1,6 +1,7 @@
 <resources>
 
     <string name="simple_and">und</string>
+    <string name="simple_new">neu</string>
 
     <string-array name="pref_where_vals">
         <item>Inaktiv</item>
@@ -57,13 +58,39 @@
         <item>Papierkorb</item>
     </string-array>
 
+    <string-array name="pref_media_image_where_vals">
+        <item>Nicht aktiviert</item>
+        <item>Home</item>
+        <item>Fotoalben</item>
+    </string-array>
+
+    <string-array name="pref_media_video_directories_vals">
+        <item>Filme</item>
+        <item>Rekorder</item>
+        <item>Papierkorb</item>
+    </string-array>
+
+    <string-array name="pref_media_video_where_vals">
+        <item>Nicht aktiviert</item>
+        <item>Home</item>
+        <item>Videos</item>
+    </string-array>
+
+
     <string name="launch_media_image_simple_send">Das Bild wird an %s versendet.</string>
     <string name="launch_media_image_simple_yousend">Sie haben ein Bild an %s gesendet.</string>
     <string name="launch_media_image_simple_yousend_du">Du hast ein Bild an %s gesendet.</string>
 
-    <string-array name="launch_media_image_longclick_vals">
+    <string-array name="launch_media_longclick_vals">
         <item>Versenden</item>
         <item>Löschen</item>
+    </string-array>
+
+    <string-array name="launch_media_options_vals">
+        <item>Dieses Bild</item>
+        <item>Dieses Video</item>
+        <item>Dieses Audio</item>
+        <item>Dieses E-Book</item>
     </string-array>
 
     <string name="comm_sender_sent_image">Bild versendet</string>

@@ -8,9 +8,13 @@
     "preferences": false,
 
     "permissions": [
-      "request",
       "intercept",
+      "request",
       "utility",
+      "health",
+      "events",
+      "media",
+      "speak",
       "prefs"
     ],
 

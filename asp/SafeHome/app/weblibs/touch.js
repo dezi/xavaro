@@ -41,6 +41,9 @@ WebLibTouch.onTouchStart = function(event)
 
     if (touch.starget)
     {
+        touch.scrollVertical   = touch.starget.scrollVertical   || touch.starget.scrollBoth;
+        touch.scrollHorizontal = touch.starget.scrollHorizontal || touch.starget.scrollBoth;
+
         touch.offsetTop  = touch.starget.offsetTop;
         touch.offsetLeft = touch.starget.offsetLeft;
 
@@ -49,6 +52,21 @@ WebLibTouch.onTouchStart = function(event)
 
         touch.parentWidth  = touch.starget.parentElement.clientWidth;
         touch.parentHeight = touch.starget.parentElement.clientHeight;
+
+        if (touch.scrollVertical && (touch.clientHeight < touch.parentHeight))
+        {
+            touch.scrollVertical = false;
+        }
+
+        if (touch.scrollHorizontal && (touch.clientWidth < touch.parentWidth))
+        {
+            touch.scrollHorizontal = false;
+        }
+
+        if (! (touch.scrollVertical || touch.scrollHorizontal))
+        {
+            touch.starget = null;
+        }
     }
 
     if (touch.ctarget)
@@ -144,9 +162,6 @@ WebLibTouch.onTouchEnd = function(event)
 
     if (touch.starget)
     {
-        if (touch.newX > 0) touch.newX = 0;
-        if (touch.newY > 0) touch.newY = 0;
-
         if ((touch.newX + touch.clientWidth) < touch.parentWidth)
         {
             touch.newX = touch.parentWidth - touch.clientWidth;
@@ -156,6 +171,9 @@ WebLibTouch.onTouchEnd = function(event)
         {
             touch.newY = touch.parentHeight - touch.clientHeight;
         }
+
+        if (touch.newX > 0) touch.newX = 0;
+        if (touch.newY > 0) touch.newY = 0;
 
         WebLibTouch.setOffsets();
     }
@@ -178,13 +196,13 @@ WebLibTouch.setOffsets = function()
         var callbackNewX = null;
         var callbackNewY = null;
 
-        if ((touch.starget.scrollHorizontal || touch.starget.scrollBoth) && ! touch.disableHorizontal)
+        if (touch.scrollHorizontal && ! touch.disableHorizontal)
         {
             callbackNewX = touch.newX;
             touch.starget.style.left = touch.newX + "px";
         }
 
-        if ((touch.starget.scrollVertical || touch.starget.scrollBoth)  && ! touch.disableVertical)
+        if (touch.scrollVertical && ! touch.disableVertical)
         {
             callbackNewY = touch.newY;
             touch.starget.style.top = touch.newY + "px";

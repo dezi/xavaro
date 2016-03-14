@@ -1146,15 +1146,18 @@ public class Simple
     {
         try
         {
-            InputStream in = new FileInputStream(file);
-            int len = (int) file.length();
-            byte[] buf = new byte[ len ];
+            if (file.exists())
+            {
+                InputStream in = new FileInputStream(file);
+                int len = (int) file.length();
+                byte[] buf = new byte[ len ];
 
-            int xfer = 0;
-            while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
-            in.close();
+                int xfer = 0;
+                while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
+                in.close();
 
-            return new String(buf);
+                return new String(buf);
+            }
         }
         catch (Exception ex)
         {
@@ -1180,6 +1183,16 @@ public class Simple
         }
 
         return false;
+    }
+
+    public static File changeExtension(File file, String extension)
+    {
+        return new File(file.getParent(), file.getName().replaceAll("\\.[a-zA-Z0-9]*$", extension));
+    }
+
+    public static String changeExtension(String file, String extension)
+    {
+        return file.replaceAll("\\.[a-zA-Z0-9]*$", extension);
     }
 
     @Nullable
@@ -1537,7 +1550,6 @@ public class Simple
         return timeStampAsISO(todayAsTimeStamp());
     }
 
-    @Nullable
     public static String timeStampAsISO(long timestamp)
     {
         DateFormat df = new SimpleDateFormat(ISO8601DATEFORMAT, Locale.getDefault());
@@ -1545,7 +1557,6 @@ public class Simple
         return df.format(new Date(timestamp));
     }
 
-    @Nullable
     public static String timeStampUTCAsLocalISO(long timestamp)
     {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
@@ -1804,7 +1815,7 @@ public class Simple
         return Json.sort(list, "time", desc);
     }
 
-    public static class IsFileFilter implements FilenameFilter
+    public static class FileFilter implements FilenameFilter
     {
         public boolean accept(File dir, String name)
         {
@@ -1812,7 +1823,7 @@ public class Simple
         }
     }
 
-    public static class IsDirFilter implements FilenameFilter
+    public static class DirFilter implements FilenameFilter
     {
         public boolean accept(File dir, String name)
         {
@@ -1820,24 +1831,49 @@ public class Simple
         }
     }
 
+    public static boolean isImage(String name)
+    {
+        final String[] exts = new String[]{".jpg", ".png", ".gif", ".jpeg"};
+
+        for (String ext : exts)
+        {
+            if (name.toLowerCase().endsWith(ext))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static class ImageFileFilter implements FilenameFilter
     {
-        private final String[] exts = new String[]{".jpg", ".png", ".gif", ".jpeg"};
-
         public boolean accept(File dir, String name)
         {
-            if (new File(dir, name).isFile())
-            {
-                for (String ext : exts)
-                {
-                    if (name.toLowerCase().endsWith(ext))
-                    {
-                        return true;
-                    }
-                }
-            }
+            return new File(dir, name).isFile() && isImage(name);
+        }
+    }
 
-            return false;
+    public static boolean isVideo(String name)
+    {
+        final String[] exts = new String[]{".mp4", ".mpg"};
+
+        for (String ext : exts)
+        {
+            if (name.toLowerCase().endsWith(ext))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static class VideoFileFilter implements FilenameFilter
+    {
+        public boolean accept(File dir, String name)
+        {
+            return new File(dir, name).isFile() && isVideo(name);
         }
     }
 

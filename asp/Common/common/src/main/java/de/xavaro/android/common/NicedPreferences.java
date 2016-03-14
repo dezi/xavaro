@@ -555,28 +555,6 @@ public class NicedPreferences
         }
     }
 
-    public static class NiceGalleryPreference extends NiceListPreference
-    {
-        public NiceGalleryPreference(Context context)
-        {
-            super(context);
-
-            CharSequence[] sendtoText= {
-                    "Nicht aktiviert",
-                    "Home",
-                    "Fotoalben"};
-
-            CharSequence[] sendtoVals = {
-                    "inact",
-                    "home",
-                    "images"};
-
-            this.setEntries(sendtoText);
-            this.setEntryValues(sendtoVals);
-            this.setDefaultValue("inact");
-        }
-    }
-
     public static class NiceMultiListPreference extends MultiSelectListPreference
             implements Preference.OnPreferenceChangeListener
     {

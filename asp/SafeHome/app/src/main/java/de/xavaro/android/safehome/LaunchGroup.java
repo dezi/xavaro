@@ -24,6 +24,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.Animator;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
@@ -252,7 +253,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
                 LayoutParams toto = new LayoutParams(lpage.getLayoutParams());
                 toto.leftMargin = finalMargin;
 
-                DitUndDat.Animator animator = new DitUndDat.Animator();
+                Animator animator = new Animator();
 
                 animator.setDuration(500);
                 animator.setLayout(lpage, from, toto);

@@ -461,7 +461,7 @@ WebLibSimple.getNiceDate = function(date)
         nicedate = prefix + ", "
                  + WebLibSimple.padNum(work.getDate(), 2) + "."
                  + WebLibSimple.padNum(work.getMonth() + 1, 2) + "."
-                 + WebLibSimple.padNum(work. getFullYear(), 4);
+                 + WebLibSimple.padNum(work.getFullYear(), 4);
     }
 
     nicedate += " " + WebLibStrings.getTrans("simple.at");
@@ -494,8 +494,33 @@ WebLibSimple.getNiceDay = function(date)
         nicedate = prefix + ", "
                  + WebLibSimple.padNum(work.getDate(), 2) + "."
                  + WebLibSimple.padNum(work.getMonth() + 1, 2) + "."
-                 + WebLibSimple.padNum(work. getFullYear(), 4);
+                 + WebLibSimple.padNum(work.getFullYear(), 4);
     }
+
+    return nicedate;
+}
+
+WebLibSimple.getDuration = function(startDate, stopDate)
+{
+    var startDate = new Date(startDate);
+    var stopDate  = new Date(stopDate);
+    var duration  = stopDate.getTime() - startDate.getTime();
+
+    // return milliseconds
+    return duration;
+}
+
+//
+// todo: Locale --> WebLibSimple.getNiceTime()
+//
+
+WebLibSimple.getNiceTime = function(date)
+{
+    var work = new Date(date);
+
+    var nicedate = WebLibSimple.padNum(work.getHours(),   2) + ":"
+                 + WebLibSimple.padNum(work.getMinutes(), 2);
+//             + WebLibSimple.padNum(work.getSeconds(), 2);
 
     return nicedate;
 }

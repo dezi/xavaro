@@ -53,6 +53,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
 
         if (Simple.equals(type, "apps"        )) item = new LaunchItemApps(context);
         if (Simple.equals(suty, "media/image" )) item = new LaunchItemMediaImage(context);
+        if (Simple.equals(suty, "media/video" )) item = new LaunchItemMediaVideo(context);
 
         if (Simple.equals(type, "phone"       )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "skype"       )) item = new LaunchItemComm(context);

@@ -17,6 +17,7 @@ public class WebAppView extends WebView
 
     public WebAppPrefs prefs;
     public WebAppSpeak speak;
+    public WebAppMedia media;
     public WebAppEvents events;
     public WebAppHealth health;
     public WebAppRequest request;
@@ -116,6 +117,12 @@ public class WebAppView extends WebView
         {
             events = new WebAppEvents(webappname);
             addJavascriptInterface(events, "WebAppEvents");
+        }
+
+        if (permissions.contains("media"))
+        {
+            media = new WebAppMedia();
+            addJavascriptInterface(media, "WebAppMedia");
         }
 
         loadUrl(WebApp.getHTTPAppRoot(webappname));

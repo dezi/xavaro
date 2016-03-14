@@ -88,6 +88,7 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchGroupWebApps.getConfig());
 
         configs.add(LaunchGroupMediaImage.getConfig());
+        configs.add(LaunchGroupMediaVideo.getConfig());
 
         configs.add(LaunchGroupDeveloper.getConfig());
 

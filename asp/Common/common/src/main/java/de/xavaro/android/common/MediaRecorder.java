@@ -2,16 +2,19 @@ package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 
+import android.media.MediaMetadataRetriever;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.RandomAccessFile;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.io.InputStream;
 import java.io.File;
 
@@ -29,13 +32,14 @@ public class MediaRecorder
         JSONObject event = new JSONObject();
         events.put(event);
 
-        Json.put(event, "start", "2016-03-11T19:15:00Z");
-        Json.put(event, "stop", "2016-03-11T19:16:00Z");
-        Json.put(event, "channel", "ZDF HD");
+        Json.put(event, "date", "2016-03-12T16:30:00Z");
+        Json.put(event, "start", "2016-03-12T18:16:00Z");
+        Json.put(event, "stop", "2016-03-12T18:30:00Z");
+        Json.put(event, "channel", "Das Erste HD");
         Json.put(event, "country", "de");
         Json.put(event, "type", "tv");
 
-        handleEvent(events);
+        //handleEvent(events);
     }
 
     public static void handleEvent(JSONArray events)
@@ -46,19 +50,6 @@ public class MediaRecorder
         {
             JSONObject event = Json.getObject(events, inx);
             if (event == null) continue;
-
-            String type  = Json.getString(event, "type");
-            String country = Json.getString(event, "country");
-            String channel = Json.getString(event, "channel");
-            String starttime = Json.getString(event, "start");
-            String stoptime = Json.getString(event, "stop");
-
-            if ((type == null) || (country == null) || (channel == null)
-                    || (starttime == null) || (stoptime == null))
-            {
-                completeEvent(event, false);
-                continue;
-            }
 
             int oldinx = getIndexFromList(event, false);
 
@@ -94,10 +85,10 @@ public class MediaRecorder
             {
                 JSONObject oldevent = recordingsList.get(inx);
 
-                if (Json.equals(event, "channel", oldevent) &&
-                        Json.equals(event, "start", oldevent) &&
-                        Json.equals(event, "country", oldevent) &&
-                        Json.equals(event, "type", oldevent))
+                if (Json.equals(event, "start", oldevent) &&
+                        Json.equals(event, "type", oldevent) &&
+                        Json.equals(event, "channel", oldevent) &&
+                        Json.equals(event, "country", oldevent))
                 {
                     if (remove) recordingsList.remove(inx);
 
@@ -124,7 +115,7 @@ public class MediaRecorder
         {
             while (recordingsList.size() > 0)
             {
-                String now = Simple.nowAsISO();
+                String stopnow = Simple.timeStampAsISO(Simple.nowAsTimeStamp() + (2 * 60 * 1000));
 
                 JSONObject recording;
 
@@ -135,7 +126,7 @@ public class MediaRecorder
 
                 String stoptime = Json.getString(recording, "stop");
 
-                if ((stoptime != null) && (now.compareTo(stoptime) > 0))
+                if ((stoptime != null) && (stopnow.compareTo(stoptime) > 0))
                 {
                     Log.d(LOGTAG, "recorderThread: einer fettig....");
 
@@ -160,7 +151,7 @@ public class MediaRecorder
         String starttime = Json.getString(recording, "start");
         String channel = Json.getString(recording, "channel");
         String country = Json.getString(recording, "country");
-        String type  = Json.getString(recording, "type");
+        String type = Json.getString(recording, "type");
 
         if ((channel == null) || (starttime == null) || (country == null) || (type == null))
         {
@@ -242,12 +233,40 @@ public class MediaRecorder
         }
     }
 
+    private static void getStillImage(FileDescriptor fd, long offset, long size, File mediafile)
+    {
+        try
+        {
+            File jpegfile = Simple.changeExtension(mediafile, ".jpg");
+
+            Log.d(LOGTAG, "getStillImage: start=" + jpegfile.toString());
+
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(fd, offset, size);
+            Bitmap still = retriever.getFrameAtTime();
+
+            FileOutputStream jpeg = new FileOutputStream(jpegfile);
+            still.compress(Bitmap.CompressFormat.JPEG, 85, jpeg);
+            jpeg.close();
+
+            Log.d(LOGTAG, "getStillImage: finis=" + jpegfile.toString());
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+
     private static void appendIPTVStream(JSONObject recordstatus, File mediafile, String lastchunk)
     {
         String lastSize = Json.getString(recordstatus, "lastsize");
         if (lastSize == null) lastSize = "0";
-
         long lastSizeLong = Long.parseLong(lastSize);
+
+        if (! recordstatus.has("nextimage")) Json.put(recordstatus, "nextimage", 1);
+        int nextimage = Json.getInt(recordstatus, "nextimage");
+        if (! recordstatus.has("chunkcount")) Json.put(recordstatus, "chunkcount", 0);
+        int chunkcount = Json.getInt(recordstatus, "chunkcount");
 
         try
         {
@@ -256,6 +275,8 @@ public class MediaRecorder
 
             RandomAccessFile output = new RandomAccessFile(mediafile, "rw");
             output.seek(lastSizeLong);
+
+            long stillPos = lastSizeLong;
 
             byte[] buffer = new byte[ 32 * 1024 ];
             int xfer;
@@ -266,11 +287,22 @@ public class MediaRecorder
                 lastSizeLong += xfer;
             }
 
+            chunkcount += 1;
+
+            if (chunkcount == nextimage)
+            {
+                getStillImage(output.getFD(), stillPos, lastSizeLong - stillPos, mediafile);
+
+                nextimage = nextimage * 2;
+            }
+
             output.close();
             input.close();
 
             Json.put(recordstatus, "lastchunk", lastchunk);
             Json.put(recordstatus, "lastsize", "" + lastSizeLong);
+            Json.put(recordstatus, "chunkcount", chunkcount);
+            Json.put(recordstatus, "nextimage", nextimage);
 
             Log.d(LOGTAG, "appendIPTVStream: mediafile=" + mediafile.toString());
             Log.d(LOGTAG, "appendIPTVStream: lastchunk=" + lastchunk);
@@ -285,12 +317,14 @@ public class MediaRecorder
 
     private static boolean setupIPTVStream(JSONObject recording)
     {
-        String starttime = Json.getString(recording, "start");
-        String channel = Json.getString(recording, "channel");
-        String country = Json.getString(recording, "country");
         String type  = Json.getString(recording, "type");
+        String country = Json.getString(recording, "country");
+        String channel = Json.getString(recording, "channel");
+        String starttime = Json.getString(recording, "start");
+        String stoptime = Json.getString(recording, "stop");
 
-        if ((channel == null) || (starttime == null) || (country == null) || (type == null))
+        if ((type == null) || (country == null) || (channel == null)
+                || (starttime == null) || (stoptime == null))
         {
             return false;
         }
@@ -310,9 +344,13 @@ public class MediaRecorder
 
         File metafile = new File(mediadir, basename + ".json");
         File mediafile = new File(mediadir, basename + (type.equals("tv") ? ".mp4" : ".mp3"));
+        File previewfile = new File(mediadir, basename + ".jpg");
 
         Json.put(recording, "metafile", metafile.toString());
         Json.put(recording, "mediafile", mediafile.toString());
+
+        if (type.equals("tv")) Json.put(recording, "previewfile", previewfile.toString());
+
         Json.put(recording, "iptvchannel", iptvchannel);
         Json.put(recording, "iptvplaylist", iptvplaylist);
 
@@ -338,7 +376,6 @@ public class MediaRecorder
 
             if (webitem == null) continue;
             if (! webitem.has("channels")) continue;
-
 
             JSONArray channels = Json.getArray(webitem, "channels");
             if (channels == null) continue;
@@ -469,6 +506,7 @@ public class MediaRecorder
         {
             HttpURLConnection connection = Simple.openUnderscoreConnection(url);
             InputStream input = connection.getInputStream();
+
             StringBuilder string = new StringBuilder();
             byte[] buffer = new byte[ 4096 ];
             int xfer;
