@@ -12,4 +12,16 @@ public class WebAppSpeak
     {
         Speak.speak(text);
     }
+
+    @JavascriptInterface
+    public void unmute()
+    {
+        Simple.unmuteSpeech();
+    }
+
+    @JavascriptInterface
+    public void vibrate()
+    {
+        Simple.makeVibration();
+    }
 }

@@ -3,6 +3,49 @@
     <string name="app_name" translatable="false">SafeHome</string>
 
     <string name="simple_and">and</string>
+    <string name="simple_new">new</string>
+
+    <string-array name="pref_where_keys">
+        <item>inact</item>
+        <item>home</item>
+        <item>folder</item>
+    </string-array>
+
+    <string-array name="pref_where_vals">
+        <item>None</item>
+        <item>Home</item>
+        <item>Folder</item>
+    </string-array>
+
+    <string-array name="pref_ioc_where_keys">
+        <item>inact</item>
+        <item>home</item>
+        <item>folder</item>
+        <item>inetdir</item>
+    </string-array>
+
+    <string-array name="pref_ioc_where_vals">
+        <item>None</item>
+        <item>Home</item>
+        <item>Folder</item>
+        <item>Internet</item>
+    </string-array>
+
+    <string-array name="pref_ioc_subtype_keys">
+        <item>newspaper</item>
+        <item>magazine</item>
+        <item>pictorial</item>
+        <item>shopping</item>
+        <item>erotics</item>
+    </string-array>
+
+    <string-array name="pref_ioc_subtype_vals">
+        <item>Newspaper</item>
+        <item>Magazine</item>
+        <item>Pictorial</item>
+        <item>Shopping</item>
+        <item>Erotics</item>
+    </string-array>
 
     <string-array name="pref_health_where_keys">
         <item>home</item>
@@ -45,7 +88,7 @@
     </string-array>
 
     <string-array name="pref_webapps_where_vals">
-        <item>No</item>
+        <item>None</item>
         <item>Home-Screen</item>
         <item>Webapp-Folder</item>
     </string-array>
@@ -72,17 +115,68 @@
         <item>Trash</item>
     </string-array>
 
+    <string-array name="pref_media_image_where_keys">
+        <item>inact</item>
+        <item>home</item>
+        <item>images</item>
+    </string-array>
+
+    <string-array name="pref_media_image_where_vals">
+        <item>Inactive</item>
+        <item>Home</item>
+        <item>Galleries</item>
+    </string-array>
+
+    <string-array name="pref_media_video_directories_keys">
+        <item>movies</item>
+        <item>recordings</item>
+        <item>recycler</item>
+    </string-array>
+
+    <string-array name="pref_media_video_directories_vals">
+        <item>Filme</item>
+        <item>Rekorder</item>
+        <item>Papierkorb</item>
+    </string-array>
+
+    <string-array name="pref_media_video_where_keys">
+        <item>inact</item>
+        <item>home</item>
+        <item>videos</item>
+    </string-array>
+
+    <string-array name="pref_media_video_where_vals">
+        <item>Inactive</item>
+        <item>Home</item>
+        <item>Filme</item>
+    </string-array>
+
+
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>
 
-    <string-array name="launch_media_image_longclick_keys">
+    <string-array name="launch_media_longclick_keys">
         <item>send</item>
         <item>delete</item>
     </string-array>
 
-    <string-array name="launch_media_image_longclick_vals">
+    <string-array name="launch_media_longclick_vals">
         <item>Forward</item>
         <item>Delete</item>
+    </string-array>
+
+    <string-array name="launch_media_options_keys">
+        <item>image</item>
+        <item>video</item>
+        <item>audio</item>
+        <item>ebook</item>
+    </string-array>
+
+    <string-array name="launch_media_options_vals">
+        <item>This image</item>
+        <item>This video</item>
+        <item>This audio</item>
+        <item>This E-book</item>
     </string-array>
 
     <string name="comm_sender_sent_image">Image sent</string>

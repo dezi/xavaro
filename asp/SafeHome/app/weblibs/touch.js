@@ -4,6 +4,8 @@
 
 WebLibTouch = {};
 
+WebLibTouch.minDist = 20;
+
 WebLibTouch.onTouchStart = function(event)
 {
     var touchobj = event.changedTouches[ 0 ];
@@ -29,6 +31,7 @@ WebLibTouch.onTouchStart = function(event)
 
     touch.moves = 0;
     touch.initial = true;
+    touch.target  = touchobj.target;
 
     touch.startX = touchobj.clientX;
     touch.startY = touchobj.clientY;
@@ -38,6 +41,9 @@ WebLibTouch.onTouchStart = function(event)
 
     if (touch.starget)
     {
+        touch.scrollVertical   = touch.starget.scrollVertical   || touch.starget.scrollBoth;
+        touch.scrollHorizontal = touch.starget.scrollHorizontal || touch.starget.scrollBoth;
+
         touch.offsetTop  = touch.starget.offsetTop;
         touch.offsetLeft = touch.starget.offsetLeft;
 
@@ -46,12 +52,27 @@ WebLibTouch.onTouchStart = function(event)
 
         touch.parentWidth  = touch.starget.parentElement.clientWidth;
         touch.parentHeight = touch.starget.parentElement.clientHeight;
+
+        if (touch.scrollVertical && (touch.clientHeight < touch.parentHeight))
+        {
+            touch.scrollVertical = false;
+        }
+
+        if (touch.scrollHorizontal && (touch.clientWidth < touch.parentWidth))
+        {
+            touch.scrollHorizontal = false;
+        }
+
+        if (! (touch.scrollVertical || touch.scrollHorizontal))
+        {
+            touch.starget = null;
+        }
     }
 
     if (touch.ctarget)
     {
         touch.bgcolor = touch.ctarget.style.backgroundColor;
-        touch.ctarget.style.backgroundColor = "#dddddd";
+        //touch.ctarget.style.backgroundColor = "#dddddd";
     }
 
     event.preventDefault();
@@ -74,9 +95,23 @@ WebLibTouch.onTouchMove = function(event)
         // Ignore small initial movements.
         //
 
-        if ((Math.abs(touch.deltaX) > 10) || (Math.abs(touch.deltaY) > 10) || ! touch.initial)
+        if ((Math.abs(touch.deltaX) > WebLibTouch.minDist) ||
+            (Math.abs(touch.deltaY) > WebLibTouch.minDist) || ! touch.initial)
         {
-            touch.initial = false;
+            if (touch.initial)
+            {
+                if (Math.abs(touch.deltaX) > WebLibTouch.minDist)
+                {
+                    touch.disableVertical = true;
+                }
+                else
+                {
+                    if (Math.abs(touch.deltaY) > WebLibTouch.minDist)
+                    {
+                        touch.disableHorizontal = true;
+                    }
+                }
+            }
 
             if (touch.newX > 0) touch.newX = Math.log(touch.newX) * 10;
             if (touch.newY > 0) touch.newY = Math.log(touch.newY) * 10;
@@ -94,12 +129,15 @@ WebLibTouch.onTouchMove = function(event)
             }
 
             WebLibTouch.setOffsets();
-        }
+
+            touch.initial = false;
+       }
     }
 
     if (touch.ctarget)
     {
-        if ((Math.abs(touch.deltaX) > 10) || (Math.abs(touch.deltaY) > 10))
+        if ((Math.abs(touch.deltaX) > WebLibTouch.minDist) ||
+            (Math.abs(touch.deltaY) > WebLibTouch.minDist))
         {
             //
             // Discard click touch events.
@@ -124,9 +162,6 @@ WebLibTouch.onTouchEnd = function(event)
 
     if (touch.starget)
     {
-        if (touch.newX > 0) touch.newX = 0;
-        if (touch.newY > 0) touch.newY = 0;
-
         if ((touch.newX + touch.clientWidth) < touch.parentWidth)
         {
             touch.newX = touch.parentWidth - touch.clientWidth;
@@ -137,13 +172,16 @@ WebLibTouch.onTouchEnd = function(event)
             touch.newY = touch.parentHeight - touch.clientHeight;
         }
 
+        if (touch.newX > 0) touch.newX = 0;
+        if (touch.newY > 0) touch.newY = 0;
+
         WebLibTouch.setOffsets();
     }
 
     if (touch.ctarget)
     {
         touch.ctarget.style.backgroundColor = touch.bgcolor;
-        touch.ctarget.onTouchClick(touch.ctarget);
+        touch.ctarget.onTouchClick(touch.ctarget, touch.target);
     }
 
     event.preventDefault();
@@ -155,15 +193,22 @@ WebLibTouch.setOffsets = function()
 
     if (touch.starget)
     {
-        if (touch.starget.scrollVertical || touch.starget.scrollBoth)
+        var callbackNewX = null;
+        var callbackNewY = null;
+
+        if (touch.scrollHorizontal && ! touch.disableHorizontal)
         {
+            callbackNewX = touch.newX;
+            touch.starget.style.left = touch.newX + "px";
+        }
+
+        if (touch.scrollVertical && ! touch.disableVertical)
+        {
+            callbackNewY = touch.newY;
             touch.starget.style.top = touch.newY + "px";
         }
 
-        if (touch.starget.scrollHorizontal || touch.starget.scrollBoth)
-        {
-            touch.starget.style.left = touch.newX + "px";
-        }
+        if (touch.starget.onTouchScroll) touch.starget.onTouchScroll(callbackNewX, callbackNewY);
     }
 }
 

@@ -1,6 +1,6 @@
 package de.xavaro.android.common;
 
-import android.media.AudioManager;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -13,7 +13,7 @@ import android.content.res.Resources;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.view.SoundEffectConstants;
+import android.media.AudioManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,6 +27,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.view.SoundEffectConstants;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.os.Handler;
@@ -51,6 +52,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
@@ -441,6 +445,7 @@ public class Simple
 
         return false;
     }
+
     @Nullable
     public static String readDatadirFile(String filename)
     {
@@ -488,6 +493,10 @@ public class Simple
         return false;
     }
 
+    //endregion All purpose simple methods
+
+    //region Haptic feedback
+
     public static void makeClick()
     {
         if (appContext != null)
@@ -497,7 +506,35 @@ public class Simple
         }
     }
 
-    //endregion All purpose simple methods
+    public static void makeVibration()
+    {
+        if (anyContext != null)
+        {
+            long pattern[] = {0, 200, 100, 300, 400};
+
+            Vibrator vibrator = (Vibrator) anyContext.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(pattern, -1);
+        }
+    }
+
+    public static void unmuteSpeech()
+    {
+        if (anyContext != null)
+        {
+            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+
+            int maxvol = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            int curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+            while (curvol < (maxvol / 2))
+            {
+                am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
+                curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            }
+        }
+    }
+
+    //endregion Haptic feedback
 
     //region All purpose simple getters
 
@@ -506,7 +543,7 @@ public class Simple
         boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
         boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
 
-        return ! (hasBackKey && hasHomeKey);
+        return !(hasBackKey && hasHomeKey);
     }
 
     public static int getDP(int pixels)
@@ -524,11 +561,11 @@ public class Simple
     {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
-        if (! matcher.find()) return null;
+        if (!matcher.find()) return null;
 
         return matcher.group(1);
     }
-    
+
     public static String getTrans(int resid, Object... args)
     {
         //
@@ -668,8 +705,13 @@ public class Simple
 
     public static void makeDirectory(File path)
     {
-        //noinspection ResultOfMethodCallIgnored
-        path.mkdirs();
+        if (! path.exists())
+        {
+            if (! path.mkdirs())
+            {
+                OopsService.log(LOGTAG, "Cannot create directory: " + path.toString());
+            }
+        }
     }
 
     public static void makeDirectory(String path)
@@ -679,6 +721,12 @@ public class Simple
 
     public static File getMediaPath(String disposition)
     {
+        if (disposition.equals("recordings"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_MOVIES);
+            return new File(dir, "Recordings");
+        }
+
         if (disposition.equals("screenshots"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
@@ -743,7 +791,7 @@ public class Simple
     {
         if (filepath == null) return 0;
         File file = new File(filepath);
-        if (! file.exists()) return 0;
+        if (!file.exists()) return 0;
 
         return file.length();
     }
@@ -1098,15 +1146,18 @@ public class Simple
     {
         try
         {
-            InputStream in = new FileInputStream(file);
-            int len = (int) file.length();
-            byte[] buf = new byte[ len ];
+            if (file.exists())
+            {
+                InputStream in = new FileInputStream(file);
+                int len = (int) file.length();
+                byte[] buf = new byte[ len ];
 
-            int xfer = 0;
-            while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
-            in.close();
+                int xfer = 0;
+                while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
+                in.close();
 
-            return new String(buf);
+                return new String(buf);
+            }
         }
         catch (Exception ex)
         {
@@ -1132,6 +1183,16 @@ public class Simple
         }
 
         return false;
+    }
+
+    public static File changeExtension(File file, String extension)
+    {
+        return new File(file.getParent(), file.getName().replaceAll("\\.[a-zA-Z0-9]*$", extension));
+    }
+
+    public static String changeExtension(String file, String extension)
+    {
+        return file.replaceAll("\\.[a-zA-Z0-9]*$", extension);
     }
 
     @Nullable
@@ -1236,7 +1297,7 @@ public class Simple
     {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
-        if (! matcher.find()) return null;
+        if (!matcher.find()) return null;
 
         return matcher.group(1);
     }
@@ -1268,7 +1329,7 @@ public class Simple
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         buffer.putInt(crc & 0xffff);
 
-        return new byte[]{buffer.array()[0], buffer.array()[1]};
+        return new byte[]{buffer.array()[ 0 ], buffer.array()[ 1 ]};
     }
 
     public static byte[] getCRC16ccittEmbed(byte[] byteArray)
@@ -1323,7 +1384,7 @@ public class Simple
 
         for (int index = 0; index < len; index++)
         {
-            reversedArray[ (len - index) - 1 ] = array[index];
+            reversedArray[ (len - index) - 1 ] = array[ index ];
         }
 
         return reversedArray;
@@ -1448,15 +1509,15 @@ public class Simple
         // I hate slash escaping.
         //
 
-        return json.replace("\\/","/");
+        return json.replace("\\/", "/");
     }
 
     //endregion JSON stuff
 
     //region Date and time
 
-    private static final String ISO8601DATENOSECS   = "yyyy-MM-dd'T'HH:mm'Z'";
-    private static final String ISO8601DATEFORMAT   = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static final String ISO8601DATENOSECS = "yyyy-MM-dd'T'HH:mm'Z'";
+    private static final String ISO8601DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String ISO8601DATEFORMATMS = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     public static long nowAsTimeStamp()
@@ -1489,7 +1550,6 @@ public class Simple
         return timeStampAsISO(todayAsTimeStamp());
     }
 
-    @Nullable
     public static String timeStampAsISO(long timestamp)
     {
         DateFormat df = new SimpleDateFormat(ISO8601DATEFORMAT, Locale.getDefault());
@@ -1497,7 +1557,6 @@ public class Simple
         return df.format(new Date(timestamp));
     }
 
-    @Nullable
     public static String timeStampUTCAsLocalISO(long timestamp)
     {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
@@ -1734,7 +1793,7 @@ public class Simple
 
     public static JSONArray getDirectorySortedByAge(File dir, FilenameFilter ff, boolean desc)
     {
-        if ((dir == null) || ! dir.isDirectory()) return null;
+        if ((dir == null) || !dir.isDirectory()) return null;
 
         String[] dirlist = dir.list(ff);
         if (dirlist == null) return null;
@@ -1756,7 +1815,7 @@ public class Simple
         return Json.sort(list, "time", desc);
     }
 
-    public static class IsFileFilter implements FilenameFilter
+    public static class FileFilter implements FilenameFilter
     {
         public boolean accept(File dir, String name)
         {
@@ -1764,7 +1823,7 @@ public class Simple
         }
     }
 
-    public static class IsDirFilter implements FilenameFilter
+    public static class DirFilter implements FilenameFilter
     {
         public boolean accept(File dir, String name)
         {
@@ -1772,24 +1831,49 @@ public class Simple
         }
     }
 
+    public static boolean isImage(String name)
+    {
+        final String[] exts = new String[]{".jpg", ".png", ".gif", ".jpeg"};
+
+        for (String ext : exts)
+        {
+            if (name.toLowerCase().endsWith(ext))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static class ImageFileFilter implements FilenameFilter
     {
-        private final String[] exts =  new String[] {".jpg", ".png", ".gif", ".jpeg"};
-
         public boolean accept(File dir, String name)
         {
-            if (new File(dir, name).isFile())
-            {
-                for (String ext : exts)
-                {
-                    if (name.toLowerCase().endsWith(ext))
-                    {
-                        return true;
-                    }
-                }
-            }
+            return new File(dir, name).isFile() && isImage(name);
+        }
+    }
 
-            return false;
+    public static boolean isVideo(String name)
+    {
+        final String[] exts = new String[]{".mp4", ".mpg"};
+
+        for (String ext : exts)
+        {
+            if (name.toLowerCase().endsWith(ext))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static class VideoFileFilter implements FilenameFilter
+    {
+        public boolean accept(File dir, String name)
+        {
+            return new File(dir, name).isFile() && isVideo(name);
         }
     }
 
@@ -1809,24 +1893,52 @@ public class Simple
 
     public static int getSharedPrefInt(String key)
     {
-        return getSharedPrefs().getInt(key, 0);
+        try
+        {
+            return getSharedPrefs().getInt(key, 0);
+        }
+        catch (Exception ex)
+        {
+            return 0;
+        }
     }
 
     public static boolean getSharedPrefBoolean(String key)
     {
-        return getSharedPrefs().getBoolean(key, false);
+        try
+        {
+            return getSharedPrefs().getBoolean(key, false);
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
 
     @Nullable
     public static String getSharedPrefString(String key)
     {
-        return getSharedPrefs().getString(key, null);
+        try
+        {
+            return getSharedPrefs().getString(key, null);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     @Nullable
     public static Set<String> getSharedPrefStringSet(String key)
     {
-        return getSharedPrefs().getStringSet(key, null);
+        try
+        {
+            return getSharedPrefs().getStringSet(key, null);
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
     public static void setSharedPrefString(String key, String value)
@@ -1860,6 +1972,11 @@ public class Simple
         return result;
     }
 
+    public static boolean hasSharedPref(String key)
+    {
+        return Simple.getSharedPrefs().contains(key);
+    }
+
     public static void removeSharedPref(String key)
     {
         if (Simple.getSharedPrefs().contains(key))
@@ -1884,4 +2001,48 @@ public class Simple
     }
 
     //endregion Preference stuff
+
+    public static String getLocale()
+    {
+        return Locale.getDefault().getLanguage() + "-r" + Locale.getDefault().getCountry();
+    }
+
+    public static String getLocaleCountry()
+    {
+        return Locale.getDefault().getCountry();
+    }
+
+    public static String getLocaleLanguage()
+    {
+        return Locale.getDefault().getLanguage();
+    }
+
+    //
+    // Opens a HTTP connection and resolves illegal underscores in host names.
+    //
+
+    public static HttpURLConnection openUnderscoreConnection(String src) throws Exception
+    {
+        URL url = new URL(src);
+
+        String host = null;
+
+        if (url.getHost().contains("_"))
+        {
+            host = url.getHost();
+
+            InetAddress ip = InetAddress.getByName(host);
+            src = src.replace(host, ip.getHostAddress());
+            url = new URL(src);
+        }
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        if (host != null) connection.setRequestProperty("Host", host);
+
+        connection.setUseCaches(false);
+        connection.setDoInput(true);
+        connection.connect();
+
+        return connection;
+    }
 }

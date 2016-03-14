@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +17,16 @@ import java.util.Set;
 public class Json
 {
     private static final String LOGTAG = Json.class.getSimpleName();
+
+    public static JSONObject getFileContent(File jsonfile)
+    {
+        return fromString(Simple.getFileContent(jsonfile));
+    }
+
+    public static void putFileContent(File jsonfile, JSONObject content)
+    {
+        Simple.putFileContent(jsonfile, Json.toPretty(content));
+    }
 
     public static JSONObject fromString(String jsonstr)
     {
@@ -96,17 +107,11 @@ public class Json
 
     public static boolean equals(JSONObject j1, String k1, String val)
     {
+        if ((k1 == null) && (val == null)) return true;
+
         String s1 = getString(j1, k1);
 
-        return ((s1 != null) && s1.equals(val));
-    }
-
-    public static boolean equals(JSONObject j1, String k1, JSONObject j2, String k2)
-    {
-        String s1 = getString(j1, k1);
-        String s2 = getString(j2, k2);
-
-        return ((s1 != null) && (s2 != null) && s1.equals(s2));
+        return ((s1 == null) && (val == null)) || ((s1 != null) && s1.equals(val));
     }
 
     public static boolean equals(JSONObject j1, String k1, JSONObject j2)
@@ -167,7 +172,7 @@ public class Json
 
     public static boolean has(JSONObject json, String key)
     {
-        return json.has(key);
+        return (json != null) && json.has(key);
     }
 
     public static double getDouble(JSONObject json, String key)
@@ -361,7 +366,7 @@ public class Json
         final String sort = field;
         final boolean desc = descending;
 
-        class compare implements Comparator<JSONObject>
+        class comparedat implements Comparator<JSONObject>
         {
             public int compare(JSONObject a, JSONObject b)
             {
@@ -372,12 +377,12 @@ public class Json
             }
         }
 
-        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+        List<JSONObject> jsonValues = new ArrayList<>();
 
         for (int inx = 0; inx < array.length(); inx++)
             jsonValues.add(getObject(array, inx));
 
-        Collections.sort(jsonValues, new compare());
+        Collections.sort(jsonValues, new comparedat());
 
         return new JSONArray(jsonValues);
     }
@@ -387,7 +392,7 @@ public class Json
         final String sort = field;
         final boolean desc = descending;
 
-        class compare implements Comparator<JSONObject>
+        class comparedat implements Comparator<JSONObject>
         {
             public int compare(JSONObject a, JSONObject b)
             {
@@ -398,12 +403,12 @@ public class Json
             }
         }
 
-        List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+        List<JSONObject> jsonValues = new ArrayList<>();
 
         for (int inx = 0; inx < array.length(); inx++)
             jsonValues.add(getObject(array, inx));
 
-        Collections.sort(jsonValues, new compare());
+        Collections.sort(jsonValues, new comparedat());
 
         return new JSONArray(jsonValues);
     }

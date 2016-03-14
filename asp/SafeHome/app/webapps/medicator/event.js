@@ -1,19 +1,6 @@
 medicator.remindMaximum = 3;
 medicator.remindIntervall = 60;
 
-medicator.requestUnload = function()
-{
-    if (medicator.getNextEventsTimer)
-    {
-        clearTimeout(medicator.getNextEventsTimer);
-        medicator.getNextEventsTimer = null;
-    }
-
-    console.log("medicator.requestUnload");
-
-    WebAppIntercept.requestUnload(0);
-}
-
 medicator.getNextEvents = function()
 {
     if (medicator.requestUnloadTimer)
@@ -26,6 +13,11 @@ medicator.getNextEvents = function()
 
     var configs = {};
 
+    //
+    // Preset event types to avoid reminding the same
+    // type of medication twice in one run.
+    //
+
     medicator.pillsreminder = false;
     medicator.weightreminder = false;
     medicator.bloodglucosereminder = false;
@@ -34,15 +26,6 @@ medicator.getNextEvents = function()
     for (var inx = 0; inx < events.length; inx++)
     {
         var event = events[ inx ];
-
-        if (event.ondemand)
-        {
-            //
-            // Ondemand medication is ignored.
-            //
-
-            continue;
-        }
 
         //
         // The formkey collects medication event into the same
@@ -71,6 +54,8 @@ medicator.getNextEvents = function()
         configs[ formkey ].events.push(event);
     }
 
+    var action = false;
+
     for (var formkey in configs)
     {
         var config = configs[ formkey ];
@@ -78,26 +63,43 @@ medicator.getNextEvents = function()
         console.log("config=" + JSON.stringify(config));
 
         var alltaken = true;
+        var ondemand = true;
 
         for (var inx in config.events)
         {
             var event = config.events[ inx ];
 
             alltaken = alltaken && event.taken;
+            ondemand = ondemand && event.ondemand;
         }
 
-        if (alltaken)
+        if (alltaken || ondemand)
         {
             medicator.completeConfig(config);
 
             continue;
         }
 
-        medicator.remindConfig(config);
+        if (medicator.remindConfig(config)) action = true;
     }
+
+    if (action) WebAppSpeak.vibrate();
 
     medicator.getNextEventsTimer = setTimeout(medicator.getNextEvents,  10 * 1000);
     medicator.requestUnloadTimer = setTimeout(medicator.requestUnload, 100 * 1000);
+}
+
+medicator.requestUnload = function()
+{
+    if (medicator.getNextEventsTimer)
+    {
+        clearTimeout(medicator.getNextEventsTimer);
+        medicator.getNextEventsTimer = null;
+    }
+
+    console.log("medicator.requestUnload");
+
+    WebAppIntercept.requestUnload(0);
 }
 
 medicator.remindConfig = function(config)
@@ -106,31 +108,34 @@ medicator.remindConfig = function(config)
     // Take current reminded date and count from first event.
     //
 
+    var action = false;
     var reminded = config.events[ 0 ].reminded;
     var remindeddate = config.events[ 0 ].remindedate;
 
     var nowtime = new Date().getTime();
     var remtime = remindeddate ? new Date(remindeddate).getTime() : 0;
 
-    if ((remtime + (medicator.remindIntervall * 1000)) >= nowtime) return;
+    if ((remtime + (medicator.remindIntervall * 1000)) >= nowtime) return action;
 
     if (config.events[ 0 ].alerted)
     {
         //
         // The assistance has already been informed,
-        // so do nothing for now.
+        // so do nothing for now and wait for medication
+        // beeing taken to inform assistance of that.
         //
 
-        return;
+        return action;
     }
 
     var assistanceInformed = false;
 
     if ((config.mediflat == "AAA") && ! medicator.pillsreminder)
     {
+        WebAppSpeak.unmute();
         WebAppSpeak.speak(WebLibStrings.getTrans("events.take.pills"));
 
-        if ((reminded + 1) >= medicator.remindMaximum)
+        if (((reminded + 1) >= medicator.remindMaximum) && WebAppAssistance.hasAssistance())
         {
             var name = WebAppUtility.getOwnerName();
             var text = WebLibStrings.getTrans("events.didnotyettake.pills", name);
@@ -140,28 +145,31 @@ medicator.remindConfig = function(config)
             assistanceInformed = true;
         }
 
-        medicator.pillsreminder = true;
+        medicator.pillsreminder = action = true;
     }
 
     if ((config.mediflat == "ZZB") && ! medicator.bloodpressurereminder)
     {
+        WebAppSpeak.unmute();
         WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodpressure"));
 
-        medicator.bloodpressurereminder = true;
+        medicator.bloodpressurereminder = action = true;
     }
 
     if ((config.mediform == "ZZG") && ! medicator.bloodglucosereminder)
     {
+        WebAppSpeak.unmute();
         WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodglucose"));
 
-        medicator.bloodglucosereminder = true;
+        medicator.bloodglucosereminder = action = true;
     }
 
     if ((config.mediflat == "ZZW") && ! medicator.weightreminder)
     {
+        WebAppSpeak.unmute();
         WebAppSpeak.speak(WebLibStrings.getTrans("events.take.weight"));
 
-        medicator.weightreminder = true;
+        medicator.weightreminder = action = true;
     }
 
     //
@@ -184,8 +192,8 @@ medicator.remindConfig = function(config)
         if ((event.reminded >= medicator.remindMaximum) && ! assistanceInformed)
         {
             //
-            // Complete only on non imimportant events. Alerted
-            // events will repeatedly return until user has performed
+            // Complete only on non important events. Alerted events
+            // will repeatedly return until user has performed
             // required action.
             //
 
@@ -193,9 +201,9 @@ medicator.remindConfig = function(config)
         }
 
         WebAppEvents.updateComingEvent(JSON.stringify(event));
-
-        console.log("reminded=" + JSON.stringify(event));
     }
+
+    return action;
 }
 
 medicator.completeConfig = function(config)

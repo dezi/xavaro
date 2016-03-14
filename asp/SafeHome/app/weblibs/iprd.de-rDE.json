@@ -1,0 +1,182 @@
+{
+  "www.antenne.de": {
+    "url": "http://www.antenne.de//",
+    "icon": "http://pbs.twimg.com/profile_images/582482382290313216/S-J8MlT3_400x400.jpg",
+    "label": "antenne Bayern",
+
+    "channels": [
+      {
+        "label": "ANTENNE BAYERN",
+        "title": "Bayerns bester Musikmix",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby152x124-2.png",
+
+        "audiourl": "http://mp3channels.webradio.antenne.de/antenne"
+      },
+      {
+        "label": "Weihnachts Hits",
+        "title": "ANTENNE BAYERN Weihnachts Hits",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_weihnachten_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/weihnachts-hits"
+      },
+      {
+        "label": "80er Kulthits",
+        "title": "Die Kulthits aus den 80ern",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_80er_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/80er-kulthits"
+      },
+      {
+        "label": "Black Beatz",
+        "title": "Das Beste aus Electronic/Club/Urban/Dance",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_black_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/black-beatz"
+      },
+      {
+        "label": "Hits für Kids",
+        "title": "Der gro&szlig;e Spass f&uuml;r kleine Leute",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_kids_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/hits-fuer-kids"
+      },
+      {
+        "label": "Hitmix",
+        "title": "Die besten Radiohits &ndash; nonstop im DJ-Mix",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/hitmix_152_124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/hitmix"
+      },
+      {
+        "label": "Classic Rock Live",
+        "title": "Classic Rock Live in Concert",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_classicRock_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/classic-rock-live"
+      },
+      {
+        "label": "Chillout",
+        "title": "Entspannung pur mit Chillout - Musik zum Relaxen",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_chillout_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/chillout"
+      },
+      {
+        "label": "Schlagersahne",
+        "title": "Die sch&ouml;nsten Melodien von gestern und heute",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_schlager_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/schlagersahne"
+      },
+      {
+        "label": "Lovesong",
+        "title": "Lovesongs zum Relaxen",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_Love_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/lovesong"
+      },
+      {
+        "label": "Oldies but Goldies",
+        "title": "Bringt die Meilensteine der Musikgeschichte",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_oldies_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/oldies-but-goldies"
+      },
+      {
+        "label": "Top 40",
+        "title": "Das Hitradio f&uuml;r Bayern",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_top40_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/top-40"
+      },
+      {
+        "label": "90er Hits",
+        "title": "Boybands, Pop und Eurodance - die Musik der 90er nonstop.",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_90er_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/90er-hits"
+      },
+      {
+        "label": "New Hits",
+        "title": "Hits bevor sie in den Top 40 sind",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_newhits_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/new-hits"
+      },
+      {
+        "label": "Event",
+        "title": "ANTENNE BAYERN Event Radio",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_Event_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/event"
+      },
+      {
+        "label": "Fresh4You",
+        "title": "ANTENNE BAYERN Fresh4You",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_fresh_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/fresh4you"
+      },
+      {
+        "label": "Workout Hits",
+        "title": "ANTENNE BAYERN Workout Hits",
+        "icon": "http://cdn.antenne.de/antenne-de/uploads/images/imda/logos/152x124/aby/aby_workout_152x124.png",
+        "audiourl": "http://mp3channels.webradio.antenne.de/workout-hits"
+      }
+    ]
+  },
+
+  "radio.sunshine-live.de": {
+    "url": "http://radio.sunshine-live.de/",
+    "icon": "http://pbs.twimg.com/profile_images/582479269307248640/3xWI-MDx_400x400.png",
+    "label": "sunshine live",
+
+    "channels": [
+      {
+        "label": "sunshine live",
+        "icon": "http://radio.sunshine-live.de/img/sunshinelive.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=studio",
+        "audiourl": "http://stream.sunshine-live.de/live/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "House",
+        "icon": "http://radio.sunshine-live.de/img/house.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=house",
+        "audiourl": "http://stream.sunshine-live.de/house/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "EDM",
+        "icon": "http://radio.sunshine-live.de/img/edm.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=edm",
+        "audiourl": "http://stream.sunshine-live.de/edm/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "Classics",
+        "icon": "http://radio.sunshine-live.de/img/classics.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=classics",
+        "audiourl": "http://stream.sunshine-live.de/classics/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "Trance",
+        "icon": "http://radio.sunshine-live.de/img/trance.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=trance",
+        "audiourl": "http://stream.sunshine-live.de/trance/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "Hard",
+        "icon": "http://radio.sunshine-live.de/img/hard.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=hard",
+        "audiourl": "http://stream.sunshine-live.de/hard/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "Techno",
+        "icon": "http://radio.sunshine-live.de/img/techno.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=techno",
+        "audiourl": "http://stream.sunshine-live.de/techno/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "Lounge",
+        "icon": "http://radio.sunshine-live.de/img/lounge.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=lounge",
+        "audiourl": "http://stream.sunshine-live.de/lounge/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "90er",
+        "icon": "http://radio.sunshine-live.de/img/90er.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=90er",
+        "audiourl": "http://stream.sunshine-live.de/90er/mp3-192/Webradio-Player/"
+      },
+      {
+        "label": "Festival",
+        "icon": "http://radio.sunshine-live.de/img/festival.jpg",
+        "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=festival",
+        "audiourl": "http://stream.sunshine-live.de/festival/mp3-192/Webradio-Player/"
+      }
+    ]
+  }
+}

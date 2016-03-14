@@ -415,7 +415,7 @@ WebLibSimple.substring = function(str, start, ende)
 
     if (ende < 0) return str.substring(start, str.length + ende);
 
-    return substring(start, ende);
+    return str.substring(start, ende);
 }
 
 
@@ -461,12 +461,66 @@ WebLibSimple.getNiceDate = function(date)
         nicedate = prefix + ", "
                  + WebLibSimple.padNum(work.getDate(), 2) + "."
                  + WebLibSimple.padNum(work.getMonth() + 1, 2) + "."
-                 + WebLibSimple.padNum(work. getFullYear(), 4);
+                 + WebLibSimple.padNum(work.getFullYear(), 4);
     }
 
     nicedate += " " + WebLibStrings.getTrans("simple.at");
     nicedate += " " + WebLibSimple.padNum(work.getHours(), 2);
     nicedate += ":" + WebLibSimple.padNum(work.getMinutes(), 2);
+
+    return nicedate;
+}
+
+WebLibSimple.getNiceDay = function(date)
+{
+    var work = new Date(date);
+    var workmilli = work.getTime();
+
+    var today  = WebLibSimple.getTodayDate().getTime();
+    var yester = today  - 86400 * 1000;
+    var midnig = today  + 86400 * 1000;
+    var tomoro = midnig + 86400 * 1000;
+
+    var nicedate = null;
+
+    if ((yester <= work) && (work < today )) nicedate = WebLibStrings.getTrans("simple.yesterday");
+    if ((today  <= work) && (work < midnig)) nicedate = WebLibStrings.getTrans("simple.today");
+    if ((midnig <= work) && (work < tomoro)) nicedate = WebLibStrings.getTrans("simple.tomorrow");
+
+    if (! nicedate)
+    {
+        var prefix = WebLibStrings.getTransTrans("simple.day.keys", (work.getDay() + 6) % 7);
+
+        nicedate = prefix + ", "
+                 + WebLibSimple.padNum(work.getDate(), 2) + "."
+                 + WebLibSimple.padNum(work.getMonth() + 1, 2) + "."
+                 + WebLibSimple.padNum(work.getFullYear(), 4);
+    }
+
+    return nicedate;
+}
+
+WebLibSimple.getDuration = function(startDate, stopDate)
+{
+    var startDate = new Date(startDate);
+    var stopDate  = new Date(stopDate);
+    var duration  = stopDate.getTime() - startDate.getTime();
+
+    // return milliseconds
+    return duration;
+}
+
+//
+// todo: Locale --> WebLibSimple.getNiceTime()
+//
+
+WebLibSimple.getNiceTime = function(date)
+{
+    var work = new Date(date);
+
+    var nicedate = WebLibSimple.padNum(work.getHours(),   2) + ":"
+                 + WebLibSimple.padNum(work.getMinutes(), 2);
+//             + WebLibSimple.padNum(work.getSeconds(), 2);
 
     return nicedate;
 }

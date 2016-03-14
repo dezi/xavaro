@@ -18,19 +18,19 @@ public class WebAppUtility
     @JavascriptInterface
     public String getLocale()
     {
-        return Locale.getDefault().getLanguage() + "-r" + Locale.getDefault().getCountry();
+        return Simple.getLocale();
     }
 
     @JavascriptInterface
     public String getLocaleCountry()
     {
-        return Locale.getDefault().getCountry();
+        return Simple.getLocaleCountry();
     }
 
     @JavascriptInterface
     public String getLocaleLanguage()
     {
-        return Locale.getDefault().getLanguage();
+        return Simple.getLocaleLanguage();
     }
 
     @JavascriptInterface

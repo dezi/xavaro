@@ -1,0 +1,1007 @@
+{
+  "domains": [
+
+    {
+      "domain": "2app.lk",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage lädt nicht."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "2mdn.net",
+      "type": "Tracking",
+      "source": "Abine Inc.",
+      "description": [
+        "2mdn.net ist eine Domäne, die von Doubleclick benutzt wird. Doubleclick ist eine ",
+        "Werbefirma die Teil eines Netzwerkes ist und mit Cookies und anderen Technologien ",
+        "den Anwender tracken. Auf lange Sicht erstellen Sites wie 2mdn.net Profile über den ",
+        "Anwender, die Daten über besuchte Websites, Suchen, Einkäufe und andere Aktivitäten ",
+        "enthalten. Möglicherweise werden diese Profile and andere Vermarkter weiterverkauft."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "71i.de",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Unsere Recherche zeigt, dass 71i.de dem Unternehmen ProSiebenSat.1 Produktion GmbH ",
+        "zugeordnet ist. Die Homepage erfordert einen User-Account. Eine Datenschutzerklärung ",
+        "kann nicht abgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "ad4mat.de",
+      "type": "Advertising",
+      "source": "ad4mat",
+      "description": [
+        "ad4mat filtert werberelevante Zielgruppen nach soziodemographischen Merkmalen und ",
+        "Interessen. Eine Zuweisung zu sensiblen Interessenkategorien, die etwa auf Rasse, ",
+        "Religion oder sexueller Orientierung basieren, findet bei ad4mat nicht statt. ",
+        "Die nach soziodemographischen Merkmalen gefilterten unterschiedlichen Zielgruppen ",
+        "bekommen für diese möglichst relevante Werbeinhalte präsentiert."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "addthis.com",
+      "type": "Tracking",
+      "source": "Wikipedia",
+      "description": [
+        "Nach Berichten einiger Nachrichtenportale hat AddThis eine neue Tracking-Technik ",
+        "getestet, das \"Canvas Fingerprinting\", die es fast unmöglich macht sich von der ",
+        "Verfolgung (Tracking) im Internet zu schützen. Nach Angaben des Unternehmens wurde ",
+        "die Testphase mittlerweile beendet und der entsprechende Code deaktiviert. \"Canvas ",
+        "Fingerprinting\" ermöglicht es den Nutzer in etwa 90 Prozent der Fälle eindeutig zu ",
+        "identifizieren und somit sein Surfverhalten zu analysieren. Forscher der Princeton ",
+        "University und der Katholischen Universität Löwen haben auf etwa fünf Prozent der ",
+        "weltweit meistbesuchten Webseiten den entsprechenden Code gefunden. Angeblich wurde ",
+        "diese Technik ohne Wissen vieler Seitenbetreiber eingesetzt."
+      ],
+      "faults": [ "noprivger", "nooptin" ]
+    },
+
+    {
+      "domain": "adition.com",
+      "type": "Advertising",
+      "source": "ADITION",
+      "description": [
+        "ADITION setzt Cookies ein, um die Einblendung von Werbemitteln, die durch die ",
+        "Kunden von ADITION geschaltet werden, für den User auszusteuern und zu optimieren. ",
+        "Dies betrifft zum Beispiel die maximale Anzeigehäufigkeit von Werbemitteln, die ",
+        "ein User zu sehen bekommt. Zudem nutzt ADITION in Einzelfällen gespeicherte ",
+        "Cookie-Informationen für statistische Erhebungen."
+      ],
+      "faults": [ "nooptin" ]
+    },
+
+    {
+      "domain": "admized.com",
+      "type": "Tracking",
+      "source": "ADMIZED",
+      "description": [
+        "ADMIZED ist einer der führenden europäischen Anbieter für Display Buying Solutions. ",
+        "Wir sorgen für bessere Kampagnenperformance. Wir erreichen eine gezieltere Ansprache ",
+        "Ihrer Zielgruppe. Wir arbeiten für die Nachhaltigkeit Ihrer Werbebotschaft."
+      ],
+      "faults": [ "nooptin" ]
+    },
+
+    {
+      "domain": "adnxs.com",
+      "type": "Tracking",
+      "source": "The Guardian",
+      "description": [
+        "Adnxs.com is run by AppNexus, a company that provides technology, data and analytics ",
+        "to help companies buy and sell online display advertising. ",
+        "The technology it uses can plug into other advertising serving platforms, such as ",
+        "Google's Doubleclick, and \"data aggregators\", such as Quantcast, which provide ",
+        "behavioural targeting. In essence, this makes AppNexus an an \"advertising exchange ",
+        "for advertising exchanges\". ",
+        "Die Homepage erfordert einen User-Account. Eine Datenschutzerklärung ",
+        "kann nicht abgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "adtech.de",
+      "type": "Advertising",
+      "source": "ADTECH",
+      "description": [
+        "ADTECHs Adserving Lösungen ermöglichen es Web-Publishern, Vermarktern, Agenturen und ",
+        "Werbetreibenden ihre Online Werbekampagnen im Bereich Display, Video und Mobile zu ",
+        "verwalten, auszuliefern und auszuwerten."
+      ],
+      "faults": [ "nooptin" ]
+    },
+
+    {
+      "domain": "amazon-adsystem.com",
+      "type": "Advertising",
+      "source": "",
+      "description": [
+        "Anzeigen-Server von Amazon. Weitere Information sind kaum zu finden. ",
+        "Die Homepage kann ebensowenig wie eine Datenschutzerklärung ",
+        "abgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "amobee.com",
+      "type": "Advertising",
+      "source": "Wikipedia",
+      "description": [
+        "Amobee is a mobile advertising technology company providing services for large ",
+        "advertisers, publishers and operators. Amobee has a proprietary platform that ",
+        "supports existing and emerging mobile ad formats on any mobile, internet-enabled ",
+        "device, including gaming platforms."
+      ],
+      "faults": [ "noprivger", "nooptout" ]
+    },
+
+    {
+      "domain": "awempire.com",
+      "type": "Pornografie",
+      "source": "Wikipedia",
+      "description": [
+        "Awempire.com ist ein Adult Affiliate Programm aus den USA. Vermarktet werden ",
+        "vorwiegend Live-Cam Angebote."
+      ],
+      "faults": [ "noprivger", "isporn", "ispremium" ]
+    },
+
+    {
+      "domain": "bazaarvoice.com",
+      "type": "Recommendation",
+      "source": "Wikipedia",
+      "description": [
+        "Bazaarvoice ist im Bereich Online-Marketing tätig und bietet anderen Unternehmen ",
+        "seinen Dienst als Software as a Service an. Es hat sich auf User-Generated-Content ",
+        "spezialisiert, bei dem Kunden von Onlineshops Produkte bewerten und empfehlen können."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "bunchbox.co",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage ist nicht vorhanden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "browser-update.org",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Fordert den Anwender auf, seinen Browser zu aktualisieren, wenn dieser veraltet ist. "
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "contentabc.com",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage lädt nicht."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "chartbeat.com+chartbeat.net",
+      "type": "Tracking",
+      "source": "Wikipedia",
+      "description": [
+        "Chartbeat is a web analytics company headquartered in New York City. It was started ",
+        "in 2009. The company helps provide actionable insights to news websites and blogs ",
+        "that the websites and blogs can use to make real-time decisions about the content ",
+        "to publish and promote on their sites."
+      ],
+      "faults": [ "noprivger", "nooptout" ]
+    },
+
+    {
+      "domain": "criteo.com+criteo.net",
+      "type": "Tracking",
+      "source": "Wikipedia",
+      "description": [
+        "Criteo is a \"personalized retargeting company\" that works with Internet retailers ",
+        "to serve personalized online display advertisements to consumers that have ",
+        "previously visited the advertiser's website."
+      ],
+      "faults": [ "noprivger", "nooptin" ]
+    },
+
+    {
+      "domain": "decibelinsight.net",
+      "type": "Session-Replay",
+      "source": "Decibelinsight",
+      "description": [
+        "Decibel Insight is the most innovative and advanced enterprise customer experience ",
+        "platform available. From session replay to error reports, our software continues ",
+        "to evolve in exciting directions."
+      ],
+      "faults": [ "noprivger", "nooptout" ]
+    },
+
+    {
+      "domain": "df-srv.de",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage ist nicht abrufbar."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "doubleclick.net",
+      "type": "Tracking",
+      "source": "Wikipedia",
+      "description": [
+        "DoubleClick ist eine Marke des US-amerikanischen Unternehmens Google Inc., unter der ",
+        "Online-Marketing-Lösungen angeboten werden. DoubleClick wird oft in Verbindung mit ",
+        "Spyware gebracht, da HTTP-Cookies im Browser so gesetzt sind, dass eine Rückverfolgung ",
+        "des Benutzers von Webseite zu Webseite möglich ist. Eine Aufzeichnung darüber, welche ",
+        "Werbung angezeigt und angeklickt wird, ist ebenso möglich."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "doublepimp.com",
+      "type": "Pornografie",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage erfordert einen User-Account."
+      ],
+      "faults": [ "nohome", "nopriv", "isporn" ]
+    },
+
+    {
+      "domain": "econda-monitor.de",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Todo."
+      ],
+      "faults": [ "nofaults" ]
+    },
+    {
+      "domain": "edelight.biz",
+      "type": "Shopping",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "emetriq.de",
+      "type": "Tracking",
+      "source": "emetriq",
+      "description": [
+        "Unser Ziel ist es, Onlinewerbung für Internetnutzer relevanter zu machen, indem ",
+        "werbliche Inhalte den voraussichtlich richtigen Zielgruppen gezeigt werden. ",
+        "Gleichzeitig versuchen wir dadurch irrelevante Werbung zu vermeiden. Voraussetzung ",
+        "ist die optimierte Ausspielung der Onlinewerbung durch Vermarkter und Werbungtreibende ",
+        "Unternehmen auf Basis qualitativ hochwertiger Daten. Die dafür notwendigen ",
+        "Daten erfasst emetriq."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "emsservice.de",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "etahub.com",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "exoclick.com",
+      "type": "Advertising",
+      "source": "Wikipedia",
+      "description": [
+        "ExoClick is a Barcelona-based online advertising company, which provides online ",
+        "advertising services to both advertisers and publishers all over the world via ",
+        "web, mobile, tablet and smart TV. ExoClick's customers include advertisers, ",
+        "advertising agencies, traffic distribution partners and publishers."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "firebaseapp.com",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Hoster für Apps. Produziert Popups."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "go-mpulse.net",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Leider kann keine Homepage und demnach auch keine Datenschutzbestimmung ",
+        "geladen werden. Der Eigentümer der Domain ist verschleiert. "
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "google-analytics.com",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Gehört natürlich zu Google."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "googleadservices.com",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Gehört natürlich zu Google. Leider kann keine Homepage und demnach auch keine ",
+        "Datenschutzbestimmung geladen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "googletagservices.com",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Gehört natürlich zu Google. Leider kann keine Homepage und demnach auch keine ",
+        "Datenschutzbestimmung geladen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "googletagmanager.com",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Gehört natürlich zu Google."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "hotjar.com",
+      "type": "Tracking",
+      "source": "hotjar",
+      "description": [
+        "Hotjar is a new all-in-one Analysis and Feedback tool that reveals the online ",
+        "behaviour and feedback of a website's visitors. By combining both A) Analysis and ",
+        "B) Feedback tools, Hotjar gives our clients the 'big picture' of how to improve ",
+        "their site's experience and its performance. The Analysis tools allow you to ",
+        "measure and observe user behaviour (what users do) while the Feedback tools allow ",
+        "you to hear what your users say (Voice of User / Customer)."
+      ],
+      "faults": [ "nogerpriv" ]
+    },
+
+    {
+      "domain": "icony.com",
+      "type": "Flirtbörse",
+      "source": "Recherche",
+      "description": [
+        "Wird unaufgefordert im Hintergrund geladen. Es ist unklar, welche Daten erhoben ",
+        "werden. "
+      ],
+      "faults": [ "nooptin" ]
+    },
+
+    {
+      "domain": "intellitxt.com",
+      "type": "In-Text-Anzeigen",
+      "source": "Wikipedia",
+      "description": [
+        "IntelliTXT, an \"in-text\" advertisement platform developed by Vibrant Media, ",
+        "is an example of keyword advertising. Web page publishers insert a script into ",
+        "their pages which calls the IntelliTXT platform when a viewer views the page. ",
+        "This script then finds keywords on the page and double underlines them. When ",
+        "holding the mouse over the double underlined link, an advertisement associated ",
+        "with that word will pop up. Advertisers pay to have their particular words ",
+        "associated to their advertisements. ",
+        "IntelliTXT may make pages more difficult to read, also delaying page navigation ",
+        "while advertisements load and flash onto the screen. Some publishers offer a help ",
+        "link inside the IntelliTXT ad' box that leads to a page that lets users turn ",
+        "off IntelliTXT."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "iqcontentplatform.de",
+      "type": "Advertising",
+      "source": "Wikipedia",
+      "description": [
+        "Eine Domäne von iq media marketing gmbh. Die Homepage erfordert ein Login, ",
+        "ein Datenschutzerklärung ist nicht abrufbar."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "ioam.de",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Unsere Website nutzt das „Skalierbare Zentrale Messverfahren next Generation“ ",
+        "(SZMnG) der INFOnline GmbH (http://www.infonline.de) für die Ermittlung ",
+        "statistischer Kennwerte zur Nutzung unserer Angebote. Dabei werden anonyme ",
+        "Messwerte erhoben. Die SZM-Reichweitenmessung verwendet zur Wiedererkennung von ",
+        "Computersystemen alternativ entweder einen Cookie mit der Kennung „ioam.de“, ein ",
+        "LocalStorage Objekt oder eine Signatur, die aus verschiedenen automatisch ",
+        "übertragenen Informationen Ihres Browsers erstellt wird."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "jasmin.com",
+      "type": "Pornografie",
+      "source": "Recherche",
+      "description": [
+        "Jasmin ist eine VideoChat Plattform, auf der sich Mitglieder und Besucher mit ",
+        "Amateurdarstellern aus der ganzen Welt unterhalten koennen. ",
+        "Siehe auch livejasmin.com."
+      ],
+      "faults": [ "isporn", "ispremium" ]
+    },
+
+    {
+      "domain": "krxd.net",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "laterpay.net",
+      "type": "Bezahlsystem",
+      "source": "Laterpay Homepage",
+      "description": [
+        "LaterPay ist eine Bezahlplattform, die es Ihnen als Anbieter ermöglicht, digitale ",
+        "Inhalte direkt aus der eigenen Website heraus zu verkaufen, und das bereits ab ",
+        "Kleinstbeträgen von 5 Cent. Ihre Nutzer können ohne Vorabregistrierung oder -zahlung ",
+        "Ihre Inhalte mit nur einem Klick kaufen, was die Konversionsraten im Kaufprozess ",
+        "deutlich steigert. LaterPay aggregiert dabei websiteübergreifend die Käufe Ihrer ",
+        "Nutzer und bittet diese erst ab einer Gesamtrechnung von 5,00 € zur Kasse."
+      ],
+      "faults": [ "ispremium" ]
+    },
+
+    {
+      "domain": "ligatus.com",
+      "type": "Tracking",
+      "source": "Ads Wiki",
+      "description": [
+        "Ligatus is a performance-marketing system permanently integrated into more than 260 ",
+        "premium-partner portals. Using its own optimisation algorithm, Ligatus enables ",
+        "advertising clients and agencies to position their advertising messages intelligently ",
+        "so that they precisely match the respective target group. In this way Ligatus develops ",
+        "successful campaigns in close collaboration with the client."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "livejasmin.com",
+      "type": "Pornografie",
+      "source": "Recherche",
+      "description": [
+        "Jasmin ist eine VideoChat Plattform, auf der sich Mitglieder und Besucher mit ",
+        "Amateurdarstellern aus der ganzen Welt unterhalten koennen. "
+      ],
+      "faults": [ "isporn", "ispremium" ]
+    },
+
+    {
+      "domain": "lp4.io",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden. Die Domain steht zum ",
+        "Verkauf."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "m-pathy.com",
+      "type": "Tracking",
+      "source": "m-pathy",
+      "description": [
+        "m-pathy Analysen machen sichtbar was Ihre Kunden erleben. Durch die Auswertung ",
+        "tausender individueller Verhaltensdaten aus Gesten, Klicks und ",
+        "Formularinteraktionen geben wir fundierte Antworten auf Ihre Optimierungsprobleme."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "m6r.eu",
+      "type": "Tracking",
+      "source": "mbr-targeting",
+      "description": [
+        "mbr targeting uses patent pending algorithms for highly efficient real-time ",
+        "advertising. We are 100% science- and technology-focused and process and ",
+        "analyze massive amounts of data. We are working at the cutting edge of big data, ",
+        "machine learning and real-time technologies and we are operating large-scale ",
+        "deployments of real-time web services."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "maxymiser.net",
+      "type": "Tracking",
+      "source": "maxymiser",
+      "description": [
+        "Kombinieren Sie Echtzeit-Analysen mit individuellen Kundenprofilen. Spielen Sie in ",
+        "Sekundenschnelle Website-Varianten ein, die auf den Besucher zugeschnitten sind. ",
+        "Präsentieren Sie intelligente Zusatzangebote und Empfehlungen je nach Bestellphase, ",
+        "Kundenprofil und Verhalten. Nutzen Sie externe Daten, um Ihre Kunden noch gezielter ",
+        "anzusprechen. Bieten Sie Ihren Kunden auf allen Plattformen ein personalisiertes ",
+        "Erlebnis. Zeigen Sie ihnen je nach Gerät die relevanten Inhalte."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "mediavoice.com",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Unsere Recherche zeigt, dass mediavoice.com dem Unternehmen GODADDY.COM, LLC ",
+        "zugeordnet ist. Die Homepage erfordert einen User-Account. Eine Datenschutzerklärung ",
+        "kann nicht abgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "meetrics.net",
+      "type": "Tracking",
+      "source": "Meetrics",
+      "description": [
+        "Meetrics führt im Auftrag von und im Einverständnis mit den Betreibern von Webseiten ",
+        "und Onlinevermarktern Auswertungen zum besseren Verständnis des Nutzungsverhaltens ",
+        "der Webseiten durch. Die Daten werden erhoben, um Attraktivität, Inhalt und ",
+        "Funktionalität der gemessenen Webseite zu erhöhen und Marketingmaßnahmen besser ",
+        "bewerten zu können. Dabei werden auf einzelnen Besuchen aufbauende Auswertungen ",
+        "erstellt, die Aufschluss über die Sichtbarkeit auf Internetseiten geben."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "movad.de",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Out.stream Video ist ein innovatives, aufmerksamkeitsstarkes Werbeformat, welches ",
+        "die Anzahl an Werbeflächen drastisch erhöht. Im Gegensatz zu in.stream Video Werbung ",
+        "wie Pre-Rolls auf YouTube, werden out.stream Video Ads nicht in den Video Content ",
+        "miteingebunden, sondern unabhängig im Text zwischen Absätzen platziert."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "mxcdn.net",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "mxcdn.net gehört zu Meetrics, siehe dort. Ruft man www.mxcdn.net auf, wird man ",
+        "auf eine Shopping Seite namens \"www.fusskleidung.de\" umgeleitet. Wir ",
+        "unterstellen mal, dass da ein Meetrics-Spassvogel am Werk ist."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "newrelic.com+nr-data.net",
+      "type": "Monitoring",
+      "source": "New Relic",
+      "description": [
+        "Around 90% of a web page’s load time is accounted for on the front-end. New Relic ",
+        "Browser takes advantage of this opportunity to improve browser-side performance ",
+        "and offers powerful performance insights."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "nexxcdn.com",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Diese Domöne gehört nexx.tv Service GmbH. Es ist keine Homepage vorhanden ",
+        "insbesondere liegt keine Datenschutz-Erklärung vor."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "nuggad.net",
+      "type": "Advertising",
+      "source": "nugg ad",
+      "description": [
+        "Die nugg.ad Smart Audience PlatformTM steht für Multichannel Audience Targeting ",
+        "auf Basis unterschiedlichster Daten und Smart Data Management, bis hin zu ",
+        "individuell entwickelten Vermarkter- oder Advertiser-Zielgruppen. Mit nugg.ads ",
+        "langjähriger Zielgruppen-Expertise und innovativer Technologie auf Basis von ",
+        "Echtzeit-Machine Learning profitieren Unternehmen von hocheffektiver digitaler ",
+        "Werbung entlang der gesamten Customer Journey und umfassendem Zielgruppenwissen. ",
+        "nugg.ad wurde 2006 gegründet und ist Pioneer sowie führender Anbieter für ",
+        "Predictive Targeting."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "optimizely.com",
+      "type": "Advertising",
+      "source": "Optimizely",
+      "description": [
+        "We may collect personally identifiable information about you through our Service ",
+        "when you register for an account, such as your full name, phone number and email ",
+        "address. If you choose to purchase a product from us, we or our third-party payment ",
+        "processors will collect your payment information also. We also collect data through ",
+        "our partners (customers) who use our Service (including by embedding our code on ",
+        "their websites) to analyze usage of their websites. When you use our Service or if ",
+        "you visit such websites, your browser may send us certain information about you as ",
+        "described below."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "outbrain.com",
+      "type": "Advertising",
+      "source": "Wikipedia",
+      "description": [
+        "Outbrain is a content discovery platform whose content marketing module offers ",
+        "to help Internet publishers increase web traffic by presenting them with relevant ",
+        "website links. It provides recommendations for several media types, including ",
+        "online, news, video, and mobile."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "pagefair.com+pagefair.net",
+      "type": "Advertising",
+      "source": "PageFair",
+      "description": [
+        "Measure how many visitors block your ads, and unlock revenue with non-intrusive ",
+        "ads just for your adblockers."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "plista.com",
+      "type": "Recommending",
+      "source": "plista",
+      "description": [
+        "plista ist Pionier innovativer Lösungen für zielgerichtete digitale Werbung und ",
+        "Content Distribution in redaktionellen Umfeldern. Über unsere datengetriebene ",
+        "Content- und Werbeplattform bringen wir seit 2008 Werbetreibende und Medien ",
+        "erfolgreich zusammen und sind auf mehreren internationalen Märkten federführend ",
+        "in seinem Segment. Durch unsere eigens entwickelte Echtzeit-Empfehlungstechnologie ",
+        "sind wir in der Lage, sowohl Inhalte als auch Werbung passend zu den Interessen des ",
+        "einzelnen Nutzers auszuliefern – auf allen Kanälen (online, mobile und in Apps) ",
+        "und über alle Endgeräte hinweg (Desktop-PCs, Tablets und Smartphones)."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "qcade.net",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "research.de.com",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "research.de.com gehört zu Meetrics, siehe dort."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "revsci.net",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden. Die Domain steht zum ",
+        "Verkauf."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "sascdn.com",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Diese Domäne ist geparkt und vorregistriert. Mithin unseriös."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "scorecardresearch.com",
+      "type": "Tracking",
+      "source": "ScorecardResearch",
+      "description": [
+        "ScorecardResearch, ein Service von Full Circle Studies, Inc. ist Teil von ",
+        "comScore, Inc. Marktforschungsgemeinschaft, einer führenden globalen ",
+        "Marktforschungseinrichtung, die Trends und Verhaltensweisen im Internet ",
+        "studiert und darüber berichtet. ScorecardResearch führt Recherchen mittels ",
+        "Sammlung von Daten über das Internetverhalten durch und verwendet diese ",
+        "Daten dann dafür, aufzuzeigen, wie Menschen das Internet nutzen und was sie ",
+        "dabei bevorzugen und was nicht."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "slopeaota.com",
+      "type": "Pornografie",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "smartadserver.com",
+      "type": "Advertising",
+      "source": "Recherche",
+      "description": [
+        "Smart AdServer is an all-inclusive ad server that allows users to program rich ",
+        "media and video campaigns and to deliver ads to mobile sites and applications."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "sociomantic.com",
+      "type": "Tracking",
+      "source": "Tagopedia",
+      "description": [
+        "Sociomantic Labs empowers advertisers with a real-time and personalized system that ",
+        "delivers increased and transparent performance. Simply put, the company makes ",
+        "display advertising more intelligent. Sociomantic is a market leader in Real-Time ",
+        "Bidding (RTB) and helps marketers drive incremental sales and grow Customer ",
+        "Lifetime Value (CLV) using today’s most advanced display advertising techniques, ",
+        "including: real-time retargeting and prospecting, stream-based data management, ",
+        "and dynamic ad personalization. These technologies allow Sociomantic’s clients to ",
+        "reach new and existing customers with individually priced and personalized display ",
+        "ads. Real-time reporting enables clients to see results just milliseconds after ",
+        "they happen."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "trafficjunky.net",
+      "type": "Pornografie",
+      "source": "Recherche",
+      "description": [
+        "Traffic Junky ist ein Netzwerk zur Promotion von erotischen Anzeigen."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "trafficstars.com",
+      "type": "Pornografie",
+      "source": "Recherche",
+      "description": [
+        "Traffic Junky ist ein Netzwerk zur Promotion von erotischen Anzeigen."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "theadex.com",
+      "type": "Tracking",
+      "source": "The Adex",
+      "description": [
+        "Unsere Mission ist es, Werbetreibenden, Publishern und Agenturen zu helfen mehr ",
+        "über ihre Zielgruppen zu erfahren. Darüberhinaus ermöglicht unsere Data Management ",
+        "Lösung der nächsten Generation allen Marktteilnehmern, einen datengestützten ",
+        "Zugang zu digitalen-Echtzeit Marktplätzen."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "uimserv.net",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Es ist keine Homepage vorhanden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "veeseo.com",
+      "type": "Advertising",
+      "source": "veeseo",
+      "description": [
+        "veeseo-Technologien helfen Publishern dabei ihre individuellen Ziele durch ",
+        "intelligente User-Steuerung zu erreichen. Zusätzlich steigert veeseo die ",
+        "Gesamtreichweite von Webseiten und erzielt signifikante Werbeerlöse von AdBlock-Usern."
+      ],
+      "faults": [ "nopriv" ]
+    },
+
+    {
+      "domain": "visualrevenue.com",
+      "type": "Recommending",
+      "source": "Recherche",
+      "description": [
+        "Gehört zu Outbrain, Inc."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "webmasterplan.com",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "webtrends.com",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Your data may be shared with service providers who work on our behalf. It may also, ",
+        "with your consent only, be shared with marketing partners or other independent third ",
+        "parties. You may opt-out of our sharing your information with independent third ",
+        "parties by emailing."
+      ],
+      "faults": [ "noprivger", "nooptin" ]
+    },
+
+    {
+      "domain": "wt-eu02.net",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Ist auf den Namen Webtrekk GmbH registriert. Leider kann keine Homepage und demnach ",
+        "auch keine Datenschutzbestimmung geladen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "xplosion.de",
+      "type": "Tracking",
+      "source": "The Adex",
+      "description": [
+        "Unser Herz schlägt für Retargeting. Es ist die effektivste Art, Ihre Conversion ",
+        "zu optimieren. Wir nutzen das schlummernde Potenzial von Website-Besuchern, die ",
+        "Interesse gezeigt, sich aber noch nicht zum Kauf entschlossen haben. Wir finden ",
+        "Ihre Kunden auf Premiumkanälen, im Social und Mobile Web wieder und überzeugen ",
+        "Sie mit individuellen Empfehlungen von Ihren Produkten. Dabei gehen wir mit sehr ",
+        "viel Präzision und Markenbewusstsein vor."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "yieldlab.net",
+      "type": "Advertising",
+      "source": "Yieldlab",
+      "description": [
+        "Yieldlab setzt Cookies ein, um die Einblendung von Werbemitteln, die durch die ",
+        "Kunden von Yieldlab geschaltet werden, für den User auszusteuern und zu optimieren. ",
+        "Dies betrifft zum Beispiel die maximale Anzeigehäufigkeit von Werbemitteln, die ein ",
+        "User zu sehen bekommt. Zudem nutzt Yieldlab in Einzelfällen gespeicherte ",
+        "Cookie-Informationen für statistische Erhebungen."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "zanox.com+zanox.ws",
+      "type": "Tracking",
+      "source": "zanox",
+      "description": [
+        "Bei der zanox TPV Tracking Technologie startet unser Tracking dann, wenn ein ",
+        "Werbemittel über unser Netzwerk eingeblendet wurde. TPV wird durch ID-, Cookie- ",
+        "und Fingerprint-Tracking-Verfahren ermöglicht und kann bei Bedarf auch externe ",
+        "Tracking-Technologien unterstützen."
+      ],
+      "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "zsrpc.net",
+      "type": "Unbekannt",
+      "source": "Recherche",
+      "description": [
+        "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
+        "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    }
+  ]
+}

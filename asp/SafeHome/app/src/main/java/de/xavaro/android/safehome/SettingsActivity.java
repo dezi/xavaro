@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.os.StrictMode;
 import android.preference.PreferenceActivity;
 import android.content.Context;
 import android.os.Bundle;
@@ -29,6 +30,19 @@ public class SettingsActivity extends PreferenceActivity
         Simple.setAppContext(this);
 
         super.onCreate(savedInstanceState);
+
+        //
+        // Allow cross fuck domain HTTP shit.
+        //
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        //
+        // Set common cookie store between webkit and java.net
+        //
+
+        WebCookie.initCookies();
 
         SettingsFragments.initialize(this);
     }
@@ -104,8 +118,8 @@ public class SettingsActivity extends PreferenceActivity
         target.add(category);
 
         target.add(PreferencesMedia.MediaImageFragment.getHeader());
-        target.add(PreferencesMedia.MediaAudioFragment.getHeader());
         target.add(PreferencesMedia.MediaVideoFragment.getHeader());
+        target.add(PreferencesMedia.MediaAudioFragment.getHeader());
         target.add(PreferencesMedia.MediaEbookFragment.getHeader());
 
         category = new Header();

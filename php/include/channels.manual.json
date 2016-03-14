@@ -1,5 +1,49 @@
 [
   {
+    "name":"ARTE Deutsch",
+    "free":true,
+    "enc":"None",
+    "hd":false,
+    "website":"www.arte.tv/de/70.html",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/arte_de.png",
+    "type":"tv",
+    "country":"Germany, France",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"12:Culture",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "7:TV Vlaanderen Digitaal",
+      "12:Orange France",
+      "15:Sky Deutschland",
+      "28:SFR"
+    ]
+  },
+  
+  {
+    "name":"ARTE Deutsch HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.arte.tv/de/70.html",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/aa/arte_de_hd.png",
+    "type":"tv",
+    "country":"Germany, France",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"12:Culture",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "7:TV Vlaanderen Digitaal",
+      "15:Sky Deutschland"
+    ]
+  },
+  
+  {
     "name":"Hope Channel Deutsch",
     "free":true,
     "enc":"None",

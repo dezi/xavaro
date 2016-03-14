@@ -1,25 +1,16 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.PreferenceFragments;
+import de.xavaro.android.common.WebLib;
 
 public class PreferencesFirewall
 {
@@ -27,7 +18,7 @@ public class PreferencesFirewall
 
     //region Firewall safety preferences
 
-    public static class SafetyFragment extends PreferenceFragment
+    public static class SafetyFragment extends PreferenceFragments.BasicFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -41,11 +32,10 @@ public class PreferencesFirewall
             return header;
         }
 
-        private final static ArrayList<Preference> preferences = new ArrayList<>();
-
-        public static void registerAll(Context context)
+        @Override
+        public void registerAll(Context context)
         {
-            preferences.clear();
+            super.registerAll(context);
 
             SafetyCBPreference cb;
 
@@ -139,39 +129,11 @@ public class PreferencesFirewall
             preferences.add(cb);
         }
 
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
-            registerAll(getActivity());
-
-            for (Preference pref : preferences) root.addPreference(pref);
-        }
-
-        //region SafetyCBPreference implementation.
-
         private static class SafetyCBPreference extends NicedPreferences.NiceCheckboxPreference
         {
             public SafetyCBPreference(Context context)
             {
                 super(context);
-            }
-
-            @Override
-            protected void onBindView(View view)
-            {
-                super.onBindView(view);
-
-                //
-                // Stupid limitation on size of description.
-                //
-
-                TextView summary = (TextView) view.findViewById(android.R.id.summary);
-                summary.setMaxLines(50);
             }
 
             public void setSummaryOff(String text)
@@ -181,15 +143,13 @@ public class PreferencesFirewall
                 super.setSummaryOff(text);
             }
         }
-
-        //endregion SafetyCBPreference implementation.
     }
 
     //endregion Firewall safety preferences
 
     //region Firewall domains preferences
 
-    public static class DomainsFragment extends PreferenceFragment
+    public static class DomainsFragment extends PreferenceFragments.BasicFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -203,115 +163,56 @@ public class PreferencesFirewall
             return header;
         }
 
-        private static final ArrayList<Preference> preferences = new ArrayList<>();
-
-        private static JSONObject globalConfig;
-
-        private static void loadGlobalConfig(Context context)
-        {
-            if (globalConfig == null)
-            {
-                try
-                {
-                    JSONObject ctemp = StaticUtils.readRawTextResourceJSON(context, R.raw.default_firewall);
-
-                    if (ctemp != null)
-                    {
-                        globalConfig = ctemp.getJSONObject("firewall");
-                    }
-                }
-                catch (NullPointerException | JSONException ex)
-                {
-                    Log.e(LOGTAG, "loadGlobalConfig: Cannot read default firewall config.");
-                }
-            }
-        }
-
-        public static void registerAll(Context context)
-        {
-            preferences.clear();
-
-            loadGlobalConfig(context);
-            if (globalConfig == null) return;
-
-            try
-            {
-                JSONArray domains = globalConfig.getJSONArray("domains");
-
-                DomainsCBPreference cb;
-
-                for (int inx = 0; inx < domains.length(); inx++)
-                {
-                    JSONObject domain = domains.getJSONObject(inx);
-
-                    // @formatter:off
-                    String name   = domain.has("domain") ? domain.getString("domain") : null;
-                    String type   = domain.has("type")   ? domain.getString("type")   : null;
-                    String source = domain.has("source") ? domain.getString("source") : null;
-                    // @formatter:on
-
-                    JSONArray desc = domain.has("description") ? domain.getJSONArray("description") : null;
-                    JSONArray faults = domain.has("faults") ? domain.getJSONArray("faults") : null;
-
-                    if ((name == null) || (desc == null) || (faults == null)) continue;
-
-                    String title = name;
-                    if (type != null) title += " (" + type + ")";
-
-                    String text = "";
-
-                    for (int cnt = 0; cnt < desc.length(); cnt++) text += desc.getString(cnt);
-                    if (source != null) text += " (Quelle: " + source + ")";
-
-                    cb = new DomainsCBPreference(context);
-
-                    cb.setKey("firewall.domains." + name);
-                    cb.setTitle(title);
-                    cb.setSummary(text, name, faults);
-
-                    preferences.add(cb);
-                }
-
-            }
-            catch (JSONException ex)
-            {
-                OopsService.log(LOGTAG, ex);
-            }
-        }
-
         @Override
-        public void onCreate(Bundle savedInstanceState)
+        public void registerAll(Context context)
         {
-            super.onCreate(savedInstanceState);
+            super.registerAll(context);
 
-            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
+            JSONObject config = WebLib.getLocaleConfig("block");
+            if (config == null) return;
 
-            registerAll(getActivity());
+            JSONArray domains = Json.getArray(config, "domains");
+            if (domains == null) return;
 
-            for (Preference pref : preferences) root.addPreference(pref);
+            DomainsCBPreference cb;
+
+            for (int inx = 0; inx < domains.length(); inx++)
+            {
+                JSONObject domain = Json.getObject(domains, inx);
+                if (domain == null) continue;
+
+                String name = Json.getString(domain, "domain");
+                String type = Json.getString(domain, "type");
+                String source = Json.getString(domain, "source");
+
+                JSONArray desc = Json.getArray(domain, "description");
+                JSONArray faults = Json.getArray(domain, "faults");
+
+                if ((name == null) || (desc == null) || (faults == null)) continue;
+
+                String title = name;
+                if (type != null) title += " (" + type + ")";
+
+                String text = "";
+
+                for (int cnt = 0; cnt < desc.length(); cnt++) text += Json.getString(desc, cnt);
+                if (source != null) text += " (Quelle: " + source + ")";
+
+                cb = new DomainsCBPreference(context);
+
+                cb.setKey("firewall.domains." + name);
+                cb.setTitle(title);
+                cb.setSummary(text, name, faults);
+
+                preferences.add(cb);
+            }
         }
-
-        //region DomainsCBPreference implementation
 
         private static class DomainsCBPreference extends NicedPreferences.NiceCheckboxPreference
         {
             public DomainsCBPreference(Context context)
             {
                 super(context);
-            }
-
-            @Override
-            protected void onBindView(View view)
-            {
-                super.onBindView(view);
-
-                //
-                // Stupid limitation on size of description.
-                //
-
-                TextView summary = (TextView) view.findViewById(android.R.id.summary);
-                summary.setMaxLines(50);
             }
 
             public void setSummary(String text, String domain, JSONArray faults)
@@ -352,8 +253,6 @@ public class PreferencesFirewall
                 setSummaryOff(text + "\n\nZugriff zurzeit gesperrt");
             }
         }
-
-        //endregion DomainsCBPreference implementation
     }
 
     //endregion Firewall domains preferences

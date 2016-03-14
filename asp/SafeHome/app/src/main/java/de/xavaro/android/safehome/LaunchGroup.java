@@ -24,6 +24,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.Animator;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
@@ -120,7 +121,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         FrameLayout ali = new FrameLayout(getContext());
         ali.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_left);
-        bmpDraw = new BitmapDrawable(getResources(),bmp);
+        bmpDraw = new BitmapDrawable(getResources(), bmp);
         bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
         ali.setBackground(bmpDraw);
 
@@ -135,7 +136,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         FrameLayout ari = new FrameLayout(getContext());
         ari.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_right);
-        bmpDraw = new BitmapDrawable(getResources(),bmp);
+        bmpDraw = new BitmapDrawable(getResources(), bmp);
         bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
         ari.setBackground(bmpDraw);
 
@@ -175,7 +176,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 
         if (motionEvent.getAction() == MotionEvent.ACTION_MOVE)
         {
-            if (! touchValid)
+            if (!touchValid)
             {
                 if ((Math.abs(xscreen - xStartTouch) >= 10) || (Math.abs(yscreen - yStartTouch) >= 10))
                 {
@@ -252,7 +253,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
                 LayoutParams toto = new LayoutParams(lpage.getLayoutParams());
                 toto.leftMargin = finalMargin;
 
-                DitUndDat.Animator animator = new DitUndDat.Animator();
+                Animator animator = new Animator();
 
                 animator.setDuration(500);
                 animator.setLayout(lpage, from, toto);
@@ -288,7 +289,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
     {
         if (changed)
         {
-            Log.d(LOGTAG,"onLayout:" + "=" + left + "=" + top + "=" + right + "=" + bottom);
+            Log.d(LOGTAG, "onLayout:" + "=" + left + "=" + top + "=" + right + "=" + bottom);
 
             positionLaunchItems();
         }
@@ -299,12 +300,12 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
-        int width  = MeasureSpec.getSize(widthMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
 
         if ((width != realWidth) || (height != realHeight))
         {
-            realWidth  = width;
+            realWidth = width;
             realHeight = height;
 
             if (Simple.hasNavigationBar()) realHeight -= Simple.getNavigationBarHeight();
@@ -342,7 +343,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 
     public void deleteLaunchItem(LaunchItem item)
     {
-        if (! launchItems.contains(item)) return;
+        if (!launchItems.contains(item)) return;
 
         ((ViewGroup) item.getParent()).removeView(item);
         launchItems.remove(item);
@@ -386,7 +387,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         launchItems = new ArrayList<>();
         launchPages = new ArrayList<>();
 
-        if ((config == null) || ! config.has(configTree))
+        if ((config == null) || !config.has(configTree))
         {
             Toast.makeText(context, "Keine <" + configTree + "> gefunden.", Toast.LENGTH_LONG).show();
 
@@ -400,7 +401,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
             int bgcol = GlobalConfigs.LaunchPageBackgroundColor;
 
             FrameLayout lp = new FrameLayout(context);
-            lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth,realHeight));
+            lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth, realHeight));
             lp.setBackgroundColor(bgcol);
             launchPages.add(lp);
             this.addView(lp);
@@ -417,7 +418,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
                 {
                     String key = lit.getString("enable");
 
-                    if (! StaticUtils.getSharedPrefsBoolean(context, key))
+                    if (!StaticUtils.getSharedPrefsBoolean(context, key))
                     {
                         continue;
                     }
@@ -430,7 +431,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
                 if (nextSlot >= maxSlots)
                 {
                     lp = new FrameLayout(context);
-                    lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth,realHeight));
+                    lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth, realHeight));
                     lp.setBackgroundColor(bgcol);
                     launchPages.add(lp);
                     this.addView(lp);
@@ -466,6 +467,55 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 
         this.parent = parent;
         this.config = config;
+    }
+
+    private void activateLaunchItem(LaunchGroup directory, String type, String subtype)
+    {
+        if (directory != null)
+        {
+            if (directory.launchItems != null)
+            {
+                //
+                // Find already created launch items.
+                //
+
+                for (LaunchItem launchItem : directory.launchItems)
+                {
+                    if (Simple.equals(type, launchItem.type)
+                            && Simple.equals(subtype, launchItem.subtype))
+                    {
+                        launchItem.onMyClick();
+                    }
+
+                    activateLaunchItem(launchItem.directory, type, subtype);
+                }
+            }
+
+            if ((directory.config != null) && directory.config.has("launchitems"))
+            {
+                //
+                // Find configured launch items.
+                //
+
+                JSONArray launchitems = Json.getArray(directory.config, "launchitems");
+
+                if (launchitems == null) return;
+
+                for (int inx = 0; inx < launchitems.length(); inx++)
+                {
+                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    if (launchitem == null) continue;
+
+                    String itype = Json.getString(launchitem, "type");
+                    String isubtype = Json.getString(launchitem, "subtype");
+                }
+            }
+        }
+    }
+
+    public void activateLaunchItem(String type, String subtype)
+    {
+        activateLaunchItem(this, type, subtype);
     }
 
     @Nullable

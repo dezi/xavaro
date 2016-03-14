@@ -43,9 +43,38 @@ public class EventManager
         Simple.removePost(freeMemory);
         getStorage();
 
+        for (int inx = 0; inx < events.length(); inx++)
+        {
+            JSONObject event = Json.getObject(events, inx);
+            if (! Json.has(event, "uuid")) Json.put(event, "uuid", Simple.getUUID());
+        }
+
         JSONObject coming = Json.getObject(eventcache, "coming");
         Json.put(coming, eventgroup, Json.sort(events, "date", false));
         dirty = true;
+
+        Simple.makePost(freeMemory, 10 * 1000);
+    }
+
+    public static void addComingEvent(String eventgroup, JSONObject event)
+    {
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        if (! Json.has(event, "uuid")) Json.put(event, "uuid", Simple.getUUID());
+
+        JSONObject coming = Json.getObject(eventcache, "coming");
+
+        if (coming != null)
+        {
+            if (!coming.has(eventgroup)) Json.put(coming, eventgroup, new JSONArray());
+            JSONArray events = Json.getArray(coming, eventgroup);
+
+            Json.put(events, event);
+
+            Json.put(coming, eventgroup, Json.sort(events, "date", false));
+            dirty = true;
+        }
 
         Simple.makePost(freeMemory, 10 * 1000);
     }
@@ -65,7 +94,7 @@ public class EventManager
                 JSONObject oldevent = Json.getObject(events, inx);
 
                 if (Json.equals(oldevent, "date", event) &&
-                        Json.equals(oldevent, "medication", event))
+                        Json.equals(oldevent, "uuid", event))
                 {
                     //
                     // Integrate all values from event into old event,
@@ -194,9 +223,14 @@ public class EventManager
             String webappname = eventgroupkey.substring(8);
             WebApp.handleEvent(webappname, Json.clone(events));
         }
+
+        if (eventgroupkey.equals("media.recorder"))
+        {
+            MediaRecorder.handleEvent(Json.clone(events));
+        }
     }
 
-    private static long nextLoadTime;
+    private static long nextLoadTime = 30 + Simple.nowAsTimeStamp() / 1000;
 
     public static void commTick()
     {

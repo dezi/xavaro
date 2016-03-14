@@ -2,11 +2,14 @@ package de.xavaro.android.safehome;
 
 import android.preference.PreferenceActivity;
 
+import de.xavaro.android.common.PreferenceFragments;
+import de.xavaro.android.common.Simple;
+
 public class PreferencesWebStream
 {
     //region IP Radio preferences
 
-    public static class IPRadioFragment extends SettingsFragments.JSONConfigFragment
+    public static class IPRadioFragment extends PreferenceFragments.WeblibFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -24,10 +27,9 @@ public class PreferencesWebStream
         {
             super();
 
-            root = "webradio";
-            jsonres = R.raw.default_webradio;
+            type = "iprd";
             iconres = GlobalConfigs.IconResIPRadio;
-            keyprefix = "ipradio";
+            keyprefix = "iprd";
             masterenable = "Internet Radio freischalten";
         }
     }
@@ -36,7 +38,7 @@ public class PreferencesWebStream
 
     //region IP Television preferences
 
-    public static class IPTelevisionFragment extends SettingsFragments.JSONConfigFragment
+    public static class IPTelevisionFragment extends PreferenceFragments.WeblibFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -54,10 +56,9 @@ public class PreferencesWebStream
         {
             super();
 
-            root = "webiptv";
-            jsonres = R.raw.default_webiptv;
+            type = "iptv";
             iconres = GlobalConfigs.IconResIPTelevision;
-            keyprefix = "iptelevision";
+            keyprefix = "iptv";
             masterenable = "Internet Fernsehen freischalten";
         }
     }

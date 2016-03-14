@@ -1,20 +1,18 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WebLib;
 
 //
-// Web stream receivers base class.
+// Web stream players base class.
 //
 
 public class LaunchGroupWebStream extends LaunchGroup
@@ -26,147 +24,64 @@ public class LaunchGroupWebStream extends LaunchGroup
         super(context);
     }
 
-    public LaunchGroupWebStream(Context context, LaunchItem parent, String webtype)
+    public LaunchGroupWebStream(Context context, LaunchItem parent)
     {
         super(context);
 
         this.parent = parent;
-        this.config = getConfig(context, webtype, null);
     }
 
-    public LaunchGroupWebStream(Context context, LaunchItem parent, String webtype, String subtype)
+    public static JSONArray getConfig(String type)
     {
-        super(context);
+        JSONArray home = new JSONArray();
+        JSONArray adir = new JSONArray();
 
-        this.parent = parent;
-        this.config = getConfig(context, webtype, subtype);
-    }
+        JSONObject config = WebLib.getLocaleConfig(type);
+        if (config == null) return home;
 
-    //region Static methods.
+        Iterator<String> keysIterator = config.keys();
 
-    private static JSONObject globalConfig = new JSONObject();
-
-    private static JSONObject loadConfig(Context context, String type)
-    {
-        JSONObject typeroot = new JSONObject();
-
-        try
+        while (keysIterator.hasNext())
         {
-            if (! globalConfig.has(type))
+            String website = keysIterator.next();
+
+            JSONObject webitem = Json.getObject(config, website);
+            if (webitem == null) continue;
+
+            JSONArray channels = Json.getArray(webitem, "channels");
+            if (channels == null) continue;
+
+            for (int inx = 0; inx < channels.length(); inx++)
             {
-                int resourceId = context.getResources().getIdentifier("default_" + type, "raw", context.getPackageName());
+                JSONObject channel = Json.clone(Json.getObject(channels, inx));
 
-                JSONObject jot = StaticUtils.readRawTextResourceJSON(context, resourceId);
+                if (channel.has("audiourl")) Json.put(channel, "type", "audioplayer");
+                if (channel.has("videourl")) Json.put(channel, "type", "videoplayer");
 
-                if ((jot == null) || !jot.has(type))
-                {
-                    Log.e(LOGTAG, "getConfig: Cannot read default " + type);
-                }
-                else
-                {
-                    globalConfig.put(type, jot.getJSONObject(type));
-                }
+                String label = Json.getString(channel, "label");
+                if (label == null) continue;
+
+                String key = type + ".channel:" + website + ":" + label;
+
+                String mode = Simple.getSharedPrefString(key);
+
+                if (Simple.equals(mode, "home")) home.put(channel);
+                if (Simple.equals(mode, "folder")) adir.put(channel);
             }
-
-            typeroot = globalConfig.getJSONObject(type);
         }
-        catch (JSONException ex)
+
+        if (adir.length() > 0)
         {
-            OopsService.log(LOGTAG, ex);
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", type);
+            Json.put(entry, "label", type.equals("iptv") ? "Fernsehen" : "Radio");
+            Json.put(entry, "order", 1050);
+
+            Json.put(entry, "launchitems", adir);
+            Json.put(home, entry);
         }
 
-        return typeroot;
+        return home;
     }
-
-    //endregion Static methods.
-
-    private String getPrefPrefix(String type, String subtype)
-    {
-        if (type.equals("webiptv")) return "iptelevision.channel";
-
-        if (type.equals("webradio")) return "ipradio.channel";
-
-        if (type.equals("webconfig") && (subtype != null))
-        {
-            return type + "." + subtype;
-        }
-
-        return "unknown";
-    }
-
-    private JSONObject getConfig(Context context, String type, String subtype)
-    {
-        try
-        {
-            JSONObject config = loadConfig(context, type);
-
-            JSONObject launchgroup = new JSONObject();
-            JSONArray launchitems = new JSONArray();
-
-            Iterator<String> keysIterator = config.keys();
-
-            String key;
-            String label;
-            String ptype = getPrefPrefix(type,subtype);
-
-            while (keysIterator.hasNext())
-            {
-                String website = keysIterator.next();
-
-                JSONObject webitem = config.getJSONObject(website);
-
-                if (webitem.has("subtype") && (subtype != null)
-                        && ! webitem.getString("subtype").equals(subtype))
-                {
-                    continue;
-                }
-
-                if (! webitem.has("channels"))
-                {
-                    key = ptype + ".website." + website;
-
-                    if (StaticUtils.getSharedPrefsBoolean(context, key))
-                    {
-                        webitem.put("type","webframe");
-                        webitem.put("name",website);
-                        launchitems.put(webitem);
-                    }
-                }
-                else
-                {
-                    JSONArray channels = webitem.getJSONArray("channels");
-
-                    for (int inx = 0; inx < channels.length(); inx++)
-                    {
-                        JSONObject channel = Json.clone(channels.getJSONObject(inx));
-
-                        if (channel.has("audiourl")) Json.put(channel, "type", "audioplayer");
-                        if (channel.has("videourl")) Json.put(channel, "type", "videoplayer");
-
-                        label = Json.getString(channel, "label");
-                        if (label == null) continue;
-
-                        key = ptype + "." + website + ":" + label.replace(" ", "_");
-
-                        if (StaticUtils.getSharedPrefsBoolean(context, key))
-                        {
-                            launchitems.put(channel);
-                        }
-                    }
-                }
-            }
-
-            launchgroup.put("launchitems", launchitems);
-
-            return launchgroup;
-        }
-        catch (JSONException ex)
-        {
-            ex.printStackTrace();
-        }
-
-        return new JSONObject();
-    }
-
-    //endregion
 }

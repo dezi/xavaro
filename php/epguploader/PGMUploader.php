@@ -64,7 +64,7 @@
 			file_put_contents($orig, $jpeg);
 			chmod($orig, 0644);
 
-			if (substr($imgurl, -4) == ".png")
+			if (strpos($imgurl, ".png") > 0)
 			{
 				$source_image = imagecreatefrompng($orig);
 				

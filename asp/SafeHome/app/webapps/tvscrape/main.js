@@ -20,6 +20,7 @@ tvscrape.channels.standard.push("tv/de/Bayerisches Fernsehen Nord");
 tvscrape.channels.standard.push("tv/de/ZDF info");
 tvscrape.channels.standard.push("tv/de/ZDF Kultur");
 tvscrape.channels.standard.push("tv/de/ZDF neo");
+tvscrape.channels.standard.push("tv/de/ARTE Deutsch");
 tvscrape.channels.standard.push("tv/de/Einsfestival");
 
 tvscrape.onClickSelect = function(event)
@@ -61,7 +62,31 @@ tvscrape.onClickTitle = function(event)
     }
     else
     {
-        tvscrape.info.search += " " + tvscrape.info.sender;
+        var sender = tvscrape.info.sender;
+
+        sender = sender.replace("Fernsehen", " ");
+        sender = sender.replace("Hamburg", " ");
+        sender = sender.replace("Sachsen-Anhalt", " ");
+        sender = sender.replace("Köln", " ");
+        sender = sender.replace("Berlin", " ");
+        sender = sender.replace("Brandenburg", " ");
+        sender = sender.replace("Bayerisches", "BR");
+        sender = sender.replace("Nord", " ");
+
+        sender = sender.replace("Das Erste", "DasErste");
+        sender = sender.replace("Sat. 1", "Sat1");
+        sender = sender.replace("Pro Sieben", "Pro7");
+        sender = sender.replace("Kabel Eins", "Kabel1");
+        sender = sender.replace("RTL 2", "RTL2");
+        sender = sender.replace("Eins Plus", "EinsPlus");
+        sender = sender.replace("ZDF info", "ZDFinfo");
+        sender = sender.replace("ZDF Kultur", "ZDFKultur");
+        sender = sender.replace("ZDF neo", "ZDFneo");
+
+        sender = sender.replace("  ", " ");
+        sender = sender.replace("  ", " ");
+
+        tvscrape.info.search += " " + sender;
         tvscrape.info.issender = true;
     }
 
@@ -340,7 +365,9 @@ tvscrape.loadChannelList = function()
         if (name.startsWith("Sky ")) continue;
 
         if (name.endsWith(" HD")) name = name.substring(0, name.length - 3);
+        if (name.endsWith(" Deutsch")) name = name.substring(0, name.length - 8);
         if (name.endsWith(" Deutschland")) name = name.substring(0, name.length - 12);
+        if (name.endsWith(" Einsfestival")) name = name.substring(0, name.length - 13);
 
         if (tvscrape.channels[ name ]) continue;
         tvscrape.channels[ name ] = channel;

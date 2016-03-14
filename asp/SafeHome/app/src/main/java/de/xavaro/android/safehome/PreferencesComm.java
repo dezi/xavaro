@@ -324,6 +324,7 @@ public class PreferencesComm
         private void putNumberType(JSONObject numbers, String type, String orignumber)
         {
             if (orignumber == null) return;
+
             String nospacenum = orignumber.replace(" ", "");
 
             if (nospacenum.endsWith("@s.whatsapp.net"))
@@ -502,6 +503,7 @@ public class PreferencesComm
 
                 //
                 // Build contacts category preference.
+                //
 
                 Iterator<String> numbersIterator = numbers.keys();
 
@@ -526,6 +528,15 @@ public class PreferencesComm
                             (vicaphone == null) && (chatphone == null)) continue;
 
                     if (isSkype) nicephone = vicaphone;
+
+                    if (isPhone && (nicephone != null) && (nicephone.length() < 6))
+                    {
+                        //
+                        // Remove all special phone numbers.
+                        //
+
+                        continue;
+                    }
 
                     if (first)
                     {

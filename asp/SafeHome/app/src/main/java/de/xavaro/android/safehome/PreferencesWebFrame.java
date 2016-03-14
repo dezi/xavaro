@@ -2,11 +2,13 @@ package de.xavaro.android.safehome;
 
 import android.preference.PreferenceActivity;
 
+import de.xavaro.android.common.PreferenceFragments;
+
 public class PreferencesWebFrame
 {
     //region Webframe newspaper preferences
 
-    public static class WebConfigNewspaperFragment extends SettingsFragments.JSONConfigFragment
+    public static class WebConfigNewspaperFragment extends PreferenceFragments.WeblibFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -24,12 +26,13 @@ public class PreferencesWebFrame
         {
             super();
 
-            root = "webconfig";
+            type = "ioc";
             subtype = "newspaper";
-            jsonres = R.raw.default_webconfig;
             iconres = GlobalConfigs.IconResWebConfigNewspaper;
-            keyprefix = "webconfig.newspaper";
+            keyprefix = type + "." + subtype;
             masterenable = "Online Zeitungen freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -37,7 +40,7 @@ public class PreferencesWebFrame
 
     //region Webframe magazine preferences
 
-    public static class WebConfigMagazineFragment extends SettingsFragments.JSONConfigFragment
+    public static class WebConfigMagazineFragment extends PreferenceFragments.WeblibFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -55,12 +58,13 @@ public class PreferencesWebFrame
         {
             super();
 
-            root = "webconfig";
+            type = "ioc";
             subtype = "magazine";
-            jsonres = R.raw.default_webconfig;
             iconres = GlobalConfigs.IconResWebConfigMagazine;
-            keyprefix = "webconfig.magazine";
+            keyprefix = type + "." + subtype;
             masterenable = "Online Magazine freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -68,7 +72,7 @@ public class PreferencesWebFrame
 
     //region Webframe magazine preferences
 
-    public static class WebConfigPictorialFragment extends SettingsFragments.JSONConfigFragment
+    public static class WebConfigPictorialFragment extends PreferenceFragments.WeblibFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -86,12 +90,13 @@ public class PreferencesWebFrame
         {
             super();
 
-            root = "webconfig";
+            type = "ioc";
             subtype = "pictorial";
-            jsonres = R.raw.default_webconfig;
             iconres = GlobalConfigs.IconResWebConfigPictorial;
-            keyprefix = "webconfig.pictorial";
+            keyprefix = type + "." + subtype;
             masterenable = "Online Illustrierte freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -99,7 +104,7 @@ public class PreferencesWebFrame
 
     //region Webframe shopping preferences
 
-    public static class WebConfigShoppingFragment extends SettingsFragments.JSONConfigFragment
+    public static class WebConfigShoppingFragment extends PreferenceFragments.WeblibFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -117,12 +122,13 @@ public class PreferencesWebFrame
         {
             super();
 
-            root = "webconfig";
+            type = "ioc";
             subtype = "shopping";
-            jsonres = R.raw.default_webconfig;
             iconres = GlobalConfigs.IconResWebConfigShopping;
-            keyprefix = "webconfig.shopping";
+            keyprefix = type + "." + subtype;
             masterenable = "Online Shopping freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 
@@ -130,7 +136,7 @@ public class PreferencesWebFrame
 
     //region Webframe erotics preferences
 
-    public static class WebConfigEroticsFragment extends SettingsFragments.JSONConfigFragment
+    public static class WebConfigEroticsFragment extends PreferenceFragments.WeblibFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -148,12 +154,13 @@ public class PreferencesWebFrame
         {
             super();
 
-            root = "webconfig";
+            type = "ioc";
             subtype = "erotics";
-            jsonres = R.raw.default_webconfig;
             iconres = GlobalConfigs.IconResWebConfigErotics;
-            keyprefix = "webconfig.erotics";
+            keyprefix = type + "." + subtype;
             masterenable = "Online Erotisches freischalten";
+            residKeys = R.array.pref_ioc_where_keys;
+            residVals = R.array.pref_ioc_where_vals;
         }
     }
 

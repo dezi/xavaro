@@ -53,6 +53,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
 
         if (Simple.equals(type, "apps"        )) item = new LaunchItemApps(context);
         if (Simple.equals(suty, "media/image" )) item = new LaunchItemMediaImage(context);
+        if (Simple.equals(suty, "media/video" )) item = new LaunchItemMediaVideo(context);
 
         if (Simple.equals(type, "phone"       )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "skype"       )) item = new LaunchItemComm(context);
@@ -64,8 +65,9 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
         if (Simple.equals(type, "webframe"    )) item = new LaunchItemWebFrame(context);
         if (Simple.equals(type, "webconfig"   )) item = new LaunchItemWebFrame(context);
 
-        if (Simple.equals(type, "ipradio"     )) item = new LaunchItemWebStream(context);
-        if (Simple.equals(type, "iptelevision")) item = new LaunchItemWebStream(context);
+        if (Simple.equals(type, "ioc"         )) item = new LaunchItemWebFrame(context);
+        if (Simple.equals(type, "iptv"        )) item = new LaunchItemWebStream(context);
+        if (Simple.equals(type, "iprd"        )) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "audioplayer" )) item = new LaunchItemWebStream(context);
         if (Simple.equals(type, "videoplayer" )) item = new LaunchItemWebStream(context);
 

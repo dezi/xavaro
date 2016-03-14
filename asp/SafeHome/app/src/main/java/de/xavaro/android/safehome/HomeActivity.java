@@ -18,13 +18,15 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.MediaRecorder;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
+import de.xavaro.android.common.VideoSurface;
 
 public class HomeActivity extends AppCompatActivity implements
-        View.OnSystemUiVisibilityChangeListener
+        View.OnSystemUiVisibilityChangeListener,
+        VideoSurface.VideoSurfaceHandler
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
@@ -98,7 +100,6 @@ public class HomeActivity extends AppCompatActivity implements
         super.onPostCreate(savedInstanceState);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         topscreen.setOnSystemUiVisibilityChangeListener(this);
     }
 
@@ -153,6 +154,31 @@ public class HomeActivity extends AppCompatActivity implements
         DitUndDat.InternetState.subscribe(this);
 
         ArchievementManager.show("howto.open.settings");
+
+        //
+        // Check for launch intent.
+        //
+
+        Intent intent = getIntent();
+
+        if (Simple.equals(intent.getAction(), "de.xavaro.android.safehome.LAUNCHITEM"))
+        {
+            final String type = intent.getStringExtra("type");
+            final String subtype = intent.getStringExtra("subtype");
+
+            final Runnable runner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    launchGroup.activateLaunchItem(type, subtype);
+                }
+            };
+
+            handler.postDelayed(runner, 100);
+        }
+
+        MediaRecorder.testDat();
     }
 
     @Override
@@ -229,6 +255,8 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void addViewToBackStack(Object view)
     {
+        // todo check parent...
+
         topscreen.addView((FrameLayout) view);
         backStack.add(view);
 
@@ -251,7 +279,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void removeVideoSurface()
     {
-        if (videoSurface != null)
+        if ((videoSurface != null) &&  (videoSurface.getParent() == topscreen))
         {
             topscreen.removeView(videoSurface);
             videoSurface = null;
@@ -290,14 +318,14 @@ public class HomeActivity extends AppCompatActivity implements
         {
             Object lastview = backStack.get(backStack.size() - 1);
 
-            if (lastview instanceof WebFrame)
+            if (lastview instanceof LaunchFrameWebFrame)
             {
                 //
                 // Give web browser option to do
                 // internal back press.
                 //
 
-                if (((WebFrame) lastview).doBackPressed())
+                if (((LaunchFrameWebFrame) lastview).doBackPressed())
                 {
                     topscreen.removeView((FrameLayout) lastview);
                     backStack.remove(backStack.size() - 1);

@@ -22,12 +22,13 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
 
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.WebLib;
 
 //
 // Guarded access and display of web client.
@@ -38,16 +39,12 @@ public class WebGuard extends WebViewClient
     //region Internal variables.
 
     private final static String LOGTAG = "WebGuard";
-
-    private Context context;
-
-    private Uri currentUri;
-    private String currentUrl;
-
-    private JSONObject config;
-
     private final ArrayList<String> subdomains = new ArrayList<>();
 
+    private Context context;
+    private Uri currentUri;
+    private String currentUrl;
+    private JSONObject config;
     private boolean wasBackAction;
 
     //endregion
@@ -58,17 +55,17 @@ public class WebGuard extends WebViewClient
     {
         this.context = context;
 
-        loadGlobalConfig(context);
+        loadGlobalConfig();
     }
 
-    public void setCurrent(String url,String website)
+    public void setCurrent(JSONObject config, String url, String website)
     {
+        this.config = config;
+
         currentUrl = url;
         currentUri = Uri.parse(url);
 
-        config = WebFrame.getConfig(context, website);
-
-        if (! subdomains.contains(website)) subdomains.add(website);
+        subdomains.add(website);
     }
 
     public void setFeatures(WebView webview)
@@ -94,19 +91,14 @@ public class WebGuard extends WebViewClient
         // Check for known and validated subdomains.
         //
 
-        if (config.has("subdomains"))
-        {
-            try
-            {
-                JSONArray json = config.getJSONArray("subdomains");
+        JSONArray jsonsubdom = Json.getArray(config, "subdomains");
 
-                for (int inx = 0; inx < json.length(); inx++)
-                {
-                    subdomains.add(json.getString(inx));
-                }
-            }
-            catch (JSONException ignore)
+        if (jsonsubdom != null)
+        {
+            for (int inx = 0; inx < jsonsubdom.length(); inx++)
             {
+                String name = Json.getString(jsonsubdom, inx);
+                if (name != null) subdomains.add(name);
             }
         }
 
@@ -168,43 +160,45 @@ public class WebGuard extends WebViewClient
     private static ArrayList<String> domains_deny  = new ArrayList<>();
     // @formatter:on
 
-    private static void loadGlobalConfig(Context context)
+    private static void loadGlobalConfig()
     {
         if (globalConfig == null)
         {
-            try
-            {
-                JSONObject ctemp = StaticUtils.readRawTextResourceJSON(context, R.raw.default_webguard);
+            globalConfig = WebLib.getConfig("guard");
 
-                if (ctemp != null)
+            if (globalConfig != null)
+            {
+                // @formatter:off
+                regex_allow   = getConfigTreeArray(globalConfig, "resource", "regex",   "allow");
+                regex_deny    = getConfigTreeArray(globalConfig, "resource", "regex",   "deny" );
+                domains_allow = getConfigTreeArray(globalConfig, "resource", "domains", "allow");
+                domains_deny  = getConfigTreeArray(globalConfig, "resource", "domains", "deny" );
+                // @formatter:on
+
+                //
+                // Add restricted domains from firewall.
+                //
+
+                JSONObject config = WebLib.getLocaleConfig("block");
+                if (config == null) return;
+
+                JSONArray domains = Json.getArray(config, "domains");
+                if (domains == null) return;
+
+                for (int inx = 0; inx < domains.length(); inx++)
                 {
-                    globalConfig = ctemp.getJSONObject("webguard");
+                    JSONObject domain = Json.getObject(domains, inx);
+                    if (domain == null) continue;
 
-                    // @formatter:off
-                    regex_allow   = getConfigTreeArray(globalConfig, "resource", "regex",   "allow");
-                    regex_deny    = getConfigTreeArray(globalConfig, "resource", "regex",   "deny" );
-                    domains_allow = getConfigTreeArray(globalConfig, "resource", "domains", "allow");
-                    domains_deny  = getConfigTreeArray(globalConfig, "resource", "domains", "deny" );
-                    // @formatter:on
+                    String name = Json.getString(domain, "domain");
+                    if (name == null) continue;
 
-                    //
-                    // Add restricted domains from firewall.
-                    //
+                    boolean allow = Simple.getSharedPrefBoolean("firewall.domains." + name);
+                    if (allow) continue;
 
-                    Map<String, Object> domains = Simple.getAllPreferences("firewall.domains.");
-
-                    for (String prefkey : domains.keySet())
-                    {
-                        if ((boolean) domains.get(prefkey)) continue;
-
-                        String[] splits = prefkey.substring(17).split("\\+");
-                        for (String domain : splits) domains_deny.add("*." + domain);
-                    }
+                    String[] splits = name.split("\\+");
+                    for (String split : splits) domains_deny.add("*." + split);
                 }
-            }
-            catch (NullPointerException | JSONException ex)
-            {
-                Log.e(LOGTAG, "loadGlobalConfig: Cannot read default webguard config.");
             }
         }
     }

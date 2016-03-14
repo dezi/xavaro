@@ -50,8 +50,8 @@ public class PreferencesMedia
 
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceCheckboxPreference cp;
-            NicedPreferences.NiceGalleryPreference gp;
             NicedPreferences.NiceSwitchPreference sp;
+            NicedPreferences.NiceListPreference lp;
 
             //
             // Settings.
@@ -98,13 +98,16 @@ public class PreferencesMedia
 
             for (int inx = 0; (inx < keys.length) && (inx < vals.length); inx++)
             {
-                gp = new NicedPreferences.NiceGalleryPreference(context);
+                lp = new NicedPreferences.NiceListPreference(context);
 
-                gp.setKey(keyprefix + ".directory." + keys[ inx ]);
-                gp.setTitle(vals[ inx ]);
-                gp.setEnabled(enabled);
+                lp.setKey(keyprefix + ".directory." + keys[ inx ]);
+                lp.setEntries(R.array.pref_media_image_where_vals);
+                lp.setEntryValues(R.array.pref_media_image_where_keys);
+                lp.setDefaultValue("inact");
+                lp.setTitle(vals[ inx ]);
+                lp.setEnabled(enabled);
 
-                preferences.add(gp);
+                preferences.add(lp);
             }
 
             //
@@ -165,66 +168,6 @@ public class PreferencesMedia
 
     //endregion Media images preferences
 
-    //region Media audio preferences
-
-    public static class MediaAudioFragment extends SettingsFragments.EnablePreferenceFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Audio";
-            header.iconRes = GlobalConfigs.IconResMediaAudio;
-            header.fragment = MediaAudioFragment.class.getName();
-
-            return header;
-        }
-
-        public MediaAudioFragment()
-        {
-            super();
-
-            iconres = GlobalConfigs.IconResMediaAudio;
-            keyprefix = "media.audio";
-            masterenable = "Audio freischalten";
-        }
-
-        @Override
-        public void registerAll(Context context)
-        {
-            super.registerAll(context);
-
-            NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceGalleryPreference gp;
-
-            //
-            // Directories.
-            //
-
-            pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Audioverzeichnisse");
-            preferences.add(pc);
-
-            gp = new NicedPreferences.NiceGalleryPreference(context);
-
-            gp.setKey(keyprefix + ".directory.music");
-            gp.setTitle("Musik");
-            gp.setEnabled(enabled);
-
-            preferences.add(gp);
-            gp = new NicedPreferences.NiceGalleryPreference(context);
-
-            gp.setKey(keyprefix + ".directory.spoken");
-            gp.setTitle("Hörbücher");
-            gp.setEnabled(enabled);
-
-            preferences.add(gp);
-        }
-    }
-
-    //endregion Media audio preferences
-
     //region Media video preferences
 
     public static class MediaVideoFragment extends SettingsFragments.EnablePreferenceFragment
@@ -256,13 +199,116 @@ public class PreferencesMedia
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceNumberPreference np;
+            NicedPreferences.NiceSwitchPreference sp;
             NicedPreferences.NiceListPreference lp;
-            NicedPreferences.NiceDatePreference dp;
+
+            //
+            // Settings.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Einstellungen");
+            preferences.add(pc);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".delete");
+            sp.setTitle("Löschen");
+            sp.setEnabled(enabled);
+
+            preferences.add(sp);
+
+            //
+            // Galeries.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Video-Ordner");
+            preferences.add(pc);
+
+            String[] keys =  Simple.getTransArray(R.array.pref_media_video_directories_keys);
+            String[] vals =  Simple.getTransArray(R.array.pref_media_video_directories_vals);
+
+            for (int inx = 0; (inx < keys.length) && (inx < vals.length); inx++)
+            {
+                lp = new NicedPreferences.NiceListPreference(context);
+
+                lp.setKey(keyprefix + ".directory." + keys[ inx ]);
+                lp.setEntries(R.array.pref_media_video_where_vals);
+                lp.setEntryValues(R.array.pref_media_video_where_keys);
+                lp.setDefaultValue("inact");
+                lp.setTitle(vals[ inx ]);
+                lp.setEnabled(enabled);
+
+                preferences.add(lp);
+            }
         }
     }
 
     //endregion Media video preferences
+
+    //region Media audio preferences
+
+    public static class MediaAudioFragment extends SettingsFragments.EnablePreferenceFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Audio";
+            header.iconRes = GlobalConfigs.IconResMediaAudio;
+            header.fragment = MediaAudioFragment.class.getName();
+
+            return header;
+        }
+
+        public MediaAudioFragment()
+        {
+            super();
+
+            iconres = GlobalConfigs.IconResMediaAudio;
+            keyprefix = "media.audio";
+            masterenable = "Audio freischalten";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceListPreference lp;
+
+            //
+            // Directories.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Audioverzeichnisse");
+            preferences.add(pc);
+
+            /*
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".directory.music");
+            lp.setTitle("Musik");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".directory.spoken");
+            lp.setTitle("Hörbücher");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+            */
+        }
+    }
+
+    //endregion Media audio preferences
 
     //region Media ebook preferences
 

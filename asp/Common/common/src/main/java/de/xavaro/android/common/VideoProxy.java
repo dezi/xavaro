@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 
@@ -24,31 +24,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
-
 //
 // Proxy media player class with icy metadata detection
 // in audio streams.
 //
 @SuppressWarnings("InfiniteLoopStatement")
-public class ProxyPlayer extends Thread
+public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteListener
 {
-    private static final String LOGTAG = ProxyPlayer.class.getSimpleName();
+    private static final String LOGTAG = VideoProxy.class.getSimpleName();
 
     //region Contructor and static instance startup.
 
-    private static ProxyPlayer proxiPlayer;
+    private static VideoProxy proxiPlayer;
 
-    public static ProxyPlayer getInstance()
+    public static VideoProxy getInstance()
     {
-        if (proxiPlayer == null) proxiPlayer = new ProxyPlayer();
+        if (proxiPlayer == null) proxiPlayer = new VideoProxy();
 
         return proxiPlayer;
     }
 
-    private ProxyPlayer()
+    private VideoProxy()
     {
         //
         // Initialize and start proxy server.
@@ -75,6 +71,7 @@ public class ProxyPlayer extends Thread
 
         handler = new Handler();
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnSeekCompleteListener(this);
     }
 
     //endregion
@@ -85,6 +82,10 @@ public class ProxyPlayer extends Thread
     private String proxyUrl;
     private boolean proxyIsVideo;
     private boolean proxyIsAudio;
+
+    private String mediaFile;
+    private boolean mediaIsVideo;
+    private boolean mediaIsAudio;
 
     private Callback calling;
     private Callback playing;
@@ -103,6 +104,8 @@ public class ProxyPlayer extends Thread
 
         proxyIsVideo = false;
         proxyIsAudio = true;
+        mediaIsAudio = false;
+        mediaIsVideo = false;
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
@@ -118,8 +121,25 @@ public class ProxyPlayer extends Thread
 
         proxyIsVideo = true;
         proxyIsAudio = false;
+        mediaIsAudio = false;
+        mediaIsVideo = false;
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+        startPlayer.start();
+    }
+
+    public void setVideoFile(Context ctx, String file, Callback caller)
+    {
+        context = ctx;
+        calling = caller;
+        mediaFile = file;
+
+        proxyIsVideo = false;
+        proxyIsAudio = false;
+        mediaIsAudio = false;
+        mediaIsVideo = true;
 
         ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
         startPlayer.start();
@@ -130,7 +150,45 @@ public class ProxyPlayer extends Thread
         mediaPlayer.setDisplay(holder);
     }
 
+    public int getDuration()
+    {
+        if ((mediaPlayer != null) && mediaPrepared && isLocalFile())
+        {
+            return mediaPlayer.getDuration();
+        }
+
+        return -1;
+    }
+
+    public int getCurrentPosition()
+    {
+        if ((mediaPlayer != null) && mediaPrepared && isLocalFile())
+        {
+            return mediaPlayer.getCurrentPosition();
+        }
+
+        return -1;
+    }
+
+    public void setCurrentPosition(int position)
+    {
+        if ((mediaPlayer != null) && mediaPrepared && isLocalFile())
+        {
+            mediaPlayer.seekTo(position);
+        }
+    }
+
+    public boolean isLocalFile()
+    {
+        return mediaIsVideo || mediaIsAudio;
+    }
+
     //endregion
+
+    public void onSeekComplete (MediaPlayer mp)
+    {
+        Log.d(LOGTAG,"onSeekComplete:");
+    }
 
     //region Control methods.
 
@@ -239,16 +297,19 @@ public class ProxyPlayer extends Thread
 
     public int getCurrentQuality()
     {
-        return streamOptions.get(currentOption).quality;
+        return (streamOptions == null) ? 0 : streamOptions.get(currentOption).quality;
     }
 
     public int getAvailableQualities()
     {
         int mask = 0;
 
-        for (DitUndDat.StreamOptions so : streamOptions)
+        if (streamOptions != null)
         {
-            mask |= so.quality;
+            for (VideoStreams so : streamOptions)
+            {
+                mask |= so.quality;
+            }
         }
 
         return mask;
@@ -345,27 +406,44 @@ public class ProxyPlayer extends Thread
                 if (proxyIsAudio) headers.put("AudioProxy-Url", proxyUrl);
                 if (proxyIsVideo) headers.put("VideoProxy-Url", proxyUrl);
 
-                try
+                if (proxyIsAudio || proxyIsVideo)
                 {
-                    int rnd = new Random().nextInt();
-                    Uri uri = Uri.parse("http://127.0.0.1:" + proxyPort + "/?rnd=" + rnd);
+                    try
+                    {
+                        int rnd = new Random().nextInt();
+                        Uri uri = Uri.parse("http://127.0.0.1:" + proxyPort + "/?rnd=" + rnd);
 
-                    mediaPlayer.setDataSource(context, uri, headers);
+                        mediaPlayer.setDataSource(context, uri, headers);
+                    }
+                    catch (IOException ex)
+                    {
+                        OopsService.log(LOGTAG, ex);
+
+                        return;
+                    }
+
+                    //
+                    // Inform all upcomming thread workers of what
+                    // we want to play. Used for video only.
+                    //
+
+                    desiredUrl = proxyUrl;
+                    desiredNextFragment = null;
                 }
-                catch (IOException ex)
+
+                if (mediaIsAudio || mediaIsVideo)
                 {
-                    OopsService.log(LOGTAG, ex);
+                    try
+                    {
+                        mediaPlayer.setDataSource(mediaFile);
+                    }
+                    catch (IOException ex)
+                    {
+                        OopsService.log(LOGTAG, ex);
 
-                    return;
+                        return;
+                    }
                 }
-
-                //
-                // Inform all upcomming thread workers of what
-                // we want to play. Used for video only.
-                //
-
-                desiredUrl = proxyUrl;
-                desiredNextFragment = null;
 
                 //
                 // Try to prepare stream.
@@ -408,7 +486,7 @@ public class ProxyPlayer extends Thread
     private String desiredNextFragment;
     private int desiredQuality;
 
-    private ArrayList<DitUndDat.StreamOptions> streamOptions;
+    private ArrayList<VideoStreams> streamOptions;
     private int currentOption;
 
     private boolean mediaPrepared;
@@ -479,8 +557,6 @@ public class ProxyPlayer extends Thread
 
                 if (requestUrl != null)
                 {
-                    Log.d(LOGTAG, "#########################=" + mediaPrepared + " " + partialFrom + "=>" + partialToto);
-
                     if (requestIsPartial && ! mediaPrepared)
                     {
                         //
@@ -859,7 +935,7 @@ public class ProxyPlayer extends Thread
 
                     streamurl = resolveRelativeUrl(requestUrl, streamurl);
 
-                    DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
+                    VideoStreams so = new VideoStreams();
 
                     so.width = (width == null) ? 0 : Integer.parseInt(width);
                     so.height = (height == null) ? 0 : Integer.parseInt(height);
@@ -867,7 +943,7 @@ public class ProxyPlayer extends Thread
                     so.bandWidth = Integer.parseInt(bandwith);
                     so.streamUrl = streamurl;
 
-                    so.quality = DitUndDat.VideoQuality.deriveQuality(so.height);
+                    so.quality = VideoQuality.deriveQuality(so.height);
 
                     streamOptions.add(so);
 
@@ -881,9 +957,9 @@ public class ProxyPlayer extends Thread
                 // Nothing found, so add original url as stream.
                 //
 
-                DitUndDat.StreamOptions so = new DitUndDat.StreamOptions();
+                VideoStreams so = new VideoStreams();
                 so.streamUrl = requestUrl;
-                so.quality = DitUndDat.VideoQuality.LQ;
+                so.quality = VideoQuality.LQ;
 
                 streamOptions.add(so);
             }
@@ -902,7 +978,7 @@ public class ProxyPlayer extends Thread
 
                 for (int inx = 0; inx < streamOptions.size(); inx++)
                 {
-                    DitUndDat.StreamOptions so = streamOptions.get( inx );
+                    VideoStreams so = streamOptions.get( inx );
 
                     if ((so.quality <= desiredQuality)
                             && (so.quality >= currentQuality)

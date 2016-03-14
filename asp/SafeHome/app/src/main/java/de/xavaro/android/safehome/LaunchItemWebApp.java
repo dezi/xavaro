@@ -25,6 +25,12 @@ public class LaunchItemWebApp extends LaunchItem
         else
         {
             icon.setImageResource(GlobalConfigs.IconResWebApps);
+
+            if (directory == null)
+            {
+                directory = new LaunchGroupWebApps(context);
+                directory.setConfig(this, Json.getArray(config, "launchitems"));
+            }
         }
     }
 
@@ -57,12 +63,6 @@ public class LaunchItemWebApp extends LaunchItem
         }
         else
         {
-            if (directory == null)
-            {
-                directory = new LaunchGroupWebApps(context);
-                directory.setConfig(this, Json.getArray(config, "launchitems"));
-            }
-
             ((HomeActivity) context).addViewToBackStack(directory);
         }
     }
