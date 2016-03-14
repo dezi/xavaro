@@ -143,6 +143,8 @@ public class MediaRecorder
 
                 Simple.sleep(10000);
             }
+
+            recorder = null;
         }
     };
 
@@ -153,6 +155,8 @@ public class MediaRecorder
         String country = Json.getString(recording, "country");
         String type = Json.getString(recording, "type");
 
+        Log.d(LOGTAG, "dosomeRecording:aaa" + starttime);
+
         if ((channel == null) || (starttime == null) || (country == null) || (type == null))
         {
             //
@@ -161,6 +165,8 @@ public class MediaRecorder
 
             return;
         }
+
+        Log.d(LOGTAG, "dosomeRecording:bbb" + starttime);
 
         String metafilepath = Json.getString(recording, "metafile");
         String mediafilepath = Json.getString(recording, "mediafile");
@@ -195,15 +201,29 @@ public class MediaRecorder
 
         String lastChunk = Json.getString(recordstatus, "lastchunk");
         String lastline = null;
+        float lastlength = 0;
 
         boolean foundlastchunk = false;
+
+        ArrayList<String> chunks = new ArrayList<>();
+        ArrayList<Float> length = new ArrayList<>();
 
         for (String line : playlist)
         {
             if (line.length() == 0) continue;
+
+            if (line.startsWith("#EXTINF:"))
+            {
+                int endpos = line.contains(",") ? line.indexOf(",") : line.length();
+                lastlength = Float.parseFloat(line.substring(8, endpos));
+            }
+
             if (line.startsWith("#")) continue;
 
             lastline = line;
+
+            chunks.add(lastline);
+            length.add(lastlength);
 
             if (foundlastchunk)
             {
@@ -224,11 +244,25 @@ public class MediaRecorder
         if (! foundlastchunk)
         {
             //
-            // The recording is new. Append the very last chunk
-            // to initialize recording.
+            // The recording is new. Check when the recording started
+            // and identify the matching start chunk. This allows to
+            // make one touch recording into the past.
             //
 
-            appendIPTVStream(recordstatus, mediafile, lastline);
+            long startsecs = (Simple.getTimeStamp(starttime) / 1000) - (3 * 60);
+            long nowsecs = Simple.nowAsTimeStamp() / 1000;
+            float secondslost = nowsecs - startsecs;
+
+            int startindex = chunks.size() - 1;
+
+            while ((secondslost > 0) && (startindex > 0))
+            {
+                secondslost -= length.get(startindex--);
+            }
+
+            Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
+
+            appendIPTVStream(recordstatus, mediafile, chunks.get(startindex));
             Json.putFileContent(metafile, metadata);
         }
     }
@@ -430,7 +464,8 @@ public class MediaRecorder
                 String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
                 String streamurl = lines[ ++inx ];
 
-                if ((bandwith == null) || (streamurl == null))
+                if ((bandwith == null) || (streamurl == null)
+                        || (width == null)|| (height == null))
                 {
                     continue;
                 }
@@ -448,8 +483,8 @@ public class MediaRecorder
 
                 JSONObject so = new JSONObject();
 
-                Json.put(so, "width", (width == null) ? 0 : Integer.parseInt(width));
-                Json.put(so, "height", (height == null) ? 0 : Integer.parseInt(height));
+                Json.put(so, "width", Integer.parseInt(width));
+                Json.put(so, "height", Integer.parseInt(height));
                 Json.put(so, "bandwith", Integer.parseInt(bandwith));
                 Json.put(so, "streamurl", streamurl);
 

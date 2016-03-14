@@ -43,6 +43,12 @@ public class EventManager
         Simple.removePost(freeMemory);
         getStorage();
 
+        for (int inx = 0; inx < events.length(); inx++)
+        {
+            JSONObject event = Json.getObject(events, inx);
+            if (! Json.has(event, "uuid")) Json.put(event, "uuid", Simple.getUUID());
+        }
+
         JSONObject coming = Json.getObject(eventcache, "coming");
         Json.put(coming, eventgroup, Json.sort(events, "date", false));
         dirty = true;
@@ -54,6 +60,8 @@ public class EventManager
     {
         Simple.removePost(freeMemory);
         getStorage();
+
+        if (! Json.has(event, "uuid")) Json.put(event, "uuid", Simple.getUUID());
 
         JSONObject coming = Json.getObject(eventcache, "coming");
 
@@ -86,7 +94,7 @@ public class EventManager
                 JSONObject oldevent = Json.getObject(events, inx);
 
                 if (Json.equals(oldevent, "date", event) &&
-                        Json.equals(oldevent, "medication", event))
+                        Json.equals(oldevent, "uuid", event))
                 {
                     //
                     // Integrate all values from event into old event,

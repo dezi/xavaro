@@ -42,6 +42,7 @@
       { "interval": -3, "pattern": "http://images\\.google\\.de/.*" },
 
       { "interval":  0, "pattern": ".*/epginfo/.*" },
+      { "interval":  0, "pattern": ".*/channels/.*" },
 
       { "interval": 24, "pattern": ".*\\.js" },
       { "interval": 72, "pattern": ".*\\.png" },

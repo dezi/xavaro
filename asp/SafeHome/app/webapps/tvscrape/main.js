@@ -20,6 +20,7 @@ tvscrape.channels.standard.push("tv/de/Bayerisches Fernsehen Nord");
 tvscrape.channels.standard.push("tv/de/ZDF info");
 tvscrape.channels.standard.push("tv/de/ZDF Kultur");
 tvscrape.channels.standard.push("tv/de/ZDF neo");
+tvscrape.channels.standard.push("tv/de/ARTE Deutsch");
 tvscrape.channels.standard.push("tv/de/Einsfestival");
 
 tvscrape.onClickSelect = function(event)
@@ -364,7 +365,9 @@ tvscrape.loadChannelList = function()
         if (name.startsWith("Sky ")) continue;
 
         if (name.endsWith(" HD")) name = name.substring(0, name.length - 3);
+        if (name.endsWith(" Deutsch")) name = name.substring(0, name.length - 8);
         if (name.endsWith(" Deutschland")) name = name.substring(0, name.length - 12);
+        if (name.endsWith(" Einsfestival")) name = name.substring(0, name.length - 13);
 
         if (tvscrape.channels[ name ]) continue;
         tvscrape.channels[ name ] = channel;

@@ -172,7 +172,7 @@ public class Json
 
     public static boolean has(JSONObject json, String key)
     {
-        return json.has(key);
+        return (json != null) && json.has(key);
     }
 
     public static double getDouble(JSONObject json, String key)
