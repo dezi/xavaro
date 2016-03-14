@@ -314,6 +314,16 @@ public class Json
         return null;
     }
 
+    public static String toJavaScript(JSONArray jsonArray)
+    {
+        return defuck((jsonArray == null) ? "[]" : Json.toPretty(jsonArray));
+    }
+
+    public static String toJavaScript(JSONObject jsonObject)
+    {
+        return defuck((jsonObject == null) ? "{}" : Json.toPretty(jsonObject));
+    }
+
     @Nullable
     public static String toPretty(JSONArray jsonArray)
     {
@@ -358,7 +368,7 @@ public class Json
         // I hate slash escaping.
         //
 
-        return json.replace("\\/","/");
+        return (json == null) ? "{}" : json.replace("\\/","/");
     }
 
     public static JSONArray sort(JSONArray array, String field, boolean descending)

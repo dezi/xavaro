@@ -198,11 +198,11 @@ WebAppIntercept.onUserHrefClick = function(url)
     WebLibSimple.setFontSpecs(tvscrape.buttdiv, 28, "bold", "#448844");
 
     tvscrape.cancelbutton = WebLibSimple.createSpanPadded(25, 0, 25, 0, "cancelbutton", tvscrape.buttdiv);
-    tvscrape.cancelbutton.innerHTML = "Cancel";
+    tvscrape.cancelbutton.innerHTML = "Cancel".toUpperCase();
     tvscrape.cancelbutton.onclick = tvscrape.onClickCancel;
 
     tvscrape.okbutton = WebLibSimple.createSpanPadded(25, 0, 25, 0, "okbutton", tvscrape.buttdiv);
-    tvscrape.okbutton.innerHTML = "Ok";
+    tvscrape.okbutton.innerHTML = "Ok".toUpperCase();
     tvscrape.okbutton.onclick = tvscrape.onClickOk;
 
     tvscrape.imgdiv.src = imgurl;

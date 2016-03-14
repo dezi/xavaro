@@ -35,6 +35,13 @@ public class WebAppMedia
     }
 
     @JavascriptInterface
+    public String getLocaleDefaultChannels(String type)
+    {
+        JSONObject locale = WebLib.getLocaleConfig("channels");
+        return Json.toJavaScript(Json.getArray(locale, "default" + "." + type));
+    }
+
+    @JavascriptInterface
     public String getRecordedItems()
     {
         JSONArray recordings = new JSONArray();
