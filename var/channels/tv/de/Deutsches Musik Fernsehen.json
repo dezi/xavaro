@@ -8,7 +8,9 @@
   "isbd":false,
   "tags":
   [
+    "DVB-C",
     "DVB-S",
+    "Digital Free",
     "MEDIA BROADCAST",
     "SDTV"
   ],
@@ -19,6 +21,7 @@
   ],
   "providers":
   [
+    "Digital Free",
     "MEDIA BROADCAST"
   ]
 }
