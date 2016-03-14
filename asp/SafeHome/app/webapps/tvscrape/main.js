@@ -1,27 +1,4 @@
 tvscrape.channels = {};
-tvscrape.channels.standard = [];
-
-tvscrape.channels.standard.push("tv/de/Das Erste");
-tvscrape.channels.standard.push("tv/de/ZDF");
-tvscrape.channels.standard.push("tv/de/Sat. 1 Deutschland");
-tvscrape.channels.standard.push("tv/de/RTL Deutschland");
-tvscrape.channels.standard.push("tv/de/Pro Sieben Deutschland");
-tvscrape.channels.standard.push("tv/de/Kabel Eins Deutschland");
-tvscrape.channels.standard.push("tv/de/Vox Deutschland");
-tvscrape.channels.standard.push("tv/de/RTL 2 Deutschland");
-tvscrape.channels.standard.push("tv/de/Tele 5");
-tvscrape.channels.standard.push("tv/de/Sixx Deutschland");
-tvscrape.channels.standard.push("tv/de/Eins Plus");
-tvscrape.channels.standard.push("tv/de/3sat");
-tvscrape.channels.standard.push("tv/de/NDR Fernsehen Hamburg");
-tvscrape.channels.standard.push("tv/de/WDR Fernsehen Köln");
-tvscrape.channels.standard.push("tv/de/MDR Fernsehen Sachsen-Anhalt");
-tvscrape.channels.standard.push("tv/de/Bayerisches Fernsehen Nord");
-tvscrape.channels.standard.push("tv/de/ZDF info");
-tvscrape.channels.standard.push("tv/de/ZDF Kultur");
-tvscrape.channels.standard.push("tv/de/ZDF neo");
-tvscrape.channels.standard.push("tv/de/ARTE Deutsch");
-tvscrape.channels.standard.push("tv/de/Einsfestival");
 
 tvscrape.onClickSelect = function(event)
 {
@@ -70,6 +47,7 @@ tvscrape.onClickTitle = function(event)
         sender = sender.replace("Köln", " ");
         sender = sender.replace("Berlin", " ");
         sender = sender.replace("Brandenburg", " ");
+        sender = sender.replace("Baden-Württemberg", " ");
         sender = sender.replace("Bayerisches", "BR");
         sender = sender.replace("Nord", " ");
 
@@ -323,6 +301,7 @@ tvscrape.loadChannelList = function()
     // Read and sort channels by priority.
     //
 
+    var standard = JSON.parse(WebAppMedia.getLocaleDefaultChannels("tv"));
     var channels = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
 
     for (var inx = 0; inx < channels.length; inx++)
@@ -334,12 +313,13 @@ tvscrape.loadChannelList = function()
 
         var channeltag = channel.type + "/" + channel.isocc + "/" + name;
 
+
         channels[ inx ].prio = 9999;
         channels[ inx ].selected = false;
 
-        for (var cnt = 0; cnt < tvscrape.channels.standard.length; cnt++)
+        for (var cnt = 0; cnt < standard.length; cnt++)
         {
-            if (tvscrape.channels.standard[ cnt ] == channeltag)
+            if (standard[ cnt ] == channeltag)
             {
                 channels[ inx ].prio = cnt;
                 channels[ inx ].selected = true;
