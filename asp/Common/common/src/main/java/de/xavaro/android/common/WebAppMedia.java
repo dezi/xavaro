@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Iterator;
 
 @SuppressWarnings("unused")
 public class WebAppMedia
@@ -39,6 +40,12 @@ public class WebAppMedia
     {
         JSONObject locale = WebLib.getLocaleConfig("channels");
         return Json.toJavaScript(Json.getArray(locale, "default" + "." + type));
+    }
+
+    @JavascriptInterface
+    public String getLocaleInternetChannels(String type)
+    {
+        return Json.toJavaScript(WebLib.getLocaleConfig(type.equals("tv") ? "iptv" : "iprd"));
     }
 
     @JavascriptInterface
