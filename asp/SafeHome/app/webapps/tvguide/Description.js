@@ -199,35 +199,57 @@ tvguide.createDescriptionSetup = function()
     tvguide.descriptionScroll.scrollVertical = true;
 }
 
-tvguide.createRecordingButton = function(iptv)
+tvguide.createButton = function(name, color, eventHandler)
 {
     var container = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     container.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
     var button = WebLibSimple.createAnyAppend("div", container);
-    button.style.height      = "50px";
-    button.innerHTML         = "Rec";
-    button.style.textAlign   = "center";
-    button.style.paddingTop  = "25px";
+    button.style.height        = "50px";
+    button.innerHTML           = name;
+    button.style.textAlign     = "center";
+    button.style.paddingTop    = "25px";
+    button.style.borderRadius  = "10px";
 
-    if (iptv)
-    {
-        button.onTouchClick = tvguide.record;
-        WebLibSimple.setBGColor(button, "#ff0000");
-    }
-    else
-    {
-        WebLibSimple.setBGColor(button, "#bfbfbf");
-    }
+    WebLibSimple.setBGColor(button, color);
 }
 
-tvguide.createTmp = function()
+tvguide.createButtons = function()
 {
-    var div = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+    var epg = tvguide.description.epg;
+    var recordings = JSON.parse(WebAppMedia.getRecordedItems());
 
-//    div.innerHTML = WebAppMedia.getRecordedItems();
+    for (var index in recordings)
+    {
+        recording = recordings[ index ];
 
-    div.innerHTML = JSON.stringify(JSON.parse(WebAppMedia.getLocaleInternetChannels("tv")));
+        if ((recording.title    == epg.title &&
+             recording.channel  == epg.channel) &&
+            (recording.start    == epg.start ||
+             recording.stop     == epg.stop))
+        {
+            tvguide.createButton("Play", "#4553c1", null);
+            return;
+        }
+
+        if (recording.title    == epg.title &&
+            recording.channel  == epg.channel &&
+            recording.subtitle == epg.subtitle)
+        {
+            tvguide.createButton("Play", "#4553c1", null);
+            return;
+        }
+    }
+
+    // WebAppMedia.getRecordings();
+    var now  = new Date().getTime();
+    var stop = new Date(epg.stop).getTime();
+
+    if ((epg.iptv == true) && (stop > now))
+    {
+        // tvguide.createRecordingButton();
+        tvguide.createButton("Record", "#ff7a7a", null);
+    }
 }
 
 tvguide.animateInfoIn = function()
@@ -276,14 +298,20 @@ tvguide.record = function()
 {
     var epg = tvguide.description.epg;
 
-    var preload = tvguide.constants.recordPreload * 1000 * 60;
-    var date = new Date(epg.start).getTime() + preload;
+    var preload  = tvguide.constants.recordPreload  * 1000 * 60;
+    var postload = tvguide.constants.recordPostload * 1000 * 60;
 
-    epg.date = new Date(date);
+    var start = new Date(epg.start).getTime() - preload;
+    var stop  = new Date(epg.stop ).getTime()  + postload;
+
+    epg.date = new Date(start);
+    epg.stop = new Date(stop);
 
     WebAppMedia.addRecording(JSON.stringify(epg));
 
     console.log(JSON.stringify(tvguide.description.epg));
+
+    alert("created recording");
 }
 
 tvguide.descriptionMain = function(target, element)
@@ -339,9 +367,7 @@ tvguide.descriptionMain = function(target, element)
 
     tvguide.createInfoBox(epg.description);
 
-    tvguide.createRecordingButton(epg.iptv);
-
-    // tvguide.createTmp();
+    tvguide.createButtons();
 }
 
 tvguide.onEPGTouchClick = function(target, element)

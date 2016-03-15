@@ -3,7 +3,8 @@ tvguide.constants =
     loadHours                : 24 * 1,
     timelineInterval         : 15,
 
-    recordPreload            : 3,
+    recordPreload            : 1,
+    recordPostload           : 1,
 
     today                    : Math.floor(WebLibSimple.getTodayDate().getTime() / 1000 / 60),
 
