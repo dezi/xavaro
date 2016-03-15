@@ -147,7 +147,7 @@ public class MediaRecorder
                     recordingsList.add(recording);
                 }
 
-                Simple.sleep(10000);
+                Simple.sleep(4000);
             }
 
             recorder = null;
@@ -164,7 +164,7 @@ public class MediaRecorder
         if ((channel == null) || (starttime == null) || (country == null) || (type == null))
         {
             //
-            // Can not happen, only satisfy compiler.
+            // Should not happen, only satisfy compiler.
             //
 
             return false;
@@ -173,11 +173,13 @@ public class MediaRecorder
         String metafilepath = Json.getString(recording, "metafile");
         String mediafilepath = Json.getString(recording, "mediafile");
         String iptvplaylist = Json.getString(recording, "iptvplaylist");
+        String masterurl = Json.getString(recording, "masterurl");
 
-        if ((metafilepath == null) || (mediafilepath == null) || (iptvplaylist == null))
+        if ((metafilepath == null) || (mediafilepath == null)
+                || (iptvplaylist == null) || (masterurl == null))
         {
             //
-            // Can not happen, only satisfy compiler.
+            // Should not happen, only satisfy compiler.
             //
 
             return false;
@@ -202,7 +204,7 @@ public class MediaRecorder
         Log.d(LOGTAG, "dosomeRecording:" + playlist.length);
 
         String lastChunk = Json.getString(recordstatus, "lastchunk");
-        String lastline = null;
+        String lastline;
         float lastlength = 0;
 
         boolean foundlastchunk = false;
@@ -222,7 +224,7 @@ public class MediaRecorder
 
             if (line.startsWith("#")) continue;
 
-            lastline = line;
+            lastline = resolveRelativeUrl(masterurl, line);
 
             chunks.add(lastline);
             length.add(lastlength);
@@ -234,7 +236,7 @@ public class MediaRecorder
                 // new chunks to media file.
                 //
 
-                if (! appendIPTVStream(recordstatus, mediafile, line))
+                if (! appendIPTVStream(recordstatus, mediafile, lastline))
                 {
                     return false;
                 }
@@ -244,7 +246,7 @@ public class MediaRecorder
                 continue;
             }
 
-            if ((lastChunk != null) && lastChunk.equals(line)) foundlastchunk = true;
+            if ((lastChunk != null) && lastChunk.equals(lastline)) foundlastchunk = true;
         }
 
         if (! foundlastchunk)
@@ -255,18 +257,41 @@ public class MediaRecorder
             // make one touch recording into the past.
             //
 
-            long startsecs = (Simple.getTimeStamp(starttime) / 1000) - (3 * 60);
-            long nowsecs = Simple.nowAsTimeStamp() / 1000;
-            float secondslost = nowsecs - startsecs;
-
             int startindex = chunks.size() - 1;
 
-            while ((secondslost > 0) && (startindex > 0))
+            if (lastChunk != null)
             {
-                secondslost -= length.get(startindex--);
-            }
+                //
+                // The recording is old, but we did not find
+                // the last chunk. We have possibly been restartet,
+                // so start with the first available fragment to
+                // keep the loss minimal.
+                //
 
-            Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
+                startindex = 0;
+
+                Log.d(LOGTAG, "dosomeRecording: continued=" + startindex + "/" + chunks.size());
+            }
+            else
+            {
+                //
+                // This is the beginning of a new recording. The User
+                // possibly clicked on an allready sending item, so
+                // try to go backwards in time as much as possible and
+                // required to make the recording complete.
+                //
+
+                long startsecs = (Simple.getTimeStamp(starttime) / 1000) - (3 * 60);
+                long nowsecs = Simple.nowAsTimeStamp() / 1000;
+                float secondslost = nowsecs - startsecs;
+
+                while ((secondslost > 0) && (startindex > 0))
+                {
+                    secondslost -= length.get(startindex--);
+                }
+
+                Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
+            }
 
             if (! appendIPTVStream(recordstatus, mediafile, chunks.get(startindex)))
             {
@@ -352,8 +377,7 @@ public class MediaRecorder
 
             Log.d(LOGTAG, "appendIPTVStream: mediafile=" + mediafile.toString());
             Log.d(LOGTAG, "appendIPTVStream: lastchunk=" + lastchunk);
-            Log.d(LOGTAG, "appendIPTVStream: size=" + lastSizeLong);
-            Log.d(LOGTAG, "appendIPTVStream: real=" + mediafile.length());
+            Log.d(LOGTAG, "appendIPTVStream: size=" + lastSizeLong + "/" + mediafile.length());
 
             return true;
         }
@@ -383,7 +407,8 @@ public class MediaRecorder
         JSONObject iptvchannel = identifyIPTVStream(channeltag);
         if (iptvchannel == null) return false;
 
-        String iptvplaylist = identifyPlaylist(Json.getString(iptvchannel, "videourl"));
+        String masterurl = Json.getString(iptvchannel, "videourl");
+        String iptvplaylist = identifyPlaylist(masterurl);
         if (iptvplaylist == null) return false;
 
         File mediadir = Simple.getMediaPath("recordings");
@@ -401,6 +426,7 @@ public class MediaRecorder
 
         if (type.equals("tv")) Json.put(recording, "previewfile", previewfile.toString());
 
+        Json.put(recording, "masterurl", masterurl);
         Json.put(recording, "iptvchannel", iptvchannel);
         Json.put(recording, "iptvplaylist", iptvplaylist);
 

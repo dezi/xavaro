@@ -73,7 +73,6 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
         if (audiourl == null) return;
 
         VideoProxy.getInstance().setAudioUrl(context, audiourl, this);
-        isPlayingAudio = true;
 
         bubbleControls();
     }
@@ -86,7 +85,6 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
         if (videourl == null) return;
 
         VideoProxy.getInstance().setVideoUrl(context, videourl, this);
-        isPlayingVideo = true;
 
         bubbleControls();
     }

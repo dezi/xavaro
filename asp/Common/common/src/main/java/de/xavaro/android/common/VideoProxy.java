@@ -183,6 +183,16 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         return mediaIsVideo || mediaIsAudio;
     }
 
+    public boolean isVideo()
+    {
+        return mediaIsVideo || proxyIsVideo;
+    }
+
+    public boolean isAudio()
+    {
+        return mediaIsAudio || proxyIsAudio;
+    }
+
     //endregion
 
     public void onSeekComplete (MediaPlayer mp)
@@ -208,7 +218,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
             mediaPlayer.pause();
 
-            playing.onPlaybackPaused();
+            if (playing != null) playing.onPlaybackPaused();
 
             //
             // Schedule a full stop within limited time.
@@ -254,7 +264,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 startPlayer.start();
             }
 
-            playing.onPlaybackResumed();
+            if (playing != null) playing.onPlaybackResumed();
         }
     }
 
@@ -463,9 +473,9 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 mediaPlayer.start();
 
-                if (current != null) current.onPlaybackStartet();
-
                 playing = current;
+
+                if (playing != null) playing.onPlaybackStartet();
             }
         }
     }

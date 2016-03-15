@@ -20,10 +20,6 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
         super(context);
     }
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-    protected boolean isPlayingAudio;
-    protected boolean isPlayingVideo;
-
     protected ArrayList<LaunchItemProxyPlayer> isPlayingParents = new ArrayList<>();
 
     @Override
@@ -121,7 +117,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
                 li.setPlaybackPrepare();
             }
 
-            if (isPlayingVideo)
+            if (VideoProxy.getInstance().isVideo())
             {
                 VideoSurface.getInstance().onPlaybackPrepare();
 
@@ -142,7 +138,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
                 li.setPlaybackStartet();
             }
 
-            if (isPlayingVideo)
+            if (VideoProxy.getInstance().isVideo())
             {
                 VideoSurface.getInstance().onPlaybackStartet();
             }
@@ -161,7 +157,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
                 li.setPlaybackPaused();
             }
 
-            if (isPlayingVideo)
+            if (VideoProxy.getInstance().isVideo())
             {
                 VideoSurface.getInstance().onPlaybackPaused();
             }
@@ -180,7 +176,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
                 li.setPlaybackResumed();
             }
 
-            if (isPlayingVideo)
+            if (VideoProxy.getInstance().isVideo())
             {
                 VideoSurface.getInstance().onPlaybackResumed();
             }
@@ -199,7 +195,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
                 li.setPlaybackFinished();
             }
 
-            if (isPlayingVideo)
+            if (VideoProxy.getInstance().isVideo())
             {
                 VideoSurface.getInstance().onPlaybackFinished();
             }

@@ -42,7 +42,6 @@ public class LaunchItemMediaVideo extends LaunchItemMedia
             if (handler == null) handler = new Handler();
 
             VideoProxy.getInstance().setVideoFile(context, mediaitem, this);
-            isPlayingVideo = true;
 
             bubbleControls();
 

@@ -111,6 +111,39 @@ public class EventManager
                     }
 
                     dirty = true;
+                    break;
+                }
+            }
+        }
+
+        Simple.makePost(freeMemory, 10 * 1000);
+        if (dirty) nextLoadTime = 0;
+    }
+
+    public static void removeComingEvent(String eventgroup, JSONObject event)
+    {
+        Simple.removePost(freeMemory);
+        getStorage();
+
+        JSONObject coming = Json.getObject(eventcache, "coming");
+        JSONArray events = Json.getArray(coming, eventgroup);
+
+        if (events != null)
+        {
+            for (int inx = 0; inx < events.length(); inx++)
+            {
+                JSONObject oldevent = Json.getObject(events, inx);
+
+                if (Json.equals(oldevent, "date", event) &&
+                        Json.equals(oldevent, "uuid", event))
+                {
+                    //
+                    // Remove identified event,
+                    //
+
+                    Json.remove(events, inx);
+                    dirty = true;
+                    break;
                 }
             }
         }

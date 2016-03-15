@@ -95,6 +95,13 @@ public class VideoControl extends FrameLayout
 
     public void setCurrentPosition(int current)
     {
+        int minutes =  (current / 1000) / 60;
+        int seconds =  (current / 1000) % 60;
+
+        String start = String.format("%2d:%02d", minutes, seconds);
+
+        timeStart.setText(start);
+
         seekBar.setProgress(current);
     }
 

@@ -36,6 +36,12 @@ public class WebAppMedia
     }
 
     @JavascriptInterface
+    public void removeRecording(String event)
+    {
+        EventManager.removeComingEvent(keyprefix, Json.fromStringObject(event));
+    }
+
+    @JavascriptInterface
     public String getLocaleDefaultChannels(String type)
     {
         JSONObject locale = WebLib.getLocaleConfig("channels");
