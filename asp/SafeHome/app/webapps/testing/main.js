@@ -2,6 +2,9 @@
 // Testing webapp.
 //
 
-testing.recordings = WebAppMedia.getRecordedItems();
 testing.pre = WebLibSimple.createAnyAppend("pre", document.body);
-testing.pre.innerHTML = testing.recordings;
+
+
+testing.pre.innerHTML = WebAppMedia.getRecordedItems();
+testing.pre.innerHTML = WebAppMedia.getLocaleDefaultChannels("tv");
+testing.pre.innerHTML = WebAppMedia.getLocaleInternetChannels("tv");

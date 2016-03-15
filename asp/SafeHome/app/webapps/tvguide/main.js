@@ -164,38 +164,7 @@ tvguide.createFrameSetup = function()
 
 tvguide.getSenderList = function()
 {
-//    var obj = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
-//
-//    tvguide.senderList = [];
-//
-//    for(var index in obj)
-//    {
-//        tvguide.senderList.push("tv/de/" + obj[ index ].name);
-//    }
-
-    tvguide.senderList =
-    [
-        "tv/de/Das Erste",
-        "tv/de/ZDF",
-        "tv/de/Sat. 1 Deutschland",
-        "tv/de/RTL Deutschland",
-        "tv/de/Pro Sieben Deutschland",
-        "tv/de/Kabel Eins Deutschland",
-        "tv/de/Vox Deutschland",
-        "tv/de/RTL 2 Deutschland",
-        "tv/de/Tele 5",
-        "tv/de/Sixx Deutschland",
-        "tv/de/Eins Plus",
-        "tv/de/3sat",
-        "tv/de/NDR Fernsehen Hamburg",
-        "tv/de/WDR Fernsehen Köln",
-        "tv/de/MDR Fernsehen Sachsen-Anhalt",
-        "tv/de/Bayerisches Fernsehen Nord",
-        "tv/de/ZDF info",
-        "tv/de/ZDF Kultur",
-        "tv/de/ZDF neo",
-        "tv/de/Einsfestival"
-    ];
+    tvguide.senderList = JSON.parse(WebAppMedia.getLocaleDefaultChannels("tv"));
 }
 
 tvguide.createSenderBar = function()
@@ -489,12 +458,6 @@ tvguide.main = function()
     //
 
     tvguide.createFrameSetup();
-
-    //
-    // Description view
-    //
-
-    tvguide.createDescriptionSetup();
 
     //
     // sender list

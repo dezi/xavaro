@@ -1,0 +1,44 @@
+{
+
+  "default.tv": [
+
+    "tv/de/Das Erste",
+    "tv/de/ZDF",
+
+    "tv/de/RTL Deutschland",
+    "tv/de/Sat. 1 Deutschland",
+    "tv/de/RTL 2 Deutschland",
+    "tv/de/Pro Sieben Deutschland",
+    "tv/de/Super RTL Deutschland",
+    "tv/de/Kabel Eins Deutschland",
+    "tv/de/Vox Deutschland",
+
+    "tv/de/NDR Fernsehen Hamburg",
+    "tv/de/WDR Fernsehen Köln",
+    "tv/de/MDR Fernsehen Sachsen-Anhalt",
+    "tv/de/Bayerisches Fernsehen Nord",
+    "tv/de/SWR Fernsehen Baden-Württemberg",
+    "tv/de/HR Fernsehen",
+    "tv/de/RBB Berlin",
+    "tv/de/SR Fernsehen",
+
+    "tv/de/N-TV",
+    "tv/de/N24",
+
+    "tv/de/Tele 5",
+    "tv/de/Sixx Deutschland",
+
+    "tv/de/KIKA",
+
+    "tv/de/3sat",
+    "tv/de/Phoenix",
+    "tv/de/Eins Plus",
+    "tv/de/Einsfestival",
+    "tv/de/ARTE Deutsch",
+
+    "tv/de/ARD Alpha",
+    "tv/de/ZDF info",
+    "tv/de/ZDF Kultur",
+    "tv/de/ZDF neo"
+  ]
+}
