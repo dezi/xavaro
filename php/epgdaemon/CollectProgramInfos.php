@@ -125,7 +125,15 @@ function readPrograms($countrydir, $channeldir)
 			
 			if (file_exists($pgminfofile))
 			{
-				$epgs[ "epgdata" ][ $inx ][ "img" ] = true;
+				//
+				// Remove legacy property.
+				//
+				
+				unset($epgs[ "epgdata" ][ $inx ][ "img" ]);
+				
+				//
+				// Add image info.
+				//
 				
 				$info = getimagesize($pgminfofile);
 				$epgs[ "epgdata" ][ $inx ][ "imgsize" ] = $info[ 0 ] . "x" . $info[ 1 ];
@@ -135,7 +143,6 @@ function readPrograms($countrydir, $channeldir)
 					$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
 				}
 				
-				//echo "Exists => $pgminfofile\n";
 				continue;
 			}
 			

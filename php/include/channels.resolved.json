@@ -620,7 +620,7 @@
 	[ "ger", "SUPER RTL",                     "Super RTL Deutschland" ],
 	[ "ger", "SWR BW HD",                     "SWR Fernsehen Baden-Württemberg HD" ],
 	[ "ger", "SWR Fernsehen BW",              "SWR Fernsehen Baden-Württemberg" ],
-	[ "ger", "SWR Fernsehen RP HD",           "" ],
+	[ "ger", "SWR Fernsehen RP HD",           "SWR Fernsehen Rheinland-Pfalz HD" ],
 	[ "ger", "SWR Fernsehen RP",              "SWR Fernsehen Rheinland-Pfalz" ],
 	[ "ger", "SWR RP HD",                     "SWR Fernsehen Rheinland-Pfalz HD" ],
 	[ "ger", "SWR1 BW",                       "SWR 1 Baden-Württemberg" ],
