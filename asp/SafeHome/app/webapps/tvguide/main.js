@@ -164,7 +164,55 @@ tvguide.createFrameSetup = function()
 
 tvguide.getSenderList = function()
 {
-    tvguide.senderList = JSON.parse(WebAppMedia.getLocaleDefaultChannels("tv"));
+    tvguide.senderList = {};
+
+    var localChannels = JSON.parse(WebAppMedia.getLocaleDefaultChannels("tv"));
+
+    for (var channelIndex in localChannels)
+    {
+        var name = localChannels[ channelIndex ];
+        tvguide.senderList[ name ] = {};
+        tvguide.senderList[ name ].index = parseInt(channelIndex);
+
+        var cparts = name.split("/");
+
+        tvguide.senderList[ name ].type    = cparts[0];
+        tvguide.senderList[ name ].country = cparts[1];
+        tvguide.senderList[ name ].channel = cparts[2];
+
+        tvguide.senderList[ name ].iptv    = false;
+    }
+
+    var iptvChannels  = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
+    var iptvAliase    = [];
+
+    for (var webKey in iptvChannels)
+    {
+        if (! iptvChannels[ webKey ][ "channels" ]) continue;
+
+        for (var channels in iptvChannels[ webKey ][ "channels" ])
+        {
+            var aliase = iptvChannels[ webKey ][ "channels" ][ channels ][ "aliase" ];
+
+            for (var aliasIndex in aliase)
+            {
+                iptvAliase.push(aliase[ aliasIndex ]);
+            }
+        }
+    }
+
+    for (var iptvAliaseIndex in iptvAliase)
+    {
+        if (tvguide.senderList[ iptvAliase[ iptvAliaseIndex ] ])
+        {
+            tvguide.senderList[ iptvAliase[ iptvAliaseIndex ] ].iptv = true;
+        }
+    }
+
+    // console.log(JSON.stringify(tvguide.senderList));
+    // console.log("--> tv/de/Das Erste: " + tvguide.senderList["tv/de/Das Erste"].index);
+
+    // tvguide.senderList = JSON.parse(WebAppMedia.getLocaleDefaultChannels("tv"));
 }
 
 tvguide.createSenderBar = function()
@@ -175,8 +223,10 @@ tvguide.createSenderBar = function()
     tvguide.senderbarScroll.onTouchScroll  = tvguide.onSenderBarScroll;
     tvguide.senderbarScroll.style.zIndex   = "2";
 
-    for(var index in tvguide.senderList)
+    for (var channel in tvguide.senderList)
     {
+        // var channel = tvguide.senderList[ index ];
+
         var senderImgDiv = WebLibSimple.createAnyAppend("div", tvguide.senderbarScroll);
         senderImgDiv.style.position = "relative";
         senderImgDiv.style.height   = tvguide.constants.senderHeight + "px";
@@ -202,7 +252,7 @@ tvguide.createSenderBar = function()
         image.style.width  = "100%";
 
         image.src = encodeURI("http://" + WebApp.manifest.appserver   + "/channels/"
-            + tvguide.senderList[ index ] + ".png");
+            + channel + ".png");
     }
 }
 
@@ -258,15 +308,24 @@ tvguide.createTimeLine = function()
     }
 }
 
-tvguide.createEpgProgram = function(channel, epgdata)
+tvguide.createEpgProgram = function(channelName, epgdata)
 {
-    var senderIndex = tvguide.senderList.indexOf(channel);
+    var channel = tvguide.senderList[ channelName ]
+    var senderIndex = channel.index;
+
     var minPix = tvguide.constants.hoursPix / 60;
 
     for (var programIndex in epgdata)
     {
-        var startDate = new Date(epgdata[ programIndex ].start).getTime() / 1000 / 60;
-        var stopDate  = new Date(epgdata[ programIndex ].stop ).getTime() / 1000 / 60;
+        var epg = epgdata[ programIndex ];
+
+        epg.type    = channel.type;
+        epg.country = channel.country;
+        epg.channel = channel.channel;
+        epg.iptv    = channel.iptv;
+
+        var startDate = new Date(epg.start).getTime() / 1000 / 60;
+        var stopDate  = new Date(epg.stop ).getTime() / 1000 / 60;
 
         var startTime = Math.floor(startDate - tvguide.constants.today);
         var stopTime  = Math.floor(stopDate  - tvguide.constants.today);
@@ -291,14 +350,8 @@ tvguide.createEpgProgram = function(channel, epgdata)
         paddingDiv.style.border          = tvguide.constants.programBoder;
         paddingDiv.style.backgroundColor = tvguide.constants.programBGColor;
 
-        paddingDiv.epg         = epgdata[ programIndex ]
-
-        var cparts = channel.split("/");
-        paddingDiv.epg.type    = cparts[0];
-        paddingDiv.epg.country = cparts[1];
-        paddingDiv.epg.channel = cparts[2];
-
-        paddingDiv.innerHTML   = paddingDiv.epg.title;
+        paddingDiv.epg = epg;
+        paddingDiv.innerHTML = paddingDiv.epg.title;
     }
 }
 
@@ -327,7 +380,7 @@ tvguide.createEpgBodyScroll = function()
     {
         var epgurl = encodeURI(
             tvguide.constants.epgDataSrcPrefix +
-            tvguide.senderList[ sender ] +
+            sender +
             tvguide.constants.epgDataSrcPostfix);
 
         WebAppRequest.loadAsyncJSON(epgurl);

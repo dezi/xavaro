@@ -45,7 +45,7 @@ tvguide.createTitleBar = function(title, subtitle)
         subtitlebar.innerHTML = subtitle;
 
         WebLibSimple.setBGColor(subtitlebar, tvguide.descriptionConstants.subtitlebarBGColor);
-        WebLibSimple.setFontSpecs(subtitlebar, 20, "normal", tvguide.descriptionConstants.subtitlebarBGColor);
+        WebLibSimple.setFontSpecs(subtitlebar, 20, "normal", tvguide.descriptionConstants.subtitlebarFontColor);
     }
 }
 
@@ -144,6 +144,8 @@ tvguide.createSpliteDiv = function(leftText, rightText, landscapePic)
 
 tvguide.createInfoBox = function(description)
 {
+    if (! description) return;
+
     //
     // tvguide.description.infoBox
     //
@@ -197,16 +199,35 @@ tvguide.createDescriptionSetup = function()
     tvguide.descriptionScroll.scrollVertical = true;
 }
 
-tvguide.createRecordingButton = function()
+tvguide.createRecordingButton = function(iptv)
 {
-    var button = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
-    button.style.height    = "50px";
-    button.innerHTML       = "Rec";
-    button.style.textAlign = "center";
+    var container = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+    container.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
-    button.onTouchClick = tvguide.record;
+    var button = WebLibSimple.createAnyAppend("div", container);
+    button.style.height      = "50px";
+    button.innerHTML         = "Rec";
+    button.style.textAlign   = "center";
+    button.style.paddingTop  = "25px";
 
-    WebLibSimple.setBGColor(button, "#ff0000");
+    if (iptv)
+    {
+        button.onTouchClick = tvguide.record;
+        WebLibSimple.setBGColor(button, "#ff0000");
+    }
+    else
+    {
+        WebLibSimple.setBGColor(button, "#bfbfbf");
+    }
+}
+
+tvguide.createTmp = function()
+{
+    var div = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+
+//    div.innerHTML = WebAppMedia.getRecordedItems();
+
+    div.innerHTML = JSON.stringify(JSON.parse(WebAppMedia.getLocaleInternetChannels("tv")));
 }
 
 tvguide.animateInfoIn = function()
@@ -267,9 +288,12 @@ tvguide.descriptionMain = function(target, element)
 
     if (! epg.title) return;
 
-    console.log("tvguide.onEPGTouchClick: element " + epg.title);
+    console.log("--> tvguide.onEPGTouchClick element: " + epg.title);
+    console.log("--> epg: " + JSON.stringify(epg));
 
     tvguide.createDescriptionSetup();
+
+    tvguide.description.epg = epg;
 
     tvguide.createTitleBar(epg.title, epg.subtitle);
 
@@ -280,10 +304,8 @@ tvguide.descriptionMain = function(target, element)
 
     var landscape = true;
 
-    if (epg.img)
+    if (epg.imgsize)
     {
-        console.log("--> Img");
-
         var size = epg.imgsize.split("x");
 
         var imgWidth  = parseInt(size[0]);
@@ -309,9 +331,13 @@ tvguide.descriptionMain = function(target, element)
     tvguide.createSpliteDiv(day + ":", timeSpan, landscape);
     tvguide.createSpliteDiv("Duration:", duration, landscape);
 
+    tvguide.createSpliteDiv("Channel:", epg.channel, landscape);
+
     tvguide.createInfoBox(epg.description);
 
-    tvguide.createRecordingButton();
+    tvguide.createRecordingButton(epg.iptv);
+
+    // tvguide.createTmp();
 }
 
 tvguide.onEPGTouchClick = function(target, element)
