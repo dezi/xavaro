@@ -3,6 +3,8 @@ tvguide.constants =
     loadHours                : 24 * 1,
     timelineInterval         : 15,
 
+    recordPreload            : 3,
+
     today                    : Math.floor(WebLibSimple.getTodayDate().getTime() / 1000 / 60),
 
     epgDataSrcPrefix         : "http://" + WebApp.manifest.appserver + "/epgdata/",

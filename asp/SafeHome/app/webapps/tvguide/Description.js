@@ -275,7 +275,11 @@ tvguide.animateInfoOut = function()
 tvguide.record = function()
 {
     var epg = tvguide.description.epg;
-    epg.date = epg.start;
+
+    var preload = tvguide.constants.recordPreload * 1000 * 60;
+    var date = new Date(epg.start).getTime() + preload;
+
+    epg.date = new Date(date);
 
     WebAppMedia.addRecording(JSON.stringify(epg));
 
