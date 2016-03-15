@@ -54,6 +54,7 @@ public class EventManager
         dirty = true;
 
         Simple.makePost(freeMemory, 10 * 1000);
+        nextLoadTime = 0;
     }
 
     public static void addComingEvent(String eventgroup, JSONObject event)
@@ -77,6 +78,7 @@ public class EventManager
         }
 
         Simple.makePost(freeMemory, 10 * 1000);
+        if (dirty) nextLoadTime = 0;
     }
 
     public static void updateComingEvent(String eventgroup, JSONObject event)
@@ -114,6 +116,7 @@ public class EventManager
         }
 
         Simple.makePost(freeMemory, 10 * 1000);
+        if (dirty) nextLoadTime = 0;
     }
 
     public static JSONArray getPassedEvents(String eventgroup)

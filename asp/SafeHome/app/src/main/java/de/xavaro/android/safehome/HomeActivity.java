@@ -255,12 +255,14 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void addViewToBackStack(Object view)
     {
-        // todo check parent...
+        if (((ViewGroup) view).getParent() == null)
+        {
+            topscreen.addView((FrameLayout) view);
+            backStack.add(view);
 
-        topscreen.addView((FrameLayout) view);
-        backStack.add(view);
+            if (videoSurface != null) videoSurface.bringToFront();
 
-        if (videoSurface != null) videoSurface.bringToFront();
+        }
     }
 
     public void addView(Object view, ViewGroup.LayoutParams params)

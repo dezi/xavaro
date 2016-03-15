@@ -134,12 +134,18 @@ public class MediaRecorder
                     continue;
                 }
 
+                if (! dosomeRecording(recording))
+                {
+                    Log.d(LOGTAG, "recorderThread: einer kaputt....");
+
+                    completeEvent(recording, false);
+                    continue;
+                }
+
                 synchronized (recordingsList)
                 {
                     recordingsList.add(recording);
                 }
-
-                dosomeRecording(recording);
 
                 Simple.sleep(10000);
             }
@@ -148,14 +154,12 @@ public class MediaRecorder
         }
     };
 
-    private static void dosomeRecording(JSONObject recording)
+    private static boolean dosomeRecording(JSONObject recording)
     {
         String starttime = Json.getString(recording, "start");
         String channel = Json.getString(recording, "channel");
         String country = Json.getString(recording, "country");
         String type = Json.getString(recording, "type");
-
-        Log.d(LOGTAG, "dosomeRecording:aaa" + starttime);
 
         if ((channel == null) || (starttime == null) || (country == null) || (type == null))
         {
@@ -163,10 +167,8 @@ public class MediaRecorder
             // Can not happen, only satisfy compiler.
             //
 
-            return;
+            return false;
         }
-
-        Log.d(LOGTAG, "dosomeRecording:bbb" + starttime);
 
         String metafilepath = Json.getString(recording, "metafile");
         String mediafilepath = Json.getString(recording, "mediafile");
@@ -178,7 +180,7 @@ public class MediaRecorder
             // Can not happen, only satisfy compiler.
             //
 
-            return;
+            return false;
         }
 
         File metafile = new File(metafilepath);
@@ -189,13 +191,13 @@ public class MediaRecorder
 
         if (! metadata.has("recordstatus")) Json.put(metadata, "recordstatus", new JSONObject());
         JSONObject recordstatus = Json.getObject(metadata, "recordstatus");
-        if (recordstatus == null) return;
+        if (recordstatus == null) return false;
 
         Log.d(LOGTAG, "dosomeRecording:" + mediafile);
         Log.d(LOGTAG, "dosomeRecording:" + iptvplaylist);
 
         String[] playlist = readLines(iptvplaylist);
-        if ((playlist == null) || (playlist.length == 0)) return;
+        if ((playlist == null) || (playlist.length == 0)) return false;
 
         Log.d(LOGTAG, "dosomeRecording:" + playlist.length);
 
@@ -228,11 +230,15 @@ public class MediaRecorder
             if (foundlastchunk)
             {
                 //
-                // The recording is old. Append all new chunks
-                // to media file.
+                // The recording is old. Append all
+                // new chunks to media file.
                 //
 
-                appendIPTVStream(recordstatus, mediafile, line);
+                if (! appendIPTVStream(recordstatus, mediafile, line))
+                {
+                    return false;
+                }
+
                 Json.putFileContent(metafile, metadata);
 
                 continue;
@@ -262,9 +268,15 @@ public class MediaRecorder
 
             Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
 
-            appendIPTVStream(recordstatus, mediafile, chunks.get(startindex));
+            if (! appendIPTVStream(recordstatus, mediafile, chunks.get(startindex)))
+            {
+                return false;
+            }
+
             Json.putFileContent(metafile, metadata);
         }
+
+        return true;
     }
 
     private static void getStillImage(FileDescriptor fd, long offset, long size, File mediafile)
@@ -291,7 +303,7 @@ public class MediaRecorder
         }
     }
 
-    private static void appendIPTVStream(JSONObject recordstatus, File mediafile, String lastchunk)
+    private static boolean appendIPTVStream(JSONObject recordstatus, File mediafile, String lastchunk)
     {
         String lastSize = Json.getString(recordstatus, "lastsize");
         if (lastSize == null) lastSize = "0";
@@ -342,11 +354,15 @@ public class MediaRecorder
             Log.d(LOGTAG, "appendIPTVStream: lastchunk=" + lastchunk);
             Log.d(LOGTAG, "appendIPTVStream: size=" + lastSizeLong);
             Log.d(LOGTAG, "appendIPTVStream: real=" + mediafile.length());
+
+            return true;
         }
         catch (Exception ex)
         {
             OopsService.log(LOGTAG, ex);
         }
+
+        return false;
     }
 
     private static boolean setupIPTVStream(JSONObject recording)
@@ -464,8 +480,7 @@ public class MediaRecorder
                 String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
                 String streamurl = lines[ ++inx ];
 
-                if ((bandwith == null) || (streamurl == null)
-                        || (width == null)|| (height == null))
+                if ((bandwith == null) || (streamurl == null))
                 {
                     continue;
                 }
@@ -483,8 +498,8 @@ public class MediaRecorder
 
                 JSONObject so = new JSONObject();
 
-                Json.put(so, "width", Integer.parseInt(width));
-                Json.put(so, "height", Integer.parseInt(height));
+                Json.put(so, "width", (width == null) ? 0 : Integer.parseInt(width));
+                Json.put(so, "height", (height == null) ? 0 : Integer.parseInt(height));
                 Json.put(so, "bandwith", Integer.parseInt(bandwith));
                 Json.put(so, "streamurl", streamurl);
 

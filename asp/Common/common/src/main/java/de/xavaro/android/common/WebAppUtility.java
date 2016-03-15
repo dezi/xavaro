@@ -52,6 +52,12 @@ public class WebAppUtility
     }
 
     @JavascriptInterface
+    public String getPrettyJson(String json)
+    {
+        return Json.toPretty(Json.fromString(json));
+    }
+
+    @JavascriptInterface
     public void makeClick()
     {
         Simple.makeClick();
