@@ -162,6 +162,19 @@ public class WebAppCache
 
         if (content == null)
         {
+            //
+            // Check if file is present on disk before going into
+            // content fetch. If not present, remove the last modified
+            // date from entry to avoid failure if the file was not
+            // modified since.
+            //
+
+            if ((cachefile != null) && (interval >= 0) && (uuid != null))
+            {
+                File cfile = new File(cachedir, uuid);
+                if (! cfile.exists()) Json.remove(cachefile, "lmod");
+            }
+
             content = getContentFromServer(webappname, url, cachefile, interval < 0 ? agent : null);
 
             if ((content != null) && (uuid != null))
