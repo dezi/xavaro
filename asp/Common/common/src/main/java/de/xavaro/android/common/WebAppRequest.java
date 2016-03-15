@@ -51,27 +51,29 @@ public class WebAppRequest
 
                 if (content == null)
                 {
-                    Log.d(LOGTAG, "loadAsync: FAIL " + webappname + "=" + src);
-                    continue;
+                    Log.e(LOGTAG, "loadAsync: FAIL " + webappname + "=" + src);
+
+                    content = (src.endsWith(".json") || src.endsWith(".json.gz"))
+                            ? "{}".getBytes()
+                            : "".getBytes();
                 }
 
-                Log.d(LOGTAG, "loadAsync: LOAD " + webappname + "=" + src + "=" + content.length);
+                String contstr = new String(content);
 
-                final String cbscript = "WebAppRequest.onLoadAsyncJSON(\"" + src + "\","
-                        + new String(content) + ");";
-
-                /*
-                Runnable callback = new Runnable()
+                if ((src.endsWith(".json") || src.endsWith(".json.gz")) &&
+                        ! (contstr.startsWith("{") || contstr.startsWith("[")))
                 {
-                    @Override
-                    public void run()
-                    {
-                        webview.evaluateJavascript(cbscript, null);
-                    }
-                };
+                    Log.e(LOGTAG, "loadAsync: NO JSON " + webappname + "=" + src);
 
-                Simple.makePost(callback);
-                */
+                    contstr = "{}";
+                }
+                else
+                {
+                    Log.d(LOGTAG, "loadAsync: LOAD " + webappname + "=" + src + "=" + content.length);
+                }
+
+                final String cbscript = "WebAppRequest.onLoadAsyncJSON"
+                        + "(\"" + src + "\"," + contstr + ");";
 
                 webview.evaluateJavascript(cbscript, null);
             }
@@ -95,8 +97,27 @@ public class WebAppRequest
     public String loadSync(String src)
     {
         byte[] content = webapploader.getRequestData(src);
-        if (content == null) Log.d(LOGTAG, "loadSync: FAIL " + webappname + "=" + src);
-        return (content == null) ? null : new String(content);
+
+        if (content == null)
+        {
+            Log.e(LOGTAG, "loadSync: FAIL " + webappname + "=" + src);
+
+            content = (src.endsWith(".json") || src.endsWith(".json.gz"))
+                    ? "{}".getBytes()
+                    : "".getBytes();
+        }
+
+        String contstr = new String(content);
+
+        if ((src.endsWith(".json") || src.endsWith(".json.gz")) &&
+                ! (contstr.startsWith("{") || contstr.startsWith("[")))
+        {
+            Log.e(LOGTAG, "loadSync: NO JSON " + webappname + "=" + src);
+
+            contstr = "{}";
+        }
+
+        return contstr;
     }
 
     @JavascriptInterface

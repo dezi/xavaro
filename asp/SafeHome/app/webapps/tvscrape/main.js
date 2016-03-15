@@ -183,6 +183,8 @@ WebAppIntercept.onUserHrefClick = function(url)
     tvscrape.okbutton.innerHTML = "Ok".toUpperCase();
     tvscrape.okbutton.onclick = tvscrape.onClickOk;
 
+    console.log("Image: " + imgurl);
+
     tvscrape.imgdiv.src = imgurl;
 }
 
