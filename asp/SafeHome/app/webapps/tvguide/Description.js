@@ -425,6 +425,8 @@ tvguide.descriptionMain = function(target, element)
 
 tvguide.onEPGTouchClick = function(target, element)
 {
+    WebAppUtility.makeClick();
+
     if (tvguide.animateInfoStatus == "Finish")
     {
         tvguide.animateInfoOut();
