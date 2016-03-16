@@ -311,8 +311,8 @@ public class VideoSurface extends FrameLayout implements
             int position = VideoProxy.getInstance().getCurrentPosition();
             if (position >= 0) videoControl.setCurrentPosition(position);
 
-            removeCallbacks(progressReader);
-            postDelayed(progressReader, 1000);
+            Simple.removePost(progressReader);
+            Simple.makePost(progressReader, 1000);
         }
     };
 
@@ -463,7 +463,7 @@ public class VideoSurface extends FrameLayout implements
 
         if (changed && isFullscreen && orientationChanged)
         {
-            getHandler().post(adjustFullscreen);
+            Simple.makePost(adjustFullscreen);
 
         }
 
@@ -541,76 +541,138 @@ public class VideoSurface extends FrameLayout implements
 
     public void onPlaybackPrepare()
     {
-        Log.d(LOGTAG, "onPlaybackPrepare");
-
-        setSpinner(true);
+        Simple.makePost(onPlaybackPrepareUI);
     }
+
+    public final Runnable onPlaybackPrepareUI = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "onPlaybackPrepare");
+
+            Context activity = Simple.getAppContext();
+
+            if (activity instanceof VideoSurfaceHandler)
+            {
+                ((VideoSurfaceHandler) activity).addVideoSurface(VideoSurface.this);
+            }
+
+            setSpinner(true);
+        }
+    };
 
     public void onPlaybackStartet()
     {
-        Log.d(LOGTAG, "onPlaybackStartet");
-
-        isPlaying = true;
-        setSpinner(false);
-
-        playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
-
-        setButtonStates();
-
-        boolean islocal = VideoProxy.getInstance().isLocalFile();
-        Log.d(LOGTAG, "onPlaybackStartet:" + islocal);
-
-        videoControl.setVisibility(islocal ? VISIBLE : INVISIBLE);
-
-        if (islocal)
-        {
-            videoControl.setDuration(VideoProxy.getInstance().getDuration());
-
-            removeCallbacks(progressReader);
-            post(progressReader);
-        }
+        Simple.makePost(onPlaybackStartetUI);
     }
+
+    public final Runnable onPlaybackStartetUI = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "onPlaybackStartet");
+
+            isPlaying = true;
+            setSpinner(false);
+
+            playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
+
+            setButtonStates();
+
+            boolean islocal = VideoProxy.getInstance().isLocalFile();
+            Log.d(LOGTAG, "onPlaybackStartet:" + islocal);
+
+            videoControl.setVisibility(islocal ? VISIBLE : INVISIBLE);
+
+            if (islocal)
+            {
+                videoControl.setDuration(VideoProxy.getInstance().getDuration());
+
+                Simple.removePost(progressReader);
+                Simple.makePost(progressReader);
+            }
+        }
+    };
 
     public void onPlaybackPaused()
     {
-        Log.d(LOGTAG,"onPlaybackPaused");
-
-        isPlaying = false;
-        setSpinner(false);
-
-        playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_play_190x190));
+        Simple.makePost(onPlaybackPausedUI);
     }
+
+    public final Runnable onPlaybackPausedUI = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "onPlaybackPaused");
+
+            isPlaying = false;
+            setSpinner(false);
+
+            playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_play_190x190));
+        }
+    };
 
     public void onPlaybackResumed()
     {
-        Log.d(LOGTAG,"onPlaybackResumed");
-
-        isPlaying = true;
-        setSpinner(false);
-
-        playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
+        Simple.makePost(onPlaybackResumedUI);
     }
+
+    public final Runnable onPlaybackResumedUI = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "onPlaybackResumed");
+
+            isPlaying = true;
+            setSpinner(false);
+
+            playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_pause_190x190));
+        }
+    };
 
     public void onPlaybackFinished()
     {
-        Log.d(LOGTAG,"onPlaybackFinished");
-
-        isPlaying = false;
-        setSpinner(false);
-
-        removeCallbacks(progressReader);
-
-        Context activity = Simple.getAppContext();
-
-        if (activity instanceof VideoSurfaceHandler)
-        {
-            ((VideoSurfaceHandler) activity).removeVideoSurface();
-        }
+        Simple.makePost(onPlaybackFinishedUI);
     }
+
+    public final Runnable onPlaybackFinishedUI = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "onPlaybackFinished");
+
+            isPlaying = false;
+            setSpinner(false);
+
+            Simple.removePost(progressReader);
+
+            Context activity = Simple.getAppContext();
+
+            if (activity instanceof VideoSurfaceHandler)
+            {
+                ((VideoSurfaceHandler) activity).removeVideoSurface();
+            }
+
+            if (isFullscreen)
+            {
+                topArea.setVisibility(INVISIBLE);
+                bottomArea.setVisibility(INVISIBLE);
+
+                surfaceLayout.setLayoutParams(normalParams);
+                setBackgroundColor(Color.TRANSPARENT);
+
+                isFullscreen = false;
+            }
+        }
+    };
 
     public void onPlaybackMeta(String meta)
     {
-        Log.d(LOGTAG,"onPlaybackMeta");
     }
 
     //endregion ProxyPlayer.Callback interface

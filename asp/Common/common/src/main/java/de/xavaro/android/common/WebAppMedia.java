@@ -18,6 +18,12 @@ public class WebAppMedia
     private static final String keyprefix = "media.recorder";
 
     @JavascriptInterface
+    public void openPlayer(String mediafile)
+    {
+        VideoProxy.getInstance().setVideoFile(mediafile);
+    }
+
+    @JavascriptInterface
     public String getRecordings()
     {
         return EventManager.getComingEvents(keyprefix).toString();

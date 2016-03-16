@@ -72,7 +72,7 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
         String audiourl = Json.getString(config, "audiourl");
         if (audiourl == null) return;
 
-        VideoProxy.getInstance().setAudioUrl(context, audiourl, this);
+        VideoProxy.getInstance().setAudioUrl(audiourl, this);
 
         bubbleControls();
     }
@@ -84,7 +84,7 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
         String videourl = Json.getString(config, "videourl");
         if (videourl == null) return;
 
-        VideoProxy.getInstance().setVideoUrl(context, videourl, this);
+        VideoProxy.getInstance().setVideoUrl(videourl, this);
 
         bubbleControls();
     }

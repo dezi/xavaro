@@ -2,7 +2,6 @@ package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 
-import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -72,6 +71,12 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         handler = new Handler();
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnSeekCompleteListener(this);
+
+        //
+        // Initialize video surface.
+        //
+
+        VideoSurface.getInstance();
     }
 
     //endregion
@@ -91,14 +96,12 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
     private Callback playing;
 
     private MediaPlayer mediaPlayer;
-    private Context context;
     private Handler handler;
 
     //region Setter methods.
 
-    public void setAudioUrl(Context ctx, String url, Callback caller)
+    public void setAudioUrl(String url, Callback caller)
     {
-        context = ctx;
         calling = caller;
         proxyUrl = url;
 
@@ -113,9 +116,8 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         startPlayer.start();
     }
 
-    public void setVideoUrl(Context ctx, String url, Callback caller)
+    public void setVideoUrl(String url, Callback caller)
     {
-        context = ctx;
         calling = caller;
         proxyUrl = url;
 
@@ -130,9 +132,13 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         startPlayer.start();
     }
 
-    public void setVideoFile(Context ctx, String file, Callback caller)
+    public void setVideoFile(String file)
     {
-        context = ctx;
+        setVideoFile(file, null);
+    }
+
+    public void setVideoFile(String file, Callback caller)
+    {
         calling = caller;
         mediaFile = file;
 
@@ -219,6 +225,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             mediaPlayer.pause();
 
             if (playing != null) playing.onPlaybackPaused();
+            if (isVideo()) VideoSurface.getInstance().onPlaybackPaused();
 
             //
             // Schedule a full stop within limited time.
@@ -265,6 +272,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             }
 
             if (playing != null) playing.onPlaybackResumed();
+            if (isVideo()) VideoSurface.getInstance().onPlaybackResumed();
         }
     }
 
@@ -298,6 +306,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         }
 
         if (playing != null) playing.onPlaybackFinished();
+        if (isVideo()) VideoSurface.getInstance().onPlaybackFinished();
     }
 
     public void setCurrentQuality(int quality)
@@ -395,17 +404,15 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 mediaPlayer.reset();
                 mediaPrepared = false;
 
-                if (playing != null)
-                {
-                    playing.onPlaybackFinished();
-                    playing = null;
-                }
+                if (playing != null) playing.onPlaybackFinished();
+                VideoSurface.getInstance().onPlaybackFinished();
 
                 //
                 // Inform current controller about preparing.
                 //
 
                 if (current != null) current.onPlaybackPrepare();
+                if (isVideo()) VideoSurface.getInstance().onPlaybackPrepare();
 
                 //
                 // Set header field and direct mediaplayer to proxy.
@@ -423,7 +430,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                         int rnd = new Random().nextInt();
                         Uri uri = Uri.parse("http://127.0.0.1:" + proxyPort + "/?rnd=" + rnd);
 
-                        mediaPlayer.setDataSource(context, uri, headers);
+                        mediaPlayer.setDataSource(Simple.getAnyContext(), uri, headers);
                     }
                     catch (IOException ex)
                     {
@@ -476,6 +483,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 playing = current;
 
                 if (playing != null) playing.onPlaybackStartet();
+                if (isVideo()) VideoSurface.getInstance().onPlaybackStartet();
             }
         }
     }

@@ -116,13 +116,6 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
             {
                 li.setPlaybackPrepare();
             }
-
-            if (VideoProxy.getInstance().isVideo())
-            {
-                VideoSurface.getInstance().onPlaybackPrepare();
-
-                HomeActivity.getInstance().addVideoSurface(VideoSurface.getInstance());
-            }
         }
     };
 
@@ -136,11 +129,6 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
             for (LaunchItemProxyPlayer li : isPlayingParents)
             {
                 li.setPlaybackStartet();
-            }
-
-            if (VideoProxy.getInstance().isVideo())
-            {
-                VideoSurface.getInstance().onPlaybackStartet();
             }
         }
     };
@@ -156,11 +144,6 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
             {
                 li.setPlaybackPaused();
             }
-
-            if (VideoProxy.getInstance().isVideo())
-            {
-                VideoSurface.getInstance().onPlaybackPaused();
-            }
         }
     };
 
@@ -175,11 +158,6 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
             {
                 li.setPlaybackResumed();
             }
-
-            if (VideoProxy.getInstance().isVideo())
-            {
-                VideoSurface.getInstance().onPlaybackResumed();
-            }
         }
     };
 
@@ -193,11 +171,6 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
             for (LaunchItemProxyPlayer li : isPlayingParents)
             {
                 li.setPlaybackFinished();
-            }
-
-            if (VideoProxy.getInstance().isVideo())
-            {
-                VideoSurface.getInstance().onPlaybackFinished();
             }
         }
     };
