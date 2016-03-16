@@ -161,11 +161,11 @@ public class SettingsFragments
                 String key;
                 String label;
                 String iconurl;
+                String iconname;
                 String summary;
-                int iconres;
-                Bitmap thumbnail;
-                Drawable drawable;
                 String apkname;
+                Drawable drawable;
+                int iconres;
                 int score;
 
                 while (keysIterator.hasNext())
@@ -182,6 +182,7 @@ public class SettingsFragments
                     if (isApps)
                     {
                         label = webitem.getString("what");
+                        apkname = website;
 
                         JSONArray sumarray = webitem.getJSONArray("info");
 
@@ -192,16 +193,14 @@ public class SettingsFragments
                             summary += sumarray.getString(inx);
                         }
 
-                        drawable = CacheManager.getIconFromAppStore(context, website);
-                        apkname = website;
+                        drawable = CacheManager.getAppIcon(apkname);
                         score = Integer.parseInt(webitem.getString("score"));
                     }
                     else
                     {
                         label = webitem.getString("label");
                         iconurl = webitem.getString("icon");
-                        thumbnail = CacheManager.cacheThumbnail(context, iconurl);
-                        drawable = new BitmapDrawable(context.getResources(), thumbnail);
+                        drawable = CacheManager.getWebIcon(website, iconurl);
                     }
 
                     if (webitem.has("enabled") && ! webitem.getBoolean("enabled"))
@@ -261,9 +260,10 @@ public class SettingsFragments
 
                             label = channel.getString("label");
                             key = keyprefix + ".channel." + website + ":" + label.replace(" ", "_");
+
                             iconurl = channel.getString("icon");
-                            thumbnail = CacheManager.cacheThumbnail(context, iconurl);
-                            drawable = new BitmapDrawable(context.getResources(), thumbnail);
+                            iconname = website + "." + label;
+                            drawable = CacheManager.getWebIcon(iconname, iconurl);
 
                             cb = new NicedPreferences.NiceScorePreference(context);
 

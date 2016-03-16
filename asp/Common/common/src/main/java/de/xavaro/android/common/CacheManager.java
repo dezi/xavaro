@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import android.content.Context;
@@ -23,24 +24,20 @@ public class CacheManager
 {
     private final static String LOGTAG = "CacheManager";
 
+    private final static String cachedir =  Simple.getCacheDir() + "/" + "iconcache";
+
     @Nullable
-    public static Bitmap getThumbnail(Context context, String filename)
+    public static Bitmap getIcon(String filename)
     {
-        File file = new File(context.getCacheDir(), filename);
+        File file = new File(cachedir, filename);
 
         if (file.exists())
         {
-            Log.d(LOGTAG,"getThumbnail: load " + file.toString());
-
             try
             {
                 FileInputStream input = new FileInputStream(file);
-
                 Bitmap myBitmap = BitmapFactory.decodeStream(input);
-
                 input.close();
-
-                Log.d(LOGTAG, "getThumbnail: load done ");
 
                 return myBitmap;
 
@@ -55,30 +52,19 @@ public class CacheManager
     }
 
     @Nullable
-    public static Bitmap cacheThumbnail(Context context, String src)
+    public static Bitmap getIcon(String filename, String src)
     {
-        Uri uri = Uri.parse(src);
-        String name = uri.getLastPathSegment();
-        String ext = MimeTypeMap.getFileExtensionFromUrl(name);
-        name = name.substring(0,name.length() - ext.length());
-
-        String filename = uri.getHost() + "." + name + "thumbnail." + ext;
-
-        return cacheThumbnail(context, src, filename);
-    }
-
-    @Nullable
-    public static Bitmap cacheThumbnail(Context context, String src, String filename)
-    {
-        File file = new File(context.getCacheDir(), filename);
+        File file = new File(cachedir, filename);
 
         if (! file.exists())
         {
-            Log.d(LOGTAG,"cacheThumbnail: fetch " + file.toString());
-            Log.d(LOGTAG,"cacheThumbnail:   url " + src);
+            Log.d(LOGTAG, "getIcon: fetch " + file.toString());
+            Log.d(LOGTAG, "getIcon:   url " + src);
 
             try
             {
+                Simple.makeDirectory(cachedir);
+
                 URL url = new URL(src);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setDoInput(true);
@@ -88,12 +74,9 @@ public class CacheManager
                 FileOutputStream output = new FileOutputStream(file);
 
                 byte[] bytes = new byte[ 4096 ];
-                int xfer;
 
-                while ((xfer = input.read(bytes)) > 0)
-                {
-                    output.write(bytes, 0, xfer);
-                }
+                int xfer;
+                while ((xfer = input.read(bytes)) > 0) output.write(bytes, 0, xfer);
 
                 output.close();
                 input.close();
@@ -105,23 +88,23 @@ public class CacheManager
                 return null;
             }
 
-            Log.d(LOGTAG,"cacheThumbnail: fetch done");
+            Log.d(LOGTAG, "cacheThumbnail: fetch done");
         }
 
-        return getThumbnail(context, filename);
+        return getIcon(filename);
     }
 
     @Nullable
-    public static BitmapDrawable getIconFromAppStore(Context context, String packageName)
+    public static Drawable getAppIcon(String packagename)
     {
-        String iconfile = "appstore." + packageName + ".thumbnail.png";
+        String iconfile = "app." + packagename + ".icon";
 
-        Bitmap icon = CacheManager.getThumbnail(context,iconfile);
-        if (icon != null) return new BitmapDrawable(context.getResources(), icon);
+        Bitmap icon = getIcon(iconfile);
+        if (icon != null) return Simple.getDrawable(icon);
 
         try
         {
-            String url = "https://play.google.com/store/apps/details?id=" + packageName;
+            String url = "https://play.google.com/store/apps/details?id=" + packagename;
 
             Log.d(LOGTAG,"getIconFromAppStore:" + url);
 
@@ -138,9 +121,7 @@ public class CacheManager
 
             Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
 
-            icon = CacheManager.cacheThumbnail(context, iconurl, iconfile);
-
-            if (icon != null) return new BitmapDrawable(context.getResources(), icon);
+            return Simple.getDrawable(getIcon(iconurl, iconfile));
         }
         catch (Exception oops)
         {
@@ -148,5 +129,14 @@ public class CacheManager
         }
 
         return null;
+    }
+
+    @Nullable
+    public static Drawable getWebIcon(String website, String src)
+    {
+        String iconfile = "web." + website + ".icon";
+
+        Bitmap icon = getIcon(iconfile, src);
+        return Simple.getDrawable(icon);
     }
 }

@@ -193,7 +193,7 @@ public class Simple
     @Nullable
     public static Drawable getIconFromAppStore(String apkname)
     {
-        return CacheManager.getIconFromAppStore(anyContext, apkname);
+        return CacheManager.getAppIcon(apkname);
     }
 
     @Nullable
@@ -714,6 +714,22 @@ public class Simple
         }
     }
 
+    public static void makeFullpath(String path)
+    {
+        makeFullpath(new File(path));
+    }
+
+    public static void makeFullpath(File path)
+    {
+        if (! path.getParentFile().exists())
+        {
+            if (! path.getParentFile().mkdirs())
+            {
+                OopsService.log(LOGTAG, "Cannot create directory: " + path.getParentFile());
+            }
+        }
+    }
+
     public static void makeDirectory(String path)
     {
         makeDirectory(new File(path));
@@ -771,6 +787,20 @@ public class Simple
         File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
         return new File(dir, "Miscellanous");
     }
+
+    public static void removeFiles(File dir, String suffix)
+    {
+        File[] files = dir.listFiles();
+
+        for (File file : files)
+        {
+            if (file.toString().endsWith(suffix))
+            {
+                if (file.delete()) Log.d(LOGTAG, "removeFiles: " + file.toString());
+            }
+        }
+    }
+
 
     public static File getFilesDir()
     {
@@ -1142,7 +1172,7 @@ public class Simple
     }
 
     @Nullable
-    public static String getFileContent(File file)
+    public static byte[] getFileBytes(File file)
     {
         try
         {
@@ -1150,13 +1180,13 @@ public class Simple
             {
                 InputStream in = new FileInputStream(file);
                 int len = (int) file.length();
-                byte[] buf = new byte[ len ];
+                byte[] bytes = new byte[ len ];
 
                 int xfer = 0;
-                while (xfer < len) xfer += in.read(buf, xfer, len - xfer);
+                while (xfer < len) xfer += in.read(bytes, xfer, len - xfer);
                 in.close();
 
-                return new String(buf);
+                return bytes;
             }
         }
         catch (Exception ex)
@@ -1167,12 +1197,19 @@ public class Simple
         return null;
     }
 
-    public static boolean putFileContent(File file, String content)
+    @Nullable
+    public static String getFileContent(File file)
+    {
+        byte[] bytes = getFileBytes(file);
+        return (bytes == null) ? null : new String(bytes);
+    }
+
+    public static boolean putFileBytes(File file, byte[] bytes)
     {
         try
         {
             OutputStream out = new FileOutputStream(file);
-            out.write(content.getBytes());
+            out.write(bytes);
             out.close();
 
             return true;
@@ -1183,6 +1220,11 @@ public class Simple
         }
 
         return false;
+    }
+
+    public static boolean putFileContent(File file, String content)
+    {
+        return putFileBytes(file, content.getBytes());
     }
 
     public static File changeExtension(File file, String extension)
@@ -1216,6 +1258,12 @@ public class Simple
         if (myBitmap == null) return null;
 
         return new BitmapDrawable(appContext.getResources(), myBitmap);
+    }
+
+    @Nullable
+    public static Drawable getDrawable(Bitmap bitmap)
+    {
+        return (bitmap == null) ? null : new BitmapDrawable(appContext.getResources(), bitmap);
     }
 
     @Nullable

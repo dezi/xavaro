@@ -314,25 +314,21 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
 
         if (config.has("icon"))
         {
-            String iconname = Json.getString(config, "icon");
+            String iconref = Json.getString(config, "icon");
 
-            if (Simple.startsWith(iconname, "http://") || Simple.startsWith(iconname, "https://"))
+            if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
             {
-                Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconname);
-
-                if (thumbnail != null)
+                if (config.has("name"))
                 {
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    String iconname = Json.getString(config, "name");
+                    Drawable drawable = CacheManager.getWebIcon(iconname, iconref);
+                    icon.setImageDrawable(drawable);
                 }
             }
             else
             {
-                int resourceId = Simple.getIconResourceId(iconname);
-
-                if (resourceId > 0)
-                {
-                    icon.setImageResource(resourceId);
-                }
+                int resourceId = Simple.getIconResourceId(iconref);
+                if (resourceId > 0) icon.setImageResource(resourceId);
             }
         }
 
@@ -351,7 +347,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
                 }
                 else
                 {
-                    BitmapDrawable drawable = CacheManager.getIconFromAppStore(context, packageName);
+                    Drawable drawable = CacheManager.getAppIcon(packageName);
 
                     if (drawable != null)
                     {

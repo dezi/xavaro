@@ -60,6 +60,7 @@ public class LaunchGroupWebStream extends LaunchGroup
 
                 String label = Json.getString(channel, "label");
                 if (label == null) continue;
+                Json.put(channel, "name", website + "." + label);
 
                 String key = type + ".channel:" + website + ":" + label;
 

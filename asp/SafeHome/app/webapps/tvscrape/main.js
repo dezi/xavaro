@@ -235,8 +235,6 @@ tvscrape.createFrameSetup = function()
 
 tvscrape.onChannelClick = function(channelspan)
 {
-    console.log("onChannelClick");
-
     var channel = channelspan.channel;
     var channelpath = channel.type + "/" + channel.isocc + "/" + channel.name + ".json";
 

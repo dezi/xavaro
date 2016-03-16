@@ -42,8 +42,8 @@ public class WebAppCache
     }
 
     //
-    // Get content from cache. If intervall is greater zero reflect age of cached
-    // item and get a fresh copy if required. If intervall equals zero, always get
+    // Get content from cache. If interval is greater zero reflect age of cached
+    // item and get a fresh copy if required. If interval equals zero, always get
     // a fresh copy from server and store for offline usage.
     //
 
@@ -65,9 +65,9 @@ public class WebAppCache
 
         String cacheurl = url;
 
-        if (url.startsWith(WebApp.getHTTPAppRoot(webappname)))
+        if (url.startsWith(WebApp.getHTTPRoot()))
         {
-            cacheurl = url.substring(WebApp.getHTTPAppRoot(webappname).length());
+            cacheurl = url.substring(WebApp.getHTTPRoot().length());
         }
 
         if (! webappcache.has(webappname)) Json.put(webappcache, webappname, new JSONObject());

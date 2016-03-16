@@ -240,6 +240,8 @@ public class LaunchFrameDeveloper extends LaunchFrame
             Json.put(jfile, "k", "~" + path.substring(plen));
             jsonprefs.put(jfile);
 
+            Log.d(LOGTAG, path);
+
             if (item.isDirectory()) recurseDirectories(item, plen);
         }
     }
@@ -283,8 +285,11 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
     private void loadStorageCache()
     {
-        File cache = Simple.getAnyContext().getCacheDir();
+        File cache = Simple.getCacheDir();
 
+        Simple.removeFiles(cache, "thumbnail.");
+
+        deleteRecursive(new File(cache, "webappcache/tvscrape"));
         deleteRecursive(new File(cache, "org.chromium.android_webview"));
 
         loadStorage(cache);

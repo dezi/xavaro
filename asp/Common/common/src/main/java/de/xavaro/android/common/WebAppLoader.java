@@ -84,7 +84,7 @@ public class WebAppLoader extends WebViewClient
 
         int interval = getCacheIntervalForUrl(url);
 
-        if (interval < 0)
+        if (interval == LOADER_UNKNOWN)
         {
             //
             // Unknown cache policy for url in manifest, deny anyway.
@@ -143,6 +143,26 @@ public class WebAppLoader extends WebViewClient
     {
         int interval = LOADER_UNKNOWN;
 
+        String wifiname = Simple.getWifiName();
+
+        if (url.startsWith(rootUrl))
+        {
+            if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
+            {
+                //
+                // Developer mode. Always load webapp components w/o cache.
+                //
+
+                interval = LOADER_CACHE_WRITEONLY;
+            }
+            else
+            {
+                interval = 24;
+            }
+
+            return interval;
+        }
+
         if (cachedefs != null)
         {
             for (int inx = 0; inx < cachedefs.length(); inx++)
@@ -150,6 +170,11 @@ public class WebAppLoader extends WebViewClient
                 JSONObject cachedef = Json.getObject(cachedefs, inx);
 
                 String pattern = Json.getString(cachedef, "pattern");
+
+                if (pattern != null)
+                {
+                    pattern = pattern.replace("%%appserver%%", WebApp.getHTTPRoot());
+                }
 
                 if ((pattern != null) && url.matches(pattern))
                 {
@@ -161,29 +186,13 @@ public class WebAppLoader extends WebViewClient
 
         if (interval >= 0)
         {
-            String wifiname = Simple.getWifiName();
-
-            if (url.startsWith(rootUrl))
+            if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable." + wifiname))
             {
-                if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
-                {
-                    //
-                    // Developer mode. Always load webapp components w/o cache.
-                    //
+                //
+                // Developer mode. Always load data components w/o cache.
+                //
 
-                    interval = LOADER_CACHE_WRITEONLY;
-                }
-            }
-            else
-            {
-                if (Simple.getSharedPrefBoolean("developer.webapps.datacachedisable." + wifiname))
-                {
-                    //
-                    // Developer mode. Always load data components w/o cache.
-                    //
-
-                    interval = LOADER_CACHE_WRITEONLY;
-                }
+                interval = LOADER_CACHE_WRITEONLY;
             }
         }
 

@@ -4,6 +4,7 @@
     "label": "TV-Scraper",
     "appname": "tvscrape",
     "appicon": "tvscrape_175x175.png",
+    "dataserver": "epg.xavaro.de",
     "preferences": false,
 
     "permissions": [
@@ -30,7 +31,7 @@
     // Interval (positive values hours before cache refresh):
     //
     //  0 : Write cache for offline use
-    // -1 : Strip server headers crossdomain
+    // -1 : Load without cache
     // -2 : Load native by chrome
     // -3 : Intercept load
     // -4 : Deny load
@@ -42,15 +43,12 @@
       { "interval": -1, "pattern": "http://.*?\\.gstatic\\.com/.*" },
       { "interval": -3, "pattern": "http://images\\.google\\.de/.*" },
 
-      { "interval":  0, "pattern": ".*/epginfo/.*" },
-      { "interval":  0, "pattern": ".*/channels/.*" },
+      { "interval": -1, "pattern": "http://epg.xavaro.de/pgminfo/.*" },
+      { "interval": -1, "pattern": "http://epg.xavaro.de/epginfo/.*" },
+      { "interval":  0, "pattern": "http://epg.xavaro.de/epgdata/.*" },
+      { "interval":  0, "pattern": "http://epg.xavaro.de/channels/.*" },
 
-      { "interval": 24, "pattern": ".*\\.js" },
-      { "interval": 72, "pattern": ".*\\.png" },
-      { "interval": 24, "pattern": ".*\\.json" },
-      { "interval": 24, "pattern": ".*\\.json\\.gz" },
-
-      { "interval": -1, "pattern": ".*" }
+      { "interval": -2, "pattern": ".*" }
     ]
   }
 }

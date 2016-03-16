@@ -70,8 +70,7 @@ public class PreferenceFragments
                     String iconurl = Json.getString(webitem, "icon");
                     if (iconurl == null) continue;
 
-                    Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl);
-                    BitmapDrawable drawable = new BitmapDrawable(context.getResources(), thumbnail);
+                    Drawable drawable = CacheManager.getWebIcon(website, iconurl);
 
                     String key = keyprefix + ".website:" + website;
 
@@ -113,8 +112,8 @@ public class PreferenceFragments
                         if (label == null) continue;
 
                         String iconurl = Json.getString(channel, "icon");
-                        Bitmap thumbnail = CacheManager.cacheThumbnail(context, iconurl);
-                        BitmapDrawable drawable = new BitmapDrawable(context.getResources(), thumbnail);
+                        String iconname = website + "." + channel;
+                        Drawable drawable = CacheManager.getWebIcon(iconname, iconurl);
 
                         lp = new NicedPreferences.NiceListPreference(context);
 

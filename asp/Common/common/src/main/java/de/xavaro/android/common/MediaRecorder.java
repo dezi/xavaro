@@ -33,8 +33,7 @@ public class MediaRecorder
         events.put(event);
 
         Json.put(event, "date", "2016-03-12T16:30:00Z");
-        Json.put(event, "start", "2016-03-12T18:16:00Z");
-        Json.put(event, "stop", "2016-03-12T18:30:00Z");
+        Json.put(event, "dateend", "2016-03-12T18:30:00Z");
         Json.put(event, "channel", "Das Erste HD");
         Json.put(event, "country", "de");
         Json.put(event, "type", "tv");
@@ -85,7 +84,7 @@ public class MediaRecorder
             {
                 JSONObject oldevent = recordingsList.get(inx);
 
-                if (Json.equals(event, "start", oldevent) &&
+                if (Json.equals(event, "date", oldevent) &&
                         Json.equals(event, "type", oldevent) &&
                         Json.equals(event, "channel", oldevent) &&
                         Json.equals(event, "country", oldevent))
@@ -115,7 +114,7 @@ public class MediaRecorder
         {
             while (recordingsList.size() > 0)
             {
-                String stopnow = Simple.timeStampAsISO(Simple.nowAsTimeStamp() + (2 * 60 * 1000));
+                String stopnow = Simple.nowAsISO();
 
                 JSONObject recording;
 
@@ -156,7 +155,7 @@ public class MediaRecorder
 
     private static boolean dosomeRecording(JSONObject recording)
     {
-        String starttime = Json.getString(recording, "start");
+        String starttime = Json.getString(recording, "date");
         String channel = Json.getString(recording, "channel");
         String country = Json.getString(recording, "country");
         String type = Json.getString(recording, "type");
@@ -394,8 +393,8 @@ public class MediaRecorder
         String type  = Json.getString(recording, "type");
         String country = Json.getString(recording, "country");
         String channel = Json.getString(recording, "channel");
-        String starttime = Json.getString(recording, "start");
-        String stoptime = Json.getString(recording, "stop");
+        String starttime = Json.getString(recording, "date");
+        String stoptime = Json.getString(recording, "dateend");
 
         if ((type == null) || (country == null) || (channel == null)
                 || (starttime == null) || (stoptime == null))
