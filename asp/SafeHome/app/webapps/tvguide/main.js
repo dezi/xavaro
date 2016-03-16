@@ -196,8 +196,8 @@ tvguide.getSenderList = function()
         tvguide.senderList[ name ].type    = cparts[0];
         tvguide.senderList[ name ].country = cparts[1];
         tvguide.senderList[ name ].channel = cparts[2];
-
         tvguide.senderList[ name ].iptv    = false;
+        tvguide.senderList[ name ].isbd    = false;
     }
 
     var iptvChannels  = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
@@ -226,10 +226,27 @@ tvguide.getSenderList = function()
         }
     }
 
-    // console.log(JSON.stringify(tvguide.senderList));
-    // console.log("--> tv/de/Das Erste: " + tvguide.senderList["tv/de/Das Erste"].index);
+    var loacation  = WebAppUtility.getLocaleLanguage();
 
-    // tvguide.senderList = JSON.parse(WebAppMedia.getLocaleDefaultChannels("tv"));
+    var bdsrc = "http://" + WebApp.manifest.appserver + "/channels/tv/" + loacation + ".json.gz";
+    var brainDeads = JSON.parse(WebAppRequest.loadSync(bdsrc));
+
+    for (var bdIndex in brainDeads)
+    {
+        var tmp = brainDeads[ bdIndex ]
+        var bdName = tmp.type + "/" + tmp.isocc + "/" + tmp.name;
+
+        for (var sender in tvguide.senderList)
+        {
+            if (sender == bdName && tmp.isbd)
+            {
+//                console.log("--> brainDead:" + sender);
+                tvguide.senderList[ sender ].isbd = tmp.isbd;
+            }
+        }
+    }
+
+//    WebAppUtility.makeClick()
 }
 
 tvguide.createSenderBar = function()
@@ -333,7 +350,9 @@ tvguide.createTimeLine = function()
 
 tvguide.createEpgProgram = function(channelName, epgdata)
 {
-//    console.log("--> channelName:" + channelName);
+    var isbd = tvguide.senderList[ channelName ].isbd;
+
+    console.log("--> channel:" + channelName + " isbd:" + isbd);
 //    console.log("--> epgdata:" + JSON.stringify(epgdata));
 
     var channel = tvguide.senderList[ channelName ]
@@ -372,9 +391,16 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         paddingDiv.style.marginBottom = "2px";
         paddingDiv.style.padding      = "8px";
         paddingDiv.style.borderRadius = "8px";
+        paddingDiv.style.border       = tvguide.constants.programBoder;
 
-        paddingDiv.style.border          = tvguide.constants.programBoder;
-        paddingDiv.style.backgroundColor = tvguide.constants.programBGColor;
+        if (isbd)
+        {
+            WebLibSimple.setBGColor(paddingDiv, "#ff5e2e");
+        }
+        else
+        {
+            WebLibSimple.setBGColor(paddingDiv, tvguide.constants.programBGColor);
+        }
 
         paddingDiv.epg = epg;
         paddingDiv.innerHTML = paddingDiv.epg.title;
