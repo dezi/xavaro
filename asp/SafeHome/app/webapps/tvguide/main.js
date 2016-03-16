@@ -1,15 +1,16 @@
 tvguide.constants =
 {
-    loadHours                : 24 * 1,
+    loadDaysFuture           : 1,
+    loadDaysPast             : 1,
     timelineInterval         : 15,
 
     recordPreload            : 1,
     recordPostload           : 1,
 
-    today                    : Math.floor(WebLibSimple.getTodayDate().getTime() / 1000 / 60),
+    today                    : WebLibSimple.getTodayDate().getTime() / 1000 / 60,
 
     epgDataSrcPrefix         : "http://" + WebApp.manifest.appserver + "/epgdata/",
-    epgDataSrcPostfix        : "/current.json.gz",
+    epgDataSrcPostfix        : ".json.gz",
 
     titlebarHeight           : 80,
     senderbarWidth           : 80,
@@ -35,6 +36,19 @@ tvguide.constants =
     pastLineColor            : "#33ff0000",
 
     programBoder             : "0px solid black"
+}
+
+tvguide.calculateDates = function()
+{
+    var today          = tvguide.constants.today;
+    var hoursPix       = tvguide.constants.hoursPix;
+    var loadDaysPast   = tvguide.constants.loadDaysPast;
+    var loadDaysFuture = tvguide.constants.loadDaysFuture;
+
+    tvguide.constants.minPix = hoursPix / 60;
+    tvguide.constants.loadHours = (loadDaysPast + loadDaysFuture) * 24;
+
+    tvguide.constants.timeShift = today - (loadDaysPast * 24 * 60);
 }
 
 tvguide.createFrameSetup = function()
@@ -263,12 +277,18 @@ tvguide.createTimeLine = function()
 {
     var timelineInterval = tvguide.constants.timelineInterval;
     var hoursPix = tvguide.constants.hoursPix;
-    var minPix   = hoursPix / 60;
+    var minPix = hoursPix / 60;
+
+    var loadDaysPast = tvguide.constants.loadDaysPast;
+    var loadDaysFuture = tvguide.constants.loadDaysFuture;
+    var loadHours = (loadDaysPast + loadDaysFuture) * 24;
+
+    var timelineWidth = loadHours * hoursPix;
 
     tvguide.timelineScroll = WebLibSimple.createDivWidth(
         0,
         0,
-        (tvguide.constants.loadHours * tvguide.constants.hoursPix),
+        timelineWidth,
         0,
         "timelineScroll",
         tvguide.timeline
@@ -280,7 +300,7 @@ tvguide.createTimeLine = function()
     tvguide.timelineScroll.scrollHorizontal = true;
     tvguide.timelineScroll.onTouchScroll    = tvguide.onTimeLineScroll;
 
-    for(var min = 0; min < (tvguide.constants.loadHours * 60); min += timelineInterval)
+    for(var min = 0; min < (loadHours * 60); min += timelineInterval)
     {
         var timelineDiv = WebLibSimple.createDivWidth(
             minPix * min,
@@ -313,15 +333,18 @@ tvguide.createTimeLine = function()
 
 tvguide.createEpgProgram = function(channelName, epgdata)
 {
+//    console.log("--> channelName:" + channelName);
+//    console.log("--> epgdata:" + JSON.stringify(epgdata));
+
     var channel = tvguide.senderList[ channelName ]
     var senderIndex = channel.index;
 
     var minPix = tvguide.constants.hoursPix / 60;
+    var timeShift = tvguide.constants.timeShift;
 
     for (var programIndex in epgdata)
     {
-        var epg = epgdata[ programIndex ];
-
+        var epg     = epgdata[ programIndex ];
         epg.type    = channel.type;
         epg.country = channel.country;
         epg.channel = channel.channel;
@@ -330,8 +353,8 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         var startDate = new Date(epg.start).getTime() / 1000 / 60;
         var stopDate  = new Date(epg.stop ).getTime() / 1000 / 60;
 
-        var startTime = Math.floor(startDate - tvguide.constants.today);
-        var stopTime  = Math.floor(stopDate  - tvguide.constants.today);
+        var startTime = Math.floor(startDate - timeShift);
+        var stopTime  = Math.floor(stopDate  - timeShift);
 
         var duration  = stopTime - startTime;
 
@@ -358,12 +381,47 @@ tvguide.createEpgProgram = function(channelName, epgdata)
     }
 }
 
+tvguide.getEpgData = function()
+{
+    var loadDaysFuture = tvguide.constants.loadDaysFuture;
+    var loadDaysPast   = tvguide.constants.loadDaysPast * -1;
+
+    for (var cDay = loadDaysPast; cDay < loadDaysFuture; cDay++)
+    {
+        var cDate = new Date().getTime() + (cDay * 1000 * 60 * 60 * 24);
+        var date  = new Date(cDate);
+
+        var year  = WebLibSimple.padNum(date.getFullYear(),  4);
+        var month = WebLibSimple.padNum(date.getMonth() + 1, 2);
+        var day   = WebLibSimple.padNum(date.getDate(),      2);
+
+        var current = year + "." + month + "." + day;
+
+//        console.log("--> current: " + current);
+
+        for (var sender in tvguide.senderList)
+        {
+            var epgurl = encodeURI(
+                tvguide.constants.epgDataSrcPrefix +
+                sender + "/" + current +
+                tvguide.constants.epgDataSrcPostfix);
+
+//            console.log("--> URL: " + epgurl);
+
+            WebAppRequest.loadAsyncJSON(epgurl);
+        }
+    }
+}
+
 tvguide.createEpgBodyScroll = function()
 {
+    var hoursPix  = tvguide.constants.hoursPix;
+    var loadHours = tvguide.constants.loadHours;
+
     tvguide.epgScroll = WebLibSimple.createDivWidHei(
         0,
         0,
-        tvguide.constants.loadHours * tvguide.constants.hoursPix,
+        loadHours * hoursPix,
         tvguide.senderbarScroll.clientHeight,
         "epgScroll",
         tvguide.epgbody);
@@ -379,15 +437,20 @@ tvguide.createEpgBodyScroll = function()
 
     WebLibSimple.setBGColor(tvguide.epgScroll, tvguide.constants.epgScrollColor);
 
-    for (var sender in tvguide.senderList)
-    {
-        var epgurl = encodeURI(
-            tvguide.constants.epgDataSrcPrefix +
-            sender +
-            tvguide.constants.epgDataSrcPostfix);
+    tvguide.getEpgData();
+}
 
-        WebAppRequest.loadAsyncJSON(epgurl);
-    }
+WebAppRequest.onLoadAsyncJSON = function(src, data)
+{
+    if (! data[ "epgdata" ]) return;
+
+    // /2016.01.01.json.gz
+    var channel = WebLibSimple.substring(
+        decodeURI(src),
+        tvguide.constants.epgDataSrcPrefix.length,
+        -(tvguide.constants.epgDataSrcPostfix.length + 11));
+
+    tvguide.createEpgProgram(channel, data[ "epgdata" ]);
 }
 
 tvguide.PastLineTimeout = function()
@@ -405,9 +468,13 @@ tvguide.PastLineTimeout = function()
 
 tvguide.createPastLine = function()
 {
+    var hoursPix = tvguide.constants.hoursPix;
+    var minPix   = tvguide.constants.minPix;
+
+    var timeShift = tvguide.constants.timeShift;
+
     var now         = Math.floor(new Date().getTime() / 1000 / 60);
-    var minPix      = tvguide.constants.hoursPix / 60;
-    var nowPosition = minPix * (tvguide.constants.today - now);
+    var nowPosition = minPix * (timeShift - now);
     var padding     = tvguide.constants.timelineInterval * 4 * minPix;
 
     //
@@ -442,35 +509,11 @@ tvguide.createPastLine = function()
     tvguide.PastLineTimeout();
 }
 
-WebAppRequest.onLoadAsyncJSON = function(src, data)
-{
-    var channel = WebLibSimple.substring(
-        decodeURI(src),
-        tvguide.constants.epgDataSrcPrefix.length,
-        -tvguide.constants.epgDataSrcPostfix.length);
-
-    //
-    // todo
-    //
-
-    var epgdata = [];
-
-    for (var index in data.epgdata)
-    {
-        var indexDate = Math.floor(new Date(data.epgdata[ index ].start).getTime() / 1000 / 60);
-
-        if (indexDate > tvguide.constants.today &&
-            indexDate < (tvguide.constants.today + (tvguide.constants.loadHours * 60)))
-        {
-            epgdata.push(data.epgdata[ index ]);
-        }
-    }
-
-    tvguide.createEpgProgram(channel, epgdata);
-}
-
 tvguide.onTimeLineScroll = function(newX, newY)
 {
+    var timeShift = tvguide.constants.timeShift;
+    var hoursPix = tvguide.constants.hoursPix;
+
     tvguide.epgScroll.style.left = newX + "px";
 
     if (tvguide.epgScroll.style.left != tvguide.timelineScroll.style.left)
@@ -479,7 +522,7 @@ tvguide.onTimeLineScroll = function(newX, newY)
     }
 
     // selectedDay --> Min
-    var selectedDay = (tvguide.constants.today - (newX / tvguide.constants.hoursPix * 60));
+    var selectedDay = (timeShift - (newX / hoursPix * 60));
 
     tvguide.title.innerHTML = WebLibSimple.getNiceDay(new Date(selectedDay * 1000 * 60));
 }
@@ -509,6 +552,8 @@ tvguide.onEPGTouchScroll = function(newX, newY)
 
 tvguide.main = function()
 {
+    tvguide.calculateDates();
+
     //
     // frame setup
     //
