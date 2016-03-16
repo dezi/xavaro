@@ -16,6 +16,21 @@ tvguide.descriptionConstants =
     boxPaddingTop : "10px"
 }
 
+tvguide.deMoronize = function(moronedEpg)
+{
+    if (! moronedEpg.description) return moronedEpg;
+
+    var cleanEpg = moronedEpg;
+
+    var regex = new RegExp("([a-z0-9äüöß])([A-ZÉÄÜÖ])", "g");
+    var demoronized = moronedEpg.description;
+    var demoronized = demoronized.replace(regex, "$1@\n$2");
+
+    cleanEpg.description = demoronized;
+
+    return cleanEpg;
+}
+
 tvguide.createTitleBar = function(title, subtitle)
 {
     //
@@ -367,13 +382,9 @@ tvguide.animateInfoOut = function()
     }
 }
 
-tvguide.descriptionMain = function(target, element)
+tvguide.descriptionMain = function(target, epg)
 {
-    var epg = element.epg;
-
-    if (! epg.title) return;
-
-    console.log("--> tvguide.onEPGTouchClick element: " + epg.title);
+//    console.log("--> tvguide.onEPGTouchClick element: " + epg.title);
 //    console.log("--> epg: " + JSON.stringify(epg));
 
     tvguide.createDescriptionSetup();
@@ -443,7 +454,16 @@ tvguide.onEPGTouchClick = function(target, element)
 
     if (! tvguide.animateInfoStatus)
     {
-        tvguide.descriptionMain(target, element);
+        var epg = element.epg;
+
+        if (! epg.title) return;
+
+        if (epg.isbd)
+        {
+            epg = tvguide.deMoronize(epg);
+        }
+
+        tvguide.descriptionMain(target, epg);
         tvguide.animateInfoIn();
     }
 }

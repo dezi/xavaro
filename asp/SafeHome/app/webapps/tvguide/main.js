@@ -352,7 +352,7 @@ tvguide.createEpgProgram = function(channelName, epgdata)
 {
     var isbd = tvguide.senderList[ channelName ].isbd;
 
-    console.log("--> channel:" + channelName + " isbd:" + isbd);
+//    console.log("--> channel:" + channelName + " isbd:" + isbd);
 //    console.log("--> epgdata:" + JSON.stringify(epgdata));
 
     var channel = tvguide.senderList[ channelName ]
@@ -368,6 +368,7 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         epg.country = channel.country;
         epg.channel = channel.channel;
         epg.iptv    = channel.iptv;
+        epg.isbd    = channel.isbd;
 
         var startDate = new Date(epg.start).getTime() / 1000 / 60;
         var stopDate  = new Date(epg.stop ).getTime() / 1000 / 60;
@@ -395,7 +396,7 @@ tvguide.createEpgProgram = function(channelName, epgdata)
 
         if (isbd)
         {
-            WebLibSimple.setBGColor(paddingDiv, "#ff5e2e");
+            WebLibSimple.setBGColor(paddingDiv, "#ff8e6c");
         }
         else
         {
