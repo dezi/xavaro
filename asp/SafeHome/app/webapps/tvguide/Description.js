@@ -199,8 +199,39 @@ tvguide.createDescriptionSetup = function()
     tvguide.descriptionScroll.scrollVertical = true;
 }
 
+tvguide.addRecord = function()
+{
+    var epg = tvguide.description.epg;
+
+    var preload  = tvguide.constants.recordPreload  * 1000 * 60;
+    var postload = tvguide.constants.recordPostload * 1000 * 60;
+
+    var start = new Date(epg.start).getTime()  - preload;
+    var stop  = new Date(epg.stop ).getTime()  + postload;
+
+    epg.date     = new Date(start);
+    epg.datestop = new Date(stop);
+
+    WebAppMedia.addRecording(JSON.stringify(epg));
+
+    alert("record: " + epg.title);
+}
+
+tvguide.play = function()
+{
+    WebAppMedia.openPlayer(tvguide.playFile);
+}
+
+tvguide.removeRecording = function()
+{
+    alert("remove: " + tvguide.removeRec.title);
+    WebAppMedia.removeRecording(JSON.stringify(tvguide.removeRec));
+}
+
 tvguide.createButton = function(name, color, eventHandler)
 {
+    // tvguide.description
+
     var container = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     container.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
@@ -215,41 +246,82 @@ tvguide.createButton = function(name, color, eventHandler)
     WebLibSimple.setBGColor(button, color);
 }
 
-tvguide.createButtons = function()
+tvguide.createRecButton = function(epg)
 {
-    var epg = tvguide.description.epg;
-    var recordings = JSON.parse(WebAppMedia.getRecordedItems());
-
-    for (var index in recordings)
-    {
-        recording = recordings[ index ];
-
-        if ((recording.title    == epg.title &&
-             recording.channel  == epg.channel) &&
-            (recording.start    == epg.start ||
-             recording.stop     == epg.stop))
-        {
-            tvguide.createButton("Play", "#4553c1", null);
-            return;
-        }
-
-//        if (recording.title    == epg.title &&
-//            recording.channel  == epg.channel &&
-//            recording.subtitle == epg.subtitle)
-//        {
-//            tvguide.createButton("Play", "#4553c1", null);
-//            return;
-//        }
-    }
-
-    // WebAppMedia.getRecordings();
     var now  = new Date().getTime();
     var stop = new Date(epg.stop).getTime();
 
     if ((epg.iptv == true) && (stop > now))
     {
         // tvguide.createRecordingButton();
-        tvguide.createButton("Record", "#ff7a7a", tvguide.record);
+        tvguide.createButton("record", "#ff7a7a", tvguide.addRecord);
+    }
+}
+
+tvguide.createPlayButton = function(epg)
+{
+    var recordings = JSON.parse(WebAppMedia.getRecordedItems());
+
+    for (var index in recordings)
+    {
+        recording = recordings[ index ];
+
+        if (epg.subtitle &&
+            epg.title    == recording.title &&
+            epg.channel  == recording.channel &&
+            epg.subtitle == recording.subtitle)
+        {
+            tvguide.playFile = recording.mediafile;
+            tvguide.createButton("play subtitle", "#58d533", tvguide.play);
+            return true;
+        }
+
+        if (recording.title    == epg.title &&
+            recording.channel  == epg.channel &&
+            recording.start    == epg.start &&
+            recording.stop     == epg.stop)
+        {
+            tvguide.playFile = recording.mediafile;
+            tvguide.createButton("play start/stop", "#58d533", tvguide.play);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+tvguide.createPlannedButton = function(epg)
+{
+    var planned = JSON.parse(WebAppMedia.getRecordings());
+
+    for (var index in planned)
+    {
+        rec = planned[ index ];
+
+        if (rec.title    == epg.title &&
+            rec.channel  == epg.channel &&
+            rec.start    == epg.start)
+        {
+            tvguide.removeRec = rec;
+            tvguide.createButton("remove planned recording", "#4553c1", tvguide.removeRecording);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+tvguide.createButtons = function(epg)
+{
+    // Rec || Play || Planned/Remove
+    if (! epg.iptv) return;
+
+    var playButton = tvguide.createPlayButton(epg);
+    var plannedButton = tvguide.createPlannedButton(epg);
+
+    if ((! playButton) && (! plannedButton))
+    {
+        tvguide.createRecButton(epg);
     }
 }
 
@@ -295,26 +367,6 @@ tvguide.animateInfoOut = function()
     }
 }
 
-tvguide.record = function()
-{
-    var epg = tvguide.description.epg;
-
-    var preload  = tvguide.constants.recordPreload  * 1000 * 60;
-    var postload = tvguide.constants.recordPostload * 1000 * 60;
-
-    var start = new Date(epg.start).getTime() - preload;
-    var stop  = new Date(epg.stop ).getTime()  + postload;
-
-    epg.date = new Date(start);
-    epg.stop = new Date(stop);
-
-    WebAppMedia.addRecording(JSON.stringify(epg));
-
-    console.log(JSON.stringify(tvguide.description.epg));
-
-    alert("created recording");
-}
-
 tvguide.descriptionMain = function(target, element)
 {
     var epg = element.epg;
@@ -322,7 +374,7 @@ tvguide.descriptionMain = function(target, element)
     if (! epg.title) return;
 
     console.log("--> tvguide.onEPGTouchClick element: " + epg.title);
-    console.log("--> epg: " + JSON.stringify(epg));
+//    console.log("--> epg: " + JSON.stringify(epg));
 
     tvguide.createDescriptionSetup();
 
@@ -368,7 +420,7 @@ tvguide.descriptionMain = function(target, element)
 
     tvguide.createInfoBox(epg.description);
 
-    tvguide.createButtons();
+    tvguide.createButtons(epg);
 }
 
 tvguide.onEPGTouchClick = function(target, element)

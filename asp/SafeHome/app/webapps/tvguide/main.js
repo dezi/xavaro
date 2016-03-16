@@ -1,7 +1,7 @@
 tvguide.constants =
 {
     loadDaysFuture           : 1,
-    loadDaysPast             : 1,
+    loadDaysPast             : 0,
     timelineInterval         : 15,
 
     recordPreload            : 1,

@@ -17,7 +17,8 @@
     "weblibs": [
       "simple",
       "touch",
-      "strings"
+      "strings",
+      "dialog"
     ],
 
     "preload": [
@@ -33,7 +34,11 @@
       { "interval": 72, "pattern": ".*\\.png" },
       { "interval": 72, "pattern": ".*\\.jpg" },
       { "interval": 24, "pattern": ".*\\.json" },
-      { "interval": 24, "pattern": ".*\\.json\\.gz" }
+      { "interval": 24, "pattern": ".*\\.json\\.gz" },
+
+      { "interval": -1, "pattern": "http://epg.xavaro.de/pgminfo/.*" },
+      { "interval":  0, "pattern": "http://epg.xavaro.de/epgdata/.*" },
+      { "interval":  0, "pattern": "http://epg.xavaro.de/channels/.*" }
     ]
   }
 }
