@@ -13,7 +13,13 @@ tvguide.descriptionConstants =
 
     containerBG : "#ffffffff",
     containerRadius : "4px",
-    boxPaddingTop : "10px"
+    boxPaddingTop : "10px",
+
+    plannedButtonTilte : "remove planned recording",
+    plannedButtonColor : "#4553c1",
+
+    playButtonTitle : "play",
+    playButtonColor : "#58d533"
 }
 
 tvguide.deMoronize = function(moronedEpg)
@@ -229,6 +235,10 @@ tvguide.addRecord = function()
 
     WebAppMedia.addRecording(JSON.stringify(epg));
 
+    tvguide.updateButton(tvguide.descriptionConstants.plannedButtonTilte,
+        tvguide.descriptionConstants.plannedButtonColor,
+        tvguide.removeRecording);
+
     alert("record: " + epg.title);
 }
 
@@ -241,6 +251,17 @@ tvguide.removeRecording = function()
 {
     alert("remove: " + tvguide.removeRec.title);
     WebAppMedia.removeRecording(JSON.stringify(tvguide.removeRec));
+
+    tvguide.updateButton("record", "#ff7a7a", tvguide.addRecord);
+}
+
+tvguide.updateButton = function(name, color, eventHandler)
+{
+    var button = tvguide.description.button;
+
+    button.innerHTML    = name;
+    button.onTouchClick = eventHandler;
+    WebLibSimple.setBGColor(button, color);
 }
 
 tvguide.createButton = function(name, color, eventHandler)
@@ -250,14 +271,16 @@ tvguide.createButton = function(name, color, eventHandler)
     var container = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
     container.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
 
-    var button = WebLibSimple.createAnyAppend("div", container);
+    tvguide.description.button = WebLibSimple.createAnyAppend("div", container);
+
+    var button = tvguide.description.button;
     button.style.height        = "50px";
-    button.innerHTML           = name;
     button.style.textAlign     = "center";
     button.style.paddingTop    = "25px";
     button.style.borderRadius  = "10px";
-    button.onTouchClick        = eventHandler;
 
+    button.innerHTML           = name;
+    button.onTouchClick        = eventHandler;
     WebLibSimple.setBGColor(button, color);
 }
 
@@ -268,7 +291,6 @@ tvguide.createRecButton = function(epg)
 
     if ((epg.iptv == true) && (stop > now))
     {
-        // tvguide.createRecordingButton();
         tvguide.createButton("record", "#ff7a7a", tvguide.addRecord);
     }
 }
@@ -281,15 +303,15 @@ tvguide.createPlayButton = function(epg)
     {
         recording = recordings[ index ];
 
-        if (epg.subtitle &&
-            epg.title    == recording.title &&
-            epg.channel  == recording.channel &&
-            epg.subtitle == recording.subtitle)
-        {
-            tvguide.playFile = recording.mediafile;
-            tvguide.createButton("play subtitle", "#58d533", tvguide.play);
-            return true;
-        }
+        // if (epg.subtitle &&
+        //     epg.title    == recording.title &&
+        //     epg.channel  == recording.channel &&
+        //     epg.subtitle == recording.subtitle)
+        // {
+        //     tvguide.playFile = recording.mediafile;
+        //     tvguide.createButton("play subtitle", "#58d533", tvguide.play);
+        //     return true;
+        // }
 
         if (recording.title    == epg.title &&
             recording.channel  == epg.channel &&
@@ -318,7 +340,11 @@ tvguide.createPlannedButton = function(epg)
             rec.start    == epg.start)
         {
             tvguide.removeRec = rec;
-            tvguide.createButton("remove planned recording", "#4553c1", tvguide.removeRecording);
+
+            tvguide.createButton(tvguide.descriptionConstants.plannedButtonTilte,
+                tvguide.descriptionConstants.plannedButtonColor,
+                tvguide.removeRecording);
+
             return true;
         }
     }
@@ -329,14 +355,16 @@ tvguide.createPlannedButton = function(epg)
 tvguide.createButtons = function(epg)
 {
     // Rec || Play || Planned/Remove
+
     if (! epg.iptv) return;
 
     var playButton = tvguide.createPlayButton(epg);
-    var plannedButton = tvguide.createPlannedButton(epg);
 
-    if ((! playButton) && (! plannedButton))
+    if (! playButton)
     {
-        tvguide.createRecButton(epg);
+        var plannedButton = tvguide.createPlannedButton(epg);
+
+        if (! plannedButton) tvguide.createRecButton(epg);
     }
 }
 
