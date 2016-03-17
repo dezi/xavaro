@@ -39,6 +39,8 @@ public class MediaRecorder
 
             if (oldinx < 0)
             {
+                Log.d(LOGTAG, "handleEvent: is new");
+
                 JSONObject recording = Json.clone(event);
 
                 if (! setupIPTVStream(recording))
@@ -71,8 +73,8 @@ public class MediaRecorder
 
                 if (Json.equals(event, "date", oldevent) &&
                         Json.equals(event, "type", oldevent) &&
-                        Json.equals(event, "channel", oldevent) &&
-                        Json.equals(event, "country", oldevent))
+                        Json.equals(event, "country", oldevent) &&
+                        Json.equals(event, "channel", oldevent))
                 {
                     if (remove) recordingsList.remove(inx);
 
@@ -106,6 +108,7 @@ public class MediaRecorder
                 synchronized (recordingsList)
                 {
                     recording = recordingsList.remove(0);
+                    recordingsList.add(recording);
                 }
 
                 String stoptime = Json.getString(recording, "datestop");
@@ -113,6 +116,11 @@ public class MediaRecorder
                 if ((stoptime != null) && (stopnow.compareTo(stoptime) > 0))
                 {
                     Log.d(LOGTAG, "recorderThread: einer fettig....");
+
+                    synchronized (recordingsList)
+                    {
+                        recordingsList.remove(recording);
+                    }
 
                     completeEvent(recording, true);
                     continue;
@@ -122,14 +130,15 @@ public class MediaRecorder
                 {
                     Log.d(LOGTAG, "recorderThread: einer kaputt....");
 
+                    synchronized (recordingsList)
+                    {
+                        recordingsList.remove(recording);
+                    }
+
                     completeEvent(recording, false);
                     continue;
                 }
 
-                synchronized (recordingsList)
-                {
-                    recordingsList.add(recording);
-                }
 
                 Simple.sleep(4000);
             }
