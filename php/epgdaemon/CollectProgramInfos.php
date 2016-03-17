@@ -3,6 +3,7 @@
 set_time_limit(0);
 
 include("../include/json.php");
+include("../include/wikifilm.php");
 include("../moviefinder/moviefinder.php");
 
 function sortInfos($a, $b)
@@ -107,6 +108,16 @@ function readPrograms($countrydir, $channeldir)
 			$epgs[ "epgdata" ][ $inx ] = $val;
 			
 			//
+			// Identify if wikipedia movie.
+			//
+
+			if (strpos($countrydir,"/tv/") > 0) 
+			{
+				$result = generateWiki($epgs[ "epgdata" ][ $inx ]);
+ 				if ($result != null) echo "$result\n";
+			}
+
+			//
 			// Check if title image exists.
 			//
 			
@@ -141,57 +152,25 @@ function readPrograms($countrydir, $channeldir)
 				{
 					$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
 				}
-				
-				continue;
 			}
 			else
 			{
 				unset($epgs[ "epgdata" ][ $inx ][ "img" ]);
 				unset($epgs[ "epgdata" ][ $inx ][ "imgsize" ]);
 				unset($epgs[ "epgdata" ][ $inx ][ "imgname" ]);
-			}
-			
-			//
-			// Identify if known movie.
-			//
-			
-			if (($year = identifyMovie($title)) != false) $title = "@movie " . $title;
+							
+				//
+				// Identify if known movie.
+				//
+		
+				if (($year = identifyMovie($title)) != false) $title = "@movie " . $title;
 
-			if (strpos($countrydir,"/tv/") > 0) checkWiki($epgs[ "epgdata" ][ $inx ]);
-			
-			//
-			// Check subtitle for year.
-			//
-			
-			/*
-			if (isset($val[ "subtitle" ]))
-			{
-				//echo $val[ "subtitle" ] . "\n";
-				
-				if (preg_match("/^[^0-9]*[12][0-9][0-9][0-9]$/", $val[ "subtitle" ], $matches))
-				{
-					echo "=========================>>>" . $matches[ 0 ] . "\n"; 
-				}
+				if (! isset($cd_arr[ $realtitle ])) $cd_arr[ $realtitle ] = 0;
+				$cd_arr[ $realtitle ] += 1;
+		
+				if (! isset($GLOBALS[ "ttoc" ])) $GLOBALS[ "ttoc" ] = array();
+				$GLOBALS[ "ttoc" ][ $realtitle ] = $channel;
 			}
-			*/
-			
-			/*
-			if (isset($val[ "description" ]))
-			{
-				//echo $val[ "subtitle" ] . "\n";
-				
-				if (preg_match("/^([^0-9(]{1,48}[12][0-9][0-9][0-9][A-ZÄÖÜ].{10})/", $val[ "description" ], $matches))
-				{
-					echo "=========================>>>" . $matches[ 0 ] . "\n"; 
-				}
-			}
-			*/
-			
-			if (! isset($cd_arr[ $realtitle ])) $cd_arr[ $realtitle ] = 0;
-			$cd_arr[ $realtitle ] += 1;
-			
-			if (! isset($GLOBALS[ "ttoc" ])) $GLOBALS[ "ttoc" ] = array();
-			$GLOBALS[ "ttoc" ][ $realtitle ] = $channel;
 		}
 		
 		file_put_contents($epgfile, gzencode(json_encdat($epgs), 9));
@@ -304,101 +283,6 @@ function collectInfos()
 	uasort($ch_arr, "sortInfos");
 	$ch_file = str_replace("epgdata", "epginfo", "$channelsdir.json");
 	writeInfos($ch_file, $ch_arr);
-}
-
-function checkWiki(&$epg)
-{
-	$okiyear = null;		
-	$badyear = null;		
-	
-	if (($badyear === null) && isset($epg[ "title" ]) && 
-		preg_match("/^[^0-9(]{1,48}([12][0-9][0-9][0-9])/", $epg[ "title" ], $matches))
-	{
-		$badyear = $matches[ 1 ];
-	}
-	
-	if (($okiyear === null) && isset($epg[ "subtitle" ]) && 
-		preg_match("/^[^0-9(]{1,48}([12][0-9][0-9][0-9])/", $epg[ "subtitle" ], $matches))
-	{
-		$okiyear = $matches[ 1 ];
-	}
-	
-	if (($okiyear === null) && isset($epg[ "description" ]) &&
-		preg_match("/^[^0-9(]{1,48}([12][0-9][0-9][0-9])/", $epg[ "description" ], $matches))
-	{
-		$okiyear = $matches[ 1 ];
-	}
-	
-	if ($okiyear === null) 
-	{
-		$okiyear = identifyMovie($epg[ "title" ]);
-	}
-	
-	if (($okiyear == null) || ($badyear != null) ||
-		($okiyear < 1900) || ($okiyear > 2020)) return;
-	
-	if (! isset($GLOBALS[ "wikidone" ])) readWiki();
-	
-	$title = $epg[ "title" ] . " (" . $okiyear . ")";
-	
-	if (! (isset($GLOBALS[ "wikidone" ][ $title ]) 
-	    || isset($GLOBALS[ "wikifail" ][ $title ])))
-	{
-		$url = trim($epg[ "title" ]);
-		$url = trim(str_replace(" ", "_", $url));
-		$url = trim(str_replace("&", "%26", $url));
-		$url = trim(str_replace(" II ", " 2 ", $url . " "));
-		$url = trim(str_replace(" III ", " 3 ", $url . " "));
-		$url = trim(str_replace(" IV ", " 4 ", $url . " "));
-		$url = trim(str_replace(" V ", " 5 ", $url . " "));
-		$url = trim(str_replace(" VI ", " 6 ", $url . " "));
-		
-		$wikiurl = "";
-		
-		if (@file_get_contents("http://de.wikipedia.org/wiki/" . $url))
-		{
-			$wikiurl = $url;
-			
-			$GLOBALS[ "wikidone" ][ $title ] = $wikiurl;
-
-			writeWiki();
-		}
-		else
-		{
-			$GLOBALS[ "wikifail" ][ $title ] = false;
-			
-			writeWiki();
-		}
-		
-		echo "================================> $title => $wikiurl\n";
-		
-		//sleep(1);
-	}
-}
-
-function readWiki()
-{
-	$GLOBALS[ "wikidone" ] = array();
-	$GLOBALS[ "wikifail" ] = array();
-
-	if (file_exists("../include/wikifilm.done.json"))
-	{
-		$GLOBALS[ "wikidone" ] = json_decdat(file_get_contents("../include/wikifilm.done.json"));
-	}
-	
-	if (file_exists("../include/wikifilm.done.json"))
-	{
-		$GLOBALS[ "wikifail" ] = json_decdat(file_get_contents("../include/wikifilm.fail.json"));
-	}
-}
-
-function writeWiki()
-{
-	ksort($GLOBALS[ "wikidone" ]);
-	ksort($GLOBALS[ "wikifail" ]);
-	
-	file_put_contents("../include/wikifilm.done.json", json_encdat($GLOBALS[ "wikidone" ]));
-	file_put_contents("../include/wikifilm.fail.json", json_encdat($GLOBALS[ "wikifail" ]));
 }
 
 collectInfos();
