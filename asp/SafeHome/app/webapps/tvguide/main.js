@@ -374,7 +374,10 @@ tvguide.createEpgProgram = function(channelName, epgdata)
             console.log("--> Moron Start:" + moronDateStart);
             console.log("--> Moron Stop: " + moronDateStop);
 
-            DeMoronize.cleanTime(epg);
+            epg = DeMoronize.cleanTime(epg);
+
+            console.log("--> Clear Start:" + epg.start);
+            console.log("--> Clear Stop: " + epg.stop );
         }
 
         // if (moronDateStop.getSeconds() > 0)

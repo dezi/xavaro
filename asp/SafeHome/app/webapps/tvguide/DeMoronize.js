@@ -59,22 +59,23 @@ DeMoronize.cleanEpg = function(moronedEpg)
     return moronedEpg;
 }
 
+DeMoronize.shiftTime = function(date)
+{
+    var date         = new Date(date);
+    var shift        = 1000 * 60;
+    var seconds      = date.getSeconds() * 1000;
+    var cleanTime    = date.getTime() - seconds;
+    var newDate      = new Date(cleanTime + shift);
+
+    return newDate;
+}
+
 DeMoronize.cleanTime = function(moronedEpg)
 {
     var epg = moronedEpg;
 
-    var startDate = new Date(epg.start);
+    epg.start = DeMoronize.shiftTime(epg.start);
+    epg.stop  = DeMoronize.shiftTime(epg.stop );
 
-    var year  = startDate.getFullYear();
-    var month = startDate.getMonth();
-    var day   = startDate.get();
-
-
-
-
-
-
-
-
-    var stop  = new Date(epg.stop );
+    return epg;
 }
