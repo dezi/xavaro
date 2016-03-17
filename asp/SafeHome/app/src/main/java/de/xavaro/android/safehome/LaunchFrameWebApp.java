@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -15,6 +16,8 @@ import de.xavaro.android.common.WebAppView;
 public class LaunchFrameWebApp extends LaunchFrame
 {
     private static final String LOGTAG = LaunchFrameWebApp.class.getSimpleName();
+
+    private WebAppView webview;
 
     public LaunchFrameWebApp(Context context)
     {
@@ -33,7 +36,7 @@ public class LaunchFrameWebApp extends LaunchFrame
 
     public void setWebAppName(String webappname)
     {
-        WebAppView webview = new WebAppView(getContext());
+        webview = new WebAppView(getContext());
         webview.setBackgroundColor(0xffffffff);
         webview.loadWebView(webappname, "main");
 
@@ -44,5 +47,20 @@ public class LaunchFrameWebApp extends LaunchFrame
     public void onBackKeyExecuted()
     {
         if (parent != null) parent.onBackKeyExecuted();
+    }
+
+    public boolean doBackPressed()
+    {
+        Log.d(LOGTAG, "doBackPressed");
+
+        if (webview.request != null)
+        {
+            webview.request.doBackPressed();
+
+            return false;
+        }
+
+        return true;
+
     }
 }

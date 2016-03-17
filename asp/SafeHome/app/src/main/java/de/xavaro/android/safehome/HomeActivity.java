@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.BackkeyHandler;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.MediaRecorder;
@@ -26,7 +27,8 @@ import de.xavaro.android.common.VideoSurface;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
-        VideoSurface.VideoSurfaceHandler
+        VideoSurface.VideoSurfaceHandler,
+        BackkeyHandler
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
@@ -307,6 +309,21 @@ public class HomeActivity extends AppCompatActivity implements
         }
     }
 
+    public void onPerformBackkeyNow()
+    {
+        handler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Object lastview = backStack.get(backStack.size() - 1);
+
+                topscreen.removeView((FrameLayout) lastview);
+                backStack.remove(backStack.size() - 1);
+            }
+        });
+    }
+
     @Override
     public void onBackPressed()
     {
@@ -317,6 +334,17 @@ public class HomeActivity extends AppCompatActivity implements
         if (backStack.size() > 0)
         {
             Object lastview = backStack.get(backStack.size() - 1);
+
+            if (lastview instanceof LaunchFrameWebApp)
+            {
+                if (((LaunchFrameWebApp) lastview).doBackPressed())
+                {
+                    topscreen.removeView((FrameLayout) lastview);
+                    backStack.remove(backStack.size() - 1);
+                }
+
+                return;
+            }
 
             if (lastview instanceof LaunchFrameWebFrame)
             {

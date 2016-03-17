@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.content.Context;
 import android.webkit.JavascriptInterface;
 import android.util.Log;
 import android.webkit.WebView;
@@ -24,6 +25,35 @@ public class WebAppRequest
         this.webappname = webappname;
         this.webview = webview;
         this.webapploader = webapploader;
+    }
+
+    public void doBackPressed()
+    {
+        final String cbscript = ""
+            + "if (! WebAppRequest.onBackkeyPressed)"
+            + "{"
+            + "    WebAppRequest.onBackkeyPressed = function()"
+            + "    {"
+            + "        WebAppRequest.haveBackkeyPressed(false);"
+            + "    }"
+            + "}"
+            + "WebAppRequest.onBackkeyPressed();";
+
+        webview.evaluateJavascript(cbscript, null);
+    }
+
+    @JavascriptInterface
+    public void haveBackkeyPressed(boolean pressed)
+    {
+        if (! pressed)
+        {
+            Context activity = Simple.getAppContext();
+
+            if (activity instanceof BackkeyHandler)
+            {
+                ((BackkeyHandler) activity).onPerformBackkeyNow();
+            }
+        }
     }
 
     private final ArrayList<String> asyncRequests = new ArrayList<>();
