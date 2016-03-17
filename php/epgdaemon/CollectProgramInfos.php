@@ -113,7 +113,7 @@ function readPrograms($countrydir, $channeldir)
 
 			if (strpos($countrydir,"/tv/") > 0) 
 			{
-				$result = checkWiki($epgs[ "epgdata" ][ $inx ]);
+				$result = generateWiki($epgs[ "epgdata" ][ $inx ]);
  				if ($result != null) echo "$result\n";
 			}
 

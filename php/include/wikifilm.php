@@ -59,7 +59,20 @@ function stripWikiSearch($title)
 	return $title;
 }
 
-function checkWiki(&$epg)
+function getWikiFilm(&$epg)
+{
+	$title = getWikiName($epg);
+	if ($title == null) return null;
+	
+	if (! isset($GLOBALS[ "wikifilm" ])) readWiki();
+
+	if (isset($GLOBALS[ "wikifilm" ][ $title ]))
+	{
+		$epg[ "wikifilm" ] = $GLOBALS[ "wikifilm" ][ $title ];
+	}
+}
+
+function generateWiki(&$epg)
 {
 	$title = getWikiName($epg);
 	if ($title == null) return null;

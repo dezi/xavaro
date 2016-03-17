@@ -38,7 +38,7 @@ if (($method == "PUT") && isset($_SERVER[ 'HTTP_UPLOAD_FILE' ]))
 		$epgdata = json_decdat($epgjson);
 		
 		addProgramInfos($ipath, $epgdata);
-		
+
 		$epgjson = json_encdat($epgdata);
 		$gzencoded = gzencode($epgjson, 9);
 
@@ -156,6 +156,8 @@ function addProgramInfos($pgminfodir, &$epgs)
 				$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
 			}
 		}
+		
+		getWikiFilm($epgs[ "epgdata" ][ $inx ]);
 	}
 }
 
