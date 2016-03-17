@@ -29,7 +29,6 @@ public class MediaRecorder
     public static void handleEvent(JSONArray events)
     {
         Log.d(LOGTAG, "handleEvent:" + events.length());
-        Log.d(LOGTAG, "handleEvent:" + Json.toPretty(events));
 
         for (int inx = 0; inx < events.length(); inx++)
         {
@@ -266,7 +265,7 @@ public class MediaRecorder
                 // required to make the recording complete.
                 //
 
-                long startsecs = (Simple.getTimeStamp(starttime) / 1000) - (3 * 60);
+                long startsecs = Simple.getTimeStamp(starttime) / 1000;
                 long nowsecs = Simple.nowAsTimeStamp() / 1000;
                 float secondslost = nowsecs - startsecs;
 
