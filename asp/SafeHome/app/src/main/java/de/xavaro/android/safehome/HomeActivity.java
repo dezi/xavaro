@@ -177,8 +177,6 @@ public class HomeActivity extends AppCompatActivity implements
 
             handler.postDelayed(runner, 100);
         }
-
-        MediaRecorder.testDat();
     }
 
     @Override

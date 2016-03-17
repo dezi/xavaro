@@ -26,24 +26,10 @@ public class MediaRecorder
     private static final String eventgroupkey = "media.recorder";
     private static Thread recorder;
 
-    public static void testDat()
-    {
-        JSONArray events = new JSONArray();
-        JSONObject event = new JSONObject();
-        events.put(event);
-
-        Json.put(event, "date", "2016-03-12T16:30:00Z");
-        Json.put(event, "dateend", "2016-03-12T18:30:00Z");
-        Json.put(event, "channel", "Das Erste HD");
-        Json.put(event, "country", "de");
-        Json.put(event, "type", "tv");
-
-        //handleEvent(events);
-    }
-
     public static void handleEvent(JSONArray events)
     {
         Log.d(LOGTAG, "handleEvent:" + events.length());
+        Log.d(LOGTAG, "handleEvent:" + Json.toPretty(events));
 
         for (int inx = 0; inx < events.length(); inx++)
         {
@@ -123,7 +109,7 @@ public class MediaRecorder
                     recording = recordingsList.remove(0);
                 }
 
-                String stoptime = Json.getString(recording, "stop");
+                String stoptime = Json.getString(recording, "datestop");
 
                 if ((stoptime != null) && (stopnow.compareTo(stoptime) > 0))
                 {
@@ -160,7 +146,7 @@ public class MediaRecorder
         String country = Json.getString(recording, "country");
         String type = Json.getString(recording, "type");
 
-        if ((channel == null) || (starttime == null) || (country == null) || (type == null))
+        if ((starttime == null) || (channel == null) || (country == null) || (type == null))
         {
             //
             // Should not happen, only satisfy compiler.
@@ -394,7 +380,7 @@ public class MediaRecorder
         String country = Json.getString(recording, "country");
         String channel = Json.getString(recording, "channel");
         String starttime = Json.getString(recording, "date");
-        String stoptime = Json.getString(recording, "dateend");
+        String stoptime = Json.getString(recording, "datestop");
 
         if ((type == null) || (country == null) || (channel == null)
                 || (starttime == null) || (stoptime == null))

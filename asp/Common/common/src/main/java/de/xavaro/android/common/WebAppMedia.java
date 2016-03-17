@@ -24,6 +24,12 @@ public class WebAppMedia
     }
 
     @JavascriptInterface
+    public void closePlayer()
+    {
+        VideoProxy.getInstance().playerReset();
+    }
+
+    @JavascriptInterface
     public String getRecordings()
     {
         return EventManager.getComingEvents(keyprefix).toString();
