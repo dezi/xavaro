@@ -59,7 +59,22 @@ DeMoronize.cleanEpg = function(moronedEpg)
     return moronedEpg;
 }
 
-// DeMoronize.cleanTime(moronedEpg)
-// {
-//
-// }
+DeMoronize.cleanTime = function(moronedEpg)
+{
+    var epg = moronedEpg;
+
+    var startDate = new Date(epg.start);
+
+    var year  = startDate.getFullYear();
+    var month = startDate.getMonth();
+    var day   = startDate.get();
+
+
+
+
+
+
+
+
+    var stop  = new Date(epg.stop );
+}

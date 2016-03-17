@@ -353,7 +353,7 @@ tvguide.createEpgProgram = function(channelName, epgdata)
     var channel = tvguide.senderList[ channelName ]
     var senderIndex = channel.index;
 
-    var minPix = tvguide.constants.hoursPix / 60;
+    var minPix    = tvguide.constants.minPix;
     var timeShift = tvguide.constants.timeShift;
 
     for (var programIndex in epgdata)
@@ -364,6 +364,23 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         epg.channel = channel.channel;
         epg.iptv    = channel.iptv;
         epg.isbd    = channel.isbd;
+
+        var moronDateStart = new Date(epg.start);
+        var moronDateStop  = new Date(epg.stop );
+
+        if (moronDateStart.getSeconds() > 0 && moronDateStop.getSeconds() > 0)
+        {
+            console.log("--> Channel:" + epg.channel + " Title:" + epg.title);
+            console.log("--> Moron Start:" + moronDateStart);
+            console.log("--> Moron Stop: " + moronDateStop);
+
+            DeMoronize.cleanTime(epg);
+        }
+
+        // if (moronDateStop.getSeconds() > 0)
+        // {
+        //     console.log("--> Moron Stop: " + moronDateStop + " Channel:" + epg.channel + " Title:" + epg.title);
+        // }
 
         var startDate = new Date(epg.start).getTime() / 1000 / 60;
         var stopDate  = new Date(epg.stop ).getTime() / 1000 / 60;
@@ -449,16 +466,18 @@ tvguide.createEpgBodyScroll = function()
         "epgScroll",
         tvguide.epgbody);
 
-    tvguide.epgScroll.style.color      = tvguide.constants.epgScrollStyleColor;
-    tvguide.epgScroll.style.fontWeight = tvguide.constants.epgScrollfontWeight;
+    var epgScroll = tvguide.epgScroll;
 
-    tvguide.epgScroll.scrollHorizontal = true;
-    tvguide.epgScroll.scrollVertical   = true;
+    epgScroll.style.color      = tvguide.constants.epgScrollStyleColor;
+    epgScroll.style.fontWeight = tvguide.constants.epgScrollfontWeight;
 
-    tvguide.epgScroll.onTouchScroll    = tvguide.onEPGTouchScroll;
-    tvguide.epgScroll.onTouchClick     = tvguide.onEPGTouchClick;
+    epgScroll.scrollHorizontal = true;
+    epgScroll.scrollVertical   = true;
 
-    WebLibSimple.setBGColor(tvguide.epgScroll, tvguide.constants.epgScrollColor);
+    epgScroll.onTouchScroll    = tvguide.onEPGTouchScroll;
+    epgScroll.onTouchClick     = tvguide.onEPGTouchClick;
+
+    WebLibSimple.setBGColor(epgScroll, tvguide.constants.epgScrollColor);
 
     tvguide.getEpgData();
 }
