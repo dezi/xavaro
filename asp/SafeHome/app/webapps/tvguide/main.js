@@ -5,7 +5,7 @@ tvguide.constants =
     timelineInterval         : 15,
 
     recordPreload            : 1,
-    recordPostload           : 1,
+    recordPostload           : 2,
 
     today                    : WebLibSimple.getTodayDate().getTime() / 1000 / 60,
 
@@ -293,12 +293,9 @@ tvguide.createSenderBar = function()
 tvguide.createTimeLine = function()
 {
     var timelineInterval = tvguide.constants.timelineInterval;
-    var hoursPix = tvguide.constants.hoursPix;
-    var minPix = hoursPix / 60;
-
-    var loadDaysPast = tvguide.constants.loadDaysPast;
-    var loadDaysFuture = tvguide.constants.loadDaysFuture;
-    var loadHours = (loadDaysPast + loadDaysFuture) * 24;
+    var hoursPix         = tvguide.constants.hoursPix;
+    var minPix           = tvguide.constants.minPix;
+    var loadHours        = tvguide.constants.loadHours;
 
     var timelineWidth = loadHours * hoursPix;
 
@@ -311,11 +308,13 @@ tvguide.createTimeLine = function()
         tvguide.timeline
     );
 
-    tvguide.timelineScroll.style.color      = tvguide.constants.timelineScrollStyleColor;
-    tvguide.timelineScroll.style.fontWeight = tvguide.constants.timelineScrollfontWeight;
+    var timelineScroll = tvguide.timelineScroll;
 
-    tvguide.timelineScroll.scrollHorizontal = true;
-    tvguide.timelineScroll.onTouchScroll    = tvguide.onTimeLineScroll;
+    timelineScroll.style.color      = tvguide.constants.timelineScrollStyleColor;
+    timelineScroll.style.fontWeight = tvguide.constants.timelineScrollfontWeight;
+
+    timelineScroll.scrollHorizontal = true;
+    timelineScroll.onTouchScroll    = tvguide.onTimeLineScroll;
 
     for(var min = 0; min < (loadHours * 60); min += timelineInterval)
     {
@@ -325,16 +324,14 @@ tvguide.createTimeLine = function()
             minPix * timelineInterval,
             0,
             null,
-            tvguide.timelineScroll
-        );
+            timelineScroll);
 
         WebLibSimple.setBGColor(timelineDiv, tvguide.constants.timelineDivColor);
 
         if (min % (timelineInterval * 2))
         {
-            var timeSpan = WebLibSimple.createAnyAppend("span", timelineDiv);
-            timeSpan.style.border = "1px dotted #e00073";
-
+            var div = WebLibSimple.createDivWidth(0, 0, 2, 0, null, timelineDiv);
+            div.style.backgroundColor = "#e00073";
         }
         else
         {
@@ -350,8 +347,6 @@ tvguide.createTimeLine = function()
 
 tvguide.createEpgProgram = function(channelName, epgdata)
 {
-    var isbd = tvguide.senderList[ channelName ].isbd;
-
 //    console.log("--> channel:" + channelName + " isbd:" + isbd);
 //    console.log("--> epgdata:" + JSON.stringify(epgdata));
 
@@ -394,9 +389,10 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         paddingDiv.style.borderRadius = "8px";
         paddingDiv.style.border       = tvguide.constants.programBoder;
 
-        if (isbd)
+        if (channel.iptv)
         {
-            WebLibSimple.setBGColor(paddingDiv, "#ff8e6c");
+            // #a0a0a0 rgb(159, 159, 159)
+            WebLibSimple.setBGColor(paddingDiv, "#8b8888");
         }
         else
         {
@@ -574,6 +570,20 @@ tvguide.onEPGTouchScroll = function(newX, newY)
     if (newY !== null)
     {
         tvguide.onSenderBarScroll(null, newY);
+    }
+}
+
+WebAppRequest.onBackkeyPressed = function()
+{
+    if (tvguide.description)
+    {
+        WebAppRequest.haveBackkeyPressed(true);
+
+        tvguide.checkInfoStatus();
+    }
+    else
+    {
+        WebAppRequest.haveBackkeyPressed(false);
     }
 }
 

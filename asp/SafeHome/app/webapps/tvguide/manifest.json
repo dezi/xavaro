@@ -22,7 +22,8 @@
     ],
 
     "preload": [
-      "Description.js"
+      "Description.js",
+      "DeMoronize.js"
     ],
 
     "files": [
