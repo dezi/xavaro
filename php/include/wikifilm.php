@@ -44,11 +44,18 @@ function getWikiName(&$epg)
 	if (($okiyear == null) || ($badyear != null) ||
 		($okiyear < 1900) || ($okiyear > 2020)) return null;
 	
-	$title = trim(preg_replace("/\\([^)]*\\)/", "", $epg[ "title" ]));
-	$title = str_replace("  ", " ", $epg[ "title" ]);
-	$title = str_replace("  ", " ", $epg[ "title" ]);
+	$title = stripWikiSearch($epg[ "title" ]);
 	$title = $title . " (" . $okiyear . ")";
 	
+	return $title;
+}
+
+function stripWikiSearch($title)
+{
+	$title = trim(preg_replace("/\([^)]*\)/", "", $title));
+	$title = trim(str_replace("  ", " ", $title));
+	$title = trim(str_replace("  ", " ", $title));
+
 	return $title;
 }
 
@@ -62,16 +69,16 @@ function checkWiki(&$epg)
 	if (isset($GLOBALS[ "wikidone" ][ $title ]))
 	{
 		$epg[ "wikifilm" ] = $GLOBALS[ "wikidone" ][ $title ];
-		return "OLD====> $title => " . $epg[ "wikifilm" ];
+		return null; //"OLD====> $title => " . $epg[ "wikifilm" ];
 	}
 	
 	if (! (isset($GLOBALS[ "wikidone" ][ $title ]) 
 	    || isset($GLOBALS[ "wikifail" ][ $title ])))
 	{
-		$url = trim($epg[ "title" ]);
+		$url = stripWikiSearch($epg[ "title" ]);
 		$url = trim(str_replace(" ", "_", $url));
 		$url = trim(str_replace("&", "%26", $url));
-		
+
 		$wikiurl = null;
 		
 		if ($wikiurl == null)
@@ -84,7 +91,7 @@ function checkWiki(&$epg)
 		
 		if ($wikiurl == null)
 		{
-			$url2 = trim($epg[ "title" ]);
+			$url2 = stripWikiSearch($epg[ "title" ]);
 			$url2 = trim(str_replace(" II ",  " 2 ", $url2 . " "));
 			$url2 = trim(str_replace(" III ", " 3 ", $url2 . " "));
 			$url2 = trim(str_replace(" IV ",  " 4 ", $url2 . " "));
@@ -101,7 +108,7 @@ function checkWiki(&$epg)
 		
 		if ($wikiurl == null)
 		{
-			$url2 = trim($epg[ "title" ]);
+			$url2 = stripWikiSearch($epg[ "title" ]);
 			$url2 = trim(str_replace(" 2 ", " II ",  $url2 . " "));
 			$url2 = trim(str_replace(" 3 ", " III ", $url2 . " "));
 			$url2 = trim(str_replace(" 4 ", " IV ",  $url2 . " "));
