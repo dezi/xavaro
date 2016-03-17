@@ -10,6 +10,7 @@ WebLibLaunch.createFrame = function()
 
     wl.bgcol = "#ffffffee";
     wl.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
+    WebLibSimple.setBGColor(wl.topDiv, wl.bgcol);
 
     wl.horzSize = WebAppUtility.getLaunchItemSize();
     wl.vertSize = WebAppUtility.getLaunchItemSize();
