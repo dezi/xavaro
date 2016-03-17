@@ -5,6 +5,8 @@
 //
 
 include("../include/json.php");
+include("../include/wikifilm.php");
+include("../moviefinder/moviefinder.php");
 
 header("Content-Type: text/plain");
 

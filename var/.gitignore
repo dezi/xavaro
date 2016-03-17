@@ -4,3 +4,4 @@ epginfo
 pgminfo
 shares
 *.json.gz
+epginfo.json
