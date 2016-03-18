@@ -173,32 +173,42 @@ tvguide.createInfoBox = function(description)
     WebLibSimple.setFontSpecs(container, 20, "normal", "#000000");
 }
 
+tvguide.nukeWiki = function()
+{
+    // tvguide.description = null;
+
+    tvguide.wikiFrame = null;
+}
+
 tvguide.openWiki = function()
 {
     var wikifilm = tvguide.description.epg.wikifilm;
     console.log("--> wiki:" + wikifilm);
 
-    tvguide.dimmerDiv = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.topdiv);
+    tvguide.wikiFrame = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.topdiv);
 
-    var dimmerDiv = tvguide.dimmerDiv;
+    var dimmerDiv = tvguide.wikiFrame;
     dimmerDiv.style.zIndex = "100";
     WebLibSimple.setBGColor(dimmerDiv, "#66000000");
+
+    //
+    // wikiFrame
+    //
+
+    var border = 80;
+    var wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
+
+    WebLibSimple.setBGColor(wikiFrame, "#000000");
 
     //
     // iframe
     //
 
-    var border = 80;
-    tvguide.wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
-
-    var wikiFrame = tvguide.wikiFrame;
-    WebLibSimple.setBGColor(wikiFrame, "#000000");
-
     var iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", wikiFrame);
     iframe.style.border = "0px solid black";
     iframe.style.display = "none";
 
-    iframe.src = "http://de.wikipedia.org/wiki/" + wikifilm;
+    iframe.src = "https://de.wikipedia.org/wiki/" + wikifilm;
 }
 
 tvguide.createWiki = function(wikifilm)

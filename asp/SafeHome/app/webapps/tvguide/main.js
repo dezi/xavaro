@@ -592,10 +592,14 @@ tvguide.onEPGTouchScroll = function(newX, newY)
 
 WebAppRequest.onBackkeyPressed = function()
 {
-    // tvguide.dimmerDiv
     if (tvguide.description)
     {
         WebAppRequest.haveBackkeyPressed(true);
+
+        if (tvguide.wikiFrame)
+        {
+            tvguide.nukeWiki();
+        }
 
         tvguide.checkInfoStatus();
     }
