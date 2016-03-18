@@ -18,23 +18,27 @@ tvguide.constants =
     timelineHeight           : 30,
     hoursPix                 : 360,
 
-    titleColor      : "#ffffff",
-    titleSize       : 34,
-    titleFontWeight : "bold",
+    titleColor               : "#ffffff",
+    titleSize                : 34,
+    titleFontWeight          : "bold",
 
     titlebarColor            : "#888888",
     content1Color            : "#dedede",
     content2Color            : "#acacac",
     senderImgDivColor        : "#ffffff",
     senderbarColor           : "#dedede",
+
     epgdataColor             : "#dedede",
     epgScrollColor           : "#ffffff",
     epgScrollStyleColor      : "#ffffff",
     epgScrollfontWeight      : "bold",
+
     timelineColor            : "#dedede",
     timelineDivColor         : "#ffffff",
     timelineScrollStyleColor : "#000000",
     timelineScrollfontWeight : "bold",
+    timelineScrollTextSize   : 15,
+
     programBGColor           : "#a0a0a0",
     descriptionColor         : "#ffffff",
     pastLineColor            : "#33ff0000",
@@ -311,8 +315,11 @@ tvguide.createTimeLine = function()
 
     var timelineScroll = tvguide.timelineScroll;
 
-    timelineScroll.style.color      = tvguide.constants.timelineScrollStyleColor;
-    timelineScroll.style.fontWeight = tvguide.constants.timelineScrollfontWeight;
+    WebLibSimple.setFontSpecs(
+        timelineScroll,
+        tvguide.constants.timelineScrollTextSize,
+        tvguide.constants.timelineScrollfontWeight,
+        tvguide.constants.timelineScrollStyleColor);
 
     timelineScroll.scrollHorizontal = true;
     timelineScroll.onTouchScroll    = tvguide.onTimeLineScroll;
@@ -416,7 +423,15 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         }
 
         paddingDiv.epg = epg;
-        paddingDiv.innerHTML = paddingDiv.epg.title;
+
+        if (paddingDiv.epg.title2)
+        {
+            paddingDiv.innerHTML = paddingDiv.epg.title + ", " + paddingDiv.epg.title2;
+        }
+        else
+        {
+            paddingDiv.innerHTML = paddingDiv.epg.title;
+        }
     }
 }
 
@@ -485,11 +500,13 @@ WebAppRequest.onLoadAsyncJSON = function(src, data)
     var channel = WebLibSimple.substring(
         decodeURI(src),
         tvguide.constants.epgDataSrcPrefix.length,
-        -(tvguide.constants.epgDataSrcPostfix.length + 11));
+      -(tvguide.constants.epgDataSrcPostfix.length + 11));
 
     data = data[ "epgdata" ];
 
-    // DeMoronize.cleanShortShows(data);
+    console.log("--> Channel:" + channel);
+
+    DeMoronize.cleanShortShows(data);
 
     tvguide.createEpgProgram(channel, data);
 }
@@ -600,8 +617,10 @@ WebAppRequest.onBackkeyPressed = function()
         {
             tvguide.nukeWiki();
         }
-
-        tvguide.checkInfoStatus();
+        else
+        {
+            tvguide.checkInfoStatus();
+        }
     }
     else
     {

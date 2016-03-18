@@ -6,7 +6,7 @@ DeMoronize.cleanEpg = function(moronedEpg)
 
     var demoronized = moronedEpg.description;
 
-    console.log("++> " + demoronized);
+    // console.log("++> " + demoronized);
 
     var regex = new RegExp("(.*?[12][0-9][0-9][0-9])([A-ZÉÄÜÖ])", "g");
 
@@ -55,7 +55,7 @@ DeMoronize.cleanEpg = function(moronedEpg)
     moronedEpg.description = "DeMoronize:<br /><br />" + demoronized;
     moronedEpg.isbd = false;
 
-    console.log("--> " + demoronized);
+    // console.log("--> " + demoronized);
     return moronedEpg;
 }
 
@@ -94,14 +94,33 @@ DeMoronize.cleanShortShows = function(data)
 {
     if (! data) return;
 
+    var lastBroadcast = null;
+
     for (var broadcast in data)
     {
         var src = data[ broadcast ];
+
+        if (lastBroadcast && lastBroadcast.stop != src.start)
+        {
+            // console.log("--> ugly: " + lastBroadcast.title + " - " + src.title);
+            // console.log("--> start/stop: " + lastBroadcast.stop + " - " + src.start);
+            src.start = lastBroadcast.stop;
+        }
+
         var duration = DeMoronize.getDuration(src);
 
-        if (duration <= 3)
+        if (duration <= 4 && lastBroadcast)
         {
-            console.log("--> duration:" + duration + " - " + JSON.stringify(src));
+            // console.log("--> duration:" + duration + " - " + JSON.stringify(src));
+            lastBroadcast.title2       = src.title;
+            lastBroadcast.subtitle2    = src.subtitle;
+            lastBroadcast.description2 = src.description;
+            lastBroadcast.description  = lastBroadcast.description + " @" + src.title;
+            lastBroadcast.stop         = src.stop;
+
+            data.splice(data.indexOf(src), 1);
         }
+
+        lastBroadcast = src;
     }
 }

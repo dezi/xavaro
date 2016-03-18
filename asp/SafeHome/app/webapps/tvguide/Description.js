@@ -175,8 +175,7 @@ tvguide.createInfoBox = function(description)
 
 tvguide.nukeWiki = function()
 {
-    // tvguide.description = null;
-
+    tvguide.wikiFrame.style.display = "none";
     tvguide.wikiFrame = null;
 }
 
@@ -189,13 +188,15 @@ tvguide.openWiki = function()
 
     var dimmerDiv = tvguide.wikiFrame;
     dimmerDiv.style.zIndex = "100";
+    dimmerDiv.onTouchClick = tvguide.nukeWiki;
+
     WebLibSimple.setBGColor(dimmerDiv, "#66000000");
 
     //
     // wikiFrame
     //
 
-    var border = 80;
+    var border = 50;
     var wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
 
     WebLibSimple.setBGColor(wikiFrame, "#000000");
@@ -207,14 +208,14 @@ tvguide.openWiki = function()
     var iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", wikiFrame);
     iframe.style.border = "0px solid black";
 
-    iframe.src = "https://de.wikipedia.org/wiki/" + wikifilm;
+    iframe.src = "https://de.m.wikipedia.org/wiki/" + wikifilm;
 }
 
 tvguide.createWiki = function(wikifilm)
 {
     if (! wikifilm) return;
 
-    tvguide.createButton("Wikipedia", "#d1d1d1", tvguide.openWiki);
+    tvguide.createButton("Wikipedia", "#d1d1d1", tvguide.openWiki, false);
 }
 
 tvguide.createDescriptionSetup = function()
@@ -283,13 +284,20 @@ tvguide.removeRecording = function()
     tvguide.createButtons();
 }
 
-tvguide.createButton = function(name, color, eventHandler)
+tvguide.createButton = function(name, color, eventHandler, global)
 {
     // tvguide.description
 
-    tvguide.description.buttonContainer = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+    if (global)
+    {
+        tvguide.description.buttonContainer = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+        var container = tvguide.description.buttonContainer;
+    }
+    else
+    {
+        var container = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+    }
 
-    var container = tvguide.description.buttonContainer;
     container.style.marginTop = tvguide.descriptionConstants.boxPaddingTop;
 
     var button = WebLibSimple.createAnyAppend("div", container);;
@@ -312,7 +320,7 @@ tvguide.createRecButton = function(epg)
     {
         tvguide.createButton(tvguide.descriptionConstants.recordingButtonTitle,
             tvguide.descriptionConstants.recordingButtonColor,
-            tvguide.addRecord);
+            tvguide.addRecord, true);
     }
 }
 
@@ -333,7 +341,7 @@ tvguide.createPlayButton = function(epg)
         //
         //     tvguide.createButton(tvguide.descriptionConstants.playButtonTitle,
         //         tvguide.descriptionConstants.playButtonColor,
-        //         tvguide.play);
+        //         tvguide.play, true);
         //
         //     return true;
         // }
@@ -347,7 +355,7 @@ tvguide.createPlayButton = function(epg)
 
             tvguide.createButton(tvguide.descriptionConstants.playButtonTitle,
                 tvguide.descriptionConstants.playButtonColor,
-                tvguide.play);
+                tvguide.play, true);
 
             return true;
         }
@@ -372,7 +380,7 @@ tvguide.createPlannedButton = function(epg)
 
             tvguide.createButton(tvguide.descriptionConstants.plannedButtonTilte,
                 tvguide.descriptionConstants.plannedButtonColor,
-                tvguide.removeRecording);
+                tvguide.removeRecording, true);
 
             return true;
         }
