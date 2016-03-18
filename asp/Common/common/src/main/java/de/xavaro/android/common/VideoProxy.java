@@ -305,8 +305,13 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             mediaPrepared = false;
         }
 
+        if (calling != null) calling.onPlaybackFinished();
         if (playing != null) playing.onPlaybackFinished();
+
         if (isVideo()) VideoSurface.getInstance().onPlaybackFinished();
+
+        calling = null;
+        playing = null;
     }
 
     public void setCurrentQuality(int quality)
@@ -316,7 +321,24 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
     public int getCurrentQuality()
     {
-        return (streamOptions == null) ? 0 : streamOptions.get(currentOption).quality;
+        try
+        {
+            if ((streamOptions == null) || (currentOption < 0)
+                    || (currentOption >= streamOptions.size()))
+            {
+                return 0;
+            }
+
+            return streamOptions.get(currentOption).quality;
+        }
+        catch (Exception ignore)
+        {
+            //
+            // Race condition on reload.
+            //
+        }
+
+        return 0;
     }
 
     public int getAvailableQualities()
@@ -355,7 +377,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 Log.d(LOGTAG, "Accepted connection on port " + proxyPort);
 
-                ProxyPlayerWorker worker = new ProxyPlayerWorker(connect);
+                VideoProxyWorker worker = new VideoProxyWorker(connect);
 
                 worker.start();
             }
@@ -493,7 +515,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
     //endregion
 
-    //region ProxyPlayerWorker class.
+    //region VideoProxyWorker class.
 
     //
     // Service variables from outer instance. Used
@@ -515,9 +537,9 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
     //
     // Thread startet on each individual connection.
     //
-    private class ProxyPlayerWorker extends Thread
+    private class VideoProxyWorker extends Thread
     {
-        private final String LOGTAG = ProxyPlayerWorker.class.getSimpleName();
+        private final String LOGTAG = VideoProxyWorker.class.getSimpleName();
 
         //
         // Fake content length > 24h for broadcasts.
@@ -559,7 +581,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         private String lastFragment;
         private String nextFragment;
 
-        public ProxyPlayerWorker(Socket connect) throws IOException
+        public VideoProxyWorker(Socket connect) throws IOException
         {
             requestInput = connect.getInputStream();
             requestOutput = connect.getOutputStream();
@@ -623,7 +645,13 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 // Try to read in stream configuration.
                 //
 
-                if (readMaster())
+                if (! readMaster())
+                {
+                    Log.d(LOGTAG, "=============================== nix drin....");
+
+                    playerReset();
+                }
+                else
                 {
                     boolean first = true;
 
@@ -745,8 +773,9 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                ex.printStackTrace();
                 Log.d(LOGTAG, "workOnVideo =========> " + ex.getMessage());
             }
 
@@ -868,51 +897,67 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         }
 
         @Nullable
-        private String readContent(String url) throws Exception
+        private String readContent(String url)
         {
-            openUnderscoreConnection(url);
-
-            InputStream input = connection.getInputStream();
-            StringBuilder string = new StringBuilder();
-            byte[] buffer = new byte[ 4096 ];
-            int xfer;
-
-            while ((xfer = input.read(buffer)) >= 0)
+            try
             {
-                string.append(new String(buffer, 0, xfer));
+                openUnderscoreConnection(url);
+
+                InputStream input = connection.getInputStream();
+                StringBuilder string = new StringBuilder();
+                byte[] buffer = new byte[ 4096 ];
+                int xfer;
+
+                while ((xfer = input.read(buffer)) >= 0)
+                {
+                    string.append(new String(buffer, 0, xfer));
+                }
+
+                input.close();
+
+                return string.toString();
+            }
+            catch (Exception ignore)
+            {
             }
 
-            input.close();
-
-            return string.toString();
+            return null;
         }
 
         @Nullable
-        private String[] readLines(String url) throws Exception
+        private String[] readLines(String url)
         {
-            openUnderscoreConnection(url);
-
-            InputStream input = connection.getInputStream();
-            StringBuilder string = new StringBuilder();
-            byte[] buffer = new byte[ 4096 ];
-            int xfer;
-
-            while (true)
+            try
             {
-                xfer = input.read(buffer);
-                if (xfer < 0) break;
-                string.append(new String(buffer, 0, xfer));
+                openUnderscoreConnection(url);
+
+                InputStream input = connection.getInputStream();
+                StringBuilder string = new StringBuilder();
+                byte[] buffer = new byte[ 4096 ];
+                int xfer;
+
+                while (true)
+                {
+                    xfer = input.read(buffer);
+                    if (xfer < 0) break;
+                    string.append(new String(buffer, 0, xfer));
+                }
+
+                input.close();
+
+                String temp = string.toString();
+
+                temp = temp.replace("\r\n", "\n");
+                temp = temp.replace("\n\n", "\n");
+                temp = temp.replace("\r", "\n");
+
+                return temp.split("\n");
+            }
+            catch (Exception ignore)
+            {
             }
 
-            input.close();
-
-            String temp = string.toString();
-
-            temp = temp.replace("\r\n", "\n");
-            temp = temp.replace("\n\n", "\n");
-            temp = temp.replace("\r", "\n");
-
-            return temp.split("\n");
+            return null;
         }
 
         private String resolveRelativeUrl(String baseurl, String streamurl)
@@ -942,9 +987,10 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             return streamurl;
         }
 
-        private boolean readWebpage() throws Exception
+        private boolean readWebpage()
         {
             String lines = readContent(requestUrl);
+            if (lines == null) return false;
 
             //
             // type:'html5', config: { file:'http://lstv3.hls1.stream-server.org/live/orf1@sd/index.m3u8' }
@@ -953,26 +999,31 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             String stream = Simple.getMatch("type:'html5'.*?file:'([^']*)'", lines);
             Log.d(LOGTAG,"=========================================>stream=" + stream);
 
-            if (stream != null) requestUrl = stream;
+            if (stream != null)
+            {
+                if ((desiredUrl != null) && desiredUrl.equals(requestUrl)) desiredUrl = stream;
+
+                requestUrl = stream;
+            }
 
             return (stream != null);
         }
 
-        private boolean readMaster() throws Exception
+        private boolean readMaster()
         {
             Log.d(LOGTAG,"readMaster: " + requestUrl);
 
-            if (requestUrl.endsWith(".html"))
-            {
-                if (! readWebpage()) return false;
-            }
+            if (requestUrl.endsWith(".html") && ! readWebpage()) return false;
 
+            currentOption = -1;
             streamOptions = new ArrayList<>();
 
             String[] lines = readLines(requestUrl);
             if (lines == null) return false;
 
             Log.d(LOGTAG, "readMaster: " + lines.length);
+
+            boolean havewidhei = false;
 
             for (int inx = 0; (inx + 1) < lines.length; inx++)
             {
@@ -987,6 +1038,17 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 if ((bandwith == null) || (streamurl == null))
                 {
+                    continue;
+                }
+
+                if (havewidhei && ((width == null) || (height == null)))
+                {
+                    //
+                    // Master has at least one stream with width and height
+                    // specification. Do not accept streams w/o this because
+                    // they are audio versions.
+                    //
+
                     continue;
                 }
 
@@ -1012,6 +1074,8 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 so.quality = VideoQuality.deriveQuality(so.height);
 
                 streamOptions.add(so);
+
+                havewidhei = havewidhei || ((width != null) && (height != null));
 
                 Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
             }
@@ -1059,6 +1123,18 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             return true;
         }
 
+        private boolean equalsFragment(String last, String line)
+        {
+            //
+            // Some stream providers put random numbers
+            // into playlist url. So only compare the last
+            // path element.
+            //
+
+            int pos = last.lastIndexOf("/") + 1;
+            return line.endsWith(last.substring(pos));
+        }
+
         private void readFragments() throws Exception
         {
             //
@@ -1072,39 +1148,61 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
             String url = streamOptions.get(currentOption).streamUrl;
 
+            Log.d(LOGTAG, "readFragments: " + url);
+
+            String[] lines = readLines(url);
+            if (lines == null) return;
+
+            Log.d(LOGTAG, "readFragments: " + url + "=" + lines.length);
+            Log.d(LOGTAG, "readFragments: last=" + lastFragment);
+
             ArrayList<String> frags = new ArrayList<>();
             Boolean next = false;
 
-            String[] lines = readLines(url);
-
-            if (lines != null)
+            for (String line : lines)
             {
-                for (String line : lines)
+                if (line.startsWith("#")) continue;
+
+                line = resolveRelativeUrl(url, line);
+
+                frags.add(line);
+
+                if (next)
                 {
-                    if (line.startsWith("#")) continue;
+                    nextFragment = line;
 
-                    line = resolveRelativeUrl(url, line);
+                    Log.d(LOGTAG, "readFragments: next=" + nextFragment);
 
-                    frags.add(line);
-
-                    if (next)
-                    {
-                        nextFragment = line;
-
-                        return;
-                    }
-
-                    next = ((lastFragment != null) && lastFragment.equals(line));
+                    return;
                 }
+
+                next = ((lastFragment != null) && equalsFragment(lastFragment, line));
+            }
+
+            if (next)
+            {
+                //
+                // Playlist is at end. Simply do nothing and wait.
+                //
+
+                return;
+            }
+
+            if (frags.size() == 0)
+            {
+                //
+                // Playlist is empty.
+                //
+
+                return;
             }
 
             //
-            // We go back at most 5 fragments for buffering.
+            // We go back at most 10 fragments for buffering.
             //
 
-            while (frags.size() > 5) frags.remove(0);
-
-            nextFragment = ((lastFragment == null) && (frags.size() > 0)) ? frags.get(0) : null;
+            while (frags.size() > 10) frags.remove(0);
+            nextFragment = frags.get(0);
 
             if (desiredNextFragment == null) desiredNextFragment = nextFragment;
         }

@@ -278,7 +278,7 @@ public class MediaRecorder
 
             for (int loadinx = startindex; loadinx < chunks.size(); loadinx++)
             {
-                if (!appendIPTVStream(recordstatus, mediafile, chunks.get(loadinx)))
+                if (! appendIPTVStream(recordstatus, mediafile, chunks.get(loadinx)))
                 {
                     return false;
                 }

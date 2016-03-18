@@ -69,14 +69,14 @@
         "label": "3sat",
         "default": true,
         "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2306126/timg644x363blob/12550745",
-        "videourl": "http://zdf0910-lh.akamaihd.net/i/dach10_v1@392872/master.m3u8?dw=0",
+        "videourl": "http://zdf0910-lh.akamaihd.net/i/dach10_v1@392872/master.m3u8",
         "aliase": [ "tv/de/3sat", "tv/de/3sat HD" ]
       },
       {
         "label": "phoenix",
         "default": true,
         "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2492878/timg644x363blob/12166545",
-        "videourl": "http://zdf-hds-de-f.zdf.de/i/de09_v1@87012/master.m3u8?dw=0",
+        "videourl": "http://zdf-hds-de-f.zdf.de/i/de09_v1@87012/master.m3u8",
         "aliase": [ "tv/de/Phoenix", "tv/de/Phoenix HD" ]
       }
     ]
