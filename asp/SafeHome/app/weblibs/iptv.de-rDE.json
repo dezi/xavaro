@@ -386,5 +386,193 @@
         "videourl": "http://alex-stream.rosebud-media.de:80/live/alexlivetv.smil/playlist.m3u8"
       }
     ]
+  },
+
+  "www.rtl.de": {
+
+    "label": "RTL",
+    "url": "http://www.rtl.de/",
+    "icon": "http://pbs.twimg.com/profile_images/505332383269142528/dxFEuzbY_400x400.png",
+
+    "channels": [
+      {
+        "label": "RTL",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/505332383269142528/dxFEuzbY_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl.html"
+      }
+    ]
+  },
+
+  "www.rtl2.de": {
+
+    "label": "RTL II",
+    "url": "http://www.rtl2.de/",
+    "icon": "http://pbs.twimg.com/profile_images/692348270736195584/VWA4jll__400x400.jpg",
+
+    "channels": [
+      {
+        "label": "RTL II",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/692348270736195584/VWA4jll__400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl2.html"
+      }
+    ]
+  },
+
+  "www.superrtl.de": {
+
+    "label": "SUPER RTL",
+    "url": "http://www.superrtl.de/",
+    "icon": "http://pbs.twimg.com/profile_images/673846526054146048/TwwE_0e7_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "SUPER RTL",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/673846526054146048/TwwE_0e7_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/superrtl.html"
+      }
+    ]
+  },
+
+  "www.rtlnitro.de": {
+
+    "label": "RTL NITRO",
+    "url": "http://www.rtlnitro.de/",
+    "icon": "https://pbs.twimg.com/profile_images/2530896718/rn3do2g6wuxc8kekdasv_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "RTL NITRO",
+        "default": false,
+        "develop": true,
+        "icon": "https://pbs.twimg.com/profile_images/2530896718/rn3do2g6wuxc8kekdasv_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtlnitro.html"
+      }
+    ]
+  },
+
+  "www.sat1.de": {
+
+    "label": "SAT.1",
+    "url": "http://www.sat1.de/",
+    "icon": "http://pbs.twimg.com/profile_images/1497994582/SAT1_3D_BM_CMYK_Voransicht_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "SAT.1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/1497994582/SAT1_3D_BM_CMYK_Voransicht_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sat1.html"
+      }
+    ]
+  },
+
+  "www.pro7.de": {
+
+    "label": "PRO7",
+    "url": "http://www.pro7.de/",
+    "icon": "http://pbs.twimg.com/profile_images/563479641386930176/wezbbzpj_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "PRO7",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/563479641386930176/wezbbzpj_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7.html"
+      }
+    ]
+  },
+
+  "www.prosiebenmaxx.de": {
+
+    "label": "PRO7 MAXX",
+    "url": "http://www.prosiebenmaxx.de/",
+    "icon": "http://pbs.twimg.com/profile_images/666190926814035968/mV8kbFLP_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "PRO7 MAXX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/666190926814035968/mV8kbFLP_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7_maxx.html"
+      }
+    ]
+  },
+
+  "www.kabeleins.de": {
+
+    "label": "KABEL 1",
+    "url": "http://www.kabeleins.de/",
+    "icon": "http://pbs.twimg.com/profile_images/638243226953084928/0aOngpLN_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "KABEL 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/638243226953084928/0aOngpLN_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/kabel1.html"
+      }
+    ]
+  },
+
+  "www.vox.de": {
+
+    "label": "VOX",
+    "url": "http://www.vox.de/",
+    "icon": "http://pbs.twimg.com/profile_images/460059950455083012/7m3LwYsN_400x400.png",
+
+    "channels": [
+      {
+        "label": "VOX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/460059950455083012/7m3LwYsN_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/vox.html"
+      }
+    ]
+  },
+
+  "www.sixx.de": {
+
+    "label": "SIXX",
+    "url": "http://www.sixx.de/",
+    "icon": "http://pbs.twimg.com/profile_images/609280667281661952/_VFt44k-_400x400.png",
+
+    "channels": [
+      {
+        "label": "SIXX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/609280667281661952/_VFt44k-_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sixx.html"
+      }
+    ]
+  },
+
+  "www.dmax.de": {
+
+    "label": "DMAX",
+    "url": "http://www.dmax.de/",
+    "icon": "http://pbs.twimg.com/profile_images/378800000663840950/655679388e2fef54aac94a66ebaf1ea4_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "DMAX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/378800000663840950/655679388e2fef54aac94a66ebaf1ea4_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/dmax.html"
+      }
+    ]
   }
+
 }
