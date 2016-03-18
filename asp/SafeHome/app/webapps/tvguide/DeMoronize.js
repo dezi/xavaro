@@ -79,3 +79,29 @@ DeMoronize.cleanTime = function(moronedEpg)
 
     return epg;
 }
+
+DeMoronize.getDuration = function(broadcast)
+{
+    var start = new Date(broadcast.start);
+    var stop  = new Date(broadcast.stop );
+
+    var duration = stop.getTime() - start.getTime();
+
+    return duration / 1000 / 60;
+}
+
+DeMoronize.cleanShortShows = function(data)
+{
+    if (! data) return;
+
+    for (var broadcast in data)
+    {
+        var src = data[ broadcast ];
+        var duration = DeMoronize.getDuration(src);
+
+        if (duration <= 3)
+        {
+            console.log("--> duration:" + duration + " - " + JSON.stringify(src));
+        }
+    }
+}

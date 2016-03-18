@@ -18,6 +18,10 @@ tvguide.constants =
     timelineHeight           : 30,
     hoursPix                 : 360,
 
+    titleColor      : "#ffffff",
+    titleSize       : 34,
+    titleFontWeight : "bold",
+
     titlebarColor            : "#888888",
     content1Color            : "#dedede",
     content2Color            : "#acacac",
@@ -45,14 +49,15 @@ tvguide.calculateDates = function()
     var loadDaysPast   = tvguide.constants.loadDaysPast;
     var loadDaysFuture = tvguide.constants.loadDaysFuture;
 
-    tvguide.constants.minPix = hoursPix / 60;
+    tvguide.constants.minPix    = hoursPix / 60;
     tvguide.constants.loadHours = (loadDaysPast + loadDaysFuture) * 24;
-
     tvguide.constants.timeShift = today - (loadDaysPast * 24 * 60);
 }
 
 tvguide.createFrameSetup = function()
 {
+    var constants = tvguide.constants;
+
     //
     // tvguide.topdiv
     //
@@ -63,8 +68,7 @@ tvguide.createFrameSetup = function()
         0,
         0,
         "topdiv",
-        document.body
-    );
+        document.body);
 
     //
     // tvguide.titlebar
@@ -74,26 +78,32 @@ tvguide.createFrameSetup = function()
         0,
         0,
         0,
-        tvguide.constants.titlebarHeight,
+        constants.titlebarHeight,
         "titlebar",
-        tvguide.topdiv
-    );
+        tvguide.topdiv);
 
-    WebLibSimple.setBGColor(tvguide.titlebar, tvguide.constants.titlebarColor);
+    WebLibSimple.setBGColor(tvguide.titlebar, constants.titlebarColor);
+
+    //
+    // tvguide.title
+    //
 
     tvguide.title = WebLibSimple.createDiv(
-        tvguide.constants.titlebarHeight,
-        tvguide.constants.titlebarHeight / 4,
-        tvguide.constants.titlebarHeight,
+        constants.titlebarHeight,
+        constants.titlebarHeight / 4,
+        constants.titlebarHeight,
         0,
         "title",
-        tvguide.titlebar
-    );
+        tvguide.titlebar);
 
     tvguide.title.style.textAlign = "center";
-    tvguide.title.innerHTML       = WebLibSimple.getNiceDay(tvguide.constants.today * 1000 * 60);
+    tvguide.title.innerHTML       = WebLibSimple.getNiceDay(constants.today * 1000 * 60);
 
-    WebLibSimple.setFontSpecs(tvguide.title, 34, "bold", "#ffffff");
+    WebLibSimple.setFontSpecs(
+        tvguide.title,
+        constants.titleSize,
+        constants.titleFontWeight,
+        constants.titleColor);
 
     //
     // tvguide.content1
@@ -101,16 +111,15 @@ tvguide.createFrameSetup = function()
 
     tvguide.content1 = WebLibSimple.createDiv(
         0,
-        tvguide.constants.titlebarHeight,
+        constants.titlebarHeight,
         0,
         0,
         "content1",
-        tvguide.topdiv
-    );
+        tvguide.topdiv);
 
     tvguide.content1.style.overflow = "hidden";
 
-    WebLibSimple.setBGColor(tvguide.content1, tvguide.constants.titlebarColor);
+    WebLibSimple.setBGColor(tvguide.content1, constants.titlebarColor);
 
     //
     // tvguide.timeline
@@ -120,14 +129,13 @@ tvguide.createFrameSetup = function()
         0,
         0,
         0,
-        tvguide.constants.timelineHeight,
+        constants.timelineHeight,
         "timeline",
-        tvguide.content1
-    );
+        tvguide.content1);
 
     tvguide.timeline.style.overflow = "hidden";
 
-    WebLibSimple.setBGColor(tvguide.timeline, tvguide.constants.timelineColor);
+    WebLibSimple.setBGColor(tvguide.timeline, constants.timelineColor);
 
     //
     // tvguide.content2
@@ -135,14 +143,13 @@ tvguide.createFrameSetup = function()
 
     tvguide.content2 = WebLibSimple.createDiv(
         0,
-        tvguide.constants.timelineHeight,
+        constants.timelineHeight,
         0,
         0,
         "content2",
-        tvguide.content1
-    );
+        tvguide.content1);
 
-    WebLibSimple.setBGColor(tvguide.content2, tvguide.constants.content2Color);
+    WebLibSimple.setBGColor(tvguide.content2, constants.content2Color);
 
     //
     // tvguide.epgbody
@@ -154,12 +161,11 @@ tvguide.createFrameSetup = function()
         0,
         0,
         "epgdata",
-        tvguide.content2
-    );
+        tvguide.content2);
 
     tvguide.epgbody.style.overflow = "hidden";
 
-    WebLibSimple.setBGColor(tvguide.epgbody, tvguide.constants.epgdataColor);
+    WebLibSimple.setBGColor(tvguide.epgbody, constants.epgdataColor);
 
     //
     // tvguide.senderbar
@@ -168,15 +174,14 @@ tvguide.createFrameSetup = function()
     tvguide.senderbar = WebLibSimple.createDivWidth(
         0,
         0,
-        tvguide.constants.senderbarWidth,
+        constants.senderbarWidth,
         0,
         "senderbar",
-        tvguide.content2
-    );
+        tvguide.content2);
 
     tvguide.senderbar.style.overflow = "hidden";
 
-    WebLibSimple.setBGColor(tvguide.senderbar, tvguide.constants.senderbarColor);
+    WebLibSimple.setBGColor(tvguide.senderbar, constants.senderbarColor);
 }
 
 tvguide.getSenderList = function()
@@ -188,16 +193,17 @@ tvguide.getSenderList = function()
     for (var channelIndex in localChannels)
     {
         var name = localChannels[ channelIndex ];
-        tvguide.senderList[ name ] = {};
-        tvguide.senderList[ name ].index = parseInt(channelIndex);
-
         var cparts = name.split("/");
 
-        tvguide.senderList[ name ].type    = cparts[0];
-        tvguide.senderList[ name ].country = cparts[1];
-        tvguide.senderList[ name ].channel = cparts[2];
-        tvguide.senderList[ name ].iptv    = false;
-        tvguide.senderList[ name ].isbd    = false;
+        tvguide.senderList[ name ] = {};
+        var sender = tvguide.senderList[ name ];
+
+        sender.index   = parseInt(channelIndex);
+        sender.type    = cparts[0];
+        sender.country = cparts[1];
+        sender.channel = cparts[2];
+        sender.iptv    = false;
+        sender.isbd    = false;
     }
 
     var iptvChannels  = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
@@ -240,13 +246,11 @@ tvguide.getSenderList = function()
         {
             if (sender == bdName && tmp.isbd)
             {
-//                console.log("--> brainDead:" + sender);
+                // console.log("--> brainDead:" + sender);
                 tvguide.senderList[ sender ].isbd = tmp.isbd;
             }
         }
     }
-
-//    WebAppUtility.makeClick()
 }
 
 tvguide.createSenderBar = function()
@@ -273,8 +277,7 @@ tvguide.createSenderBar = function()
             0,
             0,
             null,
-            senderImgDiv
-        );
+            senderImgDiv);
 
         paddingDiv.style.paddingLeft     = "7px";
         paddingDiv.style.paddingTop      = "8px";
@@ -296,8 +299,7 @@ tvguide.createTimeLine = function()
     var hoursPix         = tvguide.constants.hoursPix;
     var minPix           = tvguide.constants.minPix;
     var loadHours        = tvguide.constants.loadHours;
-
-    var timelineWidth = loadHours * hoursPix;
+    var timelineWidth    = loadHours * hoursPix;
 
     tvguide.timelineScroll = WebLibSimple.createDivWidth(
         0,
@@ -305,8 +307,7 @@ tvguide.createTimeLine = function()
         timelineWidth,
         0,
         "timelineScroll",
-        tvguide.timeline
-    );
+        tvguide.timeline);
 
     var timelineScroll = tvguide.timelineScroll;
 
@@ -347,10 +348,10 @@ tvguide.createTimeLine = function()
 
 tvguide.createEpgProgram = function(channelName, epgdata)
 {
-//    console.log("--> channel:" + channelName + " isbd:" + isbd);
-//    console.log("--> epgdata:" + JSON.stringify(epgdata));
+   // console.log("--> channel:" + channelName + " isbd:" + isbd);
+   // console.log("--> epgdata:" + JSON.stringify(epgdata));
 
-    var channel = tvguide.senderList[ channelName ]
+    var channel     = tvguide.senderList[ channelName ]
     var senderIndex = channel.index;
 
     var minPix    = tvguide.constants.minPix;
@@ -368,22 +369,17 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         var moronDateStart = new Date(epg.start);
         var moronDateStop  = new Date(epg.stop );
 
-        if (moronDateStart.getSeconds() > 0 && moronDateStop.getSeconds() > 0)
+        if (moronDateStart.getSeconds() > 0 || moronDateStop.getSeconds() > 0)
         {
-            console.log("--> Channel:" + epg.channel + " Title:" + epg.title);
-            console.log("--> Moron Start:" + moronDateStart);
-            console.log("--> Moron Stop: " + moronDateStop);
+            // console.log("--> Channel:    " + epg.channel + " Title:" + epg.title);
+            // console.log("--> Moron Start:" + moronDateStart);
+            // console.log("--> Moron Stop: " + moronDateStop);
 
             epg = DeMoronize.cleanTime(epg);
 
-            console.log("--> Clear Start:" + epg.start);
-            console.log("--> Clear Stop: " + epg.stop );
+            // console.log("--> Clear Start:" + epg.start);
+            // console.log("--> Clear Stop: " + epg.stop );
         }
-
-        // if (moronDateStop.getSeconds() > 0)
-        // {
-        //     console.log("--> Moron Stop: " + moronDateStop + " Channel:" + epg.channel + " Title:" + epg.title);
-        // }
 
         var startDate = new Date(epg.start).getTime() / 1000 / 60;
         var stopDate  = new Date(epg.stop ).getTime() / 1000 / 60;
@@ -440,16 +436,12 @@ tvguide.getEpgData = function()
 
         var current = year + "." + month + "." + day;
 
-//        console.log("--> current: " + current);
-
         for (var sender in tvguide.senderList)
         {
             var epgurl = encodeURI(
                 tvguide.constants.epgDataSrcPrefix +
                 sender + "/" + current +
                 tvguide.constants.epgDataSrcPostfix);
-
-//            console.log("--> URL: " + epgurl);
 
             WebAppRequest.loadAsyncJSON(epgurl);
         }
@@ -495,7 +487,11 @@ WebAppRequest.onLoadAsyncJSON = function(src, data)
         tvguide.constants.epgDataSrcPrefix.length,
         -(tvguide.constants.epgDataSrcPostfix.length + 11));
 
-    tvguide.createEpgProgram(channel, data[ "epgdata" ]);
+    data = data[ "epgdata" ];
+
+    // DeMoronize.cleanShortShows(data);
+
+    tvguide.createEpgProgram(channel, data);
 }
 
 tvguide.PastLineTimeout = function()
@@ -539,8 +535,7 @@ tvguide.createPastLine = function()
         nowPosition * -1,
         0,
         "PastLine",
-        tvguide.epgScroll
-    );
+        tvguide.epgScroll);
 
     WebLibSimple.setBGColor(tvguide.PastLine, tvguide.constants.pastLineColor);
 
@@ -557,7 +552,7 @@ tvguide.createPastLine = function()
 tvguide.onTimeLineScroll = function(newX, newY)
 {
     var timeShift = tvguide.constants.timeShift;
-    var hoursPix = tvguide.constants.hoursPix;
+    var hoursPix  = tvguide.constants.hoursPix;
 
     tvguide.epgScroll.style.left = newX + "px";
 
@@ -597,6 +592,7 @@ tvguide.onEPGTouchScroll = function(newX, newY)
 
 WebAppRequest.onBackkeyPressed = function()
 {
+    // tvguide.dimmerDiv
     if (tvguide.description)
     {
         WebAppRequest.haveBackkeyPressed(true);

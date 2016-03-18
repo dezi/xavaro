@@ -37,6 +37,7 @@
       { "interval": 24, "pattern": ".*\\.json" },
       { "interval": 24, "pattern": ".*\\.json\\.gz" },
 
+      { "interval": -1, "pattern": "http://de.wikipedia.org/wiki/.*" },
       { "interval": -1, "pattern": "http://epg.xavaro.de/pgminfo/.*" },
       { "interval":  0, "pattern": "http://epg.xavaro.de/epgdata/.*" },
       { "interval":  0, "pattern": "http://epg.xavaro.de/channels/.*" }

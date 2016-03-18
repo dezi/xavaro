@@ -154,7 +154,7 @@ tvguide.createInfoBox = function(description)
     if (! description) return;
 
     //
-    // tvguide.description.infoBox
+    // infoBox
     //
 
     var infoBox = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
@@ -171,6 +171,41 @@ tvguide.createInfoBox = function(description)
 
     WebLibSimple.setBGColor(container, tvguide.descriptionConstants.containerBG);
     WebLibSimple.setFontSpecs(container, 20, "normal", "#000000");
+}
+
+tvguide.openWiki = function()
+{
+    var wikifilm = tvguide.description.epg.wikifilm;
+    console.log("--> wiki:" + wikifilm);
+
+    tvguide.dimmerDiv = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.topdiv);
+
+    var dimmerDiv = tvguide.dimmerDiv;
+    dimmerDiv.style.zIndex = "100";
+    WebLibSimple.setBGColor(dimmerDiv, "#66000000");
+
+    //
+    // iframe
+    //
+
+    var border = 80;
+    tvguide.wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
+
+    var wikiFrame = tvguide.wikiFrame;
+    WebLibSimple.setBGColor(wikiFrame, "#000000");
+
+    var iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", wikiFrame);
+    iframe.style.border = "0px solid black";
+    iframe.style.display = "none";
+
+    iframe.src = "http://de.wikipedia.org/wiki/" + wikifilm;
+}
+
+tvguide.createWiki = function(wikifilm)
+{
+    if (! wikifilm) return;
+
+    tvguide.createButton("Wikipedia", "#d1d1d1", tvguide.openWiki);
 }
 
 tvguide.createDescriptionSetup = function()
@@ -411,11 +446,9 @@ tvguide.descriptionMain = function(target, epg)
 
     tvguide.createTitleBar(epg.title, epg.subtitle);
 
-    var day = WebLibSimple.getNiceDay(epg.start);
-    var timeSpan = WebLibSimple.getNiceTime(epg.start) + "-" + WebLibSimple.getNiceTime(epg.stop);
-
-    var duration = Math.floor(WebLibSimple.getDuration(epg.start, epg.stop) / 1000 / 60) + "min";
-
+    var day       = WebLibSimple.getNiceDay(epg.start);
+    var timeSpan  = WebLibSimple.getNiceTime(epg.start) + "-" + WebLibSimple.getNiceTime(epg.stop);
+    var duration  = Math.floor(WebLibSimple.getDuration(epg.start, epg.stop) / 1000 / 60) + "min";
     var landscape = true;
 
     if (epg.imgsize)
@@ -447,6 +480,8 @@ tvguide.descriptionMain = function(target, epg)
     tvguide.createSpliteDiv("Channel:", epg.channel, landscape);
 
     tvguide.createInfoBox(epg.description);
+
+    tvguide.createWiki(epg.wikifilm);
 
     tvguide.createButtons();
 }
