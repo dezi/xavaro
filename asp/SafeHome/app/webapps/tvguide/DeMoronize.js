@@ -115,7 +115,6 @@ DeMoronize.cleanShortShows = function(data)
             lastBroadcast.title2       = src.title;
             lastBroadcast.subtitle2    = src.subtitle;
             lastBroadcast.description2 = src.description;
-            lastBroadcast.description  = lastBroadcast.description + " @" + src.title;
             lastBroadcast.stop         = src.stop;
 
             data.splice(data.indexOf(src), 1);

@@ -15,11 +15,14 @@ tvguide.descriptionConstants =
     containerRadius : "4px",
     boxPaddingTop   : "10px",
 
-    plannedButtonTilte   : "remove planned recording",
+
+    plannedButtonTilte   : WebLibStrings.getTrans("tvguide.remove"),
     plannedButtonColor   : "#4553c1",
-    playButtonTitle      : "play",
+
+    playButtonTitle      : WebLibStrings.getTrans("tvguide.play"),
     playButtonColor      : "#58d533",
-    recordingButtonTitle : "record",
+
+    recordingButtonTitle : WebLibStrings.getTrans("tvguide.record"),
     recordingButtonColor : "#ff7a7a",
 }
 
@@ -502,7 +505,8 @@ tvguide.descriptionMain = function(target, epg)
         if (epg.imgname) imgSrc = epg.imgname;
 
         var src = "http://" + WebApp.manifest.appserver +
-            "/pgminfo/tv/de/" + encodeURIComponent(imgSrc) + ".orig.jpg";
+            "/pgminfo/tv/" + tvguide.constants.localLanguage + "/" +
+            encodeURIComponent(imgSrc) + ".orig.jpg";
 
         tvguide.createPic(src, landscape);
     }

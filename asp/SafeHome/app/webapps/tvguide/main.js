@@ -7,6 +7,10 @@ tvguide.constants =
     recordPreload            : 1,
     recordPostload           : 2,
 
+    locale                   : WebAppUtility.getLocale(),
+    localCountry             : WebAppUtility.getLocaleCountry(),
+    localLanguage            : WebAppUtility.getLocaleLanguage(),
+
     today                    : WebLibSimple.getTodayDate().getTime() / 1000 / 60,
 
     epgDataSrcPrefix         : "http://" + WebApp.manifest.appserver + "/epgdata/",
@@ -236,7 +240,7 @@ tvguide.getSenderList = function()
         }
     }
 
-    var loacation  = WebAppUtility.getLocaleLanguage();
+    var loacation  = tvguide.constants.localLanguage;
 
     var bdsrc = "http://" + WebApp.manifest.appserver + "/channels/tv/" + loacation + ".json.gz";
     var brainDeads = JSON.parse(WebAppRequest.loadSync(bdsrc));
@@ -492,6 +496,44 @@ tvguide.createEpgBodyScroll = function()
     tvguide.getEpgData();
 }
 
+tvguide.updateEpgScroll = function()
+{
+    // console.log(tvguide.epgScroll.innerHTML);
+
+    var hoursPix  = tvguide.constants.hoursPix;
+    var loadHours = tvguide.constants.loadHours;
+
+    var posiLeft = 0;
+
+    var epgScroll = tvguide.epgScroll;
+    epgScroll.innerHTML = "";
+    epgScroll.style.width = hoursPix * loadHours + "px";
+    tvguide.timelineScroll.style.width = hoursPix * loadHours + "px";
+
+    tvguide.getEpgData();
+
+    tvguide.createPastLine();
+
+    // if (tvguide.epgScroll)
+    // {
+    //     var left = WebLibSimple.substring(tvguide.epgScroll.style.left, 0, -2);
+    //
+    //     var posiLeft = left - hoursPix * 24;
+    //     console.log("--> tvguide.epgScroll: " + posiLeft);
+    //     console.log("--> hoursPix: " + hoursPix);
+    //     console.log("--> loadHours: " + loadHours);
+    //
+    //     tvguide.epgScroll = null;
+    // }
+    // else
+    // {
+    //     console.log("--> tvguide.epgScroll: NOOOOOOO");
+    //     console.log("--> hoursPix: " + hoursPix);
+    //     console.log("--> loadHours: " + loadHours);
+    // }
+}
+
+
 WebAppRequest.onLoadAsyncJSON = function(src, data)
 {
     if (! data[ "epgdata" ]) return;
@@ -526,9 +568,8 @@ tvguide.PastLineTimeout = function()
 
 tvguide.createPastLine = function()
 {
-    var hoursPix = tvguide.constants.hoursPix;
-    var minPix   = tvguide.constants.minPix;
-
+    var hoursPix  = tvguide.constants.hoursPix;
+    var minPix    = tvguide.constants.minPix;
     var timeShift = tvguide.constants.timeShift;
 
     var now         = Math.floor(new Date().getTime() / 1000 / 60);
@@ -598,6 +639,18 @@ tvguide.onEPGTouchScroll = function(newX, newY)
 {
     if (newX !== null)
     {
+        // if (newX >= 0 && tvguide.constants.loadDaysPast != 1)
+        // {
+        //     console.log(newX);
+        //
+        //     tvguide.constants.loadDaysPast = 1;
+        //
+        //     tvguide.calculateDates();
+        //
+        //     tvguide.updateEpgScroll();
+        //     // tvguide.getEpgData();
+        // }
+
         tvguide.onTimeLineScroll(newX, null);
     }
 
@@ -650,7 +703,10 @@ tvguide.main = function()
 
     tvguide.createSenderBar();
     tvguide.createTimeLine();
+
     tvguide.createEpgBodyScroll();
+    // tvguide.updateEpgScroll();
+    // tvguide.getEpgData();
 
     //
     // create pastline

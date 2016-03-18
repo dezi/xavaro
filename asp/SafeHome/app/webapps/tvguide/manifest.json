@@ -31,6 +31,11 @@
       "main.js"
     ],
 
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
     "cachedefs": [
       { "interval": 24, "pattern": ".*\\.js" },
       { "interval": 72, "pattern": ".*\\.png" },
