@@ -473,6 +473,9 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 }
                 catch (IOException ex)
                 {
+                    if (current != null) current.onPlaybackFinished();
+                    VideoSurface.getInstance().onPlaybackFinished();
+
                     OopsService.log(LOGTAG, ex);
 
                     return;
@@ -620,128 +623,129 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 // Try to read in stream configuration.
                 //
 
-                readMaster();
-
-                boolean first = true;
-
-                if (desiredUrl.equals(requestUrl))
+                if (readMaster())
                 {
-                    //
-                    // Re-entrance check. MediaPlayer opens
-                    // stream serveral times. Prefer to continue
-                    // with the last partially streamed fragment.
-                    //
+                    boolean first = true;
 
-                    nextFragment = desiredNextFragment;
-                }
-
-                while (true)
-                {
-                    while (nextFragment == null)
-                    {
-                        readFragments();
-
-                        if (nextFragment != null) break;
-
-                        StaticUtils.sleep(10000);
-                    }
-
-                    Log.d(LOGTAG, "workOnVideo: fragment: " + nextFragment);
-
-                    openUnderscoreConnection(nextFragment);
-
-                    InputStream fraginput = connection.getInputStream();
-
-                    byte[] buffer = new byte[ 32 * 1024 ];
-                    int xfer, fragt = 0;
-
-                    if (first)
+                    if (desiredUrl.equals(requestUrl))
                     {
                         //
-                        // First fragment in request. Prepare header and
-                        // eventually skip partial content.
+                        // Re-entrance check. MediaPlayer opens
+                        // stream serveral times. Prefer to continue
+                        // with the last partially streamed fragment.
                         //
 
-                        String response = "HTTP/1.1 200 Ok";
-                        String contentType = "Content-Type: " + readContentType();
-                        String contentLength = "Content-Length: " + fakeContentLength;
-                        String contentRange = null;
-
-                        if (requestIsPartial)
-                        {
-                            response = "HTTP/1.1 206 Partial Content";
-
-                            contentLength = "Content-Length: "
-                                    + (fakeContentLength - partialFrom);
-
-                            contentRange = "Content-Range: bytes "
-                                    + partialFrom + "-"
-                                    + fakeContentLength + "/"
-                                    + fakeContentLength;
-                        }
-
-                        Log.d(LOGTAG, "workOnVideo First: " + response);
-                        Log.d(LOGTAG, "workOnVideo First: " + contentType);
-                        Log.d(LOGTAG, "workOnVideo First: " + contentLength);
-
-                        requestOutput.write((response + "\r\n").getBytes());
-                        requestOutput.write((contentType + "\r\n").getBytes());
-                        requestOutput.write((contentLength + "\r\n").getBytes());
-
-                        if (requestIsPartial)
-                        {
-                            Log.d(LOGTAG, "workOnVideo First: " + contentRange);
-                            requestOutput.write((contentRange + "\r\n").getBytes());
-                        }
-
-                        requestOutput.write("\r\n".getBytes());
-                        requestOutput.flush();
-
-                        if (requestIsPartial)
-                        {
-                            //
-                            // Skip first bytes.
-                            //
-
-                            long max = partialFrom;
-                            long want;
-
-                            while (max > 0)
-                            {
-                                want = (max > buffer.length) ? buffer.length : max;
-                                xfer = fraginput.read(buffer, 0, (int) want);
-                                if (xfer < 0) break;
-
-                                max -= xfer;
-                            }
-
-                            Log.d(LOGTAG, "workOnVideo: skipped partial: " + partialFrom);
-                        }
-
-                        first = false;
+                        nextFragment = desiredNextFragment;
                     }
 
                     while (true)
                     {
-                        xfer = fraginput.read(buffer, 0, buffer.length);
-                        if (xfer < 0) break;
+                        while (nextFragment == null)
+                        {
+                            readFragments();
 
-                        requestOutput.write(buffer, 0, xfer);
-                        requestOutput.flush();
+                            if (nextFragment != null) break;
 
-                        total += xfer;
-                        fragt += xfer;
+                            StaticUtils.sleep(10000);
+                        }
+
+                        Log.d(LOGTAG, "workOnVideo: fragment: " + nextFragment);
+
+                        openUnderscoreConnection(nextFragment);
+
+                        InputStream fraginput = connection.getInputStream();
+
+                        byte[] buffer = new byte[ 32 * 1024 ];
+                        int xfer, fragt = 0;
+
+                        if (first)
+                        {
+                            //
+                            // First fragment in request. Prepare header and
+                            // eventually skip partial content.
+                            //
+
+                            String response = "HTTP/1.1 200 Ok";
+                            String contentType = "Content-Type: " + readContentType();
+                            String contentLength = "Content-Length: " + fakeContentLength;
+                            String contentRange = null;
+
+                            if (requestIsPartial)
+                            {
+                                response = "HTTP/1.1 206 Partial Content";
+
+                                contentLength = "Content-Length: "
+                                        + (fakeContentLength - partialFrom);
+
+                                contentRange = "Content-Range: bytes "
+                                        + partialFrom + "-"
+                                        + fakeContentLength + "/"
+                                        + fakeContentLength;
+                            }
+
+                            Log.d(LOGTAG, "workOnVideo First: " + response);
+                            Log.d(LOGTAG, "workOnVideo First: " + contentType);
+                            Log.d(LOGTAG, "workOnVideo First: " + contentLength);
+
+                            requestOutput.write((response + "\r\n").getBytes());
+                            requestOutput.write((contentType + "\r\n").getBytes());
+                            requestOutput.write((contentLength + "\r\n").getBytes());
+
+                            if (requestIsPartial)
+                            {
+                                Log.d(LOGTAG, "workOnVideo First: " + contentRange);
+                                requestOutput.write((contentRange + "\r\n").getBytes());
+                            }
+
+                            requestOutput.write("\r\n".getBytes());
+                            requestOutput.flush();
+
+                            if (requestIsPartial)
+                            {
+                                //
+                                // Skip first bytes.
+                                //
+
+                                long max = partialFrom;
+                                long want;
+
+                                while (max > 0)
+                                {
+                                    want = (max > buffer.length) ? buffer.length : max;
+                                    xfer = fraginput.read(buffer, 0, (int) want);
+                                    if (xfer < 0) break;
+
+                                    max -= xfer;
+                                }
+
+                                Log.d(LOGTAG, "workOnVideo: skipped partial: " + partialFrom);
+                            }
+
+                            first = false;
+                        }
+
+                        while (true)
+                        {
+                            xfer = fraginput.read(buffer, 0, buffer.length);
+                            if (xfer < 0) break;
+
+                            requestOutput.write(buffer, 0, xfer);
+                            requestOutput.flush();
+
+                            total += xfer;
+                            fragt += xfer;
+                        }
+
+                        fraginput.close();
+
+                        lastFragment = nextFragment;
+                        nextFragment = null;
+
+                        Log.d(LOGTAG, "workOnVideo: fragment close: " + fragt);
                     }
-
-                    fraginput.close();
-
-                    lastFragment = nextFragment;
-                    nextFragment = null;
-
-                    Log.d(LOGTAG, "workOnVideo: fragment close: " + fragt);
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Log.d(LOGTAG, "workOnVideo =========> " + ex.getMessage());
             }
@@ -864,6 +868,26 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         }
 
         @Nullable
+        private String readContent(String url) throws Exception
+        {
+            openUnderscoreConnection(url);
+
+            InputStream input = connection.getInputStream();
+            StringBuilder string = new StringBuilder();
+            byte[] buffer = new byte[ 4096 ];
+            int xfer;
+
+            while ((xfer = input.read(buffer)) >= 0)
+            {
+                string.append(new String(buffer, 0, xfer));
+            }
+
+            input.close();
+
+            return string.toString();
+        }
+
+        @Nullable
         private String[] readLines(String url) throws Exception
         {
             openUnderscoreConnection(url);
@@ -873,8 +897,10 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             byte[] buffer = new byte[ 4096 ];
             int xfer;
 
-            while ((xfer = input.read(buffer)) > 0)
+            while (true)
             {
+                xfer = input.read(buffer);
+                if (xfer < 0) break;
                 string.append(new String(buffer, 0, xfer));
             }
 
@@ -882,7 +908,9 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
             String temp = string.toString();
 
-            if (temp.contains("\r\n")) return temp.split("\r\n");
+            temp = temp.replace("\r\n", "\n");
+            temp = temp.replace("\n\n", "\n");
+            temp = temp.replace("\r", "\n");
 
             return temp.split("\n");
         }
@@ -914,59 +942,78 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             return streamurl;
         }
 
-        private void readMaster() throws Exception
+        private boolean readWebpage() throws Exception
+        {
+            String lines = readContent(requestUrl);
+
+            //
+            // type:'html5', config: { file:'http://lstv3.hls1.stream-server.org/live/orf1@sd/index.m3u8' }
+            //
+
+            String stream = Simple.getMatch("type:'html5'.*?file:'([^']*)'", lines);
+            Log.d(LOGTAG,"=========================================>stream=" + stream);
+
+            if (stream != null) requestUrl = stream;
+
+            return (stream != null);
+        }
+
+        private boolean readMaster() throws Exception
         {
             Log.d(LOGTAG,"readMaster: " + requestUrl);
+
+            if (requestUrl.endsWith(".html"))
+            {
+                if (! readWebpage()) return false;
+            }
 
             streamOptions = new ArrayList<>();
 
             String[] lines = readLines(requestUrl);
+            if (lines == null) return false;
 
-            if (lines != null)
+            Log.d(LOGTAG, "readMaster: " + lines.length);
+
+            for (int inx = 0; (inx + 1) < lines.length; inx++)
             {
-                Log.d(LOGTAG, "readMaster: " + lines.length);
+                if (!lines[ inx ].startsWith("#EXT-X-STREAM-INF:")) continue;
 
-                for (int inx = 0; (inx + 1) < lines.length; inx++)
+                String line = lines[ inx ].substring(18);
+
+                String width = Simple.getMatch("RESOLUTION=([0-9]*)x", line);
+                String height = Simple.getMatch("RESOLUTION=[0-9]*x([0-9]*)", line);
+                String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
+                String streamurl = lines[ ++inx ];
+
+                if ((bandwith == null) || (streamurl == null))
                 {
-                    if (!lines[ inx ].startsWith("#EXT-X-STREAM-INF:")) continue;
-
-                    String line = lines[ inx ].substring(18);
-
-                    String width = Simple.getMatch("RESOLUTION=([0-9]*)x", line);
-                    String height = Simple.getMatch("RESOLUTION=[0-9]*x([0-9]*)", line);
-                    String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
-                    String streamurl = lines[ ++inx ];
-
-                    if ((bandwith == null) || (streamurl == null))
-                    {
-                        continue;
-                    }
-
-                    if (streamurl.contains("akamaihd.net/") && streamurl.contains("av-b.m3u8"))
-                    {
-                        //
-                        // My guess: these are interlaced variants we do not need.
-                        //
-
-                        continue;
-                    }
-
-                    streamurl = resolveRelativeUrl(requestUrl, streamurl);
-
-                    VideoStreams so = new VideoStreams();
-
-                    so.width = (width == null) ? 0 : Integer.parseInt(width);
-                    so.height = (height == null) ? 0 : Integer.parseInt(height);
-
-                    so.bandWidth = Integer.parseInt(bandwith);
-                    so.streamUrl = streamurl;
-
-                    so.quality = VideoQuality.deriveQuality(so.height);
-
-                    streamOptions.add(so);
-
-                    Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
+                    continue;
                 }
+
+                if (streamurl.contains("akamaihd.net/") && streamurl.contains("av-b.m3u8"))
+                {
+                    //
+                    // My guess: these are interlaced variants we do not need.
+                    //
+
+                    continue;
+                }
+
+                streamurl = resolveRelativeUrl(requestUrl, streamurl);
+
+                VideoStreams so = new VideoStreams();
+
+                so.width = (width == null) ? 0 : Integer.parseInt(width);
+                so.height = (height == null) ? 0 : Integer.parseInt(height);
+
+                so.bandWidth = Integer.parseInt(bandwith);
+                so.streamUrl = streamurl;
+
+                so.quality = VideoQuality.deriveQuality(so.height);
+
+                streamOptions.add(so);
+
+                Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
             }
 
             if (streamOptions.size() == 0)
@@ -1008,6 +1055,8 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                     }
                 }
             }
+
+            return true;
         }
 
         private void readFragments() throws Exception

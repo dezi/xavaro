@@ -112,7 +112,7 @@ public class PreferenceFragments
                         if (label == null) continue;
 
                         String iconurl = Json.getString(channel, "icon");
-                        String iconname = website + "." + channel;
+                        String iconname = website + "." + label;
                         Drawable drawable = CacheManager.getWebIcon(iconname, iconurl);
 
                         lp = new NicedPreferences.NiceListPreference(context);

@@ -206,7 +206,6 @@ tvguide.openWiki = function()
 
     var iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", wikiFrame);
     iframe.style.border = "0px solid black";
-    iframe.style.display = "none";
 
     iframe.src = "https://de.wikipedia.org/wiki/" + wikifilm;
 }

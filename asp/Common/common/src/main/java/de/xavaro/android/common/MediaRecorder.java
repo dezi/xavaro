@@ -188,110 +188,115 @@ public class MediaRecorder
         JSONObject recordstatus = Json.getObject(metadata, "recordstatus");
         if (recordstatus == null) return false;
 
-        Log.d(LOGTAG, "dosomeRecording:" + mediafile);
-        Log.d(LOGTAG, "dosomeRecording:" + iptvplaylist);
+        Log.d(LOGTAG, "dosomeRecording: " + mediafile);
+        Log.d(LOGTAG, "dosomeRecording: " + iptvplaylist);
 
-        String[] playlist = readLines(iptvplaylist);
-        if ((playlist == null) || (playlist.length == 0)) return false;
-
-        Log.d(LOGTAG, "dosomeRecording:" + playlist.length);
-
-        String lastChunk = Json.getString(recordstatus, "lastchunk");
-        String lastline;
-        float lastlength = 0;
-
-        boolean foundlastchunk = false;
-
-        ArrayList<String> chunks = new ArrayList<>();
-        ArrayList<Float> length = new ArrayList<>();
-
-        for (String line : playlist)
+        while (true)
         {
-            if (line.length() == 0) continue;
+            String[] playlist = readLines(iptvplaylist);
+            if ((playlist == null) || (playlist.length == 0)) return false;
 
-            if (line.startsWith("#EXTINF:"))
+            Log.d(LOGTAG, "dosomeRecording: loaded playlist:" + playlist.length);
+
+            String lastChunk = Json.getString(recordstatus, "lastchunk");
+            String lastline;
+
+            int startindex = -1;
+            float lastlength = 0;
+
+            //
+            // Build chunk array and identify the last chunk
+            // index.
+            //
+
+            ArrayList<String> chunks = new ArrayList<>();
+            ArrayList<Float> length = new ArrayList<>();
+
+            for (String line : playlist)
             {
-                int endpos = line.contains(",") ? line.indexOf(",") : line.length();
-                lastlength = Float.parseFloat(line.substring(8, endpos));
+                if (line.length() == 0) continue;
+
+                if (line.startsWith("#EXTINF:"))
+                {
+                    int endpos = line.contains(",") ? line.indexOf(",") : line.length();
+                    lastlength = Float.parseFloat(line.substring(8, endpos));
+                }
+
+                if (line.startsWith("#")) continue;
+
+                lastline = resolveRelativeUrl(masterurl, line);
+
+                chunks.add(lastline);
+                length.add(lastlength);
+
+                if ((lastChunk != null) && lastChunk.equals(lastline))
+                {
+                    startindex = chunks.size();
+                }
             }
 
-            if (line.startsWith("#")) continue;
-
-            lastline = resolveRelativeUrl(masterurl, line);
-
-            chunks.add(lastline);
-            length.add(lastlength);
-
-            if (foundlastchunk)
+            if (startindex < 0)
             {
-                //
-                // The recording is old. Append all
-                // new chunks to media file.
-                //
+                if (lastChunk != null)
+                {
+                    //
+                    // The recording is old, but we did not find
+                    // the last chunk. We have possibly been restartet,
+                    // so start with the first available fragment to
+                    // keep the loss minimal.
+                    //
 
-                if (! appendIPTVStream(recordstatus, mediafile, lastline))
+                    startindex = 0;
+
+                    Log.d(LOGTAG, "dosomeRecording: continued=" + startindex + "/" + chunks.size());
+                }
+                else
+                {
+                    //
+                    // This is the beginning of a new recording. The User
+                    // possibly clicked on an allready sending item, so
+                    // try to go backwards in time as much as possible and
+                    // required to make the recording complete.
+                    //
+
+                    startindex = chunks.size() - 1;
+
+                    long startsecs = Simple.getTimeStamp(starttime) / 1000;
+                    long nowsecs = Simple.nowAsTimeStamp() / 1000;
+                    float secondslost = nowsecs - startsecs;
+
+                    while ((secondslost > 0) && (startindex > 0))
+                    {
+                        secondslost -= length.get(startindex--);
+                    }
+
+                    Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
+                }
+            }
+
+            int loaded = 0;
+
+            for (int loadinx = startindex; loadinx < chunks.size(); loadinx++)
+            {
+                if (!appendIPTVStream(recordstatus, mediafile, chunks.get(loadinx)))
                 {
                     return false;
                 }
 
                 Json.putFileContent(metafile, metadata);
 
-                continue;
+                loaded++;
             }
 
-            if ((lastChunk != null) && lastChunk.equals(lastline)) foundlastchunk = true;
-        }
-
-        if (! foundlastchunk)
-        {
             //
-            // The recording is new. Check when the recording started
-            // and identify the matching start chunk. This allows to
-            // make one touch recording into the past.
+            // We leave the loop when all required
+            // chunks have been loaded. If there were
+            // more than one chunks loaded, we have a
+            // backlog and need to fetch an updated
+            // playlist.
             //
 
-            int startindex = chunks.size() - 1;
-
-            if (lastChunk != null)
-            {
-                //
-                // The recording is old, but we did not find
-                // the last chunk. We have possibly been restartet,
-                // so start with the first available fragment to
-                // keep the loss minimal.
-                //
-
-                startindex = 0;
-
-                Log.d(LOGTAG, "dosomeRecording: continued=" + startindex + "/" + chunks.size());
-            }
-            else
-            {
-                //
-                // This is the beginning of a new recording. The User
-                // possibly clicked on an allready sending item, so
-                // try to go backwards in time as much as possible and
-                // required to make the recording complete.
-                //
-
-                long startsecs = Simple.getTimeStamp(starttime) / 1000;
-                long nowsecs = Simple.nowAsTimeStamp() / 1000;
-                float secondslost = nowsecs - startsecs;
-
-                while ((secondslost > 0) && (startindex > 0))
-                {
-                    secondslost -= length.get(startindex--);
-                }
-
-                Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
-            }
-
-            if (! appendIPTVStream(recordstatus, mediafile, chunks.get(startindex)))
-            {
-                return false;
-            }
-
-            Json.putFileContent(metafile, metadata);
+            if (loaded <= 1) break;
         }
 
         return true;
@@ -364,13 +369,14 @@ public class MediaRecorder
             input.close();
 
             Json.put(recordstatus, "lastchunk", lastchunk);
-            Json.put(recordstatus, "lastsize", "" + lastSizeLong);
+            Json.put(recordstatus, "lastsize", Long.toString(lastSizeLong));
             Json.put(recordstatus, "chunkcount", chunkcount);
             Json.put(recordstatus, "nextimage", nextimage);
 
             Log.d(LOGTAG, "appendIPTVStream: mediafile=" + mediafile.toString());
             Log.d(LOGTAG, "appendIPTVStream: lastchunk=" + lastchunk);
             Log.d(LOGTAG, "appendIPTVStream: size=" + lastSizeLong + "/" + mediafile.length());
+            Log.d(LOGTAG, "appendIPTVStream: cc=" + chunkcount + "/" + nextimage);
 
             return true;
         }
