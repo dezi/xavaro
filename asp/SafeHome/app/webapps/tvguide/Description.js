@@ -181,6 +181,8 @@ tvguide.nukeWiki = function()
 
 tvguide.openWiki = function()
 {
+    WebAppUtility.makeClick();
+
     var wikifilm = tvguide.description.epg.wikifilm;
     console.log("--> wiki:" + wikifilm);
 
@@ -253,6 +255,8 @@ tvguide.createDescriptionSetup = function()
 
 tvguide.addRecord = function()
 {
+    WebAppUtility.makeClick();
+
     var epg = tvguide.description.epg;
 
     var preload  = tvguide.constants.recordPreload  * 1000 * 60;
@@ -273,12 +277,16 @@ tvguide.addRecord = function()
 
 tvguide.play = function()
 {
+    WebAppUtility.makeClick();
+
     WebAppMedia.openPlayer(tvguide.playFile);
 }
 
 tvguide.removeRecording = function()
 {
+    WebAppUtility.makeClick();
     alert("remove: " + tvguide.removeRec.title);
+
     WebAppMedia.removeRecording(JSON.stringify(tvguide.removeRec));
 
     tvguide.createButtons();
@@ -308,6 +316,13 @@ tvguide.createButton = function(name, color, eventHandler, global)
 
     button.innerHTML           = name;
     button.onTouchClick        = eventHandler;
+
+    WebLibSimple.setFontSpecs(
+        button,
+        25,
+        "normal",
+        "#000000");
+
     WebLibSimple.setBGColor(button, color);
 }
 
@@ -493,8 +508,12 @@ tvguide.descriptionMain = function(target, epg)
     }
 
     tvguide.createSpliteDiv(day + ":", timeSpan, landscape);
-    tvguide.createSpliteDiv("Duration:", duration, landscape);
-    tvguide.createSpliteDiv("Channel:", epg.channel, landscape);
+
+    var durationTrans = WebLibStrings.getTrans("tvguide.duration");
+    tvguide.createSpliteDiv(durationTrans + ":", duration, landscape);
+
+    var channelTrans = WebLibStrings.getTrans("tvguide.channel");
+    tvguide.createSpliteDiv(channelTrans + ":", epg.channel, landscape);
 
     tvguide.createInfoBox(epg.description);
 

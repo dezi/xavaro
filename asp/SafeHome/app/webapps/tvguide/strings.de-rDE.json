@@ -1,0 +1,18 @@
+{
+  "tvguide.channel" : "Kanal",
+  "tvguide.duration" : "Dauer",
+
+  "tvguide.min" : "min",
+  "tvguide.record" : "Aufnehmen",
+  "tvguide.play" : "Ab",
+  "tvguide.remove" : "Remove planned recording",
+
+  "tvguide.at" : "um",
+  "tvguide.today" : "Heute",
+  "tvguide.tomorrow" : "Morgen",
+  "tvguide.yesterday" : "Gestern",
+
+  "tvguide.day.vals" : [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" ],
+
+  "EOL" : true
+}

@@ -34,7 +34,7 @@ tvguide.constants =
     epgScrollfontWeight      : "bold",
 
     timelineColor            : "#dedede",
-    timelineDivColor         : "#ffffff",
+    timelineDivColor         : "#ebe9e9",
     timelineScrollStyleColor : "#000000",
     timelineScrollfontWeight : "bold",
     timelineScrollTextSize   : 15,
@@ -504,7 +504,7 @@ WebAppRequest.onLoadAsyncJSON = function(src, data)
 
     data = data[ "epgdata" ];
 
-    console.log("--> Channel:" + channel);
+    // console.log("--> Channel:" + channel);
 
     DeMoronize.cleanShortShows(data);
 
