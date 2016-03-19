@@ -1090,6 +1090,8 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             while (frags.size() > 10) frags.remove(0);
             nextFragment = frags.get(0);
 
+            Log.d(LOGTAG, "readFragments: first=" + nextFragment);
+
             if (desiredNextFragment == null) desiredNextFragment = nextFragment;
         }
 
