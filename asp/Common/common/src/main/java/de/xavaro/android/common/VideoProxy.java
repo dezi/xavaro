@@ -702,8 +702,6 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 {
                     Log.d(LOGTAG, "=============================== nix drin....");
 
-                    String response = "HTTP/1.1 404 Not found";
-
                     requestOutput.write("HTTP/1.1 404 Not found\r\n".getBytes());
                     requestOutput.write("\r\n".getBytes());
                     requestOutput.flush();
@@ -970,34 +968,6 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         }
 
         @Nullable
-        private String readContent(String url)
-        {
-            try
-            {
-                openUnderscoreConnection(url);
-
-                InputStream input = connection.getInputStream();
-                StringBuilder string = new StringBuilder();
-                byte[] buffer = new byte[ 4096 ];
-                int xfer;
-
-                while ((xfer = input.read(buffer)) >= 0)
-                {
-                    string.append(new String(buffer, 0, xfer));
-                }
-
-                input.close();
-
-                return string.toString();
-            }
-            catch (Exception ignore)
-            {
-            }
-
-            return null;
-        }
-
-        @Nullable
         private String[] readLines(String url)
         {
             try
@@ -1033,213 +1003,6 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             return null;
         }
 
-        private String resolveRelativeUrl(String baseurl, String streamurl)
-        {
-            if (! (streamurl.startsWith("http:") || streamurl.startsWith("https:")))
-            {
-                //
-                // Releative fragment urls.
-                //
-
-                String prefix = baseurl;
-
-                if (prefix.lastIndexOf("/") > 0)
-                {
-                    prefix = prefix.substring(0,prefix.lastIndexOf("/"));
-                }
-
-                while (streamurl.startsWith("../"))
-                {
-                    streamurl = streamurl.substring(3);
-                    prefix = prefix.substring(0,prefix.lastIndexOf("/"));
-                }
-
-                streamurl = prefix + "/" + streamurl;
-            }
-
-            return streamurl;
-        }
-
-        private String elmostring;
-        private String elmoreferrer;
-
-        private boolean readWebpage()
-        {
-            String lines = readContent(requestUrl);
-            if (lines == null) return false;
-
-            //
-            // updateStreamStatistics ('rtl','sd', 'zeus');
-            // updateStreamStatistics ('dmax','sd', 'elmo');
-            //
-
-            String pm = "updateStreamStatistics[^']*'";
-
-            String sender = Simple.getMatch(pm + "([^']*)'", lines);
-            String sdtype = Simple.getMatch(pm + "[^']*','([^']*)'", lines);
-            String server = Simple.getMatch(pm + "[^']*','[^']*', '([^']*)'", lines);
-
-            if ((sender != null) && (sdtype != null) && (server != null))
-            {
-                //
-                // Very special server update to get correct streams.
-                //
-
-                Log.d(LOGTAG, "===============" + sender);
-                Log.d(LOGTAG, "===============" + sdtype);
-                Log.d(LOGTAG, "===============" + server);
-
-                //
-                // http://elmo.ucount.in/stats/update/custom/lstv/kabel1/sd&callback=?
-                // Referer: http://www.live-stream.tv/online/fernsehen/deutsch/kabel1.html
-                //
-
-                if (! server.equals("zeus"))
-                {
-                    elmoreferrer = requestUrl;
-                    elmostring = "http://" + server + ".ucount.in"
-                            + "/stats/update/custom/lstv/"
-                            + sender + "/" + sdtype
-                            + "&callback=?";
-
-                    SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
-                }
-            }
-
-            //
-            // type:'html5', config: { file:'http://lstv3.hls1.stream-server.org/live/orf1@sd/index.m3u8' }
-            //
-
-            String stream = Simple.getMatch("type:'html5'.*?file:'([^']*)'", lines);
-            Log.d(LOGTAG,"=========================================>stream=" + stream);
-
-            if (stream != null)
-            {
-                if ((desiredUrl != null) && desiredUrl.equals(requestUrl)) desiredUrl = stream;
-
-                requestUrl = stream;
-            }
-
-            return (stream != null);
-        }
-
-        private boolean readMaster()
-        {
-            Log.d(LOGTAG,"readMaster: " + requestUrl);
-
-            elmostring = null;
-            elmoreferrer = null;
-
-            if (requestUrl.endsWith(".html") && ! readWebpage()) return false;
-
-            currentOption = -1;
-            streamOptions = new ArrayList<>();
-
-            String[] lines = readLines(requestUrl);
-            if (lines == null) return false;
-
-            Log.d(LOGTAG, "readMaster: " + lines.length);
-
-            boolean havewidhei = false;
-
-            for (int inx = 0; (inx + 1) < lines.length; inx++)
-            {
-                if (!lines[ inx ].startsWith("#EXT-X-STREAM-INF:")) continue;
-
-                String line = lines[ inx ].substring(18);
-
-                String width = Simple.getMatch("RESOLUTION=([0-9]*)x", line);
-                String height = Simple.getMatch("RESOLUTION=[0-9]*x([0-9]*)", line);
-                String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
-                String streamurl = lines[ ++inx ];
-
-                if ((bandwith == null) || (streamurl == null))
-                {
-                    continue;
-                }
-
-                if (havewidhei && ((width == null) || (height == null)))
-                {
-                    //
-                    // Master has at least one stream with width and height
-                    // specification. Do not accept streams w/o this because
-                    // they are audio versions.
-                    //
-
-                    continue;
-                }
-
-                if (streamurl.contains("akamaihd.net/") && streamurl.contains("av-b.m3u8"))
-                {
-                    //
-                    // My guess: these are interlaced variants we do not need.
-                    //
-
-                    continue;
-                }
-
-                streamurl = resolveRelativeUrl(requestUrl, streamurl);
-
-                VideoStream so = new VideoStream();
-
-                so.width = (width == null) ? 0 : Integer.parseInt(width);
-                so.height = (height == null) ? 0 : Integer.parseInt(height);
-
-                so.bandWidth = Integer.parseInt(bandwith);
-                so.streamUrl = streamurl;
-
-                so.quality = VideoQuality.deriveQuality(so.height);
-
-                streamOptions.add(so);
-
-                havewidhei = havewidhei || ((width != null) && (height != null));
-
-                Log.d(LOGTAG, "readMaster: Live-Stream: " + so.width + "x" + so.height + " bw=" + so.bandWidth);
-            }
-
-            if (streamOptions.size() == 0)
-            {
-                //
-                // Nothing found, so add original url as stream.
-                //
-
-                VideoStream so = new VideoStream();
-                so.streamUrl = requestUrl;
-                so.quality = VideoQuality.LQ;
-
-                streamOptions.add(so);
-            }
-
-            //
-            // Preset a medium quality and choose the best
-            // fitting quality the user desired.
-            //
-
-            currentOption = streamOptions.size() >> 2;
-
-            if (desiredQuality > 0)
-            {
-                int currentQuality   = 0;
-                int currentBandwidth = 0;
-
-                for (int inx = 0; inx < streamOptions.size(); inx++)
-                {
-                    VideoStream so = streamOptions.get( inx );
-
-                    if ((so.quality <= desiredQuality)
-                            && (so.quality >= currentQuality)
-                            && (so.bandWidth >= currentBandwidth))
-                    {
-                        currentOption = inx;
-                        currentQuality = so.quality;
-                        currentBandwidth = so.bandWidth;
-                    }
-                }
-            }
-
-            return true;
-        }
-
         private boolean equalsFragment(String last, String line)
         {
             //
@@ -1252,7 +1015,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             return line.endsWith(last.substring(pos));
         }
 
-        private void readFragments() throws Exception
+        private void readFragments()
         {
             //
             // If no fragments have been processed yet,
@@ -1263,9 +1026,11 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             // available otherwise return null.
             //
 
-            if (elmostring != null) SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
+            VideoStream vo = streamOptions.get(currentOption);
 
-            String url = streamOptions.get(currentOption).streamUrl;
+            if (vo.elmostring != null) SimpleRequest.doHTTPGet(vo.elmostring, vo.elmoreferrer);
+
+            String url = vo.streamUrl;
 
             Log.d(LOGTAG, "readFragments: " + url);
 
@@ -1282,7 +1047,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             {
                 if (line.startsWith("#")) continue;
 
-                line = resolveRelativeUrl(url, line);
+                line = VideoStreamMaster.resolveRelativeUrl(url, line);
 
                 frags.add(line);
 
