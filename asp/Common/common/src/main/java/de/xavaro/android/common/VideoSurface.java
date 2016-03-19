@@ -221,7 +221,7 @@ public class VideoSurface extends FrameLayout implements
 
             if (select > 0)
             {
-                pp.setCurrentQuality(select);
+                pp.setDesiredQuality(select);
 
                 pp.playerRestart();
             }

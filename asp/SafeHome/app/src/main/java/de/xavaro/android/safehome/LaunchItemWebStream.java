@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -83,6 +84,8 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
 
         String videourl = Json.getString(config, "videourl");
         if (videourl == null) return;
+
+        Log.d(LOGTAG, "launchVideoPlayer:" + videourl);
 
         VideoProxy.getInstance().setVideoUrl(videourl, this);
 

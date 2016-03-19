@@ -81,6 +81,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
     //endregion
 
+    private ProxyPlayerStarter startPlayer;
     private ServerSocket proxySocket;
     private int proxyPort;
 
@@ -112,7 +113,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-        ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+        startPlayer = new ProxyPlayerStarter();
         startPlayer.start();
     }
 
@@ -126,9 +127,9 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         mediaIsAudio = false;
         mediaIsVideo = false;
 
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        //mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-        ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+        startPlayer = new ProxyPlayerStarter();
         startPlayer.start();
     }
 
@@ -147,7 +148,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         mediaIsAudio = false;
         mediaIsVideo = true;
 
-        ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+        startPlayer = new ProxyPlayerStarter();
         startPlayer.start();
     }
 
@@ -292,13 +293,22 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             // Full restart on media player.
             //
 
-            ProxyPlayerStarter startPlayer = new ProxyPlayerStarter();
+            startPlayer = new ProxyPlayerStarter();
             startPlayer.start();
         }
     }
 
     public void playerReset()
     {
+        if (startPlayer != null)
+        {
+            if (startPlayer.isAlive())
+            {
+                startPlayer.interrupt();
+                startPlayer = null;
+            }
+        }
+
         if (mediaPlayer != null)
         {
             mediaPlayer.reset();
@@ -314,9 +324,14 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         playing = null;
     }
 
-    public void setCurrentQuality(int quality)
+    public void setDesiredQuality(int quality)
     {
         desiredQuality = quality;
+    }
+
+    public int getDesiredQuality()
+    {
+        return desiredQuality;
     }
 
     public int getCurrentQuality()
@@ -347,7 +362,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
         if (streamOptions != null)
         {
-            for (VideoStreams so : streamOptions)
+            for (VideoStream so : streamOptions)
             {
                 mask |= so.quality;
             }
@@ -356,9 +371,17 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         return mask;
     }
 
+    public void setStreamOptions(ArrayList<VideoStream> streamOptions, int currentOption)
+    {
+        this.streamOptions = streamOptions;
+        this.currentOption = currentOption;
+    }
+
     //endregion Control methods.
 
     //region Proxy server thread.
+
+    private VideoProxyWorker worker;
 
     @Override
     public void run()
@@ -377,8 +400,16 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 Log.d(LOGTAG, "Accepted connection on port " + proxyPort);
 
-                VideoProxyWorker worker = new VideoProxyWorker(connect);
+                if (worker != null)
+                {
+                    if (worker.isAlive())
+                    {
+                        worker.terminate();
+                        worker = null;
+                    }
+                }
 
+                worker = new VideoProxyWorker(connect);
                 worker.start();
             }
         }
@@ -490,11 +521,16 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 try
                 {
+                    Log.d(LOGTAG, "ProxyPlayerStarter: vor prepare...");
                     mediaPlayer.prepare();
+                    Log.d(LOGTAG, "ProxyPlayerStarter: nach prepare...");
+
                     mediaPrepared = true;
                 }
                 catch (IOException ex)
                 {
+
+                    Log.d(LOGTAG, "ProxyPlayerStarter: exept prepare...");
                     if (current != null) current.onPlaybackFinished();
                     VideoSurface.getInstance().onPlaybackFinished();
 
@@ -503,13 +539,18 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                     return;
                 }
 
+                Log.d(LOGTAG, "ProxyPlayerStarter: vor start...");
+
                 mediaPlayer.start();
+                Log.d(LOGTAG, "ProxyPlayerStarter: nach start...");
 
                 playing = current;
 
                 if (playing != null) playing.onPlaybackStartet();
                 if (isVideo()) VideoSurface.getInstance().onPlaybackStartet();
             }
+
+            Log.d(LOGTAG, "ProxyPlayerStarter: done.");
         }
     }
 
@@ -529,7 +570,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
     private String desiredNextFragment;
     private int desiredQuality;
 
-    private ArrayList<VideoStreams> streamOptions;
+    private ArrayList<VideoStream> streamOptions;
     private int currentOption;
 
     private boolean mediaPrepared;
@@ -550,10 +591,13 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         // Request properties.
         //
 
+        private boolean running;
+
         private InputStream requestInput;
         private OutputStream requestOutput;
 
         private String requestUrl;
+        private String indexUrl;
 
         private boolean requestIsAudio;
         private boolean requestIsVideo;
@@ -585,6 +629,12 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         {
             requestInput = connect.getInputStream();
             requestOutput = connect.getOutputStream();
+            running = true;
+        }
+
+        public void terminate()
+        {
+            running = false;
         }
 
         @Override
@@ -645,9 +695,18 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 // Try to read in stream configuration.
                 //
 
-                if (! readMaster())
+                VideoStreamMaster sm = new VideoStreamMaster(requestUrl);
+                indexUrl = sm.readMaster();
+
+                if (indexUrl == null)
                 {
                     Log.d(LOGTAG, "=============================== nix drin....");
+
+                    String response = "HTTP/1.1 404 Not found";
+
+                    requestOutput.write("HTTP/1.1 404 Not found\r\n".getBytes());
+                    requestOutput.write("\r\n".getBytes());
+                    requestOutput.flush();
 
                     playerReset();
                 }
@@ -666,7 +725,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                         nextFragment = desiredNextFragment;
                     }
 
-                    while (true)
+                    while (running)
                     {
                         while (nextFragment == null)
                         {
@@ -674,8 +733,12 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                             if (nextFragment != null) break;
 
-                            StaticUtils.sleep(10000);
+                            StaticUtils.sleep(5000);
+
+                            if (! running) break;
                         }
+
+                        if (!running) break;
 
                         Log.d(LOGTAG, "workOnVideo: fragment: " + nextFragment);
 
@@ -752,16 +815,26 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                             first = false;
                         }
 
-                        while (true)
+                        try
                         {
-                            xfer = fraginput.read(buffer, 0, buffer.length);
-                            if (xfer < 0) break;
+                            while (running)
+                            {
+                                xfer = fraginput.read(buffer, 0, buffer.length);
+                                if (xfer < 0) break;
 
-                            requestOutput.write(buffer, 0, xfer);
-                            requestOutput.flush();
+                                requestOutput.write(buffer, 0, xfer);
+                                requestOutput.flush();
 
-                            total += xfer;
-                            fragt += xfer;
+                                total += xfer;
+                                fragt += xfer;
+                            }
+                        }
+                        catch (Exception ignore)
+                        {
+                            Log.d(LOGTAG, "workOnVideo: player closed connect...");
+
+                            fraginput.close();
+                            break;
                         }
 
                         fraginput.close();
@@ -826,7 +899,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 byte[] buffer = new byte[ 4096 ];
                 int xfer, max, chunk = 0;
 
-                while (true)
+                while (running)
                 {
                     max = (icymetaint > 0) ? icymetaint - chunk : buffer.length;
                     if (max > buffer.length) max = buffer.length;
@@ -1000,9 +1073,11 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             // updateStreamStatistics ('dmax','sd', 'elmo');
             //
 
-            String sender = Simple.getMatch("updateStreamStatistics[^']*'([^']*)'", lines);
-            String sdtype = Simple.getMatch("updateStreamStatistics[^']*'[^']*','([^']*)'", lines);
-            String server = Simple.getMatch("updateStreamStatistics[^']*'[^']*','[^']*', '([^']*)'", lines);
+            String pm = "updateStreamStatistics[^']*'";
+
+            String sender = Simple.getMatch(pm + "([^']*)'", lines);
+            String sdtype = Simple.getMatch(pm + "[^']*','([^']*)'", lines);
+            String server = Simple.getMatch(pm + "[^']*','[^']*', '([^']*)'", lines);
 
             if ((sender != null) && (sdtype != null) && (server != null))
             {
@@ -1015,16 +1090,20 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 Log.d(LOGTAG, "===============" + server);
 
                 //
-                // http://elmo.ucount.in/stats/update/custom/lstv/kabel1/sd&_=1458375092884&callback=?
+                // http://elmo.ucount.in/stats/update/custom/lstv/kabel1/sd&callback=?
                 // Referer: http://www.live-stream.tv/online/fernsehen/deutsch/kabel1.html
+                //
 
-                elmoreferrer = requestUrl;
-                elmostring = "http://" + server + ".ucount.in"
-                        + "/stats/update/custom/lstv/"
-                        + sender + "/" + sdtype
-                        + "&callback=?";
+                if (! server.equals("zeus"))
+                {
+                    elmoreferrer = requestUrl;
+                    elmostring = "http://" + server + ".ucount.in"
+                            + "/stats/update/custom/lstv/"
+                            + sender + "/" + sdtype
+                            + "&callback=?";
 
-                SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
+                    SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
+                }
             }
 
             //
@@ -1101,7 +1180,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 streamurl = resolveRelativeUrl(requestUrl, streamurl);
 
-                VideoStreams so = new VideoStreams();
+                VideoStream so = new VideoStream();
 
                 so.width = (width == null) ? 0 : Integer.parseInt(width);
                 so.height = (height == null) ? 0 : Integer.parseInt(height);
@@ -1124,7 +1203,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 // Nothing found, so add original url as stream.
                 //
 
-                VideoStreams so = new VideoStreams();
+                VideoStream so = new VideoStream();
                 so.streamUrl = requestUrl;
                 so.quality = VideoQuality.LQ;
 
@@ -1145,7 +1224,7 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 for (int inx = 0; inx < streamOptions.size(); inx++)
                 {
-                    VideoStreams so = streamOptions.get( inx );
+                    VideoStream so = streamOptions.get( inx );
 
                     if ((so.quality <= desiredQuality)
                             && (so.quality >= currentQuality)
@@ -1224,6 +1303,8 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
                 //
                 // Playlist is at end. Simply do nothing and wait.
                 //
+
+                Log.d(LOGTAG, "readFragments: at end");
 
                 return;
             }

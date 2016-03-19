@@ -1,6 +1,6 @@
 package de.xavaro.android.common;
 
-public class VideoStreams
+public class VideoStream
 {
     public String streamUrl;
 
@@ -9,4 +9,7 @@ public class VideoStreams
 
     public int width;
     public int height;
+
+    public String elmostring;
+    public String elmoreferrer;
 }
