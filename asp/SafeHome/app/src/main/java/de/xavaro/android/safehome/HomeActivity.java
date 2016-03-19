@@ -23,6 +23,7 @@ import de.xavaro.android.common.MediaRecorder;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
+import de.xavaro.android.common.SimpleRequest;
 import de.xavaro.android.common.VideoSurface;
 
 public class HomeActivity extends AppCompatActivity implements
@@ -103,6 +104,8 @@ public class HomeActivity extends AppCompatActivity implements
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         topscreen.setOnSystemUiVisibilityChangeListener(this);
+
+        SimpleRequest.testDat();
     }
 
     private final Runnable makeFullscreen = new Runnable()

@@ -987,10 +987,45 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             return streamurl;
         }
 
+        private String elmostring;
+        private String elmoreferrer;
+
         private boolean readWebpage()
         {
             String lines = readContent(requestUrl);
             if (lines == null) return false;
+
+            //
+            // updateStreamStatistics ('rtl','sd', 'zeus');
+            // updateStreamStatistics ('dmax','sd', 'elmo');
+            //
+
+            String sender = Simple.getMatch("updateStreamStatistics[^']*'([^']*)'", lines);
+            String sdtype = Simple.getMatch("updateStreamStatistics[^']*'[^']*','([^']*)'", lines);
+            String server = Simple.getMatch("updateStreamStatistics[^']*'[^']*','[^']*', '([^']*)'", lines);
+
+            if ((sender != null) && (sdtype != null) && (server != null))
+            {
+                //
+                // Very special server update to get correct streams.
+                //
+
+                Log.d(LOGTAG, "===============" + sender);
+                Log.d(LOGTAG, "===============" + sdtype);
+                Log.d(LOGTAG, "===============" + server);
+
+                //
+                // http://elmo.ucount.in/stats/update/custom/lstv/kabel1/sd&_=1458375092884&callback=?
+                // Referer: http://www.live-stream.tv/online/fernsehen/deutsch/kabel1.html
+
+                elmoreferrer = requestUrl;
+                elmostring = "http://" + server + ".ucount.in"
+                        + "/stats/update/custom/lstv/"
+                        + sender + "/" + sdtype
+                        + "&callback=?";
+
+                SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
+            }
 
             //
             // type:'html5', config: { file:'http://lstv3.hls1.stream-server.org/live/orf1@sd/index.m3u8' }
@@ -1012,6 +1047,9 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
         private boolean readMaster()
         {
             Log.d(LOGTAG,"readMaster: " + requestUrl);
+
+            elmostring = null;
+            elmoreferrer = null;
 
             if (requestUrl.endsWith(".html") && ! readWebpage()) return false;
 
@@ -1145,6 +1183,8 @@ public class VideoProxy extends Thread implements MediaPlayer.OnSeekCompleteList
             // next fragment after last, if it already
             // available otherwise return null.
             //
+
+            if (elmostring != null) SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
 
             String url = streamOptions.get(currentOption).streamUrl;
 
