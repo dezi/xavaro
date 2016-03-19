@@ -528,7 +528,7 @@ tvguide.updateEpgPast = function()
     var updateHours  = 24;
     var hoursPix     = tvguide.constants.hoursPix;
     var loadHours    = tvguide.constants.loadHours;
-    var loadDaysPast = tvguide.constants.loadDaysPast;
+    var loadDaysPast = tvguide.constants.loadDaysPast + 1;
     var today        = tvguide.constants.today;
 
     var epgScroll = tvguide.epgScroll;
@@ -552,30 +552,31 @@ tvguide.updateEpgPast = function()
     tvguide.PastLine.style.left = "0px";
     tvguide.PastLine.style.width = tvguide.PastLine.clientWidth + hoursPix * 24 + "px";
 
-
-    loadDaysPast += 1;
     tvguide.constants.timeShift = today - (loadDaysPast * 24 * 60);
 
     tvguide.updateEpgData(loadDaysPast * -1);
+
+    tvguide.constants.loadDaysPast = loadDaysPast;
+    tvguide.constants.loadHours    = loadHours + updateHours;
 }
 
 tvguide.updateEpgFuture = function()
 {
     alert("Scroll Future");
 
+
     var updateHours    = 24;
     var hoursPix       = tvguide.constants.hoursPix;
-    var loadHours      = tvguide.constants.loadHours;
+    var loadHours      = tvguide.constants.loadHours + updateHours;
 
-    tvguide.updateTimeLine(loadHours, loadHours + updateHours);
-
-    tvguide.constants.loadHours = tvguide.constants.loadHours + updateHours;
+    tvguide.updateTimeLine(loadHours - updateHours, loadHours);
 
     var epgScroll         = tvguide.epgScroll;
-    epgScroll.style.width = (tvguide.constants.loadHours * hoursPix) + "px";
+    epgScroll.style.width = (loadHours * hoursPix) + "px";
 
     tvguide.updateEpgData(tvguide.constants.loadDaysFuture);
 
+    tvguide.constants.loadHours      = loadHours;
     tvguide.constants.loadDaysFuture = tvguide.constants.loadDaysFuture + 1;
 }
 
