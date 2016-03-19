@@ -670,12 +670,15 @@ tvguide.onEPGTouchScroll = function(newX, newY)
         if (newX == 0)
         {
             console.log("Update EPG");
-
-//             tvguide.constants.loadDaysPast = 1;
-//
-//             tvguide.calculateDates();
-
             tvguide.updateEpg();
+        }
+
+        if (tvguide.epgScroll.clientWidth + newX == tvguide.content1.clientWidth)
+        {
+            console.log("Update EPG");
+
+//            tvguide.constants.loadDay
+//            tvguide.updateEpgData(loadDaysPast * -1);
         }
     }
 
