@@ -6,7 +6,7 @@ import android.util.Log;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.VideoProxy;
+import de.xavaro.android.common.MediaProxy;
 
 public class LaunchItemWebStream extends LaunchItemProxyPlayer
 {
@@ -73,7 +73,7 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
         String audiourl = Json.getString(config, "audiourl");
         if (audiourl == null) return;
 
-        VideoProxy.getInstance().setAudioUrl(audiourl, this);
+        MediaProxy.getInstance().setAudioUrl(audiourl, this);
 
         bubbleControls();
     }
@@ -87,7 +87,7 @@ public class LaunchItemWebStream extends LaunchItemProxyPlayer
 
         Log.d(LOGTAG, "launchVideoPlayer:" + videourl);
 
-        VideoProxy.getInstance().setVideoUrl(videourl, this);
+        MediaProxy.getInstance().setVideoUrl(videourl, this);
 
         bubbleControls();
     }

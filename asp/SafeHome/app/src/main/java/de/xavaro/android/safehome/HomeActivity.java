@@ -19,16 +19,15 @@ import java.util.ArrayList;
 import de.xavaro.android.common.BackkeyHandler;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
-import de.xavaro.android.common.MediaRecorder;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.SimpleRequest;
-import de.xavaro.android.common.VideoSurface;
+import de.xavaro.android.common.MediaSurface;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
-        VideoSurface.VideoSurfaceHandler,
+        MediaSurface.VideoSurfaceHandler,
         BackkeyHandler
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();

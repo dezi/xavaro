@@ -4,15 +4,15 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-public class VideoStreamMaster
+public class MediaStreamMaster
 {
-    private static final String LOGTAG = VideoStreamMaster.class.getSimpleName();
+    private static final String LOGTAG = MediaStreamMaster.class.getSimpleName();
 
     private String requestUrl;
     private String elmostring;
     private String elmoreferrer;
 
-    public VideoStreamMaster(String requestUrl)
+    public MediaStreamMaster(String requestUrl)
     {
         this.requestUrl = requestUrl;
     }
@@ -23,7 +23,7 @@ public class VideoStreamMaster
 
         if (requestUrl.endsWith(".html") && ! readWebpage()) return null;
 
-        ArrayList<VideoStream> streamOptions = new ArrayList<>();
+        ArrayList<MediaStream> streamOptions = new ArrayList<>();
 
         String[] lines = SimpleRequest.readLines(requestUrl);
         if (lines == null) return null;
@@ -70,14 +70,14 @@ public class VideoStreamMaster
 
             streamurl = resolveRelativeUrl(requestUrl, streamurl);
 
-            VideoStream so = new VideoStream();
+            MediaStream so = new MediaStream();
 
             so.streamUrl = streamurl;
 
             so.width = (width == null) ? 0 : Integer.parseInt(width);
             so.height = (height == null) ? 0 : Integer.parseInt(height);
 
-            so.quality = VideoQuality.deriveQuality(so.height);
+            so.quality = MediaQuality.deriveQuality(so.height);
             so.bandWidth = Integer.parseInt(bandwith);
 
             so.elmostring = elmostring;
@@ -97,11 +97,11 @@ public class VideoStreamMaster
             // Nothing found, so add original url as stream.
             //
 
-            VideoStream so = new VideoStream();
+            MediaStream so = new MediaStream();
 
             so.streamUrl = requestUrl;
 
-            so.quality = VideoQuality.LQ;
+            so.quality = MediaQuality.LQ;
 
             so.elmostring = elmostring;
             so.elmoreferrer = elmoreferrer;
@@ -115,7 +115,7 @@ public class VideoStreamMaster
         //
 
         int currentOption = streamOptions.size() >> 2;
-        int desiredQuality = VideoProxy.getInstance().getDesiredQuality();
+        int desiredQuality = MediaProxy.getInstance().getDesiredQuality();
 
         if (desiredQuality > 0)
         {
@@ -124,7 +124,7 @@ public class VideoStreamMaster
 
             for (int inx = 0; inx < streamOptions.size(); inx++)
             {
-                VideoStream so = streamOptions.get( inx );
+                MediaStream so = streamOptions.get( inx );
 
                 if ((so.quality <= desiredQuality)
                         && (so.quality >= currentQuality)
@@ -137,7 +137,7 @@ public class VideoStreamMaster
             }
         }
 
-        VideoProxy.getInstance().setStreamOptions(streamOptions, currentOption);
+        MediaProxy.getInstance().setStreamOptions(streamOptions, currentOption);
 
         return streamOptions.get(currentOption).streamUrl;
     }
