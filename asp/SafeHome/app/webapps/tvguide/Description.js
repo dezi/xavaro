@@ -204,7 +204,7 @@ tvguide.openWiki = function()
     var border = 50;
     var wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
 
-    WebLibSimple.setBGColor(wikiFrame, "#000000");
+    WebLibSimple.setBGColor(wikiFrame, "#ffffff");
 
     //
     // iframe

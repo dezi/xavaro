@@ -80,16 +80,6 @@ DeMoronize.cleanTime = function(moronedEpg)
     return epg;
 }
 
-DeMoronize.getDuration = function(broadcast)
-{
-    var start = new Date(broadcast.start);
-    var stop  = new Date(broadcast.stop );
-
-    var duration = stop.getTime() - start.getTime();
-
-    return duration / 1000 / 60;
-}
-
 DeMoronize.cleanShortShows = function(data)
 {
     if (! data) return;
@@ -107,7 +97,7 @@ DeMoronize.cleanShortShows = function(data)
             src.start = lastBroadcast.stop;
         }
 
-        var duration = DeMoronize.getDuration(src);
+        var duration = WebLibSimple.getDuration(src.start, src.stop) / 1000 / 60;
 
         if (duration <= 4 && lastBroadcast)
         {
