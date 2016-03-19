@@ -468,8 +468,6 @@ public class MediaProxyWorker extends Thread
         nextFragment = frags.get(0);
 
         Log.d(LOGTAG, "readFragments: first=" + nextFragment);
-
-        //if (desiredNextFragment == null) desiredNextFragment = nextFragment;
     }
 
     @Nullable

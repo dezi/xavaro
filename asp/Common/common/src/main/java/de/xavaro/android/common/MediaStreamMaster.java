@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -9,24 +10,47 @@ public class MediaStreamMaster
     private static final String LOGTAG = MediaStreamMaster.class.getSimpleName();
 
     private String requestUrl;
+
     private String elmostring;
     private String elmoreferrer;
 
-    public MediaStreamMaster(String requestUrl)
+    private ArrayList<MediaStream> streamOptions;
+    private int currentOption;
+    private int desiredQuality;
+
+    public MediaStreamMaster(String requestUrl, int desiredQuality)
     {
         this.requestUrl = requestUrl;
+        this.desiredQuality = desiredQuality;
     }
 
-    public String readMaster()
+    @Nullable
+    public ArrayList<MediaStream> getStreamOptions()
+    {
+        return streamOptions;
+    }
+
+    public int getCurrentOption()
+    {
+        return currentOption;
+    }
+
+    @Nullable
+    public MediaStream getCurrentStream()
+    {
+        return (streamOptions != null) ? streamOptions.get(currentOption) : null;
+    }
+
+    public boolean readMaster()
     {
         Log.d(LOGTAG, "readMaster: " + requestUrl);
 
-        if (requestUrl.endsWith(".html") && ! readWebpage()) return null;
+        if (requestUrl.endsWith(".html") && ! readWebpage()) return false;
 
-        ArrayList<MediaStream> streamOptions = new ArrayList<>();
+        streamOptions = new ArrayList<>();
 
         String[] lines = SimpleRequest.readLines(requestUrl);
-        if (lines == null) return null;
+        if (lines == null) return false;
 
         Log.d(LOGTAG, "readMaster: " + lines.length);
 
@@ -114,8 +138,7 @@ public class MediaStreamMaster
         // fitting quality the user desired.
         //
 
-        int currentOption = streamOptions.size() >> 2;
-        int desiredQuality = MediaProxy.getInstance().getDesiredQuality();
+        currentOption = streamOptions.size() >> 2;
 
         if (desiredQuality > 0)
         {
@@ -137,9 +160,7 @@ public class MediaStreamMaster
             }
         }
 
-        MediaProxy.getInstance().setStreamOptions(streamOptions, currentOption);
-
-        return streamOptions.get(currentOption).streamUrl;
+        return true;
     }
 
     //

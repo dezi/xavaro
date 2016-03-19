@@ -193,7 +193,19 @@ public class MediaRecorder
 
         while (true)
         {
-            String[] playlist = readLines(iptvplaylist);
+            String elmostring = Json.getString(recording, "elmostring");
+            String elmoreferrer = Json.getString(recording, "elmoreferrer");
+
+            if (elmostring != null)
+            {
+                //
+                // Update specific website if required.
+                //
+
+                SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
+            }
+
+            String[] playlist = SimpleRequest.readLines(iptvplaylist);
             if ((playlist == null) || (playlist.length == 0)) return false;
 
             Log.d(LOGTAG, "dosomeRecording: loaded playlist:" + playlist.length);
@@ -224,7 +236,7 @@ public class MediaRecorder
 
                 if (line.startsWith("#")) continue;
 
-                lastline = resolveRelativeUrl(masterurl, line);
+                lastline = MediaStreamMaster.resolveRelativeUrl(masterurl, line);
 
                 chunks.add(lastline);
                 length.add(lastlength);
@@ -407,8 +419,8 @@ public class MediaRecorder
         if (iptvchannel == null) return false;
 
         String masterurl = Json.getString(iptvchannel, "videourl");
-        String iptvplaylist = identifyPlaylist(masterurl);
-        if (iptvplaylist == null) return false;
+        MediaStream iptvstream = identifyPlaylist(masterurl);
+        if (iptvstream == null) return false;
 
         File mediadir = Simple.getMediaPath("recordings");
         Simple.makeDirectory(mediadir);
@@ -427,7 +439,9 @@ public class MediaRecorder
 
         Json.put(recording, "masterurl", masterurl);
         Json.put(recording, "iptvchannel", iptvchannel);
-        Json.put(recording, "iptvplaylist", iptvplaylist);
+        Json.put(recording, "iptvplaylist", iptvstream.streamUrl);
+        Json.put(recording, "elmostring", iptvstream.elmostring);
+        Json.put(recording, "elmoreferrer", iptvstream.elmoreferrer);
 
         Log.d(LOGTAG, "setupIPTVStream: " + Json.defuck(recording.toString()));
 
@@ -483,127 +497,19 @@ public class MediaRecorder
     }
 
     @Nullable
-    private static String identifyPlaylist(String requestUrl)
+    private static MediaStream identifyPlaylist(String requestUrl)
     {
         Log.d(LOGTAG,"identifyPlaylist: " + requestUrl);
 
-        JSONArray streamOptions = new JSONArray();
-        String[] lines = readLines(requestUrl);
+        MediaStreamMaster sm = new MediaStreamMaster(requestUrl, MediaQuality.HD);
 
-        if (lines != null)
-        {
-            Log.d(LOGTAG, "identifyPlaylist: " + lines.length);
-
-            for (int inx = 0; (inx + 1) < lines.length; inx++)
-            {
-                if (! lines[ inx ].startsWith("#EXT-X-STREAM-INF:")) continue;
-
-                String line = lines[ inx ].substring(18);
-
-                String width = Simple.getMatch("RESOLUTION=([0-9]*)x", line);
-                String height = Simple.getMatch("RESOLUTION=[0-9]*x([0-9]*)", line);
-                String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
-                String streamurl = lines[ ++inx ];
-
-                if ((bandwith == null) || (streamurl == null))
-                {
-                    continue;
-                }
-
-                if (streamurl.contains("akamaihd.net/") && streamurl.contains("av-b.m3u8"))
-                {
-                    //
-                    // My guess: these are interlaced variants we do not need.
-                    //
-
-                    continue;
-                }
-
-                streamurl = resolveRelativeUrl(requestUrl, streamurl);
-
-                JSONObject so = new JSONObject();
-
-                Json.put(so, "width", (width == null) ? 0 : Integer.parseInt(width));
-                Json.put(so, "height", (height == null) ? 0 : Integer.parseInt(height));
-                Json.put(so, "bandwith", Integer.parseInt(bandwith));
-                Json.put(so, "streamurl", streamurl);
-
-                streamOptions.put(so);
-
-                Log.d(LOGTAG, "identifyPlaylist: Live-Stream: " + width + "x" + height + " bw=" + bandwith);
-            }
-        }
-
-        if (streamOptions.length() == 0)
+        if (! sm.readMaster())
         {
             Log.d(LOGTAG, "identifyPlaylist: No streams found: " + requestUrl);
 
             return null;
         }
 
-        streamOptions = Json.sortInteger(streamOptions, "bandwith", true);
-        JSONObject streamOption = Json.getObject(streamOptions, 0);
-
-        return (streamOption != null) ? Json.getString(streamOption, "streamurl") : null;
-    }
-
-    private static String resolveRelativeUrl(String baseurl, String streamurl)
-    {
-        if (! (streamurl.startsWith("http:") || streamurl.startsWith("https:")))
-        {
-            //
-            // Releative fragment urls.
-            //
-
-            String prefix = baseurl;
-
-            if (prefix.lastIndexOf("/") > 0)
-            {
-                prefix = prefix.substring(0,prefix.lastIndexOf("/"));
-            }
-
-            while (streamurl.startsWith("../"))
-            {
-                streamurl = streamurl.substring(3);
-                prefix = prefix.substring(0,prefix.lastIndexOf("/"));
-            }
-
-            streamurl = prefix + "/" + streamurl;
-        }
-
-        return streamurl;
-    }
-
-    @Nullable
-    private static String[] readLines(String url)
-    {
-        try
-        {
-            HttpURLConnection connection = Simple.openUnderscoreConnection(url);
-            InputStream input = connection.getInputStream();
-
-            StringBuilder string = new StringBuilder();
-            byte[] buffer = new byte[ 4096 ];
-            int xfer;
-
-            while ((xfer = input.read(buffer)) > 0)
-            {
-                string.append(new String(buffer, 0, xfer));
-            }
-
-            input.close();
-
-            String temp = string.toString();
-
-            if (temp.contains("\r\n")) return temp.split("\r\n");
-
-            return temp.split("\n");
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return null;
+        return sm.getCurrentStream();
     }
 }

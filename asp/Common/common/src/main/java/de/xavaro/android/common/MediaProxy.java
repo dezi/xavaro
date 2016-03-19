@@ -492,17 +492,18 @@ public class MediaProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
                 if (proxyIsVideo)
                 {
-                    MediaStreamMaster sm = new MediaStreamMaster(proxyUrl);
+                    MediaStreamMaster sm = new MediaStreamMaster(proxyUrl, desiredQuality);
 
-                    String indexUrl = sm.readMaster();
-
-                    if (indexUrl == null)
+                    if (! sm.readMaster())
                     {
                         if (current != null) current.onPlaybackFinished();
                         if (isVideo()) MediaSurface.getInstance().onPlaybackFinished();
 
                         return;
                     }
+
+                    streamOptions = sm.getStreamOptions();
+                    currentOption = sm.getCurrentOption();
                 }
 
                 if (proxyIsAudio || proxyIsVideo)
