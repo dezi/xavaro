@@ -457,7 +457,6 @@ tvguide.createEpgProgram = function(channelName, epgdata)
     }
 }
 
-
 tvguide.updateEpgData = function(loadDay)
 {
     var cDate = new Date().getTime() + (loadDay * 1000 * 60 * 60 * 24);
@@ -522,9 +521,9 @@ tvguide.createEpgBodyScroll = function()
     tvguide.getEpgData();
 }
 
-tvguide.updateEpg = function()
+tvguide.updateEpgPast = function()
 {
-    alert("Scroll");
+    alert("Scroll Past");
 
     var updateHours  = 24;
     var hoursPix     = tvguide.constants.hoursPix;
@@ -543,8 +542,6 @@ tvguide.updateEpg = function()
 
     tvguide.updateTimeLine(loadHours, loadHours + updateHours);
 
-    console.log("tvguide.updateEpgData");
-
     for (var broadcast = 0; broadcast < childLength; broadcast++)
     {
         var child         = epgScroll.childNodes[ broadcast ];
@@ -560,6 +557,26 @@ tvguide.updateEpg = function()
     tvguide.constants.timeShift = today - (loadDaysPast * 24 * 60);
 
     tvguide.updateEpgData(loadDaysPast * -1);
+}
+
+tvguide.updateEpgFuture = function()
+{
+    alert("Scroll Future");
+
+    var updateHours    = 24;
+    var hoursPix       = tvguide.constants.hoursPix;
+    var loadHours      = tvguide.constants.loadHours;
+
+    tvguide.updateTimeLine(loadHours, loadHours + updateHours);
+
+    tvguide.constants.loadHours = tvguide.constants.loadHours + updateHours;
+
+    var epgScroll         = tvguide.epgScroll;
+    epgScroll.style.width = (tvguide.constants.loadHours * hoursPix) + "px";
+
+    tvguide.updateEpgData(tvguide.constants.loadDaysFuture);
+
+    tvguide.constants.loadDaysFuture = tvguide.constants.loadDaysFuture + 1;
 }
 
 WebAppRequest.onLoadAsyncJSON = function(src, data)
@@ -669,16 +686,14 @@ tvguide.onEPGTouchScroll = function(newX, newY)
 
         if (newX == 0)
         {
-            console.log("Update EPG");
-            tvguide.updateEpg();
+            console.log("Update EPG past");
+            tvguide.updateEpgPast();
         }
 
         if (tvguide.epgScroll.clientWidth + newX == tvguide.content1.clientWidth)
         {
-            console.log("Update EPG");
-
-//            tvguide.constants.loadDay
-//            tvguide.updateEpgData(loadDaysPast * -1);
+            console.log("Update EPG future");
+            tvguide.updateEpgFuture();
         }
     }
 
