@@ -180,6 +180,8 @@ public class SimpleRequest
                     }
                 }
 
+                Log.d(LOGTAG, "doHTTPGet: res=" + new String(response));
+
                 return new String(response);
             }
             else
