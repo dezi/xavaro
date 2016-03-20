@@ -108,7 +108,7 @@ public class MediaProxy extends Thread implements MediaPlayer.OnSeekCompleteList
     {
         setAudioUrl(url, null);
     }
-    
+
     public void setAudioUrl(String url, Callback caller)
     {
         calling = caller;
