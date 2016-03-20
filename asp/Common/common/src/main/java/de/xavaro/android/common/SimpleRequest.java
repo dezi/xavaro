@@ -54,6 +54,8 @@ public class SimpleRequest
     {
         try
         {
+            Log.d(LOGTAG, "doHTTPGet: " + src);
+
             URL url = new URL(src);
 
             InetAddress ip = InetAddress.getByName(url.getHost());

@@ -114,6 +114,16 @@ public class PreferenceFragments
                         String iconurl = Json.getString(channel, "icon");
                         String iconname = website + "." + label;
                         Drawable drawable = CacheManager.getWebIcon(iconname, iconurl);
+                        boolean developer = Json.getBoolean(channel, "develop");
+
+                        if (developer && ! Simple.getSharedPrefBoolean("developer.enable"))
+                        {
+                            //
+                            // Developer only enabled content.
+                            //
+
+                            continue;
+                        }
 
                         lp = new NicedPreferences.NiceListPreference(context);
 

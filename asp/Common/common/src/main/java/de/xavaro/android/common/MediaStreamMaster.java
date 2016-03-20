@@ -204,7 +204,7 @@ public class MediaStreamMaster
                 elmostring = "http://" + server + ".ucount.in"
                         + "/stats/update/custom/lstv/"
                         + sender + "/" + sdtype
-                        + "&callback=?";
+                        + "&_=424242&callback=?";
 
                 SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
             }

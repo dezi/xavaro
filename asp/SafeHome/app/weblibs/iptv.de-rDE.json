@@ -622,6 +622,145 @@
         "aliase": [ "tv/de/Deluxe Music", "tv/de/Deluxe Music HD" ]
       }
     ]
+  },
+
+  "www.eurosport.de": {
+
+    "label": "EUROSPORT",
+    "url": "http://www.eurosport.de/",
+    "icon": "http://pbs.twimg.com/profile_images/664929268003176449/R0Wi-91u_400x400.png",
+
+    "channels": [
+      {
+        "label": "EUROSPORT",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/664929268003176449/R0Wi-91u_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/eurosport.html",
+        "aliase": [ "tv/de/Eurosport 1 Germany", "tv/de/Eurosport 1 Germany HD" ]
+      }
+    ]
+  },
+
+  "www.sport1.de": {
+
+    "label": "SPORT 1",
+    "url": "http://www.sport1.de/",
+    "icon": "http://pbs.twimg.com/profile_images/667111090493460480/Th7E6yTQ_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "SPORT 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/667111090493460480/Th7E6yTQ_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sport1.html",
+        "aliase": [ "tv/de/Sport 1", "tv/de/Sport 1 HD" ]
+      }
+    ]
+  },
+
+  "www.orf.at": {
+
+    "label": "ORF",
+    "url": "http://www.orf.at/",
+    "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
+
+    "channels": [
+      {
+        "label": "ORF 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/orf1.html",
+        "aliase": [ "tv/de/ORF Eins", "tv/de/ORF Eins HD" ]
+      },
+      {
+      "label": "ORF 2",
+      "default": false,
+      "develop": true,
+      "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
+      "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/orf2.html",
+      "aliase": [ "tv/de/ORF 2", "tv/de/ORF 2 HD" ]
+      }
+    ]
+  },
+
+  "www.atv.at": {
+
+    "label": "ATV",
+    "url": "http://www.atv.at/",
+    "icon": "http://pbs.twimg.com/profile_images/488581242359541760/Rei25M59_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "ATV",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/488581242359541760/Rei25M59_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/atv.html",
+        "aliase": [ "tv/de/ATV", "tv/de/ATV HD" ]
+      }
+    ]
+  },
+
+  "www.servustv.com": {
+
+    "label": "Servus TV",
+    "url": "http://www.servustv.com/",
+    "icon": "http://pbs.twimg.com/profile_images/587888784945086464/3aMl6Uyt_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "Servus TV",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/587888784945086464/3aMl6Uyt_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/servustv.html",
+        "aliase": [ "tv/de/Servus TV Deutschland", "tv/de/Servus TV Deutschland HD" ]
+      }
+    ]
+  },
+
+  "www.srf.ch": {
+
+    "label": "SRF",
+    "url": "http://www.srf.ch/",
+    "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "SF 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sf1.html"
+      },
+      {
+        "label": "SF 2",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sf2.html"
+      }
+    ]
+  },
+
+  "www.3plus.tv": {
+
+    "label": "3plus",
+    "url": "http://www.3plus.tv/",
+    "icon": "http://pbs.twimg.com/profile_images/458964347834732545/F4xlFkN9_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "3plus",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/458964347834732545/F4xlFkN9_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/3plus.html"
+      }
+    ]
   }
 
 }
