@@ -1,6 +1,28 @@
 <?php
 
-function json_encrec($data,$level = 0) 
+function json_enckey($data)
+{
+	switch ($type = gettype($data)) 
+	{
+		case 'integer':
+		case 'double':
+		case 'float':
+			return '"' . $data . '"';
+			
+		case 'string':
+			$str = addslashes($data);
+			$str = str_replace("\r","\\r",$str);
+			$str = str_replace("\n","\\n",$str);
+			$str = str_replace("\t","\\t",$str);
+			$str = str_replace("\\'","'" ,$str);
+			return '"' . $str . '"';
+				
+		default:
+			return '"' . $data . '"';
+	}
+}
+
+function json_encrec($data, $level = 0) 
 {
 	$pad = str_pad("\n",$level * 2 + 1,' ');
 	
@@ -62,7 +84,7 @@ function json_encrec($data,$level = 0)
 				foreach ($data as $key => $value) 
 				{
 					$output_txtkeys[] 
-						= json_encrec($key,$level + 1) 
+						= json_enckey($key) 
 						. ':' 
 						. json_encrec($value,$level + 1)
 						;

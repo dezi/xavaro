@@ -170,8 +170,8 @@ function readWikiWork()
 	{
 		$GLOBALS[ "wikidone" ] = json_decdat(file_get_contents("../include/wikifilm.done.json"));
 	}
-	
-	if (file_exists("../include/wikifilm.done.json"))
+
+	if (file_exists("../include/wikifilm.fail.json"))
 	{
 		$GLOBALS[ "wikifail" ] = json_decdat(file_get_contents("../include/wikifilm.fail.json"));
 	}
