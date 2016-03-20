@@ -1,0 +1,19 @@
+{
+  "tvguide.channel" : "Channel",
+  "tvguide.duration" : "Duration",
+
+  "tvguide.min" : "min",
+  "tvguide.record" : "Record",
+  "tvguide.play" : "Play",
+  "tvguide.remove" : "Remove planned recording",
+
+  "tvguide.at" : "at",
+  "tvguide.today" : "Today",
+  "tvguide.tomorrow" : "Tomorrow",
+  "tvguide.yesterday" : "Yesterday",
+
+  "tvguide.day.keys" : [ "0", "1", "2", "3", "4", "5", "6" ],
+  "tvguide.day.vals" : [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
+
+  "EOL" : true
+}

@@ -23,25 +23,25 @@ import android.util.Log;
 // Video play surface layout connected to HomeActivity.
 //
 
-public class VideoSurface extends FrameLayout implements
+public class MediaSurface extends FrameLayout implements
         SeekBar.OnSeekBarChangeListener,
         SurfaceHolder.Callback,
         View.OnTouchListener,
-        VideoProxy.Callback
+        MediaProxy.Callback
 
 {
-    private static final String LOGTAG = VideoSurface.class.getSimpleName();
+    private static final String LOGTAG = MediaSurface.class.getSimpleName();
 
-    private static VideoSurface videoSurface;
+    private static MediaSurface instance;
 
-    public static VideoSurface getInstance()
+    public static MediaSurface getInstance()
     {
-        if (videoSurface == null)
+        if (instance == null)
         {
-            videoSurface = new VideoSurface(Simple.getAppContext());
+            instance = new MediaSurface(Simple.getAppContext());
         }
 
-        return videoSurface;
+        return instance;
     }
 
     private LayoutParams normalParams;
@@ -55,21 +55,21 @@ public class VideoSurface extends FrameLayout implements
     private final int xRatio = 16;
     private final int yRatio =  9;
 
-    public VideoSurface(Context context)
+    public MediaSurface(Context context)
     {
         super(context);
 
         myInit(context);
     }
 
-    public VideoSurface(Context context, AttributeSet attrs)
+    public MediaSurface(Context context, AttributeSet attrs)
     {
         super(context, attrs);
 
         myInit(context);
     }
 
-    public VideoSurface(Context context, AttributeSet attrs, int defStyle)
+    public MediaSurface(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
 
@@ -86,7 +86,7 @@ public class VideoSurface extends FrameLayout implements
     private FrameLayout qualityHQButton;
     private FrameLayout qualityHDButton;
 
-    private VideoControl videoControl;
+    private MediaControl videoControl;
 
     private void myInit(Context context)
     {
@@ -125,7 +125,7 @@ public class VideoSurface extends FrameLayout implements
             @Override
             public void onClick(View view)
             {
-                VideoProxy.getInstance().playerReset();
+                MediaProxy.getInstance().playerReset();
             }
         });
 
@@ -142,11 +142,11 @@ public class VideoSurface extends FrameLayout implements
             {
                 if (isPlaying)
                 {
-                    VideoProxy.getInstance().playerPause();
+                    MediaProxy.getInstance().playerPause();
                 }
                 else
                 {
-                    VideoProxy.getInstance().playerResume();
+                    MediaProxy.getInstance().playerResume();
                 }
             }
         });
@@ -183,7 +183,7 @@ public class VideoSurface extends FrameLayout implements
 
         this.addView(surfaceLayout, normalParams);
 
-        videoControl = new VideoControl(context);
+        videoControl = new MediaControl(context);
         videoControl.setOnSeekBarChangeListener(this);
         videoControl.setVisibility(INVISIBLE);
         bottomArea.addView(videoControl);
@@ -194,34 +194,34 @@ public class VideoSurface extends FrameLayout implements
         @Override
         public void onClick(View view)
         {
-            VideoProxy pp = VideoProxy.getInstance();
+            MediaProxy pp = MediaProxy.getInstance();
 
             int options = pp.getAvailableQualities();
             int select = 0;
 
-            if ((view == qualityLQButton) && (options & VideoQuality.LQ) != 0)
+            if ((view == qualityLQButton) && (options & MediaQuality.LQ) != 0)
             {
-                select = VideoQuality.LQ;
+                select = MediaQuality.LQ;
             }
 
-            if ((view == qualitySDButton) && (options & VideoQuality.SD) != 0)
+            if ((view == qualitySDButton) && (options & MediaQuality.SD) != 0)
             {
-                select = VideoQuality.SD;
+                select = MediaQuality.SD;
             }
 
-            if ((view == qualityHQButton) && (options & VideoQuality.HQ) != 0)
+            if ((view == qualityHQButton) && (options & MediaQuality.HQ) != 0)
             {
-                select = VideoQuality.HQ;
+                select = MediaQuality.HQ;
             }
 
-            if ((view == qualityHDButton) && (options & VideoQuality.HD) != 0)
+            if ((view == qualityHDButton) && (options & MediaQuality.HD) != 0)
             {
-                select = VideoQuality.HD;
+                select = MediaQuality.HD;
             }
 
             if (select > 0)
             {
-                pp.setCurrentQuality(select);
+                pp.setDesiredQuality(select);
 
                 pp.playerRestart();
             }
@@ -257,7 +257,7 @@ public class VideoSurface extends FrameLayout implements
 
     private void setButtonStates()
     {
-        VideoProxy pp = VideoProxy.getInstance();
+        MediaProxy pp = MediaProxy.getInstance();
 
         int current = pp.getCurrentQuality();
         int options = pp.getAvailableQualities();
@@ -266,40 +266,40 @@ public class VideoSurface extends FrameLayout implements
         int ena = CommonConfigs.VideoSurfaceEnabledButton;
         int sel = CommonConfigs.VideoSurfaceSelectedButton;
 
-        if ((options & VideoQuality.LQ) == 0)
+        if ((options & MediaQuality.LQ) == 0)
         {
             setButtonTextColor(qualityLQButton,dis);
         }
         else
         {
-            setButtonTextColor(qualityLQButton,(current == VideoQuality.LQ) ? sel : ena);
+            setButtonTextColor(qualityLQButton,(current == MediaQuality.LQ) ? sel : ena);
         }
 
-        if ((options & VideoQuality.SD) == 0)
+        if ((options & MediaQuality.SD) == 0)
         {
             setButtonTextColor(qualitySDButton,dis);
         }
         else
         {
-            setButtonTextColor(qualitySDButton,(current == VideoQuality.SD) ? sel : ena);
+            setButtonTextColor(qualitySDButton,(current == MediaQuality.SD) ? sel : ena);
         }
 
-        if ((options & VideoQuality.HQ) == 0)
+        if ((options & MediaQuality.HQ) == 0)
         {
             setButtonTextColor(qualityHQButton,dis);
         }
         else
         {
-            setButtonTextColor(qualityHQButton,(current == VideoQuality.HQ) ? sel : ena);
+            setButtonTextColor(qualityHQButton,(current == MediaQuality.HQ) ? sel : ena);
         }
 
-        if ((options & VideoQuality.HD) == 0)
+        if ((options & MediaQuality.HD) == 0)
         {
             setButtonTextColor(qualityHDButton,dis);
         }
         else
         {
-            setButtonTextColor(qualityHDButton,(current == VideoQuality.HD) ? sel : ena);
+            setButtonTextColor(qualityHDButton,(current == MediaQuality.HD) ? sel : ena);
         }
     }
 
@@ -308,7 +308,7 @@ public class VideoSurface extends FrameLayout implements
         @Override
         public void run()
         {
-            int position = VideoProxy.getInstance().getCurrentPosition();
+            int position = MediaProxy.getInstance().getCurrentPosition();
             if (position >= 0) videoControl.setCurrentPosition(position);
 
             Simple.removePost(progressReader);
@@ -321,7 +321,7 @@ public class VideoSurface extends FrameLayout implements
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
-        if (fromUser) VideoProxy.getInstance().setCurrentPosition(progress);
+        if (fromUser) MediaProxy.getInstance().setCurrentPosition(progress);
     }
 
     @Override
@@ -498,7 +498,7 @@ public class VideoSurface extends FrameLayout implements
     {
         Log.d(LOGTAG, "surfaceCreated");
 
-        VideoProxy.getInstance().setDisplay(holder);
+        MediaProxy.getInstance().setDisplay(holder);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width,int height)
@@ -510,7 +510,7 @@ public class VideoSurface extends FrameLayout implements
     {
         Log.d(LOGTAG, "surfaceDestroyed");
 
-        VideoProxy.getInstance().setDisplay(null);
+        MediaProxy.getInstance().setDisplay(null);
     }
 
     //endregion SurfaceHolder.Callback interface
@@ -526,7 +526,7 @@ public class VideoSurface extends FrameLayout implements
             ((ViewGroup) spinner.getParent()).removeView(spinner);
         }
 
-        if (visible && ! VideoProxy.getInstance().isLocalFile())
+        if (visible && ! MediaProxy.getInstance().isLocalFile())
         {
             if (spinner == null)
             {
@@ -555,7 +555,7 @@ public class VideoSurface extends FrameLayout implements
 
             if (activity instanceof VideoSurfaceHandler)
             {
-                ((VideoSurfaceHandler) activity).addVideoSurface(VideoSurface.this);
+                ((VideoSurfaceHandler) activity).addVideoSurface(MediaSurface.this);
             }
 
             setSpinner(true);
@@ -581,14 +581,14 @@ public class VideoSurface extends FrameLayout implements
 
             setButtonStates();
 
-            boolean islocal = VideoProxy.getInstance().isLocalFile();
+            boolean islocal = MediaProxy.getInstance().isLocalFile();
             Log.d(LOGTAG, "onPlaybackStartet:" + islocal);
 
             videoControl.setVisibility(islocal ? VISIBLE : INVISIBLE);
 
             if (islocal)
             {
-                videoControl.setDuration(VideoProxy.getInstance().getDuration());
+                videoControl.setDuration(MediaProxy.getInstance().getDuration());
 
                 Simple.removePost(progressReader);
                 Simple.makePost(progressReader);

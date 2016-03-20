@@ -40,5 +40,23 @@
     "tv/de/ZDF info",
     "tv/de/ZDF Kultur",
     "tv/de/ZDF neo"
+  ],
+
+  "sky.tv": [
+    "tv/de/Sky 3D HD",
+    "tv/de/Sky Action",
+    "tv/de/Sky Atlantic",
+    "tv/de/Sky Atlantic +1 HD",
+    "tv/de/Sky Cinema",
+    "tv/de/Sky Cinema +1",
+    "tv/de/Sky Cinema +24",
+    "tv/de/Sky Comedy",
+    "tv/de/Sky Emotion",
+    "tv/de/Sky Hits",
+    "tv/de/Sky Info HD",
+    "tv/de/Sky Krimi",
+    "tv/de/Sky Nostalgie",
+    "tv/de/Sky Sport News"
   ]
+
 }

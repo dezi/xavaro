@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Iterator;
 
 @SuppressWarnings("unused")
 public class WebAppMedia
@@ -20,13 +19,20 @@ public class WebAppMedia
     @JavascriptInterface
     public void openPlayer(String mediafile)
     {
-        VideoProxy.getInstance().setVideoFile(mediafile);
+        if (mediafile.startsWith("http://") || mediafile.startsWith("https://"))
+        {
+            MediaProxy.getInstance().setVideoUrl(mediafile);
+        }
+        else
+        {
+            MediaProxy.getInstance().setVideoFile(mediafile);
+        }
     }
 
     @JavascriptInterface
     public void closePlayer()
     {
-        VideoProxy.getInstance().playerReset();
+        MediaProxy.getInstance().playerReset();
     }
 
     @JavascriptInterface

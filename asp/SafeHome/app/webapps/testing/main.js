@@ -5,28 +5,32 @@
 testing.pre = WebLibSimple.createAnyAppend("pre", document.body);
 
 
-testing.pre.innerHTML = WebAppMedia.getLocaleDefaultChannels("tv");
 testing.pre.innerHTML = WebAppMedia.getLocaleInternetChannels("tv");
 testing.pre.innerHTML = WebAppMedia.getRecordedItems();
+testing.pre.innerHTML = WebAppMedia.getLocaleDefaultChannels("tv");
 
 //WebAppMedia.openPlayer("/storage/emulated/0/Movies/Recordings/2016-03-15T15-10-00Z.tv.de.ARTE Deutsch.mp4");
 
 
+testing.locale = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
+testing.channels = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
 
-testing.moroned = "Spielfilem 2015Hallo bla der BesteDeutschland.Der große ReportÜberflieger sind besser.";
-
-testing.deMoronize = function(moroned)
+testing.check = function(array, tag)
 {
-    var demoronized = moroned;
+    for (var inx = 0; inx < array.length; inx++)
+    {
+        if (tag == array[ inx ]) return true;
+    }
 
-    var regex = new RegExp("([a-z0-9äüöß])([A-ZÉÄÜÖ])", "g");
-
-    demoronized = demoronized.replace(regex,"$1@\n$2");
-
-    return demoronized;
+    return false;
 }
 
-testing.demoronized = testing.deMoronize(testing.moroned);
+for (var inx = 0; inx < testing.channels.length; inx++)
+{
+    var ccc = testing.channels[ inx ];
+    var tag = "tv/" + ccc.isocc + "/" + ccc.name;
 
-console.log(testing.moroned);
-console.log(testing.demoronized);
+    if (testing.check(testing.locale, tag)) continue;
+
+    if (ccc.name.startsWith("Sky ")) console.log(tag);
+}

@@ -510,17 +510,13 @@ WebLibSimple.getDuration = function(startDate, stopDate)
     return duration;
 }
 
-//
-// todo: Locale --> WebLibSimple.getNiceTime()
-//
-
 WebLibSimple.getNiceTime = function(date)
 {
     var work = new Date(date);
 
     var nicedate = WebLibSimple.padNum(work.getHours(),   2) + ":"
-                 + WebLibSimple.padNum(work.getMinutes(), 2);
-//             + WebLibSimple.padNum(work.getSeconds(), 2);
+                 + WebLibSimple.padNum(work.getMinutes(), 2) + "."
+                 + WebLibSimple.padNum(work.getSeconds(), 2);
 
     return nicedate;
 }
@@ -530,3 +526,21 @@ WebLibSimple.getTodayDate = function()
     var today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), today.getDate());
 }
+
+WebLibSimple.getDuration = function(start, stop)
+{
+    var start = new Date(start);
+    var stop  = new Date(stop );
+
+    var duration = stop.getTime() - start.getTime();
+
+    return duration;
+}
+
+WebLibSimple.getPxInt = function(pxString)
+{
+    var int = parseInt(WebLibSimple.substring(pxString, 0, -2));
+
+    return int;
+}
+

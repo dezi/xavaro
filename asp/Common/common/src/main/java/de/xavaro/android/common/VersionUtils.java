@@ -26,7 +26,7 @@ public class VersionUtils
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
-            return context.getResources().getDrawable(id,null);
+            return context.getResources().getDrawable(id, null);
         }
 
         //noinspection deprecation

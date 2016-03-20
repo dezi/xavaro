@@ -1,0 +1,384 @@
+Channel:Sat. 1 Deutschland Title:So gesehen
+	Moron Start:Thu Mar 17 2016 01:36:37 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 01:40:22 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Auf Streife
+	Moron Start:Thu Mar 17 2016 01:40:22 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:24:05 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Im Namen der Gerechtigkeit - Wir kämpfen für Sie!
+	Moron Start:Thu Mar 17 2016 02:24:05 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 03:07:36 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Im Namen der Gerechtigkeit - Wir kämpfen für Sie!
+	Moron Start:Thu Mar 17 2016 03:07:36 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 03:53:19 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Verdächtig - Die Wahrheit liegt im Verborgenen
+	Moron Start:Thu Mar 17 2016 03:53:19 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:45:01 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Auf Streife - Die Spezialisten
+	Moron Start:Thu Mar 17 2016 04:45:01 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:28:46 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:SAT.1-Frühstücksfernsehen
+	Moron Start:Thu Mar 17 2016 05:28:46 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 10:00:08 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Auf Streife
+	Moron Start:Thu Mar 17 2016 10:00:08 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 10:59:20 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Richterin Barbara Salesch
+	Moron Start:Thu Mar 17 2016 10:59:20 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 11:58:22 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Richter Alexander Hold
+	Moron Start:Thu Mar 17 2016 11:58:22 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 12:59:05 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Richter Alexander Hold
+	Moron Start:Thu Mar 17 2016 12:59:05 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 13:59:28 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Auf Streife
+	Moron Start:Thu Mar 17 2016 13:59:28 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 14:58:44 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Auf Streife
+	Moron Start:Thu Mar 17 2016 14:58:44 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 15:58:20 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Verdächtig - Die Wahrheit liegt im Verborgenen
+	Moron Start:Thu Mar 17 2016 15:58:20 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 16:59:11 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Auf Streife - Die Spezialisten
+	Moron Start:Thu Mar 17 2016 17:59:48 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 18:57:22 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:In Gefahr - Ein verhängnisvoller Moment
+	Moron Start:Thu Mar 17 2016 18:57:22 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 19:55:10 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:SAT.1 Nachrichten
+	Moron Start:Thu Mar 17 2016 19:55:10 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 20:14:14 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Criminal Minds
+	Moron Start:Thu Mar 17 2016 20:14:14 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 21:13:53 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Criminal Minds
+	Moron Start:Thu Mar 17 2016 21:13:53 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 22:11:02 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Criminal Minds
+	Moron Start:Thu Mar 17 2016 22:11:02 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 23:08:09 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Profiling Paris
+	Moron Start:Thu Mar 17 2016 23:08:09 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 00:07:10 GMT+0100 (CET)
+Channel:Sat. 1 Deutschland Title:Criminal Minds
+	Moron Start:Fri Mar 18 2016 00:07:10 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 01:02:13 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Fringe - Grenzfälle des FBI
+	Moron Start:Thu Mar 17 2016 01:33:06 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:14:26 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:ProSieben Spätnachrichten
+	Moron Start:Thu Mar 17 2016 02:14:26 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:17:26 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Chuck
+	Moron Start:Thu Mar 17 2016 02:17:26 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:57:53 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Chuck
+	Moron Start:Thu Mar 17 2016 02:57:53 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 03:38:20 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Scrubs - Die Anfänger
+	Moron Start:Thu Mar 17 2016 03:38:20 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 03:57:41 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Watch Me - das Kinomagazin
+	Moron Start:Thu Mar 17 2016 03:57:41 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:10:17 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Malcolm mittendrin
+	Moron Start:Thu Mar 17 2016 04:10:17 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:32:31 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Malcolm mittendrin
+	Moron Start:Thu Mar 17 2016 04:32:31 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:53:45 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Scrubs - Die Anfänger
+	Moron Start:Thu Mar 17 2016 04:53:45 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:13:36 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Scrubs - Die Anfänger
+	Moron Start:Thu Mar 17 2016 05:13:36 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:33:26 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Mike & Molly
+	Moron Start:Thu Mar 17 2016 05:33:26 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:53:03 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Mike & Molly
+	Moron Start:Thu Mar 17 2016 05:53:03 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 06:10:27 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:How I Met Your Mother
+	Moron Start:Thu Mar 17 2016 06:10:27 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 06:30:31 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:How I Met Your Mother
+	Moron Start:Thu Mar 17 2016 06:30:31 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 06:55:17 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 06:55:17 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 07:19:46 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 07:19:46 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 07:44:02 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 07:44:02 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 08:07:36 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 08:07:36 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 08:31:35 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:2 Broke Girls
+	Moron Start:Thu Mar 17 2016 08:31:35 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 08:56:44 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:2 Broke Girls
+	Moron Start:Thu Mar 17 2016 08:56:44 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 09:21:21 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 09:21:21 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 09:46:29 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 09:46:29 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 10:11:26 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 10:11:26 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 10:36:17 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 10:36:17 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 11:00:10 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Mike & Molly
+	Moron Start:Thu Mar 17 2016 11:00:10 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 11:23:12 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Mike & Molly
+	Moron Start:Thu Mar 17 2016 11:23:12 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 11:46:10 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:How I Met Your Mother
+	Moron Start:Thu Mar 17 2016 11:46:10 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 12:12:09 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:How I Met Your Mother
+	Moron Start:Thu Mar 17 2016 12:12:09 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 12:38:31 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 12:38:31 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 13:04:24 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 13:04:24 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 13:29:27 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 13:29:27 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 13:56:16 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 13:56:16 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 14:22:44 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:2 Broke Girls
+	Moron Start:Thu Mar 17 2016 14:22:44 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 14:48:16 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:2 Broke Girls
+	Moron Start:Thu Mar 17 2016 14:48:16 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 15:14:45 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 15:14:45 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 15:40:43 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 15:40:43 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 16:06:42 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 16:06:42 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 16:32:03 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:The Big Bang Theory
+	Moron Start:Thu Mar 17 2016 16:32:03 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 16:58:53 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:taff
+	Moron Start:Thu Mar 17 2016 16:58:53 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 17:57:37 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:NEWSTIME
+	Moron Start:Thu Mar 17 2016 17:57:37 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 18:07:24 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Die Simpsons
+	Moron Start:Thu Mar 17 2016 18:07:24 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 18:36:22 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Die Simpsons
+	Moron Start:Thu Mar 17 2016 18:36:22 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 19:04:38 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Galileo
+	Moron Start:Thu Mar 17 2016 19:04:38 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 20:14:12 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Germany's next Topmodel - by Heidi Klum
+	Moron Start:Thu Mar 17 2016 20:14:12 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 22:28:58 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:red! Stars, Lifestyle & More
+	Moron Start:Thu Mar 17 2016 22:28:58 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 23:29:30 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Cover Up - Wir retten dein Tattoo
+	Moron Start:Thu Mar 17 2016 23:29:30 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 23:57:31 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Thu Mar 17 2016 23:57:31 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 00:23:32 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Two and a Half Men
+	Moron Start:Fri Mar 18 2016 00:23:32 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 00:48:24 GMT+0100 (CET)
+Channel:Pro Sieben Deutschland Title:Are You There, Chelsea?
+	Moron Start:Fri Mar 18 2016 00:48:24 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 01:12:53 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Watch Me - das Kinomagazin
+	Moron Start:Thu Mar 17 2016 02:18:12 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:27:51 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:kabel eins late news
+	Moron Start:Thu Mar 17 2016 02:27:51 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:30:55 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Road Trip
+	Moron Start:Thu Mar 17 2016 02:30:55 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:03:25 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:kabel eins late news
+	Moron Start:Thu Mar 17 2016 04:03:25 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:06:25 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:The Texas Chainsaw Massacre: The Beginning
+	Moron Start:Thu Mar 17 2016 04:06:25 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:21:34 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Toto & Harry - Die Zwei vom Polizeirevier
+	Moron Start:Thu Mar 17 2016 05:21:34 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:45:53 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Numb3rs - Die Logik des Verbrechens
+	Moron Start:Thu Mar 17 2016 05:45:53 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 06:40:44 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Mord ist ihr Hobby
+	Moron Start:Thu Mar 17 2016 06:40:44 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 07:38:22 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Cold Case - Kein Opfer ist je vergessen
+	Moron Start:Thu Mar 17 2016 07:38:22 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 08:33:44 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Navy CIS
+	Moron Start:Thu Mar 17 2016 10:24:59 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 11:21:18 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Without a Trace - Spurlos verschwunden
+	Moron Start:Thu Mar 17 2016 11:21:18 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 12:16:38 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Numb3rs - Die Logik des Verbrechens
+	Moron Start:Thu Mar 17 2016 12:16:38 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 13:09:20 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Cold Case - Kein Opfer ist je vergessen
+	Moron Start:Thu Mar 17 2016 13:09:20 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 14:05:22 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Navy CIS
+	Moron Start:Thu Mar 17 2016 14:05:22 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 14:58:19 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Castle
+	Moron Start:Thu Mar 17 2016 16:04:15 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 16:58:17 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Abenteuer Leben - täglich neu entdecken
+	Moron Start:Thu Mar 17 2016 16:58:17 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 18:01:29 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Mein Lokal, Dein Lokal - Wo schmeckt's am besten?
+	Moron Start:Thu Mar 17 2016 18:01:29 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 18:54:39 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Achtung Kontrolle! Einsatz für die Ordnungshüter
+	Moron Start:Thu Mar 17 2016 18:54:39 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 20:14:30 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Das Urteil - Jeder ist käuflich
+	Moron Start:Thu Mar 17 2016 20:14:30 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 22:51:43 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:Vertrauter Feind
+	Moron Start:Thu Mar 17 2016 22:51:43 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 00:59:33 GMT+0100 (CET)
+Channel:Kabel Eins Deutschland Title:kabel eins late news
+	Moron Start:Fri Mar 18 2016 00:59:33 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 01:02:37 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Tattoo Nightmares
+	Moron Start:Thu Mar 17 2016 01:02:12 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 01:21:06 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Tattoo Nightmares
+	Moron Start:Thu Mar 17 2016 01:21:06 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 01:39:45 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Tattoo Nightmares
+	Moron Start:Thu Mar 17 2016 01:39:45 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 01:59:11 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Tattoo Nightmares
+	Moron Start:Thu Mar 17 2016 01:59:11 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:18:30 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Tattoo Nightmares
+	Moron Start:Thu Mar 17 2016 02:18:30 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:37:51 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Tattoo Nightmares
+	Moron Start:Thu Mar 17 2016 02:37:51 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 02:56:56 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Crazy Clips - Die witzigsten Videos der Welt
+	Moron Start:Thu Mar 17 2016 02:56:56 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 03:35:49 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Crazy Clips - Die witzigsten Videos der Welt
+	Moron Start:Thu Mar 17 2016 03:35:49 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:15:43 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Eine himmlische Familie
+	Moron Start:Thu Mar 17 2016 04:15:43 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 04:57:01 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Watch Me - das Kinomagazin
+	Moron Start:Thu Mar 17 2016 04:57:01 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:06:37 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:sixx QUICKIE
+	Moron Start:Thu Mar 17 2016 05:06:37 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 05:17:17 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Eine himmlische Familie
+	Moron Start:Thu Mar 17 2016 05:17:17 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 06:00:47 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Full House
+	Moron Start:Thu Mar 17 2016 06:00:47 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 06:30:27 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Full House
+	Moron Start:Thu Mar 17 2016 06:30:27 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 07:00:13 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Full House
+	Moron Start:Thu Mar 17 2016 07:00:13 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 07:30:13 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Full House
+	Moron Start:Thu Mar 17 2016 07:30:13 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 07:59:44 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Buffy - Im Bann der Dämonen
+	Moron Start:Thu Mar 17 2016 07:59:44 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 08:53:19 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Charmed - Zauberhafte Hexen
+	Moron Start:Thu Mar 17 2016 08:53:19 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 09:48:34 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Ghost Whisperer - Stimmen aus dem Jenseits
+	Moron Start:Thu Mar 17 2016 09:48:34 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 10:38:12 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Emergency Room - Die Notaufnahme
+	Moron Start:Thu Mar 17 2016 10:38:12 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 11:30:55 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Private Practice
+	Moron Start:Thu Mar 17 2016 11:30:55 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 12:22:59 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Grey's Anatomy - Die jungen Ärzte
+	Moron Start:Thu Mar 17 2016 12:22:59 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 13:15:53 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Mission: Makeover - by Trinny and Susannah
+	Moron Start:Thu Mar 17 2016 13:15:53 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 14:13:43 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Mein perfektes Hochzeitskleid! - Atlanta
+	Moron Start:Thu Mar 17 2016 14:13:43 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 14:44:42 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:My Fair Wedding - In drei Wochen zur Traumhochzeit
+	Moron Start:Thu Mar 17 2016 14:44:42 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 15:38:06 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Buffy - Im Bann der Dämonen
+	Moron Start:Thu Mar 17 2016 15:38:06 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 16:32:49 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Charmed - Zauberhafte Hexen
+	Moron Start:Thu Mar 17 2016 16:32:49 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 17:29:35 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Ghost Whisperer - Stimmen aus dem Jenseits
+	Moron Start:Thu Mar 17 2016 17:29:35 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 18:23:23 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Private Practice
+	Moron Start:Thu Mar 17 2016 18:23:23 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 19:18:52 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Grey's Anatomy - Die jungen Ärzte
+	Moron Start:Thu Mar 17 2016 19:18:52 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 20:14:45 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Vampire Diaries
+	Moron Start:Thu Mar 17 2016 20:14:45 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 21:08:43 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Reign
+	Moron Start:Thu Mar 17 2016 21:08:43 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 22:04:17 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Reign
+	Moron Start:Thu Mar 17 2016 22:04:17 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 22:50:53 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:The White Queen
+	Moron Start:Thu Mar 17 2016 22:50:53 GMT+0100 (CET)
+	Moron Stop: Thu Mar 17 2016 23:57:54 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Charmed - Zauberhafte Hexen
+	Moron Start:Thu Mar 17 2016 23:57:54 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 00:46:40 GMT+0100 (CET)
+Channel:Sixx Deutschland Title:Vampire Diaries
+	Moron Start:Fri Mar 18 2016 00:46:40 GMT+0100 (CET)
+	Moron Stop: Fri Mar 18 2016 01:26:39 GMT+0100 (CET)

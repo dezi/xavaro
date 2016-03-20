@@ -1,6 +1,6 @@
 package de.xavaro.android.common;
 
-public class VideoQuality
+public class MediaQuality
 {
     public static final int LQ = 0x01;
     public static final int SD = 0x02;

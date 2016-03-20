@@ -69,14 +69,14 @@
         "label": "3sat",
         "default": true,
         "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2306126/timg644x363blob/12550745",
-        "videourl": "http://zdf0910-lh.akamaihd.net/i/dach10_v1@392872/master.m3u8?dw=0",
+        "videourl": "http://zdf0910-lh.akamaihd.net/i/dach10_v1@392872/master.m3u8",
         "aliase": [ "tv/de/3sat", "tv/de/3sat HD" ]
       },
       {
         "label": "phoenix",
         "default": true,
         "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2492878/timg644x363blob/12166545",
-        "videourl": "http://zdf-hds-de-f.zdf.de/i/de09_v1@87012/master.m3u8?dw=0",
+        "videourl": "http://zdf-hds-de-f.zdf.de/i/de09_v1@87012/master.m3u8",
         "aliase": [ "tv/de/Phoenix", "tv/de/Phoenix HD" ]
       }
     ]
@@ -386,5 +386,412 @@
         "videourl": "http://alex-stream.rosebud-media.de:80/live/alexlivetv.smil/playlist.m3u8"
       }
     ]
+  },
+
+  "www.qvc.de": {
+
+    "label": "QVC",
+    "url": "http://www.qvc.de/",
+    "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "QVC",
+        "default": false,
+        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi5/3/prog_index.m3u8",
+        "aliase": [ "tv/de/QVC Deutschland", "tv/de/QVC Deutschland HD" ]
+      },
+      {
+        "label": "QVC Plus",
+        "default": false,
+        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi6/3/prog_index.m3u8",
+        "aliase": [ "tv/de/QVC Plus Deutschland", "tv/de/QVC Plus Deutschland HD" ]
+      },
+      {
+        "label": "QVC Beauty",
+        "default": false,
+        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi7/3/prog_index.m3u8",
+        "aliase": [ "tv/de/QVC Beauty & Style", "tv/de/QVC Beauty & Style HD" ]
+      }
+    ]
+  },
+
+  "www.rtl.de": {
+
+    "label": "RTL",
+    "url": "http://www.rtl.de/",
+    "icon": "http://pbs.twimg.com/profile_images/505332383269142528/dxFEuzbY_400x400.png",
+
+    "channels": [
+      {
+        "url": "http://www.rtl.de/",
+        "label": "RTL",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/505332383269142528/dxFEuzbY_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl.html",
+        "aliase": [ "tv/de/RTL Deutschland", "tv/de/RTL Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.rtl2.de/",
+        "label": "RTL II",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/692348270736195584/VWA4jll__400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl2.html",
+        "aliase": [ "tv/de/RTL 2 Deutschland", "tv/de/RTL 2 Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.superrtl.de/",
+        "label": "SUPER RTL",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/673846526054146048/TwwE_0e7_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/superrtl.html",
+        "aliase": [ "tv/de/Super RTL Deutschland", "tv/de/Super RTL Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.rtlnitro.de/",
+        "label": "RTL NITRO",
+        "default": false,
+        "develop": true,
+        "icon": "https://pbs.twimg.com/profile_images/2530896718/rn3do2g6wuxc8kekdasv_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtlnitro.html",
+        "aliase": [ "tv/de/RTL Nitro Deutschland", "tv/de/RTL Nitro Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.vox.de/",
+        "label": "VOX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/460059950455083012/7m3LwYsN_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/vox.html",
+        "aliase": [ "tv/de/Vox Deutschland", "tv/de/Vox Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.n-tv.de/",
+        "label": "N-TV",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/562216949191434240/oHlTVT_Q_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/ntv.html",
+        "aliase": [ "tv/de/N-TV", "tv/de/N-TV HD" ]
+      }
+    ]
+  },
+
+  "www.sat1.de": {
+
+    "label": "SAT.1 / PRO 7",
+    "url": "http://www.sat1.de/",
+    "icon": "http://pbs.twimg.com/profile_images/1497994582/SAT1_3D_BM_CMYK_Voransicht_400x400.jpg",
+
+    "channels": [
+      {
+        "url": "http://www.sat1.de/",
+        "label": "SAT.1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/1497994582/SAT1_3D_BM_CMYK_Voransicht_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sat1.html",
+        "aliase": [ "tv/de/Sat. 1 Deutschland", "tv/de/Sat. 1 Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.pro7.de/",
+        "label": "PRO7",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/563479641386930176/wezbbzpj_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7.html",
+        "aliase": [ "tv/de/Pro Sieben Deutschland", "tv/de/Pro Sieben Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.prosiebenmaxx.de/",
+        "label": "PRO7 MAXX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/666190926814035968/mV8kbFLP_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7_maxx.html",
+        "aliase": [ "tv/de/Pro Sieben Maxx Deutschland", "tv/de/Pro Sieben Maxx Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.kabeleins.de/",
+        "label": "KABEL 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/638243226953084928/0aOngpLN_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/kabel1.html",
+        "aliase": [ "tv/de/Kabel Eins Deutschland", "tv/de/Kabel Eins Deutschland HD" ]
+      },
+
+      {
+        "url": "http://www.sixx.de/",
+        "label": "SIXX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/609280667281661952/_VFt44k-_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sixx.html",
+        "aliase": [ "tv/de/Sixx Deutschland", "tv/de/Sixx Deutschland HD" ]
+      }
+    ]
+  },
+
+  "www.dmax.de": {
+
+    "label": "DMAX",
+    "url": "http://www.dmax.de/",
+    "icon": "http://pbs.twimg.com/profile_images/378800000663840950/655679388e2fef54aac94a66ebaf1ea4_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "DMAX",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/378800000663840950/655679388e2fef54aac94a66ebaf1ea4_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/dmax.html",
+        "aliase": [ "tv/de/DMAX Deutschland", "tv/de/DMAX Deutschland HD" ]
+      }
+    ]
+  },
+
+  "www.tele5.de": {
+
+    "label": "TELE 5",
+    "url": "http://www.tele5.de/",
+    "icon": "http://pbs.twimg.com/profile_images/709319138062307328/3Hd9a646_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "TELE 5",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/709319138062307328/3Hd9a646_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/tele5.html",
+        "aliase": [ "tv/de/Tele 5", "tv/de/Tele 5 HD" ]
+      }
+    ]
+  },
+
+  "www.nick.de": {
+
+    "label": "Nickelodion",
+    "url": "http://www.nick.de/",
+    "icon": "http://pbs.twimg.com/profile_images/710113025764753408/8tpSVPKg_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "Nickelodion",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/710113025764753408/8tpSVPKg_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/nickcc.html",
+        "aliase": [ "tv/de/Nickelodeon Deutschland", "tv/de/Nickelodeon Deutschland HD" ]
+      }
+    ]
+  },
+
+  "www.disneychannel.de": {
+
+    "label": "Disney Channel",
+    "url": "http://www.disneychannel.de/",
+    "icon": "http://pbs.twimg.com/profile_images/459327809760931840/Ez365Pcs_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "Disney Channel",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/459327809760931840/Ez365Pcs_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/disney_channel.html",
+        "aliase": [ "tv/de/Disney Channel Deutschland", "tv/de/Disney Channel Deutschland HD" ]
+      }
+    ]
+  },
+
+  "www.viva.tv": {
+
+    "label": "VIVA",
+    "url": "http://www.viva.tv/",
+    "icon": "http://pbs.twimg.com/profile_images/627842131122651136/L0PGaxTP_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "VIVA",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/627842131122651136/L0PGaxTP_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/viva-comedy_central.html",
+        "aliase": [ "tv/de/Comedy Central Deutschland", "tv/de/Comedy Central Deutschland HD" ]
+      }
+    ]
+  },
+
+  "www.deluxemusic.tv": {
+
+    "label": "Deluxe Music",
+    "url": "http://www.deluxemusic.tv/",
+    "icon": "http://pbs.twimg.com/profile_images/3108296919/6b1e875583edb8ba44216f339ee040e8_400x400.png",
+
+    "channels": [
+      {
+        "label": "Deluxe Music",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/3108296919/6b1e875583edb8ba44216f339ee040e8_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/deluxemusic.html",
+        "aliase": [ "tv/de/Deluxe Music", "tv/de/Deluxe Music HD" ]
+      }
+    ]
+  },
+
+  "www.eurosport.de": {
+
+    "label": "EUROSPORT",
+    "url": "http://www.eurosport.de/",
+    "icon": "http://pbs.twimg.com/profile_images/664929268003176449/R0Wi-91u_400x400.png",
+
+    "channels": [
+      {
+        "label": "EUROSPORT",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/664929268003176449/R0Wi-91u_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/eurosport.html",
+        "aliase": [ "tv/de/Eurosport 1 Germany", "tv/de/Eurosport 1 Germany HD" ]
+      }
+    ]
+  },
+
+  "www.sport1.de": {
+
+    "label": "SPORT 1",
+    "url": "http://www.sport1.de/",
+    "icon": "http://pbs.twimg.com/profile_images/667111090493460480/Th7E6yTQ_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "SPORT 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/667111090493460480/Th7E6yTQ_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sport1.html",
+        "aliase": [ "tv/de/Sport 1", "tv/de/Sport 1 HD" ]
+      }
+    ]
+  },
+
+  "www.orf.at": {
+
+    "label": "ORF",
+    "url": "http://www.orf.at/",
+    "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
+
+    "channels": [
+      {
+        "label": "ORF 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/orf1.html",
+        "aliase": [ "tv/de/ORF Eins", "tv/de/ORF Eins HD" ]
+      },
+      {
+      "label": "ORF 2",
+      "default": false,
+      "develop": true,
+      "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
+      "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/orf2.html",
+      "aliase": [ "tv/de/ORF 2", "tv/de/ORF 2 HD" ]
+      }
+    ]
+  },
+
+  "www.atv.at": {
+
+    "label": "ATV",
+    "url": "http://www.atv.at/",
+    "icon": "http://pbs.twimg.com/profile_images/488581242359541760/Rei25M59_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "ATV",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/488581242359541760/Rei25M59_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/atv.html",
+        "aliase": [ "tv/de/ATV", "tv/de/ATV HD" ]
+      }
+    ]
+  },
+
+  "www.servustv.com": {
+
+    "label": "Servus TV",
+    "url": "http://www.servustv.com/",
+    "icon": "http://pbs.twimg.com/profile_images/587888784945086464/3aMl6Uyt_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "Servus TV",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/587888784945086464/3aMl6Uyt_400x400.jpg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/servustv.html",
+        "aliase": [ "tv/de/Servus TV Deutschland", "tv/de/Servus TV Deutschland HD" ]
+      }
+    ]
+  },
+
+  "www.srf.ch": {
+
+    "label": "SRF",
+    "url": "http://www.srf.ch/",
+    "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "SF 1",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sf1.html"
+      },
+      {
+        "label": "SF 2",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sf2.html"
+      }
+    ]
+  },
+
+  "www.3plus.tv": {
+
+    "label": "3plus",
+    "url": "http://www.3plus.tv/",
+    "icon": "http://pbs.twimg.com/profile_images/458964347834732545/F4xlFkN9_400x400.jpeg",
+
+    "channels": [
+      {
+        "label": "3plus",
+        "default": false,
+        "develop": true,
+        "icon": "http://pbs.twimg.com/profile_images/458964347834732545/F4xlFkN9_400x400.jpeg",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/3plus.html"
+      }
+    ]
   }
+
 }

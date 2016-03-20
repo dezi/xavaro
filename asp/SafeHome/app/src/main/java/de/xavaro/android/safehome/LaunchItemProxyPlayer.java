@@ -8,10 +8,9 @@ import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 
-import de.xavaro.android.common.VideoProxy;
-import de.xavaro.android.common.VideoSurface;
+import de.xavaro.android.common.MediaProxy;
 
-public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Callback
+public class LaunchItemProxyPlayer extends LaunchItem implements MediaProxy.Callback
 {
     private final static String LOGTAG = LaunchItemProxyPlayer.class.getSimpleName();
 
@@ -27,7 +26,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
     {
         if (isPlayingMedia)
         {
-            VideoProxy pp = VideoProxy.getInstance();
+            MediaProxy pp = MediaProxy.getInstance();
 
             if (pp.isPlaying())
             {
@@ -236,7 +235,7 @@ public class LaunchItemProxyPlayer extends LaunchItem implements VideoProxy.Call
             ((ViewGroup) spinner.getParent()).removeView(spinner);
         }
 
-        if (visible && ! VideoProxy.getInstance().isLocalFile())
+        if (visible && ! MediaProxy.getInstance().isLocalFile())
         {
             if (spinner == null)
             {

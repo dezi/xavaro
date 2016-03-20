@@ -55,6 +55,17 @@ public class LaunchGroupWebStream extends LaunchGroup
             {
                 JSONObject channel = Json.clone(Json.getObject(channels, inx));
 
+                boolean developer = Json.getBoolean(channel, "develop");
+
+                if (developer && ! Simple.getSharedPrefBoolean("developer.enable"))
+                {
+                    //
+                    // Developer only enabled content.
+                    //
+
+                    continue;
+                }
+
                 if (channel.has("audiourl")) Json.put(channel, "type", "audioplayer");
                 if (channel.has("videourl")) Json.put(channel, "type", "videoplayer");
 

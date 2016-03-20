@@ -39,6 +39,8 @@ public class MediaRecorder
 
             if (oldinx < 0)
             {
+                Log.d(LOGTAG, "handleEvent: is new");
+
                 JSONObject recording = Json.clone(event);
 
                 if (! setupIPTVStream(recording))
@@ -71,8 +73,8 @@ public class MediaRecorder
 
                 if (Json.equals(event, "date", oldevent) &&
                         Json.equals(event, "type", oldevent) &&
-                        Json.equals(event, "channel", oldevent) &&
-                        Json.equals(event, "country", oldevent))
+                        Json.equals(event, "country", oldevent) &&
+                        Json.equals(event, "channel", oldevent))
                 {
                     if (remove) recordingsList.remove(inx);
 
@@ -106,6 +108,7 @@ public class MediaRecorder
                 synchronized (recordingsList)
                 {
                     recording = recordingsList.remove(0);
+                    recordingsList.add(recording);
                 }
 
                 String stoptime = Json.getString(recording, "datestop");
@@ -113,6 +116,11 @@ public class MediaRecorder
                 if ((stoptime != null) && (stopnow.compareTo(stoptime) > 0))
                 {
                     Log.d(LOGTAG, "recorderThread: einer fettig....");
+
+                    synchronized (recordingsList)
+                    {
+                        recordingsList.remove(recording);
+                    }
 
                     completeEvent(recording, true);
                     continue;
@@ -122,14 +130,15 @@ public class MediaRecorder
                 {
                     Log.d(LOGTAG, "recorderThread: einer kaputt....");
 
+                    synchronized (recordingsList)
+                    {
+                        recordingsList.remove(recording);
+                    }
+
                     completeEvent(recording, false);
                     continue;
                 }
 
-                synchronized (recordingsList)
-                {
-                    recordingsList.add(recording);
-                }
 
                 Simple.sleep(4000);
             }
@@ -179,110 +188,127 @@ public class MediaRecorder
         JSONObject recordstatus = Json.getObject(metadata, "recordstatus");
         if (recordstatus == null) return false;
 
-        Log.d(LOGTAG, "dosomeRecording:" + mediafile);
-        Log.d(LOGTAG, "dosomeRecording:" + iptvplaylist);
+        Log.d(LOGTAG, "dosomeRecording: " + mediafile);
+        Log.d(LOGTAG, "dosomeRecording: " + iptvplaylist);
 
-        String[] playlist = readLines(iptvplaylist);
-        if ((playlist == null) || (playlist.length == 0)) return false;
-
-        Log.d(LOGTAG, "dosomeRecording:" + playlist.length);
-
-        String lastChunk = Json.getString(recordstatus, "lastchunk");
-        String lastline;
-        float lastlength = 0;
-
-        boolean foundlastchunk = false;
-
-        ArrayList<String> chunks = new ArrayList<>();
-        ArrayList<Float> length = new ArrayList<>();
-
-        for (String line : playlist)
+        while (true)
         {
-            if (line.length() == 0) continue;
+            String elmostring = Json.getString(recording, "elmostring");
+            String elmoreferrer = Json.getString(recording, "elmoreferrer");
 
-            if (line.startsWith("#EXTINF:"))
+            if (elmostring != null)
             {
-                int endpos = line.contains(",") ? line.indexOf(",") : line.length();
-                lastlength = Float.parseFloat(line.substring(8, endpos));
+                //
+                // Update specific website if required.
+                //
+
+                SimpleRequest.doHTTPGet(elmostring, elmoreferrer);
             }
 
-            if (line.startsWith("#")) continue;
+            String[] playlist = SimpleRequest.readLines(iptvplaylist);
+            if ((playlist == null) || (playlist.length == 0)) return false;
 
-            lastline = resolveRelativeUrl(masterurl, line);
+            Log.d(LOGTAG, "dosomeRecording: loaded playlist:" + playlist.length);
 
-            chunks.add(lastline);
-            length.add(lastlength);
+            String lastChunk = Json.getString(recordstatus, "lastchunk");
+            String lastline;
 
-            if (foundlastchunk)
+            int startindex = -1;
+            float lastlength = 0;
+
+            //
+            // Build chunk array and identify the last chunk
+            // index.
+            //
+
+            ArrayList<String> chunks = new ArrayList<>();
+            ArrayList<Float> length = new ArrayList<>();
+
+            for (String line : playlist)
             {
-                //
-                // The recording is old. Append all
-                // new chunks to media file.
-                //
+                if (line.length() == 0) continue;
 
-                if (! appendIPTVStream(recordstatus, mediafile, lastline))
+                if (line.startsWith("#EXTINF:"))
+                {
+                    int endpos = line.contains(",") ? line.indexOf(",") : line.length();
+                    lastlength = Float.parseFloat(line.substring(8, endpos));
+                }
+
+                if (line.startsWith("#")) continue;
+
+                lastline = MediaStreamMaster.resolveRelativeUrl(masterurl, line);
+
+                chunks.add(lastline);
+                length.add(lastlength);
+
+                if ((lastChunk != null) && lastChunk.equals(lastline))
+                {
+                    startindex = chunks.size();
+                }
+            }
+
+            if (startindex < 0)
+            {
+                if (lastChunk != null)
+                {
+                    //
+                    // The recording is old, but we did not find
+                    // the last chunk. We have possibly been restartet,
+                    // so start with the first available fragment to
+                    // keep the loss minimal.
+                    //
+
+                    startindex = 0;
+
+                    Log.d(LOGTAG, "dosomeRecording: continued=" + startindex + "/" + chunks.size());
+                }
+                else
+                {
+                    //
+                    // This is the beginning of a new recording. The User
+                    // possibly clicked on an allready sending item, so
+                    // try to go backwards in time as much as possible and
+                    // required to make the recording complete.
+                    //
+
+                    startindex = chunks.size() - 1;
+
+                    long startsecs = Simple.getTimeStamp(starttime) / 1000;
+                    long nowsecs = Simple.nowAsTimeStamp() / 1000;
+                    float secondslost = nowsecs - startsecs;
+
+                    while ((secondslost > 0) && (startindex > 0))
+                    {
+                        secondslost -= length.get(startindex--);
+                    }
+
+                    Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
+                }
+            }
+
+            int loaded = 0;
+
+            for (int loadinx = startindex; loadinx < chunks.size(); loadinx++)
+            {
+                if (! appendIPTVStream(recordstatus, mediafile, chunks.get(loadinx)))
                 {
                     return false;
                 }
 
                 Json.putFileContent(metafile, metadata);
 
-                continue;
+                loaded++;
             }
 
-            if ((lastChunk != null) && lastChunk.equals(lastline)) foundlastchunk = true;
-        }
-
-        if (! foundlastchunk)
-        {
             //
-            // The recording is new. Check when the recording started
-            // and identify the matching start chunk. This allows to
-            // make one touch recording into the past.
+            // We leave the loop when all required
+            // chunks have been loaded. If there were
+            // more than one chunks loaded, we have a
+            // backlog and need to fetch an updated
+            // playlist.
             //
 
-            int startindex = chunks.size() - 1;
-
-            if (lastChunk != null)
-            {
-                //
-                // The recording is old, but we did not find
-                // the last chunk. We have possibly been restartet,
-                // so start with the first available fragment to
-                // keep the loss minimal.
-                //
-
-                startindex = 0;
-
-                Log.d(LOGTAG, "dosomeRecording: continued=" + startindex + "/" + chunks.size());
-            }
-            else
-            {
-                //
-                // This is the beginning of a new recording. The User
-                // possibly clicked on an allready sending item, so
-                // try to go backwards in time as much as possible and
-                // required to make the recording complete.
-                //
-
-                long startsecs = Simple.getTimeStamp(starttime) / 1000;
-                long nowsecs = Simple.nowAsTimeStamp() / 1000;
-                float secondslost = nowsecs - startsecs;
-
-                while ((secondslost > 0) && (startindex > 0))
-                {
-                    secondslost -= length.get(startindex--);
-                }
-
-                Log.d(LOGTAG, "dosomeRecording: initial=" + startindex + "/" + chunks.size());
-            }
-
-            if (! appendIPTVStream(recordstatus, mediafile, chunks.get(startindex)))
-            {
-                return false;
-            }
-
-            Json.putFileContent(metafile, metadata);
+            if (loaded <= 1) break;
         }
 
         return true;
@@ -355,13 +381,14 @@ public class MediaRecorder
             input.close();
 
             Json.put(recordstatus, "lastchunk", lastchunk);
-            Json.put(recordstatus, "lastsize", "" + lastSizeLong);
+            Json.put(recordstatus, "lastsize", Long.toString(lastSizeLong));
             Json.put(recordstatus, "chunkcount", chunkcount);
             Json.put(recordstatus, "nextimage", nextimage);
 
             Log.d(LOGTAG, "appendIPTVStream: mediafile=" + mediafile.toString());
             Log.d(LOGTAG, "appendIPTVStream: lastchunk=" + lastchunk);
             Log.d(LOGTAG, "appendIPTVStream: size=" + lastSizeLong + "/" + mediafile.length());
+            Log.d(LOGTAG, "appendIPTVStream: cc=" + chunkcount + "/" + nextimage);
 
             return true;
         }
@@ -392,8 +419,8 @@ public class MediaRecorder
         if (iptvchannel == null) return false;
 
         String masterurl = Json.getString(iptvchannel, "videourl");
-        String iptvplaylist = identifyPlaylist(masterurl);
-        if (iptvplaylist == null) return false;
+        MediaStream iptvstream = identifyPlaylist(masterurl);
+        if (iptvstream == null) return false;
 
         File mediadir = Simple.getMediaPath("recordings");
         Simple.makeDirectory(mediadir);
@@ -412,7 +439,9 @@ public class MediaRecorder
 
         Json.put(recording, "masterurl", masterurl);
         Json.put(recording, "iptvchannel", iptvchannel);
-        Json.put(recording, "iptvplaylist", iptvplaylist);
+        Json.put(recording, "iptvplaylist", iptvstream.streamUrl);
+        Json.put(recording, "elmostring", iptvstream.elmostring);
+        Json.put(recording, "elmoreferrer", iptvstream.elmoreferrer);
 
         Log.d(LOGTAG, "setupIPTVStream: " + Json.defuck(recording.toString()));
 
@@ -468,127 +497,19 @@ public class MediaRecorder
     }
 
     @Nullable
-    private static String identifyPlaylist(String requestUrl)
+    private static MediaStream identifyPlaylist(String requestUrl)
     {
         Log.d(LOGTAG,"identifyPlaylist: " + requestUrl);
 
-        JSONArray streamOptions = new JSONArray();
-        String[] lines = readLines(requestUrl);
+        MediaStreamMaster sm = new MediaStreamMaster(requestUrl, MediaQuality.HD);
 
-        if (lines != null)
-        {
-            Log.d(LOGTAG, "identifyPlaylist: " + lines.length);
-
-            for (int inx = 0; (inx + 1) < lines.length; inx++)
-            {
-                if (! lines[ inx ].startsWith("#EXT-X-STREAM-INF:")) continue;
-
-                String line = lines[ inx ].substring(18);
-
-                String width = Simple.getMatch("RESOLUTION=([0-9]*)x", line);
-                String height = Simple.getMatch("RESOLUTION=[0-9]*x([0-9]*)", line);
-                String bandwith = Simple.getMatch("BANDWIDTH=([0-9]*)", line);
-                String streamurl = lines[ ++inx ];
-
-                if ((bandwith == null) || (streamurl == null))
-                {
-                    continue;
-                }
-
-                if (streamurl.contains("akamaihd.net/") && streamurl.contains("av-b.m3u8"))
-                {
-                    //
-                    // My guess: these are interlaced variants we do not need.
-                    //
-
-                    continue;
-                }
-
-                streamurl = resolveRelativeUrl(requestUrl, streamurl);
-
-                JSONObject so = new JSONObject();
-
-                Json.put(so, "width", (width == null) ? 0 : Integer.parseInt(width));
-                Json.put(so, "height", (height == null) ? 0 : Integer.parseInt(height));
-                Json.put(so, "bandwith", Integer.parseInt(bandwith));
-                Json.put(so, "streamurl", streamurl);
-
-                streamOptions.put(so);
-
-                Log.d(LOGTAG, "identifyPlaylist: Live-Stream: " + width + "x" + height + " bw=" + bandwith);
-            }
-        }
-
-        if (streamOptions.length() == 0)
+        if (! sm.readMaster())
         {
             Log.d(LOGTAG, "identifyPlaylist: No streams found: " + requestUrl);
 
             return null;
         }
 
-        streamOptions = Json.sortInteger(streamOptions, "bandwith", true);
-        JSONObject streamOption = Json.getObject(streamOptions, 0);
-
-        return (streamOption != null) ? Json.getString(streamOption, "streamurl") : null;
-    }
-
-    private static String resolveRelativeUrl(String baseurl, String streamurl)
-    {
-        if (! (streamurl.startsWith("http:") || streamurl.startsWith("https:")))
-        {
-            //
-            // Releative fragment urls.
-            //
-
-            String prefix = baseurl;
-
-            if (prefix.lastIndexOf("/") > 0)
-            {
-                prefix = prefix.substring(0,prefix.lastIndexOf("/"));
-            }
-
-            while (streamurl.startsWith("../"))
-            {
-                streamurl = streamurl.substring(3);
-                prefix = prefix.substring(0,prefix.lastIndexOf("/"));
-            }
-
-            streamurl = prefix + "/" + streamurl;
-        }
-
-        return streamurl;
-    }
-
-    @Nullable
-    private static String[] readLines(String url)
-    {
-        try
-        {
-            HttpURLConnection connection = Simple.openUnderscoreConnection(url);
-            InputStream input = connection.getInputStream();
-
-            StringBuilder string = new StringBuilder();
-            byte[] buffer = new byte[ 4096 ];
-            int xfer;
-
-            while ((xfer = input.read(buffer)) > 0)
-            {
-                string.append(new String(buffer, 0, xfer));
-            }
-
-            input.close();
-
-            String temp = string.toString();
-
-            if (temp.contains("\r\n")) return temp.split("\r\n");
-
-            return temp.split("\n");
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return null;
+        return sm.getCurrentStream();
     }
 }

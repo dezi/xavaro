@@ -1,40 +1,38 @@
 package de.xavaro.android.common;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.SeekBar;
 import android.view.Gravity;
 import android.util.AttributeSet;
 
-public class VideoControl extends FrameLayout
+public class MediaControl extends FrameLayout
 {
-    private static final String LOGTAG = VideoControl.class.getSimpleName();
+    private static final String LOGTAG = MediaControl.class.getSimpleName();
 
     private TextView timeStart;
     private TextView timeUntil;
     private SeekBar seekBar;
 
-    public VideoControl(Context context)
+    public MediaControl(Context context)
     {
         super(context);
 
         init();
     }
 
-    public VideoControl(Context context, AttributeSet attrs)
+    public MediaControl(Context context, AttributeSet attrs)
     {
         super(context, attrs);
 
         init();
     }
 
-    public VideoControl(Context context, AttributeSet attrs, int defStyle)
+    public MediaControl(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
 

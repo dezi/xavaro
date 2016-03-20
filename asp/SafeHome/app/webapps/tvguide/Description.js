@@ -11,30 +11,19 @@ tvguide.descriptionConstants =
     subtitlebarTextAlign  : "center",
     subtitlebarFontStylen : "italic",
 
-    containerBG : "#ffffffff",
+    containerBG     : "#ffffffff",
     containerRadius : "4px",
-    boxPaddingTop : "10px",
+    boxPaddingTop   : "10px",
 
-    plannedButtonTilte : "remove planned recording",
-    plannedButtonColor : "#4553c1",
 
-    playButtonTitle : "play",
-    playButtonColor : "#58d533"
-}
+    plannedButtonTilte   : WebLibStrings.getTrans("tvguide.remove"),
+    plannedButtonColor   : "#4553c1",
 
-tvguide.deMoronize = function(moronedEpg)
-{
-    if (! moronedEpg.description) return moronedEpg;
+    playButtonTitle      : WebLibStrings.getTrans("tvguide.play"),
+    playButtonColor      : "#58d533",
 
-    var cleanEpg = moronedEpg;
-
-    var regex = new RegExp("([a-z0-9äüöß])([A-ZÉÄÜÖ])", "g");
-    var demoronized = moronedEpg.description;
-    var demoronized = demoronized.replace(regex, "$1@\n$2");
-
-    cleanEpg.description = demoronized;
-
-    return cleanEpg;
+    recordingButtonTitle : WebLibStrings.getTrans("tvguide.record"),
+    recordingButtonColor : "#ff7a7a",
 }
 
 tvguide.createTitleBar = function(title, subtitle)
@@ -145,7 +134,7 @@ tvguide.createSpliteDiv = function(leftText, rightText, landscapePic)
     var leftSpan = WebLibSimple.createAnyAppend("span", container);
 
     leftSpan.style.display   = "inline-block";
-    leftSpan.style.width     = "50%";
+    leftSpan.style.width     = "30%";
     leftSpan.style.textAlign = "left";
 
     leftSpan.innerHTML = leftText;
@@ -157,7 +146,7 @@ tvguide.createSpliteDiv = function(leftText, rightText, landscapePic)
     var rightSpan = WebLibSimple.createAnyAppend("span", container);
 
     rightSpan.style.display   = "inline-block";
-    rightSpan.style.width     = "50%";
+    rightSpan.style.width     = "70%";
     rightSpan.style.textAlign = "right";
 
     rightSpan.innerHTML = rightText;
@@ -168,7 +157,7 @@ tvguide.createInfoBox = function(description)
     if (! description) return;
 
     //
-    // tvguide.description.infoBox
+    // infoBox
     //
 
     var infoBox = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
@@ -185,6 +174,53 @@ tvguide.createInfoBox = function(description)
 
     WebLibSimple.setBGColor(container, tvguide.descriptionConstants.containerBG);
     WebLibSimple.setFontSpecs(container, 20, "normal", "#000000");
+}
+
+tvguide.nukeWiki = function()
+{
+    tvguide.wikiFrame.style.display = "none";
+    tvguide.wikiFrame = null;
+}
+
+tvguide.openWiki = function()
+{
+    WebAppUtility.makeClick();
+
+    var wikifilm = tvguide.description.epg.wikifilm;
+    console.log("--> wiki:" + wikifilm);
+
+    tvguide.wikiFrame = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.topdiv);
+
+    var dimmerDiv = tvguide.wikiFrame;
+    dimmerDiv.style.zIndex = "100";
+    dimmerDiv.onTouchClick = tvguide.nukeWiki;
+
+    WebLibSimple.setBGColor(dimmerDiv, "#66000000");
+
+    //
+    // wikiFrame
+    //
+
+    var border = 50;
+    var wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
+
+    WebLibSimple.setBGColor(wikiFrame, "#ffffff");
+
+    //
+    // iframe
+    //
+
+    var iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", wikiFrame);
+    iframe.style.border = "0px solid black";
+
+    iframe.src = "https://de.m.wikipedia.org/wiki/" + wikifilm;
+}
+
+tvguide.createWiki = function(wikifilm)
+{
+    if (! wikifilm) return;
+
+    tvguide.createButton("Wikipedia", "#d1d1d1", tvguide.openWiki, false);
 }
 
 tvguide.createDescriptionSetup = function()
@@ -222,6 +258,8 @@ tvguide.createDescriptionSetup = function()
 
 tvguide.addRecord = function()
 {
+    WebAppUtility.makeClick();
+
     var epg = tvguide.description.epg;
 
     var preload  = tvguide.constants.recordPreload  * 1000 * 60;
@@ -235,45 +273,45 @@ tvguide.addRecord = function()
 
     WebAppMedia.addRecording(JSON.stringify(epg));
 
-    tvguide.updateButton(tvguide.descriptionConstants.plannedButtonTilte,
-        tvguide.descriptionConstants.plannedButtonColor,
-        tvguide.removeRecording);
+    tvguide.createButtons();
 
     alert("record: " + epg.title);
 }
 
 tvguide.play = function()
 {
+    WebAppUtility.makeClick();
+
     WebAppMedia.openPlayer(tvguide.playFile);
 }
 
 tvguide.removeRecording = function()
 {
+    WebAppUtility.makeClick();
     alert("remove: " + tvguide.removeRec.title);
+
     WebAppMedia.removeRecording(JSON.stringify(tvguide.removeRec));
 
-    tvguide.updateButton("record", "#ff7a7a", tvguide.addRecord);
+    tvguide.createButtons();
 }
 
-tvguide.updateButton = function(name, color, eventHandler)
-{
-    var button = tvguide.description.button;
-
-    button.innerHTML    = name;
-    button.onTouchClick = eventHandler;
-    WebLibSimple.setBGColor(button, color);
-}
-
-tvguide.createButton = function(name, color, eventHandler)
+tvguide.createButton = function(name, color, eventHandler, global)
 {
     // tvguide.description
 
-    var container = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
-    container.style.paddingTop = tvguide.descriptionConstants.boxPaddingTop;
+    if (global)
+    {
+        tvguide.description.buttonContainer = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+        var container = tvguide.description.buttonContainer;
+    }
+    else
+    {
+        var container = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+    }
 
-    tvguide.description.button = WebLibSimple.createAnyAppend("div", container);
+    container.style.marginTop = tvguide.descriptionConstants.boxPaddingTop;
 
-    var button = tvguide.description.button;
+    var button = WebLibSimple.createAnyAppend("div", container);;
     button.style.height        = "50px";
     button.style.textAlign     = "center";
     button.style.paddingTop    = "25px";
@@ -281,6 +319,13 @@ tvguide.createButton = function(name, color, eventHandler)
 
     button.innerHTML           = name;
     button.onTouchClick        = eventHandler;
+
+    WebLibSimple.setFontSpecs(
+        button,
+        25,
+        "normal",
+        "#000000");
+
     WebLibSimple.setBGColor(button, color);
 }
 
@@ -291,7 +336,9 @@ tvguide.createRecButton = function(epg)
 
     if ((epg.iptv == true) && (stop > now))
     {
-        tvguide.createButton("record", "#ff7a7a", tvguide.addRecord);
+        tvguide.createButton(tvguide.descriptionConstants.recordingButtonTitle,
+            tvguide.descriptionConstants.recordingButtonColor,
+            tvguide.addRecord, true);
     }
 }
 
@@ -309,7 +356,11 @@ tvguide.createPlayButton = function(epg)
         //     epg.subtitle == recording.subtitle)
         // {
         //     tvguide.playFile = recording.mediafile;
-        //     tvguide.createButton("play subtitle", "#58d533", tvguide.play);
+        //
+        //     tvguide.createButton(tvguide.descriptionConstants.playButtonTitle,
+        //         tvguide.descriptionConstants.playButtonColor,
+        //         tvguide.play, true);
+        //
         //     return true;
         // }
 
@@ -319,7 +370,11 @@ tvguide.createPlayButton = function(epg)
             recording.stop     == epg.stop)
         {
             tvguide.playFile = recording.mediafile;
-            tvguide.createButton("play start/stop", "#58d533", tvguide.play);
+
+            tvguide.createButton(tvguide.descriptionConstants.playButtonTitle,
+                tvguide.descriptionConstants.playButtonColor,
+                tvguide.play, true);
+
             return true;
         }
     }
@@ -343,7 +398,7 @@ tvguide.createPlannedButton = function(epg)
 
             tvguide.createButton(tvguide.descriptionConstants.plannedButtonTilte,
                 tvguide.descriptionConstants.plannedButtonColor,
-                tvguide.removeRecording);
+                tvguide.removeRecording, true);
 
             return true;
         }
@@ -352,11 +407,16 @@ tvguide.createPlannedButton = function(epg)
     return false;
 }
 
-tvguide.createButtons = function(epg)
+tvguide.createButtons = function()
 {
     // Rec || Play || Planned/Remove
 
+    var epg = tvguide.description.epg;
+
     if (! epg.iptv) return;
+
+    var nukeContainer = tvguide.description.buttonContainer;
+    if (nukeContainer) nukeContainer.innerHTML = "";
 
     var playButton = tvguide.createPlayButton(epg);
 
@@ -406,14 +466,14 @@ tvguide.animateInfoOut = function()
     else
     {
         tvguide.animateInfoStatus = null;
-        tvguide.description.innerHTML = "";
+        tvguide.description = null;
     }
 }
 
 tvguide.descriptionMain = function(target, epg)
 {
-//    console.log("--> tvguide.onEPGTouchClick element: " + epg.title);
-//    console.log("--> epg: " + JSON.stringify(epg));
+    // console.log("--> tvguide.onEPGTouchClick element: " + epg.title);
+    // console.log("--> epg: " + JSON.stringify(epg));
 
     tvguide.createDescriptionSetup();
 
@@ -421,11 +481,9 @@ tvguide.descriptionMain = function(target, epg)
 
     tvguide.createTitleBar(epg.title, epg.subtitle);
 
-    var day = WebLibSimple.getNiceDay(epg.start);
-    var timeSpan = WebLibSimple.getNiceTime(epg.start) + "-" + WebLibSimple.getNiceTime(epg.stop);
-
-    var duration = Math.floor(WebLibSimple.getDuration(epg.start, epg.stop) / 1000 / 60) + "min";
-
+    var day       = WebLibSimple.getNiceDay(epg.start);
+    var timeSpan  = WebLibSimple.getNiceTime(epg.start) + "-" + WebLibSimple.getNiceTime(epg.stop);
+    var duration  = Math.floor(WebLibSimple.getDuration(epg.start, epg.stop) / 1000 / 60) + "min";
     var landscape = true;
 
     if (epg.imgsize)
@@ -447,25 +505,29 @@ tvguide.descriptionMain = function(target, epg)
         if (epg.imgname) imgSrc = epg.imgname;
 
         var src = "http://" + WebApp.manifest.appserver +
-            "/pgminfo/tv/de/" + encodeURIComponent(imgSrc) + ".orig.jpg";
+            "/pgminfo/tv/" + tvguide.constants.localLanguage + "/" +
+            encodeURIComponent(imgSrc) + ".orig.jpg";
 
         tvguide.createPic(src, landscape);
     }
 
     tvguide.createSpliteDiv(day + ":", timeSpan, landscape);
-    tvguide.createSpliteDiv("Duration:", duration, landscape);
 
-    tvguide.createSpliteDiv("Channel:", epg.channel, landscape);
+    var durationTrans = WebLibStrings.getTrans("tvguide.duration");
+    tvguide.createSpliteDiv(durationTrans + ":", duration, landscape);
+
+    var channelTrans = WebLibStrings.getTrans("tvguide.channel");
+    tvguide.createSpliteDiv(channelTrans + ":", epg.channel, landscape);
 
     tvguide.createInfoBox(epg.description);
 
-    tvguide.createButtons(epg);
+    tvguide.createWiki(epg.wikifilm);
+
+    tvguide.createButtons();
 }
 
-tvguide.onEPGTouchClick = function(target, element)
+tvguide.checkInfoStatus = function()
 {
-    WebAppUtility.makeClick();
-
     if (tvguide.animateInfoStatus == "Finish")
     {
         tvguide.animateInfoOut();
@@ -479,16 +541,23 @@ tvguide.onEPGTouchClick = function(target, element)
 
         tvguide.animateInfoOut();
     }
+}
+
+tvguide.onEPGTouchClick = function(target, element)
+{
+    WebAppUtility.makeClick();
+
+    tvguide.checkInfoStatus();
 
     if (! tvguide.animateInfoStatus)
     {
         var epg = element.epg;
 
-        if (! epg.title) return;
+        if (! epg) return;
 
         if (epg.isbd)
         {
-            epg = tvguide.deMoronize(epg);
+            epg = DeMoronize.cleanEpg(epg);
         }
 
         tvguide.descriptionMain(target, epg);
