@@ -118,7 +118,7 @@ public class SimpleRequest
 
             for (String line : lines)
             {
-                if (line.equals("Transfer-Encoding: chunked")) ischunked = true;
+                if (line.equalsIgnoreCase("Transfer-Encoding: chunked")) ischunked = true;
             }
 
             byte[] response = new byte[ 0 ];
@@ -182,7 +182,7 @@ public class SimpleRequest
                     }
                 }
 
-                Log.d(LOGTAG, "doHTTPGet: res=" + new String(response));
+                if (response.length < 80) Log.d(LOGTAG, "doHTTPGet: res=" + new String(response));
 
                 return new String(response);
             }
