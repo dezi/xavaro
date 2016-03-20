@@ -34,6 +34,12 @@ public class WebAppUtility
     }
 
     @JavascriptInterface
+    public boolean getDeveloperMode()
+    {
+        return Simple.getSharedPrefBoolean("developer.enable");
+    }
+
+    @JavascriptInterface
     public int getLaunchItemSize()
     {
         return CommonConfigs.LaunchItemSize;

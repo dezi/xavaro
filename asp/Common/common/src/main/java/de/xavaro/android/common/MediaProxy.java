@@ -104,6 +104,11 @@ public class MediaProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
     //region Setter methods.
 
+    public void setAudioUrl(String url)
+    {
+        setAudioUrl(url, null);
+    }
+    
     public void setAudioUrl(String url, Callback caller)
     {
         calling = caller;
@@ -118,6 +123,11 @@ public class MediaProxy extends Thread implements MediaPlayer.OnSeekCompleteList
 
         startPlayer = new ProxyPlayerStarter();
         startPlayer.start();
+    }
+
+    public void setVideoUrl(String url)
+    {
+        setVideoUrl(url, null);
     }
 
     public void setVideoUrl(String url, Callback caller)

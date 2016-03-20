@@ -388,6 +388,40 @@
     ]
   },
 
+  "www.qvc.de": {
+
+    "label": "QVC",
+    "url": "http://www.qvc.de/",
+    "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+
+    "channels": [
+      {
+        "label": "QVC",
+        "default": false,
+        "develop": true,
+        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi5/3/prog_index.m3u8",
+        "aliase": [ "tv/de/QVC Deutschland", "tv/de/QVC Deutschland HD" ]
+      },
+      {
+        "label": "QVC Plus",
+        "default": false,
+        "develop": true,
+        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi6/3/prog_index.m3u8",
+        "aliase": [ "tv/de/QVC Plus Deutschland", "tv/de/QVC Plus Deutschland HD" ]
+      },
+      {
+        "label": "QVC Beauty",
+        "default": false,
+        "develop": true,
+        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi7/3/prog_index.m3u8",
+        "aliase": [ "tv/de/QVC Beauty & Style", "tv/de/QVC Beauty & Style HD" ]
+      }
+    ]
+  },
+
   "www.rtl.de": {
 
     "label": "RTL",

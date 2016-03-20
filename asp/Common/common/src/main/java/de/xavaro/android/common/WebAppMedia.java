@@ -19,7 +19,14 @@ public class WebAppMedia
     @JavascriptInterface
     public void openPlayer(String mediafile)
     {
-        MediaProxy.getInstance().setVideoFile(mediafile);
+        if (mediafile.startsWith("http://") || mediafile.startsWith("https://"))
+        {
+            MediaProxy.getInstance().setVideoUrl(mediafile);
+        }
+        else
+        {
+            MediaProxy.getInstance().setVideoFile(mediafile);
+        }
     }
 
     @JavascriptInterface
