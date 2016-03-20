@@ -146,14 +146,21 @@ function addProgramInfos($pgminfodir, &$epgs)
 		$name = $realtitle;
 		$pgminfofile = $pgminfodir . "/" . $name . ".orig.jpg";
 		
+		unset($epgs[ "epgdata" ][ $inx ][ "imgsize" ]);
+		unset($epgs[ "epgdata" ][ $inx ][ "imgname" ]);
+
 		if (file_exists($pgminfofile))
 		{
 			$info = getimagesize($pgminfofile);
-			$epgs[ "epgdata" ][ $inx ][ "imgsize" ] = $info[ 0 ] . "x" . $info[ 1 ];
-
-			if ($realtitle != $title)
+			
+			if ($info[ 0 ] && $info[ 1 ])
 			{
-				$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
+				$epgs[ "epgdata" ][ $inx ][ "imgsize" ] = $info[ 0 ] . "x" . $info[ 1 ];
+
+				if ($realtitle != $title)
+				{
+					$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
+				}
 			}
 		}
 		
