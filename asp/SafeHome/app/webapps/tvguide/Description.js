@@ -15,15 +15,20 @@ tvguide.descriptionConstants =
     containerRadius : "4px",
     boxPaddingTop   : "10px",
 
+    livePlayButtonTilte  : WebLibStrings.getTrans("tvguide.livePlay"),
+    livePlayButtonColor  : "#7dff7a",
 
     plannedButtonTilte   : WebLibStrings.getTrans("tvguide.remove"),
-    plannedButtonColor   : "#4553c1",
+    plannedButtonColor   : "#7a80ff",
 
     playButtonTitle      : WebLibStrings.getTrans("tvguide.play"),
-    playButtonColor      : "#58d533",
+    playButtonColor      : "#ffba7a",
 
     recordingButtonTitle : WebLibStrings.getTrans("tvguide.record"),
     recordingButtonColor : "#ff7a7a",
+
+    wikiButtonTilte      : WebLibStrings.getTrans("tvguide.wikipedia"),
+    wikiButtonColor      : "#d1d1d1",
 }
 
 tvguide.createTitleBar = function(title, subtitle)
@@ -220,7 +225,10 @@ tvguide.createWiki = function(wikifilm)
 {
     if (! wikifilm) return;
 
-    tvguide.createButton("Wikipedia", "#d1d1d1", tvguide.openWiki, false);
+    tvguide.createButton(
+        tvguide.descriptionConstants.wikiButtonTilte,
+        tvguide.descriptionConstants.wikiButtonColor,
+        tvguide.openWiki, false);
 }
 
 tvguide.createDescriptionSetup = function()
@@ -407,10 +415,20 @@ tvguide.createPlannedButton = function(epg)
     return false;
 }
 
+tvguide.createLivePlayButton = function(epg)
+{
+    tvguide.playFile = epg.videourl;
+
+    tvguide.createButton(
+        tvguide.descriptionConstants.livePlayButtonTilte,
+        tvguide.descriptionConstants.livePlayButtonColor,
+        tvguide.play, false);
+
+//    tvguide.createButton("Live Play", "#ff0000", tvguide.play, false);
+}
+
 tvguide.createButtons = function()
 {
-    // Rec || Play || Planned/Remove
-
     var epg = tvguide.description.epg;
 
     if (! epg.iptv) return;
@@ -481,8 +499,11 @@ tvguide.descriptionMain = function(target, epg)
 
     tvguide.createTitleBar(epg.title, epg.subtitle);
 
-    var day       = WebLibSimple.getNiceDay(epg.start);
-    var timeSpan  = WebLibSimple.getNiceTime(epg.start) + "-" + WebLibSimple.getNiceTime(epg.stop);
+    var now       = new Date().getTime();
+    var start     = new Date(epg.start).getTime();
+    var stop      = new Date(epg.stop ).getTime();
+    var day       = WebLibSimple.getNiceDay(start);
+    var timeSpan  = WebLibSimple.getNiceTime(start) + "-" + WebLibSimple.getNiceTime(stop);
     var duration  = Math.floor(WebLibSimple.getDuration(epg.start, epg.stop) / 1000 / 60) + "min";
     var landscape = true;
 
@@ -522,6 +543,12 @@ tvguide.descriptionMain = function(target, epg)
     tvguide.createInfoBox(epg.description);
 
     tvguide.createWiki(epg.wikifilm);
+
+    if (now > start && now < stop)
+    {
+        console.log("--> create live play button");
+        tvguide.createLivePlayButton(epg);
+    }
 
     tvguide.createButtons();
 }
