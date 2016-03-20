@@ -42,7 +42,11 @@ function getWikiName(&$epg)
 	}
 	
 	if (($okiyear == null) || ($badyear != null) ||
-		($okiyear < 1900) || ($okiyear > 2020)) return null;
+		($okiyear < 1900) || ($okiyear > 2020))
+	{
+		$title = stripWikiSearch($epg[ "title" ]);
+		return $title;
+	}
 	
 	$title = stripWikiSearch($epg[ "title" ]);
 	$title = $title . " (" . $okiyear . ")";
