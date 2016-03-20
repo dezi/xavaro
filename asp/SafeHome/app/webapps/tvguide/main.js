@@ -215,7 +215,7 @@ tvguide.getSenderList = function()
     }
 
     var iptvChannels  = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
-    var iptvAliase    = [];
+    var iptvAliase    = {};
 
     for (var webKey in iptvChannels)
     {
@@ -225,18 +225,22 @@ tvguide.getSenderList = function()
         {
             var aliase = iptvChannels[ webKey ][ "channels" ][ channels ][ "aliase" ];
 
+            var videourl = iptvChannels[ webKey ][ "channels" ][ channels ][ "videourl" ];
+
             for (var aliasIndex in aliase)
             {
-                iptvAliase.push(aliase[ aliasIndex ]);
+                iptvAliase[ aliase[ aliasIndex ] ] = videourl;
             }
         }
     }
 
-    for (var iptvAliaseIndex in iptvAliase)
+    for (var iptv in iptvAliase)
     {
-        if (tvguide.senderList[ iptvAliase[ iptvAliaseIndex ] ])
+        if (tvguide.senderList[ iptv ])
         {
-            tvguide.senderList[ iptvAliase[ iptvAliaseIndex ] ].iptv = true;
+            var channel      = tvguide.senderList[ iptv ];
+            channel.iptv     = true;
+            channel.videourl = iptvAliase[ iptv ];
         }
     }
 
@@ -254,7 +258,6 @@ tvguide.getSenderList = function()
         {
             if (sender == bdName && tmp.isbd)
             {
-                // console.log("--> brainDead:" + sender);
                 tvguide.senderList[ sender ].isbd = tmp.isbd;
             }
         }
@@ -279,13 +282,7 @@ tvguide.createSenderBar = function()
 
         WebLibSimple.setBGColor(senderImgDiv, tvguide.constants.senderImgDivColor);
 
-        var paddingDiv = WebLibSimple.createDiv(
-            0,
-            0,
-            0,
-            0,
-            null,
-            senderImgDiv);
+        var paddingDiv = WebLibSimple.createDiv(0, 0, 0, 0, null, senderImgDiv);
 
         paddingDiv.style.paddingLeft     = "7px";
         paddingDiv.style.paddingTop      = "8px";
@@ -331,7 +328,15 @@ tvguide.updateTimeLine = function(startHour, stopHour)
         {
             var div = WebLibSimple.createDivWidth(0, 0, 2, 0, null, timelineDiv);
             div.style.backgroundColor = "#e00073";
-//            div.style.border          = "15px solid black";
+
+//            var span = WebLibSimple.createAnyAppend("span", timelineDiv);
+//            span.style.backgroundColor = "#e00073";
+//            span.style.left = "0px";
+//            span.style.top = "0px";
+//            span.style.right = "0px";
+//            span.style.bottom = "0px";
+//            span.style.width = "10px"
+//            span.style.border          = "15px solid black";
         }
         else
         {
@@ -393,6 +398,12 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         epg.country = channel.country;
         epg.channel = channel.channel;
         epg.iptv    = channel.iptv;
+
+        if (channel.iptv)
+        {
+            epg.videourl =  channel.videourl;
+        }
+
         epg.isbd    = channel.isbd;
 
         var moronDateStart = new Date(epg.start);
@@ -400,14 +411,7 @@ tvguide.createEpgProgram = function(channelName, epgdata)
 
         if (moronDateStart.getSeconds() > 0 || moronDateStop.getSeconds() > 0)
         {
-            // console.log("--> Channel:    " + epg.channel + " Title:" + epg.title);
-            // console.log("--> Moron Start:" + moronDateStart);
-            // console.log("--> Moron Stop: " + moronDateStop);
-
             epg = DeMoronize.cleanTime(epg);
-
-            // console.log("--> Clear Start:" + epg.start);
-            // console.log("--> Clear Stop: " + epg.stop );
         }
 
         var startDate = new Date(epg.start).getTime() / 1000 / 60;

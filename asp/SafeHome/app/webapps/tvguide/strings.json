@@ -2,9 +2,12 @@
   "tvguide.channel" : "Channel",
   "tvguide.duration" : "Duration",
 
+  "tvguide.wikipedia" : "Wikipedia",
+
   "tvguide.min" : "min",
   "tvguide.record" : "Record",
-  "tvguide.play" : "Play",
+  "tvguide.play" : "Live play",
+  "tvguide.livePlay" : "Play recording",
   "tvguide.remove" : "Remove planned recording",
 
   "tvguide.at" : "at",

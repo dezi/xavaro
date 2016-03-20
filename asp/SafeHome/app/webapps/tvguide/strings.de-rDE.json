@@ -1,10 +1,13 @@
 {
   "tvguide.channel" : "Kanal",
   "tvguide.duration" : "Dauer",
+  
+  "tvguide.wikipedia" : "Wikipedia",
 
   "tvguide.min" : "min",
   "tvguide.record" : "Aufnehmen",
-  "tvguide.play" : "Ab",
+  "tvguide.play" : "Aufnahme ansehen",
+  "tvguide.livePlay" : "Ansehen",
   "tvguide.remove" : "Geplannte Aufnahme abbrechen",
 
   "tvguide.at" : "um",
