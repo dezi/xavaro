@@ -133,31 +133,30 @@ function readPrograms($countrydir, $channeldir)
 			$name = $realtitle;
 			$pgminfofile = $pgminfodir . "/" . $name . ".orig.jpg";
 			
+			unset($epgs[ "epgdata" ][ $inx ][ "img" ]);
+			unset($epgs[ "epgdata" ][ $inx ][ "imgsize" ]);
+			unset($epgs[ "epgdata" ][ $inx ][ "imgname" ]);
+
 			if (file_exists($pgminfofile))
 			{
-				//
-				// Remove legacy property.
-				//
-				
-				unset($epgs[ "epgdata" ][ $inx ][ "img" ]);
-				
 				//
 				// Add image info.
 				//
 				
 				$info = getimagesize($pgminfofile);
-				$epgs[ "epgdata" ][ $inx ][ "imgsize" ] = $info[ 0 ] . "x" . $info[ 1 ];
-
-				if ($realtitle != $title)
+				
+				if ($info[ 0 ] && $info[ 1 ])
 				{
-					$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
+					$epgs[ "epgdata" ][ $inx ][ "imgsize" ] = $info[ 0 ] . "x" . $info[ 1 ];
+
+					if ($realtitle != $title)
+					{
+						$epgs[ "epgdata" ][ $inx ][ "imgname" ] = $realtitle;
+					}
 				}
 			}
 			else
 			{
-				unset($epgs[ "epgdata" ][ $inx ][ "img" ]);
-				unset($epgs[ "epgdata" ][ $inx ][ "imgsize" ]);
-				unset($epgs[ "epgdata" ][ $inx ][ "imgname" ]);
 							
 				//
 				// Identify if known movie.
