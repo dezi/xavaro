@@ -24,6 +24,7 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.SimpleRequest;
 import de.xavaro.android.common.MediaSurface;
+import de.xavaro.android.common.WebCookie;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,

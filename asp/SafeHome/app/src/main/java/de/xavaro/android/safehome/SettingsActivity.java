@@ -19,6 +19,7 @@ import java.util.List;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebApp;
+import de.xavaro.android.common.WebCookie;
 
 public class SettingsActivity extends PreferenceActivity
 {
