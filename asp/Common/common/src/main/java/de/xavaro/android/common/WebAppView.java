@@ -15,6 +15,7 @@ public class WebAppView extends WebView
         super(context);
     }
 
+    public WebAppNine nine;
     public WebAppPrefs prefs;
     public WebAppSpeak speak;
     public WebAppMedia media;
@@ -123,6 +124,12 @@ public class WebAppView extends WebView
         {
             media = new WebAppMedia();
             addJavascriptInterface(media, "WebAppMedia");
+        }
+
+        if (permissions.contains("nine"))
+        {
+            nine = new WebAppNine(webapploader);
+            addJavascriptInterface(nine, "WebAppNine");
         }
 
         loadUrl(WebApp.getHTTPAppRoot(webappname));

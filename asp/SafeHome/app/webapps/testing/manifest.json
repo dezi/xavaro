@@ -15,7 +15,8 @@
       "events",
       "media",
       "speak",
-      "prefs"
+      "prefs",
+      "nine"
     ],
 
     "weblibs": [

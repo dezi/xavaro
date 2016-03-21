@@ -2,6 +2,7 @@
 // Testing webapp.
 //
 
+/*
 testing.pre = WebLibSimple.createAnyAppend("pre", document.body);
 
 
@@ -10,7 +11,6 @@ testing.pre.innerHTML = WebAppMedia.getRecordedItems();
 testing.pre.innerHTML = WebAppMedia.getLocaleDefaultChannels("tv");
 
 //WebAppMedia.openPlayer("/storage/emulated/0/Movies/Recordings/2016-03-15T15-10-00Z.tv.de.ARTE Deutsch.mp4");
-
 
 testing.locale = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
 testing.channels = JSON.parse(WebAppRequest.loadSync("http://epg.xavaro.de/channels/tv/de.json.gz"));
@@ -34,3 +34,7 @@ for (var inx = 0; inx < testing.channels.length; inx++)
 
     if (ccc.name.startsWith("Sky ")) console.log(tag);
 }
+*/
+
+
+WebAppNine.getNinePatchBase64("nine.9.png", 200, 100);

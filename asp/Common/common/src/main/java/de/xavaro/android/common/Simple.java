@@ -1112,13 +1112,13 @@ public class Simple
 
     public static String getHexBytesToString(byte[] bytes)
     {
+        if (bytes == null) return null;
+
         return getHexBytesToString(bytes, 0, bytes.length);
     }
 
     public static String getHexBytesToString(byte[] bytes, int offset, int length)
     {
-        if (bytes == null) return null;
-
         char[] hexArray = "0123456789ABCDEF".toCharArray();
         char[] hexChars = new char[ length << 1 ];
 
