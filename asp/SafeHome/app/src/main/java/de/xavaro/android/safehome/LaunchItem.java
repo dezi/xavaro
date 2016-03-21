@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Chooser;
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VersionUtils;
@@ -338,7 +339,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
 
             if (packageName != null)
             {
-                GlobalConfigs.weLikeThis(packageName);
+                CommonConfigs.weLikeThis(packageName);
                 Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
 
                 if (appIcon != null)

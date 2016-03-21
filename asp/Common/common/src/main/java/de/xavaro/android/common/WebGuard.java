@@ -1,4 +1,4 @@
-package de.xavaro.android.safehome;
+package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
@@ -247,7 +247,7 @@ public class WebGuard extends WebViewClient
         // Do more cherry picking here.
         //
 
-        if (follow.getScheme().equals("mailto") && GlobalConfigs.likeEmail)
+        if (follow.getScheme().equals("mailto") && CommonConfigs.likeEmail)
         {
             //
             // We like Email.
@@ -266,7 +266,7 @@ public class WebGuard extends WebViewClient
             return true;
         }
 
-        if (follow.getScheme().equals("whatsapp") && GlobalConfigs.likeWhatsApp)
+        if (follow.getScheme().equals("whatsapp") && CommonConfigs.likeWhatsApp)
         {
             //
             // We love WhatsApp.
@@ -286,7 +286,7 @@ public class WebGuard extends WebViewClient
             return true;
         }
 
-        if (follow.getHost().endsWith("twitter.com") && GlobalConfigs.likeTwitter)
+        if (follow.getHost().endsWith("twitter.com") && CommonConfigs.likeTwitter)
         {
             //
             // We like Twitter.
@@ -307,7 +307,7 @@ public class WebGuard extends WebViewClient
             }
         }
 
-        if (follow.getHost().equals("plus.google.com") && GlobalConfigs.likeGooglePlus)
+        if (follow.getHost().equals("plus.google.com") && CommonConfigs.likeGooglePlus)
         {
             //
             // We hate GooglePlus.
@@ -328,7 +328,7 @@ public class WebGuard extends WebViewClient
             }
         }
 
-        if (follow.getHost().endsWith(".facebook.com") && GlobalConfigs.likeFacebook)
+        if (follow.getHost().endsWith(".facebook.com") && CommonConfigs.likeFacebook)
         {
             //
             // We hate Facebook.

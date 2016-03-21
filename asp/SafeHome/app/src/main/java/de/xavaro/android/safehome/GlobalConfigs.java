@@ -12,42 +12,6 @@ import de.xavaro.android.common.StaticUtils;
 
 public class GlobalConfigs
 {
-    //region Standard apps
-
-    //
-    // Apps we like in this setup.
-    //
-
-    // @formatter:off
-    public static boolean likeGooglePlus = true;
-    public static boolean likeWhatsApp   = false;
-    public static boolean likeFacebook   = true;
-    public static boolean likeTwitter    = true;
-    public static boolean likeSkype      = false;
-    public static boolean likeEmail      = true;
-    // @formatter:on
-
-    public static void weLikeThis(String packagename)
-    {
-        if (packagename == null) return;
-
-        if (CommonConfigs.packageEmail == null)
-        {
-            CommonConfigs.packageEmail = Simple.getDefaultEmail();
-        }
-
-        // @formatter:off
-        if (packagename.equals(CommonConfigs.packageWhatsApp  )) likeWhatsApp   = true;
-        if (packagename.equals(CommonConfigs.packageFacebook  )) likeFacebook   = true;
-        if (packagename.equals(CommonConfigs.packageTwitter   )) likeTwitter    = true;
-        if (packagename.equals(CommonConfigs.packageSkype     )) likeSkype      = true;
-        if (packagename.equals(CommonConfigs.packageGooglePlus)) likeGooglePlus = true;
-        if (packagename.equals(CommonConfigs.packageEmail     )) likeEmail      = true;
-        // @formatter:on
-    }
-
-    //endregion
-
     //region Server adresses
 
     // @formatter:off

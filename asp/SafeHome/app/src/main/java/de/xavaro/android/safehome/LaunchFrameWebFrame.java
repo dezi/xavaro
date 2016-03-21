@@ -9,6 +9,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.WebGuard;
+
 public class LaunchFrameWebFrame extends LaunchFrame
 {
     private static final String LOGTAG = LaunchFrameWebFrame.class.getSimpleName();

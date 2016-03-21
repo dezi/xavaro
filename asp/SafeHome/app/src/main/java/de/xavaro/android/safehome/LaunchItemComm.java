@@ -11,6 +11,7 @@ import android.util.Log;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.CommService;
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.RemoteGroups;
@@ -64,7 +65,7 @@ public class LaunchItemComm extends LaunchItem
 
         if (type.equals("skype"))
         {
-            GlobalConfigs.likeSkype = true;
+            CommonConfigs.likeSkype = true;
 
             if (config.has("skypename"))
             {
@@ -100,7 +101,7 @@ public class LaunchItemComm extends LaunchItem
 
         if (type.equals("whatsapp"))
         {
-            GlobalConfigs.likeWhatsApp = true;
+            CommonConfigs.likeWhatsApp = true;
 
             if (config.has("waphonenumber"))
             {

@@ -31,7 +31,7 @@ public class LaunchItemApps extends LaunchItem
         {
             String apkname = Json.getString(config, "apkname");
 
-            GlobalConfigs.weLikeThis(apkname);
+            CommonConfigs.weLikeThis(apkname);
             Drawable appIcon = Simple.getIconFromApplication(apkname);
 
             if (appIcon != null)

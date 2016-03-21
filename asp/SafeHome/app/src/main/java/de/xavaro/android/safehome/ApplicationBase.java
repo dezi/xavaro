@@ -1,10 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.app.Application;
-import android.os.StrictMode;
 import android.util.Log;
-
-import de.xavaro.android.common.Simple;
 
 public class ApplicationBase extends Application
 {
