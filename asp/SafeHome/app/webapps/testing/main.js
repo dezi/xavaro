@@ -36,5 +36,7 @@ for (var inx = 0; inx < testing.channels.length; inx++)
 }
 */
 
+var nine = JSON.parse(WebAppNine.getNinePatchBase64("nine.9.png", 200, 80));
 
-WebAppNine.getNinePatchBase64("nine.9.png", 200, 100);
+var img = WebLibSimple.createImgWidHei(100, 100, 200, 80, "img", document.body);
+img.src = nine.base64;
