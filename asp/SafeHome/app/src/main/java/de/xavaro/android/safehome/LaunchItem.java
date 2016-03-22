@@ -48,6 +48,9 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
         String suty = type + ((subtype == null) ? "" : "/" + subtype);
 
         // @formatter:off
+        if (Simple.equals(type, "prev"        )) item = new LaunchItemNextPrev(context);
+        if (Simple.equals(type, "next"        )) item = new LaunchItemNextPrev(context);
+
         if (Simple.equals(type, "beta"        )) item = new LaunchItemBeta(context);
         if (Simple.equals(type, "today"       )) item = new LaunchItemToday(context);
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);

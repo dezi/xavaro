@@ -1,17 +1,18 @@
 package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
+import android.webkit.JavascriptInterface;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-import android.webkit.JavascriptInterface;
 
-import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.File;
 
 @SuppressWarnings("unused")
 public class WebAppBeta
@@ -22,7 +23,6 @@ public class WebAppBeta
     @SuppressLint("SetWorldReadable")
     public boolean getBetaDownload(String version)
     {
-        Simple.sleep(3000);
         try
         {
             String remotename = Simple.getPackageName() + "." + version + ".apk";
@@ -89,7 +89,7 @@ public class WebAppBeta
             String localname = Simple.getPackageName() + ".apk";
             File localfile = new File(Simple.getCacheDir(), localname);
 
-            Log.d(LOGTAG, "Installing new version: " + localfile.length());
+            Log.d(LOGTAG, "makeBetaInstall: version: " + localfile.length());
 
             String mimeType = "application/vnd.android.package-archive";
             Intent promptInstall = new Intent(Intent.ACTION_VIEW);

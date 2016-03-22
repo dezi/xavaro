@@ -144,6 +144,81 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         this.addView(arrowRight);
     }
 
+    public void animateNextPage()
+    {
+        animatePage(arrowRight, true);
+    }
+
+    public void animatePrevPage()
+    {
+        animatePage(arrowLeft, true);
+    }
+
+    private void animatePage(View view, boolean clickmove)
+    {
+        FrameLayout lpage = null;
+        int finalMargin = 0;
+
+        if ((view == arrowLeft) && (launchPage > 0))
+        {
+            launchPage--;
+
+            lpage = launchPages.get(launchPage);
+
+            if (clickmove)
+            {
+                LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
+                lparams.leftMargin = -lpage.getWidth();
+                lpage.bringToFront();
+            }
+            else
+            {
+                if (xDirTouch < 0)
+                {
+                    finalMargin = -lpage.getWidth();
+                    launchPage++;
+                }
+            }
+        }
+
+        if ((view == arrowRight) && ((launchPage + 1) < launchPages.size()))
+        {
+            launchPage++;
+
+            lpage = launchPages.get(launchPage);
+
+            if (clickmove)
+            {
+                LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
+                lparams.leftMargin = lpage.getWidth();
+                lpage.bringToFront();
+            }
+            else
+            {
+                if (xDirTouch > 0)
+                {
+                    finalMargin = lpage.getWidth();
+                    launchPage--;
+                }
+            }
+        }
+
+        if (lpage != null)
+        {
+            LayoutParams from = (LayoutParams) lpage.getLayoutParams();
+            LayoutParams toto = new LayoutParams(lpage.getLayoutParams());
+            toto.leftMargin = finalMargin;
+
+            Animator animator = new Animator();
+
+            animator.setDuration(500);
+            animator.setLayout(lpage, from, toto);
+            animator.setFinalCall(animationFinished);
+
+            this.startAnimation(animator);
+        }
+    }
+
     private boolean touchValid;
     private int xStartTouch;
     private int yStartTouch;
@@ -218,49 +293,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP)
         {
-            FrameLayout lpage = null;
-            int finalMargin = 0;
-
-            if ((view == arrowLeft) && (launchPage > 0))
-            {
-                launchPage--;
-
-                lpage = launchPages.get(launchPage);
-
-                if (xDirTouch < 0)
-                {
-                    finalMargin = -lpage.getWidth();
-                    launchPage++;
-                }
-            }
-
-            if ((view == arrowRight) && ((launchPage + 1) < launchPages.size()))
-            {
-                launchPage++;
-
-                lpage = launchPages.get(launchPage);
-
-                if (xDirTouch > 0)
-                {
-                    finalMargin = lpage.getWidth();
-                    launchPage--;
-                }
-            }
-
-            if (lpage != null)
-            {
-                LayoutParams from = (LayoutParams) lpage.getLayoutParams();
-                LayoutParams toto = new LayoutParams(lpage.getLayoutParams());
-                toto.leftMargin = finalMargin;
-
-                Animator animator = new Animator();
-
-                animator.setDuration(500);
-                animator.setLayout(lpage, from, toto);
-                animator.setFinalCall(animationFinished);
-
-                this.startAnimation(animator);
-            }
+            animatePage(view, false);
         }
 
         return true;
@@ -275,7 +308,7 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         arrowRight.bringToFront();
     }
 
-    private Runnable animationFinished = new Runnable()
+    private final Runnable animationFinished = new Runnable()
     {
         @Override
         public void run()
@@ -284,61 +317,62 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         }
     };
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+    private final Runnable afterMeasure = new Runnable()
     {
-        if (changed)
+        @Override
+        public void run()
         {
-            Log.d(LOGTAG, "onLayout:" + "=" + left + "=" + top + "=" + right + "=" + bottom);
+            if ((measuredWidth != realWidth) || (measuredHeight != realHeight))
+            {
+                realWidth = measuredWidth;
+                realHeight = measuredHeight;
 
-            positionLaunchItems();
+                if (Simple.hasNavigationBar()) realHeight -= Simple.getNavigationBarHeight();
+
+                horzItems = realWidth / horzSize;
+                vertItems = realHeight / vertSize;
+
+                horzSpace = (realWidth - (horzItems * horzSize)) / (horzItems + 1);
+                vertSpace = (realHeight - (vertItems * vertSize)) / vertItems;
+
+                horzStart = ((realWidth - (horzItems * horzSize)) % (horzItems + 1)) / 2;
+                vertStart = ((realHeight - (vertItems * vertSize)) % vertItems) / 2;
+
+                horzStart += horzSpace;
+                vertStart += vertSpace / 2;
+
+                if (launchItems == null)
+                {
+                    createLaunchItems();
+                }
+                else
+                {
+                    for (FrameLayout lp : launchPages)
+                    {
+                        LayoutParams lpar = (LayoutParams) lp.getLayoutParams();
+                        lpar.width = realWidth;
+                        lpar.height = realHeight;
+                        lp.setLayoutParams(lpar);
+                    }
+                }
+
+                positionLaunchItems();
+            }
         }
+    };
 
-        super.onLayout(changed, left, top, right, bottom);
-    }
+    protected int measuredWidth;
+    protected int measuredHeight;
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-
-        if ((width != realWidth) || (height != realHeight))
-        {
-            realWidth = width;
-            realHeight = height;
-
-            if (Simple.hasNavigationBar()) realHeight -= Simple.getNavigationBarHeight();
-
-            horzItems = realWidth / horzSize;
-            vertItems = realHeight / vertSize;
-
-            horzSpace = (realWidth - (horzItems * horzSize)) / (horzItems + 1);
-            vertSpace = (realHeight - (vertItems * vertSize)) / vertItems;
-
-            horzStart = ((realWidth - (horzItems * horzSize)) % (horzItems + 1)) / 2;
-            vertStart = ((realHeight - (vertItems * vertSize)) % vertItems) / 2;
-
-            horzStart += horzSpace;
-            vertStart += vertSpace / 2;
-
-            if (launchItems == null)
-            {
-                createLaunchItems();
-            }
-            else
-            {
-                for (FrameLayout lp : launchPages)
-                {
-                    LayoutParams lpar = (LayoutParams) lp.getLayoutParams();
-                    lpar.width = realWidth;
-                    lpar.height = realHeight;
-                    lp.setLayoutParams(lpar);
-                }
-            }
-        }
-
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
+        measuredHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+        getHandler().post(afterMeasure);
     }
 
     public void deleteLaunchItem(LaunchItem item)
@@ -412,24 +446,51 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 
             for (int inx = 0; inx < numItems; inx++)
             {
+                if ((nextSlot == 0) && (parent != null))
+                {
+                    JSONObject prev = new JSONObject();
+                    Json.put(prev, "type", "prev");
+                    Json.put(prev, "label", "Zurück");
+
+                    LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
+                    liprev.setSize(horzSize, vertSize);
+                    launchItems.add(liprev);
+                    lp.addView(liprev);
+
+                    nextSlot++;
+                }
+
                 JSONObject lit = lis.getJSONObject(inx);
 
-                if (lis.getJSONObject(inx).has("enable"))
+                if (lit.has("enable"))
                 {
                     String key = lit.getString("enable");
 
-                    if (!StaticUtils.getSharedPrefsBoolean(context, key))
+                    if (! StaticUtils.getSharedPrefsBoolean(context, key))
                     {
                         continue;
                     }
                 }
 
-                LaunchItem li = LaunchItem.createLaunchItem(context, this, lit);
-                li.setSize(horzSize, vertSize);
-                launchItems.add(li);
-
-                if (nextSlot >= maxSlots)
+                if ((nextSlot + 1) >= maxSlots)
                 {
+                    //
+                    // Next icon on last position of page.
+                    //
+
+                    JSONObject next = new JSONObject();
+                    Json.put(next, "type", "next");
+                    Json.put(next, "label", "Weiter");
+
+                    LaunchItem linext = LaunchItem.createLaunchItem(context, this, next);
+                    linext.setSize(horzSize, vertSize);
+                    launchItems.add(linext);
+                    lp.addView(linext);
+
+                    //
+                    // Create new page.
+                    //
+
                     lp = new FrameLayout(context);
                     lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth, realHeight));
                     lp.setBackgroundColor(bgcol);
@@ -437,8 +498,26 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
                     this.addView(lp);
 
                     nextSlot = 0;
+
+                    //
+                    // Prev icon on first position of page.
+                    //
+
+                    JSONObject prev = new JSONObject();
+                    Json.put(prev, "type", "prev");
+                    Json.put(prev, "label", "Zurück");
+
+                    LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
+                    liprev.setSize(horzSize, vertSize);
+                    launchItems.add(liprev);
+                    lp.addView(liprev);
+
+                    nextSlot++;
                 }
 
+                LaunchItem li = LaunchItem.createLaunchItem(context, this, lit);
+                li.setSize(horzSize, vertSize);
+                launchItems.add(li);
                 lp.addView(li);
                 nextSlot++;
             }

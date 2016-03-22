@@ -437,7 +437,7 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        Log.d(LOGTAG,"onActivityResult: reques:" + requestCode + " result:" + resultCode);
+        Log.d(LOGTAG,"onActivityResult: request:" + requestCode + " result:" + resultCode);
 
         if (requestCode == 1)
         {
@@ -445,9 +445,9 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 String result = data.getStringExtra("result");
             }
+
             if (resultCode == Activity.RESULT_CANCELED)
             {
-
             }
         }
     }
