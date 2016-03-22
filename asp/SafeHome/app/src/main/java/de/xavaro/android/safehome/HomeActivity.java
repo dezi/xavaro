@@ -157,7 +157,6 @@ public class HomeActivity extends AppCompatActivity implements
             topscreen.addView(launchGroup);
         }
 
-        UpdateManager.selfUpdate(this, false);
         DitUndDat.InternetState.subscribe(this);
 
         ArchievementManager.show("howto.open.settings");

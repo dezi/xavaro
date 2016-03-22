@@ -15,6 +15,7 @@ public class WebAppView extends WebView
         super(context);
     }
 
+    public WebAppBeta beta;
     public WebAppNine nine;
     public WebAppPrefs prefs;
     public WebAppSpeak speak;
@@ -130,6 +131,12 @@ public class WebAppView extends WebView
         {
             nine = new WebAppNine(webapploader);
             addJavascriptInterface(nine, "WebAppNine");
+        }
+
+        if (permissions.contains("beta"))
+        {
+            beta = new WebAppBeta();
+            addJavascriptInterface(beta, "WebAppBeta");
         }
 
         loadUrl(WebApp.getHTTPAppRoot(webappname));

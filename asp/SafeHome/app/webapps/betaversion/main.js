@@ -1,10 +1,10 @@
 betaversion.createFrame = function()
 {
+    WebLibSimple.setBGColor(document.body, "#ffffffee");
+
     var bv = betaversion;
 
-    bv.bgcol = "#ffffffee";
-    bv.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
-    WebLibSimple.setBGColor(bv.topDiv, bv.bgcol);
+    bv.topDiv = WebLibSimple.createAnyAppend("div", document.body);
     WebLibSimple.setFontSpecs(bv.topDiv, 24, "bold", "#666666");
     bv.topDiv.style.padding = "20px";
 
@@ -75,8 +75,16 @@ betaversion.createFrame = function()
             div.style.padding = "10px";
             div.style.borderRadius = "10px";
             div.style.border = "1px solid black";
-            div.innerHTML = "Diese Version herunterladen und installieren";
-            div.onTouchClick = betaversion.downLoad;
+
+            if (bv.thisversion == bv.latestversion)
+            {
+                div.innerHTML = "Sie haben bereits die aktuellste Version";
+            }
+            else
+            {
+                div.innerHTML = "Diese Version herunterladen und installieren";
+                div.onTouchClick = betaversion.downLoadClick;
+            }
 
             bv.loadButton = div;
        }
@@ -86,13 +94,38 @@ betaversion.createFrame = function()
     }
 }
 
-betaversion.downLoad = function()
+betaversion.downLoadClick = function()
 {
     WebAppUtility.makeClick();
 
     var bv = betaversion;
 
     bv.loadButton.innerHTML = "Die Version wird geladen...";
+
+    setTimeout(bv.downLoadStart, 100);
+}
+
+betaversion.downLoadStart = function()
+{
+    var bv = betaversion;
+
+    var ok = WebAppBeta.getBetaDownload(bv.latestversion);
+
+    if (ok)
+    {
+        bv.loadButton.innerHTML = "Die Version ist nun zur Installation bereit.";
+
+        setTimeout(bv.installDat, 100);
+    }
+    else
+    {
+        bv.loadButton.innerHTML = "Der Download ist fehlgeschlagen.";
+    }
+}
+
+betaversion.installDat = function()
+{
+    WebAppBeta.makeBetaInstall();
 }
 
 betaversion.createFrame();

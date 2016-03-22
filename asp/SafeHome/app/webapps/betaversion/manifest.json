@@ -8,6 +8,7 @@
     "events": false,
 
     "permissions": [
+      "beta",
       "speak",
       "utility",
       "request"

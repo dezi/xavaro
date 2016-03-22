@@ -12,10 +12,9 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final boolean  BetaFlag        = true;
-    public static final String   BetaVersion     = "0.8.001";
-    public static final String   BetaVersionDate = "2016-03-21T23:00:00Z";
+    public static final String   BetaVersion     = "0.8.002";
+    public static final String   BetaVersionDate = "2016-03-23T23:00:00Z";
     public static final String   BetaExpiration  = "2016-05-21T23:00:00Z";
-    public static final String   BetaServerName  = "www.xavaro.de";
     // @formatter:on
 
     //endregion
