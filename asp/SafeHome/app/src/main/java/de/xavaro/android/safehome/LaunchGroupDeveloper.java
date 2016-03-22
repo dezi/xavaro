@@ -1,7 +1,6 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

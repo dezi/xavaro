@@ -35,7 +35,7 @@ public class LaunchItemAlertcall extends LaunchItem
 
             Json.put(launchitem, "type", "alertcall");
             Json.put(launchitem, "label", Simple.getTrans(R.string.alertcall_label));
-            Json.put(launchitem, "order", 100);
+            Json.put(launchitem, "order", 150);
 
             Json.put(launchitems, launchitem);
         }

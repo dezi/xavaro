@@ -24,7 +24,7 @@ public class LaunchItemToday extends LaunchItem
 
         Json.put(launchitem, "type", "today");
         Json.put(launchitem, "label", Simple.getTrans(R.string.today_label));
-        Json.put(launchitem, "order", 200);
+        Json.put(launchitem, "order", 100);
 
         Json.put(launchitems, launchitem);
 

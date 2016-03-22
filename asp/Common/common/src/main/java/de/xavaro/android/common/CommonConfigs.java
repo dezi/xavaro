@@ -8,6 +8,14 @@ import android.content.Context;
 
 public class CommonConfigs
 {
+    //region Global icons
+
+    // @formatter:off
+    public static final int IconResBetaVersion = R.drawable.betaversion_256x256;
+    // @formatter:on
+
+    //endregion Global icons
+
     //region Standard apps
 
     //

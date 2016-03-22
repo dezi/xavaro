@@ -1598,6 +1598,11 @@ public class Simple
         return timeStampAsISO(todayAsTimeStamp());
     }
 
+    public static String todayAsISO(int plusdays)
+    {
+        return timeStampAsISO(todayAsTimeStamp() + (86400L * 1000L * plusdays));
+    }
+
     public static String timeStampAsISO(long timestamp)
     {
         DateFormat df = new SimpleDateFormat(ISO8601DATEFORMAT, Locale.getDefault());

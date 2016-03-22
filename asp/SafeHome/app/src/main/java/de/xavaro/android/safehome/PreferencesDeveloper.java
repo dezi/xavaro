@@ -9,7 +9,7 @@ import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebApp;
 
-public class PreferencesBeta
+public class PreferencesDeveloper
 {
     //region Developer preferences
 

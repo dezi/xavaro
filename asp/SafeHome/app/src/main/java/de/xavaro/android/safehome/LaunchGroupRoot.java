@@ -67,8 +67,10 @@ public class LaunchGroupRoot extends LaunchGroup
 
         ArrayList<JSONArray> configs = new ArrayList<>();
 
+        configs.add(LaunchItemBeta.getConfig());
         configs.add(LaunchItemToday.getConfig());
         configs.add(LaunchItemAlertcall.getConfig());
+
         configs.add(LaunchGroupHealth.getConfig());
 
         configs.add(LaunchGroupComm.PhoneGroup.getConfig());

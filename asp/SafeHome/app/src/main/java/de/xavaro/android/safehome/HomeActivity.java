@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackkeyHandler;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
@@ -29,7 +30,8 @@ import de.xavaro.android.common.WebCookie;
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
         MediaSurface.VideoSurfaceHandler,
-        BackkeyHandler
+        BackkeyHandler,
+        AppInfoHandler
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
@@ -242,6 +244,20 @@ public class HomeActivity extends AppCompatActivity implements
 
         lostFocus = ! hasFocus;
     }
+
+    //region app info handling
+
+    public String getBetaVersion()
+    {
+        return GlobalConfigs.BetaVersion;
+    }
+
+    public String getBetaVersionDate()
+    {
+        return GlobalConfigs.BetaVersionDate;
+    }
+
+    //endregion app info handling
 
     //region onBackPressed handling
 

@@ -1,0 +1,35 @@
+{
+  "SafeHome": {
+
+    "latest": "0.8.002",
+    "latestdate": "2016-03-23T23:00:00Z",
+
+    "versions": {
+
+      "0.8.002": {
+
+        "date": "2016-03-23T23:00:00Z",
+
+        "notes": [
+          {
+            "title": "diverse Bugfixes.",
+            "summary": "Es wird in der Oberfläche angezeigt, wenn eine neue Beta-version verfügbar ist."
+          }
+        ]
+      },
+
+      "0.8.001": {
+
+        "date": "2016-03-21T23:00:00Z",
+
+        "notes": [
+          {
+            "title": "eingebauter Beta Version Updater.",
+            "summary": "Es wird in der Oberfläche angezeigt, wenn eine neue Beta-version verfügbar ist."
+          }
+        ]
+      }
+
+    }
+  }
+}

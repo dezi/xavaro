@@ -16,6 +16,38 @@ public class WebAppUtility
     private static final String LOGTAG = WebAppUtility.class.getSimpleName();
 
     @JavascriptInterface
+    public String getAppName()
+    {
+        return Simple.getAppName();
+    }
+
+    @JavascriptInterface
+    public String getBetaVersion()
+    {
+        Context appcontext = Simple.getAppContext();
+
+        if (appcontext instanceof AppInfoHandler)
+        {
+            return ((AppInfoHandler) appcontext).getBetaVersion();
+        }
+
+        return "";
+    }
+
+    @JavascriptInterface
+    public String getBetaVersionDate()
+    {
+        Context appcontext = Simple.getAppContext();
+
+        if (appcontext instanceof AppInfoHandler)
+        {
+            return ((AppInfoHandler) appcontext).getBetaVersionDate();
+        }
+
+        return "";
+    }
+
+    @JavascriptInterface
     public String getLocale()
     {
         return Simple.getLocale();

@@ -168,7 +168,7 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Betaversion";
         target.add(category);
 
-        target.add(PreferencesBeta.DeveloperFragment.getHeader());
+        target.add(PreferencesDeveloper.DeveloperFragment.getHeader());
 
         setHeaders(target);
     }

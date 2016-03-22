@@ -23,7 +23,7 @@ public class UpdateManager extends Thread
 
     public static void selfUpdate(Context context, boolean force)
     {
-        if (GlobalConfigs.BetaVersion) new UpdateManager(context,force).start();
+        if (GlobalConfigs.BetaFlag) new UpdateManager(context,force).start();
     }
 
     private final Context context;
