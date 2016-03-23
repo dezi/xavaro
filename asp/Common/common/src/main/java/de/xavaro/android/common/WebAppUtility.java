@@ -96,6 +96,12 @@ public class WebAppUtility
     }
 
     @JavascriptInterface
+    public String getDezify(String input)
+    {
+        return Simple.dezify(input);
+    }
+
+    @JavascriptInterface
     public void makeClick()
     {
         Simple.makeClick();

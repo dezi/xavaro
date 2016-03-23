@@ -2,6 +2,7 @@
   "webapps": {
 
     "tvguide": {},
-    "tvscrape": {}
+    "tvscrape": {},
+    "weather": {}
   }
 }

@@ -22,6 +22,7 @@ public class WebAppView extends WebView
     public WebAppMedia media;
     public WebAppEvents events;
     public WebAppHealth health;
+    public WebAppWeather weather;
     public WebAppRequest request;
     public WebAppUtility utility;
     public WebAppIntercept intercept;
@@ -101,6 +102,12 @@ public class WebAppView extends WebView
         {
             utility = new WebAppUtility();
             addJavascriptInterface(utility, "WebAppUtility");
+        }
+
+        if (permissions.contains("weather"))
+        {
+            weather = new WebAppWeather(webappname);
+            addJavascriptInterface(weather, "WebAppWeather");
         }
 
         if (permissions.contains("prefs"))
