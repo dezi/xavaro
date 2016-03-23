@@ -548,6 +548,11 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
         this.config = config;
     }
 
+    public void activateLaunchItem(String type, String subtype)
+    {
+        activateLaunchItem(this, type, subtype);
+    }
+
     private void activateLaunchItem(LaunchGroup directory, String type, String subtype)
     {
         if (directory != null)
@@ -590,11 +595,6 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
                 }
             }
         }
-    }
-
-    public void activateLaunchItem(String type, String subtype)
-    {
-        activateLaunchItem(this, type, subtype);
     }
 
     @Nullable
