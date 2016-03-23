@@ -23,8 +23,12 @@ for ($inx = 0; $inx < $lcount; $inx++)
 	$lat = round ($city[ "coord" ][ "lat" ], 3);
 	$lon = round ($city[ "coord" ][ "lon" ], 3);
 	
-	$line = "$id|$country|$name|$lat|$lon\n";
-	$key = "$country|$name";
+	$line = "$id|$country|$name|$lat|$lon";
+	
+	$sortid = "" . (99999999 - intval($city[ "_id" ]));
+	while (strlen($sortid) < 8) $sortid = "0" . $sortid;
+
+	$key = "$country|$name|$sortid";
 	
 	$sort[ $key ] = $line;
 }
@@ -33,9 +37,30 @@ ksort($sort);
 
 $content = "";
 
+$lastcity = "";
+$lastlat = 0.0;
+$lastlon = 0.0;
+
 foreach ($sort as $key => $line)
 {
-	$content .= $line;
+	$parts = explode("|",$line);
+	$city = $parts[ 1 ] . "|" . $parts[ 2 ];
+	$lon = floatval($parts[ 3 ]);
+	$lat = floatval($parts[ 4 ]);
+
+	if (($city == $lastcity) 
+		&& (abs($lon - $lastlon) < 0.05) 
+		&& (abs($lat - $lastlat) < 0.05))
+	{
+		echo "DUP: $line\n";
+		continue;
+	}
+	
+	$lastcity = $city;
+	$lastlat  = $lat;
+	$lastlon  = $lon;
+
+	$content .= $line . "\n";
 }
 
 $fd = fopen("city.csv", "w");

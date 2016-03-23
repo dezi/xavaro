@@ -2,6 +2,7 @@ log
 epgdata
 epginfo
 pgminfo
+owmdata
 shares
 *.json.gz
 epginfo.json
