@@ -2,6 +2,10 @@
 
 include("../include/json.php");
 
+$raw = file_get_contents("http://bulk.openweathermap.org/sample/city.list.json.gz");
+file_put_contents("city.list.json.gz",$raw);
+system("gunzip < city.list.json.gz > city.list.json");
+
 $lines = file("city.list.json");
 $lcount = count($lines);
 $sort = array();
