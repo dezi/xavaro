@@ -1,19 +1,21 @@
 package de.xavaro.android.common;
 
-import android.util.Log;
+import android.support.annotation.Nullable;
 import android.webkit.JavascriptInterface;
+
 import android.webkit.WebView;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
-import java.security.acl.LastOwnerException;
-import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
+import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class WebAppWeather
 {
     private static final String LOGTAG = WebAppWeather.class.getSimpleName();
@@ -21,7 +23,6 @@ public class WebAppWeather
     private static final String baseurl = "http://api.openweathermap.org/data/2.5/forecast";
 
     private final String webappname;
-    private final WebView webview;
     private final WebAppLoader webapploader;
 
     private String webappserver;
@@ -30,7 +31,6 @@ public class WebAppWeather
     public WebAppWeather(String webappname, WebView webview, WebAppLoader webapploader)
     {
         this.webappname = webappname;
-        this.webview = webview;
         this.webapploader = webapploader;
     }
 
@@ -74,18 +74,69 @@ public class WebAppWeather
         return (webappextra != null);
     }
 
+    @Nullable
+    private String validateByAge(byte[] bytes)
+    {
+        if (bytes != null)
+        {
+            String json = new String(bytes);
+
+            //
+            // Check age of what we have got.
+            //
+
+            JSONObject owm = Json.fromStringObject(json);
+            JSONArray list = Json.getArray(owm, "list");
+            JSONObject entry = Json.getObject(list, 0);
+            long dt = Json.getLong(entry, "dt");
+
+            if (dt > 0)
+            {
+                long diff = dt - (Simple.nowAsTimeStamp() / 1000L);
+                String utc = Simple.timeStampAsISO(dt * 1000L);
+
+                Log.d(LOGTAG,"validateByAge: diff=" + utc + "=" + diff);
+
+                if (diff > 0) return json;
+            }
+        }
+
+        return null;
+    }
+
     @JavascriptInterface
     public String getForecast(String id)
     {
         String json = null;
 
-        if (makeExtra())
+        if (makeServer())
         {
+            String url = "http://" + webappserver + "/owmdata/forecast/" + id + ".05.json.gz";
+
+            json = validateByAge(webapploader.getRequestData(url));
+        }
+
+        if ((json == null) && makeExtra())
+        {
+            //
+            // Fetch new data from weather server.
+            //
+
             String url = baseurl + "?id=" + id + "&APPID=" + webappextra + "&units=metric";
 
             Log.d(LOGTAG, "getForecast url=" + url);
 
             json = SimpleRequest.doHTTPGet(url);
+
+            if (json != null)
+            {
+                String puturl = "http://" + webappserver + "/owmuploader/" + id + ".05.json.gz";
+
+                if (! SimpleRequest.doHTTPPut(puturl, json))
+                {
+                    Log.e(LOGTAG, "getForecast put failed=" + puturl);
+                }
+            }
         }
 
         return (json == null) ? "{}" : json;
@@ -96,13 +147,30 @@ public class WebAppWeather
     {
         String json = null;
 
-        if (makeExtra())
+        if (makeServer())
+        {
+            String url = "http://" + webappserver + "/owmdata/forecast/" + id + ".16.json.gz";
+
+            json = validateByAge(webapploader.getRequestData(url));
+        }
+
+        if ((json == null) && makeExtra())
         {
             String url = baseurl + "/daily" + "?id=" + id + "&APPID=" + webappextra + "&units=metric";
 
             Log.d(LOGTAG, "getForecast16 url=" + url);
 
             json = SimpleRequest.doHTTPGet(url);
+
+            if (json != null)
+            {
+                String puturl = "http://" + webappserver + "/owmuploader/" + id + ".16.json.gz";
+
+                if (! SimpleRequest.doHTTPPut(puturl, json))
+                {
+                    Log.e(LOGTAG, "getForecast16 put failed=" + puturl);
+                }
+            }
         }
 
         return (json == null) ? "{}" : json;
@@ -137,8 +205,6 @@ public class WebAppWeather
                     {
                         int inbuf = rest + xfer;
 
-                        Log.d(LOGTAG,"========:" + inbuf);
-
                         //
                         // Find last newline.
                         //
@@ -161,8 +227,6 @@ public class WebAppWeather
 
                             while ((von > 0) && (chunk.charAt(von - 1) != '\n')) von--;
                             while ((bis < (inbuf - 1)) && (chunk.charAt(bis + 1) != '\n')) bis++;
-
-                            Log.d(LOGTAG,"=======" +  chunk.substring(von, bis));
 
                             json.put(chunk.substring(von, bis));
                         }

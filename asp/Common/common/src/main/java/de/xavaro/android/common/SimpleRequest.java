@@ -38,10 +38,6 @@ public class SimpleRequest
         return doHTTPGet(src, null);
     }
 
-    private static Socket clientSocket;
-    private static OutputStream output;
-    private static InputStream input;
-
     private static void logStuff(String string)
     {
         String[] lines = string.split("\r\n");
@@ -61,14 +57,11 @@ public class SimpleRequest
             InetAddress ip = InetAddress.getByName(url.getHost());
             int port = url.getPort() > 0 ? url.getPort() : 80;
 
-            //if (clientSocket == null)
-            {
-                InetSocketAddress sa = new InetSocketAddress(ip, port);
-                clientSocket = new Socket();
-                clientSocket.connect(sa, 5000);
-                output = clientSocket.getOutputStream();
-                input = clientSocket.getInputStream();
-            }
+            InetSocketAddress sa = new InetSocketAddress(ip, port);
+            Socket clientSocket = new Socket();
+            clientSocket.connect(sa, 5000);
+            OutputStream output = clientSocket.getOutputStream();
+            InputStream input = clientSocket.getInputStream();
 
             String urlpath = url.getPath();
             if (url.getQuery() != null) urlpath += "?" + url.getQuery();
@@ -113,14 +106,24 @@ public class SimpleRequest
             {
                 Log.e(LOGTAG, "No response....");
 
+                input.close();
+                output.close();
+
                 return null;
             }
 
+            boolean isok = false;
             boolean ischunked = false;
             int contentlength = 0;
 
             for (String line : lines)
             {
+                if (line.equalsIgnoreCase("HTTP/1.0 200 OK") ||
+                        line.equalsIgnoreCase("HTTP/1.1 200 OK"))
+                {
+                    isok = true;
+                }
+
                 if (line.equalsIgnoreCase("Transfer-Encoding: chunked"))
                 {
                     ischunked = true;
@@ -132,7 +135,15 @@ public class SimpleRequest
                 }
             }
 
-            Log.d(LOGTAG, "doHTTPGet: response:" + ischunked + "=" + contentlength);
+            Log.d(LOGTAG, "doHTTPGet: response:" + isok + "=" + ischunked + "=" + contentlength);
+
+            if (! isok)
+            {
+                input.close();
+                output.close();
+
+                return null;
+            }
 
             byte[] response = new byte[ 0 ];
 
@@ -199,6 +210,9 @@ public class SimpleRequest
 
                 if (response.length < 80) Log.d(LOGTAG, "doHTTPGet: res=" + new String(response));
 
+                input.close();
+                output.close();
+
                 return new String(response);
             }
             else
@@ -218,8 +232,14 @@ public class SimpleRequest
                 {
                     Log.d(LOGTAG, "doHTTPGet: incomplete:" + response.length + "=" + total);
 
+                    input.close();
+                    output.close();
+
                     return null;
                 }
+
+                input.close();
+                output.close();
 
                 return new String(response);
             }
@@ -230,6 +250,56 @@ public class SimpleRequest
         }
 
         return null;
+    }
+
+    public static boolean doHTTPPut(String src, String string)
+    {
+        Log.d(LOGTAG, "doHTTPPut: " + src);
+        if (string == null) return false;
+
+        try
+        {
+            URL url = new URL(src);
+
+            InetAddress ip = InetAddress.getByName(url.getHost());
+            int port = url.getPort() > 0 ? url.getPort() : 80;
+
+            InetSocketAddress sa = new InetSocketAddress(ip, port);
+            Socket clientSocket = new Socket();
+            clientSocket.connect(sa, 5000);
+
+            OutputStream output = clientSocket.getOutputStream();
+
+            String urlpath = url.getPath();
+            if (url.getQuery() != null) urlpath += "?" + url.getQuery();
+
+            byte[] data = string.getBytes("UTF-8");
+
+            String header = "";
+
+            header += "PUT " + urlpath + " HTTP/1.1\r\n";
+            header += "Host: " + url.getHost() + "\r\n";
+            header += "Content-Length: " + data.length + "\r\n";
+            header += "Upload-File: " + urlpath + "\r\n";
+            header += "Connection: close\r\n";
+            header += "\r\n";
+
+            output.write(header.getBytes("UTF-8"));
+            output.flush();
+
+            Log.d(LOGTAG, "doHTTPPut: headers...");
+
+            output.write(data);
+            output.close();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return false;
     }
 
     @Nullable

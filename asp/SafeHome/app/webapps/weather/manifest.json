@@ -36,6 +36,8 @@
     ],
 
     "cachedefs": [
+      { "interval":  1, "pattern": "http://epg.xavaro.de/owmdata/forecast/.*?.05.json.gz" },
+      { "interval": 24, "pattern": "http://epg.xavaro.de/owmdata/forecast/.*?.16.json.gz" },
       { "interval": 99, "pattern": "http://epg.xavaro.de/owmdata/city.csv.gzbin" }
     ]
   }

@@ -1,12 +1,16 @@
-
-//var info = WebAppWeather.getForecast("02821085");
-var info = WebAppWeather.getForecast16("02821085");
+//
+// API Test...
+//
 
 weather.pre = WebLibSimple.createAnyAppend("pre", document.body);
+
+var info = WebAppWeather.getForecast("02953523");
 weather.pre.innerHTML = WebAppUtility.getPrettyJson(info);
 
-var results = WebAppWeather.getQuery("Bad ");
+var info = WebAppWeather.getForecast16("02953523");
+weather.pre.innerHTML = WebAppUtility.getPrettyJson(info) + "\n" + weather.pre.innerHTML;
 
+var results = WebAppWeather.getQuery("Bad ");
 weather.pre.innerHTML = WebAppUtility.getPrettyJson(results) + "\n" + weather.pre.innerHTML;
 
 
