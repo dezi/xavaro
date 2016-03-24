@@ -226,7 +226,7 @@ public class WebAppWeather
                             int bis = matcher.end();
 
                             while ((von > 0) && (chunk.charAt(von - 1) != '\n')) von--;
-                            while ((bis < (inbuf - 1)) && (chunk.charAt(bis + 1) != '\n')) bis++;
+                            while ((bis < inbuf) && (chunk.charAt(bis) != '\n')) bis++;
 
                             json.put(chunk.substring(von, bis));
                         }
