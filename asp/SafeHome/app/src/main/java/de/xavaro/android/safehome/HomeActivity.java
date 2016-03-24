@@ -17,7 +17,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.AppInfoHandler;
-import de.xavaro.android.common.BackkeyHandler;
+import de.xavaro.android.common.BackKeyClient;
+import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
@@ -30,7 +31,7 @@ import de.xavaro.android.common.WebCookie;
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
         MediaSurface.VideoSurfaceHandler,
-        BackkeyHandler,
+        BackKeyMaster,
         AppInfoHandler
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
@@ -327,7 +328,7 @@ public class HomeActivity extends AppCompatActivity implements
         }
     }
 
-    public void onPerformBackkeyNow()
+    public void onBackKeyExecuteNow()
     {
         handler.post(new Runnable()
         {
@@ -358,42 +359,15 @@ public class HomeActivity extends AppCompatActivity implements
         {
             Object lastview = backStack.get(backStack.size() - 1);
 
-            if (lastview instanceof LaunchFrameWebApp)
+            if (lastview instanceof BackKeyClient)
             {
-                if (((LaunchFrameWebApp) lastview).doBackPressed())
+                if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
                     topscreen.removeView((FrameLayout) lastview);
                     backStack.remove(backStack.size() - 1);
+
+                    ((BackKeyClient) lastview).onBackKeyExecuted();
                 }
-
-                return;
-            }
-
-            if (lastview instanceof LaunchFrameWebFrame)
-            {
-                //
-                // Give web browser option to do
-                // internal back press.
-                //
-
-                if (((LaunchFrameWebFrame) lastview).doBackPressed())
-                {
-                    topscreen.removeView((FrameLayout) lastview);
-                    backStack.remove(backStack.size() - 1);
-                }
-
-                return;
-            }
-
-            if (lastview instanceof LaunchFrame)
-            {
-                ((LaunchFrame) lastview).onBackKeyExecuted();
-            }
-
-            if ((lastview instanceof LaunchGroup) || (lastview instanceof LaunchFrame))
-            {
-                topscreen.removeView((FrameLayout) lastview);
-                backStack.remove(backStack.size() - 1);
             }
 
             return;

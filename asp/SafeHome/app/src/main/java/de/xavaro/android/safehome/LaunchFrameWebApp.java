@@ -8,6 +8,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.WebApp;
 import de.xavaro.android.common.WebAppRequest;
 import de.xavaro.android.common.WebAppLoader;
@@ -44,23 +45,30 @@ public class LaunchFrameWebApp extends LaunchFrame
     }
 
     @Override
-    public void onBackKeyExecuted()
+    public boolean onBackKeyWanted()
     {
-        if (parent != null) parent.onBackKeyExecuted();
-    }
-
-    public boolean doBackPressed()
-    {
-        Log.d(LOGTAG, "doBackPressed");
+        Log.d(LOGTAG, "onBackKeyWanted");
 
         if (webview.request != null)
         {
             webview.request.doBackPressed();
 
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
+    }
 
+    @Override
+    public void onBackKeyExecuted()
+    {
+        if (parent != null)
+        {
+            //
+            // Inform launch item that we have been removed.
+            //
+
+            parent.onBackKeyExecuted();
+        }
     }
 }

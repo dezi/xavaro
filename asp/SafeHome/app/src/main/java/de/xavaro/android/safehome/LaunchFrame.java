@@ -1,14 +1,13 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.widget.FrameLayout;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.widget.FrameLayout;
 
-import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.BackKeyClient;
 
-public class LaunchFrame extends FrameLayout
+public class LaunchFrame extends FrameLayout implements BackKeyClient
 {
     private static final String LOGTAG = LaunchFrame.class.getSimpleName();
 
@@ -34,8 +33,23 @@ public class LaunchFrame extends FrameLayout
         this.parent = parent;
     }
 
+    public boolean onBackKeyWanted()
+    {
+        //
+        // To be overwritten.
+        //
+
+        Log.d(LOGTAG, "onBackKeyWanted");
+
+        return false;
+    }
+
     public void onBackKeyExecuted()
     {
+        //
+        // To be overwritten.
+        //
+
         Log.d(LOGTAG, "onBackKeyExecuted");
     }
 }

@@ -27,8 +27,15 @@ public class WebAppRequest
         this.webapploader = webapploader;
     }
 
+    //region Back key handling
+
     public void doBackPressed()
     {
+        //
+        // Register fake callback function in case
+        // webapp did not define one itself.
+        //
+
         final String cbscript = ""
             + "if (! WebAppRequest.onBackkeyPressed)"
             + "{"
@@ -45,16 +52,22 @@ public class WebAppRequest
     @JavascriptInterface
     public void haveBackkeyPressed(boolean pressed)
     {
+        //
+        // Callback from javascript evalution.
+        //
+
         if (! pressed)
         {
             Context activity = Simple.getAppContext();
 
-            if (activity instanceof BackkeyHandler)
+            if (activity instanceof BackKeyMaster)
             {
-                ((BackkeyHandler) activity).onPerformBackkeyNow();
+                ((BackKeyMaster) activity).onBackKeyExecuteNow();
             }
         }
     }
+
+    //endregion Back key handling
 
     private final ArrayList<String> asyncRequests = new ArrayList<>();
 

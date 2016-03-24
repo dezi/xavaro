@@ -25,6 +25,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.Animator;
+import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
@@ -151,6 +152,13 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
 
     public void animatePrevPage()
     {
+        if (launchPage == 0)
+        {
+            HomeActivity.getInstance().onBackKeyExecuteNow();
+
+            return;
+        }
+
         animatePage(arrowLeft, true);
     }
 

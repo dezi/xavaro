@@ -71,18 +71,19 @@ public class LaunchFrameWebFrame extends LaunchFrame
         webview.loadUrl(url);
     }
 
-    public boolean doBackPressed()
+    @Override
+    public boolean onBackKeyWanted()
     {
-        Log.d(LOGTAG, "doBackPressed");
+        Log.d(LOGTAG, "onBackKeyWanted");
 
         if (webview.canGoBack())
         {
             webview.goBack();
             webguard.setWasBackAction();
 
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
