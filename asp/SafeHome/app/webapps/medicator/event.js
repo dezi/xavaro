@@ -1,5 +1,5 @@
 medicator.remindMaximum = 3;
-medicator.remindIntervall = 60;
+medicator.remindIntervall = 600;
 
 medicator.getNextEvents = function()
 {
@@ -110,7 +110,7 @@ medicator.remindConfig = function(config)
 
     var action = false;
     var reminded = config.events[ 0 ].reminded;
-    var remindeddate = config.events[ 0 ].remindedate;
+    var remindeddate = config.events[ 0 ].remindeddate;
 
     var nowtime = new Date().getTime();
     var remtime = remindeddate ? new Date(remindeddate).getTime() : 0;
