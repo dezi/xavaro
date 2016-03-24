@@ -1,0 +1,42 @@
+{
+  "manifest": {
+
+    "label": "Wetter",
+    "appname": "weather",
+    "appicon": "weather_512x512.png",
+    "appguid": "20b60a6b-0644-1699-a25b-3322c0cd2b7f",
+    "appserver": "epg.xavaro.de",
+    "preferences": false,
+
+    "permissions": [
+      "request",
+      "utility",
+      "weather",
+      "media",
+      "prefs"
+    ],
+
+    "weblibs": [
+      "simple",
+      "touch",
+      "strings",
+      "dialog"
+    ],
+
+    "preload": [
+    ],
+
+    "files": [
+      "main.js"
+    ],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": [
+      { "interval": 99, "pattern": "http://epg.xavaro.de/owmdata/city.csv.gzbin" }
+    ]
+  }
+}

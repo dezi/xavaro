@@ -82,11 +82,13 @@ public class SimpleRequest
 
             if (referrer != null) header += "Referer: " + referrer + "\r\n";
 
-            header += "Connection: keep-alive\r\n";
+            header += "Connection: close\r\n";
             header += "\r\n";
 
             output.write(header.getBytes("UTF-8"));
             output.flush();
+
+            Log.d(LOGTAG, "doHTTPGet: headers...");
 
             //
             // Read response headers.
@@ -115,11 +117,22 @@ public class SimpleRequest
             }
 
             boolean ischunked = false;
+            int contentlength = 0;
 
             for (String line : lines)
             {
-                if (line.equalsIgnoreCase("Transfer-Encoding: chunked")) ischunked = true;
+                if (line.equalsIgnoreCase("Transfer-Encoding: chunked"))
+                {
+                    ischunked = true;
+                }
+
+                if (line.toLowerCase().startsWith("content-length: "))
+                {
+                    contentlength = Integer.parseInt(line.substring(16));
+                }
             }
+
+            Log.d(LOGTAG, "doHTTPGet: response:" + ischunked + "=" + contentlength);
 
             byte[] response = new byte[ 0 ];
 
@@ -182,13 +195,33 @@ public class SimpleRequest
                     }
                 }
 
+                Log.d(LOGTAG, "doHTTPGet: done length:" + response.length);
+
                 if (response.length < 80) Log.d(LOGTAG, "doHTTPGet: res=" + new String(response));
 
                 return new String(response);
             }
             else
             {
-                Log.e(LOGTAG, "Content-Length: unsupported...");
+                response = new byte[ contentlength ];
+                int total = 0;
+
+                while (total < response.length)
+                {
+                    int xfer = input.read(response, total, response.length - total);
+                    if (xfer < 0) break;
+
+                    total += xfer;
+                }
+
+                if (total < response.length)
+                {
+                    Log.d(LOGTAG, "doHTTPGet: incomplete:" + response.length + "=" + total);
+
+                    return null;
+                }
+
+                return new String(response);
             }
         }
         catch (Exception ex)
