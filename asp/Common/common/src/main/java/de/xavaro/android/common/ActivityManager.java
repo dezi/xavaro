@@ -6,6 +6,10 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.util.Iterator;
+
+@SuppressWarnings("unused")
 public class ActivityManager
 {
     private static final String LOGTAG = ActivityManager.class.getSimpleName();
@@ -25,29 +29,164 @@ public class ActivityManager
     {
         getInstance().callback = callback;
 
-        JSONObject protocoll = getInstance().getProtocoll();
+        JSONObject protocoll = getInstance().getStorage();
         if (protocoll != null) callback.onProtocollMessages(protocoll);
     }
 
     private ActivityMessageCallback callback;
 
-    @Nullable
-    private JSONObject getProtocoll()
+    private void writeArchive(JSONObject protocoll)
     {
-        String filename = Simple.getPackageName() + ".activities.json";
-        String content = Simple.readDatadirFile(filename);
-        JSONObject protocoll = Json.fromString(content);
+        String lastdate = Simple.todayAsISO(-2);
+        String suffix = lastdate.substring(0, 10).replace("-", ".");
+
+        File arch = Simple.getPackageFile("activities." + suffix + ".json");
+
+        Log.d(LOGTAG,"writeArchive: lastdate=" + lastdate + "=" + arch.toString());
+
+        if (arch.exists()) return;
+
+        JSONObject incomingact = Json.getObject(protocoll, "incoming");
+        JSONObject outgoingact = Json.getObject(protocoll, "outgoing");
+
+        JSONObject archive = new JSONObject();
+        JSONObject incomingarc = new JSONObject();
+        JSONObject outgoingarc = new JSONObject();
+        Json.put(archive, "incoming", incomingarc);
+        Json.put(archive, "outgoing", outgoingarc);
+
+        Iterator<String> keysIterator;
+        boolean dirty = false;
+
+        if (incomingact != null)
+        {
+            keysIterator = incomingact.keys();
+            while (keysIterator.hasNext())
+            {
+                String uuid = keysIterator.next();
+
+                JSONObject activity = Json.getObject(incomingact, uuid);
+                String date = Json.getString(activity, "date");
+                if ((date == null) || (date.compareTo(lastdate) > 0)) continue;
+
+                Json.put(incomingarc, uuid, activity);
+                dirty = true;
+            }
+        }
+
+        if (outgoingact != null)
+        {
+            keysIterator = outgoingact.keys();
+            while (keysIterator.hasNext())
+            {
+                String uuid = keysIterator.next();
+
+                JSONObject activity = Json.getObject(outgoingact, uuid);
+                String date = Json.getString(activity, "date");
+                if ((date == null) || (date.compareTo(lastdate) > 0)) continue;
+
+                Json.put(outgoingarc, uuid, activity);
+                dirty = true;
+            }
+        }
+
+        if (! dirty) return;
+
+        if (Simple.putFileContent(arch, Json.defuck(Json.toPretty(archive))))
+        {
+            //
+            // Commit archive.
+            //
+
+            keysIterator = incomingarc.keys();
+            while (keysIterator.hasNext())
+            {
+                Json.remove(incomingact, keysIterator.next());
+            }
+
+            keysIterator = outgoingarc.keys();
+            while (keysIterator.hasNext())
+            {
+                Json.remove(outgoingact, keysIterator.next());
+            }
+
+            putStorage(protocoll);
+        }
+    }
+
+    @Nullable
+    private JSONObject getStorage()
+    {
+        File act = Simple.getPackageFile("activities.act.json");
+        File bak = Simple.getPackageFile("activities.bak.json");
+
+        //
+        // Legacy rename.
+        //
+
+        File legacy = Simple.getPackageFile("activities.json");
+
+        if (legacy.exists() && ! legacy.renameTo(act))
+        {
+            Log.d(LOGTAG, "getStorage: legacy rename failed.");
+        }
+
+        JSONObject protocoll = null;
+
+        try
+        {
+            if (act.exists())
+            {
+                protocoll = Json.fromString(Simple.getFileContent(act));
+            }
+            else
+            {
+                if (bak.exists())
+                {
+                    protocoll = Json.fromString(Simple.getFileContent(act));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        if (protocoll == null) protocoll = new JSONObject();
 
         if (! protocoll.has("incoming")) Json.put(protocoll, "incoming", new JSONObject());
         if (! protocoll.has("outgoing")) Json.put(protocoll, "outgoing", new JSONObject());
 
+        writeArchive(protocoll);
+
         return protocoll;
     }
 
-    private void putProtocoll(JSONObject protocoll)
+    private void putStorage(JSONObject protocoll)
     {
-        String filename = Simple.getPackageName() + ".activities.json";
-        Simple.writeDatadirFile(filename, Json.toPretty(protocoll));
+        if (protocoll == null) return;
+
+        File act = Simple.getPackageFile("activities.act.json");
+        File bak = Simple.getPackageFile("activities.bak.json");
+        File tmp = Simple.getPackageFile("activities.tmp.json");
+
+        try
+        {
+            if (Simple.putFileContent(tmp, Json.defuck(Json.toPretty(protocoll))))
+            {
+                boolean ok = true;
+
+                if (bak.exists()) ok = bak.delete();
+                if (act.exists()) ok &= act.renameTo(bak);
+                if (tmp.exists()) ok &= tmp.renameTo(act);
+
+                Log.d(LOGTAG, "putStorage: ok=" + ok);
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
     }
 
     public static void recordActivity(int resid)
@@ -140,7 +279,7 @@ public class ActivityManager
         if (! message.has("date")) Json.put(message, "date", Simple.nowAsISO());
         if (! message.has("uuid")) Json.put(message, "uuid", Simple.getUUID());
 
-        JSONObject protocoll = getProtocoll();
+        JSONObject protocoll = getStorage();
         if (protocoll == null) return;
 
         String uuid = Json.getString(message, "uuid");
@@ -149,11 +288,9 @@ public class ActivityManager
         JSONObject branch = Json.getObject(protocoll, incoming ? "incoming" : "outgoing");
         if (branch == null) return;
 
-        JSONObject proto = null;
-
         if (branch.has(uuid))
         {
-            proto = Json.getObject(branch, uuid);
+            JSONObject proto = Json.getObject(branch, uuid);
             Json.copy(proto, message);
         }
         else
@@ -161,7 +298,7 @@ public class ActivityManager
             Json.put(branch, uuid, message);
         }
 
-        putProtocoll(protocoll);
+        putStorage(protocoll);
 
         if (callback != null)
         {
@@ -186,5 +323,4 @@ public class ActivityManager
     }
 
     //endregion Callback interface
-
 }

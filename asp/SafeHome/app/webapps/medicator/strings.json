@@ -24,5 +24,10 @@
   "events.didnowtake.bloodglucose" : "%$1s did just measure his blood sugar.",
   "events.didnowtake.bloodpressure" : "%$1s did just measure his blood pressure.",
 
+  "activity.took.pills" : "You took Your medication.",
+  "activity.took.weight" : "You took Your weight.",
+  "activity.took.bloodglucose" : "You measured Your blood sugar.",
+  "activity.took.bloodpressure" : "You measured Your blood pressure.",
+
   "EOL" : true
 }

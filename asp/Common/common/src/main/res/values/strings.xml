@@ -187,7 +187,7 @@
 
     <string name="alertcall_label">Assistance</string>
 
-    <string name="today_label">Today</string>
+    <string name="today_label">Logbook</string>
 
     <string name="healt_bpm_spoken">The last reading resulted in a blood pressure of %1$d to %2$d The pulse was %3$d</string>
     <string name="healt_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s.</string>

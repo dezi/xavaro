@@ -831,6 +831,11 @@ public class Simple
         return Simple.getAnyContext().getCacheDir();
     }
 
+    public static File getPackageFile(String name)
+    {
+        return new File(Simple.getFilesDir(), Simple.getPackageName() + "." + name);
+    }
+
     public static String getTempfile(String filename)
     {
         return new File(Simple.getAnyContext().getCacheDir(), filename).toString();

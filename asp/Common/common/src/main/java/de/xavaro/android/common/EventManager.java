@@ -197,11 +197,11 @@ public class EventManager
         if (eventcache != null) return;
 
         File file = new File(Simple.getFilesDir(), "events.act.json");
-        if (!file.exists()) file = new File(Simple.getFilesDir(), "events.bak.json");
+        if (! file.exists()) file = new File(Simple.getFilesDir(), "events.bak.json");
 
         try
         {
-            if (!file.exists())
+            if (! file.exists())
             {
                 eventcache = new JSONObject();
             }
@@ -211,9 +211,8 @@ public class EventManager
                 eventcache = (json != null) ? new JSONObject(json) : new JSONObject();
             }
 
-            if (!eventcache.has("passed")) Json.put(eventcache, "passed", new JSONObject());
-            if (!eventcache.has("coming")) Json.put(eventcache, "coming", new JSONObject());
-
+            if (! eventcache.has("passed")) Json.put(eventcache, "passed", new JSONObject());
+            if (! eventcache.has("coming")) Json.put(eventcache, "coming", new JSONObject());
         }
         catch (Exception ex)
         {

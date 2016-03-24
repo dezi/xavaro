@@ -24,5 +24,14 @@
   "events.didnowtake.bloodglucose" : "%$1s hat jetzt gerade den Blutzucker gemessen.",
   "events.didnowtake.bloodpressure" : "%$1s hat jetzt gerade den Blutdruck gemessen.",
 
+  "activity.took.pills" : "Sie haben ihre Medikamente genommen.",
+  "activity.took.pills.du" : "Du hast deine Medikamente genommen.",
+  "activity.took.weight" : "Sie haben sich gewogen.",
+  "activity.took.weight.du" : "Du hast dich gewogen.",
+  "activity.took.bloodglucose" : "Sie haben ihren Blutzucker gemessen.",
+  "activity.took.bloodglucose.du" : "Du hast deinen Blutzucker gemessen.",
+  "activity.took.bloodpressure" : "Sie haben ihren Bluddruck gemessen.",
+  "activity.took.bloodpressure.du" : "Du hast deinen Bluddruck gemessen.",
+
   "EOL" : true
 }

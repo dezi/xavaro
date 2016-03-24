@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
@@ -33,7 +34,6 @@ public class LaunchItemDeveloper extends LaunchItem
             {
                 icon.setImageResource(GlobalConfigs.IconResAdministrator);
             }
-
 
             if (Simple.equals(subtype, "contacts"))
             {
@@ -73,6 +73,11 @@ public class LaunchItemDeveloper extends LaunchItem
             if (Simple.equals(subtype, "events"))
             {
                 icon.setImageResource(GlobalConfigs.IconResEvents);
+            }
+
+            if (Simple.equals(subtype, "activity"))
+            {
+                icon.setImageResource(CommonConfigs.IconResActivity);
             }
 
             overicon.setImageResource(GlobalConfigs.IconResTesting);

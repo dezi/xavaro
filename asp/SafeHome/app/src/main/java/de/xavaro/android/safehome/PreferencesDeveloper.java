@@ -5,6 +5,7 @@ import android.preference.PreferenceActivity;
 
 import java.util.Map;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebApp;
@@ -270,6 +271,18 @@ public class PreferencesDeveloper
             lp.setEntryValues(keys);
             lp.setDefaultValue("folder");
             lp.setTitle("Events");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".browser.activity");
+            lp.setIcon(CommonConfigs.IconResActivity);
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("folder");
+            lp.setTitle("Activity");
             lp.setEnabled(enabled);
 
             preferences.add(lp);

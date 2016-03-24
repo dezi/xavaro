@@ -134,6 +134,16 @@ public class LaunchGroupDeveloper extends LaunchGroup
 
             if (Simple.sharedPrefEquals("developer.browser.events", "home")) home.put(entry);
             if (Simple.sharedPrefEquals("developer.browser.events", "folder")) adir.put(entry);
+
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "developer");
+            Json.put(entry, "subtype", "activity");
+            Json.put(entry, "label", "Activity");
+            Json.put(entry, "order", 4000);
+
+            if (Simple.sharedPrefEquals("developer.browser.activity", "home")) home.put(entry);
+            if (Simple.sharedPrefEquals("developer.browser.activity", "folder")) adir.put(entry);
         }
 
         if (adir.length() > 0)

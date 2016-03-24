@@ -182,6 +182,8 @@ medicator.onClickTaken = function(event)
         config.taken = alltaken;
     }
 
+    WebAppActivity.recordActivity(WebLibStrings.getTrans("activity.took.pills"));
+
     return true;
 }
 
@@ -209,6 +211,15 @@ medicator.onClickMeasured = function(event)
     var launchitem = medicator.lauchis[ formkey ];
     var overicon = WebLibLaunch.getOverIconImgElem(launchitem);
     overicon.src = "indicator_ok_480x480.png";
+
+    var mediform = config.medisets[ 0 ].mediform;
+    var meditext = null;
+
+    if (mediform.startsWith("ZZW")) meditext = "activity.took.weight";
+    if (mediform.startsWith("ZZG")) meditext = "activity.took.bloodglucose";
+    if (mediform.startsWith("ZZB")) meditext = "activity.took.bloodpressure";
+
+    if (meditext != null) WebAppActivity.recordActivity(WebLibStrings.getTrans(meditext));
 
     return true;
 }
