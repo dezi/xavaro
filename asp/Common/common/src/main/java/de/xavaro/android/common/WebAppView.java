@@ -106,7 +106,7 @@ public class WebAppView extends WebView
 
         if (permissions.contains("weather"))
         {
-            weather = new WebAppWeather(webappname);
+            weather = new WebAppWeather(webappname, this, webapploader);
             addJavascriptInterface(weather, "WebAppWeather");
         }
 

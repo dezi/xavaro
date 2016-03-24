@@ -300,17 +300,36 @@ public class Simple
         return number ^ 0x2905196228051998L;
     }
 
+    @Nullable
     public static String dezify(String string)
     {
+        if (string == null) return null;
+        byte[] bytes = dezify(string.getBytes());
+        if (bytes == null) return null;
+        return new String(bytes);
+    }
+
+    @Nullable
+    public static UUID dezify(UUID uuid)
+    {
+        if (uuid == null) return null;
+        byte[] bytes = Simple.getUUIDBytes(uuid.toString());
+        return UUID.fromString(Simple.getUUIDString(dezify(bytes)));
+    }
+
+    @Nullable
+    public static byte[] dezify(byte[] bytes)
+    {
+        if (bytes == null) return null;
+
         byte[] dezi = {0x29, 0x05, 0x19, 0x62};
-        byte[] bytes = string.getBytes();
 
         for (int inx = 0; inx < bytes.length; inx++)
         {
             bytes[ inx ] = (byte) (bytes[ inx ] ^ (0x0f & dezi[ inx % 4 ]));
         }
 
-        return new String(bytes);
+        return bytes;
     }
 
     public static View removeFromParent(View view)

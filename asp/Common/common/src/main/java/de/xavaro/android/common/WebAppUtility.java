@@ -92,7 +92,13 @@ public class WebAppUtility
     @JavascriptInterface
     public String getPrettyJson(String json)
     {
-        return Json.toPretty(Json.fromString(json));
+        if (json != null)
+        {
+            if (json.startsWith("[")) return Json.toPretty(Json.fromStringArray(json));
+            if (json.startsWith("{")) return Json.toPretty(Json.fromStringObject(json));
+        }
+
+        return "";
     }
 
     @JavascriptInterface

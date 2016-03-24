@@ -4,7 +4,7 @@
     "label": "Wetter",
     "appname": "weather",
     "appicon": "weather_512x512.png",
-    "appextra": ";<k196?;9c=38c0`hg<g:d;2j<j:;7>f",
+    "appguid": "20b60a6b-0644-1699-a25b-3322c0cd2b7f",
     "appserver": "epg.xavaro.de",
     "preferences": false,
 
