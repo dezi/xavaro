@@ -86,12 +86,16 @@ public class LaunchItemApps extends LaunchItem
             {
                 Simple.installAppFromPlaystore(apkname);
             }
-
-            return;
         }
+        else
+        {
+            if (directory == null)
+            {
+                directory = new LaunchGroupWebStream(context, this);
+                directory.setConfig(this, Json.getArray(config, "launchitems"));
+            }
 
-        if (directory == null)  directory = new LaunchGroupApps.DiscounterGroup(context);
-
-        ((HomeActivity) context).addViewToBackStack(directory);
+            ((HomeActivity) context).addViewToBackStack(directory);
+        }
     }
 }

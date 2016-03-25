@@ -894,6 +894,7 @@ public class NicedPreferences
             newlayout.setOrientation(LinearLayout.HORIZONTAL);
             newlayout.setLayoutParams(new ViewGroup.LayoutParams(Simple.MP, Simple.WC));
             newlayout.setPadding(0, 0, 16, 0);
+            //newlayout.setBackgroundColor(0x88880000);
 
             ViewGroup vg = (ViewGroup) view;
 
@@ -913,16 +914,28 @@ public class NicedPreferences
             vg.setPadding(16, 8, 0, 8);
 
             //
-            // Step three: remove summary from horizontal layout and add
+            // Step three: Fuck linear layout of icon to be square and nice.
+            //
+
+            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
+
+            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
+            {
+                LinearLayout icon_frame = (LinearLayout) icon.getParent();
+                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+                icon_frame.setPadding(0, 0, 0, 0);
+            }
+            
+            //
+            // Step four: remove summary from horizontal layout and add
             // to top layout now beeing vertical.
             //
 
             TextView summary = (TextView) view.findViewById(android.R.id.summary);
-
             vg.addView(Simple.removeFromParent(summary));
 
             //
-            // Step four: do not forget to fuck stupid max lines on summary.
+            // Step five: do not forget to fuck stupid max lines on summary.
             //
 
             summary.setMaxLines(50);

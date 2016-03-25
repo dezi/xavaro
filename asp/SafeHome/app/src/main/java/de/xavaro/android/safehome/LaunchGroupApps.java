@@ -17,6 +17,7 @@ import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
+import de.xavaro.android.common.WebLib;
 
 //
 // Utility namespace for app launch groups.
@@ -80,57 +81,66 @@ public class LaunchGroupApps
         public DiscounterGroup(Context context)
         {
             super(context);
-
-            this.config = getConfig(context);
         }
 
-        private JSONObject getConfig(Context context)
+        public static JSONArray getConfig()
         {
-            try
+            JSONArray home = new JSONArray();
+            JSONArray adir = new JSONArray();
+            JSONObject entry;
+
+            //
+            // Get available items.
+            //
+
+            JSONObject config = WebLib.getLocaleConfig("appstore");
+            config = Json.getObject(config, "discounter");
+            if (config == null) return home;
+
+            //
+            // "apps.discounter.package:" + apkname = mode
+            //
+
+            String prefix = "apps.discounter.package:";
+
+            Map<String, Object> natapps = Simple.getAllPreferences(prefix);
+
+            for (String prefkey : natapps.keySet())
             {
-                JSONObject launchgroup = new JSONObject();
-                JSONArray launchitems = new JSONArray();
+                String apkname = prefkey.substring(prefix.length());
 
-                JSONObject config = loadConfig(context, "discounter");
-                SharedPreferences sp = Simple.getSharedPrefs();
-                Iterator<String> keysIterator = config.keys();
+                JSONObject item = Json.getObject(config, apkname);
+                String label = Json.getString(item, "label");
+                if (label == null) continue;
 
-                while (keysIterator.hasNext())
-                {
-                    String apkname = keysIterator.next();
-                    JSONObject apkjson = Json.getObject(config, apkname);
-                    if (apkjson == null) continue;
+                entry = new JSONObject();
 
-                    String prefkey = "apps.discounter.apk." + apkname;
+                Json.put(entry, "type", "apps");
+                Json.put(entry, "subtype", "discounter");
+                Json.put(entry, "label", label);
+                Json.put(entry, "apkname", apkname);
+                Json.put(entry, "order", 400);
 
-                    Boolean enable = sp.getBoolean(prefkey, false);
+                String mode = (String) natapps.get(prefkey);
 
-                    if (! enable) continue;
-
-                    String label = Json.getString(apkjson, "what");
-
-                    JSONObject whatsentry = new JSONObject();
-
-                    whatsentry.put("type", "apps");
-                    whatsentry.put("subtype", "discounter");
-                    whatsentry.put("label", label);
-                    whatsentry.put("apkname", apkname);
-
-                    launchitems.put(whatsentry);
-
-                    Log.d(LOGTAG, "Prefe:" + prefkey + "=" + apkname + "=" + label);
-                }
-
-                launchgroup.put("launchitems", launchitems);
-
-                return launchgroup;
-            }
-            catch (JSONException ex)
-            {
-                ex.printStackTrace();
+                if (Simple.equals(mode, "home")) home.put(entry);
+                if (Simple.equals(mode, "folder")) adir.put(entry);
             }
 
-            return new JSONObject();
+            if (adir.length() > 0)
+            {
+                entry = new JSONObject();
+
+                Json.put(entry, "type", "apps");
+                Json.put(entry, "subtype", "discounter");
+                Json.put(entry, "label", "Discounter");
+                Json.put(entry, "order", 1050);
+
+                Json.put(entry, "launchitems", adir);
+                Json.put(home, entry);
+            }
+
+            return home;
         }
     }
 }
