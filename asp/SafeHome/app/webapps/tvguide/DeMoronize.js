@@ -10,18 +10,18 @@ DeMoronize.cleanEpg = function(moronedEpg)
 
     var regex = new RegExp("(.*?[12][0-9][0-9][0-9])([A-ZÉÄÜÖ])", "g");
 
-    // var match = demoronized.match(regex);
-    //
-    // if (match)
-    // {
-    //     var match = match[ 0 ];
-    //     var result = WebLibSimple.substring(match, 0, -1);
-    //
-    //     if (moronedEpg.subtitle)
-    //     {
-    //         moronedEpg.subtitle = moronedEpg.subtitle + " " + result;
-    //     }
-    // }
+    var match = demoronized.match(regex);
+
+    if (match)
+    {
+        var match = match[ 0 ];
+        var result = WebLibSimple.substring(match, 0, -1);
+
+        if (moronedEpg.subtitle)
+        {
+            moronedEpg.subtitle = moronedEpg.subtitle + " " + result;
+        }
+    }
 
     demoronized = demoronized.replace(regex, "$1<br />$2");
 
@@ -84,32 +84,29 @@ DeMoronize.cleanShortShows = function(data)
 {
     if (! data) return;
 
+    var data = data;
     var lastBroadcast = null;
 
     for (var broadcast in data)
     {
         var src = data[ broadcast ];
-
-        if (lastBroadcast && lastBroadcast.stop != src.start)
-        {
-            // console.log("--> ugly: " + lastBroadcast.title + " - " + src.title);
-            // console.log("--> start/stop: " + lastBroadcast.stop + " - " + src.start);
-            src.start = lastBroadcast.stop;
-        }
-
         var duration = WebLibSimple.getDuration(src.start, src.stop) / 1000 / 60;
 
-        if (duration <= 4 && lastBroadcast)
+        if ((lastBroadcast !== null) && (duration <= 4))
         {
-            // console.log("--> duration:" + duration + " - " + JSON.stringify(src));
             lastBroadcast.title2       = src.title;
             lastBroadcast.subtitle2    = src.subtitle;
             lastBroadcast.description2 = src.description;
             lastBroadcast.stop         = src.stop;
 
             data.splice(data.indexOf(src), 1);
-        }
 
-        lastBroadcast = src;
+        }
+        else
+        {
+            lastBroadcast = src;
+        }
     }
+
+    return data;
 }

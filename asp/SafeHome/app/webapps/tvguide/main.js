@@ -46,8 +46,6 @@ tvguide.constants =
     programBGColor           : "#a0a0a0",
     descriptionColor         : "#ffffff",
     pastLineColor            : "#33ff0000",
-
-    programBoder             : "0px solid black"
 }
 
 tvguide.calculateDates = function()
@@ -436,7 +434,8 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         paddingDiv.style.marginBottom = "2px";
         paddingDiv.style.padding      = "8px";
         paddingDiv.style.borderRadius = "8px";
-        paddingDiv.style.border       = tvguide.constants.programBoder;
+
+        paddingDiv.style.lineHeight   = "3";
 
         if (channel.iptv)
         {
@@ -527,8 +526,6 @@ tvguide.createEpgBodyScroll = function()
 
 tvguide.updateEpgPast = function()
 {
-    alert("Scroll Past");
-
     var updateHours  = 24;
     var hoursPix     = tvguide.constants.hoursPix;
     var loadHours    = tvguide.constants.loadHours;
@@ -566,9 +563,6 @@ tvguide.updateEpgPast = function()
 
 tvguide.updateEpgFuture = function()
 {
-    alert("Scroll Future");
-
-
     var updateHours    = 24;
     var hoursPix       = tvguide.constants.hoursPix;
     var loadHours      = tvguide.constants.loadHours + updateHours;
@@ -594,9 +588,8 @@ WebAppRequest.onLoadAsyncJSON = function(src, data)
         tvguide.constants.epgDataSrcPrefix.length,
       -(tvguide.constants.epgDataSrcPostfix.length + 11));
 
-    data = data[ "epgdata" ];
-
-    DeMoronize.cleanShortShows(data);
+    var data = data[ "epgdata" ];
+    data = DeMoronize.cleanShortShows(data);
 
     tvguide.createEpgProgram(channel, data);
 }
