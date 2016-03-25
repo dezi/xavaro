@@ -8,8 +8,10 @@ public class WebAppActivity
     private static final String LOGTAG = WebAppActivity.class.getSimpleName();
 
     @JavascriptInterface
-    public void recordActivity(String message)
+    public String recordActivity(String message)
     {
-        ActivityManager.recordActivity(message);
+        String uuid = ActivityManager.recordActivity(message);
+
+        return (uuid != null) ? uuid : "";
     }
 }

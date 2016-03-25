@@ -189,84 +189,84 @@ public class ActivityManager
         }
     }
 
-    public static void recordActivity(int resid)
+    public static String recordActivity(int resid)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", Simple.getTrans(resid));
 
-        recordActivity(jmessage);
+        return recordActivity(jmessage);
     }
 
-    public static void recordActivity(String message)
+    public static String recordActivity(String message)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", message);
 
-        recordActivity(jmessage);
+        return recordActivity(jmessage);
     }
 
-    public static void recordActivity(String message, int iconres)
+    public static String recordActivity(String message, int iconres)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", message);
         Json.put(jmessage, "iconres", iconres);
 
-        recordActivity(jmessage);
+        return recordActivity(jmessage);
     }
 
-    public static void recordActivity(String message, String mediapath)
+    public static String recordActivity(String message, String mediapath)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", message);
         Json.put(jmessage, "mediapath", mediapath);
 
-        recordActivity(jmessage);
+        return recordActivity(jmessage);
     }
 
-    public static void recordActivity(JSONObject jmessage)
+    public static String recordActivity(JSONObject jmessage)
     {
-        getInstance().onMessage(jmessage, false);
+        return getInstance().onMessage(jmessage, false);
     }
 
-    public static void recordAlert(int resid)
+    public static String recordAlert(int resid)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", Simple.getTrans(resid));
 
-        recordAlert(jmessage);
+        return recordAlert(jmessage);
     }
 
-    public static void recordAlert(String message)
+    public static String recordAlert(String message)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", message);
 
-        recordAlert(jmessage);
+        return recordAlert(jmessage);
     }
 
-    public static void recordAlert(String message, int iconres)
+    public static String recordAlert(String message, int iconres)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", message);
         Json.put(jmessage, "iconres", iconres);
 
-        recordAlert(jmessage);
+        return recordAlert(jmessage);
     }
 
-    public static void recordAlert(String message, String mediapath)
+    public static String recordAlert(String message, String mediapath)
     {
         JSONObject jmessage = new JSONObject();
         Json.put(jmessage, "message", message);
         Json.put(jmessage, "mediapath", mediapath);
 
-        recordAlert(jmessage);
+        return recordAlert(jmessage);
     }
 
-    public static void recordAlert(JSONObject jmessage)
+    public static String recordAlert(JSONObject jmessage)
     {
         Json.put(jmessage, "priority", "alertinfo");
 
-        getInstance().onMessage(jmessage, false);
+        return getInstance().onMessage(jmessage, false);
     }
 
     public static void onIncomingMessage(JSONObject message)
@@ -274,19 +274,20 @@ public class ActivityManager
         getInstance().onMessage(message, true);
     }
 
-    private void onMessage(JSONObject message, boolean incoming)
+    @Nullable
+    private String onMessage(JSONObject message, boolean incoming)
     {
-        if (! message.has("date")) Json.put(message, "date", Simple.nowAsISO());
         if (! message.has("uuid")) Json.put(message, "uuid", Simple.getUUID());
+        if (! message.has("date")) Json.put(message, "date", Simple.nowAsISO());
 
         JSONObject protocoll = getStorage();
-        if (protocoll == null) return;
+        if (protocoll == null) return null;
 
         String uuid = Json.getString(message, "uuid");
-        if (uuid == null) return;
+        if (uuid == null) return null;
 
         JSONObject branch = Json.getObject(protocoll, incoming ? "incoming" : "outgoing");
-        if (branch == null) return;
+        if (branch == null) return null;
 
         if (branch.has(uuid))
         {
@@ -311,6 +312,8 @@ public class ActivityManager
                 callback.onOutgoingMessage(message);
             }
         }
+
+        return Json.getString(message, "uuid");
     }
 
     //region Callback interface

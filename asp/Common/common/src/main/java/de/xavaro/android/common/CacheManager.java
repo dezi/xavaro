@@ -121,7 +121,7 @@ public class CacheManager
 
             Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
 
-            return Simple.getDrawable(getIcon(iconurl, iconfile));
+            return Simple.getDrawable(getIcon(iconfile, iconurl));
         }
         catch (Exception oops)
         {
