@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class Json
@@ -232,7 +233,23 @@ public class Json
     {
         try
         {
-            return json.getString(key);
+            Object obj = json.get(key);
+
+            if (obj instanceof String) return (String) obj;
+
+            if (obj instanceof JSONArray)
+            {
+                JSONArray strings = json.getJSONArray(key);
+
+                String result = "";
+
+                for (int inx = 0; inx < strings.length(); inx++)
+                {
+                    result += getString(strings, inx);
+                }
+
+                return result;
+            }
         }
         catch (Exception ignore)
         {
@@ -254,6 +271,21 @@ public class Json
 
         return null;
     }
+
+    @Nullable
+    public static Object getGeneric(JSONObject json, String key)
+    {
+        try
+        {
+            return json.get(key);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
 
     @Nullable
     public static JSONArray getArray(JSONObject json, String key)

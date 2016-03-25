@@ -109,19 +109,33 @@ public class CacheManager
             Log.d(LOGTAG,"getIconFromAppStore:" + url);
 
             String content = StaticUtils.getContentFromUrl(url);
-            if (content == null) return null;
 
-            Pattern pattern = Pattern.compile("class=\"cover-image\" src=\"([^\"]*)\"");
-            Matcher matcher = pattern.matcher(content);
-            if (! matcher.find()) return null;
+            if (content == null)
+            {
+                //
+                // For some reasons specific apps result in
+                // a 403 forbidden result. Fallback and try
+                // to extract icon from installed app.
+                //
 
-            String iconurl = matcher.group(1);
+                return VersionUtils.getIconFromApplication(Simple.getAnyContext(), packagename);
+            }
+            else
+            {
+                Log.d(LOGTAG, "getIconFromAppStore(1):" + url);
 
-            if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
+                Pattern pattern = Pattern.compile("class=\"cover-image\" src=\"([^\"]*)\"");
+                Matcher matcher = pattern.matcher(content);
+                if (!matcher.find()) return null;
 
-            Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
+                String iconurl = matcher.group(1);
 
-            return Simple.getDrawable(getIcon(iconfile, iconurl));
+                if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
+
+                Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
+
+                return Simple.getDrawable(getIcon(iconfile, iconurl));
+            }
         }
         catch (Exception oops)
         {

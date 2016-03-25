@@ -109,7 +109,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesComm.XavaroFragment.getHeader());
 
         category = new Header();
-        category.title = "Webapps";
+        category.title = "Web-Apps";
         target.add(category);
 
         PreferencesWebApps.WebappFragment.getHeaders(target);
@@ -127,7 +127,7 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Apps";
         target.add(category);
 
-        target.add(SettingsFragments.AppsDiscounterFragment.getHeader());
+        target.add(PreferencesApps.AppsDiscounterFragment.getHeader());
 
         category = new Header();
         category.title = "Vitaldaten";

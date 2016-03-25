@@ -29,6 +29,8 @@ public class PreferenceFragments
     {
         protected String type;
         protected String subtype;
+        protected String subcategory;
+        protected boolean isplaystore;
         protected int residKeys = R.array.pref_where_keys;
         protected int residVals = R.array.pref_where_vals;
 
@@ -40,8 +42,15 @@ public class PreferenceFragments
             JSONObject config = WebLib.getLocaleConfig(type);
             if (config == null) return;
 
+            if (subcategory != null)
+            {
+                config = Json.getObject(config, subcategory);
+                if (config == null) return;
+            }
+
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceListPreference lp;
+            NicedPreferences.NiceScorePreference sp;
 
             Iterator<String> keysIterator = config.keys();
 
@@ -52,7 +61,7 @@ public class PreferenceFragments
                 JSONObject webitem = Json.getObject(config, website);
                 if (webitem == null) continue;
 
-                if (webitem.has("enabled") && !Json.getBoolean(webitem, "enabled"))
+                if (webitem.has("enabled") && ! Json.getBoolean(webitem, "enabled"))
                 {
                     continue;
                 }
@@ -67,25 +76,54 @@ public class PreferenceFragments
 
                 if (! webitem.has("channels"))
                 {
-                    String iconurl = Json.getString(webitem, "icon");
-                    if (iconurl == null) continue;
+                    Drawable drawable;
+                    String key;
 
-                    Drawable drawable = CacheManager.getWebIcon(website, iconurl);
+                    if (isplaystore)
+                    {
+                        drawable = CacheManager.getAppIcon(website);
 
-                    String key = keyprefix + ".website:" + website;
+                        key = keyprefix + ".package:" + website;
 
-                    lp = new NicedPreferences.NiceListPreference(context);
+                        sp = new NicedPreferences.NiceScorePreference(context);
 
-                    lp.setKey(key);
-                    lp.setTitle(label);
-                    lp.setIcon(drawable);
-                    lp.setSummary(summary);
-                    lp.setEntries(residVals);
-                    lp.setEntryValues(residKeys);
-                    lp.setEnabled(enabled);
+                        sp.setKey(key);
+                        sp.setTitle(label);
+                        sp.setIcon(drawable);
+                        sp.setSummary(summary);
+                        sp.setEntries(residVals);
+                        sp.setEntryValues(residKeys);
+                        sp.setEnabled(enabled);
 
-                    preferences.add(lp);
-                    activekeys.add(lp.getKey());
+                        String score = Json.getString(webitem, "score");
+                        sp.setScore((score == null) ? -1 : Integer.parseInt(score));
+                        sp.setAPKName(website);
+
+                        preferences.add(sp);
+                        activekeys.add(sp.getKey());
+                    }
+                    else
+                    {
+                        String iconurl = Json.getString(webitem, "icon");
+                        if (iconurl == null) continue;
+
+                        drawable = CacheManager.getWebIcon(website, iconurl);
+
+                        key = keyprefix + ".website:" + website;
+
+                        lp = new NicedPreferences.NiceListPreference(context);
+
+                        lp.setKey(key);
+                        lp.setTitle(label);
+                        lp.setIcon(drawable);
+                        lp.setSummary(summary);
+                        lp.setEntries(residVals);
+                        lp.setEntryValues(residKeys);
+                        lp.setEnabled(enabled);
+
+                        preferences.add(lp);
+                        activekeys.add(lp.getKey());
+                    }
 
                     if (! Simple.hasSharedPref(key))
                     {

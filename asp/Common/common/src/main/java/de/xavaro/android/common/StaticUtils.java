@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.security.acl.LastOwnerException;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -267,15 +268,21 @@ public class StaticUtils
             URL loadurl = new URL(src);
 
             HttpURLConnection connection = (HttpURLConnection) loadurl.openConnection();
+            connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.connect();
+
+            if (connection.getResponseCode() != 200)
+            {
+                Log.d(LOGTAG, "getContentFromUrl: " + connection.getResponseCode() + "=" + src);
+            }
 
             InputStream input = connection.getInputStream();
             StringBuilder string = new StringBuilder();
             byte[] buffer = new byte[ 4096 ];
             int xfer;
 
-            while ((xfer = input.read(buffer)) > 0)
+            while ((xfer = input.read(buffer)) >= 0)
             {
                 string.append(new String(buffer, 0, xfer));
             }

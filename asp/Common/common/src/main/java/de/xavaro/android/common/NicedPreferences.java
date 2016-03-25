@@ -882,10 +882,60 @@ public class NicedPreferences
         {
             super.onBindView(view);
 
+            //
+            // Re-arrange completely shitty checkbox layout.
+            // The summary must be last item in layout. Icon,
+            // title and checkbox need to be in on layout.
+            //
+            // Step one: move all items into new horizontal linear layout.
+            //
+
+            LinearLayout newlayout = new LinearLayout(getContext());
+            newlayout.setOrientation(LinearLayout.HORIZONTAL);
+            newlayout.setLayoutParams(new ViewGroup.LayoutParams(Simple.MP, Simple.WC));
+            newlayout.setPadding(0, 0, 16, 0);
+
+            ViewGroup vg = (ViewGroup) view;
+
+            while (vg.getChildCount() > 0)
+            {
+                newlayout.addView(Simple.removeFromParent(vg.getChildAt(0)));
+            }
+
+            vg.addView(newlayout);
+
+            //
+            // Step two: fuck top level layout to be vertical match parent.
+            // Also add a little bit of fucking padding at left, top and bottom.
+            //
+
+            ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
+            vg.setPadding(16, 8, 0, 8);
+
+            //
+            // Step three: remove summary from horizontal layout and add
+            // to top layout now beeing vertical.
+            //
+
+            TextView summary = (TextView) view.findViewById(android.R.id.summary);
+
+            vg.addView(Simple.removeFromParent(summary));
+
+            //
+            // Step four: do not forget to fuck stupid max lines on summary.
+            //
+
+            summary.setMaxLines(50);
+            summary.setPadding(0, 0, 12, 0);
+
+            //
+            // Fucked into shape. Now add choice display.
+            //
+
             if (current == null)
             {
                 current = new TextView(getContext());
-                current.setGravity(Gravity.END);
+                current.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
                 current.setTextSize(18f);
 
                 current.setTextColor(disabled
@@ -908,10 +958,10 @@ public class NicedPreferences
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     Gravity.END);
 
-            ((LinearLayout) view).addView(current, lp);
+            newlayout.addView(current, lp);
         }
     }
 
@@ -1065,7 +1115,7 @@ public class NicedPreferences
         }
     }
 
-    public static class NiceScorePreference extends NiceCheckboxPreference implements
+    public static class NiceScorePreference extends NiceListPreference implements
             View.OnTouchListener
     {
         public NiceScorePreference(Context context)
@@ -1180,9 +1230,12 @@ public class NicedPreferences
                 }
 
                 TextView degree = new TextView(getContext());
+                degree.setLayoutParams(Simple.layoutParamsWM());
+                degree.setGravity(Gravity.CENTER_VERTICAL);
                 degree.setTextSize(Simple.getPreferredTextSize());
                 degree.setText(degreeText[ score ]);
                 degree.setPadding(8, 0, 0, 0);
+
                 scorelayout.addView(degree);
 
                 ((ViewGroup) view).addView(scorelayout, 1);
