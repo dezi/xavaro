@@ -26,7 +26,7 @@ public class PreferencesComm
 
     //region Xavaro communication preferences
 
-    public static class XavaroFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class XavaroFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -293,7 +293,7 @@ public class PreferencesComm
 
     //region Contacts preferences stub
 
-    public static class ContactsFragmentStub extends SettingsFragments.EnablePreferenceFragment
+    public static class ContactsFragmentStub extends PreferencesBasics.EnablePreferenceFragment
     {
         protected boolean isPhone;
         protected boolean isSkype;

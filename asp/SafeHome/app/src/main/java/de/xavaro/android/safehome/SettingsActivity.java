@@ -44,8 +44,6 @@ public class SettingsActivity extends PreferenceActivity
         //
 
         WebCookie.initCookies();
-
-        SettingsFragments.initialize(this);
     }
 
     @Override

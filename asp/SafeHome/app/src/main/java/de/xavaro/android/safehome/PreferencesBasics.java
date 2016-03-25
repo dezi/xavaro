@@ -4,9 +4,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -963,7 +968,7 @@ public class PreferencesBasics
 
     //region Alertgroup preferences
 
-    public static class AlertgroupFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class AlertgroupFragment extends EnablePreferenceFragment
             implements Preference.OnPreferenceChangeListener
     {
         public static PreferenceActivity.Header getHeader()
@@ -1110,4 +1115,87 @@ public class PreferencesBasics
     }
 
     //endregion Alertgroup preferences
+
+    @SuppressWarnings("WeakerAccess")
+    public static class EnablePreferenceFragment extends BasePreferenceFragment
+    {
+        protected String masterenable;
+        protected Drawable icondraw;
+        protected int iconres;
+
+        public void registerAll(Context context)
+        {
+            EnableSwitchPreference sw = new EnableSwitchPreference(context);
+
+            sw.setKey(keyprefix + ".enable");
+            sw.setTitle(masterenable);
+            sw.setDefaultValue(false);
+            sw.setIcon((iconres > 0) ? Simple.getDrawable(iconres) : icondraw);
+
+            preferences.add(sw);
+            activekeys.add(sw.getKey());
+
+            enabled = Simple.getSharedPrefBoolean(keyprefix + ".enable");
+        }
+
+        protected class EnableSwitchPreference extends SwitchPreference
+                implements Preference.OnPreferenceChangeListener
+        {
+            public EnableSwitchPreference(Context context)
+            {
+                super(context);
+
+                setOnPreferenceChangeListener(this);
+            }
+
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object obj)
+            {
+                Log.d(LOGTAG, "onPreferenceChange:" + obj.toString());
+
+                for (Preference pref : preferences)
+                {
+                    if (pref == this) continue;
+
+                    pref.setEnabled((boolean) obj);
+                }
+
+                return true;
+            }
+        }
+    }
+
+    //endregion EnablePreferenceFragment stub
+
+    //region BasePreferenceFragment stub
+
+    @SuppressWarnings("WeakerAccess")
+    public static class BasePreferenceFragment extends PreferenceFragment
+    {
+        protected ArrayList<Preference> preferences = new ArrayList<>();
+        protected ArrayList<String> activekeys = new ArrayList<>();
+
+        protected String keyprefix;
+        protected boolean enabled;
+
+        public void registerAll(Context context)
+        {
+            preferences.clear();
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState)
+        {
+            super.onCreate(savedInstanceState);
+
+            PreferenceScreen root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+        }
+    }
+
+    //endregion BasePreferenceFragment stub
 }

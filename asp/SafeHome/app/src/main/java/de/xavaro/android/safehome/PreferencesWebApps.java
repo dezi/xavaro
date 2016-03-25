@@ -32,7 +32,7 @@ public class PreferencesWebApps
 {
     //region Webapps preferences
 
-    public static class WebappFragment extends SettingsFragments.BasePreferenceFragment
+    public static class WebappFragment extends PreferencesBasics.BasePreferenceFragment
     {
         private static final String LOGTAG = WebappFragment.class.getSimpleName();
 

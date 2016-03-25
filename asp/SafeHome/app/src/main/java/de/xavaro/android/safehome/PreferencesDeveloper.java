@@ -14,7 +14,7 @@ public class PreferencesDeveloper
 {
     //region Developer preferences
 
-    public static class DeveloperFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class DeveloperFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {

@@ -45,7 +45,7 @@ public class PreferencesHealth
 
     //region Health Person preferences
 
-    public static class HealthPersonalFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class HealthPersonalFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -150,7 +150,7 @@ public class PreferencesHealth
 
     //region Health Units preferences
 
-    public static class HealthUnitsFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class HealthUnitsFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -626,7 +626,7 @@ public class PreferencesHealth
     //region BlueTooth preferences stub
 
     @SuppressWarnings("WeakerAccess")
-    public static class BlueToothFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class BlueToothFragment extends PreferencesBasics.EnablePreferenceFragment
             implements
             DialogInterface.OnClickListener,
             BlueTooth.BlueToothDiscoverCallback

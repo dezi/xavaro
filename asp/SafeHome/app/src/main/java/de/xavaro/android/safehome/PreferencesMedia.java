@@ -18,7 +18,7 @@ public class PreferencesMedia
 {
     //region Media image preferences
 
-    public static class MediaImageFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class MediaImageFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -170,7 +170,7 @@ public class PreferencesMedia
 
     //region Media video preferences
 
-    public static class MediaVideoFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class MediaVideoFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -249,7 +249,7 @@ public class PreferencesMedia
 
     //region Media audio preferences
 
-    public static class MediaAudioFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class MediaAudioFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -312,7 +312,7 @@ public class PreferencesMedia
 
     //region Media ebook preferences
 
-    public static class MediaEbookFragment extends SettingsFragments.EnablePreferenceFragment
+    public static class MediaEbookFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
         {
