@@ -925,7 +925,7 @@ public class NicedPreferences
                 icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
                 icon_frame.setPadding(0, 0, 0, 0);
             }
-            
+
             //
             // Step four: remove summary from horizontal layout and add
             // to top layout now beeing vertical.
