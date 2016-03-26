@@ -20,7 +20,7 @@
       "simple",
       "touch",
       "strings",
-      "dialog"
+      "country"
     ],
 
     "preload": [
