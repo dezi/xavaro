@@ -105,8 +105,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         topscreen.setOnSystemUiVisibilityChangeListener(this);
-
-        SimpleRequest.testDat();
     }
 
     private final Runnable makeFullscreen = new Runnable()
