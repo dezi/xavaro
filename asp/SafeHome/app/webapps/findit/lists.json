@@ -11,7 +11,8 @@
     "animals.insects",
     "animals.mammals",
     "animals.reptiles",
-    "plants"
+    "plants",
+    "tools"
   ],
 
   "list.index.icons": [
@@ -24,6 +25,7 @@
     "icon.animals.insects.png",
     "icon.animals.mammals.png",
     "icon.animals.reptiles.png",
-    "icon.plants.png"
+    "icon.plants.png",
+    "icon.tools.png"
   ]
 }
