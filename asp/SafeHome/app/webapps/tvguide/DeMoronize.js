@@ -56,7 +56,7 @@ DeMoronize.cleanEpg = function(moronedEpg)
     moronedEpg.isbd = false;
 
     // console.log("--> " + demoronized);
-    return moronedEpg;
+    // return moronedEpg;
 }
 
 DeMoronize.shiftTime = function(date)
@@ -84,28 +84,40 @@ DeMoronize.cleanShortShows = function(data)
 {
     if (! data) return;
 
-    var data = data;
-    var lastBroadcast = null;
+    var removedBrodcast = [];
 
     for (var broadcast in data)
     {
         var src = data[ broadcast ];
         var duration = WebLibSimple.getDuration(src.start, src.stop) / 1000 / 60;
 
-        if ((lastBroadcast !== null) && (duration <= 4))
+        if (duration <= 4)
         {
-            lastBroadcast.title2       = src.title;
-            lastBroadcast.subtitle2    = src.subtitle;
-            lastBroadcast.description2 = src.description;
-            lastBroadcast.stop         = src.stop;
+            src.addIndex = broadcast - 1;
+            removedBrodcast.push(src);
+
+            console.log(JSON.stringify(src));
 
             data.splice(data.indexOf(src), 1);
+        }
+    }
 
-        }
-        else
+    for (var broadcast in removedBrodcast)
+    {
+        var broadcast = removedBrodcast[ broadcast ];
+
+        if (broadcast.addIndex < 0) continue;
+
+        var addBroadcast = data[ broadcast.addIndex ];
+        broadcast.addIndex = null;
+
+        if (! addBroadcast.extraEpg)
         {
-            lastBroadcast = src;
+            addBroadcast.extraEpg = [];
         }
+
+        addBroadcast.extraEpg.push(broadcast);
+        addBroadcast.stop = broadcast.stop;
     }
 
     return data;

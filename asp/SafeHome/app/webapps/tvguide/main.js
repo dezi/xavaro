@@ -221,8 +221,7 @@ tvguide.getSenderList = function()
 
         for (var channels in iptvChannels[ webKey ][ "channels" ])
         {
-            var aliase = iptvChannels[ webKey ][ "channels" ][ channels ][ "aliase" ];
-
+            var aliase   = iptvChannels[ webKey ][ "channels" ][ channels ][ "aliase" ];
             var videourl = iptvChannels[ webKey ][ "channels" ][ channels ][ "videourl" ];
 
             for (var aliasIndex in aliase)
@@ -234,27 +233,27 @@ tvguide.getSenderList = function()
 
     for (var iptv in iptvAliase)
     {
-        if (tvguide.senderList[ iptv ])
+        var channel = tvguide.senderList[ iptv ];
+
+        if (channel)
         {
-            var channel      = tvguide.senderList[ iptv ];
             channel.iptv     = true;
             channel.videourl = iptvAliase[ iptv ];
         }
     }
 
     var loacation  = tvguide.constants.localLanguage;
-
-    var bdsrc = "http://" + WebApp.manifest.appserver + "/channels/tv/" + loacation + ".json.gz";
+    var bdsrc      = "http://" + WebApp.manifest.appserver + "/channels/tv/" + loacation + ".json.gz";
     var brainDeads = JSON.parse(WebAppRequest.loadSync(bdsrc));
 
-    for (var bdIndex in brainDeads)
+    for (var index in brainDeads)
     {
-        var tmp = brainDeads[ bdIndex ]
-        var bdName = tmp.type + "/" + tmp.isocc + "/" + tmp.name;
+        var tmp       = brainDeads[ index ]
+        var bdChannel = tmp.type + "/" + tmp.isocc + "/" + tmp.name;
 
         for (var sender in tvguide.senderList)
         {
-            if (sender == bdName && tmp.isbd)
+            if (sender == bdChannel && tmp.isbd)
             {
                 tvguide.senderList[ sender ].isbd = tmp.isbd;
             }
@@ -396,13 +395,12 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         epg.country = channel.country;
         epg.channel = channel.channel;
         epg.iptv    = channel.iptv;
+        epg.isbd    = channel.isbd;
 
         if (channel.iptv)
         {
             epg.videourl =  channel.videourl;
         }
-
-        epg.isbd    = channel.isbd;
 
         var moronDateStart = new Date(epg.start);
         var moronDateStop  = new Date(epg.stop );
@@ -587,6 +585,9 @@ WebAppRequest.onLoadAsyncJSON = function(src, data)
         decodeURI(src),
         tvguide.constants.epgDataSrcPrefix.length,
       -(tvguide.constants.epgDataSrcPostfix.length + 11));
+
+    console.log(src);
+    // console.log(channel);
 
     var data = data[ "epgdata" ];
     data = DeMoronize.cleanShortShows(data);

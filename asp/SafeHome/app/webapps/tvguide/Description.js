@@ -187,11 +187,11 @@ tvguide.nukeWiki = function()
     tvguide.wikiFrame = null;
 }
 
-tvguide.openWiki = function()
+tvguide.openWiki = function(target, element)
 {
     WebAppUtility.makeClick();
 
-    var wikifilm = tvguide.description.epg.wikifilm;
+    var wikifilm = tvguide.description.epg[ element.id ].wikifilm;
     console.log("--> wiki:" + wikifilm);
 
     tvguide.wikiFrame = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.topdiv);
@@ -221,14 +221,14 @@ tvguide.openWiki = function()
     iframe.src = "https://de.m.wikipedia.org/wiki/" + wikifilm;
 }
 
-tvguide.createWiki = function(wikifilm)
+tvguide.createWiki = function(wikifilm, id)
 {
     if (! wikifilm) return;
 
     tvguide.createButton(
         tvguide.descriptionConstants.wikiButtonTilte,
         tvguide.descriptionConstants.wikiButtonColor,
-        tvguide.openWiki, false);
+        tvguide.openWiki, id, false);
 }
 
 tvguide.createDescriptionSetup = function()
@@ -264,11 +264,11 @@ tvguide.createDescriptionSetup = function()
     tvguide.descriptionScroll.scrollVertical = true;
 }
 
-tvguide.addRecord = function()
+tvguide.addRecord = function(target, element)
 {
     WebAppUtility.makeClick();
 
-    var epg = tvguide.description.epg;
+    var epg = tvguide.description.epg[ element.id ];
 
     var preload  = tvguide.constants.recordPreload  * 1000 * 60;
     var postload = tvguide.constants.recordPostload * 1000 * 60;
@@ -281,36 +281,36 @@ tvguide.addRecord = function()
 
     WebAppMedia.addRecording(JSON.stringify(epg));
 
-    tvguide.createButtons();
+    tvguide.createButtons(element.id);
 
     alert("record: " + epg.title);
 }
 
-tvguide.play = function()
+tvguide.play = function(target, element)
 {
     WebAppUtility.makeClick();
 
-    WebAppMedia.openPlayer(tvguide.playFile);
+    WebAppMedia.openPlayer(tvguide.playFile[ element.id ]);
 }
 
-tvguide.removeRecording = function()
+tvguide.removeRecording = function(target, element)
 {
     WebAppUtility.makeClick();
-    alert("remove: " + tvguide.removeRec.title);
+    alert("remove: " + tvguide.removeRec[ element.id ].title);
 
-    WebAppMedia.removeRecording(JSON.stringify(tvguide.removeRec));
+    WebAppMedia.removeRecording(JSON.stringify(tvguide.removeRec[ element.id ]));
 
-    tvguide.createButtons();
+    tvguide.createButtons(element.id);
 }
 
-tvguide.createButton = function(name, color, eventHandler, global)
+tvguide.createButton = function(name, color, eventHandler, id, global)
 {
     // tvguide.description
 
     if (global)
     {
-        tvguide.description.buttonContainer = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
-        var container = tvguide.description.buttonContainer;
+        tvguide.description.buttonContainer[ id ] = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
+        var container = tvguide.description.buttonContainer[ id ];
     }
     else
     {
@@ -326,6 +326,7 @@ tvguide.createButton = function(name, color, eventHandler, global)
     button.style.borderRadius  = "10px";
 
     button.innerHTML           = name;
+    button.id                  = id;
     button.onTouchClick        = eventHandler;
 
     WebLibSimple.setFontSpecs(
@@ -337,7 +338,7 @@ tvguide.createButton = function(name, color, eventHandler, global)
     WebLibSimple.setBGColor(button, color);
 }
 
-tvguide.createRecButton = function(epg)
+tvguide.createRecButton = function(epg, id)
 {
     var now  = new Date().getTime();
     var stop = new Date(epg.stop).getTime();
@@ -346,11 +347,11 @@ tvguide.createRecButton = function(epg)
     {
         tvguide.createButton(tvguide.descriptionConstants.recordingButtonTitle,
             tvguide.descriptionConstants.recordingButtonColor,
-            tvguide.addRecord, true);
+            tvguide.addRecord, id, true);
     }
 }
 
-tvguide.createPlayButton = function(epg)
+tvguide.createPlayButton = function(epg, id)
 {
     var recordings = JSON.parse(WebAppMedia.getRecordedItems());
 
@@ -358,30 +359,16 @@ tvguide.createPlayButton = function(epg)
     {
         recording = recordings[ index ];
 
-        // if (epg.subtitle &&
-        //     epg.title    == recording.title &&
-        //     epg.channel  == recording.channel &&
-        //     epg.subtitle == recording.subtitle)
-        // {
-        //     tvguide.playFile = recording.mediafile;
-        //
-        //     tvguide.createButton(tvguide.descriptionConstants.playButtonTitle,
-        //         tvguide.descriptionConstants.playButtonColor,
-        //         tvguide.play, true);
-        //
-        //     return true;
-        // }
-
         if (recording.title    == epg.title &&
             recording.channel  == epg.channel &&
             recording.start    == epg.start &&
             recording.stop     == epg.stop)
         {
-            tvguide.playFile = recording.mediafile;
+            tvguide.playFile[ id ] = recording.mediafile;
 
             tvguide.createButton(tvguide.descriptionConstants.playButtonTitle,
                 tvguide.descriptionConstants.playButtonColor,
-                tvguide.play, true);
+                tvguide.play, id, true);
 
             return true;
         }
@@ -390,7 +377,7 @@ tvguide.createPlayButton = function(epg)
     return false;
 }
 
-tvguide.createPlannedButton = function(epg)
+tvguide.createPlannedButton = function(epg, id)
 {
     var planned = JSON.parse(WebAppMedia.getRecordings());
 
@@ -402,11 +389,11 @@ tvguide.createPlannedButton = function(epg)
             rec.channel  == epg.channel &&
             rec.start    == epg.start)
         {
-            tvguide.removeRec = rec;
+            tvguide.removeRec[ id ] = rec;
 
             tvguide.createButton(tvguide.descriptionConstants.plannedButtonTilte,
                 tvguide.descriptionConstants.plannedButtonColor,
-                tvguide.removeRecording, true);
+                tvguide.removeRecording, id, true);
 
             return true;
         }
@@ -415,35 +402,94 @@ tvguide.createPlannedButton = function(epg)
     return false;
 }
 
-tvguide.createLivePlayButton = function(epg)
+tvguide.createLivePlayButton = function(epg, id)
 {
-    tvguide.playFile = epg.videourl;
+    var now       = new Date().getTime();
+    var start     = new Date(epg.start).getTime();
+    var stop      = new Date(epg.stop ).getTime();
+
+    if (! (now > start && now < stop)) return;
+
+    tvguide.playFile[ id ] = epg.videourl;
 
     tvguide.createButton(
         tvguide.descriptionConstants.livePlayButtonTilte,
         tvguide.descriptionConstants.livePlayButtonColor,
-        tvguide.play, false);
-
-//    tvguide.createButton("Live Play", "#ff0000", tvguide.play, false);
+        tvguide.play, id, false);
 }
 
-tvguide.createButtons = function()
+tvguide.createButtons = function(id)
 {
-    var epg = tvguide.description.epg;
+    var epg = tvguide.description.epg[ id ];
 
     if (! epg.iptv) return;
 
-    var nukeContainer = tvguide.description.buttonContainer;
+    var nukeContainer = tvguide.description.buttonContainer[ id ];
     if (nukeContainer) nukeContainer.innerHTML = "";
 
-    var playButton = tvguide.createPlayButton(epg);
+    var playButton = tvguide.createPlayButton(epg, id);
 
     if (! playButton)
     {
-        var plannedButton = tvguide.createPlannedButton(epg);
+        var plannedButton = tvguide.createPlannedButton(epg, id);
 
-        if (! plannedButton) tvguide.createRecButton(epg);
+        if (! plannedButton) tvguide.createRecButton(epg, id);
     }
+}
+
+tvguide.descriptionMain = function(epg, id)
+{
+    if (epg.isbd) DeMoronize.cleanEpg(epg);
+
+    tvguide.description.epg[ id ] = epg;
+
+    tvguide.createTitleBar(epg.title, epg.subtitle);
+
+    var now       = new Date().getTime();
+    var start     = new Date(epg.start).getTime();
+    var stop      = new Date(epg.stop ).getTime();
+    var day       = WebLibSimple.getNiceDay(start);
+    var timeSpan  = WebLibSimple.getNiceTime(start) + "-" + WebLibSimple.getNiceTime(stop);
+    var duration  = Math.floor(WebLibSimple.getDuration(epg.start, epg.stop) / 1000 / 60) + "min";
+    var landscape = true;
+
+    if (epg.imgsize)
+    {
+        var size = epg.imgsize.split("x");
+
+        var imgWidth  = parseInt(size[0]);
+        var imgHeight = parseInt(size[1]);
+
+        var partentWidth = tvguide.description.topdiv.clientWidth;
+
+        if (imgWidth < imgHeight || imgWidth < partentWidth / 2)
+        {
+            landscape = false;
+        }
+
+        var imgSrc = epg.title;
+
+        if (epg.imgname) imgSrc = epg.imgname;
+
+        var src = "http://" + WebApp.manifest.appserver +
+            "/pgminfo/tv/" + tvguide.constants.localLanguage + "/" +
+            encodeURIComponent(imgSrc) + ".orig.jpg";
+
+        tvguide.createPic(src, landscape);
+    }
+
+    var durationTrans = WebLibStrings.getTrans("tvguide.duration");
+    var channelTrans  = WebLibStrings.getTrans("tvguide.channel");
+
+    tvguide.createSpliteDiv(day + ":",           timeSpan,    landscape);
+    tvguide.createSpliteDiv(durationTrans + ":", duration,    landscape);
+    tvguide.createSpliteDiv(channelTrans + ":",  epg.channel, landscape);
+
+    tvguide.createInfoBox(epg.description);
+
+    tvguide.createWiki(epg.wikifilm, id);
+    tvguide.createLivePlayButton(epg, id);
+    tvguide.createButtons(id);
 }
 
 tvguide.animateInfoIn = function()
@@ -488,71 +534,6 @@ tvguide.animateInfoOut = function()
     }
 }
 
-tvguide.descriptionMain = function(target, epg)
-{
-    // console.log("--> tvguide.onEPGTouchClick element: " + epg.title);
-    // console.log("--> epg: " + JSON.stringify(epg));
-
-    tvguide.createDescriptionSetup();
-
-    tvguide.description.epg = epg;
-
-    tvguide.createTitleBar(epg.title, epg.subtitle);
-
-    var now       = new Date().getTime();
-    var start     = new Date(epg.start).getTime();
-    var stop      = new Date(epg.stop ).getTime();
-    var day       = WebLibSimple.getNiceDay(start);
-    var timeSpan  = WebLibSimple.getNiceTime(start) + "-" + WebLibSimple.getNiceTime(stop);
-    var duration  = Math.floor(WebLibSimple.getDuration(epg.start, epg.stop) / 1000 / 60) + "min";
-    var landscape = true;
-
-    if (epg.imgsize)
-    {
-        var size = epg.imgsize.split("x");
-
-        var imgWidth  = parseInt(size[0]);
-        var imgHeight = parseInt(size[1]);
-
-        var partentWidth = tvguide.description.topdiv.clientWidth;
-
-        if (imgWidth < imgHeight || imgWidth < partentWidth / 2)
-        {
-            landscape = false;
-        }
-
-        var imgSrc = epg.title;
-
-        if (epg.imgname) imgSrc = epg.imgname;
-
-        var src = "http://" + WebApp.manifest.appserver +
-            "/pgminfo/tv/" + tvguide.constants.localLanguage + "/" +
-            encodeURIComponent(imgSrc) + ".orig.jpg";
-
-        tvguide.createPic(src, landscape);
-    }
-
-    tvguide.createSpliteDiv(day + ":", timeSpan, landscape);
-
-    var durationTrans = WebLibStrings.getTrans("tvguide.duration");
-    tvguide.createSpliteDiv(durationTrans + ":", duration, landscape);
-
-    var channelTrans = WebLibStrings.getTrans("tvguide.channel");
-    tvguide.createSpliteDiv(channelTrans + ":", epg.channel, landscape);
-
-    tvguide.createInfoBox(epg.description);
-
-    tvguide.createWiki(epg.wikifilm);
-
-    if (now > start && now < stop)
-    {
-        console.log("--> create live play button");
-        tvguide.createLivePlayButton(epg);
-    }
-
-    tvguide.createButtons();
-}
-
 tvguide.checkInfoStatus = function()
 {
     if (tvguide.animateInfoStatus == "Finish")
@@ -578,16 +559,22 @@ tvguide.onEPGTouchClick = function(target, element)
 
     if (! tvguide.animateInfoStatus)
     {
-        var epg = element.epg;
+        if (! element.epg) return;
 
-        if (! epg) return;
+        tvguide.createDescriptionSetup();
 
-        if (epg.isbd)
+        tvguide.playFile = {};
+        tvguide.removeRec = {};
+        tvguide.description.epg = {};
+        tvguide.description.buttonContainer = {};
+
+        tvguide.descriptionMain(element.epg, 0);
+
+        for (var id in element.epg.extraEpg)
         {
-            epg = DeMoronize.cleanEpg(epg);
+            tvguide.descriptionMain(element.epg.extraEpg[ id ], id + 1);
         }
 
-        tvguide.descriptionMain(target, epg);
         tvguide.animateInfoIn();
     }
 }
