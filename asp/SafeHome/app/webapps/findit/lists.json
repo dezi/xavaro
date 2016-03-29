@@ -1,3 +1,29 @@
 {
-  "locales": [ "lists.de-rDE" ]
+  "locales": [ "lists.de-rDE" ],
+
+  "list.index.keys": [
+    "cities.capitals",
+    "cities.mega",
+    "names.female",
+    "names.male",
+    "animals.birds",
+    "animals.fishes",
+    "animals.insects",
+    "animals.mammals",
+    "animals.reptiles",
+    "plants"
+  ],
+
+  "list.index.icons": [
+    "icon.cities.capitals.png",
+    "icon.cities.mega.png",
+    "icon.names.female.png",
+    "icon.names.male.png",
+    "icon.animals.birds.png",
+    "icon.animals.fishes.png",
+    "icon.animals.insects.png",
+    "icon.animals.mammals.png",
+    "icon.animals.reptiles.png",
+    "icon.plants.png"
+  ]
 }
