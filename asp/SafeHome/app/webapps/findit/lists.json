@@ -12,7 +12,8 @@
     "animals.mammals",
     "animals.reptiles",
     "plants",
-    "tools"
+    "tools",
+    "cars"
   ],
 
   "list.index.icons": [
@@ -26,6 +27,7 @@
     "icon.animals.mammals.png",
     "icon.animals.reptiles.png",
     "icon.plants.png",
-    "icon.tools.png"
+    "icon.tools.png",
+    "icon.cars.png"
   ]
 }
