@@ -1,21 +1,12 @@
 package de.xavaro.android.common;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.acl.LastOwnerException;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
 
 public class EventManager
 {
@@ -192,41 +183,121 @@ public class EventManager
         }
     };
 
+    private static void writeArchive()
+    {
+        String lastdate = Simple.todayAsISO(-2);
+        String suffix = lastdate.substring(0, 10).replace("-", ".");
+
+        File arch = Simple.getPackageFile("events." + suffix + ".json");
+
+        Log.d(LOGTAG,"writeArchive: lastdate=" + lastdate + "=" + arch.toString());
+
+        if (arch.exists()) return;
+
+        JSONObject passed = Json.getObject(eventcache, "passed");
+
+        JSONObject archive = new JSONObject();
+
+        Iterator<String> typeIterator;
+
+        if (passed != null)
+        {
+            typeIterator = passed.keys();
+            while (typeIterator.hasNext())
+            {
+                String type = typeIterator.next();
+
+                JSONArray events = Json.getArray(passed, type);
+                if (events == null) continue;
+
+                JSONArray eventsarc = new JSONArray();
+                Json.put(archive, type, eventsarc);
+
+                for (int inx = 0; inx < events.length(); inx++)
+                {
+                    JSONObject event = Json.getObject(events, inx);
+                    String date = Json.getString(event, "date");
+                    if ((date == null) || (date.compareTo(lastdate) > 0)) continue;
+
+                    Json.remove(events, inx--);
+                    Json.put(eventsarc, event);
+                    dirty = true;
+                }
+            }
+        }
+
+        if (! dirty) return;
+
+        if (Simple.putFileContent(arch, Json.defuck(Json.toPretty(archive))))
+        {
+            //
+            // Commit archive.
+            //
+
+            putStorage();
+        }
+    }
+
     private static void getStorage()
     {
         if (eventcache != null) return;
 
-        File file = new File(Simple.getFilesDir(), "events.act.json");
-        if (! file.exists()) file = new File(Simple.getFilesDir(), "events.bak.json");
+        File act = Simple.getPackageFile("events.act.json");
+        File bak = Simple.getPackageFile("events.bak.json");
+
+        //
+        // Legacy rename.
+        //
+
+        File legacyact = new File(Simple.getFilesDir(), "events.act.json");
+        File legacybak = new File(Simple.getFilesDir(), "events.act.json");
+
+        if (legacyact.exists() && ! legacyact.renameTo(act))
+        {
+            Log.d(LOGTAG, "getStorage: legacy rename failed.");
+        }
+
+        if (legacybak.exists() && ! legacybak.renameTo(bak))
+        {
+            Log.d(LOGTAG, "getStorage: legacy rename failed.");
+        }
 
         try
         {
-            if (! file.exists())
+            if (act.exists())
             {
-                eventcache = new JSONObject();
+                eventcache = Json.fromString(Simple.getFileContent(act));
             }
             else
             {
-                String json = Simple.getFileContent(file);
-                eventcache = (json != null) ? new JSONObject(json) : new JSONObject();
+                if (bak.exists())
+                {
+                    eventcache = Json.fromString(Simple.getFileContent(act));
+                }
             }
-
-            if (! eventcache.has("passed")) Json.put(eventcache, "passed", new JSONObject());
-            if (! eventcache.has("coming")) Json.put(eventcache, "coming", new JSONObject());
         }
         catch (Exception ex)
         {
             OopsService.log(LOGTAG, ex);
         }
+
+        if (eventcache == null) eventcache = new JSONObject();
+
+        if (! eventcache.has("passed")) Json.put(eventcache, "passed", new JSONObject());
+        if (! eventcache.has("coming")) Json.put(eventcache, "coming", new JSONObject());
+
+        writeArchive();
+
+        BackupManager.backupPackageData("events");
     }
 
     private static void putStorage()
     {
         if (eventcache == null) return;
 
-        File tmp = new File(Simple.getFilesDir(), "events.tmp.json");
-        File bak = new File(Simple.getFilesDir(), "events.bak.json");
-        File act = new File(Simple.getFilesDir(), "events.act.json");
+        File act = Simple.getPackageFile("events.act.json");
+        File bak = Simple.getPackageFile("events.bak.json");
+        File tmp = Simple.getPackageFile("events.tmp.json");
 
         try
         {

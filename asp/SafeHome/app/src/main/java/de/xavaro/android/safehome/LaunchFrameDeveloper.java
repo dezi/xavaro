@@ -193,7 +193,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
         Log.d(LOGTAG, "clearEvents: ...");
 
         JSONObject empty = new JSONObject();
-        File act = new File(Simple.getFilesDir(), "events.act.json");
+        File act = Simple.getPackageFile("events.act.json");
         Simple.putFileContent(act, Json.toPretty(empty));
 
         loadEvents();
@@ -214,7 +214,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
             scrollview.addView(jsonListing);
         }
 
-        File file = new File(Simple.getFilesDir(), "events.act.json");
+        File file = Simple.getPackageFile("events.act.json");
         String json = Simple.getFileContent(file);
         jsonListing.setText(json);
     }
