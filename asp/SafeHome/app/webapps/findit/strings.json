@@ -1,0 +1,34 @@
+{
+
+  "list.index.keys": [
+    "cities.capitals",
+    "cities.mega",
+    "names.female",
+    "names.male",
+    "animals.birds",
+    "animals.fishes",
+    "animals.insects",
+    "animals.mammals",
+    "animals.reptiles",
+    "plants",
+    "tools",
+    "cars"
+  ],
+
+  "list.index.vals": [
+    "Capitals",
+    "Megacities",
+    "Girls-Names",
+    "Boys-Names",
+    "Birds",
+    "Fishes",
+    "Insects",
+    "Mammals",
+    "Reptiles",
+    "Plants",
+    "Tools",
+    "Car-Brands"
+  ],
+
+  "EOL" : true
+}

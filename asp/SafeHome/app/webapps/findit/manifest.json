@@ -1,0 +1,43 @@
+{
+  "manifest": {
+
+    "label": "Finde Es",
+    "appname": "findit",
+    "appicon": "findit_256x256.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "prefs",
+      "speak",
+      "events",
+      "utility",
+      "request",
+      "activity"
+    ],
+
+    "weblibs": [
+      "strings",
+      "dialog",
+      "launch",
+      "simple",
+      "touch"
+    ],
+
+    "preload": [
+    ],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": [
+      { "interval": 24, "pattern": ".*\\.js" },
+      { "interval": 72, "pattern": ".*\\.png" },
+      { "interval": 24, "pattern": ".*\\.csv" },
+      { "interval": 24, "pattern": ".*\\.json" },
+      { "interval": 24, "pattern": ".*\\.json\\.gz" }
+    ]
+  }
+}

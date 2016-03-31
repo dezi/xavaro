@@ -41,7 +41,9 @@ WebLibLaunch.onResize = function()
     wl.horzStart += wl.horzSpace;
     wl.vertStart += wl.vertSpace / 2;
 
-    console.log("Resize: " + orientation + "=" + wl.realWidth + "/" + wl.realHeight + " " + wl.horzItems + ":" + wl.vertItems);
+    console.log("Resize: " + orientation
+        + "=" + wl.realWidth + "/" + wl.realHeight
+        + " " + wl.horzItems + ":" + wl.vertItems);
 
     wl.positionLaunchItems();
 }
@@ -61,24 +63,26 @@ WebLibLaunch.createLaunchItem = function(config)
     var wl = WebLibLaunch;
 
     var maxSlots = wl.horzItems * wl.vertItems;
-    var nextSlot = wl.launchItems.length % maxSlots;
+    var nextSlot = wl.launchItems.length;
 
-    if (nextSlot == 0)
-    {
-        var prev = {};
-        prev.label = "Zurück";
-        prev.icon = "/weblibs/launch/prev_600x600.png";
-
-        WebLibLaunch.createLaunchItemInternal(prev);
-    }
-
-    if ((nextSlot + 1) == maxSlots)
+    if (((nextSlot + 1) % maxSlots) == 0)
     {
         var next = {};
         next.label = "Weiter";
         next.icon = "/weblibs/launch/next_600x600.png";
 
         WebLibLaunch.createLaunchItemInternal(next);
+
+        nextSlot++;
+    }
+
+    if ((nextSlot % maxSlots) == 0)
+    {
+        var prev = {};
+        prev.label = "Zurück";
+        prev.icon = "/weblibs/launch/prev_600x600.png";
+
+        WebLibLaunch.createLaunchItemInternal(prev);
     }
 
     return WebLibLaunch.createLaunchItemInternal(config);
@@ -140,6 +144,7 @@ WebLibLaunch.positionLaunchItems = function()
         if (wl.launchPages.length < (pag + 1))
         {
             var lp = WebLibSimple.createDiv(0, 0, 0, 0, null, wl.topDiv);
+            if (wl.launchPages.length > 0) lp.style.display = "none";
             WebLibSimple.setBGColor(lp, wl.bgcol);
             wl.launchPages.push(lp);
         }

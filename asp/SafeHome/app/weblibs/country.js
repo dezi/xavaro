@@ -35,7 +35,7 @@ WebLibCountry.loadLocale = function()
     // Load weblib locale strings if present.
     //
 
-console.log("=============" + localestrings);
+    console.log("=============" + localestrings);
 
     if (WebLibCountry.findLocale(WebLibCountry.country.locales, localestrings))
     {
