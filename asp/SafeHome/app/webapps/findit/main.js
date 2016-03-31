@@ -229,6 +229,7 @@ findit.createSolution = function()
     //
 
     findit.solutionWordDivs = [];
+    findit.solutionWordSpans = [];
 
     for (var inx in findit.currentGameWords)
     {
@@ -243,6 +244,7 @@ findit.createSolution = function()
         solSpan.style.backgroundSize = "100% 100%";
         solSpan.style.backgroundImage = "url('wipeout_black.png')";
 
+        findit.solutionWordSpans.push(solSpan);
         findit.solutionWordDivs.push(solDiv);
     }
 
@@ -251,6 +253,148 @@ findit.createSolution = function()
     //
 
     findit.onResize(findit.gameScreen);
+}
+
+findit.onPuzzleClick = function(event)
+{
+    console.log("findit.onPuzzleClick:" + event.target.innerHTML);
+
+    var target = event.target;
+
+    while (target && ! target.puzzleChar)
+    {
+        target = target.parentElement;
+    }
+
+    if (! target) return;
+
+    var row = target.puzzleRow;
+    var col = target.puzzleCol;
+
+    //
+    // Deselect other characters if not continous.
+    //
+
+    var cells = findit.defs.cells;
+    var mdivs = findit.matrixDivs;
+
+    //
+    // Check straight directions.
+    //
+
+    var cont = 0;
+
+    if ((row > 0) && mdivs[ row - 1 ][ col ].puzzleSel) cont++;
+    if ((col > 0) && mdivs[ row ][ col - 1 ].puzzleSel) cont++;
+    if (((row + 1) < cells) && mdivs[ row + 1 ][ col ].puzzleSel) cont++;
+    if (((col + 1) < cells) && mdivs[ row ][ col + 1 ].puzzleSel) cont++;
+
+    //
+    // Check diagonales.
+    //
+
+    var diag = 0;
+    if ((row > 0) && (col > 0) && mdivs[ row - 1 ][ col - 1 ].puzzleSel) diag++;
+    if (((row + 1) < cells) && (col > 0) && mdivs[ row + 1 ][ col - 1 ].puzzleSel) diag++;
+    if ((row > 0) && ((col + 1) < cells) && mdivs[ row - 1 ][ col + 1 ].puzzleSel) diag++;
+    if (((row + 1) < cells) && ((col + 1) < cells) && mdivs[ row + 1 ][ col + 1 ].puzzleSel) diag++;
+
+    //
+    // Reset all fields if required.
+    //
+
+    if (diag || ! cont)
+    {
+        for (var row = 0; row < cells; row++)
+        {
+            for (var col = 0; col < cells; col++)
+            {
+                mdivs[ row ][ col ].puzzleSel = false;
+                mdivs[ row ][ col ].style.backgroundColor = null;
+            }
+        }
+    }
+
+    //
+    // Select current field.
+    //
+
+    target.puzzleSel = true;
+    target.style.backgroundColor = "#ffffbb";
+
+    //
+    // Check for a horizontal solution.
+    //
+
+    for (var row = 0; row < cells; row++)
+    {
+        var word = "";
+
+        for (var col = 0; col < cells; col++)
+        {
+            if (mdivs[ row ][ col ].puzzleSel) word += findit.matrixChars[ row ][ col ];
+        }
+
+        if (findit.checkGameWord(word))
+        {
+            for (var col = 0; col < cells; col++)
+            {
+                if (mdivs[ row ][ col ].puzzleSel)
+                {
+                    mdivs[ row ][ col ].puzzleSel = false;
+                    mdivs[ row ][ col ].style.backgroundColor = null;
+                    mdivs[ row ][ col ].style.color = "#ff0000"
+                }
+            }
+        }
+    }
+
+    //
+    // Check for a vertical solution.
+    //
+
+    for (var col = 0; col < cells; col++)
+    {
+        var word = "";
+
+        for (var row = 0; row < cells; row++)
+        {
+            if (mdivs[ row ][ col ].puzzleSel) word += findit.matrixChars[ row ][ col ];
+        }
+
+        if (findit.checkGameWord(word))
+        {
+            for (var row = 0; row < cells; row++)
+            {
+                if (mdivs[ row ][ col ].puzzleSel)
+                {
+                    mdivs[ row ][ col ].puzzleSel = false;
+                    mdivs[ row ][ col ].style.backgroundColor = null;
+                    mdivs[ row ][ col ].style.color = "#ff0000"
+                }
+            }
+        }
+    }
+}
+
+findit.checkGameWord = function(word)
+{
+    for (var inx in findit.currentGameWords)
+    {
+        if (word == findit.currentGameWords[ inx ].clean)
+        {
+            //
+            // Valid game word.
+            //
+
+            var solSpan = findit.solutionWordSpans[ inx ];
+            solSpan.style.backgroundImage = null;
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 findit.createPuzzle = function()
@@ -262,6 +406,7 @@ findit.createPuzzle = function()
     findit.puzzleDiv = WebLibSimple.createDivWidHei(0, 0, 0, 0, "puzzleDiv", findit.gameScreen);
     findit.puzzleDiv.style.border = findit.defs.border + "px solid grey";
     findit.puzzleDiv.style.borderRadius = findit.defs.radius + "px";
+    findit.puzzleDiv.onclick = findit.onPuzzleClick;
 
     //
     // Adjust to current screen dimensions.
@@ -317,8 +462,12 @@ findit.createPuzzle = function()
     // Create character elements.
     //
 
+    findit.matrixDivs = [];
+
     for (var row = 0; row < findit.defs.cells; row++)
     {
+        var rowDivs = [];
+
         for (var col = 0; col < findit.defs.cells; col++)
         {
             var left = col * cellSize;
@@ -326,8 +475,15 @@ findit.createPuzzle = function()
 
             var cccDiv = WebLibSimple.createDivWidHei(left, top, cellSize, cellSize, null, findit.puzzleDiv);
             cccDiv.style.border = "1px solid grey";
-            cccDiv.innerHTML = findit.matrix[ row ][ col ];
+            cccDiv.innerHTML = findit.matrixChars[ row ][ col ];
+            cccDiv.puzzleChar = true;
+            cccDiv.puzzleCol = col;
+            cccDiv.puzzleRow = row;
+
+            rowDivs.push(cccDiv);
         }
+
+        findit.matrixDivs.push(rowDivs);
     }
 }
 
@@ -442,7 +598,7 @@ findit.positionGameWords = function()
 
     var cells = findit.defs.cells;
 
-    findit.matrix = [];
+    findit.matrixChars = [];
 
     for (var hei = 0; hei < cells; hei++)
     {
@@ -453,7 +609,7 @@ findit.positionGameWords = function()
             row.push(" ");
         }
 
-        findit.matrix.push(row);
+        findit.matrixChars.push(row);
     }
 
     //
@@ -485,7 +641,7 @@ findit.positionGameWords = function()
 
                 for (var fnz = 0; fnz < wlen; fnz++)
                 {
-                    var ccc = findit.matrix[ row ][ col++ ];
+                    var ccc = findit.matrixChars[ row ][ col++ ];
 
                     if ((ccc != " ") && (ccc != word.charAt(fnz)))
                     {
@@ -501,7 +657,7 @@ findit.positionGameWords = function()
 
                 for (var fnz = 0; fnz < wlen; fnz++)
                 {
-                    findit.matrix[ row ][ col++ ] = word.charAt(fnz);
+                    findit.matrixChars[ row ][ col++ ] = word.charAt(fnz);
                 }
             }
             else
@@ -511,7 +667,7 @@ findit.positionGameWords = function()
 
                 for (var fnz = 0; fnz < wlen; fnz++)
                 {
-                    var ccc = findit.matrix[ row++ ][ col ];
+                    var ccc = findit.matrixChars[ row++ ][ col ];
 
                     if ((ccc != " ") && (ccc != word.charAt(fnz)))
                     {
@@ -527,7 +683,7 @@ findit.positionGameWords = function()
 
                 for (var fnz = 0; fnz < wlen; fnz++)
                 {
-                    findit.matrix[ row++ ][ col ] = word.charAt(fnz);
+                    findit.matrixChars[ row++ ][ col ] = word.charAt(fnz);
                 }
             }
 
@@ -549,10 +705,10 @@ findit.positionGameWords = function()
     {
         for (var col = 0; col < cells; col++)
         {
-            if (findit.matrix[ row ][ col ] == " ")
+            if (findit.matrixChars[ row ][ col ] == " ")
             {
                 var rnd = Math.floor(Math.random() * alpha.length);
-                findit.matrix[ row ][ col ] = alpha.charAt(rnd);
+                findit.matrixChars[ row ][ col ] = alpha.charAt(rnd);
             }
         }
     }
@@ -588,7 +744,7 @@ findit.verifyGameWords = function()
 
         for (var col = 0; col < cells; col++)
         {
-            string += findit.matrix[ row ][ col ];
+            string += findit.matrixChars[ row ][ col ];
         }
 
         allstrings.push(string);
@@ -600,7 +756,7 @@ findit.verifyGameWords = function()
 
         for (var row = 0; row < cells; row++)
         {
-            string += findit.matrix[ row ][ col ];
+            string += findit.matrixChars[ row ][ col ];
         }
 
         allstrings.push(string);
@@ -745,6 +901,18 @@ findit.computeRandomWords = function()
 
             word[ tabname ] = tabvalue;
         }
+
+        //
+        // Discard disabled names.
+        //
+
+        if (word.name.charAt(0) == "#") continue;
+
+        //
+        // Discard names w/o wikipedia entry.
+        //
+
+        if (! word.wiki) continue;
 
         //
         // Cleanup name for display.
