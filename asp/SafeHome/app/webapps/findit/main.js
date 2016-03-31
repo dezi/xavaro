@@ -110,10 +110,84 @@ findit.onResize = function(elem)
     // Size setup.
     //
 
-    findit.charsDiv.style.left   = WebLibSimple.addPixel(margin);
-    findit.charsDiv.style.top    = WebLibSimple.addPixel(margin);
-    findit.charsDiv.style.width  = WebLibSimple.addPixel(charsSize);
-    findit.charsDiv.style.height = WebLibSimple.addPixel(charsSize);
+    findit.puzzleDiv.style.left   = WebLibSimple.addPixel(margin);
+    findit.puzzleDiv.style.top    = WebLibSimple.addPixel(margin);
+    findit.puzzleDiv.style.width  = WebLibSimple.addPixel(charsSize);
+    findit.puzzleDiv.style.height = WebLibSimple.addPixel(charsSize);
+
+    //
+    // Re-arrange solution div.
+    //
+
+    if (findit.solutionDiv)
+    {
+        var wcount = findit.solutionWordDivs.length;
+
+        if (wid > hei)
+        {
+            //
+            // Landscape orientation.
+            //
+
+            var solhei = charsSize;
+            var solwid = wid - charsSize - margin * 2;
+
+            findit.solutionDiv.style.right  = WebLibSimple.addPixel(margin / 4);
+            findit.solutionDiv.style.bottom = WebLibSimple.addPixel(margin);
+
+            findit.solutionDiv.style.width  = WebLibSimple.addPixel(solwid);
+            findit.solutionDiv.style.height = WebLibSimple.addPixel(solhei);
+
+            var hoff = findit.solutionDiv.clientWidth;
+            var voff = Math.floor(findit.solutionDiv.clientHeight / wcount);
+            var fsiz = Math.floor(voff / 2);
+
+            WebLibSimple.setFontSpecs(findit.solutionDiv, fsiz, "bold")
+
+            for (var inx in findit.solutionWordDivs)
+            {
+                var solDiv = findit.solutionWordDivs[ inx ];
+
+                solDiv.style.left       = WebLibSimple.addPixel(0);
+                solDiv.style.top        = WebLibSimple.addPixel(inx * voff);
+                solDiv.style.width      = WebLibSimple.addPixel(hoff);
+                solDiv.style.height     = WebLibSimple.addPixel(voff);
+                solDiv.style.lineHeight = WebLibSimple.addPixel(voff);
+            }
+       }
+        else
+        {
+            //
+            // Portrait orientation.
+            //
+
+            var solwid = charsSize;
+            var solhei = hei - charsSize - margin * 2;
+
+            findit.solutionDiv.style.right  = WebLibSimple.addPixel(margin);
+            findit.solutionDiv.style.bottom = WebLibSimple.addPixel(margin / 4);
+
+            findit.solutionDiv.style.width  = WebLibSimple.addPixel(solwid);
+            findit.solutionDiv.style.height = WebLibSimple.addPixel(solhei);
+
+            var hoff = Math.floor(findit.solutionDiv.clientWidth / 2);
+            var voff = Math.floor(findit.solutionDiv.clientHeight / Math.floor(wcount / 2));
+            var fsiz = Math.floor(voff / 2);
+
+            WebLibSimple.setFontSpecs(findit.solutionDiv, fsiz, "bold")
+
+            for (var inx in findit.solutionWordDivs)
+            {
+                var solDiv = findit.solutionWordDivs[ inx ];
+
+                solDiv.style.left       = WebLibSimple.addPixel(((inx % 2) == 0) ? 0 : hoff);
+                solDiv.style.top        = WebLibSimple.addPixel(Math.floor(inx / 2) * voff);
+                solDiv.style.width      = WebLibSimple.addPixel(hoff);
+                solDiv.style.height     = WebLibSimple.addPixel(voff);
+                solDiv.style.lineHeight = WebLibSimple.addPixel(voff);
+            }
+        }
+    }
 }
 
 findit.createGameScreen = function()
@@ -133,13 +207,61 @@ findit.createGameScreen = function()
     findit.gameScreen.onresize = findit.onResize;
 
     //
-    // Create characters game area.
+    // Create game elements.
     //
 
-    findit.charsDiv = WebLibSimple.createDivWidHei(0, 0, 0, 0, "charsDiv", findit.gameScreen);
-    findit.charsDiv.style.border = findit.defs.border + "px solid grey";
-    findit.charsDiv.style.borderRadius = findit.defs.radius + "px";
-    findit.charsDiv.style.borderRadius = findit.defs.radius + "px";
+    findit.createPuzzle();
+    findit.createSolution();
+}
+
+findit.createSolution = function()
+{
+    //
+    // Create solution game area.
+    //
+
+    findit.solutionDiv = WebLibSimple.createDivWidHei(null, null, 0, 0, "solutionDiv", findit.gameScreen);
+    findit.solutionDiv.style.color = WebLibSimple.getRGBColor("#60000000");
+    findit.solutionDiv.style.padding = findit.defs.border + "px";
+
+    //
+    // Create the solution word divs.
+    //
+
+    findit.solutionWordDivs = [];
+
+    for (var inx in findit.currentGameWords)
+    {
+        var solDiv = WebLibSimple.createDivWidHei(null, null, 0, 0, "solWordDiv", findit.solutionDiv);
+        solDiv.style.textAlign = "center";
+
+        var solSpan = WebLibSimple.createAnyAppend("span", solDiv)
+        solSpan.innerHTML = findit.currentGameWords[ inx ].clean;
+        solSpan.style.padding = "8px";
+        solSpan.style.paddingLeft  = "14px";
+        solSpan.style.paddingRight = "14px";
+        solSpan.style.backgroundSize = "100% 100%";
+        solSpan.style.backgroundImage = "url('wipeout_black.png')";
+
+        findit.solutionWordDivs.push(solDiv);
+    }
+
+    //
+    // Adjust to current screen dimensions.
+    //
+
+    findit.onResize(findit.gameScreen);
+}
+
+findit.createPuzzle = function()
+{
+    //
+    // Create puzzle game area.
+    //
+
+    findit.puzzleDiv = WebLibSimple.createDivWidHei(0, 0, 0, 0, "puzzleDiv", findit.gameScreen);
+    findit.puzzleDiv.style.border = findit.defs.border + "px solid grey";
+    findit.puzzleDiv.style.borderRadius = findit.defs.radius + "px";
 
     //
     // Adjust to current screen dimensions.
@@ -151,7 +273,7 @@ findit.createGameScreen = function()
     // Computer cell dimensions after resize.
     //
 
-    var innerSize = findit.charsDiv.clientWidth;
+    var innerSize = findit.puzzleDiv.clientWidth;
     var cellSize  = (innerSize / findit.defs.cells);
     var cellInner = cellSize - 4;
     var fontSize  = cellInner - 4;
@@ -162,9 +284,9 @@ findit.createGameScreen = function()
     // Set font specs to master div.
     //
 
-    findit.charsDiv.style.textAlign = "center";
-    findit.charsDiv.style.lineHeight = WebLibSimple.addPixel(cellSize);
-    WebLibSimple.setFontSpecs(findit.charsDiv, fontSize, "bold", "#999999")
+    findit.puzzleDiv.style.textAlign = "center";
+    findit.puzzleDiv.style.lineHeight = WebLibSimple.addPixel(cellSize);
+    WebLibSimple.setFontSpecs(findit.puzzleDiv, fontSize, "bold", "#999999")
 
     //
     // Create target words.
@@ -202,7 +324,7 @@ findit.createGameScreen = function()
             var left = col * cellSize;
             var top  = row * cellSize;
 
-            var cccDiv = WebLibSimple.createDivWidHei(left, top, cellSize, cellSize, null, findit.charsDiv);
+            var cccDiv = WebLibSimple.createDivWidHei(left, top, cellSize, cellSize, null, findit.puzzleDiv);
             cccDiv.style.border = "1px solid grey";
             cccDiv.innerHTML = findit.matrix[ row ][ col ];
         }

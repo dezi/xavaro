@@ -299,7 +299,7 @@ WebLibSimple.setDefaultBGColor = function(elem)
     WebLibSimple.setBGColor(elem, "#ffffffee");
 }
 
-WebLibSimple.setBGColor = function(elem, color)
+WebLibSimple.getRGBColor = function(color)
 {
     if ((color.length == 9) && (color.charAt(0) == "#"))
     {
@@ -314,19 +314,22 @@ WebLibSimple.setBGColor = function(elem, color)
 
         var rgba = "rgba(" + r + "," + g + "," + b + "," + a + ")";
 
-        elem.style.backgroundColor = rgba;
-
-        return;
+        return rgba;
     }
 
-    elem.style.backgroundColor = color;
+    return color;
+}
+
+WebLibSimple.setBGColor = function(elem, color)
+{
+    elem.style.backgroundColor = WebLibSimple.getRGBColor(color);
 }
 
 WebLibSimple.setFontSpecs = function(elem, size, weight, color)
 {
     if (size) elem.style.fontSize = WebLibSimple.addPixel(size);
     if (weight) elem.style.fontWeight = weight;
-    if (color) elem.style.color = color;
+    if (color) elem.style.color = WebLibSimple.getRGBColor(color);
 }
 
 //

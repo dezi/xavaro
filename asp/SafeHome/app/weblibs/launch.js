@@ -66,6 +66,11 @@ WebLibLaunch.onResize = function()
         + " " + wl.horzItems + ":" + wl.vertItems);
 
     wl.positionLaunchItems();
+
+    if (wl.topScreen && wl.topScreen.onresize)
+    {
+        wl.topScreen.onresize(wl.topScreen);
+    }
 }
 
 WebLibLaunch.getIconDivElem = function(launchitem)
