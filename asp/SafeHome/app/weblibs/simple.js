@@ -294,6 +294,11 @@ WebLibSimple.createSpanPadded = function(left, top, right, bottom, id, parent)
 // Simplyfied style setters.
 //
 
+WebLibSimple.setDefaultBGColor = function(elem)
+{
+    WebLibSimple.setBGColor(elem, "#ffffffee");
+}
+
 WebLibSimple.setBGColor = function(elem, color)
 {
     if ((color.length == 9) && (color.charAt(0) == "#"))

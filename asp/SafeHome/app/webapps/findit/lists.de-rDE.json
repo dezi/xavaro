@@ -19,6 +19,10 @@
     "name", "country", "continent", "population", "wiki"
   ],
 
+  "lists.cities.capitals.wikipedia.clean": [
+    "normal"
+  ],
+
   "lists.cities.capitals.wikipedia": [
     [ "Kabul", "Afghanistan", "Asien", "3.289.000", 1 ],
     [ "Kairo", "Ägypten", "Afrika", "7.947.121", 1 ],
@@ -63,8 +67,8 @@
     [ "Santo Domingo", "Dominikanische Republik", "Amerika / Westindien", "2.023.029", 1 ],
     [ "Dschibuti", "Dschibuti", "Afrika", "547.100", 1 ],
     [ "Quito", "Ecuador", "Amerika / Südamerika", "1.399.814", 1 ],
-    [ "Yamoussoukro", "Elfenbeinküste (Côte d'Ivoire) (offiziell)", "Afrika", "200.659", 1 ],
-    [ "Abidjan", "Elfenbeinküste (Côte d'Ivoire) (Regierungssitz)", "Afrika", "4.351.086", 1 ],
+    [ "Yamoussoukro", "Elfenbeinküste (Côte d’Ivoire) (offiziell)", "Afrika", "200.659", 1 ],
+    [ "Abidjan", "Elfenbeinküste (Côte d’Ivoire) (Regierungssitz)", "Afrika", "4.351.086", 1 ],
     [ "San Salvador", "El Salvador", "Amerika / Zentralamerika", "534.409", 1 ],
     [ "Asmara", "Eritrea", "Afrika", "579.000", 1 ],
     [ "Tallinn (Reval)", "Estland", "Europa", "403.505", "Tallinn" ],
@@ -203,7 +207,7 @@
     [ "Daressalam", "Tansania (Regierungssitz)", "Afrika", "2.698.651", 1 ],
     [ "Bangkok", "Thailand", "Asien", "8.249.117", 1 ],
     [ "Lomé", "Togo", "Afrika", "750.000", 1 ],
-    [ "Nukuʻalofa", "Tonga", "Australien und Ozeanien", "22.400", 1 ],
+    [ "Nuku’alofa", "Tonga", "Australien und Ozeanien", "22.400", 1 ],
     [ "Port of Spain", "Trinidad und Tobago", "Amerika / Westindien", "50.700", 1 ],
     [ "N’Djamena", "Tschad", "Afrika", "753.791", 1 ],
     [ "Prag", "Tschechien", "Europa", "1.184.075", 1 ],
@@ -231,6 +235,10 @@
 
   "lists.cities.mega.wikipedia.tabs": [
     "rank", "name", "population", "country", "continent", "wiki"
+  ],
+
+  "lists.cities.mega.wikipedia.clean": [
+    "normal"
   ],
 
   "lists.cities.mega.wikipedia": [
@@ -325,7 +333,7 @@
     [ 89, "Quezon City", "2.455.943", "Philippinen", "Asien", 1 ],
     [ 90, "Gizeh", "2.443.203", "Ägypten", "Afrika", 1 ],
     [ 91, "Kabul", "2.436.000", "Afghanistan", "Asien", 1 ],
-    [ 92, "Sana'a", "2.431.649", "Jemen", "Asien", 1 ],
+    [ 92, "Sana’a", "2.431.649", "Jemen", "Asien", 1 ],
     [ 93, "Tunis", "2.380.500", "Tunesien", "Afrika", 1 ],
     [ 94, "Kapstadt", "2.375.910", "Südafrika", "Afrika", 1 ],
     [ 95, "Belo Horizonte", "2.373.255", "Brasilien", "Südamerika", 1 ],
@@ -549,6 +557,10 @@
 
   "lists.names.female.top500.tabs": [
     "rank", "name", "wiki"
+  ],
+
+  "lists.names.female.top500.clean": [
+    "normal", "multis"
   ],
 
   "lists.names.female.top500": [
@@ -1058,6 +1070,10 @@
     "rank", "name", "wiki"
   ],
 
+  "lists.names.male.top500.clean": [
+    "normal", "multis"
+  ],
+
   "lists.names.male.top500": [
     [ 1, "Ben", 1 ],
     [ 2, "Jonas", 1 ],
@@ -1563,6 +1579,10 @@
 
   "lists.animals.birds.tabs": [
     "name", "latin", "wiki"
+  ],
+
+  "lists.animals.birds.clean": [
+    "normal", "prefix", "hyphen"
   ],
 
   "lists.animals.birds": [
@@ -3170,7 +3190,7 @@
     [ "Afrikanischer Strauß", "Struthio camelus", 1 ],
     [ "Afrikanisches Schwarzkehlchen", "Saxicola torquatus", "Saxicola_torquatus" ],
     [ "Ährenträgerpfau", "Pavo muticus", 1 ],
-    [ "Alexandra's Plattschweifsittich", "Polytelis alexandrae", "Polytelis_alexandrae" ],
+    [ "Alexandra’s Plattschweifsittich", "Polytelis alexandrae", "Polytelis_alexandrae" ],
     [ "Amerikanische Bekassine", "Gallinago delicata", "Gallinago_delicata" ],
     [ "Amerikanischer Austernfischer", "Haematopus palliatus", "Haematopus_palliatus" ],
     [ "Amerikanisches Odinshühnchen", "Steganopus tricolor", "Steganopus_tricolor" ],
@@ -3178,9 +3198,7 @@
     [ "Anadyr-Knutt", "Calidris tenuirostris", "Calidris_tenuirostris" ],
     [ "Anden-Amazilie", "Amazilia franciae", "Amazilia_franciae" ],
     [ "Ara, Hellroter", "Ara macao", "Ara_macao" ],
-    [
-      "Atlantischer Gelbnasenalbatros", "Thalassarche chlororhynchos", "Thalassarche_chlororhynchos"
-    ],
+    [ "Atlantischer Gelbnasenalbatros", "Thalassarche chlororhynchos", "Thalassarche_chlororhynchos" ],
     [ "Balearen Schwarzschnabel-Sturmtaucher", "Puffinus mauretanicus", "Puffinus_mauretanicus" ],
     [ "Baltimore Trupial", "Icterus galbula", "Icterus_galbula" ],
     [ "Baumlerche", "Anthus trivialis", "Anthus_trivialis" ],
@@ -3344,7 +3362,7 @@
     [ "Rußsegler", "Aerornis senex", 1 ],
     [ "Rußsegler", "Cypseloides senex", 1 ],
     [ "Satinlaubenvogel", "Ptilonorhynchus violaceus", "Ptilonorhynchus_violaceus" ],
-    [ "Say's Phoebe", "Sayornis saya", "Sayornis_saya" ],
+    [ "Say’s Phoebe", "Sayornis saya", "Sayornis_saya" ],
     [ "Scharlachnektarvogel", "Aethopyga siparaja", "Aethopyga_siparaja" ],
     [ "Schieferrücken-Königstyrann", "Tyrannus tyrannus", "Tyrannus_tyrannus" ],
     [ "Schlangensperber", "Polyboroides typus", "Polyboroides_typus" ],
@@ -3444,6 +3462,10 @@
 
   "lists.animals.fishes.tabs": [
     "name", "latin", "wiki"
+  ],
+
+  "lists.animals.fishes.clean": [
+    "normal", "prefix", "hyphen"
   ],
 
   "lists.animals.fishes": [
@@ -3644,7 +3666,7 @@
     [ "Schneider (Fisch)", "Alburnoides bipunctatus", 1 ],
     [ "Schneider (Fisch)", "Cyprinus bipunctatus", 1 ],
     [ "Schwanzfleckbuntbarsch", "Cichlasoma urophthalma", 1 ],
-    [ "Schwartz' Panzerwels", "Corydoras schwartzi", 1 ],
+    [ "Schwartz’ Panzerwels", "Corydoras schwartzi", 1 ],
     [ "Schwarzachsel-Schwalbenschwänzchen", "Chromis atripectoralis", 1 ],
     [ "Schwarzer Knochenzüngler", "Osteoglossum ferreirai", 1 ],
     [ "Schwarzer Pacu", "Colossoma macropomum", 1 ],
@@ -3692,9 +3714,7 @@
     [ "Amerikanischer Schlammfisch", "Amia calva", "Amia_calva" ],
     [ "Anemonenfisch, Echter Clown-", "Amphiprion percula", "Amphiprion_percula" ],
     [ "Anemonenfisch, Oranger", "Amphiprion sandaracinos", "Amphiprion_sandaracinos" ],
-    [
-      "Anemonenfisch, Östlicher Weißrücken-", "Amphiprion sandaracinos", "Amphiprion_sandaracinos"
-    ],
+    [ "Anemonenfisch, Östlicher Weißrücken-", "Amphiprion sandaracinos", "Amphiprion_sandaracinos" ],
     [ "Anemonenfisch, Sattelfleck-", "Amphiprion polymnus", "Amphiprion_polymnus" ],
     [ "Atlantische Sardine", "Sardina pilchardus", "Sardina_pilchardus" ],
     [ "Arnolds Rotaugensalmler", "Arnoldichthys spilopterus", "Arnoldichthys_spilopterus" ],
@@ -3707,7 +3727,7 @@
     [ "Clownfisch, Echter", "Amphiprion percula", "Amphiprion_percula" ],
     [ "Diskus, Echter", "Symphysodon discus", "Symphysodon_discus" ],
     [ "Doktorfisch, Gelber Segel-", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
-    [ "Doktorfisch, Hawai'i-", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
+    [ "Doktorfisch, Hawai’i-", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
     [ "Doktorfisch, Indischer Segelflossen-", "Zebrasoma desjardinii", "Zebrasoma_desjardinii" ],
     [ "Doktorfisch, Pazifischer Segelflossen-", "Zebrasoma veliferum", "Zebrasoma_veliferum" ],
     [ "Doktorfisch, Weißkehl-", "Acanthurus leucosternon", "Acanthurus_leucosternon" ],
@@ -3725,21 +3745,17 @@
     [ "Gabelbart, Schwarzer", "Osteoglossum ferreirai", "Osteoglossum_ferreirai" ],
     [ "Gareisle", "Carassius carassius", "Carassius_carassius" ],
     [ "Gefleckter Katfisch", "Anarhichas minor", "Anarhichas_minor" ],
-    [ "Gelber Hawai'i-Seebader", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
+    [ "Gelber Hawai’i-Seebader", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
     [ "Giraffenmaulbrüter", "Nimbochromis venustus", "Nimbochromis_venustus" ],
     [ "Grieslaugeln", "Leuciscus souffia", "Leuciscus_souffia" ],
     [ "Große Netzmuräne", "Gymnothorax favagineus", "Gymnothorax_favagineus" ],
     [ "Großer Roter Drachenkopf", "Scorpaena scrofa", 1 ],
-    [
-      "Großschuppensalmler, Afrikanischer", "Arnoldichthys spilopterus", "Arnoldichthys_spilopterus"
-    ],
+    [ "Großschuppensalmler, Afrikanischer", "Arnoldichthys spilopterus", "Arnoldichthys_spilopterus" ],
     [ "Guratsch", "Carassius carassius", "Carassius_carassius" ],
-    [ "Hawai'i-Doktorfisch", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
-    [ "Hawai'i-Seebader, Gelber", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
+    [ "Hawai’i-Doktorfisch", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
+    [ "Hawai’i-Seebader, Gelber", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
     [ "Hecht, Europäischer", "Esox lucius", "Esox_lucius" ],
-    [
-      "Hochrückiger Schabemund-Buntbarsch", "Labeotropheus fuelleborni", "Labeotropheus_fuelleborni"
-    ],
+    [ "Hochrückiger Schabemund-Buntbarsch", "Labeotropheus fuelleborni", "Labeotropheus_fuelleborni" ],
     [ "Hoher Skalar", "Pterophyllum altum", "Pterophyllum_altum" ],
     [ "Indischer Segelflossendoktorfisch", "Zebrasoma desjardinii", "Zebrasoma_desjardinii" ],
     [ "Katfisch, Gefleckter", "Anarhichas minor", "Anarhichas_minor" ],
@@ -3773,14 +3789,8 @@
     [ "Rußnase", "Vimba vimba", 1 ],
     [ "Ryserle", "Leuciscus souffia", "Leuciscus_souffia" ],
     [ "Schluckspecht, Tentakel-", "Rhinopias frondosa", "Rhinopias_frondosa" ],
-    [
-      "Schmetterlingsbuntbarsch, Südamerikanischer", "Mikrogeophagus ramirezi",
-      "Mikrogeophagus_ramirezi"
-    ],
-    [
-      "Schneckenbuntbarsch, Vielgestreifter", "Neolamprologus multifasciatus",
-      "Neolamprologus_multifasciatus"
-    ],
+    [ "Schmetterlingsbuntbarsch, Südamerikanischer", "Mikrogeophagus ramirezi", "Mikrogeophagus_ramirezi" ],
+    [ "Schneckenbuntbarsch, Vielgestreifter", "Neolamprologus multifasciatus", "Neolamprologus_multifasciatus" ],
     [ "Schneiderkarpfen", "Carassius carassius", "Carassius_carassius" ],
     [ "Schusslaube", "Alburnoides bipunctatus", "Alburnoides_bipunctatus" ],
     [ "Schwalbenschwänzchen, Schwarzachsel-", "Chromis atripectoralis", "Chromis_atripectoralis" ],
@@ -3789,7 +3799,7 @@
     [ "Schwarzfleck-Kugelfisch", "Arothron nigropunctatus", "Arothron_nigropunctatus" ],
     [ "Schwarzlachs", "Salmo trutta trutta", "Salmo_trutta_trutta" ],
     [ "Schwarztupfen-Süßlippe", "Plectorhinchus gaterinus", 1 ],
-    [ "Seebader, Gelber Hawai'i-", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
+    [ "Seebader, Gelber Hawai’i-", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
     [ "Seewolf, Gefleckter", "Anarhichas minor", "Anarhichas_minor" ],
     [ "Segeldoktorfisch, Gelber", "Zebrasoma flavescens", "Zebrasoma_flavescens" ],
     [ "Segelflossendoktor, Fledermaus-", "Zebrasoma veliferum", "Zebrasoma_veliferum" ],
@@ -3805,10 +3815,7 @@
     [ "Tigerbuntbarsch, Roter", "Cichlasoma festae", "Cichlasoma_festae" ],
     [ "Tigerspatelwels", "Pseudoplatystoma fasciatum", "Pseudoplatystoma_fasciatum" ],
     [ "Trusche", "Lota lota", "Lota_lota" ],
-    [
-      "Vielstreifen-Schneckenbuntbarsch", "Neolamprologus multifasciatus",
-      "Neolamprologus_multifasciatus"
-    ],
+    [ "Vielstreifen-Schneckenbuntbarsch", "Neolamprologus multifasciatus", "Neolamprologus_multifasciatus" ],
     [ "Weißer Amur", "Ctenopharyngodon idella", 1 ],
     [ "Weißforelle", "Salmo trutta trutta", "Salmo_trutta_trutta" ],
     [ "Weißkehlbarsch", "Oreochromis mossambicus", "Oreochromis_mossambicus" ],
@@ -3822,6 +3829,10 @@
 
   "lists.animals.insects.tabs": [
     "name", "latin", "wiki"
+  ],
+
+  "lists.animals.insects.clean": [
+    "normal", "prefix", "hyphen"
   ],
 
   "lists.animals.insects": [
@@ -4326,10 +4337,7 @@
     [ "Listkäfer", "Poecilus cupreus", "Poecilus_cupreus" ],
     [ "Maifliege", "Ephemera danica", "Ephemera_danica" ],
     [ "Malachitkäfer", "Malachius bipustulatus", "Malachius_bipustulatus" ],
-    [
-      "Punktierte Glasflügelwanze", "Stictopleurus punctatonervosus",
-      "Stictopleurus_punctatonervosus"
-    ],
+    [ "Punktierte Glasflügelwanze", "Stictopleurus punctatonervosus", "Stictopleurus_punctatonervosus" ],
     [ "Rapsweißling", "Pieris napi", 1 ],
     [ "Rindeneule, Erlen-", "Acronicta alni", "Acronicta_alni" ],
     [ "Rindenspanner, Zackenbindiger", "Ectropis crepuscularia", "Ectropis_crepuscularia" ],
@@ -4343,7 +4351,7 @@
     [ "Schwarzbäuchige Fruchtfliege", "Drosophila melanogaster", "Drosophila_melanogaster" ],
     [ "Schwarzweiße Erdwanze", "Tritomegas bicolor", 1 ],
     [ "Stachelwanze, Wipfel-", "Acanthosoma haemorrhoidale", "Acanthosoma_haemorrhoidale" ],
-    [ "Swammerdamm's", "Ephemera danica", "Ephemera_danica" ],
+    [ "Swammerdamm’s", "Ephemera danica", "Ephemera_danica" ],
     [ "Tarantula-Falke-Wespe", "Pepsis formosa", "Pepsis_formosa" ],
     [ "Tarantula-Wespe", "Pepsis formosa", "Pepsis_formosa" ],
     [ "Töpferwegwespe", "Auplopus carbonarius", "Auplopus_carbonarius" ],
@@ -4362,6 +4370,10 @@
 
   "lists.animals.mammals.tabs": [
     "name", "latin", "wiki"
+  ],
+
+  "lists.animals.mammals.clean": [
+    "normal", "prefix", "hyphen"
   ],
 
   "lists.animals.mammals": [
@@ -4632,8 +4644,6 @@
     [ "Espiritu-Santo-Hase", "Lepus insularis", 1 ],
     [ "Etruskerspitzmaus", "Suncus etruscus", 1 ],
     [ "Eulenkopfmeerkatze", "Cercopithecus hamlyni", 1 ],
-    [ "Eumops auripendulus ", "Eumops auripendulus ", 1 ],
-    [ "Eumops bonariensis", "Eumops bonariensis", 1 ],
     [ "Eurasische Zwergmaus", "Micromys minutus", 1 ],
     [ "Eurasischer Fischotter", "Lutra lutra", 1 ],
     [ "Europäische Ginsterkatze", "Genetta genetta", 1 ],
@@ -5766,6 +5776,10 @@
     "name", "latin", "wiki"
   ],
 
+  "lists.animals.reptiles.clean": [
+    "normal", "prefix", "hyphen"
+  ],
+
   "lists.animals.reptiles": [
     [ "Abgottschlange", "Boa constrictor", 1 ],
     [ "Afrikanische Baumschlange", "Dispholidus typus", 1 ],
@@ -6118,6 +6132,10 @@
     "name", "latin", "class", "classlatin", "wiki"
   ],
 
+  "lists.plants.clean": [
+    "normal", "prefix", "hyphen"
+  ],
+
   "lists.plants": [
     [ "Acker-Gauchheil", "Anagallis arvensis", "Schlüsselblumengewächse", "Primulaceae", 1 ],
     [ "Ackerhellerkraut", "Thlaspi arvense", "Kreuzblütler", "Brassicaceae", 1 ],
@@ -6213,7 +6231,7 @@
     [ "Dahlie", "Dahlia", "Korbblütler", "Asteraceae", 1 ],
     [ "Dieffenbachie", "Dieffenbachia", "Aronstabgewächse", "Araceae", 1 ],
     [ "Dill", "Anethum graveolens", "Doldengewächse", "Apiaceae", 1 ],
-    [ "Dinkel \"Franckenkorn\"", "Triticum spelta", "Süßgräser", "Poaceae", "Triticum_spelta" ],
+    [ "Dinkel", "Triticum spelta", "Süßgräser", "Poaceae", "Triticum_spelta" ],
     [ "Acker-Kratz-Distel", "Cirsium arvense", "Korbblütler", "Asteraceae", "Cirsium_arvense" ],
     [ "Gold-Distel", "Carlina acaulis", "Korbblütler", "Asteraceae", "Carlina_acaulis" ],
     [ "Kohl-Kratz Distel", "Cirsium oleraceum", "Korbblütler", "Asteraceae", "Cirsium_oleraceum" ],
@@ -6329,7 +6347,7 @@
     [ "Granatapfel", "Punica granatum", "Weiderichgewächse", "Lythraceae", 1 ],
     [ "Grapefruit", "Citrus x aurantium", "Rautengewächse", "Rutaceae", 1 ],
     [ "Graslilie", "Chlorophytum capense", "Liliengewächse", "Liliaceae", 1 ],
-    [ "Fuchs'sches Greiskraut", "Senecio ovatus", "Korbblütler", "Asteraceae", "Senecio_ovatus" ],
+    [ "Fuchs’sches Greiskraut", "Senecio ovatus", "Korbblütler", "Asteraceae", "Senecio_ovatus" ],
     [ "Jakobs-Greiskraut", "Senecio jacobaea", "Korbblütler", "Asteraceae", 1 ],
     [ "Grünlilie", "Chlorophytum comosum var.", "Liliengewächse", "Liliaceae", 1 ],
     [ "Gummibaum", "Ficus elastica", "Maulbeergewächse", "Moraceae", 1 ],
@@ -6602,7 +6620,7 @@
     [ "Stachelbeere", "Ribes uva-crispa", "Stachelbeergewächse", "Grossulariaceae", 1 ],
     [ "Stängelumfassendes Hellerkarut", "Thlaspi perfoliatum", "Kreuzblütler", "Brassicaceae", "Thlaspi_perfoliatum" ],
     [ "Statice", "Limonium sinuatum", "Bleiwurzgewächse", "Plumbaginaceae", "Limonium_sinuatum" ],
-    [ "Steinklee, Echter, (gelb)", "Melilotus officinalis", "Schmetterlingsblütler", "Fabaceae", "Melilotus_officinalis" ],
+    [ "Echter Steinklee (gelb)", "Melilotus officinalis", "Schmetterlingsblütler", "Fabaceae", "Melilotus_officinalis" ],
     [ "Weißer Steinklee", "Melilotus albus", "Schmetterlingsblütler", "Fabaceae", 1 ],
     [ "Große Sterndolde", "Astrantia major", "Doldengewächse", "Apiaceae", 1 ],
     [ "Große Sternmiere", "Stellaria holostea", "Nelkengewächse", "Caryophyllaceae", 1 ],
@@ -6740,6 +6758,10 @@
     "name", "wiki"
   ],
 
+  "lists.tools.clean": [
+    "normal"
+  ],
+
   "lists.tools": [
     [ "Abisolierzange", 1 ],
     [ "Abflussspirale", 1 ],
@@ -6799,8 +6821,6 @@
     [ "Fallhammer", 1 ],
     [ "Falzhobel (Hobel)", "Hobel" ],
     [ "Fäustel", 1 ],
-    [ "Federhaken</li> ()", "" ],
-    [ "Federspanner</li> ()", "" ],
     [ "Feile", 1 ],
     [ "Feilkloben", 1 ],
     [ "Feinsäge", 1 ],
@@ -7045,6 +7065,10 @@
 
   "lists.cars.tabs": [
     "name", "wiki"
+  ],
+
+  "lists.cars.clean": [
+    "normal"
   ],
 
   "lists.cars": [

@@ -8,9 +8,8 @@ WebLibLaunch.createFrame = function()
 {
     var wl = WebLibLaunch;
 
-    wl.bgcol = "#ffffffee";
     wl.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
-    WebLibSimple.setBGColor(wl.topDiv, wl.bgcol);
+    WebLibSimple.setDefaultBGColor(wl.topDiv);
 
     wl.horzSize = WebAppUtility.getLaunchItemSize();
     wl.vertSize = WebAppUtility.getLaunchItemSize();
@@ -20,6 +19,27 @@ WebLibLaunch.createFrame = function()
     wl.launchPages = [];
 
     WebLibLaunch.onResize();
+}
+
+WebLibLaunch.addTopScreen = function(div)
+{
+    var wl = WebLibLaunch;
+
+    if (wl.topScreen) WebLibSimple.detachElement(wl.topScreen);
+
+    wl.topScreen = div;
+
+    if (div != null) wl.topDiv.appendChild(wl.topScreen);
+}
+
+WebLibLaunch.getWidth = function()
+{
+    return WebLibLaunch.realWidth;
+}
+
+WebLibLaunch.getHeight = function()
+{
+    return WebLibLaunch.realHeight;
 }
 
 WebLibLaunch.onResize = function()
@@ -66,8 +86,6 @@ WebLibLaunch.onClickBackItem = function(event)
     if (! (target && target.config)) return;
 
     WebAppUtility.makeClick();
-
-    console.log("======================pupsi");
 
     WebAppRequest.doBackkeyPressed();
 }
@@ -201,7 +219,7 @@ WebLibLaunch.positionLaunchItems = function()
         {
             var lp = WebLibSimple.createDiv(0, 0, 0, 0, null, wl.topDiv);
             if (wl.launchPages.length > 0) lp.style.display = "none";
-            WebLibSimple.setBGColor(lp, wl.bgcol);
+            WebLibSimple.setDefaultBGColor(lp);
             wl.launchPages.push(lp);
         }
 
