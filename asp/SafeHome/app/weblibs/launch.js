@@ -60,6 +60,34 @@ WebLibLaunch.createLaunchItem = function(config)
 {
     var wl = WebLibLaunch;
 
+    var maxSlots = wl.horzItems * wl.vertItems;
+    var nextSlot = wl.launchItems.length % maxSlots;
+
+    if (nextSlot == 0)
+    {
+        var prev = {};
+        prev.label = "Zurück";
+        prev.icon = "/weblibs/launch/prev_600x600.png";
+
+        WebLibLaunch.createLaunchItemInternal(prev);
+    }
+
+    if ((nextSlot + 1) == maxSlots)
+    {
+        var next = {};
+        next.label = "Weiter";
+        next.icon = "/weblibs/launch/next_600x600.png";
+
+        WebLibLaunch.createLaunchItemInternal(next);
+    }
+
+    return WebLibLaunch.createLaunchItemInternal(config);
+}
+
+WebLibLaunch.createLaunchItemInternal = function(config)
+{
+    var wl = WebLibLaunch;
+
     var li = WebLibSimple.createDivWidHei(0, 0, wl.horzSize, wl.vertSize, "launchItem");
     wl.launchItems.push(li);
     li.config = config;

@@ -183,14 +183,14 @@ public class EventManager
         }
     };
 
-    private static void writeArchive()
+    private static void migrateOutdatedArchive()
     {
         String lastdate = Simple.todayAsISO(-2);
         String suffix = lastdate.substring(0, 10).replace("-", ".");
 
         File arch = Simple.getPackageFile("events." + suffix + ".json");
 
-        Log.d(LOGTAG,"writeArchive: lastdate=" + lastdate + "=" + arch.toString());
+        Log.d(LOGTAG,"migrateOutdatedArchive: lastdate=" + lastdate + "=" + arch.toString());
 
         if (arch.exists()) return;
 
@@ -286,9 +286,7 @@ public class EventManager
         if (! eventcache.has("passed")) Json.put(eventcache, "passed", new JSONObject());
         if (! eventcache.has("coming")) Json.put(eventcache, "coming", new JSONObject());
 
-        writeArchive();
-
-        BackupManager.backupPackageData("events");
+        migrateOutdatedArchive();
     }
 
     private static void putStorage()

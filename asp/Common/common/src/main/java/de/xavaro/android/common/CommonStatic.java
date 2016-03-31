@@ -30,12 +30,20 @@ public class CommonStatic
     {
         Log.d(LOGTAG, "setFocused: " + activity + "=" + hasFocus);
 
-        CommonStatic.activity = activity;
-        CommonStatic.focused = hasFocus;
-        CommonStatic.lostfocus |= ! hasFocus;
-        CommonStatic.initialized |= hasFocus;
+        //
+        // The focus events come in in wrong order. The activated
+        // activity gains focus before the going activity looses it.
+        //
 
-        if (hasFocus) ProcessManager.clearOneShotApps();
+        if (hasFocus || (CommonStatic.activity == null) || CommonStatic.activity.equals(activity))
+        {
+            CommonStatic.activity = activity;
+            CommonStatic.focused = hasFocus;
+            CommonStatic.lostfocus |= !hasFocus;
+            CommonStatic.initialized |= hasFocus;
+
+            if (hasFocus) ProcessManager.clearOneShotApps();
+        }
     }
 
     //endregion Current focus status and active activity
