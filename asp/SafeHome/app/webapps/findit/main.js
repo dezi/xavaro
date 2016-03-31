@@ -624,13 +624,11 @@ findit.positionGameWords = function()
         var wlen = word.length;
         var maxpos = cells - wlen;
 
-        console.log("================>" + word + "=" + maxpos);
-
-        for (var retry = 0; retry < 20; retry++)
+        for (var retry = 0; retry < 100; retry++)
         {
             conflict = false;
 
-            var horz = (Math.random() >= 0.5);
+            var horz = ((inx % 2) == 0); //(Math.random() >= 0.5);
             var maxstart = Math.floor(Math.random() * maxpos);
             var posstart = Math.floor(Math.random() * cells);
 
