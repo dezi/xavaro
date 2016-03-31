@@ -167,6 +167,31 @@ findit.createGameScreen = function()
     WebLibSimple.setFontSpecs(findit.charsDiv, fontSize, "bold", "#999999")
 
     //
+    // Create target words.
+    //
+
+    while (true)
+    {
+        findit.computeRandomWords();
+
+        if (findit.positionGameWords())
+        {
+            //
+            // All words could be positoned.
+            //
+
+            if (findit.verifyGameWords())
+            {
+                //
+                // No other words are present.
+                //
+
+                break;
+            }
+        }
+    }
+
+    //
     // Create character elements.
     //
 
@@ -179,49 +204,53 @@ findit.createGameScreen = function()
 
             var cccDiv = WebLibSimple.createDivWidHei(left, top, cellSize, cellSize, null, findit.charsDiv);
             cccDiv.style.border = "1px solid grey";
-            cccDiv.innerHTML = "C";
+            cccDiv.innerHTML = findit.matrix[ row ][ col ];
         }
     }
-
-    findit.computeRandomWords();
 }
 
-findit.cleanupTargetWord = function(clean, name)
+findit.setupCleanRules = function(clean)
 {
     //
     // Enable clean rules.
     //
 
-    var normal = false;
-    var prefix = false;
-    var hyphen = false;
-    var multis = false;
+    findit.cleanNormal = false;
+    findit.cleanPrefix = false;
+    findit.cleanHyphen = false;
+    findit.cleanMultis = false;
 
     for (var inx in clean)
     {
         var rule = clean[ inx ];
 
-        if (rule == "normal") normal = true;
-        if (rule == "prefix") prefix = true;
-        if (rule == "hyphen") hyphen = true;
-        if (rule == "multis") multis = true;
+        if (rule == "normal") findit.cleanNormal = true;
+        if (rule == "prefix") findit.cleanPrefix = true;
+        if (rule == "hyphen") findit.cleanHyphen = true;
+        if (rule == "multis") findit.cleanMultis = true;
     }
+}
 
+findit.cleanupTargetWord = function(name)
+{
     //
     // Normal rule: "Echter Steinklee (gelb)" => "Echter Steinklee"
     //
 
-    if (normal)
+    if (findit.cleanNormal)
     {
         name = name.split("(");
-        name = name[ 0 ];
+        name = name[ 0 ].trim();
+
+        var temp = name.split(", ");
+        if (temp.length == 2) name = temp[ 1 ] + " " + temp[ 0 ];
     }
 
     //
     // Multis rule: "Hannah / Hanna" => "Hannah"
     //
 
-    if (multis)
+    if (findit.cleanMultis)
     {
         name = name.split(" / ");
         name = name[ 0 ];
@@ -231,7 +260,7 @@ findit.cleanupTargetWord = function(clean, name)
     // Prefix rule: "Afrikanischer Habichtsadler" => "Habichtsadler"
     //
 
-    if (prefix)
+    if (findit.cleanPrefix)
     {
         name = name.split(" ");
         name = name[ name.length - 1 ];
@@ -241,7 +270,7 @@ findit.cleanupTargetWord = function(clean, name)
     // Hyphen rule: "Afrika-Waldkauz" => "Waldkauz"
     //
 
-    if (hyphen)
+    if (findit.cleanHyphen)
     {
         name = name.split("-");
         name = name[ name.length - 1 ];
@@ -251,14 +280,13 @@ findit.cleanupTargetWord = function(clean, name)
     // Normal rule rest.
     //
 
-    if (normal)
+    if (findit.cleanNormal)
     {
         name = name.toUpperCase();
 
         name = name.replace(/ /g,"");
         name = name.replace(/-/g,"");
         name = name.replace(/’/g,"");
-        name = name.replace(/,/g,"");
         name = name.replace(/\./g,"");
         name = name.replace(/ß/g,"ss");
 
@@ -282,6 +310,237 @@ findit.cleanupTargetWord = function(clean, name)
     }
 
     return name;
+}
+
+findit.positionGameWords = function()
+{
+    //
+    // Setup empty matrix.
+    //
+
+    var cells = findit.defs.cells;
+
+    findit.matrix = [];
+
+    for (var hei = 0; hei < cells; hei++)
+    {
+        var row = [];
+
+        for (var wid = 0; wid < cells; wid++)
+        {
+            row.push(" ");
+        }
+
+        findit.matrix.push(row);
+    }
+
+    //
+    // Position all words by random.
+    //
+
+    var conflict = false;
+
+    for (var inx in findit.currentGameWords)
+    {
+        var word = findit.currentGameWords[ inx ].clean;
+        var wlen = word.length;
+        var maxpos = cells - wlen;
+
+        console.log("================>" + word + "=" + maxpos);
+
+        for (var retry = 0; retry < 20; retry++)
+        {
+            conflict = false;
+
+            var horz = (Math.random() >= 0.5);
+            var maxstart = Math.floor(Math.random() * maxpos);
+            var posstart = Math.floor(Math.random() * cells);
+
+            if (horz)
+            {
+                var row = posstart;
+                var col = maxstart;
+
+                for (var fnz = 0; fnz < wlen; fnz++)
+                {
+                    var ccc = findit.matrix[ row ][ col++ ];
+
+                    if ((ccc != " ") && (ccc != word.charAt(fnz)))
+                    {
+                        conflict = true;
+                        break;
+                    }
+                }
+
+                if (conflict) continue;
+
+                var row = posstart;
+                var col = maxstart;
+
+                for (var fnz = 0; fnz < wlen; fnz++)
+                {
+                    findit.matrix[ row ][ col++ ] = word.charAt(fnz);
+                }
+            }
+            else
+            {
+                var row = maxstart;
+                var col = posstart;
+
+                for (var fnz = 0; fnz < wlen; fnz++)
+                {
+                    var ccc = findit.matrix[ row++ ][ col ];
+
+                    if ((ccc != " ") && (ccc != word.charAt(fnz)))
+                    {
+                        conflict = true;
+                        break;
+                    }
+                }
+
+                if (conflict) continue;
+
+                var row = maxstart;
+                var col = posstart;
+
+                for (var fnz = 0; fnz < wlen; fnz++)
+                {
+                    findit.matrix[ row++ ][ col ] = word.charAt(fnz);
+                }
+            }
+
+            break;
+        }
+
+        if (conflict) break;
+    }
+
+    if (conflict) return false;
+
+    //
+    // Fill in junk characters.
+    //
+
+    var alpha = "abcdefghijkmlnopqrstuvwxyz";
+
+    for (var row = 0; row < cells; row++)
+    {
+        for (var col = 0; col < cells; col++)
+        {
+            if (findit.matrix[ row ][ col ] == " ")
+            {
+                var rnd = Math.floor(Math.random() * alpha.length);
+                findit.matrix[ row ][ col ] = alpha.charAt(rnd);
+            }
+        }
+    }
+
+    return true;
+}
+
+findit.verifyGameWords = function()
+{
+    //
+    // Verify current game not to contain any other
+    // word from wordlist by coincidence.
+    //
+
+    var cells = findit.defs.cells;
+
+    var current = {};
+
+    for (var inx in findit.currentGameWords)
+    {
+        current[ findit.currentGameWords[ inx ].clean ] = true;
+    }
+
+    //
+    // Build all row and col strings.
+    //
+
+    var allstrings = [];
+
+    for (var row = 0; row < cells; row++)
+    {
+        var string = "";
+
+        for (var col = 0; col < cells; col++)
+        {
+            string += findit.matrix[ row ][ col ];
+        }
+
+        allstrings.push(string);
+    }
+
+    for (var col = 0; col < cells; col++)
+    {
+        var string = "";
+
+        for (var row = 0; row < cells; row++)
+        {
+            string += findit.matrix[ row ][ col ];
+        }
+
+        allstrings.push(string);
+    }
+
+    //
+    // Derive tab index of the "name".
+    //
+
+    var tabinx = -1;
+
+    for (tabinx in findit.currentGameListTabs)
+    {
+        if (findit.currentGameListTabs[ tabinx ] == "name") break;
+    }
+
+    if (tabinx < 0)
+    {
+        //
+        // Misconfiguration.
+        //
+
+        console.log("findit.verifyGameWords: no name tab:" + findit.currentGameKey);
+
+        return false;
+    }
+
+    //
+    // Build all other strings.
+    //
+
+    for (var inx in findit.currentGameList)
+    {
+        var entry = findit.currentGameList[ inx ];
+        var name = entry[ tabinx ];
+        var clean = findit.cleanupTargetWord(name);
+
+        if (current[ clean ]) continue;
+
+        for (var cnt in allstrings)
+        {
+            if (allstrings[ cnt ].indexOf(clean) >= 0)
+            {
+                console.log("findit.verifyGameWords: found:" + clean);
+
+                var bad = true;
+
+                for (var fnz in current)
+                {
+                    if (fnz.indexOf(clean) >= 0)
+                    {
+                        console.log("findit.verifyGameWords: inside:" + fnz);
+                        bad = false;
+                    }
+                }
+
+                if (bad) return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 findit.computeRandomWords = function()
@@ -333,6 +592,12 @@ findit.computeRandomWords = function()
     console.log("findit.computeRandomWords: list.length=" + findit.currentGameList.length);
 
     //
+    // Setup word cleaning rules.
+    //
+
+    findit.setupCleanRules(findit.currentGameListClean);
+
+    //
     // Pick a number of random words.
     //
 
@@ -363,7 +628,13 @@ findit.computeRandomWords = function()
         // Cleanup name for display.
         //
 
-        word.clean = findit.cleanupTargetWord(findit.currentGameListClean, word.name);
+        word.clean = findit.cleanupTargetWord(word.name);
+
+        //
+        // Check word length.
+        //
+
+        if (word.clean.length > findit.defs.cells) continue;
 
         //
         // Check for duplicate.
@@ -377,12 +648,6 @@ findit.computeRandomWords = function()
         //
 
         findit.currentGameWords.push(word);
-    }
-
-    for (var inx in findit.currentGameWords)
-    {
-        var word = findit.currentGameWords[ inx ];
-        console.log("findit.computeRandomWords: " + JSON.stringify(word));
     }
 }
 
@@ -415,6 +680,8 @@ findit.checkAllWords = function()
             continue;
         }
 
+        findit.setupCleanRules(clean);
+
         for (var cnt in list)
         {
             var entry = list[ cnt ];
@@ -429,9 +696,10 @@ findit.checkAllWords = function()
                 word[ tabname ] = tabvalue;
             }
 
-            word.clean = findit.cleanupTargetWord(clean, word.name);
-            var res = word.clean.match(/[^A-Z]/g);
+            word.clean = findit.cleanupTargetWord(word.name);
+            if (word.clean.length == 0) console.log("findit.checkAllWords: " + JSON.stringify(word));
 
+            var res = word.clean.match(/[^A-Z]/g);
             if (res) console.log("findit.checkAllWords: " + word.clean);
         }
     }
@@ -494,4 +762,5 @@ findit.createLaunchItems = function()
 WebLibLaunch.createFrame();
 
 findit.readConfigLists();
+//findit.checkAllWords();
 findit.createLaunchItems();
