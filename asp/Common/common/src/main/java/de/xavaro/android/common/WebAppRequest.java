@@ -56,14 +56,17 @@ public class WebAppRequest
         // Callback from javascript evalution.
         //
 
-        if (! pressed)
-        {
-            Context activity = Simple.getAppContext();
+        if (! pressed) doBackkeyPressed();
+    }
 
-            if (activity instanceof BackKeyMaster)
-            {
-                ((BackKeyMaster) activity).onBackKeyExecuteNow();
-            }
+    @JavascriptInterface
+    public void doBackkeyPressed()
+    {
+        Context activity = Simple.getAppContext();
+
+        if (activity instanceof BackKeyMaster)
+        {
+            ((BackKeyMaster) activity).onBackKeyExecuteNow();
         }
     }
 

@@ -58,6 +58,54 @@ WebLibLaunch.getOverIconImgElem = function(launchitem)
     return launchitem.overImgElem;
 }
 
+WebLibLaunch.onClickBackItem = function(event)
+{
+    event.stopPropagation();
+
+    var target = WebLibSimple.findTarget(event.target, "launchItem");
+    if (! (target && target.config)) return;
+
+    WebAppUtility.makeClick();
+
+    console.log("======================pupsi");
+
+    WebAppRequest.doBackkeyPressed();
+}
+
+WebLibLaunch.onClickPrevItem = function(event)
+{
+    event.stopPropagation();
+
+    var target = WebLibSimple.findTarget(event.target, "launchItem");
+    if (! (target && target.config)) return;
+
+    WebAppUtility.makeClick();
+
+    var wl = WebLibLaunch;
+
+    var pageIndex = target.launchPageIndex;
+
+    wl.launchPages[ pageIndex ].style.display = "none";
+    wl.launchPages[ pageIndex - 1 ].style.display = "block";
+}
+
+WebLibLaunch.onClickNextItem = function(event)
+{
+    event.stopPropagation();
+
+    var target = WebLibSimple.findTarget(event.target, "launchItem");
+    if (! (target && target.config)) return;
+
+    WebAppUtility.makeClick();
+
+    var wl = WebLibLaunch;
+
+    var pageIndex = target.launchPageIndex;
+
+    wl.launchPages[ pageIndex ].style.display = "none";
+    wl.launchPages[ pageIndex + 1 ].style.display = "block";
+}
+
 WebLibLaunch.createLaunchItem = function(config)
 {
     var wl = WebLibLaunch;
@@ -68,8 +116,11 @@ WebLibLaunch.createLaunchItem = function(config)
     if (((nextSlot + 1) % maxSlots) == 0)
     {
         var next = {};
+
         next.label = "Weiter";
         next.icon = "/weblibs/launch/next_600x600.png";
+
+        next.onclick = WebLibLaunch.onClickNextItem;
 
         WebLibLaunch.createLaunchItemInternal(next);
 
@@ -79,8 +130,13 @@ WebLibLaunch.createLaunchItem = function(config)
     if ((nextSlot % maxSlots) == 0)
     {
         var prev = {};
+
         prev.label = "Zurück";
         prev.icon = "/weblibs/launch/prev_600x600.png";
+
+        prev.onclick = (nextSlot == 0)
+            ? WebLibLaunch.onClickBackItem
+            : WebLibLaunch.onClickPrevItem;
 
         WebLibLaunch.createLaunchItemInternal(prev);
     }
@@ -153,6 +209,8 @@ WebLibLaunch.positionLaunchItems = function()
 
         li.style.left = WebLibSimple.addPixel(xpos);
         li.style.top  = WebLibSimple.addPixel(ypos);
+
+        li.launchPageIndex = pag;
 
         WebLibSimple.attachElement(li, wl.launchPages[ pag ]);
 

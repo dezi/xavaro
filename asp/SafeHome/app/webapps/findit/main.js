@@ -78,6 +78,7 @@ findit.createLaunchItems = function()
 
         config.icon = gameIcon;
         config.label = gameLabel;
+        config.gameKey = gameKey;
 
         //
         // Create launch item and push to list.
