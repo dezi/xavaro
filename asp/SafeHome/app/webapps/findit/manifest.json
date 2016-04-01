@@ -1,7 +1,7 @@
 {
   "manifest": {
 
-    "label": "Finde Es",
+    "label": "Suchspiel",
     "appname": "findit",
     "appicon": "findit_256x256.png",
     "preferences": false,

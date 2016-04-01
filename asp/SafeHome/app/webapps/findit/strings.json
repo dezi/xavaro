@@ -32,7 +32,7 @@
 
   "game.solved": "You have found all %$1s",
 
-  "activity.game.solved": "You have found all %$1s in a Find-It game.",
+  "activity.game.solved": "You have found all %$1s in a spot the name game.",
 
   "EOL" : true
 }
