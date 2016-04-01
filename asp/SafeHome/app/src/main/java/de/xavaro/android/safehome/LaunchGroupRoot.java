@@ -69,6 +69,7 @@ public class LaunchGroupRoot extends LaunchGroup
 
         configs.add(LaunchItemBeta.getConfig());
         configs.add(LaunchItemToday.getConfig());
+        configs.add(LaunchItemVoice.getConfig());
         configs.add(LaunchItemAlertcall.getConfig());
 
         configs.add(LaunchGroupHealth.getConfig());

@@ -53,6 +53,7 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
 
         if (Simple.equals(type, "beta"        )) item = new LaunchItemBeta(context);
         if (Simple.equals(type, "today"       )) item = new LaunchItemToday(context);
+        if (Simple.equals(type, "voice"       )) item = new LaunchItemVoice(context);
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
 

@@ -21,6 +21,7 @@ import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.Hear;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
