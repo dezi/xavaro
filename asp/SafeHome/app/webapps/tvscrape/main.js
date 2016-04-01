@@ -151,6 +151,20 @@ WebAppIntercept.onUserHrefClick = function(url)
         dhei = Math.round(dwid / aspect);
     }
 
+    if ((width * height) > (200 * 200))
+    {
+        if (! tvscrape.saveInfo())
+        {
+            alert("Das war nix!!!")
+        }
+        else
+        {
+            tvscrape.loadNextInfo();
+        }
+
+        return;
+    }
+
     dwid +=  20;
     dhei += 100;
 

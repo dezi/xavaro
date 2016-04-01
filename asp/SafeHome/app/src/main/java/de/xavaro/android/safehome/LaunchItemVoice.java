@@ -112,6 +112,18 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
     }
 
     @Override
+    public void onPartialResults(Bundle partialResults)
+    {
+        Log.d(LOGTAG, "onPartialResults:");
+    }
+
+    @Override
+    public void onEvent(int eventType, Bundle params)
+    {
+        Log.d(LOGTAG, "onEvent:");
+    }
+
+    @Override
     public void onResults(Bundle results)
     {
         Log.d(LOGTAG, "onResults: " + results);
@@ -123,21 +135,11 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
         {
             for (int inx = 0; inx < text.size(); inx++)
             {
-                Log.d(LOGTAG, "result=" + conf[ inx ] + "=" + text.get(inx));
+                String logline = text.get(inx) + " (" + Math.round(conf[ inx ] * 100) + "%)";
+                if (inx == 0) Simple.makeToast(logline);
+                Log.d(LOGTAG, "result=" + logline);
             }
         }
-    }
-
-    @Override
-    public void onPartialResults(Bundle partialResults)
-    {
-        Log.d(LOGTAG, "onPartialResults:");
-    }
-
-    @Override
-    public void onEvent(int eventType, Bundle params)
-    {
-        Log.d(LOGTAG, "onEvent:");
     }
 
     //endregion
