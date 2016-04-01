@@ -16,12 +16,12 @@ WebLibTouch.onTouchStart = function(event)
     {
         if (target.scrollHorizontal || target.scrollVertical || target.scrollBoth)
         {
-            touch.starget = target;
+            if (! touch.starget) touch.starget = target;
         }
 
         if (target.onTouchClick)
         {
-            touch.ctarget = target;
+            if (! touch.ctarget) touch.ctarget = target;
         }
 
         target = target.parentElement;

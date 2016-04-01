@@ -9,6 +9,7 @@ WebLibLaunch.createFrame = function()
     var wl = WebLibLaunch;
 
     wl.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
+    wl.topDiv.onTouchClick = WebLibLaunch.onKillClick;
     WebLibSimple.setDefaultBGColor(wl.topDiv);
 
     wl.horzSize = WebAppUtility.getLaunchItemSize();
@@ -21,6 +22,11 @@ WebLibLaunch.createFrame = function()
     WebLibLaunch.onResize();
 }
 
+WebLibLaunch.onKillClick = function(target)
+{
+    console.log("WebLibLaunch.onKillClick: touch killed...");
+}
+
 WebLibLaunch.addTopScreen = function(div)
 {
     var wl = WebLibLaunch;
@@ -30,6 +36,15 @@ WebLibLaunch.addTopScreen = function(div)
     wl.topScreen = div;
 
     if (div != null) wl.topDiv.appendChild(wl.topScreen);
+}
+
+WebLibLaunch.removeTopScreen = function(div)
+{
+    var wl = WebLibLaunch;
+
+    if (wl.topScreen == div) WebLibSimple.detachElement(wl.topScreen);
+
+    wl.topScreen = null;
 }
 
 WebLibLaunch.getWidth = function()
@@ -83,11 +98,8 @@ WebLibLaunch.getOverIconImgElem = function(launchitem)
     return launchitem.overImgElem;
 }
 
-WebLibLaunch.onClickBackItem = function(event)
+WebLibLaunch.onClickBackItem = function(target)
 {
-    event.stopPropagation();
-
-    var target = WebLibSimple.findTarget(event.target, "launchItem");
     if (! (target && target.config)) return;
 
     WebAppUtility.makeClick();
@@ -95,11 +107,8 @@ WebLibLaunch.onClickBackItem = function(event)
     WebAppRequest.doBackkeyPressed();
 }
 
-WebLibLaunch.onClickPrevItem = function(event)
+WebLibLaunch.onClickPrevItem = function(target)
 {
-    event.stopPropagation();
-
-    var target = WebLibSimple.findTarget(event.target, "launchItem");
     if (! (target && target.config)) return;
 
     WebAppUtility.makeClick();
@@ -112,11 +121,8 @@ WebLibLaunch.onClickPrevItem = function(event)
     wl.launchPages[ pageIndex - 1 ].style.display = "block";
 }
 
-WebLibLaunch.onClickNextItem = function(event)
+WebLibLaunch.onClickNextItem = function(target)
 {
-    event.stopPropagation();
-
-    var target = WebLibSimple.findTarget(event.target, "launchItem");
     if (! (target && target.config)) return;
 
     WebAppUtility.makeClick();
@@ -143,7 +149,7 @@ WebLibLaunch.createLaunchItem = function(config)
         next.label = "Weiter";
         next.icon = "/weblibs/launch/next_600x600.png";
 
-        next.onclick = WebLibLaunch.onClickNextItem;
+        next.onTouchClick = WebLibLaunch.onClickNextItem;
 
         WebLibLaunch.createLaunchItemInternal(next);
 
@@ -157,7 +163,7 @@ WebLibLaunch.createLaunchItem = function(config)
         prev.label = "Zurück";
         prev.icon = "/weblibs/launch/prev_600x600.png";
 
-        prev.onclick = (nextSlot == 0)
+        prev.onTouchClick = (nextSlot == 0)
             ? WebLibLaunch.onClickBackItem
             : WebLibLaunch.onClickPrevItem;
 
@@ -200,7 +206,7 @@ WebLibLaunch.createLaunchItemInternal = function(config)
     li.overImgElem = WebLibSimple.createImgWidHei(0, 0, "100%", "100%", "overImgElem", li.overDivElem);
     li.overImgElem.src = config.overicon ? config.overicon : WebLibSimple.getNixPixImg();
 
-    if (config.onclick) li.onclick = config.onclick;
+    if (config.onTouchClick) li.onTouchClick = config.onTouchClick;
 
     wl.positionLaunchItems();
 

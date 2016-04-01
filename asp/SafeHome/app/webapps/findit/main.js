@@ -8,6 +8,21 @@ findit.defs =
     "words"  : 10,
 }
 
+WebAppRequest.onBackkeyPressed = function()
+{
+    if (findit.gameScreen)
+    {
+        WebLibLaunch.removeTopScreen(findit.gameScreen);
+        findit.gameScreen = null;
+
+        WebAppRequest.haveBackkeyPressed(true);
+
+        return;
+    }
+
+    WebAppRequest.haveBackkeyPressed(false);
+}
+
 findit.readConfigLists = function()
 {
     //
@@ -45,19 +60,12 @@ findit.readConfigLists = function()
     }
 }
 
-findit.onClickGame = function(event)
+findit.onClickGame = function(target)
 {
-    //
-    // Stop event from beeing handed to other elements.
-    //
-
-    event.stopPropagation();
-
     //
     // Identify the launch item for this click.
     //
 
-    var target = WebLibSimple.findTarget(event.target, "launchItem");
     if (! (target && target.config)) return;
 
     //
@@ -152,7 +160,6 @@ findit.onResize = function(elem)
                 solDiv.style.top        = WebLibSimple.addPixel(inx * voff);
                 solDiv.style.width      = WebLibSimple.addPixel(hoff);
                 solDiv.style.height     = WebLibSimple.addPixel(voff);
-                solDiv.style.lineHeight = WebLibSimple.addPixel(voff);
             }
        }
         else
@@ -184,7 +191,6 @@ findit.onResize = function(elem)
                 solDiv.style.top        = WebLibSimple.addPixel(Math.floor(inx / 2) * voff);
                 solDiv.style.width      = WebLibSimple.addPixel(hoff);
                 solDiv.style.height     = WebLibSimple.addPixel(voff);
-                solDiv.style.lineHeight = WebLibSimple.addPixel(voff);
             }
         }
     }
@@ -237,12 +243,15 @@ findit.createSolution = function()
         solDiv.style.textAlign = "center";
 
         var solSpan = WebLibSimple.createAnyAppend("span", solDiv)
-        solSpan.innerHTML = findit.currentGameWords[ inx ].clean;
-        solSpan.style.padding = "8px";
-        solSpan.style.paddingLeft  = "14px";
-        solSpan.style.paddingRight = "14px";
-        solSpan.style.backgroundSize = "100% 100%";
+        solSpan.style.paddingTop      = "8px";
+        solSpan.style.paddingBottom   = "8px";
+        solSpan.style.paddingLeft     = "14px";
+        solSpan.style.paddingRight    = "14px";
+        solSpan.style.backgroundSize  = "100% 100%";
         solSpan.style.backgroundImage = "url('wipeout_black.png')";
+
+        var solText = WebLibSimple.createAnyAppend("span", solSpan)
+        solText.innerHTML = findit.currentGameWords[ inx ].clean;
 
         findit.solutionWordSpans.push(solSpan);
         findit.solutionWordDivs.push(solDiv);
@@ -255,11 +264,9 @@ findit.createSolution = function()
     findit.onResize(findit.gameScreen);
 }
 
-findit.onPuzzleClick = function(event)
+findit.onPuzzleClick = function(target, clickelem)
 {
-    console.log("findit.onPuzzleClick:" + event.target.innerHTML);
-
-    var target = event.target;
+    var target = clickelem;
 
     while (target && ! target.puzzleChar)
     {
@@ -406,7 +413,7 @@ findit.createPuzzle = function()
     findit.puzzleDiv = WebLibSimple.createDivWidHei(0, 0, 0, 0, "puzzleDiv", findit.gameScreen);
     findit.puzzleDiv.style.border = findit.defs.border + "px solid grey";
     findit.puzzleDiv.style.borderRadius = findit.defs.radius + "px";
-    findit.puzzleDiv.onclick = findit.onPuzzleClick;
+    findit.puzzleDiv.onTouchClick = findit.onPuzzleClick;
 
     //
     // Adjust to current screen dimensions.
@@ -1037,7 +1044,7 @@ findit.createLaunchItems = function()
         config.icon = gameIcon;
         config.label = gameLabel;
         config.gameKey = gameKey;
-        config.onclick = findit.onClickGame;
+        config.onTouchClick = findit.onClickGame;
 
         //
         // Create launch item and push to list.

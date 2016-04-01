@@ -357,11 +357,8 @@ medicator.createNumberInput = function(parent, value, title, focus)
     return numberInput;
 }
 
-medicator.onClickEventItem = function(event)
+medicator.onClickEventItem = function(target)
 {
-    event.stopPropagation();
-
-    var target = WebLibSimple.findTarget(event.target, "launchItem");
     if (! (target && target.config)) return;
 
     WebAppUtility.makeClick();
@@ -627,7 +624,7 @@ medicator.createEvents = function()
 
             config.formkey = formkey;
             config.ondemand = ondemand;
-            config.onclick = medicator.onClickEventItem;
+            config.onTouchClick = medicator.onClickEventItem;
 
             config.medisets = [];
             config.pillslots = 0;
