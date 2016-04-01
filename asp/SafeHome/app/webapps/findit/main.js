@@ -220,6 +220,25 @@ findit.createGameScreen = function()
     findit.createSolution();
 }
 
+findit.onWordClick = function(target)
+{
+    if (target.style.backgroundImage == null)
+    {
+        //
+        // Open wikipedia.
+        //
+    }
+}
+
+findit.onWordLongClick = function(target)
+{
+    if (target.style.backgroundImage != null)
+    {
+        target.style.backgroundImage = null;
+        target.style.color = "#ff0000";
+    }
+}
+
 findit.createSolution = function()
 {
     //
@@ -249,6 +268,9 @@ findit.createSolution = function()
         solSpan.style.paddingRight    = "14px";
         solSpan.style.backgroundSize  = "100% 100%";
         solSpan.style.backgroundImage = "url('wipeout_black.png')";
+
+        solSpan.onTouchClick = findit.onWordClick;
+        solSpan.onTouchLongClick = findit.onWordLongClick;
 
         var solText = WebLibSimple.createAnyAppend("span", solSpan)
         solText.innerHTML = findit.currentGameWords[ inx ].clean;
@@ -384,24 +406,45 @@ findit.onPuzzleClick = function(target, clickelem)
     }
 }
 
+findit.gameSolved = function()
+{
+    var gameLabel = WebLibStrings.getTransTrans("list.index.keys", findit.currentGameKey);
+
+    WebAppSpeak.speak(WebLibStrings.getTrans("game.solved", gameLabel));
+
+    WebAppActivity.recordActivity(WebLibStrings.getTrans("activity.game.solved", gameLabel));
+}
+
 findit.checkGameWord = function(word)
 {
-    for (var inx in findit.currentGameWords)
+    var ok = false;
+
+    if (word.length > 0)
     {
-        if (word == findit.currentGameWords[ inx ].clean)
+        var allok = true;
+
+        for (var inx in findit.currentGameWords)
         {
-            //
-            // Valid game word.
-            //
+            if (word == findit.currentGameWords[ inx ].clean)
+            {
+                //
+                // Valid game word.
+                //
 
-            var solSpan = findit.solutionWordSpans[ inx ];
-            solSpan.style.backgroundImage = null;
+                var solSpan = findit.solutionWordSpans[ inx ];
+                solSpan.style.color = WebLibSimple.getRGBColor("#60000000");
+                solSpan.style.backgroundImage = null;
 
-            return true;
+                findit.currentGameWords[ inx ].found = ok = true;
+            }
+
+            allok = allok && findit.currentGameWords[ inx ].found;
         }
+
+        if (allok) setTimeout(findit.gameSolved, 1000);
     }
 
-    return false;
+    return ok;
 }
 
 findit.createPuzzle = function()

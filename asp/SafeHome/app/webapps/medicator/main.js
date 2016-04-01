@@ -187,7 +187,7 @@ medicator.onClickTaken = function(event)
     return true;
 }
 
-medicator.onClickMeasured = function(event)
+medicator.onClickMeasured = function(target)
 {
     var config = medicator.currentConfig
     if (! (config && config.medisets)) return;
@@ -224,7 +224,7 @@ medicator.onClickMeasured = function(event)
     return true;
 }
 
-medicator.onClickEverything = function(event)
+medicator.onClickEverything = function(target)
 {
     var config = medicator.currentConfig
     if (! (config && config.medisets)) return;
@@ -242,20 +242,15 @@ medicator.onClickEverything = function(event)
     return false;
 }
 
-medicator.onClickDoseCheckbox = function(event)
+medicator.onClickDoseCheckbox = function(target)
 {
-    event.stopPropagation();
-
     WebAppUtility.makeClick();
 
     medicator.onCheckOkButtonEnable();
 }
 
-medicator.onClickDoseItem = function(event)
+medicator.onClickDoseItem = function(target)
 {
-    event.stopPropagation();
-
-    var target = WebLibSimple.findTarget(event.target, "medication");
     if (! (target && target.mediset)) return;
 
     console.log("medicator.onClickDoseItem:" + JSON.stringify(target.mediset));
@@ -287,9 +282,9 @@ medicator.onCheckOkButtonEnable = function()
     WebLibDialog.setOkButtonEnable(onechecked);
 }
 
-medicator.onBloodPressureKeypress = function(event)
+medicator.onBloodPressureKeypress = function(target)
 {
-    var whatSpan = WebLibSimple.findTarget(event.target, "whatSpan");
+    var whatSpan = WebLibSimple.findTarget(target, "whatSpan");
     if (! whatSpan) return;
 
     whatSpan.systolic = parseInt(whatSpan.systolicEdit.value);
@@ -306,9 +301,9 @@ medicator.onBloodPressureKeypress = function(event)
     WebLibDialog.setOkButtonEnable(okok);
 }
 
-medicator.onBloodGlucoseKeypress = function(event)
+medicator.onBloodGlucoseKeypress = function(target)
 {
-    var whatSpan = WebLibSimple.findTarget(event.target, "whatSpan");
+    var whatSpan = WebLibSimple.findTarget(target, "whatSpan");
     if (! whatSpan) return;
 
     whatSpan.glucose = parseInt(whatSpan.glucoseEdit.value);
@@ -319,9 +314,9 @@ medicator.onBloodGlucoseKeypress = function(event)
     WebLibDialog.setOkButtonEnable(okok);
 }
 
-medicator.onWeightKeypress = function(event)
+medicator.onWeightKeypress = function(target)
 {
-    var whatSpan = WebLibSimple.findTarget(event.target, "whatSpan");
+    var whatSpan = WebLibSimple.findTarget(target, "whatSpan");
     if (! whatSpan) return;
 
     whatSpan.weight = parseFloat(whatSpan.weightEdit.value);
@@ -434,7 +429,7 @@ medicator.onClickEventItem = function(target)
             dlconfig.title = "Medikamente einnehmen";
 
             div.style.paddingTop = WebLibSimple.addPixel(12);
-            div.onclick = medicator.onClickDoseItem;
+            div.onTouchClick = medicator.onClickDoseItem;
 
             var checkSpan = WebLibSimple.createAnyAppend("span", div);
             checkSpan.style.display = "inline-block";
@@ -444,7 +439,7 @@ medicator.onClickEventItem = function(target)
 
             mediset.checkBox = WebLibSimple.createAnyAppend("input", checkSpan);
             mediset.checkBox.type = "checkbox";
-            mediset.checkBox.onclick = medicator.onClickDoseCheckbox;
+            mediset.checkBox.onTouchClick = medicator.onClickDoseCheckbox;
             mediset.checkBox.checked = (mediset.taken == true);
 
             var whatSpan = WebLibSimple.createAnyAppend("div", div);

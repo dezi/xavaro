@@ -14,6 +14,15 @@ WebLibTouch.onTouchStart = function(event)
 
     while (target)
     {
+        if (target.nodeName == "INPUT")
+        {
+            //
+            // Input element. Return to default behaviour.
+            //
+
+            return;
+        }
+
         if (target.scrollHorizontal || target.scrollVertical || target.scrollBoth)
         {
             if (! touch.starget) touch.starget = target;
@@ -24,14 +33,20 @@ WebLibTouch.onTouchStart = function(event)
             if (! touch.ctarget) touch.ctarget = target;
         }
 
+        if (target.onTouchLongClick)
+        {
+            if (! touch.ltarget) touch.ltarget = target;
+        }
+
         target = target.parentElement;
     }
 
-    if (! (touch.starget || touch.ctarget)) return;
+    if (! (touch.starget || touch.ctarget || touch.ltarget)) return;
 
     touch.moves = 0;
     touch.initial = true;
     touch.target  = touchobj.target;
+    touch.evtime  = new Date().getTime();
 
     touch.startX = touchobj.clientX;
     touch.startY = touchobj.clientY;
@@ -69,12 +84,6 @@ WebLibTouch.onTouchStart = function(event)
         }
     }
 
-    if (touch.ctarget)
-    {
-        touch.bgcolor = touch.ctarget.style.backgroundColor;
-        //touch.ctarget.style.backgroundColor = "#dddddd";
-    }
-
     event.preventDefault();
 }
 
@@ -83,7 +92,7 @@ WebLibTouch.onTouchMove = function(event)
     var touch = WebLibTouch.touch;
     var touchobj = event.changedTouches[ 0 ];
 
-    if (! (touch.starget || touch.ctarget)) return;
+    if (! (touch.starget || touch.ctarget || touch.ltarget)) return;
 
     touch.moves += 1;
 
@@ -134,7 +143,7 @@ WebLibTouch.onTouchMove = function(event)
        }
     }
 
-    if (touch.ctarget)
+    if (touch.ctarget || touch.ltarget)
     {
         if ((Math.abs(touch.deltaX) > WebLibTouch.minDist) ||
             (Math.abs(touch.deltaY) > WebLibTouch.minDist))
@@ -143,8 +152,17 @@ WebLibTouch.onTouchMove = function(event)
             // Discard click touch events.
             //
 
-            touch.ctarget.style.backgroundColor = touch.bgcolor;
             touch.ctarget = null;
+            touch.ltarget = null;
+        }
+    }
+
+    if (touch.ltarget)
+    {
+        if ((touch.evtime + 1000) < new Date().getTime())
+        {
+            touch.ltarget.onTouchLongClick(touch.ltarget, touch.target);
+            touch.ltarget = null;
         }
     }
 
@@ -156,7 +174,7 @@ WebLibTouch.onTouchEnd = function(event)
     var touch = WebLibTouch.touch;
     var touchobj = event.changedTouches[ 0 ];
 
-    if (! (touch.starget || touch.ctarget)) return;
+    if (! (touch.starget || touch.ctarget || touch.ltarget)) return;
 
     WebLibTouch.computeOffsets(touchobj);
 
@@ -180,7 +198,6 @@ WebLibTouch.onTouchEnd = function(event)
 
     if (touch.ctarget)
     {
-        touch.ctarget.style.backgroundColor = touch.bgcolor;
         touch.ctarget.onTouchClick(touch.ctarget, touch.target);
     }
 

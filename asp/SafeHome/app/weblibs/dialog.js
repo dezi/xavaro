@@ -15,11 +15,9 @@ WebLibDialog.setOkButtonEnable = function(enable)
     }
 }
 
-WebLibDialog.onClickOk = function(event)
+WebLibDialog.onClickOk = function(target)
 {
-    event.stopPropagation();
-
-    if (event.target.isenabled)
+    if (target.isenabled)
     {
         WebAppUtility.makeClick();
 
@@ -29,7 +27,7 @@ WebLibDialog.onClickOk = function(event)
 
         if (wld.currentConfig && wld.currentConfig.onClickOk)
         {
-            close = wld.currentConfig.onClickOk(event);
+            close = wld.currentConfig.onClickOk(target);
         }
 
         if (close)
@@ -41,11 +39,9 @@ WebLibDialog.onClickOk = function(event)
     }
 }
 
-WebLibDialog.onClickOther = function(event)
+WebLibDialog.onClickOther = function(target)
 {
-    event.stopPropagation();
-
-    if (event.target.isenabled)
+    if (target.isenabled)
     {
         WebAppUtility.makeClick();
 
@@ -55,7 +51,7 @@ WebLibDialog.onClickOther = function(event)
 
         if (wld.currentConfig && wld.currentConfig.onClickOther)
         {
-            close = wld.currentConfig.onClickOther(event);
+            close = wld.currentConfig.onClickOther(target);
         }
 
         if (close)
@@ -67,10 +63,8 @@ WebLibDialog.onClickOther = function(event)
     }
 }
 
-WebLibDialog.onClickCancel = function(event)
+WebLibDialog.onClickCancel = function(target)
 {
-    event.stopPropagation();
-
     WebAppUtility.makeClick();
 
     var wld = WebLibDialog;
@@ -81,11 +75,9 @@ WebLibDialog.onClickCancel = function(event)
     wld.currentDialog = null;
 }
 
-WebLibDialog.onClickIgnore = function(event)
+WebLibDialog.onClickIgnore = function(target)
 {
-    console.log("onClickIgnore:" + event.target);
-
-    event.stopPropagation();
+    console.log("WebLibDialog.onClickIgnore:" + target);
 }
 
 WebLibDialog.createDialog = function(config)
@@ -97,7 +89,7 @@ WebLibDialog.createDialog = function(config)
 
     dialog.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, null, document.body);
     WebLibSimple.setBGColor(dialog.topDiv, "#99000000");
-    dialog.topDiv.onclick = wld.onClickCancel;
+    dialog.topDiv.onTouchClick = wld.onClickCancel;
 
     dialog.centerDiv = WebLibSimple.createDivWidHei("50%", "50%", 0, 0, null, dialog.topDiv);
 
@@ -105,7 +97,7 @@ WebLibDialog.createDialog = function(config)
     WebLibSimple.setBGColor(dialog.dialogDiv, "#ffffff");
     dialog.dialogDiv.style.display = "inline-block";
     dialog.dialogDiv.style.padding = WebLibSimple.addPixel(20);
-    dialog.dialogDiv.onclick = WebLibDialog.onClickIgnore;
+    dialog.dialogDiv.onTouchClick = WebLibDialog.onClickIgnore;
 
     dialog.titleDiv = WebLibSimple.createAnyAppend("div", dialog.dialogDiv);
     dialog.titleDiv.style.paddingBottom = WebLibSimple.addPixel(28);
@@ -122,7 +114,7 @@ WebLibDialog.createDialog = function(config)
 
     dialog.cancelButton = WebLibSimple.createSpanPadded(10, 0, 50, 0, null, dialog.buttDiv);
     dialog.cancelButton.innerHTML = (config.cancel ? config.cancel : "Abbrechen").toUpperCase();
-    dialog.cancelButton.onclick = WebLibDialog.onClickCancel;
+    dialog.cancelButton.onTouchClick = WebLibDialog.onClickCancel;
 
     if (config.other)
     {
@@ -130,14 +122,14 @@ WebLibDialog.createDialog = function(config)
         dialog.otherButton.innerHTML = config.other.toUpperCase();
         dialog.otherButton.style.color = (config.otherEnabled ? "#448844" : "#cccccc");
         dialog.otherButton.isenabled = (config.otherEnabled == true);
-        dialog.otherButton.onclick = WebLibDialog.onClickOther;
+        dialog.otherButton.onTouchClick = WebLibDialog.onClickOther;
     }
 
     dialog.okButton = WebLibSimple.createSpanPadded(25, 0, 25, 0, null, dialog.buttDiv);
     dialog.okButton.innerHTML = (config.ok ? config.ok : "Ok").toUpperCase();
     dialog.okButton.style.color = (config.okEnabled ? "#448844" : "#cccccc");
     dialog.okButton.isenabled = (config.okEnabled == true);
-    dialog.okButton.onclick = WebLibDialog.onClickOk;
+    dialog.okButton.onTouchClick = WebLibDialog.onClickOk;
 
     //
     // Position dialog div ontop of the center div makes

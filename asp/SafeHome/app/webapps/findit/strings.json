@@ -30,5 +30,9 @@
     "Car-Brands"
   ],
 
+  "game.solved": "You have found all %$1s",
+
+  "activity.game.solved": "You have found all %$1s in a Find-It game.",
+
   "EOL" : true
 }
