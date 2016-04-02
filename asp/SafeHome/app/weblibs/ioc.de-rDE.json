@@ -225,7 +225,7 @@
 
     "intent": {
       "action" : "view",
-      "keywords": [ "Playboy", "hübsche Mädels" ],
+      "keywords": [ "Playboy", "hübsche Mädels", "schöne Titten" ],
       "response": "Ich öffne den Playboy"
     },
 
@@ -239,6 +239,12 @@
     "default": true,
     "subtype": "shopping",
 
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Zalando"  ],
+      "response": "Ich öffne den Zalando Web-Shop"
+    },
+
     "subdomains": [ "track.zalando.de", ".ztat.net" ]
   },
 
@@ -249,6 +255,12 @@
     "default": true,
     "subtype": "shopping",
 
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Otto", "Otto Versand"  ],
+      "response": "Ich öffne den Otto Web-Shop"
+    },
+
     "subdomains": [ "images.otto.de", "assets.cdn-otto.de", "pxc.otto.de" ]
   },
 
@@ -258,6 +270,12 @@
     "label": "DaWanda",
     "default": true,
     "subtype": "shopping",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Dawanda", "schöne Dinge"  ],
+      "response": "Ich öffne den Dawanda Web-Shop"
+    },
 
     "subdomains": [
       ".dawanda.com",
@@ -276,13 +294,19 @@
     "default": true,
     "subtype": "shopping",
 
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Klingel", "schöne Dinge"  ],
+      "response": "Ich öffne den Klingel Web-Shop"
+    },
+
     "subdomains": [
     ]
   },
 
   "de.m.xhamster.com": {
     "url": "http://de.m.xhamster.com/",
-    "icon": "http://pbs.twimg.com/profile_images/707845523772825601/NXu2sYe7_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/715800836291575808/D9cur1Ni_400x400.jpg",
     "label": "xHamster",
     "default": true,
     "subtype": "erotics",
