@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.WebLib;
+import de.xavaro.android.common.Speak;
+import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.VoiceIntentResolver;
 
 public class LaunchItemVoice extends LaunchItem implements RecognitionListener
 {
@@ -71,6 +73,40 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizer.startListening(intent);
+    }
+
+    private void onBestVoiceResult(String spoken, int percent)
+    {
+        VoiceIntent intent = new VoiceIntent(spoken);
+
+        String logline = intent.getIntent() + ":" + spoken + " (" + percent + ")";
+        Simple.makeToast(logline);
+
+        if (intent.getIntent() == null)
+        {
+            Speak.speak("Ich habe sie nicht verstanden");
+            return;
+        }
+
+        Context app = Simple.getAppContext();
+
+        if ((app != null) && app instanceof VoiceIntentResolver)
+        {
+            boolean result = ((VoiceIntentResolver) app).onResolveVoiceIntent(intent);
+
+            if (! result)
+            {
+                Speak.speak("Ich kann die gewünschte Aktion nicht finden");
+                return;
+            }
+
+            String response = intent.getResponse();
+            if (response == null) response = "Ich führe die gewünschte Aktion aus.";
+
+            Speak.speak(response);
+
+            ((VoiceIntentResolver) app).onExecuteVoiceIntent(intent);
+        }
     }
 
     //region RecognitionListener
@@ -135,9 +171,14 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
         {
             for (int inx = 0; inx < text.size(); inx++)
             {
-                String logline = text.get(inx) + " (" + Math.round(conf[ inx ] * 100) + "%)";
-                if (inx == 0) Simple.makeToast(logline);
+                String spoken = text.get(inx);
+                int percent = Math.round(conf[ inx ] * 100);
+
+                String logline = spoken + " (" + percent + "%)";
+
                 Log.d(LOGTAG, "result=" + logline);
+
+                if (inx == 0) onBestVoiceResult(spoken, percent);
             }
         }
     }

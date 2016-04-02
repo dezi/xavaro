@@ -189,10 +189,9 @@ public class EventManager
         String suffix = lastdate.substring(0, 10).replace("-", ".");
 
         File arch = Simple.getPackageFile("events." + suffix + ".json");
+        if (arch.exists()) return;
 
         Log.d(LOGTAG,"migrateOutdatedArchive: lastdate=" + lastdate + "=" + arch.toString());
-
-        if (arch.exists()) return;
 
         JSONObject passed = Json.getObject(eventcache, "passed");
 

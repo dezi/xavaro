@@ -1,0 +1,10 @@
+{
+  "locales": [ "intents.de-rDE" ],
+
+  "intents": {
+
+    "view": [ "lesen", "blättern", "anzeigen", "anschauen" ],
+
+    "play": [ "spielen", "abspielen" ]
+  }
+}

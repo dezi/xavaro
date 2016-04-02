@@ -25,13 +25,16 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
+import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.WebCookie;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
         MediaSurface.VideoSurfaceHandler,
         BackKeyMaster,
-        AppInfoHandler
+        AppInfoHandler,
+        VoiceIntentResolver
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
@@ -53,12 +56,7 @@ public class HomeActivity extends AppCompatActivity implements
     private final Handler handler = new Handler();
 
     private static final int UI_HIDE = 0
-//          | View.SYSTEM_UI_FLAG_LOW_PROFILE
-//          | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             | View.SYSTEM_UI_FLAG_FULLSCREEN
-//          | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//          | View.SYSTEM_UI_FLAG_IMMERSIVE
-//          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 
@@ -275,7 +273,6 @@ public class HomeActivity extends AppCompatActivity implements
             backStack.add(view);
 
             if (videoSurface != null) videoSurface.bringToFront();
-
         }
     }
 
@@ -419,5 +416,19 @@ public class HomeActivity extends AppCompatActivity implements
             {
             }
         }
+    }
+
+    @Override
+    public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
+    {
+        return launchGroup.onResolveVoiceIntent(voiceintent);
+    }
+
+    @Override
+    public void onExecuteVoiceIntent(VoiceIntent voiceintent)
+    {
+        //
+        // To be overridden...
+        //
     }
 }

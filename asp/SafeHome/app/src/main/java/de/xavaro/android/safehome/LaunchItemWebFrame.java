@@ -3,8 +3,12 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VoiceIntent;
 
 public class LaunchItemWebFrame extends LaunchItem
 {
@@ -80,5 +84,11 @@ public class LaunchItemWebFrame extends LaunchItem
 
             ((HomeActivity) context).addViewToBackStack(directory);
         }
+    }
+
+    @Override
+    public void onExecuteVoiceIntent(VoiceIntent voiceintent)
+    {
+        launchWebFrame();
     }
 }

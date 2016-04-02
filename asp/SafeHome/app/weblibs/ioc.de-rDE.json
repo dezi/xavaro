@@ -6,6 +6,12 @@
     "default": true,
     "subtype": "newspaper",
 
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Bild Online", "Bild Zeitung", "Bildzeitung" , "Bild" ],
+      "response": "Ich öffne Bild Online"
+    },
+
     "subdomains": [
       "code.bildstatic.de",
       "rem-track.bild.de",
@@ -21,6 +27,12 @@
     "label": "Sport Bild",
     "default": true,
     "subtype": "newspaper",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Sport Bild", "Sportbild", "Sport Online", "Sport Zeitung", "Sport", "Bild" ],
+      "response": "Ich öffne Sport Bild"
+    },
 
     "subdomains": [
       "code.bildstatic.de",

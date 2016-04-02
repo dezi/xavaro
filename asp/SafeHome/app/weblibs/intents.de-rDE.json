@@ -1,0 +1,9 @@
+{
+
+  "intents": {
+
+    "view": [ "read", "show", "look at" ],
+
+    "play": [ "play", "watch" ]
+  }
+}

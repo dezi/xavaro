@@ -22,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.CacheManager;
@@ -30,12 +31,16 @@ import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VersionUtils;
+import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.VoiceIntentResolver;
 
 //
 // Launch item view on home screen.
 //
 
-public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCallback
+public class LaunchItem extends FrameLayout implements
+        Chooser.ChooserResultCallback,
+        VoiceIntentResolver
 {
     private final static String LOGTAG = LaunchItem.class.getSimpleName();
 
@@ -414,6 +419,22 @@ public class LaunchItem extends FrameLayout implements Chooser.ChooserResultCall
     }
 
     public void onBackKeyExecuted()
+    {
+        //
+        // To be overridden...
+        //
+    }
+
+    public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
+    {
+        JSONObject intent = Json.getObject(config, "intent");
+        String action = Json.getString(intent, "action");
+        JSONArray keywords = Json.getArray(intent, "keywords");
+
+        return voiceintent.evaluateIntent(action, keywords);
+    }
+
+    public void onExecuteVoiceIntent(VoiceIntent voiceintent)
     {
         //
         // To be overridden...

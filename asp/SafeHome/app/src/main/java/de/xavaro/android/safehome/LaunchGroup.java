@@ -32,12 +32,16 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.VersionUtils;
+import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.VoiceIntentResolver;
 
 //
 // Launch item view on home screen.
 //
 
-public class LaunchGroup extends FrameLayout implements View.OnTouchListener
+public class LaunchGroup extends FrameLayout implements
+        View.OnTouchListener,
+        VoiceIntentResolver
 {
     private static final String LOGTAG = LaunchGroup.class.getSimpleName();
 
@@ -609,5 +613,21 @@ public class LaunchGroup extends FrameLayout implements View.OnTouchListener
     public LaunchItem getLaunchItem()
     {
         return this.parent;
+    }
+
+    @Override
+    public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
+    {
+        Log.d(LOGTAG,"onResolveVoiceIntent:" + voiceintent.getCommand());
+
+        return false;
+    }
+
+    @Override
+    public void onExecuteVoiceIntent(VoiceIntent voiceintent)
+    {
+        //
+        // To be overridden...
+        //
     }
 }
