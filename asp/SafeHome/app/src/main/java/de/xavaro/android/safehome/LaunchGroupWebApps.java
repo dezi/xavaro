@@ -47,11 +47,7 @@ public class LaunchGroupWebApps extends LaunchGroup
             Json.put(entry, "order", 400);
 
             JSONObject intent = WebApp.getVoiceIntents(webappname);
-            if (intent != null)
-            {
-
-                Json.put(entry, "intent", intent);
-            }
+            if (intent != null) Json.put(entry, "intent", intent);
 
             String mode = (String) webapps.get(prefkey);
 

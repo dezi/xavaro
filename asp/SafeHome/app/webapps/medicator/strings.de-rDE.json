@@ -5,6 +5,37 @@
     "response": "Ich öffne die Seite mit den Medikamenten für Dich"
   },
 
+  "intents": [
+
+    {
+      "action" : "take",
+      "keywords": [ "Medikamente", "Medis", "Pille", "Pillen"  ],
+      "response": "Du kannst Deine Medis jetzt abkreuzen",
+      "tag": "AAA"
+    },
+
+    {
+      "action" : "take",
+      "keywords": [ "Blutdruck"  ],
+      "response": "Du kannst Deine Werte jetzt eingeben",
+      "tag": "ZZB"
+    },
+
+    {
+      "action" : "take",
+      "keywords": [ "Blutzucker" ],
+      "response": "Du kannst Deinen Wert jetzt eingeben",
+      "tag": "ZZG"
+    },
+
+    {
+      "action" : "take",
+      "keywords": [ "wiegen" , "gewogen"  ],
+      "response": "Du kannst Dein Gewicht jetzt eingeben",
+      "tag": "ZZW"
+    }
+  ],
+
   "medication.days" : "Rhythmus",
   "medication.days.vals" : [ "Täglich", "Bestimmte Wochentage", "Tagesintervall", "Wöchentlich", "Monatlich", "Bei Bedarf" ],
 

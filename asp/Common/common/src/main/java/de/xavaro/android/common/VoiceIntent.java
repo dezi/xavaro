@@ -120,31 +120,52 @@ public class VoiceIntent
         return addme;
     }
 
-    public boolean evaluateIntent(String myintent, JSONArray mykeywords,
-                                  String response, String identifier)
+    public boolean evaluateIntents(JSONArray myintents, String identifier)
     {
         boolean foundone = false;
 
-        if (Simple.equals(intent, myintent) && (command != null) && (mykeywords != null))
+        if (myintents != null)
+        {
+            for (int inx = 0; inx < myintents.length(); inx++)
+            {
+                if (evaluateIntent(Json.getObject(myintents, inx), identifier))
+                {
+                    foundone = true;
+                }
+            }
+        }
+
+        return foundone;
+    }
+
+    public boolean evaluateIntent(JSONObject myintent, String identifier)
+    {
+        boolean foundone = false;
+
+        if ((command != null) && (myintent != null) && Json.equals(myintent, "action", intent))
         {
             String cmp = " " + command.toLowerCase() + " ";
 
-            for (int inx = 0; inx < mykeywords.length(); inx++)
+            JSONArray mykeywords = Json.getArray(myintent, "keywords");
+
+            if (mykeywords != null)
             {
-                String wrd = Json.getString(mykeywords, inx);
-                if (wrd == null) continue;
-
-                if (cmp.contains(" " + wrd.toLowerCase() + " "))
+                for (int inx = 0; inx < mykeywords.length(); inx++)
                 {
-                    JSONObject match = new JSONObject();
+                    String wrd = Json.getString(mykeywords, inx);
+                    if (wrd == null) continue;
 
-                    Json.put(match, "target", wrd);
-                    Json.put(match, "response", response);
-                    Json.put(match, "identifier", identifier);
+                    if (cmp.contains(" " + wrd.toLowerCase() + " "))
+                    {
+                        JSONObject match = Json.clone(myintent);
 
-                    Log.d(LOGTAG, "evaluateIntent: " + identifier + "=" + wrd + " => " + response);
+                        Json.put(match, "target", wrd);
+                        Json.put(match, "identifier", identifier);
 
-                    if (keepIfBetter(match)) foundone = true;
+                        Log.d(LOGTAG, "evaluateIntent: " + identifier + "=" + wrd);
+
+                        if (keepIfBetter(match)) foundone = true;
+                    }
                 }
             }
         }
