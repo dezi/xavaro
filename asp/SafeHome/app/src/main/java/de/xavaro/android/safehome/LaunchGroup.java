@@ -620,14 +620,74 @@ public class LaunchGroup extends FrameLayout implements
     {
         Log.d(LOGTAG,"onResolveVoiceIntent:" + voiceintent.getCommand());
 
-        return false;
+        if (launchItems != null)
+        {
+            //
+            // Find already created launch items.
+            //
+
+            for (LaunchItem launchItem : launchItems)
+            {
+                launchItem.onResolveVoiceIntent(voiceintent);
+            }
+        }
+        else
+        {
+            if ((config != null) && config.has("launchitems"))
+            {
+                //
+                // Inspect configured launch items.
+                //
+
+                JSONArray launchitems = Json.getArray(config, "launchitems");
+
+                if (launchitems == null) return false;
+
+                for (int inx = 0; inx < launchitems.length(); inx++)
+                {
+                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    if (launchitem == null) continue;
+
+                    JSONObject intent = Json.getObject(launchitem, "intent");
+                    if (intent == null) continue;
+
+                    String identifier = Json.getString(launchitem, "identifier");
+
+                    String action = Json.getString(intent, "action");
+                    String response = Json.getString(intent, "response");
+                    JSONArray keywords = Json.getArray(intent, "keywords");
+
+                    voiceintent.evaluateIntent(action, keywords, response, identifier);
+                }
+            }
+        }
+
+        return (voiceintent.getNumMatches() > 0);
     }
 
     @Override
-    public void onExecuteVoiceIntent(VoiceIntent voiceintent)
+    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
-        //
-        // To be overridden...
-        //
+        Log.d(LOGTAG,"onExecuteVoiceIntent:" + voiceintent.getCommand());
+
+        if (launchItems != null)
+        {
+            //
+            // Find already created launch items.
+            //
+
+            for (LaunchItem launchItem : launchItems)
+            {
+                if (launchItem.onExecuteVoiceIntent(voiceintent, index))
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+        }
+
+        return false;
     }
 }

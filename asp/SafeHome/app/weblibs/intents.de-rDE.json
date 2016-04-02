@@ -2,8 +2,8 @@
 
   "intents": {
 
-    "view": [ "read", "show", "look at" ],
+    "view": [ "lesen", "blättern", "anzeigen", "anschauen", "sehen" ],
 
-    "play": [ "play", "watch" ]
+    "play": [ "spielen", "abspielen" ]
   }
 }

@@ -8,8 +8,8 @@
 
     "intent": {
       "action" : "view",
-      "keywords": [ "Bild Online", "Bild Zeitung", "Bildzeitung" , "Bild" ],
-      "response": "Ich öffne Bild Online"
+      "keywords": [ "Bild Online", "Bild Zeitung", "Bildzeitung" , "Bild", "eine Zeitung" ],
+      "response": "Ich öffne die Bild Zeitung"
     },
 
     "subdomains": [
@@ -48,7 +48,13 @@
     "icon": "http://pbs.twimg.com/profile_images/1719664041/tw_spon_400x400.jpg",
     "label": "Spiegel Online",
     "default": true,
-    "subtype": "magazine"
+    "subtype": "magazine",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Spiegel", "Spiegel Online", "Den Spiegel", "Spiegel Magazin" ],
+      "response": "Ich öffne den Spiegel"
+    }
   },
 
   "m.gala.de": {
@@ -56,7 +62,13 @@
     "icon": "http://pbs.twimg.com/profile_images/568402279900794880/PSCQkXzW_400x400.png",
     "label": "Gala",
     "default": true,
-    "subtype": "pictorial"
+    "subtype": "pictorial",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Gala", "etwas Buntes" ],
+      "response": "Ich öffne die Gala"
+    }
   },
 
   "mobil.bunte.de": {
@@ -66,6 +78,12 @@
     "default": true,
     "subtype": "pictorial",
 
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Die Bunte", "etwas Buntes" ],
+      "response": "Ich öffne die Bunte"
+    },
+
     "subdomains": [ "i1.bstatic.de", "i2.bstatic.de", "i3.bstatic.de" ]
   },
 
@@ -74,7 +92,13 @@
     "icon": "http://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH_400x400.png",
     "label": "Manager Magazin",
     "default": true,
-    "subtype": "magazine"
+    "subtype": "magazine",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Manager Magazin", "ein Magazin" ],
+      "response": "Ich öffne das Manager Magazin"
+    }
   },
 
   "mobil.stern.de": {
@@ -83,6 +107,12 @@
     "label": "Stern",
     "default": true,
     "subtype": "pictorial",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Stern", "etwas Buntes", "ein Magazin" ],
+      "response": "Ich öffne den Stern"
+    },
 
     "subdomains": [ "static.stern.de" ]
   },
@@ -94,6 +124,12 @@
     "default": true,
     "subtype": "newspaper",
 
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Mopo", "Hamburger Morgenpost", "eine Zeitung" ],
+      "response": "Ich öffne die MOPO"
+    },
+
     "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
   },
 
@@ -102,7 +138,13 @@
     "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg",
     "label": "Petra",
     "default": true,
-    "subtype": "pictorial"
+    "subtype": "pictorial",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Die Petra", "Petra", "etwas Buntes" ],
+      "response": "Ich öffne die Petra"
+    }
   },
 
   "m.focus.de": {
@@ -112,6 +154,12 @@
     "default": true,
     "subtype": "magazine",
 
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Fokus", "Focus", "Focus Online", "Den Focus", "Focus Magazin" ],
+      "response": "Ich öffne das Focus Magazin"
+    },
+
     "subdomains": [ "chart.finanzen100.de" ]
   },
 
@@ -120,7 +168,13 @@
     "icon": "http://pbs.twimg.com/profile_images/705249451816853504/y1Er7BhQ_400x400.jpg",
     "label": "National Geo",
     "default": true,
-    "subtype": "magazine"
+    "subtype": "magazine",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Natgeo", "National Geographic", "National Geo graphic", "ein Magazin" ],
+      "response": "Ich öffne National Geographic"
+    }
   },
 
   "m.faz.net": {
@@ -129,6 +183,12 @@
     "label": "FAZ Online",
     "default": true,
     "subtype": "newspaper",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "FAZ", "F A Z", "eine Zeitung" ],
+      "response": "Ich öffne die FAZ"
+    },
 
     "subdomains": [ "static.faz.net", "gets.faz.net" ]
   },
@@ -139,6 +199,12 @@
     "label": "bento",
     "default": true,
     "subtype": "magazin",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Bento", "eine Jungendmagazin" ],
+      "response": "Ich öffne Bento"
+    },
 
     "subdomains": [
       "disqus.com",
@@ -156,6 +222,12 @@
     "label": "Playboy",
     "default": true,
     "subtype": "pictorial",
+
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Playboy", "hübsche Mädels" ],
+      "response": "Ich öffne den Playboy"
+    },
 
     "subdomains": [ "pbs.twimg.com" ]
   },

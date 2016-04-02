@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -20,7 +21,7 @@ public class LaunchGroupRoot extends LaunchGroup
         super(context);
     }
 
-    public static void insertDuplicateMerge(JSONArray launchitems, JSONObject newlaunchitem)
+    private static void insertDuplicateMerge(JSONArray launchitems, JSONObject newlaunchitem)
     {
         if (newlaunchitem.has("launchitems"))
         {
@@ -57,6 +58,25 @@ public class LaunchGroupRoot extends LaunchGroup
         }
 
         Json.put(launchitems, newlaunchitem);
+    }
+
+    private static void insertIdentifiers(JSONArray launchitems)
+    {
+        if (launchitems != null)
+        {
+            for (int inx = 0; inx < launchitems.length(); inx++)
+            {
+                JSONObject launchitem = Json.getObject(launchitems, inx);
+                if ((launchitem == null) || launchitem.has("identifier")) continue;
+
+                Json.put(launchitem, "identifier", UUID.randomUUID().toString());
+
+                if (launchitem.has("launchitems"))
+                {
+                    insertIdentifiers(Json.getArray(launchitem, "launchitems"));
+                }
+            }
+        }
     }
 
     public static JSONObject getConfig()
@@ -115,12 +135,12 @@ public class LaunchGroupRoot extends LaunchGroup
             }
         }
 
+        insertIdentifiers(launchitems);
+
         JSONArray sorted = Json.sortInteger(launchitems, "order", false);
 
         JSONObject config = new JSONObject();
         Json.put(config, "launchitems", sorted);
-
-        Log.d(LOGTAG, "getConfig: " + config.toString());
 
         return config;
     }

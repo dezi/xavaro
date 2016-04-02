@@ -2,11 +2,13 @@ package de.xavaro.android.common;
 
 
 import android.support.annotation.Nullable;
+
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class VoiceIntent
@@ -15,10 +17,10 @@ public class VoiceIntent
 
     private static JSONObject intents;
 
+    private final JSONArray matches = new JSONArray();
+
     private String command;
-    private String response;
     private String intent;
-    private String target;
 
     public VoiceIntent(String command)
     {
@@ -26,7 +28,7 @@ public class VoiceIntent
 
         if (intents == null)
         {
-            JSONObject global = WebLib.getConfig("intents");
+            JSONObject global = WebLib.getLocaleConfig("intents");
             if (global != null) intents = Json.getObject(global, "intents");
         }
 
@@ -77,25 +79,52 @@ public class VoiceIntent
         return intent;
     }
 
-    @Nullable
-    public String getTarget()
+    public JSONArray getMatches()
     {
-        return target;
+        return matches;
     }
 
-    @Nullable
-    public String getResponse()
+    public int getNumMatches()
     {
-        return response;
+        return matches.length();
     }
 
-    public void setResponse(String response)
+    private boolean keepIfBetter(JSONObject match)
     {
-        this.response = response;
+        String target = Json.getString(match, "target");
+        if (target == null) return false;
+
+        boolean addme = (matches.length() == 0);
+
+        for (int inx = 0; inx < matches.length(); inx++)
+        {
+            JSONObject oldmatch = Json.getObject(matches, inx);
+            String oldtarget = Json.getString(oldmatch, "target");
+            if (oldtarget == null) continue;
+
+            if (target.length() == oldtarget.length())
+            {
+                addme = true;
+                break;
+            }
+
+            if (target.length() > oldtarget.length())
+            {
+                Json.remove(matches, inx--);
+                addme = true;
+            }
+        }
+
+        if (addme) Json.put(matches, match);
+
+        return addme;
     }
 
-    public boolean evaluateIntent(String myintent, JSONArray mykeywords)
+    public boolean evaluateIntent(String myintent, JSONArray mykeywords,
+                                  String response, String identifier)
     {
+        boolean foundone = false;
+
         if (Simple.equals(intent, myintent) && (command != null) && (mykeywords != null))
         {
             String cmp = " " + command.toLowerCase() + " ";
@@ -107,12 +136,19 @@ public class VoiceIntent
 
                 if (cmp.contains(" " + wrd.toLowerCase() + " "))
                 {
-                    target = wrd;
-                    return true;
+                    JSONObject match = new JSONObject();
+
+                    Json.put(match, "target", wrd);
+                    Json.put(match, "response", response);
+                    Json.put(match, "identifier", identifier);
+
+                    Log.d(LOGTAG, "evaluateIntent: " + identifier + "=" + wrd + " => " + response);
+
+                    if (keepIfBetter(match)) foundone = true;
                 }
             }
         }
 
-        return false;
+        return foundone;
     }
 }

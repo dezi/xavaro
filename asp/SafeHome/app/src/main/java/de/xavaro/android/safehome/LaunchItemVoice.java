@@ -100,12 +100,31 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
                 return;
             }
 
-            String response = intent.getResponse();
+            JSONArray matches = intent.getMatches();
+            if (matches == null) return;
+
+            if (intent.getNumMatches() > 1)
+            {
+                Speak.speak("Es gibt mehrere Aktionen die ich ausführen kann");
+
+                for (int inx = 0; inx < matches.length(); inx++)
+                {
+                    JSONObject match = Json.getObject(matches, inx);
+                    String response = Json.getString(match, "response");
+
+                    Log.d(LOGTAG, "onBestVoiceResult: ambigous:" + response);
+                }
+
+                return;
+            }
+
+            JSONObject match = Json.getObject(matches, 0);
+            String response = Json.getString(match, "response");
             if (response == null) response = "Ich führe die gewünschte Aktion aus.";
 
             Speak.speak(response);
 
-            ((VoiceIntentResolver) app).onExecuteVoiceIntent(intent);
+            ((VoiceIntentResolver) app).onExecuteVoiceIntent(intent, 0);
         }
     }
 

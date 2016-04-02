@@ -25,6 +25,8 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
 import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
@@ -101,6 +103,7 @@ public class LaunchItem extends FrameLayout implements
 
     protected Context context;
     protected Handler handler;
+    protected String identifier;
 
     protected LayoutParams layout;
     protected LayoutParams oversize;
@@ -322,6 +325,7 @@ public class LaunchItem extends FrameLayout implements
 
         type = config.has("type") ? Json.getString(config, "type") : null;
         subtype = config.has("subtype") ? Json.getString(config, "subtype") : null;
+        identifier = config.has("identifier") ? Json.getString(config, "identifier") : null;
 
         if (config.has("icon"))
         {
@@ -381,6 +385,11 @@ public class LaunchItem extends FrameLayout implements
         return parent;
     }
 
+    public String getIdentifier()
+    {
+        return identifier;
+    }
+
     protected void setConfig()
     {
         //
@@ -425,19 +434,113 @@ public class LaunchItem extends FrameLayout implements
         //
     }
 
+    @Override
     public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
     {
-        JSONObject intent = Json.getObject(config, "intent");
-        String action = Json.getString(intent, "action");
-        JSONArray keywords = Json.getArray(intent, "keywords");
+        if (directory != null)
+        {
+            return directory.onResolveVoiceIntent(voiceintent);
+        }
 
-        return voiceintent.evaluateIntent(action, keywords);
+        if (config != null)
+        {
+            if (config.has("intent"))
+            {
+                JSONObject intent = Json.getObject(config, "intent");
+
+                String action = Json.getString(intent, "action");
+                String response = Json.getString(intent, "response");
+                JSONArray keywords = Json.getArray(intent, "keywords");
+
+                return voiceintent.evaluateIntent(action, keywords, response, identifier);
+            }
+
+            if (config.has("launchitems"))
+            {
+                //
+                // Inspect configured launch items.
+                //
+
+                JSONArray launchitems = Json.getArray(config, "launchitems");
+                if (launchitems == null) return false;
+
+                for (int inx = 0; inx < launchitems.length(); inx++)
+                {
+                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    if (launchitem == null) continue;
+
+                    JSONObject intent = Json.getObject(launchitem, "intent");
+                    if (intent == null) continue;
+
+                    String identifier = Json.getString(launchitem, "identifier");
+
+                    String action = Json.getString(intent, "action");
+                    String response = Json.getString(intent, "response");
+                    JSONArray keywords = Json.getArray(intent, "keywords");
+
+                    voiceintent.evaluateIntent(action, keywords, response, identifier);
+                }
+            }
+        }
+
+        return false;
     }
 
-    public void onExecuteVoiceIntent(VoiceIntent voiceintent)
+    @Override
+    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
-        //
-        // To be overridden...
-        //
+        if (directory != null)
+        {
+            return directory.onExecuteVoiceIntent(voiceintent, index);
+        }
+
+        if (config != null)
+        {
+            JSONArray matches = voiceintent.getMatches();
+            if ((matches == null) || (index >= matches.length())) return false;
+
+            JSONObject match = Json.getObject(matches, index);
+            if (match == null) return false;
+
+            String identifier = Json.getString(match, "identifier");
+            if (identifier == null) return false;
+
+            if (config.has("intent"))
+            {
+                return Simple.equals(identifier, this.identifier);
+            }
+
+            if (config.has("launchitems"))
+            {
+                //
+                // Inspect configured launch items.
+                //
+
+                JSONArray launchitems = Json.getArray(config, "launchitems");
+                if (launchitems == null) return false;
+
+                for (int inx = 0; inx < launchitems.length(); inx++)
+                {
+                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    if (launchitem == null) continue;
+
+                    String configidentifier = Json.getString(launchitem, "identifier");
+                    if (configidentifier == null) continue;
+
+                    if (identifier.equals(configidentifier))
+                    {
+                        //
+                        // Create and click an unattached launch icon.
+                        //
+
+                        LaunchItem.createLaunchItem(context, null, launchitem).onMyClick();
+
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

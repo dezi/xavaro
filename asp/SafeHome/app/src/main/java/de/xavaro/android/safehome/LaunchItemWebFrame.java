@@ -87,8 +87,18 @@ public class LaunchItemWebFrame extends LaunchItem
     }
 
     @Override
-    public void onExecuteVoiceIntent(VoiceIntent voiceintent)
+    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
-        launchWebFrame();
+        if (super.onExecuteVoiceIntent(voiceintent, index))
+        {
+            if (config.has("name"))
+            {
+                launchWebFrame();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
