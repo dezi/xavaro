@@ -1,4 +1,10 @@
 {
+  "intent": {
+    "action" : "take",
+    "keywords": [ "Medikamente", "Medis", "Blutdruck", "Blutzucker", "wiegen" , "gewogen"  ],
+    "response": "Ich öffne die Seite mit den Medikamenten für Dich"
+  },
+
   "medication.days" : "Rhythmus",
   "medication.days.vals" : [ "Täglich", "Bestimmte Wochentage", "Tagesintervall", "Wöchentlich", "Monatlich", "Bei Bedarf" ],
 

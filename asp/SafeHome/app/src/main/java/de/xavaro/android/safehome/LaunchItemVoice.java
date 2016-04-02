@@ -55,6 +55,7 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
     protected void setConfig()
     {
         icon.setImageResource(CommonConfigs.IconResVoice);
+        overicon.setImageResource(CommonConfigs.IconResVoiceListen);
     }
 
     @Override
@@ -74,6 +75,24 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizer.startListening(intent);
     }
+
+    private final Runnable voiceIsListening = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            overlay.setVisibility(VISIBLE);
+        }
+    };
+
+    private final Runnable voiceIsInactive = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            overlay.setVisibility(INVISIBLE);
+        }
+    };
 
     private void onBestVoiceResult(String spoken, int percent)
     {
@@ -134,6 +153,8 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
     public void onReadyForSpeech(Bundle params)
     {
         Log.d(LOGTAG, "onReadyForSpeech:");
+
+        getHandler().post(voiceIsListening);
     }
 
     @Override
@@ -164,6 +185,8 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
     public void onError(int error)
     {
         Log.d(LOGTAG, "onError:");
+
+        getHandler().post(voiceIsInactive);
     }
 
     @Override
@@ -200,6 +223,8 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
                 if (inx == 0) onBestVoiceResult(spoken, percent);
             }
         }
+
+        getHandler().post(voiceIsInactive);
     }
 
     //endregion

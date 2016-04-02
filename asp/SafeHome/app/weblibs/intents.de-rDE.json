@@ -2,6 +2,8 @@
 
   "intents": {
 
+    "take": [ "nehmen", "genommen", "messen", "gemessen", "wiegen", "gewogen" ],
+
     "view": [ "lesen", "blättern", "anzeigen", "anschauen", "sehen" ],
 
     "play": [ "spielen", "abspielen" ]

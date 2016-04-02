@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WebApp;
 
 public class LaunchGroupWebApps extends LaunchGroup
 {
@@ -44,6 +45,13 @@ public class LaunchGroupWebApps extends LaunchGroup
             Json.put(entry, "type", "webapp");
             Json.put(entry, "subtype", webappname);
             Json.put(entry, "order", 400);
+
+            JSONObject intent = WebApp.getVoiceIntents(webappname);
+            if (intent != null)
+            {
+
+                Json.put(entry, "intent", intent);
+            }
 
             String mode = (String) webapps.get(prefkey);
 

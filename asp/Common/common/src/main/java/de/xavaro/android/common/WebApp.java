@@ -68,6 +68,33 @@ public class WebApp
     }
 
     @Nullable
+    public static JSONObject getVoiceIntents(String webappname)
+    {
+        JSONObject manifest = getManifest(webappname);
+        if ((manifest == null) || ! Json.getBoolean(manifest, "voice")) return null;
+
+        JSONArray locales = Json.getArray(manifest, "locale");
+        if (locales == null) return null;
+
+        String target = Simple.getLocale() + ".json";
+
+        for (int inx = 0; inx < locales.length(); inx++)
+        {
+            String locale = Json.getString(locales, inx);
+            if ((locale == null) || ! locale.endsWith(target)) continue;
+
+            String localesrc = getHTTPAppRoot(webappname) + locale;
+            JSONObject strings = Json.fromString(getStringContent(webappname, localesrc));
+            if (strings == null) continue;
+
+            return Json.getObject(strings, "intent");
+        }
+
+        return null;
+    }
+
+
+    @Nullable
     public static Drawable getAppIcon(String webappname)
     {
         String appiconpng = Json.getString(getManifest(webappname), "appicon");
@@ -129,6 +156,11 @@ public class WebApp
     public static boolean hasPreferences(String webappname)
     {
         return Json.getBoolean(getManifest(webappname), "preferences");
+    }
+
+    public static boolean hasVoice(String webappname)
+    {
+        return Json.getBoolean(getManifest(webappname), "voice");
     }
 
     private static final Map<String, WebAppView> eventWebApps = new HashMap<>();

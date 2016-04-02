@@ -3,6 +3,8 @@
 
   "intents": {
 
+    "take": [ "take", "took", "measure", "measured", "weigh" ],
+
     "view": [ "read", "show", "look at" ],
 
     "play": [ "play", "watch" ]

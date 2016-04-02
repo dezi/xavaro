@@ -6,6 +6,7 @@
     "appicon": "medicator_512x512.png",
     "preferences": true,
     "events": true,
+    "voice": true,
 
     "permissions": [
       "prefs",

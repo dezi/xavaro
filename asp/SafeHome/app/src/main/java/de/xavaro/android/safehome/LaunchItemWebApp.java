@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.WebApp;
 
 public class LaunchItemWebApp extends LaunchItem
@@ -65,5 +66,21 @@ public class LaunchItemWebApp extends LaunchItem
         {
             ((HomeActivity) context).addViewToBackStack(directory);
         }
+    }
+
+    @Override
+    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
+    {
+        if (super.onExecuteVoiceIntent(voiceintent, index))
+        {
+            if (subtype != null)
+            {
+                launchWebapp();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

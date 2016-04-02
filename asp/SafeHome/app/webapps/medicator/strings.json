@@ -1,4 +1,10 @@
 {
+  "intent": {
+    "action" : "take",
+    "keywords": [ "Medicine", "Medis", "blood pressure", "blood sugar", "weigh"  ],
+    "response": "I open the medis page for You"
+  },
+
   "medication.days" : "Interval",
   "medication.days.keys" : [ "daily", "weekdays",          "interval",      "weekly",      "monthly",   "ondemand"  ],
   "medication.days.vals" : [ "Daily", "Selected Weekdays", "Interval Days", "Wöchentlich", "Monatlich", "Bei Bedarf" ],
