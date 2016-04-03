@@ -22,6 +22,11 @@ public class VoiceIntent
     private String command;
     private String intent;
 
+    public VoiceIntent()
+    {
+        this(null);
+    }
+
     public VoiceIntent(String command)
     {
         this.command = command;
@@ -192,5 +197,34 @@ public class VoiceIntent
         }
 
         return foundone;
+    }
+
+    public boolean collectIntents(JSONArray myintents, String identifier)
+    {
+        boolean foundone = false;
+
+        if (myintents != null)
+        {
+            for (int inx = 0; inx < myintents.length(); inx++)
+            {
+                if (collectIntent(Json.getObject(myintents, inx), identifier))
+                {
+                    foundone = true;
+                }
+            }
+        }
+
+        return foundone;
+    }
+
+    public boolean collectIntent(JSONObject myintent, String identifier)
+    {
+        if (myintent == null) return false;
+
+        JSONObject match = Json.clone(myintent);
+        Json.put(match, "identifier", identifier);
+        Json.put(matches, match);
+
+        return true;
     }
 }

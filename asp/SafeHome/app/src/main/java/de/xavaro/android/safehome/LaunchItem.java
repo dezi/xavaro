@@ -435,6 +435,59 @@ public class LaunchItem extends FrameLayout implements
     }
 
     @Override
+    public boolean onCollectVoiceIntent(VoiceIntent voiceintent)
+    {
+        if (directory != null)
+        {
+            return directory.onCollectVoiceIntent(voiceintent);
+        }
+
+        if (config != null)
+        {
+            if (config.has("intent"))
+            {
+                JSONObject intent = Json.getObject(config, "intent");
+                return voiceintent.collectIntent(intent, identifier);
+            }
+
+            if (config.has("intents"))
+            {
+                JSONArray intents = Json.getArray(config, "intents");
+                return voiceintent.collectIntents(intents, identifier);
+            }
+
+            if (config.has("launchitems"))
+            {
+                //
+                // Inspect configured launch items.
+                //
+
+                JSONArray launchitems = Json.getArray(config, "launchitems");
+                if (launchitems == null) return false;
+
+                boolean foundone = false;
+
+                for (int inx = 0; inx < launchitems.length(); inx++)
+                {
+                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    String identifier = Json.getString(launchitem, "identifier");
+                    if (identifier == null) continue;
+
+                    JSONObject intent = Json.getObject(launchitem, "intent");
+                    if (voiceintent.collectIntent(intent, identifier)) foundone = true;
+
+                    JSONArray intents = Json.getArray(launchitem, "intents");
+                    if (voiceintent.collectIntents(intents, identifier)) foundone = true;
+                }
+
+                return foundone;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
     {
         if (directory != null)
@@ -465,6 +518,8 @@ public class LaunchItem extends FrameLayout implements
                 JSONArray launchitems = Json.getArray(config, "launchitems");
                 if (launchitems == null) return false;
 
+                boolean foundone = false;
+
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
                     JSONObject launchitem = Json.getObject(launchitems, inx);
@@ -472,11 +527,13 @@ public class LaunchItem extends FrameLayout implements
                     if (identifier == null) continue;
 
                     JSONObject intent = Json.getObject(launchitem, "intent");
-                    voiceintent.evaluateIntent(intent, identifier);
+                    if (voiceintent.evaluateIntent(intent, identifier)) foundone = true;
 
                     JSONArray intents = Json.getArray(launchitem, "intents");
-                    voiceintent.evaluateIntents(intents, identifier);
+                    if (voiceintent.evaluateIntents(intents, identifier)) foundone = true;
                 }
+
+                return foundone;
             }
         }
 
