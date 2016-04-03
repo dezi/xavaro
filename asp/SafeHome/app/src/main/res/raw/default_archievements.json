@@ -38,6 +38,14 @@
       "message": "Der Alarmruf kann nur durch einen langen Click ausgelöst werden.",
       "buttons": "ok|noshow",
       "prio": 300
+    },
+
+    "voice.longclick":
+    {
+      "title": "important",
+      "message": "Mit einem langen Click können sie die Befehle sehen.",
+      "buttons": "ok|noshow",
+      "prio": 300
     }
   }
 }

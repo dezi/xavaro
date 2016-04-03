@@ -62,10 +62,25 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
         overicon.setImageResource(CommonConfigs.IconResVoiceListen);
     }
 
+    private final Runnable launchVoiceDelayed = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            launchVoice();
+        }
+    };
+
     @Override
     protected void onMyClick()
     {
-        if (type.equals("voice")) launchVoice();
+        if (type.equals("voice"))
+        {
+            if (! ArchievementManager.show("voice.longclick", launchVoiceDelayed))
+            {
+                launchVoice();
+            }
+        }
     }
 
     private void launchVoice()

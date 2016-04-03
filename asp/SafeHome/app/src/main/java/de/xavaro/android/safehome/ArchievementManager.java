@@ -21,7 +21,8 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
 public class ArchievementManager implements
-        DialogInterface.OnClickListener
+        DialogInterface.OnClickListener,
+        DialogInterface.OnDismissListener
 {
     private static final String LOGTAG = ArchievementManager.class.getSimpleName();
 
@@ -37,6 +38,11 @@ public class ArchievementManager implements
     public static boolean show(String tag)
     {
         return new ArchievementManager(tag).showCheck();
+    }
+
+    public static boolean show(String tag, Runnable postonclose)
+    {
+        return new ArchievementManager(tag, postonclose).showCheck();
     }
 
     public static void archieved(String tag)
@@ -123,9 +129,17 @@ public class ArchievementManager implements
     private String currentNeutralb;
     private String currentXpathpref;
 
+    private Runnable currentPost;
+
     public ArchievementManager(String tag)
     {
+        this(tag, null);
+    }
+
+    public ArchievementManager(String tag, Runnable postonclose)
+    {
         currentTag = tag;
+        currentPost = postonclose;
         context = Simple.getAppContext();
         if (config == null) readConfig();
     }
@@ -210,7 +224,7 @@ public class ArchievementManager implements
 
         if (! config.has(currentTag))
         {
-            OopsService.log(LOGTAG,"showInternal: archievement <" + currentTag + "> not found.");
+            OopsService.log(LOGTAG, "showInternal: archievement <" + currentTag + "> not found.");
 
             return false;
         }
@@ -304,6 +318,8 @@ public class ArchievementManager implements
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(24f);
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTransformationMethod(null);
 
+            dialog.setOnDismissListener(this);
+
             String dpath = currentXpathpref + "/displays";
             int displaycount = PersistManager.getXpathInt(dpath);
             PersistManager.putXpath(dpath, ++displaycount);
@@ -319,6 +335,16 @@ public class ArchievementManager implements
         }
     }
 
+    @Override
+    public void onDismiss(DialogInterface dialog)
+    {
+        if (currentPost != null)
+        {
+            handler.postDelayed(currentPost, 100);
+        }
+    }
+
+    @Override
     public void onClick(DialogInterface dialog, int which)
     {
         if (which == DialogInterface.BUTTON_POSITIVE)
@@ -340,6 +366,7 @@ public class ArchievementManager implements
         if ((which == DialogInterface.BUTTON_NEUTRAL) && currentNeutralb.equals("follow"))
         {
             handler.postDelayed(followRunnable, 100);
+            currentPost = null;
         }
     }
 
