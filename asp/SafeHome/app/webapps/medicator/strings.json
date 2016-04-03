@@ -5,6 +5,7 @@
       "action" : "take",
       "keywords": [ "medicine", "medis", "pill", "pills"  ],
       "response": "You can register Your medis now",
+      "sample": "I would like to take my medis now",
       "tag": "AAA"
     },
 
@@ -12,6 +13,7 @@
       "action" : "take",
       "keywords": [ "blood pressure"  ],
       "response": "You can enter Your values now",
+      "sample": "I would like to take my blood pressure now",
       "tag": "ZZB"
     },
 
@@ -19,6 +21,7 @@
       "action" : "take",
       "keywords": [ "blood sugar" ],
       "response": "You can enter Your value now",
+      "sample": "I would like to take my blood sugar now",
       "tag": "ZZG"
     },
 
@@ -26,6 +29,7 @@
       "action" : "take",
       "keywords": [ "weigh" ],
       "response": "You can enter Your weight now",
+      "sample": "I would like to weigh myself",
       "tag": "ZZW"
     }
   ],

@@ -5,6 +5,7 @@
       "action" : "take",
       "keywords": [ "Medikamente", "Medis", "Pille", "Pillen"  ],
       "response": "Du kannst Deine Medis jetzt abkreuzen",
+      "sample": "Ich möchte meine Medikamente nehmen",
       "tag": "AAA"
     },
 
@@ -12,6 +13,7 @@
       "action" : "take",
       "keywords": [ "Blutdruck"  ],
       "response": "Du kannst Deine Werte jetzt eingeben",
+      "sample": "Ich möchte meinen Blutdruck messen",
       "tag": "ZZB"
     },
 
@@ -19,6 +21,7 @@
       "action" : "take",
       "keywords": [ "Blutzucker" ],
       "response": "Du kannst Deinen Wert jetzt eingeben",
+      "sample": "Ich möchte meinen Blutzucker messen",
       "tag": "ZZG"
     },
 
@@ -26,6 +29,7 @@
       "action" : "take",
       "keywords": [ "wiegen" , "gewogen"  ],
       "response": "Du kannst Dein Gewicht jetzt eingeben",
+      "sample": "Ich möchte mich wiegen",
       "tag": "ZZW"
     }
   ],
