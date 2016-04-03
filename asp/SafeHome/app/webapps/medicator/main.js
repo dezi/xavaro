@@ -2,6 +2,11 @@
 // Medicator main page.
 //
 
+WebAppRequest.onVoiceIntent = function(intent)
+{
+    console.log("WebAppRequest.onVoiceIntent: ====================>" + JSON.stringify(intent));
+}
+
 medicator.updateMedisetEvent = function(mediset)
 {
     var eventdate = mediset.date;

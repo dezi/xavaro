@@ -68,7 +68,7 @@ public class WebApp
     }
 
     @Nullable
-    public static JSONObject getVoiceIntents(String webappname)
+    public static JSONArray getVoiceIntents(String webappname)
     {
         JSONObject manifest = getManifest(webappname);
         if ((manifest == null) || ! Json.getBoolean(manifest, "voice")) return null;
@@ -87,7 +87,20 @@ public class WebApp
             JSONObject strings = Json.fromString(getStringContent(webappname, localesrc));
             if (strings == null) continue;
 
-            return Json.getObject(strings, "intent");
+            JSONArray intents = null;
+
+            if (Json.has(strings, "intents"))
+            {
+                intents = Json.getArray(strings, "intents");
+            }
+
+            if (Json.has(strings, "intent"))
+            {
+                if (intents == null) intents = new JSONArray();
+                Json.put(intents, Json.getObject(strings, "intent"));
+            }
+
+            return ((intents != null) && (intents.length() > 0)) ? intents : null;
         }
 
         return null;

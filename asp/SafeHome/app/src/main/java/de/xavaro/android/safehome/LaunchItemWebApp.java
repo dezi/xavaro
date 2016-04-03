@@ -76,6 +76,18 @@ public class LaunchItemWebApp extends LaunchItem
             if (subtype != null)
             {
                 launchWebapp();
+
+                final VoiceIntent cbvoiceintent = voiceintent;
+                final int cbindex = index;
+
+                getHandler().postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        webappFrame.onExecuteVoiceIntent(cbvoiceintent, cbindex);
+                    }
+                }, 1000);
             }
 
             return true;

@@ -5,6 +5,8 @@ import android.webkit.JavascriptInterface;
 import android.util.Log;
 import android.webkit.WebView;
 
+import org.json.JSONObject;
+
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -27,6 +29,29 @@ public class WebAppRequest
         this.webapploader = webapploader;
     }
 
+    public void doVoiceIntent(VoiceIntent intent, int index)
+    {
+        //
+        // Register fake callback function in case
+        // webapp did not define one itself.
+        //
+
+        JSONObject matchobj = intent.getMatch(index);
+        Json.put(matchobj, "command", intent.getCommand());
+        String match = (matchobj == null) ? "{}" : matchobj.toString();
+
+        final String cbscript = ""
+                + "if (! WebAppRequest.onVoiceIntent)"
+                + "{"
+                + "    WebAppRequest.onVoiceIntent = function()"
+                + "    {"
+                + "    }"
+                + "}"
+                + "WebAppRequest.onVoiceIntent(" + match + ");";
+
+        webview.evaluateJavascript(cbscript, null);
+    }
+
     //region Back key handling
 
     public void doBackPressed()
@@ -37,14 +62,14 @@ public class WebAppRequest
         //
 
         final String cbscript = ""
-            + "if (! WebAppRequest.onBackkeyPressed)"
-            + "{"
-            + "    WebAppRequest.onBackkeyPressed = function()"
-            + "    {"
-            + "        WebAppRequest.haveBackkeyPressed(false);"
-            + "    }"
-            + "}"
-            + "WebAppRequest.onBackkeyPressed();";
+                + "if (! WebAppRequest.onBackkeyPressed)"
+                + "{"
+                + "    WebAppRequest.onBackkeyPressed = function()"
+                + "    {"
+                + "        WebAppRequest.haveBackkeyPressed(false);"
+                + "    }"
+                + "}"
+                + "WebAppRequest.onBackkeyPressed();";
 
         webview.evaluateJavascript(cbscript, null);
     }

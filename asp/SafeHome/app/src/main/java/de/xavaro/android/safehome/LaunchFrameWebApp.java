@@ -9,6 +9,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import de.xavaro.android.common.BackKeyClient;
+import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.WebApp;
 import de.xavaro.android.common.WebAppRequest;
 import de.xavaro.android.common.WebAppLoader;
@@ -42,6 +43,16 @@ public class LaunchFrameWebApp extends LaunchFrame
         webview.loadWebView(webappname, "main");
 
         addView(webview);
+    }
+
+    public void onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
+    {
+        Log.d(LOGTAG, "onExecuteVoiceIntent");
+
+        if (webview.request != null)
+        {
+            webview.request.doVoiceIntent(voiceintent, index);
+        }
     }
 
     @Override

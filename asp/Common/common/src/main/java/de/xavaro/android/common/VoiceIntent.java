@@ -79,6 +79,16 @@ public class VoiceIntent
         return intent;
     }
 
+    public JSONObject getMatch(int index)
+    {
+        if ((matches != null) && (index < matches.length()))
+        {
+            return Json.getObject(matches, index);
+        }
+
+        return null;
+    }
+
     public JSONArray getMatches()
     {
         return matches;

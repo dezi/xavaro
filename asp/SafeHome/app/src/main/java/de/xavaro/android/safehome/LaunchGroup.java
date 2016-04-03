@@ -651,6 +651,9 @@ public class LaunchGroup extends FrameLayout implements
 
                     JSONObject intent = Json.getObject(launchitem, "intent");
                     voiceintent.evaluateIntent(intent, identifier);
+
+                    JSONArray intents = Json.getArray(launchitem, "intents");
+                    voiceintent.evaluateIntents(intents, identifier);
                 }
             }
         }

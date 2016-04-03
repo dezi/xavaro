@@ -450,6 +450,12 @@ public class LaunchItem extends FrameLayout implements
                 return voiceintent.evaluateIntent(intent, identifier);
             }
 
+            if (config.has("intents"))
+            {
+                JSONArray intents = Json.getArray(config, "intents");
+                return voiceintent.evaluateIntents(intents, identifier);
+            }
+
             if (config.has("launchitems"))
             {
                 //
@@ -467,6 +473,9 @@ public class LaunchItem extends FrameLayout implements
 
                     JSONObject intent = Json.getObject(launchitem, "intent");
                     voiceintent.evaluateIntent(intent, identifier);
+
+                    JSONArray intents = Json.getArray(launchitem, "intents");
+                    voiceintent.evaluateIntents(intents, identifier);
                 }
             }
         }
@@ -493,7 +502,7 @@ public class LaunchItem extends FrameLayout implements
             String identifier = Json.getString(match, "identifier");
             if (identifier == null) return false;
 
-            if (config.has("intent"))
+            if (config.has("intent") || config.has("intents"))
             {
                 return Simple.equals(identifier, this.identifier);
             }
