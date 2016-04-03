@@ -208,6 +208,16 @@ tvguide.createDescriptionSetup = function()
     tvguide.description = {};
 
     //
+    // dimmerDiv
+    //
+
+    tvguide.description.dimmerDiv = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.content1);
+    tvguide.description.dimmerDiv.style.zIndex = "50";
+    tvguide.description.dimmerDiv.onTouchClick = WebAppRequest.onBackkeyPressed;
+
+    WebLibSimple.setBGColor(tvguide.description.dimmerDiv, "#66000000");
+
+    //
     // tvguide.description.topdiv
     //
 
@@ -215,7 +225,7 @@ tvguide.createDescriptionSetup = function()
 
     tvguide.descriptionPosition = 100;
 
-    tvguide.description.topdiv.style.zIndex = "3";
+    tvguide.description.topdiv.style.zIndex = "100";
 
     WebLibSimple.setBGColor(tvguide.description.topdiv, tvguide.constants.descriptionColor);
 
@@ -499,6 +509,9 @@ tvguide.animateInfoOut = function()
     }
     else
     {
+        tvguide.description.dimmerDiv.style.display = "none";
+        tvguide.description.dimmerDiv = null;
+
         tvguide.animateInfoStatus = null;
         tvguide.description = null;
     }

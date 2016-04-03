@@ -43,7 +43,7 @@ tvguide.constants =
     epgScrollfontWeight      : "bold",
 
     timelineColor            : "#dedede",
-    timelineDivColor         : "#ebe9e9",
+    timelineDivColor         : "#ffffff",
     timelineScrollStyleColor : "#000000",
     timelineScrollfontWeight : "bold",
     timelineScrollTextSize   : 15,
