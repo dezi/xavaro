@@ -28,6 +28,7 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
     private final static String LOGTAG = LaunchItemVoice.class.getSimpleName();
 
     private SpeechRecognizer recognizer;
+    private VoiceIntent collected;
     private VoiceIntent intent;
 
     public LaunchItemVoice(Context context)
@@ -81,6 +82,25 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
                 launchVoice();
             }
         }
+    }
+
+    @Override
+    protected boolean onMyLongClick()
+    {
+        if (collected == null)
+        {
+            collected = new VoiceIntent();
+            Context appcontext = Simple.getAppContext();
+
+            if ((appcontext != null) && (appcontext instanceof VoiceIntentResolver))
+            {
+                ((VoiceIntentResolver) appcontext).onCollectVoiceIntent(collected);
+            }
+        }
+
+        Log.d(LOGTAG, "LaunchFrameVoice: intents:" + collected.getNumMatches());
+
+        return true;
     }
 
     private void launchVoice()

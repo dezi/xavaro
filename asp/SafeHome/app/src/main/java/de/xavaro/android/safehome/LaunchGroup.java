@@ -616,6 +616,52 @@ public class LaunchGroup extends FrameLayout implements
     }
 
     @Override
+    public boolean onCollectVoiceIntent(VoiceIntent voiceintent)
+    {
+        Log.d(LOGTAG,"onCollectVoiceIntent:" + voiceintent.getCommand());
+
+        if (launchItems != null)
+        {
+            //
+            // Find already created launch items.
+            //
+
+            for (LaunchItem launchItem : launchItems)
+            {
+                launchItem.onCollectVoiceIntent(voiceintent);
+            }
+        }
+        else
+        {
+            if ((config != null) && config.has("launchitems"))
+            {
+                //
+                // Inspect configured launch items.
+                //
+
+                JSONArray launchitems = Json.getArray(config, "launchitems");
+
+                if (launchitems == null) return false;
+
+                for (int inx = 0; inx < launchitems.length(); inx++)
+                {
+                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    String identifier = Json.getString(launchitem, "identifier");
+                    if (identifier == null) continue;
+
+                    JSONObject intent = Json.getObject(launchitem, "intent");
+                    voiceintent.collectIntent(intent, identifier);
+
+                    JSONArray intents = Json.getArray(launchitem, "intents");
+                    voiceintent.collectIntents(intents, identifier);
+                }
+            }
+        }
+
+        return (voiceintent.getNumMatches() > 0);
+    }
+
+    @Override
     public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
     {
         Log.d(LOGTAG,"onResolveVoiceIntent:" + voiceintent.getCommand());

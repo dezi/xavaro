@@ -19,8 +19,6 @@ public class LaunchItemBeta extends LaunchItem
 {
     private final static String LOGTAG = LaunchItemBeta.class.getSimpleName();
 
-    private LaunchFrameWebApp webappFrame;
-
     public LaunchItemBeta(Context context)
     {
         super(context);
@@ -77,20 +75,11 @@ public class LaunchItemBeta extends LaunchItem
         if (type.equals("beta")) launchBeta();
     }
 
-    @Override
-    public void onBackKeyExecuted()
-    {
-        webappFrame = null;
-    }
-
     private void launchBeta()
     {
-        if (webappFrame == null)
-        {
-            webappFrame = new LaunchFrameWebApp(context);
-            webappFrame.setWebAppName("betaversion");
-            webappFrame.setParent(this);
-        }
+        LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
+        webappFrame.setWebAppName("betaversion");
+        webappFrame.setParent(this);
 
         ((HomeActivity) context).addViewToBackStack(webappFrame);
     }

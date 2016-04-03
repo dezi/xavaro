@@ -101,7 +101,7 @@ public class LaunchItemDeveloper extends LaunchItem
         if (type.equals("developer")) launchDeveloper();
     }
 
-    LaunchFrameDeveloper developerFrame;
+    protected LaunchFrameDeveloper developerFrame;
 
     private void launchDeveloper()
     {
