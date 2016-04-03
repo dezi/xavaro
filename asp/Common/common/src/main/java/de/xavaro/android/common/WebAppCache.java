@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
+
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -9,11 +10,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class WebAppCache
 {
@@ -47,13 +47,26 @@ public class WebAppCache
     // a fresh copy from server and store for offline usage.
     //
 
-    public static WebAppCacheResponse getCacheFile(String webappname, String url, int interval)
+    public static WebAppCacheResponse getCacheFile
+            (String webappname, String url, int interval)
     {
         return getCacheFile(webappname, url, interval, null);
     }
 
     public static WebAppCacheResponse getCacheFile(
+            String webappname, String url, int interval, boolean nolastuse)
+    {
+        return getCacheFile(webappname, url, interval, null, nolastuse);
+    }
+
+    public static WebAppCacheResponse getCacheFile(
             String webappname, String url, int interval, String agent)
+    {
+        return getCacheFile(webappname, url, interval, agent, false);
+    }
+
+    private static WebAppCacheResponse getCacheFile(
+            String webappname, String url, int interval, String agent, boolean nolastuse)
     {
         Simple.removePost(freeMemory);
         getStorage();
@@ -226,7 +239,7 @@ public class WebAppCache
             if (interval >= 0)
             {
                 Json.put(cachefile, "ival", interval);
-                Json.put(cachefile, "luse", Simple.nowAsISO());
+                if (! nolastuse) Json.put(cachefile, "luse", Simple.nowAsISO());
                 dirty = true;
             }
         }
@@ -497,6 +510,11 @@ public class WebAppCache
             JSONObject cachefiles = Json.getObject(webappcache, webappname);
             if (cachefiles == null) continue;
 
+            //
+            // Process wep app cached urls list.
+            //
+
+            ArrayList<String> unusedUrls = new ArrayList<>();
             Iterator<String> cachefilesIter = cachefiles.keys();
 
             while (cachefilesIter.hasNext())
@@ -505,12 +523,47 @@ public class WebAppCache
                 JSONObject cachefile = Json.getObject(cachefiles, url);
                 if (cachefile == null) continue;
 
+                String luse = Json.getString(cachefile, "luse");
+                String lget = Json.getString(cachefile, "lget");
+
+                if ((luse == null) && (lget == null))
+                {
+                    //
+                    // Entry is somewhat junky.
+                    //
+
+                    unusedUrls.add(url);
+                    continue;
+                }
+
                 int ival = Json.getInt(cachefile, "ival");
                 if (ival == 0) continue;
                 int ivalsecs = ival * 3600;
                 int time = Json.getInt(cachefile, "time") % ivalsecs;
 
-                String lget = Json.getString(cachefile, "lget");
+                //
+                // Check last usage of item.
+                //
+
+                if (luse != null)
+                {
+                    long lastusage = todaysecs - (Simple.getTimeStamp(luse) / 1000);
+
+                    if (lastusage >= ivalsecs)
+                    {
+                        //
+                        // File was not used within cache interval.
+                        //
+
+                        unusedUrls.add(url);
+                        continue;
+                    }
+                }
+
+                //
+                // Check last fetch of item.
+                //
+
                 long lastLoad = (lget == null) ? todaysecs : (Simple.getTimeStamp(lget) / 1000);
                 long nextLoad = ((lastLoad / 86400) * 86400) + time;
 
@@ -530,6 +583,26 @@ public class WebAppCache
 
                     nextDue = secstoload;
                 }
+            }
+
+            //
+            // Process unused list.
+            //
+
+            File cachedir = new File(Simple.getCacheDir(), "webappcache/" + webappname);
+
+            for (String url : unusedUrls)
+            {
+                JSONObject cachefile = Json.getObject(cachefiles, url);
+                String uuid = Json.getString(cachefile, "uuid");
+                if (uuid == null) continue;
+
+                File cfile = new File(cachedir, uuid);
+
+                if (cfile.delete()) Log.d(LOGTAG, "getNextLoadItem: unused/deleted:" + url);
+
+                Json.remove(cachefiles, url);
+                dirty = true;
             }
         }
 
@@ -576,7 +649,7 @@ public class WebAppCache
 
             Log.d(LOGTAG, "commTick: load=" + webappname + "=" + ival + "=" + secondsdue + "=" + url);
 
-            getCacheFile(webappname, url, ival);
+            getCacheFile(webappname, url, ival, true);
 
             nextLoadItem = null;
             nextLoadTime = 0;
