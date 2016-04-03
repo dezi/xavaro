@@ -96,7 +96,7 @@ DeMoronize.cleanShortShows = function(data)
             src.addIndex = broadcast - 1;
             removedBrodcast.push(src);
 
-            console.log(JSON.stringify(src));
+            // console.log(JSON.stringify(src));
 
             data.splice(data.indexOf(src), 1);
         }
