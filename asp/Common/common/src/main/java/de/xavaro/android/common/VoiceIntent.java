@@ -101,24 +101,24 @@ public class VoiceIntent
 
     private boolean keepIfBetter(JSONObject match)
     {
-        String target = Json.getString(match, "target");
-        if (target == null) return false;
+        int score = Json.getInt(match, "score");
 
         boolean addme = (matches.length() == 0);
 
         for (int inx = 0; inx < matches.length(); inx++)
         {
             JSONObject oldmatch = Json.getObject(matches, inx);
-            String oldtarget = Json.getString(oldmatch, "target");
-            if (oldtarget == null) continue;
+            if (oldmatch == null) continue;
 
-            if (target.length() == oldtarget.length())
+            int oldscore = Json.getInt(oldmatch, "score");
+
+            if (score == oldscore)
             {
                 addme = true;
                 break;
             }
 
-            if (target.length() > oldtarget.length())
+            if (score > oldscore)
             {
                 Json.remove(matches, inx--);
                 addme = true;
@@ -160,6 +160,10 @@ public class VoiceIntent
 
             if (mykeywords != null)
             {
+                JSONArray targets = new JSONArray();
+
+                int score = 0;
+
                 for (int inx = 0; inx < mykeywords.length(); inx++)
                 {
                     String wrd = Json.getString(mykeywords, inx);
@@ -167,15 +171,22 @@ public class VoiceIntent
 
                     if (cmp.contains(" " + wrd.toLowerCase() + " "))
                     {
-                        JSONObject match = Json.clone(myintent);
-
-                        Json.put(match, "target", wrd);
-                        Json.put(match, "identifier", identifier);
-
                         Log.d(LOGTAG, "evaluateIntent: " + identifier + "=" + wrd);
 
-                        if (keepIfBetter(match)) foundone = true;
+                        Json.put(targets, wrd);
+                        score++;
                     }
+                }
+
+                if (score > 0)
+                {
+                    JSONObject match = Json.clone(myintent);
+
+                    Json.put(match, "score", score);
+                    Json.put(match, "targets", targets);
+                    Json.put(match, "identifier", identifier);
+
+                    if (keepIfBetter(match)) foundone = true;
                 }
             }
         }

@@ -1,3 +1,8 @@
+WebAppRequest.onVoiceIntent = function(intent)
+{
+    console.log("WebAppRequest.onVoiceIntent: ====================>" + JSON.stringify(intent));
+}
+
 tvguide.constants =
 {
     loadDaysFuture           : 1,

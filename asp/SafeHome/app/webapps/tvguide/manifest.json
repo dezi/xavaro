@@ -6,6 +6,7 @@
     "appicon": "tvguide_175x175.png",
     "appserver": "epg.xavaro.de",
     "preferences": true,
+    "voice": true,
 
     "permissions": [
       "domstorage",

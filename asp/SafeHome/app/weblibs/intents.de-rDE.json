@@ -4,7 +4,7 @@
 
     "take": [ "nehmen", "genommen", "messen", "gemessen", "wiegen", "gewogen" ],
 
-    "view": [ "lesen", "blättern", "anzeigen", "anschauen", "sehen" ],
+    "view": [ "zeige", "öffne", "lesen", "blättern", "anzeigen", "anschauen", "ansehen", "sehen" ],
 
     "play": [ "spielen", "abspielen" ]
   }

@@ -1,9 +1,34 @@
 {
-  "intent": {
-    "action" : "take",
-    "keywords": [ "Medicine", "Medis", "blood pressure", "blood sugar", "weigh"  ],
-    "response": "I open the medis page for You"
-  },
+  "intents": [
+
+    {
+      "action" : "take",
+      "keywords": [ "medicine", "medis", "pill", "pills"  ],
+      "response": "You can register Your medis now",
+      "tag": "AAA"
+    },
+
+    {
+      "action" : "take",
+      "keywords": [ "blood pressure"  ],
+      "response": "You can enter Your values now",
+      "tag": "ZZB"
+    },
+
+    {
+      "action" : "take",
+      "keywords": [ "blood sugar" ],
+      "response": "You can enter Your value now",
+      "tag": "ZZG"
+    },
+
+    {
+      "action" : "take",
+      "keywords": [ "weigh" ],
+      "response": "You can enter Your weight now",
+      "tag": "ZZW"
+    }
+  ],
 
   "medication.days" : "Interval",
   "medication.days.keys" : [ "daily", "weekdays",          "interval",      "weekly",      "monthly",   "ondemand"  ],
