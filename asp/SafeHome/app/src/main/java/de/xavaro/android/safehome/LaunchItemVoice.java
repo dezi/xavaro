@@ -2,17 +2,20 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -25,6 +28,7 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
     private final static String LOGTAG = LaunchItemVoice.class.getSimpleName();
 
     private SpeechRecognizer recognizer;
+    private VoiceIntent intent;
 
     public LaunchItemVoice(Context context)
     {
@@ -96,7 +100,7 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
 
     private void onBestVoiceResult(String spoken, int percent)
     {
-        VoiceIntent intent = new VoiceIntent(spoken);
+        intent = new VoiceIntent(spoken);
 
         String logline = intent.getIntent() + ":" + spoken + " (" + percent + ")";
         Simple.makeToast(logline);
@@ -126,13 +130,22 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
             {
                 Speak.speak("Es gibt mehrere Aktionen die ich ausführen kann");
 
+                Map<String, String> options = new LinkedHashMap<>();
+
                 for (int inx = 0; inx < matches.length(); inx++)
                 {
                     JSONObject match = Json.getObject(matches, inx);
                     String response = Json.getString(match, "response");
+                    String identifier = Json.getString(match, "identifier");
+
+                    options.put(identifier, response);
 
                     Log.d(LOGTAG, "onBestVoiceResult: ambigous:" + response);
                 }
+
+                Chooser chooser = new Chooser(options);
+                chooser.setOnChooserResult(this);
+                chooser.showDialog();
 
                 return;
             }
@@ -144,6 +157,35 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
             Speak.speak(response);
 
             ((VoiceIntentResolver) app).onExecuteVoiceIntent(intent, 0);
+        }
+    }
+
+    @Override
+    public void onChooserResult(String key)
+    {
+        JSONArray matches = intent.getMatches();
+        if (matches == null) return;
+
+        Context app = Simple.getAppContext();
+
+        if ((app != null) && (app instanceof VoiceIntentResolver))
+        {
+            for (int inx = 0; inx < matches.length(); inx++)
+            {
+                JSONObject match = Json.getObject(matches, inx);
+                String response = Json.getString(match, "response");
+                String identifier = Json.getString(match, "identifier");
+
+                if (! Simple.equals(key, identifier)) continue;
+
+                if (response == null) response = "Ich führe die gewünschte Aktion aus.";
+
+                Speak.speak(response);
+
+                ((VoiceIntentResolver) app).onExecuteVoiceIntent(intent, inx);
+
+                break;
+            }
         }
     }
 

@@ -23,12 +23,22 @@ public class Chooser implements DialogInterface.OnClickListener
         this.vals = vals;
     }
 
+    public Chooser(String[] keys, String[] vals)
+    {
+        this(null, keys, vals);
+    }
+
     public Chooser(String title, ArrayList<String> keys, ArrayList<String> vals)
     {
         this.title = title;
 
         this.keys = keys.toArray(new String[ keys.size() ]);
         this.vals = vals.toArray(new String[ vals.size() ]);
+    }
+
+    public Chooser(ArrayList<String> keys, ArrayList<String> vals)
+    {
+        this(null, keys, vals);
     }
 
     public Chooser(String title, Map<String, String> map)
@@ -45,6 +55,11 @@ public class Chooser implements DialogInterface.OnClickListener
             vals[ inx ] = map.get(key);
             inx++;
         }
+    }
+
+    public Chooser(Map<String, String> map)
+    {
+        this(null, map);
     }
 
     private ChooserResultCallback callback;
