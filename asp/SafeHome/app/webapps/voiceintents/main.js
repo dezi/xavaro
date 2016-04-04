@@ -46,8 +46,6 @@ voiceintents.createFrame = function()
 
 voiceintents.onClickMore = function(target)
 {
-    console.log("voiceintents.onClickMore:" + target);
-
     WebAppUtility.makeClick();
 
     target.imgMore.src = "arrow_less_270x270.png";
@@ -71,8 +69,6 @@ voiceintents.onClickMore = function(target)
 
 voiceintents.onClickLess = function(target)
 {
-    console.log("voiceintents.onClickLess:" + target);
-
     WebAppUtility.makeClick();
 
     target.imgMore.src = "arrow_more_270x270.png";
