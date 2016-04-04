@@ -2,6 +2,14 @@
   "intents": [
 
     {
+      "action" : "view",
+      "keywords": [ "Medikation", "Medikations Übersicht"  ],
+      "response": "Ich öffne die Medikations Übersicht",
+      "sample": "Öffne die Medikations Übersicht",
+      "icon": "/webapps/medicator/health_medication_512x512.png"
+    },
+
+    {
       "action" : "take",
       "keywords": [ "Medikamente", "Medis", "Pille", "Pillen"  ],
       "response": "Du kannst Deine Medis jetzt abkreuzen",

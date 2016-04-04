@@ -168,16 +168,16 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
 
         if ((app != null) && app instanceof VoiceIntentResolver)
         {
-            boolean result = ((VoiceIntentResolver) app).onResolveVoiceIntent(intent);
+            ((VoiceIntentResolver) app).onResolveVoiceIntent(intent);
 
-            if (! result)
+            JSONArray matches = intent.getMatches();
+            if (matches == null) return;
+
+            if (intent.getNumMatches() == 0)
             {
                 Speak.speak("Ich kann die gewünschte Aktion nicht finden");
                 return;
             }
-
-            JSONArray matches = intent.getMatches();
-            if (matches == null) return;
 
             if (intent.getNumMatches() > 1)
             {

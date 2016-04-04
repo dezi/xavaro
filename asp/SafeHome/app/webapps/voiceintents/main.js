@@ -1,3 +1,29 @@
+voiceintents.onVoiceIntentData = function(intents)
+{
+    voiceintents.intents = intents;
+
+    voiceintents.intents.sort(voiceintents.sortCompare);
+
+    voiceintents.createIntentData();
+}
+
+voiceintents.sortCompare = function(a, b)
+{
+    var astring = "";
+    if (a.type) astring += a.type + "|";
+    if (a.subtype) astring += a.subtype + "|";
+    if (a.subtypetag) astring += a.subtypetag + "|";
+
+    var bstring = "";
+    if (b.type) bstring += b.type + "|";
+    if (b.subtype) bstring += b.subtype + "|";
+    if (b.subtypetag) bstring += b.subtypetag + "|";
+
+    if (astring == bstring) return 0;
+
+    return (astring > bstring) ? 1 : -1;
+}
+
 voiceintents.createFrame = function()
 {
     WebLibSimple.setBGColor(document.body, "#ffffffee");
@@ -16,20 +42,18 @@ voiceintents.createFrame = function()
     div.innerHTML = "Auf diese Kommandos reagiert die Spracheingabe:"
 }
 
-voiceintents.onVoiceIntentData = function(intents)
+voiceintents.createIntentData = function()
 {
     var vi = voiceintents;
 
-    voiceintents.intents = intents;
-
     vi.listDiv = WebLibSimple.createAnyAppend("div", vi.topDiv);
 
-    for (var inx = 0; inx < intents.length; inx++)
+    for (var inx = 0; inx < vi.intents.length; inx++)
     {
-        var intent = intents[ inx ];
+        var intent = vi.intents[ inx ];
         if (! intent.sample) continue;
 
-        //intents.splice(inx--, 1);
+        //vi.intents.splice(inx--, 1);
 
         var divOuter = WebLibSimple.createAnyAppend("div", vi.listDiv);
         divOuter.style.position = "relative";
@@ -82,7 +106,7 @@ voiceintents.onVoiceIntentData = function(intents)
     }
 
     var pre = WebLibSimple.createAnyAppend("pre", vi.topDiv);
-    pre.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(intents));
+    pre.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(vi.intents));
 }
 
 voiceintents.createFrame();

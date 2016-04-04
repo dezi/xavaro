@@ -161,7 +161,7 @@
 
       "intent": {
         "action" : "view",
-        "keywords": [ "Bento", "eine Jungendmagazin" ],
+        "keywords": [ "Bento" ],
         "response": "Ich öffne Bento",
         "sample": "Ich möchte Bento lesen"
       },

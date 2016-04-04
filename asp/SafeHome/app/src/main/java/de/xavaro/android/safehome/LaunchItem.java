@@ -3,29 +3,20 @@ package de.xavaro.android.safehome;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
-
 import android.content.Context;
-
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-
-import android.os.Handler;
 import android.util.AttributeSet;
-
-import android.util.Log;
-import android.view.View;
-import android.view.Gravity;
-
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.view.Gravity;
+import android.view.View;
+import android.os.Handler;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.UUID;
 
 import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Chooser;
@@ -391,11 +382,6 @@ public class LaunchItem extends FrameLayout implements
         return parent;
     }
 
-    public String getIdentifier()
-    {
-        return identifier;
-    }
-
     protected void setConfig()
     {
         //
@@ -440,120 +426,14 @@ public class LaunchItem extends FrameLayout implements
         //
     }
 
-    @Nullable
-    private JSONArray prepareIntents(JSONObject myconfig, JSONArray intents)
-    {
-        if (intents != null)
-        {
-            for (int inx = 0; inx < intents.length(); inx++)
-            {
-                prepareIntent(myconfig, Json.getObject(intents, inx));
-            }
-        }
-
-        return intents;
-    }
-
-    private JSONObject prepareIntent(JSONObject myconfig, JSONObject intent)
-    {
-        if (intent != null)
-        {
-            if (myconfig.has("type"))
-            {
-                Json.put(intent, "type", Json.getString(myconfig, "type"));
-            }
-
-            if (myconfig.has("subtype"))
-            {
-                Json.put(intent, "subtype", Json.getString(myconfig, "subtype"));
-            }
-
-            if (myconfig.has("name"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(myconfig, "name"));
-            }
-
-            if (intent.has("tag"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(intent, "tag"));
-            }
-
-            if (myconfig.has("iconres"))
-            {
-                int iconres = Json.getInt(myconfig, "iconres");
-
-                if (iconres != 0)
-                {
-                    Json.put(intent, "iconres", iconres);
-                }
-            }
-
-            if (myconfig.has("icon"))
-            {
-                String iconref = Json.getString(myconfig, "icon");
-
-                if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
-                {
-                    if (myconfig.has("name"))
-                    {
-                        String iconname = Json.getString(myconfig, "name");
-                        String iconpath = CacheManager.getWebIconPath(iconname, iconref);
-
-                        Json.put(intent, "icon", "local://" + iconpath);
-                    }
-                }
-                else
-                {
-                    int resourceId = Simple.getIconResourceId(iconref);
-
-                    if (resourceId > 0)
-                    {
-                        Json.put(intent, "icon", resourceId);
-                    }
-                }
-            }
-
-            /*
-            if (myconfig.has("packagename"))
-            {
-                String packageName = Json.getString(myconfig, "packagename");
-
-                if (packageName != null)
-                {
-                    CommonConfigs.weLikeThis(packageName);
-                    Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
-
-                    if (appIcon != null)
-                    {
-                        icon.setImageDrawable(appIcon);
-                    }
-                    else
-                    {
-                        Drawable drawable = CacheManager.getAppIcon(packageName);
-
-                        if (drawable != null)
-                        {
-                            icon.setImageDrawable(drawable);
-                        }
-                        else
-                        {
-                            icon.setImageResource(R.drawable.stop_512x512);
-                        }
-                    }
-                }
-            }
-            */
-        }
-
-        return intent;
-    }
-
     @Override
-    public boolean onCollectVoiceIntent(VoiceIntent voiceintent)
+    public void onCollectVoiceIntent(VoiceIntent voiceintent)
     {
         if (directory != null)
         {
-            return directory.onCollectVoiceIntent(voiceintent);
+            directory.onCollectVoiceIntent(voiceintent);
+
+            return;
         }
 
         if (config != null)
@@ -561,13 +441,13 @@ public class LaunchItem extends FrameLayout implements
             if (config.has("intent"))
             {
                 JSONObject intent = Json.getObject(config, "intent");
-                return voiceintent.collectIntent(prepareIntent(config, intent), identifier);
+                voiceintent.collectIntent(config, intent);
             }
 
             if (config.has("intents"))
             {
                 JSONArray intents = Json.getArray(config, "intents");
-                return voiceintent.collectIntents(prepareIntents(config, intents), identifier);
+                voiceintent.collectIntents(config, intents);
             }
 
             if (config.has("launchitems"))
@@ -577,44 +457,30 @@ public class LaunchItem extends FrameLayout implements
                 //
 
                 JSONArray launchitems = Json.getArray(config, "launchitems");
-                if (launchitems == null) return false;
-
-                boolean foundone = false;
+                if (launchitems == null) return;
 
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
                     JSONObject launchitem = Json.getObject(launchitems, inx);
-                    String identifier = Json.getString(launchitem, "identifier");
-                    if (identifier == null) continue;
 
                     JSONObject intent = Json.getObject(launchitem, "intent");
-
-                    if (voiceintent.collectIntent(prepareIntent(launchitem, intent), identifier))
-                    {
-                        foundone = true;
-                    }
+                    voiceintent.collectIntent(launchitem, intent);
 
                     JSONArray intents = Json.getArray(launchitem, "intents");
-
-                    if (voiceintent.collectIntents(prepareIntents(launchitem, intents), identifier))
-                    {
-                        foundone = true;
-                    }
+                    voiceintent.collectIntents(launchitem, intents);
                 }
-
-                return foundone;
             }
         }
-
-        return false;
     }
 
     @Override
-    public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
+    public void onResolveVoiceIntent(VoiceIntent voiceintent)
     {
         if (directory != null)
         {
-            return directory.onResolveVoiceIntent(voiceintent);
+            directory.onResolveVoiceIntent(voiceintent);
+
+            return;
         }
 
         if (config != null)
@@ -622,13 +488,13 @@ public class LaunchItem extends FrameLayout implements
             if (config.has("intent"))
             {
                 JSONObject intent = Json.getObject(config, "intent");
-                return voiceintent.evaluateIntent(intent, identifier);
+                voiceintent.evaluateIntent(intent, identifier);
             }
 
             if (config.has("intents"))
             {
                 JSONArray intents = Json.getArray(config, "intents");
-                return voiceintent.evaluateIntents(intents, identifier);
+                voiceintent.evaluateIntents(intents, identifier);
             }
 
             if (config.has("launchitems"))
@@ -638,9 +504,7 @@ public class LaunchItem extends FrameLayout implements
                 //
 
                 JSONArray launchitems = Json.getArray(config, "launchitems");
-                if (launchitems == null) return false;
-
-                boolean foundone = false;
+                if (launchitems == null) return;
 
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
@@ -649,17 +513,13 @@ public class LaunchItem extends FrameLayout implements
                     if (identifier == null) continue;
 
                     JSONObject intent = Json.getObject(launchitem, "intent");
-                    if (voiceintent.evaluateIntent(intent, identifier)) foundone = true;
+                    voiceintent.evaluateIntent(intent, identifier);
 
                     JSONArray intents = Json.getArray(launchitem, "intents");
-                    if (voiceintent.evaluateIntents(intents, identifier)) foundone = true;
+                    voiceintent.evaluateIntents(intents, identifier);
                 }
-
-                return foundone;
             }
         }
-
-        return false;
     }
 
     @Override
@@ -683,7 +543,7 @@ public class LaunchItem extends FrameLayout implements
 
             if (config.has("intent") || config.has("intents"))
             {
-                return Simple.equals(identifier, this.identifier);
+                if (Simple.equals(identifier, this.identifier)) return true;
             }
 
             if (config.has("launchitems"))

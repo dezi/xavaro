@@ -616,7 +616,7 @@ public class LaunchGroup extends FrameLayout implements
     }
 
     @Override
-    public boolean onCollectVoiceIntent(VoiceIntent voiceintent)
+    public void onCollectVoiceIntent(VoiceIntent voiceintent)
     {
         Log.d(LOGTAG,"onCollectVoiceIntent:" + voiceintent.getCommand());
 
@@ -630,39 +630,37 @@ public class LaunchGroup extends FrameLayout implements
             {
                 launchItem.onCollectVoiceIntent(voiceintent);
             }
+
+            return;
         }
-        else
+
+        if (config != null)
         {
-            if ((config != null) && config.has("launchitems"))
+            if (config.has("launchitems"))
             {
                 //
                 // Inspect configured launch items.
                 //
 
                 JSONArray launchitems = Json.getArray(config, "launchitems");
-
-                if (launchitems == null) return false;
+                if (launchitems == null) return;
 
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
                     JSONObject launchitem = Json.getObject(launchitems, inx);
-                    String identifier = Json.getString(launchitem, "identifier");
-                    if (identifier == null) continue;
 
                     JSONObject intent = Json.getObject(launchitem, "intent");
-                    voiceintent.collectIntent(intent, identifier);
+                    voiceintent.collectIntent(launchitem, intent);
 
                     JSONArray intents = Json.getArray(launchitem, "intents");
-                    voiceintent.collectIntents(intents, identifier);
+                    voiceintent.collectIntents(launchitem, intents);
                 }
             }
         }
-
-        return (voiceintent.getNumMatches() > 0);
     }
 
     @Override
-    public boolean onResolveVoiceIntent(VoiceIntent voiceintent)
+    public void onResolveVoiceIntent(VoiceIntent voiceintent)
     {
         Log.d(LOGTAG,"onResolveVoiceIntent:" + voiceintent.getCommand());
 
@@ -687,7 +685,7 @@ public class LaunchGroup extends FrameLayout implements
 
                 JSONArray launchitems = Json.getArray(config, "launchitems");
 
-                if (launchitems == null) return false;
+                if (launchitems == null) return;
 
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
@@ -703,8 +701,6 @@ public class LaunchGroup extends FrameLayout implements
                 }
             }
         }
-
-        return (voiceintent.getNumMatches() > 0);
     }
 
     @Override
