@@ -117,7 +117,7 @@
 
       "intent": {
         "action" : "view",
-        "keywords": [ "Manager Magazin", "ein Magazin" ],
+        "keywords": [ "Manager Magazin" ],
         "response": "Ich öffne das Manager Magazin",
         "sample": "Ich möchte das Manager Magazin lesen"
       }
@@ -147,7 +147,7 @@
 
       "intent": {
         "action" : "view",
-        "keywords": [ "Natgeo", "National Geographic", "National Geo graphic", "ein Magazin" ],
+        "keywords": [ "Natgeo", "National Geographic", "National Geo graphic" ],
         "response": "Ich öffne National Geographic",
         "sample": "Ich möchte National Geographic lesen"
       }
@@ -224,7 +224,7 @@
 
       "intent": {
         "action": "view",
-        "keywords": [ "den Stern", "etwas Buntes", "ein Magazin" ],
+        "keywords": [ "den Stern", "etwas Buntes" ],
         "response": "Ich öffne den Stern",
         "sample": "Ich möchte den Stern lesen"
       },

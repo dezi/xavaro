@@ -187,6 +187,7 @@ voiceintents.createIntentData = function()
                 divMore.style.right = "0px";
                 divMore.style.top = "0px";
                 divMore.style.bottom = "0px";
+                divMore.style.width = "70px";
 
                 divMore.onTouchClick = voiceintents.onClickMore;
                 divMore.intentIndex = vi.intentDivs.length;
