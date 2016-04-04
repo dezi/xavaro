@@ -547,7 +547,7 @@ public class WebAppCache
 
                 if (luse != null)
                 {
-                    long lastusage = todaysecs - (Simple.getTimeStamp(luse) / 1000);
+                    long lastusage = nowsecs - (Simple.getTimeStamp(luse) / 1000);
 
                     if (lastusage >= ivalsecs)
                     {
