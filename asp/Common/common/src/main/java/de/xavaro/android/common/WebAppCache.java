@@ -537,9 +537,7 @@ public class WebAppCache
                 }
 
                 int ival = Json.getInt(cachefile, "ival");
-                if (ival == 0) continue;
                 int ivalsecs = ival * 3600;
-                int time = Json.getInt(cachefile, "time") % ivalsecs;
 
                 //
                 // Check last usage of item.
@@ -549,10 +547,13 @@ public class WebAppCache
                 {
                     long lastusage = nowsecs - (Simple.getTimeStamp(luse) / 1000);
 
-                    if (lastusage >= ivalsecs)
+                    if (((ivalsecs > 0) && (lastusage >= ivalsecs))
+                            || ((ivalsecs == 0) && (lastusage > (3600 * 48))))
                     {
                         //
-                        // File was not used within cache interval.
+                        // File was not used within cache interval
+                        // or is developer bypass and not used within
+                        // 48 hours.
                         //
 
                         unusedUrls.add(url);
@@ -563,6 +564,9 @@ public class WebAppCache
                 //
                 // Check last fetch of item.
                 //
+
+                if (ival == 0) continue;
+                int time = Json.getInt(cachefile, "time") % ivalsecs;
 
                 long lastLoad = (lget == null) ? todaysecs : (Simple.getTimeStamp(lget) / 1000);
                 long nextLoad = ((lastLoad / 86400) * 86400) + time;
