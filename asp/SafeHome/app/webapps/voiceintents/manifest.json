@@ -1,0 +1,35 @@
+{
+  "manifest": {
+
+    "label": "Voice",
+    "appname": "voiceintents",
+    "appicon": "voiceintents_256x256.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "utility",
+      "request"
+    ],
+
+    "weblibs": [
+      "strings",
+      "simple",
+      "touch"
+    ],
+
+    "preload": [
+    ],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": [
+      { "interval": 24, "pattern": ".*\\.js" },
+      { "interval": 72, "pattern": ".*\\.png" },
+      { "interval": 24, "pattern": ".*\\.json" }
+    ]
+  }
+}

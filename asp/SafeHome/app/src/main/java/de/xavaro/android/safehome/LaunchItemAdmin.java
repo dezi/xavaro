@@ -49,7 +49,7 @@ public class LaunchItemAdmin extends LaunchItem
 
             if (packageName != null)
             {
-                Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+                Drawable appIcon = VersionUtils.getIconFromApplication(packageName);
 
                 if (appIcon != null)
                 {

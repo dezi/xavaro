@@ -1,15 +1,19 @@
 package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
+
 import android.content.Context;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.util.Log;
 
 import java.util.ArrayList;
 
 public class WebAppView extends WebView
 {
+    private static final String LOGTAG = WebAppView.class.getSimpleName();
+
     public WebAppView(Context context)
     {
         super(context);
@@ -28,6 +32,8 @@ public class WebAppView extends WebView
     public WebAppActivity activity;
     public WebAppIntercept intercept;
     public WebAppAssistance assistance;
+
+    public ArrayList<String> permissions;
 
     @SuppressLint("SetJavaScriptEnabled")
     public void loadWebView(String webappname, String mode)
@@ -59,17 +65,10 @@ public class WebAppView extends WebView
         // Permission setting in webview.
         //
 
-        ArrayList<String> permissions = WebApp.getPermissions(webappname);
+        permissions = WebApp.getPermissions(webappname);
 
-        if (permissions.contains("domstorage"))
-        {
-            getSettings().setDomStorageEnabled(false);
-        }
-
-        if (permissions.contains("database"))
-        {
-            getSettings().setDatabaseEnabled(false);
-        }
+        getSettings().setDatabaseEnabled(permissions.contains("database"));
+        getSettings().setDomStorageEnabled(permissions.contains("domstorage"));
 
         //
         // Native add ons via permissions.

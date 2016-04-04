@@ -23,6 +23,16 @@ public class WebLib
     }
 
     @Nullable
+    public static JSONObject getLocaleConfig(String weblib, String subtype)
+    {
+        JSONObject config = getLocaleConfig(weblib);
+
+        if (subtype != null) config = Json.getObject(config, subtype);
+
+        return config;
+    }
+
+    @Nullable
     public static JSONObject getLocaleConfig(String weblib)
     {
         String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();

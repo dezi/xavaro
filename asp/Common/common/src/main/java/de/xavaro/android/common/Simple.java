@@ -199,7 +199,7 @@ public class Simple
     @Nullable
     public static Drawable getIconFromApplication(String apkname)
     {
-        return VersionUtils.getIconFromApplication(anyContext, apkname);
+        return VersionUtils.getIconFromApplication(apkname);
     }
 
     public static boolean isAppInstalled(String packageName)

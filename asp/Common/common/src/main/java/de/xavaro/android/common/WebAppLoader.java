@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 public class WebAppLoader extends WebViewClient
 {
@@ -102,10 +103,25 @@ public class WebAppLoader extends WebViewClient
         return wcr.content;
     }
 
+    private WebResourceResponse getLocalFile(WebView view, String url)
+    {
+        if (! url.startsWith("local://")) return denyLoad();
+
+        byte[] bytes = Simple.getFileBytes(new File(url.substring(8)));
+        if (bytes == null) return denyLoad();
+
+        String mime = "application/binary";
+        String enco = "UTF-8";
+
+        return new WebResourceResponse(mime, enco, new ByteArrayInputStream(bytes));
+    }
+
     private WebResourceResponse getRequest(WebView view, String url)
     {
         if (url.equals(appRootUrl)) return loadRootHTML();
         if (url.endsWith("favicon.ico")) return denyLoad();
+
+        if (url.startsWith("local://")) return getLocalFile(view, url);
 
         int interval = getCacheIntervalForUrl(url);
 

@@ -6,6 +6,7 @@
       "keywords": [ "Medikamente", "Medis", "Pille", "Pillen"  ],
       "response": "Du kannst Deine Medis jetzt abkreuzen",
       "sample": "Ich möchte meine Medikamente nehmen",
+      "icon": "/webapps/medicator/health_medis_490x490.png",
       "tag": "AAA"
     },
 
@@ -14,6 +15,7 @@
       "keywords": [ "Blutdruck"  ],
       "response": "Du kannst Deine Werte jetzt eingeben",
       "sample": "Ich möchte meinen Blutdruck messen",
+      "icon": "/webapps/medicator/health_bpm_256x256.png",
       "tag": "ZZB"
     },
 
@@ -22,6 +24,7 @@
       "keywords": [ "Blutzucker" ],
       "response": "Du kannst Deinen Wert jetzt eingeben",
       "sample": "Ich möchte meinen Blutzucker messen",
+      "icon": "/webapps/medicator/health_glucose_512x512.png",
       "tag": "ZZG"
     },
 
@@ -30,6 +33,7 @@
       "keywords": [ "wiegen" , "gewogen"  ],
       "response": "Du kannst Dein Gewicht jetzt eingeben",
       "sample": "Ich möchte mich wiegen",
+      "icon": "/webapps/medicator/health_scale_280x280.png",
       "tag": "ZZW"
     }
   ],

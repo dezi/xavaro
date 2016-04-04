@@ -37,10 +37,11 @@ public class VersionUtils
     // Get SDK compliant drawable resource.
     //
 
-    public static Drawable getIconFromApplication(Context context, String packageName)
+    public static Drawable getIconFromApplication(String packageName)
     {
         try
         {
+            Context context = Simple.getAnyContext();
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
             Resources res = context.getPackageManager().getResourcesForApplication(appInfo);
 

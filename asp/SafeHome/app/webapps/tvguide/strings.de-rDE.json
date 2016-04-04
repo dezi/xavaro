@@ -4,13 +4,17 @@
     {
       "action" : "view",
       "keywords": [ "Fernsehprogramm", "Fernsehen"  ],
-      "response": "Ich öffne das Fernsehprogramm"
+      "response": "Ich öffne das Fernsehprogramm",
+      "sample": "Ich möchte das Fernsehprogramm sehen",
+      "icon": "/webapps/tvguide/tvguide_175x175.png"
     },
 
     {
       "action" : "view",
       "keywords": [ "Fernsehprogramm", "Fernsehen", "8:15" ],
       "response": "Das gibt es heute nach der Tagesschau",
+      "sample": "Ich möchte das Fernsehprogramm um Acht Uhr Fünfzehn sehen",
+      "icon": "/webapps/tvguide/tvguide_175x175.png",
       "tag": "time=20:15"
     }
   ],

@@ -42,6 +42,12 @@ public class PreferenceFragments
             JSONObject config = WebLib.getLocaleConfig(type);
             if (config == null) return;
 
+            if (subtype != null)
+            {
+                config = Json.getObject(config, subtype);
+                if (config == null) return;
+            }
+
             if (subcategory != null)
             {
                 config = Json.getObject(config, subcategory);
@@ -57,16 +63,12 @@ public class PreferenceFragments
             while (keysIterator.hasNext())
             {
                 String website = keysIterator.next();
+                if (website.equals("intent") || website.equals("intents")) continue;
 
                 JSONObject webitem = Json.getObject(config, website);
                 if (webitem == null) continue;
 
                 if (webitem.has("enabled") && ! Json.getBoolean(webitem, "enabled"))
-                {
-                    continue;
-                }
-
-                if (! Json.equals(webitem, "subtype", subtype))
                 {
                     continue;
                 }

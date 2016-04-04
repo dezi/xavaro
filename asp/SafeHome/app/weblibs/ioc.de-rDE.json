@@ -1,573 +1,602 @@
 {
-  "m.bild.de": {
-    "url": "http://m.bild.de/",
-    "icon": "http://pbs.twimg.com/profile_images/672813907057229824/g3MBf6VF_400x400.png",
-    "label": "Bild Online",
-    "default": true,
-    "subtype": "newspaper",
+  "newspaper": {
 
     "intent": {
       "action" : "view",
-      "keywords": [ "Bild Online", "Bild Zeitung", "Bildzeitung" , "Bild", "eine Zeitung" ],
-      "response": "Ich öffne die Bild Zeitung"
+      "keywords": [ "eine Zeitung" ],
+      "response": "Ich öffne die Zeitungs Auswahl",
+      "sample": "Ich möchte eine Zeitung lesen"
     },
 
-    "subdomains": [
-      "code.bildstatic.de",
-      "rem-track.bild.de",
-      "pixel.bild.de",
-      "bilder.bild.de",
-      "m.wetter.bild.de"
-    ]
-  },
+    "m.bild.de": {
+      "url": "http://m.bild.de/",
+      "icon": "http://pbs.twimg.com/profile_images/672813907057229824/g3MBf6VF_400x400.png",
+      "label": "Bild Online",
+      "default": true,
 
-  "m.sportbild.bild.de": {
-    "url": "http://m.sportbild.bild.de/",
-    "icon": "http://pbs.twimg.com/profile_images/378800000268844744/33094934ef7680645fb39e87b02c99df_400x400.jpeg",
-    "label": "Sport Bild",
-    "default": true,
-    "subtype": "newspaper",
+      "intent": {
+        "action": "view",
+        "keywords": [ "Bild Online", "Bild Zeitung", "Bildzeitung", "Bild" ],
+        "response": "Ich öffne die Bild Zeitung",
+        "sample": "Ich möchte die Bild Zeitung lesen"
+      },
 
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Sport Bild", "Sportbild", "Sport Online", "Sport Zeitung", "Sport", "Bild" ],
-      "response": "Ich öffne Sport Bild"
+      "subdomains": [
+        "code.bildstatic.de",
+        "rem-track.bild.de",
+        "pixel.bild.de",
+        "bilder.bild.de",
+        "m.wetter.bild.de"
+      ]
     },
 
-    "subdomains": [
-      "code.bildstatic.de",
-      "rem-track.bild.de",
-      "pixel.bild.de",
-      "bilder.bild.de",
-      "m.wetter.bild.de"
-    ]
-  },
+    "m.sportbild.bild.de": {
+      "url": "http://m.sportbild.bild.de/",
+      "icon": "http://pbs.twimg.com/profile_images/378800000268844744/33094934ef7680645fb39e87b02c99df_400x400.jpeg",
 
-  "m.spiegel.de": {
-    "url": "http://m.spiegel.de/",
-    "icon": "http://pbs.twimg.com/profile_images/1719664041/tw_spon_400x400.jpg",
-    "label": "Spiegel Online",
-    "default": true,
-    "subtype": "magazine",
+      "label": "Sport Bild",
+      "default": true,
 
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Spiegel", "Spiegel Online", "Den Spiegel", "Spiegel Magazin" ],
-      "response": "Ich öffne den Spiegel"
+      "intent": {
+        "action": "view",
+        "keywords": [ "Sport Bild", "Sportbild", "Sport Online", "Sport Zeitung", "Sport", "Bild" ],
+        "response": "Ich öffne Sport Bild",
+        "sample": "Ich möchte Sport Bild lesen"
+      },
+
+      "subdomains": [
+        "code.bildstatic.de",
+        "rem-track.bild.de",
+        "pixel.bild.de",
+        "bilder.bild.de",
+        "m.wetter.bild.de"
+      ]
+    },
+
+    "mobil.mopo.de": {
+      "url": "http://mobil.mopo.de/",
+      "icon": "http://pbs.twimg.com/profile_images/700585031912153090/LPBp5cA4_400x400.png",
+      "label": "MOPO",
+      "default": true,
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Mopo", "Hamburger Morgenpost" ],
+        "response": "Ich öffne die MOPO",
+        "sample": "Ich möchte die MOPO lesen"
+      },
+
+      "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
+    },
+
+    "m.faz.net": {
+      "url": "http://m.faz.net/",
+      "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg",
+      "label": "FAZ Online",
+      "default": true,
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "FAZ", "F A Z", "Frankfurter Allgemeine" ],
+        "response": "Ich öffne die FAZ",
+        "sample": "Ich möchte die FAZ lesen"
+      },
+
+      "subdomains": [ "static.faz.net", "gets.faz.net" ]
     }
   },
 
-  "m.gala.de": {
-    "url": "http://m.gala.de/",
-    "icon": "http://pbs.twimg.com/profile_images/568402279900794880/PSCQkXzW_400x400.png",
-    "label": "Gala",
-    "default": true,
-    "subtype": "pictorial",
+  "magazine": {
 
     "intent": {
       "action" : "view",
-      "keywords": [ "Gala", "etwas Buntes" ],
-      "response": "Ich öffne die Gala"
-    }
-  },
-
-  "mobil.bunte.de": {
-    "url": "http://mobil.bunte.de/",
-    "icon": "http://pbs.twimg.com/profile_images/308504986/bunte_only_400x400.jpg",
-    "label": "Bunte",
-    "default": true,
-    "subtype": "pictorial",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Die Bunte", "etwas Buntes" ],
-      "response": "Ich öffne die Bunte"
+      "keywords": [ "ein Magazin" ],
+      "response": "Ich öffne die Magazin Auswahl",
+      "sample": "Ich möchte ein Magazin lesen"
     },
 
-    "subdomains": [ "i1.bstatic.de", "i2.bstatic.de", "i3.bstatic.de" ]
-  },
+    "m.spiegel.de": {
+      "url": "http://m.spiegel.de/",
+      "icon": "http://pbs.twimg.com/profile_images/1719664041/tw_spon_400x400.jpg",
+      "label": "Spiegel Online",
+      "default": true,
 
-  "m.manager-magazin.de": {
-    "url": "http://m.manager-magazin.de/",
-    "icon": "http://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH_400x400.png",
-    "label": "Manager Magazin",
-    "default": true,
-    "subtype": "magazine",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Manager Magazin", "ein Magazin" ],
-      "response": "Ich öffne das Manager Magazin"
-    }
-  },
-
-  "mobil.stern.de": {
-    "url": "http://mobil.stern.de/",
-    "icon": "http://pbs.twimg.com/profile_images/453882199477985280/XAAheikJ_400x400.png",
-    "label": "Stern",
-    "default": true,
-    "subtype": "pictorial",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Stern", "etwas Buntes", "ein Magazin" ],
-      "response": "Ich öffne den Stern"
-    },
-
-    "subdomains": [ "static.stern.de" ]
-  },
-
-  "mobil.mopo.de": {
-    "url": "http://mobil.mopo.de/",
-    "icon": "http://pbs.twimg.com/profile_images/700585031912153090/LPBp5cA4_400x400.png",
-    "label": "MOPO",
-    "default": true,
-    "subtype": "newspaper",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Mopo", "Hamburger Morgenpost", "eine Zeitung" ],
-      "response": "Ich öffne die MOPO"
-    },
-
-    "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
-  },
-
-  "m.petra.de": {
-    "url": "http://m.petra.de/",
-    "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg",
-    "label": "Petra",
-    "default": true,
-    "subtype": "pictorial",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Die Petra", "Petra", "etwas Buntes" ],
-      "response": "Ich öffne die Petra"
-    }
-  },
-
-  "m.focus.de": {
-    "url": "http://m.focus.de/",
-    "icon": "http://pbs.twimg.com/profile_images/142508522/FOCUS-Facebook_400x400.jpg",
-    "label": "Focus",
-    "default": true,
-    "subtype": "magazine",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Fokus", "Focus", "Focus Online", "Den Focus", "Focus Magazin" ],
-      "response": "Ich öffne das Focus Magazin"
-    },
-
-    "subdomains": [ "chart.finanzen100.de" ]
-  },
-
-  "m.nationalgeographic.de": {
-    "url": "http://m.nationalgeographic.de/",
-    "icon": "http://pbs.twimg.com/profile_images/705249451816853504/y1Er7BhQ_400x400.jpg",
-    "label": "National Geo",
-    "default": true,
-    "subtype": "magazine",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Natgeo", "National Geographic", "National Geo graphic", "ein Magazin" ],
-      "response": "Ich öffne National Geographic"
-    }
-  },
-
-  "m.faz.net": {
-    "url": "http://m.faz.net/",
-    "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg",
-    "label": "FAZ Online",
-    "default": true,
-    "subtype": "newspaper",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "FAZ", "F A Z", "eine Zeitung" ],
-      "response": "Ich öffne die FAZ"
-    },
-
-    "subdomains": [ "static.faz.net", "gets.faz.net" ]
-  },
-
-  "www.bento.de": {
-    "url": "http://www.bento.de/",
-    "icon": "http://pbs.twimg.com/profile_images/652103303103385600/e_TKuZ3q_400x400.jpg",
-    "label": "bento",
-    "default": true,
-    "subtype": "magazin",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Bento", "eine Jungendmagazin" ],
-      "response": "Ich öffne Bento"
-    },
-
-    "subdomains": [
-      "disqus.com",
-      "a.disquscdn.com",
-      "referrer.disqus.com",
-      "bentobento.disqus.com",
-      "link.services.disqus.com",
-      "glitter.services.disqus.com"
-    ]
-  },
-
-  "www.playboy.de": {
-    "url": "http://www.playboy.de/",
-    "icon": "http://pbs.twimg.com/profile_images/668931765080227840/ZgR1OKJI_400x400.png",
-    "label": "Playboy",
-    "default": true,
-    "subtype": "pictorial",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Playboy", "hübsche Mädels", "schöne Titten" ],
-      "response": "Ich öffne den Playboy"
-    },
-
-    "subdomains": [ "pbs.twimg.com" ]
-  },
-
-  "m.zalando.de": {
-    "url": "http://m.zalando.de/",
-    "icon": "http://pbs.twimg.com/profile_images/705724583794630656/Id7jmjPO_400x400.jpg",
-    "label": "Zalando",
-    "default": true,
-    "subtype": "shopping",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Zalando"  ],
-      "response": "Ich öffne den Zalando Web-Shop"
-    },
-
-    "subdomains": [ "track.zalando.de", ".ztat.net" ]
-  },
-
-  "www.otto.de": {
-    "url": "http://www.otto.de/",
-    "icon": "http://pbs.twimg.com/profile_images/572316581649059840/kkLQ3q1X_400x400.png",
-    "label": "Otto",
-    "default": true,
-    "subtype": "shopping",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Otto", "Otto Versand"  ],
-      "response": "Ich öffne den Otto Web-Shop"
-    },
-
-    "subdomains": [ "images.otto.de", "assets.cdn-otto.de", "pxc.otto.de" ]
-  },
-
-  "de.dawanda.com": {
-    "url": "http://de.dawanda.com/",
-    "icon": "http://pbs.twimg.com/profile_images/542650070231822336/rpRDD2ge_400x400.png",
-    "label": "DaWanda",
-    "default": true,
-    "subtype": "shopping",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Dawanda", "schöne Dinge"  ],
-      "response": "Ich öffne den Dawanda Web-Shop"
-    },
-
-    "subdomains": [
-      ".dawanda.com",
-      ".dawandastatic.com",
-      "fonts.googleapis.com",
-      "fonts.gstatic.com",
-      "apis.google.com",
-      ".amazonaws.com"
-    ]
-  },
-
-  "www.klingel.de": {
-    "url": "http://www.klingel.de/",
-    "icon": "http://www.mydealz.de/images/merchants/klingel_logo.png",
-    "label": "KLINGEL.de",
-    "default": true,
-    "subtype": "shopping",
-
-    "intent": {
-      "action" : "view",
-      "keywords": [ "Klingel", "schöne Dinge"  ],
-      "response": "Ich öffne den Klingel Web-Shop"
-    },
-
-    "subdomains": [
-    ]
-  },
-
-  "de.m.xhamster.com": {
-    "url": "http://de.m.xhamster.com/",
-    "icon": "http://pbs.twimg.com/profile_images/715800836291575808/D9cur1Ni_400x400.jpg",
-    "label": "xHamster",
-    "default": true,
-    "subtype": "erotics",
-
-    "webguard": {
-      "mingle": {
-        "replace": [
-          { "regex": ">Advertising.*?iframe>", "replace": ">" }
-        ]
+      "intent": {
+        "action": "view",
+        "keywords": [ "Spiegel", "Spiegel Online", "den Spiegel", "Spiegel Magazin" ],
+        "response": "Ich öffne den Spiegel",
+        "sample": "Ich möchte Spiegel Online lesen"
       }
-    }
-  },
+    },
 
-  "de.tube8.com": {
-    "url": "http://de.tube8.com/",
-    "icon": "http://a3-images.myspacecdn.com/images03/1/cb9e1e694ca941abaf62f0026d18049f/300x300.jpg",
-    "label": "TUBE8",
-    "default": true,
-    "subtype": "erotics",
+    "m.manager-magazin.de": {
+      "url": "http://m.manager-magazin.de/",
+      "icon": "http://pbs.twimg.com/profile_images/573094312260452353/Vi44LHKH_400x400.png",
+      "label": "Manager Magazin",
+      "default": true,
 
-    "subdomains": [ "tube8.com", "phncdn.com" ],
-
-    "webguard": {
-
-      //
-      // Preset age check and table style.
-      //
-
-      "cookies": [ "t8disclaimer=1", "platform=tablet" ],
-
-      "mingle": {
-        "replace": [
-
-          //
-          // Tube8 m.f. re-inserts this div if gone. So set to display none.
-          //
-
-          {
-            "regex": "(?s)<div id=\"PornhubNetworkBar\">",
-            "replace": "<div id=\"PornhubNetworkBar\" style=\"display:none\">"
-          },
-
-          //
-          // Eliminate undesired links from menu bar.
-          //
-
-          {
-            "regex": "(?s)<li class=\"float-left\">.*?loadAdFromHeaderTab.*?<\\/li>",
-            "replace": ""
-          },
-
-          //
-          // Eliminate ads blocks.
-          //
-
-          {
-            "regex": "(?s)<div class=\"blockHtml.*?Traffic Junky.*?<\\/div>",
-            "replace": ""
-          },
-
-          //
-          // Eliminate player pause ad.
-          //
-
-          {
-            "regex": "(?s)<div id=\"pb_block\">",
-            "replace": "<div id=\"pb_block\" style=\"background:rgba(255,0,0,0)\">"
-          },
-          {
-            "regex": "(?s)<div id=\"pb_top_bar\">.*?<\\/div>",
-            "replace": "<div id=\"pb_top_bar\" style=\"background:rgba(255,0,0,0)\"></div>"
-          },
-          {
-            "regex": "(?s)<div id=\"pb_content\">.*?<\\/div>",
-            "replace": "<div id=\"pb_content\" style=\"background:rgba(255,0,0,0)\"></div>"
-          },
-
-          //
-          // Correct bogus resume player button.
-          //
-
-          {
-            "regex": "Zusammenfassung",
-            "replace": "Fortsetzen"
-          }
-        ]
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Manager Magazin", "ein Magazin" ],
+        "response": "Ich öffne das Manager Magazin",
+        "sample": "Ich möchte das Manager Magazin lesen"
       }
-    }
-  },
+    },
 
-  "www.pornhub.com": {
-    "url": "http://www.pornhub.com/",
-    "icon": "http://pbs.twimg.com/profile_images/615525585826222080/W9b7zw3R_400x400.jpg",
-    "label": "Pornhub",
-    "default": true,
-    "subtype": "erotics",
+    "m.focus.de": {
+      "url": "http://m.focus.de/",
+      "icon": "http://pbs.twimg.com/profile_images/142508522/FOCUS-Facebook_400x400.jpg",
+      "label": "Focus",
+      "default": true,
 
-    "subdomains": [ "phncdn.com" ],
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Fokus", "Focus", "Focus Online", "den Focus", "Focus Magazin" ],
+        "response": "Ich öffne das Focus Magazin",
+        "sample": "Ich möchte den Focus lesen"
+      },
 
-    "webguard": {
+      "subdomains": [ "chart.finanzen100.de" ]
+    },
 
-      //
-      // Site javascript crashes w/o this.
-      //
+    "m.nationalgeographic.de": {
+      "url": "http://m.nationalgeographic.de/",
+      "icon": "http://pbs.twimg.com/profile_images/705249451816853504/y1Er7BhQ_400x400.jpg",
+      "label": "National Geo",
+      "default": true,
 
-      "feature": [ "DomStorage=1" ],
-
-      //
-      // Preset age check and table style.
-      //
-
-      "cookies": [ "age_verified=1", "platform=tablet" ],
-
-      "mingle": {
-        "replace": [
-
-          //
-          // Get rid of PornHub NetworkBar.
-          //
-
-          {
-            "regex": "<div id=\"backgroundLayer\">",
-            "replace": "<div id=\"backgroundLayer\" style=\"display:none\">"
-          },
-          {
-            "regex": "<div id=\"pageLayer\">",
-            "replace": "<div id=\"pageLayer\" style=\"top:0px\">"
-          },
-
-          //
-          // Turn ads areas invisible.
-          //
-
-          {
-            "regex": "class=\"rightAds\"",
-            "replace": "class=\"rightAds\" style=\"display:none\""
-          },
-          {
-            "regex": "class=\"ad\"",
-            "replace": "class=\"ad\" style=\"display:none\""
-          },
-
-          //
-          // Resize video player.
-          //
-
-          {
-            "regex": "<div class=\"playerContainer\">",
-            "replace": "<div class=\"playerContainer\" style=\"float:none;width:650px;height:478px;margin:auto\">"
-          },
-
-          //
-          // Eliminate player pause ad.
-          //
-
-          {
-            "regex": "(?s)<div id=\"pb_block\">",
-            "replace": "<div id=\"pb_block\" style=\"background:rgba(255,0,0,0)\">"
-          },
-          {
-            "regex": "(?s)<div id=\"pb_top_bar\">.*?<\\/div>",
-            "replace": "<div id=\"pb_top_bar\" style=\"background:rgba(255,0,0,0)\"></div>"
-          },
-          {
-            "regex": "(?s)<div id=\"pb_content\">.*?<\\/div>",
-            "replace": "<div id=\"pb_content\" style=\"background:rgba(255,0,0,0)\"></div>"
-          }
-        ]
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Natgeo", "National Geographic", "National Geo graphic", "ein Magazin" ],
+        "response": "Ich öffne National Geographic",
+        "sample": "Ich möchte National Geographic lesen"
       }
+    },
+
+    "www.bento.de": {
+      "url": "http://www.bento.de/",
+      "icon": "http://pbs.twimg.com/profile_images/652103303103385600/e_TKuZ3q_400x400.jpg",
+      "label": "bento",
+      "default": true,
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Bento", "eine Jungendmagazin" ],
+        "response": "Ich öffne Bento",
+        "sample": "Ich möchte Bento lesen"
+      },
+
+      "subdomains": [
+        "disqus.com",
+        "a.disquscdn.com",
+        "referrer.disqus.com",
+        "bentobento.disqus.com",
+        "link.services.disqus.com",
+        "glitter.services.disqus.com"
+      ]
     }
   },
 
-  "www.youporn.com": {
-    "url": "http://www.youporn.com/",
-    "icon": "http://pbs.twimg.com/profile_images/689869440394092544/DZdpg5qR_400x400.png",
-    "label": "YouPorn",
-    "default": true,
-    "subtype": "erotics",
+  "pictorial": {
 
-    "subdomains": [ "phncdn.com" ],
+    "intent": {
+      "action" : "view",
+      "keywords": [ "eine Zeitschrift" ],
+      "response": "Ich öffne die Zeitschriften Auswahl",
+      "sample": "Ich möchte eine Zeitschrift lesen"
+    },
 
-    "webguard": {
+    "m.gala.de": {
+      "url": "http://m.gala.de/",
+      "icon": "http://pbs.twimg.com/profile_images/568402279900794880/PSCQkXzW_400x400.png",
+      "label": "Gala",
+      "default": true,
 
-      //
-      // Preset age check.
-      //
-
-      "cookies": [ "age_verified=1" ],
-
-      "mingle": {
-        "replace": [
-
-          //
-          // Eliminate undesired links from menu bar.
-          //
-
-          { "regex": "(?s)<li><[^<]*?trafficjunky.*?li>", "replace": "" },
-
-          //
-          // Eliminate ads blocks.
-          //
-
-          {
-            "regex": "(?s)<div class=\"ad-wrapper\">",
-            "replace": "<div class=\"ad-wrapper\" style=\"display:none\">"
-          },
-
-          //
-          // Adjust size in css.
-          //
-
-          { "regex": "305px", "replace": "650px" },
-          { "regex": "172px", "replace": "366px" }
-        ]
+      "intent": {
+        "action": "view",
+        "keywords": [ "die Gala", "etwas Buntes" ],
+        "response": "Ich öffne die Gala",
+        "sample": "Ich möchte die Gala lesen"
       }
+    },
+
+    "mobil.bunte.de": {
+      "url": "http://mobil.bunte.de/",
+      "icon": "http://pbs.twimg.com/profile_images/308504986/bunte_only_400x400.jpg",
+      "label": "Bunte",
+      "default": true,
+
+      "intent": {
+        "action": "view",
+        "keywords": [ "die Bunte", "etwas Buntes" ],
+        "response": "Ich öffne die Bunte",
+        "sample": "Ich möchte die Bunte lesen"
+      },
+
+      "subdomains": [ "i1.bstatic.de", "i2.bstatic.de", "i3.bstatic.de" ]
+    },
+
+    "mobil.stern.de": {
+      "url": "http://mobil.stern.de/",
+      "icon": "http://pbs.twimg.com/profile_images/453882199477985280/XAAheikJ_400x400.png",
+      "label": "Stern",
+      "default": true,
+
+      "intent": {
+        "action": "view",
+        "keywords": [ "den Stern", "etwas Buntes", "ein Magazin" ],
+        "response": "Ich öffne den Stern",
+        "sample": "Ich möchte den Stern lesen"
+      },
+
+      "subdomains": [ "static.stern.de" ]
+    },
+
+    "m.petra.de": {
+      "url": "http://m.petra.de/",
+      "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg",
+      "label": "Petra",
+      "default": true,
+
+      "intent": {
+        "action": "view",
+        "keywords": [ "die Petra", "Petra", "etwas Buntes" ],
+        "response": "Ich öffne die Petra",
+        "sample": "Ich möchte die Petra lesen"
+      }
+    },
+
+    "www.playboy.de": {
+      "url": "http://www.playboy.de/",
+      "icon": "http://pbs.twimg.com/profile_images/668931765080227840/ZgR1OKJI_400x400.png",
+      "label": "Playboy",
+      "default": true,
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Playboy", "hübsche Mädels", "schöne Titten" ],
+        "response": "Ich öffne den Playboy",
+        "sample": "Ich möchte den Playboy lesen"
+      },
+
+      "subdomains": [ "pbs.twimg.com" ]
     }
   },
 
-  "www.redtube.com": {
-    "url": "http://www.redtube.com/",
-    "icon": "http://pbs.twimg.com/profile_images/619269637096628224/f5A48Q44_400x400.png",
-    "label": "RedTube",
-    "default": true,
-    "subtype": "erotics",
+  "shopping": {
 
-    "webguard": {
+    "m.zalando.de": {
+      "url": "http://m.zalando.de/",
+      "icon": "http://pbs.twimg.com/profile_images/705724583794630656/Id7jmjPO_400x400.jpg",
+      "label": "Zalando",
+      "default": true,
 
-      //
-      // Preset age check.
-      //
+      "intent": {
+        "action": "view",
+        "keywords": [ "Zalando" ],
+        "response": "Ich öffne den Zalando Web-Shop"
+      },
 
-      "cookies": [ "cookAV=1" ],
+      "subdomains": [ "track.zalando.de", ".ztat.net" ]
+    },
 
-      "mingle": {
-        "replace": [
+    "www.otto.de": {
+      "url": "http://www.otto.de/",
+      "icon": "http://pbs.twimg.com/profile_images/572316581649059840/kkLQ3q1X_400x400.png",
+      "label": "Otto",
+      "default": true,
 
-          //
-          // Eliminate undesired links from menu bar.
-          //
+      "intent": {
+        "action": "view",
+        "keywords": [ "Otto", "Otto Versand" ],
+        "response": "Ich öffne den Otto Web-Shop"
+      },
 
-          { "regex": "(?s)<li><[^<]*?trafficjunky.*?li>", "replace": "" },
+      "subdomains": [ "images.otto.de", "assets.cdn-otto.de", "pxc.otto.de" ]
+    },
 
-          //
-          // Eliminate ads blocks.
-          //
+    "de.dawanda.com": {
+      "url": "http://de.dawanda.com/",
+      "icon": "http://pbs.twimg.com/profile_images/542650070231822336/rpRDD2ge_400x400.png",
+      "label": "DaWanda",
+      "default": true,
 
-          { "regex": "after-header", "replace": "" },
-          { "regex": "between-videos", "replace": "" },
-          { "regex": "before-footer", "replace": "" },
+      "intent": {
+        "action": "view",
+        "keywords": [ "Dawanda", "schöne Dinge" ],
+        "response": "Ich öffne den Dawanda Web-Shop"
+      },
 
-          //
-          // Adjust mobile player to reasonable size.
-          //
+      "subdomains": [
+        ".dawanda.com",
+        ".dawandastatic.com",
+        "fonts.googleapis.com",
+        "fonts.gstatic.com",
+        "apis.google.com",
+        ".amazonaws.com"
+      ]
+    },
 
-          { "regex": "height:208px", "replace": "height:100%" },
+    "www.klingel.de": {
+      "url": "http://www.klingel.de/",
+      "icon": "http://www.mydealz.de/images/merchants/klingel_logo.png",
+      "label": "KLINGEL.de",
+      "default": true,
 
-          {
-            "regex": "class=\"video-player\"",
-            "replace": "class=\"video-player\" style=\"margin:auto;width:650px;height:384px\""
-          }
-        ]
+      "intent": {
+        "action": "view",
+        "keywords": [ "Klingel", "schöne Dinge" ],
+        "response": "Ich öffne den Klingel Web-Shop"
+      },
+
+      "subdomains": [
+      ]
+    }
+  },
+
+  "erotics": {
+
+    "de.m.xhamster.com": {
+      "url": "http://de.m.xhamster.com/",
+      "icon": "http://pbs.twimg.com/profile_images/715800836291575808/D9cur1Ni_400x400.jpg",
+      "label": "xHamster",
+      "default": true,
+
+      "webguard": {
+        "mingle": {
+          "replace": [
+            { "regex": ">Advertising.*?iframe>", "replace": ">" }
+          ]
+        }
+      }
+    },
+
+    "de.tube8.com": {
+      "url": "http://de.tube8.com/",
+      "icon": "http://a3-images.myspacecdn.com/images03/1/cb9e1e694ca941abaf62f0026d18049f/300x300.jpg",
+
+      "label": "TUBE8",
+      "default": true,
+
+      "subdomains": [ "tube8.com", "phncdn.com" ],
+
+      "webguard": {
+
+        //
+        // Preset age check and table style.
+        //
+
+        "cookies": [ "t8disclaimer=1", "platform=tablet" ],
+
+        "mingle": {
+          "replace": [
+
+            //
+            // Tube8 m.f. re-inserts this div if gone. So set to display none.
+            //
+
+            {
+              "regex": "(?s)<div id=\"PornhubNetworkBar\">",
+              "replace": "<div id=\"PornhubNetworkBar\" style=\"display:none\">"
+            },
+
+            //
+            // Eliminate undesired links from menu bar.
+            //
+
+            {
+              "regex": "(?s)<li class=\"float-left\">.*?loadAdFromHeaderTab.*?<\\/li>",
+              "replace": ""
+            },
+
+            //
+            // Eliminate ads blocks.
+            //
+
+            {
+              "regex": "(?s)<div class=\"blockHtml.*?Traffic Junky.*?<\\/div>",
+              "replace": ""
+            },
+
+            //
+            // Eliminate player pause ad.
+            //
+
+            {
+              "regex": "(?s)<div id=\"pb_block\">",
+              "replace": "<div id=\"pb_block\" style=\"background:rgba(255,0,0,0)\">"
+            },
+            {
+              "regex": "(?s)<div id=\"pb_top_bar\">.*?<\\/div>",
+              "replace": "<div id=\"pb_top_bar\" style=\"background:rgba(255,0,0,0)\"></div>"
+            },
+            {
+              "regex": "(?s)<div id=\"pb_content\">.*?<\\/div>",
+              "replace": "<div id=\"pb_content\" style=\"background:rgba(255,0,0,0)\"></div>"
+            },
+
+            //
+            // Correct bogus resume player button.
+            //
+
+            {
+              "regex": "Zusammenfassung",
+              "replace": "Fortsetzen"
+            }
+          ]
+        }
+      }
+    },
+
+    "www.pornhub.com": {
+      "url": "http://www.pornhub.com/",
+      "icon": "http://pbs.twimg.com/profile_images/615525585826222080/W9b7zw3R_400x400.jpg",
+      "label": "Pornhub",
+      "default": true,
+
+      "subdomains": [ "phncdn.com" ],
+
+      "webguard": {
+
+        //
+        // Site javascript crashes w/o this.
+        //
+
+        "feature": [ "DomStorage=1" ],
+
+        //
+        // Preset age check and table style.
+        //
+
+        "cookies": [ "age_verified=1", "platform=tablet" ],
+
+        "mingle": {
+          "replace": [
+
+            //
+            // Get rid of PornHub NetworkBar.
+            //
+
+            {
+              "regex": "<div id=\"backgroundLayer\">",
+              "replace": "<div id=\"backgroundLayer\" style=\"display:none\">"
+            },
+            {
+              "regex": "<div id=\"pageLayer\">",
+              "replace": "<div id=\"pageLayer\" style=\"top:0px\">"
+            },
+
+            //
+            // Turn ads areas invisible.
+            //
+
+            {
+              "regex": "class=\"rightAds\"",
+              "replace": "class=\"rightAds\" style=\"display:none\""
+            },
+            {
+              "regex": "class=\"ad\"",
+              "replace": "class=\"ad\" style=\"display:none\""
+            },
+
+            //
+            // Resize video player.
+            //
+
+            {
+              "regex": "<div class=\"playerContainer\">",
+              "replace": "<div class=\"playerContainer\" style=\"float:none;width:650px;height:478px;margin:auto\">"
+            },
+
+            //
+            // Eliminate player pause ad.
+            //
+
+            {
+              "regex": "(?s)<div id=\"pb_block\">",
+              "replace": "<div id=\"pb_block\" style=\"background:rgba(255,0,0,0)\">"
+            },
+            {
+              "regex": "(?s)<div id=\"pb_top_bar\">.*?<\\/div>",
+              "replace": "<div id=\"pb_top_bar\" style=\"background:rgba(255,0,0,0)\"></div>"
+            },
+            {
+              "regex": "(?s)<div id=\"pb_content\">.*?<\\/div>",
+              "replace": "<div id=\"pb_content\" style=\"background:rgba(255,0,0,0)\"></div>"
+            }
+          ]
+        }
+      }
+    },
+
+    "www.youporn.com": {
+      "url": "http://www.youporn.com/",
+      "icon": "http://pbs.twimg.com/profile_images/689869440394092544/DZdpg5qR_400x400.png",
+      "label": "YouPorn",
+      "default": true,
+
+      "subdomains": [ "phncdn.com" ],
+
+      "webguard": {
+
+        //
+        // Preset age check.
+        //
+
+        "cookies": [ "age_verified=1" ],
+
+        "mingle": {
+          "replace": [
+
+            //
+            // Eliminate undesired links from menu bar.
+            //
+
+            { "regex": "(?s)<li><[^<]*?trafficjunky.*?li>", "replace": "" },
+
+            //
+            // Eliminate ads blocks.
+            //
+
+            {
+              "regex": "(?s)<div class=\"ad-wrapper\">",
+              "replace": "<div class=\"ad-wrapper\" style=\"display:none\">"
+            },
+
+            //
+            // Adjust size in css.
+            //
+
+            { "regex": "305px", "replace": "650px" },
+            { "regex": "172px", "replace": "366px" }
+          ]
+        }
+      }
+    },
+
+    "www.redtube.com": {
+      "url": "http://www.redtube.com/",
+      "icon": "http://pbs.twimg.com/profile_images/619269637096628224/f5A48Q44_400x400.png",
+      "label": "RedTube",
+      "default": true,
+
+      "webguard": {
+
+        //
+        // Preset age check.
+        //
+
+        "cookies": [ "cookAV=1" ],
+
+        "mingle": {
+          "replace": [
+
+            //
+            // Eliminate undesired links from menu bar.
+            //
+
+            { "regex": "(?s)<li><[^<]*?trafficjunky.*?li>", "replace": "" },
+
+            //
+            // Eliminate ads blocks.
+            //
+
+            { "regex": "after-header", "replace": "" },
+            { "regex": "between-videos", "replace": "" },
+            { "regex": "before-footer", "replace": "" },
+
+            //
+            // Adjust mobile player to reasonable size.
+            //
+
+            { "regex": "height:208px", "replace": "height:100%" },
+
+            {
+              "regex": "class=\"video-player\"",
+              "replace": "class=\"video-player\" style=\"margin:auto;width:650px;height:384px\""
+            }
+          ]
+        }
       }
     }
   }

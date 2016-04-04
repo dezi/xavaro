@@ -45,6 +45,11 @@ public class LaunchFrameWebApp extends LaunchFrame
         addView(webview);
     }
 
+    public void doDataCallback(String function, String data)
+    {
+        webview.request.doDataCallback(function, data);
+    }
+
     public void onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
         Log.d(LOGTAG, "onExecuteVoiceIntent");

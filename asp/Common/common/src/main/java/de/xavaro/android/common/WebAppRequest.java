@@ -1,12 +1,14 @@
 package de.xavaro.android.common;
 
 import android.content.Context;
+import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.util.Log;
 import android.webkit.WebView;
 
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -27,6 +29,12 @@ public class WebAppRequest
         this.webappname = webappname;
         this.webview = webview;
         this.webapploader = webapploader;
+    }
+
+    public void doDataCallback(String function, String data)
+    {
+        final String cbscript = function + "(" + data + ");";
+        webview.evaluateJavascript(cbscript, null);
     }
 
     public void doVoiceIntent(VoiceIntent intent, int index)
@@ -189,6 +197,26 @@ public class WebAppRequest
         }
 
         return contstr;
+    }
+
+    @JavascriptInterface
+    public String loadResourceImage(int resourceid)
+    {
+        try
+        {
+            InputStream raw = Simple.getAnyContext().getResources().openRawResource(resourceid);
+
+            byte[] ba = new byte[ 32 * 1024 ];
+            int xfer = raw.read(ba, 0, ba.length);
+
+            return "data:image/png;base64," + Base64.encodeToString(ba, 0, xfer, 0);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return "";
     }
 
     @JavascriptInterface

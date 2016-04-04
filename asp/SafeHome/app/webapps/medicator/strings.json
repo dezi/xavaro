@@ -6,6 +6,7 @@
       "keywords": [ "medicine", "medis", "pill", "pills"  ],
       "response": "You can register Your medis now",
       "sample": "I would like to take my medis now",
+      "icon": "/webapps/medicator/health_bpm_256x256.png",
       "tag": "AAA"
     },
 
@@ -14,6 +15,7 @@
       "keywords": [ "blood pressure"  ],
       "response": "You can enter Your values now",
       "sample": "I would like to take my blood pressure now",
+      "icon": "/webapps/medicator/health_bpm_256x256.png",
       "tag": "ZZB"
     },
 
@@ -22,6 +24,7 @@
       "keywords": [ "blood sugar" ],
       "response": "You can enter Your value now",
       "sample": "I would like to take my blood sugar now",
+      "icon": "/webapps/medicator/health_glucose_512x512.png",
       "tag": "ZZG"
     },
 
@@ -30,6 +33,7 @@
       "keywords": [ "weigh" ],
       "response": "You can enter Your weight now",
       "sample": "I would like to weigh myself",
+      "icon": "/webapps/medicator/health_scale_280x280.png",
       "tag": "ZZW"
     }
   ],

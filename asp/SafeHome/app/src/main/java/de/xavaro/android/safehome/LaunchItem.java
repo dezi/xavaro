@@ -327,6 +327,12 @@ public class LaunchItem extends FrameLayout implements
         subtype = config.has("subtype") ? Json.getString(config, "subtype") : null;
         identifier = config.has("identifier") ? Json.getString(config, "identifier") : null;
 
+        if (config.has("iconres"))
+        {
+            int resourceId = Json.getInt(config, "iconres");
+            if (resourceId > 0) icon.setImageResource(resourceId);
+        }
+
         if (config.has("icon"))
         {
             String iconref = Json.getString(config, "icon");
@@ -354,7 +360,7 @@ public class LaunchItem extends FrameLayout implements
             if (packageName != null)
             {
                 CommonConfigs.weLikeThis(packageName);
-                Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+                Drawable appIcon = VersionUtils.getIconFromApplication(packageName);
 
                 if (appIcon != null)
                 {
@@ -434,6 +440,114 @@ public class LaunchItem extends FrameLayout implements
         //
     }
 
+    @Nullable
+    private JSONArray prepareIntents(JSONObject myconfig, JSONArray intents)
+    {
+        if (intents != null)
+        {
+            for (int inx = 0; inx < intents.length(); inx++)
+            {
+                prepareIntent(myconfig, Json.getObject(intents, inx));
+            }
+        }
+
+        return intents;
+    }
+
+    private JSONObject prepareIntent(JSONObject myconfig, JSONObject intent)
+    {
+        if (intent != null)
+        {
+            if (myconfig.has("type"))
+            {
+                Json.put(intent, "type", Json.getString(myconfig, "type"));
+            }
+
+            if (myconfig.has("subtype"))
+            {
+                Json.put(intent, "subtype", Json.getString(myconfig, "subtype"));
+            }
+
+            if (myconfig.has("name"))
+            {
+                Json.put(intent, "subtypetag", Json.getString(myconfig, "name"));
+            }
+
+            if (intent.has("tag"))
+            {
+                Json.put(intent, "subtypetag", Json.getString(intent, "tag"));
+            }
+
+            if (myconfig.has("iconres"))
+            {
+                int iconres = Json.getInt(myconfig, "iconres");
+
+                if (iconres != 0)
+                {
+                    Json.put(intent, "iconres", iconres);
+                }
+            }
+
+            if (myconfig.has("icon"))
+            {
+                String iconref = Json.getString(myconfig, "icon");
+
+                if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
+                {
+                    if (myconfig.has("name"))
+                    {
+                        String iconname = Json.getString(myconfig, "name");
+                        String iconpath = CacheManager.getWebIconPath(iconname, iconref);
+
+                        Json.put(intent, "icon", "local://" + iconpath);
+                    }
+                }
+                else
+                {
+                    int resourceId = Simple.getIconResourceId(iconref);
+
+                    if (resourceId > 0)
+                    {
+                        Json.put(intent, "icon", resourceId);
+                    }
+                }
+            }
+
+            /*
+            if (myconfig.has("packagename"))
+            {
+                String packageName = Json.getString(myconfig, "packagename");
+
+                if (packageName != null)
+                {
+                    CommonConfigs.weLikeThis(packageName);
+                    Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+
+                    if (appIcon != null)
+                    {
+                        icon.setImageDrawable(appIcon);
+                    }
+                    else
+                    {
+                        Drawable drawable = CacheManager.getAppIcon(packageName);
+
+                        if (drawable != null)
+                        {
+                            icon.setImageDrawable(drawable);
+                        }
+                        else
+                        {
+                            icon.setImageResource(R.drawable.stop_512x512);
+                        }
+                    }
+                }
+            }
+            */
+        }
+
+        return intent;
+    }
+
     @Override
     public boolean onCollectVoiceIntent(VoiceIntent voiceintent)
     {
@@ -447,13 +561,13 @@ public class LaunchItem extends FrameLayout implements
             if (config.has("intent"))
             {
                 JSONObject intent = Json.getObject(config, "intent");
-                return voiceintent.collectIntent(intent, identifier);
+                return voiceintent.collectIntent(prepareIntent(config, intent), identifier);
             }
 
             if (config.has("intents"))
             {
                 JSONArray intents = Json.getArray(config, "intents");
-                return voiceintent.collectIntents(intents, identifier);
+                return voiceintent.collectIntents(prepareIntents(config, intents), identifier);
             }
 
             if (config.has("launchitems"))
@@ -474,10 +588,18 @@ public class LaunchItem extends FrameLayout implements
                     if (identifier == null) continue;
 
                     JSONObject intent = Json.getObject(launchitem, "intent");
-                    if (voiceintent.collectIntent(intent, identifier)) foundone = true;
+
+                    if (voiceintent.collectIntent(prepareIntent(launchitem, intent), identifier))
+                    {
+                        foundone = true;
+                    }
 
                     JSONArray intents = Json.getArray(launchitem, "intents");
-                    if (voiceintent.collectIntents(intents, identifier)) foundone = true;
+
+                    if (voiceintent.collectIntents(prepareIntents(launchitem, intents), identifier))
+                    {
+                        foundone = true;
+                    }
                 }
 
                 return foundone;

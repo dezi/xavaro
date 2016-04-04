@@ -51,8 +51,7 @@ public class CacheManager
         return null;
     }
 
-    @Nullable
-    public static Bitmap getIcon(String filename, String src)
+    private static String loadWebIcon(String filename, String src)
     {
         File file = new File(cachedir, filename);
 
@@ -91,7 +90,73 @@ public class CacheManager
             Log.d(LOGTAG, "cacheThumbnail: fetch done");
         }
 
-        return getIcon(filename);
+        return file.toString();
+    }
+
+    private static String loadAppIcon(String filename, String packagename)
+    {
+        File file = new File(cachedir, filename);
+
+        if (! file.exists())
+        {
+            try
+            {
+                String url = "https://play.google.com/store/apps/details?id=" + packagename;
+
+                Log.d(LOGTAG, "getIconFromAppStore:" + url);
+
+                String content = StaticUtils.getContentFromUrl(url);
+
+                if (content == null)
+                {
+                    //
+                    // For some reasons specific apps result in
+                    // a 403 forbidden result. Fallback and try
+                    // to extract icon from installed app.
+                    //
+                    // For some reason means: The app has been discontinued.
+                    //
+
+                    Drawable drawable = VersionUtils.getIconFromApplication(packagename);
+
+                    if (drawable != null)
+                    {
+                        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+                        if (bitmap != null)
+                        {
+                            FileOutputStream out = new FileOutputStream(file);
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                            out.close();
+                        }
+                    }
+                }
+                else
+                {
+                    Log.d(LOGTAG, "getIconFromAppStore(1):" + url);
+
+                    Pattern pattern = Pattern.compile("class=\"cover-image\" src=\"([^\"]*)\"");
+                    Matcher matcher = pattern.matcher(content);
+                    if (!matcher.find()) return null;
+
+                    String iconurl = matcher.group(1);
+
+                    if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
+
+                    Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
+
+                    loadWebIcon(filename, iconurl);
+                }
+            }
+            catch (Exception oops)
+            {
+                OopsService.log(LOGTAG, oops);
+
+                return null;
+            }
+        }
+
+        return file.toString();
     }
 
     @Nullable
@@ -99,50 +164,17 @@ public class CacheManager
     {
         String iconfile = "app." + packagename + ".icon";
 
-        Bitmap icon = getIcon(iconfile);
-        if (icon != null) return Simple.getDrawable(icon);
+        loadAppIcon(iconfile, packagename);
 
-        try
-        {
-            String url = "https://play.google.com/store/apps/details?id=" + packagename;
+        return Simple.getDrawable(getIcon(iconfile));
+    }
 
-            Log.d(LOGTAG,"getIconFromAppStore:" + url);
+    @Nullable
+    public static String getAppIconPath(String packagename)
+    {
+        String iconfile = "app." + packagename + ".icon";
 
-            String content = StaticUtils.getContentFromUrl(url);
-
-            if (content == null)
-            {
-                //
-                // For some reasons specific apps result in
-                // a 403 forbidden result. Fallback and try
-                // to extract icon from installed app.
-                //
-
-                return VersionUtils.getIconFromApplication(Simple.getAnyContext(), packagename);
-            }
-            else
-            {
-                Log.d(LOGTAG, "getIconFromAppStore(1):" + url);
-
-                Pattern pattern = Pattern.compile("class=\"cover-image\" src=\"([^\"]*)\"");
-                Matcher matcher = pattern.matcher(content);
-                if (!matcher.find()) return null;
-
-                String iconurl = matcher.group(1);
-
-                if (iconurl.startsWith("//")) iconurl = "http:" + iconurl;
-
-                Log.d(LOGTAG, "getIconFromAppStore:" + iconurl);
-
-                return Simple.getDrawable(getIcon(iconfile, iconurl));
-            }
-        }
-        catch (Exception oops)
-        {
-            OopsService.log(LOGTAG, oops);
-        }
-
-        return null;
+        return loadAppIcon(iconfile, packagename);
     }
 
     @Nullable
@@ -150,7 +182,16 @@ public class CacheManager
     {
         String iconfile = "web." + website + ".icon";
 
-        Bitmap icon = getIcon(iconfile, src);
-        return Simple.getDrawable(icon);
+        loadWebIcon(iconfile, src);
+
+        return Simple.getDrawable(getIcon(iconfile));
+    }
+
+    @Nullable
+    public static String getWebIconPath(String website, String src)
+    {
+        String iconfile = "web." + website + ".icon";
+
+        return loadWebIcon(iconfile, src);
     }
 }

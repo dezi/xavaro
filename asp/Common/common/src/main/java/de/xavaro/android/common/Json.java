@@ -329,6 +329,16 @@ public class Json
         return null;
     }
 
+    public static String toJavaScript(JSONObject jsonObject)
+    {
+        return (jsonObject == null) ? "{}" : Json.toPretty(jsonObject);
+    }
+
+    public static String toJavaScript(JSONArray jsonArray)
+    {
+        return (jsonArray == null) ? "[]" : Json.toPretty(jsonArray);
+    }
+
     @Nullable
     public static String toPretty(JSONObject jsonObject)
     {
@@ -336,7 +346,7 @@ public class Json
         {
             try
             {
-                return jsonObject.toString(2);
+                return defuck(jsonObject.toString(2));
             }
             catch (Exception ignored)
             {
@@ -346,16 +356,6 @@ public class Json
         return null;
     }
 
-    public static String toJavaScript(JSONArray jsonArray)
-    {
-        return defuck((jsonArray == null) ? "[]" : Json.toPretty(jsonArray));
-    }
-
-    public static String toJavaScript(JSONObject jsonObject)
-    {
-        return defuck((jsonObject == null) ? "{}" : Json.toPretty(jsonObject));
-    }
-
     @Nullable
     public static String toPretty(JSONArray jsonArray)
     {
@@ -363,7 +363,7 @@ public class Json
         {
             try
             {
-                return jsonArray.toString(2);
+                return defuck(jsonArray.toString(2));
             }
             catch (Exception ignored)
             {

@@ -19,8 +19,7 @@ public class LaunchItemWebFrame extends LaunchItem
         super(context);
     }
 
-    @Override
-    protected void setConfig()
+    protected void setConfigxxx()
     {
         if (! config.has("name"))
         {

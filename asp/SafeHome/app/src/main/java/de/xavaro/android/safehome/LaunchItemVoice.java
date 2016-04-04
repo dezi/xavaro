@@ -100,6 +100,24 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
 
         Log.d(LOGTAG, "LaunchFrameVoice: intents:" + collected.getNumMatches());
 
+        final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
+        webappFrame.setWebAppName("voiceintents");
+        webappFrame.setParent(this);
+
+        ((HomeActivity) context).addViewToBackStack(webappFrame);
+
+        final String cbfunction = "voiceintents.onVoiceIntentData";
+        final String cbdata = collected.getMatches().toString();
+
+        getHandler().postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                webappFrame.doDataCallback(cbfunction, cbdata);
+            }
+        }, 1000);
+
         return true;
     }
 
