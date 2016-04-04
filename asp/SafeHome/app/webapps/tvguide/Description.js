@@ -1,9 +1,9 @@
 tvguide.descriptionConstants =
 {
-    titlebarFontSize  : 30,
-    titlebarFontColor : "#000000",
-    titlebarBGColor   : "#ffffff",
-    titlebarTextAlign : "center",
+    titlebarFontSize      : 30,
+    titlebarFontColor     : "#000000",
+    titlebarBGColor       : "#ffffff",
+    titlebarTextAlign     : "center",
 
     subtitlebarFontSize   : 20,
     subtitlebarFontColor  : "#000000",
@@ -11,9 +11,9 @@ tvguide.descriptionConstants =
     subtitlebarTextAlign  : "center",
     subtitlebarFontStylen : "italic",
 
-    containerBG     : "#ffffffff",
-    containerRadius : "4px",
-    boxPaddingTop   : "10px",
+    containerBG           : "#ffffffff",
+    containerRadius       : "4px",
+    boxPaddingTop         : "10px",
 
     livePlayButtonTilte  : WebLibStrings.getTrans("tvguide.livePlay"),
     livePlayButtonColor  : "#7dff7a",
@@ -181,44 +181,16 @@ tvguide.createInfoBox = function(description)
     WebLibSimple.setFontSpecs(container, 20, "normal", "#000000");
 }
 
-tvguide.nukeWiki = function()
-{
-    tvguide.wikiFrame.style.display = "none";
-    tvguide.wikiFrame = null;
-}
-
 tvguide.openWiki = function(target, element)
 {
     WebAppUtility.makeClick();
 
     var wikifilm = tvguide.description.epg[ element.id ].wikifilm;
-    console.log("--> wiki:" + wikifilm);
 
-    tvguide.wikiFrame = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.topdiv);
+    element.wikiArticle = "https://de.m.wikipedia.org/wiki/" + wikifilm;
+    element.appendObj   = tvguide.topdiv;
 
-    var dimmerDiv = tvguide.wikiFrame;
-    dimmerDiv.style.zIndex = "100";
-    dimmerDiv.onTouchClick = tvguide.nukeWiki;
-
-    WebLibSimple.setBGColor(dimmerDiv, "#66000000");
-
-    //
-    // wikiFrame
-    //
-
-    var border = 50;
-    var wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
-
-    WebLibSimple.setBGColor(wikiFrame, "#ffffff");
-
-    //
-    // iframe
-    //
-
-    var iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", wikiFrame);
-    iframe.style.border = "0px solid black";
-
-    iframe.src = "https://de.m.wikipedia.org/wiki/" + wikifilm;
+    WebLibSimple.openWiki(element, element);
 }
 
 tvguide.createWiki = function(wikifilm, id)
@@ -236,6 +208,16 @@ tvguide.createDescriptionSetup = function()
     tvguide.description = {};
 
     //
+    // dimmerDiv
+    //
+
+    tvguide.description.dimmerDiv = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", tvguide.content1);
+    tvguide.description.dimmerDiv.style.zIndex = "50";
+    tvguide.description.dimmerDiv.onTouchClick = WebAppRequest.onBackkeyPressed;
+
+    WebLibSimple.setBGColor(tvguide.description.dimmerDiv, "#66000000");
+
+    //
     // tvguide.description.topdiv
     //
 
@@ -243,7 +225,7 @@ tvguide.createDescriptionSetup = function()
 
     tvguide.descriptionPosition = 100;
 
-    tvguide.description.topdiv.style.zIndex = "3";
+    tvguide.description.topdiv.style.zIndex = "100";
 
     WebLibSimple.setBGColor(tvguide.description.topdiv, tvguide.constants.descriptionColor);
 
@@ -305,8 +287,6 @@ tvguide.removeRecording = function(target, element)
 
 tvguide.createButton = function(name, color, eventHandler, id, global)
 {
-    // tvguide.description
-
     if (global)
     {
         tvguide.description.buttonContainer[ id ] = WebLibSimple.createAnyAppend("div", tvguide.descriptionScroll);
@@ -529,6 +509,9 @@ tvguide.animateInfoOut = function()
     }
     else
     {
+        tvguide.description.dimmerDiv.style.display = "none";
+        tvguide.description.dimmerDiv = null;
+
         tvguide.animateInfoStatus = null;
         tvguide.description = null;
     }

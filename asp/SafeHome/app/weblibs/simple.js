@@ -552,3 +552,42 @@ WebLibSimple.getPxInt = function(pxString)
     return int;
 }
 
+WebLibSimple.nukeWiki = function()
+{
+    WebLibSimple.wikiFrame.style.display = "none";
+    WebLibSimple.wikiFrame = null;
+}
+
+WebLibSimple.openWiki = function(target, element)
+{
+    var wikiArticle = element.wikiArticle;
+    var appendObj   = element.appendObj;
+
+    console.log("--> wiki:" + wikiArticle);
+
+    WebLibSimple.wikiFrame = WebLibSimple.createDiv(0, 0, 0, 0, "dimemrDiv", appendObj);
+
+    var dimmerDiv = WebLibSimple.wikiFrame;
+    dimmerDiv.style.zIndex = "100";
+    dimmerDiv.onTouchClick = WebLibSimple.nukeWiki;
+
+    WebLibSimple.setBGColor(dimmerDiv, "#66000000");
+
+    //
+    // wikiFrame
+    //
+
+    var border = 50;
+    var wikiFrame = WebLibSimple.createDiv(border, border, border, border, "wikiDiv", dimmerDiv);
+
+    WebLibSimple.setBGColor(wikiFrame, "#ffffff");
+
+    //
+    // iframe
+    //
+
+    var iframe = WebLibSimple.createAnyWidHei("iframe", 0, 0, "100%", "100%", "iframe", wikiFrame);
+    iframe.style.border = "0px solid black";
+
+    iframe.src = wikiArticle;
+}

@@ -43,7 +43,7 @@ tvguide.constants =
     epgScrollfontWeight      : "bold",
 
     timelineColor            : "#dedede",
-    timelineDivColor         : "#ebe9e9",
+    timelineDivColor         : "#ffffff",
     timelineScrollStyleColor : "#000000",
     timelineScrollfontWeight : "bold",
     timelineScrollTextSize   : 15,
@@ -474,7 +474,7 @@ tvguide.updateEpgData = function(loadDay)
 
     var current = year + "." + month + "." + day;
 
-    console.log("--> get: " + current);
+    // console.log("--> get: " + current);
 
     for (var sender in tvguide.senderList)
     {
@@ -591,7 +591,7 @@ WebAppRequest.onLoadAsyncJSON = function(src, data)
         tvguide.constants.epgDataSrcPrefix.length,
       -(tvguide.constants.epgDataSrcPostfix.length + 11));
 
-    console.log(src);
+    // console.log(src);
     // console.log(channel);
 
     var data = data[ "epgdata" ];
@@ -713,9 +713,9 @@ WebAppRequest.onBackkeyPressed = function()
     {
         WebAppRequest.haveBackkeyPressed(true);
 
-        if (tvguide.wikiFrame)
+        if (WebLibSimple.wikiFrame)
         {
-            tvguide.nukeWiki();
+            WebLibSimple.nukeWiki();
         }
         else
         {
