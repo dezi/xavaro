@@ -227,11 +227,14 @@ public class VoiceIntent
         //
 
         String identifier = Json.getString(match, "identifier");
+        String tag = Json.getString(match, "tag");
 
         for (int inx = 0; inx < matches.length(); inx++)
         {
             JSONObject oldmatch = Json.getObject(matches, inx);
-            if (Json.equals(oldmatch, "identifier", identifier)) return;
+
+            if (Json.equals(oldmatch, "identifier", identifier) &&
+                    Json.equals(oldmatch, "tag", tag)) return;
         }
 
         Json.put(matches, match);
