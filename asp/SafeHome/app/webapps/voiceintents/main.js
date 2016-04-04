@@ -1,9 +1,7 @@
 voiceintents.onVoiceIntentData = function(intents)
 {
     voiceintents.intents = intents;
-
     voiceintents.intents.sort(voiceintents.sortCompare);
-
     voiceintents.createIntentData();
 }
 
@@ -20,7 +18,6 @@ voiceintents.sortCompare = function(a, b)
     if (b.subtypetag) bstring += b.subtypetag + "|";
 
     if (astring == bstring) return 0;
-
     return (astring > bstring) ? 1 : -1;
 }
 
@@ -113,46 +110,24 @@ voiceintents.createIntentData = function()
         divOuter.style.height = "80px";
         divOuter.intent = intent;
 
-        var divInner = WebLibSimple.createAnyAppend("div", divOuter);
-        divInner.style.position = "absolute";
-        divInner.style.left = "0px";
-        divInner.style.top = "0px";
-        divInner.style.right = "0px";
-        divInner.style.bottom = "0px";
+        var divInner = WebLibSimple.createDiv(0, 0, 0, 0, "divInner", divOuter);
         divInner.style.marginTop = "4px";
         divInner.style.marginBottom = "4px";
         divInner.style.border = "1px solid grey";
         divInner.style.backgroundColor = "#dddddd";
 
-        var divIcon = WebLibSimple.createAnyAppend("div", divInner);
-        divIcon.style.position = "absolute";
-        divIcon.style.left = "0px";
-        divIcon.style.top = "0px";
-        divIcon.style.bottom = "0px";
+        var divIcon = WebLibSimple.createDiv(0, 0, null, 0, "divIcon", divInner);
         divIcon.style.margin = "4px";
 
-        var imgIcon = WebLibSimple.createAnyAppend("img", divIcon);
-        imgIcon.style.position = "absolute";
-        imgIcon.style.left = "0px";
-        imgIcon.style.top = "0px";
-        imgIcon.style.width = "auto";
-        imgIcon.style.height = "100%";
+        var imgIcon = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", "imgIcon", divIcon);
         imgIcon.src = intent.icon ? intent.icon : WebAppRequest.loadResourceImage(intent.iconres);
 
-        var divSample = WebLibSimple.createAnyAppend("div", divInner);
-        divSample.style.position = "absolute";
-        divSample.style.left = "64px";
-        divSample.style.top = "0px";
-        divSample.style.right = "64px";
+        var divSample = WebLibSimple.createDiv(64, 0, 0, null, "divSample", divInner);
         divSample.style.padding = "8px";
         divSample.innerHTML = intent.sample;
 
-        var divKeywords = WebLibSimple.createAnyAppend("div", divInner);
+        var divKeywords = WebLibSimple.createDiv(64, null, 0, 0, "divKeywords", divInner);
         WebLibSimple.setFontSpecs(divKeywords, 18, "normal", "#888888");
-        divKeywords.style.position = "absolute";
-        divKeywords.style.left = "64px";
-        divKeywords.style.right = "0px";
-        divKeywords.style.bottom = "0px";
         divKeywords.style.padding = "8px";
         divKeywords.innerHTML = intent.keywords.join(", ");
 
