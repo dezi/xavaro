@@ -47,6 +47,14 @@
         <item>Erotics</item>
     </string-array>
 
+    <string-array name="pref_apps_subtype_keys">
+        <item>discounter</item>
+    </string-array>
+
+    <string-array name="pref_apps_subtype_vals">
+        <item>Discounter</item>
+    </string-array>
+
     <string-array name="pref_health_where_keys">
         <item>home</item>
         <item>folder</item>

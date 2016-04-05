@@ -276,6 +276,11 @@ public class VoiceIntent
                 Json.put(intent, "subtype", Json.getString(config, "subtype"));
             }
 
+            if (config.has("apkname"))
+            {
+                Json.put(intent, "subtypetag", Json.getString(config, "apkname"));
+            }
+
             if (config.has("name"))
             {
                 Json.put(intent, "subtypetag", Json.getString(config, "name"));
@@ -308,8 +313,7 @@ public class VoiceIntent
                         {
                             String iconname = Json.getString(config, "name");
                             String iconpath = CacheManager.getWebIconPath(iconname, iconref);
-
-                            Json.put(intent, "icon", "local://" + iconpath);
+                            if (iconpath != null) Json.put(intent, "icon", "local://" + iconpath);
                         }
                     }
                     else
@@ -323,36 +327,16 @@ public class VoiceIntent
                     }
                 }
 
-                /*
-                if (myconfig.has("packagename"))
+                if (config.has("apkname"))
                 {
-                    String packageName = Json.getString(myconfig, "packagename");
+                    String packageName = Json.getString(config, "apkname");
 
                     if (packageName != null)
                     {
-                        CommonConfigs.weLikeThis(packageName);
-                        Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
-
-                        if (appIcon != null)
-                        {
-                            icon.setImageDrawable(appIcon);
-                        }
-                        else
-                        {
-                            Drawable drawable = CacheManager.getAppIcon(packageName);
-
-                            if (drawable != null)
-                            {
-                                icon.setImageDrawable(drawable);
-                            }
-                            else
-                            {
-                                icon.setImageResource(R.drawable.stop_512x512);
-                            }
-                        }
+                        String iconpath = CacheManager.getAppIconPath(packageName);
+                        if (iconpath != null) Json.put(intent, "icon", "local://" + iconpath);
                     }
                 }
-                */
             }
         }
     }

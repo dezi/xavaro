@@ -19,42 +19,6 @@ public class LaunchItemWebFrame extends LaunchItem
         super(context);
     }
 
-    protected void setConfigxxx()
-    {
-        if (! config.has("name"))
-        {
-            if (Simple.equals(subtype, "newspaper"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResWebConfigNewspaper);
-            }
-
-            if (Simple.equals(subtype, "magazine"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResWebConfigMagazine);
-            }
-
-            if (Simple.equals(subtype, "pictorial"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResWebConfigPictorial);
-            }
-
-            if (Simple.equals(subtype, "shopping"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResWebConfigShopping);
-            }
-
-            if (Simple.equals(subtype, "erotics"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResWebConfigErotics);
-            }
-
-            if (Simple.equals(subtype, "inetdir"))
-            {
-                icon.setImageResource(GlobalConfigs.IconResWebConfigInternet);
-            }
-        }
-    }
-
     @Override
     protected void onMyClick()
     {

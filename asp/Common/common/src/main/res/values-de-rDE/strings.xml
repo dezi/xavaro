@@ -24,6 +24,10 @@
         <item>Erotisches</item>
     </string-array>
 
+    <string-array name="pref_apps_subtype_vals">
+        <item>Discounter</item>
+    </string-array>
+
     <string-array name="pref_alertgroup_vals">
         <item>Inaktiv</item>
         <item>Eingeladen</item>

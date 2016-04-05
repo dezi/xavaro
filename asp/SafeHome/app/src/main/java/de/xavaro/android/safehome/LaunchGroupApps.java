@@ -1,146 +1,93 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.RemoteContacts;
-import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.WebLib;
 
 //
 // Utility namespace for app launch groups.
 //
 
-public class LaunchGroupApps
+public class LaunchGroupApps extends LaunchGroup
 {
     private static final String LOGTAG = LaunchGroupApps.class.getSimpleName();
 
-    //region Static methods.
-
-    private static JSONObject globalConfig = new JSONObject();
-
-    private static JSONObject loadConfig(Context context, String type)
+    public LaunchGroupApps(Context context)
     {
-        JSONObject typeroot = new JSONObject();
-
-        try
-        {
-            if (! globalConfig.has(type))
-            {
-                int resourceId = context.getResources().getIdentifier("default_apps", "raw", context.getPackageName());
-
-                JSONObject jot = StaticUtils.readRawTextResourceJSON(context, resourceId);
-
-                if ((jot == null) || !jot.has("apps"))
-                {
-                    Log.e(LOGTAG, "getConfig: Cannot read default apps");
-                }
-                else
-                {
-                    jot = Json.getObject(jot, "apps");
-                }
-
-                if ((jot == null) || !jot.has(type))
-                {
-                    Log.e(LOGTAG, "getConfig: Cannot read default " + type);
-                }
-                else
-                {
-                    globalConfig.put(type, jot.getJSONObject(type));
-                }
-            }
-
-            typeroot = globalConfig.getJSONObject(type);
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return typeroot;
+        super(context);
     }
 
-    //endregion Static methods.
-
-    public static class DiscounterGroup extends LaunchGroup
+    public static JSONArray getConfig(String subtype)
     {
-        private static final String LOGTAG = DiscounterGroup.class.getSimpleName();
+        JSONArray home = new JSONArray();
+        JSONArray adir = new JSONArray();
+        JSONObject entry;
 
-        public DiscounterGroup(Context context)
+        //
+        // Get available items.
+        //
+
+        JSONObject config = WebLib.getLocaleConfig("appstore");
+        config = Json.getObject(config, subtype);
+        if (config == null) return home;
+
+        //
+        // "apps.discounter.package:" + apkname = mode
+        //
+
+        String prefix = "apps." + subtype + ".package:";
+
+        Map<String, Object> natapps = Simple.getAllPreferences(prefix);
+
+        for (String prefkey : natapps.keySet())
         {
-            super(context);
+            String apkname = prefkey.substring(prefix.length());
+
+            JSONObject item = Json.getObject(config, apkname);
+            if (item == null) continue;
+
+            entry = Json.clone(item);
+
+            Json.put(entry, "type", "apps");
+            Json.put(entry, "subtype", subtype);
+            Json.put(entry, "apkname", apkname);
+            Json.put(entry, "order", 400);
+
+            String mode = (String) natapps.get(prefkey);
+
+            if (Simple.equals(mode, "home")) home.put(entry);
+
+            adir.put(entry);
         }
 
-        public static JSONArray getConfig()
+        if (adir.length() > 0)
         {
-            JSONArray home = new JSONArray();
-            JSONArray adir = new JSONArray();
-            JSONObject entry;
+            entry = new JSONObject();
 
-            //
-            // Get available items.
-            //
+            Json.put(entry, "type", "apps");
+            Json.put(entry, "subtype", subtype);
+            Json.put(entry, "label", Simple.getTransVal(R.array.pref_apps_subtype_keys, subtype));
+            Json.put(entry, "order", 1050);
 
-            JSONObject config = WebLib.getLocaleConfig("appstore");
-            config = Json.getObject(config, "discounter");
-            if (config == null) return home;
+            if (config.has("intent")) Json.put(entry, "intent", Json.getObject(config, "intent"));
+            if (config.has("intents")) Json.put(entry, "intents", Json.getArray(config, "intents"));
 
-            //
-            // "apps.discounter.package:" + apkname = mode
-            //
-
-            String prefix = "apps.discounter.package:";
-
-            Map<String, Object> natapps = Simple.getAllPreferences(prefix);
-
-            for (String prefkey : natapps.keySet())
+            if (Simple.equals(subtype, "discounter"))
             {
-                String apkname = prefkey.substring(prefix.length());
-
-                JSONObject item = Json.getObject(config, apkname);
-                String label = Json.getString(item, "label");
-                if (label == null) continue;
-
-                entry = new JSONObject();
-
-                Json.put(entry, "type", "apps");
-                Json.put(entry, "subtype", "discounter");
-                Json.put(entry, "label", label);
-                Json.put(entry, "apkname", apkname);
-                Json.put(entry, "order", 400);
-
-                String mode = (String) natapps.get(prefkey);
-
-                if (Simple.equals(mode, "home")) home.put(entry);
-                if (Simple.equals(mode, "folder")) adir.put(entry);
+                Json.put(entry, "iconres", GlobalConfigs.IconResAppsDiscounter);
             }
 
-            if (adir.length() > 0)
-            {
-                entry = new JSONObject();
-
-                Json.put(entry, "type", "apps");
-                Json.put(entry, "subtype", "discounter");
-                Json.put(entry, "label", "Discounter");
-                Json.put(entry, "order", 1050);
-
-                Json.put(entry, "launchitems", adir);
-                Json.put(home, entry);
-            }
-
-            return home;
+            Json.put(entry, "launchitems", adir);
+            Json.put(home, entry);
         }
+
+        return home;
     }
 }

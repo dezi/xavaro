@@ -110,7 +110,7 @@ public class LaunchGroupRoot extends LaunchGroup
 
         configs.add(LaunchGroupWebApps.getConfig());
 
-        configs.add(LaunchGroupApps.DiscounterGroup.getConfig());
+        configs.add(LaunchGroupApps.getConfig("discounter"));
 
         configs.add(LaunchGroupMediaImage.getConfig());
         configs.add(LaunchGroupMediaVideo.getConfig());

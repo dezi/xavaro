@@ -15,10 +15,24 @@
 
   "discounter":
   {
+    "intent": {
+      "action" : "view",
+      "keywords": [ "Discounter", "Supermarkt", "Handzettel", "Prospekt", "Prospekte", "Angebote" ],
+      "response": "Ich öffne die Discounter Auswahl",
+      "sample": "Ich möchte die Supermarkt-Prospekte lesen"
+    },
+
     "com.famila.nordost":
     {
       "label": "famila Nordost",
       "score": "0",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Famila" ],
+        "response": "Ich öffne die Famila App",
+        "sample": "Ich möchte den Famila Prospekt sehen"
+      },
 
       "summary": [
         "Die App möchte als erstes ein Kundenkonto erstellen. Ohne das geht es nicht weiter. ",
@@ -31,6 +45,13 @@
     {
       "label": "Real",
       "score": "7",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Real" ],
+        "response": "Ich öffne die Real App",
+        "sample": "Ich möchte die Real Angebote sehen"
+      },
 
       "summary": [
         "Nach relativ langem Laden will die App, dass wir sie bewerten. Wir haben aber noch ",
@@ -48,6 +69,13 @@
       "label": "NORMA",
       "score": "4",
 
+      "intent": {
+        "action" : "view",
+        "keywords": [ "NORMA" ],
+        "response": "Ich öffne die Norma App",
+        "sample": "Ich möchte den NORMA Handzettel sehen"
+      },
+
       "summary": [
         "Die App ist für Mobil-Telefone ausgelegt. Alle Anzeigen sind mikroskopisch ",
         "klein. Man kann einen Markt auswählen, allerdings hat das keine Einfluss auf ",
@@ -61,6 +89,13 @@
     {
       "label": "REWE",
       "score": "5",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "REWE" ],
+        "response": "Ich öffne die Rewe App",
+        "sample": "Ich möchte den REWE Prospekt sehen"
+      },
 
       "summary": [
         "Die App hat ein nettes Design. Die Marktsuche ergabt stereotyp \"keine Märkte in der ",
@@ -76,6 +111,13 @@
     {
       "label": "EDEKA",
       "score": "14",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "EDEKA" ],
+        "response": "Ich öffne die Edeka App",
+        "sample": "Ich möchte die EDEKA Angebote sehen"
+      },
 
       "summary": [
         "Die Marktauswahl ist sehr einfach. Es wird eine Karte der Umgebung angezeigt. ",
@@ -94,6 +136,13 @@
       "label": "Netto (EDEKA)",
       "score": "0",
 
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Netto" ],
+        "response": "Ich öffne die Netto Edeka App",
+        "sample": "Ich möchte den Netto Handzettel sehen"
+      },
+
       "summary": [
         "Die App möchte als erstes ein Kundenkonto erstellen. Ohne das geht es nicht weiter. ",
         "Da wir natürlich hier kein Konto einrichten, sind die Handzettel oder irgendwelche ",
@@ -110,6 +159,13 @@
       "label": "NETTO Scotty",
       "score": "15",
 
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Scotty", "Scottie" ],
+        "response": "Ich öffne die Netto Scotty App",
+        "sample": "Ich möchte den Scotty Prospekt sehen"
+      },
+
       "summary": [
         "Einfacher geht es nicht mehr. App aufrufen. \"Hammer Donnerstag\" oder ",
         "\"Hammer Samstag\" clicken, und der Handzettel geht auf. Mehr ist nicht ",
@@ -121,6 +177,13 @@
     {
       "label": "Aldi Nord",
       "score": "12",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Aldi" ],
+        "response": "Ich öffne die Aldi Nord App",
+        "sample": "Ich möchte die Aldi Angebote sehen"
+      },
 
       "summary": [
         "Angebote, Angebote, Angebote. Was anderes kann man nicht machen. Was ",
@@ -135,6 +198,13 @@
       "label": "Penny",
       "score": "9",
 
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Penny" ],
+        "response": "Ich öffne die Penny App",
+        "sample": "Ich möchte den Penny Prospekt sehen"
+      },
+
       "summary": [
         "Die Marktsuche mit Landkarte funktioniert prima. Ist der Mark erstmal ausgewählt, ",
         "kann man recht schnell die Angebote in Listenform einsehen. Handzettel gibt es ",
@@ -146,6 +216,13 @@
     {
       "label": "Lidl",
       "score": "7",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Lidl" ],
+        "response": "Ich öffne die Lidl App",
+        "sample": "Ich möchte den Lidl Handzettel sehen"
+      },
 
       "summary": [
         "Die Benutzerführung bei der Marktsuche ist wenig intuitiv. Aber, immerhin, ist der ",
@@ -159,6 +236,13 @@
     {
       "label": "Kaisers und Tengelmann",
       "score": "9",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Tengelmann", "Kaisers" ],
+        "response": "Ich öffne die Kaisers und Tengelmann App",
+        "sample": "Ich möchte den Tengelmann Prospekt sehen"
+      },
 
       "summary": [
         "Die Marktsuche ist nicht zielführend. Immerhin sind Angebote auch ohne ",
