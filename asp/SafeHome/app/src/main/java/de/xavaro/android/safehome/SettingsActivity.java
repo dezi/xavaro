@@ -25,6 +25,8 @@ public class SettingsActivity extends PreferenceActivity
 {
     private static final String LOGTAG = SettingsActivity.class.getSimpleName();
 
+    private static List<Header> headers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -170,8 +172,6 @@ public class SettingsActivity extends PreferenceActivity
 
         setHeaders(target);
     }
-
-    private List<Header> headers;
 
     private void setHeaders(List<Header> headers)
     {
