@@ -21,6 +21,7 @@ public class WebAppView extends WebView
 
     public WebAppBeta beta;
     public WebAppNine nine;
+    public WebAppVoice voice;
     public WebAppPrefs prefs;
     public WebAppSpeak speak;
     public WebAppMedia media;
@@ -120,6 +121,12 @@ public class WebAppView extends WebView
         {
             prefs = new WebAppPrefs(webappname);
             addJavascriptInterface(prefs, "WebAppPrefs");
+        }
+
+        if (permissions.contains("voice"))
+        {
+            voice = new WebAppVoice(this);
+            addJavascriptInterface(voice, "WebAppVoice");
         }
 
         if (permissions.contains("speak"))

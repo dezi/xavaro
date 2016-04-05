@@ -9,7 +9,8 @@
 
     "permissions": [
       "utility",
-      "request"
+      "request",
+      "voice"
     ],
 
     "weblibs": [

@@ -37,8 +37,43 @@ voiceintents.createFrame = function()
     vi.titleDiv.style.marginBottom = "8px";
     vi.titleDiv.innerHTML = "Auf diese Kommandos reagiert die Spracheingabe:"
 
-    vi.contDiv = WebLibSimple.createDiv(20, 80, 20 , 0, "contDiv", vi.topDiv);
+    vi.contDiv = WebLibSimple.createDiv(20, 80, 20 , 110, "contDiv", vi.topDiv);
     vi.contDiv.style.overflow = "hidden";
+
+    vi.testDiv = WebLibSimple.createDivHeight(20, 20, 20, -60, "testDiv" , vi.topDiv);
+    WebLibSimple.setBGColor(vi.testDiv, "#888888");
+    WebLibSimple.setFontSpecs(vi.testDiv, 24, "bold", "#ffffff");
+    vi.testDiv.style.padding = "8px";
+    vi.testDiv.style.marginTop = "8px";
+
+    vi.resultDiv = WebLibSimple.createDiv(16, 0, 80, 0, "testDiv" , vi.testDiv);
+    vi.resultDiv.style.color = "#cccccc";
+    vi.resultDiv.style.lineHeight = "78px";
+    vi.resultDiv.innerHTML = "Hier können sie es ausprobieren..."
+
+    vi.divButton = WebLibSimple.createAnyAppend("div", vi.testDiv);
+    vi.divButton.style.position = "absolute";
+    vi.divButton.style.right = "0px";
+    vi.divButton.style.top = "0px";
+    vi.divButton.style.bottom = "0px";
+    vi.divButton.style.width = "70px";
+
+    vi.divButton.onTouchClick = voiceintents.onClickTry;
+
+    vi.divPadd = WebLibSimple.createAnyAppend("div", vi.divButton);
+    vi.divPadd.style.position = "absolute";
+    vi.divPadd.style.right = "0px";
+    vi.divPadd.style.top = "0px";
+    vi.divPadd.style.bottom = "0px";
+    vi.divPadd.style.margin = "8px";
+
+    vi.imgTry = WebLibSimple.createAnyAppend("img", vi.divPadd);
+    vi.imgTry.style.position = "absolute";
+    vi.imgTry.style.right = "0px";
+    vi.imgTry.style.top = "0px";
+    vi.imgTry.style.width = "auto";
+    vi.imgTry.style.height = "100%";
+    vi.imgTry.src = "voiceintents_256x256.png";
 }
 
 voiceintents.onClickMore = function(target)
@@ -185,6 +220,64 @@ voiceintents.createIntentData = function()
 
     //var pre = WebLibSimple.createAnyAppend("pre", vi.listDiv);
     //pre.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(vi.intents));
+}
+
+voiceintents.onClickTry = function(target)
+{
+    WebAppUtility.makeClick();
+
+    var vi = voiceintents;
+
+    if (! vi.trying)
+    {
+        vi.trying = true;
+        WebAppVoice.startSpeechRecognizer();
+    }
+}
+
+WebAppVoice.onReadyForSpeech = function()
+{
+    var vi = voiceintents;
+
+    vi.imgTry.src = "voice_ear_256x256.png";
+
+    vi.resultDiv.style.color = "#cccccc";
+    vi.resultDiv.innerHTML = "Bitte sprechen Sie nun..."
+}
+
+WebAppVoice.onBeginningOfSpeech = function()
+{
+}
+
+WebAppVoice.onEndOfSpeech = function()
+{
+}
+
+WebAppVoice.onError = function()
+{
+    var vi = voiceintents;
+
+    vi.trying = false;
+    vi.imgTry.src = "voiceintents_256x256.png";
+
+    vi.resultDiv.style.color = "#cccccc";
+    vi.resultDiv.innerHTML = "Das hat nicht geklappt..."
+}
+
+WebAppVoice.onResults = function(results)
+{
+    var vi = voiceintents;
+
+    vi.trying = false;
+    vi.imgTry.src = "voiceintents_256x256.png";
+
+    vi.results = results;
+
+    if (vi.results)
+    {
+        vi.resultDiv.style.color = "#ffffff";
+        vi.resultDiv.innerHTML = vi.results[ 0 ].spoken + " (" + vi.results[ 0 ].confidence + "%)";
+    }
 }
 
 voiceintents.createFrame();
