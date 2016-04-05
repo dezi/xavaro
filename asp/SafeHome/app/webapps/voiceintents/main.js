@@ -1,10 +1,3 @@
-voiceintents.onVoiceIntentData = function(intents)
-{
-    voiceintents.intents = intents;
-    voiceintents.intents.sort(voiceintents.sortCompare);
-    voiceintents.createIntentData();
-}
-
 voiceintents.sortCompare = function(a, b)
 {
     var astring = "";
@@ -74,6 +67,10 @@ voiceintents.createFrame = function()
     vi.imgTry.style.width = "auto";
     vi.imgTry.style.height = "100%";
     vi.imgTry.src = "voiceintents_256x256.png";
+
+    vi.intents = JSON.parse(WebAppVoice.getCollectedIntents());
+    vi.intents.sort(voiceintents.sortCompare);
+    vi.createIntentData();
 }
 
 voiceintents.onClickMore = function(target)
@@ -145,23 +142,23 @@ voiceintents.createIntentData = function()
         divOuter.style.height = "80px";
         divOuter.intent = intent;
 
-        var divInner = WebLibSimple.createDiv(0, 0, 0, 0, "divInner", divOuter);
-        divInner.style.marginTop = "4px";
-        divInner.style.marginBottom = "4px";
-        divInner.style.border = "1px solid grey";
-        divInner.style.backgroundColor = "#dddddd";
+        divOuter.divInner = WebLibSimple.createDiv(0, 0, 0, 0, "divInner", divOuter);
+        divOuter.divInner.style.marginTop = "4px";
+        divOuter.divInner.style.marginBottom = "4px";
+        divOuter.divInner.style.border = "1px solid grey";
+        divOuter.divInner.style.backgroundColor = "#dddddd";
 
-        var divIcon = WebLibSimple.createDiv(0, 0, null, 0, "divIcon", divInner);
+        var divIcon = WebLibSimple.createDiv(0, 0, null, 0, "divIcon", divOuter.divInner);
         divIcon.style.margin = "4px";
 
         var imgIcon = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", "imgIcon", divIcon);
         imgIcon.src = intent.icon ? intent.icon : WebAppRequest.loadResourceImage(intent.iconres);
 
-        var divSample = WebLibSimple.createDiv(64, 0, 0, null, "divSample", divInner);
+        var divSample = WebLibSimple.createDiv(64, 0, 0, null, "divSample", divOuter.divInner);
         divSample.style.padding = "8px";
         divSample.innerHTML = intent.sample;
 
-        var divKeywords = WebLibSimple.createDiv(64, null, 0, 0, "divKeywords", divInner);
+        var divKeywords = WebLibSimple.createDiv(64, null, 0, 0, "divKeywords", divOuter.divInner);
         WebLibSimple.setFontSpecs(divKeywords, 18, "normal", "#888888");
         divKeywords.style.padding = "8px";
         divKeywords.innerHTML = intent.keywords.join(", ");
@@ -172,7 +169,7 @@ voiceintents.createIntentData = function()
             // Subtypes with tags are folded.
             //
 
-            divInner.style.backgroundColor = "#eeeeee";
+            divOuter.divInner.style.backgroundColor = "#eeeeee";
             divOuter.style.display = "none";
         }
         else
@@ -188,7 +185,7 @@ voiceintents.createIntentData = function()
                 // the clickable area gets to small.
                 //
 
-                var divMore = WebLibSimple.createAnyAppend("div", divInner);
+                var divMore = WebLibSimple.createAnyAppend("div", divOuter.divInner);
                 divMore.style.position = "absolute";
                 divMore.style.right = "0px";
                 divMore.style.top = "0px";
@@ -277,6 +274,36 @@ WebAppVoice.onResults = function(results)
     {
         vi.resultDiv.style.color = "#ffffff";
         vi.resultDiv.innerHTML = vi.results[ 0 ].spoken + " (" + vi.results[ 0 ].confidence + "%)";
+
+        vi.matches = JSON.parse(WebAppVoice.evaluateCommand(vi.results[ 0 ].spoken));
+
+        console.log("WebAppVoice.onResults: " + JSON.stringify(vi.matches));
+
+        for (var inx = 0; inx < vi.intentDivs.length; inx++)
+        {
+            var divOuter = vi.intentDivs[ inx ];
+            var intent = divOuter.intent;
+            var ismatch = false;
+
+            for (var cnt = 0; cnt < vi.matches.length; cnt++)
+            {
+                if (vi.matches[ cnt ].identifier == intent.identifier)
+                {
+                    ismatch = true;
+                    break;
+                }
+            }
+
+            if (vi.intentDivs[ inx ].intent.subtypetag)
+            {
+                divOuter.divInner.style.backgroundColor = ismatch ? "#eeffee" : "#eeeeee";
+                divOuter.style.display = ismatch ? "block" : "none";
+            }
+            else
+            {
+                divOuter.divInner.style.backgroundColor = ismatch ? "#ddffdd" : "#dddddd";
+            }
+        }
     }
 }
 

@@ -21,6 +21,7 @@ public class WebAppVoice implements RecognitionListener
 
     private final WebView webview;
     private SpeechRecognizer recognizer;
+    private VoiceIntent collected;
 
     public WebAppVoice(WebView webview)
     {
@@ -33,15 +34,21 @@ public class WebAppVoice implements RecognitionListener
         }
     }
 
-    private final Runnable startSpeechRecognizerUI = new Runnable()
+    public void setCollectedIntents(VoiceIntent collected)
     {
-        @Override
-        public void run()
+        this.collected = collected;
+    }
+
+    @JavascriptInterface
+    public String getCollectedIntents()
+    {
+        if (collected != null)
         {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            recognizer.startListening(intent);
+            return collected.getMatches().toString();
         }
-    };
+
+        return "[]";
+    }
 
     @JavascriptInterface
     public boolean checkSpeechRecognizer()
@@ -58,6 +65,45 @@ public class WebAppVoice implements RecognitionListener
 
         return true;
     }
+
+    @JavascriptInterface
+    public String evaluateCommand(String command)
+    {
+        if (collected != null)
+        {
+            JSONArray intents = collected.getMatches();
+
+            if (intents != null)
+            {
+                VoiceIntent evaluate = new VoiceIntent(command);
+
+                for (int inx = 0; inx < intents.length(); inx++)
+                {
+                    JSONObject intent = Json.getObject(intents, inx);
+                    String identifier = Json.getString(intent, "identifier");
+                    if (identifier == null) continue;
+
+                    evaluate.evaluateIntent(intent, identifier);
+                }
+
+                return evaluate.getMatches().toString();
+            }
+        }
+
+        return "[]";
+    }
+
+    //region Recognition handling
+
+    private final Runnable startSpeechRecognizerUI = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            recognizer.startListening(intent);
+        }
+    };
 
     private void makeCallbackScript(String callback)
     {
@@ -85,6 +131,10 @@ public class WebAppVoice implements RecognitionListener
 
         webview.evaluateJavascript(script, null);
     }
+
+    //endregion Recognition handling
+
+    //region RecognitionListener interface
 
     @Override
     public void onReadyForSpeech(Bundle params)
@@ -160,4 +210,6 @@ public class WebAppVoice implements RecognitionListener
     public void onEvent(int eventType, Bundle params)
     {
     }
+
+    //endregion RecognitionListener interface
 }

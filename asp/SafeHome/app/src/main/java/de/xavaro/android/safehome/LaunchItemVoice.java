@@ -104,19 +104,12 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
         webappFrame.setWebAppName("voiceintents");
         webappFrame.setParent(this);
 
-        ((HomeActivity) context).addViewToBackStack(webappFrame);
-
-        final String cbfunction = "voiceintents.onVoiceIntentData";
-        final String cbdata = collected.getMatches().toString();
-
-        getHandler().postDelayed(new Runnable()
+        if (webappFrame.getWebAppView().voice != null)
         {
-            @Override
-            public void run()
-            {
-                webappFrame.doDataCallback(cbfunction, cbdata);
-            }
-        }, 1000);
+            webappFrame.getWebAppView().voice.setCollectedIntents(collected);
+        }
+
+        ((HomeActivity) context).addViewToBackStack(webappFrame);
 
         return true;
     }
@@ -166,7 +159,7 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
 
         Context app = Simple.getAppContext();
 
-        if ((app != null) && app instanceof VoiceIntentResolver)
+        if ((app != null) && (app instanceof VoiceIntentResolver))
         {
             ((VoiceIntentResolver) app).onResolveVoiceIntent(intent);
 
