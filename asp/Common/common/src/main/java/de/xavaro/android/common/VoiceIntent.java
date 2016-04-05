@@ -8,7 +8,6 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class VoiceIntent
@@ -163,6 +162,7 @@ public class VoiceIntent
         {
             String cmp = " " + command.toLowerCase() + " ";
 
+            String response = Json.getString(myintent, "response");
             JSONArray mykeywords = Json.getArray(myintent, "keywords");
 
             if (mykeywords != null)
@@ -178,7 +178,7 @@ public class VoiceIntent
 
                     if (cmp.contains(" " + wrd.toLowerCase() + " "))
                     {
-                        Log.d(LOGTAG, "evaluateIntent: " + identifier + "=" + wrd);
+                        Log.d(LOGTAG, "evaluateIntent: " + identifier + "=" + wrd + ":" + response);
 
                         Json.put(targets, wrd);
                         score++;

@@ -1,19 +1,3 @@
-voiceintents.sortCompare = function(a, b)
-{
-    var astring = "";
-    if (a.type) astring += a.type + "|";
-    if (a.subtype) astring += a.subtype + "|";
-    if (a.subtypetag) astring += a.subtypetag + "|";
-
-    var bstring = "";
-    if (b.type) bstring += b.type + "|";
-    if (b.subtype) bstring += b.subtype + "|";
-    if (b.subtypetag) bstring += b.subtypetag + "|";
-
-    if (astring == bstring) return 0;
-    return (astring > bstring) ? 1 : -1;
-}
-
 voiceintents.createFrame = function()
 {
     WebLibSimple.setBGColor(document.body, "#ffffffee");
@@ -71,6 +55,22 @@ voiceintents.createFrame = function()
     vi.intents = JSON.parse(WebAppVoice.getCollectedIntents());
     vi.intents.sort(voiceintents.sortCompare);
     vi.createIntentData();
+}
+
+voiceintents.sortCompare = function(a, b)
+{
+    var astring = "";
+    if (a.type) astring += a.type + "|";
+    if (a.subtype) astring += a.subtype + "|";
+    if (a.subtypetag) astring += a.subtypetag + "|";
+
+    var bstring = "";
+    if (b.type) bstring += b.type + "|";
+    if (b.subtype) bstring += b.subtype + "|";
+    if (b.subtypetag) bstring += b.subtypetag + "|";
+
+    if (astring == bstring) return 0;
+    return (astring > bstring) ? 1 : -1;
 }
 
 voiceintents.onClickMore = function(target)
@@ -287,7 +287,9 @@ WebAppVoice.onResults = function(results)
 
             for (var cnt = 0; cnt < vi.matches.length; cnt++)
             {
-                if (vi.matches[ cnt ].identifier == intent.identifier)
+                if ((vi.matches[ cnt ].type == intent.type) &&
+                    (vi.matches[ cnt ].subtype == intent.subtype) &&
+                    (vi.matches[ cnt ].subtypetag == intent.subtypetag))
                 {
                     ismatch = true;
                     break;

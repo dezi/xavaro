@@ -265,6 +265,13 @@
 
   "shopping": {
 
+    "intent": {
+      "action" : "shop",
+      "keywords": [ "bestellen", "stöbern" ],
+      "response": "Ich öffne die Web-Shop Auswahl",
+      "sample": "Ich möchte etwas stöbern"
+    },
+
     "m.zalando.de": {
       "url": "http://m.zalando.de/",
       "icon": "http://pbs.twimg.com/profile_images/705724583794630656/Id7jmjPO_400x400.jpg",
@@ -272,9 +279,10 @@
       "default": true,
 
       "intent": {
-        "action": "view",
+        "action": "shop",
         "keywords": [ "Zalando" ],
-        "response": "Ich öffne den Zalando Web-Shop"
+        "response": "Ich öffne den Zalando Web-Shop",
+        "sample": "Ich möchte bei Zalando etwas bestellen"
       },
 
       "subdomains": [ "track.zalando.de", ".ztat.net" ]
@@ -287,9 +295,10 @@
       "default": true,
 
       "intent": {
-        "action": "view",
+        "action": "shop",
         "keywords": [ "Otto", "Otto Versand" ],
-        "response": "Ich öffne den Otto Web-Shop"
+        "response": "Ich öffne den Otto Web-Shop",
+        "sample": "Ich möchte bei Otto etwas stöbern"
       },
 
       "subdomains": [ "images.otto.de", "assets.cdn-otto.de", "pxc.otto.de" ]
@@ -302,9 +311,10 @@
       "default": true,
 
       "intent": {
-        "action": "view",
+        "action": "shop",
         "keywords": [ "Dawanda", "schöne Dinge" ],
-        "response": "Ich öffne den Dawanda Web-Shop"
+        "response": "Ich öffne den Dawanda Web-Shop",
+        "sample": "Ich möchte bei Dawanda etwas stöbern"
       },
 
       "subdomains": [
@@ -324,9 +334,10 @@
       "default": true,
 
       "intent": {
-        "action": "view",
+        "action": "shop",
         "keywords": [ "Klingel", "schöne Dinge" ],
-        "response": "Ich öffne den Klingel Web-Shop"
+        "response": "Ich öffne den Klingel Web-Shop",
+        "sample": "Ich möchte bei Klingel etwas bestellen"
       },
 
       "subdomains": [

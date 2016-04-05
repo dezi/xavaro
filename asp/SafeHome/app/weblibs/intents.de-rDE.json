@@ -1,6 +1,7 @@
 {
-
   "intents": {
+
+    "shop": [ "bestellen", "stöbern" ],
 
     "take": [ "nehmen", "genommen", "messen", "gemessen", "wiegen", "gewogen" ],
 

@@ -254,7 +254,6 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
     @Override
     public void onRmsChanged(float rmsdB)
     {
-        //Log.d(LOGTAG, "onRmsChanged:" + rmsdB);
     }
 
     @Override
