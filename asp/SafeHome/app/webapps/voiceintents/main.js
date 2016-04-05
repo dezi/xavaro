@@ -185,7 +185,7 @@ voiceintents.createIntentData = function()
                 // the clickable area gets to small.
                 //
 
-                var divMore = WebLibSimple.createAnyAppend("div", divOuter.divInner);
+                var divMore = divOuter.divMore = WebLibSimple.createAnyAppend("div", divOuter.divInner);
                 divMore.style.position = "absolute";
                 divMore.style.right = "0px";
                 divMore.style.top = "0px";
@@ -277,7 +277,7 @@ WebAppVoice.onResults = function(results)
 
         vi.matches = JSON.parse(WebAppVoice.evaluateCommand(vi.results[ 0 ].spoken));
 
-        console.log("WebAppVoice.onResults: " + JSON.stringify(vi.matches));
+        var lastOuter = null;
 
         for (var inx = 0; inx < vi.intentDivs.length; inx++)
         {
@@ -300,10 +300,21 @@ WebAppVoice.onResults = function(results)
             {
                 divOuter.divInner.style.backgroundColor = ismatch ? "#eeffee" : "#eeeeee";
                 divOuter.style.display = ismatch ? "block" : "none";
+
+                if (ismatch && lastOuter)
+                {
+                    lastOuter.divMore.imgMore.src = "arrow_less_270x270.png";
+                    lastOuter.divMore.onTouchClick = voiceintents.onClickLess;
+                }
             }
             else
             {
                 divOuter.divInner.style.backgroundColor = ismatch ? "#ddffdd" : "#dddddd";
+
+                divOuter.divMore.imgMore.src = "arrow_more_270x270.png";
+                divOuter.divMore.onTouchClick = voiceintents.onClickMore;
+
+                lastOuter = divOuter;
             }
         }
     }

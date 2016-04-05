@@ -136,7 +136,7 @@ public class VoiceIntent
         return addme;
     }
 
-    public boolean evaluateIntents(JSONArray myintents, String identifier)
+    public boolean evaluateIntents(JSONObject config, JSONArray myintents)
     {
         boolean foundone = false;
 
@@ -144,7 +144,7 @@ public class VoiceIntent
         {
             for (int inx = 0; inx < myintents.length(); inx++)
             {
-                if (evaluateIntent(Json.getObject(myintents, inx), identifier))
+                if (evaluateIntent(config, Json.getObject(myintents, inx)))
                 {
                     foundone = true;
                 }
@@ -154,15 +154,23 @@ public class VoiceIntent
         return foundone;
     }
 
-    public boolean evaluateIntent(JSONObject myintent, String identifier)
+    public boolean evaluateIntent(JSONObject myintent)
+    {
+        return evaluateIntent(null, myintent);
+    }
+
+    public boolean evaluateIntent(JSONObject config, JSONObject myintent)
     {
         boolean foundone = false;
 
         if ((command != null) && (myintent != null) && Json.equals(myintent, "action", intent))
         {
+            if (config != null) prepareIntent(config, myintent, false);
+
             String cmp = " " + command.toLowerCase() + " ";
 
             String response = Json.getString(myintent, "response");
+            String identifier = Json.getString(myintent, "identifier");
             JSONArray mykeywords = Json.getArray(myintent, "keywords");
 
             if (mykeywords != null)
@@ -187,11 +195,20 @@ public class VoiceIntent
 
                 if (score > 0)
                 {
+                    if (myintent.has("subtypetag"))
+                    {
+                        //
+                        // Give a score bonus for having a tag or a name,
+                        // which is more specific than an entry w/o tag.
+                        //
+
+                        score += 1;
+                    }
+
                     JSONObject match = Json.clone(myintent);
 
                     Json.put(match, "score", score);
                     Json.put(match, "targets", targets);
-                    Json.put(match, "identifier", identifier);
 
                     if (keepIfBetter(match)) foundone = true;
                 }
@@ -218,7 +235,7 @@ public class VoiceIntent
 
         JSONObject match = Json.clone(intent);
 
-        prepareIntent(config, match);
+        prepareIntent(config, match, true);
 
         //
         // Check for duplicates. Duplicates occur if a launchitem
@@ -240,7 +257,7 @@ public class VoiceIntent
         Json.put(matches, match);
     }
 
-    private void prepareIntent(JSONObject config, JSONObject intent)
+    private void prepareIntent(JSONObject config, JSONObject intent, boolean prepicon)
     {
         if (intent != null)
         {
@@ -269,71 +286,74 @@ public class VoiceIntent
                 Json.put(intent, "subtypetag", Json.getString(intent, "tag"));
             }
 
-            if (config.has("iconres"))
+            if (prepicon)
             {
-                int iconres = Json.getInt(config, "iconres");
-
-                if (iconres != 0)
+                if (config.has("iconres"))
                 {
-                    Json.put(intent, "iconres", iconres);
-                }
-            }
+                    int iconres = Json.getInt(config, "iconres");
 
-            if (config.has("icon"))
-            {
-                String iconref = Json.getString(config, "icon");
-
-                if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
-                {
-                    if (config.has("name"))
+                    if (iconres != 0)
                     {
-                        String iconname = Json.getString(config, "name");
-                        String iconpath = CacheManager.getWebIconPath(iconname, iconref);
-
-                        Json.put(intent, "icon", "local://" + iconpath);
+                        Json.put(intent, "iconres", iconres);
                     }
                 }
-                else
+
+                if (config.has("icon"))
                 {
-                    int resourceId = Simple.getIconResourceId(iconref);
+                    String iconref = Json.getString(config, "icon");
 
-                    if (resourceId > 0)
+                    if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
                     {
-                        Json.put(intent, "icon", resourceId);
-                    }
-                }
-            }
+                        if (config.has("name"))
+                        {
+                            String iconname = Json.getString(config, "name");
+                            String iconpath = CacheManager.getWebIconPath(iconname, iconref);
 
-            /*
-            if (myconfig.has("packagename"))
-            {
-                String packageName = Json.getString(myconfig, "packagename");
-
-                if (packageName != null)
-                {
-                    CommonConfigs.weLikeThis(packageName);
-                    Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
-
-                    if (appIcon != null)
-                    {
-                        icon.setImageDrawable(appIcon);
+                            Json.put(intent, "icon", "local://" + iconpath);
+                        }
                     }
                     else
                     {
-                        Drawable drawable = CacheManager.getAppIcon(packageName);
+                        int resourceId = Simple.getIconResourceId(iconref);
 
-                        if (drawable != null)
+                        if (resourceId > 0)
                         {
-                            icon.setImageDrawable(drawable);
-                        }
-                        else
-                        {
-                            icon.setImageResource(R.drawable.stop_512x512);
+                            Json.put(intent, "icon", resourceId);
                         }
                     }
                 }
+
+                /*
+                if (myconfig.has("packagename"))
+                {
+                    String packageName = Json.getString(myconfig, "packagename");
+
+                    if (packageName != null)
+                    {
+                        CommonConfigs.weLikeThis(packageName);
+                        Drawable appIcon = VersionUtils.getIconFromApplication(context, packageName);
+
+                        if (appIcon != null)
+                        {
+                            icon.setImageDrawable(appIcon);
+                        }
+                        else
+                        {
+                            Drawable drawable = CacheManager.getAppIcon(packageName);
+
+                            if (drawable != null)
+                            {
+                                icon.setImageDrawable(drawable);
+                            }
+                            else
+                            {
+                                icon.setImageResource(R.drawable.stop_512x512);
+                            }
+                        }
+                    }
+                }
+                */
             }
-            */
         }
     }
 }

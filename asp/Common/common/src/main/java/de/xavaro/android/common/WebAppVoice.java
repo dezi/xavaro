@@ -83,7 +83,7 @@ public class WebAppVoice implements RecognitionListener
                     String identifier = Json.getString(intent, "identifier");
                     if (identifier == null) continue;
 
-                    evaluate.evaluateIntent(intent, identifier);
+                    evaluate.evaluateIntent(intent);
                 }
 
                 return evaluate.getMatches().toString();
