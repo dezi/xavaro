@@ -11,7 +11,7 @@
 
     {
       "action" : "take",
-      "keywords": [ "Medikamente", "Medis", "Pille", "Pillen"  ],
+      "keywords": [ "Medikamente", "Medis", "Pille", "Pillen", "Tablette", "Tabletten"  ],
       "response": "Du kannst Deine Medis jetzt abkreuzen",
       "sample": "Ich möchte meine Medikamente nehmen",
       "icon": "/webapps/medicator/health_medis_490x490.png",
