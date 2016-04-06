@@ -18,43 +18,47 @@
 
   "intents": {
 
-    "phone.register": [
+    "contacts.register": {
+      "action": "find",
+      "keywords": [ "jemanden" ],
+      "response": "Ich öffne das Kontakte-Verzeichnis",
+      "sample": "Ich suche jemanden"
+    },
 
+    "phone.register": [
       {
-        "action": "call",
+        "type": "phone",
         "subtype": "voip",
+        "action": "call",
         "keywords": [ "jemanden" ],
         "response": "Ich öffne das Telefonbuch",
         "sample": "Ich möchte jemanden anrufen"
       },
 
       {
-        "action": "text",
+        "type": "phone",
         "subtype": "text",
+        "action": "text",
         "keywords": [ "jemanden" ],
         "response": "Ich öffne das Telefonbuch",
         "sample": "Ich möchte jemanden eine SMS schreiben"
       }
-
     ],
 
     "phone.voip": {
+      "type": "phone",
+      "subtype": "voip",
       "action": "call",
       "response": "Ich nehme den Hörer ab",
       "sample": "Ich möchte %1$s anrufen"
     },
 
     "phone.text": {
+      "type": "phone",
+      "subtype": "text",
       "action": "text",
       "response": "Ich öffne die SMS Funktion",
       "sample": "Ich möchte %1$s eine Nachricht schreiben"
-    },
-
-    "contacts.register": {
-      "action": "find",
-      "keywords": [ "jemanden" ],
-      "response": "Ich öffne das Kontakte-Verzeichnis",
-      "sample": "Ich suche jemanden"
     }
   }
 }

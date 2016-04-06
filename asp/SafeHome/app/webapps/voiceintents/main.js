@@ -215,8 +215,8 @@ voiceintents.createIntentData = function()
         vi.intentDivs.push(divOuter);
     }
 
-    var pre = WebLibSimple.createAnyAppend("pre", vi.listDiv);
-    pre.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(vi.intents));
+    //var pre = WebLibSimple.createAnyAppend("pre", vi.listDiv);
+    //pre.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(vi.intents));
 }
 
 voiceintents.onClickTry = function(target)

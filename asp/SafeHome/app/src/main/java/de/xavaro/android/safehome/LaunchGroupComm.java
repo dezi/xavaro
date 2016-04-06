@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -178,10 +177,13 @@ public class LaunchGroupComm
                 Json.put(entry, "phonenumber", phonenumber);
                 Json.put(entry, "order", 600);
 
-                JSONObject intent = new VoiceIntent().getIntent("phone." + subtype);
+                JSONObject intent = VoiceIntent.getIntent("phone." + subtype);
 
                 if (intent != null)
                 {
+                    VoiceIntent.prepareIconRes(intent, "phone", "voip", GlobalConfigs.IconResPhoneAppCall);
+                    VoiceIntent.prepareIconRes(intent, "phone", "text", GlobalConfigs.IconResPhoneAppText);
+
                     Json.makeFormat(intent, "sample", label);
                     Json.put(intent, "keywords", Json.splitName(label));
                     Json.put(entry, "intent", intent);
@@ -201,13 +203,23 @@ public class LaunchGroupComm
                 Json.put(entry, "label", "Telefonbuch");
                 Json.put(entry, "order", 650);
 
-                Json.put(entry, "iconres", GlobalConfigs.IconResPhoneApp);
+                JSONObject intent = VoiceIntent.getIntent("phone.register");
 
-                JSONObject intent = new VoiceIntent().getIntent("phone.register");
-                if (intent != null) Json.put(entry, "intent", intent);
+                if (intent != null)
+                {
+                    VoiceIntent.prepareIconRes(intent, "phone", "voip", GlobalConfigs.IconResPhoneAppCall);
+                    VoiceIntent.prepareIconRes(intent, "phone", "text", GlobalConfigs.IconResPhoneAppText);
+                    Json.put(entry, "intent", intent);
+                }
 
-                JSONArray intents = new VoiceIntent().getIntents("phone.register");
-                if (intents != null) Json.put(entry, "intents", intents);
+                JSONArray intents = VoiceIntent.getIntents("phone.register");
+
+                if (intents != null)
+                {
+                    VoiceIntent.prepareIconRes(intents, "phone", "voip", GlobalConfigs.IconResPhoneAppCall);
+                    VoiceIntent.prepareIconRes(intents, "phone", "text", GlobalConfigs.IconResPhoneAppText);
+                    Json.put(entry, "intents", intents);
+                }
 
                 Json.put(entry, "launchitems", adir);
                 Json.put(home, entry);
@@ -223,10 +235,10 @@ public class LaunchGroupComm
 
                 Json.put(entry, "iconres", GlobalConfigs.IconResContacts);
 
-                JSONObject intent = new VoiceIntent().getIntent("contacts.register");
+                JSONObject intent = VoiceIntent.getIntent("contacts.register");
                 if (intent != null) Json.put(entry, "intent", intent);
 
-                JSONArray intents = new VoiceIntent().getIntents("contacts.register");
+                JSONArray intents = VoiceIntent.getIntents("contacts.register");
                 if (intents != null) Json.put(entry, "intents", intents);
 
                 Json.put(entry, "launchitems", cdir);
@@ -281,10 +293,9 @@ public class LaunchGroupComm
                 Json.put(entry, "order", 800);
 
                 if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
-                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
 
-                Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + skypename + "=" + label);
+                Json.put(adir, entry);
+                Json.put(cdir, entry);
             }
 
             if (adir.length() > 0)
@@ -294,6 +305,8 @@ public class LaunchGroupComm
                 Json.put(entry, "type", "skype");
                 Json.put(entry, "label", "Skype");
                 Json.put(entry, "order", 850);
+
+                Json.put(entry, "iconres", GlobalConfigs.IconResWhatsApp);
 
                 Json.put(entry, "launchitems", adir);
                 Json.put(home, entry);

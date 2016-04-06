@@ -32,16 +32,7 @@ public class VoiceIntent
     {
         this.command = command;
 
-        if (global == null)
-        {
-            global = WebLib.getLocaleConfig("intents");
-
-            if (global != null)
-            {
-                actions = Json.getObject(global, "actions");
-                intents = Json.getObject(global, "intents");
-            }
-        }
+        readConfig();
 
         if (actions == null)
         {
@@ -78,19 +69,63 @@ public class VoiceIntent
         }
     }
 
-    @Nullable
-    public JSONObject getIntent(String key)
+    //region static utilities
+
+    private static void readConfig()
     {
+        if (global == null)
+        {
+            global = WebLib.getLocaleConfig("intents");
+
+            if (global != null)
+            {
+                actions = Json.getObject(global, "actions");
+                intents = Json.getObject(global, "intents");
+            }
+        }
+    }
+
+    @Nullable
+    public static JSONObject getIntent(String key)
+    {
+        readConfig();
+
         JSONObject json = Json.getObject(intents, key);
         return (json != null) ? Json.clone(json) : null;
     }
 
     @Nullable
-    public JSONArray getIntents(String key)
+    public static JSONArray getIntents(String key)
     {
+        readConfig();
+
         JSONArray json = Json.getArray(intents, key);
         return (json != null) ? Json.clone(json) : null;
     }
+
+    public static void prepareIconRes(JSONArray intents, String type, String subtype, int iconres)
+    {
+        if (intents != null)
+        {
+            for (int inx = 0; inx < intents.length(); inx++)
+            {
+                prepareIconRes(Json.getObject(intents, inx), type, subtype, iconres);
+            }
+        }
+    }
+
+    public static void prepareIconRes(JSONObject intent, String type, String subtype, int iconres)
+    {
+        if (intent != null)
+        {
+            if (Json.equals(intent, "type", type) && Json.equals(intent, "subtype", subtype))
+            {
+                Json.put(intent, "iconres", iconres);
+            }
+        }
+    }
+
+    //endregion static utilities
 
     @Nullable
     public String getCommand()
@@ -284,71 +319,27 @@ public class VoiceIntent
     {
         if (intent != null)
         {
-            if (config.has("identifier"))
-            {
-                Json.put(intent, "identifier", Json.getString(config, "identifier"));
-            }
+            Json.copy(intent, "identifier", config);
+            Json.copy(intent, "type", config);
+            Json.copy(intent, "subtype", config);
+            Json.copy(intent, "icon", config);
+            Json.copy(intent, "iconres", config);
+            Json.copy(intent, "apkname", config);
 
-            if (config.has("type"))
-            {
-                Json.put(intent, "type", Json.getString(config, "type"));
-            }
+            Json.copy(intent, "subtypetag", config, "name");
+            Json.copy(intent, "subtypetag", config, "apkname");
+            Json.copy(intent, "subtypetag", config, "phonenumber");
+            Json.copy(intent, "subtypetag", config, "waphonenumber");
+            Json.copy(intent, "subtypetag", config, "skypename");
+            Json.copy(intent, "subtypetag", config, "identity");
 
-            if (config.has("subtype"))
-            {
-                Json.put(intent, "subtype", Json.getString(config, "subtype"));
-            }
-
-            if (config.has("apkname"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(config, "apkname"));
-            }
-
-            if (config.has("name"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(config, "name"));
-            }
-
-            if (config.has("phonenumber"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(config, "phonenumber"));
-            }
-
-            if (config.has("waphonenumber"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(config, "waphonenumber"));
-            }
-
-            if (config.has("identity"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(config, "identity"));
-            }
-
-            if (config.has("skypename"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(config, "skypename"));
-            }
-
-            if (intent.has("tag"))
-            {
-                Json.put(intent, "subtypetag", Json.getString(intent, "tag"));
-            }
+            Json.copy(intent, "subtypetag", intent, "tag");
 
             if (prepicon)
             {
-                if (config.has("iconres"))
+                if (intent.has("icon"))
                 {
-                    int iconres = Json.getInt(config, "iconres");
-
-                    if (iconres != 0)
-                    {
-                        Json.put(intent, "iconres", iconres);
-                    }
-                }
-
-                if (config.has("icon"))
-                {
-                    String iconref = Json.getString(config, "icon");
+                    String iconref = Json.getString(intent, "icon");
 
                     if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
                     {
@@ -370,9 +361,9 @@ public class VoiceIntent
                     }
                 }
 
-                if (config.has("apkname"))
+                if (intent.has("apkname"))
                 {
-                    String packageName = Json.getString(config, "apkname");
+                    String packageName = Json.getString(intent, "apkname");
 
                     if (packageName != null)
                     {

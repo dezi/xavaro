@@ -123,9 +123,16 @@ public class Json
         return ((s1 != null) && (s2 != null) && s1.equals(s2));
     }
 
+    public static void copy(JSONObject dst, String dkey, JSONObject src, String skey)
+    {
+        Object tmp = get(src, skey);
+        if (tmp != null) put(dst, dkey, tmp);
+    }
+
     public static void copy(JSONObject dst, String key, JSONObject src)
     {
-        put(dst, key, get(src, key));
+        Object tmp = get(src, key);
+        if (tmp != null) put(dst, key, tmp);
     }
 
     public static void copy(JSONObject dst, JSONObject src)
