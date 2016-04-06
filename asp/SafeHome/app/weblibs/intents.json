@@ -15,6 +15,8 @@
 
     "text": [ "text", "write" ],
 
-    "play": [ "play", "watch" ]
+    "play": [ "play", "watch" ],
+
+    "skype": [ "skype" ]
   }
 }

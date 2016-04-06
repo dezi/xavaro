@@ -13,7 +13,9 @@
 
     "text": [ "schreiben" ],
 
-    "play": [ "spielen", "abspielen" ]
+    "play": [ "spielen", "abspielen" ],
+
+    "skype": [ "skype", "skypen" ]
   },
 
   "intents": {
@@ -59,6 +61,40 @@
       "action": "text",
       "response": "Ich öffne die SMS Funktion",
       "sample": "Ich möchte %1$s eine Nachricht schreiben"
+    },
+
+    "skype.register": [
+      {
+        "type": "skype",
+        "action": "skype",
+        "keywords": [ "jemanden" ],
+        "response": "Ich öffne das Skype-Verzeichnis",
+        "sample": "Ich möchte mit jemanden skypen"
+      }
+    ],
+
+    "skype.voip": {
+      "type": "skype",
+      "subtype": "voip",
+      "action": "call",
+      "response": "Ich rufe Skype auf",
+      "sample": "Ich möchte %1$s per Skype telefonieren"
+    },
+
+    "skype.chat": {
+      "type": "skype",
+      "subtype": "chat",
+      "action": "text",
+      "response": "Ich rufe Skype auf",
+      "sample": "Ich möchte %1$s per Skype ein Nachricht schreiben"
+    },
+
+    "skype.vica": {
+      "type": "skype",
+      "subtype": "vica",
+      "action": "text",
+      "response": "Ich rufe Skype auf",
+      "sample": "Ich möchte %1$s per Skype Video sprechen"
     }
   }
 }
