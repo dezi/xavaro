@@ -14,6 +14,8 @@ public class VoiceIntent
 {
     private static final String LOGTAG = VoiceIntent.class.getSimpleName();
 
+    private static JSONObject global;
+    private static JSONObject actions;
     private static JSONObject intents;
 
     private final JSONArray matches = new JSONArray();
@@ -30,15 +32,20 @@ public class VoiceIntent
     {
         this.command = command;
 
-        if (intents == null)
+        if (global == null)
         {
-            JSONObject global = WebLib.getLocaleConfig("intents");
-            if (global != null) intents = Json.getObject(global, "intents");
+            global = WebLib.getLocaleConfig("intents");
+
+            if (global != null)
+            {
+                actions = Json.getObject(global, "actions");
+                intents = Json.getObject(global, "intents");
+            }
         }
 
-        if (intents == null)
+        if (actions == null)
         {
-            Log.e(LOGTAG, "Constructor: cannot read intents definitions.");
+            Log.e(LOGTAG, "VoiceIntent: cannot read actions definitions.");
 
             return;
         }
@@ -47,13 +54,13 @@ public class VoiceIntent
         {
             String cmp = " " + command.toLowerCase() + " ";
 
-            Iterator<String> keysIterator = intents.keys();
+            Iterator<String> keysIterator = actions.keys();
 
             while (keysIterator.hasNext())
             {
                 String intentkey = keysIterator.next();
 
-                JSONArray targets = Json.getArray(intents, intentkey);
+                JSONArray targets = Json.getArray(actions, intentkey);
                 if (targets == null) continue;
 
                 for (int inx = 0; inx < targets.length(); inx++)
@@ -69,6 +76,20 @@ public class VoiceIntent
                 }
             }
         }
+    }
+
+    @Nullable
+    public JSONObject getIntent(String key)
+    {
+        JSONObject json = Json.getObject(intents, key);
+        return (json != null) ? Json.clone(json) : null;
+    }
+
+    @Nullable
+    public JSONArray getIntents(String key)
+    {
+        JSONArray json = Json.getArray(intents, key);
+        return (json != null) ? Json.clone(json) : null;
     }
 
     @Nullable
@@ -136,6 +157,11 @@ public class VoiceIntent
         return addme;
     }
 
+    public boolean evaluateIntent(JSONObject myintent)
+    {
+        return evaluateIntent(null, myintent);
+    }
+
     public boolean evaluateIntents(JSONObject config, JSONArray myintents)
     {
         boolean foundone = false;
@@ -152,11 +178,6 @@ public class VoiceIntent
         }
 
         return foundone;
-    }
-
-    public boolean evaluateIntent(JSONObject myintent)
-    {
-        return evaluateIntent(null, myintent);
     }
 
     public boolean evaluateIntent(JSONObject config, JSONObject myintent)
@@ -243,15 +264,17 @@ public class VoiceIntent
         // the application area it belongs to.
         //
 
-        String identifier = Json.getString(match, "identifier");
-        String tag = Json.getString(match, "tag");
-
         for (int inx = 0; inx < matches.length(); inx++)
         {
             JSONObject oldmatch = Json.getObject(matches, inx);
 
-            if (Json.equals(oldmatch, "identifier", identifier) &&
-                    Json.equals(oldmatch, "tag", tag)) return;
+            if (Json.equals(match, "identifier", oldmatch) &&
+                    Json.equals(match, "type", oldmatch) &&
+                    Json.equals(match, "subtype", oldmatch) &&
+                    Json.equals(match, "subtypetag", oldmatch))
+            {
+                return;
+            }
         }
 
         Json.put(matches, match);
@@ -284,6 +307,26 @@ public class VoiceIntent
             if (config.has("name"))
             {
                 Json.put(intent, "subtypetag", Json.getString(config, "name"));
+            }
+
+            if (config.has("phonenumber"))
+            {
+                Json.put(intent, "subtypetag", Json.getString(config, "phonenumber"));
+            }
+
+            if (config.has("waphonenumber"))
+            {
+                Json.put(intent, "subtypetag", Json.getString(config, "waphonenumber"));
+            }
+
+            if (config.has("identity"))
+            {
+                Json.put(intent, "subtypetag", Json.getString(config, "identity"));
+            }
+
+            if (config.has("skypename"))
+            {
+                Json.put(intent, "subtypetag", Json.getString(config, "skypename"));
             }
 
             if (intent.has("tag"))

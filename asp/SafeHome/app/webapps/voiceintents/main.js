@@ -215,8 +215,8 @@ voiceintents.createIntentData = function()
         vi.intentDivs.push(divOuter);
     }
 
-    //var pre = WebLibSimple.createAnyAppend("pre", vi.listDiv);
-    //pre.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(vi.intents));
+    var pre = WebLibSimple.createAnyAppend("pre", vi.listDiv);
+    pre.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(vi.intents));
 }
 
 voiceintents.onClickTry = function(target)
@@ -301,7 +301,7 @@ WebAppVoice.onResults = function(results)
                 divOuter.divInner.style.backgroundColor = ismatch ? "#eeffee" : "#eeeeee";
                 divOuter.style.display = ismatch ? "block" : "none";
 
-                if (ismatch && lastOuter)
+                if (ismatch && lastOuter && lastOuter.divMore)
                 {
                     lastOuter.divMore.imgMore.src = "arrow_less_270x270.png";
                     lastOuter.divMore.onTouchClick = voiceintents.onClickLess;
@@ -311,8 +311,11 @@ WebAppVoice.onResults = function(results)
             {
                 divOuter.divInner.style.backgroundColor = ismatch ? "#ddffdd" : "#dddddd";
 
-                divOuter.divMore.imgMore.src = "arrow_more_270x270.png";
-                divOuter.divMore.onTouchClick = voiceintents.onClickMore;
+                if (divOuter.divMore)
+                {
+                    divOuter.divMore.imgMore.src = "arrow_more_270x270.png";
+                    divOuter.divMore.onTouchClick = voiceintents.onClickMore;
+                }
 
                 lastOuter = divOuter;
             }

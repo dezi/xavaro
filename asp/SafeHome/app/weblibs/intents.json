@@ -1,13 +1,19 @@
 {
   "locales": [ "intents.de-rDE" ],
 
-  "intents": {
+  "actions": {
+
+    "find": [ "find", "searching" ],
 
     "shop": [ "shop", "shopping" ],
 
     "take": [ "take", "took", "measure", "measured", "weigh" ],
 
     "view": [ "read", "show", "look at" ],
+
+    "call": [ "call" ],
+
+    "text": [ "text", "write" ],
 
     "play": [ "play", "watch" ]
   }

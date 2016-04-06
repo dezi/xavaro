@@ -1,5 +1,7 @@
 {
-  "intents": {
+  "actions": {
+
+    "find": [ "suche" ],
 
     "shop": [ "bestellen", "stöbern" ],
 
@@ -7,6 +9,52 @@
 
     "view": [ "zeige", "öffne", "lesen", "blättern", "anzeigen", "anschauen", "ansehen", "sehen" ],
 
+    "call": [ "anrufen", "telefonieren" ],
+
+    "text": [ "schreiben" ],
+
     "play": [ "spielen", "abspielen" ]
+  },
+
+  "intents": {
+
+    "phone.register": [
+
+      {
+        "action": "call",
+        "subtype": "voip",
+        "keywords": [ "jemanden" ],
+        "response": "Ich öffne das Telefonbuch",
+        "sample": "Ich möchte jemanden anrufen"
+      },
+
+      {
+        "action": "text",
+        "subtype": "text",
+        "keywords": [ "jemanden" ],
+        "response": "Ich öffne das Telefonbuch",
+        "sample": "Ich möchte jemanden eine SMS schreiben"
+      }
+
+    ],
+
+    "phone.voip": {
+      "action": "call",
+      "response": "Ich nehme den Hörer ab",
+      "sample": "Ich möchte %1$s anrufen"
+    },
+
+    "phone.text": {
+      "action": "text",
+      "response": "Ich öffne die SMS Funktion",
+      "sample": "Ich möchte %1$s eine Nachricht schreiben"
+    },
+
+    "contacts.register": {
+      "action": "find",
+      "keywords": [ "jemanden" ],
+      "response": "Ich öffne das Kontakte-Verzeichnis",
+      "sample": "Ich suche jemanden"
+    }
   }
 }

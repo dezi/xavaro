@@ -339,6 +339,40 @@ public class Json
         return (jsonArray == null) ? "[]" : Json.toPretty(jsonArray);
     }
 
+    public static void makeFormat(JSONObject jsonObject, String key, Object... args)
+    {
+        if (jsonObject != null)
+        {
+            String value = getString(jsonObject, key);
+
+            if (value != null)
+            {
+                value = String.format(value, args);
+
+                put(jsonObject, key, value);
+            }
+        }
+    }
+
+    public static JSONArray splitName(String name)
+    {
+        JSONArray split = new JSONArray();
+
+        if (name != null)
+        {
+            put(split, name);
+
+            String[] parts = name.split(" ");
+
+            if (parts.length > 1)
+            {
+                for (String part : parts) put(split, part);
+            }
+        }
+
+        return split;
+    }
+
     @Nullable
     public static String toPretty(JSONObject jsonObject)
     {

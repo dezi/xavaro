@@ -14,6 +14,7 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VoiceIntent;
 
 //
 // Utility namespace for app launch groups.
@@ -177,11 +178,19 @@ public class LaunchGroupComm
                 Json.put(entry, "phonenumber", phonenumber);
                 Json.put(entry, "order", 600);
 
-                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
-                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+                JSONObject intent = new VoiceIntent().getIntent("phone." + subtype);
 
-                Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + phonenumber + "=" + label);
+                if (intent != null)
+                {
+                    Json.makeFormat(intent, "sample", label);
+                    Json.put(intent, "keywords", Json.splitName(label));
+                    Json.put(entry, "intent", intent);
+                }
+
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+
+                Json.put(adir, entry);
+                Json.put(cdir, entry);
             }
 
             if (adir.length() > 0)
@@ -189,8 +198,16 @@ public class LaunchGroupComm
                 JSONObject entry = new JSONObject();
 
                 Json.put(entry, "type", "phone");
-                Json.put(entry, "label", "Telefon");
+                Json.put(entry, "label", "Telefonbuch");
                 Json.put(entry, "order", 650);
+
+                Json.put(entry, "iconres", GlobalConfigs.IconResPhoneApp);
+
+                JSONObject intent = new VoiceIntent().getIntent("phone.register");
+                if (intent != null) Json.put(entry, "intent", intent);
+
+                JSONArray intents = new VoiceIntent().getIntents("phone.register");
+                if (intents != null) Json.put(entry, "intents", intents);
 
                 Json.put(entry, "launchitems", adir);
                 Json.put(home, entry);
@@ -203,6 +220,14 @@ public class LaunchGroupComm
                 Json.put(entry, "type", "contacts");
                 Json.put(entry, "label", "Kontakte");
                 Json.put(entry, "order", 950);
+
+                Json.put(entry, "iconres", GlobalConfigs.IconResContacts);
+
+                JSONObject intent = new VoiceIntent().getIntent("contacts.register");
+                if (intent != null) Json.put(entry, "intent", intent);
+
+                JSONArray intents = new VoiceIntent().getIntents("contacts.register");
+                if (intents != null) Json.put(entry, "intents", intents);
 
                 Json.put(entry, "launchitems", cdir);
                 Json.put(home, entry);
