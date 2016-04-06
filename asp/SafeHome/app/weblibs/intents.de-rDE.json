@@ -3,13 +3,13 @@
 
     "find": [ "suche" ],
 
-    "shop": [ "bestellen", "stöbern" ],
+    "shop": [ "bestellen", "stöbern", "shoppen", "einkaufen" ],
 
     "take": [ "nehmen", "genommen", "messen", "gemessen", "wiegen", "gewogen" ],
 
     "view": [ "zeige", "öffne", "lesen", "blättern", "anzeigen", "anschauen", "ansehen", "sehen" ],
 
-    "call": [ "anrufen", "telefonieren" ],
+    "call": [ "anrufen", "telefonieren", "sprechen" ],
 
     "text": [ "schreiben" ],
 
@@ -51,7 +51,7 @@
       "type": "phone",
       "subtype": "voip",
       "action": "call",
-      "response": "Ich nehme den Hörer ab",
+      "response": "Ich rufe %1$s an",
       "sample": "Ich möchte %1$s anrufen"
     },
 
@@ -59,7 +59,7 @@
       "type": "phone",
       "subtype": "text",
       "action": "text",
-      "response": "Ich öffne die SMS Funktion",
+      "response": "Ich öffne die SMS an %1$s",
       "sample": "Ich möchte %1$s eine Nachricht schreiben"
     },
 
@@ -78,7 +78,7 @@
       "subtype": "voip",
       "action": "skype",
       "keywords": [ "telefonieren" ],
-      "response": "Ich rufe Skype auf",
+      "response": "Ich rufe %1$s per Skype an",
       "sample": "Ich möchte %1$s per Skype telefonieren"
     },
 
@@ -87,7 +87,7 @@
       "subtype": "chat",
       "action": "skype",
       "keywords": [ "schreiben", "chatten" ],
-      "response": "Ich rufe Skype auf",
+      "response": "Ich öffne den Skype Chat an %1$s",
       "sample": "Ich möchte %1$s per Skype ein Nachricht schreiben"
     },
 
@@ -95,7 +95,7 @@
       "type": "skype",
       "subtype": "vica",
       "action": "skype",
-      "response": "Ich rufe Skype auf",
+      "response": "Ich rufe %1$s per Skype Video an",
       "keywords": [ "video" ],
       "sample": "Ich möchte %1$s per Skype Video sprechen"
     }
