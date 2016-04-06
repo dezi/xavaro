@@ -184,8 +184,8 @@ public class LaunchGroupComm
                     VoiceIntent.prepareIconRes(intent, "phone", "voip", GlobalConfigs.IconResPhoneAppCall);
                     VoiceIntent.prepareIconRes(intent, "phone", "text", GlobalConfigs.IconResPhoneAppText);
 
-                    Json.makeFormat(intent, "sample", label);
-                    Json.put(intent, "keywords", Json.splitName(label));
+                    VoiceIntent.prepareLabel(intent, label);
+
                     Json.put(entry, "intent", intent);
                 }
 
@@ -300,8 +300,8 @@ public class LaunchGroupComm
                     VoiceIntent.prepareIconRes(intent, "skype", "chat", GlobalConfigs.IconResSkypeChat);
                     VoiceIntent.prepareIconRes(intent, "skype", "vica", GlobalConfigs.IconResSkypeVica);
 
-                    Json.makeFormat(intent, "sample", label);
-                    Json.put(intent, "keywords", Json.splitName(label));
+                    VoiceIntent.prepareLabel(intent, label);
+
                     Json.put(entry, "intent", intent);
                 }
 

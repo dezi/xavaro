@@ -76,7 +76,8 @@
     "skype.voip": {
       "type": "skype",
       "subtype": "voip",
-      "action": "call",
+      "action": "skype",
+      "keywords": [ "telefonieren" ],
       "response": "Ich rufe Skype auf",
       "sample": "Ich möchte %1$s per Skype telefonieren"
     },
@@ -84,7 +85,8 @@
     "skype.chat": {
       "type": "skype",
       "subtype": "chat",
-      "action": "text",
+      "action": "skype",
+      "keywords": [ "schreiben", "chatten" ],
       "response": "Ich rufe Skype auf",
       "sample": "Ich möchte %1$s per Skype ein Nachricht schreiben"
     },
@@ -92,8 +94,9 @@
     "skype.vica": {
       "type": "skype",
       "subtype": "vica",
-      "action": "text",
+      "action": "skype",
       "response": "Ich rufe Skype auf",
+      "keywords": [ "video" ],
       "sample": "Ich möchte %1$s per Skype Video sprechen"
     }
   }

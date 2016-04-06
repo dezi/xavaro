@@ -361,25 +361,6 @@ public class Json
         }
     }
 
-    public static JSONArray splitName(String name)
-    {
-        JSONArray split = new JSONArray();
-
-        if (name != null)
-        {
-            put(split, name);
-
-            String[] parts = name.split(" ");
-
-            if (parts.length > 1)
-            {
-                for (String part : parts) put(split, part);
-            }
-        }
-
-        return split;
-    }
-
     @Nullable
     public static String toPretty(JSONObject jsonObject)
     {

@@ -125,6 +125,28 @@ public class VoiceIntent
         }
     }
 
+    public static void prepareLabel(JSONObject intent, String label)
+    {
+        Json.makeFormat(intent, "sample", label);
+
+        JSONArray keywords = Json.getArray(intent, "keywords");
+        if (keywords == null) keywords = new JSONArray();
+
+        if (label != null)
+        {
+            Json.put(keywords, label);
+
+            String[] parts = label.split(" ");
+
+            if (parts.length > 1)
+            {
+                for (String part : parts) Json.put(keywords, part);
+            }
+        }
+
+        Json.put(intent, "keywords", keywords);
+    }
+
     //endregion static utilities
 
     @Nullable
