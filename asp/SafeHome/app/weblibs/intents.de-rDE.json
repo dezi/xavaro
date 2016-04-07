@@ -3,6 +3,8 @@
 
     "find": [ "suche" ],
 
+    "calc": [ "was ergibt", "wie viel ist", "wie viel sind" ],
+
     "shop": [ "bestellen", "stöbern", "shoppen", "einkaufen" ],
 
     "take": [ "nehmen", "genommen", "messen", "gemessen", "wiegen", "gewogen" ],

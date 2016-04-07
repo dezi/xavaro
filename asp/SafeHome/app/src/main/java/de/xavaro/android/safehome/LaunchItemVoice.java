@@ -181,8 +181,9 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
                 for (int inx = 0; inx < matches.length(); inx++)
                 {
                     JSONObject match = Json.getObject(matches, inx);
-                    String response = Json.getString(match, "response");
                     String identifier = Json.getString(match, "identifier");
+                    String response = Json.getString(match, "response");
+                    if (response == null) continue;
 
                     options.put(identifier, response);
 
@@ -198,9 +199,7 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
 
             JSONObject match = Json.getObject(matches, 0);
             String response = Json.getString(match, "response");
-            if (response == null) response = "Ich führe die gewünschte Aktion aus.";
-
-            Speak.speak(response);
+            if (response != null) Speak.speak(response);
 
             ((VoiceIntentResolver) app).onExecuteVoiceIntent(intent, 0);
         }

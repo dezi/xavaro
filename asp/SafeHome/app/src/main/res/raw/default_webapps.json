@@ -1,6 +1,7 @@
 {
   "webapps": {
 
+    "calculator": {},
     "tvguide": {},
     "tvscrape": {},
     "weather": {},

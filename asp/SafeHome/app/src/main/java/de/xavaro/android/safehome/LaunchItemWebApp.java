@@ -1,10 +1,15 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.util.Log;
+
+import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.WebApp;
+import de.xavaro.android.common.WebAppView;
 
 public class LaunchItemWebApp extends LaunchItem
 {
@@ -48,6 +53,7 @@ public class LaunchItemWebApp extends LaunchItem
     }
 
     private LaunchFrameWebApp webappFrame;
+    private WebAppView webappVoice;
 
     private void launchWebapp()
     {
@@ -68,26 +74,86 @@ public class LaunchItemWebApp extends LaunchItem
         }
     }
 
+    private final Runnable onUnloadVoice = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "onUnloadVoice");
+
+            webappVoice = null;
+        }
+    };
+
+    private void onDoVoiceIntent(VoiceIntent voiceintent, int index)
+    {
+        Log.d(LOGTAG, "onDoVoiceIntent");
+
+        if (webappVoice.request != null)
+        {
+            webappVoice.request.doVoiceIntent(voiceintent, index);
+        }
+    }
+
     @Override
     public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
         if (super.onExecuteVoiceIntent(voiceintent, index))
         {
+            final VoiceIntent cbvoiceintent = voiceintent;
+            final int cbindex = index;
+
             if (subtype != null)
             {
-                launchWebapp();
+                JSONObject intent = voiceintent.getMatch(index);
+                Json.put(intent, "command", voiceintent.getCommand());
 
-                final VoiceIntent cbvoiceintent = voiceintent;
-                final int cbindex = index;
-
-                getHandler().postDelayed(new Runnable()
+                if (Json.equals(intent, "mode", "speak") && WebApp.hasVoice(subtype))
                 {
-                    @Override
-                    public void run()
+                    //
+                    // Start voice.js of web app w/o attached view.
+                    //
+
+                    getHandler().removeCallbacks(onUnloadVoice);
+
+                    int delay = 0;
+
+                    if (webappVoice == null)
                     {
-                        webappFrame.onExecuteVoiceIntent(cbvoiceintent, cbindex);
+                        webappVoice = new WebAppView(Simple.getAppContext());
+                        webappVoice.loadWebView(subtype, "voice");
+
+                        delay = 1000;
                     }
-                }, 1000);
+
+                    getHandler().postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            onDoVoiceIntent(cbvoiceintent, cbindex);
+                        }
+                    }, delay);
+
+                    getHandler().postDelayed(onUnloadVoice, 20 * 1000);
+                }
+                else
+                {
+                    //
+                    // Start main.js of web app with attached view.
+                    //
+
+                    launchWebapp();
+
+                    getHandler().postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            webappFrame.onExecuteVoiceIntent(cbvoiceintent, cbindex);
+                        }
+                    }, 1000);
+                }
             }
 
             return true;
