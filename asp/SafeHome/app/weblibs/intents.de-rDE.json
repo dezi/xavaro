@@ -11,7 +11,7 @@
 
     "call": [ "anrufen", "telefonieren", "sprechen" ],
 
-    "text": [ "schreiben" ],
+    "text": [ "schreiben", "chatten", "schicken" ],
 
     "play": [ "spielen", "abspielen" ],
 
@@ -63,6 +63,34 @@
       "sample": "Ich möchte %1$s eine Nachricht schreiben"
     },
 
+    "whatsapp.register": [
+      {
+        "type": "whatsapp",
+        "action": "whatsapp",
+        "keywords": [ "jemanden" ],
+        "response": "Ich öffne das WhatsApp-Verzeichnis",
+        "sample": "Ich möchte jemanden per WhatsApp schreiben"
+      }
+    ],
+
+    "whatsapp.voip": {
+      "type": "whatsapp",
+      "subtype": "voip",
+      "action": "call",
+      "keywords": [ "WhatsApp", "telefonieren" ],
+      "response": "Ich rufe %1$s per WhatsApp an",
+      "sample": "Ich möchte mit %1$s per WhatsApp telefonieren"
+    },
+
+    "whatsapp.chat": {
+      "type": "whatsapp",
+      "subtype": "chat",
+      "action": "text",
+      "keywords": [ "WhatsApp", "schreiben", "chatten", "schicken" ],
+      "response": "Ich öffne den WhatsApp Chat an %1$s",
+      "sample": "Ich möchte %1$s eine WhatsApp schreiben"
+    },
+
     "skype.register": [
       {
         "type": "skype",
@@ -79,7 +107,7 @@
       "action": "skype",
       "keywords": [ "telefonieren" ],
       "response": "Ich rufe %1$s per Skype an",
-      "sample": "Ich möchte %1$s per Skype telefonieren"
+      "sample": "Ich möchte mit %1$s per Skype telefonieren"
     },
 
     "skype.chat": {

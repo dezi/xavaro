@@ -18,6 +18,7 @@ import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.SystemIdentity;
+import de.xavaro.android.common.VoiceIntent;
 
 public class LaunchItemComm extends LaunchItem
 {
@@ -182,6 +183,23 @@ public class LaunchItemComm extends LaunchItem
         if (type.equals("xavaro"  )) launchXavaro();
         if (type.equals("whatsapp")) launchWhatsApp();
         if (type.equals("contacts")) launchContacts();
+    }
+
+    @Override
+    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
+    {
+        if (super.onExecuteVoiceIntent(voiceintent, index))
+        {
+            if (type.equals("phone"   )) launchPhone();
+            if (type.equals("skype"   )) launchSkype();
+            if (type.equals("xavaro"  )) launchXavaro();
+            if (type.equals("whatsapp")) launchWhatsApp();
+            if (type.equals("contacts")) launchContacts();
+
+            return true;
+        }
+
+        return false;
     }
 
     private void launchPhone()

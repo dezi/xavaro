@@ -396,11 +396,22 @@ public class LaunchGroupComm
                 Json.put(entry, "waphonenumber", waphonenumber);
                 Json.put(entry, "order", 750);
 
-                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
-                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+                JSONObject intent = VoiceIntent.getIntent("whatsapp." + subtype);
 
-                Log.d(LOGTAG, "Prefe:" + prefkey + "=" + subtype + "=" + waphonenumber + "=" + label);
+                if (intent != null)
+                {
+                    VoiceIntent.prepareIconRes(intent, "whatsapp", "voip", GlobalConfigs.IconResWhatsAppVoip);
+                    VoiceIntent.prepareIconRes(intent, "whatsapp", "chat", GlobalConfigs.IconResWhatsAppChat);
+
+                    VoiceIntent.prepareLabel(intent, label);
+
+                    Json.put(entry, "intent", intent);
+                }
+
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+
+                Json.put(adir, entry);
+                Json.put(cdir, entry);
             }
 
             if (adir.length() > 0)
@@ -410,6 +421,14 @@ public class LaunchGroupComm
                 Json.put(entry, "type", "whatsapp");
                 Json.put(entry, "label", "WhatsApp");
                 Json.put(entry, "order", 750);
+
+                Json.put(entry, "iconres", GlobalConfigs.IconResWhatsApp);
+
+                JSONObject intent = VoiceIntent.getIntent("whatsapp.register");
+                if (intent != null) Json.put(entry, "intent", intent);
+
+                JSONArray intents = VoiceIntent.getIntents("whatsapp.register");
+                if (intents != null)  Json.put(entry, "intents", intents);
 
                 Json.put(entry, "launchitems", adir);
                 Json.put(home, entry);
@@ -422,6 +441,14 @@ public class LaunchGroupComm
                 Json.put(entry, "type", "contacts");
                 Json.put(entry, "label", "Kontakte");
                 Json.put(entry, "order", 950);
+
+                Json.put(entry, "iconres", GlobalConfigs.IconResContacts);
+
+                JSONObject intent = VoiceIntent.getIntent("contacts.register");
+                if (intent != null) Json.put(entry, "intent", intent);
+
+                JSONArray intents = VoiceIntent.getIntents("contacts.register");
+                if (intents != null) Json.put(entry, "intents", intents);
 
                 Json.put(entry, "launchitems", cdir);
                 Json.put(home, entry);
