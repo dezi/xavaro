@@ -361,6 +361,11 @@ public class HomeActivity extends AppCompatActivity implements
                     ((BackKeyClient) lastview).onBackKeyExecuted();
                 }
             }
+            else
+            {
+                topscreen.removeView((FrameLayout) lastview);
+                backStack.remove(backStack.size() - 1);
+            }
 
             return;
         }

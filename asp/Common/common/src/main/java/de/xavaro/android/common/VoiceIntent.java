@@ -127,6 +127,7 @@ public class VoiceIntent
 
     public static void prepareLabel(JSONObject intent, String label)
     {
+        Json.makeFormat(intent, "response", label);
         Json.makeFormat(intent, "sample", label);
 
         JSONArray keywords = Json.getArray(intent, "keywords");

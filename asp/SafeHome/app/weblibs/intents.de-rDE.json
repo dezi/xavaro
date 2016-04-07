@@ -3,15 +3,17 @@
 
     "find": [ "suche" ],
 
-    "shop": [ "bestellen", "stöbern" ],
+    "calc": [ "was ergibt", "wie viel ist", "wie viel sind" ],
+
+    "shop": [ "bestellen", "stöbern", "shoppen", "einkaufen" ],
 
     "take": [ "nehmen", "genommen", "messen", "gemessen", "wiegen", "gewogen" ],
 
     "view": [ "zeige", "öffne", "lesen", "blättern", "anzeigen", "anschauen", "ansehen", "sehen" ],
 
-    "call": [ "anrufen", "telefonieren" ],
+    "call": [ "anrufen", "telefonieren", "sprechen" ],
 
-    "text": [ "schreiben" ],
+    "text": [ "schreiben", "chatten", "schicken" ],
 
     "play": [ "spielen", "abspielen" ],
 
@@ -51,7 +53,7 @@
       "type": "phone",
       "subtype": "voip",
       "action": "call",
-      "response": "Ich nehme den Hörer ab",
+      "response": "Ich rufe %1$s an",
       "sample": "Ich möchte %1$s anrufen"
     },
 
@@ -59,8 +61,36 @@
       "type": "phone",
       "subtype": "text",
       "action": "text",
-      "response": "Ich öffne die SMS Funktion",
+      "response": "Ich öffne die SMS an %1$s",
       "sample": "Ich möchte %1$s eine Nachricht schreiben"
+    },
+
+    "whatsapp.register": [
+      {
+        "type": "whatsapp",
+        "action": "whatsapp",
+        "keywords": [ "jemanden" ],
+        "response": "Ich öffne das WhatsApp-Verzeichnis",
+        "sample": "Ich möchte jemanden per WhatsApp schreiben"
+      }
+    ],
+
+    "whatsapp.voip": {
+      "type": "whatsapp",
+      "subtype": "voip",
+      "action": "call",
+      "keywords": [ "WhatsApp", "telefonieren" ],
+      "response": "Ich rufe %1$s per WhatsApp an",
+      "sample": "Ich möchte mit %1$s per WhatsApp telefonieren"
+    },
+
+    "whatsapp.chat": {
+      "type": "whatsapp",
+      "subtype": "chat",
+      "action": "text",
+      "keywords": [ "WhatsApp", "schreiben", "chatten", "schicken" ],
+      "response": "Ich öffne den WhatsApp Chat an %1$s",
+      "sample": "Ich möchte %1$s eine WhatsApp schreiben"
     },
 
     "skype.register": [
@@ -78,8 +108,8 @@
       "subtype": "voip",
       "action": "skype",
       "keywords": [ "telefonieren" ],
-      "response": "Ich rufe Skype auf",
-      "sample": "Ich möchte %1$s per Skype telefonieren"
+      "response": "Ich rufe %1$s per Skype an",
+      "sample": "Ich möchte mit %1$s per Skype telefonieren"
     },
 
     "skype.chat": {
@@ -87,7 +117,7 @@
       "subtype": "chat",
       "action": "skype",
       "keywords": [ "schreiben", "chatten" ],
-      "response": "Ich rufe Skype auf",
+      "response": "Ich öffne den Skype Chat an %1$s",
       "sample": "Ich möchte %1$s per Skype ein Nachricht schreiben"
     },
 
@@ -95,7 +125,7 @@
       "type": "skype",
       "subtype": "vica",
       "action": "skype",
-      "response": "Ich rufe Skype auf",
+      "response": "Ich rufe %1$s per Skype Video an",
       "keywords": [ "video" ],
       "sample": "Ich möchte %1$s per Skype Video sprechen"
     }

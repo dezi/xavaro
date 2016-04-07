@@ -1,0 +1,31 @@
+{
+  "intents": [
+
+    {
+      "action" : "view",
+      "keywords": [ "Taschenrechner", "Rechner"  ],
+      "response": "Ich öffne den Taschenrechner",
+      "sample": "Öffne den Taschenrechner",
+      "icon": "/webapps/calculator/calculator_512x512.png"
+    },
+
+    {
+      "mode": "speak",
+      "action" : "calc",
+
+      "keywords": [
+        "x", "durch", "plus", "minus",
+        "und", "weniger", "+",
+        "geteilt durch",
+        "wurzel", "quadrat"
+      ],
+
+      "sample": "Wieviel ist 12 mal 13",
+      "icon": "/webapps/calculator/calculator_512x512.png",
+      "tag": "compute"
+    }
+
+  ],
+
+  "EOL" : true
+}
