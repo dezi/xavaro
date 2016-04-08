@@ -170,10 +170,23 @@ function buildProducts(&$products)
 		if (strtolower($brand) == "marke noch nicht gesetzt") $brand = "-";
 		if (strtolower($brand) == "j | hettinger") $brand = "J. Hettinger";
 		
+		if (strtolower($brand) == "hausmarke beste wahl") $brand = "Hausmarke";
+		
 		//
 		// Tune price and base.
 		//
 		
+		if (substr($price, 0, 6) == "1l")
+		{
+			if (substr($title, -3) == " 1000ml") $title = substr($title, 0, -7);
+		}
+	
+		if (substr($base, 0, 6) == "1000ml")
+		{
+			$base = "1l" . substr($base, 6);
+		}
+		
+
 		if (substr($price, 0, 6) == "1000ml")
 		{
 			$price = "1l" . substr($price, 6);
@@ -245,7 +258,7 @@ function buildProducts(&$products)
 		if ((! isset($GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ])) ||
 			(strpos(strtolower($prodstr), $GLOBALS[ "host" ]) !== false) || 
 			(strpos(strtolower($prodstr), $GLOBALS[ "port" ]) !== false) ||
-			(strpos(strtolower($brand), "feine Welt") !== false)) 
+			(strpos(strtolower($brand), "feine welt") !== false)) 
 		{
 			echo "SKIP: " . $product[ "categoryId" ] . ":" . $product[ "title" ] . "\n";
 			continue;
