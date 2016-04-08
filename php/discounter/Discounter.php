@@ -284,6 +284,6 @@ sort($GLOBALS[ "csvprods" ]);
 $csvlines = implode("\n", $GLOBALS[ "csvprods" ]);
 file_put_contents("complete.csv", $csvlines);
 
-file_put_contents("../../var/prodata/proprices.de-rDE.gz.bin", gzencode($csvlines, 9));
+file_put_contents("../../var/prodata/proprices.de-rDE.csv.gzbin", gzencode($csvlines, 9));
 ?>
 
