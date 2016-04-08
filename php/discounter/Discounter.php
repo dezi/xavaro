@@ -54,7 +54,6 @@ function buildProducts(&$products)
 
 	foreach ($products as $index => $product)
 	{	
-		if (! isset($GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ])) continue;
 		$category = &$GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ];
 	
 		$title = trim($product[ "title" ]);
@@ -157,12 +156,12 @@ function buildProducts(&$products)
 		// Tune brand and title.
 		//
 		
-		if (substr(strtolower($title), 0, 3) == $GLOBALS[ "port" ])
+		if (strtolower(substr($title, 0, 3)) == $GLOBALS[ "port" ])
 		{
 			$title = trim(substr($title, 3));
 		}
 		
-		if (strtolower(substr($brand, 0, 4) == $GLOBALS[ "host" ]))
+		if (strtolower(substr($brand, 0, 4)) == $GLOBALS[ "host" ])
 		{
 			$brand = "Hausmarke" . substr($brand, 4);
 		}
@@ -242,10 +241,15 @@ function buildProducts(&$products)
 		}
 		
 		$prodstr = "$title|$brand|$price|$base";
-		
-		if ((strpos(strtolower($prodstr), $GLOBALS[ "host" ]) !== false) || 
+
+		if ((! isset($GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ])) ||
+			(strpos(strtolower($prodstr), $GLOBALS[ "host" ]) !== false) || 
 			(strpos(strtolower($prodstr), $GLOBALS[ "port" ]) !== false) ||
-			(strpos(strtolower($brand), "feine Welt") !== false)) continue;
+			(strpos(strtolower($brand), "feine Welt") !== false)) 
+		{
+			echo "SKIP: " . $product[ "categoryId" ] . ":" . $product[ "title" ] . "\n";
+			continue;
+		}
 		
 		//
 		// Setup product with nice property order.
@@ -277,6 +281,9 @@ buildProducts($products);
 file_put_contents("complete.json", json_encdat($GLOBALS[ "categories" ]));
 
 sort($GLOBALS[ "csvprods" ]);
-file_put_contents("complete.csv", implode("\n", $GLOBALS[ "csvprods" ]));
+$csvlines = implode("\n", $GLOBALS[ "csvprods" ]);
+file_put_contents("complete.csv", $csvlines);
+
+file_put_contents("../../var/prodata/proprices.de-rDE.gz.bin", gzencode($csvlines, 9));
 ?>
 
