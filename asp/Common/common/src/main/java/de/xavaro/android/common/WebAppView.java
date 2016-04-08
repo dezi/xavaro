@@ -27,6 +27,7 @@ public class WebAppView extends WebView
     public WebAppMedia media;
     public WebAppEvents events;
     public WebAppHealth health;
+    public WebAppPrices prices;
     public WebAppWeather weather;
     public WebAppRequest request;
     public WebAppUtility utility;
@@ -74,6 +75,12 @@ public class WebAppView extends WebView
         //
         // Native add ons via permissions.
         //
+
+        if (permissions.contains("prices"))
+        {
+            prices = new WebAppPrices(webappname, this, webapploader);
+            addJavascriptInterface(prices, "WebAppPrices");
+        }
 
         if (permissions.contains("health"))
         {

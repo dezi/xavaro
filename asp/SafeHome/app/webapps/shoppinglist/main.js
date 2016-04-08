@@ -21,6 +21,12 @@ shoppinglist.createFrame = function()
 
     sl.voiceIntent = WebLibSimple.createAny("center", 0, "50%", 0, null, "voiceIntent", sl.topDiv);
     WebLibSimple.setFontSpecs(sl.voiceIntent, 22, "bold", "#666666");
+
+    sl.queryResult = WebLibSimple.createAny("pre", 0, "60%", 0, 0, "queryResult", sl.topDiv);
+    WebLibSimple.setFontSpecs(sl.queryResult, 12, "normal", "#000000");
+
+    var results = WebAppPrices.getQuery("Bärenmarke");
+    sl.queryResult.innerHTML = WebAppUtility.getPrettyJson(results);
 }
 
 shoppinglist.createFrame();

@@ -35,4 +35,5 @@ WebAppRequest.onVoiceIntent = function(intent)
     WebAppSpeak.speak(sl.answer);
 
     console.log("WebAppRequest.onVoiceIntent: answer:" + sl.answer);
+
 }
