@@ -61,15 +61,15 @@
   "events.take.bloodpressure" : "Sie müssen noch Ihren Blutdruck messen",
   "events.take.bloodpressure.du" : "Du musst noch Deinen Blutdruck messen",
 
-  "events.didnotyettake.pills" : "%$1s hat seine Medikamente noch nicht genommen.",
-  "events.didnotyettake.weight" : "%$1s hat sich noch nicht gewogen.",
-  "events.didnotyettake.bloodglucose" : "%$1s hat noch nicht den Blutzucker gemessen.",
-  "events.didnotyettake.bloodpressure" : "%$1s hat noch nicht den Blutdruck gemessen.",
+  "events.didnotyettake.pills" : "%1$s hat seine Medikamente noch nicht genommen.",
+  "events.didnotyettake.weight" : "%1$s hat sich noch nicht gewogen.",
+  "events.didnotyettake.bloodglucose" : "%1$s hat noch nicht den Blutzucker gemessen.",
+  "events.didnotyettake.bloodpressure" : "%1$s hat noch nicht den Blutdruck gemessen.",
 
-  "events.didnowtake.pills" : "%$1s hat seine Medikamente jetzt gerade genommen.",
-  "events.didnowtake.weight" : "%$1s hat sich jetzt gerade gewogen.",
-  "events.didnowtake.bloodglucose" : "%$1s hat jetzt gerade den Blutzucker gemessen.",
-  "events.didnowtake.bloodpressure" : "%$1s hat jetzt gerade den Blutdruck gemessen.",
+  "events.didnowtake.pills" : "%1$s hat seine Medikamente jetzt gerade genommen.",
+  "events.didnowtake.weight" : "%1$s hat sich jetzt gerade gewogen.",
+  "events.didnowtake.bloodglucose" : "%1$s hat jetzt gerade den Blutzucker gemessen.",
+  "events.didnowtake.bloodpressure" : "%1$s hat jetzt gerade den Blutdruck gemessen.",
 
   "activity.took.pills" : "Sie haben ihre Medikamente genommen.",
   "activity.took.pills.du" : "Du hast deine Medikamente genommen.",

@@ -103,6 +103,15 @@ public class VoiceIntent
         return (json != null) ? Json.clone(json) : null;
     }
 
+    @Nullable
+    public static JSONArray getActionKeywords(String key)
+    {
+        readConfig();
+
+        JSONArray json = Json.getArray(actions, key);
+        return (json != null) ? Json.clone(json) : null;
+    }
+
     public static void prepareIconRes(JSONArray intents, String type, String subtype, int iconres)
     {
         if (intents != null)
@@ -180,6 +189,21 @@ public class VoiceIntent
     public int getNumMatches()
     {
         return matches.length();
+    }
+
+    @Nullable
+    public  JSONArray getActionKeywords(int index)
+    {
+        readConfig();
+
+        if ((matches != null) && (index < matches.length()))
+        {
+            JSONObject match = Json.getObject(matches, index);
+            JSONArray json = Json.getArray(actions, Json.getString(match, "action"));
+            return (json != null) ? Json.clone(json) : null;
+        }
+
+        return null;
     }
 
     private boolean keepIfBetter(JSONObject match)
@@ -263,7 +287,7 @@ public class VoiceIntent
                     String wrd = Json.getString(mykeywords, inx);
                     if (wrd == null) continue;
 
-                    if (cmp.contains(" " + wrd.toLowerCase() + " "))
+                    if (wrd.equals("*") || cmp.contains(" " + wrd.toLowerCase() + " "))
                     {
                         Log.d(LOGTAG, "evaluateIntent: " + identifier + "=" + wrd + ":" + response);
 

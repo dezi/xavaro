@@ -46,6 +46,7 @@ public class WebAppRequest
 
         JSONObject matchobj = intent.getMatch(index);
         Json.put(matchobj, "command", intent.getCommand());
+        Json.put(matchobj, "triggers", intent.getActionKeywords(index));
         String match = (matchobj == null) ? "{}" : matchobj.toString();
 
         final String cbscript = ""

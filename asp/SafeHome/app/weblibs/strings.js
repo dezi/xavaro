@@ -68,12 +68,7 @@ WebLibStrings.getTrans = function(key, arg1, arg2, arg3, arg4)
         if (WebLibStrings.strings[ duzkey ]) text = WebLibStrings.strings[ duzkey ];
     }
 
-    if (text && (arg1 !== null) && ! Array.isArray(text)) text = text.replace("%$1s", arg1);
-    if (text && (arg2 !== null) && ! Array.isArray(text)) text = text.replace("%$2s", arg2);
-    if (text && (arg3 !== null) && ! Array.isArray(text)) text = text.replace("%$3s", arg3);
-    if (text && (arg4 !== null) && ! Array.isArray(text)) text = text.replace("%$4s", arg4);
-
-    return text;
+    return WebLibStrings.getFormat(text, arg1, arg2, arg3, arg4)
 }
 
 WebLibStrings.getTransMap = function(key)
@@ -100,6 +95,16 @@ WebLibStrings.getTransTrans = function(key, keyval)
     var map = WebLibStrings.getTransMap(key);
 
     return map ? map[ keyval ] : keyval;
+}
+
+WebLibStrings.getFormat = function(text, arg1, arg2, arg3, arg4)
+{
+    if (text && (arg1 !== null) && ! Array.isArray(text)) text = text.replace("%1$s", arg1);
+    if (text && (arg2 !== null) && ! Array.isArray(text)) text = text.replace("%2$s", arg2);
+    if (text && (arg3 !== null) && ! Array.isArray(text)) text = text.replace("%3$s", arg3);
+    if (text && (arg4 !== null) && ! Array.isArray(text)) text = text.replace("%4$s", arg4);
+
+    return text;
 }
 
 WebLibStrings.loadLocale();

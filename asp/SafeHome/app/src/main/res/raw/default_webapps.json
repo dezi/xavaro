@@ -1,6 +1,7 @@
 {
   "webapps": {
 
+    "shoppinglist": {},
     "calculator": {},
     "tvguide": {},
     "tvscrape": {},

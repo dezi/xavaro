@@ -15,11 +15,11 @@
     "Automarken"
   ],
 
-  "game.solved": "Sie haben alle %$1s gefunden",
-  "game.solved.du": "Du hast alle %$1s gefunden",
+  "game.solved": "Sie haben alle %1$s gefunden",
+  "game.solved.du": "Du hast alle %1$s gefunden",
 
-  "activity.game.solved": "Sie haben alle %$1s in einem Suchspiel gefunden.",
-  "activity.game.solved.du": "Du hast alle %$1s in einem Suchspiel gefunden.",
+  "activity.game.solved": "Sie haben alle %1$s in einem Suchspiel gefunden.",
+  "activity.game.solved.du": "Du hast alle %1$s in einem Suchspiel gefunden.",
 
   "EOL" : true
 }

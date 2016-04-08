@@ -1,0 +1,27 @@
+{
+  "intents": [
+
+    {
+      "action" : "view",
+      "keywords": [ "Einkaufszettel", "Einkaufsliste", "Fresszettel"  ],
+      "response": "Ich öffne den Einkaufszettel",
+      "sample": "Öffne den Einkaufszettel",
+      "icon": "/webapps/shoppinglist/shoppinglist_512x512.png"
+    },
+
+    {
+      "mode": "speak",
+      "action" : "procure",
+
+      "keywords": [ "*" ],
+
+      "answer": "Ich habe %1$s auf die Liste geschrieben",
+      "sample": "Ich brauche noch Milch",
+      "icon": "/webapps/shoppinglist/shoppinglist_512x512.png",
+      "tag": "procure"
+    }
+
+  ],
+
+  "EOL" : true
+}

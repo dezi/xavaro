@@ -1,9 +1,11 @@
 {
   "actions": {
 
-    "find": [ "suche" ],
+    "procure": [ "ich brauche noch", "wir brauchen noch", "ich brauche", "wir brauchen", "einkaufen" ],
 
     "calc": [ "was ergibt", "wie viel ist", "wie viel sind" ],
+
+    "find": [ "suche" ],
 
     "shop": [ "bestellen", "stöbern", "shoppen", "einkaufen" ],
 

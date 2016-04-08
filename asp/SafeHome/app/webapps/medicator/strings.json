@@ -53,15 +53,15 @@
   "events.take.bloodglucose" : "You have to measure Your blood sugar",
   "events.take.bloodpressure" : "You have to measure Your blood pressure",
 
-  "events.didnotyettake.pills" : "%$1s did not yet take his medication.",
-  "events.didnotyettake.weight" : "%$1s did not yet take his weight.",
-  "events.didnotyettake.bloodglucose" : "%$1s did not yet measured his blood sugar.",
-  "events.didnotyettake.bloodpressure" : "%$1s did not yet measured his blood pressure.",
+  "events.didnotyettake.pills" : "%1$s did not yet take his medication.",
+  "events.didnotyettake.weight" : "%1$s did not yet take his weight.",
+  "events.didnotyettake.bloodglucose" : "%1$s did not yet measured his blood sugar.",
+  "events.didnotyettake.bloodpressure" : "%1$s did not yet measured his blood pressure.",
 
-  "events.didnowtake.pills" : "%$1s did just take his medication.",
-  "events.didnowtake.weight" : "%$1s did just take his weight.",
-  "events.didnowtake.bloodglucose" : "%$1s did just measure his blood sugar.",
-  "events.didnowtake.bloodpressure" : "%$1s did just measure his blood pressure.",
+  "events.didnowtake.pills" : "%1$s did just take his medication.",
+  "events.didnowtake.weight" : "%1$s did just take his weight.",
+  "events.didnowtake.bloodglucose" : "%1$s did just measure his blood sugar.",
+  "events.didnowtake.bloodpressure" : "%1$s did just measure his blood pressure.",
 
   "activity.took.pills" : "You took Your medication.",
   "activity.took.weight" : "You took Your weight.",
