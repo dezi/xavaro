@@ -3,6 +3,7 @@ epgdata
 epginfo
 pgminfo
 owmdata
+prodata
 shares
 *.json.gz
 epginfo.json
