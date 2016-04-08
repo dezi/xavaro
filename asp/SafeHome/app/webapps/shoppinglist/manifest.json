@@ -4,10 +4,12 @@
     "label": "Einkaufszettel",
     "appname": "shoppinglist",
     "appicon": "shoppinglist_512x512.png",
+    "appserver": "epg.xavaro.de",
     "voice": true,
 
     "permissions": [
       "speak",
+      "prices",
       "request",
       "utility"
     ],
@@ -31,7 +33,8 @@
     "cachedefs": [
       { "interval": 24, "pattern": ".*\\.js" },
       { "interval": 72, "pattern": ".*\\.png" },
-      { "interval": 24, "pattern": ".*\\.json" }
+      { "interval": 24, "pattern": ".*\\.json" },
+      { "interval": 99, "pattern": "http://epg.xavaro.de/prodata/.*.csv.gzbin" }
     ]
   }
 }
