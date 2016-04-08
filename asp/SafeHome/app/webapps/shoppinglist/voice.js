@@ -3,9 +3,9 @@ WebAppRequest.onVoiceIntent = function(intent)
     var sl = shoppinglist;
 
     sl.intent = intent;
+    sl.action = sl.intent.action;
     sl.command = sl.intent.command;
 
-    console.log("WebAppRequest.onVoiceIntent: command:" + JSON.stringify(intent));
     console.log("WebAppRequest.onVoiceIntent: command:" + sl.command);
 
     //
@@ -32,8 +32,7 @@ WebAppRequest.onVoiceIntent = function(intent)
     //
 
     sl.answer = WebLibStrings.getFormat(sl.intent.answer, sl.cleancmd);
+    WebAppSpeak.speak(sl.answer);
 
     console.log("WebAppRequest.onVoiceIntent: answer:" + sl.answer);
-
-    WebAppSpeak.speak(sl.answer);
 }

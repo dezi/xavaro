@@ -19,7 +19,20 @@
       "sample": "Ich brauche noch Milch",
       "icon": "/webapps/shoppinglist/shoppinglist_512x512.png",
       "tag": "procure"
+    },
+
+    {
+      "mode": "speak",
+      "action" : "procure.query",
+
+      "keywords": [ "*" ],
+
+      "answer": "Meine Datenbank ist noch nicht online, daher kenne ich den Preis von %1$s nicht",
+      "sample": "Was kostet Milch",
+      "icon": "/webapps/shoppinglist/shoppinglist_512x512.png",
+      "tag": "procure.query"
     }
+
 
   ],
 

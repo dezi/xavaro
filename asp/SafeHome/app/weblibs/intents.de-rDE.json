@@ -3,6 +3,8 @@
 
     "procure": [ "ich brauche noch", "wir brauchen noch", "ich brauche", "wir brauchen", "einkaufen" ],
 
+    "procure.query": [ "was kostet", "was kosten" ],
+
     "calc": [ "was ergibt", "wie viel ist", "wie viel sind" ],
 
     "find": [ "suche" ],
