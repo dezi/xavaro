@@ -9,6 +9,7 @@
 
     "permissions": [
       "speak",
+      "voice",
       "prices",
       "request",
       "utility"
@@ -19,6 +20,10 @@
       "touch",
       "strings",
       "dialog"
+    ],
+
+    "preload": [
+      "parse.js"
     ],
 
     "files": [

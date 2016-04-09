@@ -156,6 +156,9 @@ public class LaunchItemVoice extends LaunchItem implements
         if (intent.getIntent() == null)
         {
             Speak.speak("Ich habe sie nicht verstanden");
+
+            getHandler().postDelayed(launchVoiceDelayed, 1000);
+
             return;
         }
 
@@ -171,6 +174,9 @@ public class LaunchItemVoice extends LaunchItem implements
             if (intent.getNumMatches() == 0)
             {
                 Speak.speak("Ich kann die gewünschte Aktion nicht finden");
+
+                getHandler().postDelayed(launchVoiceDelayed, 1000);
+
                 return;
             }
 
@@ -224,7 +230,7 @@ public class LaunchItemVoice extends LaunchItem implements
         //
         // Give user a little bit more time for next speech.
         //
-        
+
         getHandler().postDelayed(launchVoiceDelayed, 1000);
     }
 
