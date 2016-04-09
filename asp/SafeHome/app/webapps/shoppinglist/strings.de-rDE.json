@@ -38,16 +38,20 @@
 
     "wir brauchen auch",
     "wir brauchen noch",
+    "wir brauchen nach",
     "ich brauche auch",
     "ich brauche noch",
+    "ich brauche nach",
     "wir haben keinen",
     "wir haben keine",
     "ich habe keinen",
     "ich habe keine",
     "brauchen auch",
     "brauchen noch",
+    "brauchen nach",
     "brauche auch",
     "brauche noch",
+    "brauche nach",
     "wir brauchen",
     "ich brauche",
     "einkaufen",
@@ -57,6 +61,13 @@
   ],
 
   "stores.defines": [
+
+    {
+      "store": "Apotheke",
+      "logo": "logos/apotheke.de.jpg",
+      "sort": 40,
+      "keywords": [ "apotheke" ]
+    },
 
     {
       "store": "Supermarkt",
@@ -117,7 +128,98 @@
       "logo": "logos/edeka.de.png",
       "sort": 100,
       "keywords": [ "edeka" ]
+    },
+
+    {
+      "store": "Famila",
+      "logo": "logos/famila.de.png",
+      "sort": 100,
+      "keywords": [ "famila" ]
+    },
+
+    {
+      "store": "Kaufland",
+      "logo": "logos/kaufland.de.png",
+      "sort": 100,
+      "keywords": [ "kaufland" ]
+    },
+
+    {
+      "store": "Lidl",
+      "logo": "logos/lidl.de.png",
+      "sort": 100,
+      "keywords": [ "lidl" ]
+    },
+
+    {
+      "store": "Penny",
+      "logo": "logos/penny.de.png",
+      "sort": 100,
+      "keywords": [ "penny" ]
+    },
+
+    {
+      "store": "Real,-",
+      "logo": "logos/real.de.jpg",
+      "sort": 100,
+      "keywords": [ "real" ]
+    },
+
+    {
+      "store": "REWE",
+      "logo": "logos/rewe.de.png",
+      "sort": 100,
+      "keywords": [ "rewe" ]
+    },
+    {
+      "store": "Alnatura",
+      "logo": "logos/alnatura.de.jpg",
+      "sort": 200,
+      "keywords": [ "alnatura" ]
+    },
+
+    {
+      "store": "Budnikowsky",
+      "logo": "logos/budni.de.jpg",
+      "sort": 300,
+      "keywords": [ "budnikowsky", "budni" ]
+    },
+
+    {
+      "store": "dm - Drogeriemarkt",
+      "logo": "logos/dm.de.jpg",
+      "sort": 300,
+      "keywords": [ "dm" ]
+    },
+
+    {
+      "store": "Rossmann",
+      "logo": "logos/rossmann.de.jpg",
+      "sort": 300,
+      "keywords": [ "rossmann" ]
+    },
+
+    {
+      "store": "OBI - Baumarkt",
+      "logo": "logos/obi.de.png",
+      "sort": 400,
+      "keywords": [ "obi baumarkt", "obi" ]
+    },
+
+    {
+      "store": "Hagebau - Baumarkt",
+      "logo": "logos/hagebau.de.jpg",
+      "sort": 400,
+      "keywords": [ "hagebau baumarkt", "hagebau" ]
+    },
+
+    {
+      "store": "Hornbach - Baumarkt",
+      "logo": "logos/hornbach.de.jpg",
+      "sort": 400,
+      "keywords": [ "hornbach baumarkt", "hornbach" ]
     }
+
   ],
 
   "stores.intro.keywords": [ "aus der", "von der", "auf dem", "aus dem", "von", "vom", "vonne", "im" ],

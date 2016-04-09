@@ -123,17 +123,6 @@ shoppinglist.createItemDiv = function(item)
     divSample.style.lineHeight = "54px";
     divSample.style.padding = "8px";
 
-    if (item.isproduct)
-    {
-        divOuter.divInner.style.backgroundColor = "#eeeeee";
-        divSample.innerHTML = item.text;
-    }
-    else
-    {
-        divSample.style.fontSize = "32px";
-        divSample.innerHTML = item.store;
-    }
-
     var divKeywords = WebLibSimple.createDiv(64, null, 0, 0, "divKeywords", divOuter.divInner);
     WebLibSimple.setFontSpecs(divKeywords, 18, "normal", "#888888");
     divKeywords.style.padding = "8px";
@@ -150,8 +139,6 @@ shoppinglist.createItemDiv = function(item)
     divMore.style.bottom = "0px";
     divMore.style.width = "70px";
 
-    divMore.onTouchClick = shoppinglist.onClickMore;
-
     divMore.divPadd = WebLibSimple.createAnyAppend("div", divMore);
     divMore.divPadd.style.position = "absolute";
     divMore.divPadd.style.right = "0px";
@@ -166,6 +153,21 @@ shoppinglist.createItemDiv = function(item)
     divMore.imgMore.style.width = "auto";
     divMore.imgMore.style.height = "100%";
     divMore.imgMore.src = "arrow_more_270x270.png";
+
+    if (item.isproduct)
+    {
+        divOuter.divInner.style.backgroundColor = "#eeeeee";
+        divSample.innerHTML = item.text;
+        divMore.imgMore.src = "search_300x300.png";
+        divMore.onTouchClick = shoppinglist.onClickSearch;
+    }
+    else
+    {
+        divSample.style.fontSize = "32px";
+        divSample.innerHTML = item.store;
+        divMore.imgMore.src = "arrow_more_270x270.png";
+        divMore.onTouchClick = shoppinglist.onClickMore;
+    }
 
     return divOuter;
 }
@@ -213,6 +215,15 @@ shoppinglist.addProduct = function(product)
     shoppinglist.updateitemlist();
 }
 
+shoppinglist.onClickSearch = function(target)
+{
+    WebAppUtility.makeClick();
+
+    var sl = shoppinglist;
+    var product = target.item;
+}
+
+
 shoppinglist.onClickMore = function(target)
 {
     WebAppUtility.makeClick();
@@ -221,7 +232,7 @@ shoppinglist.onClickMore = function(target)
     target.onTouchClick = shoppinglist.onClickLess;
 
     var sl = shoppinglist;
-    var product = target.product;
+    var store = target.item;
 }
 
 shoppinglist.onClickLess = function(target)
@@ -232,7 +243,7 @@ shoppinglist.onClickLess = function(target)
     target.onTouchClick = shoppinglist.onClickMore;
 
     var sl = shoppinglist;
-    var product = target.product;
+    var store = target.item;
 }
 
 shoppinglist.onClickAdd = function(target)
