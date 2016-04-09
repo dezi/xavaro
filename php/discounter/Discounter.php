@@ -38,7 +38,8 @@ function recurseCategories($prefix, $rawdata, &$categories)
 		$categories[ $index ][ "items" ] = array();
 		
 		$GLOBALS[ "inx2cat" ][ $rawdata[ $index ][ "id" ] ] = &$categories[ $index ][ "items" ];
-		
+		$GLOBALS[ "inx2nam" ][ $rawdata[ $index ][ "id" ] ] = &$categories[ $index ][ "name" ];
+
 		if (isset($rawdata[ $index ][ "childCategories" ]))
 		{
 			$nextpref = $prefix . " => " . $rawdata[ $index ][ "name" ];
@@ -96,6 +97,15 @@ function buildProducts(&$products)
 		// Derive base price and price.
 		//
 	
+		if (isset($GLOBALS[ "inx2nam" ][ $product[ "categoryId" ] ]))
+		{
+			$catname = $GLOBALS[ "inx2nam" ][ $product[ "categoryId" ] ];
+		}
+		else
+		{
+			$catname = "Skip Category";
+		}
+		
 		$price = null;
 		$base = null;
 	
@@ -132,7 +142,9 @@ function buildProducts(&$products)
 	
 		if (($base == null) && ($product[ "volumeCode" ] == "STK"))
 		{
-			$base = "1st"
+			$quantity = "1st";
+			
+			$base = $quantity
 				  . "="
 				  . $cents;	
 	
@@ -145,11 +157,49 @@ function buildProducts(&$products)
 	
 		$dispquant = str_replace(".", ",", $quantity);
 	
-		if (substr($dispquant, -2) == "st") $dispquant = substr($dispquant, 0, -2) . " Stück";
+		if (substr($dispquant, -2) == "st") 
+		{
+			if ($dispquant == "1st");
+			{
+				$parts = explode(" ", $title);
+				
+				if (count($parts) > 2)
+				{
+					if (($parts[ count($parts) - 1 ] == "Stück") &&
+					    ($parts[ count($parts) - 2 ] != $product[ "baseQuantity" ]))
+					{
+						$base = $parts[ count($parts) - 2 ]
+							  . "st"
+				  			  . "="
+				  			  . $cents;	
+	
+						$price = $base;
+						
+						unset($parts[ count($parts) - 1 ]);
+						unset($parts[ count($parts) - 1 ]);
+						
+						$title = implode(" ",$parts);
+					}
+				}
+			}
+			
+			$dispquant = substr($dispquant, 0, -2) . " Stück";
+		}
 	
 		if ($dispquant && (substr($title, -strlen($dispquant)) == $dispquant))
 		{
 			$title = trim(substr($title, 0, -strlen($dispquant)));
+		}
+		
+		if ($dispquant && (strpos($title, " $dispquant, ") !== false))
+		{
+			$title = str_replace(" $dispquant, ", " ", $title);
+		}
+		
+		if ($catname == "Bedientheke")
+		{
+			$title = trim(str_replace(" 100g", " ", $title));
+			$title = trim(str_replace(" 150g", " ", $title));
 		}
 		
 		//
@@ -169,6 +219,7 @@ function buildProducts(&$products)
 		if (strtolower($brand) == $GLOBALS[ "port" ]) $brand = "Eigenmarke";
 		if (strtolower($brand) == "marke noch nicht gesetzt") $brand = "-";
 		if (strtolower($brand) == "j | hettinger") $brand = "J. Hettinger";
+		if (strtolower($brand) == "hausmarke beste wahl") $brand = "Hausmarke";
 		
 		//
 		// Tune price and base.
@@ -229,6 +280,8 @@ function buildProducts(&$products)
 			$title = strtoupper(substr($title, 6, 1)) . substr($title, 7);
 		}
 		
+		if ($title == "") $title = $brand;
+
 		//
 		// Check data.
 		//
@@ -245,12 +298,14 @@ function buildProducts(&$products)
 		if ((! isset($GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ])) ||
 			(strpos(strtolower($prodstr), $GLOBALS[ "host" ]) !== false) || 
 			(strpos(strtolower($prodstr), $GLOBALS[ "port" ]) !== false) ||
-			(strpos(strtolower($brand), "feine Welt") !== false)) 
+			(strpos(strtolower($brand), "feine welt") !== false)) 
 		{
 			echo "SKIP: " . $product[ "categoryId" ] . ":" . $product[ "title" ] . "\n";
 			continue;
 		}
 		
+		$prodstr = "$catname|$title|$brand|$price|$base";
+
 		//
 		// Setup product with nice property order.
 		//
@@ -268,6 +323,7 @@ getRawdata();
 
 $GLOBALS[ "categories" ] = array();
 $GLOBALS[ "inx2cat"    ] = array();
+$GLOBALS[ "inx2nam"    ] = array();
 $GLOBALS[ "csvprods"   ] = array();
 
 $rawcats = json_decdat(file_get_contents("categories.json"));
