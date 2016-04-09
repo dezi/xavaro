@@ -350,7 +350,7 @@ buildProducts($products);
 file_put_contents("complete.json", json_encdat($GLOBALS[ "categories" ]));
 
 sort($GLOBALS[ "csvprods" ]);
-$csvlines = implode("\n", $GLOBALS[ "csvprods" ]);
+$csvlines = implode("\n", $GLOBALS[ "csvprods" ]) . "\n";
 file_put_contents("complete.csv", $csvlines);
 
 file_put_contents("../../var/prodata/proprices.de-rDE.csv.gzbin", gzencode($csvlines, 9));
