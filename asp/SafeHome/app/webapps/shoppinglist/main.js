@@ -1,14 +1,6 @@
 WebAppRequest.onVoiceIntent = function(intent)
 {
     console.log("WebAppRequest.onVoiceIntent: ====================>" + JSON.stringify(intent));
-
-    var sl = shoppinglist;
-
-    sl.voiceIntent.innerHTML = intent.command;
-
-    //var results = WebAppPrices.getQuery("Dr|Oetker|Salami|Pizza");
-    //sl.queryResult.innerHTML = WebAppUtility.getPrettyJson(results);
-
 }
 
 shoppinglist.createFrame = function()
@@ -68,19 +60,52 @@ shoppinglist.createFrame = function()
     sl.listDiv = WebLibSimple.createDivHeight(0, 0, 0, null, "listDiv", sl.contDiv);
     sl.listDiv.scrollVertical = true;
 
-    sl.itemDivs = [];
+    sl.itemlist = [];
 }
 
-shoppinglist.addProduct = function(product)
+shoppinglist.sortCompare = function(a, b)
+{
+    var astring = "";
+
+    if (a.isproduct)
+    {
+        astring += WebLibSimple.padNum(a.storeobj.sort,8) + "|";
+        astring += a.storeobj.store + "|";
+        astring += a.text + "|";
+    }
+    else
+    {
+        astring += WebLibSimple.padNum(a.sort,8) + "|";
+        astring += a.store + "|";
+    }
+
+    var bstring = "";
+
+    if (b.isproduct)
+    {
+        bstring += WebLibSimple.padNum(b.storeobj.sort,8) + "|";
+        bstring += b.storeobj.store + "|";
+        bstring += b.text + "|";
+    }
+    else
+    {
+        bstring += WebLibSimple.padNum(b.sort,8) + "|";
+        bstring += b.store + "|";
+    }
+
+    if (astring == bstring) return 0;
+    return (astring > bstring) ? 1 : -1;
+}
+
+shoppinglist.createItemDiv = function(item)
 {
     var sl = shoppinglist;
 
-    var divOuter = WebLibSimple.createAnyAppend("div", sl.listDiv);
+    var divOuter = document.createElement("div");
     divOuter.style.position = "relative";
     divOuter.style.display = "inline-block";
     divOuter.style.width = "100%";
     divOuter.style.height = "80px";
-    divOuter.product = product;
 
     divOuter.divInner = WebLibSimple.createDiv(0, 0, 0, 0, "divInner", divOuter);
     divOuter.divInner.style.marginTop = "4px";
@@ -92,67 +117,122 @@ shoppinglist.addProduct = function(product)
     divIcon.style.margin = "4px";
 
     var imgIcon = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", "imgIcon", divIcon);
-    imgIcon.src = product.icon ? product.icon : WebLibSimple.getNixPixImg();
+    imgIcon.src = item.logo ? item.logo : WebLibSimple.getNixPixImg();
 
     var divSample = WebLibSimple.createDiv(64, 0, 0, null, "divSample", divOuter.divInner);
+    divSample.style.lineHeight = "54px";
     divSample.style.padding = "8px";
-    divSample.innerHTML = product.text;
+
+    if (item.isproduct)
+    {
+        divOuter.divInner.style.backgroundColor = "#eeeeee";
+        divSample.innerHTML = item.text;
+    }
+    else
+    {
+        divSample.style.fontSize = "32px";
+        divSample.innerHTML = item.store;
+    }
 
     var divKeywords = WebLibSimple.createDiv(64, null, 0, 0, "divKeywords", divOuter.divInner);
     WebLibSimple.setFontSpecs(divKeywords, 18, "normal", "#888888");
     divKeywords.style.padding = "8px";
-    divKeywords.innerHTML = "";
 
-    if (product.subtypetag)
+    //
+    // Pad a secondary padding div because otherwise
+    // the clickable area gets to small.
+    //
+
+    var divMore = divOuter.divMore = WebLibSimple.createAnyAppend("div", divOuter.divInner);
+    divMore.style.position = "absolute";
+    divMore.style.right = "0px";
+    divMore.style.top = "0px";
+    divMore.style.bottom = "0px";
+    divMore.style.width = "70px";
+
+    divMore.onTouchClick = shoppinglist.onClickMore;
+
+    divMore.divPadd = WebLibSimple.createAnyAppend("div", divMore);
+    divMore.divPadd.style.position = "absolute";
+    divMore.divPadd.style.right = "0px";
+    divMore.divPadd.style.top = "0px";
+    divMore.divPadd.style.bottom = "0px";
+    divMore.divPadd.style.margin = "20px";
+
+    divMore.imgMore = WebLibSimple.createAnyAppend("img", divMore.divPadd);
+    divMore.imgMore.style.position = "absolute";
+    divMore.imgMore.style.right = "0px";
+    divMore.imgMore.style.top = "0px";
+    divMore.imgMore.style.width = "auto";
+    divMore.imgMore.style.height = "100%";
+    divMore.imgMore.src = "arrow_more_270x270.png";
+
+    return divOuter;
+}
+
+shoppinglist.updateitemlist = function()
+{
+    var sl = shoppinglist;
+
+    sl.listDiv.innerHTML = "";
+
+    var laststore = null;
+
+    for (var pinx = 0; pinx < sl.itemlist.length; pinx++)
     {
-        //
-        // Subtypes with tags are folded.
-        //
+        item = sl.itemlist[ pinx ];
 
-        divOuter.divInner.style.backgroundColor = "#eeeeee";
-        divOuter.style.display = "none";
-    }
-    else
-    {
-        //
-        // Subtypes w/o tags have an unfold icon.
-        //
-
-        if (((inx + 1) < sl.intents.length) && sl.intents[ inx + 1 ].subtypetag)
+        if (item.isproduct)
         {
-            //
-            // Pad a secondary padding div because otherwise
-            // the clickable area gets to small.
-            //
+            if (item.storeobj.store != laststore)
+            {
+                item.storeobj.itemDiv = shoppinglist.createItemDiv(item.storeobj);
+                sl.listDiv.appendChild(item.storeobj.itemDiv);
+                sl.itemlist.splice(pinx++, 0, item.storeobj);
+            }
 
-            var divMore = divOuter.divMore = WebLibSimple.createAnyAppend("div", divOuter.divInner);
-            divMore.style.position = "absolute";
-            divMore.style.right = "0px";
-            divMore.style.top = "0px";
-            divMore.style.bottom = "0px";
-            divMore.style.width = "70px";
-
-            divMore.onTouchClick = voiceintents.onClickMore;
-            divMore.intentIndex = sl.intentDivs.length;
-
-            divMore.divPadd = WebLibSimple.createAnyAppend("div", divMore);
-            divMore.divPadd.style.position = "absolute";
-            divMore.divPadd.style.right = "0px";
-            divMore.divPadd.style.top = "0px";
-            divMore.divPadd.style.bottom = "0px";
-            divMore.divPadd.style.margin = "20px";
-
-            divMore.imgMore = WebLibSimple.createAnyAppend("img", divMore.divPadd);
-            divMore.imgMore.style.position = "absolute";
-            divMore.imgMore.style.right = "0px";
-            divMore.imgMore.style.top = "0px";
-            divMore.imgMore.style.width = "auto";
-            divMore.imgMore.style.height = "100%";
-            divMore.imgMore.src = "arrow_more_270x270.png";
+            laststore = item.storeobj.store;
         }
-    }
+        else
+        {
+            laststore = item.store;
+        }
 
-    sl.intentDivs.push(divOuter);
+        if (! item.itemDiv) item.itemDiv = shoppinglist.createItemDiv(item);
+        sl.listDiv.appendChild(item.itemDiv);
+    }
+}
+
+shoppinglist.addProduct = function(product)
+{
+    var sl = shoppinglist;
+
+    sl.itemlist.push(product);
+    sl.itemlist.sort(shoppinglist.sortCompare);
+
+    shoppinglist.updateitemlist();
+}
+
+shoppinglist.onClickMore = function(target)
+{
+    WebAppUtility.makeClick();
+
+    target.imgMore.src = "arrow_less_270x270.png";
+    target.onTouchClick = shoppinglist.onClickLess;
+
+    var sl = shoppinglist;
+    var product = target.product;
+}
+
+shoppinglist.onClickLess = function(target)
+{
+    WebAppUtility.makeClick();
+
+    target.imgMore.src = "arrow_more_270x270.png";
+    target.onTouchClick = shoppinglist.onClickMore;
+
+    var sl = shoppinglist;
+    var product = target.product;
 }
 
 shoppinglist.onClickAdd = function(target)

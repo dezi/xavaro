@@ -32,6 +32,99 @@
       "icon": "/webapps/shoppinglist/shoppinglist_512x512.png",
       "tag": "procure.query"
     }
+  ],
+
+  "intent.intro.keywords": [
+
+    "wir brauchen auch",
+    "wir brauchen noch",
+    "ich brauche auch",
+    "ich brauche noch",
+    "wir haben keinen",
+    "wir haben keine",
+    "ich habe keinen",
+    "ich habe keine",
+    "brauchen auch",
+    "brauchen noch",
+    "brauche auch",
+    "brauche noch",
+    "wir brauchen",
+    "ich brauche",
+    "einkaufen",
+    "bitte",
+    "mehr"
+
+  ],
+
+  "stores.defines": [
+
+    {
+      "store": "Supermarkt",
+      "logo": "logos/generic.super-market.png",
+      "sort": 50,
+      "keywords": [ "supermarkt" ]
+    },
+
+    {
+      "store": "Drogerie",
+      "logo": "logos/generic.drug-store.png",
+      "sort": 55,
+      "keywords": [ "drogerie" ]
+    },
+
+    {
+      "store": "Wochenmarkt",
+      "logo": "logos/generic.farmers-market.png",
+      "sort": 60,
+      "keywords": [ "wochenmarkt", "markt" ]
+    },
+
+    {
+      "store": "Schlachter",
+      "logo": "logos/generic.butcher.png",
+      "sort": 70,
+      "keywords": [ "schlachter" ]
+    },
+
+    {
+      "store": "Grünhöker",
+      "logo": "logos/generic.grocer.png",
+      "sort": 70,
+      "keywords": [
+        "grünhöker", "gemüsemann", "gemüsefrau", "gemüseladen", "türken"
+      ]
+    },
+
+    {
+      "store": "Fischgeschäft",
+      "logo": "logos/generic.fish-dealer.png",
+      "sort": 70,
+      "keywords": [
+        "fischhöker", "fischmann", "fisch mann", "fischfrau", "fisch frau",
+        "fischladen", "fischgeschäft"
+      ]
+    },
+
+    {
+      "store": "ALDI-Nord",
+      "logo": "logos/aldi-nord.de.png",
+      "sort": 100,
+      "keywords": [ "aldi", "aldi nord" ]
+    },
+
+    {
+      "store": "EDEKA",
+      "logo": "logos/edeka.de.png",
+      "sort": 100,
+      "keywords": [ "edeka" ]
+    }
+  ],
+
+  "stores.intro.keywords": [ "aus der", "von der", "auf dem", "aus dem", "von", "vom", "vonne", "im" ],
+
+  "product.synonyms": [
+
+    [ "Toilettenpapier", [ "toll papier", "toipapier", "klopapier", "klopier" ] ]
 
   ],
 
