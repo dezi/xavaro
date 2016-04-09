@@ -20,6 +20,7 @@ public class VoiceIntent
 
     private final JSONArray matches = new JSONArray();
 
+    private VoiceIntentRequester requester;
     private String command;
     private String intent;
 
@@ -84,7 +85,6 @@ public class VoiceIntent
             }
         }
     }
-
     @Nullable
     public static JSONObject getIntent(String key)
     {
@@ -158,6 +158,17 @@ public class VoiceIntent
     }
 
     //endregion static utilities
+
+    public void setRequester(VoiceIntentRequester requester)
+    {
+        this.requester = requester;
+    }
+
+    @Nullable
+    public VoiceIntentRequester getRequester()
+    {
+        return requester;
+    }
 
     @Nullable
     public String getCommand()

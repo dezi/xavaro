@@ -25,7 +25,7 @@ shoppinglist.createFrame = function()
     sl.queryResult = WebLibSimple.createAny("pre", 0, "60%", 0, 0, "queryResult", sl.topDiv);
     WebLibSimple.setFontSpecs(sl.queryResult, 12, "normal", "#000000");
 
-    var results = WebAppPrices.getQuery("Bärenmarke");
+    var results = WebAppPrices.getQuery("Blumenkohl");
     sl.queryResult.innerHTML = WebAppUtility.getPrettyJson(results);
 }
 

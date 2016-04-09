@@ -24,6 +24,8 @@ public class WebAppRequest
     private final WebView webview;
     private final WebAppLoader webapploader;
 
+    private VoiceIntentRequester requester;
+
     public WebAppRequest(String webappname, WebView webview, WebAppLoader webapploader)
     {
         this.webappname = webappname;
@@ -39,6 +41,13 @@ public class WebAppRequest
 
     public void doVoiceIntent(VoiceIntent intent, int index)
     {
+        //
+        // Remember voice requesting instance for
+        // a possible callback from client web app.
+        //
+
+        requester = intent.getRequester();
+
         //
         // Register fake callback function in case
         // webapp did not define one itself.
@@ -81,6 +90,20 @@ public class WebAppRequest
                 + "WebAppRequest.onBackkeyPressed();";
 
         webview.evaluateJavascript(cbscript, null);
+    }
+
+    @JavascriptInterface
+    public void requestVoiceIntent()
+    {
+        //
+        // Callback from javascript evalution.
+        //
+
+        if (requester != null)
+        {
+            requester.onRequestVoiceIntent();
+            requester = null;
+        }
     }
 
     @JavascriptInterface

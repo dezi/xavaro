@@ -20,8 +20,17 @@ public class Speak extends UtteranceProgressListener
         instance.addQueue(text);
     }
 
+    public static void speak(String text, SpeakDoneCallback callback)
+    {
+        if (instance == null) instance = new Speak();
+
+        instance.callback = callback;
+        instance.addQueue(text);
+    }
+
     private TextToSpeech ttspeech;
     private final ArrayList<String> texts = new ArrayList<>();
+    private SpeakDoneCallback callback;
     private boolean isInited;
 
     public Speak()
@@ -79,6 +88,12 @@ public class Speak extends UtteranceProgressListener
     {
         Log.d(LOGTAG,"onDone: " + text);
 
+        if (callback != null)
+        {
+            callback.OnSpeakDone(text);
+            callback = null;
+        }
+
         queueAll();
     }
 
@@ -86,5 +101,10 @@ public class Speak extends UtteranceProgressListener
     public void onError(String text)
     {
         Log.d(LOGTAG,"onError: " + text);
+    }
+
+    public interface SpeakDoneCallback
+    {
+        void OnSpeakDone(String text);
     }
 }

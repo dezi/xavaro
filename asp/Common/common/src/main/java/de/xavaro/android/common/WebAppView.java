@@ -138,7 +138,7 @@ public class WebAppView extends WebView
 
         if (permissions.contains("speak"))
         {
-            speak = new WebAppSpeak();
+            speak = new WebAppSpeak(this);
             addJavascriptInterface(speak, "WebAppSpeak");
         }
 

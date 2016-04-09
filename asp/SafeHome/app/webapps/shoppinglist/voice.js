@@ -32,8 +32,14 @@ WebAppRequest.onVoiceIntent = function(intent)
     //
 
     sl.answer = WebLibStrings.getFormat(sl.intent.answer, sl.cleancmd);
-    WebAppSpeak.speak(sl.answer);
+    WebAppSpeak.speak(sl.answer, true);
 
     console.log("WebAppRequest.onVoiceIntent: answer:" + sl.answer);
+}
 
+WebAppSpeak.onSpeakDone = function(text)
+{
+    console.log("WebAppSpeak.onSpeakDone: fettig:" + text);
+
+    WebAppRequest.requestVoiceIntent();
 }

@@ -21,9 +21,11 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.VoiceIntentRequester;
 import de.xavaro.android.common.VoiceIntentResolver;
 
-public class LaunchItemVoice extends LaunchItem implements RecognitionListener
+public class LaunchItemVoice extends LaunchItem implements
+        RecognitionListener, VoiceIntentRequester
 {
     private final static String LOGTAG = LaunchItemVoice.class.getSimpleName();
 
@@ -201,8 +203,29 @@ public class LaunchItemVoice extends LaunchItem implements RecognitionListener
             String response = Json.getString(match, "response");
             if (response != null) Speak.speak(response);
 
+            //
+            // Register for a new voice request to be
+            // fired from voice intent executor.
+            //
+
+            intent.setRequester(this);
+
+            //
+            // Resolve executing instance.
+            //
+
             ((VoiceIntentResolver) app).onExecuteVoiceIntent(intent, 0);
         }
+    }
+
+    @Override
+    public void onRequestVoiceIntent()
+    {
+        //
+        // Give user a little bit more time for next speech.
+        //
+        
+        getHandler().postDelayed(launchVoiceDelayed, 1000);
     }
 
     @Override
