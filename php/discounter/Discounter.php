@@ -25,6 +25,22 @@ function getRawdata()
 	}
 }
 
+function tuneTitle($title)
+{
+	$title = str_replace("0er", "0 Stück", $title);
+	$title = str_replace("1er", "1 Stück", $title);
+	$title = str_replace("2er", "2 Stück", $title);
+	$title = str_replace("3er", "3 Stück", $title);
+	$title = str_replace("4er", "4 Stück", $title);
+	$title = str_replace("5er", "5 Stück", $title);
+	$title = str_replace("6er", "6 Stück", $title);
+	$title = str_replace("7er", "7 Stück", $title);
+	$title = str_replace("8er", "8 Stück", $title);
+	$title = str_replace("9er", "9 Stück", $title);
+	
+	return $title;
+}
+
 function tuneCategory($category)
 {
 	if (! isset($GLOBALS[ "tunecat" ]))
@@ -194,6 +210,8 @@ function buildProducts(&$products)
 		$title = str_replace("  ", " ", $title);
 		$title = trim($title);
 	
+		$title = tuneTitle($title);
+		
 		//
 		// Get regular price.
 		//

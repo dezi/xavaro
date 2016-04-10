@@ -80,8 +80,8 @@ shoppinglist.sortCompare = function(a, b)
         astring += WebLibSimple.padNum(a.product.storeobj.sort,8) + "|";
         astring += a.product.storeobj.store + "|";
         astring += a.product.text + "|";
-        astring += shoppinglist.brandSortPrio(a.brand) + "|";
-        astring += a.text + "|";
+        //astring += shoppinglist.brandSortPrio(a.brand) + "|";
+        astring += a.basesort + "|";
     }
     else
     if (a.isproduct)
@@ -103,8 +103,8 @@ shoppinglist.sortCompare = function(a, b)
         bstring += WebLibSimple.padNum(b.product.storeobj.sort,8) + "|";
         bstring += b.product.storeobj.store + "|";
         bstring += b.product.text + "|";
-        bstring += shoppinglist.brandSortPrio(b.brand) + "|";
-        bstring += b.text + "|";
+        //bstring += shoppinglist.brandSortPrio(b.brand) + "|";
+        bstring += b.basesort + "|";
     }
     else
     if (b.isproduct)
@@ -143,10 +143,12 @@ shoppinglist.createItemDiv = function(item)
     divIcon.style.margin = "4px";
 
     var imgIcon = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", "imgIcon", divIcon);
-    imgIcon.src = item.logo ? item.logo : WebLibSimple.getNixPixImg();
 
-    var divSample = WebLibSimple.createDiv(64, 0, 0, null, "divSample", divOuter.divInner);
+    var divSample = WebLibSimple.createDiv(64, 0, 64, null, "divSample", divOuter.divInner);
+    divSample.style.overflow = "hidden";
     divSample.style.lineHeight = "54px";
+    divSample.style.whiteSpace = "nowrap";
+    divSample.style.textOverflow = "ellipsis";
     divSample.style.padding = "8px";
 
     var divKeywords = WebLibSimple.createDiv(64, null, 0, 0, "divKeywords", divOuter.divInner);
@@ -183,12 +185,13 @@ shoppinglist.createItemDiv = function(item)
     if (item.isprice)
     {
         divOuter.divInner.style.backgroundColor = "#eeeeee";
-        divSample.innerHTML = item.brand + " " + item.text;
+        divSample.innerHTML = item.displaytext;
         divSample.style.lineHeight = "40px";
-        divKeywords.innerHTML = shoppinglist.parsePrice(item.text, item.price);
+        divKeywords.innerHTML = item.displayprice;
         divKeywords.style.color = "#ff4444";
-        divMore.imgMore.src = "search_300x300.png";
+        divMore.imgMore.src = "arrow_pick_270x270.png";
         divMore.onTouchClick = shoppinglist.onClickPick;
+        imgIcon.src = item.icon ? item.icon :WebLibSimple.getNixPixImg();
     }
     else
     if (item.isproduct)
@@ -197,6 +200,7 @@ shoppinglist.createItemDiv = function(item)
         divSample.innerHTML = item.text;
         divMore.imgMore.src = "search_300x300.png";
         divMore.onTouchClick = shoppinglist.onClickSearch;
+        imgIcon.src = WebLibSimple.getNixPixImg();
     }
     else
     {
@@ -204,6 +208,7 @@ shoppinglist.createItemDiv = function(item)
         divSample.innerHTML = item.store;
         divMore.imgMore.src = "arrow_more_270x270.png";
         divMore.onTouchClick = shoppinglist.onClickMore;
+        imgIcon.src = item.logo ? item.logo : WebLibSimple.getNixPixImg();
     }
 
     divOuter.item = item;
@@ -220,25 +225,32 @@ shoppinglist.updateitemlist = function()
     sl.listDiv.innerHTML = "";
 
     var laststore = null;
+    var lastproduct = null;
 
     for (var pinx = 0; pinx < sl.itemlist.length; pinx++)
     {
         item = sl.itemlist[ pinx ];
 
+        if (item.isprice)
+        {
+        }
+        else
         if (item.isproduct)
         {
-            if (item.storeobj.store != laststore)
+            if (item.storeobj != laststore)
             {
                 item.storeobj.itemDiv = shoppinglist.createItemDiv(item.storeobj);
                 sl.listDiv.appendChild(item.storeobj.itemDiv);
                 sl.itemlist.splice(pinx++, 0, item.storeobj);
             }
 
-            laststore = item.storeobj.store;
+            laststore = item.storeobj;
+
+            lastproduct = item;
         }
         else
         {
-            laststore = item.store;
+            laststore = item;
         }
 
         if (! item.itemDiv) item.itemDiv = shoppinglist.createItemDiv(item);
@@ -286,7 +298,7 @@ shoppinglist.onClickSearch = function(target)
 
     var results = JSON.parse(WebAppPrices.getQuery(1, product.text));
 
-    if (results.length < 4)
+    if (results.length < 7)
     {
         var categories = [];
 
@@ -402,5 +414,7 @@ WebAppVoice.onResults = function(results)
 
 shoppinglist.createFrame();
 
+shoppinglist.addItem(shoppinglist.parseProduct("Batterien aus dem Aldi"));
 shoppinglist.addItem(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
+shoppinglist.addItem(shoppinglist.parseProduct("Kartoffeln aus dem Aldi"));
 shoppinglist.addItem(shoppinglist.parseProduct("Butter aus dem Penny"));

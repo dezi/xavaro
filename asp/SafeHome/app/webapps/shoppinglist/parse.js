@@ -1,11 +1,13 @@
-shoppinglist.parsePrice = function(producttext, pricetag)
+shoppinglist.parsePrice = function(price)
 {
-    var parts = pricetag.split("=");
-    if (parts.length != 2) return pricetag;
+    var display = "" + price;
 
-    var price = ((parseInt(parts[ 1 ]) / 100.0) + " €").replace(".", ",");
+    while (display.length < 3) display = "0" + display;
+    var displen = display.length;
 
-    return price;
+    display = display.substring(0, displen - 2) + "," + display.substring(displen - 2, displen);
+
+    return display + " €";
 }
 
 shoppinglist.parseRealProduct = function(product, line)
@@ -22,6 +24,69 @@ shoppinglist.parseRealProduct = function(product, line)
     price.brand   = parts[ 3 ];
     price.price   = parts[ 4 ];
     price.base    = parts[ 5 ];
+
+    if (price.base == "*") price.base = price.price;
+
+    //
+    // Adjust display values.
+    //
+
+    price.displaytext = price.text;
+
+    //
+    // Price formatting.
+    //
+
+    var parts = price.price.split("=");
+
+    if (parts.length == 2)
+    {
+        price.displayprice = shoppinglist.parsePrice(parts[ 1 ]);
+
+        var units  = parts[ 0 ].substring(parts[ 0 ].length - 2, parts[ 0 ].length);
+        var amount = parts[ 0 ].substring(0, parts[ 0 ].length - 2);
+
+        if ((price.text.indexOf(amount) < 0) && ! ((amount == "1") && (units == "st")))
+        {
+            if (units == "st") units = "Stück";
+
+            price.displaytext += " " + amount + " " + units;
+        }
+    }
+
+    //
+    // Base price formatting.
+    //
+
+    var parts = price.base.split("=");
+
+    if (parts.length == 2)
+    {
+        var cents  = parseInt(parts[ 1 ]);
+        var base   = shoppinglist.parsePrice(parts[ 1 ]);
+        var units  = parts[ 0 ].substring(parts[ 0 ].length - 2, parts[ 0 ].length);
+        var amount = parts[ 0 ].substring(0, parts[ 0 ].length - 2);
+
+        price.displayprice += " – " + amount + " " + units + " = " + base;
+
+        //
+        // Make sort to kilogramm or liter.
+        //
+
+        price.basesort = WebLibSimple.padNum(cents, 8);
+    }
+
+    if ((price.brand == "Eigenmarke") ||
+        (price.brand == "Hausmarke") ||
+        (price.brand == "Hausmarke Regional") ||
+        (price.brand == "-"))
+    {
+        price.icon = "cheap_320x320.png"
+    }
+    else
+    {
+        price.displaytext = price.brand + " " + price.displaytext;
+    }
 
     return price;
 }

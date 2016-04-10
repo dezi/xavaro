@@ -58,7 +58,7 @@ public class WebAppPrices
             query += "\\|" + Json.getString(catlist, inx) + "\\|";
         }
 
-        return getQuery(2, query);
+        return getQuery(3, query);
     }
 
     @JavascriptInterface
