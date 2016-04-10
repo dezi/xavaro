@@ -45,13 +45,29 @@ public class WebAppPrices
     }
 
     @JavascriptInterface
-    public String getQuery(String product)
+    public String getProducts(String categories)
+    {
+        JSONArray catlist = Json.fromStringArray(categories);
+        if (catlist == null) return "[]";
+
+        String query = "";
+
+        for (int inx = 0; inx < catlist.length(); inx++)
+        {
+            if (query.length() > 0) query += "|";
+            query += "\\|" + Json.getString(catlist, inx) + "\\|";
+        }
+
+        return getQuery(2, query);
+    }
+
+    @JavascriptInterface
+    public String getQuery(int recordtype, String query)
     {
         JSONArray json = new JSONArray();
 
-        Pattern pattern = Pattern.compile(product);
-
-        Log.d(LOGTAG,"===================" + product + "====");
+        Pattern pattern = Pattern.compile(query);
+        String recordstart = recordtype + "|";
 
         if (makeServer())
         {
@@ -98,9 +114,8 @@ public class WebAppPrices
                             while ((von > 0) && (chunk.charAt(von - 1) != '\n')) von--;
                             while ((bis < inbuf) && (chunk.charAt(bis) != '\n')) bis++;
 
-                            json.put(chunk.substring(von, bis));
-
-                            Log.d(LOGTAG, "====>" + chunk.substring(von, bis - 1));
+                            String line = chunk.substring(von, bis);
+                            if (line.startsWith(recordstart)) json.put(line);
                         }
 
                         //

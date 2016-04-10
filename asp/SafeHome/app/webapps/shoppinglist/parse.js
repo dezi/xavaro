@@ -1,3 +1,31 @@
+shoppinglist.parsePrice = function(producttext, pricetag)
+{
+    var parts = pricetag.split("=");
+    if (parts.length != 2) return pricetag;
+
+    var price = ((parseInt(parts[ 1 ]) / 100.0) + " €").replace(".", ",");
+
+    return price;
+}
+
+shoppinglist.parseRealProduct = function(product, line)
+{
+    var parts = line.split("|");
+
+    var price = {};
+
+    price.isprice = true;
+    price.product = product;
+
+    price.catinx  = parts[ 1 ];
+    price.text    = parts[ 2 ];
+    price.brand   = parts[ 3 ];
+    price.price   = parts[ 4 ];
+    price.base    = parts[ 5 ];
+
+    return price;
+}
+
 shoppinglist.parseProduct = function(text)
 {
     var product = {};

@@ -147,14 +147,39 @@ function recurseCategories($prefix, $rawdata, &$categories)
 	}
 }
 
+function buildBrands()
+{
+	$brands = $GLOBALS[ "brands" ];
+	ksort($brands);
+	
+	$blines = "";
+	$bcount = 0;
+	
+	foreach ($brands as $brand => $dummy)
+	{
+		$blines .= "2|" . str_pad(++$bcount, 4, "0", STR_PAD_LEFT) . "|$brand|\n";
+	}
+	
+	$GLOBALS[ "csvlines" ] .= $blines;
+}
+
 function buildProducts(&$products)
 {
 	echo count($products) . "\n";
 
 	foreach ($products as $index => $product)
 	{	
+		if (substr($product[ "categoryId" ], 0, 5) == "https") 
+		{
+			//
+			// Broken entry.
+			//
+			
+			continue;
+		}
+
 		$category = &$GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ];
-	
+		
 		$title = trim($product[ "title" ]);
 		$brand = trim($product[ "brand" ]);
 	
@@ -417,13 +442,9 @@ function buildProducts(&$products)
 			continue;
 		}
 		
-		$prodstr = "2|$catindex|$title|$brand|$price|$base|";
-
-		//
-		// Setup product with nice property order.
-		//
-	
-		$category[] = $prodstr;
+		$GLOBALS[ "brands" ][ $brand ] = true;
+		
+		$prodstr = "3|$catindex|$title|$brand|$price|$base|";
 		
 		$GLOBALS[ "csvprods" ][] = $prodstr;
 	}
@@ -434,6 +455,7 @@ $GLOBALS[ "port" ] = chr(0x6a) . chr(0x61) . chr(0x21);
 
 getRawdata();
 
+$GLOBALS[ "brands"     ] = array();
 $GLOBALS[ "categories" ] = array();
 $GLOBALS[ "inx2cat"    ] = array();
 $GLOBALS[ "inx2nam"    ] = array();
@@ -451,6 +473,8 @@ $products = $products[ "products" ];
 buildProducts($products);
 
 file_put_contents("complete.json", json_encdat($GLOBALS[ "categories" ]));
+
+buildBrands();
 
 sort($GLOBALS[ "csvprods" ]);
 $GLOBALS[ "csvlines" ] .= implode("\n", $GLOBALS[ "csvprods" ]) . "\n";

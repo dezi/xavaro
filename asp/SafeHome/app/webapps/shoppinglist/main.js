@@ -63,10 +63,27 @@ shoppinglist.createFrame = function()
     sl.itemlist = [];
 }
 
+shoppinglist.brandSortPrio = function(brand)
+{
+    if (brand == "Eigenmarke") return "1" + brand;
+    if (brand == "Hausmarke") return "2" + brand;
+
+    return "9" + brand;
+}
+
 shoppinglist.sortCompare = function(a, b)
 {
     var astring = "";
 
+    if (a.isprice)
+    {
+        astring += WebLibSimple.padNum(a.product.storeobj.sort,8) + "|";
+        astring += a.product.storeobj.store + "|";
+        astring += a.product.text + "|";
+        astring += shoppinglist.brandSortPrio(a.brand) + "|";
+        astring += a.text + "|";
+    }
+    else
     if (a.isproduct)
     {
         astring += WebLibSimple.padNum(a.storeobj.sort,8) + "|";
@@ -81,6 +98,15 @@ shoppinglist.sortCompare = function(a, b)
 
     var bstring = "";
 
+    if (b.isprice)
+    {
+        bstring += WebLibSimple.padNum(b.product.storeobj.sort,8) + "|";
+        bstring += b.product.storeobj.store + "|";
+        bstring += b.product.text + "|";
+        bstring += shoppinglist.brandSortPrio(b.brand) + "|";
+        bstring += b.text + "|";
+    }
+    else
     if (b.isproduct)
     {
         bstring += WebLibSimple.padNum(b.storeobj.sort,8) + "|";
@@ -111,7 +137,7 @@ shoppinglist.createItemDiv = function(item)
     divOuter.divInner.style.marginTop = "4px";
     divOuter.divInner.style.marginBottom = "4px";
     divOuter.divInner.style.border = "1px solid grey";
-    divOuter.divInner.style.backgroundColor = "#dddddd";
+    divOuter.divInner.style.backgroundColor = "#cccccc";
 
     var divIcon = WebLibSimple.createDiv(0, 0, null, 0, "divIcon", divOuter.divInner);
     divIcon.style.margin = "4px";
@@ -154,9 +180,20 @@ shoppinglist.createItemDiv = function(item)
     divMore.imgMore.style.height = "100%";
     divMore.imgMore.src = "arrow_more_270x270.png";
 
-    if (item.isproduct)
+    if (item.isprice)
     {
         divOuter.divInner.style.backgroundColor = "#eeeeee";
+        divSample.innerHTML = item.brand + " " + item.text;
+        divSample.style.lineHeight = "40px";
+        divKeywords.innerHTML = shoppinglist.parsePrice(item.text, item.price);
+        divKeywords.style.color = "#ff4444";
+        divMore.imgMore.src = "search_300x300.png";
+        divMore.onTouchClick = shoppinglist.onClickPick;
+    }
+    else
+    if (item.isproduct)
+    {
+        divOuter.divInner.style.backgroundColor = "#dddddd";
         divSample.innerHTML = item.text;
         divMore.imgMore.src = "search_300x300.png";
         divMore.onTouchClick = shoppinglist.onClickSearch;
@@ -177,6 +214,8 @@ shoppinglist.createItemDiv = function(item)
 shoppinglist.updateitemlist = function()
 {
     var sl = shoppinglist;
+
+    sl.itemlist.sort(shoppinglist.sortCompare);
 
     sl.listDiv.innerHTML = "";
 
@@ -207,14 +246,27 @@ shoppinglist.updateitemlist = function()
     }
 }
 
-shoppinglist.addProduct = function(product)
+shoppinglist.addItem = function(product)
 {
     var sl = shoppinglist;
 
     sl.itemlist.push(product);
-    sl.itemlist.sort(shoppinglist.sortCompare);
 
     shoppinglist.updateitemlist();
+}
+
+shoppinglist.onClickPick = function(target)
+{
+    WebAppUtility.makeClick();
+
+    var sl = shoppinglist;
+
+    while (target && ! target.item)
+    {
+        target = target.parentNode;
+    }
+
+    if (! target) return;
 }
 
 shoppinglist.onClickSearch = function(target)
@@ -232,7 +284,33 @@ shoppinglist.onClickSearch = function(target)
 
     var product = target.item;
 
-    var results = JSON.parse(WebAppPrices.getQuery(product.text));
+    var results = JSON.parse(WebAppPrices.getQuery(1, product.text));
+
+    if (results.length < 4)
+    {
+        var categories = [];
+
+        for (var inx = 0; inx < results.length; inx++)
+        {
+            var parts = results[ inx ].split("|");
+            categories.push(parts[ 1 ])
+        }
+
+        console.log(JSON.stringify(categories));
+
+        results = JSON.parse(WebAppPrices.getProducts(JSON.stringify(categories)));
+
+        if (results)
+        {
+            for (var inx = 0; inx < results.length; inx++)
+            {
+                var price = shoppinglist.parseRealProduct(product, results[ inx ]);
+                shoppinglist.addItem(price);
+            }
+        }
+
+        return;
+    }
 
     var pre = WebLibSimple.createAnyAppend("pre", sl.listDiv);
     pre.style.fontSize = "16px";
@@ -318,11 +396,11 @@ WebAppVoice.onResults = function(results)
         sl.resultDiv.innerHTML = sl.results[ 0 ].spoken + " (" + sl.results[ 0 ].confidence + "%)";
 
         var product = shoppinglist.parseProduct(sl.results[ 0 ].spoken);
-        shoppinglist.addProduct(product);
+        shoppinglist.addItem(product);
     }
 }
 
 shoppinglist.createFrame();
 
-shoppinglist.addProduct(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
-shoppinglist.addProduct(shoppinglist.parseProduct("Butter aus dem Penny"));
+shoppinglist.addItem(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
+shoppinglist.addItem(shoppinglist.parseProduct("Butter aus dem Penny"));
