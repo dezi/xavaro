@@ -1,4 +1,4 @@
-shoppinglist.parsePrice = function(price)
+shoppinglist.parseCents = function(price)
 {
     var display = "" + price;
 
@@ -8,6 +8,95 @@ shoppinglist.parsePrice = function(price)
     display = display.substring(0, displen - 2) + "," + display.substring(displen - 2, displen);
 
     return display + " €";
+}
+
+shoppinglist.parsePrice = function(price, base)
+{
+    var pelem = {};
+
+    var parts = price.split("=");
+    if (parts.length != 2) return pelem;
+
+    pelem.cents = parseInt(parts[ 1 ]);
+    pelem.units = "";
+
+    var work = parts[ 0 ];
+
+    if (work.substring(work.length - 2, work.length) == "st") pelem.units = "st";
+    if (work.substring(work.length - 2, work.length) == "kg") pelem.units = "kg";
+    if (work.substring(work.length - 2, work.length) == "ml") pelem.units = "ml";
+
+    if (pelem.units == "")
+    {
+        if (work.substring(work.length - 1, work.length) == "g") pelem.units = "g";
+        if (work.substring(work.length - 1, work.length) == "l") pelem.units = "l";
+    }
+
+    work = work.substring(0, work.length - pelem.units.length);
+
+    if (work.indexOf("x") >= 0)
+    {
+        parts = work.split("x");
+
+        pelem.multi  = parseInt(parts[ 0 ]);
+        pelem.amount = parseInt(parts[ 1 ]);
+    }
+    else
+    {
+        pelem.multi  = 1;
+        pelem.amount = parseInt(work);
+    }
+
+    //
+    // Normalize sort price to kilogramm or liter or 1000 pieces.
+    //
+
+    pelem.sortcents = pelem.cents;
+
+    if ((pelem.units == "st") || (pelem.units == "ml") || (pelem.units == "g"))
+    {
+        pelem.sortcents = Math.round((pelem.sortcents * 1000) / (pelem.multi * pelem.amount));
+    }
+
+    pelem.sortcents = WebLibSimple.padNum(pelem.sortcents, 8);
+
+    //
+    // Normalize base prize.
+    //
+
+    if (pelem.units == "st")
+    {
+        if (base && ((pelem.multi * pelem.amount) != 1))
+        {
+            pelem.cents  = Math.round((pelem.cents + 1) / (pelem.multi * pelem.amount));
+            pelem.multi  = 1;
+            pelem.amount = 1;
+        }
+
+        pelem.units = "Stück";
+    }
+
+    pelem.displaycents = shoppinglist.parseCents(pelem.cents);
+    pelem.displayamount = "";
+
+    if (pelem.multi != 1)
+    {
+        pelem.displayprice = pelem.multi + "x" + pelem.amount
+        pelem.displayamount = pelem.displayprice + " " + pelem.units;
+    }
+    else
+    {
+        pelem.displayprice = pelem.amount
+
+        if ((pelem.amount != 1) || (pelem.units != "Stück"))
+        {
+            pelem.displayamount = pelem.amount + " " + pelem.units;
+        }
+    }
+
+    pelem.displayprice += " " + pelem.units + " = " + pelem.displaycents;
+
+    return pelem;
 }
 
 shoppinglist.parseRealProduct = function(product, line)
@@ -28,53 +117,23 @@ shoppinglist.parseRealProduct = function(product, line)
     if (price.base == "*") price.base = price.price;
 
     //
+    // Price formatting.
+    //
+
+    price.baseobj = shoppinglist.parsePrice(price.base, true);
+    price.priceobj = shoppinglist.parsePrice(price.price, false);
+
+    price.basesort = price.baseobj.sortcents;
+    price.displayprice = price.priceobj.displaycents;
+    price.displayamount = price.priceobj.displayamount;
+
+    //
     // Adjust display values.
     //
 
     price.displaytext = price.text;
 
-    //
-    // Price formatting.
-    //
-
-    var parts = price.price.split("=");
-
-    if (parts.length == 2)
-    {
-        price.displayprice = shoppinglist.parsePrice(parts[ 1 ]);
-
-        var units  = parts[ 0 ].substring(parts[ 0 ].length - 2, parts[ 0 ].length);
-        var amount = parts[ 0 ].substring(0, parts[ 0 ].length - 2);
-
-        if ((price.text.indexOf(amount) < 0) && ! ((amount == "1") && (units == "st")))
-        {
-            if (units == "st") units = "Stück";
-
-            price.displaytext += " " + amount + " " + units;
-        }
-    }
-
-    //
-    // Base price formatting.
-    //
-
-    var parts = price.base.split("=");
-
-    if (parts.length == 2)
-    {
-        var cents  = parseInt(parts[ 1 ]);
-        var base   = shoppinglist.parsePrice(parts[ 1 ]);
-        var units  = parts[ 0 ].substring(parts[ 0 ].length - 2, parts[ 0 ].length);
-        var amount = parts[ 0 ].substring(0, parts[ 0 ].length - 2);
-
-        price.displayprice += " – " + amount + " " + units + " = " + base;
-
-        //
-        // Make sort to kilogramm or liter.
-        //
-
-        price.basesort = WebLibSimple.padNum(cents, 8);
-    }
+    if (price.displayamount != "") price.displaytext += " " + price.displayamount;
 
     if ((price.brand == "Eigenmarke") ||
         (price.brand == "Hausmarke") ||
@@ -87,6 +146,8 @@ shoppinglist.parseRealProduct = function(product, line)
     {
         price.displaytext = price.brand + " " + price.displaytext;
     }
+
+    price.displayprice = price.displayprice + " – " + price.baseobj.displayprice;
 
     return price;
 }

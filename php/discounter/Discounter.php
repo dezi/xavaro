@@ -218,7 +218,44 @@ function buildProducts(&$products)
 		//
 	
 		$cents = $product[ "regularPrice" ] ? $product[ "regularPrice" ] : $product[ "price" ];
+		
+		//
+		// Special Klopapier etc. cleanup.
+		//
+		
+		if (substr($title, -6) == " Blatt")
+		{
+			//
+			// Remove "blatt".
+			//
+			
+			$parts = explode(" ", $title);
+			unset($parts[ count($parts) - 1 ]);
+			
+			//
+			// Get and remove amount.
+			//
+		
+			$amount = $parts[ count($parts) - 1 ];
+			unset($parts[ count($parts) - 1 ]);
+			$title = implode(" ", $parts);
 
+			$parts = explode("x", $amount);
+			
+			if (count($parts) == 2)
+			{
+				$product[ "multi1"       ] = intVal($parts[ 0 ]);
+				$product[ "baseQuantity" ] = intVal($parts[ 1 ]);
+			}
+			else
+			{
+				$product[ "multi1"       ] = 1;
+				$product[ "baseQuantity" ] = intVal($parts[ 0 ]);
+			}
+
+			$product[ "quantityType" ] = "bl";
+		}
+	
 		//
 		// Derive quantity.
 		//
