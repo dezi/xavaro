@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import android.webkit.WebView;
@@ -50,6 +51,8 @@ public class WebAppPrices
 
         Pattern pattern = Pattern.compile(product);
 
+        Log.d(LOGTAG,"===================" + product + "====");
+
         if (makeServer())
         {
             String url = "http://" + webappserver + "/prodata/proprices.de-rDE.csv.gzbin";
@@ -96,6 +99,8 @@ public class WebAppPrices
                             while ((bis < inbuf) && (chunk.charAt(bis) != '\n')) bis++;
 
                             json.put(chunk.substring(von, bis));
+
+                            Log.d(LOGTAG, "====>" + chunk.substring(von, bis - 1));
                         }
 
                         //

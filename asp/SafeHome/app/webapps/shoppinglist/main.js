@@ -169,6 +169,8 @@ shoppinglist.createItemDiv = function(item)
         divMore.onTouchClick = shoppinglist.onClickMore;
     }
 
+    divOuter.item = item;
+
     return divOuter;
 }
 
@@ -220,9 +222,22 @@ shoppinglist.onClickSearch = function(target)
     WebAppUtility.makeClick();
 
     var sl = shoppinglist;
-    var product = target.item;
-}
 
+    while (target && ! target.item)
+    {
+        target = target.parentNode;
+    }
+
+    if (! target) return;
+
+    var product = target.item;
+
+    var results = JSON.parse(WebAppPrices.getQuery(product.text));
+
+    var pre = WebLibSimple.createAnyAppend("pre", sl.listDiv);
+    pre.style.fontSize = "16px";
+    pre.innerHTML = results.join("\n");
+}
 
 shoppinglist.onClickMore = function(target)
 {
@@ -306,4 +321,8 @@ WebAppVoice.onResults = function(results)
         shoppinglist.addProduct(product);
     }
 }
+
 shoppinglist.createFrame();
+
+shoppinglist.addProduct(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
+shoppinglist.addProduct(shoppinglist.parseProduct("Butter aus dem Penny"));

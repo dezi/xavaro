@@ -10,6 +10,8 @@ shoppinglist.parseProduct = function(text)
 
     shoppinglist.replaceSynonyms(product);
 
+    product.text = product.text.trim();
+
     return product;
 }
 

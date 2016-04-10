@@ -25,24 +25,121 @@ function getRawdata()
 	}
 }
 
+function tuneCategory($category)
+{
+	if (! isset($GLOBALS[ "tunecat" ]))
+	{
+		$GLOBALS[ "tunecat" ] = array(
+			"Weitere Bereiche" => "Sonstiges",
+			"Grill- & Ofenkäse" => "Grillkäse & Ofenkäse",
+			"Schmelz- & Sandwichkäse" => "Schmelzkäse & Sandwichkäse",
+			"Brüh- & Bratwurst" => "Brühwurst & Bratwurst",
+			"Koch- & Rotwurst" => "Kochwurst & Rotwurst",
+			"Schnitt- & Stückkäse" => "Schnittkäse & Stückkäse",
+			"Stiel- & Waffeleis" => "Stieleis & Waffeleis",
+			"Wasser- & Fruchteis" => "Wassereis & Fruchteis",
+			"Fischburger & -frikadellen" => "Fischburger & Fischfrikadellen",
+			"Ofen- & Bratkartoffeln" => "Ofenkartoffeln & Bratkartoffeln",
+			"Sahnerollen & -schnitten" => "Sahnerollen & Sahneschnitten",
+			"Back- & Teigwaren" => "Backwaren & Teigwaren",
+			"Nuss- & Schokoaufstrich" => "Nussaufstrich & Schokoaufstrich",
+			"Kräuter- & Früchtetee" => "Kräutertee & Früchtetee",
+			"Bechergerichte & -suppen" => "Bechergerichte & Bechersuppen",
+			"Erbsen- & Linsentopf" => "Erbsentopf & Linsentopf",
+			"Fleisch- & Wurstkonserven" => "Fleischkonserven & Wurstkonserven",
+			"Fleisch- & Grillgewürze" => "Fleischgewürze & Grillgewürze",
+			"Fleisch- & Geflügelsoßen" => "Fleischsoßen & Geflügelsoßen",
+			"Gemüse- & Fischsoßen" => "Gemüsesoßen & Fischsoßen",
+			"Brat- & Pflanzenöl" => "Bratöl & Pflanzenöl",
+			"Mais- & Reiswaffeln" => "Maiswaffeln & Reiswaffeln",
+			"Karamell- & Schokobonbons" => "Karamellbonbons & Schokobonbons",
+			"Kräuter- & Hustenbonbons" => "Kräuterbonbons & Hustenbonbons",
+			"Bier & -mischgetränke" => "Bier & Biermischgetränke",
+			"Alt- & Schwarzbier" => "Altbier & Schwarzbier",
+			"Bock- & Starkbier" => "Bockbier & Starkbier",
+			"Mix- & Bittergetränke" => "Mixgetränke & Bittergetränke",
+			"Energy- & Sportgetränke" => "Energygetränke & Sportgetränke",
+			"Spirituosen & -mischgetränke" => "Spirituosen & Spirituosenmischgetränke",
+			"Wein, Fruchtwein & -mischgetränke" => "Wein, Fruchtwein & Weinmischgetränke",
+			"Milch- & Getreidebreie" => "Milchbreie & Getreidebreie",
+			"Trinksauger & -tüllen" => "Trinksauger & Trinktüllen",
+			"Bratbeutel & -schläuche" => "Bratbeutel & Bratschläuche",
+			"Thermoskannen & -becher" => "Thermoskannen & Thermosbecher",
+			"Bodenreiniger & -pflege" => "Bodenreiniger & Bodenpflege",
+			"Glas- & Fensterreiniger" => "Glasreiniger & Fensterreiniger",
+			"Möbelglanz & -pflege" => "Möbelglanz & Möbelpflege",
+			"Gummi- & Arbeitshandschuhe" => "Gummihandschuhe & Arbeitshandschuhe",
+			"WC-Steine & -gele" => "WC-Steine & WC-Gele",
+			"Spülbürsten & -schwämme" => "Spülbürsten & Spülschwämme",
+			"Fein- & Wollwaschmittel" => "Feinwaschmittel & Wollwaschmittel",
+			"Verhütungs- & Gleitmittel" => "Verhütungsmittel & Gleitmittel",
+			"Haargummis & -spangen" => "Haargummis & Haarspangen",
+			"Haaröl & -wasser" => "Haaröl & Haarwasser",
+			"Körperpflege & -reinigung" => "Körperpflege & Körperreinigung",
+			"Hand-, Fuß- & Nagelpflege" => "Handpflege, Fußpflege & Nagelpflege",
+			"Körperbutter & -öle" => "Körperbutter & Körperöle",
+			"Körperlotion & -milch" => "Körperlotion & Körpermilch",
+			"Rasierschaum & -gel" => "Rasierschaum & Rasiergel",
+			"Papier- & Hygieneartikel" => "Papierartikel & Hygieneartikel",
+			"Kosmetik- & Taschentücher" => "Kosmetiktücher & Taschentücher",
+			"Zahn- & Mundpflege" => "Zahnpflege & Mundpflege",
+			"Nager- & Kleintierfutter" => "Nagerfutter & Kleintierfutter"
+		);
+	}
+	
+	$category = trim(str_replace("**","", $category));
+
+	if (isset($GLOBALS[ "tunecat" ][ $category ]))
+	{
+		$category = $GLOBALS[ "tunecat" ][ $category ];
+	}
+	
+	return $category;
+}
+
+function addCategoryToCSV($catpath,$catindex)
+{
+	$GLOBALS[ "csvlines" ] .= "1"
+		. "|" 
+		. str_pad($catindex, 4, "0", STR_PAD_LEFT)
+		. "|" 
+		. str_replace(" => ", "|", $catpath)
+		. "\n";
+}
+
 function recurseCategories($prefix, $rawdata, &$categories)
 {
 	foreach ($rawdata as $index => $dummy)
 	{
 		if ($rawdata[ $index ][ "name" ] == "Treuepunkt-Aktion") continue;
 		
-		echo $prefix . " => " . $rawdata[ $index ][ "name" ] .  "\n";
+		$category = tuneCategory($rawdata[ $index ][ "name" ]);
+		
+		if ((strpos($category, "- &") !== false) ||
+			(strpos($category, "& -") !== false))
+		{
+			echo $category . " => " . $category . "\n";
+		}
+		
+		$catpath = ($prefix ? ($prefix . " => ") : "") . $category;
+		
+		echo $catpath .  "\n";
 		
 		$categories[ $index ] = array();
-		$categories[ $index ][ "name" ] = $rawdata[ $index ][ "name" ];
+		$categories[ $index ][ "name" ] = $category;
 		$categories[ $index ][ "items" ] = array();
 		
+		$GLOBALS[ "cat2inx" ][ $catpath ] = count($GLOBALS[ "cat2inx" ]) + 1;
+		$GLOBALS[ "inx2inx" ][ $rawdata[ $index ][ "id" ] ] = $GLOBALS[ "cat2inx" ][ $catpath ];
+		
 		$GLOBALS[ "inx2cat" ][ $rawdata[ $index ][ "id" ] ] = &$categories[ $index ][ "items" ];
-		$GLOBALS[ "inx2nam" ][ $rawdata[ $index ][ "id" ] ] = &$categories[ $index ][ "name" ];
+		$GLOBALS[ "inx2nam" ][ $rawdata[ $index ][ "id" ] ] = $category;
+		
+		addCategoryToCSV($catpath, $GLOBALS[ "cat2inx" ][ $catpath ]);
 
 		if (isset($rawdata[ $index ][ "childCategories" ]))
 		{
-			$nextpref = $prefix . " => " . $rawdata[ $index ][ "name" ];
+			$nextpref = ($prefix ? ($prefix . " => ") : "") . $category;
 
 			recurseCategories($nextpref, $rawdata[ $index ][ "childCategories" ], $categories[ $index ][ "items" ]);
 		}
@@ -337,11 +434,17 @@ getRawdata();
 $GLOBALS[ "categories" ] = array();
 $GLOBALS[ "inx2cat"    ] = array();
 $GLOBALS[ "inx2nam"    ] = array();
+$GLOBALS[ "cat2inx"    ] = array();
+$GLOBALS[ "inx2inx"    ] = array();
 $GLOBALS[ "csvprods"   ] = array();
+$GLOBALS[ "csvlines"   ] = "";
 
 $rawcats = json_decdat(file_get_contents("categories.json"));
 $rawcats = $rawcats[ "topLevelCategories" ];
-recurseCategories("", $rawcats, $GLOBALS[ "categories" ]);
+recurseCategories(null, $rawcats, $GLOBALS[ "categories" ]);
+
+echo $GLOBALS[ "csvlines" ];
+exit(0);
 
 $products = json_decdat(file_get_contents("products.json"));
 $products = $products[ "products" ];
