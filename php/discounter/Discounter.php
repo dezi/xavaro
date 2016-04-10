@@ -403,6 +403,7 @@ function buildProducts(&$products)
 		if (($brand == "Hausmarke Bio") && (strpos(strtolower($title), "bio") === false))
 		{
 			$title = "Bio " . $title;
+			$brand = "Hausmarke";
 		}
 		
 		if (substr($title, 0, 1) == "-" ) $title = $brand . $title;
