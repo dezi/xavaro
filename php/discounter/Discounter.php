@@ -204,6 +204,7 @@ function buildProducts(&$products)
 			$title = trim(substr($title, strlen($brand)));
 		}
 	
+		$title = str_replace(",4er", " 4er", $title);
 		$title = str_replace("\"", "", $title);
 		$title = str_replace(" %", "%", $title);
 		$title = str_replace("   ", " ", $title);
