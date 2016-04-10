@@ -401,8 +401,8 @@ function buildProducts(&$products)
 		if (strtolower($brand) == "marke noch nicht gesetzt") $brand = "-";
 		if (strtolower($brand) == "j | hettinger") $brand = "J. Hettinger";
 		if (strtolower($brand) == "hausmarke beste wahl") $brand = "Hausmarke";
-		
-		if (strtolower($brand) == "hausmarke beste wahl") $brand = "Hausmarke";
+		if (strtolower($brand) == "vivess") $brand = "Hausmarke";
+		if (strtolower($brand) == "today") $brand = "Hausmarke";
 		
 		//
 		// Tune price and base.

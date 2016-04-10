@@ -45,10 +45,22 @@ public class WebAppPrices
     }
 
     @JavascriptInterface
-    public String getProducts(String categories)
+    public String getProducts(String product)
+    {
+        return getQuery(3, product);
+    }
+
+    @JavascriptInterface
+    public String getCategories(String product)
+    {
+        return getQuery(1, product);
+    }
+
+    @JavascriptInterface
+    public String getProductsFromCategories(String categories)
     {
         JSONArray catlist = Json.fromStringArray(categories);
-        if (catlist == null) return "[]";
+        if ((catlist == null) || (catlist.length() == 0)) return "[]";
 
         String query = "";
 
@@ -61,8 +73,7 @@ public class WebAppPrices
         return getQuery(3, query);
     }
 
-    @JavascriptInterface
-    public String getQuery(int recordtype, String query)
+    private String getQuery(int recordtype, String query)
     {
         JSONArray json = new JSONArray();
 

@@ -296,7 +296,23 @@ shoppinglist.onClickSearch = function(target)
 
     var product = target.item;
 
-    var results = JSON.parse(WebAppPrices.getQuery(1, product.text));
+    var results = JSON.parse(WebAppPrices.getCategories(product.text));
+
+    if (results.length == 0)
+    {
+        results = JSON.parse(WebAppPrices.getProducts(product.text));
+
+        if (results)
+        {
+            for (var inx = 0; inx < results.length; inx++)
+            {
+                var price = shoppinglist.parseRealProduct(product, results[ inx ]);
+                shoppinglist.addItem(price);
+            }
+        }
+
+        return;
+    }
 
     if (results.length < 7)
     {
@@ -310,7 +326,7 @@ shoppinglist.onClickSearch = function(target)
 
         console.log(JSON.stringify(categories));
 
-        results = JSON.parse(WebAppPrices.getProducts(JSON.stringify(categories)));
+        results = JSON.parse(WebAppPrices.getProductsFromCategories(JSON.stringify(categories)));
 
         if (results)
         {

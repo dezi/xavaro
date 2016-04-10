@@ -22,6 +22,7 @@ shoppinglist.parsePrice = function(price, base)
 
     var work = parts[ 0 ];
 
+    if (work.substring(work.length - 2, work.length) == "bl") pelem.units = "bl";
     if (work.substring(work.length - 2, work.length) == "st") pelem.units = "st";
     if (work.substring(work.length - 2, work.length) == "kg") pelem.units = "kg";
     if (work.substring(work.length - 2, work.length) == "ml") pelem.units = "ml";
@@ -53,7 +54,8 @@ shoppinglist.parsePrice = function(price, base)
 
     pelem.sortcents = pelem.cents;
 
-    if ((pelem.units == "st") || (pelem.units == "ml") || (pelem.units == "g"))
+    if ((pelem.units == "bl") || (pelem.units == "st") ||
+        (pelem.units == "ml") || (pelem.units == "g"))
     {
         pelem.sortcents = Math.round((pelem.sortcents * 1000) / (pelem.multi * pelem.amount));
     }
@@ -61,20 +63,30 @@ shoppinglist.parsePrice = function(price, base)
     pelem.sortcents = WebLibSimple.padNum(pelem.sortcents, 8);
 
     //
-    // Normalize base prize.
+    // Normalize base prizes.
     //
 
-    if (pelem.units == "st")
+
+    if (base && ((pelem.units == "st") || (pelem.units == "bl")))
     {
-        if (base && ((pelem.multi * pelem.amount) != 1))
+        var itemcents = Math.round((pelem.cents + 1) / (pelem.multi * pelem.amount));
+
+        if (itemcents >= 15)
         {
-            pelem.cents  = Math.round((pelem.cents + 1) / (pelem.multi * pelem.amount));
+            pelem.cents  = itemcents;
             pelem.multi  = 1;
             pelem.amount = 1;
         }
-
-        pelem.units = "Stück";
+        else
+        {
+            pelem.cents  = Math.round((pelem.cents * 100) / (pelem.multi * pelem.amount));
+            pelem.multi  = 1;
+            pelem.amount = 100;
+        }
     }
+
+    if (pelem.units == "st") pelem.units = "Stück";
+    if (pelem.units == "bl") pelem.units = "Blatt";
 
     pelem.displaycents = shoppinglist.parseCents(pelem.cents);
     pelem.displayamount = "";
@@ -272,7 +284,7 @@ shoppinglist.parseStore = function(product)
 
                     product.storeobj = stores[ stinx ];
 
-                    console.log("shoppinglist.parseStore: " + product.storeobj.name + " => " + product.text);
+                    console.log("shoppinglist.parseStore: " + product.storeobj.store + " => " + product.text);
 
                     return;
                 }
