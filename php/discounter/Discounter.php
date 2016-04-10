@@ -104,6 +104,7 @@ function addCategoryToCSV($catpath,$catindex)
 		. str_pad($catindex, 4, "0", STR_PAD_LEFT)
 		. "|" 
 		. str_replace(" => ", "|", $catpath)
+		. "|" 
 		. "\n";
 }
 
@@ -196,7 +197,9 @@ function buildProducts(&$products)
 	
 		if (isset($GLOBALS[ "inx2nam" ][ $product[ "categoryId" ] ]))
 		{
-			$catname = $GLOBALS[ "inx2nam" ][ $product[ "categoryId" ] ];
+			$catname  = $GLOBALS[ "inx2nam" ][ $product[ "categoryId" ] ];
+			$catindex = $GLOBALS[ "inx2inx" ][ $product[ "categoryId" ] ];
+			$catindex = str_pad($catindex, 4, "0", STR_PAD_LEFT);
 		}
 		else
 		{
@@ -414,7 +417,7 @@ function buildProducts(&$products)
 			continue;
 		}
 		
-		$prodstr = "$catname|$title|$brand|$price|$base";
+		$prodstr = "2|$catindex|$title|$brand|$price|$base|";
 
 		//
 		// Setup product with nice property order.
@@ -443,9 +446,6 @@ $rawcats = json_decdat(file_get_contents("categories.json"));
 $rawcats = $rawcats[ "topLevelCategories" ];
 recurseCategories(null, $rawcats, $GLOBALS[ "categories" ]);
 
-echo $GLOBALS[ "csvlines" ];
-exit(0);
-
 $products = json_decdat(file_get_contents("products.json"));
 $products = $products[ "products" ];
 buildProducts($products);
@@ -453,9 +453,11 @@ buildProducts($products);
 file_put_contents("complete.json", json_encdat($GLOBALS[ "categories" ]));
 
 sort($GLOBALS[ "csvprods" ]);
-$csvlines = implode("\n", $GLOBALS[ "csvprods" ]) . "\n";
-file_put_contents("complete.csv", $csvlines);
+$GLOBALS[ "csvlines" ] .= implode("\n", $GLOBALS[ "csvprods" ]) . "\n";
+file_put_contents("complete.csv", $GLOBALS[ "csvlines" ]);
 
-file_put_contents("../../var/prodata/proprices.de-rDE.csv.gzbin", gzencode($csvlines, 9));
+$datafile = "../../var/prodata/proprices.de-rDE.csv.gzbin";
+file_put_contents($datafile . ".tmp", gzencode($GLOBALS[ "csvlines" ], 9));
+rename($datafile . ".tmp", $datafile);
 ?>
 
