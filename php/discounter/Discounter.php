@@ -46,6 +46,7 @@ function tuneCategory($category)
 	if (! isset($GLOBALS[ "tunecat" ]))
 	{
 		$GLOBALS[ "tunecat" ] = array(
+			"Kartoffelbeutel" => "Kartoffeln im Beutel",
 			"Weitere Bereiche" => "Sonstiges",
 			"Grill- & Ofenkäse" => "Grillkäse & Ofenkäse",
 			"Schmelz- & Sandwichkäse" => "Schmelzkäse & Sandwichkäse",
