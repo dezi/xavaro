@@ -252,12 +252,14 @@ shoppinglist.parseQuantity = function(product)
 
     var text = product.text.toLowerCase();
 
+    product.quantunit = "st";
+    product.quantphrase = "x";
+    product.quantmulti = 1;
+    product.quantity = 1;
+
     //
     // Get units from phrase.
     //
-
-    product.quantunit = "st";
-    product.quantmulti = 1;
 
     var units = WebLibStrings.strings[ "quantity.units" ];
 
@@ -271,14 +273,29 @@ shoppinglist.parseQuantity = function(product)
 
             if (pos >= 0)
             {
-                product.text = product.text.substring(0, pos).trim()
+                product.quantunit   = units[ uinx ].unit;
+                product.quantmulti  = units[ uinx ].multi ? units[ uinx ].multi : 1;
+                product.quantphrase = units[ uinx ].phrase;
+
+                //
+                // Inspect phrase before unit for numeric values.
+                //
+
+                var numcheck = product.text.substring(0, pos).trim().split(" ");
+                var number = parseInt(numcheck[ numcheck.length - 1 ]);
+
+                if (! isNaN(number))
+                {
+                    product.quantity = number;
+
+                    numcheck.pop();
+                }
+
+                product.text = numcheck.join(" ")
                              + " "
                              + product.text.substring(pos + len).trim();
 
                 text = product.text.toLowerCase();
-
-                product.quantunit  = units[ uinx ].unit;
-                product.quantmulti = units[ uinx ].multi ? units[ uinx ].multi : 1;
             }
         }
     }
@@ -286,8 +303,6 @@ shoppinglist.parseQuantity = function(product)
     //
     // Get multiple quantities from phrase.
     //
-
-    product.quantity = 1;
 
     var amount = WebLibStrings.strings[ "quantity.amount" ];
 
@@ -312,7 +327,51 @@ shoppinglist.parseQuantity = function(product)
         }
     }
 
-    product.text += " (" + product.quantity + " x " + product.quantmulti + " x " + product.quantunit + ")";
+    //
+    // Normalize quantities.
+    //
+
+    product.quantity *= product.quantmulti;
+    product.quantmulti = 1;
+
+    if ((product.quantunit == "kg") && (product.quantity <= 0.25))
+    {
+        product.quantity = product.quantity * 1000;
+        product.quantmulti = 1;
+        product.quantunit = "g";
+    }
+
+    if ((product.quantunit == "g") && (product.quantity >= 1000))
+    {
+        product.quantity = product.quantity / 1000;
+        product.quantmulti = 1;
+        product.quantunit = "kg";
+    }
+
+    if ((product.quantunit == "l") && (product.quantity <= 0.25))
+    {
+        product.quantity = product.quantity * 1000;
+        product.quantmulti = 1;
+        product.quantunit = "ml";
+    }
+
+    if ((product.quantunit == "ml") && (product.quantity >= 1000))
+    {
+        product.quantity = product.quantity / 1000;
+        product.quantmulti = 1;
+        product.quantunit = "kg";
+    }
+
+    if (product.quantunit == "st")
+    {
+        if (product.quantphrase = "Pack") product.quantphrase = "x";
+        
+        product.displayquant = product.quantity + " " + product.quantphrase;
+    }
+    else
+    {
+        product.displayquant = product.quantity + " " + product.quantunit;
+    }
 }
 
 shoppinglist.stripIntro = function(product)

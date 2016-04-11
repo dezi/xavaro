@@ -62,12 +62,19 @@
 
   "quantity.units": [
 
+    { "unit": "st", "phrase": "x" },
     { "unit": "st", "phrase": "Stück" },
+    { "unit": "st", "phrase": "Stücke" },
     { "unit": "st", "phrase": "Paket" },
+    { "unit": "st", "phrase": "Pakete" },
     { "unit": "st", "phrase": "Netz" },
+    { "unit": "st", "phrase": "Netze" },
     { "unit": "st", "phrase": "Beutel" },
+    { "unit": "st", "phrase": "Packungen" },
     { "unit": "st", "phrase": "Packung" },
+    { "unit": "st", "phrase": "Pack" },
     { "unit": "st", "phrase": "Kiste" },
+    { "unit": "st", "phrase": "Kisten" },
 
     { "unit": "g",  "phrase": "Gramm" },
 
@@ -82,34 +89,76 @@
 
   "quantity.amount": [
 
-    { "amount": 4,  "phrase": "Zweierpack" },
-    { "amount": 4,  "phrase": "Viererpack" },
-    { "amount": 6,  "phrase": "Sechserpack" },
-    { "amount": 8,  "phrase": "Achterpack" },
-    { "amount": 6,  "phrase": "Sixpack" },
+    { "amount":  1, "phrase": "Einerpack" },
+    { "amount":  2, "phrase": "Zweierpack" },
+    { "amount":  3, "phrase": "Dreierpack" },
+    { "amount":  4, "phrase": "Viererpack" },
+    { "amount":  5, "phrase": "Fünferpack" },
+    { "amount":  6, "phrase": "Sechserpack" },
+    { "amount":  8, "phrase": "Achterpack" },
+    { "amount": 10, "phrase": "Zehnerpack" },
+    { "amount":  6, "phrase": "Sixpack" },
     { "amount": 12, "phrase": "Dutzend" },
     { "amount": 60, "phrase": "Schock" },
 
-    { "amount": 1,    "phrase": "ein ganzes" },
-    { "amount": 0.5,  "phrase": "ein halbes" },
-    { "amount": 0.25, "phrase": "ein viertel" },
+    { "amount":  1, "phrase": "einer" },
+    { "amount":  2, "phrase": "zweier" },
+    { "amount":  3, "phrase": "dreier" },
+    { "amount":  4, "phrase": "vierer" },
+    { "amount":  5, "phrase": "fünfer" },
+    { "amount":  6, "phrase": "sechser" },
+    { "amount":  7, "phrase": "siebener" },
+    { "amount":  8, "phrase": "achter" },
+    { "amount":  9, "phrase": "neuner" },
+    { "amount": 10, "phrase": "zehner" },
 
-    { "amount": 1, "phrase": "ein" },
-    { "amount": 1, "phrase": "eine" },
-    { "amount": 1, "phrase": "einen" },
-    { "amount": 1, "phrase": "eines" },
+    { "amount": 1,    "phrase": "ganzes" },
+    { "amount": 1,    "phrase": "ganze" },
+    { "amount": 0.5,  "phrase": "halbes" },
+    { "amount": 0.5,  "phrase": "halben" },
+    { "amount": 0.5,  "phrase": "halbe" },
+    { "amount": 0.25, "phrase": "viertel" },
 
-    { "amount": 2, "phrase": "zwei" },
-    { "amount": 3, "phrase": "drei" },
-    { "amount": 4, "phrase": "vier" },
-    { "amount": 5, "phrase": "fünf" },
-    { "amount": 6, "phrase": "sechs" },
-    { "amount": 7, "phrase": "sieben" },
-    { "amount": 8, "phrase": "acht" },
-    { "amount": 9, "phrase": "neun" },
+    { "amount": 1, "phrase": "einmal" },
+    { "amount": 2, "phrase": "zweimal" },
+    { "amount": 3, "phrase": "dreimal" },
+    { "amount": 4, "phrase": "viermal" },
+    { "amount": 5, "phrase": "fünfmal" },
+    { "amount": 6, "phrase": "sechsmal" },
+    { "amount": 7, "phrase": "siebenmal" },
+    { "amount": 8, "phrase": "achtmal" },
+    { "amount": 9, "phrase": "neunmal" },
+
+    { "amount":  1, "phrase": "einen" },
+    { "amount":  1, "phrase": "eines" },
+    { "amount":  1, "phrase": "eine" },
+    { "amount":  1, "phrase": "ein" },
+
+    { "amount":  2, "phrase": "zwei" },
+    { "amount":  3, "phrase": "drei" },
+    { "amount":  4, "phrase": "vier" },
+    { "amount":  5, "phrase": "fünf" },
+    { "amount":  6, "phrase": "sechs" },
+    { "amount":  7, "phrase": "sieben" },
+    { "amount":  8, "phrase": "acht" },
+    { "amount":  9, "phrase": "neun" },
     { "amount": 10, "phrase": "zehn" },
     { "amount": 11, "phrase": "elf" },
     { "amount": 12, "phrase": "zwölf" }
+
+  ],
+
+  "stores.intro.keywords": [
+    "aus der", "auf der", "aus dem", "auf dem", "aus den", "auf den",
+    "von der", "von dem", "von den", "vonne", "von", "vom",
+    "im"
+  ],
+
+  "product.synonyms": [
+
+    [ "Ouzo", [ "umso", "udo", "uwe" ] ],
+
+    [ "Toilettenpapier", [ "toll papier", "toipapier", "klopapier", "klopier" ] ]
 
   ],
 
@@ -286,18 +335,6 @@
       "sort": 500,
       "keywords": [ "hornbach baumarkt", "hornbach" ]
     }
-
-  ],
-
-  "stores.intro.keywords": [
-    "aus der", "auf der", "aus dem", "auf dem", "aus den", "auf den",
-    "von der", "von dem", "von den", "vonne", "von", "vom",
-    "im"
-  ],
-
-  "product.synonyms": [
-
-    [ "Toilettenpapier", [ "toll papier", "toipapier", "klopapier", "klopier" ] ]
 
   ],
 

@@ -212,7 +212,7 @@ shoppinglist.createItemDiv = function(item)
         }
         else
         {
-            divSample.innerHTML = item.text;
+            divSample.innerHTML = item.displayquant + " " + item.text;
             imgIcon.src =  "multi_320x320.png";
         }
    }
