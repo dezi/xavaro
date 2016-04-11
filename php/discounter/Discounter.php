@@ -113,17 +113,6 @@ function tuneCategory($category)
 	return $category;
 }
 
-function addCategoryToCSV($catpath,$catindex)
-{
-	$GLOBALS[ "csvlines" ] .= "1"
-		. "|" 
-		. str_pad($catindex, 4, "0", STR_PAD_LEFT)
-		. "|" 
-		. str_replace(" => ", "|", $catpath)
-		. "|" 
-		. "\n";
-}
-
 function recurseCategories($prefix, $rawdata, &$categories)
 {
 	foreach ($rawdata as $index => $dummy)
@@ -146,14 +135,15 @@ function recurseCategories($prefix, $rawdata, &$categories)
 		$categories[ $index ][ "name" ] = $category;
 		$categories[ $index ][ "items" ] = array();
 		
-		$GLOBALS[ "cat2inx" ][ $catpath ] = count($GLOBALS[ "cat2inx" ]) + 1;
-		$GLOBALS[ "inx2inx" ][ $rawdata[ $index ][ "id" ] ] = $GLOBALS[ "cat2inx" ][ $catpath ];
+		$catindex = count($GLOBALS[ "cp2inx" ]) + 1;
 		
-		$GLOBALS[ "inx2cat" ][ $rawdata[ $index ][ "id" ] ] = &$categories[ $index ][ "items" ];
-		$GLOBALS[ "inx2nam" ][ $rawdata[ $index ][ "id" ] ] = $category;
-		
-		addCategoryToCSV($catpath, $GLOBALS[ "cat2inx" ][ $catpath ]);
+		$GLOBALS[ "cp2inx"  ][ $catpath  ] = $catindex;
+		$GLOBALS[ "inx2cnt" ][ $catindex ] = 0;
 
+		$GLOBALS[ "id2inx" ][ $rawdata[ $index ][ "id" ] ] = $catindex;		
+		$GLOBALS[ "id2nam" ][ $rawdata[ $index ][ "id" ] ] = $category;
+		$GLOBALS[ "id2cat" ][ $rawdata[ $index ][ "id" ] ] = &$categories[ $index ][ "items" ];
+		
 		if (isset($rawdata[ $index ][ "childCategories" ]))
 		{
 			$nextpref = ($prefix ? ($prefix . " => ") : "") . $category;
@@ -161,6 +151,30 @@ function recurseCategories($prefix, $rawdata, &$categories)
 			recurseCategories($nextpref, $rawdata[ $index ][ "childCategories" ], $categories[ $index ][ "items" ]);
 		}
 	}
+}
+
+function buildCategories()
+{
+	$categories = $GLOBALS[ "cp2inx" ];
+	
+	$clines = "";
+	
+	foreach ($categories as $catpath => $index)
+	{
+		$productcount = isset($GLOBALS[ "inx2cnt" ][ $index ]) 
+					  ? $GLOBALS[ "inx2cnt" ][ $index ] 
+					  : 0;
+		
+		$clines .= "1|" 
+				. str_pad($index, 4, "0", STR_PAD_LEFT) 
+				. "|" 
+				. str_replace(" => ", "|", $catpath) 
+				. "|"
+				. $productcount
+				. "\n";
+	}
+	
+	$GLOBALS[ "csvlines" ] .= $clines;
 }
 
 function buildBrands()
@@ -194,7 +208,7 @@ function buildProducts(&$products)
 			continue;
 		}
 
-		$category = &$GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ];
+		$category = &$GLOBALS[ "id2cat" ][ $product[ "categoryId" ] ];
 		
 		$title = trim($product[ "title" ]);
 		$brand = trim($product[ "brand" ]);
@@ -276,10 +290,10 @@ function buildProducts(&$products)
 		// Derive base price and price.
 		//
 	
-		if (isset($GLOBALS[ "inx2nam" ][ $product[ "categoryId" ] ]))
+		if (isset($GLOBALS[ "id2nam" ][ $product[ "categoryId" ] ]))
 		{
-			$catname  = $GLOBALS[ "inx2nam" ][ $product[ "categoryId" ] ];
-			$catindex = $GLOBALS[ "inx2inx" ][ $product[ "categoryId" ] ];
+			$catname  = $GLOBALS[ "id2nam" ][ $product[ "categoryId" ] ];
+			$catindex = $GLOBALS[ "id2inx" ][ $product[ "categoryId" ] ];
 			$catindex = str_pad($catindex, 4, "0", STR_PAD_LEFT);
 		}
 		else
@@ -490,7 +504,7 @@ function buildProducts(&$products)
 		
 		$prodstr = "$title|$brand|$price|$base";
 
-		if ((! isset($GLOBALS[ "inx2cat" ][ $product[ "categoryId" ] ])) ||
+		if ((! isset($GLOBALS[ "id2cat" ][ $product[ "categoryId" ] ])) ||
 			(strpos(strtolower($prodstr), $GLOBALS[ "host" ]) !== false) || 
 			(strpos(strtolower($prodstr), $GLOBALS[ "port" ]) !== false) ||
 			(strpos(strtolower($brand), "feine welt") !== false)) 
@@ -503,6 +517,9 @@ function buildProducts(&$products)
 		
 		$prodstr = "3|$catindex|$title|$brand|$price|$base|";
 		
+		$catindex = $GLOBALS[ "id2inx" ][ $product[ "categoryId" ] ];
+		$GLOBALS[ "inx2cnt" ][ $catindex ]++;
+		
 		$GLOBALS[ "csvprods" ][] = $prodstr;
 	}
 }
@@ -514,10 +531,11 @@ getRawdata();
 
 $GLOBALS[ "brands"     ] = array();
 $GLOBALS[ "categories" ] = array();
-$GLOBALS[ "inx2cat"    ] = array();
-$GLOBALS[ "inx2nam"    ] = array();
-$GLOBALS[ "cat2inx"    ] = array();
-$GLOBALS[ "inx2inx"    ] = array();
+$GLOBALS[ "id2cat"     ] = array();
+$GLOBALS[ "id2nam"     ] = array();
+$GLOBALS[ "cp2inx"     ] = array();
+$GLOBALS[ "id2inx"     ] = array();
+$GLOBALS[ "inx2cnt"    ] = array();
 $GLOBALS[ "csvprods"   ] = array();
 $GLOBALS[ "csvlines"   ] = "";
 
@@ -527,11 +545,12 @@ recurseCategories(null, $rawcats, $GLOBALS[ "categories" ]);
 
 $products = json_decdat(file_get_contents("products.json"));
 $products = $products[ "products" ];
+
 buildProducts($products);
+buildCategories();
+buildBrands();
 
 file_put_contents("complete.json", json_encdat($GLOBALS[ "categories" ]));
-
-buildBrands();
 
 sort($GLOBALS[ "csvprods" ]);
 $GLOBALS[ "csvlines" ] .= implode("\n", $GLOBALS[ "csvprods" ]) . "\n";
