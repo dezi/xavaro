@@ -71,53 +71,47 @@ shoppinglist.brandSortPrio = function(brand)
     return "9" + brand;
 }
 
+shoppinglist.sortCompareString = function(ab)
+{
+    var abstring = "";
+
+    if (ab.isprice)
+    {
+        abstring += WebLibSimple.padNum(ab.product.storeobj.sort,8) + "|";
+        abstring += ab.product.storeobj.store + "|";
+        abstring += ab.product.text + "|";
+        abstring += ab.catinx + "|";
+        abstring += ab.basesort + "|";
+    }
+
+    if (ab.iscategory)
+    {
+        abstring += WebLibSimple.padNum(ab.product.storeobj.sort,8) + "|";
+        abstring += ab.product.storeobj.store + "|";
+        abstring += ab.product.text + "|";
+        abstring += ab.catinx + "|";
+    }
+
+    if (ab.isproduct)
+    {
+        abstring += WebLibSimple.padNum(ab.storeobj.sort,8) + "|";
+        abstring += ab.storeobj.store + "|";
+        abstring += ab.text + "|";
+    }
+
+    if (ab.isstore)
+    {
+        abstring += WebLibSimple.padNum(ab.sort,8) + "|";
+        abstring += ab.store + "|";
+    }
+
+    return abstring;
+}
+
 shoppinglist.sortCompare = function(a, b)
 {
-    var astring = "";
-
-    if (a.isprice)
-    {
-        astring += WebLibSimple.padNum(a.product.storeobj.sort,8) + "|";
-        astring += a.product.storeobj.store + "|";
-        astring += a.product.text + "|";
-        //astring += shoppinglist.brandSortPrio(a.brand) + "|";
-        astring += a.basesort + "|";
-    }
-    else
-    if (a.isproduct)
-    {
-        astring += WebLibSimple.padNum(a.storeobj.sort,8) + "|";
-        astring += a.storeobj.store + "|";
-        astring += a.text + "|";
-    }
-    else
-    {
-        astring += WebLibSimple.padNum(a.sort,8) + "|";
-        astring += a.store + "|";
-    }
-
-    var bstring = "";
-
-    if (b.isprice)
-    {
-        bstring += WebLibSimple.padNum(b.product.storeobj.sort,8) + "|";
-        bstring += b.product.storeobj.store + "|";
-        bstring += b.product.text + "|";
-        //bstring += shoppinglist.brandSortPrio(b.brand) + "|";
-        bstring += b.basesort + "|";
-    }
-    else
-    if (b.isproduct)
-    {
-        bstring += WebLibSimple.padNum(b.storeobj.sort,8) + "|";
-        bstring += b.storeobj.store + "|";
-        bstring += b.text + "|";
-    }
-    else
-    {
-        bstring += WebLibSimple.padNum(b.sort,8) + "|";
-        bstring += b.store + "|";
-    }
+    var astring = shoppinglist.sortCompareString(a);
+    var bstring = shoppinglist.sortCompareString(b);
 
     if (astring == bstring) return 0;
     return (astring > bstring) ? 1 : -1;
@@ -182,6 +176,15 @@ shoppinglist.createItemDiv = function(item)
     divMore.imgMore.style.height = "100%";
     divMore.imgMore.src = "arrow_more_270x270.png";
 
+    if (item.iscategory)
+    {
+        divOuter.divInner.style.backgroundColor = "#eeeeee";
+        divSample.innerHTML = item.text;
+        divMore.imgMore.src = "search_300x300.png";
+        divMore.onTouchClick = shoppinglist.onClickCategory;
+        imgIcon.src = WebLibSimple.getNixPixImg();
+    }
+    else
     if (item.isprice)
     {
         divOuter.divInner.style.backgroundColor = "#eeeeee";
@@ -231,10 +234,6 @@ shoppinglist.updateitemlist = function()
     {
         item = sl.itemlist[ pinx ];
 
-        if (item.isprice)
-        {
-        }
-        else
         if (item.isproduct)
         {
             if (item.storeobj != laststore)
@@ -248,7 +247,8 @@ shoppinglist.updateitemlist = function()
 
             lastproduct = item;
         }
-        else
+
+        if (item.isstore)
         {
             laststore = item;
         }
@@ -279,6 +279,86 @@ shoppinglist.onClickPick = function(target)
     }
 
     if (! target) return;
+}
+
+shoppinglist.onClickCategory = function(target)
+{
+    WebAppUtility.makeClick();
+
+    var sl = shoppinglist;
+
+    while (target && ! target.item)
+    {
+        target = target.parentNode;
+    }
+
+    if (! target) return;
+
+    var categories = [];
+    categories.push(target.item);
+
+    shoppinglist.searchCategories(target.item.product, categories);
+}
+
+shoppinglist.evaluteBestCategories = function(product, results)
+{
+    //
+    // Evaluate best categories.
+    //
+
+    var tempcats = [];
+
+    for (var inx = 0; inx < results.length; inx++)
+    {
+        tempcats.push(shoppinglist.parseCategory(product, results[ inx ]));
+    }
+
+    var categories = [];
+
+    for (var inx = 0; inx < tempcats.length; inx++)
+    {
+        var text = tempcats[ inx ].text;
+        var path = tempcats[ inx ].path;
+        var topcat = false;
+
+        for (var cnt = 0; cnt < tempcats.length; cnt++)
+        {
+            if (inx == cnt) continue;
+
+            if (tempcats[ cnt ].path.substring(0, path.length) == path)
+            {
+                topcat = true;
+                break;
+            }
+        }
+
+        if (! topcat) categories.push(tempcats[ inx ]);
+    }
+
+    return categories;
+}
+
+shoppinglist.searchCategories = function(product, categories)
+{
+    var catquery = [];
+
+    for (var inx = 0; inx < categories.length; inx++)
+    {
+        catquery.push(categories[ inx ].catinx)
+    }
+
+    console.log(JSON.stringify(catquery));
+
+    results = JSON.parse(WebAppPrices.getProductsFromCategories(JSON.stringify(catquery)));
+
+    if (results)
+    {
+        for (var inx = 0; inx < results.length; inx++)
+        {
+            var price = shoppinglist.parseRealProduct(product, results[ inx ]);
+            shoppinglist.addItem(price);
+        }
+    }
 }
 
 shoppinglist.onClickSearch = function(target)
@@ -314,35 +394,23 @@ shoppinglist.onClickSearch = function(target)
         return;
     }
 
-    if (results.length < 7)
+    var categories = shoppinglist.evaluteBestCategories(product, results);
+
+    if (categories.length == 1)
     {
-        var categories = [];
-
-        for (var inx = 0; inx < results.length; inx++)
-        {
-            var parts = results[ inx ].split("|");
-            categories.push(parts[ 1 ])
-        }
-
-        console.log(JSON.stringify(categories));
-
-        results = JSON.parse(WebAppPrices.getProductsFromCategories(JSON.stringify(categories)));
-
-        if (results)
-        {
-            for (var inx = 0; inx < results.length; inx++)
-            {
-                var price = shoppinglist.parseRealProduct(product, results[ inx ]);
-                shoppinglist.addItem(price);
-            }
-        }
+        shoppinglist.searchCategories(product, categories);
 
         return;
     }
 
-    var pre = WebLibSimple.createAnyAppend("pre", sl.listDiv);
-    pre.style.fontSize = "16px";
-    pre.innerHTML = results.join("\n");
+    for (var inx = 0; inx < categories.length; inx++)
+    {
+        shoppinglist.addItem(categories[ inx ]);
+    }
+
+    //var pre = WebLibSimple.createAnyAppend("pre", sl.listDiv);
+    //pre.style.fontSize = "16px";
+    //pre.innerHTML = results.join("\n");
 }
 
 shoppinglist.onClickMore = function(target)
