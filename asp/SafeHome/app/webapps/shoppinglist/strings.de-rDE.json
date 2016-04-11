@@ -63,6 +63,7 @@
   "quantity.units": [
 
     { "unit": "st", "phrase": "x" },
+    { "unit": "st", "phrase": "Mal" },
     { "unit": "st", "phrase": "Stück" },
     { "unit": "st", "phrase": "Stücke" },
     { "unit": "st", "phrase": "Paket" },
