@@ -365,7 +365,7 @@ shoppinglist.parseQuantity = function(product)
     if (product.quantunit == "st")
     {
         if (product.quantphrase = "Pack") product.quantphrase = "x";
-        
+
         product.displayquant = product.quantity + " " + product.quantphrase;
     }
     else
