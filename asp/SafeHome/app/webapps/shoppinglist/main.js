@@ -183,7 +183,7 @@ shoppinglist.createItemDiv = function(item)
         divKeywords.style.color = "#ff4444";
         divMore.imgMore.src = "arrow_pick_270x270.png";
         divMore.onTouchClick = shoppinglist.onClickPick;
-        imgIcon.src = item.icon ? item.icon :WebLibSimple.getNixPixImg();
+        imgIcon.src = item.icon ? item.icon : "multi_320x320.png";
     }
 
     if (item.iscategory)
@@ -198,11 +198,24 @@ shoppinglist.createItemDiv = function(item)
     if (item.isproduct)
     {
         divOuter.divInner.style.backgroundColor = "#cccccc";
-        divSample.innerHTML = item.text;
         divMore.imgMore.src = "search_300x300.png";
         divMore.onTouchClick = shoppinglist.onClickSearch;
-        imgIcon.src = WebLibSimple.getNixPixImg();
-    }
+        divMore.onTouchLongClick = shoppinglist.onClickDelete;
+
+        if (item.price)
+        {
+            divSample.innerHTML = item.price.text;
+            divSample.style.lineHeight = "40px";
+            divKeywords.innerHTML = item.price.displayprice;
+            divKeywords.style.color = "#ff4444";
+            imgIcon.src = item.price.icon ? item.price.icon : "multi_320x320.png";
+        }
+        else
+        {
+            divSample.innerHTML = item.text;
+            imgIcon.src =  "multi_320x320.png";
+        }
+   }
 
     if (item.isstore)
     {
@@ -213,6 +226,11 @@ shoppinglist.createItemDiv = function(item)
         divMore.onTouchClick = shoppinglist.onClickMore;
         imgIcon.src = item.logo ? item.logo : WebLibSimple.getNixPixImg();
     }
+
+    divOuter.imgIcon = imgIcon;
+    divOuter.divMore = divMore;
+    divOuter.divSample = divSample;
+    divOuter.divKeywords = divKeywords;
 
     divOuter.item = item;
 
@@ -256,6 +274,18 @@ shoppinglist.updateitemlist = function()
         if (! item.itemDiv) item.itemDiv = shoppinglist.createItemDiv(item);
         sl.listDiv.appendChild(item.itemDiv);
     }
+
+    var displayheight = sl.listDiv.parentNode.clientHeight;
+    var scrollheight = sl.listDiv.clientHeight;
+
+    if (scrollheight < displayheight)
+    {
+        //
+        // Reset list div offset to 0px.
+        //
+
+        sl.listDiv.style.top = "0px";
+    }
 }
 
 shoppinglist.addItem = function(product)
@@ -269,23 +299,40 @@ shoppinglist.addItem = function(product)
 
 shoppinglist.onClickPick = function(target)
 {
-    WebAppUtility.makeClick();
+    //
+    // Do not click here, nuking will make a click.
+    //
 
-    var sl = shoppinglist;
+    //WebAppUtility.makeClick();
 
-    while (target && ! target.item)
+    var realtarget = target;
+
+    while (realtarget && ! realtarget.item)
     {
-        target = target.parentNode;
+        realtarget = realtarget.parentNode;
     }
 
-    if (! target) return;
+    if (! realtarget) return;
+
+    var price = realtarget.item;
+    var product = price.product;
+    var itemDiv = product.itemDiv;
+
+    product.price = price;
+
+    itemDiv.divSample.innerHTML = product.price.displaytext;
+    itemDiv.divSample.style.lineHeight = "40px";
+    itemDiv.divKeywords.innerHTML = product.price.displayprice;
+    itemDiv.divKeywords.style.color = "#ff4444";
+    itemDiv.imgIcon.src = product.price.icon ? product.price.icon : WebLibSimple.getNixPixImg();
+
+    shoppinglist.onClickNukeSearches(product.itemDiv.divMore);
 }
 
 shoppinglist.onClickCategory = function(target)
 {
     WebAppUtility.makeClick();
 
-    var sl = shoppinglist;
     var realtarget = target;
 
     while (realtarget && ! realtarget.item)
@@ -325,6 +372,13 @@ shoppinglist.evaluteBestCategories = function(product, results)
         tempcats.push(shoppinglist.parseCategory(product, results[ inx ]));
     }
 
+    var nummatches = 0;
+    var targettext = product.text.toLowerCase();
+
+    //
+    // Collect and check category setup.
+    //
+
     var categories = [];
 
     for (var inx = 0; inx < tempcats.length; inx++)
@@ -344,7 +398,50 @@ shoppinglist.evaluteBestCategories = function(product, results)
             }
         }
 
-        if (! topcat) categories.push(tempcats[ inx ]);
+        if (topcat) continue;
+
+        if (text.toLowerCase().indexOf(targettext) >= 0)
+        {
+            //
+            // The category name contains the target word.
+            //
+
+            nummatches++;
+        }
+
+        categories.push(tempcats[ inx ]);
+    }
+
+    if (nummatches > 0)
+    {
+        //
+        // Redo category selection now and accept only
+        // categories with matches in name.
+        //
+
+        categories = [];
+
+        for (var inx = 0; inx < tempcats.length; inx++)
+        {
+            var text = tempcats[ inx ].text;
+            var path = tempcats[ inx ].path;
+            var topcat = false;
+
+            for (var cnt = 0; cnt < tempcats.length; cnt++)
+            {
+                if (inx == cnt) continue;
+
+                if (tempcats[ cnt ].path.substring(0, path.length) == path)
+                {
+                    topcat = true;
+                    break;
+                }
+            }
+
+            if (topcat || (text.toLowerCase().indexOf(targettext) < 0)) continue;
+
+            categories.push(tempcats[ inx ]);
+        }
     }
 
     return categories;
@@ -430,11 +527,70 @@ shoppinglist.onClickNukeSearches = function(target)
     target.onTouchClick = shoppinglist.onClickSearch;
 }
 
+shoppinglist.getTargetItem = function(target)
+{
+    while (target && ! target.item)
+    {
+        target = target.parentNode;
+    }
+
+    return target ? target.item : null;
+}
+
+shoppinglist.onClickDelete = function(target)
+{
+    WebAppUtility.makeClick();
+
+    var item = shoppinglist.getTargetItem(target);
+    if (! item) return;
+
+    var sl = shoppinglist;
+
+    for (var inx = 0; inx < sl.itemlist.length; inx++)
+    {
+        if (sl.itemlist[ inx ] == item)
+        {
+            sl.itemlist.splice(inx, 1);
+
+            //
+            // Nuke open categories and prices.
+            //
+
+            while (inx < sl.itemlist.length)
+            {
+                if (! (sl.itemlist[ inx ].iscategory || sl.itemlist[ inx ].isprice))
+                {
+                    break;
+                }
+
+                sl.itemlist.splice(inx--, 1);
+            }
+
+            //
+            // Check if last in store list.
+            //
+
+            if (((inx > 0) && (sl.itemlist[ inx - 1 ].isstore)) &&
+                ((inx == sl.itemlist.length) || sl.itemlist[ inx ].isstore))
+            {
+                //
+                // Empty store, nuke.
+                //
+
+                sl.itemlist.splice(inx - 1, 1);
+            }
+
+            break;
+        }
+    }
+
+    shoppinglist.updateitemlist();
+}
+
 shoppinglist.onClickSearch = function(target)
 {
     WebAppUtility.makeClick();
 
-    var sl = shoppinglist;
     var realtarget = target;
 
     while (realtarget && ! realtarget.item)
@@ -577,7 +733,9 @@ WebAppVoice.onResults = function(results)
 
 shoppinglist.createFrame();
 
-shoppinglist.addItem(shoppinglist.parseProduct("Batterien aus dem Aldi"));
-shoppinglist.addItem(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
+shoppinglist.addItem(shoppinglist.parseProduct("Milch aus dem Aldi"));
 shoppinglist.addItem(shoppinglist.parseProduct("Kartoffeln aus dem Aldi"));
-shoppinglist.addItem(shoppinglist.parseProduct("Butter aus dem Penny"));
+shoppinglist.addItem(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
+
+//shoppinglist.addItem(shoppinglist.parseProduct("Batterien aus dem Aldi"));
+//shoppinglist.addItem(shoppinglist.parseProduct("Butter aus dem Penny"));

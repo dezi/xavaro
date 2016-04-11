@@ -66,7 +66,6 @@ shoppinglist.parsePrice = function(price, base)
     // Normalize base prizes.
     //
 
-
     if (base && ((pelem.units == "st") || (pelem.units == "bl")))
     {
         var itemcents = Math.round((pelem.cents + 1) / (pelem.multi * pelem.amount));
@@ -195,6 +194,7 @@ shoppinglist.parseProduct = function(text)
 
     shoppinglist.stripIntro(product);
     shoppinglist.parseStore(product);
+    shoppinglist.parseQuantity(product);
 
     shoppinglist.replaceSynonyms(product);
 
@@ -242,6 +242,77 @@ shoppinglist.replaceSynonyms = function(product)
             }
         }
     }
+}
+
+shoppinglist.parseQuantity = function(product)
+{
+    //
+    // Parse quantity from product text.
+    //
+
+    var text = product.text.toLowerCase();
+
+    //
+    // Get units from phrase.
+    //
+
+    product.quantunit = "st";
+    product.quantmulti = 1;
+
+    var units = WebLibStrings.strings[ "quantity.units" ];
+
+    if (units)
+    {
+        for (var uinx in units)
+        {
+            var phrase = units[ uinx ].phrase.toLowerCase();
+            var pos = text.indexOf(phrase);
+            var len = phrase.length;
+
+            if (pos >= 0)
+            {
+                product.text = product.text.substring(0, pos).trim()
+                             + " "
+                             + product.text.substring(pos + len).trim();
+
+                text = product.text.toLowerCase();
+
+                product.quantunit  = units[ uinx ].unit;
+                product.quantmulti = units[ uinx ].multi ? units[ uinx ].multi : 1;
+            }
+        }
+    }
+
+    //
+    // Get multiple quantities from phrase.
+    //
+
+    product.quantity = 1;
+
+    var amount = WebLibStrings.strings[ "quantity.amount" ];
+
+    if (amount)
+    {
+        for (var ainx in amount)
+        {
+            var phrase = amount[ ainx ].phrase.toLowerCase();
+            var pos = text.indexOf(phrase);
+            var len = phrase.length;
+
+            if (pos >= 0)
+            {
+                product.text = product.text.substring(0, pos).trim()
+                             + " "
+                             + product.text.substring(pos + len).trim();
+
+                text = product.text.toLowerCase();
+
+                product.quantity *= amount[ ainx ].amount;
+            }
+        }
+    }
+
+    product.text += " (" + product.quantity + " x " + product.quantmulti + " x " + product.quantunit + ")";
 }
 
 shoppinglist.stripIntro = function(product)
@@ -320,4 +391,5 @@ shoppinglist.parseStore = function(product)
     //
 
     product.storeobj = stores[ 0 ];
+    product.storeobj.isstore = true;
 }

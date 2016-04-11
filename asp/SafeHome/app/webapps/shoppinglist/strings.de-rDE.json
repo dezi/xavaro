@@ -60,20 +60,73 @@
 
   ],
 
+  "quantity.units": [
+
+    { "unit": "st", "phrase": "Stück" },
+    { "unit": "st", "phrase": "Paket" },
+    { "unit": "st", "phrase": "Netz" },
+    { "unit": "st", "phrase": "Beutel" },
+    { "unit": "st", "phrase": "Packung" },
+    { "unit": "st", "phrase": "Kiste" },
+
+    { "unit": "g",  "phrase": "Gramm" },
+
+    { "unit": "kg", "phrase": "Kilo" },
+    { "unit": "kg", "phrase": "Kilogramm" },
+    { "unit": "kg", "phrase": "Pfund", "multi": 0.5 },
+
+    { "unit": "l",  "phrase": "Liter" },
+    { "unit": "ml", "phrase": "Milliliter" }
+
+  ],
+
+  "quantity.amount": [
+
+    { "amount": 4,  "phrase": "Zweierpack" },
+    { "amount": 4,  "phrase": "Viererpack" },
+    { "amount": 6,  "phrase": "Sechserpack" },
+    { "amount": 8,  "phrase": "Achterpack" },
+    { "amount": 6,  "phrase": "Sixpack" },
+    { "amount": 12, "phrase": "Dutzend" },
+    { "amount": 60, "phrase": "Schock" },
+
+    { "amount": 1,    "phrase": "ein ganzes" },
+    { "amount": 0.5,  "phrase": "ein halbes" },
+    { "amount": 0.25, "phrase": "ein viertel" },
+
+    { "amount": 1, "phrase": "ein" },
+    { "amount": 1, "phrase": "eine" },
+    { "amount": 1, "phrase": "einen" },
+    { "amount": 1, "phrase": "eines" },
+
+    { "amount": 2, "phrase": "zwei" },
+    { "amount": 3, "phrase": "drei" },
+    { "amount": 4, "phrase": "vier" },
+    { "amount": 5, "phrase": "fünf" },
+    { "amount": 6, "phrase": "sechs" },
+    { "amount": 7, "phrase": "sieben" },
+    { "amount": 8, "phrase": "acht" },
+    { "amount": 9, "phrase": "neun" },
+    { "amount": 10, "phrase": "zehn" },
+    { "amount": 11, "phrase": "elf" },
+    { "amount": 12, "phrase": "zwölf" }
+
+  ],
+
   "stores.defines": [
+
+    {
+      "store": "Einkauf",
+      "logo": "logos/generic.super-market.png",
+      "sort": 50,
+      "keywords": [ "supermarkt" ]
+    },
 
     {
       "store": "Apotheke",
       "logo": "logos/apotheke.de.jpg",
       "sort": 40,
       "keywords": [ "apotheke" ]
-    },
-
-    {
-      "store": "Supermarkt",
-      "logo": "logos/generic.super-market.png",
-      "sort": 50,
-      "keywords": [ "supermarkt" ]
     },
 
     {
@@ -112,7 +165,7 @@
       "sort": 70,
       "keywords": [
         "fischhöker", "fischmann", "fisch mann", "fischfrau", "fisch frau",
-        "fischladen", "fischgeschäft"
+        "fischladen", "fischgeschäft", "fischmarkt"
       ]
     },
 
@@ -200,29 +253,47 @@
     },
 
     {
+      "store": "Mediamarkt",
+      "logo": "logos/mediamarkt.de.jpg",
+      "sort": 400,
+      "keywords": [ "mediamarkt", "media markt" ]
+    },
+
+    {
+      "store": "Saturn",
+      "logo": "logos/saturn.de.png",
+      "sort": 400,
+      "keywords": [ "saturn" ]
+    },
+
+    {
       "store": "OBI - Baumarkt",
       "logo": "logos/obi.de.png",
-      "sort": 400,
+      "sort": 500,
       "keywords": [ "obi baumarkt", "obi" ]
     },
 
     {
       "store": "Hagebau - Baumarkt",
       "logo": "logos/hagebau.de.jpg",
-      "sort": 400,
+      "sort": 500,
       "keywords": [ "hagebau baumarkt", "hagebau" ]
     },
 
     {
       "store": "Hornbach - Baumarkt",
       "logo": "logos/hornbach.de.jpg",
-      "sort": 400,
+      "sort": 500,
       "keywords": [ "hornbach baumarkt", "hornbach" ]
     }
 
   ],
 
-  "stores.intro.keywords": [ "aus der", "von der", "auf dem", "aus dem", "von", "vom", "vonne", "im" ],
+  "stores.intro.keywords": [
+    "aus der", "auf der", "aus dem", "auf dem", "aus den", "auf den",
+    "von der", "von dem", "von den", "vonne", "von", "vom",
+    "im"
+  ],
 
   "product.synonyms": [
 
