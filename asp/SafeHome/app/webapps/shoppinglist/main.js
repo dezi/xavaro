@@ -131,7 +131,6 @@ shoppinglist.createItemDiv = function(item)
     divOuter.divInner.style.marginTop = "4px";
     divOuter.divInner.style.marginBottom = "4px";
     divOuter.divInner.style.border = "1px solid grey";
-    divOuter.divInner.style.backgroundColor = "#cccccc";
 
     var divIcon = WebLibSimple.createDiv(0, 0, null, 0, "divIcon", divOuter.divInner);
     divIcon.style.margin = "4px";
@@ -174,17 +173,7 @@ shoppinglist.createItemDiv = function(item)
     divMore.imgMore.style.top = "0px";
     divMore.imgMore.style.width = "auto";
     divMore.imgMore.style.height = "100%";
-    divMore.imgMore.src = "arrow_more_270x270.png";
 
-    if (item.iscategory)
-    {
-        divOuter.divInner.style.backgroundColor = "#eeeeee";
-        divSample.innerHTML = item.text;
-        divMore.imgMore.src = "search_300x300.png";
-        divMore.onTouchClick = shoppinglist.onClickCategory;
-        imgIcon.src = WebLibSimple.getNixPixImg();
-    }
-    else
     if (item.isprice)
     {
         divOuter.divInner.style.backgroundColor = "#eeeeee";
@@ -196,20 +185,31 @@ shoppinglist.createItemDiv = function(item)
         divMore.onTouchClick = shoppinglist.onClickPick;
         imgIcon.src = item.icon ? item.icon :WebLibSimple.getNixPixImg();
     }
-    else
-    if (item.isproduct)
+
+    if (item.iscategory)
     {
         divOuter.divInner.style.backgroundColor = "#dddddd";
+        divSample.innerHTML = item.text;
+        divMore.imgMore.src = "search_300x300.png";
+        divMore.onTouchClick = shoppinglist.onClickCategory;
+        imgIcon.src = WebLibSimple.getNixPixImg();
+    }
+
+    if (item.isproduct)
+    {
+        divOuter.divInner.style.backgroundColor = "#cccccc";
         divSample.innerHTML = item.text;
         divMore.imgMore.src = "search_300x300.png";
         divMore.onTouchClick = shoppinglist.onClickSearch;
         imgIcon.src = WebLibSimple.getNixPixImg();
     }
-    else
+
+    if (item.isstore)
     {
+        divOuter.divInner.style.backgroundColor = "#aaaaaa";
         divSample.style.fontSize = "32px";
         divSample.innerHTML = item.store;
-        divMore.imgMore.src = "arrow_more_270x270.png";
+        divMore.imgMore.src = "arrow_less_270x270.png";
         divMore.onTouchClick = shoppinglist.onClickMore;
         imgIcon.src = item.logo ? item.logo : WebLibSimple.getNixPixImg();
     }
@@ -286,18 +286,30 @@ shoppinglist.onClickCategory = function(target)
     WebAppUtility.makeClick();
 
     var sl = shoppinglist;
+    var realtarget = target;
 
-    while (target && ! target.item)
+    while (realtarget && ! realtarget.item)
     {
-        target = target.parentNode;
+        realtarget = realtarget.parentNode;
     }
 
-    if (! target) return;
+    if (! realtarget) return;
 
     var categories = [];
-    categories.push(target.item);
 
-    shoppinglist.searchCategories(target.item.product, categories);
+    categories.push(realtarget.item);
+
+    var itemsfound = shoppinglist.searchCategories(realtarget.item.product, categories);
+
+    if (itemsfound == 0)
+    {
+        WebAppSpeak.speak("Ich habe keine Artikel gefunden");
+    }
+    else
+    {
+        target.imgMore.src = "arrow_less_270x270.png";
+        target.onTouchClick = shoppinglist.onClickNukePrices;
+    }
 }
 
 shoppinglist.evaluteBestCategories = function(product, results)
@@ -340,6 +352,8 @@ shoppinglist.evaluteBestCategories = function(product, results)
 
 shoppinglist.searchCategories = function(product, categories)
 {
+    var itemsfound = 0;
+
     var catquery = [];
 
     for (var inx = 0; inx < categories.length; inx++)
@@ -349,7 +363,7 @@ shoppinglist.searchCategories = function(product, categories)
 
     console.log(JSON.stringify(catquery));
 
-    results = JSON.parse(WebAppPrices.getProductsFromCategories(JSON.stringify(catquery)));
+    var results = JSON.parse(WebAppPrices.getProductsFromCategories(JSON.stringify(catquery)));
 
     if (results)
     {
@@ -357,8 +371,63 @@ shoppinglist.searchCategories = function(product, categories)
         {
             var price = shoppinglist.parseRealProduct(product, results[ inx ]);
             shoppinglist.addItem(price);
+            itemsfound++;
         }
     }
+
+    return itemsfound;
+}
+
+shoppinglist.onClickNukePrices = function(target)
+{
+    //
+    // Remove all open search releated entries.
+    //
+
+    WebAppUtility.makeClick();
+
+    var sl = shoppinglist;
+
+    for (var inx = 0; inx < sl.itemlist.length; inx++)
+    {
+        item = sl.itemlist[ inx ];
+
+        if (item.isprice)
+        {
+            sl.itemlist.splice(inx--, 1);
+        }
+    }
+
+    shoppinglist.updateitemlist();
+
+    target.imgMore.src = "search_300x300.png";
+    target.onTouchClick = shoppinglist.onClickCategory;
+}
+
+shoppinglist.onClickNukeSearches = function(target)
+{
+    //
+    // Remove all open search releated entries.
+    //
+
+    WebAppUtility.makeClick();
+
+    var sl = shoppinglist;
+
+    for (var inx = 0; inx < sl.itemlist.length; inx++)
+    {
+        item = sl.itemlist[ inx ];
+
+        if (item.isprice || item.iscategory)
+        {
+            sl.itemlist.splice(inx--, 1);
+        }
+    }
+
+    shoppinglist.updateitemlist();
+
+    target.imgMore.src = "search_300x300.png";
+    target.onTouchClick = shoppinglist.onClickSearch;
 }
 
 shoppinglist.onClickSearch = function(target)
@@ -366,15 +435,17 @@ shoppinglist.onClickSearch = function(target)
     WebAppUtility.makeClick();
 
     var sl = shoppinglist;
+    var realtarget = target;
 
-    while (target && ! target.item)
+    while (realtarget && ! realtarget.item)
     {
-        target = target.parentNode;
+        realtarget = realtarget.parentNode;
     }
 
-    if (! target) return;
+    if (! realtarget) return;
 
-    var product = target.item;
+    var product = realtarget.item;
+    var itemsfound = 0;
 
     var results = JSON.parse(WebAppPrices.getCategories(product.text));
 
@@ -382,35 +453,43 @@ shoppinglist.onClickSearch = function(target)
     {
         results = JSON.parse(WebAppPrices.getProducts(product.text));
 
-        if (results)
+        if (results.length > 0)
         {
             for (var inx = 0; inx < results.length; inx++)
             {
                 var price = shoppinglist.parseRealProduct(product, results[ inx ]);
                 shoppinglist.addItem(price);
+                itemsfound++;
             }
         }
-
-        return;
     }
-
-    var categories = shoppinglist.evaluteBestCategories(product, results);
-
-    if (categories.length == 1)
+    else
     {
-        shoppinglist.searchCategories(product, categories);
+        var categories = shoppinglist.evaluteBestCategories(product, results);
 
-        return;
+        if (categories.length == 1)
+        {
+            itemsfound = shoppinglist.searchCategories(product, categories);
+        }
+        else
+        {
+            for (var inx = 0; inx < categories.length; inx++)
+            {
+                shoppinglist.addItem(categories[ inx ]);
+                itemsfound++;
+            }
+        }
     }
 
-    for (var inx = 0; inx < categories.length; inx++)
+    if (itemsfound == 0)
     {
-        shoppinglist.addItem(categories[ inx ]);
+        WebAppSpeak.speak("Ich habe keine Artikel gefunden");
     }
-
-    //var pre = WebLibSimple.createAnyAppend("pre", sl.listDiv);
-    //pre.style.fontSize = "16px";
-    //pre.innerHTML = results.join("\n");
+    else
+    {
+        target.imgMore.src = "arrow_less_270x270.png";
+        target.onTouchClick = shoppinglist.onClickNukeSearches;
+    }
 }
 
 shoppinglist.onClickMore = function(target)

@@ -120,7 +120,6 @@ shoppinglist.parseCategory = function(product, line)
     category.iscategory = true;
     category.product = product;
 
-
     category.catinx = parts[ 1 ];
     category.level  = parts.length - 3;
     category.text   = parts[ parts.length - 2 ];
