@@ -111,6 +111,28 @@ shoppinglist.parsePrice = function(price, base)
     return pelem;
 }
 
+shoppinglist.parseCategory = function(product, line)
+{
+    var parts = line.split("|");
+
+    var category = {};
+
+    category.iscategory = true;
+    category.product = product;
+
+    category.catinx = parts[ 1 ];
+    category.level  = parts.length - 3;
+    category.text   = parts[ parts.length - 2 ];
+    category.count  = parseInt(parts.pop());
+
+    parts.shift();
+    parts.shift();
+
+    category.path = parts.join("|") + "|";
+
+    return category;
+}
+
 shoppinglist.parseRealProduct = function(product, line)
 {
     var parts = line.split("|");
@@ -283,6 +305,7 @@ shoppinglist.parseStore = function(product)
                                  + product.text.substring(pos + len).trim();
 
                     product.storeobj = stores[ stinx ];
+                    product.storeobj.isstore = true;
 
                     console.log("shoppinglist.parseStore: " + product.storeobj.store + " => " + product.text);
 

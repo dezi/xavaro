@@ -117,6 +117,8 @@ public class WebAppPrices
 
                         Matcher matcher = pattern.matcher(chunk);
 
+                        String lastline = null;
+
                         while (matcher.find())
                         {
                             int von = matcher.start();
@@ -126,7 +128,16 @@ public class WebAppPrices
                             while ((bis < inbuf) && (chunk.charAt(bis) != '\n')) bis++;
 
                             String line = chunk.substring(von, bis);
-                            if (line.startsWith(recordstart)) json.put(line);
+
+                            if (line.startsWith(recordstart))
+                            {
+                                if ((lastline == null) || ! lastline.equals(line))
+                                {
+                                    json.put(line);
+                                }
+                            }
+
+                            lastline = line;
                         }
 
                         //
