@@ -31,6 +31,7 @@ public class WebAppView extends WebView
     public WebAppWeather weather;
     public WebAppRequest request;
     public WebAppUtility utility;
+    public WebAppStorage storage;
     public WebAppActivity activity;
     public WebAppIntercept intercept;
     public WebAppAssistance assistance;
@@ -110,6 +111,12 @@ public class WebAppView extends WebView
         {
             utility = new WebAppUtility();
             addJavascriptInterface(utility, "WebAppUtility");
+        }
+
+        if (permissions.contains("storage"))
+        {
+            storage = new WebAppStorage(webappname);
+            addJavascriptInterface(storage, "WebAppStorage");
         }
 
         if (permissions.contains("activity"))

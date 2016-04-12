@@ -77,8 +77,8 @@ shoppinglist.sortCompareString = function(ab)
 
     if (ab.isprice)
     {
-        abstring += WebLibSimple.padNum(ab.product.storeobj.sort,8) + "|";
-        abstring += ab.product.storeobj.store + "|";
+        abstring += WebLibSimple.padNum(ab.product.storesort,8) + "|";
+        abstring += ab.product.storename + "|";
         abstring += ab.product.text + "|";
         abstring += ab.catinx + "|";
         abstring += ab.basesort + "|";
@@ -86,16 +86,16 @@ shoppinglist.sortCompareString = function(ab)
 
     if (ab.iscategory)
     {
-        abstring += WebLibSimple.padNum(ab.product.storeobj.sort,8) + "|";
-        abstring += ab.product.storeobj.store + "|";
+        abstring += WebLibSimple.padNum(ab.product.storesort,8) + "|";
+        abstring += ab.product.storename + "|";
         abstring += ab.product.text + "|";
         abstring += ab.catinx + "|";
     }
 
     if (ab.isproduct)
     {
-        abstring += WebLibSimple.padNum(ab.storeobj.sort,8) + "|";
-        abstring += ab.storeobj.store + "|";
+        abstring += WebLibSimple.padNum(ab.storesort,8) + "|";
+        abstring += ab.storename + "|";
         abstring += ab.text + "|";
     }
 
@@ -204,7 +204,7 @@ shoppinglist.createItemDiv = function(item)
 
         if (item.price)
         {
-            divSample.innerHTML = item.price.text;
+            divSample.innerHTML = item.displayquant + " " + item.price.text;
             divSample.style.lineHeight = "40px";
             divKeywords.innerHTML = item.price.displayprice;
             divKeywords.style.color = "#ff4444";
@@ -237,6 +237,30 @@ shoppinglist.createItemDiv = function(item)
     return divOuter;
 }
 
+shoppinglist.createStore = function(storename)
+{
+    var stores = WebLibStrings.strings[ "stores.defines" ];
+
+    if (stores)
+    {
+        for (var stinx in stores)
+        {
+            if (stores[ stinx ].store == storename)
+            {
+                if (! stores[ stinx ].itemDiv)
+                {
+                    stores[ stinx ].isstore = true;
+                    stores[ stinx ].itemDiv = shoppinglist.createItemDiv(stores[ stinx ]);
+                }
+
+                return stores[ stinx ];
+            }
+        }
+    }
+
+    return null;
+}
+
 shoppinglist.updateitemlist = function()
 {
     var sl = shoppinglist;
@@ -245,8 +269,10 @@ shoppinglist.updateitemlist = function()
 
     sl.listDiv.innerHTML = "";
 
+    sl.storage = {};
+    sl.storage.items = [];
+
     var laststore = null;
-    var lastproduct = null;
 
     for (var pinx = 0; pinx < sl.itemlist.length; pinx++)
     {
@@ -254,21 +280,19 @@ shoppinglist.updateitemlist = function()
 
         if (item.isproduct)
         {
-            if (item.storeobj != laststore)
+            if (item.storename != laststore)
             {
-                item.storeobj.itemDiv = shoppinglist.createItemDiv(item.storeobj);
-                sl.listDiv.appendChild(item.storeobj.itemDiv);
-                sl.itemlist.splice(pinx++, 0, item.storeobj);
+                var storeobj = shoppinglist.createStore(item.storename);
+                sl.listDiv.appendChild(storeobj.itemDiv);
+                sl.itemlist.splice(pinx++, 0, storeobj);
             }
 
-            laststore = item.storeobj;
-
-            lastproduct = item;
+            laststore = item.storename;
         }
 
         if (item.isstore)
         {
-            laststore = item;
+            laststore = item.store;
         }
 
         if (! item.itemDiv) item.itemDiv = shoppinglist.createItemDiv(item);
@@ -288,11 +312,74 @@ shoppinglist.updateitemlist = function()
     }
 }
 
-shoppinglist.addItem = function(product)
+shoppinglist.cloneItem = function(item)
+{
+    var ni = {};
+
+    for (var property in item)
+    {
+        if (property == "itemDiv") continue;
+        if (item[ property ] == null) continue;
+        if (typeof item[ property ] === 'object') continue;
+
+        ni[ property ] = item[ property ];
+    }
+
+    return ni;
+}
+
+shoppinglist.loadItems = function()
 {
     var sl = shoppinglist;
 
-    sl.itemlist.push(product);
+    var storage = JSON.parse(WebAppStorage.getAppStorage("list"));
+
+    if (storage.items)
+    {
+        for (var inx in storage.items)
+        {
+            var item = storage.items[ inx ];
+
+            if (item.priceline)
+            {
+                item.price = shoppinglist.parseRealProduct(item, item.priceline);
+            }
+
+            sl.itemlist.push(item);
+        }
+    }
+
+    shoppinglist.updateitemlist();
+}
+
+shoppinglist.saveItems = function()
+{
+    var sl = shoppinglist;
+
+    var storage = {};
+    storage.items = [];
+
+    for (var pinx = 0; pinx < sl.itemlist.length; pinx++)
+    {
+        item = sl.itemlist[ pinx ];
+
+        if (! item.isproduct) continue;
+
+        var si = shoppinglist.cloneItem(item);
+
+        storage.items.push(si);
+    }
+
+    console.log("shoppinglist.saveItems: " + WebAppUtility.getPrettyJson(JSON.stringify(storage)));
+
+    WebAppStorage.putAppStorage("list", JSON.stringify(storage));
+}
+
+shoppinglist.addItem = function(item)
+{
+    var sl = shoppinglist;
+
+    sl.itemlist.push(item);
 
     shoppinglist.updateitemlist();
 }
@@ -319,14 +406,23 @@ shoppinglist.onClickPick = function(target)
     var itemDiv = product.itemDiv;
 
     product.price = price;
+    product.priceline = price.line;
 
-    itemDiv.divSample.innerHTML = product.price.displaytext;
+    //
+    // Delete recusive element used for picking.
+    //
+
+    delete price.product;
+
+    itemDiv.divSample.innerHTML = product.displayquant + " " + product.price.displaytext;
     itemDiv.divSample.style.lineHeight = "40px";
     itemDiv.divKeywords.innerHTML = product.price.displayprice;
     itemDiv.divKeywords.style.color = "#ff4444";
-    itemDiv.imgIcon.src = product.price.icon ? product.price.icon : WebLibSimple.getNixPixImg();
+    itemDiv.imgIcon.src = product.price.icon ? product.price.icon : "multi_320x320.png";
 
     shoppinglist.onClickNukeSearches(product.itemDiv.divMore);
+
+    shoppinglist.saveItems();
 }
 
 shoppinglist.onClickCategory = function(target)
@@ -467,6 +563,8 @@ shoppinglist.searchCategories = function(product, categories)
         for (var inx = 0; inx < results.length; inx++)
         {
             var price = shoppinglist.parseRealProduct(product, results[ inx ]);
+            price.product = product;
+
             shoppinglist.addItem(price);
             itemsfound++;
         }
@@ -614,6 +712,8 @@ shoppinglist.onClickSearch = function(target)
             for (var inx = 0; inx < results.length; inx++)
             {
                 var price = shoppinglist.parseRealProduct(product, results[ inx ]);
+                price.product = product;
+                
                 shoppinglist.addItem(price);
                 itemsfound++;
             }
@@ -728,14 +828,16 @@ WebAppVoice.onResults = function(results)
 
         var product = shoppinglist.parseProduct(sl.results[ 0 ].spoken);
         shoppinglist.addItem(product);
+        shoppinglist.saveItems();
     }
 }
 
 shoppinglist.createFrame();
+shoppinglist.loadItems();
 
-shoppinglist.addItem(shoppinglist.parseProduct("Milch aus dem Aldi"));
-shoppinglist.addItem(shoppinglist.parseProduct("Kartoffeln aus dem Aldi"));
-shoppinglist.addItem(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
+//shoppinglist.addItem(shoppinglist.parseProduct("Milch aus dem Aldi"));
+//shoppinglist.addItem(shoppinglist.parseProduct("Kartoffeln aus dem Aldi"));
+//shoppinglist.addItem(shoppinglist.parseProduct("Klopapier aus dem Aldi"));
 
 //shoppinglist.addItem(shoppinglist.parseProduct("Batterien aus dem Aldi"));
 //shoppinglist.addItem(shoppinglist.parseProduct("Butter aus dem Penny"));

@@ -134,12 +134,12 @@ shoppinglist.parseCategory = function(product, line)
 
 shoppinglist.parseRealProduct = function(product, line)
 {
-    var parts = line.split("|");
-
     var price = {};
 
     price.isprice = true;
-    price.product = product;
+    price.line    = line;
+
+    var parts = line.split("|");
 
     price.catinx  = parts[ 1 ];
     price.text    = parts[ 2 ];
@@ -445,10 +445,10 @@ shoppinglist.parseStore = function(product)
                                  + " "
                                  + product.text.substring(pos + len).trim();
 
-                    product.storeobj = stores[ stinx ];
-                    product.storeobj.isstore = true;
+                    product.storename = stores[ stinx ].store;
+                    product.storesort = stores[ stinx ].sort;
 
-                    console.log("shoppinglist.parseStore: " + product.storeobj.store + " => " + product.text);
+                    console.log("shoppinglist.parseStore: " + product.storename + " => " + product.text);
 
                     return;
                 }
@@ -460,6 +460,6 @@ shoppinglist.parseStore = function(product)
     // The first entry is default.
     //
 
-    product.storeobj = stores[ 0 ];
-    product.storeobj.isstore = true;
+    product.storename = stores[ 0 ].store;
+    product.storesort = stores[ 0 ].sort;
 }

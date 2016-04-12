@@ -820,10 +820,14 @@ public class Simple
         }
     }
 
-
     public static File getFilesDir()
     {
         return Simple.getAnyContext().getFilesDir();
+    }
+
+    public static File getExternalFilesDir()
+    {
+        return Simple.getAnyContext().getExternalFilesDir(null);
     }
 
     public static File getCacheDir()
