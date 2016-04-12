@@ -63,14 +63,6 @@ shoppinglist.createFrame = function()
     sl.itemlist = [];
 }
 
-shoppinglist.brandSortPrio = function(brand)
-{
-    if (brand == "Eigenmarke") return "1" + brand;
-    if (brand == "Hausmarke") return "2" + brand;
-
-    return "9" + brand;
-}
-
 shoppinglist.sortCompareString = function(ab)
 {
     var abstring = "";
@@ -223,7 +215,7 @@ shoppinglist.createItemDiv = function(item)
         divSample.style.fontSize = "32px";
         divSample.innerHTML = item.store;
         divMore.imgMore.src = "arrow_less_270x270.png";
-        divMore.onTouchClick = shoppinglist.onClickMore;
+        divMore.onTouchClick = shoppinglist.onClickLess;
         imgIcon.src = item.logo ? item.logo : WebLibSimple.getNixPixImg();
     }
 
@@ -259,6 +251,27 @@ shoppinglist.createStore = function(storename)
     }
 
     return null;
+}
+
+shoppinglist.adjustScroll = function()
+{
+    var sl = shoppinglist;
+
+    //
+    // Check if scroll needs resetting.
+    //
+
+    var displayheight = sl.listDiv.parentNode.clientHeight;
+    var scrollheight = sl.listDiv.clientHeight;
+
+    if (scrollheight < displayheight)
+    {
+        //
+        // Reset list div offset to 0px.
+        //
+
+        sl.listDiv.style.top = "0px";
+    }
 }
 
 shoppinglist.updateitemlist = function()
@@ -299,17 +312,7 @@ shoppinglist.updateitemlist = function()
         sl.listDiv.appendChild(item.itemDiv);
     }
 
-    var displayheight = sl.listDiv.parentNode.clientHeight;
-    var scrollheight = sl.listDiv.clientHeight;
-
-    if (scrollheight < displayheight)
-    {
-        //
-        // Reset list div offset to 0px.
-        //
-
-        sl.listDiv.style.top = "0px";
-    }
+    shoppinglist.adjustScroll();
 }
 
 shoppinglist.cloneItem = function(item)
@@ -369,8 +372,6 @@ shoppinglist.saveItems = function()
 
         storage.items.push(si);
     }
-
-    console.log("shoppinglist.saveItems: " + WebAppUtility.getPrettyJson(JSON.stringify(storage)));
 
     WebAppStorage.putAppStorage("list", JSON.stringify(storage));
 }
@@ -666,6 +667,7 @@ shoppinglist.onClickDelete = function(ctarget, target)
     }
 
     shoppinglist.updateitemlist();
+    shoppinglist.saveItems();
 }
 
 shoppinglist.onClickSearch = function(ctarget, target)
@@ -719,8 +721,8 @@ shoppinglist.onClickSearch = function(ctarget, target)
     }
     else
     {
-        target.imgMore.src = "arrow_less_270x270.png";
-        target.onTouchClick = shoppinglist.onClickNukeSearches;
+        ctarget.imgMore.src = "arrow_less_270x270.png";
+        ctarget.onTouchClick = shoppinglist.onClickNukeSearches;
     }
 }
 
@@ -728,16 +730,58 @@ shoppinglist.onClickMore = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
-    target.imgMore.src = "arrow_less_270x270.png";
-    target.onTouchClick = shoppinglist.onClickLess;
+    var store = shoppinglist.getTargetItem(ctarget);
+    if (! store) return;
+
+    var sl = shoppinglist;
+
+    for (var pinx = 0; pinx < sl.itemlist.length; pinx++)
+    {
+        item = sl.itemlist[ pinx ];
+
+        if (item.isproduct && (item.storename == store.store))
+        {
+            item.itemDiv.style.display = "block";
+        }
+
+        if ((item.isprice || item.iscategory) && (item.product.storename == store.store))
+        {
+            item.itemDiv.style.display = "block";
+        }
+   }
+
+    ctarget.imgMore.src = "arrow_less_270x270.png";
+    ctarget.onTouchClick = shoppinglist.onClickLess;
 }
 
 shoppinglist.onClickLess = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
-    target.imgMore.src = "arrow_more_270x270.png";
-    target.onTouchClick = shoppinglist.onClickMore;
+    var store = shoppinglist.getTargetItem(ctarget);
+    if (! store) return;
+
+    var sl = shoppinglist;
+
+    for (var pinx = 0; pinx < sl.itemlist.length; pinx++)
+    {
+        item = sl.itemlist[ pinx ];
+
+        if (item.isproduct && (item.storename == store.store))
+        {
+            item.itemDiv.style.display = "none";
+        }
+
+        if ((item.isprice || item.iscategory) && (item.product.storename == store.store))
+        {
+            item.itemDiv.style.display = "none";
+        }
+    }
+
+    shoppinglist.adjustScroll();
+
+    ctarget.imgMore.src = "arrow_more_270x270.png";
+    ctarget.onTouchClick = shoppinglist.onClickMore;
 }
 
 shoppinglist.onClickAdd = function(ctarget, target)
