@@ -250,8 +250,6 @@ shoppinglist.parseQuantity = function(product)
     // Parse quantity from product text.
     //
 
-    var text = product.text.toLowerCase();
-
     product.quantunit = "st";
     product.quantphrase = "x";
     product.quantmulti = 1;
@@ -267,35 +265,31 @@ shoppinglist.parseQuantity = function(product)
     {
         for (var uinx in units)
         {
-            var phrase = units[ uinx ].phrase.toLowerCase();
-            var pos = text.indexOf(phrase);
-            var len = phrase.length;
+            var phrase = units[ uinx ].phrase;
+            var parts = product.text.split(new RegExp("\\b" + phrase + "\\b","i"));
 
-            if (pos >= 0)
+            if (parts.length == 2)
             {
                 product.quantunit   = units[ uinx ].unit;
                 product.quantmulti  = units[ uinx ].multi ? units[ uinx ].multi : 1;
                 product.quantphrase = units[ uinx ].phrase;
 
                 //
-                // Inspect phrase before unit for numeric values.
+                // Check rest of left hand string for quantity
                 //
 
-                var numcheck = product.text.substring(0, pos).trim().split(" ");
-                var number = parseInt(numcheck[ numcheck.length - 1 ]);
+                var numparts = parts[ 0 ].trim().split(" ");
+                var number = parseFloat(numparts[ numparts.length - 1].replace(",", "."));
 
                 if (! isNaN(number))
                 {
-                    product.quantity = number;
+                    product.quantity *= number;
+                    numparts.pop();
 
-                    numcheck.pop();
+                    parts[ 0 ] = numparts.join(" ");
                 }
 
-                product.text = numcheck.join(" ")
-                             + " "
-                             + product.text.substring(pos + len).trim();
-
-                text = product.text.toLowerCase();
+                product.text = parts[ 0 ].trim() + " " + parts[ 1 ].trim();
             }
         }
     }
@@ -310,21 +304,40 @@ shoppinglist.parseQuantity = function(product)
     {
         for (var ainx in amount)
         {
-            var phrase = amount[ ainx ].phrase.toLowerCase();
-            var pos = text.indexOf(phrase);
-            var len = phrase.length;
+            var phrase = amount[ ainx ].phrase;
+            var parts = product.text.split(new RegExp("\\b" + phrase + "\\b","i"));
 
-            if (pos >= 0)
+            if (parts.length == 2)
             {
-                product.text = product.text.substring(0, pos).trim()
-                             + " "
-                             + product.text.substring(pos + len).trim();
-
-                text = product.text.toLowerCase();
-
                 product.quantity *= amount[ ainx ].amount;
+
+                product.text = parts[ 0 ].trim() + " " + parts[ 1 ].trim();
             }
         }
+    }
+
+    //
+    // Get simple standalone quantities.
+    //
+
+    var parts = product.text.split(new RegExp("\\b[0-9,.]+\\b","i"));
+
+    if (parts.length == 2)
+    {
+        var start = parts[ 0 ].length;
+        var end   = product.text.length - parts[ 1 ].length;
+
+        var numpart = product.text.substring(start,end);
+        var number = parseFloat(numpart.replace(",", "."));
+
+        console.log("======================:" + numpart + "==");
+
+        if (! isNaN(number))
+        {
+            product.quantity *= number;
+        }
+
+        product.text = parts[ 0 ].trim() + " " + parts[ 1 ].trim();
     }
 
     //

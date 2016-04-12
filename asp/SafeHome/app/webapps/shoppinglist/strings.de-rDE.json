@@ -112,6 +112,7 @@
     { "amount":  8, "phrase": "achter" },
     { "amount":  9, "phrase": "neuner" },
     { "amount": 10, "phrase": "zehner" },
+    { "amount": 10, "phrase": "zwölfer" },
 
     { "amount": 1,    "phrase": "ganzes" },
     { "amount": 1,    "phrase": "ganze" },
