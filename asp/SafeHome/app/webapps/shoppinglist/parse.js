@@ -330,8 +330,6 @@ shoppinglist.parseQuantity = function(product)
         var numpart = product.text.substring(start,end);
         var number = parseFloat(numpart.replace(",", "."));
 
-        console.log("======================:" + numpart + "==");
-
         if (! isNaN(number))
         {
             product.quantity *= number;
