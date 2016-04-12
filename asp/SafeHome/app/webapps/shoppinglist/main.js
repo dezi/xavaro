@@ -204,7 +204,7 @@ shoppinglist.createItemDiv = function(item)
 
         if (item.price)
         {
-            divSample.innerHTML = item.displayquant + " " + item.price.text;
+            divSample.innerHTML = item.displayquant + " " + item.price.displaytext;
             divSample.style.lineHeight = "40px";
             divKeywords.innerHTML = item.price.displayprice;
             divKeywords.style.color = "#ff4444";
@@ -384,24 +384,13 @@ shoppinglist.addItem = function(item)
     shoppinglist.updateitemlist();
 }
 
-shoppinglist.onClickPick = function(target)
+shoppinglist.onClickPick = function(ctarget, target)
 {
-    //
-    // Do not click here, nuking will make a click.
-    //
+    WebAppUtility.makeClick();
 
-    //WebAppUtility.makeClick();
+    var price = shoppinglist.getTargetItem(ctarget);
+    if (! price) return;
 
-    var realtarget = target;
-
-    while (realtarget && ! realtarget.item)
-    {
-        realtarget = realtarget.parentNode;
-    }
-
-    if (! realtarget) return;
-
-    var price = realtarget.item;
     var product = price.product;
     var itemDiv = product.itemDiv;
 
@@ -425,24 +414,18 @@ shoppinglist.onClickPick = function(target)
     shoppinglist.saveItems();
 }
 
-shoppinglist.onClickCategory = function(target)
+shoppinglist.onClickCategory = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
-    var realtarget = target;
-
-    while (realtarget && ! realtarget.item)
-    {
-        realtarget = realtarget.parentNode;
-    }
-
-    if (! realtarget) return;
+    var category = shoppinglist.getTargetItem(ctarget);
+    if (! category) return;
 
     var categories = [];
 
-    categories.push(realtarget.item);
+    categories.push(category);
 
-    var itemsfound = shoppinglist.searchCategories(realtarget.item.product, categories);
+    var itemsfound = shoppinglist.searchCategories(category.product, categories);
 
     if (itemsfound == 0)
     {
@@ -573,7 +556,7 @@ shoppinglist.searchCategories = function(product, categories)
     return itemsfound;
 }
 
-shoppinglist.onClickNukePrices = function(target)
+shoppinglist.onClickNukePrices = function(ctarget, target)
 {
     //
     // Remove all open search releated entries.
@@ -595,17 +578,17 @@ shoppinglist.onClickNukePrices = function(target)
 
     shoppinglist.updateitemlist();
 
-    target.imgMore.src = "search_300x300.png";
-    target.onTouchClick = shoppinglist.onClickCategory;
+    ctarget.imgMore.src = "search_300x300.png";
+    ctarget.onTouchClick = shoppinglist.onClickCategory;
 }
 
-shoppinglist.onClickNukeSearches = function(target)
+shoppinglist.onClickNukeSearches = function(ctarget, target)
 {
     //
     // Remove all open search releated entries.
     //
 
-    WebAppUtility.makeClick();
+    if (target) WebAppUtility.makeClick();
 
     var sl = shoppinglist;
 
@@ -621,8 +604,8 @@ shoppinglist.onClickNukeSearches = function(target)
 
     shoppinglist.updateitemlist();
 
-    target.imgMore.src = "search_300x300.png";
-    target.onTouchClick = shoppinglist.onClickSearch;
+    ctarget.imgMore.src = "search_300x300.png";
+    ctarget.onTouchClick = shoppinglist.onClickSearch;
 }
 
 shoppinglist.getTargetItem = function(target)
@@ -635,11 +618,11 @@ shoppinglist.getTargetItem = function(target)
     return target ? target.item : null;
 }
 
-shoppinglist.onClickDelete = function(target)
+shoppinglist.onClickDelete = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
-    var item = shoppinglist.getTargetItem(target);
+    var item = shoppinglist.getTargetItem(ctarget);
     if (! item) return;
 
     var sl = shoppinglist;
@@ -685,20 +668,13 @@ shoppinglist.onClickDelete = function(target)
     shoppinglist.updateitemlist();
 }
 
-shoppinglist.onClickSearch = function(target)
+shoppinglist.onClickSearch = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
-    var realtarget = target;
+    var product = shoppinglist.getTargetItem(ctarget);
+    if (! product) return;
 
-    while (realtarget && ! realtarget.item)
-    {
-        realtarget = realtarget.parentNode;
-    }
-
-    if (! realtarget) return;
-
-    var product = realtarget.item;
     var itemsfound = 0;
 
     var results = JSON.parse(WebAppPrices.getCategories(product.text));
@@ -713,7 +689,7 @@ shoppinglist.onClickSearch = function(target)
             {
                 var price = shoppinglist.parseRealProduct(product, results[ inx ]);
                 price.product = product;
-                
+
                 shoppinglist.addItem(price);
                 itemsfound++;
             }
@@ -748,29 +724,23 @@ shoppinglist.onClickSearch = function(target)
     }
 }
 
-shoppinglist.onClickMore = function(target)
+shoppinglist.onClickMore = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
     target.imgMore.src = "arrow_less_270x270.png";
     target.onTouchClick = shoppinglist.onClickLess;
-
-    var sl = shoppinglist;
-    var store = target.item;
 }
 
-shoppinglist.onClickLess = function(target)
+shoppinglist.onClickLess = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
     target.imgMore.src = "arrow_more_270x270.png";
     target.onTouchClick = shoppinglist.onClickMore;
-
-    var sl = shoppinglist;
-    var store = target.item;
 }
 
-shoppinglist.onClickAdd = function(target)
+shoppinglist.onClickAdd = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
