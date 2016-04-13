@@ -161,6 +161,16 @@ shoppinglist.parseRealProduct = function(product, line)
     price.displayamount = price.priceobj.displayamount;
 
     //
+    // No display of amount with products having a
+    // circa weight in text.
+    //
+
+    if (price.text.match(/ ca\. [0-9]+g/))
+    {
+        price.displayamount = "";
+    }
+
+    //
     // Adjust display values.
     //
 

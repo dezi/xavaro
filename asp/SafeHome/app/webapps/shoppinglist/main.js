@@ -434,8 +434,8 @@ shoppinglist.onClickCategory = function(ctarget, target)
     }
     else
     {
-        target.imgMore.src = "arrow_less_270x270.png";
-        target.onTouchClick = shoppinglist.onClickNukePrices;
+        ctarget.imgMore.src = "arrow_less_270x270.png";
+        ctarget.onTouchClick = shoppinglist.onClickNukePrices;
     }
 }
 
@@ -480,6 +480,7 @@ shoppinglist.evaluteBestCategories = function(product, results)
         }
 
         if (topcat) continue;
+        if (tempcats[ inx ].count == 0) continue;
 
         if (text.toLowerCase().indexOf(targettext) >= 0)
         {
@@ -518,8 +519,9 @@ shoppinglist.evaluteBestCategories = function(product, results)
         }
 
         if (topcat) continue;
+        if (tempcats[ inx ].count == 0) continue;
 
-        if ((nummatches > 0)  && (text.toLowerCase().indexOf(targettext) < 0)) continue;
+        if ((nummatches > 0) && (text.toLowerCase().indexOf(targettext) < 0)) continue;
 
         //
         // Tune ups from category path.
@@ -614,14 +616,8 @@ shoppinglist.onClickNukePrices = function(ctarget, target)
     ctarget.onTouchClick = shoppinglist.onClickCategory;
 }
 
-shoppinglist.onClickNukeSearches = function(ctarget, target)
+shoppinglist.nukeSearches = function()
 {
-    //
-    // Remove all open search releated entries.
-    //
-
-    if (target) WebAppUtility.makeClick();
-
     var sl = shoppinglist;
 
     for (var inx = 0; inx < sl.itemlist.length; inx++)
@@ -632,9 +628,26 @@ shoppinglist.onClickNukeSearches = function(ctarget, target)
         {
             sl.itemlist.splice(inx--, 1);
         }
+
+        if (item.isproduct)
+        {
+            item.itemDiv.divMore.imgMore.src = "search_300x300.png";
+            item.itemDiv.divMore.onTouchClick = shoppinglist.onClickSearch;
+        }
     }
 
     shoppinglist.updateitemlist();
+}
+
+shoppinglist.onClickNukeSearches = function(ctarget, target)
+{
+    //
+    // Remove all open search releated entries.
+    //
+
+    if (target) WebAppUtility.makeClick();
+
+    shoppinglist.nukeSearches();
 
     ctarget.imgMore.src = "search_300x300.png";
     ctarget.onTouchClick = shoppinglist.onClickSearch;
@@ -909,6 +922,8 @@ WebAppVoice.onResults = function(results)
     {
         sl.resultDiv.style.color = "#ffffff";
         sl.resultDiv.innerHTML = sl.results[ 0 ].spoken + " (" + sl.results[ 0 ].confidence + "%)";
+
+        shoppinglist.nukeSearches();
 
         var product = shoppinglist.parseProduct(sl.results[ 0 ].spoken);
         shoppinglist.addItem(product);
