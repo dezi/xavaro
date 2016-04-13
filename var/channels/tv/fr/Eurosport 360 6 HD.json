@@ -1,0 +1,23 @@
+{
+  "name":"Eurosport 360 6 HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"ger",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "HDTV",
+    "SKY"
+  ],
+  "packs":
+  [
+    "15:Sky Deutschland"
+  ],
+  "providers":
+  [
+    "SKY"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name":"France Ô",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":false,
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "12:Orange France",
+    "17:CanalSat France",
+    "18:TNT Sat",
+    "27:Telesat",
+    "28:SFR"
+  ],
+  "providers":
+  [
+    ""
+  ]
+}

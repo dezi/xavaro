@@ -1,9 +1,11 @@
 {
   "name":"QVC France HD",
   "type":"tv",
-  "ishd":false,
   "isocc":"fr",
   "isolang":"fre",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
   "tags":
   [
     "DVB-S",
@@ -16,6 +18,7 @@
   ],
   "providers":
   [
-    "SES"
+    "SES",
+    "SES ASTRA"
   ]
 }

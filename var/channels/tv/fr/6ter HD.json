@@ -1,0 +1,24 @@
+{
+  "name":"6ter HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":false,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "17:CanalSat France",
+    "18:TNT Sat"
+  ],
+  "providers":
+  [
+    "CSAT"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name":"Trek",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "AB SAT",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "12:Orange France",
+    "17:CanalSat France",
+    "27:Telesat"
+  ],
+  "providers":
+  [
+    "AB SAT"
+  ]
+}
