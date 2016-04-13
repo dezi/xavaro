@@ -1626,6 +1626,27 @@ public class Simple
         return null;
     }
 
+    @Nullable
+    public static String UTF8defuck(String utf8)
+    {
+        //
+        // Remove
+        //
+        // LEFT-TO-RIGHT EMBEDDING
+        // POP DIRECTIONAL FORMATTING
+        //
+        // fuck characters.
+        //
+
+        if (utf8 != null)
+        {
+            utf8 = utf8.replace("\u202A", "");
+            utf8 = utf8.replace("\u202C", "");
+        }
+
+        return utf8;
+    }
+
     public static String JSONdefuck(String json)
     {
         //

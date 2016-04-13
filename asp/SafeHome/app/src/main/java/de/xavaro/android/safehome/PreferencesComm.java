@@ -434,8 +434,9 @@ public class PreferencesComm
                         // the numbers with spaces.
                         //
 
-                        String isspacenum = Json.getString(item, "NUMBER");
+                        String isspacenum = Simple.UTF8defuck(Json.getString(item, "NUMBER"));
                         if (isspacenum == null) continue;
+
                         String nospacenum = isspacenum.replace(" ", "");
 
                         JSONObject number;
@@ -464,8 +465,11 @@ public class PreferencesComm
                     {
                         if (Simple.equals(kind, "Phone"))
                         {
-                            putNumberType(numbers, "voipphone", Json.getString(item, "NUMBER"));
-                            putNumberType(numbers, "textphone", Json.getString(item, "NUMBER"));
+                            putNumberType(numbers, "voipphone",
+                                    Simple.UTF8defuck(Json.getString(item, "NUMBER")));
+
+                            putNumberType(numbers, "textphone",
+                                    Simple.UTF8defuck(Json.getString(item, "NUMBER")));
                         }
                     }
 
