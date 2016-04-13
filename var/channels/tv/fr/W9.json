@@ -1,0 +1,26 @@
+{
+  "name":"W9",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "12:Orange France",
+    "17:CanalSat France",
+    "28:SFR"
+  ],
+  "providers":
+  [
+    "CSAT"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name":"Canal + Décalé HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "19:Les chaînes Canal +",
+    "28:SFR"
+  ],
+  "providers":
+  [
+    ""
+  ]
+}

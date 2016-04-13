@@ -1,0 +1,23 @@
+{
+  "name":"Aristo TV",
+  "type":"tv",
+  "isocc":"de",
+  "isolang":"ger",
+  "isen":false,
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "ORF",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "16:ORF Digital"
+  ],
+  "providers":
+  [
+    "ORF"
+  ]
+}

@@ -8,8 +8,11 @@
   "isbd":false,
   "tags":
   [
+    "CSAT",
     "DVB-C",
+    "DVB-S",
     "Digital Free",
+    "HDTV",
     "SDTV"
   ],
   "packs":
@@ -22,6 +25,7 @@
   ],
   "providers":
   [
+    "CSAT",
     "Digital Free"
   ]
 }

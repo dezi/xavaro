@@ -251,7 +251,6 @@ function readMuxes($muxesdir, $networkname)
 		if ($entry == ".") continue;
 		if ($entry == "..") continue;
 
-
 		$jsondata = file_get_contents($muxesdir . "/" . $entry);
 		$json = json_decdat($jsondata);
 
@@ -708,14 +707,14 @@ function readEPGs()
 		if (isset($episode[ "title"    ])) $json[ "title"    ] = $episode[ "title"    ];
 		if (isset($episode[ "subtitle" ])) $json[ "subtitle" ] = $episode[ "subtitle" ];
 
-		$channel = $json[ "channel" ];
-		$channel = $GLOBALS[ "channels" ][ $channel ];
+		$epgchannel = $json[ "channel" ];
+		$channel = $GLOBALS[ "channels" ][ $epgchannel ];
 
 		$service = $channel[ "services" ];
 		$service = $GLOBALS[ "services" ][ $service[ 0 ] ];
 
 		$json[ "network"  ] = $service[ "networkname" ];
-		$json[ "channel"  ] = $service[ "svcname"     ];
+		$json[ "channel"  ] = isset($service[ "svcname" ]) ? $service[ "svcname" ] : "NOSCVNAME";
 
 		if (isset($service[ "provider" ])) $json[ "provider" ] = $service[ "provider" ];
 
@@ -728,8 +727,23 @@ function readEPGs()
 		for ($inx = 0; $inx < count($tags); $inx++)
 		{
 			$tag = $GLOBALS[ "tags" ][ $tags[ $inx ] ][ "name" ];
-			if ($tag == "Radio") $type = "rd";
-			$json[ "tags" ][] = $tag;
+			
+			if ($tag == "Radio") 
+			{
+				if ($json[ "channel" ] != "RTL2")
+				{
+					//
+					// RTL2 has a hard conflict with RTL2 Radio and RTL2 TV.
+					// Since there is now EPG on RTL2 Radio, we prefer RTL TV here.
+					//
+					
+					$type = "rd";
+				}
+			}
+			else
+			{
+				$json[ "tags" ][] = $tag;
+			}
 		}
 
 		$json[ "tags" ] = implode("|",$json[ "tags" ]);
@@ -926,8 +940,8 @@ readHomedir();
 readHostname();
 
 readTags();
-readChannels();
 readNetworks();
+readChannels();
 readChannelConfig();
 
 readEPGs();

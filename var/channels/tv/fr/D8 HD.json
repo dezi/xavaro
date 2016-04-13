@@ -1,0 +1,25 @@
+{
+  "name":"D8 HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV",
+    "IMEDIA",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "17:CanalSat France"
+  ],
+  "providers":
+  [
+    ""
+  ]
+}

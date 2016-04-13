@@ -1,0 +1,23 @@
+{
+  "name":"Dorcel XXX",
+  "type":"tv",
+  "isocc":"nl",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":false,
+  "isbd":false,
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "37:Orange România"
+  ],
+  "providers":
+  [
+    "CSAT"
+  ]
+}

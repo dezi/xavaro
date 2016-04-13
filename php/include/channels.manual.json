@@ -1,5 +1,40 @@
 [
   {
+    "name":"SR Fernsehen HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.sr-online.de/sronline/sr_fernsehen/uebersicht",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/ss/sr_sudwest_fernsehen.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"3:General Entertainment",
+    "packs":
+    [
+      "6:CanalDigitaal",
+      "7:TV Vlaanderen Digitaal"
+    ]
+  },
+  
+  {
+    "name":"Channel 21 HD",
+    "free":true,
+    "enc":"None",
+    "hd":true,
+    "website":"www.channel21.de",
+    "language":"German",
+    "logo":"http://www.lyngsat-logo.com/logo/tv/cc/channel_21_de.png",
+    "type":"tv",
+    "country":"Germany",
+    "isocc":"de",
+    "isolang":"ger",
+    "genre":"17:Shopping"
+  },
+  
+  {
     "name":"ARTE Deutsch",
     "free":true,
     "enc":"None",
