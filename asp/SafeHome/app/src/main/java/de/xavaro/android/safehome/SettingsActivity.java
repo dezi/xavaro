@@ -97,8 +97,6 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesBasics.CommunityFragment.getHeader());
         target.add(PreferencesBasics.AlertgroupFragment.getHeader());
 
-        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
-
         category = new Header();
         category.title = "Kommunikation";
         target.add(category);
@@ -139,6 +137,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesHealth.HealthSensorFragment.getHeader());
         target.add(PreferencesHealth.HealthGlucoseFragment.getHeader());
         target.add(PreferencesHealth.HealthUnitsFragment.getHeader());
+        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";
