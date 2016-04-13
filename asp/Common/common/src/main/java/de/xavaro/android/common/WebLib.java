@@ -12,9 +12,7 @@ public class WebLib
     @Nullable
     public static JSONObject getConfig(String weblib)
     {
-        boolean devel = Simple.getSharedPrefBoolean("developer.enable");
-        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval = (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
+        int interval = WebApp.getWebAppInterval();
 
         String src = WebApp.getHTTPLibRoot() + weblib + ".json";
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);
@@ -36,9 +34,7 @@ public class WebLib
     @Nullable
     public static JSONObject getLocaleConfig(String weblib)
     {
-        boolean devel = Simple.getSharedPrefBoolean("developer.enable");
-        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
+        int interval = WebApp.getWebAppInterval();
 
         String src = WebApp.getHTTPLibRoot() + weblib + ".json";
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);

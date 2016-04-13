@@ -134,12 +134,18 @@ public class WebApp
         return list;
     }
 
-    @Nullable
-    private static Drawable getImage(String webappname, String src)
+    public static int getWebAppInterval()
     {
         boolean devel = Simple.getSharedPrefBoolean("developer.enable");
         String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
+
+        return (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
+    }
+
+    @Nullable
+    private static Drawable getImage(String webappname, String src)
+    {
+        int interval = getWebAppInterval();
 
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
@@ -155,9 +161,7 @@ public class WebApp
     @Nullable
     private static String getStringContent(String webappname, String src)
     {
-        boolean devel = Simple.getSharedPrefBoolean("developer.enable");
-        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
+        int interval = getWebAppInterval();
 
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
