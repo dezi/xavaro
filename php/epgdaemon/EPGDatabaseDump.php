@@ -173,7 +173,7 @@ function readChannels()
 		if ($entry == "..") continue;
 
 		$jsondata = file_get_contents($channeldir . "/" . $entry);
-		$json = json_decdat($jsondata);
+		$json = json_decdat($jsondata);		
 
 		$GLOBALS[ "channels" ][ $entry ] = $json;
 	}

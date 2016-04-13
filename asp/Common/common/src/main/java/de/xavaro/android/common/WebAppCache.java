@@ -32,12 +32,14 @@ public class WebAppCache
         public final String mimetype;
         public final String encoding;
         public final byte[] content;
+        public final boolean notmodified;
 
-        public WebAppCacheResponse(String mimetype, String encoding, byte[] content)
+        public WebAppCacheResponse(String mimetype, String encoding, byte[] content, boolean notmodified)
         {
             this.mimetype = mimetype;
             this.encoding = encoding;
             this.content = content;
+            this.notmodified = notmodified;
         }
     }
 
@@ -89,7 +91,7 @@ public class WebAppCache
         if (cachefiles == null)
         {
             Simple.makePost(freeMemory, 10 * 1000);
-            return new WebAppCacheResponse(null, null, null);
+            return new WebAppCacheResponse(null, null, null, false);
         }
 
         File cachedir = new File(Simple.getCacheDir(), "webappcache/" + webappname);
@@ -205,6 +207,8 @@ public class WebAppCache
             }
         }
 
+        boolean notmodified = false;
+
         if ((content == null) && (uuid != null))
         {
             //
@@ -223,6 +227,8 @@ public class WebAppCache
                 //
 
                 Log.d(LOGTAG, "getCacheFile: NOM=" + mimetype + "=" + url);
+
+                notmodified = true;
             }
         }
 
@@ -267,7 +273,7 @@ public class WebAppCache
             }
         }
 
-        return new WebAppCacheResponse(mimetype, encoding, content);
+        return new WebAppCacheResponse(mimetype, encoding, content, notmodified);
     }
 
     @Nullable
@@ -536,6 +542,17 @@ public class WebAppCache
                     continue;
                 }
 
+                //
+                // Check if entry is from webapps or weblibs directory.
+                // This is an all or nothing update. Only trigger on
+                // the modification of the manifest.json entry.
+                //
+
+                if (url.startsWith("/") && ! url.endsWith("manifest.json"))
+                {
+                    continue;
+                }
+
                 int ival = Json.getInt(cachefile, "ival");
                 int ivalsecs = ival * 3600;
 
@@ -615,6 +632,11 @@ public class WebAppCache
         return nextItem;
     }
 
+    public static void revalidateWebapp(String webappname)
+    {
+
+    }
+
     public static void commTick()
     {
         if (nextLoadTime > (Simple.nowAsTimeStamp() / 1000)) return;
@@ -635,28 +657,70 @@ public class WebAppCache
         String webappname = Json.getString(nextLoadItem, "webappname");
         String url = Json.getString(nextLoadItem, "url");
         int ival = Json.getInt(nextLoadItem, "ival");
-
         long secondsdue = (nextload - Simple.nowAsTimeStamp()) / 1000;
 
-        if (secondsdue > 0)
+        if (url == null)
         {
-            Log.d(LOGTAG, "commTick: wait=" + webappname + "=" + ival + "=" + secondsdue + "=" + url);
-
-            nextLoadTime = (Simple.nowAsTimeStamp() / 1000) + secondsdue;
+            nextLoadItem = null;
+            nextLoadTime = 0;
         }
         else
         {
-            if ((url != null) && ! url.startsWith("http:"))
+            String logline = webappname + "=" + ival + "=" + secondsdue + "=" + url;
+
+            if (secondsdue > 0)
             {
-                url = WebApp.getHTTPAppRoot(webappname) + url;
+                Log.d(LOGTAG, "commTick: wait=" + logline);
+
+                nextLoadTime = (Simple.nowAsTimeStamp() / 1000) + secondsdue;
             }
+            else
+            {
+                Log.d(LOGTAG, "commTick: load=" + logline);
 
-            Log.d(LOGTAG, "commTick: load=" + webappname + "=" + ival + "=" + secondsdue + "=" + url);
+                if (url.startsWith("/"))
+                {
+                    url = WebApp.getHTTPAppRoot(webappname) + url;
 
-            getCacheFile(webappname, url, ival, true);
+                    if (url.endsWith("manifest.json"))
+                    {
+                        //
+                        // Manifest check.
+                        //
 
-            nextLoadItem = null;
-            nextLoadTime = 0;
+                        WebAppCacheResponse res = getCacheFile(webappname, url, ival, true);
+
+                        if (! res.notmodified)
+                        {
+                            //
+                            // Re-validate / reload all local
+                            // cache files for this webapp.
+                            //
+
+                            revalidateWebapp(webappname);
+                        }
+                    }
+                    else
+                    {
+                        //
+                        // Should not happen any more.
+                        //
+
+                        OopsService.log(LOGTAG, "Webapp local file re-cached on schedule...");
+                    }
+                }
+                else
+                {
+                    //
+                    // File from app data servers or other.
+                    //
+
+                    getCacheFile(webappname, url, ival, true);
+                }
+
+                nextLoadItem = null;
+                nextLoadTime = 0;
+            }
         }
     }
 }

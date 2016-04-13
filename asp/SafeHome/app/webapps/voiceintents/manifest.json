@@ -27,10 +27,6 @@
       "strings.de-rDE.json"
     ],
 
-    "cachedefs": [
-      { "interval": 24, "pattern": ".*\\.js" },
-      { "interval": 72, "pattern": ".*\\.png" },
-      { "interval": 24, "pattern": ".*\\.json" }
-    ]
+    "cachedefs": []
   }
 }

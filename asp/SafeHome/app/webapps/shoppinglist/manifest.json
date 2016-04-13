@@ -37,9 +37,6 @@
     ],
 
     "cachedefs": [
-      { "interval": 24, "pattern": ".*\\.js" },
-      { "interval": 72, "pattern": ".*\\.png" },
-      { "interval": 24, "pattern": ".*\\.json" },
       { "interval": 99, "pattern": "http://epg.xavaro.de/prodata/.*.csv.gzbin" }
     ]
   }
