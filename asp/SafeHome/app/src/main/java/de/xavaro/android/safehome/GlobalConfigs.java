@@ -16,7 +16,7 @@ public class GlobalConfigs
     public static final String   BetaVersionDate = "2016-04-13T23:00:00Z";
     public static final String   BetaExpiration  = "2016-05-21T23:00:00Z";
     // @formatter:on
- 
+
     //endregion
 
     //region Colors, styles and sizes.
