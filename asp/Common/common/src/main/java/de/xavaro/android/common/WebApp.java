@@ -26,7 +26,8 @@ public class WebApp
         String httpport = "" + CommonConfigs.WebappsServerPort;
         String wifiname = Simple.getWifiName();
 
-        if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
+        if (Simple.getSharedPrefBoolean("developer.enable") &&
+            Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
         {
             httpserver = Simple.getSharedPrefString("developer.webapps.httpserver." + wifiname);
             httpport = Simple.getSharedPrefString("developer.webapps.httpport." + wifiname);
@@ -136,8 +137,9 @@ public class WebApp
     @Nullable
     private static Drawable getImage(String webappname, String src)
     {
+        boolean devel = Simple.getSharedPrefBoolean("developer.enable");
         String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+        int interval =  (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
 
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
@@ -153,8 +155,9 @@ public class WebApp
     @Nullable
     private static String getStringContent(String webappname, String src)
     {
+        boolean devel = Simple.getSharedPrefBoolean("developer.enable");
         String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+        int interval =  (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
 
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 
