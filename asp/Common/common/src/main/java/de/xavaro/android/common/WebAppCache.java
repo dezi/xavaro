@@ -19,6 +19,7 @@ public class WebAppCache
 {
     private static final String LOGTAG = WebAppCache.class.getSimpleName();
 
+    private static final JSONObject webappsync = new JSONObject();
     private static JSONObject webappcache;
     private static boolean dirty;
 
@@ -85,8 +86,13 @@ public class WebAppCache
             cacheurl = url.substring(WebApp.getHTTPRoot().length());
         }
 
-        if (! webappcache.has(webappname)) Json.put(webappcache, webappname, new JSONObject());
-        JSONObject cachefiles = Json.getObject(webappcache, webappname);
+        JSONObject cachefiles;
+
+        synchronized (webappsync)
+        {
+            if (! webappcache.has(webappname)) Json.put(webappcache, webappname, new JSONObject());
+            cachefiles = Json.getObject(webappcache, webappname);
+        }
 
         if (cachefiles == null)
         {
@@ -242,9 +248,10 @@ public class WebAppCache
 
             mimetype = Json.getString(cachefile, "mime");
 
+            if (interval > 1) Json.put(cachefile, "ival", interval);
+
             if (interval >= 0)
             {
-                Json.put(cachefile, "ival", interval);
                 if (! nolastuse) Json.put(cachefile, "luse", Simple.nowAsISO());
                 dirty = true;
             }
@@ -429,66 +436,75 @@ public class WebAppCache
         @Override
         public void run()
         {
-            if (webappcache != null)
+            synchronized (webappsync)
             {
-                if (dirty) putStorage();
+                if (webappcache != null)
+                {
+                    if (dirty) putStorage();
 
-                webappcache = null;
+                    webappcache = null;
+                }
             }
         }
     };
 
     private static void getStorage()
     {
-        if (webappcache != null) return;
-
-        File file = new File(Simple.getFilesDir(), "webappcache.act.json");
-        if (! file.exists()) file = new File(Simple.getFilesDir(), "webappcache.bak.json");
-
-        try
+        synchronized (webappsync)
         {
-            if (! file.exists())
+            if (webappcache != null) return;
+
+            File file = new File(Simple.getFilesDir(), "webappcache.act.json");
+            if (!file.exists()) file = new File(Simple.getFilesDir(), "webappcache.bak.json");
+
+            try
             {
-                webappcache = new JSONObject();
+                if (!file.exists())
+                {
+                    webappcache = new JSONObject();
+                }
+                else
+                {
+                    String json = Simple.getFileContent(file);
+                    webappcache = (json != null) ? new JSONObject(json) : new JSONObject();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                String json = Simple.getFileContent(file);
-                webappcache = (json != null) ? new JSONObject(json) : new JSONObject();
+                OopsService.log(LOGTAG, ex);
             }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG,ex);
         }
     }
 
     private static void putStorage()
     {
-        if (webappcache == null) return;
-
-        File tmp = new File(Simple.getFilesDir(), "webappcache.tmp.json");
-        File bak = new File(Simple.getFilesDir(), "webappcache.bak.json");
-        File act = new File(Simple.getFilesDir(), "webappcache.act.json");
-
-        try
+        synchronized (webappsync)
         {
-            if (Simple.putFileContent(tmp, Json.defuck(Json.toPretty(webappcache))))
+            if (webappcache == null) return;
+
+            File tmp = new File(Simple.getFilesDir(), "webappcache.tmp.json");
+            File bak = new File(Simple.getFilesDir(), "webappcache.bak.json");
+            File act = new File(Simple.getFilesDir(), "webappcache.act.json");
+
+            try
             {
-                boolean ok = true;
+                if (Simple.putFileContent(tmp, Json.defuck(Json.toPretty(webappcache))))
+                {
+                    boolean ok = true;
 
-                if (bak.exists()) ok = bak.delete();
-                if (act.exists()) ok &= act.renameTo(bak);
-                if (tmp.exists()) ok &= tmp.renameTo(act);
+                    if (bak.exists()) ok = bak.delete();
+                    if (act.exists()) ok &= act.renameTo(bak);
+                    if (tmp.exists()) ok &= tmp.renameTo(act);
 
-                dirty = false;
+                    dirty = false;
 
-                Log.d(LOGTAG, "putStorage: ok=" + ok);
+                    Log.d(LOGTAG, "putStorage: ok=" + ok);
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG,ex);
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
         }
     }
 
@@ -501,129 +517,132 @@ public class WebAppCache
         Simple.removePost(freeMemory);
         getStorage();
 
-        long nowsecs = Simple.nowAsTimeStamp() / 1000;
-        long todaysecs = (nowsecs / 86400) * 86400;
-
         JSONObject nextItem = null;
-        long nextDue = Long.MAX_VALUE;
 
-        Iterator<String> webappsIter = webappcache.keys();
-
-        while (webappsIter.hasNext())
+        synchronized (webappsync)
         {
-            String webappname = webappsIter.next();
+            long nowsecs = Simple.nowAsTimeStamp() / 1000;
+            long todaysecs = (nowsecs / 86400) * 86400;
+            long nextDue = Long.MAX_VALUE;
 
-            JSONObject cachefiles = Json.getObject(webappcache, webappname);
-            if (cachefiles == null) continue;
+            Iterator<String> webappsIter = webappcache.keys();
 
-            //
-            // Process wep app cached urls list.
-            //
-
-            ArrayList<String> unusedUrls = new ArrayList<>();
-            Iterator<String> cachefilesIter = cachefiles.keys();
-
-            while (cachefilesIter.hasNext())
+            while (webappsIter.hasNext())
             {
-                String url = cachefilesIter.next();
-                JSONObject cachefile = Json.getObject(cachefiles, url);
-                if (cachefile == null) continue;
+                String webappname = webappsIter.next();
 
-                String luse = Json.getString(cachefile, "luse");
-                String lget = Json.getString(cachefile, "lget");
+                JSONObject cachefiles = Json.getObject(webappcache, webappname);
+                if (cachefiles == null) continue;
 
-                if ((luse == null) && (lget == null))
+                //
+                // Process webapp cached urls list.
+                //
+
+                ArrayList<String> unusedUrls = new ArrayList<>();
+                Iterator<String> cachefilesIter = cachefiles.keys();
+
+                while (cachefilesIter.hasNext())
                 {
-                    //
-                    // Entry is somewhat junky.
-                    //
+                    String url = cachefilesIter.next();
+                    JSONObject cachefile = Json.getObject(cachefiles, url);
+                    if (cachefile == null) continue;
 
-                    unusedUrls.add(url);
-                    continue;
-                }
+                    String luse = Json.getString(cachefile, "luse");
+                    String lget = Json.getString(cachefile, "lget");
 
-                //
-                // Check if entry is from webapps or weblibs directory.
-                // This is an all or nothing update. Only trigger on
-                // the modification of the manifest.json entry.
-                //
-
-                if (url.startsWith("/") && ! url.endsWith("manifest.json"))
-                {
-                    continue;
-                }
-
-                int ival = Json.getInt(cachefile, "ival");
-                int ivalsecs = ival * 3600;
-
-                //
-                // Check last usage of item.
-                //
-
-                if (luse != null)
-                {
-                    long lastusage = nowsecs - (Simple.getTimeStamp(luse) / 1000);
-
-                    if (((ivalsecs > 0) && (lastusage >= ivalsecs))
-                            || ((ivalsecs == 0) && (lastusage > (3600 * 48))))
+                    if ((luse == null) && (lget == null))
                     {
                         //
-                        // File was not used within cache interval
-                        // or is developer bypass and not used within
-                        // 48 hours.
+                        // Entry is somewhat junky.
                         //
 
                         unusedUrls.add(url);
                         continue;
                     }
+
+                    //
+                    // Check if entry is from webapps or weblibs directory.
+                    // This is an all or nothing update. Only trigger on
+                    // the modification of the manifest.json entry.
+                    //
+
+                    if (url.startsWith("/") && !url.endsWith("manifest.json"))
+                    {
+                        continue;
+                    }
+
+                    int ival = Json.getInt(cachefile, "ival");
+                    int ivalsecs = ival * 3600;
+
+                    //
+                    // Check last usage of item.
+                    //
+
+                    if (luse != null)
+                    {
+                        long lastusage = nowsecs - (Simple.getTimeStamp(luse) / 1000);
+
+                        if (((ivalsecs > 0) && (lastusage >= ivalsecs))
+                                || ((ivalsecs == 0) && (lastusage > (3600 * 48))))
+                        {
+                            //
+                            // File was not used within cache interval
+                            // or is developer bypass and not used within
+                            // 48 hours.
+                            //
+
+                            unusedUrls.add(url);
+                            continue;
+                        }
+                    }
+
+                    //
+                    // Check last fetch of item.
+                    //
+
+                    if (ival == 0) continue;
+                    int time = Json.getInt(cachefile, "time") % ivalsecs;
+
+                    long lastLoad = (lget == null) ? todaysecs : (Simple.getTimeStamp(lget) / 1000);
+                    long nextLoad = ((lastLoad / 86400) * 86400) + time;
+
+                    while (nextLoad < nowsecs) nextLoad += ivalsecs;
+                    if ((nextLoad - lastLoad) <= ivalsecs) nextLoad += ivalsecs;
+
+                    long secstoload = nextLoad - nowsecs;
+
+                    if (secstoload < nextDue)
+                    {
+                        nextItem = new JSONObject();
+
+                        Json.put(nextItem, "webappname", webappname);
+                        Json.put(nextItem, "nextload", Simple.timeStampAsISO(nextLoad * 1000L));
+                        Json.put(nextItem, "ival", ival);
+                        Json.put(nextItem, "url", url);
+
+                        nextDue = secstoload;
+                    }
                 }
 
                 //
-                // Check last fetch of item.
+                // Process unused list.
                 //
 
-                if (ival == 0) continue;
-                int time = Json.getInt(cachefile, "time") % ivalsecs;
+                File cachedir = new File(Simple.getCacheDir(), "webappcache/" + webappname);
 
-                long lastLoad = (lget == null) ? todaysecs : (Simple.getTimeStamp(lget) / 1000);
-                long nextLoad = ((lastLoad / 86400) * 86400) + time;
-
-                while (nextLoad < nowsecs) nextLoad += ivalsecs;
-                if ((nextLoad - lastLoad) <= ivalsecs) nextLoad += ivalsecs;
-
-                long secstoload = nextLoad - nowsecs;
-
-                if (secstoload < nextDue)
+                for (String url : unusedUrls)
                 {
-                    nextItem = new JSONObject();
+                    JSONObject cachefile = Json.getObject(cachefiles, url);
+                    String uuid = Json.getString(cachefile, "uuid");
+                    if (uuid == null) continue;
 
-                    Json.put(nextItem, "webappname", webappname);
-                    Json.put(nextItem, "nextload", Simple.timeStampAsISO(nextLoad * 1000L));
-                    Json.put(nextItem, "ival", ival);
-                    Json.put(nextItem, "url", url);
+                    File cfile = new File(cachedir, uuid);
 
-                    nextDue = secstoload;
+                    if (cfile.delete()) Log.d(LOGTAG, "getNextLoadItem: unused/deleted:" + url);
+
+                    Json.remove(cachefiles, url);
+                    dirty = true;
                 }
-            }
-
-            //
-            // Process unused list.
-            //
-
-            File cachedir = new File(Simple.getCacheDir(), "webappcache/" + webappname);
-
-            for (String url : unusedUrls)
-            {
-                JSONObject cachefile = Json.getObject(cachefiles, url);
-                String uuid = Json.getString(cachefile, "uuid");
-                if (uuid == null) continue;
-
-                File cfile = new File(cachedir, uuid);
-
-                if (cfile.delete()) Log.d(LOGTAG, "getNextLoadItem: unused/deleted:" + url);
-
-                Json.remove(cachefiles, url);
-                dirty = true;
             }
         }
 
@@ -634,7 +653,34 @@ public class WebAppCache
 
     public static void revalidateWebapp(String webappname)
     {
+        Simple.removePost(freeMemory);
+        getStorage();
 
+        synchronized (webappsync)
+        {
+            JSONObject cachefiles = Json.getObject(webappcache, webappname);
+            if (cachefiles == null) return;
+
+            //
+            // Process webapp cached urls list.
+            //
+
+            Iterator<String> cachefilesIter = cachefiles.keys();
+
+            while (cachefilesIter.hasNext())
+            {
+                String url = cachefilesIter.next();
+                JSONObject cachefile = Json.getObject(cachefiles, url);
+
+                if (cachefile == null) continue;
+                if (!url.startsWith("/")) continue;
+
+                url = WebApp.getHTTPRoot() + url;
+                getCacheFile(webappname, url, 1, true);
+            }
+        }
+
+        Simple.makePost(freeMemory, 10 * 1000);
     }
 
     public static void commTick()
@@ -680,7 +726,7 @@ public class WebAppCache
 
                 if (url.startsWith("/"))
                 {
-                    url = WebApp.getHTTPAppRoot(webappname) + url;
+                    url = WebApp.getHTTPRoot() + url;
 
                     if (url.endsWith("manifest.json"))
                     {
