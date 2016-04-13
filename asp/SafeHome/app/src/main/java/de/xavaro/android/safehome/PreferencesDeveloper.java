@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
 import java.util.Map;
@@ -12,8 +13,6 @@ import de.xavaro.android.common.WebApp;
 
 public class PreferencesDeveloper
 {
-    //region Developer preferences
-
     public static class DeveloperFragment extends PreferencesBasics.EnablePreferenceFragment
     {
         public static PreferenceActivity.Header getHeader()
@@ -37,6 +36,25 @@ public class PreferencesDeveloper
             masterenable = "Entwickler freischalten";
         }
 
+        private void nukeWifiPreference(String wifiname)
+        {
+            String devwebappsprefix = keyprefix + ".webapps.";
+
+            for (int inx = 0; inx < preferences.size(); inx++)
+            {
+                Preference preference = preferences.get(inx);
+                String key = preference.getKey();
+                if (key == null) continue;
+
+                if (key.startsWith(devwebappsprefix) && key.endsWith("." + wifiname))
+                {
+                    getPreferenceScreen().removePreference(preference);
+                    Simple.removeSharedPref(key);
+                    preferences.remove(inx--);
+                }
+            }
+        }
+
         @Override
         public void registerAll(Context context)
         {
@@ -57,18 +75,32 @@ public class PreferencesDeveloper
             // Make sure, our current wifi is in list.
             //
 
-            String mywifi = Simple.getWifiName();
-            String mywifipref = wifiprefix + mywifi;
-            Simple.setSharedPrefBoolean(mywifipref, Simple.getSharedPrefBoolean(mywifipref));
+            if (Simple.isWifiConnected())
+            {
+                String mywifi = Simple.getWifiName();
+                String mywifipref = wifiprefix + mywifi;
+                Simple.setSharedPrefBoolean(mywifipref, Simple.getSharedPrefBoolean(mywifipref));
+            }
 
             Map<String, Object> wifiprefs = Simple.getAllPreferences(wifiprefix);
 
             for (String pref : wifiprefs.keySet())
             {
-                String wifiname = pref.substring(wifiprefix.length());
+                final String wifiname = pref.substring(wifiprefix.length());
 
                 pc = new NicedPreferences.NiceCategoryPreference(context);
+                pc.setKey(keyprefix + ".webapps.wlancat." + wifiname);
                 pc.setTitle("WLAN" + " \"" + wifiname + "\"");
+
+                pc.setOnLongClick(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        nukeWifiPreference(wifiname);
+                    }
+                });
+
                 preferences.add(pc);
 
                 cp = new NicedPreferences.NiceCheckboxPreference(context);

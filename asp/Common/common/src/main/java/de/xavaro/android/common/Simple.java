@@ -1,5 +1,7 @@
 package de.xavaro.android.common;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 
@@ -1017,6 +1019,51 @@ public class Simple
         }
 
         return null;
+    }
+
+    @Nullable
+    public static ConnectivityManager getConnectivityManager()
+    {
+        if (anyContext != null)
+        {
+            return (ConnectivityManager) anyContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        }
+
+        return null;
+    }
+
+    public static boolean isWifiConnected()
+    {
+        ConnectivityManager cm = getConnectivityManager();
+
+        if (cm != null)
+        {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            if (activeNetwork != null)
+            {
+                if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isMobileConnected()
+    {
+        ConnectivityManager cm = getConnectivityManager();
+
+        if (cm != null)
+        {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            if (activeNetwork != null)
+            {
+                if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean isSameSubnet(String ip1, String ip2)
