@@ -314,7 +314,20 @@ function buildProducts(&$products)
 		
 			$price = $quantity
 				   . "="
-				   . $cents;		   
+				   . $cents;
+				   
+			//
+			// Auto correct obvious wrong base measure from g to kg...
+			//
+			
+			if (($product[ "basePrice" ] >= 1500) && 
+				($product[ "baseMeasure" ] == "G") && 
+				($product[ "baseAmount" ] == "100"))
+			{
+				$base = "1kg" 
+					  . "="
+					  . $product[ "basePrice" ];
+			}  
 		}
 
 		if (($base == null) && $product[ "pricePerKilo" ])
@@ -385,6 +398,16 @@ function buildProducts(&$products)
 		if ($dispquant && (substr($title, -strlen($dispquant)) == $dispquant))
 		{
 			$title = trim(substr($title, 0, -strlen($dispquant)));
+		}
+		
+		if ($dispquant && (substr($dispquant, 0 ,2) == "1x"))
+		{	
+			$dqremove = substr($dispquant, 2);
+				
+			if (substr($title, -strlen($dqremove)) == $dqremove)
+			{
+				$title = trim(substr($title, 0, -strlen($dqremove)));
+			}
 		}
 		
 		if ($dispquant && (strpos($title, " $dispquant, ") !== false))

@@ -460,6 +460,7 @@ shoppinglist.evaluteBestCategories = function(product, results)
     //
 
     var categories = [];
+    var duptexts = {};
 
     for (var inx = 0; inx < tempcats.length; inx++)
     {
@@ -489,39 +490,69 @@ shoppinglist.evaluteBestCategories = function(product, results)
             nummatches++;
         }
 
-        categories.push(tempcats[ inx ]);
+        duptexts[ text ] = duptexts[ text ] ? duptexts[ text ] + 1 : 1;
     }
 
-    if (nummatches > 0)
+    //
+    // Redo category selection now and accept only
+    // categories with matches in name.
+    //
+
+    categories = [];
+
+    for (var inx = 0; inx < tempcats.length; inx++)
     {
-        //
-        // Redo category selection now and accept only
-        // categories with matches in name.
-        //
+        var text = tempcats[ inx ].text;
+        var path = tempcats[ inx ].path;
+        var topcat = false;
 
-        categories = [];
-
-        for (var inx = 0; inx < tempcats.length; inx++)
+        for (var cnt = 0; cnt < tempcats.length; cnt++)
         {
-            var text = tempcats[ inx ].text;
-            var path = tempcats[ inx ].path;
-            var topcat = false;
+            if (inx == cnt) continue;
 
-            for (var cnt = 0; cnt < tempcats.length; cnt++)
+            if (tempcats[ cnt ].path.substring(0, path.length) == path)
             {
-                if (inx == cnt) continue;
+                topcat = true;
+                break;
+            }
+        }
 
-                if (tempcats[ cnt ].path.substring(0, path.length) == path)
+        if (topcat) continue;
+
+        if ((nummatches > 0)  && (text.toLowerCase().indexOf(targettext) < 0)) continue;
+
+        //
+        // Tune ups from category path.
+        //
+
+        var parts = path.split("|");
+
+        if ((duptexts[ text ] > 1) && (parts.length >= 3))
+        {
+            //
+            // Duplicate text entry. Add last part of category
+            // path to make text unique.
+            //
+
+            tempcats[ inx ].text = parts[ parts.length - 3 ] + " / " + tempcats[ inx ].text;
+        }
+
+        var extras = WebLibStrings.strings[ "category.extra.display" ];
+
+        if (extras)
+        {
+            var cmppath = "|" + path;
+
+            for (var catname in extras)
+            {
+                if (cmppath.indexOf("|" + catname + "|") >= 0)
                 {
-                    topcat = true;
-                    break;
+                    tempcats[ inx ].text = extras[ catname ] + " / " + tempcats[ inx ].text
                 }
             }
-
-            if (topcat || (text.toLowerCase().indexOf(targettext) < 0)) continue;
-
-            categories.push(tempcats[ inx ]);
         }
+
+        categories.push(tempcats[ inx ]);
     }
 
     return categories;
@@ -670,6 +701,27 @@ shoppinglist.onClickDelete = function(ctarget, target)
     shoppinglist.saveItems();
 }
 
+shoppinglist.evaluateResults = function(product, query, caseignore)
+{
+    var itemsfound = 0;
+
+    results = JSON.parse(WebAppPrices.getProducts(query, caseignore));
+
+    if (results.length > 0)
+    {
+        for (var inx = 0; inx < results.length; inx++)
+        {
+            var price = shoppinglist.parseRealProduct(product, results[ inx ]);
+            price.product = product;
+
+            shoppinglist.addItem(price);
+            itemsfound++;
+        }
+    }
+
+    return itemsfound;
+}
+
 shoppinglist.onClickSearch = function(ctarget, target)
 {
     WebAppUtility.makeClick();
@@ -679,39 +731,57 @@ shoppinglist.onClickSearch = function(ctarget, target)
 
     var itemsfound = 0;
 
-    var results = JSON.parse(WebAppPrices.getCategories(product.text));
-
-    if (results.length == 0)
+    if (itemsfound == 0)
     {
-        results = JSON.parse(WebAppPrices.getProducts(product.text));
+        //
+        // Make a category search.
+        //
+
+        var results = JSON.parse(WebAppPrices.getCategories(product.text));
 
         if (results.length > 0)
         {
-            for (var inx = 0; inx < results.length; inx++)
-            {
-                var price = shoppinglist.parseRealProduct(product, results[ inx ]);
-                price.product = product;
+            var categories = shoppinglist.evaluteBestCategories(product, results);
 
-                shoppinglist.addItem(price);
-                itemsfound++;
+            if (categories.length == 1)
+            {
+                itemsfound = shoppinglist.searchCategories(product, categories);
+            }
+            else
+            {
+                for (var inx = 0; inx < categories.length; inx++)
+                {
+                    shoppinglist.addItem(categories[ inx ]);
+                    itemsfound++;
+                }
             }
         }
     }
-    else
-    {
-        var categories = shoppinglist.evaluteBestCategories(product, results);
 
-        if (categories.length == 1)
+    if (itemsfound == 0)
+    {
+        //
+        // Make a plain all word search.
+        //
+
+        itemsfound = shoppinglist.evaluateResults(product, product.text);
+    }
+
+    if (itemsfound == 0)
+    {
+        //
+        // Make any two words a query term.
+        //
+
+        var terms = product.text.split(" ");
+
+        for (var inx = 0; (inx + 1) < terms.length; inx++)
         {
-            itemsfound = shoppinglist.searchCategories(product, categories);
-        }
-        else
-        {
-            for (var inx = 0; inx < categories.length; inx++)
-            {
-                shoppinglist.addItem(categories[ inx ]);
-                itemsfound++;
-            }
+            var term = terms[ inx ] + terms[ inx + 1 ];
+
+            itemsfound = shoppinglist.evaluateResults(product, term, true);
+
+            if (itemsfound > 0) break;
         }
     }
 
