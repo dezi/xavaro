@@ -551,19 +551,34 @@ public class PreferencesBasics
             }
         };
 
-        public final Runnable findWifiDialogcancel = new Runnable()
+        private final View.OnClickListener findWifiDialogCancel = new View.OnClickListener()
         {
             @Override
-            public void run()
+            public void onClick(View view)
             {
                 dialog.cancel();
             }
         };
 
-        private void findWifiDialogShow()
+        private void findWifiDialogShow(boolean wassearch)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
-            builder.setTitle(wifiFindPref.getTitle() + ":");
+
+            if (wassearch)
+            {
+                if (wifiFoundText.size() == 0)
+                {
+                    builder.setTitle("Es wurden keine Geräte gefunden.");
+                }
+                else
+                {
+                    builder.setTitle("Gefundene Geräte:");
+                }
+            }
+            else
+            {
+                builder.setTitle("Suche nach Geräten...");
+            }
 
             builder.setPositiveButton("Abbrechen", clickListener);
             builder.setNeutralButton("Suchen", clickListener);
@@ -598,12 +613,28 @@ public class PreferencesBasics
                     {
                         if (checked)
                         {
-                            //
-                            // Todo save contact.
-                            //
-                        }
+                            String identity = (String) compoundButton.getTag();
 
-                        handler.postDelayed(findWifiDialogcancel, 200);
+                            Log.d(LOGTAG,"onCheckedChanged: identity:" + identity);
+
+                            if (retrieved != null)
+                            {
+                                for (int inx = 0; inx < retrieved.length(); inx++)
+                                {
+                                    JSONObject entry = Json.getObject(retrieved, inx);
+                                    String idremote = Json.getString(entry, "idremote");
+                                    if ((idremote == null) || ! idremote.equals(identity)) continue;
+
+                                    Log.d(LOGTAG,"onCheckedChanged: requestKeyExchange...");
+
+                                    CommService.subscribeMessage(CommunityFragment.this, "responsePublicKeyXChange");
+                                    CommService.subscribeMessage(CommunityFragment.this, "responseAESpassXChange");
+                                    CommService.subscribeMessage(CommunityFragment.this, "responseOwnerIdentity");
+
+                                    requestKeyExchange(entry);
+                                }
+                            }
+                        }
                     }
                 });
 
@@ -613,6 +644,7 @@ public class PreferencesBasics
             dialog.setView(rg);
             dialog.show();
 
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(findWifiDialogCancel);
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(findWifiAction);
         }
 
@@ -621,7 +653,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                findWifiDialogShow();
+                findWifiDialogShow(false);
 
                 findWifiAction.onClick(null);
             }
@@ -649,7 +681,7 @@ public class PreferencesBasics
                         String firstName = Json.getString(entry, "ownerFirstName");
                         String givenName = Json.getString(entry, "ownerGivenName");
 
-                        String newValue = Json.getString(entry, "identity");
+                        String newValue = Json.getString(entry, "idremote");
 
                         String newEntry = firstName + " " + givenName
                                 + " (" + appName + "/" + devName + ")";
@@ -662,7 +694,7 @@ public class PreferencesBasics
                     }
                 }
 
-                findWifiDialogShow();
+                findWifiDialogShow(true);
             }
         };
 
@@ -975,44 +1007,73 @@ public class PreferencesBasics
             {
                 dialog.setTitle("Benutzerdaten erhalten");
 
-                String name = "";
-
-                try
+                if (pinName != null)
                 {
-                    if (remoteContact.has("ownerFirstName"))
+                    String name = "";
+
+                    try
                     {
-                        name += " " + remoteContact.getString("ownerFirstName");
+                        if (remoteContact.has("ownerFirstName"))
+                        {
+                            name += " " + remoteContact.getString("ownerFirstName");
+                        }
+
+                        if (remoteContact.has("ownerGivenName"))
+                        {
+                            name += " " + remoteContact.getString("ownerGivenName");
+                        }
+
+                        if (remoteContact.has("appName"))
+                        {
+                            name += "\n" + remoteContact.getString("appName");
+                        }
+
+                        if (remoteContact.has("devName"))
+                        {
+                            name += " - " + remoteContact.getString("devName");
+                        }
+                    }
+                    catch (JSONException ignore)
+                    {
                     }
 
-                    if (remoteContact.has("ownerGivenName"))
-                    {
-                        name += " " + remoteContact.getString("ownerGivenName");
-                    }
+                    name = name.trim();
+                    if (name.length() == 0) name = "Anonymer Benutzer";
 
-                    if (remoteContact.has("appName"))
-                    {
-                        name += "\n" + remoteContact.getString("appName");
-                    }
-
-                    if (remoteContact.has("devName"))
-                    {
-                        name += " - " + remoteContact.getString("devName");
-                    }
+                    dialog.setTitle("Pincode verbunden mit:");
+                    pinName.setText(name);
                 }
-                catch (JSONException ignore)
-                {
-                }
-
-                name = name.trim();
-                if (name.length() == 0) name = "Anonymer Benutzer";
-
-                dialog.setTitle("Pincode verbunden mit:");
-                pinName.setText(name);
 
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setText("Kontakt speichern");
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(storeContactAction);
             }
         };
+
+        public void requestKeyExchange(JSONObject message)
+        {
+            //
+            // Setup temporary identity to allow GCM messages.
+            //
+
+            String idremote = Json.getString(message, "idremote");
+            String gcmtoken = Json.getString(message, "gcmtoken");
+            String publickey = CryptUtils.RSAgetPublicKey(Simple.getAnyContext());
+
+            if (gcmtoken == null) gcmtoken = Json.getString(message, "gcmUuid");
+            if ((idremote == null) || (gcmtoken == null)) return;
+
+            Log.d(LOGTAG, "requestKeyExchange: " + idremote);
+
+            RemoteContacts.setGCMTokenTemp(idremote, gcmtoken);
+
+            JSONObject requestPublicKeyXChange = new JSONObject();
+
+            Json.put(requestPublicKeyXChange, "type", "requestPublicKeyXChange");
+            Json.put(requestPublicKeyXChange, "publicKey", publickey);
+            Json.put(requestPublicKeyXChange, "idremote", idremote);
+
+            CommService.sendMessage(requestPublicKeyXChange, true);
+        }
 
         public void onMessageReceived(JSONObject message)
         {
@@ -1038,21 +1099,7 @@ public class PreferencesBasics
                                 }
                             });
 
-                            //
-                            // Setup temporary identity to allow GCM messages.
-                            //
-
-                            String remoteIdentity = message.getString("idremote");
-                            String gcmtoken = message.getString("gcmtoken");
-                            RemoteContacts.setGCMTokenTemp(remoteIdentity, gcmtoken);
-
-                            JSONObject requestPublicKeyXChange = new JSONObject();
-
-                            requestPublicKeyXChange.put("type", "requestPublicKeyXChange");
-                            requestPublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(Simple.getAnyContext()));
-                            requestPublicKeyXChange.put("idremote", remoteIdentity);
-
-                            CommService.sendMessage(requestPublicKeyXChange, true);
+                            requestKeyExchange(message);
 
                             return;
                         }

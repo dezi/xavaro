@@ -60,7 +60,13 @@ public class WifiLookup
 
             retrieved = new JSONArray();
 
-            byte[] txbuf = "HELO".getBytes();
+            JSONObject helomessage = new JSONObject();
+
+            Json.put(helomessage, "type", "HELO");
+            Json.put(helomessage, "identity", SystemIdentity.getIdentity());
+            Json.put(helomessage, "gcmtoken", CommonStatic.gcm_token);
+
+            byte[] txbuf = helomessage.toString().getBytes();
             DatagramPacket helo = new DatagramPacket(txbuf, txbuf.length);
             helo.setAddress(multicastAddress);
             helo.setPort(port);
@@ -145,10 +151,29 @@ public class WifiLookup
 
                     Log.d(LOGTAG, "received=" + message);
 
-                    if (message.equals("HELO"))
+                    if (! message.startsWith("{")) continue;
+                    JSONObject jmess = Json.fromString(message);
+                    if (jmess == null) continue;
+
+                    if (Json.equals(jmess, "type", "HELO"))
                     {
+                        //
+                        // Register identity of caller temporary.
+                        //
+
+                        String idremote = Json.getString(jmess, "identity");
+                        String gcmtoken = Json.getString(jmess, "gcmtoken");
+                        if ((idremote == null) || (gcmtoken == null)) continue;
+
+                        RemoteContacts.setGCMTokenTemp(idremote, gcmtoken);
+
+                        //
+                        // Reply with own information.
+                        //
+
                         JSONObject mejson = new JSONObject();
-                        Json.put(mejson, "identity", SystemIdentity.getIdentity());
+                        Json.put(mejson, "type", "MEME");
+                        Json.put(mejson, "idremote", SystemIdentity.getIdentity());
                         RemoteContacts.deliverOwnContact(mejson);
 
                         byte[] txbuf = mejson.toString().getBytes();
@@ -158,20 +183,19 @@ public class WifiLookup
 
                         socket.send(me);
                     }
-                    else
-                    {
-                        JSONObject contact = Json.fromString(message);
 
-                        if ((contact != null) && (retrieved != null))
+                    if (Json.equals(jmess, "type", "MEME"))
+                    {
+                        if (retrieved != null)
                         {
                             String selfident = SystemIdentity.getIdentity();
-                            String identity = Json.getString(contact, "identity");
+                            String idremote = Json.getString(jmess, "idremote");
 
-                            if ((identity != null) && ! identity.equals(selfident))
+                            if ((idremote != null) && ! idremote.equals(selfident))
                             {
                                 synchronized (LOGTAG)
                                 {
-                                    Json.put(retrieved, contact);
+                                    Json.put(retrieved, jmess);
                                 }
                             }
                         }

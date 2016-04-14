@@ -80,6 +80,8 @@ public class GCMMessageService extends GcmListenerService
     {
         JSONArray tokens = null;
 
+        Log.d(LOGTAG,"sendMessage");
+
         String token = RemoteContacts.getGCMToken(receiver);
 
         if (token == null)
@@ -133,6 +135,8 @@ public class GCMMessageService extends GcmListenerService
             inputStream.close();
 
             boolean success = response.contains("\"success\":1");
+
+            Log.d(LOGTAG,"success:" + success + "=>" + token);
 
             return success;
         }
