@@ -20,25 +20,21 @@ public class WifiLookup
     private static MulticastSocket socket;
     private static WifiLookupWorker worker;
     private static JSONArray retrieved;
+    private static boolean visible;
 
     public static void makeVisible()
     {
-        try
-        {
-            Log.d(LOGTAG,"makeVisible");
-
-            createSocket();
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+        createSocket();
+        visible = true;
     }
 
     public static void removeVisibility()
     {
-        Log.d(LOGTAG,"removeVisibility");
+        visible = false;
+    }
 
+    public static void deleteSocket()
+    {
         if (worker != null)
         {
             worker.terminate();
@@ -157,31 +153,34 @@ public class WifiLookup
 
                     if (Json.equals(jmess, "type", "HELO"))
                     {
-                        //
-                        // Register identity of caller temporary.
-                        //
+                        if (visible)
+                        {
+                            //
+                            // Register identity of caller temporary.
+                            //
 
-                        String idremote = Json.getString(jmess, "identity");
-                        String gcmtoken = Json.getString(jmess, "gcmtoken");
-                        if ((idremote == null) || (gcmtoken == null)) continue;
+                            String idremote = Json.getString(jmess, "identity");
+                            String gcmtoken = Json.getString(jmess, "gcmtoken");
+                            if ((idremote == null) || (gcmtoken == null)) continue;
 
-                        RemoteContacts.setGCMTokenTemp(idremote, gcmtoken);
+                            RemoteContacts.setGCMTokenTemp(idremote, gcmtoken);
 
-                        //
-                        // Reply with own information.
-                        //
+                            //
+                            // Reply with own information.
+                            //
 
-                        JSONObject mejson = new JSONObject();
-                        Json.put(mejson, "type", "MEME");
-                        Json.put(mejson, "idremote", SystemIdentity.getIdentity());
-                        RemoteContacts.deliverOwnContact(mejson);
+                            JSONObject mejson = new JSONObject();
+                            Json.put(mejson, "type", "MEME");
+                            Json.put(mejson, "idremote", SystemIdentity.getIdentity());
+                            RemoteContacts.deliverOwnContact(mejson);
 
-                        byte[] txbuf = mejson.toString().getBytes();
-                        DatagramPacket me = new DatagramPacket(txbuf, txbuf.length);
-                        me.setAddress(multicastAddress);
-                        me.setPort(port);
+                            byte[] txbuf = mejson.toString().getBytes();
+                            DatagramPacket me = new DatagramPacket(txbuf, txbuf.length);
+                            me.setAddress(multicastAddress);
+                            me.setPort(port);
 
-                        socket.send(me);
+                            socket.send(me);
+                        }
                     }
 
                     if (Json.equals(jmess, "type", "MEME"))

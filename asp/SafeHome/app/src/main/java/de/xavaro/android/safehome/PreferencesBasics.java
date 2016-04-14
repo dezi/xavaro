@@ -279,24 +279,28 @@ public class PreferencesBasics
 
             Log.d(LOGTAG, "onDestroy");
 
-            WifiLookup.removeVisibility();
+            WifiLookup.deleteSocket();
         }
 
         private final ArrayList<String> remoteContacts = new ArrayList<>();
 
-        private NicedPreferences.NiceEditTextPreference sendPinPref;
-        private NicedPreferences.NiceEditTextPreference recvPinPref;
-        private NicedPreferences.NiceListPreference wifiFindPref;
-        final ArrayList<String> wifiFoundText = new ArrayList<>();
-        final ArrayList<String> wifiFoundVals = new ArrayList<>();
-
         private JSONObject remoteContact;
         private AlertDialog dialog;
+
+        private NicedPreferences.NiceEditTextPreference sendPinPref;
+        private NicedPreferences.NiceEditTextPreference recvPinPref;
+
         private TextView pincode;
         private TextView pinName;
         private EditText pinPart1;
         private EditText pinPart2;
         private EditText pinPart3;
+
+        private NicedPreferences.NiceListPreference wifiFindPref;
+
+        private JSONArray wifiRetrieved;
+        private final ArrayList<String> wifiFoundText = new ArrayList<>();
+        private final ArrayList<String> wifiFoundVals = new ArrayList<>();
 
         private void generatePincode()
         {
@@ -543,6 +547,7 @@ public class PreferencesBasics
             @Override
             public void onClick(View view)
             {
+                dialog.setTitle("Suche nach Geräten...");
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
 
                 WifiLookup.findVisible();
@@ -617,11 +622,11 @@ public class PreferencesBasics
 
                             Log.d(LOGTAG,"onCheckedChanged: identity:" + identity);
 
-                            if (retrieved != null)
+                            if (wifiRetrieved != null)
                             {
-                                for (int inx = 0; inx < retrieved.length(); inx++)
+                                for (int inx = 0; inx < wifiRetrieved.length(); inx++)
                                 {
-                                    JSONObject entry = Json.getObject(retrieved, inx);
+                                    JSONObject entry = Json.getObject(wifiRetrieved, inx);
                                     String idremote = Json.getString(entry, "idremote");
                                     if ((idremote == null) || ! idremote.equals(identity)) continue;
 
@@ -659,8 +664,6 @@ public class PreferencesBasics
             }
         };
 
-        private JSONArray retrieved;
-
         public final Runnable onWifiFindDone = new Runnable()
         {
             @Override
@@ -668,13 +671,16 @@ public class PreferencesBasics
             {
                 Log.d(LOGTAG, "onWifiFindDone: ");
 
-                retrieved = WifiLookup.getVisible();
+                wifiRetrieved = WifiLookup.getVisible();
 
-                if (retrieved != null)
+                wifiFoundText.clear();
+                wifiFoundVals.clear();
+
+                if (wifiRetrieved != null)
                 {
-                    for (int inx = 0; inx < retrieved.length(); inx++)
+                    for (int inx = 0; inx < wifiRetrieved.length(); inx++)
                     {
-                        JSONObject entry = Json.getObject(retrieved, inx);
+                        JSONObject entry = Json.getObject(wifiRetrieved, inx);
 
                         String appName   = Json.getString(entry, "appName");
                         String devName   = Json.getString(entry, "devName");
@@ -693,6 +699,8 @@ public class PreferencesBasics
                         }
                     }
                 }
+
+                dialog.cancel();
 
                 findWifiDialogShow(true);
             }
@@ -995,6 +1003,8 @@ public class PreferencesBasics
             @Override
             public void run()
             {
+                Log.d(LOGTAG,"storeContact: =================>" + Json.toPretty(remoteContact));
+
                 RemoteContacts.registerContact(remoteContact);
                 registerRemotes(Simple.getAppContext(), true);
             }
