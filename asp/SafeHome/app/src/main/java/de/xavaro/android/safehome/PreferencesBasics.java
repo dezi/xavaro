@@ -32,6 +32,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import de.xavaro.android.common.CommService;
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.CryptUtils;
 import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.NicedPreferences;
@@ -223,7 +224,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                DefaultApps.setDefaultHome(getContext());
+                DefaultApps.setDefaultHome(Simple.getAppContext());
             }
         };
 
@@ -232,7 +233,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                DefaultApps.setDefaultAssist(getContext());
+                DefaultApps.setDefaultAssist(Simple.getAppContext());
             }
         };
     }
@@ -486,7 +487,7 @@ public class PreferencesBasics
             @Override
             public void run()
             {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
                 builder.setTitle(sendPinPref.getTitle());
 
                 builder.setPositiveButton("Abbrechen", clickListener);
@@ -495,7 +496,7 @@ public class PreferencesBasics
 
                 dialog = builder.create();
 
-                pincode = new TextView(getContext());
+                pincode = new TextView(Simple.getAppContext());
                 pincode.setTextSize(Simple.getPreferredEditSize());
                 pincode.setPadding(40, 24, 0, 0);
                 pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
@@ -515,7 +516,7 @@ public class PreferencesBasics
             {
                 String[] actpincode = sharedPrefs.getString(recvPinPref.getKey(), "").split("-");
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
                 builder.setTitle(recvPinPref.getTitle());
 
                 builder.setPositiveButton("Abbrechen", clickListener);
@@ -523,18 +524,18 @@ public class PreferencesBasics
 
                 dialog = builder.create();
 
-                LinearLayout ll = new LinearLayout(getContext());
+                LinearLayout ll = new LinearLayout(Simple.getAppContext());
                 ll.setOrientation(LinearLayout.VERTICAL);
                 ll.setPadding(40, 24, 0, 0);
 
-                LinearLayout lp = new LinearLayout(getContext());
+                LinearLayout lp = new LinearLayout(Simple.getAppContext());
                 lp.setOrientation(LinearLayout.HORIZONTAL);
                 ll.addView(lp);
 
                 InputFilter[] filters = new InputFilter[ 1 ];
                 filters[ 0 ] = new InputFilter.LengthFilter(4);
 
-                pinPart1 = new EditText(getContext());
+                pinPart1 = new EditText(Simple.getAppContext());
                 pinPart1.setMinEms(3);
                 pinPart1.setTextSize(Simple.getPreferredEditSize());
                 pinPart1.setFilters(filters);
@@ -566,12 +567,12 @@ public class PreferencesBasics
                     }
                 });
 
-                TextView sep1 = new TextView(getContext());
+                TextView sep1 = new TextView(Simple.getAppContext());
                 sep1.setTextSize(Simple.getPreferredEditSize());
                 sep1.setText(" – ");
                 lp.addView(sep1);
 
-                pinPart2 = new EditText(getContext());
+                pinPart2 = new EditText(Simple.getAppContext());
                 pinPart2.setMinEms(3);
                 pinPart2.setTextSize(Simple.getPreferredEditSize());
                 pinPart2.setFilters(filters);
@@ -603,12 +604,12 @@ public class PreferencesBasics
                     }
                 });
 
-                TextView sep2 = new TextView(getContext());
+                TextView sep2 = new TextView(Simple.getAppContext());
                 sep2.setTextSize(Simple.getPreferredEditSize());
                 sep2.setText(" – ");
                 lp.addView(sep2);
 
-                pinPart3 = new EditText(getContext());
+                pinPart3 = new EditText(Simple.getAppContext());
                 pinPart3.setMinEms(3);
                 pinPart3.setTextSize(Simple.getPreferredEditSize());
                 pinPart3.setFilters(filters);
@@ -649,7 +650,7 @@ public class PreferencesBasics
                     }
                 });
 
-                pinName = new TextView(getContext());
+                pinName = new TextView(Simple.getAppContext());
                 pinName.setPadding(0, 16, 0, 0);
                 pinName.setTextSize(Simple.getPreferredEditSize());
 
@@ -706,8 +707,14 @@ public class PreferencesBasics
                 {
                     JSONObject sendPincode = new JSONObject();
 
+                    String pincode = Simple.getSharedPrefString(sendPinPref.getKey());
+                    String gcmtoken = CommonStatic.gcm_token;
+                    int timeout = Simple.getSharedPrefInt(keyprefix + ".sendpinduration");
+
                     sendPincode.put("type", "sendPin");
-                    sendPincode.put("pincode", sharedPrefs.getString(sendPinPref.getKey(), ""));
+                    sendPincode.put("pincode", pincode);
+                    sendPincode.put("gcmtoken", gcmtoken);
+                    sendPincode.put("timeout", timeout);
 
                     CommService.sendMessage(sendPincode);
 
@@ -773,7 +780,7 @@ public class PreferencesBasics
             public void run()
             {
                 RemoteContacts.registerContact(remoteContact);
-                registerRemotes(getContext(), true);
+                registerRemotes(Simple.getAppContext(), true);
             }
         };
 
@@ -847,7 +854,13 @@ public class PreferencesBasics
                                 }
                             });
 
+                            //
+                            // Setup temporary identity to allow GCM messages.
+                            //
+
                             String remoteIdentity = message.getString("idremote");
+                            String gcmtoken = message.getString("gcmtoken");
+                            RemoteContacts.setGCMTokenTemp(remoteIdentity, gcmtoken);
 
                             JSONObject requestPublicKeyXChange = new JSONObject();
 
@@ -855,7 +868,7 @@ public class PreferencesBasics
                             requestPublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(Simple.getAnyContext()));
                             requestPublicKeyXChange.put("idremote", remoteIdentity);
 
-                            CommService.sendMessage(requestPublicKeyXChange);
+                            CommService.sendMessage(requestPublicKeyXChange, true);
 
                             return;
                         }
@@ -911,7 +924,7 @@ public class PreferencesBasics
                             requestAESpassXChange.put("idremote", remoteIdentity);
                             requestAESpassXChange.put("encodedPassPhrase", encoPassPhrase);
 
-                            CommService.sendMessage(requestAESpassXChange);
+                            CommService.sendMessage(requestAESpassXChange, true);
 
                             return;
                         }
@@ -938,7 +951,7 @@ public class PreferencesBasics
 
                             RemoteContacts.deliverOwnContact(requestOwnerIdentity);
 
-                            CommService.sendEncrypted(requestOwnerIdentity, false);
+                            CommService.sendEncrypted(requestOwnerIdentity, true);
 
                             return;
                         }

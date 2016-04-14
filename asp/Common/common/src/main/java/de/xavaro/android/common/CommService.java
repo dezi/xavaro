@@ -80,6 +80,14 @@ public class CommService extends Service
         }
     }
 
+    public static void sendMessage(JSONObject message, boolean allowGCM)
+    {
+        synchronized (messageBacklog)
+        {
+            messageBacklog.add(new MessageClass(message, MessageClass.NONE, allowGCM));
+        }
+    }
+
     public static void sendEncrypted(JSONObject message, boolean allowGCM)
     {
         synchronized (messageBacklog)
@@ -310,7 +318,7 @@ public class CommService extends Service
                 responsePublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(getApplicationContext()));
                 responsePublicKeyXChange.put("status", "success");
 
-                CommService.sendMessage(responsePublicKeyXChange);
+                CommService.sendMessage(responsePublicKeyXChange, true);
 
                 return true;
             }
@@ -334,7 +342,7 @@ public class CommService extends Service
                 responseAESpassXChange.put("idremote", remoteIdentity);
                 responseAESpassXChange.put("status", "success");
 
-                CommService.sendEncrypted(responseAESpassXChange, false);
+                CommService.sendEncrypted(responseAESpassXChange, true);
 
                 return true;
             }
@@ -357,7 +365,7 @@ public class CommService extends Service
 
                 RemoteContacts.deliverOwnContact(responseOwnerIdentity);
 
-                CommService.sendEncrypted(responseOwnerIdentity, false);
+                CommService.sendEncrypted(responseOwnerIdentity, true);
 
                 return true;
             }
@@ -669,6 +677,11 @@ public class CommService extends Service
                 datagramPacket.setData(ping);
             }
 
+            if ((mc.enc == MessageClass.NONE) && mc.msg.has("idremote"))
+            {
+                idrem = Simple.JSONgetString(mc.msg, "idremote");
+            }
+
             if ((mc.enc == MessageClass.CLIENT_ACK) && mc.msg.has("uuid"))
             {
                 ident = identity;
@@ -748,13 +761,16 @@ public class CommService extends Service
 
                 Log.d(LOGTAG, "sendThread"
                         + ": " + datagramPacket.getData().length
-                        + "=" + mc.msg.getString("type"));
+                        + "=" + mc.msg.getString("type")
+                        + "=" + idrem + ":" + mc.gcm);
 
                 if (mc.gcm && (idrem != null) && Simple.isGCMInitialized())
                 {
                     //
                     // GCM allowed and initialized.
                     //
+
+                    Log.d(LOGTAG,"sendThread: send via GCM");
 
                     if (GCMMessageService.sendMessage(idrem, datagramPacket.getData()))
                     {

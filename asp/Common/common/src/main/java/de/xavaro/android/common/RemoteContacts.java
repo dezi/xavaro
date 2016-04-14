@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RemoteContacts
@@ -17,6 +19,7 @@ public class RemoteContacts
     private static final String LOGTAG = RemoteContacts.class.getSimpleName();
 
     private static final String xPathRoot = "RemoteContacts/identities";
+    private static final Map<String, String> tempGCMTokens = new HashMap<>();
 
     public static void deliverOwnContact(JSONObject rc)
     {
@@ -39,28 +42,25 @@ public class RemoteContacts
 
     public static boolean registerContact(JSONObject rc)
     {
-        try
+        String ident = Json.getString(rc, "identity");
+
+        if (ident != null)
         {
-            String ident = rc.getString("identity");
             String xpath = xPathRoot + "/"  + ident;
             JSONObject recontact = PersistManager.getXpathJSONObject(xpath);
             if (recontact == null) recontact = new JSONObject();
 
-            recontact.put("appName", rc.getString("appName"));
-            recontact.put("devName", rc.getString("devName"));
-            recontact.put("macAddr", rc.getString("macAddr"));
-            recontact.put("gcmUuid", rc.getString("gcmUuid"));
-            recontact.put("ownerFirstName", rc.getString("ownerFirstName"));
-            recontact.put("ownerGivenName", rc.getString("ownerGivenName"));
+            Json.copy(recontact, "appName", rc);
+            Json.copy(recontact, "devName", rc);
+            Json.copy(recontact, "macAddr", rc);
+            Json.copy(recontact, "gcmUuid", rc);
+            Json.copy(recontact, "ownerFirstName", rc);
+            Json.copy(recontact, "ownerGivenName", rc);
 
             PersistManager.putXpath(xpath, recontact);
             PersistManager.flush();
 
             return true;
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
         }
 
         return false;
@@ -77,6 +77,7 @@ public class RemoteContacts
         {
             String ident = rc.getString("identity");
             String xpath = xPathRoot + "/" + ident;
+
             PersistManager.putXpath(xpath, rc);
             PersistManager.flush();
 
@@ -96,22 +97,19 @@ public class RemoteContacts
         return PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
     }
 
+    public static void setGCMTokenTemp(String ident, String gcmUuid)
+    {
+        tempGCMTokens.put(ident, gcmUuid);
+    }
+
     @Nullable
     public static String getGCMToken(String ident)
     {
         JSONObject rc = PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
 
-        if (rc != null)
-        {
-            try
-            {
-                if (rc.has("gcmUuid")) return rc.getString("gcmUuid");
-            }
-            catch (JSONException ex)
-            {
-                OopsService.log(LOGTAG, ex);
-            }
-        }
+        if (rc != null) return Json.getString(rc, "gcmUuid");
+
+        if (tempGCMTokens.containsKey(ident))  return tempGCMTokens.get(ident);
 
         return null;
     }
