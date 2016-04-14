@@ -143,6 +143,8 @@ public class PreferenceFragments
                     pc.setEnabled(enabled);
                     preferences.add(pc);
 
+                    int activecount = 0;
+
                     for (int inx = 0; inx < channels.length(); inx++)
                     {
                         JSONObject channel = Json.getObject(channels, inx);
@@ -179,12 +181,22 @@ public class PreferenceFragments
 
                         preferences.add(lp);
                         activekeys.add(lp.getKey());
+                        activecount++;
 
                         if (! Simple.hasSharedPref(key))
                         {
                             boolean def = Json.getBoolean(channel, "default");
                             Simple.setSharedPrefString(key, def ? "folder" : "inact");
                         }
+                    }
+
+                    if (activecount == 0)
+                    {
+                        //
+                        // Category does not contain active entries, remove.
+                        //
+
+                        preferences.remove(pc);
                     }
                 }
             }

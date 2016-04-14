@@ -119,61 +119,61 @@
     "channels": [
       {
         "label": "sunshine live",
-        "icon": "http://radio.sunshine-live.de/img/sunshinelive.jpg",
+        "icon": "http://www.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_sunshine_live_fg_v3.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=studio",
         "audiourl": "http://stream.sunshine-live.de/live/mp3-192/Webradio-Player/"
       },
       {
         "label": "House",
-        "icon": "http://radio.sunshine-live.de/img/house.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_house_fg_v2.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=house",
         "audiourl": "http://stream.sunshine-live.de/house/mp3-192/Webradio-Player/"
       },
       {
         "label": "EDM",
-        "icon": "http://radio.sunshine-live.de/img/edm.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_edm_fg_v2.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=edm",
         "audiourl": "http://stream.sunshine-live.de/edm/mp3-192/Webradio-Player/"
       },
       {
         "label": "Classics",
-        "icon": "http://radio.sunshine-live.de/img/classics.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_classics_fg_v2.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=classics",
         "audiourl": "http://stream.sunshine-live.de/classics/mp3-192/Webradio-Player/"
       },
       {
         "label": "Trance",
-        "icon": "http://radio.sunshine-live.de/img/trance.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_trance_fg_v3.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=trance",
         "audiourl": "http://stream.sunshine-live.de/trance/mp3-192/Webradio-Player/"
       },
       {
         "label": "Hard",
-        "icon": "http://radio.sunshine-live.de/img/hard.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_hard_fg_v3.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=hard",
         "audiourl": "http://stream.sunshine-live.de/hard/mp3-192/Webradio-Player/"
       },
       {
         "label": "Techno",
-        "icon": "http://radio.sunshine-live.de/img/techno.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_festival_fg_v3.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=techno",
         "audiourl": "http://stream.sunshine-live.de/techno/mp3-192/Webradio-Player/"
       },
       {
         "label": "Lounge",
-        "icon": "http://radio.sunshine-live.de/img/lounge.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_lounge_fg_v2.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=lounge",
         "audiourl": "http://stream.sunshine-live.de/lounge/mp3-192/Webradio-Player/"
       },
       {
         "label": "90er",
-        "icon": "http://radio.sunshine-live.de/img/90er.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_die_90er_fg_v2.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=90er",
         "audiourl": "http://stream.sunshine-live.de/90er/mp3-192/Webradio-Player/"
       },
       {
         "label": "Festival",
-        "icon": "http://radio.sunshine-live.de/img/festival.jpg",
+        "icon": "http://radio.sunshine-live.de/cache/com_image_stream_list_4c383743a611a214173ab53830b617ac/sunshine_live_channelgrafik_techno_fg_v3.jpg",
         "metadata": "http://metadata.sunshine-live.de/api/track/current/?channel=festival",
         "audiourl": "http://stream.sunshine-live.de/festival/mp3-192/Webradio-Player/"
       }
