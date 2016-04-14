@@ -1338,7 +1338,7 @@ public class NicedPreferences
             //
 
             ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            vg.setPadding(20, 8, 0, 8);
+            vg.setPadding(14, 8, 10, 8);
 
             //
             // Step three: remove summary from horizontal layout and add

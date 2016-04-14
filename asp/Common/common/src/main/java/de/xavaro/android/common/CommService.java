@@ -618,7 +618,7 @@ public class CommService extends Service
 
             StaticUtils.sleep(sleeptime);
 
-            checkPing();
+            //checkPing();
 
             CommSender.commTick();
             WebAppCache.commTick();

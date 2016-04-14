@@ -49,6 +49,14 @@ public class SettingsActivity extends PreferenceActivity
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState)
+    {
+        super.onPostCreate(savedInstanceState);
+
+        getListView().setKeepScreenOn(true);
+    }
+
+    @Override
     protected void onResume()
     {
         Log.d(LOGTAG, "onResume...");

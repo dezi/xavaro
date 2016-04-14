@@ -5,24 +5,28 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,6 +39,7 @@ import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.CryptUtils;
 import de.xavaro.android.common.IdentityManager;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
@@ -43,6 +48,7 @@ import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.PreferenceFragments;
+import de.xavaro.android.common.WifiLookup;
 
 public class PreferencesBasics
 {
@@ -266,10 +272,23 @@ public class PreferencesBasics
             keyprefix = "community";
         }
 
+        @Override
+        public void onDestroy()
+        {
+            super.onDestroy();
+
+            Log.d(LOGTAG, "onDestroy");
+
+            WifiLookup.removeVisibility();
+        }
+
         private final ArrayList<String> remoteContacts = new ArrayList<>();
 
         private NicedPreferences.NiceEditTextPreference sendPinPref;
         private NicedPreferences.NiceEditTextPreference recvPinPref;
+        private NicedPreferences.NiceListPreference wifiFindPref;
+        final ArrayList<String> wifiFoundText = new ArrayList<>();
+        final ArrayList<String> wifiFoundVals = new ArrayList<>();
 
         private JSONObject remoteContact;
         private AlertDialog dialog;
@@ -314,14 +333,15 @@ public class PreferencesBasics
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceCheckboxPreference cp;
             NicedPreferences.NiceListPreference lp;
 
             //
-            // Connect.
+            // Connect via pincode.
             //
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Verbindungen herstellen");
+            pc.setTitle("Über Pincode verbinden");
             preferences.add(pc);
 
             //
@@ -349,8 +369,7 @@ public class PreferencesBasics
                     "60 Minuten",
                     "8 Stunden",
                     "1 Tag",
-                    "2 Tage",
-                    "Permanent"
+                    "2 Tage"
             };
 
             CharSequence[] durationVals = {
@@ -358,15 +377,14 @@ public class PreferencesBasics
                     "60",
                     "640",
                     "1440",
-                    "2880",
-                    "0"
+                    "2880"
             };
 
             lp.setKey(keyprefix + ".sendpinduration");
             lp.setEntries(durationText);
             lp.setEntryValues(durationVals);
             lp.setDefaultValue("5");
-            lp.setTitle("Pincode freigeben für");
+            lp.setTitle("Pincode Timeout");
 
             preferences.add(lp);
 
@@ -377,10 +395,48 @@ public class PreferencesBasics
             recvPinPref = new NicedPreferences.NiceEditTextPreference(context);
 
             recvPinPref.setKey(keyprefix + ".recvpin");
-            recvPinPref.setTitle("Pincode verbinden:");
+            recvPinPref.setTitle("Pincode verbinden");
             recvPinPref.setOnclick(recvPinDialog);
 
             preferences.add(recvPinPref);
+
+            //
+            // Connect via udp broadcast.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Über Wifi verbinden");
+            preferences.add(pc);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+            cp.setTitle("Gerät sichtbar machen");
+
+            cp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    if ((Boolean) newValue)
+                    {
+                        WifiLookup.makeVisible();
+                    }
+                    else
+                    {
+                        WifiLookup.removeVisibility();
+                    }
+
+                    return true;
+                }
+            });
+
+            preferences.add(cp);
+
+            wifiFindPref = new NicedPreferences.NiceListPreference(context);
+
+            wifiFindPref.setTitle("Nach Geräten suchen");
+            wifiFindPref.setOnclick(findWifiDialog);
+
+            preferences.add(wifiFindPref);
 
             //
             // Confirmed connects.
@@ -482,13 +538,141 @@ public class PreferencesBasics
             }
         }
 
+        private final View.OnClickListener findWifiAction = new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
+
+                WifiLookup.findVisible();
+
+                handler.postDelayed(onWifiFindDone, 2000);
+            }
+        };
+
+        public final Runnable findWifiDialogcancel = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                dialog.cancel();
+            }
+        };
+
+        private void findWifiDialogShow()
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
+            builder.setTitle(wifiFindPref.getTitle() + ":");
+
+            builder.setPositiveButton("Abbrechen", clickListener);
+            builder.setNeutralButton("Suchen", clickListener);
+
+            dialog = builder.create();
+
+            RadioGroup rg = new RadioGroup(Simple.getAppContext());
+            rg.setOrientation(RadioGroup.VERTICAL);
+            rg.setPadding(40, 10, 0, 0);
+
+            for (int inx = 0; inx < wifiFoundText.size(); inx++)
+            {
+                RadioButton rb = new RadioButton(Simple.getAppContext());
+
+                rb.setId(4711 + inx);
+                rb.setTextSize(18f);
+                rb.setPadding(0, 10, 0, 10);
+
+                //
+                // Display unknown as text option, selected devices
+                // with name and mac address to get better overwiev
+                // for user.
+                //
+
+                rb.setText((inx == 0) ? wifiFoundText.get(inx) : wifiFoundVals.get(inx));
+                rb.setTag(wifiFoundVals.get(inx));
+
+                rb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+                {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean checked)
+                    {
+                        if (checked)
+                        {
+                            //
+                            // Todo save contact.
+                            //
+                        }
+
+                        handler.postDelayed(findWifiDialogcancel, 200);
+                    }
+                });
+
+                rg.addView(rb);
+            }
+
+            dialog.setView(rg);
+            dialog.show();
+
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(findWifiAction);
+        }
+
+        public final Runnable findWifiDialog = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                findWifiDialogShow();
+
+                findWifiAction.onClick(null);
+            }
+        };
+
+        private JSONArray retrieved;
+
+        public final Runnable onWifiFindDone = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Log.d(LOGTAG, "onWifiFindDone: ");
+
+                retrieved = WifiLookup.getVisible();
+
+                if (retrieved != null)
+                {
+                    for (int inx = 0; inx < retrieved.length(); inx++)
+                    {
+                        JSONObject entry = Json.getObject(retrieved, inx);
+
+                        String appName   = Json.getString(entry, "appName");
+                        String devName   = Json.getString(entry, "devName");
+                        String firstName = Json.getString(entry, "ownerFirstName");
+                        String givenName = Json.getString(entry, "ownerGivenName");
+
+                        String newValue = Json.getString(entry, "identity");
+
+                        String newEntry = firstName + " " + givenName
+                                + " (" + appName + "/" + devName + ")";
+
+                        if (! wifiFoundText.contains(newEntry))
+                        {
+                            wifiFoundText.add(newEntry);
+                            wifiFoundVals.add(newValue);
+                        }
+                    }
+                }
+
+                findWifiDialogShow();
+            }
+        };
+
         public final Runnable sendPinDialog = new Runnable()
         {
             @Override
             public void run()
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
-                builder.setTitle(sendPinPref.getTitle());
+                builder.setTitle(sendPinPref.getTitle() + ":");
 
                 builder.setPositiveButton("Abbrechen", clickListener);
                 builder.setNegativeButton("Neu", clickListener);
@@ -822,7 +1006,7 @@ public class PreferencesBasics
                 name = name.trim();
                 if (name.length() == 0) name = "Anonymer Benutzer";
 
-                recvPinPref.setTitle("Pincode verbunden mit:");
+                dialog.setTitle("Pincode verbunden mit:");
                 pinName.setText(name);
 
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setText("Kontakt speichern");
