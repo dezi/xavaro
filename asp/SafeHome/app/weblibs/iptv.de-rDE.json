@@ -510,7 +510,7 @@
         "label": "PRO7",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/563479641386930176/wezbbzpj_400x400.jpeg",
+        "icon": "http://upload.wikimedia.org/wikipedia/bar/thumb/2/2e/Pro7-Logo.svg/600px-Pro7-Logo.svg.png",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7.html",
         "aliase": [ "tv/de/Pro Sieben Deutschland", "tv/de/Pro Sieben Deutschland HD" ]
       },
