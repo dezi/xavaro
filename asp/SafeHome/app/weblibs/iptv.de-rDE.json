@@ -569,14 +569,14 @@
 
     "label": "TELE 5",
     "url": "http://www.tele5.de/",
-    "icon": "http://pbs.twimg.com/profile_images/709319138062307328/3Hd9a646_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/711856625498198016/M0xEqzy1_400x400.jpg",
 
     "channels": [
       {
         "label": "TELE 5",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/709319138062307328/3Hd9a646_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/711856625498198016/M0xEqzy1_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/tele5.html",
         "aliase": [ "tv/de/Tele 5", "tv/de/Tele 5 HD" ]
       }
@@ -587,14 +587,14 @@
 
     "label": "Nickelodion",
     "url": "http://www.nick.de/",
-    "icon": "http://pbs.twimg.com/profile_images/710113025764753408/8tpSVPKg_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/715298426754236416/MN9DJ73J_400x400.jpg",
 
     "channels": [
       {
         "label": "Nickelodion",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/710113025764753408/8tpSVPKg_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/715298426754236416/MN9DJ73J_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/nickcc.html",
         "aliase": [ "tv/de/Nickelodeon Deutschland", "tv/de/Nickelodeon Deutschland HD" ]
       }
