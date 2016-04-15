@@ -43,6 +43,7 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.ProfileImagesNew;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
@@ -76,11 +77,12 @@ public class PreferencesBasics
 
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceEditTextPreference et;
+            NicedPreferences.NiceSwitchPreference sp;
             NicedPreferences.NiceListPreference lp;
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Persönliches");
-            pc.setIcon(Simple.getOwnerProfileImage());
+            pc.setIcon(ProfileImagesNew.getOwnerProfileImage());
             preferences.add(pc);
 
             final CharSequence[] prefixText = { "Keine", "Herr", "Frau" };
@@ -122,6 +124,14 @@ public class PreferencesBasics
             lp.setTitle("Anwender möchte");
 
             preferences.add(lp);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey("owner.usephoto");
+            sp.setTitle("Profilfoto freigeben");
+            sp.setDefaultValue(true);
+
+            preferences.add(sp);
         }
     }
 
@@ -500,19 +510,23 @@ public class PreferencesBasics
                     if (rc.has("ownerFirstName")) name += " " + rc.getString("ownerFirstName");
                     if (rc.has("ownerGivenName")) name += " " + rc.getString("ownerGivenName");
                     name = name.trim();
-                    if (name.length() == 0) name = "Anonymer Benutzer";
+                    if (name.length() == 0) name = "Unbekannter Benutzer";
 
                     String info = "";
                     if (rc.has("appName")) info += rc.getString("appName");
                     if (rc.has("devName")) info += " - " + rc.getString("devName");
-                    if (rc.has("macAddr")) info += " - " + rc.getString("macAddr");
 
-                    String title = (name + "\n" + info).trim() + "\n" + ident;
+                    if (GlobalConfigs.BetaFlag)
+                    {
+                        if (rc.has("macAddr")) info += " - " + rc.getString("macAddr");
+                        info += "\n" + ident;
+                    }
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
                     pc.setKey(prefkey);
+                    pc.setTitle(name);
+                    pc.setSummary(info);
                     pc.setDefaultValue(true);
-                    pc.setTitle(title);
 
                     pc.setOnLongClick(new Runnable()
                     {

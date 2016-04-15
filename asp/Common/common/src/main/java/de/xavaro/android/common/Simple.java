@@ -790,12 +790,6 @@ public class Simple
             return new File(dir, "Incoming");
         }
 
-        if (disposition.equals("misc"))
-        {
-            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
-            return new File(dir, "Miscellanous");
-        }
-
         if (disposition.equals("download"))
         {
             return getMediaDirType(Environment.DIRECTORY_DOWNLOADS);
@@ -805,6 +799,29 @@ public class Simple
         {
             File dir = Environment.getExternalStorageDirectory();
             return new File(dir, "WhatsApp/Media/WhatsApp Images");
+        }
+
+        if (disposition.equals("profiles"))
+        {
+            File dir = getExternalFilesDir();
+            File profiles = new File(dir, "profiles");
+
+            if (! profiles.exists())
+            {
+                Log.d(LOGTAG, "getMediaPath: profiles created:" + profiles.mkdirs());
+            }
+            else
+            {
+                Log.d(LOGTAG, "getMediaPath: profiles exists:" + profiles.toString());
+            }
+
+            return profiles;
+        }
+
+        if (disposition.equals("misc"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+            return new File(dir, "Miscellanous");
         }
 
         File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
@@ -1227,6 +1244,50 @@ public class Simple
         return bytes;
     }
 
+    public static byte[] appendBytes(byte[] buffer, byte[] append)
+    {
+        if (append == null) return buffer;
+
+        return appendBytes(buffer, append, 0, append.length);
+    }
+
+    public static byte[] appendBytes(byte[] buffer, byte[] append, int offset, int size)
+    {
+        if (append == null) return buffer;
+        if (buffer == null) return null;
+
+        byte[] newbuf = new byte[ buffer.length + size ];
+
+        System.arraycopy(buffer, 0, newbuf, 0, buffer.length);
+        System.arraycopy(append, offset, newbuf, buffer.length, size);
+
+        return newbuf;
+    }
+
+    @Nullable
+    public static byte[] getAllInputData(InputStream input)
+    {
+        byte[] buffer = new byte[ 0 ];
+        byte[] chunk = new byte[ 8192 ];
+        int xfer;
+
+        try
+        {
+            while ((xfer = input.read(chunk)) > 0)
+            {
+                buffer = appendBytes(buffer, chunk, 0, xfer);
+            }
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+
+            return null;
+        }
+
+        return buffer;
+    }
+
     public static String getAllInput(InputStream input)
     {
         StringBuilder string = new StringBuilder();
@@ -1431,39 +1492,6 @@ public class Simple
     {
         return anyContext.getResources().getIdentifier(
                 iconname, "drawable", anyContext.getPackageName());
-    }
-
-    @Nullable
-    public static Drawable getOwnerProfileImage()
-    {
-        Cursor items = Simple.getAnyContext().getContentResolver().query(
-                ContactsContract.Profile.CONTENT_URI,
-                null, null, null, null);
-
-        if ((items == null) || ! items.moveToNext()) return null;
-
-        int photoCol = items.getColumnIndex(ContactsContract.Profile.PHOTO_URI);
-        String photoUrl = items.getString(photoCol);
-
-        Log.d(LOGTAG, "COL:" + "=" + photoUrl);
-
-        if (photoUrl == null) return null;
-
-        try
-        {
-            InputStream photoStream = Simple.getInputStream(photoUrl);
-            if (photoStream == null) return null;
-
-            Bitmap bitmap = BitmapFactory.decodeStream(photoStream);
-            return Simple.getDrawable(bitmap);
-
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        return null;
     }
 
     @Nullable

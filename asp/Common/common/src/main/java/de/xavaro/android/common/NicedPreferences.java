@@ -1454,8 +1454,6 @@ public class NicedPreferences
             actionIcon.setPadding(10, 16, 10, 10);
             ((LinearLayout) ((ViewGroup) view).getChildAt(0)).addView(actionIcon);
 
-            StaticUtils.dumpViewsChildren(view);
-
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
         }

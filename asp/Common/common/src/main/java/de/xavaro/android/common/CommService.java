@@ -9,6 +9,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -366,6 +367,8 @@ public class CommService extends Service
                 RemoteContacts.deliverOwnContact(responseOwnerIdentity);
 
                 CommService.sendEncrypted(responseOwnerIdentity, true);
+
+                ProfileImagesNew.sendOwnerImage(remoteIdentity);
 
                 return true;
             }
