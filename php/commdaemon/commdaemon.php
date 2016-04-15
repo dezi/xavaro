@@ -27,7 +27,9 @@ echo "Socket bind OK \n";
 $identities = array();
 
 $packetlog = array();
+
 $pincodes = array();
+$gcmtoken = array();
 
 function readableuuid($uuid)
 {
@@ -331,6 +333,12 @@ while (1)
 		if (isset($json[ "type" ]) && ($json[ "type" ] == "sendPin"))
 		{
 			$pincodes[ $json[ "pincode" ] ] = $json[ "identity" ];
+			$gcmtoken[ $json[ "pincode" ] ] = $json[ "gcmtoken" ];
+			
+			echo "    => " . $remote_ip . ":" . $remote_port . "\n";
+			echo "    => " . $json[ "pincode"  ] . "\n";			
+			echo "    => " . $json[ "identity" ] . "\n";			
+			echo "    => " . $json[ "gcmtoken" ] . "\n";			
 		}
 	
 		if (isset($json[ "type" ]) && ($json[ "type" ] == "requestPin"))
@@ -346,6 +354,7 @@ while (1)
 			{
 				$data[ "status"   ] = "success";
 				$data[ "idremote" ] = $pincodes[ $pincode ];
+				$data[ "gcmtoken" ] = $gcmtoken[ $pincode ];
 			}
 			else
 			{
