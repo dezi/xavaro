@@ -80,6 +80,7 @@ public class PreferencesBasics
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Persönliches");
+            pc.setIcon(Simple.getOwnerProfileImage());
             preferences.add(pc);
 
             final CharSequence[] prefixText = { "Keine", "Herr", "Frau" };

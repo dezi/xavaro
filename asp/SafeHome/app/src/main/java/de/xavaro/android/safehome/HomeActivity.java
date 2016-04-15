@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.AppInfoHandler;
@@ -21,6 +22,7 @@ import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
@@ -102,6 +104,9 @@ public class HomeActivity extends AppCompatActivity implements
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         topscreen.setOnSystemUiVisibilityChangeListener(this);
+
+        File contacts = new File(Simple.getExternalFilesDir(), "contacts.json");
+        Simple.putFileContent(contacts, Json.toPretty(ContactsHandler.getJSONData(this)));
     }
 
     private final Runnable makeFullscreen = new Runnable()

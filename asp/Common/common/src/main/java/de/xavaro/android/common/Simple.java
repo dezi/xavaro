@@ -1,8 +1,10 @@
 package de.xavaro.android.common;
 
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Vibrator;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -1273,6 +1275,22 @@ public class Simple
     }
 
     @Nullable
+    public static InputStream getInputStream(String contentUrl)
+    {
+        try
+        {
+            Uri contentUri = Uri.parse(contentUrl);
+            return anyContext.getContentResolver().openInputStream(contentUri);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static String getFileContent(File file)
     {
         byte[] bytes = getFileBytes(file);
@@ -1413,6 +1431,39 @@ public class Simple
     {
         return anyContext.getResources().getIdentifier(
                 iconname, "drawable", anyContext.getPackageName());
+    }
+
+    @Nullable
+    public static Drawable getOwnerProfileImage()
+    {
+        Cursor items = Simple.getAnyContext().getContentResolver().query(
+                ContactsContract.Profile.CONTENT_URI,
+                null, null, null, null);
+
+        if ((items == null) || ! items.moveToNext()) return null;
+
+        int photoCol = items.getColumnIndex(ContactsContract.Profile.PHOTO_URI);
+        String photoUrl = items.getString(photoCol);
+
+        Log.d(LOGTAG, "COL:" + "=" + photoUrl);
+
+        if (photoUrl == null) return null;
+
+        try
+        {
+            InputStream photoStream = Simple.getInputStream(photoUrl);
+            if (photoStream == null) return null;
+
+            Bitmap bitmap = BitmapFactory.decodeStream(photoStream);
+            return Simple.getDrawable(bitmap);
+
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
     }
 
     @Nullable

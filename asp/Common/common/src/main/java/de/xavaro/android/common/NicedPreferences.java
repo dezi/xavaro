@@ -1413,12 +1413,21 @@ public class NicedPreferences
             //
 
             ((LinearLayout) view).setOrientation(LinearLayout.VERTICAL);
-            view.setPadding(0, 0, 0, 8);
+            view.setPadding(0, 4, 0, 4);
 
             //
             // Step three: remove summary from horizontal layout and add
             // to top layout now beeing vertical.
             //
+
+            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
+
+            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
+            {
+                LinearLayout icon_frame = (LinearLayout) icon.getParent();
+                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+                icon_frame.setPadding(0, 0, 0, 0);
+            }
 
             TextView summary = (TextView) view.findViewById(android.R.id.summary);
             summary.setPadding(16, 0, 16, 0);
@@ -1434,7 +1443,6 @@ public class NicedPreferences
             view.setBackgroundColor(0xcccccccc);
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setPadding(0, 6, 0, 0);
             title.setTextSize(Simple.getDeviceTextSize(24f));
 
             //
@@ -1445,6 +1453,8 @@ public class NicedPreferences
             actionIcon.setLayoutParams(Simple.layoutParamsXX(Simple.WC, Simple.MP));
             actionIcon.setPadding(10, 16, 10, 10);
             ((LinearLayout) ((ViewGroup) view).getChildAt(0)).addView(actionIcon);
+
+            StaticUtils.dumpViewsChildren(view);
 
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
