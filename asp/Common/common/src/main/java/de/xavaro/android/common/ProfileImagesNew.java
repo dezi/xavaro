@@ -32,6 +32,13 @@ public class ProfileImagesNew
         return photoUrl;
     }
 
+    private static File getOwnerProfileImageFile()
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "xavaro.image." + SystemIdentity.getIdentity() + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
     @Nullable
     public static Drawable getOwnerProfileImage()
     {
@@ -51,10 +58,8 @@ public class ProfileImagesNew
             // Save data to profiles directory under own identity.
             //
 
-            File profilespath = Simple.getMediaPath("profiles");
-            String profilename = "xavaro.image." + SystemIdentity.getIdentity() + ".jpg";
-            File ownerimage = new File(profilespath, profilename);
-            Simple.putFileBytes(ownerimage, data);
+
+            Simple.putFileBytes(getOwnerProfileImageFile(), data);
 
             ByteArrayInputStream bais = new ByteArrayInputStream(data);
             return Simple.getDrawable(BitmapFactory.decodeStream(bais));
@@ -69,9 +74,7 @@ public class ProfileImagesNew
 
     public static void sendOwnerImage(String remoteIdentity)
     {
-        File profilespath = Simple.getMediaPath("profiles");
-        String profilename = "xavaro.image." + SystemIdentity.getIdentity() + ".jpg";
-        File ownerimage = new File(profilespath, profilename);
+        File ownerimage = getOwnerProfileImageFile();
 
         if (ownerimage.exists())
         {
