@@ -5,7 +5,7 @@ WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
 
 tvguide.buildBasicPreference = function()
 {
-//    WebAppPrefs.removeAllPrefs("");
+    WebAppPrefs.removeAllPrefs("");
 
     tvguide.prefs = [];
 
@@ -33,8 +33,11 @@ tvguide.buildBasicPreference = function()
             var pref = {};
             pref.key = "channel." + channel;
             pref.type = "check";
-            pref.title = channel;
-            pref.icon = encodeURI("http://" + WebApp.manifest.appserver + "/channels/tv/de/" + channel + ".png");
+
+            var title = channel.split("/");
+
+            pref.title = title[ title.length - 1 ];
+            pref.icon = encodeURI("http://" + WebApp.manifest.appserver + "/channels/" + channel + ".png");
             pref.defvalue = false;
 
             if (category == "default") pref.defvalue = true;

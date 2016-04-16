@@ -195,30 +195,90 @@ tvguide.createFrameSetup = function()
     WebLibSimple.setBGColor(tvguide.senderbar, constants.senderbarColor);
 }
 
+tvguide.cleanSender = function(senders)
+{
+    var clean = [];
+
+    for (var sender in senders)
+    {
+        if (! senders[ sender ]) continue;
+
+        // remove channel.
+        var name = sender.substring(8);
+        console.log("--> name: " + name);
+
+        clean.push(name);
+    }
+
+    return clean;
+}
+
+tvguide.sortSender = function(allChannels, sender)
+{
+    var sortedSender = [];
+
+    for (var channel in allChannels)
+    {
+        var check = allChannels[ channel ];
+        if (sender.indexOf(check))
+        {
+            sortedSender.push(check);
+        }
+    }
+
+    return sortedSender;
+}
+
 tvguide.getSenderList = function()
 {
+    console.log("--> " + WebAppPrefs.getAllPrefs());
+//    console.log("--> " + WebAppMedia.getLocaleDefaultChannels("tv"));
+
     tvguide.senderList = {};
 
-    var localChannels = JSON.parse(WebAppMedia.getLocaleDefaultChannels("tv"));
+    var StringsKeys = WebLibStrings.strings[ "tvguide.senderlists.keys" ];
+    var allChannels = [];
 
-    for (var channelIndex in localChannels)
+    for (var key in StringsKeys)
     {
-        var name = localChannels[ channelIndex ];
+        var channels = WebLibStrings.strings[ "tvguide.list." + StringsKeys[ key ] ];
+
+        for (var channel in channels) allChannels.push(channels[ channel ]);
+    }
+
+    var localChannels = JSON.parse(WebAppPrefs.getAllPrefs());
+    localChannels = tvguide.cleanSender(localChannels);
+
+    localChannels = tvguide.sortSender(allChannels, localChannels);
+
+    var count = 0;
+
+    for (var channelName in localChannels)
+    {
+        if (! localChannels[ channelName ]) continue;
+
+        // remove channel.
+        var name = channelName.substring(8);
+        console.log("--> name: " + name);
+
+
         var cparts = name.split("/");
 
         tvguide.senderList[ name ] = {};
         var sender = tvguide.senderList[ name ];
 
-        sender.index   = parseInt(channelIndex);
+        sender.index   = count;
         sender.type    = cparts[0];
         sender.country = cparts[1];
         sender.channel = cparts[2];
         sender.iptv    = false;
         sender.isbd    = false;
+
+        count = count + 1;
     }
 
-    var iptvChannels  = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
-    var iptvAliase    = {};
+    var iptvChannels = JSON.parse(WebAppMedia.getLocaleInternetChannels("tv"));
+    var iptvAliase = {};
 
     for (var webKey in iptvChannels)
     {
