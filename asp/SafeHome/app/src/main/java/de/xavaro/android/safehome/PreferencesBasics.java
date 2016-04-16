@@ -82,7 +82,7 @@ public class PreferencesBasics
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Persönliches");
-            pc.setIcon(ProfileImagesNew.getOwnerProfileImage());
+            pc.setIcon(ProfileImagesNew.getOwnerProfileDrawable());
             preferences.add(pc);
 
             final CharSequence[] prefixText = { "Keine", "Herr", "Frau" };
@@ -1208,6 +1208,7 @@ public class PreferencesBasics
                             RemoteContacts.deliverOwnContact(requestOwnerIdentity);
 
                             CommService.sendEncrypted(requestOwnerIdentity, true);
+                            ProfileImagesNew.sendOwnerImage(remoteIdentity);
 
                             return;
                         }
