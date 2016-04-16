@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,8 +8,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.support.annotation.Nullable;
 
 import android.provider.ContactsContract;
 import android.database.Cursor;
@@ -17,9 +16,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class ProfileImagesNew
@@ -72,8 +69,7 @@ public class ProfileImagesNew
 
             Simple.putFileBytes(getOwnerProfileImageFile(), data);
 
-            ByteArrayInputStream bais = new ByteArrayInputStream(data);
-            Bitmap bitmap = BitmapFactory.decodeStream(bais);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
             if (circle) bitmap = getCircleBitmap(bitmap);
             return bitmap;
         }

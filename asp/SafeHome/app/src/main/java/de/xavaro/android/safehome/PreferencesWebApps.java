@@ -180,13 +180,12 @@ public class PreferencesWebApps
                     {
                         IconPrefData ip = iconmap.remove(0);
 
-                        byte[] icondata = webprefs.webapploader.getRequestData(ip.icon);
+                        byte[] idata = webprefs.webapploader.getRequestData(ip.icon);
 
-                        if (icondata != null)
+                        if (idata != null)
                         {
-                            ByteArrayInputStream bais = new ByteArrayInputStream(icondata);
-                            Bitmap bitmap = BitmapFactory.decodeStream(bais);
-                            ip.ap.setIcon(Simple.getDrawable(bitmap));
+                            Bitmap bm = BitmapFactory.decodeByteArray(idata, 0, idata.length);
+                            ip.ap.setIcon(Simple.getDrawable(bm));
                         }
                     }
 
