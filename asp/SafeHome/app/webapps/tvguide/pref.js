@@ -1,6 +1,30 @@
-console.log("alive........ locale=" + WebAppUtility.getLocaleCountry());
+WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
+{
+    console.log("=========================>" + prefkey);
+}
 
 tvguide.buildBasicPreference = function()
+{
+    tvguide.prefs = [];
+
+    //var units = WebLibStrings.strings[ "quantity.units" ];
+
+    var pref = {};
+    pref.key = "cat.defaults",
+    pref.type = "category",
+    pref.title = "Fernsehsender";
+    tvguide.prefs.push(pref);
+
+    var pref = {};
+    pref.key = "cat.sky",
+    pref.type = "category",
+    pref.title = "Fernsehsender";
+    tvguide.prefs.push(pref);
+
+    WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
+}
+
+tvguide.buildBasicPreferenceSample = function()
 {
     tvguide.prefs = [];
 
