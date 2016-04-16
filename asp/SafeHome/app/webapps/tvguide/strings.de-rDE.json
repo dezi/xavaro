@@ -2,15 +2,15 @@
   "intents": [
 
     {
-      "action" : "view",
-      "keywords": [ "Fernsehprogramm", "Fernsehen"  ],
+      "action": "view",
+      "keywords": [ "Fernsehprogramm", "Fernsehen" ],
       "response": "Ich öffne das Fernsehprogramm",
       "sample": "Ich möchte das Fernsehprogramm sehen",
       "icon": "/webapps/tvguide/tvguide_175x175.png"
     },
 
     {
-      "action" : "view",
+      "action": "view",
       "keywords": [ "Fernsehprogramm", "Fernsehen", "8:15" ],
       "response": "Das gibt es heute nach der Tagesschau",
       "sample": "Ich möchte das Fernsehprogramm um Acht Uhr Fünfzehn sehen",
@@ -19,23 +19,37 @@
     }
   ],
 
-  "tvguide.channel" : "Kanal",
-  "tvguide.duration" : "Dauer",
-  
-  "tvguide.wikipedia" : "Wikipedia",
+  "tvguide.channel": "Kanal",
+  "tvguide.duration": "Dauer",
 
-  "tvguide.min" : "min",
-  "tvguide.record" : "Aufnehmen",
-  "tvguide.play" : "Aufnahme ansehen",
-  "tvguide.livePlay" : "Ansehen",
-  "tvguide.remove" : "Geplannte Aufnahme abbrechen",
+  "tvguide.wikipedia": "Wikipedia",
 
-  "tvguide.at" : "um",
-  "tvguide.today" : "Heute",
-  "tvguide.tomorrow" : "Morgen",
-  "tvguide.yesterday" : "Gestern",
+  "tvguide.min": "min",
+  "tvguide.record": "Aufnehmen",
+  "tvguide.play": "Aufnahme ansehen",
+  "tvguide.livePlay": "Ansehen",
+  "tvguide.remove": "Geplannte Aufnahme abbrechen",
 
-  "tvguide.day.vals" : [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" ],
+  "tvguide.at": "um",
+  "tvguide.today": "Heute",
+  "tvguide.tomorrow": "Morgen",
+  "tvguide.yesterday": "Gestern",
 
-  "EOL" : true
+  "tvguide.day.vals": [
+    "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
+  ],
+
+  "tvguide.senderlists.keys": [ "default", "sky", "sports", "homeshopping", "paytv", "other" ],
+
+  "tvguide.senderlists.vals": [ "default", "sky", "sports", "homeshopping", "paytv", "other" ],
+
+  "tvguide.list.default": [
+
+  ],
+
+  "tvguide.list.sky": [
+
+  ],
+
+  "EOL": true
 }
