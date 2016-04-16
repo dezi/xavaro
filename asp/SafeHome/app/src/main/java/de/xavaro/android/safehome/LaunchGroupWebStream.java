@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,13 +32,16 @@ public class LaunchGroupWebStream extends LaunchGroup
         this.parent = parent;
     }
 
+    @Nullable
     public static JSONArray getConfig(String type)
     {
-        JSONArray home = new JSONArray();
-        JSONArray adir = new JSONArray();
+        if (! Simple.getSharedPrefBoolean(type + ".enable")) return null;
 
         JSONObject config = WebLib.getLocaleConfig(type);
-        if (config == null) return home;
+        if (config == null) return null;
+
+        JSONArray home = new JSONArray();
+        JSONArray adir = new JSONArray();
 
         Iterator<String> keysIterator = config.keys();
 

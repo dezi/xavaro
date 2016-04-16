@@ -32,6 +32,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("xavaro.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
@@ -147,6 +149,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("phone.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
@@ -260,6 +264,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("skype.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
@@ -366,6 +372,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("whatsapp.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();

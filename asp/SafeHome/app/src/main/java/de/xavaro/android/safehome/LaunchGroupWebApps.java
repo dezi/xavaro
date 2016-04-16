@@ -23,6 +23,12 @@ public class LaunchGroupWebApps extends LaunchGroup
 
     public static JSONArray getConfig()
     {
+        //
+        // Legacy remove.
+        //
+
+        Simple.removeSharedPref("webapps.mode.testing");
+
         JSONArray home = new JSONArray();
         JSONArray adir = new JSONArray();
         JSONObject entry;

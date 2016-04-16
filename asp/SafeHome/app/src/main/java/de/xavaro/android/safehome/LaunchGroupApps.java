@@ -26,9 +26,7 @@ public class LaunchGroupApps extends LaunchGroup
 
     public static JSONArray getConfig(String subtype)
     {
-        JSONArray home = new JSONArray();
-        JSONArray adir = new JSONArray();
-        JSONObject entry;
+        if (! Simple.getSharedPrefBoolean("apps." + subtype + ".enable")) return null;
 
         //
         // Get available items.
@@ -36,7 +34,11 @@ public class LaunchGroupApps extends LaunchGroup
 
         JSONObject config = WebLib.getLocaleConfig("appstore");
         config = Json.getObject(config, subtype);
-        if (config == null) return home;
+        if (config == null) return null;
+
+        JSONArray home = new JSONArray();
+        JSONArray adir = new JSONArray();
+        JSONObject entry;
 
         //
         // "apps.discounter.package:" + apkname = mode
