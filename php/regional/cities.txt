@@ -1,0 +1,678 @@
+Berlin;Berlin
+Hamburg;Hamburg
+München;Bayern
+Köln;Nordrhein-Westfalen
+Frankfurt am Main;Hessen
+Stuttgart;Baden-Württemberg
+Düsseldorf;Nordrhein-Westfalen
+Dortmund;Nordrhein-Westfalen
+Essen;Nordrhein-Westfalen
+Bremen;Bremen
+Leipzig;Sachsen
+Dresden;Sachsen
+Hannover;Niedersachsen
+Nürnberg;Bayern
+Duisburg;Nordrhein-Westfalen
+Bochum;Nordrhein-Westfalen
+Wuppertal;Nordrhein-Westfalen
+Bielefeld;Nordrhein-Westfalen
+Bonn;Nordrhein-Westfalen
+Münster;Nordrhein-Westfalen
+Karlsruhe;Baden-Württemberg
+Mannheim;Baden-Württemberg
+Augsburg;Bayern
+Wiesbaden;Hessen
+Gelsenkirchen;Nordrhein-Westfalen
+Mönchengladbach;Nordrhein-Westfalen
+Braunschweig;Niedersachsen
+Chemnitz;Sachsen
+Aachen;Nordrhein-Westfalen
+Kiel;Schleswig-Holstein
+Halle (Saale);Sachsen-Anhalt
+Magdeburg;Sachsen-Anhalt
+Krefeld;Nordrhein-Westfalen
+Freiburg im Breisgau;Baden-Württemberg
+Lübeck;Schleswig-Holstein
+Oberhausen;Nordrhein-Westfalen
+Mainz;Rheinland-Pfalz
+Erfurt;Thüringen
+Rostock;Mecklenburg-Vorpommern
+Kassel;Hessen
+Hagen;Nordrhein-Westfalen
+Saarbrücken;Saarland
+Hamm;Nordrhein-Westfalen
+Mülheim an der Ruhr;Nordrhein-Westfalen
+Potsdam;Brandenburg
+Ludwigshafen am Rhein;Rheinland-Pfalz
+Leverkusen;Nordrhein-Westfalen
+Oldenburg;Niedersachsen
+Osnabrück;Niedersachsen
+Solingen;Nordrhein-Westfalen
+Heidelberg;Baden-Württemberg
+Herne;Nordrhein-Westfalen
+Neuss;Nordrhein-Westfalen
+Darmstadt;Hessen
+Paderborn;Nordrhein-Westfalen
+Regensburg;Bayern
+Ingolstadt;Bayern
+Würzburg;Bayern
+Wolfsburg;Niedersachsen
+Fürth;Bayern
+Offenbach am Main;Hessen
+Ulm;Baden-Württemberg
+Heilbronn;Baden-Württemberg
+Pforzheim;Baden-Württemberg
+Göttingen;Niedersachsen
+Bottrop;Nordrhein-Westfalen
+Recklinghausen;Nordrhein-Westfalen
+Reutlingen;Baden-Württemberg
+Koblenz;Rheinland-Pfalz
+Bremerhaven;Bremen
+Bergisch Gladbach;Nordrhein-Westfalen
+Remscheid;Nordrhein-Westfalen
+Trier;Rheinland-Pfalz
+Jena;Thüringen
+Erlangen;Bayern
+Moers;Nordrhein-Westfalen
+Siegen;Nordrhein-Westfalen
+Hildesheim;Niedersachsen
+Cottbus;Brandenburg
+Salzgitter;Niedersachsen
+Kaiserslautern;Rheinland-Pfalz
+Gütersloh;Nordrhein-Westfalen
+Witten;Nordrhein-Westfalen
+Gera;Thüringen
+Iserlohn;Nordrhein-Westfalen
+Schwerin;Mecklenburg-Vorpommern
+Ludwigsburg;Baden-Württemberg
+Zwickau;Sachsen
+Hanau;Hessen
+Esslingen am Neckar;Baden-Württemberg
+Düren;Nordrhein-Westfalen
+Ratingen;Nordrhein-Westfalen
+Tübingen;Baden-Württemberg
+Lünen;Nordrhein-Westfalen
+Flensburg;Schleswig-Holstein
+Marl;Nordrhein-Westfalen
+Gießen;Hessen
+Dessau-Roßlau;Sachsen-Anhalt
+Villingen-Schwenningen;Baden-Württemberg
+Konstanz;Baden-Württemberg
+Worms;Rheinland-Pfalz
+Velbert;Nordrhein-Westfalen
+Minden;Nordrhein-Westfalen
+Neumünster;Schleswig-Holstein
+Norderstedt;Schleswig-Holstein
+Wilhelmshaven;Niedersachsen
+Dorsten;Nordrhein-Westfalen
+Viersen;Nordrhein-Westfalen
+Delmenhorst;Niedersachsen
+Gladbeck;Nordrhein-Westfalen
+Rheine;Nordrhein-Westfalen
+Detmold;Nordrhein-Westfalen
+Castrop-Rauxel;Nordrhein-Westfalen
+Troisdorf;Nordrhein-Westfalen
+Arnsberg;Nordrhein-Westfalen
+Marburg;Hessen
+Lüdenscheid;Nordrhein-Westfalen
+Lüneburg;Niedersachsen
+Bamberg;Bayern
+Bayreuth;Bayern
+Brandenburg an der Havel;Brandenburg
+Bocholt;Nordrhein-Westfalen
+Celle;Niedersachsen
+Aschaffenburg;Bayern
+Landshut;Bayern
+Aalen;Baden-Württemberg
+Dinslaken;Nordrhein-Westfalen
+Lippstadt;Nordrhein-Westfalen
+Kempten (Allgäu);Bayern
+Fulda;Hessen
+Herford;Nordrhein-Westfalen
+Kerpen;Nordrhein-Westfalen
+Plauen;Sachsen
+Neuwied;Rheinland-Pfalz
+Weimar;Thüringen
+Neubrandenburg;Mecklenburg-Vorpommern
+Dormagen;Nordrhein-Westfalen
+Sindelfingen;Baden-Württemberg
+Grevenbroich;Nordrhein-Westfalen
+Rüsselsheim am Main;Hessen
+Rosenheim;Bayern
+Herten;Nordrhein-Westfalen
+Wesel;Nordrhein-Westfalen
+Garbsen;Niedersachsen
+Bergheim;Nordrhein-Westfalen
+Schwäbisch Gmünd;Baden-Württemberg
+Unna;Nordrhein-Westfalen
+Friedrichshafen;Baden-Württemberg
+Hürth;Nordrhein-Westfalen
+Offenburg;Baden-Württemberg
+Frankfurt (Oder);Brandenburg
+Stralsund;Mecklenburg-Vorpommern
+Langenfeld (Rheinland);Nordrhein-Westfalen
+Greifswald;Mecklenburg-Vorpommern
+Stolberg (Rheinland);Nordrhein-Westfalen
+Hameln;Niedersachsen
+Euskirchen;Nordrhein-Westfalen
+Göppingen;Baden-Württemberg
+Neu-Ulm;Bayern
+Eschweiler;Nordrhein-Westfalen
+Hilden;Nordrhein-Westfalen
+Sankt Augustin;Nordrhein-Westfalen
+Meerbusch;Nordrhein-Westfalen
+Hattingen;Nordrhein-Westfalen
+Görlitz;Sachsen
+Waiblingen;Baden-Württemberg
+Pulheim;Nordrhein-Westfalen
+Baden-Baden;Baden-Württemberg
+Menden (Sauerland);Nordrhein-Westfalen
+Bad Homburg vor der Höhe;Hessen
+Nordhorn;Niedersachsen
+Neustadt an der Weinstraße;Rheinland-Pfalz
+Lingen (Ems);Niedersachsen
+Langenhagen;Niedersachsen
+Bad Salzuflen;Nordrhein-Westfalen
+Ahlen;Nordrhein-Westfalen
+Wolfenbüttel;Niedersachsen
+Schweinfurt;Bayern
+Frechen;Nordrhein-Westfalen
+Wetzlar;Hessen
+Ibbenbüren;Nordrhein-Westfalen
+Willich;Nordrhein-Westfalen
+Goslar;Niedersachsen
+Emden;Niedersachsen
+Passau;Bayern
+Speyer;Rheinland-Pfalz
+Gummersbach;Nordrhein-Westfalen
+Erftstadt;Nordrhein-Westfalen
+Ravensburg;Baden-Württemberg
+Bad Kreuznach;Rheinland-Pfalz
+Kleve;Nordrhein-Westfalen
+Lörrach;Baden-Württemberg
+Peine;Niedersachsen
+Bad Oeynhausen;Nordrhein-Westfalen
+Cuxhaven;Niedersachsen
+Bergkamen;Nordrhein-Westfalen
+Elmshorn;Schleswig-Holstein
+Frankenthal (Pfalz);Rheinland-Pfalz
+Rastatt;Baden-Württemberg
+Böblingen;Baden-Württemberg
+Rheda-Wiedenbrück;Nordrhein-Westfalen
+Heidenheim an der Brenz;Baden-Württemberg
+Soest;Nordrhein-Westfalen
+Bornheim;Nordrhein-Westfalen
+Wittenberg, Lutherstadt;Sachsen-Anhalt
+Hennef (Sieg);Nordrhein-Westfalen
+Herzogenrath;Nordrhein-Westfalen
+Singen (Hohentwiel);Baden-Württemberg
+Alsdorf;Nordrhein-Westfalen
+Schwerte;Nordrhein-Westfalen
+Gronau (Westf.);Nordrhein-Westfalen
+Leonberg;Baden-Württemberg
+Straubing;Bayern
+Dachau;Bayern
+Dülmen;Nordrhein-Westfalen
+Freising;Bayern
+Melle;Niedersachsen
+Neunkirchen;Saarland
+Stade;Niedersachsen
+Oberursel (Taunus);Hessen
+Bünde;Nordrhein-Westfalen
+Filderstadt;Baden-Württemberg
+Gotha;Thüringen
+Fellbach;Baden-Württemberg
+Landau in der Pfalz;Rheinland-Pfalz
+Hof;Bayern
+Lahr/Schwarzwald;Baden-Württemberg
+Albstadt;Baden-Württemberg
+Brühl;Nordrhein-Westfalen
+Weinheim;Baden-Württemberg
+Erkrath;Nordrhein-Westfalen
+Rodgau;Hessen
+Neustadt am Rübenberge;Niedersachsen
+Kamen;Nordrhein-Westfalen
+Lehrte;Niedersachsen
+Bruchsal;Baden-Württemberg
+Erkelenz;Nordrhein-Westfalen
+Oranienburg;Brandenburg
+Kaarst;Nordrhein-Westfalen
+Wismar;Mecklenburg-Vorpommern
+Bietigheim-Bissingen;Baden-Württemberg
+Rottenburg am Neckar;Baden-Württemberg
+Memmingen;Bayern
+Kaufbeuren;Bayern
+Pinneberg;Schleswig-Holstein
+Eisenach;Thüringen
+Weiden in der Oberpfalz;Bayern
+Nordhausen;Thüringen
+Falkensee;Brandenburg
+Gifhorn;Niedersachsen
+Nettetal;Nordrhein-Westfalen
+Amberg;Bayern
+Homburg;Saarland
+Borken;Nordrhein-Westfalen
+Heinsberg;Nordrhein-Westfalen
+Aurich;Niedersachsen
+Coburg;Bayern
+Freiberg;Sachsen
+Wunstorf;Niedersachsen
+Bitterfeld-Wolfen;Sachsen-Anhalt
+Lemgo;Nordrhein-Westfalen
+Seevetal ;Niedersachsen
+Halberstadt;Sachsen-Anhalt
+Monheim am Rhein;Nordrhein-Westfalen
+Dreieich;Hessen
+Stendal;Sachsen-Anhalt
+Königswinter;Nordrhein-Westfalen
+Pirmasens;Rheinland-Pfalz
+Ansbach;Bayern
+Nürtingen;Baden-Württemberg
+Schwabach;Bayern
+Laatzen;Niedersachsen
+Weißenfels;Sachsen-Anhalt
+Siegburg;Nordrhein-Westfalen
+Buxtehude;Niedersachsen
+Löhne;Nordrhein-Westfalen
+Bensheim;Hessen
+Freital;Sachsen
+Bautzen;Sachsen
+Kirchheim unter Teck;Baden-Württemberg
+Hückelhoven;Nordrhein-Westfalen
+Ahaus;Nordrhein-Westfalen
+Eberswalde;Brandenburg
+Ettlingen;Baden-Württemberg
+Neumarkt in der Oberpfalz;Bayern
+Schorndorf;Baden-Württemberg
+Germering;Bayern
+Völklingen;Saarland
+Hofheim am Taunus;Hessen
+Leinfelden-Echterdingen;Baden-Württemberg
+Würselen;Nordrhein-Westfalen
+Buchholz in der Nordheide;Niedersachsen
+Schwäbisch Hall;Baden-Württemberg
+Mettmann;Nordrhein-Westfalen
+Ostfildern;Baden-Württemberg
+Pirna;Sachsen
+Maintal;Hessen
+Haltern am See;Nordrhein-Westfalen
+Kamp-Lintfort;Nordrhein-Westfalen
+Niederkassel;Nordrhein-Westfalen
+Warendorf;Nordrhein-Westfalen
+Bernau bei Berlin;Brandenburg
+Neu-Isenburg;Hessen
+Voerde (Niederrhein);Nordrhein-Westfalen
+Suhl;Thüringen
+Beckum;Nordrhein-Westfalen
+Sankt Ingbert;Saarland
+Langen;Hessen
+Papenburg;Niedersachsen
+Coesfeld;Nordrhein-Westfalen
+Greven;Nordrhein-Westfalen
+Emsdetten;Nordrhein-Westfalen
+Erding;Bayern
+Wesseling;Nordrhein-Westfalen
+Backnang;Baden-Württemberg
+Porta Westfalica;Nordrhein-Westfalen
+Fürstenfeldbruck;Bayern
+Sinsheim;Baden-Württemberg
+Königs Wusterhausen;Brandenburg
+Lage;Nordrhein-Westfalen
+Kempen;Nordrhein-Westfalen
+Meppen;Niedersachsen
+Kehl;Baden-Württemberg
+Wermelskirchen;Nordrhein-Westfalen
+Datteln;Nordrhein-Westfalen
+Saarlouis;Saarland
+Zweibrücken;Rheinland-Pfalz
+Leer;Niedersachsen
+Limburg an der Lahn;Hessen
+Radebeul;Sachsen
+Hoyerswerda;Sachsen
+Tuttlingen;Baden-Württemberg
+Hemer;Nordrhein-Westfalen
+Bernburg (Saale);Sachsen-Anhalt
+Balingen;Baden-Württemberg
+Winsen (Luhe);Niedersachsen
+Goch;Nordrhein-Westfalen
+Uelzen;Niedersachsen
+Wernigerode;Sachsen-Anhalt
+Merseburg;Sachsen-Anhalt
+Barsinghausen;Niedersachsen
+Viernheim;Hessen
+Steinfurt;Nordrhein-Westfalen
+Cloppenburg;Niedersachsen
+Crailsheim;Baden-Württemberg
+Mühlhausen/Thüringen;Thüringen
+Geldern;Nordrhein-Westfalen
+Mörfelden-Walldorf;Hessen
+Dietzenbach;Hessen
+Altenburg;Thüringen
+Naumburg (Saale);Sachsen-Anhalt
+Seelze;Niedersachsen
+Stuhr;Niedersachsen
+Kornwestheim;Baden-Württemberg
+Bad Vilbel;Hessen
+Wedel;Schleswig-Holstein
+Rheinfelden (Baden);Baden-Württemberg
+Korschenbroich;Nordrhein-Westfalen
+Jülich;Nordrhein-Westfalen
+Deggendorf;Bayern
+Lampertheim;Hessen
+Ahrensburg;Schleswig-Holstein
+Georgsmarienhütte;Niedersachsen
+Biberach an der Riß;Baden-Württemberg
+Einbeck;Niedersachsen
+Vechta;Niedersachsen
+Schönebeck;Sachsen-Anhalt
+Fürstenwalde/Spree;Brandenburg
+Delbrück;Nordrhein-Westfalen
+Gevelsberg;Nordrhein-Westfalen
+Forchheim;Bayern
+Itzehoe;Schleswig-Holstein
+Kreuztal;Nordrhein-Westfalen
+Bad Nauheim;Hessen
+Riesa;Sachsen
+Oer-Erkenschwick;Nordrhein-Westfalen
+Rheinberg;Nordrhein-Westfalen
+Nienburg/Weser;Niedersachsen
+Neuruppin;Brandenburg
+Herrenberg;Baden-Württemberg
+Achim;Niedersachsen
+Geestland;Niedersachsen
+Ganderkesee;Niedersachsen
+Bramsche;Niedersachsen
+Radolfzell am Bodensee;Baden-Württemberg
+Weyhe ;Niedersachsen
+Emmerich am Rhein;Nordrhein-Westfalen
+Schwedt/Oder;Brandenburg
+Haan;Nordrhein-Westfalen
+Osterholz-Scharmbeck;Niedersachsen
+Meschede;Nordrhein-Westfalen
+Werl;Nordrhein-Westfalen
+Lohmar;Nordrhein-Westfalen
+Ennepetal;Nordrhein-Westfalen
+Weil am Rhein;Baden-Württemberg
+Werne;Nordrhein-Westfalen
+Burgdorf;Niedersachsen
+Geesthacht;Schleswig-Holstein
+Merzig;Saarland
+Höxter;Nordrhein-Westfalen
+Zeitz;Sachsen-Anhalt
+Andernach;Rheinland-Pfalz
+Tönisvorst;Nordrhein-Westfalen
+Friedberg;Bayern
+Rietberg;Nordrhein-Westfalen
+Waltrop;Nordrhein-Westfalen
+Wedemark ;Niedersachsen
+Neuburg an der Donau;Bayern
+Bad Hersfeld;Hessen
+Northeim;Niedersachsen
+Güstrow;Mecklenburg-Vorpommern
+Oelde;Nordrhein-Westfalen
+Taunusstein;Hessen
+Gaggenau;Baden-Württemberg
+Bühl;Baden-Württemberg
+Bretten;Baden-Württemberg
+Landsberg am Lech;Bayern
+Grimma;Sachsen
+Vaihingen an der Enz;Baden-Württemberg
+Springe;Niedersachsen
+Kelkheim (Taunus);Hessen
+Idar-Oberstein;Rheinland-Pfalz
+Rösrath;Nordrhein-Westfalen
+Schwandorf;Bayern
+Bad Zwischenahn ;Niedersachsen
+Sundern (Sauerland);Nordrhein-Westfalen
+Kevelaer;Nordrhein-Westfalen
+Friedberg (Hessen);Hessen
+Leichlingen (Rheinland);Nordrhein-Westfalen
+Schwelm;Nordrhein-Westfalen
+Mühlheim am Main;Hessen
+Aschersleben;Sachsen-Anhalt
+Wegberg;Nordrhein-Westfalen
+Winnenden;Baden-Württemberg
+Sangerhausen;Sachsen-Anhalt
+Henstedt-Ulzburg;Schleswig-Holstein
+Königsbrunn;Bayern
+Eisenhüttenstadt;Brandenburg
+Wetter (Ruhr);Nordrhein-Westfalen
+Baunatal;Hessen
+Meißen;Sachsen
+Rendsburg;Schleswig-Holstein
+Bad Neuenahr-Ahrweiler;Rheinland-Pfalz
+Overath;Nordrhein-Westfalen
+Mechernich;Nordrhein-Westfalen
+Neukirchen-Vluyn;Nordrhein-Westfalen
+Rödermark;Hessen
+Emmendingen;Baden-Württemberg
+Verden (Aller);Niedersachsen
+Rheinbach;Nordrhein-Westfalen
+Staßfurt;Sachsen-Anhalt
+Geilenkirchen;Nordrhein-Westfalen
+Unterschleißheim;Bayern
+Reinbek;Schleswig-Holstein
+Wangen im Allgäu;Baden-Württemberg
+Geislingen an der Steige;Baden-Württemberg
+Baesweiler;Nordrhein-Westfalen
+Hamminkeln;Nordrhein-Westfalen
+Griesheim;Hessen
+Schloß Holte-Stukenbrock;Nordrhein-Westfalen
+Köthen (Anhalt);Sachsen-Anhalt
+Hattersheim am Main;Hessen
+Weinstadt;Baden-Württemberg
+Olching;Bayern
+Garmisch-Partenkirchen;Bayern
+Nordenham;Niedersachsen
+Lauf an der Pegnitz;Bayern
+Leimen;Baden-Württemberg
+Kulmbach;Bayern
+Blankenfelde-Mahlow ;Brandenburg
+Strausberg;Brandenburg
+Hennigsdorf;Brandenburg
+Ilmenau;Thüringen
+St. Wendel;Saarland
+Lennestadt;Nordrhein-Westfalen
+Neckarsulm;Baden-Württemberg
+Zittau;Sachsen
+Lohne (Oldenburg);Niedersachsen
+Wiesloch;Baden-Württemberg
+Plettenberg;Nordrhein-Westfalen
+Selm;Nordrhein-Westfalen
+Heiligenhaus;Nordrhein-Westfalen
+Brilon;Nordrhein-Westfalen
+Lübbecke;Nordrhein-Westfalen
+Petershagen;Nordrhein-Westfalen
+Hohen Neuendorf;Brandenburg
+Mühlacker;Baden-Württemberg
+Wiehl;Nordrhein-Westfalen
+Saalfeld/Saale;Thüringen
+Rinteln;Niedersachsen
+Warstein;Nordrhein-Westfalen
+Bad Honnef;Nordrhein-Westfalen
+Remseck am Neckar;Baden-Württemberg
+Sprockhövel;Nordrhein-Westfalen
+Verl;Nordrhein-Westfalen
+Heppenheim (Bergstraße);Hessen
+Schmallenberg;Nordrhein-Westfalen
+Delitzsch;Sachsen
+Butzbach;Hessen
+Norden;Niedersachsen
+Ehingen;Baden-Württemberg
+Friedrichsdorf;Hessen
+Weiterstadt;Hessen
+Achern;Baden-Württemberg
+Senftenberg;Brandenburg
+Quedlinburg;Sachsen-Anhalt
+Lindau (Bodensee);Bayern
+Pfaffenhofen an der Ilm;Bayern
+Bad Oldesloe;Schleswig-Holstein
+Espelkamp;Nordrhein-Westfalen
+Salzkotten;Nordrhein-Westfalen
+Olpe;Nordrhein-Westfalen
+Bingen am Rhein;Rheinland-Pfalz
+Teltow;Brandenburg
+Zirndorf;Bayern
+Rottweil;Baden-Württemberg
+Roth;Bayern
+Horb am Neckar;Baden-Württemberg
+Ditzingen;Baden-Württemberg
+Ludwigsfelde;Brandenburg
+Werder (Havel);Brandenburg
+Eisleben, Lutherstadt;Sachsen-Anhalt
+Groß-Gerau;Hessen
+Pfungstadt;Hessen
+Attendorn;Nordrhein-Westfalen
+Harsewinkel;Nordrhein-Westfalen
+Ingelheim am Rhein;Rheinland-Pfalz
+Rathenow;Brandenburg
+Markkleeberg;Sachsen
+Salzwedel;Sachsen-Anhalt
+Geretsried;Bayern
+Obertshausen;Hessen
+Schleswig;Schleswig-Holstein
+Übach-Palenberg;Nordrhein-Westfalen
+Limbach-Oberfrohna;Sachsen
+Lüdinghausen;Nordrhein-Westfalen
+Arnstadt;Thüringen
+Weingarten;Baden-Württemberg
+Stutensee;Baden-Württemberg
+Meckenheim;Nordrhein-Westfalen
+Idstein;Hessen
+Syke;Niedersachsen
+Hann. Münden;Niedersachsen
+Unterhaching;Bayern
+Ellwangen (Jagst);Baden-Württemberg
+Ronnenberg;Niedersachsen
+Sonneberg;Thüringen
+Varel;Niedersachsen
+Dillenburg;Hessen
+Isernhagen ;Niedersachsen
+Warburg;Nordrhein-Westfalen
+Walsrode;Niedersachsen
+Haren (Ems);Niedersachsen
+Glauchau;Sachsen
+Korbach;Hessen
+Sehnde;Niedersachsen
+Alfter;Nordrhein-Westfalen
+Gardelegen;Sachsen-Anhalt
+Helmstedt;Niedersachsen
+Netphen;Nordrhein-Westfalen
+Waldshut-Tiengen;Baden-Württemberg
+Bedburg;Nordrhein-Westfalen
+Wallenhorst;Niedersachsen
+Öhringen;Baden-Württemberg
+Herzogenaurach;Bayern
+Jüchen;Nordrhein-Westfalen
+Starnberg;Bayern
+Moormerland ;Niedersachsen
+Mosbach;Baden-Württemberg
+Bad Mergentheim;Baden-Württemberg
+Waldkraiburg;Bayern
+Burg;Sachsen-Anhalt
+Rudolstadt;Thüringen
+Calw;Baden-Württemberg
+Herdecke;Nordrhein-Westfalen
+Riedstadt;Hessen
+Vreden;Nordrhein-Westfalen
+Wertheim;Baden-Württemberg
+Spremberg;Brandenburg
+Vaterstetten ;Bayern
+Gelnhausen;Hessen
+Freudenstadt;Baden-Württemberg
+Überlingen;Baden-Württemberg
+Husum;Schleswig-Holstein
+Osterode am Harz;Niedersachsen
+Radevormwald;Nordrhein-Westfalen
+Leutkirch im Allgäu;Baden-Württemberg
+Lengerich;Nordrhein-Westfalen
+Westerstede;Niedersachsen
+Zerbst/Anhalt;Sachsen-Anhalt
+Karben;Hessen
+Sondershausen;Thüringen
+Apolda;Thüringen
+Eckernförde;Schleswig-Holstein
+Bad Soden am Taunus;Hessen
+Weilheim in Oberbayern;Bayern
+Senden;Bayern
+Stadthagen;Niedersachsen
+Gersthofen;Bayern
+Friesoythe;Niedersachsen
+Wandlitz;Brandenburg
+Rastede;Niedersachsen
+Bad Harzburg;Niedersachsen
+Büren;Nordrhein-Westfalen
+Döbeln;Sachsen
+Edewecht;Niedersachsen
+Schwetzingen;Baden-Württemberg
+Nagold;Baden-Württemberg
+Neusäß;Bayern
+Metzingen;Baden-Württemberg
+Sonthofen;Bayern
+Donaueschingen;Baden-Württemberg
+Wipperfürth;Nordrhein-Westfalen
+Bad Kissingen;Bayern
+Ilsede;Niedersachsen
+Heide;Schleswig-Holstein
+Xanten;Nordrhein-Westfalen
+Waldkirch;Baden-Württemberg
+Rees;Nordrhein-Westfalen
+Lindlar;Nordrhein-Westfalen
+Soltau;Niedersachsen
+Halle (Westf.);Nordrhein-Westfalen
+Greiz;Thüringen
+Eppingen;Baden-Württemberg
+Elsdorf;Nordrhein-Westfalen
+Meiningen;Thüringen
+Büdingen;Hessen
+Waren (Müritz);Mecklenburg-Vorpommern
+Ottobrunn;Bayern
+Rotenburg (Wümme);Niedersachsen
+Hockenheim;Baden-Württemberg
+Eschborn;Hessen
+Werdau;Sachsen
+Wülfrath;Nordrhein-Westfalen
+Versmold;Nordrhein-Westfalen
+Blieskastel;Saarland
+Stadtallendorf;Hessen
+Schramberg;Baden-Württemberg
+Aichach;Bayern
+Duderstadt;Niedersachsen
+Fröndenberg/Ruhr;Nordrhein-Westfalen
+Puchheim;Bayern
+Laupheim;Baden-Württemberg
+Seligenstadt;Hessen
+Coswig;Sachsen
+Neu Wulmstorf;Niedersachsen
+Groß-Umstadt;Hessen
+Geseke;Nordrhein-Westfalen
+Kleinmachnow;Brandenburg
+Meinerzhagen;Nordrhein-Westfalen
+Traunreut;Bayern
+Blankenburg (Harz);Sachsen-Anhalt
+Neustrelitz;Mecklenburg-Vorpommern
+Kitzingen;Bayern
+Quickborn;Schleswig-Holstein
+Annaberg-Buchholz;Sachsen
+Steinhagen;Nordrhein-Westfalen
+Enger;Nordrhein-Westfalen
+Waghäusel;Baden-Württemberg
+Wittmund;Niedersachsen
+Flörsheim am Main;Hessen
+Herborn;Hessen
+Germersheim;Rheinland-Pfalz
+Burgwedel;Niedersachsen
+Rheinstetten;Baden-Württemberg
+Westoverledingen;Niedersachsen
+Bad Rappenau;Baden-Württemberg
+Bruchköbel;Hessen
+Senden;Nordrhein-Westfalen
+Holzminden;Niedersachsen
+Gauting;Bayern
+Kaltenkirchen;Schleswig-Holstein
+Stadtlohn;Nordrhein-Westfalen
+Wilnsdorf;Nordrhein-Westfalen
+Schortens;Niedersachsen
+Lichtenfels;Bayern
+Luckenwalde;Brandenburg
+Dillingen/Saar;Saarland
