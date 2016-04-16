@@ -82,7 +82,7 @@ public class PreferencesBasics
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Persönliches");
-            pc.setIcon(ProfileImagesNew.getOwnerProfileDrawable());
+            pc.setIcon(ProfileImagesNew.getOwnerProfileDrawable(true));
             preferences.add(pc);
 
             final CharSequence[] prefixText = { "Keine", "Herr", "Frau" };
@@ -526,6 +526,7 @@ public class PreferencesBasics
                     pc.setKey(prefkey);
                     pc.setTitle(name);
                     pc.setSummary(info);
+                    pc.setIcon(ProfileImagesNew.getXavaroProfileDrawable(ident, true));
                     pc.setDefaultValue(true);
 
                     pc.setOnLongClick(new Runnable()
@@ -1327,6 +1328,7 @@ public class PreferencesBasics
 
                 pc = new NicedPreferences.NiceCategoryPreference(context);
                 pc.setTitle(name);
+                pc.setIcon(ProfileImagesNew.getXavaroProfileDrawable(ident, true));
                 pc.setEnabled(enabled);
 
                 preferences.add(pc);

@@ -139,13 +139,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("subtype"))
             {
                 String ident = Json.getString(config, "identity");
-                Bitmap thumbnail = ProfileImagesNew.getXavaroProfileBitmap(ident);
+                Drawable drawable = ProfileImagesNew.getXavaroProfileDrawable(ident, true);
 
-                if (thumbnail != null)
+                if (drawable != null)
                 {
-                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setImageDrawable(drawable);
                     targetIcon = overicon;
                 }
 

@@ -715,7 +715,7 @@ public class CommSender
 
         nb.setAutoCancel(true);
         nb.setSmallIcon(iconRes);
-        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
+        nb.setLargeIcon(Simple.getBitmap(iconRes));
         nb.setContentTitle(title);
         nb.setContentText(message);
         nb.setSound(soundUri);

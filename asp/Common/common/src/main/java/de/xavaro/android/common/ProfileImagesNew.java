@@ -1,5 +1,13 @@
 package de.xavaro.android.common;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
 
 import android.provider.ContactsContract;
@@ -44,7 +52,7 @@ public class ProfileImagesNew
     }
 
     @Nullable
-    public static Drawable getOwnerProfileDrawable()
+    public static Bitmap getOwnerProfileBitmap(boolean circle)
     {
         String photoUrl = getOwnerProfileImageUrl();
         if (photoUrl == null) return null;
@@ -62,11 +70,12 @@ public class ProfileImagesNew
             // Save data to profiles directory under own identity.
             //
 
-
             Simple.putFileBytes(getOwnerProfileImageFile(), data);
 
             ByteArrayInputStream bais = new ByteArrayInputStream(data);
-            return Simple.getDrawable(BitmapFactory.decodeStream(bais));
+            Bitmap bitmap = BitmapFactory.decodeStream(bais);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
         }
         catch (Exception ex)
         {
@@ -74,6 +83,12 @@ public class ProfileImagesNew
         }
 
         return null;
+    }
+
+    @Nullable
+    public static Drawable getOwnerProfileDrawable(boolean circle)
+    {
+        return Simple.getDrawable(getOwnerProfileBitmap(circle));
     }
 
     public static void sendOwnerImage(String remoteIdentity)
@@ -98,28 +113,55 @@ public class ProfileImagesNew
     }
 
     @Nullable
-    public static Bitmap getXavaroProfileBitmap(String identity)
+    public static Bitmap getXavaroProfileBitmap(String identity, boolean circle)
     {
         File imagefile = getXavaroProfileImageFile(identity);
 
         if (imagefile.exists())
         {
-            try
-            {
-                FileInputStream fi = new FileInputStream(imagefile);
-                Bitmap bitmap = BitmapFactory.decodeStream(fi);
-                fi.close();
-
-                return bitmap;
-            }
-            catch (Exception ex)
-            {
-                OopsService.log(LOGTAG, ex);
-            }
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
         }
 
         return null;
     }
 
+    @Nullable
+    public static Drawable getXavaroProfileDrawable(String identity, boolean circle)
+    {
+        return Simple.getDrawable(getXavaroProfileBitmap(identity, circle));
+    }
+
     //endregion Xavaro profiles
+
+    @Nullable
+    public static Bitmap getCircleBitmap(Bitmap bitmap)
+    {
+        if (bitmap == null) return null;
+
+        Bitmap output = Bitmap.createBitmap(
+                bitmap.getWidth(),
+                bitmap.getHeight(),
+                Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+
+        int color = Color.RED;
+        Paint paint = new Paint();
+        Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawOval(rectF, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        bitmap.recycle();
+
+        return output;
+    }
 }

@@ -1,10 +1,8 @@
 package de.xavaro.android.common;
 
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Vibrator;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -1462,14 +1460,14 @@ public class Simple
     @Nullable
     public static Drawable getDrawableFromFile(String file)
     {
-        Bitmap myBitmap = getBitmapFromFile(file);
+        Bitmap myBitmap = getBitmap(file);
         if (myBitmap == null) return null;
 
         return new BitmapDrawable(appContext.getResources(), myBitmap);
     }
 
     @Nullable
-    public static Bitmap getBitmapFromFile(String file)
+    public static Bitmap getBitmap(String file)
     {
         try
         {
@@ -1483,7 +1481,22 @@ public class Simple
         return null;
     }
 
-    public static Bitmap getBitmapFromResource(int resid)
+    @Nullable
+    public static Bitmap getBitmap(File file)
+    {
+        try
+        {
+            return BitmapFactory.decodeFile(file.toString());
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    public static Bitmap getBitmap(int resid)
     {
         return BitmapFactory.decodeResource(anyContext.getResources(), resid);
     }

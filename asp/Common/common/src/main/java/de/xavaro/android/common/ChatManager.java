@@ -508,7 +508,7 @@ public class ChatManager implements CommService.CommServiceCallback
 
         nb.setAutoCancel(true);
         nb.setSmallIcon(iconRes);
-        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
+        nb.setLargeIcon(Simple.getBitmap(iconRes));
         nb.setContentTitle(sender);
         nb.setContentText(message);
         nb.setSound(soundUri);

@@ -15,6 +15,7 @@ import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.ProfileImagesNew;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
@@ -105,6 +106,7 @@ public class PreferencesComm
                     String name = RemoteContacts.getDisplayName(ident);
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
+                    pc.setIcon(ProfileImagesNew.getXavaroProfileDrawable(ident, true));
                     pc.setTitle(name);
 
                     preferences.add(pc);
