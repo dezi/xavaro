@@ -1,10 +1,30 @@
 {
   "SafeHome": {
 
-    "latest": "0.8.003",
-    "latestdate": "2016-04-13T23:00:00Z",
+    "latest": "0.8.004",
+    "latestdate": "2016-04-15T23:00:00Z",
 
     "versions": {
+
+      "0.8.004": {
+
+        "date": "2016-04-15T23:00:00Z",
+
+        "notes": [
+          {
+            "title": "Xavaro Kommunikation.",
+            "summary": [
+              "Kontakte lassen sich über Pincode oder Wifi herstellen.",
+              "Das Tablet-Eingetümer Profilbild wird durchgereicht."
+            ]
+          },
+
+          {
+            "title": "Bereinigte Präferenzen.",
+            "summary": "Die Präferenzen lassen sich nun korrekt abschalten."
+          }
+        ]
+      },
 
       "0.8.003": {
 

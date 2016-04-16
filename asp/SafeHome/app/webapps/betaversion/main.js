@@ -52,14 +52,24 @@ betaversion.createFrame = function()
                 div.style.paddingRight = "24px";
                 div.innerHTML = "– " + vi.notes[ inx ].title;
 
-                if (vi.notes[ inx ].summary)
+                var summary = vi.notes[ inx ].summary;
+
+                if (summary)
                 {
                     var div = WebLibSimple.createAnyAppend("div", bv.topDiv);
                     WebLibSimple.setFontSpecs(div, 16, "bold", "#666666");
                     div.style.paddingTop   = "4px";
                     div.style.paddingLeft  = "48px";
                     div.style.paddingRight = "24px";
-                    div.innerHTML = vi.notes[ inx ].summary;
+
+                    if (Array.isArray(summary))
+                    {
+                        div.innerHTML = summary.join("<br />");
+                    }
+                    else
+                    {
+                        div.innerHTML = summary;
+                    }
                 }
             }
         }
