@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 import android.util.Log;
@@ -14,6 +15,7 @@ import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.ProfileImagesNew;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
@@ -136,9 +138,20 @@ public class LaunchItemComm extends LaunchItem
         {
             if (config.has("subtype"))
             {
+                String ident = Json.getString(config, "identity");
+                Bitmap thumbnail = ProfileImagesNew.getXavaroProfileBitmap(ident);
+
+                if (thumbnail != null)
+                {
+                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
+
+                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    targetIcon = overicon;
+                }
+
                 if (Json.equals(config, "chattype", "user"))
                 {
-                    icon.setImageResource(GlobalConfigs.IconResCommChatUser);
+                    targetIcon.setImageResource(GlobalConfigs.IconResCommChatUser);
                 }
 
                 if (Json.equals(config, "chattype", "group"))

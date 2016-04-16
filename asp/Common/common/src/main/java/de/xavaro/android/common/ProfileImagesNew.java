@@ -4,17 +4,21 @@ import android.support.annotation.Nullable;
 
 import android.provider.ContactsContract;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class ProfileImagesNew
 {
     private static final String LOGTAG = ProfileImagesNew.class.getSimpleName();
+
+    //region Owner profile
 
     @Nullable
     private static String getOwnerProfileImageUrl()
@@ -40,7 +44,7 @@ public class ProfileImagesNew
     }
 
     @Nullable
-    public static Drawable getOwnerProfileImage()
+    public static Drawable getOwnerProfileDrawable()
     {
         String photoUrl = getOwnerProfileImageUrl();
         if (photoUrl == null) return null;
@@ -81,4 +85,41 @@ public class ProfileImagesNew
             CommSender.sendFile(ownerimage.toString(), "profiles", remoteIdentity);
         }
     }
+
+    //endregion Owner profile
+
+    //region Xavaro profiles
+
+    private static File getXavaroProfileImageFile(String identity)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "xavaro.image." + identity + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    public static Bitmap getXavaroProfileBitmap(String identity)
+    {
+        File imagefile = getXavaroProfileImageFile(identity);
+
+        if (imagefile.exists())
+        {
+            try
+            {
+                FileInputStream fi = new FileInputStream(imagefile);
+                Bitmap bitmap = BitmapFactory.decodeStream(fi);
+                fi.close();
+
+                return bitmap;
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+        }
+
+        return null;
+    }
+
+    //endregion Xavaro profiles
 }
