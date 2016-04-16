@@ -5,21 +5,43 @@ WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
 
 tvguide.buildBasicPreference = function()
 {
+//    WebAppPrefs.removeAllPrefs("");
+
     tvguide.prefs = [];
 
-    //var units = WebLibStrings.strings[ "quantity.units" ];
+    var StringsKeys = WebLibStrings.strings[ "tvguide.senderlists.keys" ];
+    var StringsVals = WebLibStrings.strings[ "tvguide.senderlists.vals" ];
 
-    var pref = {};
-    pref.key = "cat.defaults",
-    pref.type = "category",
-    pref.title = "Fernsehsender";
-    tvguide.prefs.push(pref);
+    for (var key in StringsKeys)
+    {
+        var category = StringsKeys[ key ];
+        var name     = StringsVals[ key ];
 
-    var pref = {};
-    pref.key = "cat.sky",
-    pref.type = "category",
-    pref.title = "Fernsehsender";
-    tvguide.prefs.push(pref);
+        var pref = {};
+        pref.key = "cat." + category;
+        pref.type = "category";
+        pref.title = name;
+        tvguide.prefs.push(pref);
+
+        var channels = "tvguide.list." + category;
+        var channelList = WebLibStrings.strings[ channels ];
+
+        for (var channel in channelList)
+        {
+            channel = channelList[ channel ];
+
+            var pref = {};
+            pref.key = "channel." + channel;
+            pref.type = "check";
+            pref.title = channel;
+            pref.icon = encodeURI("http://" + WebApp.manifest.appserver + "/channels/" + channel + ".png");
+            pref.defvalue = false;
+
+            if (category == "default") pref.defvalue = true;
+
+            tvguide.prefs.push(pref);
+        }
+    }
 
     WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
 }
@@ -86,7 +108,7 @@ tvguide.buildBasicPreferenceSample = function()
     pref.vals = [ "SD", "HD", "Free-TV", "Pay-TV", "Inland",   "Ausland", "Sky", "Antenne", "Kabel", "Satellit" ];
     tvguide.prefs.push(pref);
 
-    WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
+//    WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
 }
 
 tvguide.buildBasicPreference();

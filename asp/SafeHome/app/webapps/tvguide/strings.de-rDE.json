@@ -44,7 +44,7 @@
   ],
 
   "tvguide.senderlists.vals": [
-    "default", "regional", "sky", "sports", "homeshopping", "paytv", "other"
+    "Hauptsender", "Regional", "Sky", "Sport", "Shopping", "Paytv", "Sonstige"
   ],
 
   "tvguide.list.default": [
