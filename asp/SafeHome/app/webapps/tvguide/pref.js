@@ -5,7 +5,7 @@ WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
 
 tvguide.buildBasicPreference = function()
 {
-    WebAppPrefs.removeAllPrefs("");
+//    WebAppPrefs.removeAllPrefs("");
 
     tvguide.prefs = [];
 

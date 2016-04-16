@@ -201,6 +201,7 @@ tvguide.cleanSender = function(senders)
 
     for (var sender in senders)
     {
+        if (! sender.substring(0, 8) == "channel.") continue;
         if (! senders[ sender ]) continue;
 
         var name = sender.substring(8);
@@ -219,7 +220,8 @@ tvguide.sortSender = function(allChannels, sender)
     for (var channel in allChannels)
     {
         var check = allChannels[ channel ];
-        if (sender.indexOf(check))
+
+        if (sender.indexOf(check) > -1)
         {
             sortedSender.push(check);
         }
@@ -230,9 +232,6 @@ tvguide.sortSender = function(allChannels, sender)
 
 tvguide.getSenderList = function()
 {
-    console.log("--> " + WebAppPrefs.getAllPrefs());
-//    console.log("--> " + WebAppMedia.getLocaleDefaultChannels("tv"));
-
     tvguide.senderList = {};
 
     var StringsKeys = WebLibStrings.strings[ "tvguide.senderlists.keys" ];
@@ -257,8 +256,6 @@ tvguide.getSenderList = function()
     {
         // remove channel.
         var name = localChannels[ channelIndex ];
-        console.log("--dddd> name: " + name);
-
 
         var cparts = name.split("/");
 
@@ -497,6 +494,8 @@ tvguide.createEpgProgram = function(channelName, epgdata)
         paddingDiv.style.borderRadius = "8px";
 
         paddingDiv.style.lineHeight   = "3";
+        paddingDiv.style.lineHeight   = "3";
+        paddingDiv.style.overflow     = "hidden";
 
         if (channel.iptv)
         {
