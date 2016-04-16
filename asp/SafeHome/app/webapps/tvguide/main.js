@@ -203,9 +203,8 @@ tvguide.cleanSender = function(senders)
     {
         if (! senders[ sender ]) continue;
 
-        // remove channel.
         var name = sender.substring(8);
-        console.log("--> name: " + name);
+        //console.log("=====###" + name);
 
         clean.push(name);
     }
@@ -247,19 +246,18 @@ tvguide.getSenderList = function()
     }
 
     var localChannels = JSON.parse(WebAppPrefs.getAllPrefs());
+
     localChannels = tvguide.cleanSender(localChannels);
 
     localChannels = tvguide.sortSender(allChannels, localChannels);
 
     var count = 0;
 
-    for (var channelName in localChannels)
+    for (var channelIndex in localChannels)
     {
-        if (! localChannels[ channelName ]) continue;
-
         // remove channel.
-        var name = channelName.substring(8);
-        console.log("--> name: " + name);
+        var name = localChannels[ channelIndex ];
+        console.log("--dddd> name: " + name);
 
 
         var cparts = name.split("/");

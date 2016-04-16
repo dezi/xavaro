@@ -11,8 +11,10 @@
     "m.bild.de": {
       "url": "http://m.bild.de/",
       "icon": "http://pbs.twimg.com/profile_images/719453746158301185/OmA9DZxW_400x400.jpg",
+
       "label": "Bild Online",
       "default": true,
+      "region": "de",
 
       "intent": {
         "action": "view",
@@ -36,6 +38,7 @@
 
       "label": "Sport Bild",
       "default": true,
+      "region": "de",
 
       "intent": {
         "action": "view",
@@ -53,11 +56,63 @@
       ]
     },
 
+    "m.faz.net": {
+      "url": "http://m.faz.net/",
+      "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg",
+
+      "label": "FAZ Online",
+      "default": true,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "FAZ", "F A Z", "Frankfurter Allgemeine" ],
+        "response": "Ich öffne die FAZ",
+        "sample": "Ich möchte die FAZ lesen"
+      },
+
+      "subdomains": [ "static.faz.net", "gets.faz.net" ]
+    },
+
+    "www.taz.de": {
+      "url": "http://www.taz.de/",
+      "icon": "http://pbs.twimg.com/profile_images/454280998159532032/Pq43tr1F_400x400.png",
+
+      "label": "TAZ",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "TAZ" ],
+        "response": "Ich öffne die TAZ",
+        "sample": "Ich möchte die TAZ lesen"
+      }
+    },
+
+    "www.sueddeutsche.de": {
+      "url": "http://www.sueddeutsche.de/",
+      "icon": "http://pbs.twimg.com/profile_images/654959930663936000/WDymQKHU_400x400.png",
+
+      "label": "Süddeutsche Zeitung",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Süddeutsche Zeitung" ],
+        "response": "Ich öffne die Süddeutsche Zeitung",
+        "sample": "Ich möchte die Süddeutsche Zeitung lesen"
+      }
+    },
+
     "mobil.mopo.de": {
       "url": "http://mobil.mopo.de/",
       "icon": "http://pbs.twimg.com/profile_images/700585031912153090/LPBp5cA4_400x400.png",
+
       "label": "MOPO",
       "default": true,
+      "region": "de.hh",
 
       "intent": {
         "action" : "view",
@@ -69,21 +124,39 @@
       "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
     },
 
-    "m.faz.net": {
-      "url": "http://m.faz.net/",
-      "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg",
-      "label": "FAZ Online",
-      "default": true,
+    "t.haz.de": {
+      "url": "http://t.haz.de/",
+      "icon": "http://pbs.twimg.com/profile_images/603240721072726016/PyXJlsR9_400x400.png",
+
+      "label": "HAZ",
+      "default": false,
+      "region": "de.nds",
 
       "intent": {
         "action" : "view",
-        "keywords": [ "FAZ", "F A Z", "Frankfurter Allgemeine" ],
-        "response": "Ich öffne die FAZ",
-        "sample": "Ich möchte die FAZ lesen"
-      },
+        "keywords": [ "HAZ", "Hannoversche Allgemeine" ],
+        "response": "Ich öffne die Hannoversche Allgemeine Zeitung",
+        "sample": "Ich möchte die HAZ lesen"
+      }
+    },
 
-      "subdomains": [ "static.faz.net", "gets.faz.net" ]
+    "t.lvz.de": {
+      "url": "http://t.lvz.de/",
+      "icon": "http://pbs.twimg.com/profile_images/647002421013688320/HKqUkitP_400x400.jpg",
+
+      "label": "LVZ",
+      "default": false,
+      "region": "de.sn",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "LVZ", "Leipziger Volkszeitung" ],
+        "response": "Ich öffne die Leipziger Volkszeitung",
+        "sample": "Ich möchte die Leipziger Volkszeitung lesen"
+      }
     }
+
+
   },
 
   "magazine": {

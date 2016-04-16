@@ -126,6 +126,16 @@
     },
 
     {
+      "domain": "adspirit.de+adscale.de",
+      "type": "Advertising",
+      "source": "adspirit.de",
+      "description": [
+        "Todo...."
+      ],
+      "faults": [ "nooptin" ]
+    },
+
+    {
       "domain": "amazon-adsystem.com",
       "type": "Advertising",
       "source": "",
@@ -346,6 +356,16 @@
         "advertising agencies, traffic distribution partners and publishers."
       ],
       "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "etracker.com+etracker.de",
+      "type": "Tracking",
+      "source": "etracker.de",
+      "description": [
+        "Todo..."
+      ],
+      "faults": [ "nooptin" ]
     },
 
     {

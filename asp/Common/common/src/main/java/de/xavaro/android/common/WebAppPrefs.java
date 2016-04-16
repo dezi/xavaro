@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import org.json.JSONArray;

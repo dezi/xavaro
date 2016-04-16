@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.content.Context;
 
@@ -92,6 +93,12 @@ public class WebAppUtility
         }
 
         return "";
+    }
+
+    @JavascriptInterface
+    public void makePrettyLog(String json)
+    {
+        Log.d(LOGTAG, "makePrettyLog:" + getPrettyJson(json));
     }
 
     @JavascriptInterface
