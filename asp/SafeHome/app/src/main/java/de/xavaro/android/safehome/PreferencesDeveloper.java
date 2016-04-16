@@ -149,7 +149,7 @@ public class PreferencesDeveloper
 
             lp = new NicedPreferences.NiceListPreference(context);
 
-            lp.setKey("webapps" + ".mode." + webappname);
+            lp.setKey("developer" + ".mode." + webappname);
             lp.setEntries(appvals);
             lp.setEntryValues(appkeys);
             lp.setDefaultValue("inact");
