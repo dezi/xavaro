@@ -77,8 +77,8 @@
   "activity.took.weight.du" : "Du hast dich gewogen.",
   "activity.took.bloodglucose" : "Sie haben ihren Blutzucker gemessen.",
   "activity.took.bloodglucose.du" : "Du hast deinen Blutzucker gemessen.",
-  "activity.took.bloodpressure" : "Sie haben ihren Bluddruck gemessen.",
-  "activity.took.bloodpressure.du" : "Du hast deinen Bluddruck gemessen.",
+  "activity.took.bloodpressure" : "Sie haben ihren Blutdruck gemessen.",
+  "activity.took.bloodpressure.du" : "Du hast deinen Blutdruck gemessen.",
 
   "EOL" : true
 }
