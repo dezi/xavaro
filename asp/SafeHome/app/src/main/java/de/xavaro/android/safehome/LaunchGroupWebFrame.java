@@ -29,15 +29,19 @@ public class LaunchGroupWebFrame extends LaunchGroup
         super(context);
     }
 
+    @Nullable
     public static JSONArray getConfig(String type, String subtype)
     {
+        if (subtype == null) return null;
+
+        if (! Simple.getSharedPrefBoolean(type + "." + subtype + ".enable")) return null;
+
+        JSONObject config = WebLib.getLocaleConfig(type, subtype);
+        if (config == null) return null;
+
         JSONArray home = new JSONArray();
         JSONArray adir = new JSONArray();
         JSONArray cdir = new JSONArray();
-        if (subtype == null) return home;
-
-        JSONObject config = WebLib.getLocaleConfig(type, subtype);
-        if (config == null) return home;
 
         Iterator<String> keysIterator = config.keys();
 
