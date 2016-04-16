@@ -1,5 +1,8 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.webkit.JavascriptInterface;
 import android.support.annotation.Nullable;
 
@@ -15,10 +18,14 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.xavaro.android.common.Json;
@@ -143,6 +150,53 @@ public class PreferencesWebApps
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
 
+            private final ArrayList<IconPrefData> iconmap = new ArrayList<>();
+            private final Drawable nixpix;
+            private Thread worker;
+
+            public WebAppPrefBuilder()
+            {
+                nixpix = Simple.getDrawable(Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888));
+            }
+
+            private class IconPrefData
+            {
+                public final String icon;
+                public final Preference ap;
+
+                IconPrefData(String icon, Preference ap)
+                {
+                    this.icon = icon;
+                    this.ap = ap;
+                }
+            }
+
+            private Runnable iconload = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (iconmap.size() > 0)
+                    {
+                        IconPrefData ip = iconmap.remove(0);
+
+                        byte[] icondata = webprefs.webapploader.getRequestData(ip.icon);
+
+                        if (icondata != null)
+                        {
+                            ByteArrayInputStream bais = new ByteArrayInputStream(icondata);
+                            Bitmap bitmap = BitmapFactory.decodeStream(bais);
+                            ip.ap.setIcon(Simple.getDrawable(bitmap));
+                        }
+                    }
+
+                    if (iconmap.size() > 0)
+                    {
+                        handler.postDelayed(iconload, 0);
+                    }
+                }
+            };
+
             @Override
             public boolean onPreferenceChange(Preference preference, Object obj)
             {
@@ -177,6 +231,7 @@ public class PreferencesWebApps
                 if (pref == null) return null;
 
                 String key = Json.getString(pref, "key");
+                String icon = Json.getString(pref, "icon");
                 String type = Json.getString(pref, "type");
                 String title = Json.getString(pref, "title");
                 String summary = Json.getString(pref, "summary");
@@ -283,6 +338,12 @@ public class PreferencesWebApps
 
                 if (ap != null)
                 {
+                    if (icon != null)
+                    {
+                        iconmap.add(new IconPrefData(icon, ap));
+                        ap.setIcon(nixpix);
+                    }
+
                     ap.setKey(key);
                     ap.setTitle(title);
                     ap.setSummary(summary);
@@ -372,6 +433,8 @@ public class PreferencesWebApps
                 }
 
                 preferences = newprefs;
+
+                if (iconmap.size() > 0) handler.post(iconload);
             }
 
             @JavascriptInterface

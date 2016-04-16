@@ -19,6 +19,7 @@ public class WebAppView extends WebView
         super(context);
     }
 
+
     public WebAppBeta beta;
     public WebAppNine nine;
     public WebAppVoice voice;
@@ -36,6 +37,7 @@ public class WebAppView extends WebView
     public WebAppIntercept intercept;
     public WebAppAssistance assistance;
 
+    public WebAppLoader webapploader;
     public ArrayList<String> permissions;
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -50,7 +52,7 @@ public class WebAppView extends WebView
 
         String agent = getSettings().getUserAgentString().replace("Chrome","");
 
-        WebAppLoader webapploader = new WebAppLoader(webappname, agent, mode);
+        webapploader = new WebAppLoader(webappname, agent, mode);
         setWebViewClient(webapploader);
 
         //

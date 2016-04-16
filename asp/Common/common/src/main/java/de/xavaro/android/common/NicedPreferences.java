@@ -1340,6 +1340,15 @@ public class NicedPreferences
             ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
             vg.setPadding(14, 8, 10, 8);
 
+            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
+
+            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
+            {
+                LinearLayout icon_frame = (LinearLayout) icon.getParent();
+                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+                icon_frame.setPadding(0, 0, 0, 0);
+            }
+
             //
             // Step three: remove summary from horizontal layout and add
             // to top layout now beeing vertical.

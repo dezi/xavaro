@@ -34,7 +34,7 @@ tvguide.buildBasicPreference = function()
             pref.key = "channel." + channel;
             pref.type = "check";
             pref.title = channel;
-            pref.icon = encodeURI("http://" + WebApp.manifest.appserver + "/channels/" + channel + ".png");
+            pref.icon = encodeURI("http://" + WebApp.manifest.appserver + "/channels/tv/de/" + channel + ".png");
             pref.defvalue = false;
 
             if (category == "default") pref.defvalue = true;
