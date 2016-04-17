@@ -278,6 +278,7 @@ public class LaunchItem extends FrameLayout implements
 
             textsize = layout.height / 12;
             label.setTextSize(Simple.getDeviceTextSize(textsize));
+            label.setLineSpacing(-4, 1);
 
             //
             // This might lead to a shitty breaking
@@ -302,7 +303,7 @@ public class LaunchItem extends FrameLayout implements
                     // maximum width to last good value.
                     //
 
-                    label.setMaxWidth(++laywid);
+                    label.setMaxWidth(laywid + (laywid / 4));
                     break;
                 }
             }
