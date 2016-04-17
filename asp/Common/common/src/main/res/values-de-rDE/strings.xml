@@ -3,6 +3,46 @@
     <string name="simple_and">und</string>
     <string name="simple_new">neu</string>
 
+    <string-array name="de_regions_keys">
+        <item>de</item>
+        <item>de.bw</item>
+        <item>de.by</item>
+        <item>de.be</item>
+        <item>de.bb</item>
+        <item>de.hb</item>
+        <item>de.hh</item>
+        <item>de.he</item>
+        <item>de.mv</item>
+        <item>de.ni</item>
+        <item>de.nw</item>
+        <item>de.rp</item>
+        <item>de.sl</item>
+        <item>de.sn</item>
+        <item>de.st</item>
+        <item>de.sh</item>
+        <item>de.th</item>
+    </string-array>
+
+    <string-array name="de_regions_vals">
+        <item>Überregional</item>
+        <item>Baden-Württemberg</item>
+        <item>Bayern</item>
+        <item>Berlin</item>
+        <item>Brandenburg</item>
+        <item>Bremen</item>
+        <item>Hamburg</item>
+        <item>Hessen</item>
+        <item>Mecklenburg-Vorpommern</item>
+        <item>Niedersachsen</item>
+        <item>Nordrhein-Westfalen</item>
+        <item>Rheinland-Pfalz</item>
+        <item>Saarland</item>
+        <item>Sachsen</item>
+        <item>Sachsen-Anhalt</item>
+        <item>Schleswig-Holstein</item>
+        <item>Thüringen</item>
+    </string-array>
+
     <string-array name="pref_where_vals">
         <item>Inaktiv</item>
         <item>Home</item>

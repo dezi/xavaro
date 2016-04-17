@@ -114,6 +114,16 @@
     },
 
     {
+      "domain": "adobedtm.com",
+      "type": "Tracking",
+      "source": "Recherche",
+      "description": [
+        "Todo..."
+      ],
+      "faults": [ "nofaults" ]
+    },
+
+    {
       "domain": "adtech.de",
       "type": "Advertising",
       "source": "ADTECH",

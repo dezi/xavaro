@@ -218,6 +218,22 @@
         "response": "Ich öffne die Leipziger Volkszeitung",
         "sample": "Ich möchte die Leipziger Volkszeitung lesen"
       }
+    },
+
+    "www.express.de": {
+      "url": "http://www.express.de/",
+      "icon": "http://pbs.twimg.com/profile_images/643385266275684352/b9N1TTZ__200x200.png",
+
+      "label": "Kölner Express",
+      "default": false,
+      "region": "de.nw",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Express", "Kölner Express" ],
+        "response": "Ich öffne den Kölner Express",
+        "sample": "Ich möchte den Kölner Express lesen"
+      }
     }
   },
 

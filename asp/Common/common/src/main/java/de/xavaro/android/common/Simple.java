@@ -608,6 +608,12 @@ public class Simple
         return String.format(message, args);
     }
 
+    public static int getResArrayIdentifier(String resname)
+    {
+        Resources res = anyContext.getResources();
+        return res.getIdentifier(resname, "array", anyContext.getPackageName());
+    }
+
     public static String[] getTransArray(int resid)
     {
         return appContext.getResources().getStringArray(resid);

@@ -75,6 +75,7 @@ public class PreferenceFragments
 
                 String label = Json.getString(webitem, "label");
                 String summary = Json.getString(webitem, "summary");
+                String region = Json.getString(webitem, "region");
 
                 if (! webitem.has("channels"))
                 {
@@ -114,6 +115,8 @@ public class PreferenceFragments
                         key = keyprefix + ".website:" + website;
 
                         lp = new NicedPreferences.NiceListPreference(context);
+
+                        //Log.d(LOGTAG, "=======================>" + Simple.getResArrayIdentifier("de_regions_keys"));
 
                         lp.setKey(key);
                         lp.setTitle(label);
