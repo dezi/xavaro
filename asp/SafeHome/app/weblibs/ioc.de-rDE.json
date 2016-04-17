@@ -106,6 +106,70 @@
       }
     },
 
+    "mobil.fr-online.de": {
+      "url": "http://mobil.fr-online.de/",
+      "icon": "http://pbs.twimg.com/profile_images/378800000730203118/4cc42b7be5291c568b05b651a903d3d3_400x400.jpeg",
+
+      "label": "Frankfurter Rundschau",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Frankfurter Rundschau" ],
+        "response": "Ich öffne die Frankfurter Rundschau",
+        "sample": "Ich möchte die Frankfurter Rundschau lesen"
+      }
+    },
+
+    "www.neues-deutschland.de": {
+      "url": "http://www.neues-deutschland.de/m/",
+      "icon": "http://pbs.twimg.com/profile_images/610769623605243904/uVFqXxAx_400x400.png",
+
+      "label": "Neues Deutschland",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Neues Deutschland", "Neue Deutschland" ],
+        "response": "Ich öffne die Zeitung Neues Deutschland",
+        "sample": "Ich möchte das Neue Deutschland lesen"
+      }
+    },
+
+    "m.welt.de": {
+      "url": "http://m.welt.de/",
+      "icon": "http://pbs.twimg.com/profile_images/671295032259948544/3QSKkel-_400x400.png",
+
+      "label": "Die Welt",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Die Welt" ],
+        "response": "Ich öffne Die Welt",
+        "sample": "Ich möchte Die Welt lesen"
+      }
+    },
+
+    "app.handelsblatt.com": {
+      "url": "http://app.handelsblatt.com/",
+      "icon": "http://pbs.twimg.com/profile_images/562563461171798017/AkHF4keI_400x400.png",
+
+      "label": "Handelsblatt",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Handelsblatt" ],
+        "response": "Ich öffne das Handelsblatt",
+        "sample": "Ich möchte das Handelsblatt lesen"
+      }
+    },
+
     "mobil.mopo.de": {
       "url": "http://mobil.mopo.de/",
       "icon": "http://pbs.twimg.com/profile_images/700585031912153090/LPBp5cA4_400x400.png",
@@ -128,7 +192,7 @@
       "url": "http://t.haz.de/",
       "icon": "http://pbs.twimg.com/profile_images/603240721072726016/PyXJlsR9_400x400.png",
 
-      "label": "HAZ",
+      "label": "Hannoversche Allgemeine",
       "default": false,
       "region": "de.nds",
 
@@ -144,7 +208,7 @@
       "url": "http://t.lvz.de/",
       "icon": "http://pbs.twimg.com/profile_images/647002421013688320/HKqUkitP_400x400.jpg",
 
-      "label": "LVZ",
+      "label": "Leipziger Volkszeitung",
       "default": false,
       "region": "de.sn",
 
@@ -155,8 +219,6 @@
         "sample": "Ich möchte die Leipziger Volkszeitung lesen"
       }
     }
-
-
   },
 
   "magazine": {

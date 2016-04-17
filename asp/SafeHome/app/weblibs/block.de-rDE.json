@@ -335,6 +335,16 @@
     },
 
     {
+      "domain": "enliveo.de",
+      "type": "Tracking",
+      "source": "enliveo.de",
+      "description": [
+        "Todo..."
+      ],
+      "faults": [ "nooptout" ]
+    },
+
+    {
       "domain": "etahub.com",
       "type": "Unbekannt",
       "source": "Recherche",
@@ -376,6 +386,16 @@
         "Hoster für Apps. Produziert Popups."
       ],
       "faults": [ "noprivger" ]
+    },
+
+    {
+      "domain": "flashtalking.com",
+      "type": "Advertising",
+      "source": "flashtalking.com",
+      "description": [
+        "Todo..."
+      ],
+      "faults": [ "nooptout" ]
     },
 
     {
@@ -673,6 +693,19 @@
     },
 
     {
+      "domain": "nativendo.de",
+      "type": "Advertising",
+      "source": "nativendo.de",
+      "description": [
+        "Die Besonderheit an Native Advertising ist die authentische Platzierung von ",
+        "werblichem Content als natürliches und vollwertiges Element im Einklang mit ",
+        "den redaktionellen Inhalten der Werbeträger. Frei von Störeffekten und ",
+        "Unterbrechungen, für einen nativen Informationsfluss."
+      ],
+      "faults": [ "nooptout" ]
+    },
+
+    {
       "domain": "newrelic.com+nr-data.net",
       "type": "Monitoring",
       "source": "New Relic",
@@ -710,6 +743,16 @@
         "Predictive Targeting."
       ],
       "faults": [ "nofaults" ]
+    },
+
+    {
+      "domain": "omsnative.de",
+      "type": "Advertising",
+      "source": "omsnative.de",
+      "description": [
+        "Todo..."
+      ],
+      "faults": [ "nooptout" ]
     },
 
     {
@@ -885,6 +928,16 @@
     },
 
     {
+      "domain": "taboola.com+perfectmarket.com",
+      "type": "Advertising",
+      "source": "taboola.com",
+      "description": [
+        "Todo..."
+      ],
+      "faults": [ "nooptout" ]
+    },
+
+    {
       "domain": "t4ft.de",
       "type": "Unbekannt",
       "source": "Recherche",
@@ -962,6 +1015,16 @@
     },
 
     {
+      "domain": "visualwebsiteoptimizer.com",
+      "type": "Tracking",
+      "source": "visualwebsiteoptimizer.com",
+      "description": [
+        "Todo..."
+      ],
+      "faults": [ "nooptout" ]
+    },
+
+    {
       "domain": "w55c.net",
       "type": "Tracking",
       "source": "w55c.net",
@@ -978,6 +1041,21 @@
       "description": [
         "Es ist so gut wie nichts über diese Domain bekannt, insbesondere liegt keine ",
         "Datenschutz-Erklärung vor. Die Homepage kann nicht aufgerufen werden."
+      ],
+      "faults": [ "nohome", "nopriv" ]
+    },
+
+    {
+      "domain": "webtrekk.net",
+      "type": "Tracking",
+      "source": "Wikipedia",
+      "description": [
+        "According to Webtrekk, Digital Intelligence is the ability to collect, manage ",
+        "and utilise data to create a user-centric approach to business and marketing ",
+        "strategy. This requires integration between analytics data, user-centric profiles ",
+        "and segments, as well as flexible automation software. Data about users and their ",
+        "behaviour is therefore not distinct or \"siloed off\" from marketing tools, but ",
+        "instead can be used as the foundation for campaigns."
       ],
       "faults": [ "nohome", "nopriv" ]
     },
