@@ -17,6 +17,16 @@
         <item>Folder</item>
     </string-array>
 
+    <string-array name="pref_calls_subtype_keys">
+        <item>important</item>
+        <item>delivery</item>
+    </string-array>
+
+    <string-array name="pref_calls_subtype_vals">
+        <item>Quick Dialing</item>
+        <item>Delivery Services</item>
+    </string-array>
+
     <string-array name="pref_ioc_where_keys">
         <item>inact</item>
         <item>home</item>

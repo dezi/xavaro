@@ -92,6 +92,8 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchItemVoice.getConfig());
         configs.add(LaunchItemAlertcall.getConfig());
 
+        configs.add(LaunchGroupCalls.getConfig("calls","important"));
+
         configs.add(LaunchGroupHealth.getConfig());
 
         configs.add(LaunchGroupComm.PhoneGroup.getConfig());

@@ -54,6 +54,7 @@ public class LaunchItem extends FrameLayout implements
         if (Simple.equals(type, "voice"       )) item = new LaunchItemVoice(context);
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
+        if (Simple.equals(type, "calls"       )) item = new LaunchItemCall(context);
 
         if (Simple.equals(type, "apps"        )) item = new LaunchItemApps(context);
         if (Simple.equals(suty, "media/image" )) item = new LaunchItemMediaImage(context);

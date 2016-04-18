@@ -49,6 +49,11 @@
         <item>Ordner</item>
     </string-array>
 
+    <string-array name="pref_calls_subtype_vals">
+        <item>Rufnummern</item>
+        <item>Lieferdienste</item>
+    </string-array>
+
     <string-array name="pref_ioc_where_vals">
         <item>Inaktiv</item>
         <item>Home</item>
