@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 
@@ -186,8 +187,6 @@ public class PreferencesComm
             // Remove disabled or obsoleted preferences.
             //
 
-            String websiteprefix = keyprefix + ".";
-
             Map<String, ?> exists = Simple.getAllPreferences(keyprefix + ".remote.");
 
             for (Map.Entry<String, ?> entry : exists.entrySet())
@@ -196,7 +195,6 @@ public class PreferencesComm
 
                 Simple.removeSharedPref(entry.getKey());
             }
-
         }
     }
 
@@ -460,6 +458,15 @@ public class PreferencesComm
                             Json.put(number, "nicephone", isspacenum);
                             Json.put(number, "label", Json.getString(item, "LABEL"));
                             Json.put(number, "type", Json.getInt(item, "TYPE"));
+
+                            int type = Json.getInt(item, "TYPE");
+
+                            if (type != 0)
+                            {
+                                String tkey = "" + type;
+                                String label = Simple.getTransVal(R.array.phone_labels_keys, tkey);
+                                Json.put(number, "label", label);
+                            }
                         }
                     }
 
@@ -549,22 +556,33 @@ public class PreferencesComm
                         multi = numbersIterator.hasNext();
                         first = false;
 
+                        Drawable icon;
+
+                        icon = ProfileImagesNew.getContactsProfileDrawable(nicephone, true);
+
+                        if (icon == null)
+                        {
+                            icon = ProfileImagesNew.getWhatsAppProfileDrawable(nicephone, true);
+                        }
+
                         nc = new NicedPreferences.NiceCategoryPreference(context);
                         nc.setTitle(name + (multi ? "" : " " + nicephone));
+                        nc.setIcon(icon);
                         nc.setEnabled(enabled);
                         preferences.add(nc);
                     }
 
                     if (chatphone != null)
                     {
-                        String key = keyprefix + ".chat." + chatphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".chat." + chatphone);
+                        lp.setTitle("Nachricht" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("Nachricht" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);
@@ -573,14 +591,15 @@ public class PreferencesComm
 
                     if (textphone != null)
                     {
-                        String key = keyprefix + ".text." + voipphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".text." + voipphone);
+                        lp.setTitle("SMS" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("SMS" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);
@@ -589,14 +608,15 @@ public class PreferencesComm
 
                     if (voipphone != null)
                     {
-                        String key = keyprefix + ".voip." + voipphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".voip." + voipphone);
+                        lp.setTitle("Anruf" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("Anruf" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);
@@ -605,14 +625,15 @@ public class PreferencesComm
 
                     if (vicaphone != null)
                     {
-                        String key = keyprefix + ".vica." + vicaphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".vica." + vicaphone);
+                        lp.setTitle("Videoanruf" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("Videoanruf" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);

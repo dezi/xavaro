@@ -860,6 +860,11 @@ public class Simple
         return Simple.getAnyContext().getCacheDir();
     }
 
+    public static File getExternalStorageDir()
+    {
+        return Environment.getExternalStorageDirectory();
+    }
+
     public static File getPackageFile(String name)
     {
         return new File(Simple.getFilesDir(), Simple.getPackageName() + "." + name);

@@ -203,4 +203,30 @@
     <string name="healt_bpm_highbp">The blood pressure is alarming low.</string>
     <string name="healt_bpm_activity">You have a blood pressure of %1$d to %2$d. The pulse is %3$d.</string>
 
+    <string-array name="phone_labels_keys">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="phone_labels_vals">
+        <item>Home</item>
+        <item>Mobile</item>
+        <item>Work</item>
+        <item>Fax Work</item>
+        <item>Fax Home</item>
+        <item>Pager</item>
+        <item>Other</item>
+        <item>Callback</item>
+        <item>Car</item>
+        <item>Company Main</item>
+    </string-array>
+
 </resources>

@@ -157,4 +157,17 @@
     <string name="healt_bpm_activity">Sie haben einen Blutdruck von %1$d zu %2$d. Ihr Puls ist %3$d.</string>
     <string name="healt_bpm_activity_du">Du hast einen Blutdruck von %1$d zu %2$d. Dein Puls ist %3$d.</string>
 
+    <string-array name="phone_labels_vals">
+        <item>Zuhause</item>
+        <item>Mobil</item>
+        <item>Firma</item>
+        <item>Fax Arbeit</item>
+        <item>Fax Zuhause</item>
+        <item>Pager</item>
+        <item>Andere</item>
+        <item>Rückruf</item>
+        <item>Auto</item>
+        <item>Firma Zentrale</item>
+    </string-array>
+
 </resources>

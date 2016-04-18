@@ -275,7 +275,7 @@ public class ProfileImages
     }
 
     //
-    // Retrieve profile image bitmap for Sykpe account.
+    // Retrieve profile image bitmap for Skype account.
     //
 
     @Nullable

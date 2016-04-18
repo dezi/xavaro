@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,9 +15,15 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Iterator;
 
 public class ProfileImagesNew
 {
@@ -129,6 +136,180 @@ public class ProfileImagesNew
     }
 
     //endregion Xavaro profiles
+
+    //region Contacts profiles
+
+    private static JSONObject contacts = null;
+
+    private static File getContactsProfileImageFile(String phonenumber)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "contacts.image." + phonenumber.replaceAll(" ", "") + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    private static void getContactsProfileImage(File imagefile, String phonenumber)
+    {
+        String search = phonenumber.replaceAll(" ", "");
+        boolean ismatch = false;
+        String photo = null;
+
+        if (contacts == null)
+        {
+            //
+            // Read into static contacts once.
+            //
+
+            contacts = ContactsHandler.getJSONData();
+        }
+
+        try
+        {
+            Iterator<?> ids = contacts.keys();
+
+            while (ids.hasNext())
+            {
+                String id = (String) ids.next();
+                JSONArray contact = contacts.getJSONArray(id);
+                if (contact == null) continue;
+
+                ismatch = false;
+                photo = null;
+
+                for (int inx = 0; inx < contact.length(); inx++)
+                {
+                    JSONObject item = contact.getJSONObject(inx);
+
+                    if (item.has("NUMBER"))
+                    {
+                        String number = item.getString("NUMBER").replaceAll(" ","");
+
+                        if (number.endsWith(search))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("DATA1"))
+                    {
+                        String number = item.getString("DATA1").replaceAll(" ","");
+
+                        if (number.endsWith(search))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("PHOTO"))
+                    {
+                        photo = item.getString("PHOTO");
+                    }
+                }
+
+                if (ismatch && (photo != null)) break;
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        if (ismatch && (photo != null))
+        {
+            Simple.putFileBytes(imagefile, Simple.getHexStringToBytes(photo));
+        }
+    }
+
+    @Nullable
+    public static Bitmap getContactsProfileBitmap(String phonenumber, boolean circle)
+    {
+        if (phonenumber == null) return null;
+
+        File imagefile = getContactsProfileImageFile(phonenumber);
+
+        if (! imagefile.exists())
+        {
+            getContactsProfileImage(imagefile, phonenumber);
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getContactsProfileDrawable(String phonenumber, boolean circle)
+    {
+        return Simple.getDrawable(getContactsProfileBitmap(phonenumber, circle));
+    }
+
+    //endregion Contacts profiles
+
+    //region WhatsApp profiles
+
+    private static File getWhatsAppProfileImageFile(String phonenumber)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "whatsapp.image." + phonenumber.replaceAll(" ", "") + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    private static void getWhatsAppProfileImage(File imagefile, String phonenumber)
+    {
+        if (phonenumber.startsWith("+")) phonenumber = phonenumber.substring(1);
+        phonenumber = phonenumber.replaceAll(" ", "");
+
+        String wappsub = "WhatsApp/Profile Pictures";
+        File wappdir = new File(Simple.getExternalStorageDir(), wappsub);
+        if (! wappdir.isDirectory()) return;
+
+        String[] wappdirlist = wappdir.list();
+        if (wappdirlist == null) return;
+
+        for (String ppfile : wappdirlist)
+        {
+            if (ppfile.startsWith(phonenumber))
+            {
+                File profilefile = new File(wappdir, ppfile);
+                Simple.fileCopy(profilefile, imagefile);
+            }
+        }
+    }
+
+    @Nullable
+    public static Bitmap getWhatsAppProfileBitmap(String phonenumber, boolean circle)
+    {
+        if (phonenumber == null) return null;
+
+        File imagefile = getWhatsAppProfileImageFile(phonenumber);
+
+        if (! imagefile.exists())
+        {
+            getWhatsAppProfileImage(imagefile, phonenumber);
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getWhatsAppProfileDrawable(String phonenumber, boolean circle)
+    {
+        return Simple.getDrawable(getWhatsAppProfileBitmap(phonenumber, circle));
+    }
+
+    //endregion WhatsApp profiles
 
     @Nullable
     public static Bitmap getCircleBitmap(Bitmap bitmap)
