@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -341,6 +340,15 @@ public class ProfileImagesNew
         if (! imagefile.exists())
         {
             getWhatsAppProfileImage(imagefile, phonenumber);
+
+            if (! imagefile.exists())
+            {
+                //
+                // Fallback to contacts image.
+                //
+
+                getContactsProfileImage(imagefile, phonenumber);
+            }
         }
 
         if (imagefile.exists())
@@ -379,17 +387,17 @@ public class ProfileImagesNew
 
         if (! imagefile.exists())
         {
-            String phonennumber = getPhoneFromSkype(skypename);
+            String phonenumber = getPhoneFromSkype(skypename);
 
-            getContactsProfileImage(imagefile, phonennumber);
+            getContactsProfileImage(imagefile, phonenumber);
 
             if (! imagefile.exists())
             {
                 //
-                // Fallback to an WhatsApp image.
+                // Fallback to WhatsApp image.
                 //
 
-                getWhatsAppProfileImage(imagefile, phonennumber);
+                getWhatsAppProfileImage(imagefile, phonenumber);
             }
         }
 

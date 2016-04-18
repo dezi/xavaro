@@ -105,8 +105,16 @@ public class HomeActivity extends AppCompatActivity implements
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         topscreen.setOnSystemUiVisibilityChangeListener(this);
 
+        //
+        // Debug update external contacts.
+        //
+
         File contacts = new File(Simple.getExternalFilesDir(), "contacts.json");
         Simple.putFileContent(contacts, Json.toPretty(ContactsHandler.getJSONData(this)));
+
+        Log.d(LOGTAG, "density DPI=" + Simple.getDensityDPI());
+        Log.d(LOGTAG, "scaled Density=" + Simple.getScaledDensity());
+        Log.d(LOGTAG, "font Scale=" + Simple.getFontScale());
     }
 
     private final Runnable makeFullscreen = new Runnable()

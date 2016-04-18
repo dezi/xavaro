@@ -278,7 +278,7 @@ public class LaunchItem extends FrameLayout implements
 
             textsize = layout.height / 12;
             label.setTextSize(Simple.getDeviceTextSize(textsize));
-            label.setLineSpacing(-4, 1);
+            label.setLineSpacing(-3 * Simple.getDensity(), 1);
 
             //
             // This might lead to a shitty breaking

@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Vibrator;
@@ -16,6 +17,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.view.Display;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -567,14 +569,34 @@ public class Simple
         return !(hasBackKey && hasHomeKey);
     }
 
-    public static int getDP(int pixels)
+    public static int getDensityDPI()
     {
-        return (int) ((pixels / (float) getDeviceDPI()) * 160);
+        return anyContext.getResources().getDisplayMetrics().densityDpi;
+    }
+
+    public static float getScaledDensity()
+    {
+        return anyContext.getResources().getDisplayMetrics().scaledDensity;
+    }
+
+    public static float getDensity()
+    {
+        return anyContext.getResources().getDisplayMetrics().density;
+    }
+
+    public static float getFontScale()
+    {
+        return getResources().getConfiguration().fontScale;
+    }
+
+    public static int getDevicePixels(int pixels)
+    {
+        return (int) ((pixels / (float) getDensityDPI()) * 160);
     }
 
     public static float getDeviceTextSize(float textsize)
     {
-        return (textsize / getDeviceDPI()) * 160;
+        return (textsize / getDensity()) / getFontScale();
     }
 
     @Nullable
@@ -912,11 +934,6 @@ public class Simple
     public static String getDirectory(String filepath)
     {
         return new File(filepath).getParent();
-    }
-
-    public static int getDeviceDPI()
-    {
-        return anyContext.getResources().getDisplayMetrics().densityDpi;
     }
 
     public static int getRandom(int min, int max)
@@ -1861,9 +1878,23 @@ public class Simple
         return 0;
     }
 
-    public static String getLocalDay(long timeStamp)
+    public static String getLocalDayOfMonth(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("d", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(timeStamp);
+    }
+
+    public static String getLocalDayOfWeek(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("EEEE", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(timeStamp);
+    }
+
+    public static String getLocalMonth(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("MMMM", Locale.getDefault());
         df.setTimeZone(TimeZone.getDefault());
         return df.format(timeStamp);
     }
