@@ -194,7 +194,7 @@
 
       "label": "Hannoversche Allgemeine",
       "default": false,
-      "region": "de.nds",
+      "region": "de.ni",
 
       "intent": {
         "action" : "view",

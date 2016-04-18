@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public class PreferenceFragments
         protected String subtype;
         protected String subcategory;
         protected boolean isplaystore;
+
         protected int residKeys = R.array.pref_where_keys;
         protected int residVals = R.array.pref_where_vals;
 
@@ -54,11 +56,13 @@ public class PreferenceFragments
                 if (config == null) return;
             }
 
-            NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceListPreference lp;
-            NicedPreferences.NiceScorePreference sp;
+            //
+            // Preflight and sort configs.
+            //
 
             Iterator<String> keysIterator = config.keys();
+            JSONArray configs = new JSONArray();
+            boolean hasregion = false;
 
             while (keysIterator.hasNext())
             {
@@ -72,6 +76,43 @@ public class PreferenceFragments
                 {
                     continue;
                 }
+
+                Json.put(webitem, "website", website);
+                Json.put(configs, webitem);
+
+                if (Json.has(webitem, "region")) hasregion = true;
+            }
+
+            //
+            // Get locale regions if required.
+            //
+
+            Map<String, String> regionMap = null;
+
+            if (hasregion)
+            {
+                String lang = Simple.getLocaleLanguage();
+                int resid = Simple.getResArrayIdentifier(lang + "_regions_keys");
+                regionMap = Simple.getTransMap(resid);
+
+                configs = Json.sort(configs, "region", false);
+            }
+
+            //
+            // Build preferences.
+            //
+
+            NicedPreferences.NiceCategoryPreference pc = null;
+            NicedPreferences.NiceListPreference lp;
+            NicedPreferences.NiceScorePreference sp;
+
+            for (int cinx = 0; cinx < configs.length(); cinx++)
+            {
+                JSONObject webitem = Json.getObject(configs, cinx);
+                if (webitem == null) continue;
+
+                String website = Json.getString(webitem, "website");
+                if (website == null) continue;
 
                 String label = Json.getString(webitem, "label");
                 String summary = Json.getString(webitem, "summary");
@@ -110,13 +151,25 @@ public class PreferenceFragments
                         String iconurl = Json.getString(webitem, "icon");
                         if (iconurl == null) continue;
 
+                        if ((regionMap != null) && (region != null)
+                                && ((pc == null) || ! region.equals(pc.getKey())))
+                        {
+                            //
+                            // Build a region category header.
+                            //
+
+                            pc = new NicedPreferences.NiceCategoryPreference(context);
+                            pc.setKey(region);
+                            pc.setTitle(regionMap.get(region));
+                            pc.setEnabled(enabled);
+                            preferences.add(pc);
+                        }
+
                         drawable = CacheManager.getWebIcon(website, iconurl);
 
                         key = keyprefix + ".website:" + website;
 
                         lp = new NicedPreferences.NiceListPreference(context);
-
-                        //Log.d(LOGTAG, "=======================>" + Simple.getResArrayIdentifier("de_regions_keys"));
 
                         lp.setKey(key);
                         lp.setTitle(label);
