@@ -1,0 +1,163 @@
+{
+  "important": {
+
+    "doctor": {
+      "label": "Hausarzt",
+      "icon": "call_doctor_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Arzt", "Hausarzt", "den Doktor", "Frau Doktor" ],
+        "response": "Ich rufe %1$s an",
+        "sample": "Ich möchte meinen Arzt anrufen"
+      }
+    },
+
+    "pharmacie": {
+      "label": "Apotheke",
+      "icon": "call_pharmacie_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Apotheke" ],
+        "response": "Ich rufe die Apotheke an",
+        "sample": "Ich möchte die Apotheke anrufen"
+      }
+    },
+
+    "therapist": {
+      "label": "Therapeut",
+      "icon": "call_therapist_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Therapeut", "Physio" ],
+        "response": "Ich rufe %1$s an",
+        "sample": "Ich möchte den Therapeuten anrufen"
+      }
+    },
+
+    "meals": {
+      "label": "Essen auf Rädern",
+      "icon": "call_meals_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Essen" ],
+        "response": "Ich rufe Essen auf Rädern an",
+        "sample": "Ich möchte Essen auf Rädern bestellen"
+      }
+    },
+
+    "taxi": {
+      "label": "Taxi",
+      "icon": "call_taxi_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Taxi", "Wagen" ],
+        "response": "Ich rufe %1$s an",
+        "sample": "Ich möchte ein Taxi rufen"
+      }
+    }
+  },
+
+  "delivery": {
+
+    "asia": {
+      "label": "Chinesen",
+      "icon": "delivery_asia_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Chinesen" ],
+        "response": "Ich rufe beim Chinesen an",
+        "sample": "Ich möchte beim Chinesen etwas bestellen"
+      }
+    },
+
+    "burger": {
+      "label": "Burger",
+      "icon": "delivery_burger_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Burger" ],
+        "response": "Ich rufe beim Burger-Lieferdienst an",
+        "sample": "Ich möchte einen Burger bestellen"
+      }
+    },
+
+    "croque": {
+      "label": "Croque",
+      "icon": "delivery_croque_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Croque" ],
+        "response": "Ich rufe beim Croque-Lieferdienst an",
+        "sample": "Ich möchte einen Croque bestellen"
+      }
+    },
+
+    "doener": {
+      "label": "Doener",
+      "icon": "delivery_doener_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Doener" ],
+        "response": "Ich rufe beim Doener-Mann an",
+        "sample": "Ich möchte einen Doener bestellen"
+      }
+    },
+
+    "homestyle": {
+      "label": "Gutbürgerlich",
+      "icon": "delivery_homestyle_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Gutbürgerlich" ],
+        "response": "Ich rufe bei %1$s an",
+        "sample": "Ich möchte etwas zu Essen bestellen"
+      }
+    },
+
+    "pizza": {
+      "label": "Pizza",
+      "icon": "delivery_pizza_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Pizza" ],
+        "response": "Ich rufe beim Pizza-Service an",
+        "sample": "Ich möchte eine Pizza bestellen"
+      }
+    },
+
+    "salad": {
+      "label": "Salatbar",
+      "icon": "delivery_salad_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Salat" ],
+        "response": "Ich rufe beim Frische-Service an",
+        "sample": "Ich möchte einen Salat bestellen"
+      }
+    },
+
+    "sushi": {
+      "label": "Sushi",
+      "icon": "delivery_sushi_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Sushi" ],
+        "response": "Ich rufe beim Japaner an",
+        "sample": "Ich möchte Sushi bestellen"
+      }
+    }
+  }
+}

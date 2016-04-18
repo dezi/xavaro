@@ -8,12 +8,13 @@ import java.util.Map;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebApp;
 
 public class PreferencesDeveloper
 {
-    public static class DeveloperFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class DeveloperFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {

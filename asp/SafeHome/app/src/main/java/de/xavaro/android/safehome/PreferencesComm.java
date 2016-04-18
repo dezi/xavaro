@@ -16,6 +16,7 @@ import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.ProfileImagesNew;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
@@ -29,7 +30,7 @@ public class PreferencesComm
 
     //region Xavaro communication preferences
 
-    public static class XavaroFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class XavaroFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -296,7 +297,7 @@ public class PreferencesComm
 
     //region Contacts preferences stub
 
-    public static class ContactsFragmentStub extends PreferencesBasics.EnablePreferenceFragment
+    public static class ContactsFragmentStub extends PreferenceFragments.EnableFragmentStub
     {
         protected boolean isPhone;
         protected boolean isSkype;

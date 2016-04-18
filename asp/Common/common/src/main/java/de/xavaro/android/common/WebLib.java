@@ -1,5 +1,8 @@
 package de.xavaro.android.common;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
@@ -64,5 +67,23 @@ public class WebLib
         }
 
         return null;
+    }
+
+    @Nullable
+    public static Bitmap getIconBitmap(String weblib, String iconurl)
+    {
+        int interval = WebApp.getWebAppInterval();
+
+        String src = WebApp.getHTTPLibRoot() + weblib + "/" + iconurl;
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);
+        if (wcr.content == null) return null;
+
+        return BitmapFactory.decodeByteArray(wcr.content, 0, wcr.content.length);
+    }
+
+    @Nullable
+    public static Drawable getIconDrawable(String weblib, String iconurl)
+    {
+        return Simple.getDrawable(getIconBitmap(weblib, iconurl));
     }
 }

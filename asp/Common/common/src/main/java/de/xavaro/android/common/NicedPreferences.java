@@ -1001,6 +1001,7 @@ public class NicedPreferences
         protected boolean disabled;
         private boolean isPassword;
         private boolean isUppercase;
+        private boolean isPhonenumber;
         private Runnable onClickRunner;
         private String emptytext;
 
@@ -1073,6 +1074,11 @@ public class NicedPreferences
             isUppercase = true;
         }
 
+        public void setIsPhonenumber()
+        {
+            isPhonenumber = true;
+        }
+
         public void setOnclick(Runnable onclick)
         {
             onClickRunner = onclick;
@@ -1084,6 +1090,24 @@ public class NicedPreferences
             if (onClickRunner == null)
             {
                 super.showDialog(state);
+
+                View view = getDialog().getWindow().getDecorView();
+                View edit = view.findViewById(android.R.id.edit);
+
+                if ((edit != null) && (edit instanceof EditText))
+                {
+                    ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
+                    if (isUppercase)
+                    {
+                        ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                    }
+
+                    if (isPhonenumber)
+                    {
+                        ((EditText) edit).setInputType(InputType.TYPE_CLASS_PHONE);
+                    }
+                }
 
                 return;
             }

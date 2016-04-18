@@ -2,8 +2,6 @@ package de.xavaro.android.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -16,7 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -31,6 +28,7 @@ public class PreferenceFragments
         protected String type;
         protected String subtype;
         protected String subcategory;
+        protected boolean iscalls;
         protected boolean isplaystore;
 
         protected int residKeys = R.array.pref_where_keys;
@@ -103,6 +101,7 @@ public class PreferenceFragments
             //
 
             NicedPreferences.NiceCategoryPreference pc = null;
+            NicedPreferences.NiceEditTextPreference ep;
             NicedPreferences.NiceListPreference lp;
             NicedPreferences.NiceScorePreference sp;
 
@@ -120,12 +119,11 @@ public class PreferenceFragments
 
                 if (! webitem.has("channels"))
                 {
-                    Drawable drawable;
-                    String key;
+                    String key = null;
 
                     if (isplaystore)
                     {
-                        drawable = CacheManager.getAppIcon(website);
+                        Drawable drawable = CacheManager.getAppIcon(website);
 
                         key = keyprefix + ".package:" + website;
 
@@ -146,7 +144,58 @@ public class PreferenceFragments
                         preferences.add(sp);
                         activekeys.add(sp.getKey());
                     }
-                    else
+
+                    if (iscalls)
+                    {
+                        String iconurl = Json.getString(webitem, "icon");
+                        if (iconurl == null) continue;
+
+                        Drawable drawable = WebLib.getIconDrawable(type, iconurl);
+
+                        pc = new NicedPreferences.NiceCategoryPreference(context);
+                        pc.setTitle(label);
+                        pc.setIcon(drawable);
+                        pc.setEnabled(enabled);
+
+                        preferences.add(pc);
+
+                        key = keyprefix + ".subtype:" + website;
+
+                        lp = new NicedPreferences.NiceListPreference(context);
+
+                        lp.setKey(key);
+                        lp.setTitle("Funktion");
+                        lp.setSummary(summary);
+                        lp.setEntries(residVals);
+                        lp.setEntryValues(residKeys);
+                        lp.setEnabled(enabled);
+
+                        preferences.add(lp);
+                        activekeys.add(lp.getKey());
+
+                        ep = new NicedPreferences.NiceEditTextPreference(context);
+
+                        ep.setKey(keyprefix + ".nametag:" + website);
+                        ep.setTitle("Bezeichnung");
+                        ep.setSummary(summary);
+                        ep.setEnabled(enabled);
+
+                        preferences.add(ep);
+                        activekeys.add(ep.getKey());
+
+                        ep = new NicedPreferences.NiceEditTextPreference(context);
+
+                        ep.setKey(keyprefix + ".phonenumber:" + website);
+                        ep.setTitle("Telefon");
+                        ep.setIsPhonenumber();
+                        ep.setSummary(summary);
+                        ep.setEnabled(enabled);
+
+                        preferences.add(ep);
+                        activekeys.add(ep.getKey());
+                    }
+
+                    if (! (iscalls || isplaystore))
                     {
                         String iconurl = Json.getString(webitem, "icon");
                         if (iconurl == null) continue;
@@ -165,7 +214,7 @@ public class PreferenceFragments
                             preferences.add(pc);
                         }
 
-                        drawable = CacheManager.getWebIcon(website, iconurl);
+                        Drawable drawable = CacheManager.getWebIcon(website, iconurl);
 
                         key = keyprefix + ".website:" + website;
 
@@ -183,7 +232,7 @@ public class PreferenceFragments
                         activekeys.add(lp.getKey());
                     }
 
-                    if (! Simple.hasSharedPref(key))
+                    if ((key != null) && ! Simple.hasSharedPref(key))
                     {
                         boolean def = Json.getBoolean(webitem, "default");
                         Simple.setSharedPrefString(key, def ? "folder" : "inact");

@@ -1239,7 +1239,7 @@ public class PreferencesBasics
 
     //region Alertgroup preferences
 
-    public static class AlertgroupFragment extends EnablePreferenceFragment
+    public static class AlertgroupFragment extends PreferenceFragments.EnableFragmentStub
             implements Preference.OnPreferenceChangeListener
     {
         public static PreferenceActivity.Header getHeader()
@@ -1387,6 +1387,39 @@ public class PreferencesBasics
     }
 
     //endregion Alertgroup preferences
+
+    //region Important calls preferences
+
+    public static class ImportantCallsFragment extends PreferenceFragments.WeblibFragmentStub
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Rufnummern";
+            header.iconRes = GlobalConfigs.IconResCallImportant;
+            header.fragment = ImportantCallsFragment.class.getName();
+
+            return header;
+        }
+
+        public ImportantCallsFragment()
+        {
+            super();
+
+            type = "calls";
+            subtype = "important";
+            iscalls = true;
+            iconres = GlobalConfigs.IconResCallImportant;
+            keyprefix = type + "." + subtype;
+            masterenable = "Wichtige Rufnummern freischalten";
+            residKeys = R.array.pref_where_keys;
+            residVals = R.array.pref_where_vals;
+        }
+    }
+
+    //endregion Important calls preferences
 
     @SuppressWarnings("WeakerAccess")
     public static class EnablePreferenceFragment extends BasePreferenceFragment
