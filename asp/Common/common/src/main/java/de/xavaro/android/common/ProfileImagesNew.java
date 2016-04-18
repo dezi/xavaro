@@ -1,6 +1,5 @@
 package de.xavaro.android.common;
 
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -150,18 +149,12 @@ public class ProfileImagesNew
 
     private static void getContactsProfileImage(File imagefile, String phonenumber)
     {
+        if (phonenumber == null) return;
+
         String search = phonenumber.replaceAll(" ", "");
-        boolean ismatch = false;
-        String photo = null;
 
-        if (contacts == null)
-        {
-            //
-            // Read into static contacts once.
-            //
-
-            contacts = ContactsHandler.getJSONData();
-        }
+        if (contacts == null) contacts = ContactsHandler.getJSONData();
+        if (contacts == null) return;
 
         try
         {
@@ -173,8 +166,8 @@ public class ProfileImagesNew
                 JSONArray contact = contacts.getJSONArray(id);
                 if (contact == null) continue;
 
-                ismatch = false;
-                photo = null;
+                boolean ismatch = false;
+                String photo = null;
 
                 for (int inx = 0; inx < contact.length(); inx++)
                 {
@@ -206,7 +199,67 @@ public class ProfileImagesNew
                     }
                 }
 
-                if (ismatch && (photo != null)) break;
+                if (ismatch && (photo != null))
+                {
+                    Simple.putFileBytes(imagefile, Simple.getHexStringToBytes(photo));
+                    break;
+                }
+            }
+        }
+        catch (JSONException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+    }
+    @Nullable
+    private static String getPhoneFromSkype(String skypename)
+    {
+        if (contacts == null) contacts = ContactsHandler.getJSONData();
+        if (contacts == null) return null;
+
+        try
+        {
+            Iterator<?> ids = contacts.keys();
+
+            while (ids.hasNext())
+            {
+                String id = (String) ids.next();
+                JSONArray contact = contacts.getJSONArray(id);
+                if (contact == null) continue;
+
+                boolean ismatch = false;
+                String phone = null;
+
+                for (int inx = 0; inx < contact.length(); inx++)
+                {
+                    JSONObject item = contact.getJSONObject(inx);
+
+                    if (item.has("DATA1"))
+                    {
+                        String number = item.getString("DATA1").replaceAll(" ","");
+
+                        if (number.endsWith(skypename))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("NUMBER"))
+                    {
+                        phone = item.getString("NUMBER");
+
+                        if (phone != null) phone = phone.replaceAll(" ", "");
+                    }
+                }
+
+                if (ismatch && (phone != null))
+                {
+                    //
+                    // We have found a phone number within skype contact.
+                    //
+
+                    return phone;
+                }
             }
         }
         catch (JSONException ex)
@@ -214,10 +267,7 @@ public class ProfileImagesNew
             OopsService.log(LOGTAG, ex);
         }
 
-        if (ismatch && (photo != null))
-        {
-            Simple.putFileBytes(imagefile, Simple.getHexStringToBytes(photo));
-        }
+        return null;
     }
 
     @Nullable
@@ -310,6 +360,56 @@ public class ProfileImagesNew
     }
 
     //endregion WhatsApp profiles
+
+    //region Skype profiles
+
+    private static File getSkypeProfileImageFile(String skypename)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "skype.image." + skypename + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    public static Bitmap getSkypeProfileBitmap(String skypename, boolean circle)
+    {
+        if (skypename == null) return null;
+
+        File imagefile = getSkypeProfileImageFile(skypename);
+
+        if (! imagefile.exists())
+        {
+            String phonennumber = getPhoneFromSkype(skypename);
+
+            getContactsProfileImage(imagefile, phonennumber);
+
+            if (! imagefile.exists())
+            {
+                //
+                // Fallback to an WhatsApp image.
+                //
+
+                getWhatsAppProfileImage(imagefile, phonennumber);
+            }
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getSkypeProfileDrawable(String skypename, boolean circle)
+    {
+        return Simple.getDrawable(getSkypeProfileBitmap(skypename, circle));
+    }
+
+    //endregion Skype profiles
 
     @Nullable
     public static Bitmap getCircleBitmap(Bitmap bitmap)

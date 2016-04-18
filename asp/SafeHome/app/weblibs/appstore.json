@@ -1,3 +1,26 @@
 {
-  "locales": [ "appstore.de-rDE" ]
+  "locales": [ "appstore.de-rDE" ],
+
+  "essential":
+  {
+    "com.whatsapp":
+    {
+      "label": "WhatsApp",
+      "score": "14",
+
+      "summary": [
+        "WhatsApp Communication. Essential."
+      ]
+    },
+
+    "com.skype.raider":
+    {
+      "label": "Skype",
+      "score": "10",
+
+      "summary": [
+        "Skype Communication. Nearly essential."
+      ]
+    }
+  }
 }

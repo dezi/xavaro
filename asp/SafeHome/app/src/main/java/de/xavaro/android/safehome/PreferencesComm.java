@@ -21,6 +21,7 @@ import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SystemIdentity;
+import de.xavaro.android.common.WebLib;
 
 public class PreferencesComm
 {
@@ -109,6 +110,7 @@ public class PreferencesComm
                     pc = new NicedPreferences.NiceCategoryPreference(context);
                     pc.setIcon(ProfileImagesNew.getXavaroProfileDrawable(ident, true));
                     pc.setTitle(name);
+                    pc.setEnabled(enabled);
 
                     preferences.add(pc);
                     if (!initial) getPreferenceScreen().addPreference(pc);
@@ -119,6 +121,7 @@ public class PreferencesComm
                     cb.setEntryValues(sendtoVals);
                     cb.setDefaultValue("inact");
                     cb.setTitle("Nachricht");
+                    cb.setEnabled(enabled);
 
                     preferences.add(cb);
                     activekeys.add(cb.getKey());
@@ -253,7 +256,7 @@ public class PreferencesComm
             iconres = GlobalConfigs.IconResSkype;
             keyprefix = "skype";
             masterenable = "Skype freischalten";
-            installtext = "Skype App";
+            installtext = "Skype";
             installpack = CommonConfigs.packageSkype;
         }
     }
@@ -284,7 +287,7 @@ public class PreferencesComm
             iconres = GlobalConfigs.IconResWhatsApp;
             keyprefix = "whatsapp";
             masterenable = "WhatsApp freischalten";
-            installtext = "WhatsApp App";
+            installtext = "WhatsApp";
             installpack = CommonConfigs.packageWhatsApp;
         }
     }
@@ -353,41 +356,89 @@ public class PreferencesComm
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference nc;
+            NicedPreferences.NiceScorePreference sp;
             NicedPreferences.NiceListPreference lp;
 
             boolean enabled = Simple.getSharedPrefBoolean(keyprefix + ".enable");
 
             if (installpack != null)
             {
-                lp = new NicedPreferences.NiceListPreference(context);
-
                 boolean installed = Simple.isAppInstalled(installpack);
 
-                lp.setEntries(installText);
-                lp.setEntryValues(installVals);
-                lp.setKey(keyprefix + ".installed");
-                lp.setTitle(installtext);
-                lp.setEnabled(enabled);
+                JSONObject config = WebLib.getLocaleConfig("appstore");
+                config = Json.getObject(config, "essential");
+                config = Json.getObject(config, installpack);
 
-                //
-                // This is nice about Java. No clue how it is done!
-                //
-
-                final String installName = installpack;
-
-                lp.setOnclick(new Runnable()
+                if (config != null)
                 {
-                    @Override
-                    public void run()
+                    nc = new NicedPreferences.NiceCategoryPreference(context);
+                    nc.setTitle(Json.getString(config, "label") + " – " + "Anwendung");
+                    nc.setEnabled(enabled);
+
+                    preferences.add(nc);
+
+                    //
+                    // Score preference.
+                    //
+
+                    sp = new NicedPreferences.NiceScorePreference(context);
+
+                    sp.setKey(keyprefix + ".installed");
+                    sp.setEntries(installText);
+                    sp.setEntryValues(installVals);
+                    sp.setTitle(Json.getString(config, "label"));
+                    sp.setSummary(Json.getString(config, "summary"));
+                    sp.setEnabled(enabled);
+
+                    String score = Json.getString(config, "score");
+                    sp.setScore((score == null) ? -1 : Integer.parseInt(score));
+                    sp.setAPKName(installpack);
+
+                    Simple.setSharedPrefString(sp.getKey(), installed ? "ready" : "notinst");
+
+                    preferences.add(sp);
+                    activekeys.add(sp.getKey());
+                }
+                else
+                {
+                    nc = new NicedPreferences.NiceCategoryPreference(context);
+                    nc.setTitle(installtext + " – " + "Anwendung");
+                    nc.setEnabled(enabled);
+
+                    preferences.add(nc);
+
+                    //
+                    // Legacy preference.
+                    //
+
+                    lp = new NicedPreferences.NiceListPreference(context);
+
+                    lp.setEntries(installText);
+                    lp.setEntryValues(installVals);
+                    lp.setKey(keyprefix + ".installed");
+                    lp.setTitle(installtext);
+                    lp.setEnabled(enabled);
+
+                    //
+                    // This is nice about Java. No clue how it is done!
+                    //
+
+                    final String installName = installpack;
+
+                    lp.setOnclick(new Runnable()
                     {
-                        Simple.installAppFromPlaystore(installName);
-                    }
-                });
+                        @Override
+                        public void run()
+                        {
+                            Simple.installAppFromPlaystore(installName);
+                        }
+                    });
 
-                Simple.setSharedPrefString(lp.getKey(), installed ? "ready" : "notinst");
+                    Simple.setSharedPrefString(lp.getKey(), installed ? "ready" : "notinst");
 
-                preferences.add(lp);
-                activekeys.add(lp.getKey());
+                    preferences.add(lp);
+                    activekeys.add(lp.getKey());
+                }
             }
 
             JSONObject contacts = ContactsHandler.getJSONData(context);
@@ -556,19 +607,28 @@ public class PreferencesComm
                         multi = numbersIterator.hasNext();
                         first = false;
 
-                        Drawable icon;
+                        Drawable icon = null;
 
-                        icon = ProfileImagesNew.getContactsProfileDrawable(nicephone, true);
+                        if (isPhone)
+                        {
+                            icon = ProfileImagesNew.getContactsProfileDrawable(nicephone, true);
+                        }
 
-                        if (icon == null)
+                        if ((icon == null) && (isWhatsApp || isPhone))
                         {
                             icon = ProfileImagesNew.getWhatsAppProfileDrawable(nicephone, true);
+                        }
+
+                        if ((icon == null) && isSkype)
+                        {
+                            icon = ProfileImagesNew.getSkypeProfileDrawable(nicephone, true);
                         }
 
                         nc = new NicedPreferences.NiceCategoryPreference(context);
                         nc.setTitle(name + (multi ? "" : " " + nicephone));
                         nc.setIcon(icon);
                         nc.setEnabled(enabled);
+
                         preferences.add(nc);
                     }
 
