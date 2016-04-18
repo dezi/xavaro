@@ -1,11 +1,14 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.WebApp;
@@ -54,9 +57,23 @@ public class LaunchItemCall extends LaunchItem
     {
         if (config.has("subitem"))
         {
-            //
-            // Todo launch phone.
-            //
+            if (config.has("phonenumber"))
+            {
+                try
+                {
+                    String phonenumber = config.getString("phonenumber");
+
+                    Uri uri = Uri.parse("tel:" + phonenumber);
+                    Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
+                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    sendIntent.setPackage("com.android.server.telecom");
+                    context.startActivity(Intent.createChooser(sendIntent, ""));
+                }
+                catch (Exception ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
+            }
         }
         else
         {
