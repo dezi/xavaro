@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
-import de.xavaro.android.common.BatteryLevel;
+import de.xavaro.android.common.BatteryManager;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
@@ -87,6 +87,8 @@ public class HomeActivity extends AppCompatActivity implements
         startService(new Intent(this, GCMRegistrationService.class));
         startService(new Intent(this, USSDMessageService.class));
 
+        BatteryManager.registerReceiver();
+
         //
         // Allow cross fuck domain HTTP shit.
         //
@@ -103,14 +105,10 @@ public class HomeActivity extends AppCompatActivity implements
         try
         {
             int enabled = Settings.Secure.getInt(this.getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
-            Log.d(LOGTAG,"=====================================ACCESSIBILITY_ENABLED=" + enabled);
+            Log.d(LOGTAG, "=====================================ACCESSIBILITY_ENABLED=" + enabled);
 
             String settingValue = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            Log.d(LOGTAG,"=====================================ACCESSIBILITY_ENABLED=" + settingValue);
-
-            BatteryLevel.isCharging();
-
-            BatteryLevel.batteryLevel();
+            Log.d(LOGTAG, "=====================================ACCESSIBILITY_ENABLED=" + settingValue);
         }
         catch (Exception ex)
         {
@@ -255,6 +253,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onStop();
 
+        BatteryManager.unregisterReceiver();
         DitUndDat.InternetState.unsubscribe(this);
     }
 
