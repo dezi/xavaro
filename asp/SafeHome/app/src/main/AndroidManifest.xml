@@ -62,6 +62,14 @@
         </service>
 
         <service
+            android:name="de.xavaro.android.common.USSDMessageService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+
+        <service
             android:name="de.xavaro.android.common.GCMRegistrationService"
             android:exported="false">
         </service>
@@ -128,7 +136,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".BootLoader" android:enabled="true" android:exported="false">
+        <receiver android:name=".BootLoader" android:enabled="true" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

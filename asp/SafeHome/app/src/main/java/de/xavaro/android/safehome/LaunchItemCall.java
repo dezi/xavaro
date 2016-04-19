@@ -62,6 +62,7 @@ public class LaunchItemCall extends LaunchItem
                 try
                 {
                     String phonenumber = config.getString("phonenumber");
+                    phonenumber = phonenumber.replace("#", "%23");
 
                     Uri uri = Uri.parse("tel:" + phonenumber);
                     Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);

@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.app.Activity;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
+import de.xavaro.android.common.BatteryLevel;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
@@ -27,6 +29,7 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
+import de.xavaro.android.common.USSDMessageService;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.WebCookie;
@@ -82,6 +85,7 @@ public class HomeActivity extends AppCompatActivity implements
         startService(new Intent(this, OopsService.class));
 
         startService(new Intent(this, GCMRegistrationService.class));
+        startService(new Intent(this, USSDMessageService.class));
 
         //
         // Allow cross fuck domain HTTP shit.
@@ -95,6 +99,23 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
+
+        try
+        {
+            int enabled = Settings.Secure.getInt(this.getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+            Log.d(LOGTAG,"=====================================ACCESSIBILITY_ENABLED=" + enabled);
+
+            String settingValue = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            Log.d(LOGTAG,"=====================================ACCESSIBILITY_ENABLED=" + settingValue);
+
+            BatteryLevel.isCharging();
+
+            BatteryLevel.batteryLevel();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     @Override
