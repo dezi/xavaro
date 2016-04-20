@@ -188,8 +188,11 @@ public class PreferenceFragments
 
                         ep = new NicedPreferences.NiceEditTextPreference(context);
 
+                        String calltext = Json.getString(webitem, "calltext");
+                        if (calltext == null) calltext = "Telefon";
+
                         ep.setKey(keyprefix + ".phonenumber:" + website);
-                        ep.setTitle("Telefon");
+                        ep.setTitle(calltext);
                         ep.setIsPhonenumber();
                         ep.setSummary(summary);
                         ep.setEnabled(enabled);
@@ -199,6 +202,24 @@ public class PreferenceFragments
 
                         preferences.add(ep);
                         activekeys.add(ep.getKey());
+
+                        String loadtext = Json.getString(webitem, "loadtext");
+                        String loadvalue = Json.getString(webitem, "loadvalue");
+
+                        if ((loadtext != null) && (loadvalue != null))
+                        {
+                            ep = new NicedPreferences.NiceEditTextPreference(context);
+
+                            ep.setKey(keyprefix + ".prepaidload:" + website);
+                            ep.setTitle(loadtext);
+                            ep.setIsPhonenumber();
+                            ep.setSummary(summary);
+                            ep.setEnabled(enabled);
+                            ep.setDefaultValue(loadvalue);
+
+                            preferences.add(ep);
+                            activekeys.add(ep.getKey());
+                        }
                     }
 
                     if (! (iscalls || isplaystore))

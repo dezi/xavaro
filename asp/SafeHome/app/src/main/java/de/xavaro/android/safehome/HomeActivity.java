@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
-import de.xavaro.android.common.BatteryManager;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
@@ -29,7 +28,7 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
-import de.xavaro.android.common.USSDMessageService;
+import de.xavaro.android.common.MessageService;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.WebCookie;
@@ -85,7 +84,7 @@ public class HomeActivity extends AppCompatActivity implements
         startService(new Intent(this, OopsService.class));
 
         startService(new Intent(this, GCMRegistrationService.class));
-        startService(new Intent(this, USSDMessageService.class));
+        startService(new Intent(this, MessageService.class));
 
         //
         // Allow cross fuck domain HTTP shit.

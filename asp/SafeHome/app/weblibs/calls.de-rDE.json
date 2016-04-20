@@ -4,8 +4,11 @@
     "prepaid": {
       "label": "Guthaben",
       "icon": "call_prepaid_600x600.png",
+      "calltext": "Abrufcode",
       "defaulttext": "Prepaid Guthaben",
       "defaultvalue": "*100#",
+      "loadtext": "Aufladecode",
+      "loadvalue": "*101*",
 
       "intent": {
         "action": "call",

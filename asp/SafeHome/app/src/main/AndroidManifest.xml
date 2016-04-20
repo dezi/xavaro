@@ -62,7 +62,7 @@
         </service>
 
         <service
-            android:name="de.xavaro.android.common.USSDMessageService"
+            android:name="de.xavaro.android.common.MessageService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />

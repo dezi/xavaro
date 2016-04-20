@@ -1,8 +1,6 @@
 package de.xavaro.android.common;
 
-import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
@@ -16,7 +14,6 @@ public class BatteryManager
 
     private static final ArrayList<BatteryManagerCallback> callbacks = new ArrayList<>();
     private static final JSONObject batteryStatus = new JSONObject();
-    private static boolean registered;
     private static long nextCheck;
 
     public static void commTick()
@@ -26,9 +23,11 @@ public class BatteryManager
         nextCheck = now + 60 * 1000;
 
         IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent status = Simple.getAppContext().registerReceiver(null, batteryLevelFilter);
+        Intent status = Simple.getAnyContext().registerReceiver(null, batteryLevelFilter);
 
         putBatteryStatus(status);
+
+        Simple.makePost(doCallbacks);
     }
 
     public static void subscribe(BatteryManagerCallback callback)
@@ -47,6 +46,14 @@ public class BatteryManager
         }
     }
 
+    public static void unsubscribeAll()
+    {
+        synchronized (callbacks)
+        {
+            callbacks.clear();
+        }
+    }
+
     public static JSONObject getBatteryStatus()
     {
         synchronized (batteryStatus)
@@ -55,7 +62,7 @@ public class BatteryManager
         }
     }
 
-    public static void putBatteryStatus(Intent intent)
+    private static void putBatteryStatus(Intent intent)
     {
         int status = intent.getIntExtra(android.os.BatteryManager.EXTRA_STATUS, -1);
         int plugged = intent.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, -1);
@@ -94,6 +101,23 @@ public class BatteryManager
 
         Log.d(LOGTAG, "putBatteryStatus:" + percent + "% " + stag + " " + ptag);
     }
+
+    private static final Runnable doCallbacks = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            JSONObject status = getBatteryStatus();
+
+            synchronized (callbacks)
+            {
+                for (BatteryManagerCallback callback : callbacks)
+                {
+                    callback.onBatteryStatus(status);
+                }
+            }
+        }
+    };
 
     public interface BatteryManagerCallback
     {

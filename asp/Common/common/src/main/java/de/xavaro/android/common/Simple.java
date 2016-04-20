@@ -66,6 +66,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -607,6 +608,12 @@ public class Simple
         if (!matcher.find()) return null;
 
         return matcher.group(1);
+    }
+
+    public static String getCurrencySymbol()
+    {
+        Currency currency = Currency.getInstance(Locale.getDefault());
+        return currency.getSymbol();
     }
 
     public static String getTrans(int resid, Object... args)
