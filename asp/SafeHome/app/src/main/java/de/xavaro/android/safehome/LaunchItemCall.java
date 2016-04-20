@@ -34,6 +34,7 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
     }
 
     private TextView prepaidView;
+    private boolean isPrepaidLoad;
 
     @Override
     protected void setConfig()
@@ -108,7 +109,7 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
                 Simple.removePost(unsubscribeMessage);
                 Simple.makePost(unsubscribeMessage);
 
-                return AccessibilityService.GLOBAL_ACTION_BACK;
+                return isPrepaidLoad ? 0 : AccessibilityService.GLOBAL_ACTION_BACK;
             }
         }
 
@@ -155,14 +156,19 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
     {
         if (config.has("subitem"))
         {
+            String subitem = Json.getString(config, "subitem");
             String phonenumber = Json.getString(config, "phonenumber");
 
-            if (phonenumber != null)
+            if ((subitem != null) && (phonenumber != null))
             {
                 phonenumber = phonenumber.replace("#", "%23");
 
-                MessageService.subscribe(this);
-                Simple.makePost(unsubscribeMessage, 5000);
+                if (subitem.equals("prepaid"))
+                {
+                    isPrepaidLoad = false;
+                    MessageService.subscribe(this);
+                    Simple.makePost(unsubscribeMessage, 5000);
+                }
 
                 try
                 {
@@ -258,6 +264,7 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
 
                 final String cbprepaidload = prepaidload;
 
+                isPrepaidLoad = true;
                 MessageService.subscribe(this);
                 Simple.makePost(unsubscribeMessage, 5000);
 
@@ -268,6 +275,8 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
                     {
                         try
                         {
+                            isPrepaidLoad = true;
+
                             Uri uri = Uri.parse("tel:" + cbprepaidload);
                             Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
                             sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
