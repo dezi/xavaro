@@ -109,7 +109,9 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
                 Simple.removePost(unsubscribeMessage);
                 Simple.makePost(unsubscribeMessage);
 
-                return isPrepaidLoad ? 0 : AccessibilityService.GLOBAL_ACTION_BACK;
+                //return isPrepaidLoad ? 0 : AccessibilityService.GLOBAL_ACTION_BACK;
+
+                return 0;
             }
         }
 

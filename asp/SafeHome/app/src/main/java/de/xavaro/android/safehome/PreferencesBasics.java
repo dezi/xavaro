@@ -1084,11 +1084,11 @@ public class PreferencesBasics
             String idremote = Json.getString(message, "idremote");
             String gcmtoken = Json.getString(message, "gcmtoken");
             String publickey = CryptUtils.RSAgetPublicKey(Simple.getAnyContext());
-
             if (gcmtoken == null) gcmtoken = Json.getString(message, "gcmUuid");
             if ((idremote == null) || (gcmtoken == null)) return;
 
             Log.d(LOGTAG, "requestKeyExchange: " + idremote);
+            Log.d(LOGTAG, "requestKeyExchange: " + gcmtoken);
 
             RemoteContacts.setGCMTokenTemp(idremote, gcmtoken);
 

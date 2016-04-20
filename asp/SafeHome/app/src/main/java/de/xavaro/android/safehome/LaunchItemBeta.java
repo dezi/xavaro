@@ -1,11 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,27 +43,38 @@ public class LaunchItemBeta extends LaunchItem
     {
         icon.setImageResource(CommonConfigs.IconResBetaVersion);
 
-        JSONObject beta = WebLib.getConfig("beta");
+        Simple.makePost(checkBeta);
+    }
 
-        if (beta != null)
+    private final Runnable checkBeta = new Runnable()
+    {
+        @Override
+        public void run()
         {
-            Log.d(LOGTAG, "Beta=" + beta.toString());
+            Log.d(LOGTAG, "checkBeta...");
 
-            JSONObject betaapp = Json.getObject(beta, Simple.getAppName());
+            JSONObject beta = WebLib.getConfig("beta");
 
-            if (betaapp != null)
+            if (beta != null)
             {
-                String latest = Json.getString(betaapp, "latest");
+                JSONObject betaapp = Json.getObject(beta, Simple.getAppName());
 
-                if ((latest != null) && (latest.compareTo(GlobalConfigs.BetaVersion) > 0))
+                if (betaapp != null)
                 {
-                    overicon.setImageResource(R.drawable.circle_green_256x256);
-                    overtext.setText(R.string.simple_new);
-                    overlay.setVisibility(VISIBLE);
+                    String latest = Json.getString(betaapp, "latest");
+
+                    if ((latest != null) && (latest.compareTo(GlobalConfigs.BetaVersion) > 0))
+                    {
+                        overicon.setImageResource(R.drawable.circle_green_256x256);
+                        overtext.setText(R.string.simple_new);
+                        overlay.setVisibility(VISIBLE);
+                    }
                 }
             }
+
+            Simple.makePost(checkBeta, 3600 * 1000);
         }
-    }
+    };
 
     @Override
     protected void onMyClick()
