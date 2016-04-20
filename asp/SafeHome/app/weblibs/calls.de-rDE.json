@@ -1,15 +1,17 @@
 {
   "important": {
 
-    "doctor": {
-      "label": "Hausarzt",
-      "icon": "call_doctor_600x600.png",
+    "prepaid": {
+      "label": "Guthaben",
+      "icon": "call_prepaid_600x600.png",
+      "defaulttext": "Prepaid Guthaben",
+      "defaultvalue": "*100#",
 
       "intent": {
         "action": "call",
-        "keywords": [ "Arzt", "Hausarzt", "den Doktor", "Frau Doktor" ],
-        "response": "Ich rufe %1$s an",
-        "sample": "Ich möchte meinen Arzt anrufen"
+        "keywords": [ "Guthaben", "pre paid" ],
+        "response": "Ich rufe das Guthaben ab.",
+        "sample": "Ich mein Guthaben abrufen"
       }
     },
 
@@ -22,6 +24,30 @@
         "keywords": [ "Apotheke" ],
         "response": "Ich rufe die Apotheke an",
         "sample": "Ich möchte die Apotheke anrufen"
+      }
+    },
+
+    "taxi": {
+      "label": "Taxi",
+      "icon": "call_taxi_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Taxi", "Wagen" ],
+        "response": "Ich rufe %1$s an",
+        "sample": "Ich möchte ein Taxi rufen"
+      }
+    },
+
+    "doctor": {
+      "label": "Hausarzt",
+      "icon": "call_doctor_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Arzt", "Hausarzt", "den Doktor", "Frau Doktor" ],
+        "response": "Ich rufe %1$s an",
+        "sample": "Ich möchte meinen Arzt anrufen"
       }
     },
 
@@ -46,18 +72,6 @@
         "keywords": [ "Essen" ],
         "response": "Ich rufe Essen auf Rädern an",
         "sample": "Ich möchte Essen auf Rädern bestellen"
-      }
-    },
-
-    "taxi": {
-      "label": "Taxi",
-      "icon": "call_taxi_600x600.png",
-
-      "intent": {
-        "action": "call",
-        "keywords": [ "Taxi", "Wagen" ],
-        "response": "Ich rufe %1$s an",
-        "sample": "Ich möchte ein Taxi rufen"
       }
     }
   },

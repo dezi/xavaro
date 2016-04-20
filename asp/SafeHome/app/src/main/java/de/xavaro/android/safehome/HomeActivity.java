@@ -217,7 +217,6 @@ public class HomeActivity extends AppCompatActivity implements
         super.onResume();
 
         Simple.setAppContext(this);
-        BatteryManager.registerReceiver();
 
         if (wasPaused && ! lostFocus)
         {
@@ -252,7 +251,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onStop();
 
-        BatteryManager.unregisterReceiver();
         DitUndDat.InternetState.unsubscribe(this);
     }
 

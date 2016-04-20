@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.preference.PreferenceFragment;
 import android.webkit.JavascriptInterface;
 import android.support.annotation.Nullable;
 
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.StaticUtils;
@@ -39,7 +41,7 @@ public class PreferencesWebApps
 {
     //region Webapps preferences
 
-    public static class WebappFragment extends PreferencesBasics.BasePreferenceFragment
+    public static class WebappFragment extends PreferenceFragments.BasicFragmentStub
     {
         private static final String LOGTAG = WebappFragment.class.getSimpleName();
 

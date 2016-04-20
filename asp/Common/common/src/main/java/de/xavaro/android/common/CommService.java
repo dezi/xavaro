@@ -9,7 +9,6 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -626,6 +625,7 @@ public class CommService extends Service
             CommSender.commTick();
             WebAppCache.commTick();
             EventManager.commTick();
+            BatteryManager.commTick();
 
             if (! checkSocket()) continue;
 

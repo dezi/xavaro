@@ -180,6 +180,9 @@ public class PreferenceFragments
                         ep.setSummary(summary);
                         ep.setEnabled(enabled);
 
+                        String defaulttext = Json.getString(webitem, "defaulttext");
+                        if (defaulttext != null) ep.setDefaultValue(defaulttext);
+
                         preferences.add(ep);
                         activekeys.add(ep.getKey());
 
@@ -190,6 +193,9 @@ public class PreferenceFragments
                         ep.setIsPhonenumber();
                         ep.setSummary(summary);
                         ep.setEnabled(enabled);
+
+                        String defaultvalue = Json.getString(webitem, "defaultvalue");
+                        if (defaultvalue != null) ep.setDefaultValue(defaultvalue);
 
                         preferences.add(ep);
                         activekeys.add(ep.getKey());
@@ -378,10 +384,10 @@ public class PreferenceFragments
 
     public static class BasicFragmentStub extends PreferenceFragment
     {
-        protected final ArrayList<Preference> preferences = new ArrayList<>();
         protected final SharedPreferences sharedPrefs = Simple.getSharedPrefs();
         protected final Handler handler = new Handler();
 
+        protected ArrayList<Preference> preferences = new ArrayList<>();
         protected PreferenceScreen root;
         protected String keyprefix;
 
