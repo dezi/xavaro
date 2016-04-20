@@ -87,8 +87,6 @@ public class HomeActivity extends AppCompatActivity implements
         startService(new Intent(this, GCMRegistrationService.class));
         startService(new Intent(this, USSDMessageService.class));
 
-        BatteryManager.registerReceiver();
-
         //
         // Allow cross fuck domain HTTP shit.
         //
@@ -219,6 +217,7 @@ public class HomeActivity extends AppCompatActivity implements
         super.onResume();
 
         Simple.setAppContext(this);
+        BatteryManager.registerReceiver();
 
         if (wasPaused && ! lostFocus)
         {
