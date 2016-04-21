@@ -217,6 +217,11 @@
         Ende-zu-Ende verschlüsselt wird.
     </string>
 
+    <string name="pref_basic_assistance">Assistenz</string>
+    <string name="pref_basic_assistance_enable">Assistenz freischalten</string>
+    <string name="pref_basic_assistance_asmember">Als Mitglied</string>
+    <string name="pref_basic_assistance_skypecall">Skype Rückruf</string>
+
     <string name="launch_media_image_simple_send">Das Bild wird an %s versendet.</string>
     <string name="launch_media_image_simple_yousend">Sie haben ein Bild an %s gesendet.</string>
     <string name="launch_media_image_simple_yousend_du">Du hast ein Bild an %s gesendet.</string>

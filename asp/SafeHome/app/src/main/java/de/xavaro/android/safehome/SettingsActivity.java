@@ -104,7 +104,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesBasicsAdmin.getHeader());
         target.add(PreferencesBasicsOwner.getHeader());
         target.add(PreferencesBasicsCommunity.getHeader());
-        target.add(PreferencesBasics.AlertgroupFragment.getHeader());
+        target.add(PreferencesBasicsAssistance.getHeader());
         target.add(PreferencesBasics.ImportantCallsFragment.getHeader());
 
         category = new Header();
