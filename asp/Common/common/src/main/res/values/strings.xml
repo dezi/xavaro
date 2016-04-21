@@ -179,15 +179,6 @@
         <item>Active</item>
     </string-array>
 
-    <string name="pref_basic_owner">User</string>
-    <string name="pref_basic_owner_personal">Personal</string>
-    <string name="pref_basic_owner_personal_summary">####</string>
-    <string name="pref_basic_owner_address">Address</string>
-    <string name="pref_basic_owner_firstname">First Name</string>
-    <string name="pref_basic_owner_givenname">Given Name</string>
-    <string name="pref_basic_owner_duzen">User likes to be</string>
-    <string name="pref_basic_owner_profileimage_share">Share profile image</string>
-
     <string name="pref_basic_admin">Administration</string>
     <string name="pref_basic_admin_access">Access</string>
     <string name="pref_basic_admin_password">Admin Password</string>
@@ -202,6 +193,22 @@
     <string name="pref_basic_admin_home_button">Home</string>
     <string name="pref_basic_admin_assistance_button">Assistance</string>
     <string name="pref_basic_admin_menu_button">Menu</string>
+
+    <string name="pref_basic_owner">User</string>
+    <string name="pref_basic_owner_personal">Personal</string>
+    <string name="pref_basic_owner_personal_summary">####</string>
+    <string name="pref_basic_owner_address">Address</string>
+    <string name="pref_basic_owner_firstname">First Name</string>
+    <string name="pref_basic_owner_givenname">Given Name</string>
+    <string name="pref_basic_owner_duzen">User likes to be</string>
+    <string name="pref_basic_owner_profileimage_share">Share profile image</string>
+
+    <string name="pref_basic_community">Community</string>
+    <string name="pref_basic_community_pincode">Connect via Pincode</string>
+    <string name="pref_basic_community_pincode_summary">####</string>
+
+    <string name="pref_basic_community_wifi">Connect via Wifi</string>
+    <string name="pref_basic_community_wifi_summary">####</string>
 
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>

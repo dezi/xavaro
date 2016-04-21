@@ -99,7 +99,10 @@ public class RemoteContacts
 
     public static void setGCMTokenTemp(String ident, String gcmUuid)
     {
-        tempGCMTokens.put(ident, gcmUuid);
+        if ((ident != null) && (gcmUuid != null))
+        {
+            tempGCMTokens.put(ident, gcmUuid);
+        }
     }
 
     @Nullable

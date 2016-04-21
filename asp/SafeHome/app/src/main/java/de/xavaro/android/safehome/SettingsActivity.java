@@ -103,7 +103,7 @@ public class SettingsActivity extends PreferenceActivity
 
         target.add(PreferencesBasicsAdmin.getHeader());
         target.add(PreferencesBasicsOwner.getHeader());
-        target.add(PreferencesBasics.CommunityFragment.getHeader());
+        target.add(PreferencesBasicsCommunity.getHeader());
         target.add(PreferencesBasics.AlertgroupFragment.getHeader());
         target.add(PreferencesBasics.ImportantCallsFragment.getHeader());
 

@@ -1631,7 +1631,6 @@ public class NicedPreferences
             dialog = null;
         }
 
-
         public interface DeleteCallback
         {
             void onDeleteRequest(String prefkey);

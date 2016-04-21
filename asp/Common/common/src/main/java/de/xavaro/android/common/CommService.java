@@ -304,8 +304,11 @@ public class CommService extends Service
             {
                 String remoteIdentity = json.getString("identity");
                 String remotePublicKey = json.getString("publicKey");
+                String gcmtoken = Json.getString(json, "gcmtoken");
+                if (gcmtoken == null) gcmtoken = Json.getString(json, "gcmUuid");
 
                 IdentityManager.put(remoteIdentity, "publicKey", remotePublicKey);
+                RemoteContacts.setGCMTokenTemp(remoteIdentity, gcmtoken);
 
                 Log.d(LOGTAG, "onMessageReceived: requestPublicKeyXChange"
                         + " remoteIdentity=" + remoteIdentity
@@ -315,7 +318,7 @@ public class CommService extends Service
 
                 responsePublicKeyXChange.put("type", "responsePublicKeyXChange");
                 responsePublicKeyXChange.put("idremote", remoteIdentity);
-                responsePublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(getApplicationContext()));
+                responsePublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey());
                 responsePublicKeyXChange.put("status", "success");
 
                 CommService.sendMessage(responsePublicKeyXChange, true);
@@ -327,7 +330,7 @@ public class CommService extends Service
             {
                 String remoteIdentity = json.getString("identity");
                 String encoPassPhrase = json.getString("encodedPassPhrase");
-                String privateKey = CryptUtils.RSAgetPrivateKey(getApplicationContext());
+                String privateKey = CryptUtils.RSAgetPrivateKey();
                 String passPhrase = CryptUtils.RSADecrypt(privateKey, encoPassPhrase);
 
                 IdentityManager.put(remoteIdentity, "passPhrase", passPhrase);
