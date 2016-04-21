@@ -179,15 +179,26 @@
         <item>Active</item>
     </string-array>
 
+    <string name="pref_basic_owner">User</string>
+    <string name="pref_basic_owner_personal">Personal</string>
+    <string name="pref_basic_owner_personal_summary">####</string>
+    <string name="pref_basic_owner_address">Address</string>
+    <string name="pref_basic_owner_firstname">First Name</string>
+    <string name="pref_basic_owner_givenname">Given Name</string>
+    <string name="pref_basic_owner_duzen">User likes to be</string>
+    <string name="pref_basic_owner_profileimage_share">Share profile image</string>
+
+    <string name="pref_basic_admin">Administration</string>
     <string name="pref_basic_admin_access">Access</string>
     <string name="pref_basic_admin_password">Admin Password</string>
 
     <string name="pref_basic_admin_services">Services</string>
-    <string name="pref_basic_admin_services_summary">#</string>
+    <string name="pref_basic_admin_services_summary">####</string>
     <string name="pref_basic_admin_accessibility_service">Accessibility</string>
     <string name="pref_basic_admin_kioskmode_service">Kiosk-Mode</string>
 
     <string name="pref_basic_admin_buttons">Buttons</string>
+    <string name="pref_basic_admin_buttons_summary">####</string>
     <string name="pref_basic_admin_home_button">Home</string>
     <string name="pref_basic_admin_assistance_button">Assistance</string>
     <string name="pref_basic_admin_menu_button">Menu</string>

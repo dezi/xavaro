@@ -130,7 +130,29 @@
         <item>Aktiviert</item>
     </string-array>
 
+    <string name="pref_basic_owner">Anwender</string>
+    <string name="pref_basic_owner_personal">Persönliches</string>
+    <string name="pref_basic_owner_personal_summary">
+        Wenn Sie in der Android Kontakte App ein Profilfoto für den
+        Eigentümer dieses Gerätes hinterlegt haben, wird es automatisch
+        übernommen.
+        \n\nDiese persönlichen Daten werden nur mit den Bezugspersonen geteilt.
+        Sie werden in keiner Art und Weise übertragen oder weiterverarbeitet.
+    </string>
+    <string name="pref_basic_owner_address">Anrede</string>
+    <string name="pref_basic_owner_firstname">Vorname</string>
+    <string name="pref_basic_owner_givenname">Nachnahme</string>
+    <string name="pref_basic_owner_duzen">Anwender möchte</string>
+    <string name="pref_basic_owner_profileimage_share">Profilfoto freigeben</string>
+
+    <string name="pref_basic_admin">Administration</string>
     <string name="pref_basic_admin_access">Zugang</string>
+    <string name="pref_basic_admin_access_summary">
+        Diese Einstellungen können jederzeit durch 5 x schnelles Drücken
+        der Zurück-Taste aufgerufen werden.
+        \n\nEs ist empfehlenswert, die Einstellungen mit einem Passwort
+        zu sichern.
+    </string>
     <string name="pref_basic_admin_password">Admin Passwort</string>
 
     <string name="pref_basic_admin_services">Services</string>

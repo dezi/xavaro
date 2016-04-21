@@ -18,7 +18,7 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         PreferenceActivity.Header header;
 
         header = new PreferenceActivity.Header();
-        header.title = "Administration";
+        header.titleRes = R.string.pref_basic_admin;
         header.iconRes = GlobalConfigs.IconResAdministrator;
         header.fragment = PreferencesBasicsAdmin.class.getName();
 
@@ -48,8 +48,9 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         NicedPreferences.NiceEditTextPreference ep;
         NicedPreferences.NiceListPreference lp;
 
-        cp = new NicedPreferences.NiceCategoryPreference(context);
+        cp = new NicedPreferences.NiceInfoPreference(context);
         cp.setTitle(R.string.pref_basic_admin_access);
+        cp.setSummary(R.string.pref_basic_admin_access_summary);
         preferences.add(cp);
 
         ep = new NicedPreferences.NiceEditTextPreference(context);
@@ -75,7 +76,6 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
 
         cp = new NicedPreferences.NiceInfoPreference(context);
         cp.setTitle(R.string.pref_basic_admin_services);
-        cp.setSummary(R.string.pref_basic_admin_services_summary);
         preferences.add(cp);
 
         CharSequence[] prefText = Simple.getTransArray(R.array.pref_basic_admin_service_vals);

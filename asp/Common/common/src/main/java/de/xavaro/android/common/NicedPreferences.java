@@ -1541,15 +1541,18 @@ public class NicedPreferences
         @Override
         public void onClick(View view)
         {
-            if (summaryOpen)
+            if (summaryResid != 0)
             {
-                setSummary(null);
-                summaryOpen = false;
-            }
-            else
-            {
-                setSummary(Simple.getTrans(summaryResid));
-                summaryOpen = true;
+                if (summaryOpen)
+                {
+                    setSummary(null);
+                    summaryOpen = false;
+                }
+                else
+                {
+                    setSummary(Simple.getTrans(summaryResid));
+                    summaryOpen = true;
+                }
             }
         }
     }
