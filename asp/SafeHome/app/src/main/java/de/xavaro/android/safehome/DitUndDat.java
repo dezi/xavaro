@@ -189,28 +189,12 @@ public class DitUndDat
             {
                 Bitmap orig = ((BitmapDrawable) getDrawable()).getBitmap();
                 Bitmap anti = StaticUtils.downscaleAntiAliasBitmap(orig, right - left, bottom - top);
-
                 setImageDrawable(new BitmapDrawable(getResources(), anti));
             }
         }
     }
 
     //endregion public static class ImageAntiAliasView extends ImageView
-
-    //region public static class StreamOptions
-
-    public static class StreamOptions
-    {
-        public String streamUrl;
-
-        public int quality;
-        public int bandWidth;
-
-        public int width;
-        public int height;
-    }
-
-    //endregion public static class StreamOptions
 
     //region public static class InternetState extends BroadcastReceiver
 

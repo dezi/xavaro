@@ -49,8 +49,6 @@ public class KioskService extends Service
 
         recentProc = getPackageName();
 
-        whitelistApps.add("com.whatsapp");
-
         blacklistApps.add("com.android.systemui.recentsactivity");
         blacklistApps.add("com.samsung.android.email.composer");
         blacklistApps.add("com.samsung.android.email.ui");
@@ -73,11 +71,7 @@ public class KioskService extends Service
 
         if (wdThread == null)
         {
-            //registerDefsystemApps();
-
             running = true;
-
-            Log.d(LOGTAG, "onStartCommand: starting watchdog thread.");
 
             wdThread = new Thread(new Runnable()
             {
@@ -93,14 +87,7 @@ public class KioskService extends Service
                             handleKioskMode();
                         }
 
-                        try
-                        {
-                            Thread.sleep(INTERVAL);
-
-                        } catch (InterruptedException e)
-                        {
-                            Log.d(LOGTAG, "wdThread: sleep interrupted.");
-                        }
+                        Simple.sleep(INTERVAL);
 
                         sequence++;
                     }
@@ -110,7 +97,7 @@ public class KioskService extends Service
             wdThread.start();
         }
 
-        return Service.START_NOT_STICKY; // Service.START_STICKY <=> Service.START_NOT_STICKY;
+        return Service.START_STICKY; // Service.START_STICKY <=> Service.START_NOT_STICKY;
     }
 
     private String getAppType(String processName)
@@ -119,8 +106,8 @@ public class KioskService extends Service
 
         if (whitelistApps.contains(processName)) mode = "wl";
         if (blacklistApps.contains(processName)) mode = "bl";
-        if (ProcessManager.isSystemProcess(processName)) mode = "ds";
         if (ProcessManager.isOneShotProcess(processName)) mode = "os";
+        if (ProcessManager.isSystemProcess(processName)) mode = "ds";
         if (processName.equals(getPackageName())) mode = "me";
 
         return mode;
@@ -163,12 +150,6 @@ public class KioskService extends Service
 
         if (mode.equals("ds")) return;
 
-        /*
-        Log.d(LOGTAG, "APP:" + mode + "=" + proc
-                + " => " + pi.importance
-                + " threads=" + pi.iniThreads + "/" + pi.actThreads);
-        */
-
         String currentMessage = mode + " => " + proc;
 
         boolean showit = true;
@@ -196,12 +177,11 @@ public class KioskService extends Service
 
         if (proc.equals("com.android.systemui.recentsactivity"))
         {
-            String what = Simple.getSharedPrefs().getString("admin.recent.button", "");
-
-            if (what.equals("android")) blockit = false;
+            String what = Simple.getSharedPrefString("admin.recent.button");
+            if ((what != null) && what.equals("android")) blockit = false;
         }
 
-        if (blockit && DefaultApps.isDefaultHome(this))
+        if (blockit && DefaultApps.isDefaultHome())
         {
             restoreRecentProc();
         }

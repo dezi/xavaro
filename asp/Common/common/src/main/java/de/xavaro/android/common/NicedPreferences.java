@@ -878,6 +878,14 @@ public class NicedPreferences
         }
 
         @Override
+        public void setValue(String value)
+        {
+            super.setValue(value);
+
+            if (current != null) current.setText(getDisplayValue(value));
+        }
+
+        @Override
         protected void onBindView(View view)
         {
             super.onBindView(view);
@@ -1203,7 +1211,7 @@ public class NicedPreferences
 
                 if (view.getTag().toString().equals("open"))
                 {
-                    ProcessManager.launchApp(getContext(), apkname);
+                    ProcessManager.launchApp(apkname);
                 }
 
                 if (view.getTag().toString().equals("install"))
@@ -1503,6 +1511,46 @@ public class NicedPreferences
             if (onLongClickRunner != null) onLongClickRunner.run();
 
             return false;
+        }
+    }
+
+    public static class NiceInfoPreference extends NiceCategoryPreference
+    {
+        public NiceInfoPreference(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            actionIcon.setImageResource(android.R.drawable.ic_menu_info_details);
+        }
+
+        private int summaryResid;
+        private boolean summaryOpen;
+
+        @Override
+        public void setSummary(int resid)
+        {
+            summaryResid = resid;
+        }
+
+        @Override
+        public void onClick(View view)
+        {
+            if (summaryOpen)
+            {
+                setSummary(null);
+                summaryOpen = false;
+            }
+            else
+            {
+                setSummary(Simple.getTrans(summaryResid));
+                summaryOpen = true;
+            }
         }
     }
 

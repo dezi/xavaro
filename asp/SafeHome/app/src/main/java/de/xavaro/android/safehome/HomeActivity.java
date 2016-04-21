@@ -1,7 +1,6 @@
 package de.xavaro.android.safehome;
 
 import android.app.Activity;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
@@ -28,7 +27,7 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
-import de.xavaro.android.common.MessageService;
+import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.WebCookie;
@@ -84,7 +83,7 @@ public class HomeActivity extends AppCompatActivity implements
         startService(new Intent(this, OopsService.class));
 
         startService(new Intent(this, GCMRegistrationService.class));
-        startService(new Intent(this, MessageService.class));
+        startService(new Intent(this, AccessibilityService.class));
 
         //
         // Allow cross fuck domain HTTP shit.
@@ -98,19 +97,6 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
-
-        try
-        {
-            int enabled = Settings.Secure.getInt(this.getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
-            Log.d(LOGTAG, "=====================================ACCESSIBILITY_ENABLED=" + enabled);
-
-            String settingValue = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            Log.d(LOGTAG, "=====================================ACCESSIBILITY_ENABLED=" + settingValue);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
     }
 
     @Override
@@ -178,6 +164,8 @@ public class HomeActivity extends AppCompatActivity implements
             launchGroup = new LaunchGroupRoot(this);
             launchGroup.setConfig(null, LaunchGroupRoot.getConfig());
             topscreen.addView(launchGroup);
+
+            CommonStatic.settingschanged = false;
         }
 
         DitUndDat.InternetState.subscribe(this);
@@ -339,7 +327,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void executeOnBackPressed()
     {
-        if (! DefaultApps.isDefaultHome(this))
+        if (! DefaultApps.isDefaultHome())
         {
             //
             // Finally release user to system.

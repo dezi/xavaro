@@ -98,10 +98,11 @@ public class SettingsActivity extends PreferenceActivity
 
         category = new Header();
         category.title = "Wichtige Einstellungen";
+
         target.add(category);
 
         target.add(PreferencesBasics.OwnerFragment.getHeader());
-        target.add(PreferencesBasics.AdminFragment.getHeader());
+        target.add(PreferencesBasicsAdmin.getHeader());
         target.add(PreferencesBasics.CommunityFragment.getHeader());
         target.add(PreferencesBasics.AlertgroupFragment.getHeader());
         target.add(PreferencesBasics.ImportantCallsFragment.getHeader());
@@ -352,7 +353,12 @@ public class SettingsActivity extends PreferenceActivity
 
                         if (webappname != null)
                         {
-                            holder.icon.setImageDrawable(WebApp.getAppIcon(webappname));
+                            if ((holder.icon.getTag() == null) ||
+                                    ! Simple.equals((String) holder.icon.getTag(), webappname))
+                            {
+                                holder.icon.setImageDrawable(WebApp.getAppIcon(webappname));
+                                holder.icon.setTag(webappname);
+                            }
                         }
                     }
                 }

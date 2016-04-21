@@ -63,39 +63,44 @@ public class ProcessManager
         oneshotApps.clear();
     }
 
-    public static void launchApp(Context context, String packagename)
+    public static void launchApp(String packagename)
     {
-        oneshotApps.add(packagename);
-
-        try
+        if (packagename != null)
         {
-            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
-            context.startActivity(launchIntent);
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-    }
-
-    public static boolean launchIntent(Context context, Intent intent)
-    {
-        ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
-
-        if (res.activityInfo != null)
-        {
-            oneshotApps.add(res.activityInfo.packageName);
+            oneshotApps.add(packagename);
 
             try
             {
-                context.startActivity(intent);
-
-                return true;
+                Context context = Simple.getAppContext();
+                Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packagename);
+                context.startActivity(launchIntent);
             }
             catch (Exception ex)
             {
                 OopsService.log(LOGTAG, ex);
             }
+        }
+    }
+
+    public static boolean launchIntent(Intent intent)
+    {
+        try
+        {
+            Context context = Simple.getAppContext();
+            ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
+
+            if (res.activityInfo != null)
+            {
+                oneshotApps.add(res.activityInfo.packageName);
+
+                context.startActivity(intent);
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
         }
 
         return false;

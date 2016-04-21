@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
@@ -381,14 +382,19 @@ public class ArchievementManager implements
 
     private void follow()
     {
+        if (currentTag.equals("configure.settings.accessibility"))
+        {
+            AccessibilityService.selectAccessibility.run();
+        }
+
         if (currentTag.equals("configure.settings.homebutton"))
         {
-            DefaultApps.setDefaultHome(context);
+            DefaultApps.setDefaultHome();
         }
 
         if (currentTag.equals("configure.settings.assistbutton"))
         {
-            DefaultApps.setDefaultAssist(context);
+            DefaultApps.setDefaultAssist();
         }
     }
 }

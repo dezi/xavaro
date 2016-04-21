@@ -15,6 +15,7 @@ import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.ProfileImagesNew;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
@@ -228,7 +229,8 @@ public class LaunchItemComm extends LaunchItem
                     Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
                     sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     sendIntent.setPackage("com.android.mms");
-                    context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                    ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
                 }
 
                 if (subtype.equals("voip"))
@@ -237,7 +239,8 @@ public class LaunchItemComm extends LaunchItem
                     Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
                     sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     sendIntent.setPackage("com.android.server.telecom");
-                    context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                    ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
                 }
             }
             catch (Exception ex)
@@ -286,7 +289,8 @@ public class LaunchItemComm extends LaunchItem
                 Intent skype = new Intent(Intent.ACTION_VIEW);
                 skype.setData(uri);
                 skype.setPackage("com.skype.raider");
-                context.startActivity(skype);
+
+                ProcessManager.launchIntent(skype);
             }
             catch (Exception ex)
             {
@@ -316,7 +320,8 @@ public class LaunchItemComm extends LaunchItem
                 Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
                 sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 sendIntent.setPackage("com.whatsapp");
-                context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                ProcessManager.launchIntent(sendIntent);
             }
             catch (Exception ex)
             {

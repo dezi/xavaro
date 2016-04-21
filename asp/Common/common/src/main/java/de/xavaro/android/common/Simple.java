@@ -226,23 +226,19 @@ public class Simple
 
     public static void installAppFromPlaystore(String packagename)
     {
-        if (appContext == null) return;
-
         Intent goToMarket = new Intent(Intent.ACTION_VIEW);
         goToMarket.setData(Uri.parse("market://details?id=" + packagename));
 
-        ProcessManager.launchIntent(appContext, goToMarket);
+        ProcessManager.launchIntent(goToMarket);
     }
 
     public static void uninstallApp(String packagename)
     {
-        if (anyContext == null) return;
-
         try
         {
             Uri packageUri = Uri.parse("package:" + packagename);
             Intent unInstall = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
-            anyContext.startActivity(unInstall);
+            ProcessManager.launchIntent(unInstall);
         }
         catch (Exception ex)
         {
@@ -252,12 +248,7 @@ public class Simple
 
     public static void launchApp(String packagename)
     {
-        ProcessManager.launchApp(appContext, packagename);
-    }
-
-    public static void startActivityForResult(Intent intent, int tag)
-    {
-        appContext.startActivityForResult(intent, tag);
+        ProcessManager.launchApp(packagename);
     }
 
     //endregion Application stuff

@@ -169,6 +169,28 @@
         <item>Filme</item>
     </string-array>
 
+    <string-array name="pref_basic_admin_service_keys">
+        <item>inactive</item>
+        <item>active</item>
+    </string-array>
+
+    <string-array name="pref_basic_admin_service_vals">
+        <item>Inactive</item>
+        <item>Active</item>
+    </string-array>
+
+    <string name="pref_basic_admin_access">Access</string>
+    <string name="pref_basic_admin_password">Admin Password</string>
+
+    <string name="pref_basic_admin_services">Services</string>
+    <string name="pref_basic_admin_services_summary">#</string>
+    <string name="pref_basic_admin_accessibility_service">Accessibility</string>
+    <string name="pref_basic_admin_kioskmode_service">Kiosk-Mode</string>
+
+    <string name="pref_basic_admin_buttons">Buttons</string>
+    <string name="pref_basic_admin_home_button">Home</string>
+    <string name="pref_basic_admin_assistance_button">Assistance</string>
+    <string name="pref_basic_admin_menu_button">Menu</string>
 
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>

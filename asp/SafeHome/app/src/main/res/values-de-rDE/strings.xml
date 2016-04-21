@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="accessibility_info">
+        Die Berechtigung dient ausschließlich dazu, zur Sicherheit
+        des Anwenders beizutragen. Es werden keinerlei Informationen
+        abgefragt oder weiterverarbeitet.
+    </string>
+
+</resources>

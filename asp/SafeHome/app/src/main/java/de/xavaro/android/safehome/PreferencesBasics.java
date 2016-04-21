@@ -4,12 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -22,7 +18,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
@@ -40,6 +35,7 @@ import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.CryptUtils;
 import de.xavaro.android.common.IdentityManager;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PersistManager;
@@ -136,126 +132,6 @@ public class PreferencesBasics
     }
 
     //endregion Owner preferences
-
-    //region Administrator preferences
-
-    public static class AdminFragment extends PreferenceFragments.BasicFragmentStub
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Administration";
-            header.iconRes = GlobalConfigs.IconResAdministrator;
-            header.fragment = AdminFragment.class.getName();
-
-            return header;
-        }
-
-        @Override
-        public void registerAll(Context context)
-        {
-            super.registerAll(context);
-
-            NicedPreferences.NiceEditTextPreference et;
-            NicedPreferences.NiceCategoryPreference pc;
-
-            pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Zugang");
-            preferences.add(pc);
-
-            et = new NicedPreferences.NiceEditTextPreference(context);
-
-            et.setKey("admin.password");
-            et.setTitle("Admin Passwort");
-            et.setIsPassword();
-
-            if (! sharedPrefs.getString(et.getKey(),"").equals(""))
-            {
-                ArchievementManager.archieved("configure.settings.password");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.password");
-            }
-
-            preferences.add(et);
-
-            pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("System-Buttons");
-            preferences.add(pc);
-
-            et = new NicedPreferences.NiceEditTextPreference(context);
-
-            et.setKey("admin.home.button");
-            et.setTitle("Home-Button");
-            et.setText(DefaultApps.getDefaultHomeLabel(context));
-            et.setOnclick(selectHome);
-
-            if (sharedPrefs.getString(et.getKey(), "").equals(StaticUtils.getAppName(context)))
-            {
-                ArchievementManager.archieved("configure.settings.homebutton");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.homebutton");
-            }
-
-            preferences.add(et);
-
-            et = new NicedPreferences.NiceEditTextPreference(context);
-
-            et.setKey("admin.assist.button");
-            et.setTitle("Assistenz-Button");
-            et.setText(DefaultApps.getDefaultAssistLabel(context));
-            et.setOnclick(selectAssist);
-
-            if (sharedPrefs.getString(et.getKey(),"").equals(DefaultApps.getAppLable(context)))
-            {
-                ArchievementManager.archieved("configure.settings.assistbutton");
-            }
-            else
-            {
-                ArchievementManager.revoke("configure.settings.assistbutton");
-            }
-
-            preferences.add(et);
-
-            NicedPreferences.NiceListPreference cb = new NicedPreferences.NiceListPreference(context);
-
-            CharSequence[] menueText = { "Android-System", "SafeHome" };
-            CharSequence[] menueVals = { "android", "safehome" };
-
-            cb.setKey("admin.recent.button");
-            cb.setEntries(menueText);
-            cb.setEntryValues(menueVals);
-            cb.setDefaultValue("safehome");
-            cb.setTitle("Menü-Button");
-
-            preferences.add(cb);
-        }
-
-        private final Runnable selectHome = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                DefaultApps.setDefaultHome(Simple.getAppContext());
-            }
-        };
-
-        private final Runnable selectAssist = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                DefaultApps.setDefaultAssist(Simple.getAppContext());
-            }
-        };
-    }
-
-    //endregion Administrator preferences
 
     //region Community preferences
 

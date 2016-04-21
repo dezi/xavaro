@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.accessibilityservice.AccessibilityService;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,12 +18,13 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.MessageService;
+import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebLib;
 
-public class LaunchItemCall extends LaunchItem implements MessageService.MessageServiceCallback
+public class LaunchItemCall extends LaunchItem implements AccessibilityService.MessageServiceCallback
 {
     private final static String LOGTAG = LaunchItemCall.class.getSimpleName();
 
@@ -79,7 +79,7 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
         @Override
         public void run()
         {
-            MessageService.unsubscribe(LaunchItemCall.this);
+            AccessibilityService.unsubscribe(LaunchItemCall.this);
         }
     };
 
@@ -168,7 +168,7 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
                 if (subitem.equals("prepaid"))
                 {
                     isPrepaidLoad = false;
-                    MessageService.subscribe(this);
+                    AccessibilityService.subscribe(this);
                     Simple.makePost(unsubscribeMessage, 5000);
                 }
 
@@ -178,7 +178,8 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
                     Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
                     sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     sendIntent.setPackage("com.android.server.telecom");
-                    context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                    ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
                 }
                 catch (Exception ex)
                 {
@@ -267,7 +268,7 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
                 final String cbprepaidload = prepaidload;
 
                 isPrepaidLoad = true;
-                MessageService.subscribe(this);
+                AccessibilityService.subscribe(this);
                 Simple.makePost(unsubscribeMessage, 5000);
 
                 Simple.makePost(new Runnable()
@@ -283,7 +284,8 @@ public class LaunchItemCall extends LaunchItem implements MessageService.Message
                             Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
                             sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             sendIntent.setPackage("com.android.server.telecom");
-                            context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                            ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
                         }
                         catch (Exception ex)
                         {

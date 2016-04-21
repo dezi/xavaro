@@ -1,7 +1,7 @@
 package de.xavaro.android.common;
 
-import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.provider.Settings;
 import android.view.accessibility.AccessibilityEvent;
 import android.content.Intent;
 import android.util.Log;
@@ -10,10 +10,60 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MessageService extends AccessibilityService
+public class AccessibilityService extends android.accessibilityservice.AccessibilityService
 {
-    private static final String LOGTAG = MessageService.class.getSimpleName();
+    private static final String LOGTAG = AccessibilityService.class.getSimpleName();
     private static final ArrayList<MessageServiceCallback> callbacks = new ArrayList<>();
+
+    public static boolean checkEnabled()
+    {
+        return checkEnabled(false);
+    }
+
+    public static boolean checkEnabled(boolean verbose)
+    {
+        try
+        {
+            int enabled = Settings.Secure.getInt(
+                    Simple.getAnyContext().getContentResolver(),
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+
+            if (verbose) Log.d(LOGTAG, "checkEnabled=" + enabled);
+
+            if (enabled != 0)
+            {
+                String binds = Settings.Secure.getString(
+                        Simple.getAnyContext().getContentResolver(),
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+
+                boolean found = (binds != null) && binds.contains(AccessibilityService.class.getName());
+
+                if (verbose)
+                {
+                    Log.d(LOGTAG, "checkEnabled=" + binds);
+                    Log.d(LOGTAG, "checkEnabled=" + found);
+                }
+
+                return found;
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public final static Runnable selectAccessibility = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            ProcessManager.launchIntent(intent);
+        }
+    };
 
     public static void subscribe(MessageServiceCallback callback)
     {

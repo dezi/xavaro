@@ -125,6 +125,46 @@
         <item>Videos</item>
     </string-array>
 
+    <string-array name="pref_basic_admin_service_vals">
+        <item>Inaktiv</item>
+        <item>Aktiviert</item>
+    </string-array>
+
+    <string name="pref_basic_admin_access">Zugang</string>
+    <string name="pref_basic_admin_password">Admin Passwort</string>
+
+    <string name="pref_basic_admin_services">Services</string>
+    <string name="pref_basic_admin_services_summary">
+        Diese Einstellungen ermöglichen es, den Benutzer in der Anwendung festzuhalten.
+        Dazu muss die Eingabehilfe über die Android-Einstellungen von Ihnen aktiviert werden.
+        Ist Ihnen dieses gelungen, wird die Eingabehilfe als aktiviert angezeigt.
+        \n\nDanach können Sie über den Kioskmodus steuern, ob der Benutzer unkonsolidierte
+        Anwendungen starten kann oder nicht.
+    </string>
+    <string name="pref_basic_admin_accessibility_service">Eingabehilfe</string>
+    <string name="pref_basic_admin_kioskmode_service">Kioskmodus</string>
+
+    <string name="pref_basic_admin_buttons">Tasten</string>
+    <string name="pref_basic_admin_buttons_summary">
+        Diese Einstellungen beziehen sich auf die Funktion der Hardware-Tasten.
+        \n\nWenn diese Anwendung auf die Home-Taste gelegt wird, ersetzt sie den standard
+        Launcher ihres Android Tablets.
+        \n\nDie Assistenz-Funktion wird über einen langen Druck auf die Home-Taste aufgerufen.
+        Hier ist normalerweise die Sprach-Eingabe zu finden. Wenn sie diese Taste auf die
+        Anwendung legen, wird die interne Spracheingabe aufgerufen.
+        Anmerkung Ole/Zimmel: Hier sind zur Zeit die Einstellungen draufgelegt.
+        \n\nDie Menü Taste dient zum Umschalten von einer App in die andere. Allerdings
+        lassen sich hier auch weitere, eventuell unerwünschte Apps aufrufen. Wenn sie diese
+        Taste auf die Anwendung legen, wird zur Hauptseite gewechselt.
+        Anmerkung Ole/Zimmel: Hier werde ich eine lineare Liste aller Icons der
+        Oberfläche draulegen, wo Ordner auf und zugeklappt werden können und auch
+        die Reihenfolge der Icons geändert werden kann oder so etwas. Für Vorschläge bin
+        ich dankbar.
+    </string>
+
+    <string name="pref_basic_admin_home_button">Home</string>
+    <string name="pref_basic_admin_assistance_button">Assistenz</string>
+    <string name="pref_basic_admin_menu_button">Menü</string>
 
     <string name="launch_media_image_simple_send">Das Bild wird an %s versendet.</string>
     <string name="launch_media_image_simple_yousend">Sie haben ein Bild an %s gesendet.</string>
