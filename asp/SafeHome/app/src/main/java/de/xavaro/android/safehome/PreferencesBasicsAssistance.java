@@ -2,15 +2,13 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.os.Handler;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import org.json.JSONObject;
 
@@ -51,6 +49,26 @@ public class PreferencesBasicsAssistance extends PreferenceFragments.EnableFragm
         keyprefix = "alertgroup";
         iconres = GlobalConfigs.IconResAlertgroup;
         masterenable = Simple.getTrans(R.string.pref_basic_assistance_enable);
+    }
+
+    @Override
+    @SuppressWarnings("ResourceType")
+    public void onStart()
+    {
+        super.onStart();
+
+        StaticUtils.dumpViewsChildren(getActivity().getWindow().getDecorView());
+
+        View view = getActivity().getWindow().getDecorView();
+
+        view = view.findViewById(0x1020342);
+        view = view.findViewById(0x1020032);
+
+        ((ImageView) view).setImageResource(GlobalConfigs.IconResAlertcall);
+        ((ImageView) view).setVisibility(View.VISIBLE);
+        ((ImageView) view).setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+        ((ImageView) view).setAdjustViewBounds(true);
+        ((ImageView) view).setPadding(4, 8, 4, 8);
     }
 
     @Override
