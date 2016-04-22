@@ -149,6 +149,8 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     {
         Log.d(LOGTAG, "onStartCommand");
 
+        checkEnabled(true);
+
         return super.onStartCommand(intent, flags, startId);
     }
 

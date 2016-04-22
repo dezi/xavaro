@@ -105,7 +105,8 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesBasicsOwner.getHeader());
         target.add(PreferencesBasicsCommunity.getHeader());
         target.add(PreferencesBasicsAssistance.getHeader());
-        target.add(PreferencesBasics.ImportantCallsFragment.getHeader());
+        target.add(PreferencesBasicsMonitors.getHeader());
+        target.add(PreferencesBasicsCalls.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";

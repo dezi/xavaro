@@ -1,14 +1,22 @@
 {
-  "important": {
+  "monitors": {
 
     "prepaid": {
-      "label": "Guthaben",
+      "label": "Prepaid Guthaben",
       "icon": "call_prepaid_600x600.png",
       "calltext": "Abrufcode",
       "defaulttext": "Prepaid Guthaben",
       "defaultvalue": "*100#",
       "loadtext": "Aufladecode",
       "loadvalue": "*101*",
+      "summary": [
+        "Das Prepaid-Guthaben kann mit einfachen Codes über das normale",
+        "Tastenfeld des Telefons abgerufen und aufgeladen werden. ",
+        "Bitte informieren Sie sich, ob die hier vorgeschlagenen Codes ",
+        "für Ihren Provider gültigkeit haben.",
+        "\n\nDas Guthaben kann mit einem langen Click auf das Icon ",
+        "aufgeladen werden."
+      ],
 
       "intent": {
         "action": "call",
@@ -16,7 +24,10 @@
         "response": "Ich rufe das Guthaben ab.",
         "sample": "Ich mein Guthaben abrufen"
       }
-    },
+    }
+  },
+
+  "important": {
 
     "pharmacie": {
       "label": "Apotheke",
@@ -51,6 +62,18 @@
         "keywords": [ "Arzt", "Hausarzt", "den Doktor", "Frau Doktor" ],
         "response": "Ich rufe %1$s an",
         "sample": "Ich möchte meinen Arzt anrufen"
+      }
+    },
+
+    "nursing": {
+      "label": "Pflegedienst",
+      "icon": "call_nursing_600x600.png",
+
+      "intent": {
+        "action": "call",
+        "keywords": [ "Pflegedienst" ],
+        "response": "Ich rufe %1$s an",
+        "sample": "Ich möchte den Pflegedienst anrufen"
       }
     },
 

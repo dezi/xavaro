@@ -219,6 +219,14 @@
     <string name="pref_basic_assistance_asmember">As member</string>
     <string name="pref_basic_assistance_skypecall">Skype callback</string>
 
+    <string name="pref_basic_calls">Phone Numbers</string>
+    <string name="pref_basic_calls_summary">todo</string>
+    <string name="pref_basic_calls_enable">Enable Phone Numbers</string>
+
+    <string name="pref_basic_monitoring">Monitoring</string>
+    <string name="pref_basic_monitoring_summary">todo</string>
+    <string name="pref_basic_monitoring_enable">Enable Monitoring</string>
+
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>
 

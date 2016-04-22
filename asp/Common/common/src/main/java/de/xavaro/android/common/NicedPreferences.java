@@ -2,12 +2,6 @@ package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
@@ -15,11 +9,11 @@ import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.SwitchPreference;
-import android.text.InputType;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -28,6 +22,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.text.InputType;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -1528,10 +1528,14 @@ public class NicedPreferences
         {
             super.onBindView(view);
 
-            actionIcon.setImageResource(android.R.drawable.ic_menu_info_details);
+            if ((summaryResid != 0) || (summaryText != null))
+            {
+                actionIcon.setImageResource(android.R.drawable.ic_menu_info_details);
+            }
         }
 
         private int summaryResid;
+        private String summaryText;
         private boolean summaryOpen;
 
         @Override
@@ -1541,18 +1545,24 @@ public class NicedPreferences
         }
 
         @Override
+        public void setSummary(CharSequence summary)
+        {
+            if (summary != null) summaryText = summary.toString();
+        }
+
+        @Override
         public void onClick(View view)
         {
-            if (summaryResid != 0)
+            if ((summaryResid != 0) || (summaryText != null))
             {
                 if (summaryOpen)
                 {
-                    setSummary(null);
+                    super.setSummary(null);
                     summaryOpen = false;
                 }
                 else
                 {
-                    setSummary(Simple.getTrans(summaryResid));
+                    super.setSummary((summaryText != null) ? summaryText : Simple.getTrans(summaryResid));
                     summaryOpen = true;
                 }
             }

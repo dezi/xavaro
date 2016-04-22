@@ -242,6 +242,22 @@
     <string name="pref_basic_assistance_asmember">Als Mitglied</string>
     <string name="pref_basic_assistance_skypecall">Skype Rückruf</string>
 
+    <string name="pref_basic_calls">Rufnummern</string>
+    <string name="pref_basic_calls_summary">
+        Hier finden Sie eine Auswahl vordefinierter Funktionen. Bitte aktivieren
+        sie die entsprechenden Icons und tragen die gewünschten Rufnummern und
+        Bezeichnungen ein.
+    </string>
+    <string name="pref_basic_calls_enable">Wichtige Rufnummern freischalten</string>
+
+    <string name="pref_basic_monitoring">Monitoring</string>
+    <string name="pref_basic_monitoring_summary">
+        Hier wird das Monitoring grundsätzlicher Tablet-Funktionen eingestellt.
+        Die hier abgefragten Werte können automatisiert and Bezugspersonen
+        weitergeleitet werden.
+    </string>
+    <string name="pref_basic_monitoring_enable">Monitoring freischalten</string>
+
     <string name="launch_media_image_simple_send">Das Bild wird an %s versendet.</string>
     <string name="launch_media_image_simple_yousend">Sie haben ein Bild an %s gesendet.</string>
     <string name="launch_media_image_simple_yousend_du">Du hast ein Bild an %s gesendet.</string>

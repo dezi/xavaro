@@ -120,8 +120,8 @@ public class PreferenceFragments
                 if (website == null) continue;
 
                 String label = Json.getString(webitem, "label");
-                String summary = Json.getString(webitem, "summary");
                 String region = Json.getString(webitem, "region");
+                String summary = Json.getString(webitem, "summary");
 
                 if (! webitem.has("channels"))
                 {
@@ -158,9 +158,10 @@ public class PreferenceFragments
 
                         Drawable drawable = WebLib.getIconDrawable(type, iconurl);
 
-                        pc = new NicedPreferences.NiceCategoryPreference(context);
+                        pc = new NicedPreferences.NiceInfoPreference(context);
                         pc.setTitle(label);
                         pc.setIcon(drawable);
+                        pc.setSummary(summary);
                         pc.setEnabled(enabled);
 
                         preferences.add(pc);
@@ -171,7 +172,6 @@ public class PreferenceFragments
 
                         lp.setKey(key);
                         lp.setTitle("Funktion");
-                        lp.setSummary(summary);
                         lp.setEntries(residVals);
                         lp.setEntryValues(residKeys);
                         lp.setEnabled(enabled);
@@ -183,7 +183,6 @@ public class PreferenceFragments
 
                         ep.setKey(keyprefix + ".nametag:" + website);
                         ep.setTitle("Bezeichnung");
-                        ep.setSummary(summary);
                         ep.setEnabled(enabled);
 
                         String defaulttext = Json.getString(webitem, "defaulttext");
@@ -200,7 +199,6 @@ public class PreferenceFragments
                         ep.setKey(keyprefix + ".phonenumber:" + website);
                         ep.setTitle(calltext);
                         ep.setIsPhonenumber();
-                        ep.setSummary(summary);
                         ep.setEnabled(enabled);
 
                         String defaultvalue = Json.getString(webitem, "defaultvalue");
@@ -219,7 +217,6 @@ public class PreferenceFragments
                             ep.setKey(keyprefix + ".prepaidload:" + website);
                             ep.setTitle(loadtext);
                             ep.setIsPhonenumber();
-                            ep.setSummary(summary);
                             ep.setEnabled(enabled);
                             ep.setDefaultValue(loadvalue);
 
@@ -554,7 +551,6 @@ public class PreferenceFragments
             }
 
             view = (View) view.getParent();
-            StaticUtils.dumpViewsChildren(view);
         }
     }
 

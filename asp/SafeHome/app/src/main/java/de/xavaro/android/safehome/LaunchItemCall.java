@@ -56,6 +56,15 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
                 prepaidView.setTextColor(Color.WHITE);
                 prepaidView.setTypeface(null, Typeface.BOLD);
 
+                String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
+                long mstamp = (mdate == null) ? 0 : Simple.getTimeStamp(mdate);
+
+                if ((Simple.nowAsTimeStamp() - mstamp) < (86400 * 1000))
+                {
+                    int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+                    onPrepaidReceived(money, false);
+                }
+
                 addView(prepaidView);
             }
         }
@@ -83,9 +92,15 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
         }
     };
 
-    public void onPrepaidReceived(float money)
+    public void onPrepaidReceived(int money, boolean save)
     {
-        String value = String.format("%.02f", money) + Simple.getCurrencySymbol();
+        if (save)
+        {
+            Simple.setSharedPrefString("monitoring.prepaid.stamp", Simple.nowAsISO());
+            Simple.setSharedPrefInt("monitoring.prepaid.money", money);
+        }
+
+        String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
 
         prepaidView.setText(value);
     }
@@ -102,9 +117,9 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
 
             if (value != null)
             {
-                float money = Float.parseFloat(value.replace(",", "."));
+                int money = Math.round(100 * Float.parseFloat(value.replace(",", ".")));
 
-                onPrepaidReceived(money);
+                onPrepaidReceived(money, true);
 
                 Simple.removePost(unsubscribeMessage);
                 Simple.makePost(unsubscribeMessage);

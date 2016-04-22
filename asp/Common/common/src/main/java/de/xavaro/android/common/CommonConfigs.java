@@ -17,6 +17,7 @@ public class CommonConfigs
     public static final int IconResVoiceListen  = R.drawable.voice_ear_256x256;
     public static final int IconResActivity     = R.drawable.activity_256x256;
     public static final int IconResBetaVersion  = R.drawable.betaversion_256x256;
+    public static final int IconResMonitoring   = R.drawable.monitoring_626x626;
     // @formatter:on
 
     //endregion Global icons
