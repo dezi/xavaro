@@ -52,26 +52,6 @@ public class PreferencesBasicsAssistance extends PreferenceFragments.EnableFragm
     }
 
     @Override
-    @SuppressWarnings("ResourceType")
-    public void onStart()
-    {
-        super.onStart();
-
-        StaticUtils.dumpViewsChildren(getActivity().getWindow().getDecorView());
-
-        View view = getActivity().getWindow().getDecorView();
-
-        view = view.findViewById(0x1020342);
-        view = view.findViewById(0x1020032);
-
-        ((ImageView) view).setImageResource(GlobalConfigs.IconResAlertcall);
-        ((ImageView) view).setVisibility(View.VISIBLE);
-        ((ImageView) view).setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
-        ((ImageView) view).setAdjustViewBounds(true);
-        ((ImageView) view).setPadding(4, 8, 4, 8);
-    }
-
-    @Override
     public void registerAll(Context context)
     {
         super.registerAll(context);

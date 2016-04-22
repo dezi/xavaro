@@ -88,6 +88,7 @@ public class PreferencesWebApps
             keyprefix = "webapps";
             webappname = getArguments().getString("webappname");
             webappkeyprefix = keyprefix + ".pref." + webappname + ".";
+            icondraw = WebApp.getAppIcon(webappname);
 
             super.onCreate(savedInstanceState);
         }

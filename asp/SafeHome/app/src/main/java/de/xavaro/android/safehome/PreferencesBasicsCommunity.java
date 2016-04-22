@@ -66,6 +66,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
         super();
 
         keyprefix = "community";
+        iconres = GlobalConfigs.IconResCommunity;
 
         CommService.subscribeMessage(PreferencesBasicsCommunity.this, "responsePin");
         CommService.subscribeMessage(PreferencesBasicsCommunity.this, "responsePublicKeyXChange");

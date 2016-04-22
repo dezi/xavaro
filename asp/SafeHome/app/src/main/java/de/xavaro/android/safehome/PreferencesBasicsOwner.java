@@ -26,6 +26,13 @@ public class PreferencesBasicsOwner extends PreferenceFragments.BasicFragmentStu
         return header;
     }
 
+    public PreferencesBasicsOwner()
+    {
+        super();
+
+        iconres = GlobalConfigs.IconResOwner;
+    }
+
     public void registerAll(Context context)
     {
         super.registerAll(context);

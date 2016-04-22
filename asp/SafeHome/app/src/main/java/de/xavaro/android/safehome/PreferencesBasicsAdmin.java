@@ -25,6 +25,13 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         return header;
     }
 
+    public PreferencesBasicsAdmin()
+    {
+        super();
+
+        iconres = GlobalConfigs.IconResAdministrator;
+    }
+
     private NicedPreferences.NiceListPreference accessibilityPref;
     private NicedPreferences.NiceEditTextPreference homeButtonPref;
     private NicedPreferences.NiceEditTextPreference assistButtonPref;

@@ -9,6 +9,9 @@ import android.preference.PreferenceScreen;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -361,8 +364,6 @@ public class PreferenceFragments
         protected Preference enabler;
         protected String masterenable;
         protected boolean enabled;
-        protected Drawable icondraw;
-        protected int iconres;
 
         @Override
         protected void registerAll(Context context)
@@ -376,7 +377,7 @@ public class PreferenceFragments
             sw.setKey(keyprefix + ".enable");
             sw.setTitle(masterenable);
             sw.setDefaultValue(false);
-            sw.setIcon((iconres > 0) ? Simple.getDrawable(iconres) : icondraw);
+            //sw.setIcon((iconres > 0) ? Simple.getDrawable(iconres) : icondraw);
             sw.setOnPreferenceChangeListener(this);
 
             preferences.add(sw);
@@ -411,9 +412,56 @@ public class PreferenceFragments
         protected ArrayList<Preference> preferences = new ArrayList<>();
         protected PreferenceScreen root;
         protected String keyprefix;
+        protected Drawable icondraw;
+        protected int iconres;
 
         protected void registerAll(Context context)
         {
+        }
+
+        @Override
+        @SuppressWarnings("ResourceType")
+        public void onStart()
+        {
+            super.onStart();
+
+            //StaticUtils.dumpViewsChildren(getActivity().getWindow().getDecorView());
+
+            final int breadcrumb_section = 0x1020342;
+            final int left_icon = 0x1020032;
+
+            View view = getActivity().getWindow().getDecorView();
+            if (view == null) return;
+
+            view = view.findViewById(breadcrumb_section);
+            if (view == null) return;
+
+            view = view.findViewById(left_icon);
+            if ((view == null) || ! (view instanceof ImageView)) return;
+
+            ImageView icon = (ImageView) view;
+
+            if (iconres != 0) icon.setImageResource(iconres);
+            if (icondraw != null) icon.setImageDrawable(icondraw);
+
+            icon.setVisibility(View.VISIBLE);
+            icon.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+            icon.setAdjustViewBounds(true);
+            icon.setPadding(8, 8, 0, 8);
+
+            view = (View) view.getParent();
+
+            view = (View) view.getParent();
+            view = (View) view.getParent();
+            view.setBackgroundColor(0xdddddddd);
+
+            view = (View) view.getParent();
+
+            view.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.WC));
+            view.setPadding(8, 4, 8, 4);
+
+            view = (View) view.getParent();
+            StaticUtils.dumpViewsChildren(view);
         }
 
         @Override
