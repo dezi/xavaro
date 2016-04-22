@@ -48,6 +48,7 @@ public class PreferencesBasicsAssistance extends PreferenceFragments.EnableFragm
 
         keyprefix = "alertgroup";
         iconres = GlobalConfigs.IconResAlertgroup;
+        summaryres = R.string.pref_basic_assistance_summary;
         masterenable = Simple.getTrans(R.string.pref_basic_assistance_enable);
     }
 

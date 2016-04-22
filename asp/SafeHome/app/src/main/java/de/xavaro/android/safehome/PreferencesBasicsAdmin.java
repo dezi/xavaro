@@ -30,6 +30,7 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         super();
 
         iconres = GlobalConfigs.IconResAdministrator;
+        summaryres = R.string.pref_basic_admin_summary;
     }
 
     private NicedPreferences.NiceListPreference accessibilityPref;
@@ -83,6 +84,7 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
 
         cp = new NicedPreferences.NiceInfoPreference(context);
         cp.setTitle(R.string.pref_basic_admin_services);
+        cp.setSummary(R.string.pref_basic_admin_services_summary);
         preferences.add(cp);
 
         CharSequence[] prefText = Simple.getTransArray(R.array.pref_basic_admin_service_vals);

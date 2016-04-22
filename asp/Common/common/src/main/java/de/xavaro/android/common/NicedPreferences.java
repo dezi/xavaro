@@ -1497,6 +1497,8 @@ public class NicedPreferences
 
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
+
+            //StaticUtils.dumpViewsChildren(view);
         }
 
         @Override

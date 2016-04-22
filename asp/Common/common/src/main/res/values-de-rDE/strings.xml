@@ -131,6 +131,9 @@
     </string-array>
 
     <string name="pref_basic_admin">Administration</string>
+    <string name="pref_basic_admin_summary">
+        Hier das Verhalten der Anwendung konfiguiert. More Todo.
+    </string>
     <string name="pref_basic_admin_access">Zugang</string>
     <string name="pref_basic_admin_access_summary">
         Diese Einstellungen können jederzeit durch 5 x schnelles Drücken
@@ -218,6 +221,14 @@
     </string>
 
     <string name="pref_basic_assistance">Assistenz</string>
+    <string name="pref_basic_assistance_summary">
+        Die Assistenz-Gruppe dient dazu, dass der Anwender einfach und sicher
+        Informationen mit seinen betreuenden Bezugspersonen austauschen kann.
+        \n\nLaden sie dazu die gewünschten Bezugspersonen in diese Gruppe ein.
+        Gegebenenfalls können sie für jedes Mitglied hier den Skype-Account
+        hinterlegen. Jedes Gruppenmitglied mit Skype Account kann dann im
+        Assistenzfall einen Skype-Rückruf von diesem Gerät aus veranlassen.
+    </string>
     <string name="pref_basic_assistance_enable">Assistenz freischalten</string>
     <string name="pref_basic_assistance_asmember">Als Mitglied</string>
     <string name="pref_basic_assistance_skypecall">Skype Rückruf</string>

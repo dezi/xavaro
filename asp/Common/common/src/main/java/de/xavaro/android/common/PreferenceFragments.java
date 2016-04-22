@@ -1,17 +1,21 @@
 package de.xavaro.android.common;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.view.Gravity;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.view.View;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -413,7 +417,9 @@ public class PreferenceFragments
         protected PreferenceScreen root;
         protected String keyprefix;
         protected Drawable icondraw;
+        protected TextView summaryView;
         protected int iconres;
+        protected int summaryres;
 
         protected void registerAll(Context context)
         {
@@ -429,6 +435,7 @@ public class PreferenceFragments
 
             final int breadcrumb_section = 0x1020342;
             final int left_icon = 0x1020032;
+            final int title = 0x1020016;
 
             View view = getActivity().getWindow().getDecorView();
             if (view == null) return;
@@ -438,7 +445,6 @@ public class PreferenceFragments
 
             view = view.findViewById(left_icon);
             if ((view == null) || ! (view instanceof ImageView)) return;
-
             ImageView icon = (ImageView) view;
 
             if (iconres != 0) icon.setImageResource(iconres);
@@ -449,16 +455,69 @@ public class PreferenceFragments
             icon.setAdjustViewBounds(true);
             icon.setPadding(8, 8, 0, 8);
 
-            view = (View) view.getParent();
+            view = (View) icon.getParent();
+
+            if ((summaryres != 0) && (view instanceof LinearLayout))
+            {
+                LinearLayout ll = (LinearLayout) view;
+                ll.setOrientation(LinearLayout.HORIZONTAL);
+                ll.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.MP));
+
+                FrameLayout infoframe = new FrameLayout(Simple.getAppContext());
+                infoframe.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+                infoframe.setBackgroundColor(0x88880000);
+
+                infoframe.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        if (summaryView != null)
+                        {
+                            if (summaryView.getVisibility() == View.GONE)
+                            {
+                                summaryView.setVisibility(View.VISIBLE);
+                            }
+                            else
+                            {
+                                summaryView.setVisibility(View.GONE);
+                            }
+                        }
+                    }
+                });
+
+                ll.addView(infoframe, new LinearLayout.LayoutParams(
+                        Simple.WC, Simple.MP, Gravity.END));
+
+                ImageView info = new ImageView(Simple.getAppContext());
+                info.setImageResource(android.R.drawable.ic_menu_info_details);
+                info.setPadding(8, 8, 8, 8);
+                info.setBackgroundColor(0xffffffff);
+
+                infoframe.addView(info, new LinearLayout.LayoutParams(Simple.WC, Simple.MP, Gravity.END));
+            }
 
             view = (View) view.getParent();
+            view.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.MP));
+
             view = (View) view.getParent();
             view.setBackgroundColor(0xdddddddd);
 
             view = (View) view.getParent();
-
             view.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.WC));
             view.setPadding(8, 4, 8, 4);
+
+            if ((summaryres != 0) && (view instanceof LinearLayout))
+            {
+                summaryView = new TextView(Simple.getAppContext());
+                summaryView.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.WC));
+                summaryView.setBackgroundColor(0xdddddddd);
+                summaryView.setPadding(16, 8, 16, 8);
+                summaryView.setVisibility(View.GONE);
+                summaryView.setText(summaryres);
+
+                ((LinearLayout) view).addView(summaryView);
+            }
 
             view = (View) view.getParent();
             StaticUtils.dumpViewsChildren(view);
