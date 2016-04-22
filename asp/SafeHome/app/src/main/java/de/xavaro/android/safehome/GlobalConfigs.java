@@ -12,8 +12,8 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final boolean  BetaFlag        = true;
-    public static final String   BetaVersion     = "0.8.005";
-    public static final String   BetaVersionDate = "2016-04-21T23:00:00Z";
+    public static final String   BetaVersion     = "0.8.006";
+    public static final String   BetaVersionDate = "2016-04-22T23:00:00Z";
     public static final String   BetaExpiration  = "2016-05-21T23:00:00Z";
     // @formatter:on
 
