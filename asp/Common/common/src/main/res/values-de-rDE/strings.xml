@@ -254,7 +254,7 @@
     <string name="pref_basic_monitoring_summary">
         Hier wird das Monitoring grundsätzlicher Tablet-Funktionen eingestellt.
         Die hier abgefragten Werte können automatisiert and Bezugspersonen
-        weitergeleitet werden.
+        weitergeleitet werden. Ole/Zimmel: Noch nicht eingebaut.
     </string>
     <string name="pref_basic_monitoring_enable">Monitoring freischalten</string>
 

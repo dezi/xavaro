@@ -69,7 +69,11 @@ public class LaunchGroupCalls extends LaunchGroup
             String mode = Simple.getSharedPrefString(key);
 
             if (Simple.equals(mode, "home")) home.put(webitem);
-            if (! Simple.equals(mode, "inact")) adir.put(webitem);
+
+            if (! (Simple.equals(mode, "inact") || Simple.equals(subtype, "monitors")))
+            {
+                adir.put(webitem);
+            }
         }
 
         if (adir.length() > 0)

@@ -64,6 +64,17 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
                     int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
                     onPrepaidReceived(money, false);
                 }
+                else
+                {
+                    Simple.makePost(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            launchCall();
+                        }
+                    });
+                }
 
                 addView(prepaidView);
             }
