@@ -258,6 +258,58 @@
     </string>
     <string name="pref_basic_monitoring_enable">Monitoring freischalten</string>
 
+    <string name="pref_basic_monitoring_warnings">Warnungen</string>
+    <string name="pref_basic_monitoring_remind">Erinnerung</string>
+    <string name="pref_basic_monitoring_warn">Warnung</string>
+    <string name="pref_basic_monitoring_assistance">Assistenz</string>
+    <string name="pref_basic_monitoring_repeat">Intervall</string>
+    <string name="pref_basic_monitoring_record">Verlauf aufzeichnen</string>
+
+    <string name="pref_basic_monitoring_prepaid_auto">Automatisch abfragen</string>
+    <string name="pref_basic_monitoring_prepaid_call">Nach jedem Vorgang abfragen</string>
+
+    <string-array name="pref_basic_monitoring_prepaid_warn_vals">
+        <item>Aus</item>
+        <item>50€</item>
+        <item>25€</item>
+        <item>10€</item>
+        <item>5€</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_prepaid_repeat_vals">
+        <item>Nur einmal</item>
+        <item>Alle 8 Stunden</item>
+        <item>Alle 24 Stunden</item>
+        <item>Alle 48 Stunden</item>
+    </string-array>
+
+    <string name="pref_basic_monitoring_battery">Batterie</string>
+    <string name="pref_basic_monitoring_battery_summary">todo</string>
+    <string name="pref_basic_monitoring_battery_where">Icon anzeigen</string>
+
+    <string-array name="pref_basic_monitoring_battery_where_vals">
+        <item>Inaktiv</item>
+        <item>Home</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_warn_vals">
+        <item>Aus</item>
+        <item>75%</item>
+        <item>50%</item>
+        <item>40%</item>
+        <item>30%</item>
+        <item>20%</item>
+        <item>10%</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_repeat_vals">
+        <item>Nur einmal</item>
+        <item>Alle 10 Minuten</item>
+        <item>Alle 20 Minuten</item>
+        <item>Alle 30 Minuten</item>
+        <item>Alle 60 Minuten</item>
+    </string-array>
+
     <string name="launch_media_image_simple_send">Das Bild wird an %s versendet.</string>
     <string name="launch_media_image_simple_yousend">Sie haben ein Bild an %s gesendet.</string>
     <string name="launch_media_image_simple_yousend_du">Du hast ein Bild an %s gesendet.</string>

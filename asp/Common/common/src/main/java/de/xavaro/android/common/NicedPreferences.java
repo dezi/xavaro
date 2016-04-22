@@ -1402,6 +1402,16 @@ public class NicedPreferences
         }
     }
 
+    public static class NiceSeparatorPreference extends NiceCategoryPreference
+    {
+        public NiceSeparatorPreference(Context context)
+        {
+            super(context);
+
+            textSize = 20f;
+        }
+    }
+
     public static class NiceCategoryPreference extends Preference implements
             View.OnClickListener,
             View.OnLongClickListener
@@ -1411,10 +1421,10 @@ public class NicedPreferences
             super(context);
         }
 
+        protected float textSize = 24f;
         protected Runnable onClickRunner;
         protected Runnable onLongClickRunner;
         protected ImageView actionIcon;
-
         public void setOnClick(Runnable onclick)
         {
             onClickRunner = onclick;
@@ -1484,7 +1494,7 @@ public class NicedPreferences
             view.setBackgroundColor(0xcccccccc);
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setTextSize(Simple.getDeviceTextSize(24f));
+            title.setTextSize(Simple.getDeviceTextSize(textSize));
 
             //
             // Add an action icon.

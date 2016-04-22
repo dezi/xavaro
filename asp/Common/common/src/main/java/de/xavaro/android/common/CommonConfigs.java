@@ -18,6 +18,7 @@ public class CommonConfigs
     public static final int IconResActivity     = R.drawable.activity_256x256;
     public static final int IconResBetaVersion  = R.drawable.betaversion_256x256;
     public static final int IconResMonitoring   = R.drawable.monitoring_626x626;
+    public static final int IconResBattery      = R.drawable.battery_charge_100_600x600;
     // @formatter:on
 
     //endregion Global icons

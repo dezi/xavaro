@@ -171,7 +171,7 @@ public class PreferenceFragments
                         lp = new NicedPreferences.NiceListPreference(context);
 
                         lp.setKey(key);
-                        lp.setTitle("Funktion");
+                        lp.setTitle("Icon anzeigen");
                         lp.setEntries(residVals);
                         lp.setEntryValues(residKeys);
                         lp.setEnabled(enabled);

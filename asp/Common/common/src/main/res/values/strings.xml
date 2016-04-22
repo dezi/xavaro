@@ -227,6 +227,96 @@
     <string name="pref_basic_monitoring_summary">todo</string>
     <string name="pref_basic_monitoring_enable">Enable Monitoring</string>
 
+    <string name="pref_basic_monitoring_warnings">Warnings</string>
+    <string name="pref_basic_monitoring_remind">Reminder</string>
+    <string name="pref_basic_monitoring_warn">Warning</string>
+    <string name="pref_basic_monitoring_assistance">Assistance</string>
+    <string name="pref_basic_monitoring_repeat">Interval</string>
+    <string name="pref_basic_monitoring_record">Record progress</string>
+
+    <string name="pref_basic_monitoring_prepaid_auto">Automatic request</string>
+    <string name="pref_basic_monitoring_prepaid_call">Request after call</string>
+
+    <string-array name="pref_basic_monitoring_prepaid_warn_keys">
+        <item>never</item>
+        <item>50</item>
+        <item>25</item>
+        <item>10</item>
+        <item>5</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_prepaid_warn_vals">
+        <item>Never</item>
+        <item>50$</item>
+        <item>25$</item>
+        <item>10$</item>
+        <item>5$</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_prepaid_repeat_keys">
+        <item>once</item>
+        <item>8</item>
+        <item>24</item>
+        <item>48</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_prepaid_repeat_vals">
+        <item>Only once</item>
+        <item>Every 8 Hours</item>
+        <item>Every 24 Hours</item>
+        <item>Every 48 Hours</item>
+    </string-array>
+
+    <string name="pref_basic_monitoring_battery">Battery</string>
+    <string name="pref_basic_monitoring_battery_summary">todo</string>
+    <string name="pref_basic_monitoring_battery_where">Icon</string>
+
+    <string-array name="pref_basic_monitoring_battery_where_keys">
+        <item>inact</item>
+        <item>home</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_where_vals">
+        <item>Inactive</item>
+        <item>Home</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_warn_keys">
+        <item>never</item>
+        <item>75</item>
+        <item>50</item>
+        <item>40</item>
+        <item>30</item>
+        <item>20</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_warn_vals">
+        <item>Never</item>
+        <item>75%</item>
+        <item>50%</item>
+        <item>40%</item>
+        <item>30%</item>
+        <item>20%</item>
+        <item>10%</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_repeat_keys">
+        <item>once</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_repeat_vals">
+        <item>Only once</item>
+        <item>Every 10 Minutes</item>
+        <item>Every 20 Minutes</item>
+        <item>Every 30 Minutes</item>
+        <item>Every 60 Minutes</item>
+    </string-array>
+
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>
 
