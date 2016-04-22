@@ -1439,7 +1439,7 @@ public class NicedPreferences
             LinearLayout newlayout = new LinearLayout(getContext());
             newlayout.setLayoutParams(Simple.layoutParamsMW());
             newlayout.setOrientation(LinearLayout.HORIZONTAL);
-            newlayout.setPadding(16, 0, 0, 0);
+            newlayout.setPadding(12, 0, 0, 0);
 
             while (((ViewGroup) view).getChildCount() > 0)
             {

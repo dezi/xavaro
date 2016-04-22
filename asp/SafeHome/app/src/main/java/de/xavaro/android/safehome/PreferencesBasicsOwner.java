@@ -31,6 +31,7 @@ public class PreferencesBasicsOwner extends PreferenceFragments.BasicFragmentStu
         super();
 
         iconres = GlobalConfigs.IconResOwner;
+        summaryres = R.string.pref_basic_owner_summary;
     }
 
     public void registerAll(Context context)

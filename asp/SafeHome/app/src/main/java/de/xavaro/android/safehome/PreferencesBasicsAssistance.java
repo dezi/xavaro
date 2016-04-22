@@ -6,9 +6,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import org.json.JSONObject;
 
@@ -23,7 +20,6 @@ import de.xavaro.android.common.ProfileImagesNew;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
 
 public class PreferencesBasicsAssistance extends PreferenceFragments.EnableFragmentStub
         implements Preference.OnPreferenceChangeListener
@@ -156,15 +152,17 @@ public class PreferencesBasicsAssistance extends PreferenceFragments.EnableFragm
             return super.onPreferenceChange(preference, newValue);
         }
 
+        boolean retval = true;
+
         if (preference instanceof NicedPreferences.NiceListPreference)
         {
-            return ((NicedPreferences.NiceListPreference) preference)
+            retval = ((NicedPreferences.NiceListPreference) preference)
                     .onPreferenceChange(preference, newValue);
         }
 
         handler.postDelayed(updateAlertGroup, 100);
 
-        return true;
+        return retval;
     }
 
     public final Runnable updateAlertGroup = new Runnable()

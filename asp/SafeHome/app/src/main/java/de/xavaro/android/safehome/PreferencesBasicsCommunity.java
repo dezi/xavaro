@@ -67,6 +67,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
         keyprefix = "community";
         iconres = GlobalConfigs.IconResCommunity;
+        summaryres = R.string.pref_basic_community_summary;
 
         CommService.subscribeMessage(PreferencesBasicsCommunity.this, "responsePin");
         CommService.subscribeMessage(PreferencesBasicsCommunity.this, "responsePublicKeyXChange");

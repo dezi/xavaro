@@ -1,6 +1,5 @@
 package de.xavaro.android.common;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -11,11 +10,11 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.view.View;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -426,16 +425,29 @@ public class PreferenceFragments
         }
 
         @Override
-        @SuppressWarnings("ResourceType")
-        public void onStart()
+        public void onCreate(Bundle savedInstanceState)
         {
-            super.onStart();
+            super.onCreate(savedInstanceState);
 
-            //StaticUtils.dumpViewsChildren(getActivity().getWindow().getDecorView());
+            rebuildHeader();
+
+            root = getPreferenceManager().createPreferenceScreen(getActivity());
+            setPreferenceScreen(root);
+
+            registerAll(getActivity());
+
+            for (Preference pref : preferences) root.addPreference(pref);
+        }
+
+        @SuppressWarnings("ResourceType")
+        protected void rebuildHeader()
+        {
+            //
+            // Android internal IDs.
+            //
 
             final int breadcrumb_section = 0x1020342;
             final int left_icon = 0x1020032;
-            final int title = 0x1020016;
 
             View view = getActivity().getWindow().getDecorView();
             if (view == null) return;
@@ -447,25 +459,32 @@ public class PreferenceFragments
             if ((view == null) || ! (view instanceof ImageView)) return;
             ImageView icon = (ImageView) view;
 
-            if (iconres != 0) icon.setImageResource(iconres);
-            if (icondraw != null) icon.setImageDrawable(icondraw);
+            //
+            // Adjust icon settings.
+            //
 
             icon.setVisibility(View.VISIBLE);
             icon.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
             icon.setAdjustViewBounds(true);
             icon.setPadding(8, 8, 0, 8);
 
+            if (iconres != 0) icon.setImageResource(iconres);
+            if (icondraw != null) icon.setImageDrawable(icondraw);
+
             view = (View) icon.getParent();
 
             if ((summaryres != 0) && (view instanceof LinearLayout))
             {
+                //
+                // Add info icon and click listener.
+                //
+
                 LinearLayout ll = (LinearLayout) view;
                 ll.setOrientation(LinearLayout.HORIZONTAL);
                 ll.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.MP));
 
                 FrameLayout infoframe = new FrameLayout(Simple.getAppContext());
                 infoframe.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
-                infoframe.setBackgroundColor(0x88880000);
 
                 infoframe.setOnClickListener(new View.OnClickListener()
                 {
@@ -491,11 +510,14 @@ public class PreferenceFragments
 
                 ImageView info = new ImageView(Simple.getAppContext());
                 info.setImageResource(android.R.drawable.ic_menu_info_details);
-                info.setPadding(8, 8, 8, 8);
-                info.setBackgroundColor(0xffffffff);
+                info.setPadding(8, 8, 7, 8);
 
-                infoframe.addView(info, new LinearLayout.LayoutParams(Simple.WC, Simple.MP, Gravity.END));
+                infoframe.addView(info, Simple.layoutParamsWM(Gravity.END));
             }
+
+            //
+            // Adjust minor settings in parent views.
+            //
 
             view = (View) view.getParent();
             view.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.MP));
@@ -507,33 +529,32 @@ public class PreferenceFragments
             view.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.WC));
             view.setPadding(8, 4, 8, 4);
 
-            if ((summaryres != 0) && (view instanceof LinearLayout))
+            if (view instanceof LinearLayout)
             {
-                summaryView = new TextView(Simple.getAppContext());
-                summaryView.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.WC));
-                summaryView.setBackgroundColor(0xdddddddd);
-                summaryView.setPadding(16, 8, 16, 8);
-                summaryView.setVisibility(View.GONE);
-                summaryView.setText(summaryres);
+                //
+                // Add the info summary. This view stays the same
+                // through different sections.
+                //
 
-                ((LinearLayout) view).addView(summaryView);
+                summaryView = (TextView) view.findViewById(android.R.id.summary);
+
+                if (summaryView == null)
+                {
+                    summaryView = new TextView(Simple.getAppContext());
+                    summaryView.setLayoutParams(Simple.layoutParamsMW());
+                    summaryView.setId(android.R.id.summary);
+                    summaryView.setBackgroundColor(0xdddddddd);
+                    summaryView.setPadding(16, 8, 16, 8);
+
+                    ((LinearLayout) view).addView(summaryView);
+                }
+
+                if (summaryres != 0) summaryView.setText(summaryres);
+                summaryView.setVisibility(View.GONE);
             }
 
             view = (View) view.getParent();
             StaticUtils.dumpViewsChildren(view);
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            root = getPreferenceManager().createPreferenceScreen(getActivity());
-            setPreferenceScreen(root);
-
-            registerAll(getActivity());
-
-            for (Preference pref : preferences) root.addPreference(pref);
         }
     }
 
