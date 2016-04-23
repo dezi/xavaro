@@ -185,11 +185,18 @@ public class DitUndDat
         {
             super.onLayout(changed, left, top, right, bottom);
 
-            if (getDrawable() instanceof  BitmapDrawable)
+            if (getDrawable() instanceof BitmapDrawable)
             {
+                int width = right - left;
+                int height = bottom - top;
+
                 Bitmap orig = ((BitmapDrawable) getDrawable()).getBitmap();
-                Bitmap anti = StaticUtils.downscaleAntiAliasBitmap(orig, right - left, bottom - top);
-                setImageDrawable(new BitmapDrawable(getResources(), anti));
+
+                if ((orig.getWidth() > width) && (orig.getHeight() > height))
+                {
+                    Bitmap anti = StaticUtils.downscaleAntiAliasBitmap(orig, width, height);
+                    setImageDrawable(new BitmapDrawable(getResources(), anti));
+                }
             }
         }
     }

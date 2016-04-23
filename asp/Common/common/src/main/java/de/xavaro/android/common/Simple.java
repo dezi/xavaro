@@ -532,7 +532,7 @@ public class Simple
         }
     }
 
-    public static void unmuteSpeech()
+    public static void raiseSpeechVolume(int percent)
     {
         if (anyContext != null)
         {
@@ -540,13 +540,33 @@ public class Simple
 
             int maxvol = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             int curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int dstvol = (maxvol * percent) / 100;
+            if (dstvol > maxvol) dstvol = maxvol;
 
-            while (curvol < (maxvol / 2))
-            {
-                am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
-                curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-            }
+            if (dstvol < curvol) am.setStreamVolume(AudioManager.STREAM_MUSIC, dstvol, 0);
         }
+    }
+
+    public static void setSpeechVolume(int index)
+    {
+        if (anyContext != null)
+        {
+            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0);
+        }
+    }
+
+    public static int getSpeechVolume()
+    {
+        if (anyContext != null)
+        {
+            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+
+            return am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        }
+
+        return 0;
     }
 
     //endregion Haptic feedback
@@ -888,6 +908,18 @@ public class Simple
     public static File getPackageFile(String name)
     {
         return new File(Simple.getFilesDir(), Simple.getPackageName() + "." + name);
+    }
+
+    public static File getIdentityFile(String name)
+    {
+        File identdir =  new File(Simple.getExternalFilesDir(), SystemIdentity.getIdentity());
+
+        if ((! identdir.exists()) && ! identdir.mkdirs())
+        {
+            Log.d(LOGTAG, "Creating identity directory failed:" + identdir.toString());
+        }
+
+        return new File(identdir, name);
     }
 
     public static String getTempfile(String filename)
@@ -1836,6 +1868,8 @@ public class Simple
 
     public static long getTimeStamp(String isodate)
     {
+        if (isodate == null) return 0;
+
         try
         {
             SimpleDateFormat df = new SimpleDateFormat(ISO8601DATEFORMAT, Locale.getDefault());

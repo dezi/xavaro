@@ -22,6 +22,25 @@ public class WebAppSpeak implements Speak.SpeakDoneCallback
     }
 
     @JavascriptInterface
+    public void speak(String text, int volume)
+    {
+        Speak.speak(text, volume);
+    }
+
+    @JavascriptInterface
+    public void speak(String text, int volume, boolean callback)
+    {
+        if (callback)
+        {
+            Speak.speak(text, volume, this);
+        }
+        else
+        {
+            Speak.speak(text, volume);
+        }
+    }
+
+    @JavascriptInterface
     public void speak(String text, boolean callback)
     {
         if (callback)
@@ -37,7 +56,7 @@ public class WebAppSpeak implements Speak.SpeakDoneCallback
     @JavascriptInterface
     public void unmute()
     {
-        Simple.unmuteSpeech();
+        Simple.raiseSpeechVolume(50);
     }
 
     @JavascriptInterface

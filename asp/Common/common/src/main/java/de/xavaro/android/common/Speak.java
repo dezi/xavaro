@@ -1,13 +1,12 @@
 package de.xavaro.android.common;
 
-import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import java.util.ArrayList;
 
-public class Speak extends UtteranceProgressListener
-        implements TextToSpeech.OnInitListener
+public class Speak extends UtteranceProgressListener implements TextToSpeech.OnInitListener
 {
     private static final String LOGTAG = Speak.class.getSimpleName();
 
@@ -15,22 +14,56 @@ public class Speak extends UtteranceProgressListener
 
     public static void speak(String text)
     {
-        if (instance == null) instance = new Speak();
+        speak(text, -1, null);
+    }
 
-        instance.addQueue(text);
+    public static void speak(String text, int volume)
+    {
+        speak(text, volume, null);
     }
 
     public static void speak(String text, SpeakDoneCallback callback)
     {
-        if (instance == null) instance = new Speak();
-
-        instance.callback = callback;
-        instance.addQueue(text);
+        speak(text, -1, callback);
     }
 
+    public static void speak(String text, int volume, SpeakDoneCallback callback)
+    {
+        if (instance == null) instance = new Speak();
+
+        SpeakData data = new SpeakData(text);
+
+        data.volume = volume;
+        data.callback = callback;
+
+        instance.addQueue(data);
+    }
+
+    public static void shutdown()
+    {
+        if (instance != null)
+        {
+            instance.shutdownInstance();
+            instance = null;
+        }
+    }
+
+    private static class SpeakData
+    {
+        public SpeakData(String text)
+        {
+            this.text = text;
+        }
+
+        public String text;
+        public int volume = -1;
+        public int oldvolume = -1;
+        public SpeakDoneCallback callback;
+    }
+
+    private final ArrayList<SpeakData> texts = new ArrayList<>();
     private TextToSpeech ttspeech;
-    private final ArrayList<String> texts = new ArrayList<>();
-    private SpeakDoneCallback callback;
+    private SpeakData current;
     private boolean isInited;
 
     public Speak()
@@ -40,25 +73,38 @@ public class Speak extends UtteranceProgressListener
         ttspeech.setPitch(1.0f);
     }
 
-    public void addQueue(String text)
+    public void shutdownInstance()
     {
-        synchronized (texts)
-        {
-            texts.add(text);
-        }
-
-        if (isInited && ! ttspeech.isSpeaking()) queueAll();
+        ttspeech.shutdown();
+        ttspeech = null;
+        isInited = false;
     }
 
-    private void queueAll()
+    public void addQueue(SpeakData data)
     {
         synchronized (texts)
         {
-            while (texts.size() > 0)
-            {
-                String text = texts.remove(0);
+            texts.add(data);
+        }
 
-                ttspeech.speak(text, TextToSpeech.QUEUE_ADD, null, text);
+        if (isInited && ! ttspeech.isSpeaking()) queueNext();
+    }
+
+    private void queueNext()
+    {
+        synchronized (texts)
+        {
+            if ((texts.size() > 0) && ! ttspeech.isSpeaking())
+            {
+                current = texts.remove(0);
+
+                if (current.volume > 0)
+                {
+                    current.oldvolume = Simple.getSpeechVolume();
+                    Simple.raiseSpeechVolume(current.volume);
+                }
+
+                ttspeech.speak(current.text, TextToSpeech.QUEUE_ADD, null, current.text);
             }
         }
     }
@@ -67,9 +113,9 @@ public class Speak extends UtteranceProgressListener
     {
         if (status == TextToSpeech.SUCCESS)
         {
-            queueAll();
-
             isInited = true;
+
+            queueNext();
         }
         else
         {
@@ -88,13 +134,14 @@ public class Speak extends UtteranceProgressListener
     {
         Log.d(LOGTAG,"onDone: " + text);
 
-        if (callback != null)
+        if ((current != null) && (current.callback != null))
         {
-            callback.OnSpeakDone(text);
-            callback = null;
+            if (current.oldvolume >= 0) Simple.setSpeechVolume(current.oldvolume);
+
+            current.callback.OnSpeakDone(text);
         }
 
-        queueAll();
+        queueNext();
     }
 
     @Override

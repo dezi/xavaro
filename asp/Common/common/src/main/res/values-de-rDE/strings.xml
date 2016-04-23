@@ -294,7 +294,8 @@
 
     <string-array name="pref_basic_monitoring_battery_warn_vals">
         <item>Aus</item>
-        <item>75%</item>
+        <item>96%</item>
+        <item>95%</item>
         <item>50%</item>
         <item>40%</item>
         <item>30%</item>
@@ -309,6 +310,14 @@
         <item>Alle 30 Minuten</item>
         <item>Alle 60 Minuten</item>
     </string-array>
+
+    <string name="battery_manager_remind">Bitte verbinden Sie ihr Tablet demnächst mit der Ladestation.</string>
+    <string name="battery_manager_remind_du">Bitte verbinde Dein Tablet demnächst mit der Ladestation.</string>
+    <string name="battery_manager_warn">Bitte verbinden Sie ihr Tablet jetzt mit der Ladestation.</string>
+    <string name="battery_manager_warn_du">Bitte verbinde Dein Tablet jetzt mit der Ladestation.</string>
+    <string name="battery_manager_assist_warn">%1$s Tablet muss geladen werden.</string>
+    <string name="battery_manager_assist_clear">%1$s lädt nun sein Tablet.</string>
+    <string name="battery_manager_assist_level">Der Batteriestatus ist bei %1$d Prozent.</string>
 
     <string name="launch_media_image_simple_send">Das Bild wird an %s versendet.</string>
     <string name="launch_media_image_simple_yousend">Sie haben ein Bild an %s gesendet.</string>

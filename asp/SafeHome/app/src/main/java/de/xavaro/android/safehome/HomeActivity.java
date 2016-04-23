@@ -28,6 +28,7 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
 import de.xavaro.android.common.AccessibilityService;
+import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.WebCookie;
@@ -159,6 +160,8 @@ public class HomeActivity extends AppCompatActivity implements
                 topscreen.removeAllViews();
                 backStack.clear();
                 launchGroup = null;
+
+                System.gc();
             }
 
             launchGroup = new LaunchGroupRoot(this);
@@ -239,6 +242,8 @@ public class HomeActivity extends AppCompatActivity implements
         super.onStop();
 
         DitUndDat.InternetState.unsubscribe(this);
+
+        Speak.shutdown();
     }
 
     @Override

@@ -283,6 +283,8 @@
 
     <string-array name="pref_basic_monitoring_battery_warn_keys">
         <item>never</item>
+        <item>96</item>
+        <item>95</item>
         <item>75</item>
         <item>50</item>
         <item>40</item>
@@ -293,6 +295,8 @@
 
     <string-array name="pref_basic_monitoring_battery_warn_vals">
         <item>Never</item>
+        <item>96%</item>
+        <item>95%</item>
         <item>75%</item>
         <item>50%</item>
         <item>40%</item>
@@ -316,6 +320,12 @@
         <item>Every 30 Minutes</item>
         <item>Every 60 Minutes</item>
     </string-array>
+
+    <string name="battery_manager_remind">Please plug Your tablet into the charger soon.</string>
+    <string name="battery_manager_warn">Please plug Your tablet into the charger now.</string>
+    <string name="battery_manager_assist_warn">%1$s tablet desperatly needs some charging.</string>
+    <string name="battery_manager_assist_clear">%1$s is now charging his tablet.</string>
+    <string name="battery_manager_assist_level">The level is now at %1$d percent.</string>
 
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>
@@ -355,7 +365,7 @@
     <string name="today_label">Logbook</string>
 
     <string name="healt_bpm_spoken">The last reading resulted in a blood pressure of %1$d to %2$d The pulse was %3$d</string>
-    <string name="healt_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s.</string>
+    <string name="healt_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
     <string name="healt_bpm_lowpb">The blood pressure is alarming high.</string>
     <string name="healt_bpm_highbp">The blood pressure is alarming low.</string>
     <string name="healt_bpm_activity">You have a blood pressure of %1$d to %2$d. The pulse is %3$d.</string>
