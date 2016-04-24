@@ -109,7 +109,7 @@ public class PreferencesComm
                     String name = RemoteContacts.getDisplayName(ident);
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
-                    pc.setIcon(ProfileImages.getXavaroProfileDrawable(ident, true));
+                    pc.setIcon(ProfileImages.getProfileDrawable(ident, true));
                     pc.setTitle(name);
                     pc.setEnabled(enabled);
 
@@ -608,22 +608,7 @@ public class PreferencesComm
                         multi = numbersIterator.hasNext();
                         first = false;
 
-                        Drawable icon = null;
-
-                        if (isPhone)
-                        {
-                            icon = ProfileImages.getContactsProfileDrawable(nicephone, true);
-                        }
-
-                        if ((icon == null) && (isWhatsApp || isPhone))
-                        {
-                            icon = ProfileImages.getWhatsAppProfileDrawable(nicephone, true);
-                        }
-
-                        if ((icon == null) && isSkype)
-                        {
-                            icon = ProfileImages.getSkypeProfileDrawable(nicephone, true);
-                        }
+                        Drawable icon = ProfileImages.getProfileDrawable(nicephone, true);
 
                         nc = new NicedPreferences.NiceCategoryPreference(context);
                         nc.setTitle(name + (multi ? "" : " " + nicephone));

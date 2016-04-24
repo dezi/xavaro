@@ -38,7 +38,7 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("phonenumber"))
             {
                 String phone = Json.getString(config, "phonenumber");
-                Drawable drawable = ProfileImages.getContactsProfileDrawable(phone, true);
+                Drawable drawable = ProfileImages.getProfileDrawable(phone, true);
 
                 if (drawable != null)
                 {
@@ -68,7 +68,7 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("skypename"))
             {
                 String skypename = Json.getString(config, "skypename");
-                Drawable thumbnail = ProfileImages.getSkypeProfileDrawable(skypename, true);
+                Drawable thumbnail = ProfileImages.getProfileDrawable(skypename, true);
 
                 if (thumbnail != null)
                 {
@@ -102,7 +102,7 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("waphonenumber"))
             {
                 String phone = Json.getString(config, "waphonenumber");
-                Drawable drawable = ProfileImages.getWhatsAppProfileDrawable(phone, true);
+                Drawable drawable = ProfileImages.getProfileDrawable(phone, true);
 
                 if (drawable != null)
                 {
@@ -130,7 +130,7 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("subtype"))
             {
                 String ident = Json.getString(config, "identity");
-                Drawable drawable = ProfileImages.getXavaroProfileDrawable(ident, true);
+                Drawable drawable = ProfileImages.getProfileDrawable(ident, true);
 
                 if (drawable != null)
                 {

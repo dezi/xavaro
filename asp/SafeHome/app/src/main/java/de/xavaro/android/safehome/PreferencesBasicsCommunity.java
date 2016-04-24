@@ -333,7 +333,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
                     if (pp.getIcon() == null)
                     {
-                        pp.setIcon(ProfileImages.getXavaroProfileDrawable(ident, true));
+                        pp.setIcon(ProfileImages.getProfileDrawable(ident, true));
                     }
 
                     continue;
@@ -362,7 +362,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 dp.setKey(prefkey);
                 dp.setTitle(name);
                 dp.setSummary(info);
-                dp.setIcon(ProfileImages.getXavaroProfileDrawable(ident, true));
+                dp.setIcon(ProfileImages.getProfileDrawable(ident, true));
                 dp.setDefaultValue(true);
                 dp.setDeleteCallback(this);
 

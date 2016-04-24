@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +22,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class ProfileImages
 {
@@ -53,7 +56,7 @@ public class ProfileImages
     }
 
     @Nullable
-    public static Bitmap getOwnerProfileBitmap(boolean circle)
+    private static Bitmap getOwnerProfileBitmap(boolean circle)
     {
         String photoUrl = getOwnerProfileImageUrl();
         if (photoUrl == null) return null;
@@ -85,10 +88,28 @@ public class ProfileImages
         return null;
     }
 
+    private static Drawable ownerCachePlain;
+    private static Drawable ownerCacheCircle;
+
     @Nullable
     public static Drawable getOwnerProfileDrawable(boolean circle)
     {
-        return Simple.getDrawable(getOwnerProfileBitmap(circle));
+        if (circle)
+        {
+            if (ownerCacheCircle == null)
+            {
+                ownerCacheCircle = Simple.getDrawable(getOwnerProfileBitmap(true));
+            }
+
+            return ownerCacheCircle;
+        }
+
+        if (ownerCachePlain == null)
+        {
+            ownerCachePlain = Simple.getDrawable(getOwnerProfileBitmap(false));
+        }
+
+        return ownerCachePlain;
     }
 
     public static void sendOwnerImage(String remoteIdentity)
@@ -113,7 +134,7 @@ public class ProfileImages
     }
 
     @Nullable
-    public static Bitmap getXavaroProfileBitmap(String identity, boolean circle)
+    private static Bitmap getXavaroProfileBitmap(String identity, boolean circle)
     {
         File imagefile = getXavaroProfileImageFile(identity);
 
@@ -128,7 +149,7 @@ public class ProfileImages
     }
 
     @Nullable
-    public static Drawable getXavaroProfileDrawable(String identity, boolean circle)
+    private static Drawable getXavaroProfileDrawable(String identity, boolean circle)
     {
         return Simple.getDrawable(getXavaroProfileBitmap(identity, circle));
     }
@@ -212,11 +233,191 @@ public class ProfileImages
     }
 
     @Nullable
-    public static String getDisplayFromPhoneOrSkype(String identtag)
+    private static Bitmap getContactsProfileBitmap(String phonenumber, boolean circle)
+    {
+        if (phonenumber == null) return null;
+
+        File imagefile = getContactsProfileImageFile(phonenumber);
+
+        if (! imagefile.exists())
+        {
+            getContactsProfileImage(imagefile, phonenumber);
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static Drawable getContactsProfileDrawable(String phonenumber, boolean circle)
+    {
+        return Simple.getDrawable(getContactsProfileBitmap(phonenumber, circle));
+    }
+
+    //endregion Contacts profiles
+
+    //region WhatsApp profiles
+
+    private static File getWhatsAppProfileImageFile(String phonenumber)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "whatsapp.image." + phonenumber.replaceAll(" ", "") + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    private static void getWhatsAppProfileImage(File imagefile, String phonenumber)
+    {
+        if (phonenumber.startsWith("+")) phonenumber = phonenumber.substring(1);
+        phonenumber = phonenumber.replaceAll(" ", "");
+
+        String wappsub = "WhatsApp/Profile Pictures";
+        File wappdir = new File(Simple.getExternalStorageDir(), wappsub);
+        if (! wappdir.isDirectory()) return;
+
+        String[] wappdirlist = wappdir.list();
+        if (wappdirlist == null) return;
+
+        for (String ppfile : wappdirlist)
+        {
+            if (ppfile.startsWith(phonenumber))
+            {
+                File profilefile = new File(wappdir, ppfile);
+                Simple.fileCopy(profilefile, imagefile);
+            }
+        }
+    }
+
+    @Nullable
+    public static Bitmap getWhatsAppProfileBitmap(String phonenumber, boolean circle)
+    {
+        if (phonenumber == null) return null;
+
+        File imagefile = getWhatsAppProfileImageFile(phonenumber);
+
+        if (! imagefile.exists())
+        {
+            getWhatsAppProfileImage(imagefile, phonenumber);
+
+            if (! imagefile.exists())
+            {
+                //
+                // Fallback to contacts image.
+                //
+
+                getContactsProfileImage(imagefile, phonenumber);
+            }
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static Drawable getWhatsAppProfileDrawable(String phonenumber, boolean circle)
+    {
+        return Simple.getDrawable(getWhatsAppProfileBitmap(phonenumber, circle));
+    }
+
+    //endregion WhatsApp profiles
+
+    //region Skype profiles
+
+    private static File getSkypeProfileImageFile(String skypename)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "skype.image." + skypename + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    private static Bitmap getSkypeProfileBitmap(String skypename, boolean circle)
+    {
+        if (skypename == null) return null;
+
+        File imagefile = getSkypeProfileImageFile(skypename);
+
+        if (! imagefile.exists())
+        {
+            String phonenumber = getPhoneFromSkype(skypename);
+
+            if (phonenumber != null)
+            {
+                getContactsProfileImage(imagefile, phonenumber);
+
+                if (! imagefile.exists())
+                {
+                    //
+                    // Fallback to WhatsApp image.
+                    //
+
+                    getWhatsAppProfileImage(imagefile, phonenumber);
+                }
+            }
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static Drawable getSkypeProfileDrawable(String skypename, boolean circle)
+    {
+        return Simple.getDrawable(getSkypeProfileBitmap(skypename, circle));
+    }
+
+    //endregion Skype profiles
+
+    private static final Map<String, Drawable> drawableCache = new HashMap<>();
+
+    @Nullable
+    public static Drawable getProfileDrawable(String identtag, boolean circle)
+    {
+        String cachetag = circle + ":" + identtag;
+
+        if (drawableCache.containsKey(cachetag))
+        {
+            Log.d(LOGTAG, "getProfileDrawable: cached=" + cachetag);
+
+            return drawableCache.get(cachetag);
+        }
+
+        Drawable drawable = getWhatsAppProfileDrawable(identtag, circle);
+
+        if (drawable == null) drawable = getXavaroProfileDrawable(identtag, circle);
+        if (drawable == null) drawable = getContactsProfileDrawable(identtag, circle);
+        if (drawable == null) drawable = getSkypeProfileDrawable(identtag, circle);
+
+        drawableCache.put(cachetag, drawable);
+
+        return drawable;
+    }
+
+    //region Data getters
+
+    @Nullable
+    public static String getDisplayName(String identtag)
     {
         if (identtag == null) return null;
 
-        String search = identtag.replaceAll(" ", "");
+        identtag = identtag.replaceAll(" ", "");
 
         if (contacts == null) contacts = ContactsHandler.getJSONData();
         if (contacts == null) return null;
@@ -349,158 +550,10 @@ public class ProfileImages
         return null;
     }
 
-    @Nullable
-    public static Bitmap getContactsProfileBitmap(String phonenumber, boolean circle)
-    {
-        if (phonenumber == null) return null;
-
-        File imagefile = getContactsProfileImageFile(phonenumber);
-
-        if (! imagefile.exists())
-        {
-            getContactsProfileImage(imagefile, phonenumber);
-        }
-
-        if (imagefile.exists())
-        {
-            Bitmap bitmap = Simple.getBitmap(imagefile);
-            if (circle) bitmap = getCircleBitmap(bitmap);
-            return bitmap;
-        }
-
-        return null;
-    }
+    //endregion Data getters
 
     @Nullable
-    public static Drawable getContactsProfileDrawable(String phonenumber, boolean circle)
-    {
-        return Simple.getDrawable(getContactsProfileBitmap(phonenumber, circle));
-    }
-
-    //endregion Contacts profiles
-
-    //region WhatsApp profiles
-
-    private static File getWhatsAppProfileImageFile(String phonenumber)
-    {
-        File profilespath = Simple.getMediaPath("profiles");
-        String profilename = "whatsapp.image." + phonenumber.replaceAll(" ", "") + ".jpg";
-        return new File(profilespath, profilename);
-    }
-
-    private static void getWhatsAppProfileImage(File imagefile, String phonenumber)
-    {
-        if (phonenumber.startsWith("+")) phonenumber = phonenumber.substring(1);
-        phonenumber = phonenumber.replaceAll(" ", "");
-
-        String wappsub = "WhatsApp/Profile Pictures";
-        File wappdir = new File(Simple.getExternalStorageDir(), wappsub);
-        if (! wappdir.isDirectory()) return;
-
-        String[] wappdirlist = wappdir.list();
-        if (wappdirlist == null) return;
-
-        for (String ppfile : wappdirlist)
-        {
-            if (ppfile.startsWith(phonenumber))
-            {
-                File profilefile = new File(wappdir, ppfile);
-                Simple.fileCopy(profilefile, imagefile);
-            }
-        }
-    }
-
-    @Nullable
-    public static Bitmap getWhatsAppProfileBitmap(String phonenumber, boolean circle)
-    {
-        if (phonenumber == null) return null;
-
-        File imagefile = getWhatsAppProfileImageFile(phonenumber);
-
-        if (! imagefile.exists())
-        {
-            getWhatsAppProfileImage(imagefile, phonenumber);
-
-            if (! imagefile.exists())
-            {
-                //
-                // Fallback to contacts image.
-                //
-
-                getContactsProfileImage(imagefile, phonenumber);
-            }
-        }
-
-        if (imagefile.exists())
-        {
-            Bitmap bitmap = Simple.getBitmap(imagefile);
-            if (circle) bitmap = getCircleBitmap(bitmap);
-            return bitmap;
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static Drawable getWhatsAppProfileDrawable(String phonenumber, boolean circle)
-    {
-        return Simple.getDrawable(getWhatsAppProfileBitmap(phonenumber, circle));
-    }
-
-    //endregion WhatsApp profiles
-
-    //region Skype profiles
-
-    private static File getSkypeProfileImageFile(String skypename)
-    {
-        File profilespath = Simple.getMediaPath("profiles");
-        String profilename = "skype.image." + skypename + ".jpg";
-        return new File(profilespath, profilename);
-    }
-
-    @Nullable
-    public static Bitmap getSkypeProfileBitmap(String skypename, boolean circle)
-    {
-        if (skypename == null) return null;
-
-        File imagefile = getSkypeProfileImageFile(skypename);
-
-        if (! imagefile.exists())
-        {
-            String phonenumber = getPhoneFromSkype(skypename);
-
-            getContactsProfileImage(imagefile, phonenumber);
-
-            if (! imagefile.exists())
-            {
-                //
-                // Fallback to WhatsApp image.
-                //
-
-                getWhatsAppProfileImage(imagefile, phonenumber);
-            }
-        }
-
-        if (imagefile.exists())
-        {
-            Bitmap bitmap = Simple.getBitmap(imagefile);
-            if (circle) bitmap = getCircleBitmap(bitmap);
-            return bitmap;
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static Drawable getSkypeProfileDrawable(String skypename, boolean circle)
-    {
-        return Simple.getDrawable(getSkypeProfileBitmap(skypename, circle));
-    }
-
-    //endregion Skype profiles
-
-    @Nullable
-    public static Bitmap getCircleBitmap(Bitmap bitmap)
+    private static Bitmap getCircleBitmap(Bitmap bitmap)
     {
         if (bitmap == null) return null;
 

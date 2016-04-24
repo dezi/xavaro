@@ -172,7 +172,7 @@ public class LaunchGroupComm
 
                 String phonenumber = prefkey.substring(11);
                 String subtype = prefkey.substring(6, 10);
-                String label = ProfileImages.getDisplayFromPhoneOrSkype(phonenumber);
+                String label = ProfileImages.getDisplayName(phonenumber);
 
                 JSONObject entry = new JSONObject();
 
@@ -289,7 +289,7 @@ public class LaunchGroupComm
 
                 String skypename = prefkey.substring(11);
                 String subtype = prefkey.substring(6, 10);
-                String label = ProfileImages.getDisplayFromPhoneOrSkype(skypename);
+                String label = ProfileImages.getDisplayName(skypename);
 
                 JSONObject entry = new JSONObject();
 
@@ -395,7 +395,7 @@ public class LaunchGroupComm
 
                 String waphonenumber = prefkey.substring(14);
                 String subtype = prefkey.substring(9, 13);
-                String label = ProfileImages.getDisplayFromPhoneOrSkype(waphonenumber);
+                String label = ProfileImages.getDisplayName(waphonenumber);
 
                 JSONObject entry = new JSONObject();
 

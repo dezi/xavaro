@@ -109,7 +109,7 @@ public class PreferencesBasicsAssistance extends PreferenceFragments.EnableFragm
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle(name);
-            pc.setIcon(ProfileImages.getXavaroProfileDrawable(ident, true));
+            pc.setIcon(ProfileImages.getProfileDrawable(ident, true));
             pc.setEnabled(enabled);
 
             preferences.add(pc);
