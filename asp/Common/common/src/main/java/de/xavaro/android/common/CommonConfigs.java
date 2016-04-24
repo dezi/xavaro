@@ -11,6 +11,7 @@ public class CommonConfigs
     //region Global icons
 
     // @formatter:off
+    public static final int IconResAnon         = R.drawable.anon_300x300;
     public static final int IconResNext         = R.drawable.next_600x600;
     public static final int IconResPrev         = R.drawable.prev_600x600;
     public static final int IconResVoice        = R.drawable.voice_256x256;

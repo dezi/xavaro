@@ -543,7 +543,10 @@ public class Simple
             int dstvol = (maxvol * percent) / 100;
             if (dstvol > maxvol) dstvol = maxvol;
 
-            if (dstvol < curvol) am.setStreamVolume(AudioManager.STREAM_MUSIC, dstvol, 0);
+            if (curvol < dstvol) am.setStreamVolume(AudioManager.STREAM_MUSIC, dstvol, 0);
+            curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+            Log.d(LOGTAG, "raiseSpeechVolume: percent=" + percent + " " + dstvol + "=>" + curvol);
         }
     }
 

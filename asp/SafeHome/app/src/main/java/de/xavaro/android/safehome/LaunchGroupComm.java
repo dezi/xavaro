@@ -92,6 +92,7 @@ public class LaunchGroupComm
                 String ident = prefkey.substring(keyprefix.length());
                 String label = RemoteGroups.getDisplayName(ident);
                 String gtype = RemoteGroups.getGroupType(ident);
+                String owner = RemoteGroups.getGroupOwner(ident);
 
                 JSONObject entry = new JSONObject();
 
@@ -100,6 +101,7 @@ public class LaunchGroupComm
                 Json.put(entry, "subtype", "chat");
                 Json.put(entry, "chattype", "group");
                 Json.put(entry, "grouptype", gtype);
+                Json.put(entry, "groupowner", owner);
                 Json.put(entry, "identity", ident);
 
                 Json.put(entry, "order", Simple.equals(gtype, "alertcall") ? 200 : 550);

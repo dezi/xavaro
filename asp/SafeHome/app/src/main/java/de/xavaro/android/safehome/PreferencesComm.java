@@ -168,6 +168,7 @@ public class PreferencesComm
                     String name = RemoteGroups.getDisplayName(ident);
 
                     pc = new NicedPreferences.NiceCategoryPreference(context);
+                    pc.setIcon(ProfileImages.getProfileDrawable(groupowner, true));
                     pc.setTitle(name);
 
                     preferences.add(pc);

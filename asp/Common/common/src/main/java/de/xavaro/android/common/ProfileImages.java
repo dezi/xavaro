@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -387,6 +388,19 @@ public class ProfileImages
 
     private static final Map<String, Drawable> drawableCache = new HashMap<>();
 
+    private static Drawable getAnonProfileDrawable(boolean circle)
+    {
+        Drawable drawable = Simple.getDrawable(CommonConfigs.IconResAnon);
+
+        if (circle && (drawable != null))
+        {
+            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+            drawable = Simple.getDrawable(getCircleBitmap(bitmap));
+        }
+
+        return drawable;
+    }
+
     @Nullable
     public static Drawable getProfileDrawable(String identtag, boolean circle)
     {
@@ -404,6 +418,7 @@ public class ProfileImages
         if (drawable == null) drawable = getXavaroProfileDrawable(identtag, circle);
         if (drawable == null) drawable = getContactsProfileDrawable(identtag, circle);
         if (drawable == null) drawable = getSkypeProfileDrawable(identtag, circle);
+        if (drawable == null) drawable = getAnonProfileDrawable(circle);
 
         drawableCache.put(cachetag, drawable);
 

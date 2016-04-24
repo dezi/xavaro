@@ -147,11 +147,20 @@ public class LaunchItemComm extends LaunchItem
                 {
                     if (Json.equals(config, "grouptype", "alertcall"))
                     {
-                        icon.setImageResource(GlobalConfigs.IconResCommChatAlert);
+                        String owner = Json.getString(config, "groupowner");
+                        drawable = ProfileImages.getProfileDrawable(owner, true);
+
+                        if (drawable != null)
+                        {
+                            icon.setImageDrawable(drawable);
+                            targetIcon = overicon;
+                        }
+
+                        targetIcon.setImageResource(GlobalConfigs.IconResCommChatAlert);
                     }
                     else
                     {
-                        icon.setImageResource(GlobalConfigs.IconResCommChatGroup);
+                        targetIcon.setImageResource(GlobalConfigs.IconResCommChatGroup);
                     }
                 }
             }

@@ -134,11 +134,11 @@ public class Speak extends UtteranceProgressListener implements TextToSpeech.OnI
     {
         Log.d(LOGTAG,"onDone: " + text);
 
-        if ((current != null) && (current.callback != null))
+        if (current != null)
         {
             if (current.oldvolume >= 0) Simple.setSpeechVolume(current.oldvolume);
-
-            current.callback.OnSpeakDone(text);
+            if (current.callback != null) current.callback.OnSpeakDone(text);
+            current = null;
         }
 
         queueNext();
