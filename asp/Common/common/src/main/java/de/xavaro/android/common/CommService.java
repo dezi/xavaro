@@ -370,7 +370,7 @@ public class CommService extends Service
 
                 CommService.sendEncrypted(responseOwnerIdentity, true);
 
-                ProfileImagesNew.sendOwnerImage(remoteIdentity);
+                ProfileImages.sendOwnerImage(remoteIdentity);
 
                 return true;
             }

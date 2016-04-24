@@ -16,7 +16,7 @@ import java.util.UUID;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.PreferenceFragments;
-import de.xavaro.android.common.ProfileImagesNew;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
@@ -109,7 +109,7 @@ public class PreferencesBasicsAssistance extends PreferenceFragments.EnableFragm
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle(name);
-            pc.setIcon(ProfileImagesNew.getXavaroProfileDrawable(ident, true));
+            pc.setIcon(ProfileImages.getXavaroProfileDrawable(ident, true));
             pc.setEnabled(enabled);
 
             preferences.add(pc);

@@ -38,7 +38,7 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PreferenceFragments;
-import de.xavaro.android.common.ProfileImagesNew;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WifiLookup;
@@ -333,7 +333,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
                     if (pp.getIcon() == null)
                     {
-                        pp.setIcon(ProfileImagesNew.getXavaroProfileDrawable(ident, true));
+                        pp.setIcon(ProfileImages.getXavaroProfileDrawable(ident, true));
                     }
 
                     continue;
@@ -362,7 +362,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 dp.setKey(prefkey);
                 dp.setTitle(name);
                 dp.setSummary(info);
-                dp.setIcon(ProfileImagesNew.getXavaroProfileDrawable(ident, true));
+                dp.setIcon(ProfileImages.getXavaroProfileDrawable(ident, true));
                 dp.setDefaultValue(true);
                 dp.setDeleteCallback(this);
 
@@ -1026,7 +1026,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                         RemoteContacts.deliverOwnContact(requestOwnerIdentity);
 
                         CommService.sendEncrypted(requestOwnerIdentity, true);
-                        ProfileImagesNew.sendOwnerImage(remoteIdentity);
+                        ProfileImages.sendOwnerImage(remoteIdentity);
 
                         return;
                     }

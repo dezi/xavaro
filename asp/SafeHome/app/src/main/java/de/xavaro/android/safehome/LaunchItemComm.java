@@ -2,12 +2,9 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -16,10 +13,9 @@ import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
-import de.xavaro.android.common.ProfileImagesNew;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
 import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.VoiceIntent;
 
@@ -42,13 +38,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("phonenumber"))
             {
                 String phone = Json.getString(config, "phonenumber");
-                Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
+                Drawable drawable = ProfileImages.getContactsProfileDrawable(phone, true);
 
-                if (thumbnail != null)
+                if (drawable != null)
                 {
-                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setImageDrawable(drawable);
                     targetIcon = overicon;
                 }
 
@@ -74,13 +68,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("skypename"))
             {
                 String skypename = Json.getString(config, "skypename");
-                Bitmap thumbnail = ProfileImages.getSkypeProfileBitmap(context, skypename);
+                Drawable thumbnail = ProfileImages.getSkypeProfileDrawable(skypename, true);
 
                 if (thumbnail != null)
                 {
-                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setImageDrawable(thumbnail);
                     targetIcon = overicon;
                 }
 
@@ -110,13 +102,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("waphonenumber"))
             {
                 String phone = Json.getString(config, "waphonenumber");
-                Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
+                Drawable drawable = ProfileImages.getWhatsAppProfileDrawable(phone, true);
 
-                if (thumbnail != null)
+                if (drawable != null)
                 {
-                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setImageDrawable(drawable);
                     targetIcon = overicon;
                 }
 
@@ -140,7 +130,7 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("subtype"))
             {
                 String ident = Json.getString(config, "identity");
-                Drawable drawable = ProfileImagesNew.getXavaroProfileDrawable(ident, true);
+                Drawable drawable = ProfileImages.getXavaroProfileDrawable(ident, true);
 
                 if (drawable != null)
                 {

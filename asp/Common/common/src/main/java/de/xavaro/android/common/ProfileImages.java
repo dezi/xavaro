@@ -23,9 +23,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Iterator;
 
-public class ProfileImagesNew
+public class ProfileImages
 {
-    private static final String LOGTAG = ProfileImagesNew.class.getSimpleName();
+    private static final String LOGTAG = ProfileImages.class.getSimpleName();
 
     //region Owner profile
 
@@ -210,6 +210,86 @@ public class ProfileImagesNew
             OopsService.log(LOGTAG, ex);
         }
     }
+
+    @Nullable
+    public static String getDisplayFromPhoneOrSkype(String identtag)
+    {
+        if (identtag == null) return null;
+
+        String search = identtag.replaceAll(" ", "");
+
+        if (contacts == null) contacts = ContactsHandler.getJSONData();
+        if (contacts == null) return null;
+
+        try
+        {
+            Iterator<?> ids = contacts.keys();
+
+            while (ids.hasNext())
+            {
+                String id = (String) ids.next();
+                JSONArray contact = contacts.getJSONArray(id);
+                if (contact == null) continue;
+
+                boolean ismatch = false;
+                String display = null;
+
+                for (int inx = 0; inx < contact.length(); inx++)
+                {
+                    JSONObject item = contact.getJSONObject(inx);
+
+                    if (item.has("NUMBER"))
+                    {
+                        String number = item.getString("NUMBER").replaceAll(" ","");
+
+                        if (number.endsWith(identtag))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("DATA1"))
+                    {
+                        String number = item.getString("DATA1").replaceAll(" ","");
+
+                        if (number.endsWith(identtag))
+                        {
+                            ismatch = true;
+                        }
+                    }
+
+                    if (item.has("DISPLAY_NAME"))
+                    {
+                        //
+                        // Workaround for Skype which puts
+                        // nickname as display name and
+                        // duplicates it into given name.
+                        //
+
+                        String disp = item.getString("DISPLAY_NAME");
+                        String gina = item.getString("GIVEN_NAME");
+
+                        if ((display == null) || ! disp.equals(gina)) display = disp;
+                    }
+                }
+
+                if (ismatch && (display != null))
+                {
+                    //
+                    // We have found a phone number within skype contact.
+                    //
+
+                    return display;
+                }
+            }
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
     @Nullable
     private static String getPhoneFromSkype(String skypename)
     {

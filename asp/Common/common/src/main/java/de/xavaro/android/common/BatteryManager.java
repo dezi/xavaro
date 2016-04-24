@@ -106,6 +106,7 @@ public class BatteryManager
         }
 
         int percent = Json.getInt(batteryStatus, "percent");
+
         int remindval = 0;
         int warnval = 0;
         int assistval = 0;
@@ -220,7 +221,7 @@ public class BatteryManager
         Calendar calendar = new GregorianCalendar();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
-        int day = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String filename = String.format("battery.%04d.%02d.%02d.json", year, month, day);
         File statusfile = Simple.getIdentityFile(filename);

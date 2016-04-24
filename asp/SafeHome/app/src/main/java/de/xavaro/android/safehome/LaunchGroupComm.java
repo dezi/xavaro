@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;

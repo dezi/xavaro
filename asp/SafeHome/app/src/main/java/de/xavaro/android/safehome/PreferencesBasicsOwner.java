@@ -2,13 +2,10 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.preference.PreferenceActivity;
-import android.util.Log;
 
-import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
-import de.xavaro.android.common.ProfileImagesNew;
-import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.ProfileImages;
 
 public class PreferencesBasicsOwner extends PreferenceFragments.BasicFragmentStub
 {
@@ -46,7 +43,7 @@ public class PreferencesBasicsOwner extends PreferenceFragments.BasicFragmentStu
         pc = new NicedPreferences.NiceInfoPreference(context);
         pc.setTitle(R.string.pref_basic_owner_personal);
         pc.setSummary(R.string.pref_basic_owner_personal_summary);
-        pc.setIcon(ProfileImagesNew.getOwnerProfileDrawable(true));
+        pc.setIcon(ProfileImages.getOwnerProfileDrawable(true));
         preferences.add(pc);
 
         final CharSequence[] prefixText = { "Keine", "Herr", "Frau" };
