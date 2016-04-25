@@ -8,6 +8,8 @@ import android.widget.ImageView;
 
 import org.json.JSONObject;
 
+import java.io.File;
+
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
@@ -38,11 +40,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("phonenumber"))
             {
                 String phone = Json.getString(config, "phonenumber");
-                Drawable drawable = ProfileImages.getProfileDrawable(phone, true);
+                File profile = ProfileImages.getProfileFile(phone);
 
-                if (drawable != null)
+                if (profile != null)
                 {
-                    icon.setImageDrawable(drawable);
+                    icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
@@ -68,11 +70,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("skypename"))
             {
                 String skypename = Json.getString(config, "skypename");
-                Drawable thumbnail = ProfileImages.getProfileDrawable(skypename, true);
+                File profile = ProfileImages.getProfileFile(skypename);
 
-                if (thumbnail != null)
+                if (profile != null)
                 {
-                    icon.setImageDrawable(thumbnail);
+                    icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
@@ -102,11 +104,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("waphonenumber"))
             {
                 String phone = Json.getString(config, "waphonenumber");
-                Drawable drawable = ProfileImages.getProfileDrawable(phone, true);
+                File profile = ProfileImages.getProfileFile(phone);
 
-                if (drawable != null)
+                if (profile != null)
                 {
-                    icon.setImageDrawable(drawable);
+                    icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
@@ -130,11 +132,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("subtype"))
             {
                 String ident = Json.getString(config, "identity");
-                Drawable drawable = ProfileImages.getProfileDrawable(ident, true);
+                File profile = ProfileImages.getProfileFile(ident);
 
-                if (drawable != null)
+                if (profile != null)
                 {
-                    icon.setImageDrawable(drawable);
+                    icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
@@ -148,11 +150,11 @@ public class LaunchItemComm extends LaunchItem
                     if (Json.equals(config, "grouptype", "alertcall"))
                     {
                         String owner = Json.getString(config, "groupowner");
-                        drawable = ProfileImages.getProfileDrawable(owner, true);
+                        profile = ProfileImages.getProfileFile(owner);
 
-                        if (drawable != null)
+                        if (profile != null)
                         {
-                            icon.setImageDrawable(drawable);
+                            icon.setImageResource(profile.toString(), true);
                             targetIcon = overicon;
                         }
 

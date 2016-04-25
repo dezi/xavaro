@@ -107,12 +107,12 @@ public class LaunchItem extends FrameLayout implements
     protected String type;
     protected String subtype;
 
-    protected ImageView icon;
+    protected ImageSmartView icon;
     protected TextView label;
     protected String labelText;
 
     protected FrameLayout overlay;
-    protected ImageView overicon;
+    protected ImageSmartView overicon;
     protected TextView overtext;
     protected FrameLayout dimmer;
 
@@ -148,8 +148,8 @@ public class LaunchItem extends FrameLayout implements
         layout = new LayoutParams(0, 0);
         setLayoutParams(layout);
 
-        icon = new ImageView(context);
-        icon.setPadding(0, 0, 0, 40);
+        icon = new ImageSmartView(context);
+        icon.setPadding(20, 0, 20, 40);
         addView(icon);
 
         label = new TextView(context);
@@ -335,8 +335,8 @@ public class LaunchItem extends FrameLayout implements
                 if (config.has("name"))
                 {
                     String iconname = Json.getString(config, "name");
-                    Drawable drawable = CacheManager.getWebIcon(iconname, iconref);
-                    icon.setImageDrawable(drawable);
+                    String iconpath = CacheManager.getWebIconPath(iconname, iconref);
+                    icon.setImageResource(iconpath);
                 }
             }
             else

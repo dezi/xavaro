@@ -70,15 +70,22 @@ public class WebLib
     }
 
     @Nullable
-    public static Bitmap getIconBitmap(String weblib, String iconurl)
+    public static byte[] getIconData(String weblib, String iconurl)
     {
         int interval = WebApp.getWebAppInterval();
 
         String src = WebApp.getHTTPLibRoot() + weblib + "/" + iconurl;
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);
-        if (wcr.content == null) return null;
+        return wcr.content;
+    }
 
-        return BitmapFactory.decodeByteArray(wcr.content, 0, wcr.content.length);
+    @Nullable
+    public static Bitmap getIconBitmap(String weblib, String iconurl)
+    {
+        byte[] data = getIconData(weblib, iconurl);
+        if (data == null) return null;
+
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
     @Nullable

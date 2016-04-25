@@ -1,6 +1,5 @@
 package de.xavaro.android.common;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -15,6 +14,7 @@ public class ImageSmartView extends ImageView
     private static final String LOGTAG = ImageSmartView.class.getSimpleName();
 
     private String restag;
+    private boolean circle;
 
     private int width;
     private int height;
@@ -23,7 +23,7 @@ public class ImageSmartView extends ImageView
 
     private boolean reffed;
 
-    private final Paint paint = new Paint();
+    private final Paint npaint = new Paint();
     private final Rect srcrect = new Rect();
     private final Rect dstrect = new Rect();
 
@@ -40,7 +40,12 @@ public class ImageSmartView extends ImageView
 
     public void setImageResource(String restag)
     {
-        Log.d(LOGTAG, "setImageResource: " + restag);
+        setImageResource(restag, false);
+    }
+
+    public void setImageResource(String restag, boolean circle)
+    {
+        //Log.d(LOGTAG, "setImageResource: " + restag);
 
         if (Simple.equals(this.restag, restag)) return;
 
@@ -54,7 +59,7 @@ public class ImageSmartView extends ImageView
         {
             if (reffed)
             {
-                ImageSmartCache.releaseImage(this.restag, width, height);
+                ImageSmartCache.releaseImage(this.restag, width, height, this.circle);
                 reffed = false;
             }
 
@@ -64,10 +69,11 @@ public class ImageSmartView extends ImageView
         }
 
         this.restag = restag;
+        this.circle = circle;
 
         if ((width > 0) && (height > 0))
         {
-            ImageSmartCache.claimImage(this.restag, width, height);
+            ImageSmartCache.claimImage(this.restag, width, height, this.circle);
             reffed = true;
         }
     }
@@ -75,6 +81,8 @@ public class ImageSmartView extends ImageView
     @Override
     public void setPadding(int left, int top, int right, int bottom)
     {
+        super.setPadding(left, top, right, bottom);
+
         this.left = left;
         this.top = top;
         this.right = right;
@@ -86,11 +94,11 @@ public class ImageSmartView extends ImageView
     {
         super.onAttachedToWindow();
 
-        Log.d(LOGTAG, "onAttachedToWindow");
+        //Log.d(LOGTAG, "onAttachedToWindow");
 
         if ((width > 0) && (height > 0) && ! reffed)
         {
-            ImageSmartCache.claimImage(restag, width, height);
+            ImageSmartCache.claimImage(restag, width, height, circle);
             reffed = true;
         }
     }
@@ -100,11 +108,11 @@ public class ImageSmartView extends ImageView
     {
         super.onDetachedFromWindow();
 
-        Log.d(LOGTAG, "onDetachedFromWindow");
+        //Log.d(LOGTAG, "onDetachedFromWindow");
 
         if (reffed)
         {
-            ImageSmartCache.releaseImage(restag, width, height);
+            ImageSmartCache.releaseImage(restag, width, height, circle);
             reffed = false;
         }
     }
@@ -117,14 +125,13 @@ public class ImageSmartView extends ImageView
         width = MeasureSpec.getSize(widthMeasureSpec) - left - right;
         height = MeasureSpec.getSize(heightMeasureSpec) - top - bottom;
 
-        srcrect.set(0, 0, width, height);
         dstrect.set(left, top, left + width, top + height);
 
-        Log.d(LOGTAG, "onMeasure: " + width + "x" + height);
+        //Log.d(LOGTAG, "onMeasure: " + width + "x" + height);
 
         if (! reffed)
         {
-            ImageSmartCache.claimImage(restag, width, height);
+            ImageSmartCache.claimImage(restag, width, height, circle);
             reffed = true;
         }
     }
@@ -132,40 +139,18 @@ public class ImageSmartView extends ImageView
     @Override
     protected void onDraw(Canvas canvas)
     {
-        Bitmap bitmap = ImageSmartCache.getCachedBitmap(restag, width, height);
+        Bitmap bitmap = ImageSmartCache.getCachedBitmap(restag, width, height, circle);
 
-        Log.d(LOGTAG, "onDraw bitmap:" + bitmap);
+        //(LOGTAG, "onDraw bitmap:" + bitmap);
 
         if (bitmap != null)
         {
-            canvas.drawBitmap(bitmap, srcrect, dstrect, paint);
+            srcrect.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            canvas.drawBitmap(bitmap, srcrect, dstrect, npaint);
         }
         else
         {
             canvas.drawColor(Color.TRANSPARENT);
         }
-    }
-
-    @Override
-    @SuppressLint("DrawAllocation")
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom)
-    {
-        super.onLayout(changed, left, top, right, bottom);
-
-        /*
-        if (getDrawable() instanceof BitmapDrawable)
-        {
-            int width = right - left;
-            int height = bottom - top;
-
-            Bitmap orig = ((BitmapDrawable) getDrawable()).getBitmap();
-
-            if ((orig.getWidth() > width) && (orig.getHeight() > height))
-            {
-                Bitmap anti = StaticUtils.downscaleAntiAliasBitmap(orig, width, height);
-                setImageDrawable(new BitmapDrawable(getResources(), anti));
-            }
-        }
-        */
     }
 }

@@ -42,7 +42,8 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
         if (config.has("subitem"))
         {
             String iconurl = Json.getString(config, "icon");
-            icon.setImageDrawable(WebLib.getIconDrawable("calls", iconurl));
+            String iconpath = "weblib|calls|" + iconurl;
+            icon.setImageResource(iconpath);
 
             String subitem = Json.getString(config, "subitem");
 

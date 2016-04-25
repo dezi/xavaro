@@ -135,6 +135,14 @@ public class ProfileImages
     }
 
     @Nullable
+    private static File getXavaroProfileFile(String identity)
+    {
+        File imagefile = getXavaroProfileImageFile(identity);
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    @Nullable
     private static Bitmap getXavaroProfileBitmap(String identity, boolean circle)
     {
         File imagefile = getXavaroProfileImageFile(identity);
@@ -234,6 +242,22 @@ public class ProfileImages
     }
 
     @Nullable
+    private static File getContactsProfileFile(String phonenumber)
+    {
+        if (phonenumber == null) return null;
+
+        File imagefile = getContactsProfileImageFile(phonenumber);
+
+        if (! imagefile.exists())
+        {
+            getContactsProfileImage(imagefile, phonenumber);
+        }
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+
+    @Nullable
     private static Bitmap getContactsProfileBitmap(String phonenumber, boolean circle)
     {
         if (phonenumber == null) return null;
@@ -295,6 +319,30 @@ public class ProfileImages
     }
 
     @Nullable
+    public static File getWhatsAppProfileFile(String phonenumber)
+    {
+        if (phonenumber == null) return null;
+
+        File imagefile = getWhatsAppProfileImageFile(phonenumber);
+
+        if (! imagefile.exists())
+        {
+            getWhatsAppProfileImage(imagefile, phonenumber);
+
+            if (! imagefile.exists())
+            {
+                //
+                // Fallback to contacts image.
+                //
+
+                getContactsProfileImage(imagefile, phonenumber);
+            }
+        }
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    @Nullable
     public static Bitmap getWhatsAppProfileBitmap(String phonenumber, boolean circle)
     {
         if (phonenumber == null) return null;
@@ -343,6 +391,35 @@ public class ProfileImages
     }
 
     @Nullable
+    private static File getSkypeProfileFile(String skypename)
+    {
+        if (skypename == null) return null;
+
+        File imagefile = getSkypeProfileImageFile(skypename);
+
+        if (! imagefile.exists())
+        {
+            String phonenumber = getPhoneFromSkype(skypename);
+
+            if (phonenumber != null)
+            {
+                getContactsProfileImage(imagefile, phonenumber);
+
+                if (! imagefile.exists())
+                {
+                    //
+                    // Fallback to WhatsApp image.
+                    //
+
+                    getWhatsAppProfileImage(imagefile, phonenumber);
+                }
+            }
+        }
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    @Nullable
     private static Bitmap getSkypeProfileBitmap(String skypename, boolean circle)
     {
         if (skypename == null) return null;
@@ -388,6 +465,11 @@ public class ProfileImages
 
     private static final Map<String, Drawable> drawableCache = new HashMap<>();
 
+    private static File getAnonProfileFile()
+    {
+        return new File("" + CommonConfigs.IconResAnon);
+    }
+
     private static Drawable getAnonProfileDrawable(boolean circle)
     {
         Drawable drawable = Simple.getDrawable(CommonConfigs.IconResAnon);
@@ -399,6 +481,18 @@ public class ProfileImages
         }
 
         return drawable;
+    }
+
+    @Nullable
+    public static File getProfileFile(String identtag)
+    {
+        File file = getWhatsAppProfileFile(identtag);
+        if (file == null) file = getXavaroProfileFile(identtag);
+        if (file == null) file = getContactsProfileFile(identtag);
+        if (file == null) file = getSkypeProfileFile(identtag);
+        if (file == null) file = getAnonProfileFile();
+
+        return file;
     }
 
     @Nullable
@@ -414,7 +508,6 @@ public class ProfileImages
         }
 
         Drawable drawable = getWhatsAppProfileDrawable(identtag, circle);
-
         if (drawable == null) drawable = getXavaroProfileDrawable(identtag, circle);
         if (drawable == null) drawable = getContactsProfileDrawable(identtag, circle);
         if (drawable == null) drawable = getSkypeProfileDrawable(identtag, circle);

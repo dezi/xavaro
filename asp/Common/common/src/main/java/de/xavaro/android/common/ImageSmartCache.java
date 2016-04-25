@@ -1,10 +1,18 @@
 package de.xavaro.android.common;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class ImageSmartCache
@@ -13,7 +21,7 @@ public class ImageSmartCache
 
     private static final ArrayList<CacheDesc> cacheDescs = new ArrayList<>();
 
-    public static void claimImage(String restag, int width, int height)
+    public static void claimImage(String restag, int width, int height, boolean circle)
     {
         if (restag == null) return;
 
@@ -22,6 +30,7 @@ public class ImageSmartCache
             for (CacheDesc cacheDesc : cacheDescs)
             {
                 if (Simple.equals(cacheDesc.restag, restag) &&
+                        (cacheDesc.circle == circle) &&
                         (cacheDesc.width == width) &&
                         (cacheDesc.height == height))
                 {
@@ -34,11 +43,12 @@ public class ImageSmartCache
             CacheDesc cacheDesc = new CacheDesc();
 
             cacheDesc.restag = restag;
+            cacheDesc.circle = circle;
             cacheDesc.width = width;
             cacheDesc.height = height;
             cacheDesc.refcount = 1;
 
-            cacheDesc.bitmap = getBitmap(restag, width, height);
+            cacheDesc.bitmap = getBitmap(restag, width, height, circle);
 
             Log.d(LOGTAG, "claimImage: aquired: " + restag + ":" + width + "x" + height);
 
@@ -46,7 +56,7 @@ public class ImageSmartCache
         }
     }
 
-    public static void releaseImage(String restag, int width, int height)
+    public static void releaseImage(String restag, int width, int height, boolean circle)
     {
         if (restag == null) return;
 
@@ -57,6 +67,7 @@ public class ImageSmartCache
                 CacheDesc cacheDesc = cacheDescs.get(inx);
 
                 if (Simple.equals(cacheDesc.restag, restag) &&
+                        (cacheDesc.circle == circle) &&
                         (cacheDesc.width == width) &&
                         (cacheDesc.height == height))
                 {
@@ -82,7 +93,7 @@ public class ImageSmartCache
     }
 
     @Nullable
-    public static Bitmap getCachedBitmap(String restag, int width, int height)
+    public static Bitmap getCachedBitmap(String restag, int width, int height, boolean circle)
     {
         if (restag == null) return null;
 
@@ -91,6 +102,7 @@ public class ImageSmartCache
             for (CacheDesc cacheDesc : cacheDescs)
             {
                 if (Simple.equals(cacheDesc.restag, restag) &&
+                        (cacheDesc.circle == circle) &&
                         (cacheDesc.width == width) &&
                         (cacheDesc.height == height))
                 {
@@ -123,7 +135,7 @@ public class ImageSmartCache
     }
 
     @Nullable
-    private static Bitmap getBitmap(String restag, int width, int height)
+    private static Bitmap getBitmap(String restag, int width, int height, boolean circle)
     {
         //
         // In the first step we just like to get the size of bitmap.
@@ -133,27 +145,50 @@ public class ImageSmartCache
         options.inJustDecodeBounds = true;
 
         Bitmap tmp = null;
+        byte[] data = null;
 
         int resid = Simple.parseNumber(restag);
 
         if (resid > 0)
         {
+            //
+            // Decode from resources.
+            //
+
             BitmapFactory.decodeResource(Simple.getAnyContext().getResources(), resid, options);
             adjustOptions(options, width, height);
             tmp = BitmapFactory.decodeResource(Simple.getAnyContext().getResources(), resid, options);
         }
-        else
+
+        if ((tmp == null) && restag.startsWith("weblib|"))
         {
-            Log.d(LOGTAG, "getBitmap:" + restag);
+            String[] parts = restag.split("\\|");
 
-            byte data[] = WebApp.getAppIconData(restag);
-
-            if (data != null)
+            if (parts.length == 3)
             {
-                BitmapFactory.decodeByteArray(data, 0, data.length, options);
-                adjustOptions(options, width, height);
-                tmp = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+                data = WebLib.getIconData(parts[ 1 ], parts[ 2 ]);
             }
+        }
+
+        if ((tmp == null) && (data == null) && restag.startsWith("/"))
+        {
+            //
+            // Decode from local file cache.
+            //
+
+            data = Simple.getFileBytes(new File(restag));
+        }
+
+        if ((tmp == null) && (data == null))
+        {
+            data = WebApp.getAppIconData(restag);
+        }
+
+        if (data != null)
+        {
+            BitmapFactory.decodeByteArray(data, 0, data.length, options);
+            adjustOptions(options, width, height);
+            tmp = BitmapFactory.decodeByteArray(data, 0, data.length, options);
         }
 
         if (tmp == null) return null;
@@ -166,7 +201,7 @@ public class ImageSmartCache
             // Bitmap is too small to be anti aliased.
             //
 
-            end = Bitmap.createScaledBitmap(tmp, width, height, true);
+            end = tmp;
         }
         else
         {
@@ -174,12 +209,38 @@ public class ImageSmartCache
             // Anti alias bitmap.
             //
 
+            Log.d(LOGTAG, "getBitmap: anti-alias=" + restag + ":" + width + "x" + height);
+
             end = StaticUtils.downscaleAntiAliasBitmap(tmp, width, height);
+            tmp.recycle();
         }
 
-        tmp.recycle();
+        if (! circle) return end;
 
-        return end;
+        //
+        // Make circle bitmap.
+        //
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.RED);
+
+        Rect srcrect = new Rect(0, 0, end.getWidth(), end.getHeight());
+        Rect dstrect = new Rect(0, 0, width, height);
+        RectF dstrectF = new RectF(dstrect);
+
+        Bitmap cbm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(cbm);
+        canvas.drawColor(Color.TRANSPARENT);
+        canvas.drawOval(dstrectF, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(end, srcrect, dstrect, paint);
+
+        end.recycle();
+
+        return cbm;
     }
 
     private static class CacheDesc
@@ -187,6 +248,7 @@ public class ImageSmartCache
         public String restag;
         public int width;
         public int height;
+        public boolean circle;
 
         public int refcount;
         public Bitmap bitmap;
