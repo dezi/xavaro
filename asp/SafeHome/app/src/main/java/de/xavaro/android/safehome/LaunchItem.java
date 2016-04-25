@@ -220,13 +220,6 @@ public class LaunchItem extends FrameLayout implements
         oversize.height = layout.height / 4;
 
         //
-        // Tiny adjust makes this image probably
-        // the same size as preferences images.
-        //
-
-        if ((oversize.width & 1) == 1) oversize.width++;
-        if ((oversize.height & 1) == 1) oversize.height++;
-        //
         // Nine patch background does not scale implicit
         // padding according to background itself. Bug
         // in Android. Set padding to some reasonable

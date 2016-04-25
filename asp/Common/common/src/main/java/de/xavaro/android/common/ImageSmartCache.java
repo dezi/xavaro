@@ -68,7 +68,7 @@ public class ImageSmartCache
 
                         cacheDescs.remove(inx);
                     }
-                    
+
                     return;
                 }
             }
@@ -97,7 +97,11 @@ public class ImageSmartCache
     public static Bitmap getBitmap(int resid, int width, int height)
     {
         Bitmap tmp = BitmapFactory.decodeResource(Simple.getAnyContext().getResources(), resid);
-        return Bitmap.createScaledBitmap(tmp, width, height, true);
+        Bitmap end = Bitmap.createScaledBitmap(tmp, width, height, true);
+
+        tmp.recycle();
+
+        return end;
     }
 
     private static class CacheDesc
