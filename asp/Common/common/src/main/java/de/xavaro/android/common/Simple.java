@@ -1,9 +1,5 @@
 package de.xavaro.android.common;
 
-import android.graphics.Point;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Vibrator;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -17,7 +13,6 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
-import android.view.Display;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,12 +29,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.SoundEffectConstants;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.os.Handler;
-import android.os.Environment;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.DhcpInfo;
 import android.net.Uri;
+import android.os.Vibrator;
+import android.os.Handler;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.util.Log;
@@ -66,6 +64,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Currency;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -257,14 +256,12 @@ public class Simple
 
     public static boolean equals(String str1, String str2)
     {
-        if ((str1 == null) && (str2 == null)) return true;
-        return (str1 != null) && (str2 != null) && str1.equals(str2);
+        return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equals(str2);
     }
 
     public static boolean equalsIgnoreCase(String str1, String str2)
     {
-        if ((str1 == null) && (str2 == null)) return true;
-        return (str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2);
+        return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2);
     }
 
     public static boolean startsWith(String str1, String str2)
@@ -427,7 +424,7 @@ public class Simple
             int xfer = inputStream.read(content);
             inputStream.close();
 
-            return content;
+            return (xfer == size) ? content : null;
         }
         catch (FileNotFoundException ignore)
         {
@@ -667,7 +664,7 @@ public class Simple
         String[] array = getTransArray(resid);
         List<String> list = new ArrayList<>();
 
-        for (String string : array) list.add(string);
+        Collections.addAll(list, array);
 
         return list;
     }
@@ -853,13 +850,9 @@ public class Simple
             File dir = getExternalFilesDir();
             File profiles = new File(dir, "profiles");
 
-            if (! profiles.exists())
+            if (! (profiles.exists() || ! profiles.mkdirs()))
             {
-                Log.d(LOGTAG, "getMediaPath: profiles created:" + profiles.mkdirs());
-            }
-            else
-            {
-                Log.d(LOGTAG, "getMediaPath: profiles exists:" + profiles.toString());
+                Log.d(LOGTAG, "getMediaPath: failed create pofile:" + profiles.toString());
             }
 
             return profiles;
@@ -1829,8 +1822,6 @@ public class Simple
 
     public static long todayAsTimeStamp()
     {
-        long now = (nowAsTimeStamp() / (1000 * 86400)) * (1000 * 86400);
-
         Calendar calendar = new GregorianCalendar();
 
         int year = calendar.get(Calendar.YEAR);

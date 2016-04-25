@@ -68,7 +68,7 @@ public class Speak extends UtteranceProgressListener implements TextToSpeech.OnI
 
     public Speak()
     {
-        ttspeech = new TextToSpeech(Simple.getAppContext(), this);
+        ttspeech = new TextToSpeech(Simple.getAnyContext(), this);
         ttspeech.setOnUtteranceProgressListener(this);
         ttspeech.setPitch(1.0f);
     }

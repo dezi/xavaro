@@ -170,39 +170,6 @@ public class DitUndDat
 
     //endregion public static class Toolbar
 
-    //region public static class ImageAntiAliasView extends ImageView
-
-    public static class ImageAntiAliasView extends ImageView
-    {
-        public ImageAntiAliasView(Context context)
-        {
-            super(context);
-        }
-
-        @Override
-        @SuppressLint("DrawAllocation")
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom)
-        {
-            super.onLayout(changed, left, top, right, bottom);
-
-            if (getDrawable() instanceof BitmapDrawable)
-            {
-                int width = right - left;
-                int height = bottom - top;
-
-                Bitmap orig = ((BitmapDrawable) getDrawable()).getBitmap();
-
-                if ((orig.getWidth() > width) && (orig.getHeight() > height))
-                {
-                    Bitmap anti = StaticUtils.downscaleAntiAliasBitmap(orig, width, height);
-                    setImageDrawable(new BitmapDrawable(getResources(), anti));
-                }
-            }
-        }
-    }
-
-    //endregion public static class ImageAntiAliasView extends ImageView
-
     //region public static class InternetState extends BroadcastReceiver
 
     public static class InternetState extends BroadcastReceiver

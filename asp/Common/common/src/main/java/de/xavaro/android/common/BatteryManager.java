@@ -7,10 +7,10 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.io.File;
 
 public class BatteryManager
 {
@@ -18,6 +18,7 @@ public class BatteryManager
 
     private static final ArrayList<BatteryManagerCallback> callbacks = new ArrayList<>();
     private static final JSONObject batteryStatus = new JSONObject();
+
     private static long nextCheck;
     private static int sequence;
     private static int lastStatus;
@@ -80,6 +81,7 @@ public class BatteryManager
     private static void checkWarnings()
     {
         int status = Json.getInt(batteryStatus, "status");
+        int plugged = Json.getInt(batteryStatus, "plugged");
 
         if (status == android.os.BatteryManager.BATTERY_STATUS_CHARGING)
         {
@@ -131,7 +133,8 @@ public class BatteryManager
         if ((repeat != null) && ! repeat.equals("once")) repeatval = Integer.parseInt(repeat);
         repeatval *= 60 * 1000;
 
-        if ((percent <= remindval) && (percent > warnval))
+        if ((percent <= remindval) && (percent > warnval)
+                && (plugged != android.os.BatteryManager.BATTERY_PLUGGED_USB))
         {
             String date = Simple.getSharedPrefString("monitors.battery.lastremind");
             String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
@@ -151,7 +154,6 @@ public class BatteryManager
             if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
             {
                 Speak.speak(Simple.getTrans(R.string.battery_manager_warn), 100);
-
                 Simple.setSharedPrefString("monitors.battery.lastwarn", Simple.nowAsISO());
             }
         }

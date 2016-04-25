@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.view.Gravity;
 import android.view.View;
 import android.os.Handler;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +20,7 @@ import org.json.JSONObject;
 import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VersionUtils;
@@ -166,7 +166,7 @@ public class LaunchItem extends FrameLayout implements
         overlay.setVisibility(INVISIBLE);
         addView(overlay);
 
-        overicon = new DitUndDat.ImageAntiAliasView(context);
+        overicon = new ImageSmartView(context);
         overlay.addView(overicon);
 
         overtext = new TextView(context);
@@ -219,6 +219,13 @@ public class LaunchItem extends FrameLayout implements
         oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;
 
+        //
+        // Tiny adjust makes this image probably
+        // the same size as preferences images.
+        //
+
+        if ((oversize.width & 1) == 1) oversize.width++;
+        if ((oversize.height & 1) == 1) oversize.height++;
         //
         // Nine patch background does not scale implicit
         // padding according to background itself. Bug

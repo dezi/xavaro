@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebApp;
 import de.xavaro.android.common.WebCookie;
@@ -292,7 +293,7 @@ public class SettingsActivity extends PreferenceActivity
 
                 if (headerType == HEADER_TYPE_NORMAL)
                 {
-                    holder.icon = new DitUndDat.ImageAntiAliasView(context);
+                    holder.icon = new ImageSmartView(context);
                     holder.icon.setPadding(24, 12, 0, 12);
                     flview.addView(holder.icon, new LinearLayout.LayoutParams(
                             56, ViewGroup.LayoutParams.MATCH_PARENT));
