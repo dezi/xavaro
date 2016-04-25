@@ -28,12 +28,13 @@ public class BatteryManager
     {
         long now = Simple.nowAsTimeStamp();
         if (now < nextCheck) return;
-        nextCheck = now + 60 * 1000;
+        nextCheck = now + 3 * 1000;
+        sequence++;
 
         IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         Intent status = Simple.getAnyContext().registerReceiver(null, batteryLevelFilter);
 
-        if (putBatteryStatus(status) || ((sequence++ % 10) == 0))
+        if (putBatteryStatus(status) || ((sequence % 200) == 0))
         {
             if (Simple.getSharedPrefBoolean("monitors.battery.record"))
             {
@@ -43,7 +44,7 @@ public class BatteryManager
 
         Simple.makePost(doCallbacks);
 
-        checkWarnings();
+        if ((sequence % 20) == 0) checkWarnings();
     }
 
     public static void subscribe(BatteryManagerCallback callback)
