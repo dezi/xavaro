@@ -254,6 +254,19 @@ public class Simple
 
     //region All purpose simple methods
 
+    public static int parseNumber(String restag)
+    {
+        try
+        {
+            return Integer.parseInt(restag);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return 0;
+    }
+
     public static boolean equals(String str1, String str2)
     {
         return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equals(str2);

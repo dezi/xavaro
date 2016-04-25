@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.widget.ImageView;
@@ -13,9 +14,11 @@ public class ImageSmartView extends ImageView
 {
     private static final String LOGTAG = ImageSmartView.class.getSimpleName();
 
-    private int resid;
+    private String restag;
+
     private int width;
     private int height;
+
     private int left, top, right, bottom;
 
     private boolean reffed;
@@ -32,7 +35,14 @@ public class ImageSmartView extends ImageView
     @Override
     public void setImageResource(int resid)
     {
-        Log.d(LOGTAG, "setImageResource: " + resid);
+        setImageResource("" + resid);
+    }
+
+    public void setImageResource(String restag)
+    {
+        Log.d(LOGTAG, "setImageResource: " + restag);
+
+        if (Simple.equals(this.restag, restag)) return;
 
         //
         // Images in preferences get recycled. Check
@@ -40,16 +50,26 @@ public class ImageSmartView extends ImageView
         // reclame images if required.
         //
 
-        if ((this.resid != 0) && (this.resid != resid))
+        if (this.restag != null)
         {
-            if (reffed) ImageSmartCache.releaseImage(this.resid, width, height);
+            if (reffed)
+            {
+                ImageSmartCache.releaseImage(this.restag, width, height);
+                reffed = false;
+            }
 
-            ImageSmartCache.claimImage(resid, width, height);
+            this.restag = null;
 
             invalidate();
         }
 
-        this.resid = resid;
+        this.restag = restag;
+
+        if ((width > 0) && (height > 0))
+        {
+            ImageSmartCache.claimImage(this.restag, width, height);
+            reffed = true;
+        }
     }
 
     @Override
@@ -68,9 +88,9 @@ public class ImageSmartView extends ImageView
 
         Log.d(LOGTAG, "onAttachedToWindow");
 
-        if ((resid != 0) && (width != 0) && (height != 0) && ! reffed)
+        if ((width > 0) && (height > 0) && ! reffed)
         {
-            ImageSmartCache.claimImage(resid, width, height);
+            ImageSmartCache.claimImage(restag, width, height);
             reffed = true;
         }
     }
@@ -82,9 +102,9 @@ public class ImageSmartView extends ImageView
 
         Log.d(LOGTAG, "onDetachedFromWindow");
 
-        if ((resid != 0) && (width != 0) && (height != 0) && reffed)
+        if (reffed)
         {
-            ImageSmartCache.releaseImage(resid, width, height);
+            ImageSmartCache.releaseImage(restag, width, height);
             reffed = false;
         }
     }
@@ -102,9 +122,9 @@ public class ImageSmartView extends ImageView
 
         Log.d(LOGTAG, "onMeasure: " + width + "x" + height);
 
-        if ((resid != 0) && ! reffed)
+        if (! reffed)
         {
-            ImageSmartCache.claimImage(resid, width, height);
+            ImageSmartCache.claimImage(restag, width, height);
             reffed = true;
         }
     }
@@ -112,11 +132,18 @@ public class ImageSmartView extends ImageView
     @Override
     protected void onDraw(Canvas canvas)
     {
-        Bitmap bitmap = ImageSmartCache.getCachedBitmap(resid, width, height);
+        Bitmap bitmap = ImageSmartCache.getCachedBitmap(restag, width, height);
 
         Log.d(LOGTAG, "onDraw bitmap:" + bitmap);
 
-        if (bitmap != null) canvas.drawBitmap(bitmap, srcrect, dstrect, paint);
+        if (bitmap != null)
+        {
+            canvas.drawBitmap(bitmap, srcrect, dstrect, paint);
+        }
+        else
+        {
+            canvas.drawColor(Color.TRANSPARENT);
+        }
     }
 
     @Override

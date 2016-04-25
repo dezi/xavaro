@@ -216,7 +216,7 @@ public class SettingsActivity extends PreferenceActivity
 
         private static class HeaderViewHolder
         {
-            ImageView icon;
+            ImageSmartView icon;
             TextView title;
         }
 
@@ -358,8 +358,8 @@ public class SettingsActivity extends PreferenceActivity
                             if ((holder.icon.getTag() == null) ||
                                     ! Simple.equals((String) holder.icon.getTag(), webappname))
                             {
-                                holder.icon.setImageDrawable(WebApp.getAppIcon(webappname));
                                 holder.icon.setTag(webappname);
+                                holder.icon.setImageResource(webappname);
                             }
                         }
                     }
