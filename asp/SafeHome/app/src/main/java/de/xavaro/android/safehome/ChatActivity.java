@@ -57,6 +57,8 @@ public class ChatActivity extends AppCompatActivity implements
     private boolean isalert;
     private String idremote;
     private String groupStatus;
+    private String groupOwner;
+    private String groupType;
     private String label;
 
     private FrameLayout.LayoutParams lp;
@@ -76,6 +78,9 @@ public class ChatActivity extends AppCompatActivity implements
 
         Simple.setAppContext(this);
 
+        int toolbarIcon = R.drawable.communication_400x400;
+        int toolbarColor = 0xff448844;
+
         chatManager = ChatManager.getInstance();
 
         idremote = getIntent().getStringExtra("idremote");
@@ -88,7 +93,25 @@ public class ChatActivity extends AppCompatActivity implements
 
         if (RemoteGroups.isGroup(idremote))
         {
-            label = RemoteGroups.getDisplayName(idremote);
+            groupOwner = RemoteGroups.getGroupOwner(idremote);
+            groupType = RemoteGroups.getGroupType(idremote);
+
+            if (Simple.equals(groupOwner, SystemIdentity.getIdentity()) &&
+                    Simple.equals(groupType, "alertcall"))
+            {
+                label = "Assistenz für Dich";
+
+                toolbarIcon = R.drawable.alertgroup_300x300;
+                toolbarColor = 0xff444444;
+            }
+            else
+            {
+                label = RemoteGroups.getDisplayName(idremote);
+
+                toolbarIcon = R.drawable.commchatalert_300x300;
+                toolbarColor = 0xff888888;
+            }
+
             isgroup = true;
         }
 
@@ -105,8 +128,9 @@ public class ChatActivity extends AppCompatActivity implements
 
         toolbar = new DitUndDat.Toolbar(this);
 
+        toolbar.setBackgroundColor(toolbarColor);
         toolbar.title.setText(label);
-        toolbar.icon.setImageResource(R.drawable.communication_400x400);
+        toolbar.icon.setImageResource(toolbarIcon);
         toolbar.trash.setOnClickListener(onTrashClick);
 
         topscreen.addView(toolbar);
@@ -150,7 +174,7 @@ public class ChatActivity extends AppCompatActivity implements
         input.setLayoutParams(lp);
         input.setPadding(16, 12, 16, 12);
         input.setFocusable(false);
-        input.setTextSize(30f);
+        input.setTextSize(Simple.getDeviceTextSize(30f));
         input.setText("Nachricht");
         input.setTextColor(0x33333333);
         input.setTag(0);

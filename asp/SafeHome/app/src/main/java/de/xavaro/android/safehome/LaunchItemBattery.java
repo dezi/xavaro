@@ -2,17 +2,12 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.BatteryManager;
-import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 

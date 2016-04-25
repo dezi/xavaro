@@ -17,6 +17,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -138,24 +139,29 @@ public class DitUndDat
 
             title.setGravity(Gravity.BOTTOM);
             title.setTextColor(Color.WHITE);
-            title.setTextSize(24f);
+            title.setTextSize(Simple.getDeviceTextSize(24f));
             title.setSingleLine();
+            title.setEllipsize(TextUtils.TruncateAt.END);
 
             int magic = abheight / 16;
 
             lp = new FrameLayout.LayoutParams(Simple.WC, abheight / 2 + magic, Gravity.TOP);
             lp.leftMargin = abheight;
+            lp.rightMargin = abheight;
 
             addView(title, lp);
 
             subtitle = new TextView(getContext());
 
             subtitle.setGravity(Gravity.TOP);
+            subtitle.setTextSize(Simple.getDeviceTextSize(16f));
             subtitle.setTextColor(Color.WHITE);
             subtitle.setSingleLine();
+            subtitle.setEllipsize(TextUtils.TruncateAt.END);
 
             lp = new FrameLayout.LayoutParams(Simple.WC, abheight / 2 - magic, Gravity.BOTTOM);
             lp.leftMargin = abheight;
+            lp.rightMargin = abheight;
 
             addView(subtitle, lp);
 

@@ -221,36 +221,33 @@ public class RemoteGroups
 
         if (finalMembers != null)
         {
-            if (dirty)
+            JSONObject pubgroup = Json.clone(finalGroup);
+            Json.remove(pubgroup, "members");
+
+            for (int send = 0; send < finalMembers.length(); send++)
             {
-                JSONObject pubgroup = Json.clone(finalGroup);
-                Json.remove(pubgroup, "members");
+                JSONObject finalMember = Json.getObject(finalMembers, send);
+                String fmIdentity = Json.getString(finalMember, "identity");
+                if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
 
-                for (int send = 0; send < finalMembers.length(); send++)
-                {
-                    JSONObject finalMember = Json.getObject(finalMembers, send);
-                    String fmIdentity = Json.getString(finalMember, "identity");
-                    if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
+                JSONObject groupStatusUpdate = new JSONObject();
 
-                    JSONObject groupStatusUpdate = new JSONObject();
+                Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
+                Json.put(groupStatusUpdate, "idremote", fmIdentity);
+                Json.put(groupStatusUpdate, "remotegroup", pubgroup);
 
-                    Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
-                    Json.put(groupStatusUpdate, "idremote", fmIdentity);
-                    Json.put(groupStatusUpdate, "remotegroup", pubgroup);
+                Log.d(LOGTAG, "updateGroup=============>" + fmIdentity);
 
-                    Log.d(LOGTAG, "updateGroup=============>" + fmIdentity);
-
-                    CommService.sendEncrypted(groupStatusUpdate, true);
-                }
+                CommService.sendEncrypted(groupStatusUpdate, true);
             }
 
             for (int inx = 0; inx < finalMembers.length(); inx++)
             {
                 JSONObject pubmember = Json.clone(Json.getObject(finalMembers, inx));
 
-                JSONObject pubgroup = new JSONObject();
-                Json.put(pubgroup, "groupidentity", groupidentity);
-                Json.put(pubgroup, "member", pubmember);
+                JSONObject pubgroupdata = new JSONObject();
+                Json.put(pubgroupdata, "groupidentity", groupidentity);
+                Json.put(pubgroupdata, "member", pubmember);
 
                 for (int send = 0; send < finalMembers.length(); send++)
                 {
@@ -262,7 +259,7 @@ public class RemoteGroups
 
                     Json.put(groupMemberUpdate, "type", "groupMemberUpdate");
                     Json.put(groupMemberUpdate, "idremote", fmIdentity);
-                    Json.put(groupMemberUpdate, "remotegroup", pubgroup);
+                    Json.put(groupMemberUpdate, "remotegroup", pubgroupdata);
 
                     Log.d(LOGTAG, "updateMember=============>" + fmIdentity);
 
@@ -326,6 +323,7 @@ public class RemoteGroups
 
             IdentityManager.put(groupidentity, "passPhrase", passPhrase);
 
+            Log.d(LOGTAG, "groupStatusUpdate=" + groupidentity + " => " + passPhrase);
             Simple.makeToast("groupStatusUpdate=" + groupidentity + " => " + passPhrase);
         }
 
@@ -336,6 +334,7 @@ public class RemoteGroups
     {
         boolean dirty = false;
 
+        Log.d(LOGTAG, "updateMember=" + member.toString());
         Simple.makeToast("groupMemberUpdate=" + member.toString());
 
         synchronized (LOGTAG)
