@@ -83,6 +83,9 @@ public class BatteryManager
     {
         int status = Json.getInt(batteryStatus, "status");
         int plugged = Json.getInt(batteryStatus, "plugged");
+        int percent = Json.getInt(batteryStatus, "percent");
+
+        Log.d(LOGTAG, "checkWarnings:" + percent + "% " + status + " " + plugged);
 
         if (status == android.os.BatteryManager.BATTERY_STATUS_CHARGING)
         {
@@ -107,8 +110,6 @@ public class BatteryManager
 
             return;
         }
-
-        int percent = Json.getInt(batteryStatus, "percent");
 
         int remindval = 0;
         int warnval = 0;
@@ -209,8 +210,6 @@ public class BatteryManager
             Json.put(batteryStatus, "statustag", stag);
             Json.put(batteryStatus, "pluggedtag", ptag);
         }
-
-        Log.d(LOGTAG, "putBatteryStatus:" + percent + "% " + stag + " " + ptag);
 
         boolean changed = (lastStatus != status) || (lastPercent != percent);
         lastStatus = status;
