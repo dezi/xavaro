@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,13 +8,12 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.support.annotation.Nullable;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.io.File;
 
 public class ImageSmartCache
 {
