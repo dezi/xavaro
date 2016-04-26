@@ -1,10 +1,24 @@
 {
   "SafeHome": {
 
-    "latest": "0.8.007",
-    "latestdate": "2016-04-24T23:00:00Z",
+    "latest": "0.8.008",
+    "latestdate": "2016-04-25T23:00:00Z",
 
     "versions": {
+
+      "0.8.008": {
+
+        "date": "2016-04-25T23:00:00Z",
+
+        "notes": [
+          {
+            "title": "Assistenz Chats Kosmetik.",
+            "summary": [
+              "Bessere Unterscheidbarkeit der Chats."
+            ]
+          }
+        ]
+      },
 
       "0.8.007": {
 
@@ -12,7 +26,7 @@
 
         "notes": [
           {
-            "title": "Smart image handling.",
+            "title": "Smart Image Cache.",
             "summary": [
               "Bis zu 70% geringerer Speicherbedarf."
             ]
