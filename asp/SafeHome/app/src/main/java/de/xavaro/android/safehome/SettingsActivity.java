@@ -9,7 +9,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -19,7 +18,6 @@ import java.util.List;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.WebApp;
 import de.xavaro.android.common.WebCookie;
 
 public class SettingsActivity extends PreferenceActivity
@@ -102,17 +100,17 @@ public class SettingsActivity extends PreferenceActivity
 
         target.add(category);
 
-        target.add(PreferencesBasicsAdmin.getHeader());
         target.add(PreferencesBasicsOwner.getHeader());
         target.add(PreferencesBasicsCommunity.getHeader());
         target.add(PreferencesBasicsAssistance.getHeader());
         target.add(PreferencesBasicsMonitors.getHeader());
-        target.add(PreferencesBasicsCalls.getHeader());
+        target.add(PreferencesBasicsSafety.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";
         target.add(category);
 
+        target.add(PreferencesBasicsCalls.getHeader());
         target.add(PreferencesComm.PhoneFragment.getHeader());
         target.add(PreferencesComm.SkypeFragment.getHeader());
         target.add(PreferencesComm.WhatsAppFragment.getHeader());

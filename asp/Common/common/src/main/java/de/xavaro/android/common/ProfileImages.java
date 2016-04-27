@@ -1,7 +1,9 @@
 package de.xavaro.android.common;
 
-import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
+
+import android.provider.ContactsContract;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,8 +11,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-
-import android.provider.ContactsContract;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -520,6 +520,16 @@ public class ProfileImages
         return file;
     }
 
+    public static boolean isAnonProfile(String identtag)
+    {
+        File file = getWhatsAppProfileFile(identtag);
+        if (file == null) file = getXavaroProfileFile(identtag);
+        if (file == null) file = getContactsProfileFile(identtag);
+        if (file == null) file = getSkypeProfileFile(identtag);
+
+        return (file == null);
+    }
+
     @Nullable
     public static Drawable getProfileDrawable(String identtag, boolean circle)
     {
@@ -536,9 +546,10 @@ public class ProfileImages
         if (drawable == null) drawable = getXavaroProfileDrawable(identtag, circle);
         if (drawable == null) drawable = getContactsProfileDrawable(identtag, circle);
         if (drawable == null) drawable = getSkypeProfileDrawable(identtag, circle);
-        if (drawable == null) drawable = getAnonProfileDrawable(circle);
 
-        drawableCache.put(cachetag, drawable);
+        if (drawable != null) drawableCache.put(cachetag, drawable);
+
+        if (drawable == null) drawable = getAnonProfileDrawable(circle);
 
         return drawable;
     }

@@ -1613,25 +1613,23 @@ public class NicedPreferences
             dialog = builder.create();
             dialog.show();
 
-            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-            negative.setTextSize(24f);
+            Simple.adjustAlertDialog(dialog);
 
+            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
             negative.setOnClickListener(new View.OnClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(View view)
                 {
                     onCancelClick();
                 }
             });
 
             Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            positive.setTextSize(24f);
-
             positive.setOnClickListener(new View.OnClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(View view)
                 {
                     onDeleteClick();
                 }

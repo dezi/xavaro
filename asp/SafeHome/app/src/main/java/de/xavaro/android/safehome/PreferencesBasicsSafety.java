@@ -9,28 +9,28 @@ import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
 
-public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStub
+public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentStub
 {
-    private static final String LOGTAG = PreferencesBasicsAdmin.class.getSimpleName();
+    private static final String LOGTAG = PreferencesBasicsSafety.class.getSimpleName();
 
     public static PreferenceActivity.Header getHeader()
     {
         PreferenceActivity.Header header;
 
         header = new PreferenceActivity.Header();
-        header.titleRes = R.string.pref_basic_admin;
+        header.titleRes = R.string.pref_basic_safety;
         header.iconRes = GlobalConfigs.IconResAdministrator;
-        header.fragment = PreferencesBasicsAdmin.class.getName();
+        header.fragment = PreferencesBasicsSafety.class.getName();
 
         return header;
     }
 
-    public PreferencesBasicsAdmin()
+    public PreferencesBasicsSafety()
     {
         super();
 
         iconres = GlobalConfigs.IconResAdministrator;
-        summaryres = R.string.pref_basic_admin_summary;
+        summaryres = R.string.pref_basic_safety_summary;
     }
 
     private NicedPreferences.NiceListPreference accessibilityPref;
@@ -57,14 +57,14 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         NicedPreferences.NiceListPreference lp;
 
         cp = new NicedPreferences.NiceInfoPreference(context);
-        cp.setTitle(R.string.pref_basic_admin_access);
-        cp.setSummary(R.string.pref_basic_admin_access_summary);
+        cp.setTitle(R.string.pref_basic_safety_access);
+        cp.setSummary(R.string.pref_basic_safety_access_summary);
         preferences.add(cp);
 
         ep = new NicedPreferences.NiceEditTextPreference(context);
 
         ep.setKey("admin.password");
-        ep.setTitle(R.string.pref_basic_admin_password);
+        ep.setTitle(R.string.pref_basic_safety_password);
         ep.setIsPassword();
 
         if (!sharedPrefs.getString(ep.getKey(), "").equals(""))
@@ -83,17 +83,17 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         //
 
         cp = new NicedPreferences.NiceInfoPreference(context);
-        cp.setTitle(R.string.pref_basic_admin_services);
-        cp.setSummary(R.string.pref_basic_admin_services_summary);
+        cp.setTitle(R.string.pref_basic_safety_services);
+        cp.setSummary(R.string.pref_basic_safety_services_summary);
         preferences.add(cp);
 
-        CharSequence[] prefText = Simple.getTransArray(R.array.pref_basic_admin_service_vals);
-        CharSequence[] prefKeys = Simple.getTransArray(R.array.pref_basic_admin_service_keys);
+        CharSequence[] prefText = Simple.getTransArray(R.array.pref_basic_safety_service_vals);
+        CharSequence[] prefKeys = Simple.getTransArray(R.array.pref_basic_safety_service_keys);
 
         lp = new NicedPreferences.NiceListPreference(context);
 
         lp.setKey("admin.accessibility.service");
-        lp.setTitle(R.string.pref_basic_admin_accessibility_service);
+        lp.setTitle(R.string.pref_basic_safety_accessibility_service);
         lp.setEntries(prefText);
         lp.setEntryValues(prefKeys);
         lp.setDefaultValue("inact");
@@ -105,7 +105,7 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         lp = new NicedPreferences.NiceListPreference(context);
 
         lp.setKey("admin.kioskmode.service");
-        lp.setTitle(R.string.pref_basic_admin_kioskmode_service);
+        lp.setTitle(R.string.pref_basic_safety_kioskmode_service);
         lp.setEntries(prefText);
         lp.setEntryValues(prefKeys);
         lp.setDefaultValue("inact");
@@ -118,8 +118,8 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         //
 
         cp = new NicedPreferences.NiceInfoPreference(context);
-        cp.setTitle(R.string.pref_basic_admin_buttons);
-        cp.setSummary(R.string.pref_basic_admin_buttons_summary);
+        cp.setTitle(R.string.pref_basic_safety_buttons);
+        cp.setSummary(R.string.pref_basic_safety_buttons_summary);
         preferences.add(cp);
 
         //
@@ -129,7 +129,7 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         ep = new NicedPreferences.NiceEditTextPreference(context);
 
         ep.setKey("admin.home.button");
-        ep.setTitle(R.string.pref_basic_admin_home_button);
+        ep.setTitle(R.string.pref_basic_safety_home_button);
         ep.setOnclick(selectHome);
 
         preferences.add(ep);
@@ -142,7 +142,7 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         ep = new NicedPreferences.NiceEditTextPreference(context);
 
         ep.setKey("admin.assist.button");
-        ep.setTitle(R.string.pref_basic_admin_assistance_button);
+        ep.setTitle(R.string.pref_basic_safety_assistance_button);
         ep.setOnclick(selectAssist);
 
         preferences.add(ep);
@@ -154,7 +154,7 @@ public class PreferencesBasicsAdmin extends PreferenceFragments.BasicFragmentStu
         CharSequence[] menueVals = {"android", "safehome"};
 
         lp.setKey("admin.recent.button");
-        lp.setTitle(R.string.pref_basic_admin_menu_button);
+        lp.setTitle(R.string.pref_basic_safety_menu_button);
         lp.setEntries(menueText);
         lp.setEntryValues(menueVals);
         lp.setDefaultValue("safehome");

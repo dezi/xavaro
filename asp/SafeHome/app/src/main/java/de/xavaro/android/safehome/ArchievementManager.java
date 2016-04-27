@@ -287,8 +287,8 @@ public class ArchievementManager implements
 
             final TextView textview = new TextView(context);
 
-            textview.setPadding(40, 40, 40, 40);
-            textview.setTextSize(24f);
+            Simple.setPadding(textview, 20, 20, 20, 20);
+            textview.setTextSize(Simple.getPreferredTextSize());
             textview.setText(message);
 
             builder.setView(textview);
@@ -312,13 +312,7 @@ public class ArchievementManager implements
 
             dialog.show();
 
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(24f);
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTransformationMethod(null);
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTransformationMethod(null);
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(24f);
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTransformationMethod(null);
-
+            Simple.adjustAlertDialog(dialog);
             dialog.setOnDismissListener(this);
 
             String dpath = currentXpathpref + "/displays";

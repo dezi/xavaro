@@ -63,6 +63,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
 
         sp.setKey(prepaidprefix + ".automatic");
         sp.setTitle(R.string.pref_basic_monitoring_prepaid_auto);
+        sp.setEnabled(enabled);
 
         preferences.add(sp);
 
@@ -70,6 +71,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
 
         sp.setKey(prepaidprefix + ".aftercall");
         sp.setTitle(R.string.pref_basic_monitoring_prepaid_call);
+        sp.setEnabled(enabled);
 
         preferences.add(sp);
 
@@ -77,11 +79,13 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
 
         sp.setKey(prepaidprefix + ".record");
         sp.setTitle(R.string.pref_basic_monitoring_record);
+        sp.setEnabled(enabled);
 
         preferences.add(sp);
 
         cp = new NicedPreferences.NiceSeparatorPreference(context);
         cp.setTitle(R.string.pref_basic_monitoring_warnings);
+        cp.setEnabled(enabled);
         preferences.add(cp);
 
         lp = new NicedPreferences.NiceListPreference(context);
@@ -91,6 +95,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(preWarnText);
         lp.setEntryValues(preWarnKeys);
         lp.setDefaultValue("never");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -101,6 +106,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(preWarnText);
         lp.setEntryValues(preWarnKeys);
         lp.setDefaultValue("never");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -111,6 +117,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(preWarnText);
         lp.setEntryValues(preWarnKeys);
         lp.setDefaultValue("never");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -121,6 +128,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(preRepeatText);
         lp.setEntryValues(preRepeatKeys);
         lp.setDefaultValue("once");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -143,6 +151,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         cp.setIcon(CommonConfigs.IconResBattery);
         cp.setTitle(R.string.pref_basic_monitoring_battery);
         cp.setSummary(R.string.pref_basic_monitoring_battery_summary);
+        cp.setEnabled(enabled);
         preferences.add(cp);
 
         lp = new NicedPreferences.NiceListPreference(context);
@@ -152,6 +161,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(battPrefText);
         lp.setEntryValues(battPrefKeys);
         lp.setDefaultValue("inact");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -159,11 +169,13 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
 
         sp.setKey(batteryprefix + ".record");
         sp.setTitle(R.string.pref_basic_monitoring_record);
+        sp.setEnabled(enabled);
 
         preferences.add(sp);
 
         cp = new NicedPreferences.NiceSeparatorPreference(context);
         cp.setTitle(R.string.pref_basic_monitoring_warnings);
+        cp.setEnabled(enabled);
         preferences.add(cp);
 
         lp = new NicedPreferences.NiceListPreference(context);
@@ -173,6 +185,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(battWarnText);
         lp.setEntryValues(battWarnKeys);
         lp.setDefaultValue("never");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -183,6 +196,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(battWarnText);
         lp.setEntryValues(battWarnKeys);
         lp.setDefaultValue("never");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -193,6 +207,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(battWarnText);
         lp.setEntryValues(battWarnKeys);
         lp.setDefaultValue("never");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
 
@@ -203,6 +218,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         lp.setEntries(battRepeatText);
         lp.setEntryValues(battRepeatKeys);
         lp.setDefaultValue("once");
+        lp.setEnabled(enabled);
 
         preferences.add(lp);
     }

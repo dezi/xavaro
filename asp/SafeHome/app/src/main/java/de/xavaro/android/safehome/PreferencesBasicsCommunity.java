@@ -326,13 +326,12 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 if (remoteContacts.containsKey(ident))
                 {
                     //
-                    // Check for an updated profile image.
+                    // Check for an updated profile image on last contact.
                     //
 
-                    Preference pp = remoteContacts.get(ident);
-
-                    if (pp.getIcon() == null)
+                    if (! ProfileImages.isAnonProfile(ident))
                     {
+                        Preference pp = remoteContacts.get(ident);
                         pp.setIcon(ProfileImages.getProfileDrawable(ident, true));
                     }
 
@@ -370,9 +369,12 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 remoteContacts.put(ident, dp);
                 if (update) root.addPreference(dp);
 
+                String nickname = Json.getString(rc, "ownerNickName");
+                if (nickname == null) nickname = name;
+
                 ep = new NicedPreferences.NiceEditTextPreference(Simple.getActContext());
                 ep.setKey(prefkey + ".nickname");
-                ep.setDefaultValue(name);
+                ep.setDefaultValue(nickname);
                 ep.setTitle("Nickname");
 
                 preferences.add(ep);
@@ -395,7 +397,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
             WifiLookup.findVisible();
 
-            handler.postDelayed(onWifiFindDone, 2000);
+            handler.postDelayed(onWifiFindDone, 3000);
         }
     };
 
@@ -442,7 +444,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
             RadioButton rb = new RadioButton(Simple.getActContext());
 
             rb.setId(4711 + inx);
-            rb.setTextSize(18f);
+            rb.setTextSize(Simple.getPreferredTextSize());
             rb.setPadding(0, 10, 0, 10);
 
             //
@@ -487,6 +489,8 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
         dialog.setView(rg);
         dialog.show();
+
+        Simple.adjustAlertDialog(dialog);
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(findWifiDialogCancel);
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(findWifiAction);
@@ -566,6 +570,8 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
             dialog.setView(pincode);
             dialog.show();
+
+            Simple.adjustAlertDialog(dialog);
 
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(sendPinAction);
             dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(randPinAction);
@@ -867,6 +873,11 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                     if (remoteContact.has("ownerGivenName"))
                     {
                         name += " " + remoteContact.getString("ownerGivenName");
+                    }
+
+                    if (remoteContact.has("ownerNickName"))
+                    {
+                        name += " (" + remoteContact.getString("ownerNickName") + ")";
                     }
 
                     if (remoteContact.has("appName"))

@@ -22,14 +22,25 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
     public static boolean checkEnabled(boolean verbose)
     {
+        int enabled;
+
         try
         {
-            int enabled = Settings.Secure.getInt(
+            enabled = Settings.Secure.getInt(
                     Simple.getAnyContext().getContentResolver(),
                     android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
 
             if (verbose) Log.d(LOGTAG, "checkEnabled=" + enabled);
+        }
+        catch (Exception ignore)
+        {
+            if (verbose) Log.d(LOGTAG, "checkEnabled: service not present");
 
+            return false;
+        }
+
+        try
+        {
             if (enabled != 0)
             {
                 String binds = Settings.Secure.getString(

@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.app.AlertDialog;
+import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -125,6 +126,11 @@ public class Simple
     public static Resources getResources()
     {
         return appContext.getResources();
+    }
+
+    public static int getIdentifier(String name, String type, String pack)
+    {
+        return getResources().getIdentifier(name, type, pack);
     }
 
     //endregion Initialisation
@@ -637,20 +643,25 @@ public class Simple
 
     public static void adjustAlertDialog(AlertDialog dialog)
     {
-        int titleId = getResources().getIdentifier("alertTitle", "id", "android");
-        TextView titleView = (TextView) dialog.findViewById(titleId);
-        if (titleView != null) titleView.setTextSize(getPreferredTitleSize());
+        View titleView = dialog.findViewById(getIdentifier("alertTitle", "id", "android"));
+
+        if ((titleView != null) && (titleView instanceof TextView))
+        {
+            ((TextView) titleView).setTextSize(getPreferredTitleSize());
+        }
 
         Button button;
 
+        float textSize = Simple.getPreferredTextSize();
+
         button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        if (button != null) button.setTextSize(Simple.getPreferredTextSize());
+        if (button != null) button.setTextSize(textSize);
 
         button = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        if (button != null) button.setTextSize(Simple.getPreferredTextSize());
+        if (button != null) button.setTextSize(textSize);
 
         button = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-        if (button != null) button.setTextSize(Simple.getPreferredTextSize());
+        if (button != null) button.setTextSize(textSize);
     }
 
     @Nullable
@@ -1227,12 +1238,19 @@ public class Simple
 
     public static float getPreferredTextSize()
     {
-        return getDeviceTextSize(20f);
+        return getDeviceTextSize(22f);
     }
 
     public static float getPreferredTitleSize()
     {
         return getDeviceTextSize(24f);
+    }
+
+    public static boolean isTablet()
+    {
+        return (getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     public static int getActionBarHeight()

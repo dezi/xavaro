@@ -1,5 +1,7 @@
 package de.xavaro.android.common;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.support.annotation.Nullable;
 import android.provider.ContactsContract;
 import android.database.Cursor;

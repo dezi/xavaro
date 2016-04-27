@@ -33,6 +33,7 @@ public class RemoteContacts
             rc.put("gcmUuid", Simple.getGCMToken());
             rc.put("ownerFirstName", sp.getString("owner.firstname", null));
             rc.put("ownerGivenName", sp.getString("owner.givenname", null));
+            rc.put("ownerNickName", sp.getString("owner.nickname", null));
         }
         catch (JSONException ex)
         {
@@ -56,6 +57,7 @@ public class RemoteContacts
             Json.copy(recontact, "gcmUuid", rc);
             Json.copy(recontact, "ownerFirstName", rc);
             Json.copy(recontact, "ownerGivenName", rc);
+            Json.copy(recontact, "ownerNickName", rc);
 
             PersistManager.putXpath(xpath, recontact);
             PersistManager.flush();
