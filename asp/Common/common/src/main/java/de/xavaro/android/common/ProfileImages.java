@@ -97,12 +97,28 @@ public class ProfileImages
     {
         if (circle)
         {
+            if (ownerCacheCircle != null)
+            {
+                if (((BitmapDrawable) ownerCacheCircle).getBitmap().isRecycled())
+                {
+                    ownerCacheCircle = null;
+                }
+            }
+
             if (ownerCacheCircle == null)
             {
                 ownerCacheCircle = Simple.getDrawable(getOwnerProfileBitmap(true));
             }
 
             return ownerCacheCircle;
+        }
+
+        if (ownerCachePlain != null)
+        {
+            if (((BitmapDrawable) ownerCachePlain).getBitmap().isRecycled())
+            {
+                ownerCachePlain = null;
+            }
         }
 
         if (ownerCachePlain == null)
@@ -161,6 +177,16 @@ public class ProfileImages
     private static Drawable getXavaroProfileDrawable(String identity, boolean circle)
     {
         return Simple.getDrawable(getXavaroProfileBitmap(identity, circle));
+    }
+
+    public static void removeXavaroProfileImageFile(String identity)
+    {
+        File file = getXavaroProfileImageFile(identity);
+
+        if (file.exists() && file.delete())
+        {
+            Log.d(LOGTAG, "removeXavaroProfileImageFile: deleted=" + identity);
+        }
     }
 
     //endregion Xavaro profiles
@@ -472,15 +498,14 @@ public class ProfileImages
 
     private static Drawable getAnonProfileDrawable(boolean circle)
     {
-        Drawable drawable = Simple.getDrawable(CommonConfigs.IconResAnon);
+        Bitmap bitmap = BitmapFactory.decodeResource(Simple.getResources(), CommonConfigs.IconResAnon);
 
-        if (circle && (drawable != null))
+        if (circle && (bitmap != null))
         {
-            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-            drawable = Simple.getDrawable(getCircleBitmap(bitmap));
+            return Simple.getDrawable(getCircleBitmap(bitmap));
         }
 
-        return drawable;
+        return Simple.getDrawable(bitmap);
     }
 
     @Nullable

@@ -141,7 +141,7 @@ public class ArchievementManager implements
     {
         currentTag = tag;
         currentPost = postonclose;
-        context = Simple.getAppContext();
+        context = Simple.getActContext();
         if (config == null) readConfig();
     }
 

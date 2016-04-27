@@ -358,7 +358,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                     info += "\n" + ident;
                 }
 
-                dp = new NicedPreferences.NiceDeletePreference(Simple.getAppContext());
+                dp = new NicedPreferences.NiceDeletePreference(Simple.getActContext());
                 dp.setKey(prefkey);
                 dp.setTitle(name);
                 dp.setSummary(info);
@@ -370,7 +370,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 remoteContacts.put(ident, dp);
                 if (update) root.addPreference(dp);
 
-                ep = new NicedPreferences.NiceEditTextPreference(Simple.getAppContext());
+                ep = new NicedPreferences.NiceEditTextPreference(Simple.getActContext());
                 ep.setKey(prefkey + ".nickname");
                 ep.setDefaultValue(name);
                 ep.setTitle("Nickname");
@@ -410,7 +410,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
     private void findWifiDialogShow(boolean wassearch)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
 
         if (wassearch)
         {
@@ -433,13 +433,13 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
         dialog = builder.create();
 
-        RadioGroup rg = new RadioGroup(Simple.getAppContext());
+        RadioGroup rg = new RadioGroup(Simple.getActContext());
         rg.setOrientation(RadioGroup.VERTICAL);
         rg.setPadding(40, 10, 0, 0);
 
         for (int inx = 0; inx < wifiFoundText.size(); inx++)
         {
-            RadioButton rb = new RadioButton(Simple.getAppContext());
+            RadioButton rb = new RadioButton(Simple.getActContext());
 
             rb.setId(4711 + inx);
             rb.setTextSize(18f);
@@ -550,7 +550,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
         @Override
         public void run()
         {
-            AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
             builder.setTitle(sendPinPref.getTitle() + ":");
 
             builder.setPositiveButton("Abbrechen", clickListener);
@@ -559,7 +559,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
             dialog = builder.create();
 
-            pincode = new TextView(Simple.getAppContext());
+            pincode = new TextView(Simple.getActContext());
             pincode.setTextSize(Simple.getPreferredEditSize());
             pincode.setPadding(40, 24, 0, 0);
             pincode.setText(sharedPrefs.getString(sendPinPref.getKey(), ""));
@@ -577,28 +577,30 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
         @Override
         public void run()
         {
-            String[] actpincode = sharedPrefs.getString(recvPinPref.getKey(), "").split("-");
+            String actpinstr = Simple.getSharedPrefString(recvPinPref.getKey());
+            String[] actpincode = (actpinstr == null) ? new String[ 0 ] : actpinstr.split("-");
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getAppContext());
-            builder.setTitle(recvPinPref.getTitle());
+            AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
 
-            builder.setPositiveButton("Abbrechen", clickListener);
-            builder.setNeutralButton("Jetzt verbinden", clickListener);
+            builder.setPositiveButton("Abbrechen", null);
+            builder.setNeutralButton("Jetzt verbinden", null);
 
             dialog = builder.create();
 
-            LinearLayout ll = new LinearLayout(Simple.getAppContext());
+            dialog.setTitle(recvPinPref.getTitle());
+
+            LinearLayout ll = new LinearLayout(Simple.getActContext());
             ll.setOrientation(LinearLayout.VERTICAL);
             ll.setPadding(40, 24, 0, 0);
 
-            LinearLayout lp = new LinearLayout(Simple.getAppContext());
+            LinearLayout lp = new LinearLayout(Simple.getActContext());
             lp.setOrientation(LinearLayout.HORIZONTAL);
             ll.addView(lp);
 
             InputFilter[] filters = new InputFilter[ 1 ];
             filters[ 0 ] = new InputFilter.LengthFilter(4);
 
-            pinPart1 = new EditText(Simple.getAppContext());
+            pinPart1 = new EditText(Simple.getActContext());
             pinPart1.setMinEms(3);
             pinPart1.setTextSize(Simple.getPreferredEditSize());
             pinPart1.setFilters(filters);
@@ -630,12 +632,12 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 }
             });
 
-            TextView sep1 = new TextView(Simple.getAppContext());
+            TextView sep1 = new TextView(Simple.getActContext());
             sep1.setTextSize(Simple.getPreferredEditSize());
             sep1.setText(" – ");
             lp.addView(sep1);
 
-            pinPart2 = new EditText(Simple.getAppContext());
+            pinPart2 = new EditText(Simple.getActContext());
             pinPart2.setMinEms(3);
             pinPart2.setTextSize(Simple.getPreferredEditSize());
             pinPart2.setFilters(filters);
@@ -667,12 +669,12 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 }
             });
 
-            TextView sep2 = new TextView(Simple.getAppContext());
+            TextView sep2 = new TextView(Simple.getActContext());
             sep2.setTextSize(Simple.getPreferredEditSize());
             sep2.setText(" – ");
             lp.addView(sep2);
 
-            pinPart3 = new EditText(Simple.getAppContext());
+            pinPart3 = new EditText(Simple.getActContext());
             pinPart3.setMinEms(3);
             pinPart3.setTextSize(Simple.getPreferredEditSize());
             pinPart3.setFilters(filters);
@@ -713,14 +715,16 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 }
             });
 
-            pinName = new TextView(Simple.getAppContext());
+            pinName = new TextView(Simple.getActContext());
             pinName.setPadding(0, 16, 0, 0);
-            pinName.setTextSize(Simple.getPreferredEditSize());
+            pinName.setTextSize(Simple.getPreferredTextSize());
 
             ll.addView(pinName);
 
             dialog.setView(ll);
             dialog.show();
+
+            Simple.adjustAlertDialog(dialog);
 
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(recvPinAction);
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(actpincode.length == 3);

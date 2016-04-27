@@ -216,5 +216,11 @@ public class RemoteContacts
         //
 
         IdentityManager.removeIdentityFinally(identity);
+
+        //
+        // Remove profile image.
+        //
+
+        ProfileImages.removeXavaroProfileImageFile(identity);
     }
 }

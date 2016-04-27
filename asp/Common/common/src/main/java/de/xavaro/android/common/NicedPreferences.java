@@ -691,7 +691,7 @@ public class NicedPreferences
             {
                 current = new TextView(getContext());
                 current.setGravity(Gravity.END);
-                current.setTextSize(18f);
+                current.setTextSize(Simple.getPreferredTextSize());
 
                 current.setTextColor(disabled
                         ? CommonConfigs.PreferenceTextDisabledColor
@@ -902,7 +902,6 @@ public class NicedPreferences
             newlayout.setOrientation(LinearLayout.HORIZONTAL);
             newlayout.setLayoutParams(new ViewGroup.LayoutParams(Simple.MP, Simple.WC));
             newlayout.setPadding(0, 0, 16, 0);
-            //newlayout.setBackgroundColor(0x88880000);
 
             ViewGroup vg = (ViewGroup) view;
 
@@ -919,7 +918,7 @@ public class NicedPreferences
             //
 
             ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            vg.setPadding(16, 8, 0, 8);
+            Simple.setPadding(vg, 16, 8, 0, 8);
 
             //
             // Step three: Fuck linear layout of icon to be square and nice.
@@ -957,7 +956,7 @@ public class NicedPreferences
             {
                 current = new TextView(getContext());
                 current.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
-                current.setTextSize(18f);
+                current.setTextSize(Simple.getPreferredTextSize());
 
                 current.setTextColor(disabled
                         ? CommonConfigs.PreferenceTextDisabledColor
@@ -1370,7 +1369,7 @@ public class NicedPreferences
             //
 
             ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            vg.setPadding(14, 8, 10, 8);
+            Simple.setPadding(vg, 14, 8, 10, 8);
 
             ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
 

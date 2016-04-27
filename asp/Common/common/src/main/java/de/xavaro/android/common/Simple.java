@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.app.AlertDialog;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -13,6 +14,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -615,19 +617,40 @@ public class Simple
         return anyContext.getResources().getDisplayMetrics().density;
     }
 
-    public static float getFontScale()
-    {
-        return getResources().getConfiguration().fontScale;
-    }
-
     public static int getDevicePixels(int pixels)
     {
-        return (int) ((pixels / (float) getDensityDPI()) * 160);
+        return (pixels * getDensityDPI()) / 160;
     }
 
     public static float getDeviceTextSize(float textsize)
     {
-        return (textsize / getDensity()) / getFontScale();
+        return textsize / getDensity();
+    }
+
+    public static void setPadding(View view, int left, int top, int right, int bottom)
+    {
+        view.setPadding(getDevicePixels(left),
+                getDevicePixels(top),
+                getDevicePixels(right),
+                getDevicePixels(bottom));
+    }
+
+    public static void adjustAlertDialog(AlertDialog dialog)
+    {
+        int titleId = getResources().getIdentifier("alertTitle", "id", "android");
+        TextView titleView = (TextView) dialog.findViewById(titleId);
+        if (titleView != null) titleView.setTextSize(getPreferredTitleSize());
+
+        Button button;
+
+        button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (button != null) button.setTextSize(Simple.getPreferredTextSize());
+
+        button = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (button != null) button.setTextSize(Simple.getPreferredTextSize());
+
+        button = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+        if (button != null) button.setTextSize(Simple.getPreferredTextSize());
     }
 
     @Nullable
@@ -1199,28 +1222,17 @@ public class Simple
 
     public static float getPreferredEditSize()
     {
-        if (anyContext == null) return 16f;
-
-        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
-
-        int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
-
-        if (pixels < 500) return 17f;
-
-        return 24f;
+        return getDeviceTextSize(24f);
     }
 
     public static float getPreferredTextSize()
     {
-        if (anyContext == null) return 17f;
+        return getDeviceTextSize(20f);
+    }
 
-        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
-
-        int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
-
-        if (pixels < 500) return 17f;
-
-        return 18f;
+    public static float getPreferredTitleSize()
+    {
+        return getDeviceTextSize(24f);
     }
 
     public static int getActionBarHeight()
