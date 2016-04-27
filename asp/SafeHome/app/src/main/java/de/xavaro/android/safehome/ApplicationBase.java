@@ -9,12 +9,21 @@ public class ApplicationBase extends Application
 {
     private static final String LOGTAG = ApplicationBase.class.getSimpleName();
 
+    @Override
     public void onCreate()
     {
-        Log.d(LOGTAG, "Here i am...");
+        Log.d(LOGTAG, "onCreate");
 
         super.onCreate();
 
         Simple.setAnyContext(getApplicationContext());
+    }
+
+    @Override
+    public void onTerminate()
+    {
+        Log.d(LOGTAG, "onTerminate");
+
+        super.onTerminate();
     }
 }
