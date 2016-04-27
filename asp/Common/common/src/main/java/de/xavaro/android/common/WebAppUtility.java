@@ -18,7 +18,7 @@ public class WebAppUtility
     @JavascriptInterface
     public String getBetaVersion()
     {
-        Context appcontext = Simple.getAppContext();
+        Context appcontext = Simple.getActContext();
 
         if (appcontext instanceof AppInfoHandler)
         {
@@ -31,7 +31,7 @@ public class WebAppUtility
     @JavascriptInterface
     public String getBetaVersionDate()
     {
-        Context appcontext = Simple.getAppContext();
+        Context appcontext = Simple.getActContext();
 
         if (appcontext instanceof AppInfoHandler)
         {

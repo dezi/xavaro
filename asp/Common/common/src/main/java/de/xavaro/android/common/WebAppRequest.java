@@ -119,7 +119,7 @@ public class WebAppRequest
     @JavascriptInterface
     public void doBackkeyPressed()
     {
-        Context activity = Simple.getAppContext();
+        Context activity = Simple.getActContext();
 
         if (activity instanceof BackKeyMaster)
         {

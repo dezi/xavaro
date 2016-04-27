@@ -38,7 +38,7 @@ public class MediaSurface extends FrameLayout implements
     {
         if (instance == null)
         {
-            instance = new MediaSurface(Simple.getAppContext());
+            instance = new MediaSurface(Simple.getActContext());
         }
 
         return instance;
@@ -551,7 +551,7 @@ public class MediaSurface extends FrameLayout implements
         {
             Log.d(LOGTAG, "onPlaybackPrepare");
 
-            Context activity = Simple.getAppContext();
+            Context activity = Simple.getActContext();
 
             if (activity instanceof VideoSurfaceHandler)
             {
@@ -651,7 +651,7 @@ public class MediaSurface extends FrameLayout implements
 
             Simple.removePost(progressReader);
 
-            Context activity = Simple.getAppContext();
+            Context activity = Simple.getActContext();
 
             if (activity instanceof VideoSurfaceHandler)
             {

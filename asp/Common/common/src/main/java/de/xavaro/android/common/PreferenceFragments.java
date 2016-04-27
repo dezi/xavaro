@@ -480,7 +480,7 @@ public class PreferenceFragments
                 ll.setOrientation(LinearLayout.HORIZONTAL);
                 ll.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.MP));
 
-                FrameLayout infoframe = new FrameLayout(Simple.getAppContext());
+                FrameLayout infoframe = new FrameLayout(Simple.getActContext());
                 infoframe.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
 
                 infoframe.setOnClickListener(new View.OnClickListener()
@@ -505,7 +505,7 @@ public class PreferenceFragments
                 ll.addView(infoframe, new LinearLayout.LayoutParams(
                         Simple.WC, Simple.MP, Gravity.END));
 
-                ImageView info = new ImageView(Simple.getAppContext());
+                ImageView info = new ImageView(Simple.getActContext());
                 info.setImageResource(android.R.drawable.ic_menu_info_details);
                 info.setPadding(8, 8, 7, 8);
 
@@ -537,7 +537,7 @@ public class PreferenceFragments
 
                 if (summaryView == null)
                 {
-                    summaryView = new TextView(Simple.getAppContext());
+                    summaryView = new TextView(Simple.getActContext());
                     summaryView.setLayoutParams(Simple.layoutParamsMW());
                     summaryView.setId(android.R.id.summary);
                     summaryView.setBackgroundColor(0xdddddddd);

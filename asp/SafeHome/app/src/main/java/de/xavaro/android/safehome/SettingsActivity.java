@@ -31,7 +31,7 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
 
         super.onCreate(savedInstanceState);
 
@@ -64,7 +64,7 @@ public class SettingsActivity extends PreferenceActivity
 
         super.onResume();
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
     }
 
     @Override

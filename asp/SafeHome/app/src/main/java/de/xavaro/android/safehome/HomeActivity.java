@@ -67,7 +67,7 @@ public class HomeActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
@@ -206,7 +206,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
 
         if (wasPaused && ! lostFocus)
         {

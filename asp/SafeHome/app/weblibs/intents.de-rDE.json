@@ -5,7 +5,7 @@
 
     "procure.query": [ "was kostet", "was kosten" ],
 
-    "calc": [ "was ergibt", "wie viel ist", "wie viel sind" ],
+    "calc": [ "was ergibt", "wie viel ist", "wie viel sind", "wie viel ergibt", "was ist"  ],
 
     "find": [ "suche" ],
 

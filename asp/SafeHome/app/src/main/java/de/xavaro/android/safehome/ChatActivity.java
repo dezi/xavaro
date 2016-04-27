@@ -76,7 +76,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onCreate(savedInstanceState);
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
 
         int toolbarIcon = R.drawable.communication_400x400;
         int toolbarColor = 0xff448844;
@@ -264,7 +264,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
     }
 
     @Override

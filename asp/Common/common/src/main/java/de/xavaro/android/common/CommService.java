@@ -175,8 +175,6 @@ public class CommService extends Service
 
         Log.d(LOGTAG, "onCreate: running with " + getApplicationContext().getPackageName());
 
-        Simple.setAnyContext(getApplicationContext());
-
         instance = this;
         identity = SystemIdentity.getIdentity();
 

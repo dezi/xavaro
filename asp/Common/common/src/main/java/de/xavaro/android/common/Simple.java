@@ -87,36 +87,42 @@ public class Simple
 
     //region Initialisation
 
-    private static Activity appContext;
-    private static Handler appHandler;
+    private static Context appContext;
+    private static Context actContext;
     private static Context anyContext;
+    private static Handler appHandler;
     private static WifiManager wifiManager;
 
-    public static void setAppContext(Activity context)
+    public static void setAppContext(Context context)
     {
-        Simple.appContext = context;
-        Simple.anyContext = context;
-        Simple.appHandler = new Handler();
+        appContext = context;
+        anyContext = context;
+        appHandler = new Handler();
     }
 
-    public static Activity getAppContext()
+    public static Context getAppContext()
     {
-        return Simple.appContext;
+        return appContext;
     }
 
-    public static void setAnyContext(Context context)
+    public static void setActContext(Activity context)
     {
-        Simple.anyContext = context;
+        actContext = context;
+    }
+
+    public static Context getActContext()
+    {
+        return actContext;
     }
 
     public static Context getAnyContext()
     {
-        return Simple.anyContext;
+        return appContext;
     }
 
     public static Resources getResources()
     {
-        return Simple.anyContext.getResources();
+        return appContext.getResources();
     }
 
     //endregion Initialisation

@@ -16,7 +16,7 @@ public class ApplicationBase extends Application
 
         super.onCreate();
 
-        Simple.setAnyContext(getApplicationContext());
+        Simple.setAppContext(getApplicationContext());
     }
 
     @Override
