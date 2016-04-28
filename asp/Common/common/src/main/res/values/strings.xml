@@ -226,6 +226,11 @@
     <string name="pref_basic_owner_duzen">User likes to be</string>
     <string name="pref_basic_owner_profileimage_share">Share profile image</string>
 
+    <string name="pref_basic_owner_communication">Communication</string>
+    <string name="pref_basic_owner_communication_summary">todo</string>
+    <string name="pref_basic_owner_phonenumber">Phone number</string>
+    <string name="pref_basic_owner_skypename">Skype Name</string>
+
     <string name="pref_basic_community">Community</string>
     <string name="pref_basic_community_summary">todo</string>
     <string name="pref_basic_community_pincode">Connect via Pincode</string>
@@ -237,7 +242,9 @@
     <string name="pref_basic_assistance_summary">todo</string>
     <string name="pref_basic_assistance_enable">Enable Assistance</string>
     <string name="pref_basic_assistance_asmember">As member</string>
+    <string name="pref_basic_assistance_skypename">Skype name</string>
     <string name="pref_basic_assistance_skypecall">Skype callback</string>
+    <string name="pref_basic_assistance_prepaidadmin">Prepaid Admin</string>
 
     <string name="pref_basic_calls">Shortcuts</string>
     <string name="pref_basic_calls_summary">todo</string>

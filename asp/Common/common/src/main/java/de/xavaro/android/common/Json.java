@@ -117,10 +117,10 @@ public class Json
 
     public static boolean equals(JSONObject j1, String k1, JSONObject j2)
     {
-        String s1 = getString(j1, k1);
-        String s2 = getString(j2, k1);
+        Object s1 = get(j1, k1);
+        Object s2 = get(j2, k1);
 
-        return ((s1 != null) && (s2 != null) && s1.equals(s2));
+        return ((s1 == null) && (s2 == null)) || ((s1 != null) && s1.equals(s2));
     }
 
     public static void copy(JSONObject dst, String dkey, JSONObject src, String skey)

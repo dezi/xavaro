@@ -1,11 +1,10 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.res.Configuration;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.preference.PreferenceManager;
@@ -17,6 +16,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.telephony.TelephonyManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -130,6 +130,11 @@ public class Simple
         return appContext.getResources();
     }
 
+    public static Object getSystemService(String service)
+    {
+        return anyContext.getSystemService(service);
+    }
+
     public static ContentResolver getContentResolver()
     {
         return appContext.getContentResolver();
@@ -190,7 +195,7 @@ public class Simple
     {
         if (anyContext == null) return;
 
-        InputMethodManager imm = (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
@@ -205,7 +210,7 @@ public class Simple
             @Override
             public void run()
             {
-                InputMethodManager imm = (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(runview, 0);
             }
         }, 500);
@@ -547,7 +552,7 @@ public class Simple
     {
         if (appContext != null)
         {
-            AudioManager am = (AudioManager) appContext.getSystemService(Context.AUDIO_SERVICE);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             am.playSoundEffect(SoundEffectConstants.CLICK);
         }
     }
@@ -558,7 +563,7 @@ public class Simple
         {
             long pattern[] = {0, 200, 100, 300, 400};
 
-            Vibrator vibrator = (Vibrator) anyContext.getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(pattern, -1);
         }
     }
@@ -567,7 +572,7 @@ public class Simple
     {
         if (anyContext != null)
         {
-            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
             int maxvol = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             int curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -585,7 +590,7 @@ public class Simple
     {
         if (anyContext != null)
         {
-            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
             am.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0);
         }
@@ -595,7 +600,7 @@ public class Simple
     {
         if (anyContext != null)
         {
-            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
             return am.getStreamVolume(AudioManager.STREAM_MUSIC);
         }
@@ -1053,12 +1058,12 @@ public class Simple
 
     public static NotificationManager getNotificationManager()
     {
-        return (NotificationManager) anyContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     public static InputMethodManager getInputMethodManager()
     {
-        return (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        return (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     public static String getAppName()
@@ -1101,7 +1106,7 @@ public class Simple
         {
             if (wifiManager == null)
             {
-                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+                wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             }
 
             DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
@@ -1122,6 +1127,23 @@ public class Simple
     }
 
     @Nullable
+    public static String getPhoneNumber()
+    {
+        try
+        {
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+            return tm.getLine1Number();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static String getWifiIPAddress()
     {
         if (anyContext == null) return null;
@@ -1130,7 +1152,7 @@ public class Simple
         {
             if (wifiManager == null)
             {
-                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+                wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             }
 
             DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
@@ -1159,7 +1181,7 @@ public class Simple
         {
             if (wifiManager == null)
             {
-                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+                wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             }
 
             return wifiManager.getConnectionInfo().getSSID().replace("\"", "");
@@ -1176,7 +1198,7 @@ public class Simple
     {
         if (anyContext != null)
         {
-            return (ConnectivityManager) anyContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            return (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         }
 
         return null;
@@ -1236,7 +1258,7 @@ public class Simple
     {
         if (anyContext == null) return null;
 
-        WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         return wInfo.getMacAddress();
     }

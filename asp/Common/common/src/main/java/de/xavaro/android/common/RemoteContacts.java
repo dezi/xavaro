@@ -34,6 +34,8 @@ public class RemoteContacts
             rc.put("ownerFirstName", sp.getString("owner.firstname", null));
             rc.put("ownerGivenName", sp.getString("owner.givenname", null));
             rc.put("ownerNickName", sp.getString("owner.nickname", null));
+            rc.put("ownerSkypeName", sp.getString("owner.skypename", null));
+            rc.put("ownerPhoneNumber", sp.getString("owner.phonenumber", null));
         }
         catch (JSONException ex)
         {
@@ -58,6 +60,8 @@ public class RemoteContacts
             Json.copy(recontact, "ownerFirstName", rc);
             Json.copy(recontact, "ownerGivenName", rc);
             Json.copy(recontact, "ownerNickName", rc);
+            Json.copy(recontact, "ownerSkypeName", rc);
+            Json.copy(recontact, "ownerPhoneNumber", rc);
 
             PersistManager.putXpath(xpath, recontact);
             PersistManager.flush();
@@ -117,6 +121,14 @@ public class RemoteContacts
         if (tempGCMTokens.containsKey(ident))  return tempGCMTokens.get(ident);
 
         return null;
+    }
+
+    @Nullable
+    public static String getSkypeName(String ident)
+    {
+        JSONObject rc = PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
+
+        return Json.getString(rc, "ownerSkypeName");
     }
 
     public static JSONObject getAllContacts()

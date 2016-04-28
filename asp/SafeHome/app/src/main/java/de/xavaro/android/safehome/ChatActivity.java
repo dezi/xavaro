@@ -631,7 +631,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         if ((group == null) || ! group.has("members"))
         {
-            groupStatus = "unbekannt";
+            groupStatus = "Gruppe hat keine Mitglieder";
             toolbar.subtitle.setText(groupStatus);
 
             return;
@@ -641,6 +641,9 @@ public class ChatActivity extends AppCompatActivity implements
         {
             SharedPreferences sp = Simple.getSharedPrefs();
             JSONArray members = group.getJSONArray("members");
+
+            String grouptype = Json.getString(group, "type");
+            String groupowner = Json.getString(group, "owner");
 
             groupStatus = "";
 
@@ -653,6 +656,15 @@ public class ChatActivity extends AppCompatActivity implements
                 {
                     //
                     // Surprise, we are in the group.
+                    //
+
+                    continue;
+                }
+
+                if (Simple.equals(groupType, "alertcall") && Simple.equals(groupowner, ident))
+                {
+                    //
+                    // The goup owner name is already in title of group.
                     //
 
                     continue;

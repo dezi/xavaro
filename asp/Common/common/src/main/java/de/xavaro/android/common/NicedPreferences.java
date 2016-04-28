@@ -1061,7 +1061,14 @@ public class NicedPreferences
                 }
                 else
                 {
-                    current.setText(text);
+                    if (isPhonenumber)
+                    {
+                        current.setText(VersionUtils.formatPhoneNumber(getText()));
+                    }
+                    else
+                    {
+                        current.setText(text);
+                    }
                 }
             }
         }

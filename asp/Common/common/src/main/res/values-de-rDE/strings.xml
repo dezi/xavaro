@@ -216,6 +216,16 @@
     <string name="pref_basic_owner_duzen">Anwender möchte</string>
     <string name="pref_basic_owner_profileimage_share">Profilfoto freigeben</string>
 
+    <string name="pref_basic_owner_communication">Kommunikation</string>
+    <string name="pref_basic_owner_communication_summary">
+        Sofern Ihr Tablet über Telefonie verfügt, was wir für überaus sinnvoll halten,
+        wird die Telefon-Nummer der SIM-Karte automatisch ausgelesen.
+        \n\nSie sollten sich auch die Mühe machen, einen Skype-Account einzurichten,
+        weil in der Assistenz-Funktion ein Rückruf über Skype ausgelöst werden kann.
+    </string>
+    <string name="pref_basic_owner_phonenumber">Telefon</string>
+    <string name="pref_basic_owner_skypename">Skype-Name</string>
+
     <string name="pref_basic_community">Bezugspersonen</string>
     <string name="pref_basic_community_summary">
         Bezugspersonen sind die näheren Angehörigen des Anwenders. Sie können
@@ -265,7 +275,9 @@
     </string>
     <string name="pref_basic_assistance_enable">Assistenz freischalten</string>
     <string name="pref_basic_assistance_asmember">Als Mitglied</string>
+    <string name="pref_basic_assistance_skypename">Skype Name</string>
     <string name="pref_basic_assistance_skypecall">Skype Rückruf</string>
+    <string name="pref_basic_assistance_prepaidadmin">Prepaid Admin</string>
 
     <string name="pref_basic_calls">Kurzwahl</string>
     <string name="pref_basic_calls_summary">

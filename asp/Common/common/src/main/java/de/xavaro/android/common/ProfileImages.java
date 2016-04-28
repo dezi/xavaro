@@ -537,7 +537,7 @@ public class ProfileImages
 
         if (drawableCache.containsKey(cachetag))
         {
-            Log.d(LOGTAG, "getProfileDrawable: cached=" + cachetag);
+            //Log.d(LOGTAG, "getProfileDrawable: cached=" + cachetag);
 
             return drawableCache.get(cachetag);
         }

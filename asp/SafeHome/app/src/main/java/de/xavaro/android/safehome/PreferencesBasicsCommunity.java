@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.widget.CompoundButton;
@@ -333,7 +334,9 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                     if (! ProfileImages.isAnonProfile(ident))
                     {
                         Preference pp = remoteContacts.get(ident);
-                        pp.setIcon(ProfileImages.getProfileDrawable(ident, true));
+
+                        Drawable icon = ProfileImages.getProfileDrawable(ident, true);
+                        if (pp.getIcon() != icon) pp.setIcon(icon);
                     }
 
                     continue;

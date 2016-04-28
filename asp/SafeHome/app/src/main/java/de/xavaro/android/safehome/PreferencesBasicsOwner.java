@@ -110,6 +110,10 @@ public class PreferencesBasicsOwner extends PreferenceFragments.BasicFragmentStu
 
         checkPretty.run();
 
+        //
+        // Personal entries.
+        //
+
         pc = new NicedPreferences.NiceInfoPreference(context);
         pc.setTitle(R.string.pref_basic_owner_personal);
         pc.setSummary(R.string.pref_basic_owner_personal_summary);
@@ -148,6 +152,44 @@ public class PreferencesBasicsOwner extends PreferenceFragments.BasicFragmentStu
         lp.setTitle(R.string.pref_basic_owner_duzen);
 
         preferences.add(lp);
+
+        //
+        // Communication entries.
+        //
+
+        pc = new NicedPreferences.NiceInfoPreference(context);
+        pc.setTitle(R.string.pref_basic_owner_communication);
+        pc.setSummary(R.string.pref_basic_owner_communication_summary);
+        preferences.add(pc);
+
+        Simple.removeSharedPref("owner.phonenumber");
+        et = new NicedPreferences.NiceEditTextPreference(context);
+
+        et.setKey("owner.phonenumber");
+        et.setTitle(R.string.pref_basic_owner_phonenumber);
+        et.setEmptyText("…");
+        et.setDefaultValue("");
+        et.setIsPhonenumber();
+
+        String phonenumber = Simple.getPhoneNumber();
+        String prefnumber = Simple.getSharedPrefString(et.getKey());
+
+        if ((phonenumber != null) && ((prefnumber == null) || prefnumber.isEmpty()))
+        {
+            Simple.setSharedPrefString(et.getKey(), phonenumber);
+            et.setText(phonenumber);
+        }
+
+        preferences.add(et);
+
+        et = new NicedPreferences.NiceEditTextPreference(context);
+
+        et.setKey("owner.skypename");
+        et.setTitle(R.string.pref_basic_owner_skypename);
+        et.setEmptyText("…");
+        et.setDefaultValue("");
+
+        preferences.add(et);
 
         //
         // Legacy remove.

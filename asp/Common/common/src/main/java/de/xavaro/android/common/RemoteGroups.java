@@ -192,6 +192,12 @@ public class RemoteGroups
             String skypecallback = Simple.getSharedPrefString(skypecallbackpref);
             if (skypecallback == null) skypecallback = "";
 
+            String skypeenablepref = groupprefix + ".skypeenable." + memberident;
+            boolean skypeenable = Simple.getSharedPrefBoolean(skypeenablepref);
+
+            String prepaidadminpref = groupprefix + ".prepaidadmin." + memberident;
+            boolean prepaidadmin = Simple.getSharedPrefBoolean(prepaidadminpref);
+
             if (memberident.equals(SystemIdentity.getIdentity()))
             {
                 //
@@ -207,6 +213,8 @@ public class RemoteGroups
             Json.put(minfo, "identity", memberident);
             Json.put(minfo, "groupstatus", memberstatus);
             Json.put(minfo, "skypecallback", skypecallback);
+            Json.put(minfo, "skypeenable", skypeenable);
+            Json.put(minfo, "prepaidadmin", prepaidadmin);
 
             updateMember(groupidentity, minfo);
         }
@@ -368,6 +376,18 @@ public class RemoteGroups
                 if (! Json.equals(oldmember, "skypecallback", member))
                 {
                     Json.copy(oldmember, "skypecallback", member);
+                    dirty = true;
+                }
+
+                if (! Json.equals(oldmember, "skypeenable", member))
+                {
+                    Json.copy(oldmember, "skypeenable", member);
+                    dirty = true;
+                }
+
+                if (! Json.equals(oldmember, "prepaidadmin", member))
+                {
+                    Json.copy(oldmember, "prepaidadmin", member);
                     dirty = true;
                 }
 
