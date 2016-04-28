@@ -15,6 +15,7 @@ public class CommonConfigs
     public static final int IconResNext         = R.drawable.next_600x600;
     public static final int IconResPrev         = R.drawable.prev_600x600;
     public static final int IconResVoice        = R.drawable.voice_256x256;
+    public static final int IconResPrepaid      = R.drawable.prepaid_600x600;
     public static final int IconResVoiceListen  = R.drawable.voice_ear_256x256;
     public static final int IconResActivity     = R.drawable.activity_256x256;
     public static final int IconResBetaVersion  = R.drawable.betaversion_256x256;

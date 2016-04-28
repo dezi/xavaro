@@ -111,10 +111,12 @@ public class SettingsActivity extends PreferenceActivity
         target.add(category);
 
         target.add(PreferencesBasicsCalls.getHeader());
+
         target.add(PreferencesComm.PhoneFragment.getHeader());
         target.add(PreferencesComm.SkypeFragment.getHeader());
         target.add(PreferencesComm.WhatsAppFragment.getHeader());
-        target.add(PreferencesComm.XavaroFragment.getHeader());
+
+        target.add(PreferencesCommXavaro.getHeader());
 
         category = new Header();
         category.title = "Web-Apps";

@@ -113,6 +113,43 @@ public class LaunchGroupComm
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
             }
 
+            //
+            // Xavaro prepaid admins.
+            //
+
+            for (String prefkey : prefs.keySet())
+            {
+                String keyprefix = "xavaro.remote.groups.padm.";
+
+                if (! prefkey.startsWith(keyprefix)) continue;
+
+                String what = sp.getString(prefkey, null);
+
+                if ((what == null) || what.equals("inact")) continue;
+
+                String ident = prefkey.substring(keyprefix.length());
+                String owner = RemoteGroups.getGroupOwner(ident);
+                String label = RemoteContacts.getDisplayName(owner);
+
+                label = "Prepaid von" + " " + label;
+
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", label);
+                Json.put(entry, "type", "xavaro");
+                Json.put(entry, "subtype", "padm");
+                Json.put(entry, "identity", ident);
+                Json.put(entry, "groupowner", owner);
+
+                Json.put(entry, "order", 200);
+
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
+                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Log.d(LOGTAG, "Prefe:" + prefkey + "=padm=" + ident + "=" + label);
+            }
+
             if (adir.length() > 0)
             {
                 JSONObject entry = new JSONObject();

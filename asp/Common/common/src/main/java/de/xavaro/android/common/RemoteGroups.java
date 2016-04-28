@@ -100,6 +100,26 @@ public class RemoteGroups
         return null;
     }
 
+    @Nullable
+    public static JSONObject getGroupMember(String groupidentity, String memberidentity)
+    {
+        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
+        if (rg == null) return null;
+
+        JSONArray members = Json.getArray(rg, "members");
+        if (members == null) return null;
+
+        for (int inx = 0; inx < members.length(); inx++)
+        {
+            JSONObject member = Json.getObject(members, inx);
+            String ident = Json.getString(member, "identity");
+
+            if (Simple.equals(ident, memberidentity)) return member;
+        }
+
+        return null;
+    }
+
     public static String getDisplayName(String groupidentity)
     {
         JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);

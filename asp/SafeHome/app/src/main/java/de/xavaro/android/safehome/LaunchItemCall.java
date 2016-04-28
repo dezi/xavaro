@@ -20,11 +20,11 @@ import org.json.JSONObject;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.PrepaidManager;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.WebLib;
 
-public class LaunchItemCall extends LaunchItem implements AccessibilityService.MessageServiceCallback
+public class LaunchItemCall extends LaunchItem implements PrepaidManager.PrepaidManagerCallback
 {
     private final static String LOGTAG = LaunchItemCall.class.getSimpleName();
 
@@ -34,7 +34,6 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
     }
 
     private TextView prepaidView;
-    private boolean isPrepaidLoad;
 
     @Override
     protected void setConfig()
@@ -57,13 +56,14 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
                 prepaidView.setTextColor(Color.WHITE);
                 prepaidView.setTypeface(null, Typeface.BOLD);
 
+                addView(prepaidView);
+
                 String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
                 long mstamp = (mdate == null) ? 0 : Simple.getTimeStamp(mdate);
 
                 if ((Simple.nowAsTimeStamp() - mstamp) < (86400 * 1000))
                 {
-                    int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
-                    onPrepaidReceived(money, false);
+                    onPrepaidReceived(Simple.getSharedPrefInt("monitoring.prepaid.money"));
                 }
                 else
                 {
@@ -76,8 +76,6 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
                         }
                     });
                 }
-
-                addView(prepaidView);
             }
         }
         else
@@ -95,54 +93,17 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
         }
     }
 
-    private final Runnable unsubscribeMessage = new Runnable()
+    public void onPrepaidReceived(int money)
     {
-        @Override
-        public void run()
-        {
-            AccessibilityService.unsubscribe(LaunchItemCall.this);
-        }
-    };
-
-    public void onPrepaidReceived(int money, boolean save)
-    {
-        if (save)
-        {
-            Simple.setSharedPrefString("monitoring.prepaid.stamp", Simple.nowAsISO());
-            Simple.setSharedPrefInt("monitoring.prepaid.money", money);
-        }
-
         String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
 
         prepaidView.setText(value);
     }
 
     @Override
-    public int onMessageReceived(JSONObject message)
+    public void onPrepaidBalanceReceived(String text, int money, JSONObject slug)
     {
-        Log.d(LOGTAG, "onMessageReceived:" + message.toString());
-
-        if ((prepaidView != null) && Json.equals(message, "app", "com.android.phone"))
-        {
-            String text = Json.getString(message, "text");
-            String value = Simple.getMatch("([0-9,.]+)[ ]*(EUR|€|USD|$)", text);
-
-            if (value != null)
-            {
-                int money = Math.round(100 * Float.parseFloat(value.replace(",", ".")));
-
-                onPrepaidReceived(money, true);
-
-                Simple.removePost(unsubscribeMessage);
-                Simple.makePost(unsubscribeMessage);
-
-                //return isPrepaidLoad ? 0 : AccessibilityService.GLOBAL_ACTION_BACK;
-
-                return 0;
-            }
-        }
-
-        return 0;
+        onPrepaidReceived(money);
     }
 
     @Override
@@ -194,23 +155,23 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
 
                 if (subitem.equals("prepaid"))
                 {
-                    isPrepaidLoad = false;
-                    AccessibilityService.subscribe(this);
-                    Simple.makePost(unsubscribeMessage, 5000);
+                    PrepaidManager.makeRequest(this, false, null, null);
                 }
-
-                try
+                else
                 {
-                    Uri uri = Uri.parse("tel:" + phonenumber);
-                    Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
-                    sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    sendIntent.setPackage("com.android.server.telecom");
+                    try
+                    {
+                        Uri uri = Uri.parse("tel:" + phonenumber);
+                        Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
+                        sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        sendIntent.setPackage("com.android.server.telecom");
 
-                    ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
-                }
-                catch (Exception ex)
-                {
-                    OopsService.log(LOGTAG, ex);
+                        ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
+                    }
+                    catch (Exception ex)
+                    {
+                        OopsService.log(LOGTAG, ex);
+                    }
                 }
             }
         }
@@ -282,46 +243,16 @@ public class LaunchItemCall extends LaunchItem implements AccessibilityService.M
 
     public void onLoadClick()
     {
-        if (config.has("subitem"))
+        final String loadcode = cashcode.getText().toString();
+
+        Simple.makePost(new Runnable()
         {
-            String prepaidload = Json.getString(config, "prepaidload");
-
-            if (prepaidload != null)
+            @Override
+            public void run()
             {
-                prepaidload = prepaidload + cashcode.getText();
-                if (! prepaidload.endsWith("#")) prepaidload += "#";
-                prepaidload = prepaidload.replace("#", "%23");
-
-                final String cbprepaidload = prepaidload;
-
-                isPrepaidLoad = true;
-                AccessibilityService.subscribe(this);
-                Simple.makePost(unsubscribeMessage, 5000);
-
-                Simple.makePost(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            isPrepaidLoad = true;
-
-                            Uri uri = Uri.parse("tel:" + cbprepaidload);
-                            Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
-                            sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            sendIntent.setPackage("com.android.server.telecom");
-
-                            ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
-                        }
-                        catch (Exception ex)
-                        {
-                            OopsService.log(LOGTAG, ex);
-                        }
-                    }
-                });
+                PrepaidManager.makeRequest(LaunchItemCall.this, false, null, loadcode);
             }
-        }
+        });
 
         dialog.cancel();
         dialog = null;

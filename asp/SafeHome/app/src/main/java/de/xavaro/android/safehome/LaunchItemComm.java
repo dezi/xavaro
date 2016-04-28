@@ -2,9 +2,13 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.view.Gravity;
 import android.widget.ImageView;
+import android.net.Uri;
+import android.util.Log;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -21,9 +25,12 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.VoiceIntent;
 
-public class LaunchItemComm extends LaunchItem
+public class LaunchItemComm extends LaunchItem implements
+        CommService.CommServiceCallback
 {
     private final static String LOGTAG = LaunchItemComm.class.getSimpleName();
+
+    private TextView prepaidView;
 
     public LaunchItemComm(Context context)
     {
@@ -131,38 +138,64 @@ public class LaunchItemComm extends LaunchItem
         {
             if (config.has("subtype"))
             {
-                String ident = Json.getString(config, "identity");
-                File profile = ProfileImages.getProfileFile(ident);
-
-                if (profile != null)
+                if (Json.equals(config, "subtype", "padm"))
                 {
-                    icon.setImageResource(profile.toString(), true);
-                    targetIcon = overicon;
-                }
+                    String owner = Json.getString(config, "groupowner");
+                    File profile = ProfileImages.getProfileFile(owner);
 
-                if (Json.equals(config, "chattype", "user"))
-                {
-                    targetIcon.setImageResource(GlobalConfigs.IconResCommChatUser);
-                }
-
-                if (Json.equals(config, "chattype", "group"))
-                {
-                    if (Json.equals(config, "grouptype", "alertcall"))
+                    if (profile != null)
                     {
-                        String owner = Json.getString(config, "groupowner");
-                        profile = ProfileImages.getProfileFile(owner);
-
-                        if (profile != null)
-                        {
-                            icon.setImageResource(profile.toString(), true);
-                            targetIcon = overicon;
-                        }
-
-                        targetIcon.setImageResource(GlobalConfigs.IconResCommChatAlert);
+                        overicon.setImageResource(profile.toString(), true);
+                        overlay.setVisibility(VISIBLE);
                     }
-                    else
+
+                    icon.setImageResource(CommonConfigs.IconResPrepaid);
+
+                    prepaidView = new TextView(getContext());
+                    prepaidView.setLayoutParams(Simple.layoutParamsMM());
+                    prepaidView.setPadding(0, 20, 0, icon.getPaddingBottom() + 36);
+                    prepaidView.setTextSize(Simple.getDeviceTextSize(40f));
+                    prepaidView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+                    prepaidView.setTextColor(Color.WHITE);
+                    prepaidView.setTypeface(null, Typeface.BOLD);
+
+                    addView(prepaidView);
+                }
+                else
+                {
+                    String ident = Json.getString(config, "identity");
+                    File profile = ProfileImages.getProfileFile(ident);
+
+                    if (profile != null)
                     {
-                        targetIcon.setImageResource(GlobalConfigs.IconResCommChatGroup);
+                        icon.setImageResource(profile.toString(), true);
+                        targetIcon = overicon;
+                    }
+
+                    if (Json.equals(config, "chattype", "user"))
+                    {
+                        targetIcon.setImageResource(GlobalConfigs.IconResCommChatUser);
+                    }
+
+                    if (Json.equals(config, "chattype", "group"))
+                    {
+                        if (Json.equals(config, "grouptype", "alertcall"))
+                        {
+                            String owner = Json.getString(config, "groupowner");
+                            profile = ProfileImages.getProfileFile(owner);
+
+                            if (profile != null)
+                            {
+                                icon.setImageResource(profile.toString(), true);
+                                targetIcon = overicon;
+                            }
+
+                            targetIcon.setImageResource(GlobalConfigs.IconResCommChatAlert);
+                        }
+                        else
+                        {
+                            targetIcon.setImageResource(GlobalConfigs.IconResCommChatGroup);
+                        }
                     }
                 }
             }
@@ -341,24 +374,59 @@ public class LaunchItemComm extends LaunchItem
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
+    @Override
+    public void onMessageReceived(JSONObject message)
+    {
+        Log.d(LOGTAG, "onMessageReceived:" + message.toString());
+
+        if (Json.equals(message, "type", "recvPrepaidBalance"))
+        {
+            onPrepaidReceived(Json.getInt(message, "money"));
+        }
+
+        // todo unsubscribe post runner.
+    }
+
+    public void onPrepaidReceived(int money)
+    {
+        String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
+
+        prepaidView.setText(value);
+    }
+
     private void launchXavaro()
     {
         if (config.has("identity"))
         {
-            try
+            if (subtype.equals("chat"))
             {
-                String ident = Json.getString(config, "identity");
-
-                if (subtype.equals("chat"))
+                try
                 {
+                    String ident = Json.getString(config, "identity");
                     Intent intent = new Intent(context, ChatActivity.class);
                     intent.putExtra("idremote", ident);
                     context.startActivity(intent);
                 }
+                catch (Exception ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
             }
-            catch (Exception ex)
+
+            if (subtype.equals("padm"))
             {
-                OopsService.log(LOGTAG, ex);
+                String groupowner = Json.getString(config, "groupowner");
+
+                JSONObject prepaidmess = new JSONObject();
+
+                Json.put(prepaidmess, "type", "sendPrepaidBalance");
+                Json.put(prepaidmess, "idremote", groupowner);
+
+                CommService.subscribeMessage(this, "recvPrepaidBalance");
+                CommService.sendEncrypted(prepaidmess, true);
+
+                Simple.makeToast("Die Guthabenanfrage wurde übertragen. "
+                        + "\n" + "Bitte einen Moment Gelduld.");
             }
 
             return;
@@ -386,9 +454,13 @@ public class LaunchItemComm extends LaunchItem
 
                 String groupidentity = Json.getString(config, "identity");
                 String identity = SystemIdentity.getIdentity();
-                String skypecallback = RemoteGroups.getSkypeCallback(groupidentity, identity);
 
-                if (skypecallback != null)
+                JSONObject member = RemoteGroups.getGroupMember(groupidentity, identity);
+
+                String skypecallback = Json.getString(member, "skypecallback");
+                boolean skypeenable = Json.getBoolean(member, "skypeenable");
+
+                if (skypeenable && (skypecallback != null))
                 {
                     String groupowner = RemoteGroups.getGroupOwner(groupidentity);
 
@@ -399,10 +471,10 @@ public class LaunchItemComm extends LaunchItem
                     Json.put(skypecall, "groupidentity", groupidentity);
                     Json.put(skypecall, "skypecallback", skypecallback);
 
-                    CommService.sendEncryptedReliable(skypecall, true);
+                    CommService.sendEncrypted(skypecall, true);
 
                     Simple.makeToast("Der Skype Rückruf wurde übertragen. "
-                            + "Bitte einen Moment Gelduld.");
+                            + "\n" + "Bitte einen Moment Gelduld.");
                 }
             }
         }

@@ -18,7 +18,9 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChatManager implements CommService.CommServiceCallback
+public class ChatManager implements
+        CommService.CommServiceCallback,
+        PrepaidManager.PrepaidManagerCallback
 {
     private static final String LOGTAG = ChatManager.class.getSimpleName();
 
@@ -32,7 +34,7 @@ public class ChatManager implements CommService.CommServiceCallback
         {
             instance = new ChatManager(Simple.getAnyContext());
 
-            Log.d(LOGTAG,"Initialized");
+            Log.d(LOGTAG, "Initialized");
         }
     }
 
@@ -56,6 +58,7 @@ public class ChatManager implements CommService.CommServiceCallback
 
         CommService.subscribeMessage(this, "chatMessage");
         CommService.subscribeMessage(this, "skypeCallback");
+        CommService.subscribeMessage(this, "sendPrepaidBalance");
 
         CommService.subscribeMessage(this, "feedbackMessage");
 
@@ -68,7 +71,7 @@ public class ChatManager implements CommService.CommServiceCallback
 
     public void subscribe(String identity, ChatMessageCallback callback)
     {
-        if (! callbacks.containsKey(identity)) callbacks.put(identity, callback);
+        if (!callbacks.containsKey(identity)) callbacks.put(identity, callback);
 
         JSONObject protocoll = getProtocoll(identity);
         if (protocoll != null) callback.onProtocollMessages(protocoll);
@@ -131,7 +134,7 @@ public class ChatManager implements CommService.CommServiceCallback
         Json.put(chatMessage, "type", "chatMessage");
         Json.put(chatMessage, "idremote", idremote);
 
-        if (! chatMessage.has("date")) Json.put(chatMessage, "date", Simple.nowAsISO());
+        if (!chatMessage.has("date")) Json.put(chatMessage, "date", Simple.nowAsISO());
 
         CommService.sendEncryptedReliable(chatMessage, true);
 
@@ -180,10 +183,17 @@ public class ChatManager implements CommService.CommServiceCallback
                         Intent skype = new Intent(Intent.ACTION_VIEW);
                         skype.setData(uri);
                         skype.setPackage("com.skype.raider");
-                        Simple.getAppContext().startActivity(skype);
+
+                        ProcessManager.launchIntent(skype);
                     }
 
                     return;
+                }
+
+                if (Simple.equals(type, "sendPrepaidBalance"))
+                {
+                    String loadcode = Json.getString(message, "loadcode");
+                    PrepaidManager.makeRequest(this, true, message, loadcode);
                 }
 
                 if (Simple.equals(type, "sendOnlineStatus"))
@@ -246,7 +256,7 @@ public class ChatManager implements CommService.CommServiceCallback
                 {
                     sendFeedbackMessage(message, "recv");
                     Boolean wasread = onIncomingMessage(message);
-                    if (! wasread) sendNotification(message);
+                    if (!wasread) sendNotification(message);
 
                     return;
                 }
@@ -285,6 +295,24 @@ public class ChatManager implements CommService.CommServiceCallback
         }
 
         Log.d(LOGTAG, "onMessageReceived: unresolved: " + message.toString());
+    }
+
+    @Override
+    public void onPrepaidBalanceReceived(String text, int money, JSONObject slug)
+    {
+        Log.d(LOGTAG, "onPrepaidBalanceReceived: " + money);
+
+        String identity = Json.getString(slug, "identity");
+
+        JSONObject recvPrepaidBalance = new JSONObject();
+
+        Json.put(recvPrepaidBalance, "type", "recvPrepaidBalance");
+        Json.put(recvPrepaidBalance, "idremote", identity);
+        Json.put(recvPrepaidBalance, "text", text);
+        Json.put(recvPrepaidBalance, "money", money);
+        Json.put(recvPrepaidBalance, "stamp", Simple.nowAsISO());
+
+        CommService.sendEncrypted(recvPrepaidBalance, true);
     }
 
     @Nullable

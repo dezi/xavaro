@@ -191,7 +191,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         {
             for (MessageServiceCallback callback : callbacks)
             {
-                int action = callback.onMessageReceived(message);
+                int action = callback.onAccessibilityMessageReceived(message);
 
                 if (action == GLOBAL_ACTION_BACK)
                 {
@@ -203,6 +203,6 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
     public interface MessageServiceCallback
     {
-        int onMessageReceived(JSONObject message);
+        int onAccessibilityMessageReceived(JSONObject message);
     }
 }
