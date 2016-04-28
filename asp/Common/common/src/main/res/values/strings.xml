@@ -171,6 +171,7 @@
 
     <string name="pref_basic_safety">Sicherheit</string>
     <string name="pref_basic_safety_summary">todo</string>
+
     <string name="pref_basic_safety_access">Access</string>
     <string name="pref_basic_safety_access_summary">todo</string>
     <string name="pref_basic_safety_password">Admin Password</string>
@@ -178,6 +179,9 @@
     <string name="pref_basic_safety_services">Services</string>
     <string name="pref_basic_safety_services_summary">todo</string>
     <string name="pref_basic_safety_accessibility_service">Accessibility</string>
+    <string name="pref_basic_safety_accessibility_unavailable">
+        There are no Accessibility Services on this device.
+    </string>
     <string name="pref_basic_safety_kioskmode_service">Kiosk-Mode</string>
 
     <string name="pref_basic_safety_buttons">Buttons</string>
@@ -192,6 +196,18 @@
     </string-array>
 
     <string-array name="pref_basic_safety_service_vals">
+        <item>Inactive</item>
+        <item>Active</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_accessibility_keys">
+        <item>unavailable</item>
+        <item>inactive</item>
+        <item>active</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_accessibility_vals">
+        <item>Not available</item>
         <item>Inactive</item>
         <item>Active</item>
     </string-array>

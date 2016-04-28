@@ -223,6 +223,7 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
         cp = new NicedPreferences.NiceCheckboxPreference(context);
         cp.setTitle("Gerät sichtbar machen");
+        cp.setSummary(Simple.getWifiName());
 
         cp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
         {

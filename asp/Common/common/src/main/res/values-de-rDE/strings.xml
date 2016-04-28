@@ -136,15 +136,23 @@
     </string>
     <string name="pref_basic_safety_password">Admin Passwort</string>
 
-    <string name="pref_basic_safety_services">Services</string>
+    <string name="pref_basic_safety_services">Funktion</string>
     <string name="pref_basic_safety_services_summary">
         Diese Einstellungen ermöglichen es, den Benutzer in der Anwendung festzuhalten.
         Dazu muss die Eingabehilfe über die Android-Einstellungen von Ihnen aktiviert werden.
         Ist Ihnen dieses gelungen, wird die Eingabehilfe als aktiviert angezeigt.
         \n\nDanach können Sie über den Kioskmodus steuern, ob der Benutzer unkonsolidierte
         Anwendungen starten kann oder nicht.
+        \n\nManche Hersteller bieten diese Option nicht an. In diesem Fall kann keine
+        automatische Prepaid-Guthaben Abfrage durchgeführt werden. Auch der Kioskmode
+        ist dann unter Umständen nicht nutzbar.
     </string>
     <string name="pref_basic_safety_accessibility_service">Eingabehilfe</string>
+    <string name="pref_basic_safety_accessibility_unavailable">
+        Auf diesem Gerät sind Eingabehilfen zur Zeit nicht möglich.
+        Bitte versuchen Sie manuell über die Einstellungen / Eingabehilfen
+        SafeHome zu aktivieren.
+    </string>
     <string name="pref_basic_safety_kioskmode_service">Kioskmodus</string>
 
     <string name="pref_basic_safety_buttons">Tasten</string>
@@ -170,6 +178,12 @@
     <string name="pref_basic_safety_menu_button">Menü</string>
 
     <string-array name="pref_basic_safety_service_vals">
+        <item>Inaktiv</item>
+        <item>Aktiviert</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_accessibility_vals">
+        <item>Nicht verfügbar</item>
         <item>Inaktiv</item>
         <item>Aktiviert</item>
     </string-array>

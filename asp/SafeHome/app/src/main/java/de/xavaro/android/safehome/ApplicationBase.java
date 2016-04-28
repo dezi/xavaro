@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.app.Application;
 import android.content.res.Configuration;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -28,15 +29,35 @@ public class ApplicationBase extends Application
         // Ignore users system setting regarding font scaling.
         //
 
-        Configuration configuration = getResources().getConfiguration();
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        Simple.setFontScale();
 
-        configuration.fontScale = 1.0f;
-        metrics.scaledDensity = configuration.fontScale * metrics.density;
-
-        getResources().updateConfiguration(configuration, metrics);
-
+        Log.d(LOGTAG, "font SCALE=" + getResources().getConfiguration().fontScale);
         Log.d(LOGTAG, "density DPI=" + getResources().getConfiguration().densityDpi);
+    }
+
+    public final Runnable setFontScale = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            //
+            // On LG phone some application fucks with the font scale setting.
+            // This leads to unreadable system dialogs. We set it to default
+            // value if screwed up.
+            //
+
+            Simple.setFontScale();
+        }
+    };
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+
+        Log.d(LOGTAG, "onConfigurationChanged: font SCALE=" + newConfig.fontScale);
+
+        Simple.makePost(setFontScale);
     }
 
     @Override

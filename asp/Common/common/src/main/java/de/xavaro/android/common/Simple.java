@@ -1,7 +1,9 @@
 package de.xavaro.android.common;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.res.Configuration;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -126,6 +128,11 @@ public class Simple
     public static Resources getResources()
     {
         return appContext.getResources();
+    }
+
+    public static ContentResolver getContentResolver()
+    {
+        return appContext.getContentResolver();
     }
 
     public static int getIdentifier(String name, String type, String pack)
@@ -818,9 +825,15 @@ public class Simple
         return result;
     }
 
+    private static final Map<String, File> externalDirs = new HashMap<>();
+
     public static File getMediaDirType(String dirtype)
     {
-        return Environment.getExternalStoragePublicDirectory(dirtype);
+        if (externalDirs.containsKey(dirtype)) return externalDirs.get(dirtype);
+        File extdir = Environment.getExternalStoragePublicDirectory(dirtype);
+        externalDirs.put(dirtype, extdir);
+
+        return extdir;
     }
 
     public static void makeDirectory(File path)
@@ -894,7 +907,7 @@ public class Simple
 
         if (disposition.equals("whatsapp"))
         {
-            File dir = Environment.getExternalStorageDirectory();
+            File dir = getExternalStorageDir();
             return new File(dir, "WhatsApp/Media/WhatsApp Images");
         }
 
@@ -936,22 +949,35 @@ public class Simple
 
     public static File getFilesDir()
     {
-        return Simple.getAnyContext().getFilesDir();
+        return getAnyContext().getFilesDir();
     }
+
+    private static File externalFilesDir;
 
     public static File getExternalFilesDir()
     {
-        return Simple.getAnyContext().getExternalFilesDir(null);
+        if (externalFilesDir != null) return externalFilesDir;
+        externalFilesDir = getAnyContext().getExternalFilesDir(null);
+        return externalFilesDir;
     }
 
     public static File getCacheDir()
     {
-        return Simple.getAnyContext().getCacheDir();
+        return getAnyContext().getCacheDir();
     }
+
+    private static File externalStorageDir;
 
     public static File getExternalStorageDir()
     {
-        return Environment.getExternalStorageDirectory();
+        //
+        // Avoid extremly annoying system log message if
+        // SD-Card is not installed.
+        //
+
+        if (externalStorageDir != null) return externalStorageDir;
+        externalStorageDir = Environment.getExternalStorageDirectory();
+        return externalStorageDir;
     }
 
     public static File getPackageFile(String name)
@@ -1244,6 +1270,24 @@ public class Simple
     public static float getPreferredTitleSize()
     {
         return getDeviceTextSize(24f);
+    }
+
+    public static void setFontScale()
+    {
+        if (getResources().getConfiguration().fontScale > 1.0f)
+        {
+            Settings.System.putFloat(getContentResolver(), Settings.System.FONT_SCALE, 1.0f);
+
+            Configuration configuration = getResources().getConfiguration();
+            configuration.fontScale = 1.0f;
+
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+
+            getResources().updateConfiguration(configuration, metrics);
+
+            Log.d(LOGTAG, "setFontScale: adjusted.");
+        }
     }
 
     public static boolean isTablet()

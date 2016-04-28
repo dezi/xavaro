@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.AlertDialog;
 import android.provider.Settings;
 import android.view.accessibility.AccessibilityEvent;
 import android.content.Intent;
@@ -14,6 +15,25 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 {
     private static final String LOGTAG = AccessibilityService.class.getSimpleName();
     private static final ArrayList<MessageServiceCallback> callbacks = new ArrayList<>();
+
+    public static boolean checkAvailable()
+    {
+        try
+        {
+            Settings.Secure.getInt(
+                    Simple.getAnyContext().getContentResolver(),
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+
+            return true;
+        }
+        catch (Exception ignore)
+        {
+            //
+            // Will throw if feature not available.
+        }
+
+        return false;
+    }
 
     public static boolean checkEnabled()
     {
@@ -66,7 +86,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         return false;
     }
 
-    public final static Runnable selectAccessibility = new Runnable()
+    public static final Runnable selectAccessibility = new Runnable()
     {
         @Override
         public void run()
@@ -112,7 +132,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     public void onAccessibilityEvent(AccessibilityEvent event)
     {
         String text = event.getText().toString();
-        String app = event.getPackageName().toString();
+        String app = (event.getPackageName() != null) ? event.getPackageName().toString() : "unknown";
         int type = event.getEventType();
 
         Log.d(LOGTAG, "onAccessibilityEvent:" + app + "=" + type + "=" + text);

@@ -504,7 +504,16 @@ public class CommSender
             if (uuid == null) return;
 
             JSONObject recvFile = getRecvFile(uuid, false);
-            if (recvFile == null) return;
+
+            if (recvFile == null)
+            {
+                synchronized (recvFiles)
+                {
+                    recvFiles.add(message);
+                }
+
+                recvFile = message;
+            }
 
             Json.put(recvFile, "fileTransferUploaded", true);
         }

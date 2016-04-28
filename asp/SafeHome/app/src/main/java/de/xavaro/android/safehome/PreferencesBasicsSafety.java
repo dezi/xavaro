@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.preference.PreferenceActivity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
 
@@ -87,17 +88,19 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         cp.setSummary(R.string.pref_basic_safety_services_summary);
         preferences.add(cp);
 
-        CharSequence[] prefText = Simple.getTransArray(R.array.pref_basic_safety_service_vals);
-        CharSequence[] prefKeys = Simple.getTransArray(R.array.pref_basic_safety_service_keys);
+        CharSequence[] kioskText = Simple.getTransArray(R.array.pref_basic_safety_service_vals);
+        CharSequence[] kioskKeys = Simple.getTransArray(R.array.pref_basic_safety_service_keys);
+        CharSequence[] accessText = Simple.getTransArray(R.array.pref_basic_safety_accessibility_vals);
+        CharSequence[] accessKeys = Simple.getTransArray(R.array.pref_basic_safety_accessibility_keys);
 
         lp = new NicedPreferences.NiceListPreference(context);
 
         lp.setKey("admin.accessibility.service");
         lp.setTitle(R.string.pref_basic_safety_accessibility_service);
-        lp.setEntries(prefText);
-        lp.setEntryValues(prefKeys);
-        lp.setDefaultValue("inact");
-        lp.setOnclick(AccessibilityService.selectAccessibility);
+        lp.setEntries(accessText);
+        lp.setEntryValues(accessKeys);
+        lp.setDefaultValue("inactive");
+        lp.setOnclick(selectAccessibility);
 
         preferences.add(lp);
         accessibilityPref = lp;
@@ -106,12 +109,11 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
 
         lp.setKey("admin.kioskmode.service");
         lp.setTitle(R.string.pref_basic_safety_kioskmode_service);
-        lp.setEntries(prefText);
-        lp.setEntryValues(prefKeys);
-        lp.setDefaultValue("inact");
+        lp.setEntries(kioskText);
+        lp.setEntryValues(kioskKeys);
+        lp.setDefaultValue("inactive");
 
         preferences.add(lp);
-        accessibilityPref = lp;
 
         //
         // System buttons.
@@ -164,11 +166,35 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         Simple.makePost(monitorSettings);
     }
 
+    public final static Runnable selectAccessibility = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (AccessibilityService.checkAvailable())
+            {
+                AccessibilityService.selectAccessibility.run();
+
+                return;
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
+
+            builder.setTitle(R.string.pref_basic_safety_accessibility_unavailable);
+            builder.setPositiveButton("Ok", null);
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            Simple.adjustAlertDialog(dialog);
+        }
+    };
+
     private final Runnable selectHome = new Runnable()
     {
         @Override
         public void run()
         {
+            Simple.setFontScale();
             DefaultApps.setDefaultHome();
         }
     };
@@ -178,6 +204,7 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         @Override
         public void run()
         {
+            Simple.setFontScale();
             DefaultApps.setDefaultAssist();
         }
     };
@@ -187,14 +214,19 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         @Override
         public void run()
         {
-            String access = AccessibilityService.checkEnabled() ? "active" : "inactive";
+            String access = "unavailable";
+
+            if (AccessibilityService.checkAvailable())
+            {
+                access = AccessibilityService.checkEnabled() ? "active" : "inactive";
+            }
 
             if (! Simple.equals(access, Simple.getSharedPrefString("admin.accessibility.service")))
             {
                 Simple.setSharedPrefString("admin.accessibility.service", access);
                 accessibilityPref.setValue(access);
 
-                if (Simple.equals(access, "active"))
+                if (Simple.equals(access, "active") || Simple.equals(access, "unavailable"))
                 {
                     ArchievementManager.archieved("configure.settings.accessibility");
                 }

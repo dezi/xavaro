@@ -86,7 +86,7 @@ public class ProcessManager
     {
         try
         {
-            Context context = Simple.getAppContext();
+            Context context = Simple.getActContext();
             ResolveInfo res = context.getPackageManager().resolveActivity(intent, 0);
 
             if (res.activityInfo != null)
