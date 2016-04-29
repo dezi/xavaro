@@ -29,7 +29,8 @@ public class LaunchItemCall extends LaunchItem implements
         super(context);
     }
 
-    private TextView prepaidView;
+    private TextView prepaidDateView;
+    private TextView prepaidMoneyView;
 
     @Override
     protected void setConfig()
@@ -44,22 +45,33 @@ public class LaunchItemCall extends LaunchItem implements
 
             if (Simple.equals(subitem, "prepaid"))
             {
-                prepaidView = new TextView(getContext());
-                prepaidView.setLayoutParams(Simple.layoutParamsMM());
-                prepaidView.setPadding(0, 20, 0, icon.getPaddingBottom() + 36);
-                prepaidView.setTextSize(Simple.getDeviceTextSize(40f));
-                prepaidView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-                prepaidView.setTextColor(Color.WHITE);
-                prepaidView.setTypeface(null, Typeface.BOLD);
+                prepaidDateView = new TextView(getContext());
+                prepaidDateView.setLayoutParams(Simple.layoutParamsMW());
+                prepaidDateView.setPadding(0, 16, 0, 0);
+                prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f));
+                prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
+                prepaidDateView.setTextColor(Color.WHITE);
+                prepaidDateView.setTypeface(null, Typeface.BOLD);
 
-                addView(prepaidView);
+                addView(prepaidDateView);
+
+                prepaidMoneyView = new TextView(getContext());
+                prepaidMoneyView.setLayoutParams(Simple.layoutParamsMM());
+                prepaidMoneyView.setPadding(0, 20, 0, icon.getPaddingBottom() + 36);
+                prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f));
+                prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+                prepaidMoneyView.setTextColor(Color.WHITE);
+                prepaidMoneyView.setTypeface(null, Typeface.BOLD);
+
+                addView(prepaidMoneyView);
 
                 String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
                 long mstamp = (mdate == null) ? 0 : Simple.getTimeStamp(mdate);
 
                 if ((Simple.nowAsTimeStamp() - mstamp) < (86400 * 1000))
                 {
-                    onPrepaidReceived(Simple.getSharedPrefInt("monitoring.prepaid.money"));
+                    int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+                    onPrepaidReceived(money, mdate);
                 }
                 else
                 {
@@ -89,11 +101,14 @@ public class LaunchItemCall extends LaunchItem implements
         }
     }
 
-    public void onPrepaidReceived(int money)
+    public void onPrepaidReceived(int money, String date)
     {
-        String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
+        long stamp = Simple.getTimeStamp(date);
+        String dom = Simple.getLocalDayOfMonth(stamp) + ". " + Simple.getLocalMonth(stamp);
+        prepaidDateView.setText(dom);
 
-        prepaidView.setText(value);
+        String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
+        prepaidMoneyView.setText(value);
     }
 
     @Override
@@ -101,14 +116,16 @@ public class LaunchItemCall extends LaunchItem implements
     {
         if (money >= 0)
         {
-            onPrepaidReceived(money);
+            String date = Simple.nowAsISO();
+
+            onPrepaidReceived(money, date);
 
             JSONObject recvPrepaidBalance = new JSONObject();
 
             Json.put(recvPrepaidBalance, "type", "recvPrepaidBalance");
             Json.put(recvPrepaidBalance, "text", text);
             Json.put(recvPrepaidBalance, "money", money);
-            Json.put(recvPrepaidBalance, "date", Simple.nowAsISO());
+            Json.put(recvPrepaidBalance, "date", date);
 
             AssistanceMessage.sendInfoMessage(recvPrepaidBalance);
         }

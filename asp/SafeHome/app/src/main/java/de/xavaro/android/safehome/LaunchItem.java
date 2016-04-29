@@ -8,7 +8,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.Gravity;
 import android.view.View;
@@ -63,9 +62,10 @@ public class LaunchItem extends FrameLayout implements
 
         if (Simple.equals(type, "phone"       )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "skype"       )) item = new LaunchItemComm(context);
-        if (Simple.equals(type, "xavaro"      )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "whatsapp"    )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "contacts"    )) item = new LaunchItemComm(context);
+
+        if (Simple.equals(type, "xavaro"      )) item = new LaunchItemCommXavaro(context);
 
         if (Simple.equals(type, "webapp"      )) item = new LaunchItemWebApp(context);
         if (Simple.equals(type, "webframe"    )) item = new LaunchItemWebFrame(context);

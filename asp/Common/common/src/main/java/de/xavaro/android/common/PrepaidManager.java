@@ -68,7 +68,7 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
         phonenumber = phonenumber.replace("#", "%23");
 
         AccessibilityService.subscribe(this);
-        Simple.makePost(unsubscribeMessage, 5000);
+        Simple.makePost(unsubscribeMessage, 15 * 1000);
 
         try
         {

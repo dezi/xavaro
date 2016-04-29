@@ -372,6 +372,40 @@ public class CommService extends Service
 
                 return true;
             }
+
+            if (type.equals("recvPrepaidBalance"))
+            {
+                //
+                // Inspect remote prepaid balance messages
+                // and store results into preferences.
+                //
+
+                int money = Json.getInt(json, "money");
+
+                if (money >= 0)
+                {
+                    //
+                    // The identity could either be a direct response
+                    // for a prepaid request or an assistance broadcast.
+                    //
+
+                    String identity = Json.getString(json, "identity");
+
+                    if (RemoteGroups.isGroup(identity))
+                    {
+                        identity = RemoteGroups.getGroupOwner(identity);
+                    }
+
+                    String date = Json.getString(json, "date");
+                    if (date == null) date = Simple.nowAsISO();
+
+                    String pfix = "monitoring.prepaid.remote.";
+                    Simple.setSharedPrefInt(pfix + "money:" + identity, money);
+                    Simple.setSharedPrefString(pfix + "stamp:" + identity, date);
+                }
+
+                return false;
+            }
         }
         catch (JSONException ex)
         {
@@ -528,7 +562,7 @@ public class CommService extends Service
         if (onMessageReceived(json))
         {
             //
-            // Message was handled by commservice itself.
+            // Message was handled by comm service itself.
             //
 
             return;
