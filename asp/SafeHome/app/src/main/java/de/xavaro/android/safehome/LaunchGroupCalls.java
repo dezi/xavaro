@@ -12,10 +12,6 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebLib;
 
-//
-// Web stream receivers base class.
-//
-
 public class LaunchGroupCalls extends LaunchGroup
 {
     private static final String LOGTAG = LaunchGroupCalls.class.getSimpleName();

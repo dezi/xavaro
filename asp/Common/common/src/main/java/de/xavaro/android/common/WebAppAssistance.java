@@ -14,26 +14,12 @@ public class WebAppAssistance
     @JavascriptInterface
     public boolean hasAssistance()
     {
-        if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return false;
-        String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
-        return (groupIdentity != null);
+        return AssistanceMessage.hasAssistance();
     }
 
     @JavascriptInterface
     public void informAssistance(String text)
     {
-        if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return;
-        String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
-        if (groupIdentity == null) return;
-
-        JSONObject assistMessage = new JSONObject();
-
-        Json.put(assistMessage, "uuid", Simple.getUUID());
-        Json.put(assistMessage, "message", text);
-        Json.put(assistMessage, "priority", "alertinfo");
-
-        ChatManager.getInstance().sendOutgoingMessage(groupIdentity, assistMessage);
-
-        Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
+        AssistanceMessage.informAssistance(text);
     }
 }

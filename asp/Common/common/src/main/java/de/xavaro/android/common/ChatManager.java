@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class ChatManager implements
         CommService.CommServiceCallback,
-        PrepaidManager.PrepaidManagerCallback
+        PrepaidManager.PrepaidManagerBalanceCallback
 {
     private static final String LOGTAG = ChatManager.class.getSimpleName();
 
@@ -192,8 +192,8 @@ public class ChatManager implements
 
                 if (Simple.equals(type, "sendPrepaidBalance"))
                 {
-                    String loadcode = Json.getString(message, "loadcode");
-                    PrepaidManager.makeRequest(this, true, message, loadcode);
+                    String cashcode = Json.getString(message, "cashcode");
+                    PrepaidManager.makeRequest(this, true, message, cashcode);
                 }
 
                 if (Simple.equals(type, "sendOnlineStatus"))
@@ -310,7 +310,7 @@ public class ChatManager implements
         Json.put(recvPrepaidBalance, "idremote", identity);
         Json.put(recvPrepaidBalance, "text", text);
         Json.put(recvPrepaidBalance, "money", money);
-        Json.put(recvPrepaidBalance, "stamp", Simple.nowAsISO());
+        Json.put(recvPrepaidBalance, "date", Simple.nowAsISO());
 
         CommService.sendEncrypted(recvPrepaidBalance, true);
     }

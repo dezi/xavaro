@@ -17,7 +17,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.telephony.TelephonyManager;
+import android.text.InputType;
+import android.view.Gravity;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -403,21 +406,39 @@ public class Simple
         }
     }
 
+    public static void makeAlert(String text)
+    {
+        makeAlert(text, null);
+    }
+
+    public static void makeAlert(String text , String title)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
+
+        builder.setTitle(title);
+        builder.setMessage(text);
+        builder.setPositiveButton("Ok", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        Simple.adjustAlertDialog(dialog);
+    }
+
     public static void makeToast(String text)
     {
-        if (appHandler != null)
-        {
-            final String phtext = text;
+        final String cbtext = text;
 
-            appHandler.post(new Runnable()
+        makePost(new Runnable()
+        {
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
-                    Toast.makeText(anyContext, phtext, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+                Toast toast = Toast.makeText(anyContext, cbtext, Toast.LENGTH_LONG);
+                TextView view = (TextView) toast.getView().findViewById(android.R.id.message);
+                if (view != null) view.setGravity(Gravity.CENTER);
+                toast.show();
+            }
+        });
     }
 
     public static void makePost(Runnable runnable)

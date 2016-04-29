@@ -14,10 +14,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 
+import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.PrepaidManager;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteGroups;
@@ -26,7 +28,8 @@ import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.VoiceIntent;
 
 public class LaunchItemComm extends LaunchItem implements
-        CommService.CommServiceCallback
+        CommService.CommServiceCallback,
+        PrepaidManager.PrepaidManagerCashcodeCallback
 {
     private final static String LOGTAG = LaunchItemComm.class.getSimpleName();
 
@@ -232,6 +235,25 @@ public class LaunchItemComm extends LaunchItem implements
     }
 
     @Override
+    public void onPrepaidCashcodeReceived(String cashcode)
+    {
+        String groupowner = Json.getString(config, "groupowner");
+
+        JSONObject prepaidmess = new JSONObject();
+
+        Json.put(prepaidmess, "type", "sendPrepaidBalance");
+        Json.put(prepaidmess, "idremote", groupowner);
+        Json.put(prepaidmess, "cashcode", cashcode);
+
+        CommService.subscribeMessage(this, "recvPrepaidBalance");
+        CommService.sendEncrypted(prepaidmess, true);
+        Simple.makePost(unsubscribeMessage, 20 * 1000);
+
+        Simple.makeToast("Der Cashcode wurde übertragen.");
+        Simple.makeToast("Bitte einen Moment Gelduld.");
+    }
+
+    @Override
     public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
         if (super.onExecuteVoiceIntent(voiceintent, index))
@@ -381,18 +403,68 @@ public class LaunchItemComm extends LaunchItem implements
 
         if (Json.equals(message, "type", "recvPrepaidBalance"))
         {
-            onPrepaidReceived(Json.getInt(message, "money"));
-        }
+            String rmidentity = Json.getString(message, "identity");
 
-        // todo unsubscribe post runner.
+            String gpidentity = Json.getString(config, "identity");
+            String owidentity = Json.getString(config, "groupowner");
+
+            Log.d(LOGTAG, "=========================== remote=" + rmidentity);
+            Log.d(LOGTAG, "=========================== goup=" + gpidentity);
+            Log.d(LOGTAG, "=========================== owner=" + owidentity);
+
+            if (Simple.equals(rmidentity, gpidentity) || Simple.equals(rmidentity, owidentity))
+            {
+                //
+                // This message belongs to this launch item.
+                //
+
+                final JSONObject cbmessage = message;
+
+                Simple.makePost(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        String label = Json.getString(config, "label");
+                        String text = Json.getString(cbmessage, "text");
+                        int money = Json.getInt(cbmessage, "money");
+
+                        String ctxt = (text == null) ? "" : text.substring(1, text.length() - 1);
+                        if (ctxt.endsWith(", OK")) ctxt = ctxt.substring(0, ctxt.length() - 4);
+
+                        if (money >= 0)
+                        {
+                            onPrepaidReceived(money);
+
+                            if (!ctxt.isEmpty()) Simple.makeToast(ctxt);
+                        }
+                        else
+                        {
+                            if (!ctxt.isEmpty()) Simple.makeAlert(ctxt, label);
+                        }
+                    }
+                });
+
+                Simple.removePost(unsubscribeMessage);
+                Simple.makePost(unsubscribeMessage);
+            }
+        }
     }
 
     public void onPrepaidReceived(int money)
     {
         String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
-
         prepaidView.setText(value);
     }
+
+    private final Runnable unsubscribeMessage = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            CommService.unsubscribeMessage(LaunchItemComm.this, "recvPrepaidBalance");
+        }
+    };
 
     private void launchXavaro()
     {
@@ -424,9 +496,10 @@ public class LaunchItemComm extends LaunchItem implements
 
                 CommService.subscribeMessage(this, "recvPrepaidBalance");
                 CommService.sendEncrypted(prepaidmess, true);
+                Simple.makePost(unsubscribeMessage, 20 * 1000);
 
-                Simple.makeToast("Die Guthabenanfrage wurde übertragen. "
-                        + "\n" + "Bitte einen Moment Gelduld.");
+                Simple.makeToast("Die Guthabenanfrage wurde übertragen.");
+                Simple.makeToast("Bitte einen Moment Gelduld.");
             }
 
             return;
@@ -443,6 +516,11 @@ public class LaunchItemComm extends LaunchItem implements
 
     private boolean launchXavaroLong()
     {
+        if (subtype.equals("padm"))
+        {
+            PrepaidManager.createPrepaidLoadDialog(this);
+        }
+
         if (config.has("grouptype"))
         {
             if (Json.equals(config, "grouptype", "alertcall"))
@@ -473,8 +551,8 @@ public class LaunchItemComm extends LaunchItem implements
 
                     CommService.sendEncrypted(skypecall, true);
 
-                    Simple.makeToast("Der Skype Rückruf wurde übertragen. "
-                            + "\n" + "Bitte einen Moment Gelduld.");
+                    Simple.makeToast("Der Skype Rückruf wurde übertragen.");
+                    Simple.makeToast("Bitte einen Moment Gelduld.");
                 }
             }
         }
