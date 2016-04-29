@@ -17,15 +17,16 @@ instaface.createFrame();
 
     FB.init({
       appId      : '610331582448824',
+      cookie     : false,
       xfbml      : false,
       version    : 'v2.5'
     });
-
+/*
 FB.getLoginStatus(function(response)
 {
     alert("getLoginStatus");
 });
-
+*/
 
   };
 
