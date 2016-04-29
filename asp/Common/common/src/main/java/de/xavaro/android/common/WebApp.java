@@ -25,7 +25,7 @@ public class WebApp
         String httpserver = CommonConfigs.WebappsServerName;
         String httpport = "" + CommonConfigs.WebappsServerPort;
 
-        if ((httpport == null) || httpport.equals("80"))
+        if (httpport.equals("80"))
         {
             return "http://" + httpserver;
         }

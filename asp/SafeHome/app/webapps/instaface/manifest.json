@@ -7,28 +7,15 @@
     "preferences": false,
     "events": false,
 
-    "permissions": [
-      "beta",
-      "speak",
-      "utility",
-      "request"
-    ],
+    "permissions": [],
 
-    "weblibs": [
-      "strings",
-      "dialog",
-      "simple",
-      "touch"
-    ],
+    "weblibs": [],
 
     "preload": [
       "//connect.facebook.net/en_US/sdk/debug.js"
     ],
 
-    "locale": [
-      "strings.json",
-      "strings.de-rDE.json"
-    ],
+    "locale": [],
 
     "cachedefs": [
       { "interval": -1, "pattern": "(http|https)://.*?.facebook.net/.*" },

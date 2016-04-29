@@ -287,7 +287,6 @@ public class WebAppCache
     private static byte[] getContentFromServer(
             String webappname, String src, JSONObject cachefile, String agent)
     {
-
         String wifiname = Simple.getWifiName();
         if (Simple.getSharedPrefBoolean("developer.enable") &&
             Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))

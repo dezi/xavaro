@@ -1,34 +1,23 @@
 instaface.createFrame = function()
 {
-    WebLibSimple.setBGColor(document.body, "#ffffff88");
-
-    var ic = instaface;
-
-    ic.topDiv = WebLibSimple.createAnyAppend("div", document.body);
-    WebLibSimple.setFontSpecs(ic.topDiv, 24, "bold", "#666666");
-    ic.topDiv.style.padding = "20px";
+    document.body.innerHTML += '<div class="fb-like" data-share="true" data-width="450" data-show-faces="true"> </div>';
 }
 
 instaface.createFrame();
 
-  window.fbAsyncInit = function()
-  {
+window.fbAsyncInit = function()
+{
     alert("pupsi");
 
     FB.init({
-      appId      : '610331582448824',
-      cookie     : false,
-      xfbml      : false,
-      version    : 'v2.5'
+        appId      : '610331582448824',
+        xfbml      : true,
+        version    : 'v2.6'
     });
-/*
-FB.getLoginStatus(function(response)
-{
-    alert("getLoginStatus");
-});
-*/
 
-  };
+    console.log(document.body.innerHTML);
+}
+
 
 /*
   (function(d, s, id)

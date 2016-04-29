@@ -3,10 +3,17 @@ package de.xavaro.android.common;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Message;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.util.Log;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
