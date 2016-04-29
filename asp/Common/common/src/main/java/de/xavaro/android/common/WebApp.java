@@ -24,14 +24,6 @@ public class WebApp
     {
         String httpserver = CommonConfigs.WebappsServerName;
         String httpport = "" + CommonConfigs.WebappsServerPort;
-        String wifiname = Simple.getWifiName();
-
-        if (Simple.getSharedPrefBoolean("developer.enable") &&
-            Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
-        {
-            httpserver = Simple.getSharedPrefString("developer.webapps.httpserver." + wifiname);
-            httpport = Simple.getSharedPrefString("developer.webapps.httpport." + wifiname);
-        }
 
         if ((httpport == null) || httpport.equals("80"))
         {

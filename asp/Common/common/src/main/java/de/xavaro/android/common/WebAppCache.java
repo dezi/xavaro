@@ -287,6 +287,34 @@ public class WebAppCache
     private static byte[] getContentFromServer(
             String webappname, String src, JSONObject cachefile, String agent)
     {
+
+        String wifiname = Simple.getWifiName();
+        if (Simple.getSharedPrefBoolean("developer.enable") &&
+            Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
+        {
+            String server = WebApp.getHTTPRoot();
+
+            if (src.startsWith(server))
+            {
+                String httpserver = Simple.getSharedPrefString("developer.webapps.httpserver." + wifiname);
+                String httpport = Simple.getSharedPrefString("developer.webapps.httpport." + wifiname);
+
+                String devserver;
+
+                if ((httpport == null) || httpport.equals("80"))
+                {
+                    devserver = "http://" + httpserver;
+                }
+                else
+                {
+                    devserver = "http://" + httpserver + ":" + httpport;
+                }
+
+                src = devserver + src.substring(server.length());
+                Log.d(LOGTAG, "getContentFromServer: real=" + src);
+            }
+        }
+
         try
         {
             URL url = new URL(src);
@@ -322,6 +350,27 @@ public class WebAppCache
             connection.setDoInput(true);
             connection.connect();
 
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP)
+            {
+                //
+                // A cross protocoll redirect happened from
+                // HTTP to HTTPS or vice versa.
+                //
+
+                String location = connection.getHeaderField("Location");
+
+                Log.d(LOGTAG, "getContentFromServer: 302=" + location);
+                Log.d(LOGTAG, "getContentFromServer: old=" + src);
+
+                url = new URL(location);
+
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(4000);
+                connection.setUseCaches(false);
+                connection.setDoInput(true);
+                connection.connect();
+            }
+
             if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED)
             {
                 //
@@ -339,6 +388,8 @@ public class WebAppCache
                 //
                 // File cannot be loaded.
                 //
+
+                Log.d(LOGTAG, "getContentFromServer: ERR=" + connection.getResponseCode());
 
                 return null;
             }
