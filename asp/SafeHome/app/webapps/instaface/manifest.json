@@ -1,0 +1,39 @@
+{
+  "manifest": {
+
+    "label": "Instaface",
+    "appname": "instaface",
+    "appicon": "instaface_600x600.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "beta",
+      "speak",
+      "utility",
+      "request"
+    ],
+
+    "weblibs": [
+      "strings",
+      "dialog",
+      "simple",
+      "touch"
+    ],
+
+    "preload": [
+      "//connect.facebook.net/en_US/sdk/debug.js"
+    ],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": [
+      { "interval": -1, "pattern": "(http|https)://.*?.facebook.net/.*" },
+      { "interval": -1, "pattern": "(http|https)://.*?.facebook.com/.*" },
+      { "interval": -1, "pattern": "(http|https)://.*?.fbcdn.net/.*" }
+    ]
+  }
+}

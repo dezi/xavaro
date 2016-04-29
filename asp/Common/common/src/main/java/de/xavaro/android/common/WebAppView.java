@@ -19,7 +19,6 @@ public class WebAppView extends WebView
         super(context);
     }
 
-
     public WebAppBeta beta;
     public WebAppNine nine;
     public WebAppVoice voice;
