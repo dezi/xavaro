@@ -8,6 +8,7 @@ import android.preference.PreferenceActivity;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import de.xavaro.android.common.Facebook;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Owner;
 import de.xavaro.android.common.PreferenceFragments;

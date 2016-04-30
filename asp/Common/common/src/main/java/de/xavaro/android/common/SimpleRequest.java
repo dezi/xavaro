@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -47,6 +48,13 @@ public class SimpleRequest
 
     @Nullable
     public static String doHTTPGet(String src, String referrer)
+    {
+        byte[] data = doHTTPGetData(src, referrer);
+        return (data == null) ? null : new String(data);
+    }
+
+    @Nullable
+    public static byte[] doHTTPGetData(String src, String referrer)
     {
         try
         {
@@ -213,7 +221,7 @@ public class SimpleRequest
                 input.close();
                 output.close();
 
-                return new String(response);
+                return response;
             }
             else
             {
@@ -241,7 +249,7 @@ public class SimpleRequest
                 input.close();
                 output.close();
 
-                return new String(response);
+                return response;
             }
         }
         catch (Exception ex)
@@ -305,6 +313,8 @@ public class SimpleRequest
     @Nullable
     public static String[] readLines(String url)
     {
+        if (url == null) return null;
+
         try
         {
             HttpURLConnection connection = Simple.openUnderscoreConnection(url);
@@ -342,6 +352,8 @@ public class SimpleRequest
     @Nullable
     public static String readContent(String url)
     {
+        if (url == null) return null;
+
         try
         {
             HttpURLConnection connection = Simple.openUnderscoreConnection(url);
@@ -359,6 +371,37 @@ public class SimpleRequest
             input.close();
 
             return string.toString();
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static byte[] readData(String url)
+    {
+        if (url == null) return null;
+
+        try
+        {
+            HttpURLConnection connection = Simple.openUnderscoreConnection(url);
+
+            InputStream input = connection.getInputStream();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[ 4096 ];
+            int xfer;
+
+            while ((xfer = input.read(buffer)) >= 0)
+            {
+                output.write(buffer, 0, xfer);
+            }
+
+            input.close();
+
+            return output.toByteArray();
         }
         catch (Exception ignore)
         {

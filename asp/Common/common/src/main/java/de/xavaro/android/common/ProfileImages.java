@@ -489,6 +489,55 @@ public class ProfileImages
 
     //endregion Skype profiles
 
+    //region Facebook profiles
+
+    private static File getFacebookProfileImageFile(String facebookid)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "facebook.image." + facebookid + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    private static File getFacebookProfileFile(String facebookid)
+    {
+        if (facebookid == null) return null;
+
+        File imagefile = getFacebookProfileImageFile(facebookid);
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    @Nullable
+    private static Bitmap getFacebookProfileBitmap(String facebookid, boolean circle)
+    {
+        if (facebookid == null) return null;
+
+        File imagefile = getFacebookProfileImageFile(facebookid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, Facebook.getUserIcon(facebookid));
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getFacebookProfileDrawable(String facebookid, boolean circle)
+    {
+        return Simple.getDrawable(getFacebookProfileBitmap(facebookid, circle));
+    }
+
+    //endregion Facebook profiles
+
     private static final Map<String, Drawable> drawableCache = new HashMap<>();
 
     private static File getAnonProfileFile()
@@ -526,6 +575,7 @@ public class ProfileImages
         if (file == null) file = getXavaroProfileFile(identtag);
         if (file == null) file = getContactsProfileFile(identtag);
         if (file == null) file = getSkypeProfileFile(identtag);
+        if (file == null) file = getFacebookProfileFile(identtag);
 
         return (file == null);
     }

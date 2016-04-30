@@ -355,6 +355,7 @@ public class ProcessManager
         for (Map.Entry<Integer, ProcessInfo> pid : processes.entrySet())
         {
             ProcessInfo pi = pid.getValue();
+            if (pi.name == null) continue;
 
             if (pi.sequence != sequence)
             {

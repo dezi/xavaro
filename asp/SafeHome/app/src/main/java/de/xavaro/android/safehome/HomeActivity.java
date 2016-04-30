@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.facebook.appevents.AppEventsLogger;
+
 import org.json.JSONObject;
 
 import java.io.File;
@@ -22,6 +24,7 @@ import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.Facebook;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
@@ -203,6 +206,8 @@ public class HomeActivity extends AppCompatActivity implements
         super.onResume();
 
         Simple.setActContext(this);
+
+        Facebook.logEvent("HomeActivity");
 
         if (wasPaused && ! lostFocus)
         {

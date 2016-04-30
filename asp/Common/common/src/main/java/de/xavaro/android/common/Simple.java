@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.app.Application;
 import android.support.annotation.Nullable;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -95,8 +96,8 @@ public class Simple
 
     //region Initialisation
 
+    private static Activity actContext;
     private static Context appContext;
-    private static Context actContext;
     private static Context anyContext;
     private static Handler appHandler;
     private static WifiManager wifiManager;
@@ -118,7 +119,7 @@ public class Simple
         actContext = context;
     }
 
-    public static Context getActContext()
+    public static Activity getActContext()
     {
         return actContext;
     }
@@ -1548,6 +1549,8 @@ public class Simple
 
     public static boolean putFileBytes(File file, byte[] bytes)
     {
+        if (bytes == null) return false;
+
         try
         {
             OutputStream out = new FileOutputStream(file);

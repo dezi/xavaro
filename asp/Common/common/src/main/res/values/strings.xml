@@ -1,7 +1,8 @@
 <resources>
 
     <string name="app_name" translatable="false">SafeHome</string>
-
+    <string name="facebook_app_id" translatable="false">610331582448824</string>
+    
     <string name="simple_and">and</string>
     <string name="simple_new">new</string>
 

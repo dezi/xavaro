@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.content.Intent;
 import android.os.StrictMode;
 import android.preference.PreferenceActivity;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.Facebook;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebCookie;
@@ -25,6 +27,16 @@ public class SettingsActivity extends PreferenceActivity
     private static final String LOGTAG = SettingsActivity.class.getSimpleName();
 
     private static List<Header> headers;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(LOGTAG, "onActivityResult");
+
+        Facebook.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -63,6 +75,8 @@ public class SettingsActivity extends PreferenceActivity
         super.onResume();
 
         Simple.setActContext(this);
+
+        Facebook.logEvent("SettingsActivity");
     }
 
     @Override
@@ -117,6 +131,12 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesComm.WhatsAppFragment.getHeader());
 
         target.add(PreferencesCommXavaro.getHeader());
+
+        category = new Header();
+        category.title = "Social Media";
+        target.add(category);
+
+        target.add(PreferencesSocial.FacebookFragment.getHeader());
 
         category = new Header();
         category.title = "Web-Apps";
