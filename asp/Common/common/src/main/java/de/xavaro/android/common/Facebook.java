@@ -33,7 +33,9 @@ public class Facebook
     private static final Collection<String> permissions = Arrays.asList
     (
         "public_profile",
+
         "user_friends",
+        "user_likes",
         "user_posts"
     );
 
@@ -179,7 +181,6 @@ public class Facebook
 
         Bundle parameters = new Bundle();
 
-        //graphrequest.setAccessToken(AccessToken.getCurrentAccessToken());
         graphrequest.setGraphPath("/" + getUserId() + "/friends");
         graphrequest.setParameters(parameters);
         graphrequest.executeAndWait();
@@ -188,6 +189,26 @@ public class Facebook
         JSONArray data = Json.getArray(json, "data");
 
         if (data != null) Log.d(LOGTAG, "getUserFriendlists: data:" + data.toString());
+
+        return data;
+    }
+
+    @Nullable
+    public static JSONArray getUserLikeslist()
+    {
+        AccessToken token = AccessToken.getCurrentAccessToken();
+        if (token == null) return null;
+
+        Bundle parameters = new Bundle();
+
+        graphrequest.setGraphPath("/" + getUserId() + "/likes");
+        graphrequest.setParameters(parameters);
+        graphrequest.executeAndWait();
+
+        JSONObject json = response.getJSONObject();
+        JSONArray data = Json.getArray(json, "data");
+
+        if (data != null) Log.d(LOGTAG, "getUserLikeslist: data:" + data.toString());
 
         return data;
     }
