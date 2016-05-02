@@ -1,31 +1,58 @@
-instaface.createFrame = function()
-{
-    document.body.innerHTML += '<div class="fb-like" data-share="true" data-width="450" data-show-faces="true"> </div>';
-}
+//
+// API Test...
+//
 
-instaface.createFrame();
+instaface.pre = WebLibSimple.createAnyAppend("pre", document.body);
 
-window.fbAsyncInit = function()
-{
-    alert("pupsi");
+instaface.target = WebAppFacebook.getTarget();
+instaface.pre.innerHTML += "\n===============>target";
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(instaface.target);
 
-    FB.init({
-        appId      : '610331582448824',
-        xfbml      : true,
-        version    : 'v2.6'
-    });
+var fields = [ "id", "name", "currency" ];
+var params = { "fields": fields };
 
-    console.log(document.body.innerHTML);
-}
+var info = WebAppFacebook.getGraphSync("/me", JSON.stringify(params));
+instaface.pre.innerHTML += "\n===============>user";
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(info);
 
+var data = WebAppFacebook.getUserFeedFriends();
+instaface.pre.innerHTML += "\n===============>friends";
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
 
-/*
-  (function(d, s, id)
-  {
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/sdk/debug.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-*/
+instaface.pre.innerHTML += "\n===============>likes";
+var data = WebAppFacebook.getUserFeedLikes();
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
+
+var likes = JSON.parse(data);
+var likeid = likes[ 0 ].id;
+
+var fields = [ "id", "message", "link", "place", "privacy" ];
+var params = { "fields": fields };
+
+var data = WebAppFacebook.getGraphSync("/" + likeid + "/feed", JSON.stringify(params));
+instaface.pre.innerHTML += "\n===============>feed";
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
+
+var feed = JSON.parse(data);
+var storyid = feed.data[ 0 ].id;
+
+var fields =
+[
+    "id", "caption", "description", "icon",
+    "link", "message", "message_tags", "picture",
+    "place", "shares", "source", "type"
+];
+
+var params = { "fields": fields };
+
+var data = WebAppFacebook.getGraphSync("/" + storyid, JSON.stringify(params));
+instaface.pre.innerHTML += "\n===============>post";
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
+
+var data = WebAppFacebook.getGraphSync("/" + storyid + "/comments");
+instaface.pre.innerHTML += "\n===============>post/comments";
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
+
+var data = WebAppFacebook.getGraphSync("/" + storyid + "/attachments");
+instaface.pre.innerHTML += "\n===============>post/attachments";
+instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);

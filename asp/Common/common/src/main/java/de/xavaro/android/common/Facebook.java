@@ -44,6 +44,7 @@ public class Facebook
     private static GraphResponse response;
     private static CallbackManager callbackManager;
     private static AppEventsLogger logger;
+    private static boolean verbose = true;
 
     public static void initialize(Application app)
     {
@@ -88,7 +89,14 @@ public class Facebook
         @Override
         public void onCompleted(GraphResponse response)
         {
-            Log.d(LOGTAG, "graphcallback: onCompleted..." + response);
+            if (verbose)
+            {
+                Log.d(LOGTAG, "graphcallback: onCompleted..." + response);
+            }
+            else
+            {
+                Log.d(LOGTAG, "graphcallback: onCompleted...");
+            }
 
             Facebook.response = response;
         }
@@ -137,13 +145,19 @@ public class Facebook
 
     public static boolean isLoggedIn()
     {
-        if (AccessToken.getCurrentAccessToken() != null)
+        AccessToken token = AccessToken.getCurrentAccessToken();
+
+        if (token != null)
         {
-            Log.d(LOGTAG, "isLoggedIn: permissions=" + AccessToken.getCurrentAccessToken().getPermissions());
+            Log.d(LOGTAG, "isLoggedIn: permissions=" + token.getPermissions());
         }
 
-        return (AccessToken.getCurrentAccessToken() != null) &&
-                (Profile.getCurrentProfile() != null);
+        return (token != null) && (Profile.getCurrentProfile() != null);
+    }
+
+    public static void setVerbose(boolean yesno)
+    {
+        verbose = yesno;
     }
 
     @Nullable
@@ -175,6 +189,113 @@ public class Facebook
     }
 
     @Nullable
+    public static JSONArray getUserFriendlist()
+    {
+        JSONObject json = getGraphRequest("/" + getUserId() + "/friends");
+        JSONArray data = Json.getArray(json, "data");
+
+        if (data != null) Log.d(LOGTAG, "getUserFriendlists: data:" + data.toString());
+
+        return data;
+    }
+
+    public static JSONArray getUserFeedFriends()
+    {
+        return getUserFeed("friend");
+    }
+
+    public static JSONArray getUserFeedLikes()
+    {
+        return getUserFeed("like");
+    }
+
+    public static JSONArray getUserFeed(String what)
+    {
+        JSONArray data = new JSONArray();
+
+        String modeprefix = "facebook." + what + ".mode.";
+        String nameprefix = "facebook." + what + ".name.";
+
+        Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
+
+        for (Map.Entry<String, Object> entry : friends.entrySet())
+        {
+            Object fmode = entry.getValue();
+
+            if ((! (fmode instanceof String)) || ! ((String) fmode).contains("feed")) continue;
+
+            String fbid = entry.getKey().substring(modeprefix.length());
+            String name = Simple.getSharedPrefString(nameprefix + fbid);
+            if (name == null) continue;
+
+            JSONObject item = new JSONObject();
+
+            Json.put(item, "id", fbid);
+            Json.put(item, "name", name);
+
+            Json.put(data, item);
+        }
+
+        return data;
+    }
+
+    @Nullable
+    public static JSONArray getUserLikeslist()
+    {
+        JSONObject json = getGraphRequest("/" + getUserId() + "/likes");
+        JSONArray data = Json.getArray(json, "data");
+
+        if (data != null) Log.d(LOGTAG, "getUserLikeslist: data:" + data.toString());
+
+        return data;
+    }
+
+    @Nullable
+    public static byte[] getUserIconData(String fbid)
+    {
+        if (fbid == null) return null;
+
+        Bundle parameters = new Bundle();
+        parameters.putBoolean("redirect", false);
+        parameters.putString("type", "square");
+        parameters.putInt("width", 400);
+        parameters.putInt("height", 400);
+
+        JSONObject json = getGraphRequest("/" + fbid + "/picture", parameters);
+
+        JSONObject data = Json.getObject(json, "data");
+        String iconurl = Json.getString(data, "url");
+
+        Log.d(LOGTAG, "getUserIcon: facebookid:" + fbid + "=" + iconurl);
+
+        return SimpleRequest.readData(iconurl);
+    }
+
+    private static JSONObject getGraphRequest(String path)
+    {
+        return getGraphRequest(path, null);
+    }
+
+    public static JSONObject getGraphRequest(String path, Bundle parameters)
+    {
+        if (path == null) return null;
+
+        AccessToken token = AccessToken.getCurrentAccessToken();
+        if (token == null) return null;
+
+        if (parameters == null) parameters = new Bundle();
+
+        synchronized (graphrequest)
+        {
+            graphrequest.setAccessToken(token);
+            graphrequest.setGraphPath(path);
+            graphrequest.setParameters(parameters);
+            graphrequest.executeAndWait();
+
+            return response.getJSONObject();
+        }
+    }
+
     public static void reconfigureFriendsAndLikes()
     {
         if (! isLoggedIn()) return;
@@ -254,75 +375,5 @@ public class Facebook
                 Simple.removeSharedPref(entry.getKey());
             }
         }
-    }
-
-    @Nullable
-    public static JSONArray getUserFriendlist()
-    {
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        if (token == null) return null;
-
-        Bundle parameters = new Bundle();
-
-        graphrequest.setAccessToken(token);
-        graphrequest.setGraphPath("/" + getUserId() + "/friends");
-        graphrequest.setParameters(parameters);
-        graphrequest.executeAndWait();
-
-        JSONObject json = response.getJSONObject();
-        JSONArray data = Json.getArray(json, "data");
-
-        if (data != null) Log.d(LOGTAG, "getUserFriendlists: data:" + data.toString());
-
-        return data;
-    }
-
-    @Nullable
-    public static JSONArray getUserLikeslist()
-    {
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        if (token == null) return null;
-
-        Bundle parameters = new Bundle();
-
-        graphrequest.setAccessToken(token);
-        graphrequest.setGraphPath("/" + getUserId() + "/likes");
-        graphrequest.setParameters(parameters);
-        graphrequest.executeAndWait();
-
-        JSONObject json = response.getJSONObject();
-        JSONArray data = Json.getArray(json, "data");
-
-        if (data != null) Log.d(LOGTAG, "getUserLikeslist: data:" + data.toString());
-
-        return data;
-    }
-
-    @Nullable
-    public static byte[] getUserIcon(String fbid)
-    {
-        if (fbid == null) return null;
-
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        if (token == null) return null;
-
-        Bundle parameters = new Bundle();
-        parameters.putBoolean("redirect", false);
-        parameters.putString("type", "square");
-        parameters.putInt("width", 400);
-        parameters.putInt("height", 400);
-
-        graphrequest.setAccessToken(token);
-        graphrequest.setGraphPath("/" + fbid + "/picture");
-        graphrequest.setParameters(parameters);
-        graphrequest.executeAndWait();
-
-        JSONObject json = response.getJSONObject();
-        JSONObject data = Json.getObject(json, "data");
-        String iconurl = Json.getString(data, "url");
-
-        Log.d(LOGTAG, "getUserIcon: facebookid:" + fbid + "=" + iconurl);
-
-        return SimpleRequest.readData(iconurl);
     }
 }

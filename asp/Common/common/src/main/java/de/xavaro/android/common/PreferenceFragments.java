@@ -378,7 +378,6 @@ public class PreferenceFragments
             sw.setTitle(masterenable);
             sw.setDefaultValue(false);
             sw.setOnPreferenceChangeListener(this);
-            sw.setOrder(0);
 
             preferences.add(sw);
             activekeys.add(sw.getKey());

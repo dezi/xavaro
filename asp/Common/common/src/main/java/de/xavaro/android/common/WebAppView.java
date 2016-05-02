@@ -3,17 +3,10 @@ package de.xavaro.android.common;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Message;
-import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.util.Log;
-import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
@@ -39,6 +32,7 @@ public class WebAppView extends WebView
     public WebAppRequest request;
     public WebAppUtility utility;
     public WebAppStorage storage;
+    public WebAppFacebook facebook;
     public WebAppActivity activity;
     public WebAppIntercept intercept;
     public WebAppAssistance assistance;
@@ -49,6 +43,8 @@ public class WebAppView extends WebView
     @SuppressLint("SetJavaScriptEnabled")
     public void loadWebView(String webappname, String mode)
     {
+        Log.d(LOGTAG, "loadWebView: " + webappname + " mode=" + mode);
+
         setWebChromeClient(new WebChromeClient());
 
         //
@@ -131,6 +127,12 @@ public class WebAppView extends WebView
         {
             activity = new WebAppActivity();
             addJavascriptInterface(activity, "WebAppActivity");
+        }
+
+        if (permissions.contains("facebook"))
+        {
+            facebook = new WebAppFacebook();
+            addJavascriptInterface(facebook, "WebAppFacebook");
         }
 
         if (permissions.contains("weather"))

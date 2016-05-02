@@ -517,7 +517,7 @@ public class ProfileImages
 
         if (! imagefile.exists())
         {
-            Simple.putFileBytes(imagefile, Facebook.getUserIcon(facebookid));
+            Simple.putFileBytes(imagefile, Facebook.getUserIconData(facebookid));
         }
 
         if (imagefile.exists())

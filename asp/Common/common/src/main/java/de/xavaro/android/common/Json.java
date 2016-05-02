@@ -178,6 +178,20 @@ public class Json
         return null;
     }
 
+    @Nullable
+    public static Object get(JSONArray json, int index)
+    {
+        try
+        {
+            return json.get(index);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
     public static boolean has(JSONObject json, String key)
     {
         return (json != null) && json.has(key);
