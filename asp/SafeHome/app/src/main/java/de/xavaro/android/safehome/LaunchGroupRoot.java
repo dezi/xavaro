@@ -103,6 +103,8 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchGroupComm.WhatsappGroup.getConfig());
         configs.add(LaunchGroupComm.XavaroGroup.getConfig());
 
+        configs.add(LaunchGroupSocial.FacebookGroup.getConfig());
+
         configs.add(LaunchGroupWebStream.getConfig("iptv"));
         configs.add(LaunchGroupWebStream.getConfig("iprd"));
 

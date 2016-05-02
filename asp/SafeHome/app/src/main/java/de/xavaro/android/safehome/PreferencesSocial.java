@@ -1,25 +1,19 @@
 package de.xavaro.android.safehome;
 
-import android.content.Context;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.Preference;
+import android.content.Context;
 import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Facebook;
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.WifiLookup;
 
 public class PreferencesSocial
 {
@@ -72,6 +66,10 @@ public class PreferencesSocial
 
             NicedPreferences.NiceDisplayTextPreference dp;
 
+            // legacy remove.
+
+            Simple.removeAllPreferences("facebook.");
+
             //
             // Get login status. Store current credentials
             // into or get last loggedin credentials from
@@ -82,13 +80,13 @@ public class PreferencesSocial
             String name = Facebook.getUserDisplayName();
             String expi = Facebook.getUserTokenExpiration();
 
-            if (fbid != null) Simple.setSharedPrefString("facebook.fbid", fbid);
-            if (name != null) Simple.setSharedPrefString("facebook.name", name);
-            if (expi != null) Simple.setSharedPrefString("facebook.expi", expi);
+            if (fbid != null) Simple.setSharedPrefString(keyprefix + ".fbid", fbid);
+            if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
+            if (expi != null) Simple.setSharedPrefString(keyprefix + ".expi", expi);
 
-            if (fbid == null) fbid = Simple.getSharedPrefString("facebook.fbid");
-            if (name == null) name = Simple.getSharedPrefString("facebook.name");
-            if (expi == null) expi = Simple.getSharedPrefString("facebook.expi");
+            if (fbid == null) fbid = Simple.getSharedPrefString(keyprefix + ".fbid");
+            if (name == null) name = Simple.getSharedPrefString(keyprefix + ".name");
+            if (expi == null) expi = Simple.getSharedPrefString(keyprefix + ".expi");
 
             facebookHead = new NicedPreferences.NiceInfoPreference(context);
             facebookHead.setTitle(R.string.pref_social_facebook_account);
@@ -203,19 +201,19 @@ public class PreferencesSocial
 
                 lp = new NicedPreferences.NiceListPreference(context);
 
-                lp.setKey("facebook.newfriends.default");
+                lp.setKey(keyprefix + ".newfriends.default");
                 lp.setTitle(R.string.pref_social_facebook_autofriends);
                 lp.setEntryValues(R.array.pref_social_facebook_newfriends_keys);
                 lp.setEntries(R.array.pref_social_facebook_newfriends_vals);
-                lp.setDefaultValue("feed");
+                lp.setDefaultValue("feed+folder");
                 lp.setEnabled(enabled);
                 lp.setOrder(10001);
 
                 preferences.add(lp);
             }
 
-            String friendsname = "facebook.friend.name.";
-            String friendsmode = "facebook.friend.mode.";
+            String friendsname = keyprefix + ".friend.name.";
+            String friendsmode = keyprefix + ".friend.mode.";
 
             Map<String, Object> friendspref = Simple.getAllPreferences(friendsname);
 
@@ -268,7 +266,7 @@ public class PreferencesSocial
 
                 lp = new NicedPreferences.NiceListPreference(context);
 
-                lp.setKey("facebook.newlikes.default");
+                lp.setKey(keyprefix + ".newlikes.default");
                 lp.setTitle(R.string.pref_social_facebook_autolikes);
                 lp.setEntryValues(R.array.pref_social_facebook_newlikes_keys);
                 lp.setEntries(R.array.pref_social_facebook_newlikes_vals);
@@ -279,8 +277,8 @@ public class PreferencesSocial
                 preferences.add(lp);
             }
 
-            String likesname = "facebook.like.name.";
-            String likesmode = "facebook.like.mode.";
+            String likesname = keyprefix + ".like.name.";
+            String likesmode = keyprefix + ".like.mode.";
 
             Map<String, Object> likespref = Simple.getAllPreferences(likesname);
 

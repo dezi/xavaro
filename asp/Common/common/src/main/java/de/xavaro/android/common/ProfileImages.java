@@ -345,7 +345,7 @@ public class ProfileImages
     }
 
     @Nullable
-    public static File getWhatsAppProfileFile(String phonenumber)
+    private static File getWhatsAppProfileFile(String phonenumber)
     {
         if (phonenumber == null) return null;
 
@@ -369,7 +369,7 @@ public class ProfileImages
     }
 
     @Nullable
-    public static Bitmap getWhatsAppProfileBitmap(String phonenumber, boolean circle)
+    private static Bitmap getWhatsAppProfileBitmap(String phonenumber, boolean circle)
     {
         if (phonenumber == null) return null;
 
@@ -491,7 +491,7 @@ public class ProfileImages
 
     //region Facebook profiles
 
-    private static File getFacebookProfileImageFile(String facebookid)
+    public static File getFacebookProfileImageFile(String facebookid)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "facebook.image." + facebookid + ".jpg";
@@ -499,7 +499,7 @@ public class ProfileImages
     }
 
     @Nullable
-    private static File getFacebookProfileFile(String facebookid)
+    public static File getFacebookProfileFile(String facebookid)
     {
         if (facebookid == null) return null;
 
@@ -509,7 +509,7 @@ public class ProfileImages
     }
 
     @Nullable
-    private static Bitmap getFacebookProfileBitmap(String facebookid, boolean circle)
+    public static Bitmap getFacebookProfileBitmap(String facebookid, boolean circle)
     {
         if (facebookid == null) return null;
 

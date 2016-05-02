@@ -434,9 +434,9 @@
         <item>Inaktiv</item>
         <item>Feed</item>
         <item>Feed + Home</item>
-        <item>Feed + Folder</item>
+        <item>Feed + Ordner</item>
         <item>Home</item>
-        <item>Folder</item>
+        <item>Ordner</item>
     </string-array>
 
     <string name="battery_manager_remind">Bitte verbinden Sie ihr Tablet demnächst mit der Ladestation.</string>

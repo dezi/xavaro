@@ -213,8 +213,8 @@ public class Facebook
     {
         JSONArray data = new JSONArray();
 
-        String modeprefix = "facebook." + what + ".mode.";
-        String nameprefix = "facebook." + what + ".name.";
+        String modeprefix = "social.facebook." + what + ".mode.";
+        String nameprefix = "social.facebook." + what + ".name.";
 
         Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
 
@@ -304,10 +304,10 @@ public class Facebook
 
         if (friends != null)
         {
-            Map<String, Object> oldfriends = Simple.getAllPreferences("facebook.friend.");
+            Map<String, Object> oldfriends = Simple.getAllPreferences("social.facebook.friend.");
 
-            String dfmode = Simple.getSharedPrefString("facebook.newfriends.default");
-            if (dfmode == null) dfmode = "feed";
+            String dfmode = Simple.getSharedPrefString("social.facebook.newfriends.default");
+            if (dfmode == null) dfmode = "feed+folder";
 
             for (int inx = 0; inx < friends.length(); inx++)
             {
@@ -318,8 +318,8 @@ public class Facebook
                 String name = Json.getString(friend, "name");
                 if ((fbid == null) || (name == null)) continue;
 
-                String fnamepref = "facebook.friend.name." + fbid;
-                String fmodepref = "facebook.friend.mode." + fbid;
+                String fnamepref = "social.facebook.friend.name." + fbid;
+                String fmodepref = "social.facebook.friend.mode." + fbid;
 
                 Simple.setSharedPrefString(fnamepref, name);
 
@@ -342,10 +342,10 @@ public class Facebook
 
         if (likes != null)
         {
-            Map<String, Object> oldlikes = Simple.getAllPreferences("facebook.like.");
+            Map<String, Object> oldlikes = Simple.getAllPreferences("social.facebook.like.");
 
-            String dfmode = Simple.getSharedPrefString("facebook.newlikes.default");
-            if (dfmode == null) dfmode = "feed";
+            String dfmode = Simple.getSharedPrefString("social.facebook.newlikes.default");
+            if (dfmode == null) dfmode = "folder";
 
             for (int inx = 0; inx < likes.length(); inx++)
             {
@@ -356,8 +356,8 @@ public class Facebook
                 String name = Json.getString(like, "name");
                 if ((fbid == null) || (name == null)) continue;
 
-                String fnamepref = "facebook.like.name." + fbid;
-                String fmodepref = "facebook.like.mode." + fbid;
+                String fnamepref = "social.facebook.like.name." + fbid;
+                String fmodepref = "social.facebook.like.mode." + fbid;
 
                 Simple.setSharedPrefString(fnamepref, name);
 

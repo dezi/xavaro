@@ -65,6 +65,8 @@ public class LaunchItem extends FrameLayout implements
         if (Simple.equals(type, "whatsapp"    )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "contacts"    )) item = new LaunchItemComm(context);
 
+        if (Simple.equals(type, "facebook"    )) item = new LaunchItemSocial(context);
+
         if (Simple.equals(type, "xavaro"      )) item = new LaunchItemCommXavaro(context);
 
         if (Simple.equals(type, "webapp"      )) item = new LaunchItemWebApp(context);
