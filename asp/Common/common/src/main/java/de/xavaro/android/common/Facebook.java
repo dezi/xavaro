@@ -24,6 +24,7 @@ import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 
 public class Facebook
@@ -174,6 +175,88 @@ public class Facebook
     }
 
     @Nullable
+    public static void reconfigureFriendsAndLikes()
+    {
+        if (! isLoggedIn()) return;
+
+        JSONArray friends = getUserFriendlist();
+
+        if (friends != null)
+        {
+            Map<String, Object> oldfriends = Simple.getAllPreferences("facebook.friend.");
+
+            String dfmode = Simple.getSharedPrefString("facebook.newfriends.default");
+            if (dfmode == null) dfmode = "feed";
+
+            for (int inx = 0; inx < friends.length(); inx++)
+            {
+                JSONObject friend = Json.getObject(friends, inx);
+                if (friend == null) continue;
+
+                String fbid = Json.getString(friend, "id");
+                String name = Json.getString(friend, "name");
+                if ((fbid == null) || (name == null)) continue;
+
+                String fnamepref = "facebook.friend.name." + fbid;
+                String fmodepref = "facebook.friend.mode." + fbid;
+
+                Simple.setSharedPrefString(fnamepref, name);
+
+                if (Simple.getSharedPrefString(fmodepref) == null)
+                {
+                    Simple.setSharedPrefString(fmodepref, dfmode);
+                }
+
+                if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
+                if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
+            }
+
+            for (Map.Entry<String, ?> entry : oldfriends.entrySet())
+            {
+                Simple.removeSharedPref(entry.getKey());
+            }
+        }
+
+        JSONArray likes = getUserLikeslist();
+
+        if (likes != null)
+        {
+            Map<String, Object> oldlikes = Simple.getAllPreferences("facebook.like.");
+
+            String dfmode = Simple.getSharedPrefString("facebook.newlikes.default");
+            if (dfmode == null) dfmode = "feed";
+
+            for (int inx = 0; inx < likes.length(); inx++)
+            {
+                JSONObject like = Json.getObject(likes, inx);
+                if (like == null) continue;
+
+                String fbid = Json.getString(like, "id");
+                String name = Json.getString(like, "name");
+                if ((fbid == null) || (name == null)) continue;
+
+                String fnamepref = "facebook.like.name." + fbid;
+                String fmodepref = "facebook.like.mode." + fbid;
+
+                Simple.setSharedPrefString(fnamepref, name);
+
+                if (Simple.getSharedPrefString(fmodepref) == null)
+                {
+                    Simple.setSharedPrefString(fmodepref, dfmode);
+                }
+
+                if (oldlikes.containsKey(fnamepref)) oldlikes.remove(fnamepref);
+                if (oldlikes.containsKey(fmodepref)) oldlikes.remove(fmodepref);
+            }
+
+            for (Map.Entry<String, ?> entry : oldlikes.entrySet())
+            {
+                Simple.removeSharedPref(entry.getKey());
+            }
+        }
+    }
+
+    @Nullable
     public static JSONArray getUserFriendlist()
     {
         AccessToken token = AccessToken.getCurrentAccessToken();
@@ -181,6 +264,7 @@ public class Facebook
 
         Bundle parameters = new Bundle();
 
+        graphrequest.setAccessToken(token);
         graphrequest.setGraphPath("/" + getUserId() + "/friends");
         graphrequest.setParameters(parameters);
         graphrequest.executeAndWait();
@@ -201,6 +285,7 @@ public class Facebook
 
         Bundle parameters = new Bundle();
 
+        graphrequest.setAccessToken(token);
         graphrequest.setGraphPath("/" + getUserId() + "/likes");
         graphrequest.setParameters(parameters);
         graphrequest.executeAndWait();
@@ -227,6 +312,7 @@ public class Facebook
         parameters.putInt("width", 400);
         parameters.putInt("height", 400);
 
+        graphrequest.setAccessToken(token);
         graphrequest.setGraphPath("/" + fbid + "/picture");
         graphrequest.setParameters(parameters);
         graphrequest.executeAndWait();

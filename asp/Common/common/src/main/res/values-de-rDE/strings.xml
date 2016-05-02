@@ -351,6 +351,94 @@
         <item>Alle 60 Minuten</item>
     </string-array>
 
+    <string name="pref_social_facebook">Facebook</string>
+    <string name="pref_social_facebook_summary">
+        Facebook ermöglicht es dem Anwender auf einfachste Art und Weise
+        mit allen Menschen in Kontakt zu bleiben. Bla bla.
+        \n\nOle/Zimmel: Facebook hat April 2015 seine Policy bezüglich der
+        Privatsphäre grundsätzlich geändert. Das hat zur Folge, dass eine
+        App (wir sind eine App) grundsätzlich keinen Zugriff mehr auf die
+        Freundesliste des Facebook-Users hat. Es sei denn, jeder einzelne
+        Freund hat den Zugriff auf diese App authorisiert. Daran hat sich
+        bereits eine Handvoll Internet-Startups final zerlegt. Sic.
+        \n\nDas ist einerseits gut und andererseits schlecht. Wenn ihr hier
+        euren Account reinbastelt, ist die Sektion unter Freunde leer.
+        \n\nDer einzige Weg, wie die Freunde da reinkommen ist, sie gehen
+        auf www.xavaro.de/facebook.php und loggen sich dort per Facebook
+        einmal ein. Das bewirkt, dass der FBUser uns die entsprechenden
+        Zugriffrechte gibt und wie durch Wunder erscheint dieser User
+        dann hier in der Freundliste. Immerhin. Wir basteln da eine
+        nette Landingpage mit pipapo "Opi Zugriff erlauben". Der Betreuer
+        muss dann halt diesen Link mit der Family teilen und alle auffordern,
+        da mal hinzugehen.
+    </string>
+    <string name="pref_social_facebook_enable">Facebook freischalten</string>
+    <string name="pref_social_facebook_account">Facebook Account</string>
+    <string name="pref_social_facebook_account_summary">
+        Wenn Sie Facebook benutzen wollen, müssen Sie sich hier mit demjenigen
+        Account einloggen, den der Anwender lesen können soll. Sie können dazu
+        einen individuellen Account bei Facebook anlegen, oder einfach ihren
+        eigenen Account benutzen, wenn Sie eine Betreuungsperson aus der Familie
+        sind.
+        \n\nDer Anwender kann diejenigen Posts verfolgen, die im weiteren aktiviert
+        sind. Er kann jedoch weder kommentieren, liken oder posten. Der gesammte
+        Feed wird ausschließlich lesend zur Verfügung gestellt.
+        \n\nAchtung: Aufgrund der Facebook Privacy Policy muss jeder Facebook
+        Benutzer, dessen Profil und Posts hier angezeigt werden sollen, dem
+        dediziert zustimmen. Solange er dies nicht gemacht hat, wird er nicht
+        in der Freundesliste erscheinen.
+        \n\nBitte veranlassen Sie, dass relevante Personen einmal die Seite
+        http:/www.xavaro.de/facebook.php besuchen und dort Xavaro authorisieren.
+    </string>
+    <string name="pref_social_facebook_user">Facebook Benutzer</string>
+    <string name="pref_social_facebook_validuntil">Gültig bis</string>
+    <string name="pref_social_facebook_login">Login</string>
+    <string name="pref_social_facebook_logout">Logout</string>
+    <string name="pref_social_facebook_isloggedin">ist eingeloggt</string>
+    <string name="pref_social_facebook_isloggedout">ist ausgeloggt</string>
+    <string name="pref_social_facebook_friends">Facebook Freunde</string>
+    <string name="pref_social_facebook_friends_summary">
+        Sie können hier entscheiden, wo die Posts individueller Freunde erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Die Posts werden wie auf der Facebook Homepage aggregiert.
+        \n\nHome: Ein individueller Feed des Freundes wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Ein individueller Feed des Freundes wird im Facebook-Ordner angezeigt.
+        \n\nKontakte: Ein individueller Feed des Freundes wird im Kontakte-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Freunden verfahren wird.
+    </string>
+    <string name="pref_social_facebook_autofriends">Automatik neue Freunde</string>
+    <string name="pref_social_facebook_likes">Facebook Likes</string>
+    <string name="pref_social_facebook_likes_summary">
+        Sie können hier entscheiden, wo die Posts von Likes (wie z.B. Celebrieties oder
+        Fanpages) erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Die Posts werden wie auf der Facebook Homepage aggregiert.
+        \n\nHome: Ein individueller Feed des Likes wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Ein individueller Feed des Likes wird im Facebook-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Likes verfahren wird.
+    </string>
+    <string name="pref_social_facebook_autolikes">Automatik neue Likes</string>
+
+    <string-array name="pref_social_facebook_newfriends_vals">
+        <item>Inaktiv</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Ordner</item>
+        <item>Feed + Kontakte</item>
+        <item>Home</item>
+        <item>Ordner</item>
+        <item>Kontakte</item>
+    </string-array>
+
+    <string-array name="pref_social_facebook_newlikes_vals">
+        <item>Inaktiv</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Folder</item>
+        <item>Home</item>
+        <item>Folder</item>
+    </string-array>
+
     <string name="battery_manager_remind">Bitte verbinden Sie ihr Tablet demnächst mit der Ladestation.</string>
     <string name="battery_manager_remind_du">Bitte verbinde Dein Tablet demnächst mit der Ladestation.</string>
     <string name="battery_manager_warn">Bitte verbinden Sie ihr Tablet jetzt mit der Ladestation.</string>

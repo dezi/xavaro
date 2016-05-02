@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Map;
 
+import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Facebook;
 import de.xavaro.android.common.Json;
@@ -18,6 +19,7 @@ import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WifiLookup;
 
 public class PreferencesSocial
 {
@@ -32,7 +34,7 @@ public class PreferencesSocial
             PreferenceActivity.Header header;
 
             header = new PreferenceActivity.Header();
-            header.title = "Facebook";
+            header.titleRes = R.string.pref_social_facebook;
             header.iconRes = CommonConfigs.IconResSocialFacebook;
             header.fragment = FacebookFragment.class.getName();
 
@@ -45,12 +47,24 @@ public class PreferencesSocial
 
             iconres = CommonConfigs.IconResSocialFacebook;
             keyprefix = "social.facebook";
-            masterenable = "Facebook freischalten";
+            masterenable = Simple.getTrans(R.string.pref_social_facebook_enable);
+            summaryres = R.string.pref_social_facebook_summary;
         }
 
+        ArrayList<String> knownfbids = new ArrayList<>();
         NicedPreferences.NiceCategoryPreference facebookHead;
         NicedPreferences.NiceDisplayTextPreference facebookUser;
         NicedPreferences.NiceDisplayTextPreference facebookExpi;
+
+        @Override
+        public void onDestroy()
+        {
+            super.onDestroy();
+
+            Log.d(LOGTAG, "onDestroy");
+
+            Simple.removePost(monitorPrefs);
+        }
 
         public void registerAll(Context context)
         {
@@ -77,30 +91,37 @@ public class PreferencesSocial
             if (expi == null) expi = Simple.getSharedPrefString("facebook.expi");
 
             facebookHead = new NicedPreferences.NiceInfoPreference(context);
-            facebookHead.setTitle("Facebook Account");
-            facebookHead.setSummary(R.string.pref_basic_owner_profile_summary);
+            facebookHead.setTitle(R.string.pref_social_facebook_account);
+            facebookHead.setSummary(R.string.pref_social_facebook_account_summary);
             facebookHead.setIcon(ProfileImages.getFacebookProfileDrawable(fbid, true));
             facebookHead.setEnabled(enabled);
 
             preferences.add(facebookHead);
 
             facebookUser = new NicedPreferences.NiceDisplayTextPreference(context);
-            facebookUser.setTitle("Facebook Benutzer");
+            facebookUser.setTitle(R.string.pref_social_facebook_user);
             facebookUser.setText(name);
             facebookUser.setEnabled(enabled);
 
             preferences.add(facebookUser);
 
             facebookExpi = new NicedPreferences.NiceDisplayTextPreference(context);
-            facebookExpi.setTitle("Gültig bis");
+            facebookExpi.setTitle(R.string.pref_social_facebook_validuntil);
             facebookExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
             facebookExpi.setEnabled(enabled);
 
             preferences.add(facebookExpi);
 
             dp = new NicedPreferences.NiceDisplayTextPreference(context);
-            dp.setTitle(Facebook.isLoggedIn() ? "Ausloggen" : "Einloggen");
-            dp.setText(Facebook.isLoggedIn() ? "ist eingeloggt" : "ist ausgelogt");
+
+            dp.setTitle(Facebook.isLoggedIn()
+                    ? R.string.pref_social_facebook_logout
+                    : R.string.pref_social_facebook_login);
+
+            dp.setText(Simple.getTrans(Facebook.isLoggedIn()
+                    ?  R.string.pref_social_facebook_isloggedin
+                    :  R.string.pref_social_facebook_isloggedout));
+
             dp.setEnabled(enabled);
 
             dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -142,42 +163,63 @@ public class PreferencesSocial
 
             preferences.add(dp);
 
-            registerFriends(context);
-            registerLikes(context);
+            //
+            // Define preference order.
+            //
+
+            int order = 1;
+
+            for (Preference pref : preferences)
+            {
+                pref.setOrder(order++);
+            }
+
+            //
+            // Preset all current friends and likes preferences.
+            //
+
+            Facebook.reconfigureFriendsAndLikes();
+
+            registerFriends(context, true);
+            registerLikes(context, true);
+
+            Simple.makePost(monitorPrefs, 5 * 1000);
         }
 
-        public void registerFriends(Context context)
+        public void registerFriends(Context context, boolean initial)
         {
             NicedPreferences.NiceInfoPreference ip;
-            NicedPreferences.NiceCheckboxPreference cp;
-            NicedPreferences.NiceSwitchPreference sp;
+            NicedPreferences.NiceListPreference lp;
 
-            ip = new NicedPreferences.NiceInfoPreference(context);
-            ip.setTitle("Facebook Freunde");
-            ip.setSummary("todo");
-            ip.setEnabled(enabled);
-            preferences.add(ip);
+            if (initial)
+            {
+                ip = new NicedPreferences.NiceInfoPreference(context);
+                ip.setTitle(R.string.pref_social_facebook_friends);
+                ip.setSummary(R.string.pref_social_facebook_friends_summary);
+                ip.setEnabled(enabled);
+                ip.setOrder(10000);
 
-            sp = new NicedPreferences.NiceSwitchPreference(context);
-            sp.setKey("facebook.friends.autoenable");
-            sp.setTitle("Automatisch aktivieren");
-            sp.setDefaultValue(true);
-            sp.setEnabled(enabled);
+                preferences.add(ip);
 
-            preferences.add(sp);
+                lp = new NicedPreferences.NiceListPreference(context);
 
-            //
-            // Display already known friends list.
-            //
+                lp.setKey("facebook.newfriends.default");
+                lp.setTitle(R.string.pref_social_facebook_autofriends);
+                lp.setEntryValues(R.array.pref_social_facebook_newfriends_keys);
+                lp.setEntries(R.array.pref_social_facebook_newfriends_vals);
+                lp.setDefaultValue("feed");
+                lp.setEnabled(enabled);
+                lp.setOrder(10001);
 
-            ArrayList<String> oldfriends = new ArrayList<>();
+                preferences.add(lp);
+            }
 
             String friendsname = "facebook.friend.name.";
-            String friendsenabled = "facebook.friend.enabled.";
+            String friendsmode = "facebook.friend.mode.";
 
-            Map<String, Object> oldfriendspref = Simple.getAllPreferences(friendsname);
+            Map<String, Object> friendspref = Simple.getAllPreferences(friendsname);
 
-            for (Map.Entry<String, ?> entry : oldfriendspref.entrySet())
+            for (Map.Entry<String, ?> entry : friendspref.entrySet())
             {
                 Object fnobj = entry.getValue();
 
@@ -186,139 +228,107 @@ public class PreferencesSocial
                 String ffbid = entry.getKey().substring(friendsname.length());
                 String fname = (String) fnobj;
 
-                cp = new NicedPreferences.NiceCheckboxPreference(context);
-                cp.setKey(friendsenabled + ffbid);
-                cp.setTitle(fname);
-                cp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
-                cp.setEnabled(enabled);
+                if (knownfbids.contains(ffbid)) continue;
+                knownfbids.add(ffbid);
 
-                preferences.add(cp);
-                oldfriends.add(ffbid);
-            }
+                lp = new NicedPreferences.NiceListPreference(context);
+                lp.setKey(friendsmode + ffbid);
+                lp.setTitle(fname);
+                lp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
+                lp.setEntryValues(R.array.pref_social_facebook_newfriends_keys);
+                lp.setEntries(R.array.pref_social_facebook_newfriends_vals);
+                lp.setEnabled(enabled);
 
-            //
-            // Display new potential friends list.
-            //
+                //
+                // Updated items get first.
+                //
 
-            boolean autoenable = Simple.getSharedPrefBoolean("facebook.friends.autoenable");
+                lp.setOrder(19999 - preferences.size());
 
-            if (Facebook.isLoggedIn())
-            {
-                JSONArray allfriends = Facebook.getUserFriendlist();
+                preferences.add(lp);
 
-                if (allfriends != null)
-                {
-                    for (int inx = 0; inx < allfriends.length(); inx++)
-                    {
-                        JSONObject allfriend = Json.getObject(allfriends, inx);
-                        if (allfriend == null) continue;
-
-                        String ffbid = Json.getString(allfriend, "id");
-                        String fname = Json.getString(allfriend, "name");
-
-                        if (oldfriends.contains(ffbid)) continue;
-
-                        Simple.setSharedPrefString(friendsname + ffbid, fname);
-
-                        cp = new NicedPreferences.NiceCheckboxPreference(context);
-                        cp.setKey(friendsenabled + ffbid);
-                        cp.setTitle(fname);
-                        cp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
-                        cp.setDefaultValue(autoenable);
-                        cp.setEnabled(enabled);
-
-                        preferences.add(cp);
-                    }
-                }
+                if (! initial) getPreferenceScreen().addPreference(lp);
             }
         }
 
-        public void registerLikes(Context context)
+        public void registerLikes(Context context, boolean initial)
         {
             NicedPreferences.NiceInfoPreference ip;
-            NicedPreferences.NiceCheckboxPreference cp;
-            NicedPreferences.NiceSwitchPreference sp;
+            NicedPreferences.NiceListPreference lp;
 
-            ip = new NicedPreferences.NiceInfoPreference(context);
-            ip.setTitle("Facebook Likes");
-            ip.setSummary("todo");
-            ip.setEnabled(enabled);
-            preferences.add(ip);
+            if (initial)
+            {
+                ip = new NicedPreferences.NiceInfoPreference(context);
+                ip.setTitle(R.string.pref_social_facebook_likes);
+                ip.setSummary(R.string.pref_social_facebook_likes_summary);
+                ip.setEnabled(enabled);
+                ip.setOrder(20000);
 
-            sp = new NicedPreferences.NiceSwitchPreference(context);
-            sp.setKey("facebook.likes.autoenable");
-            sp.setTitle("Automatisch aktivieren");
-            sp.setDefaultValue(true);
-            sp.setEnabled(enabled);
+                preferences.add(ip);
 
-            preferences.add(sp);
+                lp = new NicedPreferences.NiceListPreference(context);
 
-            //
-            // Display already known likes list.
-            //
+                lp.setKey("facebook.newlikes.default");
+                lp.setTitle(R.string.pref_social_facebook_autolikes);
+                lp.setEntryValues(R.array.pref_social_facebook_newlikes_keys);
+                lp.setEntries(R.array.pref_social_facebook_newlikes_vals);
+                lp.setDefaultValue("folder");
+                lp.setEnabled(enabled);
+                lp.setOrder(20001);
 
-            ArrayList<String> oldfriends = new ArrayList<>();
+                preferences.add(lp);
+            }
 
-            String friendsname = "facebook.like.name.";
-            String friendsenabled = "facebook.like.enabled.";
+            String likesname = "facebook.like.name.";
+            String likesmode = "facebook.like.mode.";
 
-            Map<String, Object> oldfriendspref = Simple.getAllPreferences(friendsname);
+            Map<String, Object> likespref = Simple.getAllPreferences(likesname);
 
-            for (Map.Entry<String, ?> entry : oldfriendspref.entrySet())
+            for (Map.Entry<String, ?> entry : likespref.entrySet())
             {
                 Object fnobj = entry.getValue();
 
                 if (! (fnobj instanceof String)) continue;
 
-                String ffbid = entry.getKey().substring(friendsname.length());
+                String ffbid = entry.getKey().substring(likesname.length());
                 String fname = (String) fnobj;
 
-                cp = new NicedPreferences.NiceCheckboxPreference(context);
-                cp.setKey(friendsenabled + ffbid);
-                cp.setTitle(fname);
-                cp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
-                cp.setEnabled(enabled);
+                if (knownfbids.contains(ffbid)) continue;
+                knownfbids.add(ffbid);
 
-                preferences.add(cp);
-                oldfriends.add(ffbid);
-            }
+                lp = new NicedPreferences.NiceListPreference(context);
+                lp.setKey(likesmode + ffbid);
+                lp.setTitle(fname);
+                lp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
+                lp.setEntryValues(R.array.pref_social_facebook_newlikes_keys);
+                lp.setEntries(R.array.pref_social_facebook_newlikes_vals);
+                lp.setEnabled(enabled);
 
-            //
-            // Display new potential friends list.
-            //
+                //
+                // Updated items get first.
+                //
 
-            boolean autoenable = Simple.getSharedPrefBoolean("facebook.likes.autoenable");
+                lp.setOrder(29999 - preferences.size());
 
-            if (Facebook.isLoggedIn())
-            {
-                JSONArray allfriends = Facebook.getUserLikeslist();
+                preferences.add(lp);
 
-                if (allfriends != null)
-                {
-                    for (int inx = 0; inx < allfriends.length(); inx++)
-                    {
-                        JSONObject allfriend = Json.getObject(allfriends, inx);
-                        if (allfriend == null) continue;
-
-                        String ffbid = Json.getString(allfriend, "id");
-                        String fname = Json.getString(allfriend, "name");
-
-                        if (oldfriends.contains(ffbid)) continue;
-
-                        Simple.setSharedPrefString(friendsname + ffbid, fname);
-
-                        cp = new NicedPreferences.NiceCheckboxPreference(context);
-                        cp.setKey(friendsenabled + ffbid);
-                        cp.setTitle(fname);
-                        cp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
-                        cp.setDefaultValue(autoenable);
-                        cp.setEnabled(enabled);
-
-                        preferences.add(cp);
-                    }
-                }
+                if (! initial) getPreferenceScreen().addPreference(lp);
             }
         }
+
+        private final Runnable monitorPrefs = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Facebook.reconfigureFriendsAndLikes();
+
+                registerFriends(Simple.getActContext(), false);
+                registerLikes(Simple.getActContext(), false);
+
+                Simple.makePost(monitorPrefs, 5 * 1000);
+            }
+        };
     }
 
     //endregion Facebook preferences

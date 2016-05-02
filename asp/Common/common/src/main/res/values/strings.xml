@@ -349,6 +349,64 @@
         <item>Every 60 Minutes</item>
     </string-array>
 
+    <string name="pref_social_facebook">Facebook</string>
+    <string name="pref_social_facebook_summary">todo</string>
+    <string name="pref_social_facebook_enable">Enable Facebook</string>
+    <string name="pref_social_facebook_account">Facebook Account</string>
+    <string name="pref_social_facebook_account_summary">todo</string>
+    <string name="pref_social_facebook_user">Facebook User</string>
+    <string name="pref_social_facebook_validuntil">Valid until</string>
+    <string name="pref_social_facebook_login">Login</string>
+    <string name="pref_social_facebook_logout">Logout</string>
+    <string name="pref_social_facebook_isloggedin">is logged in</string>
+    <string name="pref_social_facebook_isloggedout">is logged out</string>
+    <string name="pref_social_facebook_friends">Facebook Friends</string>
+    <string name="pref_social_facebook_friends_summary">todo</string>
+    <string name="pref_social_facebook_autofriends">Automated new friends</string>
+    <string name="pref_social_facebook_likes">Facebook Likes</string>
+    <string name="pref_social_facebook_likes_summary">todo</string>
+    <string name="pref_social_facebook_autolikes">Automated new likes</string>
+
+    <string-array name="pref_social_facebook_newfriends_keys">
+        <item>inactive</item>
+        <item>feed</item>
+        <item>feed+home</item>
+        <item>feed+folder</item>
+        <item>feed+contacts</item>
+        <item>home</item>
+        <item>folder</item>
+        <item>contacts</item>
+    </string-array>
+
+    <string-array name="pref_social_facebook_newfriends_vals">
+        <item>Inaktive</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Folder</item>
+        <item>Feed + Contacts</item>
+        <item>Home</item>
+        <item>Folder</item>
+        <item>Contacts</item>
+    </string-array>
+
+    <string-array name="pref_social_facebook_newlikes_keys">
+        <item>inactive</item>
+        <item>feed</item>
+        <item>feed+home</item>
+        <item>feed+folder</item>
+        <item>home</item>
+        <item>folder</item>
+    </string-array>
+
+    <string-array name="pref_social_facebook_newlikes_vals">
+        <item>Inaktive</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Folder</item>
+        <item>Home</item>
+        <item>Folder</item>
+    </string-array>
+
     <string name="battery_manager_remind">Please plug Your tablet into the charger soon.</string>
     <string name="battery_manager_warn">Please plug Your tablet into the charger now.</string>
     <string name="battery_manager_assist_warn">%1$s tablet desperatly needs some charging.</string>
