@@ -26,6 +26,7 @@ public class SocialInstagram
 {
     private static final String LOGTAG = SocialInstagram.class.getSimpleName();
 
+    private static final String appsecret = "ab19aa46d88f4fb9a433f6d6cc1d4df3";
     private static final String appkey = "63afb3307ec24f4886230f44d2fda884";
     private static final String appurl = "http://www.xavaro.de/instagram";
     private static final String apiurl = "https://api.instagram.com/v1";
@@ -91,6 +92,20 @@ public class SocialInstagram
                     String code = uri.getQueryParameter("code");
 
                     Log.d(LOGTAG, "shouldOverrideUrlLoading: code=" + code);
+
+                    JSONObject postdata = new JSONObject();
+
+                    Json.put(postdata, "code", "code");
+                    Json.put(postdata, "client_id", appkey);
+                    Json.put(postdata, "client_secret", appsecret);
+                    Json.put(postdata, "redirect_uri", "appurl");
+                    Json.put(postdata, "grant_type", "authorization_code");
+
+                    String tokenurl = "https://api.instagram.com/oauth/access_token";
+                    String content = SimpleRequest.readContent(tokenurl, postdata);
+
+                    Log.d(LOGTAG, "=====>" + content);
+
                     Simple.setSharedPrefString(tokenpref, code);
 
                     dialog.cancel();
@@ -229,7 +244,7 @@ public class SocialInstagram
         if (user == null)
         {
             JSONObject data = getGraphRequest("/users/self");
-            Log.d(LOGTAG, "=================>" + data.toString());
+            Log.d(LOGTAG, "=================>" + data);
         }
 
         return user;

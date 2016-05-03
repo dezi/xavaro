@@ -58,7 +58,6 @@ public class TestDat
             }
 
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
             connection.setRequestProperty("Content-Length", "" + content.getBytes().length);
 
             Log.d(LOGTAG, "===================>" + content);

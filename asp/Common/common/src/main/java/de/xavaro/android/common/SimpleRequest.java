@@ -4,6 +4,9 @@ import android.support.annotation.Nullable;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -13,6 +16,8 @@ import java.net.URL;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.util.Iterator;
 
 public class SimpleRequest
 {
@@ -352,11 +357,57 @@ public class SimpleRequest
     @Nullable
     public static String readContent(String url)
     {
-        if (url == null) return null;
+        return readContent(url, null);
+    }
+
+    @Nullable
+    public static String readContent(String src, JSONObject post)
+    {
+        if (src == null) return null;
 
         try
         {
-            HttpURLConnection connection = Simple.openUnderscoreConnection(url);
+            URL url = new URL(src);
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
+
+            connection.setRequestMethod((post == null) ? "GET" : "POST");
+
+            if (post != null)
+            {
+                String payload = "";
+
+                Iterator<String> keysIterator = post.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String key = keysIterator.next();
+                    String val = Json.getString(post, key);
+                    if (val == null) continue;
+
+                    payload += ((payload.length() > 0) ? "&" : "?")
+                        + URLEncoder.encode(key, "UTF-8")
+                        + "="
+                        + URLEncoder.encode(val, "UTF-8");
+                }
+
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length", "" + payload.getBytes().length);
+                connection.setDoOutput(true);
+
+                connection.connect();
+
+                OutputStream output = connection.getOutputStream();
+                output.write(payload.getBytes());
+                output.close();
+            }
+            else
+            {
+                connection.connect();
+            }
 
             InputStream input = connection.getInputStream();
             StringBuilder string = new StringBuilder();
@@ -374,6 +425,7 @@ public class SimpleRequest
         }
         catch (Exception ignore)
         {
+            ignore.printStackTrace();
         }
 
         return null;
