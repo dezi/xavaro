@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
-import de.xavaro.android.common.Facebook;
+import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.ChatManager;
@@ -267,7 +267,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         Simple.setActContext(this);
 
-        Facebook.logEvent("ChatActivity");
+        SocialFacebook.logEvent("ChatActivity");
     }
 
     @Override

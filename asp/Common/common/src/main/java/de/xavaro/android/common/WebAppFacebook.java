@@ -1,21 +1,13 @@
 package de.xavaro.android.common;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 @SuppressWarnings("unused")
@@ -40,11 +32,11 @@ public class WebAppFacebook
     {
         JSONObject target = new JSONObject();
 
-        String actuser = (fbid != null) ? fbid : Facebook.getUserId();
+        String actuser = (fbid != null) ? fbid : SocialFacebook.getUserId();
         File icon = ProfileImages.getFacebookProfileImageFile(actuser);
 
         Json.put(target, "id", actuser);
-        Json.put(target, "name", (name != null) ? name : Facebook.getUserDisplayName());
+        Json.put(target, "name", (name != null) ? name : SocialFacebook.getUserDisplayName());
         Json.put(target, "type", (type != null) ? type : "owner");
         Json.put(target, "icon", (icon != null) ? icon.toString() : null);
 
@@ -54,7 +46,7 @@ public class WebAppFacebook
     @JavascriptInterface
     public String getUserFeeds()
     {
-        return Facebook.getUserFeeds(true).toString();
+        return SocialFacebook.getUserFeeds(true).toString();
     }
 
     @JavascriptInterface
@@ -62,7 +54,7 @@ public class WebAppFacebook
     {
         Log.d(LOGTAG, "getPost:" + postid);
 
-        JSONObject post = Facebook.getPost(postid);
+        JSONObject post = SocialFacebook.getPost(postid);
         return (post == null) ? "{}" : post.toString();
     }
 
@@ -71,7 +63,7 @@ public class WebAppFacebook
     {
         Log.d(LOGTAG, "getFeed:" + userid);
 
-        JSONArray feed = Facebook.getFeed(userid);
+        JSONArray feed = SocialFacebook.getFeed(userid);
         return (feed == null) ? "[]" : feed.toString();
     }
 
@@ -141,7 +133,7 @@ public class WebAppFacebook
             }
         }
 
-        JSONObject response = Facebook.getGraphRequest(edge, bparams);
+        JSONObject response = SocialFacebook.getGraphRequest(edge, bparams);
 
         return (response == null) ? "{}" : response.toString();
     }
@@ -149,6 +141,6 @@ public class WebAppFacebook
     @JavascriptInterface
     public void setVerbose(boolean yesno)
     {
-        Facebook.setVerbose(yesno);
+        SocialFacebook.setVerbose(yesno);
     }
 }

@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.res.Configuration;
 import android.util.Log;
 
-import de.xavaro.android.common.Facebook;
+import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Simple;
 
 public class ApplicationBase extends Application
@@ -33,7 +33,7 @@ public class ApplicationBase extends Application
         Log.d(LOGTAG, "font SCALE=" + getResources().getConfiguration().fontScale);
         Log.d(LOGTAG, "density DPI=" + getResources().getConfiguration().densityDpi);
 
-        Facebook.initialize(this);
+        SocialFacebook.initialize(this);
     }
 
     public final Runnable setFontScale = new Runnable()

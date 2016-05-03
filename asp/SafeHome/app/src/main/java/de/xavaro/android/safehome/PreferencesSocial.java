@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import de.xavaro.android.common.CommonConfigs;
-import de.xavaro.android.common.Facebook;
+import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.ProfileImages;
@@ -92,11 +92,11 @@ public class PreferencesSocial
 
             facebookLogi = new NicedPreferences.NiceDisplayTextPreference(context);
 
-            facebookLogi.setTitle(Facebook.isLoggedIn()
+            facebookLogi.setTitle(SocialFacebook.isLoggedIn()
                     ? R.string.pref_social_facebook_logout
                     : R.string.pref_social_facebook_login);
 
-            facebookLogi.setText(Simple.getTrans(Facebook.isLoggedIn()
+            facebookLogi.setText(Simple.getTrans(SocialFacebook.isLoggedIn()
                     ?  R.string.pref_social_facebook_isloggedin
                     :  R.string.pref_social_facebook_isloggedout));
 
@@ -107,13 +107,13 @@ public class PreferencesSocial
                 @Override
                 public boolean onPreferenceClick(Preference preference)
                 {
-                    if (Facebook.isLoggedIn())
+                    if (SocialFacebook.isLoggedIn())
                     {
-                        Facebook.logout();
+                        SocialFacebook.logout();
                     }
                     else
                     {
-                        Facebook.login();
+                        SocialFacebook.login();
                     }
 
                     return false;
@@ -123,7 +123,7 @@ public class PreferencesSocial
             preferences.add(facebookLogi);
 
             dp = new NicedPreferences.NiceDisplayTextPreference(context);
-            dp.setTitle(Facebook.isLoggedIn() ? "Etwas testen" : "Nix machen");
+            dp.setTitle(SocialFacebook.isLoggedIn() ? "Etwas testen" : "Nix machen");
             dp.setEnabled(enabled);
 
             dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -131,9 +131,9 @@ public class PreferencesSocial
                 @Override
                 public boolean onPreferenceClick(Preference preference)
                 {
-                    Log.d(LOGTAG, "Permissions=" + Facebook.getUserPermissions());
+                    Log.d(LOGTAG, "Permissions=" + SocialFacebook.getUserPermissions());
 
-                    Facebook.getUserLikeslist();
+                    SocialFacebook.getUserLikeslist();
 
                     return false;
                 }
@@ -156,7 +156,7 @@ public class PreferencesSocial
             // Preset all current friends and likes preferences.
             //
 
-            Facebook.reconfigureFriendsAndLikes();
+            SocialFacebook.reconfigureFriendsAndLikes();
 
             registerFriends(context, true);
             registerLikes(context, true);
@@ -305,9 +305,9 @@ public class PreferencesSocial
                 // preferences.
                 //
 
-                String fbid = Facebook.getUserId();
-                String name = Facebook.getUserDisplayName();
-                String expi = Facebook.getUserTokenExpiration();
+                String fbid = SocialFacebook.getUserId();
+                String name = SocialFacebook.getUserDisplayName();
+                String expi = SocialFacebook.getUserTokenExpiration();
 
                 if (fbid != null) Simple.setSharedPrefString(keyprefix + ".fbid", fbid);
                 if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
@@ -324,15 +324,15 @@ public class PreferencesSocial
                     facebookExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
                 }
 
-                facebookLogi.setTitle(Facebook.isLoggedIn()
+                facebookLogi.setTitle(SocialFacebook.isLoggedIn()
                         ? R.string.pref_social_facebook_logout
                         : R.string.pref_social_facebook_login);
 
-                facebookLogi.setText(Simple.getTrans(Facebook.isLoggedIn()
+                facebookLogi.setText(Simple.getTrans(SocialFacebook.isLoggedIn()
                         ?  R.string.pref_social_facebook_isloggedin
                         :  R.string.pref_social_facebook_isloggedout));
 
-                Facebook.reconfigureFriendsAndLikes();
+                SocialFacebook.reconfigureFriendsAndLikes();
 
                 registerFriends(Simple.getActContext(), false);
                 registerLikes(Simple.getActContext(), false);

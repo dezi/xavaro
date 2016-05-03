@@ -657,11 +657,11 @@ public class CommService extends Service
 
             //checkPing();
 
-            Facebook.commTick();
             CommSender.commTick();
             WebAppCache.commTick();
             EventManager.commTick();
             BatteryManager.commTick();
+            SocialFacebook.commTick();
 
             if (! checkSocket()) continue;
 

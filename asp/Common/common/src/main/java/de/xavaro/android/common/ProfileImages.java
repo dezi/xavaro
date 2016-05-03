@@ -517,7 +517,7 @@ public class ProfileImages
 
         if (! imagefile.exists())
         {
-            Simple.putFileBytes(imagefile, Facebook.getUserIconData(facebookid));
+            Simple.putFileBytes(imagefile, SocialFacebook.getUserIconData(facebookid));
         }
     }
 
@@ -530,7 +530,7 @@ public class ProfileImages
 
         if (! imagefile.exists())
         {
-            Simple.putFileBytes(imagefile, Facebook.getUserIconData(facebookid));
+            Simple.putFileBytes(imagefile, SocialFacebook.getUserIconData(facebookid));
         }
 
         if (imagefile.exists())

@@ -31,9 +31,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class Facebook
+public class SocialFacebook
 {
-    private static final String LOGTAG = Facebook.class.getSimpleName();
+    private static final String LOGTAG = SocialFacebook.class.getSimpleName();
 
     private static final Collection<String> permissions = Arrays.asList
             (
@@ -86,9 +86,9 @@ public class Facebook
 
     public static void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (Facebook.callbackManager != null)
+        if (SocialFacebook.callbackManager != null)
         {
-            Facebook.callbackManager.onActivityResult(requestCode, resultCode, data);
+            SocialFacebook.callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -105,7 +105,7 @@ public class Facebook
                 Log.d(LOGTAG, "graphcallback: onCompleted:" + mess + "=" + edge);
             }
 
-            Facebook.response = response;
+            SocialFacebook.response = response;
         }
     };
 

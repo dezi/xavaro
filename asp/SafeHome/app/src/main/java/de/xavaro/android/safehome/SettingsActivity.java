@@ -17,7 +17,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
-import de.xavaro.android.common.Facebook;
+import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebCookie;
@@ -35,7 +35,7 @@ public class SettingsActivity extends PreferenceActivity
 
         Log.d(LOGTAG, "onActivityResult");
 
-        Facebook.onActivityResult(requestCode, resultCode, data);
+        SocialFacebook.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class SettingsActivity extends PreferenceActivity
 
         Simple.setActContext(this);
 
-        Facebook.logEvent("SettingsActivity");
+        SocialFacebook.logEvent("SettingsActivity");
     }
 
     @Override
