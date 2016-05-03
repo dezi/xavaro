@@ -1,58 +1,36 @@
-//
-// API Test...
-//
+instaface.createTest = function()
+{
+    var ic = instaface;
 
-instaface.pre = WebLibSimple.createAnyAppend("pre", document.body);
+    ic.pre = WebLibSimple.createAnyAppend("pre", document.body);
 
-instaface.target = WebAppFacebook.getTarget();
-instaface.pre.innerHTML += "\n===============>target";
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(instaface.target);
+    ic.target = JSON.parse(WebAppFacebook.getTarget());
 
-var fields = [ "id", "name", "currency" ];
-var params = { "fields": fields };
+    ic.pre.innerHTML += "===============>target\n";
+    ic.pre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.target)) + "\n";
 
-var info = WebAppFacebook.getGraphSync("/me", JSON.stringify(params));
-instaface.pre.innerHTML += "\n===============>user";
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(info);
+    ic.feed = JSON.parse(WebAppFacebook.getFeed(ic.target.id));
 
-var data = WebAppFacebook.getUserFeedFriends();
-instaface.pre.innerHTML += "\n===============>friends";
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
+    if (ic.feed.length > 0)
+    {
+        var postid = ic.feed[ 0 ].id;
+        ic.post = JSON.parse(WebAppFacebook.getPost(postid));
 
-instaface.pre.innerHTML += "\n===============>likes";
-var data = WebAppFacebook.getUserFeedLikes();
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
+        ic.pre.innerHTML += "===============>post\n";
+        ic.pre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.post)) + "\n";
+    }
 
-var likes = JSON.parse(data);
-var likeid = likes[ 0 ].id;
+    ic.pre.innerHTML += "===============>feed\n";
+    ic.pre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.feed)) + "\n";
 
-var fields = [ "id", "message", "link", "place", "privacy" ];
-var params = { "fields": fields };
+    if (ic.target.type == "owner")
+    {
+        ic.userfeeds = JSON.parse(WebAppFacebook.getUserFeeds());
 
-var data = WebAppFacebook.getGraphSync("/" + likeid + "/feed", JSON.stringify(params));
-instaface.pre.innerHTML += "\n===============>feed";
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
+        ic.pre.innerHTML += "===============>userfeeds\n";
+        ic.pre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.userfeeds)) + "\n";
+    }
+}
 
-var feed = JSON.parse(data);
-var storyid = feed.data[ 0 ].id;
+instaface.createTest();
 
-var fields =
-[
-    "id", "caption", "description", "icon",
-    "link", "message", "message_tags", "picture",
-    "place", "shares", "source", "type"
-];
-
-var params = { "fields": fields };
-
-var data = WebAppFacebook.getGraphSync("/" + storyid, JSON.stringify(params));
-instaface.pre.innerHTML += "\n===============>post";
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
-
-var data = WebAppFacebook.getGraphSync("/" + storyid + "/comments");
-instaface.pre.innerHTML += "\n===============>post/comments";
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);
-
-var data = WebAppFacebook.getGraphSync("/" + storyid + "/attachments");
-instaface.pre.innerHTML += "\n===============>post/attachments";
-instaface.pre.innerHTML += "\n" + WebAppUtility.getPrettyJson(data);

@@ -657,6 +657,7 @@ public class CommService extends Service
 
             //checkPing();
 
+            Facebook.commTick();
             CommSender.commTick();
             WebAppCache.commTick();
             EventManager.commTick();

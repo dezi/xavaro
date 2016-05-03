@@ -80,6 +80,15 @@ public class LaunchItemSocial extends LaunchItem
             webappFrame.setWebAppName("instaface");
             webappFrame.setParent(this);
 
+            if (webappFrame.getWebAppView().facebook != null)
+            {
+                String fbid = Json.getString(config, "fbid");
+                String name = Json.getString(config, "label");
+                String type = Json.getString(config, "subtype");
+
+                webappFrame.getWebAppView().facebook.setTarget(fbid, name, type);
+            }
+
             ((HomeActivity) context).addViewToBackStack(webappFrame);
 
             return;

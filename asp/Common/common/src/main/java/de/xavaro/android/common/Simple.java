@@ -72,6 +72,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Currency;
@@ -980,12 +981,20 @@ public class Simple
     }
 
     private static File externalFilesDir;
+    private static File externalCacheDir;
 
     public static File getExternalFilesDir()
     {
         if (externalFilesDir != null) return externalFilesDir;
         externalFilesDir = getAnyContext().getExternalFilesDir(null);
         return externalFilesDir;
+    }
+
+    public static File getExternalCacheDir()
+    {
+        if (externalCacheDir != null) return externalCacheDir;
+        externalCacheDir = getAnyContext().getExternalCacheDir();
+        return externalCacheDir;
     }
 
     public static File getCacheDir()
@@ -2261,6 +2270,27 @@ public class Simple
         }
 
         return Json.sort(list, "time", desc);
+    }
+
+    public static String[] getDirectoryAsArray(File dir, FilenameFilter filter)
+    {
+        String[] files = null;
+
+        try
+        {
+            files = dir.list(filter);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return (files != null) ? files : new String[ 0 ];
+    }
+
+    public static ArrayList<String> getDirectoryAsList(File dir, FilenameFilter filter)
+    {
+        return new ArrayList<>(Arrays.asList(getDirectoryAsArray(dir, filter)));
     }
 
     public static class FileFilter implements FilenameFilter

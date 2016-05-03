@@ -26,6 +26,7 @@ public class WebAppFacebook
     private String fbid;
     private String name;
     private String type;
+    private String icon;
 
     public void setTarget(String fbid, String name, String type)
     {
@@ -51,15 +52,27 @@ public class WebAppFacebook
     }
 
     @JavascriptInterface
-    public String getUserFeedFriends()
+    public String getUserFeeds()
     {
-        return Facebook.getUserFeedFriends().toString();
+        return Facebook.getUserFeeds(true).toString();
     }
 
     @JavascriptInterface
-    public String getUserFeedLikes()
+    public String getPost(String postid)
     {
-        return Facebook.getUserFeedLikes().toString();
+        Log.d(LOGTAG, "getPost:" + postid);
+
+        JSONObject post = Facebook.getPost(postid);
+        return (post == null) ? "{}" : post.toString();
+    }
+
+    @JavascriptInterface
+    public String getFeed(String userid)
+    {
+        Log.d(LOGTAG, "getFeed:" + userid);
+
+        JSONArray feed = Facebook.getFeed(userid);
+        return (feed == null) ? "[]" : feed.toString();
     }
 
     @JavascriptInterface

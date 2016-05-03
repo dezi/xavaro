@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.facebook.FacebookSdk;
@@ -22,6 +23,9 @@ import com.facebook.login.LoginResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Arrays;
 import java.util.Map;
@@ -32,19 +36,20 @@ public class Facebook
     private static final String LOGTAG = Facebook.class.getSimpleName();
 
     private static final Collection<String> permissions = Arrays.asList
-    (
-        "public_profile",
+            (
+                    "public_profile",
 
-        "user_friends",
-        "user_likes",
-        "user_posts"
-    );
+                    "user_friends",
+                    "user_likes",
+                    "user_posts"
+            );
 
     private static final GraphRequest graphrequest = new GraphRequest();
     private static GraphResponse response;
     private static CallbackManager callbackManager;
     private static AppEventsLogger logger;
     private static boolean verbose = true;
+    private static String locale;
 
     public static void initialize(Application app)
     {
@@ -65,6 +70,9 @@ public class Facebook
         graphrequest.setCallback(graphcallback);
         graphrequest.setAccessToken(AccessToken.getCurrentAccessToken());
         graphrequest.setHttpMethod(HttpMethod.GET);
+
+        cachedir = new File(Simple.getExternalCacheDir(), "facebook");
+        locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
     }
 
     public static void logEvent(String eventName)
@@ -89,13 +97,12 @@ public class Facebook
         @Override
         public void onCompleted(GraphResponse response)
         {
+            String edge = response.getRequest().getGraphPath();
+            String mess = (response.getJSONObject() == null) ? "failed" : "success";
+
             if (verbose)
             {
-                Log.d(LOGTAG, "graphcallback: onCompleted..." + response);
-            }
-            else
-            {
-                Log.d(LOGTAG, "graphcallback: onCompleted...");
+                Log.d(LOGTAG, "graphcallback: onCompleted:" + mess + "=" + edge);
             }
 
             Facebook.response = response;
@@ -188,41 +195,52 @@ public class Facebook
         return (profile == null) ? null : profile.getName();
     }
 
-    @Nullable
-    public static JSONArray getUserFriendlist()
+    public static JSONArray getUserFeeds(boolean feedonly)
     {
-        JSONObject json = getGraphRequest("/" + getUserId() + "/friends");
-        JSONArray data = Json.getArray(json, "data");
+        JSONArray data = new JSONArray();
 
-        if (data != null) Log.d(LOGTAG, "getUserFriendlists: data:" + data.toString());
+        //
+        // Add facebook account owner as a owner feed.
+        //
+
+        JSONObject owner = new JSONObject();
+
+        String fbid = Simple.getSharedPrefString("social.facebook.fbid");
+        String name = Simple.getSharedPrefString("social.facebook.name");
+
+        if ((fbid != null) && (name != null))
+        {
+            Json.put(owner, "id", fbid);
+            Json.put(owner, "name", name);
+            Json.put(owner, "type", "owner");
+
+            File icon = ProfileImages.getFacebookProfileImageFile(fbid);
+            if (icon != null) Json.put(owner, "icon", icon.toString());
+
+            Json.put(data, owner);
+        }
+
+        getUserFeeds(data, "friend", feedonly);
+        getUserFeeds(data, "like", feedonly);
 
         return data;
     }
 
-    public static JSONArray getUserFeedFriends()
+    private static JSONArray getUserFeeds(JSONArray data, String type, boolean feedonly)
     {
-        return getUserFeed("friend");
-    }
-
-    public static JSONArray getUserFeedLikes()
-    {
-        return getUserFeed("like");
-    }
-
-    public static JSONArray getUserFeed(String what)
-    {
-        JSONArray data = new JSONArray();
-
-        String modeprefix = "social.facebook." + what + ".mode.";
-        String nameprefix = "social.facebook." + what + ".name.";
+        String modeprefix = "social.facebook." + type + ".mode.";
+        String nameprefix = "social.facebook." + type + ".name.";
 
         Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
 
         for (Map.Entry<String, Object> entry : friends.entrySet())
         {
             Object fmode = entry.getValue();
+            if (! (fmode instanceof String)) continue;
 
-            if ((! (fmode instanceof String)) || ! ((String) fmode).contains("feed")) continue;
+            String mode = (String) fmode;
+            if (feedonly && ! mode.contains("feed")) continue;
+            if (mode.equals("inactive")) continue;
 
             String fbid = entry.getKey().substring(modeprefix.length());
             String name = Simple.getSharedPrefString(nameprefix + fbid);
@@ -232,9 +250,24 @@ public class Facebook
 
             Json.put(item, "id", fbid);
             Json.put(item, "name", name);
+            Json.put(item, "type", type);
+
+            File icon = ProfileImages.getFacebookProfileImageFile(fbid);
+            if (icon != null) Json.put(item, "icon", icon.toString());
 
             Json.put(data, item);
         }
+
+        return data;
+    }
+
+    @Nullable
+    public static JSONArray getUserFriendlist()
+    {
+        JSONObject json = getGraphRequest("/" + getUserId() + "/friends");
+        JSONArray data = Json.getArray(json, "data");
+
+        if (data != null) Log.d(LOGTAG, "getUserFriendlists: data:" + data.toString());
 
         return data;
     }
@@ -271,6 +304,78 @@ public class Facebook
         return SimpleRequest.readData(iconurl);
     }
 
+    @Nullable
+    public static JSONObject getPost(String postid)
+    {
+        if (postid == null) return null;
+
+        File postfile = new File(cachedir, postid + ".post.json");
+
+        if (postfile.exists())
+        {
+            return Json.fromString(Simple.getFileContent(postfile));
+        }
+
+        return getGraphPost(postid);
+    }
+
+    @Nullable
+    public static JSONArray getFeed(String userid)
+    {
+        if (userid == null) return null;
+
+        File feedfile = new File(cachedir, userid + ".feed.json");
+
+        if (feedfile.exists())
+        {
+            return Json.fromStringArray(Simple.getFileContent(feedfile));
+        }
+
+        JSONObject response = getGraphRequest(userid + "/feed");
+        return Json.getArray(response, "data");
+    }
+
+    private static JSONObject getGraphPost(String postid)
+    {
+        String[] fields =
+        {
+                "caption",
+                "created_time",
+                "description",
+                "event",
+                "expanded_height",
+                "expanded_width",
+                "from",
+                "full_picture",
+                "height",
+                "icon",
+                "link",
+                "message",
+                "message_tags",
+                "name",
+                "object_id",
+                "picture",
+                "place",
+                "properties",
+                "shares",
+                "source",
+                "status_type",
+                "story",
+                "story_tags",
+                "width",
+                "likes",
+                "comments",
+                "reactions",
+                "sharedposts",
+                "attachments"
+        };
+
+        Bundle params = new Bundle();
+        params.putString("fields", TextUtils.join(",", fields));
+
+        return getGraphRequest(postid, params);
+    }
+
     private static JSONObject getGraphRequest(String path)
     {
         return getGraphRequest(path, null);
@@ -284,6 +389,7 @@ public class Facebook
         if (token == null) return null;
 
         if (parameters == null) parameters = new Bundle();
+        parameters.putString("locale", locale);
 
         synchronized (graphrequest)
         {
@@ -380,4 +486,127 @@ public class Facebook
             }
         }
     }
+
+    //region Cache maintenance
+
+    private static long totalInterval = 60;
+    private static long lastReconfigure;
+    private static long nextInterval;
+    private static long nextAction;
+    private static File cachedir;
+
+    private static JSONArray feedList;
+
+    public static void commTick()
+    {
+        long now = Simple.nowAsTimeStamp();
+
+        if ((now - lastReconfigure) > 24 * 3600 * 1000)
+        {
+            cachedir = new File(Simple.getExternalCacheDir(), "facebook");
+
+            if (! cachedir.exists())
+            {
+                if (cachedir.mkdirs()) Log.d(LOGTAG, "commTick: created cache:" + cachedir);
+            }
+
+            Log.d(LOGTAG, "commTick: reconfigureFriendsAndLikes");
+
+            reconfigureFriendsAndLikes();
+            lastReconfigure = now;
+            nextAction = now;
+
+            return;
+        }
+
+        if (now < nextAction) return;
+
+        if ((feedList == null) || feedList.length() == 0)
+        {
+            feedList = getUserFeeds(false);
+
+            if (feedList.length() == 0)
+            {
+                nextAction = now + (totalInterval * 1000);
+            }
+            else
+            {
+                nextInterval = (totalInterval * 1000) / feedList.length();
+                nextAction = now;
+            }
+
+            return;
+        }
+
+        nextAction += nextInterval;
+
+        //
+        // Load one feed.
+        //
+
+        JSONObject feed = Json.getObject(feedList, 0);
+        Json.remove(feedList, 0);
+        if (feed == null) return;
+
+        final String feedfbid = Json.getString(feed, "id");
+        final String feedname = Json.getString(feed, "name");
+
+        Log.d(LOGTAG, "commTick: feed:" + feedfbid + " => " + feedname);
+
+        JSONObject response = getGraphRequest(feedfbid + "/feed");
+        JSONArray feeddata = Json.getArray(response, "data");
+        if (feeddata == null) return;
+
+        File feedfile = new File(cachedir, feedfbid + ".feed.json");
+        Simple.putFileContent(feedfile, Json.toPretty(feeddata));
+
+        //
+        // Check feed stories.
+        //
+
+        FilenameFilter postsfilter = new FilenameFilter()
+        {
+            @Override
+            public boolean accept(File dir, String filename)
+            {
+                return filename.startsWith(feedfbid + "_") && filename.endsWith(".post.json");
+            }
+        };
+
+        if ((! cachedir.exists()) && cachedir.mkdirs()) Log.d(LOGTAG, "commtick: created cache");
+        ArrayList<String> postfiles = Simple.getDirectoryAsList(cachedir, postsfilter);
+
+        for (int inx = 0; inx < feeddata.length(); inx++)
+        {
+            JSONObject post = Json.getObject(feeddata, inx);
+            String postid = Json.getString(post, "id");
+            if (postid == null) continue;
+
+            String postname = postid + ".post.json";
+            File postfile = new File(cachedir, postname);
+
+            if (postfiles.contains(postname))
+            {
+                postfiles.remove(postname);
+                continue;
+            }
+
+            JSONObject postdata = getGraphPost(postid);
+            if (postdata == null) continue;
+
+            Simple.putFileContent(postfile, Json.toPretty(postdata));
+        }
+
+        //
+        // Remove outdated posts.
+        //
+
+        while (postfiles.size() > 0)
+        {
+            File obsolete = new File(cachedir, postfiles.remove(0));
+            if (obsolete.delete()) Log.d(LOGTAG, "commTick: deleted:" + obsolete);
+        }
+    }
+
+    //endregion Cache maintenance
 }
