@@ -2,11 +2,13 @@ package de.xavaro.android.safehome;
 
 import android.app.Application;
 import android.content.res.Configuration;
+import android.os.StrictMode;
 import android.util.Log;
 
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SocialInstagram;
+import de.xavaro.android.common.WebCookie;
 
 public class ApplicationBase extends Application
 {
@@ -33,6 +35,23 @@ public class ApplicationBase extends Application
 
         Log.d(LOGTAG, "font SCALE=" + getResources().getConfiguration().fontScale);
         Log.d(LOGTAG, "density DPI=" + getResources().getConfiguration().densityDpi);
+
+        //
+        // Allow cross fuck domain HTTP shit.
+        //
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        //
+        // Set common cookie store between webkit and java.net
+        //
+
+        WebCookie.initCookies();
+
+        //
+        // Initialize social plugin.
+        //
 
         SocialFacebook.initialize(this);
         SocialInstagram.initialize(this);

@@ -361,15 +361,13 @@ public class SimpleRequest
     }
 
     @Nullable
-    public static String readContent(String src, JSONObject post)
+    public static String readContent(String url, JSONObject post)
     {
-        if (src == null) return null;
+        if (url == null) return null;
 
         try
         {
-            URL url = new URL(src);
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = Simple.openUnderscoreConnection(url, false);
 
             connection.setUseCaches(false);
             connection.setDoInput(true);
@@ -388,11 +386,13 @@ public class SimpleRequest
                     String val = Json.getString(post, key);
                     if (val == null) continue;
 
-                    payload += ((payload.length() > 0) ? "&" : "?")
+                    payload += ((payload.length() > 0) ? "&" : "")
                         + URLEncoder.encode(key, "UTF-8")
                         + "="
                         + URLEncoder.encode(val, "UTF-8");
                 }
+
+                Log.d(LOGTAG, "======================payload=" + payload);
 
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 connection.setRequestProperty("Content-Length", "" + payload.getBytes().length);

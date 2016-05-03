@@ -2501,6 +2501,11 @@ public class Simple
 
     public static HttpURLConnection openUnderscoreConnection(String src) throws Exception
     {
+        return openUnderscoreConnection(src, true);
+    }
+
+    public static HttpURLConnection openUnderscoreConnection(String src, boolean connect) throws Exception
+    {
         URL url = new URL(src);
 
         String host = null;
@@ -2519,7 +2524,8 @@ public class Simple
 
         connection.setUseCaches(false);
         connection.setDoInput(true);
-        connection.connect();
+
+        if (connect) connection.connect();
 
         return connection;
     }

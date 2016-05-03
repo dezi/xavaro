@@ -95,10 +95,10 @@ public class SocialInstagram
 
                     JSONObject postdata = new JSONObject();
 
-                    Json.put(postdata, "code", "code");
+                    Json.put(postdata, "code", code);
                     Json.put(postdata, "client_id", appkey);
                     Json.put(postdata, "client_secret", appsecret);
-                    Json.put(postdata, "redirect_uri", "appurl");
+                    Json.put(postdata, "redirect_uri", appurl);
                     Json.put(postdata, "grant_type", "authorization_code");
 
                     String tokenurl = "https://api.instagram.com/oauth/access_token";
@@ -106,7 +106,12 @@ public class SocialInstagram
 
                     Log.d(LOGTAG, "=====>" + content);
 
-                    Simple.setSharedPrefString(tokenpref, code);
+                    if (content != null)
+                    {
+                        user = Json.fromString(content);
+                        token = Json.getString(user, "access_token");
+                        Simple.setSharedPrefString(tokenpref, token);
+                    }
 
                     dialog.cancel();
 
@@ -209,7 +214,8 @@ public class SocialInstagram
     @Nullable
     public static String getUserId()
     {
-        return null;
+        JSONObject userdata = getCurrentUser();
+        return Json.getString(userdata, "username");
     }
 
     @Nullable
@@ -229,7 +235,8 @@ public class SocialInstagram
     @Nullable
     public static String getUserDisplayName()
     {
-        return null;
+        JSONObject userdata = getCurrentUser();
+        return Json.getString(userdata, "full_name");
     }
 
     @Nullable
@@ -244,7 +251,9 @@ public class SocialInstagram
         if (user == null)
         {
             JSONObject data = getGraphRequest("/users/self");
-            Log.d(LOGTAG, "=================>" + data);
+            user = Json.getObject(data, "data");
+
+            Log.d(LOGTAG, "=================>" + user);
         }
 
         return user;
