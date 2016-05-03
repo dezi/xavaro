@@ -6,6 +6,7 @@ import android.util.Log;
 
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SocialInstagram;
 
 public class ApplicationBase extends Application
 {
@@ -34,6 +35,7 @@ public class ApplicationBase extends Application
         Log.d(LOGTAG, "density DPI=" + getResources().getConfiguration().densityDpi);
 
         SocialFacebook.initialize(this);
+        SocialInstagram.initialize(this);
     }
 
     public final Runnable setFontScale = new Runnable()

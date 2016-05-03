@@ -1,51 +1,26 @@
 package de.xavaro.android.common;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.Application;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
+import android.annotation.SuppressLint;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.Profile;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
+import android.app.AlertDialog;
+import android.app.Application;
+import android.text.TextUtils;
+import android.view.MotionEvent;
+import android.view.View;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 public class SocialInstagram
 {
@@ -53,6 +28,8 @@ public class SocialInstagram
 
     private static final String appkey = "63afb3307ec24f4886230f44d2fda884";
     private static final String appurl = "http://www.xavaro.de/instagram";
+    private static final String apiurl = "https://api.instagram.com/v1";
+    private static final String tokenpref = "social.instagram.token";
 
     private static final Collection<String> permissions = Arrays.asList
             (
@@ -63,12 +40,17 @@ public class SocialInstagram
             );
 
     private static boolean verbose = true;
+    private static JSONObject user;
     private static String locale;
+    private static String token;
 
     public static void initialize(Application app)
     {
         //cachedir = new File(Simple.getExternalCacheDir(), "instagram");
         locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
+        token = getAccessToken();
+
+        getCurrentUser();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -108,8 +90,8 @@ public class SocialInstagram
                     Uri uri = Uri.parse(url);
                     String code = uri.getQueryParameter("code");
 
-                    Log.d(LOGTAG, "=====================code=" + code);
-                    Simple.setSharedPrefString("social.instagram.code", code);
+                    Log.d(LOGTAG, "shouldOverrideUrlLoading: code=" + code);
+                    Simple.setSharedPrefString(tokenpref, code);
 
                     dialog.cancel();
 
@@ -194,14 +176,14 @@ public class SocialInstagram
         // Nuke preference and session id.
         //
 
-        Simple.removeSharedPref("social.instagram.code");
-
+        token = null;
+        Simple.removeSharedPref(tokenpref);
         CookieManager.getInstance().setCookie("https://www.instagram.com", "sessionid=");
     }
 
     public static boolean isLoggedIn()
     {
-        return (Simple.getSharedPrefString("social.instagram.code") != null);
+        return (Simple.getSharedPrefString(tokenpref) != null);
     }
 
     public static void setVerbose(boolean yesno)
@@ -233,5 +215,52 @@ public class SocialInstagram
     public static String getUserDisplayName()
     {
         return null;
+    }
+
+    @Nullable
+    public static String getAccessToken()
+    {
+        return Simple.getSharedPrefString(tokenpref);
+    }
+
+    @Nullable
+    public static JSONObject getCurrentUser()
+    {
+        if (user == null)
+        {
+            JSONObject data = getGraphRequest("/users/self");
+            Log.d(LOGTAG, "=================>" + data.toString());
+        }
+
+        return user;
+    }
+
+    @Nullable
+    private static JSONObject getGraphRequest(String path)
+    {
+        return getGraphRequest(path, null);
+    }
+
+    @Nullable
+    public static JSONObject getGraphRequest(String path, Bundle parameters)
+    {
+        if (path == null) return null;
+        if (token == null) token = getAccessToken();
+        if (token == null) return null;
+
+        String url = apiurl + path + "?access_token=" + token;
+        String content = SimpleRequest.readContent(url);
+
+        if (content == null)
+        {
+            Log.d(LOGTAG, "getGraphRequest: failed=" + url);
+        }
+        else
+        {
+            Log.d(LOGTAG, "getGraphRequest: success=" + url);
+            if (verbose) Log.d(LOGTAG, "getGraphRequest: " + content);
+        }
+
+        return Json.fromString(content);
     }
 }
