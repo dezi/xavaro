@@ -407,6 +407,43 @@
         <item>Folder</item>
     </string-array>
 
+    <string name="pref_social_instagram">Instagram</string>
+    <string name="pref_social_instagram_summary">todo</string>
+    <string name="pref_social_instagram_enable">Enable Instagram</string>
+    <string name="pref_social_instagram_account">Instagram Account</string>
+    <string name="pref_social_instagram_account_summary">todo</string>
+    <string name="pref_social_instagram_user">Instagram User</string>
+    <string name="pref_social_instagram_validuntil">Valid until</string>
+    <string name="pref_social_instagram_login">Login</string>
+    <string name="pref_social_instagram_logout">Logout</string>
+    <string name="pref_social_instagram_isloggedin">is logged in</string>
+    <string name="pref_social_instagram_isloggedout">is logged out</string>
+    <string name="pref_social_instagram_friends">Instagram Friends</string>
+    <string name="pref_social_instagram_friends_summary">todo</string>
+    <string name="pref_social_instagram_autofriends">Automated new friends</string>
+
+    <string-array name="pref_social_instagram_newfriends_keys">
+        <item>inactive</item>
+        <item>feed</item>
+        <item>feed+home</item>
+        <item>feed+folder</item>
+        <item>feed+contacts</item>
+        <item>home</item>
+        <item>folder</item>
+        <item>contacts</item>
+    </string-array>
+
+    <string-array name="pref_social_instagram_newfriends_vals">
+        <item>Inaktive</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Folder</item>
+        <item>Feed + Contacts</item>
+        <item>Home</item>
+        <item>Folder</item>
+        <item>Contacts</item>
+    </string-array>
+
     <string name="battery_manager_remind">Please plug Your tablet into the charger soon.</string>
     <string name="battery_manager_warn">Please plug Your tablet into the charger now.</string>
     <string name="battery_manager_assist_warn">%1$s tablet desperatly needs some charging.</string>

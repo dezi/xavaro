@@ -489,7 +489,7 @@ public class SocialFacebook
 
     //region Cache maintenance
 
-    private static long totalInterval = 60;
+    private static long totalInterval = 3600;
     private static long lastReconfigure;
     private static long nextInterval;
     private static long nextAction;
