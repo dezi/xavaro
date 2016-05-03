@@ -328,6 +328,8 @@ public class Facebook
                     Simple.setSharedPrefString(fmodepref, dfmode);
                 }
 
+                ProfileImages.getFacebookLoadProfileImage(fbid);
+
                 if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
                 if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
             }
@@ -365,6 +367,8 @@ public class Facebook
                 {
                     Simple.setSharedPrefString(fmodepref, dfmode);
                 }
+
+                ProfileImages.getFacebookLoadProfileImage(fbid);
 
                 if (oldlikes.containsKey(fnamepref)) oldlikes.remove(fnamepref);
                 if (oldlikes.containsKey(fmodepref)) oldlikes.remove(fmodepref);

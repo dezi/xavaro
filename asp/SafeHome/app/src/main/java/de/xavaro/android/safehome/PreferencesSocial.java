@@ -49,6 +49,7 @@ public class PreferencesSocial
         NicedPreferences.NiceCategoryPreference facebookHead;
         NicedPreferences.NiceDisplayTextPreference facebookUser;
         NicedPreferences.NiceDisplayTextPreference facebookExpi;
+        NicedPreferences.NiceDisplayTextPreference facebookLogi;
 
         @Override
         public void onDestroy()
@@ -70,59 +71,38 @@ public class PreferencesSocial
 
             Simple.removeAllPreferences("facebook.");
 
-            //
-            // Get login status. Store current credentials
-            // into or get last loggedin credentials from
-            // preferences.
-            //
-
-            String fbid = Facebook.getUserId();
-            String name = Facebook.getUserDisplayName();
-            String expi = Facebook.getUserTokenExpiration();
-
-            if (fbid != null) Simple.setSharedPrefString(keyprefix + ".fbid", fbid);
-            if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
-            if (expi != null) Simple.setSharedPrefString(keyprefix + ".expi", expi);
-
-            if (fbid == null) fbid = Simple.getSharedPrefString(keyprefix + ".fbid");
-            if (name == null) name = Simple.getSharedPrefString(keyprefix + ".name");
-            if (expi == null) expi = Simple.getSharedPrefString(keyprefix + ".expi");
-
             facebookHead = new NicedPreferences.NiceInfoPreference(context);
             facebookHead.setTitle(R.string.pref_social_facebook_account);
             facebookHead.setSummary(R.string.pref_social_facebook_account_summary);
-            facebookHead.setIcon(ProfileImages.getFacebookProfileDrawable(fbid, true));
             facebookHead.setEnabled(enabled);
 
             preferences.add(facebookHead);
 
             facebookUser = new NicedPreferences.NiceDisplayTextPreference(context);
             facebookUser.setTitle(R.string.pref_social_facebook_user);
-            facebookUser.setText(name);
             facebookUser.setEnabled(enabled);
 
             preferences.add(facebookUser);
 
             facebookExpi = new NicedPreferences.NiceDisplayTextPreference(context);
             facebookExpi.setTitle(R.string.pref_social_facebook_validuntil);
-            facebookExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
             facebookExpi.setEnabled(enabled);
 
             preferences.add(facebookExpi);
 
-            dp = new NicedPreferences.NiceDisplayTextPreference(context);
+            facebookLogi = new NicedPreferences.NiceDisplayTextPreference(context);
 
-            dp.setTitle(Facebook.isLoggedIn()
+            facebookLogi.setTitle(Facebook.isLoggedIn()
                     ? R.string.pref_social_facebook_logout
                     : R.string.pref_social_facebook_login);
 
-            dp.setText(Simple.getTrans(Facebook.isLoggedIn()
+            facebookLogi.setText(Simple.getTrans(Facebook.isLoggedIn()
                     ?  R.string.pref_social_facebook_isloggedin
                     :  R.string.pref_social_facebook_isloggedout));
 
-            dp.setEnabled(enabled);
+            facebookLogi.setEnabled(enabled);
 
-            dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            facebookLogi.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
             {
                 @Override
                 public boolean onPreferenceClick(Preference preference)
@@ -140,7 +120,7 @@ public class PreferencesSocial
                 }
             });
 
-            preferences.add(dp);
+            preferences.add(facebookLogi);
 
             dp = new NicedPreferences.NiceDisplayTextPreference(context);
             dp.setTitle(Facebook.isLoggedIn() ? "Etwas testen" : "Nix machen");
@@ -181,7 +161,7 @@ public class PreferencesSocial
             registerFriends(context, true);
             registerLikes(context, true);
 
-            Simple.makePost(monitorPrefs, 5 * 1000);
+            monitorPrefs.run();
         }
 
         public void registerFriends(Context context, boolean initial)
@@ -319,6 +299,39 @@ public class PreferencesSocial
             @Override
             public void run()
             {
+                //
+                // Get login status. Store current credentials
+                // into or get last loggedin credentials from
+                // preferences.
+                //
+
+                String fbid = Facebook.getUserId();
+                String name = Facebook.getUserDisplayName();
+                String expi = Facebook.getUserTokenExpiration();
+
+                if (fbid != null) Simple.setSharedPrefString(keyprefix + ".fbid", fbid);
+                if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
+                if (expi != null) Simple.setSharedPrefString(keyprefix + ".expi", expi);
+
+                if (fbid == null) fbid = Simple.getSharedPrefString(keyprefix + ".fbid");
+                if (name == null) name = Simple.getSharedPrefString(keyprefix + ".name");
+                if (expi == null) expi = Simple.getSharedPrefString(keyprefix + ".expi");
+
+                if (! Simple.equals(facebookUser.getText(), name))
+                {
+                    facebookUser.setText(name);
+                    facebookHead.setIcon(ProfileImages.getFacebookProfileDrawable(fbid, true));
+                    facebookExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
+                }
+
+                facebookLogi.setTitle(Facebook.isLoggedIn()
+                        ? R.string.pref_social_facebook_logout
+                        : R.string.pref_social_facebook_login);
+
+                facebookLogi.setText(Simple.getTrans(Facebook.isLoggedIn()
+                        ?  R.string.pref_social_facebook_isloggedin
+                        :  R.string.pref_social_facebook_isloggedout));
+
                 Facebook.reconfigureFriendsAndLikes();
 
                 registerFriends(Simple.getActContext(), false);

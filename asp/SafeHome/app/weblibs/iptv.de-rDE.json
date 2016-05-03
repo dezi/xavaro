@@ -296,20 +296,20 @@
 
     "label": "rbb Fernsehen",
     "url": "http://www.rbb-online.de/",
-    "icon": "http://pbs.twimg.com/profile_images/461089900394082304/oZnbRxRt_400x400.jpeg",
+    "icon": "http://pbs.twimg.com/profile_images/714750587510923265/JuYJKk_q_400x400.jpg",
 
     "channels": [
       {
         "label": "rbb Berlin",
         "default": true,
-        "icon": "http://pbs.twimg.com/profile_images/461089900394082304/oZnbRxRt_400x400.jpeg",
+        "icon": "http://pbs.twimg.com/profile_images/714750587510923265/JuYJKk_q_400x400.jpg",
         "videourl": "http://rbb_live-lh.akamaihd.net/i/rbb_berlin@108248/master.m3u8",
         "aliase": [ "tv/de/RBB Berlin", "tv/de/RBB Berlin HD" ]
       },
       {
         "label": "rbb Brandenburg",
         "default": false,
-        "icon": "http://pbs.twimg.com/profile_images/461089900394082304/oZnbRxRt_400x400.jpeg",
+        "icon": "http://pbs.twimg.com/profile_images/714750587510923265/JuYJKk_q_400x400.jpg",
         "videourl": "http://rbb_live-lh.akamaihd.net/i/rbb_brandenburg@107638/master.m3u8",
         "aliase": [ "tv/de/RBB Brandenburg", "tv/de/RBB Brandenburg HD" ]
       }
@@ -677,14 +677,14 @@
 
     "label": "SPORT 1",
     "url": "http://www.sport1.de/",
-    "icon": "http://pbs.twimg.com/profile_images/667111090493460480/Th7E6yTQ_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/726059518061383680/cZxtg0Xb_400x400.jpg",
 
     "channels": [
       {
         "label": "SPORT 1",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/667111090493460480/Th7E6yTQ_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/726059518061383680/cZxtg0Xb_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sport1.html",
         "aliase": [ "tv/de/Sport 1", "tv/de/Sport 1 HD" ]
       }

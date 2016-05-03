@@ -10,6 +10,7 @@ import android.webkit.WebView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -34,19 +35,17 @@ public class WebAppFacebook
     }
 
     @JavascriptInterface
-    public void setVerbose(boolean yesno)
-    {
-        Facebook.setVerbose(yesno);
-    }
-
-    @JavascriptInterface
     public String getTarget()
     {
         JSONObject target = new JSONObject();
 
-        Json.put(target, "id",   (fbid != null) ? fbid : Facebook.getUserId());
+        String actuser = (fbid != null) ? fbid : Facebook.getUserId();
+        File icon = ProfileImages.getFacebookProfileImageFile(actuser);
+
+        Json.put(target, "id", actuser);
         Json.put(target, "name", (name != null) ? name : Facebook.getUserDisplayName());
         Json.put(target, "type", (type != null) ? type : "owner");
+        Json.put(target, "icon", (icon != null) ? icon.toString() : null);
 
         return target.toString();
     }
@@ -132,5 +131,11 @@ public class WebAppFacebook
         JSONObject response = Facebook.getGraphRequest(edge, bparams);
 
         return (response == null) ? "{}" : response.toString();
+    }
+
+    @JavascriptInterface
+    public void setVerbose(boolean yesno)
+    {
+        Facebook.setVerbose(yesno);
     }
 }

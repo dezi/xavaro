@@ -509,6 +509,19 @@ public class ProfileImages
     }
 
     @Nullable
+    public static void getFacebookLoadProfileImage(String facebookid)
+    {
+        if (facebookid == null) return;
+
+        File imagefile = getFacebookProfileImageFile(facebookid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, Facebook.getUserIconData(facebookid));
+        }
+    }
+
+    @Nullable
     public static Bitmap getFacebookProfileBitmap(String facebookid, boolean circle)
     {
         if (facebookid == null) return null;
