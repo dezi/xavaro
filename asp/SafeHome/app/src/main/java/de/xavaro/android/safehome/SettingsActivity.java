@@ -136,7 +136,7 @@ public class SettingsActivity extends PreferenceActivity
         category.title = "Social Media";
         target.add(category);
 
-        target.add(PreferencesSocial.FacebookFragment.getHeader());
+        target.add(PreferencesSocialFacebook.getHeader());
 
         category = new Header();
         category.title = "Web-Apps";
