@@ -204,64 +204,10 @@ public class SocialFacebook extends Social
     {
         JSONArray data = new JSONArray();
 
-        //
-        // Add facebook account owner as a owner feed.
-        //
+        getOwnerFeed(data, "facebook");
 
-        JSONObject owner = new JSONObject();
-
-        String fbid = Simple.getSharedPrefString("social.facebook.fbid");
-        String name = Simple.getSharedPrefString("social.facebook.name");
-
-        if ((fbid != null) && (name != null))
-        {
-            Json.put(owner, "id", fbid);
-            Json.put(owner, "name", name);
-            Json.put(owner, "type", "owner");
-
-            File icon = ProfileImages.getFacebookProfileImageFile(fbid);
-            if (icon != null) Json.put(owner, "icon", icon.toString());
-
-            Json.put(data, owner);
-        }
-
-        getUserFeeds(data, "friend", feedonly);
-        getUserFeeds(data, "like", feedonly);
-
-        return data;
-    }
-
-    private static JSONArray getUserFeeds(JSONArray data, String type, boolean feedonly)
-    {
-        String modeprefix = "social.facebook." + type + ".mode.";
-        String nameprefix = "social.facebook." + type + ".name.";
-
-        Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
-
-        for (Map.Entry<String, Object> entry : friends.entrySet())
-        {
-            Object fmode = entry.getValue();
-            if (! (fmode instanceof String)) continue;
-
-            String mode = (String) fmode;
-            if (feedonly && ! mode.contains("feed")) continue;
-            if (mode.equals("inactive")) continue;
-
-            String fbid = entry.getKey().substring(modeprefix.length());
-            String name = Simple.getSharedPrefString(nameprefix + fbid);
-            if (name == null) continue;
-
-            JSONObject item = new JSONObject();
-
-            Json.put(item, "id", fbid);
-            Json.put(item, "name", name);
-            Json.put(item, "type", type);
-
-            File icon = ProfileImages.getFacebookProfileImageFile(fbid);
-            if (icon != null) Json.put(item, "icon", icon.toString());
-
-            Json.put(data, item);
-        }
+        getUserFeeds(data, "facebook", "friend", feedonly);
+        getUserFeeds(data, "facebook", "like", feedonly);
 
         return data;
     }
@@ -289,9 +235,9 @@ public class SocialFacebook extends Social
     }
 
     @Nullable
-    public static byte[] getUserIconData(String fbid)
+    public static byte[] getUserIconData(String pfid)
     {
-        if (fbid == null) return null;
+        if (pfid == null) return null;
 
         Bundle parameters = new Bundle();
         parameters.putBoolean("redirect", false);
@@ -299,12 +245,12 @@ public class SocialFacebook extends Social
         parameters.putInt("width", 400);
         parameters.putInt("height", 400);
 
-        JSONObject json = getGraphRequest("/" + fbid + "/picture", parameters);
+        JSONObject json = getGraphRequest("/" + pfid + "/picture", parameters);
 
         JSONObject data = Json.getObject(json, "data");
         String iconurl = Json.getString(data, "url");
 
-        Log.d(LOGTAG, "getUserIcon: facebookid:" + fbid + "=" + iconurl);
+        Log.d(LOGTAG, "getUserIcon: facebookid:" + pfid + "=" + iconurl);
 
         return SimpleRequest.readData(iconurl);
     }
@@ -431,12 +377,12 @@ public class SocialFacebook extends Social
                 JSONObject friend = Json.getObject(friends, inx);
                 if (friend == null) continue;
 
-                String fbid = Json.getString(friend, "id");
+                String pfid = Json.getString(friend, "id");
                 String name = Json.getString(friend, "name");
-                if ((fbid == null) || (name == null)) continue;
+                if ((pfid == null) || (name == null)) continue;
 
-                String fnamepref = "social.facebook.friend.name." + fbid;
-                String fmodepref = "social.facebook.friend.mode." + fbid;
+                String fnamepref = "social.facebook.friend.name." + pfid;
+                String fmodepref = "social.facebook.friend.mode." + pfid;
 
                 Simple.setSharedPrefString(fnamepref, name);
 
@@ -445,7 +391,7 @@ public class SocialFacebook extends Social
                     Simple.setSharedPrefString(fmodepref, dfmode);
                 }
 
-                ProfileImages.getFacebookLoadProfileImage(fbid);
+                ProfileImages.getFacebookLoadProfileImage(pfid);
 
                 if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
                 if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
@@ -471,12 +417,12 @@ public class SocialFacebook extends Social
                 JSONObject like = Json.getObject(likes, inx);
                 if (like == null) continue;
 
-                String fbid = Json.getString(like, "id");
+                String pfid = Json.getString(like, "id");
                 String name = Json.getString(like, "name");
-                if ((fbid == null) || (name == null)) continue;
+                if ((pfid == null) || (name == null)) continue;
 
-                String fnamepref = "social.facebook.like.name." + fbid;
-                String fmodepref = "social.facebook.like.mode." + fbid;
+                String fnamepref = "social.facebook.like.name." + pfid;
+                String fmodepref = "social.facebook.like.mode." + pfid;
 
                 Simple.setSharedPrefString(fnamepref, name);
 
@@ -485,7 +431,7 @@ public class SocialFacebook extends Social
                     Simple.setSharedPrefString(fmodepref, dfmode);
                 }
 
-                ProfileImages.getFacebookLoadProfileImage(fbid);
+                ProfileImages.getFacebookLoadProfileImage(pfid);
 
                 if (oldlikes.containsKey(fnamepref)) oldlikes.remove(fnamepref);
                 if (oldlikes.containsKey(fmodepref)) oldlikes.remove(fmodepref);
@@ -559,16 +505,16 @@ public class SocialFacebook extends Social
         Json.remove(feedList, 0);
         if (feed == null) return;
 
-        final String feedfbid = Json.getString(feed, "id");
+        final String feedpfid = Json.getString(feed, "id");
         final String feedname = Json.getString(feed, "name");
 
-        Log.d(LOGTAG, "commTick: feed:" + feedfbid + " => " + feedname);
+        Log.d(LOGTAG, "commTick: feed:" + feedpfid + " => " + feedname);
 
-        JSONObject response = getGraphRequest(feedfbid + "/feed");
+        JSONObject response = getGraphRequest(feedpfid + "/feed");
         JSONArray feeddata = Json.getArray(response, "data");
         if (feeddata == null) return;
 
-        File feedfile = new File(cachedir, feedfbid + ".feed.json");
+        File feedfile = new File(cachedir, feedpfid + ".feed.json");
         Simple.putFileContent(feedfile, Json.toPretty(feeddata));
 
         //
@@ -580,7 +526,7 @@ public class SocialFacebook extends Social
             @Override
             public boolean accept(File dir, String filename)
             {
-                return filename.startsWith(feedfbid + "_") && filename.endsWith(".post.json");
+                return filename.startsWith(feedpfid + "_") && filename.endsWith(".post.json");
             }
         };
 

@@ -41,7 +41,7 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
         summaryres = R.string.pref_social_facebook_summary;
     }
 
-    ArrayList<String> knownfbids = new ArrayList<>();
+    ArrayList<String> knownpfids = new ArrayList<>();
     NicedPreferences.NiceCategoryPreference facebookHead;
     NicedPreferences.NiceDisplayTextPreference facebookUser;
     NicedPreferences.NiceDisplayTextPreference facebookExpi;
@@ -199,16 +199,16 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
 
             if (!(fnobj instanceof String)) continue;
 
-            String ffbid = entry.getKey().substring(friendsname.length());
+            String fpfid = entry.getKey().substring(friendsname.length());
             String fname = (String) fnobj;
 
-            if (knownfbids.contains(ffbid)) continue;
-            knownfbids.add(ffbid);
+            if (knownpfids.contains(fpfid)) continue;
+            knownpfids.add(fpfid);
 
             lp = new NicedPreferences.NiceListPreference(context);
-            lp.setKey(friendsmode + ffbid);
+            lp.setKey(friendsmode + fpfid);
             lp.setTitle(fname);
-            lp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
+            lp.setIcon(ProfileImages.getFacebookProfileDrawable(fpfid, true));
             lp.setEntryValues(R.array.pref_social_facebook_newfriends_keys);
             lp.setEntries(R.array.pref_social_facebook_newfriends_vals);
             lp.setEnabled(enabled);
@@ -264,16 +264,16 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
 
             if (!(fnobj instanceof String)) continue;
 
-            String ffbid = entry.getKey().substring(likesname.length());
+            String fpfid = entry.getKey().substring(likesname.length());
             String fname = (String) fnobj;
 
-            if (knownfbids.contains(ffbid)) continue;
-            knownfbids.add(ffbid);
+            if (knownpfids.contains(fpfid)) continue;
+            knownpfids.add(fpfid);
 
             lp = new NicedPreferences.NiceListPreference(context);
-            lp.setKey(likesmode + ffbid);
+            lp.setKey(likesmode + fpfid);
             lp.setTitle(fname);
-            lp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
+            lp.setIcon(ProfileImages.getFacebookProfileDrawable(fpfid, true));
             lp.setEntryValues(R.array.pref_social_facebook_newlikes_keys);
             lp.setEntries(R.array.pref_social_facebook_newlikes_vals);
             lp.setEnabled(enabled);
@@ -301,22 +301,22 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
             // preferences.
             //
 
-            String fbid = SocialFacebook.getUserId();
+            String pfid = SocialFacebook.getUserId();
             String name = SocialFacebook.getUserDisplayName();
             String expi = SocialFacebook.getUserTokenExpiration();
 
-            if (fbid != null) Simple.setSharedPrefString(keyprefix + ".fbid", fbid);
+            if (pfid != null) Simple.setSharedPrefString(keyprefix + ".pfid", pfid);
             if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
             if (expi != null) Simple.setSharedPrefString(keyprefix + ".expi", expi);
 
-            if (fbid == null) fbid = Simple.getSharedPrefString(keyprefix + ".fbid");
+            if (pfid == null) pfid = Simple.getSharedPrefString(keyprefix + ".pfid");
             if (name == null) name = Simple.getSharedPrefString(keyprefix + ".name");
             if (expi == null) expi = Simple.getSharedPrefString(keyprefix + ".expi");
 
             if (!Simple.equals(facebookUser.getText(), name))
             {
                 facebookUser.setText(name);
-                facebookHead.setIcon(ProfileImages.getFacebookProfileDrawable(fbid, true));
+                facebookHead.setIcon(ProfileImages.getFacebookProfileDrawable(pfid, true));
                 facebookExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
             }
 

@@ -43,7 +43,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
         summaryres = R.string.pref_social_instagram_summary;
     }
 
-    ArrayList<String> knownfbids = new ArrayList<>();
+    ArrayList<String> knownpfids = new ArrayList<>();
     NicedPreferences.NiceCategoryPreference instagramHead;
     NicedPreferences.NiceDisplayTextPreference instagramUser;
     NicedPreferences.NiceDisplayTextPreference instagramExpi;
@@ -200,16 +200,16 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
 
             if (!(fnobj instanceof String)) continue;
 
-            String ffbid = entry.getKey().substring(friendsname.length());
+            String fpfid = entry.getKey().substring(friendsname.length());
             String fname = (String) fnobj;
 
-            if (knownfbids.contains(ffbid)) continue;
-            knownfbids.add(ffbid);
+            if (knownpfids.contains(fpfid)) continue;
+            knownpfids.add(fpfid);
 
             lp = new NicedPreferences.NiceListPreference(context);
-            lp.setKey(friendsmode + ffbid);
+            lp.setKey(friendsmode + fpfid);
             lp.setTitle(fname);
-            lp.setIcon(ProfileImages.getInstagramProfileDrawable(ffbid, true));
+            lp.setIcon(ProfileImages.getInstagramProfileDrawable(fpfid, true));
             lp.setEntryValues(R.array.pref_social_instagram_newfriends_keys);
             lp.setEntries(R.array.pref_social_instagram_newfriends_vals);
             lp.setEnabled(enabled);
@@ -237,22 +237,22 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
             // preferences.
             //
 
-            String fbid = SocialInstagram.getUserId();
+            String pfid = SocialInstagram.getUserId();
             String name = SocialInstagram.getUserDisplayName();
             String expi = SocialInstagram.getUserTokenExpiration();
 
-            if (fbid != null) Simple.setSharedPrefString(keyprefix + ".fbid", fbid);
+            if (pfid != null) Simple.setSharedPrefString(keyprefix + ".pfid", pfid);
             if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
             if (expi != null) Simple.setSharedPrefString(keyprefix + ".expi", expi);
 
-            if (fbid == null) fbid = Simple.getSharedPrefString(keyprefix + ".fbid");
+            if (pfid == null) pfid = Simple.getSharedPrefString(keyprefix + ".pfid");
             if (name == null) name = Simple.getSharedPrefString(keyprefix + ".name");
             if (expi == null) expi = Simple.getSharedPrefString(keyprefix + ".expi");
 
             if (!Simple.equals(instagramUser.getText(), name))
             {
                 instagramUser.setText(name);
-                instagramHead.setIcon(ProfileImages.getInstagramProfileDrawable(fbid, true));
+                instagramHead.setIcon(ProfileImages.getInstagramProfileDrawable(pfid, true));
                 instagramExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
             }
 
@@ -264,7 +264,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
                     ? R.string.pref_social_instagram_isloggedin
                     : R.string.pref_social_instagram_isloggedout));
 
-            //SocialInstagram.reconfigureFriendsAndLikes();
+            SocialInstagram.reconfigureFriends();
 
             registerFriends(Simple.getActContext(), false);
 

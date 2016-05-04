@@ -20,6 +20,9 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -239,6 +242,17 @@ public class SocialInstagram extends Social
         return Json.getString(userdata, "full_name");
     }
 
+    public static JSONArray getUserFeeds(boolean feedonly)
+    {
+        JSONArray data = new JSONArray();
+
+        getOwnerFeed(data, "instagram");
+
+        getUserFeeds(data, "instagram", "friend", feedonly);
+
+        return data;
+    }
+
     @Nullable
     public static JSONArray getUserFriendlist()
     {
@@ -286,6 +300,12 @@ public class SocialInstagram extends Social
     public static JSONObject getUser(String igid)
     {
         JSONObject response = getGraphRequest("/users/" + igid);
+        return Json.getObject(response, "data");
+    }
+
+    private static JSONObject getGraphPost(String postid)
+    {
+        JSONObject response = getGraphRequest("/media/" + postid);
         return Json.getObject(response, "data");
     }
 
@@ -342,12 +362,12 @@ public class SocialInstagram extends Social
                 JSONObject friend = Json.getObject(friends, inx);
                 if (friend == null) continue;
 
-                String fbid = Json.getString(friend, "id");
+                String pfid = Json.getString(friend, "id");
                 String name = Json.getString(friend, "full_name");
-                if ((fbid == null) || (name == null)) continue;
+                if ((pfid == null) || (name == null)) continue;
 
-                String fnamepref = "social.instagram.friend.name." + fbid;
-                String fmodepref = "social.instagram.friend.mode." + fbid;
+                String fnamepref = "social.instagram.friend.name." + pfid;
+                String fmodepref = "social.instagram.friend.mode." + pfid;
 
                 Simple.setSharedPrefString(fnamepref, name);
 
@@ -356,7 +376,7 @@ public class SocialInstagram extends Social
                     Simple.setSharedPrefString(fmodepref, dfmode);
                 }
 
-                ProfileImages.getFacebookLoadProfileImage(fbid);
+                ProfileImages.getFacebookLoadProfileImage(pfid);
 
                 if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
                 if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
@@ -368,4 +388,127 @@ public class SocialInstagram extends Social
             }
         }
     }
+
+    //region Cache maintenance
+
+    private static long totalInterval = 3600;
+    private static long lastReconfigure;
+    private static long nextInterval;
+    private static long nextAction;
+    private static File cachedir;
+
+    private static JSONArray feedList;
+
+    public static void commTick()
+    {
+        long now = Simple.nowAsTimeStamp();
+
+        if ((now - lastReconfigure) > 24 * 3600 * 1000)
+        {
+            cachedir = new File(Simple.getExternalCacheDir(), "instagram");
+
+            if (! cachedir.exists())
+            {
+                if (cachedir.mkdirs()) Log.d(LOGTAG, "commTick: created cache:" + cachedir);
+            }
+
+            Log.d(LOGTAG, "commTick: reconfigureFriends");
+
+            reconfigureFriends();
+            lastReconfigure = now;
+            nextAction = now;
+
+            return;
+        }
+
+        if (now < nextAction) return;
+
+        if ((feedList == null) || feedList.length() == 0)
+        {
+            feedList = getUserFeeds(false);
+
+            if (feedList.length() == 0)
+            {
+                nextAction = now + (totalInterval * 1000);
+            }
+            else
+            {
+                nextInterval = (totalInterval * 1000) / feedList.length();
+                nextAction = now;
+            }
+
+            return;
+        }
+
+        nextAction += nextInterval;
+
+        //
+        // Load one feed.
+        //
+
+        JSONObject feed = Json.getObject(feedList, 0);
+        Json.remove(feedList, 0);
+        if (feed == null) return;
+
+        final String feedpfid = Json.getString(feed, "id");
+        final String feedname = Json.getString(feed, "name");
+
+        Log.d(LOGTAG, "commTick: feed:" + feedpfid + " => " + feedname);
+
+        JSONObject response = getGraphRequest("/users/" + feedpfid  + "/media/recent");
+        JSONArray feeddata = Json.getArray(response, "data");
+        if (feeddata == null) return;
+
+        File feedfile = new File(cachedir, feedpfid + ".feed.json");
+        Simple.putFileContent(feedfile, Json.toPretty(feeddata));
+
+        //
+        // Check feed stories.
+        //
+
+        FilenameFilter postsfilter = new FilenameFilter()
+        {
+            @Override
+            public boolean accept(File dir, String filename)
+            {
+                return filename.startsWith(feedpfid + "_") && filename.endsWith(".post.json");
+            }
+        };
+
+        if ((! cachedir.exists()) && cachedir.mkdirs()) Log.d(LOGTAG, "commtick: created cache");
+        ArrayList<String> postfiles = Simple.getDirectoryAsList(cachedir, postsfilter);
+
+        for (int inx = 0; inx < feeddata.length(); inx++)
+        {
+            JSONObject post = Json.getObject(feeddata, inx);
+            String postid = Json.getString(post, "id");
+            if (postid == null) continue;
+
+            String postname = postid + ".post.json";
+            File postfile = new File(cachedir, postname);
+
+            if (postfiles.contains(postname))
+            {
+                postfiles.remove(postname);
+                continue;
+            }
+
+            JSONObject postdata = getGraphPost(postid);
+            if (postdata == null) continue;
+
+            Simple.putFileContent(postfile, Json.toPretty(postdata));
+        }
+
+        //
+        // Remove outdated posts.
+        //
+
+        while (postfiles.size() > 0)
+        {
+            File obsolete = new File(cachedir, postfiles.remove(0));
+            if (obsolete.delete()) Log.d(LOGTAG, "commTick: deleted:" + obsolete);
+        }
+    }
+
+    //endregion Cache maintenance
 }
