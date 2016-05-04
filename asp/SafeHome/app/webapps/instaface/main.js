@@ -4,12 +4,12 @@ instaface.createTest = function()
 
     ic.pre = WebLibSimple.createAnyAppend("pre", document.body);
 
-    ic.target = JSON.parse(WebAppFacebook.getTarget());
+    ic.targets = JSON.parse(WebAppFacebook.getTargets());
 
-    ic.pre.innerHTML += "===============>target\n";
-    ic.pre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.target)) + "\n";
+    ic.pre.innerHTML += "===============>targets\n";
+    ic.pre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.targets)) + "\n";
 
-    ic.feed = JSON.parse(WebAppFacebook.getFeed(ic.target.id));
+    ic.feed = JSON.parse(WebAppFacebook.getFeed(ic.targets[ 0 ].id));
 
     if (ic.feed.length > 0)
     {
@@ -23,7 +23,7 @@ instaface.createTest = function()
     ic.pre.innerHTML += "===============>feed\n";
     ic.pre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.feed)) + "\n";
 
-    if (ic.target.type == "owner")
+    if (ic.target[ 0 ].type == "owner")
     {
         ic.userfeeds = JSON.parse(WebAppFacebook.getUserFeeds());
 

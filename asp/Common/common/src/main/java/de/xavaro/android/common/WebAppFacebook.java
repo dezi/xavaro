@@ -19,7 +19,6 @@ public class WebAppFacebook
     private String pfid;
     private String name;
     private String type;
-    private String icon;
 
     public void setTarget(String platform, String pfid, String name, String type)
     {
@@ -30,20 +29,72 @@ public class WebAppFacebook
     }
 
     @JavascriptInterface
-    public String getTarget()
+    public String getTargets()
     {
-        JSONObject target = new JSONObject();
+        JSONArray targets = new JSONArray();
 
-        String actuser = (pfid != null) ? pfid : SocialFacebook.getUserId();
-        File icon = ProfileImages.getFacebookProfileImageFile(actuser);
+        File icon = null;
 
-        Json.put(target, "id", actuser);
-        Json.put(target, "name", (name != null) ? name : SocialFacebook.getUserDisplayName());
-        Json.put(target, "type", (type != null) ? type : "owner");
-        Json.put(target, "plat", plat );
-        Json.put(target, "icon", (icon != null) ? icon.toString() : null);
+        if (plat != null)
+        {
+            if (Simple.equals(plat, "facebook"))
+            {
+                icon = ProfileImages.getFacebookProfileImageFile(pfid);
+            }
 
-        return target.toString();
+            if (Simple.equals(plat, "instagram"))
+            {
+                icon = ProfileImages.getFacebookProfileImageFile(pfid);
+            }
+
+            JSONObject target = new JSONObject();
+
+            Json.put(target, "id", pfid);
+            Json.put(target, "name", name);
+            Json.put(target, "type", type);
+            Json.put(target, "plat", plat );
+            Json.put(target, "icon", (icon != null) ? icon.toString() : null);
+
+            Json.put(targets, target);
+        }
+        else
+        {
+            if (SocialFacebook.isLoggedIn() && SocialFacebook.isLoggedIn())
+            {
+                JSONObject target = new JSONObject();
+
+                String actuser = SocialFacebook.getUserId();
+                String actname = SocialFacebook.getUserDisplayName();
+                icon = ProfileImages.getFacebookProfileImageFile(actuser);
+
+                Json.put(target, "id", actuser);
+                Json.put(target, "name", actname);
+                Json.put(target, "type", "owner");
+                Json.put(target, "plat", "facebook" );
+                Json.put(target, "icon", (icon != null) ? icon.toString() : null);
+
+                Json.put(targets, target);
+            }
+
+            if (SocialInstagram.isLoggedIn() && SocialInstagram.isLoggedIn())
+            {
+                JSONObject target = new JSONObject();
+
+                String actuser = SocialInstagram.getUserId();
+                String actname = SocialInstagram.getUserDisplayName();
+                icon = ProfileImages.getInstagramProfileImageFile(actuser);
+
+                Json.put(target, "id", actuser);
+                Json.put(target, "name", actname);
+                Json.put(target, "type", "owner");
+                Json.put(target, "plat", "instagram" );
+                Json.put(target, "icon", (icon != null) ? icon.toString() : null);
+
+                Json.put(targets, target);
+            }
+        }
+
+        return targets.toString();
     }
 
     @JavascriptInterface
@@ -79,64 +130,8 @@ public class WebAppFacebook
     @JavascriptInterface
     public String getGraphSync(String edge, String params)
     {
-        Bundle bparams = null;
         JSONObject jparams = (params != null) ? Json.fromString(params) : null;
-
-        if (jparams != null)
-        {
-            bparams = new Bundle();
-
-            Iterator<String> keysIterator = jparams.keys();
-
-            while (keysIterator.hasNext())
-            {
-                String key = keysIterator.next();
-                Object val = Json.get(jparams, key);
-
-                if (val instanceof Boolean)
-                {
-                    bparams.putBoolean(key, (Boolean) val);
-                    continue;
-                }
-
-                if (val instanceof Integer)
-                {
-                    bparams.putInt(key, (Integer) val);
-                    continue;
-                }
-
-                if (val instanceof Long)
-                {
-                    bparams.putLong(key, (Long) val);
-                    continue;
-                }
-
-                if (val instanceof String)
-                {
-                    bparams.putString(key, (String) val);
-                    continue;
-                }
-
-                if (val instanceof JSONArray)
-                {
-                    JSONArray array = (JSONArray) val;
-                    String imploded = "";
-
-                    for (int inx = 0; inx < array.length(); inx++)
-                    {
-                        Object jobj = Json.get(array, inx);
-                        if (! (jobj instanceof String)) continue;
-
-                        if (imploded.length() > 0) imploded += ",";
-                        imploded  += (String) jobj;
-                    }
-
-                    bparams.putString(key, imploded);
-                }
-            }
-        }
-
-        JSONObject response = SocialFacebook.getGraphRequest(edge, bparams);
+        JSONObject response = SocialFacebook.getGraphRequest(edge, jparams);
 
         return (response == null) ? "{}" : response.toString();
     }
@@ -145,5 +140,6 @@ public class WebAppFacebook
     public void setVerbose(boolean yesno)
     {
         SocialFacebook.setVerbose(yesno);
+        SocialInstagram.setVerbose(yesno);
     }
 }

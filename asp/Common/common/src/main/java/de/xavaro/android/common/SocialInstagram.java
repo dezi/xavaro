@@ -2,6 +2,7 @@ package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 import android.annotation.SuppressLint;
+
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -23,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-public class SocialInstagram
+public class SocialInstagram extends Social
 {
     private static final String LOGTAG = SocialInstagram.class.getSimpleName();
 
@@ -41,15 +42,12 @@ public class SocialInstagram
                     "likes"
             );
 
-    private static boolean verbose = true;
     private static JSONObject user;
-    private static String locale;
     private static String token;
 
     public static void initialize(Application app)
     {
         //cachedir = new File(Simple.getExternalCacheDir(), "instagram");
-        locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
         token = getAccessToken();
 
         getCurrentUser();
@@ -197,19 +195,20 @@ public class SocialInstagram
         // Nuke preference and session id.
         //
 
+        user = null;
         token = null;
         Simple.removeSharedPref(tokenpref);
         CookieManager.getInstance().setCookie("https://www.instagram.com", "sessionid=");
     }
 
+    public static boolean isEnabled()
+    {
+        return Simple.getSharedPrefBoolean("social.instagram.enable");
+    }
+
     public static boolean isLoggedIn()
     {
         return (Simple.getSharedPrefString(tokenpref) != null);
-    }
-
-    public static void setVerbose(boolean yesno)
-    {
-        verbose = yesno;
     }
 
     @Nullable
@@ -291,9 +290,15 @@ public class SocialInstagram
     }
 
     @Nullable
-    private static JSONObject getGraphRequest(String path)
+    public static JSONObject getGraphRequest(String path)
     {
-        return getGraphRequest(path, null);
+        return getGraphRequest(path, new Bundle());
+    }
+
+    @Nullable
+    public static JSONObject getGraphRequest(String path, JSONObject parameters)
+    {
+        return getGraphRequest(path, getParameters(parameters));
     }
 
     @Nullable

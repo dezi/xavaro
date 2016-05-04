@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-public class SocialFacebook
+public class SocialFacebook extends Social
 {
     private static final String LOGTAG = SocialFacebook.class.getSimpleName();
 
@@ -148,6 +148,11 @@ public class SocialFacebook
     public static void logout()
     {
         LoginManager.getInstance().logOut();
+    }
+
+    public static boolean isEnabled()
+    {
+        return Simple.getSharedPrefBoolean("social.facebook.enable");
     }
 
     public static boolean isLoggedIn()
@@ -378,7 +383,13 @@ public class SocialFacebook
 
     private static JSONObject getGraphRequest(String path)
     {
-        return getGraphRequest(path, null);
+        return getGraphRequest(path, new Bundle());
+    }
+
+    @Nullable
+    public static JSONObject getGraphRequest(String path, JSONObject parameters)
+    {
+        return getGraphRequest(path, getParameters(parameters));
     }
 
     public static JSONObject getGraphRequest(String path, Bundle parameters)
