@@ -303,10 +303,48 @@ public class SocialInstagram extends Social
         return Json.getObject(response, "data");
     }
 
+    @Nullable
+    public static JSONObject getPost(String postid)
+    {
+        if (postid == null) return null;
+
+        File postfile = new File(cachedir, postid + ".post.json");
+
+        if (postfile.exists())
+        {
+            return Json.fromString(Simple.getFileContent(postfile));
+        }
+
+        return getGraphPost(postid);
+    }
+
     private static JSONObject getGraphPost(String postid)
     {
         JSONObject response = getGraphRequest("/media/" + postid);
         return Json.getObject(response, "data");
+    }
+
+    @Nullable
+    public static JSONArray getFeed(String userid)
+    {
+        if (userid == null) return null;
+
+        File feedfile = new File(cachedir, userid + ".feed.json");
+
+        if (feedfile.exists())
+        {
+            return Json.fromStringArray(Simple.getFileContent(feedfile));
+        }
+
+        return getGraphFeed(userid);
+    }
+
+    private static JSONArray getGraphFeed(String userid)
+    {
+        if (userid == null) return null;
+
+        JSONObject response = getGraphRequest("/users/" + userid  + "/media/recent");
+        return Json.getArray(response, "data");
     }
 
     @Nullable
@@ -455,8 +493,7 @@ public class SocialInstagram extends Social
 
         Log.d(LOGTAG, "commTick: feed:" + feedpfid + " => " + feedname);
 
-        JSONObject response = getGraphRequest("/users/" + feedpfid  + "/media/recent");
-        JSONArray feeddata = Json.getArray(response, "data");
+        JSONArray feeddata = getGraphFeed(feedpfid);
         if (feeddata == null) return;
 
         File feedfile = new File(cachedir, feedpfid + ".feed.json");

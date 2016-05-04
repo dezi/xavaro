@@ -270,6 +270,47 @@ public class SocialFacebook extends Social
         return getGraphPost(postid);
     }
 
+    private static JSONObject getGraphPost(String postid)
+    {
+        String[] fields =
+                {
+                        "caption",
+                        "created_time",
+                        "description",
+                        "event",
+                        "expanded_height",
+                        "expanded_width",
+                        "from",
+                        "full_picture",
+                        "height",
+                        "icon",
+                        "link",
+                        "message",
+                        "message_tags",
+                        "name",
+                        "object_id",
+                        "picture",
+                        "place",
+                        "properties",
+                        "shares",
+                        "source",
+                        "status_type",
+                        "story",
+                        "story_tags",
+                        "width",
+                        "likes",
+                        "comments",
+                        "reactions",
+                        "sharedposts",
+                        "attachments"
+                };
+
+        Bundle params = new Bundle();
+        params.putString("fields", TextUtils.join(",", fields));
+
+        return getGraphRequest(postid, params);
+    }
+
     @Nullable
     public static JSONArray getFeed(String userid)
     {
@@ -282,49 +323,16 @@ public class SocialFacebook extends Social
             return Json.fromStringArray(Simple.getFileContent(feedfile));
         }
 
-        JSONObject response = getGraphRequest(userid + "/feed");
-        return Json.getArray(response, "data");
+        return getGraphFeed(userid);
     }
 
-    private static JSONObject getGraphPost(String postid)
+    @Nullable
+    private static JSONArray getGraphFeed(String userid)
     {
-        String[] fields =
-        {
-                "caption",
-                "created_time",
-                "description",
-                "event",
-                "expanded_height",
-                "expanded_width",
-                "from",
-                "full_picture",
-                "height",
-                "icon",
-                "link",
-                "message",
-                "message_tags",
-                "name",
-                "object_id",
-                "picture",
-                "place",
-                "properties",
-                "shares",
-                "source",
-                "status_type",
-                "story",
-                "story_tags",
-                "width",
-                "likes",
-                "comments",
-                "reactions",
-                "sharedposts",
-                "attachments"
-        };
+        if (userid == null) return null;
 
-        Bundle params = new Bundle();
-        params.putString("fields", TextUtils.join(",", fields));
-
-        return getGraphRequest(postid, params);
+        JSONObject response = getGraphRequest(userid + "/feed");
+        return Json.getArray(response, "data");
     }
 
     private static JSONObject getGraphRequest(String path)
@@ -510,8 +518,7 @@ public class SocialFacebook extends Social
 
         Log.d(LOGTAG, "commTick: feed:" + feedpfid + " => " + feedname);
 
-        JSONObject response = getGraphRequest(feedpfid + "/feed");
-        JSONArray feeddata = Json.getArray(response, "data");
+        JSONArray feeddata = getGraphFeed(feedpfid);
         if (feeddata == null) return;
 
         File feedfile = new File(cachedir, feedpfid + ".feed.json");
