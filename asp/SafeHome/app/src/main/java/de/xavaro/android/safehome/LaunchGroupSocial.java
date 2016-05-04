@@ -31,16 +31,23 @@ public class LaunchGroupSocial
         @Nullable
         public static JSONArray getConfig()
         {
-            if (! Simple.getSharedPrefBoolean("social.facebook.enable")) return null;
-
             JSONArray home = new JSONArray();
-            JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
+            JSONArray fbdir = new JSONArray();
+            JSONArray igdir = new JSONArray();
 
-            configPrefs("friend", home, adir, cdir);
-            configPrefs("like", home, adir, cdir);
+            if (Simple.getSharedPrefBoolean("social.facebook.enable"))
+            {
+                configPrefs("facebook", "friend", home, fbdir, cdir);
+                configPrefs("facebook", "like", home, fbdir, cdir);
+            }
 
-            if (adir.length() > 0)
+            if (Simple.getSharedPrefBoolean("social.instagram.enable"))
+            {
+                configPrefs("instagram", "friend", home, igdir, cdir);
+            }
+
+            if (fbdir.length() > 0)
             {
                 JSONObject entry = new JSONObject();
 
@@ -48,7 +55,19 @@ public class LaunchGroupSocial
                 Json.put(entry, "label", "Facebook");
                 Json.put(entry, "order", 550);
 
-                Json.put(entry, "launchitems", adir);
+                Json.put(entry, "launchitems", fbdir);
+                Json.put(home, entry);
+            }
+
+            if (igdir.length() > 0)
+            {
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "type", "instagram");
+                Json.put(entry, "label", "Instagram");
+                Json.put(entry, "order", 550);
+
+                Json.put(entry, "launchitems", igdir);
                 Json.put(home, entry);
             }
 
@@ -67,10 +86,11 @@ public class LaunchGroupSocial
             return home;
         }
 
-        private static void configPrefs(String type, JSONArray home, JSONArray adir, JSONArray cdir)
+        private static void configPrefs(String platform, String type,
+                                        JSONArray home, JSONArray adir, JSONArray cdir)
         {
-            String modeprefix = "social.facebook." + type + ".mode.";
-            String nameprefix = "social.facebook." + type + ".name.";
+            String modeprefix = "social." + platform + "." + type + ".mode.";
+            String nameprefix = "social." + platform + "." + type + ".name.";
 
             Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
 
@@ -81,16 +101,16 @@ public class LaunchGroupSocial
                 if ((fmode == null) || !(fmode instanceof String)) continue;
 
                 String mode = (String) fmode;
-                String fbid = item.getKey().substring(modeprefix.length());
-                String name = Simple.getSharedPrefString(nameprefix + fbid);
+                String pfid = item.getKey().substring(modeprefix.length());
+                String name = Simple.getSharedPrefString(nameprefix + pfid);
                 if (name == null) continue;
 
                 JSONObject entry = new JSONObject();
 
                 Json.put(entry, "label", name);
-                Json.put(entry, "type", "facebook");
+                Json.put(entry, "type", platform);
                 Json.put(entry, "subtype", type);
-                Json.put(entry, "fbid", fbid);
+                Json.put(entry, "pfid", pfid);
                 Json.put(entry, "order", 500);
 
                 if (mode.contains("home")) Json.put(home, entry);
@@ -98,7 +118,7 @@ public class LaunchGroupSocial
                 if (mode.contains("folder")) Json.put(adir, entry);
                 if (mode.contains("contacts")) Json.put(cdir, entry);
 
-                Log.d(LOGTAG, "Prefe:" + item.getKey() + "=fbid=" + fbid + "=" + name);
+                Log.d(LOGTAG, "Prefe:" + item.getKey() + "=id=" + pfid + "=" + name);
             }
         }
     }

@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 public class SocialInstagram
 {
@@ -215,7 +216,7 @@ public class SocialInstagram
     public static String getUserId()
     {
         JSONObject userdata = getCurrentUser();
-        return Json.getString(userdata, "username");
+        return Json.getString(userdata, "id");
     }
 
     @Nullable
@@ -240,6 +241,29 @@ public class SocialInstagram
     }
 
     @Nullable
+    public static JSONArray getUserFriendlist()
+    {
+        JSONObject response = getGraphRequest("/users/self/follows");
+        return Json.getArray(response, "data");
+    }
+
+    @Nullable
+    public static byte[] getUserIconData(String igid)
+    {
+        if (igid == null) return null;
+
+        JSONObject userdata = getCurrentUser();
+
+        if ((userdata == null) || ! Simple.equals(igid, Json.getString(userdata, "username")))
+        {
+            userdata = getUser(igid);
+        }
+
+        String iconurl = Json.getString(userdata, "profile_picture");
+        return SimpleRequest.readData(iconurl);
+    }
+
+    @Nullable
     public static String getAccessToken()
     {
         return Simple.getSharedPrefString(tokenpref);
@@ -250,13 +274,20 @@ public class SocialInstagram
     {
         if (user == null)
         {
-            JSONObject data = getGraphRequest("/users/self");
-            user = Json.getObject(data, "data");
+            JSONObject response = getGraphRequest("/users/self");
+            user = Json.getObject(response, "data");
 
-            Log.d(LOGTAG, "=================>" + user);
+            if (user != null) Log.d(LOGTAG, "=================>" + user.toString());
         }
 
         return user;
+    }
+
+    @Nullable
+    public static JSONObject getUser(String igid)
+    {
+        JSONObject response = getGraphRequest("/users/" + igid);
+        return Json.getObject(response, "data");
     }
 
     @Nullable
@@ -286,5 +317,50 @@ public class SocialInstagram
         }
 
         return Json.fromString(content);
+    }
+
+    public static void reconfigureFriends()
+    {
+        if (! isLoggedIn()) return;
+
+        JSONArray friends = getUserFriendlist();
+
+        if (friends != null)
+        {
+            Map<String, Object> oldfriends = Simple.getAllPreferences("social.instagram.friend.");
+
+            String dfmode = Simple.getSharedPrefString("social.instagram.newfriends.default");
+            if (dfmode == null) dfmode = "feed+folder";
+
+            for (int inx = 0; inx < friends.length(); inx++)
+            {
+                JSONObject friend = Json.getObject(friends, inx);
+                if (friend == null) continue;
+
+                String fbid = Json.getString(friend, "id");
+                String name = Json.getString(friend, "full_name");
+                if ((fbid == null) || (name == null)) continue;
+
+                String fnamepref = "social.instagram.friend.name." + fbid;
+                String fmodepref = "social.instagram.friend.mode." + fbid;
+
+                Simple.setSharedPrefString(fnamepref, name);
+
+                if (Simple.getSharedPrefString(fmodepref) == null)
+                {
+                    Simple.setSharedPrefString(fmodepref, dfmode);
+                }
+
+                ProfileImages.getFacebookLoadProfileImage(fbid);
+
+                if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
+                if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
+            }
+
+            for (Map.Entry<String, ?> entry : oldfriends.entrySet())
+            {
+                Simple.removeSharedPref(entry.getKey());
+            }
+        }
     }
 }

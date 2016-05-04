@@ -15,14 +15,16 @@ public class WebAppFacebook
 {
     private static final String LOGTAG = WebAppFacebook.class.getSimpleName();
 
-    private String fbid;
+    private String plat;
+    private String pfid;
     private String name;
     private String type;
     private String icon;
 
-    public void setTarget(String fbid, String name, String type)
+    public void setTarget(String platform, String pfid, String name, String type)
     {
-        this.fbid = fbid;
+        this.plat = platform;
+        this.pfid = pfid;
         this.name = name;
         this.type = type;
     }
@@ -32,12 +34,13 @@ public class WebAppFacebook
     {
         JSONObject target = new JSONObject();
 
-        String actuser = (fbid != null) ? fbid : SocialFacebook.getUserId();
+        String actuser = (pfid != null) ? pfid : SocialFacebook.getUserId();
         File icon = ProfileImages.getFacebookProfileImageFile(actuser);
 
         Json.put(target, "id", actuser);
         Json.put(target, "name", (name != null) ? name : SocialFacebook.getUserDisplayName());
         Json.put(target, "type", (type != null) ? type : "owner");
+        Json.put(target, "plat", plat );
         Json.put(target, "icon", (icon != null) ? icon.toString() : null);
 
         return target.toString();

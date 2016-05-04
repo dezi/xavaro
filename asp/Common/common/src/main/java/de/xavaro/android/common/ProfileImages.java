@@ -551,6 +551,68 @@ public class ProfileImages
 
     //endregion Facebook profiles
 
+    //region Instagram profiles
+
+    public static File getInstagramProfileImageFile(String instagramid)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "Instagram.image." + instagramid + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    public static File getInstagramProfileFile(String instagramid)
+    {
+        if (instagramid == null) return null;
+
+        File imagefile = getInstagramProfileImageFile(instagramid);
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    @Nullable
+    public static void getInstagramLoadProfileImage(String instagramid)
+    {
+        if (instagramid == null) return;
+
+        File imagefile = getInstagramProfileImageFile(instagramid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, SocialInstagram.getUserIconData(instagramid));
+        }
+    }
+
+    @Nullable
+    public static Bitmap getInstagramProfileBitmap(String instagramid, boolean circle)
+    {
+        if (instagramid == null) return null;
+
+        File imagefile = getInstagramProfileImageFile(instagramid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, SocialInstagram.getUserIconData(instagramid));
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getInstagramProfileDrawable(String instagramid, boolean circle)
+    {
+        return Simple.getDrawable(getInstagramProfileBitmap(instagramid, circle));
+    }
+
+    //endregion Facebook profiles
+
     private static final Map<String, Drawable> drawableCache = new HashMap<>();
 
     private static File getAnonProfileFile()

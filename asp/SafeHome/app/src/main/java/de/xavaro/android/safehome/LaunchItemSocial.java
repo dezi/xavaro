@@ -1,18 +1,13 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.widget.ImageView;
 
 import java.io.File;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.ProfileImages;
-import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VoiceIntent;
 
 public class LaunchItemSocial extends LaunchItem
@@ -31,10 +26,10 @@ public class LaunchItemSocial extends LaunchItem
 
         if (type.equals("facebook"))
         {
-            if (config.has("subtype"))
+            if (config.has("pfid"))
             {
-                String fbid = Json.getString(config, "fbid");
-                File profile = ProfileImages.getFacebookProfileImageFile(fbid);
+                String pfid = Json.getString(config, "pfid");
+                File profile = ProfileImages.getFacebookProfileImageFile(pfid);
 
                 if (profile != null)
                 {
@@ -50,13 +45,34 @@ public class LaunchItemSocial extends LaunchItem
             }
         }
 
+        if (type.equals("instagram"))
+        {
+            if (config.has("pfid"))
+            {
+                String pfid = Json.getString(config, "pfid");
+                File profile = ProfileImages.getInstagramProfileImageFile(pfid);
+
+                if (profile != null)
+                {
+                    icon.setImageResource(profile.toString(), false);
+                    targetIcon = overicon;
+                }
+
+                targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
+            }
+            else
+            {
+                icon.setImageResource(CommonConfigs.IconResSocialInstagram);
+            }
+        }
+
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
     }
 
     @Override
     protected void onMyClick()
     {
-        if (type.equals("facebook")) launchFacebook();
+        launchAny();
     }
 
     @Override
@@ -64,7 +80,7 @@ public class LaunchItemSocial extends LaunchItem
     {
         if (super.onExecuteVoiceIntent(voiceintent, index))
         {
-            if (type.equals("facebook"   )) launchFacebook();
+            launchAny();
 
             return true;
         }
@@ -72,9 +88,9 @@ public class LaunchItemSocial extends LaunchItem
         return false;
     }
 
-    private void launchFacebook()
+    private void launchAny()
     {
-        if (config.has("fbid"))
+        if (config.has("pfid"))
         {
             final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
             webappFrame.setWebAppName("instaface");
@@ -82,11 +98,12 @@ public class LaunchItemSocial extends LaunchItem
 
             if (webappFrame.getWebAppView().facebook != null)
             {
-                String fbid = Json.getString(config, "fbid");
+                String plat = Json.getString(config, "type");
+                String pfid = Json.getString(config, "pfid");
                 String name = Json.getString(config, "label");
                 String type = Json.getString(config, "subtype");
 
-                webappFrame.getWebAppView().facebook.setTarget(fbid, name, type);
+                webappFrame.getWebAppView().facebook.setTarget(plat, pfid, name, type);
             }
 
             ((HomeActivity) context).addViewToBackStack(webappFrame);

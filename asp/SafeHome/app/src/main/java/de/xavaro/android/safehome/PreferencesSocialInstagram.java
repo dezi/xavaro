@@ -5,6 +5,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -25,7 +27,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
 
         header = new PreferenceActivity.Header();
         header.titleRes = R.string.pref_social_instagram;
-        header.iconRes = CommonConfigs.IconResSocialInstgram;
+        header.iconRes = CommonConfigs.IconResSocialInstagram;
         header.fragment = PreferencesSocialInstagram.class.getName();
 
         return header;
@@ -35,7 +37,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
     {
         super();
 
-        iconres = CommonConfigs.IconResSocialInstgram;
+        iconres = CommonConfigs.IconResSocialInstagram;
         keyprefix = "social.instagram";
         masterenable = Simple.getTrans(R.string.pref_social_instagram_enable);
         summaryres = R.string.pref_social_instagram_summary;
@@ -127,6 +129,10 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
+                JSONArray data = SocialInstagram.getUserFriendlist();
+
+                if (data != null) Log.d(LOGTAG, "====================" + data.toString());
+
                 return false;
             }
         });
@@ -145,10 +151,10 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
         }
 
         //
-        // Preset all current friends and likes preferences.
+        // Preset all current friends preferences.
         //
 
-        //SocialInstagram.reconfigureFriendsAndLikes();
+        SocialInstagram.reconfigureFriends();
 
         registerFriends(context, true);
 
@@ -203,7 +209,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
             lp = new NicedPreferences.NiceListPreference(context);
             lp.setKey(friendsmode + ffbid);
             lp.setTitle(fname);
-            lp.setIcon(ProfileImages.getFacebookProfileDrawable(ffbid, true));
+            lp.setIcon(ProfileImages.getInstagramProfileDrawable(ffbid, true));
             lp.setEntryValues(R.array.pref_social_instagram_newfriends_keys);
             lp.setEntries(R.array.pref_social_instagram_newfriends_vals);
             lp.setEnabled(enabled);
@@ -246,7 +252,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
             if (!Simple.equals(instagramUser.getText(), name))
             {
                 instagramUser.setText(name);
-                instagramHead.setIcon(ProfileImages.getFacebookProfileDrawable(fbid, true));
+                instagramHead.setIcon(ProfileImages.getInstagramProfileDrawable(fbid, true));
                 instagramExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
             }
 
