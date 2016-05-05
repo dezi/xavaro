@@ -186,7 +186,7 @@ public class SocialFacebook extends Social
         return (profile == null) ? null : profile.getName();
     }
 
-    @Nullable
+    @Override
     public JSONArray getUserFriendlist()
     {
         JSONObject json = getGraphRequest("/" + getUserId() + "/friends");
@@ -197,7 +197,7 @@ public class SocialFacebook extends Social
         return data;
     }
 
-    @Nullable
+    @Override
     public JSONArray getUserLikeslist()
     {
         JSONObject json = getGraphRequest("/" + getUserId() + "/likes");

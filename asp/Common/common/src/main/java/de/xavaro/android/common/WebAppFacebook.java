@@ -1,14 +1,12 @@
 package de.xavaro.android.common;
 
-import android.os.Bundle;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.Iterator;
 
 @SuppressWarnings("unused")
 public class WebAppFacebook
@@ -68,7 +66,7 @@ public class WebAppFacebook
         }
         else
         {
-            if (facebook.isLoggedIn() && facebook.isLoggedIn())
+            if (facebook.isReady())
             {
                 JSONObject target = new JSONObject();
 
@@ -85,7 +83,7 @@ public class WebAppFacebook
                 Json.put(targets, target);
             }
 
-            if (instagram.isLoggedIn() && instagram.isLoggedIn())
+            if (instagram.isReady())
             {
                 JSONObject target = new JSONObject();
 
@@ -109,38 +107,64 @@ public class WebAppFacebook
     @JavascriptInterface
     public String getUserFeeds()
     {
-        return facebook.getUserFeeds(true).toString();
+        JSONArray allfeeds = new JSONArray();
+
+        if (facebook.isReady())
+        {
+            JSONArray feeds = facebook.getUserFeeds(true);
+            Json.append(allfeeds, feeds);
+        }
+
+        if (instagram.isReady())
+        {
+            JSONArray feeds = instagram.getUserFeeds(true);
+            Json.append(allfeeds, feeds);
+        }
+
+        return allfeeds.toString();
     }
 
     @JavascriptInterface
-    public String getPost(String postid)
+    public String getPost(String platform, String postid)
     {
-        Log.d(LOGTAG, "getPost:" + postid);
+        Log.d(LOGTAG, "getPost:" + platform + "=" + postid);
 
-        JSONObject post = facebook.getPost(postid);
+        JSONObject post = null;
+
+        if (isFacebook(platform)) post = facebook.getPost(postid);
+        if (isInstagram(platform)) post = instagram.getPost(postid);
+
         return (post == null) ? "{}" : post.toString();
     }
 
     @JavascriptInterface
-    public String getFeed(String userid)
+    public String getFeed(String platform, String userid)
     {
-        Log.d(LOGTAG, "getFeed:" + userid);
+        Log.d(LOGTAG, "getFeed:" + platform + "=" + userid);
 
-        JSONArray feed = facebook.getFeed(userid);
+        JSONArray feed = null;
+
+        if (isFacebook(platform)) feed = facebook.getFeed(userid);
+        if (isInstagram(platform)) feed = instagram.getFeed(userid);
+
         return (feed == null) ? "[]" : feed.toString();
     }
 
     @JavascriptInterface
-    public String getGraphSync(String edge)
+    public String getGraphSync(String platform, String edge)
     {
-        return getGraphSync(edge, null);
+        return getGraphSync(platform, edge, null);
     }
 
     @JavascriptInterface
-    public String getGraphSync(String edge, String params)
+    public String getGraphSync(String platform, String edge, String params)
     {
         JSONObject jparams = (params != null) ? Json.fromString(params) : null;
-        JSONObject response = facebook.getGraphRequest(edge, jparams);
+
+        JSONObject response = null;
+
+        if (isFacebook(platform)) response = facebook.getGraphRequest(edge, jparams);
+        if (isInstagram(platform)) response = instagram.getGraphRequest(edge, jparams);
 
         return (response == null) ? "{}" : response.toString();
     }
@@ -148,7 +172,23 @@ public class WebAppFacebook
     @JavascriptInterface
     public void setVerbose(boolean yesno)
     {
-        facebook.setVerbose(yesno);
-        instagram.setVerbose(yesno);
+        setVerbose(null, yesno);
+    }
+
+    @JavascriptInterface
+    public void setVerbose(String platform, boolean yesno)
+    {
+        if ((platform == null) || isFacebook(platform)) facebook.setVerbose(yesno);
+        if ((platform == null) || isInstagram(platform)) instagram.setVerbose(yesno);
+    }
+
+    private boolean isFacebook(String platform)
+    {
+        return Simple.equals(platform, "facebook");
+    }
+
+    private boolean isInstagram(String platform)
+    {
+        return Simple.equals(platform, "instagram");
     }
 }

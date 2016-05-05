@@ -42,6 +42,11 @@ public class Social
         return false;
     }
 
+    public boolean isReady()
+    {
+        return isEnabled() && isLoggedIn();
+    }
+
     public void setVerbose(boolean yesno)
     {
         verbose = yesno;
@@ -511,7 +516,7 @@ public class Social
 
     //region Cache maintenance
 
-    private long totalInterval = 3600;
+    private final long totalInterval = 3600;
     private long lastReconfigure;
     private long nextInterval;
     private long nextAction;
@@ -553,6 +558,13 @@ public class Social
             else
             {
                 nextInterval = (totalInterval * 1000) / feedList.length();
+
+                //
+                // Impose a rate limit on too many feeds.
+                //
+
+                if (now < (60 * 1000)) now = 60 * 1000;
+
                 nextAction = now;
             }
 

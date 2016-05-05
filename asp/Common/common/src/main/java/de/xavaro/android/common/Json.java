@@ -26,7 +26,7 @@ public class Json
 
     public static void putFileContent(File jsonfile, JSONObject content)
     {
-        Simple.putFileContent(jsonfile, Json.toPretty(content));
+        Simple.putFileContent(jsonfile, Json.defuck(Json.toPretty(content)));
     }
 
     public static JSONObject fromString(String jsonstr)
@@ -145,6 +145,19 @@ public class Json
 
             copy(dst, key, src);
         }
+    }
+
+    public static JSONArray append(JSONArray dst, JSONArray src)
+    {
+        if ((dst != null) && (src != null))
+        {
+            for (int inx = 0; inx < src.length(); inx++)
+            {
+                put(dst, get(src, inx));
+            }
+        }
+
+        return dst;
     }
 
     public static void put(JSONObject json, String key, Object val)
