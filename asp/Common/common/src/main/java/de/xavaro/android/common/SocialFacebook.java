@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.app.Application;
 import android.content.Intent;
@@ -23,15 +24,11 @@ import com.facebook.login.LoginResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 
-public class SocialFacebook extends Social
+public class SocialFacebook extends Social implements Social.SocialInterface
 {
     private static final String LOGTAG = SocialFacebook.class.getSimpleName();
 
@@ -306,5 +303,11 @@ public class SocialFacebook extends Social
 
             return graphresponse.getJSONObject();
         }
+    }
+
+    @Nullable
+    public Drawable getProfileDrawable(String pfid, boolean circle)
+    {
+        return ProfileImages.getFacebookProfileDrawable(pfid, true);
     }
 }

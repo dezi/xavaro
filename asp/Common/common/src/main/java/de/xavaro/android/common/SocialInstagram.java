@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.annotation.SuppressLint;
 
@@ -17,6 +18,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.facebook.AccessToken;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -25,9 +28,11 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-public class SocialInstagram extends Social
+public class SocialInstagram extends Social implements Social.SocialInterface
 {
     private static final String LOGTAG = SocialInstagram.class.getSimpleName();
     private static SocialInstagram instance;
@@ -38,13 +43,13 @@ public class SocialInstagram extends Social
     private static final String apiurl = "https://api.instagram.com/v1";
     private static final String tokenpref = "social.instagram.token";
 
-    private static final Collection<String> permissions = Arrays.asList
+    private static final Set<String> permissions = new HashSet<String>(Arrays.asList
             (
                     "basic",
                     "public_content",
                     "follower_list",
                     "likes"
-            );
+            ));
 
     private JSONObject user;
     private String token;
@@ -228,6 +233,12 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
+    public Set<String> getUserPermissions()
+    {
+        return permissions;
+    }
+
+    @Nullable
     public String getUserTokenExpiration()
     {
         if (isLoggedIn())
@@ -343,5 +354,11 @@ public class SocialInstagram extends Social
         }
 
         return Json.fromString(content);
+    }
+
+    @Nullable
+    public Drawable getProfileDrawable(String pfid, boolean circle)
+    {
+        return ProfileImages.getInstagramProfileDrawable(pfid, true);
     }
 }

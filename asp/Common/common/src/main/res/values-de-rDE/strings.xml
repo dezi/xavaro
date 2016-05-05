@@ -351,7 +351,40 @@
         <item>Alle 60 Minuten</item>
     </string-array>
 
+    <string name="pref_social_account">Account</string>
+    <string name="pref_social_user">Benutzer</string>
+    <string name="pref_social_validuntil">Gültig bis</string>
+    <string name="pref_social_login">Login</string>
+    <string name="pref_social_logout">Logout</string>
+    <string name="pref_social_isloggedin">ist eingeloggt</string>
+    <string name="pref_social_isloggedout">ist ausgeloggt</string>
+    <string name="pref_social_friends">Freunde</string>
+    <string name="pref_social_autofriends">Automatik neue Freunde</string>
+    <string name="pref_social_likes">Likes</string>
+    <string name="pref_social_autolikes">Automatik neue Likes</string>
+
+    <string-array name="pref_social_newfriends_vals">
+        <item>Inaktiv</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Ordner</item>
+        <item>Feed + Kontakte</item>
+        <item>Home</item>
+        <item>Ordner</item>
+        <item>Kontakte</item>
+    </string-array>
+
+    <string-array name="pref_social_newlikes_vals">
+        <item>Inaktiv</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Ordner</item>
+        <item>Home</item>
+        <item>Ordner</item>
+    </string-array>
+
     <string name="pref_social_facebook">Facebook</string>
+    <string name="pref_social_facebook_enable">Facebook freischalten</string>
     <string name="pref_social_facebook_summary">
         Facebook ermöglicht es dem Anwender auf einfachste Art und Weise
         mit allen Menschen in Kontakt zu bleiben. Bla bla.
@@ -372,8 +405,6 @@
         muss dann halt diesen Link mit der Family teilen und alle auffordern,
         da mal hinzugehen.
     </string>
-    <string name="pref_social_facebook_enable">Facebook freischalten</string>
-    <string name="pref_social_facebook_account">Facebook Account</string>
     <string name="pref_social_facebook_account_summary">
         Wenn Sie Facebook benutzen wollen, müssen Sie sich hier mit demjenigen
         Account einloggen, den der Anwender lesen können soll. Sie können dazu
@@ -390,13 +421,6 @@
         \n\nBitte veranlassen Sie, dass relevante Personen einmal die Seite
         http:/www.xavaro.de/facebook.php besuchen und dort Xavaro authorisieren.
     </string>
-    <string name="pref_social_facebook_user">Facebook Benutzer</string>
-    <string name="pref_social_facebook_validuntil">Gültig bis</string>
-    <string name="pref_social_facebook_login">Login</string>
-    <string name="pref_social_facebook_logout">Logout</string>
-    <string name="pref_social_facebook_isloggedin">ist eingeloggt</string>
-    <string name="pref_social_facebook_isloggedout">ist ausgeloggt</string>
-    <string name="pref_social_facebook_friends">Facebook Freunde</string>
     <string name="pref_social_facebook_friends_summary">
         Sie können hier entscheiden, wo die Posts individueller Freunde erscheinen sollen:
         \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
@@ -406,8 +430,6 @@
         \n\nKontakte: Ein individueller Feed des Freundes wird im Kontakte-Ordner angezeigt.
         \n\nWeiter können Sie festlegen, wie mit neuen Freunden verfahren wird.
     </string>
-    <string name="pref_social_facebook_autofriends">Automatik neue Freunde</string>
-    <string name="pref_social_facebook_likes">Facebook Likes</string>
     <string name="pref_social_facebook_likes_summary">
         Sie können hier entscheiden, wo die Posts von Likes (wie z.B. Celebrieties oder
         Fanpages) erscheinen sollen:
@@ -417,27 +439,6 @@
         \n\nOrdner: Ein individueller Feed des Likes wird im Facebook-Ordner angezeigt.
         \n\nWeiter können Sie festlegen, wie mit neuen Likes verfahren wird.
     </string>
-    <string name="pref_social_facebook_autolikes">Automatik neue Likes</string>
-
-    <string-array name="pref_social_facebook_newfriends_vals">
-        <item>Inaktiv</item>
-        <item>Feed</item>
-        <item>Feed + Home</item>
-        <item>Feed + Ordner</item>
-        <item>Feed + Kontakte</item>
-        <item>Home</item>
-        <item>Ordner</item>
-        <item>Kontakte</item>
-    </string-array>
-
-    <string-array name="pref_social_facebook_newlikes_vals">
-        <item>Inaktiv</item>
-        <item>Feed</item>
-        <item>Feed + Home</item>
-        <item>Feed + Ordner</item>
-        <item>Home</item>
-        <item>Ordner</item>
-    </string-array>
 
     <string name="battery_manager_remind">Bitte verbinden Sie ihr Tablet demnächst mit der Ladestation.</string>
     <string name="battery_manager_remind_du">Bitte verbinde Dein Tablet demnächst mit der Ladestation.</string>

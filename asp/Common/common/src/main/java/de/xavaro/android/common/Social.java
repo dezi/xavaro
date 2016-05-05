@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public class Social
 {
@@ -642,4 +644,26 @@ public class Social
     }
 
     //endregion Cache maintenance
+
+    public interface SocialInterface
+    {
+        boolean isEnabled();
+        boolean isLoggedIn();
+        boolean isReady();
+
+        void login();
+        void logout();
+
+        String getUserId();
+        String getUserDisplayName();
+        String getUserTokenExpiration();
+        Set<String> getUserPermissions();
+
+        Drawable getProfileDrawable(String pfid, boolean circle);
+
+        void reconfigureFriendsAndLikes();
+
+        int getHourStatistic();
+        int getTodayStatistic();
+    }
 }
