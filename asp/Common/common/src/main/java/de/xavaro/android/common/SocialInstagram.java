@@ -207,17 +207,14 @@ public class SocialInstagram extends Social
         // Nuke preference and session id.
         //
 
-        user = null;
-        token = null;
         Simple.removeSharedPref(tokenpref);
         CookieManager.getInstance().setCookie("https://www.instagram.com", "sessionid=");
+
+        token = null;
+        user = null;
     }
 
-    public boolean isEnabled()
-    {
-        return Simple.getSharedPrefBoolean("social.instagram.enable");
-    }
-
+    @Override
     public boolean isLoggedIn()
     {
         return (Simple.getSharedPrefString(tokenpref) != null);
@@ -251,34 +248,16 @@ public class SocialInstagram extends Social
         return Json.getString(userdata, "full_name");
     }
 
-    public JSONArray getUserFeeds(boolean feedonly)
-    {
-        JSONArray data = new JSONArray();
-
-        getOwnerFeed(data, "instagram");
-
-        getUserFeeds(data, "instagram", "friend", feedonly);
-
-        return data;
-    }
-
     @Nullable
-    public JSONArray getUserFriendlist()
+    public byte[] getUserIconData(String pfid)
     {
-        JSONObject response = getGraphRequest("/users/self/follows");
-        return Json.getArray(response, "data");
-    }
-
-    @Nullable
-    public byte[] getUserIconData(String igid)
-    {
-        if (igid == null) return null;
+        if (pfid == null) return null;
 
         JSONObject userdata = getCurrentUser();
 
-        if ((userdata == null) || ! Simple.equals(igid, Json.getString(userdata, "username")))
+        if ((userdata == null) || ! Simple.equals(pfid, Json.getString(userdata, "username")))
         {
-            userdata = getUser(igid);
+            userdata = getUser(pfid);
         }
 
         String iconurl = Json.getString(userdata, "profile_picture");
@@ -306,49 +285,34 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
-    public JSONObject getUser(String igid)
+    public JSONObject getUser(String pfid)
     {
-        JSONObject response = getGraphRequest("/users/" + igid);
+        JSONObject response = getGraphRequest("/users/" + pfid);
         return Json.getObject(response, "data");
     }
 
-    @Nullable
-    public JSONObject getPost(String postid)
+    @Override
+    public JSONArray getUserFriendlist()
     {
-        if (postid == null) return null;
-
-        File postfile = new File(cachedir, postid + ".post.json");
-
-        if (postfile.exists())
-        {
-            return Json.fromString(Simple.getFileContent(postfile));
-        }
-
-        return getGraphPost(postid);
+        JSONObject response = getGraphRequest("/users/self/follows");
+        return Json.getArray(response, "data");
     }
 
-    private JSONObject getGraphPost(String postid)
+    @Override
+    public JSONArray getUserLikeslist()
+    {
+        return null;
+    }
+
+    @Override
+    protected JSONObject getGraphPost(String postid)
     {
         JSONObject response = getGraphRequest("/media/" + postid);
         return Json.getObject(response, "data");
     }
 
-    @Nullable
-    public JSONArray getFeed(String userid)
-    {
-        if (userid == null) return null;
-
-        File feedfile = new File(cachedir, userid + ".feed.json");
-
-        if (feedfile.exists())
-        {
-            return Json.fromStringArray(Simple.getFileContent(feedfile));
-        }
-
-        return getGraphFeed(userid);
-    }
-
-    private JSONArray getGraphFeed(String userid)
+    @Override
+    protected JSONArray getGraphFeed(String userid)
     {
         if (userid == null) return null;
 
@@ -357,23 +321,13 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
-    public JSONObject getGraphRequest(String path)
-    {
-        return getGraphRequest(path, new Bundle());
-    }
-
-    @Nullable
-    public JSONObject getGraphRequest(String path, JSONObject parameters)
-    {
-        return getGraphRequest(path, getParameters(parameters));
-    }
-
-    @Nullable
     public JSONObject getGraphRequest(String path, Bundle parameters)
     {
         if (path == null) return null;
         if (token == null) token = getAccessToken();
         if (token == null) return null;
+
+        maintainStatistic(path, parameters);
 
         String url = apiurl + path + "?access_token=" + token;
         String content = SimpleRequest.readContent(url);
@@ -390,170 +344,4 @@ public class SocialInstagram extends Social
 
         return Json.fromString(content);
     }
-
-    public void reconfigureFriends()
-    {
-        if (! isLoggedIn()) return;
-
-        JSONArray friends = getUserFriendlist();
-
-        if (friends != null)
-        {
-            Map<String, Object> oldfriends = Simple.getAllPreferences("social.instagram.friend.");
-
-            String dfmode = Simple.getSharedPrefString("social.instagram.newfriends.default");
-            if (dfmode == null) dfmode = "feed+folder";
-
-            for (int inx = 0; inx < friends.length(); inx++)
-            {
-                JSONObject friend = Json.getObject(friends, inx);
-                if (friend == null) continue;
-
-                String pfid = Json.getString(friend, "id");
-                String name = Json.getString(friend, "full_name");
-                if ((pfid == null) || (name == null)) continue;
-
-                String fnamepref = "social.instagram.friend.name." + pfid;
-                String fmodepref = "social.instagram.friend.mode." + pfid;
-
-                Simple.setSharedPrefString(fnamepref, name);
-
-                if (Simple.getSharedPrefString(fmodepref) == null)
-                {
-                    Simple.setSharedPrefString(fmodepref, dfmode);
-                }
-
-                ProfileImages.getFacebookLoadProfileImage(pfid);
-
-                if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
-                if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
-            }
-
-            for (Map.Entry<String, ?> entry : oldfriends.entrySet())
-            {
-                Simple.removeSharedPref(entry.getKey());
-            }
-        }
-    }
-
-    //region Cache maintenance
-
-    private long totalInterval = 3600;
-    private long lastReconfigure;
-    private long nextInterval;
-    private long nextAction;
-
-    private JSONArray feedList;
-
-    public void commTick()
-    {
-        long now = Simple.nowAsTimeStamp();
-
-        if ((now - lastReconfigure) > 24 * 3600 * 1000)
-        {
-            cachedir = new File(Simple.getExternalCacheDir(), "instagram");
-
-            if (! cachedir.exists())
-            {
-                if (cachedir.mkdirs()) Log.d(LOGTAG, "commTick: created cache:" + cachedir);
-            }
-
-            Log.d(LOGTAG, "commTick: reconfigureFriends");
-
-            reconfigureFriends();
-            lastReconfigure = now;
-            nextAction = now;
-
-            return;
-        }
-
-        if (now < nextAction) return;
-
-        if ((feedList == null) || feedList.length() == 0)
-        {
-            feedList = getUserFeeds(false);
-
-            if (feedList.length() == 0)
-            {
-                nextAction = now + (totalInterval * 1000);
-            }
-            else
-            {
-                nextInterval = (totalInterval * 1000) / feedList.length();
-                nextAction = now;
-            }
-
-            return;
-        }
-
-        nextAction += nextInterval;
-
-        //
-        // Load one feed.
-        //
-
-        JSONObject feed = Json.getObject(feedList, 0);
-        Json.remove(feedList, 0);
-        if (feed == null) return;
-
-        final String feedpfid = Json.getString(feed, "id");
-        final String feedname = Json.getString(feed, "name");
-
-        Log.d(LOGTAG, "commTick: feed:" + feedpfid + " => " + feedname);
-
-        JSONArray feeddata = getGraphFeed(feedpfid);
-        if (feeddata == null) return;
-
-        File feedfile = new File(cachedir, feedpfid + ".feed.json");
-        Simple.putFileContent(feedfile, Json.toPretty(feeddata));
-
-        //
-        // Check feed stories.
-        //
-
-        FilenameFilter postsfilter = new FilenameFilter()
-        {
-            @Override
-            public boolean accept(File dir, String filename)
-            {
-                return filename.startsWith(feedpfid + "_") && filename.endsWith(".post.json");
-            }
-        };
-
-        if ((! cachedir.exists()) && cachedir.mkdirs()) Log.d(LOGTAG, "commtick: created cache");
-        ArrayList<String> postfiles = Simple.getDirectoryAsList(cachedir, postsfilter);
-
-        for (int inx = 0; inx < feeddata.length(); inx++)
-        {
-            JSONObject post = Json.getObject(feeddata, inx);
-            String postid = Json.getString(post, "id");
-            if (postid == null) continue;
-
-            String postname = postid + ".post.json";
-            File postfile = new File(cachedir, postname);
-
-            if (postfiles.contains(postname))
-            {
-                postfiles.remove(postname);
-                continue;
-            }
-
-            JSONObject postdata = getGraphPost(postid);
-            if (postdata == null) continue;
-
-            Simple.putFileContent(postfile, Json.toPretty(postdata));
-        }
-
-        //
-        // Remove outdated posts.
-        //
-
-        while (postfiles.size() > 0)
-        {
-            File obsolete = new File(cachedir, postfiles.remove(0));
-            if (obsolete.delete()) Log.d(LOGTAG, "commTick: deleted:" + obsolete);
-        }
-    }
-
-    //endregion Cache maintenance
 }

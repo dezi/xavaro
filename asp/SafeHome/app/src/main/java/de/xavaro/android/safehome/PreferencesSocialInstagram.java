@@ -53,6 +53,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
     NicedPreferences.NiceDisplayTextPreference instagramUser;
     NicedPreferences.NiceDisplayTextPreference instagramExpi;
     NicedPreferences.NiceDisplayTextPreference instagramLogi;
+    NicedPreferences.NiceDisplayTextPreference instagramCalls;
 
     @Override
     public void onDestroy()
@@ -125,6 +126,16 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
 
         preferences.add(instagramLogi);
 
+        if (GlobalConfigs.BetaFlag)
+        {
+            instagramCalls = new NicedPreferences.NiceDisplayTextPreference(context);
+            instagramCalls.setTitle("API Calls");
+            instagramCalls.setEnabled(enabled);
+
+            preferences.add(instagramCalls);
+        }
+
+
         dp = new NicedPreferences.NiceDisplayTextPreference(context);
         dp.setTitle(instagram.isLoggedIn() ? "Etwas testen" : "Nix machen");
         dp.setEnabled(enabled);
@@ -159,7 +170,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
         // Preset all current friends preferences.
         //
 
-        instagram.reconfigureFriends();
+        instagram.reconfigureFriendsAndLikes();
 
         registerFriends(context, true);
 
@@ -231,6 +242,8 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
         }
     }
 
+    private int monitorSequence;
+
     private final Runnable monitorPrefs = new Runnable()
     {
         @Override
@@ -269,11 +282,21 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
                     ? R.string.pref_social_instagram_isloggedin
                     : R.string.pref_social_instagram_isloggedout));
 
-            instagram.reconfigureFriends();
+            if (instagramCalls != null)
+            {
+                int hourcount = instagram.getHourStatistic();
+                int todaycount = instagram.getTodayStatistic();
 
-            registerFriends(Simple.getActContext(), false);
+                instagramCalls.setText(hourcount + "/" + todaycount);
+            }
 
-            Simple.makePost(monitorPrefs, 5 * 1000);
+            if ((monitorSequence++ % 10) == 0)
+            {
+                instagram.reconfigureFriendsAndLikes();
+                registerFriends(Simple.getActContext(), false);
+            }
+
+            Simple.makePost(monitorPrefs, 1000);
         }
     };
 }

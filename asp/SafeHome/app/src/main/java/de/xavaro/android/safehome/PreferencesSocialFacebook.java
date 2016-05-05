@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
@@ -50,6 +51,7 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
     NicedPreferences.NiceDisplayTextPreference facebookUser;
     NicedPreferences.NiceDisplayTextPreference facebookExpi;
     NicedPreferences.NiceDisplayTextPreference facebookLogi;
+    NicedPreferences.NiceDisplayTextPreference facebookCalls;
 
     @Override
     public void onDestroy()
@@ -121,6 +123,15 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
         });
 
         preferences.add(facebookLogi);
+
+        if (GlobalConfigs.BetaFlag)
+        {
+            facebookCalls = new NicedPreferences.NiceDisplayTextPreference(context);
+            facebookCalls.setTitle("API Calls");
+            facebookCalls.setEnabled(enabled);
+
+            preferences.add(facebookCalls);
+        }
 
         dp = new NicedPreferences.NiceDisplayTextPreference(context);
         dp.setTitle(facebook.isLoggedIn() ? "Etwas testen" : "Nix machen");
@@ -294,6 +305,8 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
         }
     }
 
+    private int monitorSequence;
+
     private final Runnable monitorPrefs = new Runnable()
     {
         @Override
@@ -332,12 +345,22 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
                     ? R.string.pref_social_facebook_isloggedin
                     : R.string.pref_social_facebook_isloggedout));
 
-            facebook.reconfigureFriendsAndLikes();
+            if (facebookCalls != null)
+            {
+                int hourcount = facebook.getHourStatistic();
+                int todaycount = facebook.getTodayStatistic();
 
-            registerFriends(Simple.getActContext(), false);
-            registerLikes(Simple.getActContext(), false);
+                facebookCalls.setText(hourcount + "/" + todaycount);
+            }
 
-            Simple.makePost(monitorPrefs, 5 * 1000);
+            if ((monitorSequence++ % 10) == 0)
+            {
+                facebook.reconfigureFriendsAndLikes();
+                registerFriends(Simple.getActContext(), false);
+                registerLikes(Simple.getActContext(), false);
+            }
+
+            Simple.makePost(monitorPrefs, 1000);
         }
     };
 }
