@@ -15,6 +15,7 @@ import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.SocialInstagram;
 
 public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragmentStub
@@ -33,14 +34,18 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
         return header;
     }
 
+    private final SocialInstagram instagram;
+
     public PreferencesSocialInstagram()
     {
         super();
 
-        iconres = CommonConfigs.IconResSocialInstagram;
         keyprefix = "social.instagram";
+        iconres = CommonConfigs.IconResSocialInstagram;
         masterenable = Simple.getTrans(R.string.pref_social_instagram_enable);
         summaryres = R.string.pref_social_instagram_summary;
+
+        instagram = SocialInstagram.getInstance();
     }
 
     ArrayList<String> knownpfids = new ArrayList<>();
@@ -90,11 +95,11 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
 
         instagramLogi = new NicedPreferences.NiceDisplayTextPreference(context);
 
-        instagramLogi.setTitle(SocialInstagram.isLoggedIn()
+        instagramLogi.setTitle(instagram.isLoggedIn()
                 ? R.string.pref_social_instagram_logout
                 : R.string.pref_social_instagram_login);
 
-        instagramLogi.setText(Simple.getTrans(SocialInstagram.isLoggedIn()
+        instagramLogi.setText(Simple.getTrans(instagram.isLoggedIn()
                 ? R.string.pref_social_instagram_isloggedin
                 : R.string.pref_social_instagram_isloggedout));
 
@@ -105,13 +110,13 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                if (SocialInstagram.isLoggedIn())
+                if (instagram.isLoggedIn())
                 {
-                    SocialInstagram.logout();
+                    instagram.logout();
                 }
                 else
                 {
-                    SocialInstagram.login();
+                    instagram.login();
                 }
 
                 return false;
@@ -121,7 +126,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
         preferences.add(instagramLogi);
 
         dp = new NicedPreferences.NiceDisplayTextPreference(context);
-        dp.setTitle(SocialInstagram.isLoggedIn() ? "Etwas testen" : "Nix machen");
+        dp.setTitle(instagram.isLoggedIn() ? "Etwas testen" : "Nix machen");
         dp.setEnabled(enabled);
 
         dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -129,7 +134,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                JSONArray data = SocialInstagram.getUserFriendlist();
+                JSONArray data = instagram.getUserFriendlist();
 
                 if (data != null) Log.d(LOGTAG, "====================" + data.toString());
 
@@ -154,7 +159,7 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
         // Preset all current friends preferences.
         //
 
-        SocialInstagram.reconfigureFriends();
+        instagram.reconfigureFriends();
 
         registerFriends(context, true);
 
@@ -237,9 +242,9 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
             // preferences.
             //
 
-            String pfid = SocialInstagram.getUserId();
-            String name = SocialInstagram.getUserDisplayName();
-            String expi = SocialInstagram.getUserTokenExpiration();
+            String pfid = instagram.getUserId();
+            String name = instagram.getUserDisplayName();
+            String expi = instagram.getUserTokenExpiration();
 
             if (pfid != null) Simple.setSharedPrefString(keyprefix + ".pfid", pfid);
             if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
@@ -256,15 +261,15 @@ public class PreferencesSocialInstagram extends PreferenceFragments.EnableFragme
                 instagramExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
             }
 
-            instagramLogi.setTitle(SocialInstagram.isLoggedIn()
+            instagramLogi.setTitle(instagram.isLoggedIn()
                     ? R.string.pref_social_instagram_logout
                     : R.string.pref_social_instagram_login);
 
-            instagramLogi.setText(Simple.getTrans(SocialInstagram.isLoggedIn()
+            instagramLogi.setText(Simple.getTrans(instagram.isLoggedIn()
                     ? R.string.pref_social_instagram_isloggedin
                     : R.string.pref_social_instagram_isloggedout));
 
-            SocialInstagram.reconfigureFriends();
+            instagram.reconfigureFriends();
 
             registerFriends(Simple.getActContext(), false);
 

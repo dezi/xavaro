@@ -16,14 +16,25 @@ public class Social
 {
     private static final String LOGTAG = Social.class.getSimpleName();
 
-    protected static boolean verbose = true;
+    protected String platform;
+    protected boolean verbose;
+    protected String locale;
+    protected File cachedir;
 
-    public static void setVerbose(boolean yesno)
+    public Social(String platform)
+    {
+        this.platform = platform;
+
+        locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
+        cachedir = new File(Simple.getExternalCacheDir(), platform);
+    }
+
+    public void setVerbose(boolean yesno)
     {
         verbose = yesno;
     }
 
-    protected static Bundle getParameters(JSONObject jparams)
+    protected Bundle getParameters(JSONObject jparams)
     {
         Bundle bparams = new Bundle();
 
@@ -82,7 +93,7 @@ public class Social
         return bparams;
     }
 
-    protected static JSONArray getOwnerFeed(JSONArray data, String platform)
+    protected JSONArray getOwnerFeed(JSONArray data, String platform)
     {
         //
         // Add facebook account owner as a owner feed.
@@ -109,7 +120,7 @@ public class Social
         return data;
     }
 
-    protected static JSONArray getUserFeeds(
+    protected JSONArray getUserFeeds(
             JSONArray data, String platform, String type, boolean feedonly)
     {
         String modeprefix = "social." + platform + "." + type + ".mode.";

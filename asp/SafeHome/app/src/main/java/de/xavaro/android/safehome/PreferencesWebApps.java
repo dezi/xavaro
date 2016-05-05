@@ -1,17 +1,15 @@
 package de.xavaro.android.safehome;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.preference.PreferenceFragment;
 import android.webkit.JavascriptInterface;
 import android.support.annotation.Nullable;
 
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.content.Context;
-import android.webkit.WebView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -19,15 +17,9 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.PreferenceFragments;
@@ -109,7 +101,6 @@ public class PreferencesWebApps
             lp.setEntries(vals);
             lp.setEntryValues(keys);
             lp.setDefaultValue("inact");
-            lp.setIcon(WebApp.getAppIcon(webappname));
             lp.setTitle("Aktiviert");
 
             lp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
@@ -132,7 +123,7 @@ public class PreferencesWebApps
 
             if ((webprefs == null) && WebApp.hasPreferences(webappname))
             {
-                webprefs = new WebAppView(Simple.getAppContext());
+                webprefs = new WebAppView(Simple.getActContext());
                 webprefs.loadWebView(webappname, "pref");
 
                 Object builder = new WebAppPrefBuilder();
@@ -258,14 +249,14 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "search"))
                 {
-                    ap = qp = new NicedPreferences.NiceSearchPreference(Simple.getAppContext());
+                    ap = qp = new NicedPreferences.NiceSearchPreference(Simple.getActContext());
 
                     qp.setSearchCallback(this);
                 }
 
                 if (Simple.equals(type, "delete"))
                 {
-                    ap = xp = new NicedPreferences.NiceDeletePreference(Simple.getAppContext());
+                    ap = xp = new NicedPreferences.NiceDeletePreference(Simple.getActContext());
 
                     xp.setDeleteCallback(this);
 
@@ -274,42 +265,42 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "category"))
                 {
-                    ap = ct = new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
+                    ap = ct = new NicedPreferences.NiceCategoryPreference(Simple.getActContext());
 
                     ct.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "date"))
                 {
-                    ap = dp = new NicedPreferences.NiceDatePreference(Simple.getAppContext());
+                    ap = dp = new NicedPreferences.NiceDatePreference(Simple.getActContext());
 
                     dp.setDefaultValue(Json.getString(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "switch"))
                 {
-                    ap = sp = new NicedPreferences.NiceSwitchPreference(Simple.getAppContext());
+                    ap = sp = new NicedPreferences.NiceSwitchPreference(Simple.getActContext());
 
                     sp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "check"))
                 {
-                    ap = cp = new NicedPreferences.NiceCheckboxPreference(Simple.getAppContext());
+                    ap = cp = new NicedPreferences.NiceCheckboxPreference(Simple.getActContext());
 
                     cp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "edit"))
                 {
-                    ap = ep = new NicedPreferences.NiceEditTextPreference(Simple.getAppContext());
+                    ap = ep = new NicedPreferences.NiceEditTextPreference(Simple.getActContext());
 
                     ep.setDefaultValue(Json.getString(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "list"))
                 {
-                    ap = lp = new NicedPreferences.NiceListPreference(Simple.getAppContext());
+                    ap = lp = new NicedPreferences.NiceListPreference(Simple.getActContext());
 
                     lp.setEntries(Json.getArray(pref, "vals"));
                     lp.setEntryValues(Json.getArray(pref, "keys"));
@@ -318,7 +309,7 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "multi"))
                 {
-                    ap = mp = new NicedPreferences.NiceMultiListPreference(Simple.getAppContext());
+                    ap = mp = new NicedPreferences.NiceMultiListPreference(Simple.getActContext());
 
                     mp.setEntries(Json.getArray(pref, "vals"));
                     mp.setEntryValues(Json.getArray(pref, "keys"));
@@ -327,7 +318,7 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "number"))
                 {
-                    ap = np = new NicedPreferences.NiceNumberPreference(Simple.getAppContext());
+                    ap = np = new NicedPreferences.NiceNumberPreference(Simple.getActContext());
 
                     int min = Json.getInt(pref, "min");
                     int max = Json.getInt(pref, "max");

@@ -30,6 +30,7 @@ import java.util.Map;
 public class SocialInstagram extends Social
 {
     private static final String LOGTAG = SocialInstagram.class.getSimpleName();
+    private static SocialInstagram instance;
 
     private static final String appsecret = "ab19aa46d88f4fb9a433f6d6cc1d4df3";
     private static final String appkey = "63afb3307ec24f4886230f44d2fda884";
@@ -45,19 +46,27 @@ public class SocialInstagram extends Social
                     "likes"
             );
 
-    private static JSONObject user;
-    private static String token;
+    private JSONObject user;
+    private String token;
 
     public static void initialize(Application app)
     {
-        //cachedir = new File(Simple.getExternalCacheDir(), "instagram");
-        token = getAccessToken();
+        if (instance != null) return;
+        instance = new SocialInstagram();
+    }
 
-        getCurrentUser();
+    public static SocialInstagram getInstance()
+    {
+        return instance;
+    }
+
+    public SocialInstagram()
+    {
+        super("instagram");
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    public static void login()
+    public void login()
     {
         //
         // Make sure, session cookies are invalidated
@@ -192,7 +201,7 @@ public class SocialInstagram extends Social
         webview.loadUrl(url);
     }
 
-    public static void logout()
+    public void logout()
     {
         //
         // Nuke preference and session id.
@@ -204,25 +213,25 @@ public class SocialInstagram extends Social
         CookieManager.getInstance().setCookie("https://www.instagram.com", "sessionid=");
     }
 
-    public static boolean isEnabled()
+    public boolean isEnabled()
     {
         return Simple.getSharedPrefBoolean("social.instagram.enable");
     }
 
-    public static boolean isLoggedIn()
+    public boolean isLoggedIn()
     {
         return (Simple.getSharedPrefString(tokenpref) != null);
     }
 
     @Nullable
-    public static String getUserId()
+    public String getUserId()
     {
         JSONObject userdata = getCurrentUser();
         return Json.getString(userdata, "id");
     }
 
     @Nullable
-    public static String getUserTokenExpiration()
+    public String getUserTokenExpiration()
     {
         if (isLoggedIn())
         {
@@ -236,13 +245,13 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
-    public static String getUserDisplayName()
+    public String getUserDisplayName()
     {
         JSONObject userdata = getCurrentUser();
         return Json.getString(userdata, "full_name");
     }
 
-    public static JSONArray getUserFeeds(boolean feedonly)
+    public JSONArray getUserFeeds(boolean feedonly)
     {
         JSONArray data = new JSONArray();
 
@@ -254,14 +263,14 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
-    public static JSONArray getUserFriendlist()
+    public JSONArray getUserFriendlist()
     {
         JSONObject response = getGraphRequest("/users/self/follows");
         return Json.getArray(response, "data");
     }
 
     @Nullable
-    public static byte[] getUserIconData(String igid)
+    public byte[] getUserIconData(String igid)
     {
         if (igid == null) return null;
 
@@ -277,13 +286,13 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
-    public static String getAccessToken()
+    public String getAccessToken()
     {
         return Simple.getSharedPrefString(tokenpref);
     }
 
     @Nullable
-    public static JSONObject getCurrentUser()
+    public JSONObject getCurrentUser()
     {
         if (user == null)
         {
@@ -297,14 +306,14 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
-    public static JSONObject getUser(String igid)
+    public JSONObject getUser(String igid)
     {
         JSONObject response = getGraphRequest("/users/" + igid);
         return Json.getObject(response, "data");
     }
 
     @Nullable
-    public static JSONObject getPost(String postid)
+    public JSONObject getPost(String postid)
     {
         if (postid == null) return null;
 
@@ -318,14 +327,14 @@ public class SocialInstagram extends Social
         return getGraphPost(postid);
     }
 
-    private static JSONObject getGraphPost(String postid)
+    private JSONObject getGraphPost(String postid)
     {
         JSONObject response = getGraphRequest("/media/" + postid);
         return Json.getObject(response, "data");
     }
 
     @Nullable
-    public static JSONArray getFeed(String userid)
+    public JSONArray getFeed(String userid)
     {
         if (userid == null) return null;
 
@@ -339,7 +348,7 @@ public class SocialInstagram extends Social
         return getGraphFeed(userid);
     }
 
-    private static JSONArray getGraphFeed(String userid)
+    private JSONArray getGraphFeed(String userid)
     {
         if (userid == null) return null;
 
@@ -348,19 +357,19 @@ public class SocialInstagram extends Social
     }
 
     @Nullable
-    public static JSONObject getGraphRequest(String path)
+    public JSONObject getGraphRequest(String path)
     {
         return getGraphRequest(path, new Bundle());
     }
 
     @Nullable
-    public static JSONObject getGraphRequest(String path, JSONObject parameters)
+    public JSONObject getGraphRequest(String path, JSONObject parameters)
     {
         return getGraphRequest(path, getParameters(parameters));
     }
 
     @Nullable
-    public static JSONObject getGraphRequest(String path, Bundle parameters)
+    public JSONObject getGraphRequest(String path, Bundle parameters)
     {
         if (path == null) return null;
         if (token == null) token = getAccessToken();
@@ -382,7 +391,7 @@ public class SocialInstagram extends Social
         return Json.fromString(content);
     }
 
-    public static void reconfigureFriends()
+    public void reconfigureFriends()
     {
         if (! isLoggedIn()) return;
 
@@ -429,15 +438,14 @@ public class SocialInstagram extends Social
 
     //region Cache maintenance
 
-    private static long totalInterval = 3600;
-    private static long lastReconfigure;
-    private static long nextInterval;
-    private static long nextAction;
-    private static File cachedir;
+    private long totalInterval = 3600;
+    private long lastReconfigure;
+    private long nextInterval;
+    private long nextAction;
 
-    private static JSONArray feedList;
+    private JSONArray feedList;
 
-    public static void commTick()
+    public void commTick()
     {
         long now = Simple.nowAsTimeStamp();
 

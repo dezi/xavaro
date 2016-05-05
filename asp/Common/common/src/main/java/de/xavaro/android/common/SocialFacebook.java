@@ -35,44 +35,42 @@ public class SocialFacebook extends Social
 {
     private static final String LOGTAG = SocialFacebook.class.getSimpleName();
 
-    private static final Collection<String> permissions = Arrays.asList
-            (
-                    "public_profile",
-
-                    "user_friends",
-                    "user_likes",
-                    "user_posts"
-            );
-
-    private static final GraphRequest graphrequest = new GraphRequest();
-    private static GraphResponse response;
-    private static CallbackManager callbackManager;
+    private static SocialFacebook instance;
     private static AppEventsLogger logger;
-    private static boolean verbose = true;
-    private static String locale;
 
-    public static void initialize(Application app)
+    private static final Collection<String> permissions = Arrays.asList
+            ( "public_profile", "user_friends", "user_likes", "user_posts" );
+
+    private GraphRequest graphrequest;
+    private GraphResponse response;
+    private CallbackManager callbackManager;
+
+    public SocialFacebook()
     {
-        FacebookSdk.sdkInitialize(app.getApplicationContext());
+        super("facebook");
 
-        //AppEventsLogger.activateApp(app);
-
-        AppEventsLogger.setFlushBehavior(AppEventsLogger.FlushBehavior.EXPLICIT_ONLY);
-
-        logger = AppEventsLogger.newLogger(app);
-
-        logEvent(Simple.getAppName());
-
-        //
-        // Initialize API calls.
-        //
-
+        graphrequest = new GraphRequest();
         graphrequest.setCallback(graphcallback);
         graphrequest.setAccessToken(AccessToken.getCurrentAccessToken());
         graphrequest.setHttpMethod(HttpMethod.GET);
+    }
 
-        cachedir = new File(Simple.getExternalCacheDir(), "facebook");
-        locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
+    public static void initialize(Application app)
+    {
+        if (instance != null) return;
+
+        FacebookSdk.sdkInitialize(app.getApplicationContext());
+        AppEventsLogger.setFlushBehavior(AppEventsLogger.FlushBehavior.EXPLICIT_ONLY);
+
+        logger = AppEventsLogger.newLogger(app);
+        instance = new SocialFacebook();
+
+        logEvent(Simple.getAppName());
+    }
+
+    public static SocialFacebook getInstance()
+    {
+        return instance;
     }
 
     public static void logEvent(String eventName)
@@ -86,13 +84,13 @@ public class SocialFacebook extends Social
 
     public static void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (SocialFacebook.callbackManager != null)
+        if (instance.callbackManager != null)
         {
-            SocialFacebook.callbackManager.onActivityResult(requestCode, resultCode, data);
+            SocialFacebook.instance.callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    private static final GraphRequest.Callback graphcallback = new GraphRequest.Callback()
+    private final GraphRequest.Callback graphcallback = new GraphRequest.Callback()
     {
         @Override
         public void onCompleted(GraphResponse response)
@@ -105,11 +103,11 @@ public class SocialFacebook extends Social
                 Log.d(LOGTAG, "graphcallback: onCompleted:" + mess + "=" + edge);
             }
 
-            SocialFacebook.response = response;
+            SocialFacebook.this.response = response;
         }
     };
 
-    public static void login()
+    public void login()
     {
         callbackManager = CallbackManager.Factory.create();
 
@@ -145,17 +143,17 @@ public class SocialFacebook extends Social
         LoginManager.getInstance().logInWithReadPermissions(Simple.getActContext(), permissions);
     }
 
-    public static void logout()
+    public void logout()
     {
         LoginManager.getInstance().logOut();
     }
 
-    public static boolean isEnabled()
+    public boolean isEnabled()
     {
         return Simple.getSharedPrefBoolean("social.facebook.enable");
     }
 
-    public static boolean isLoggedIn()
+    public boolean isLoggedIn()
     {
         AccessToken token = AccessToken.getCurrentAccessToken();
 
@@ -167,40 +165,35 @@ public class SocialFacebook extends Social
         return (token != null) && (Profile.getCurrentProfile() != null);
     }
 
-    public static void setVerbose(boolean yesno)
-    {
-        verbose = yesno;
-    }
-
     @Nullable
-    public static String getUserId()
+    public String getUserId()
     {
         AccessToken token = AccessToken.getCurrentAccessToken();
         return (token == null) ? null : token.getUserId();
     }
 
     @Nullable
-    public static Set<String> getUserPermissions()
+    public Set<String> getUserPermissions()
     {
         AccessToken token = AccessToken.getCurrentAccessToken();
         return token.getPermissions();
     }
 
     @Nullable
-    public static String getUserTokenExpiration()
+    public String getUserTokenExpiration()
     {
         AccessToken token = AccessToken.getCurrentAccessToken();
         return (token == null) ? null : Simple.timeStampAsISO(token.getExpires().getTime());
     }
 
     @Nullable
-    public static String getUserDisplayName()
+    public String getUserDisplayName()
     {
         Profile profile = Profile.getCurrentProfile();
         return (profile == null) ? null : profile.getName();
     }
 
-    public static JSONArray getUserFeeds(boolean feedonly)
+    public JSONArray getUserFeeds(boolean feedonly)
     {
         JSONArray data = new JSONArray();
 
@@ -213,7 +206,7 @@ public class SocialFacebook extends Social
     }
 
     @Nullable
-    public static JSONArray getUserFriendlist()
+    public JSONArray getUserFriendlist()
     {
         JSONObject json = getGraphRequest("/" + getUserId() + "/friends");
         JSONArray data = Json.getArray(json, "data");
@@ -224,7 +217,7 @@ public class SocialFacebook extends Social
     }
 
     @Nullable
-    public static JSONArray getUserLikeslist()
+    public JSONArray getUserLikeslist()
     {
         JSONObject json = getGraphRequest("/" + getUserId() + "/likes");
         JSONArray data = Json.getArray(json, "data");
@@ -235,7 +228,7 @@ public class SocialFacebook extends Social
     }
 
     @Nullable
-    public static byte[] getUserIconData(String pfid)
+    public byte[] getUserIconData(String pfid)
     {
         if (pfid == null) return null;
 
@@ -256,7 +249,7 @@ public class SocialFacebook extends Social
     }
 
     @Nullable
-    public static JSONObject getPost(String postid)
+    public JSONObject getPost(String postid)
     {
         if (postid == null) return null;
 
@@ -270,7 +263,7 @@ public class SocialFacebook extends Social
         return getGraphPost(postid);
     }
 
-    private static JSONObject getGraphPost(String postid)
+    private JSONObject getGraphPost(String postid)
     {
         String[] fields =
                 {
@@ -312,7 +305,7 @@ public class SocialFacebook extends Social
     }
 
     @Nullable
-    public static JSONArray getFeed(String userid)
+    public JSONArray getFeed(String userid)
     {
         if (userid == null) return null;
 
@@ -327,7 +320,7 @@ public class SocialFacebook extends Social
     }
 
     @Nullable
-    private static JSONArray getGraphFeed(String userid)
+    private JSONArray getGraphFeed(String userid)
     {
         if (userid == null) return null;
 
@@ -335,18 +328,18 @@ public class SocialFacebook extends Social
         return Json.getArray(response, "data");
     }
 
-    private static JSONObject getGraphRequest(String path)
+    private JSONObject getGraphRequest(String path)
     {
         return getGraphRequest(path, new Bundle());
     }
 
     @Nullable
-    public static JSONObject getGraphRequest(String path, JSONObject parameters)
+    public JSONObject getGraphRequest(String path, JSONObject parameters)
     {
         return getGraphRequest(path, getParameters(parameters));
     }
 
-    public static JSONObject getGraphRequest(String path, Bundle parameters)
+    public JSONObject getGraphRequest(String path, Bundle parameters)
     {
         if (path == null) return null;
 
@@ -367,7 +360,7 @@ public class SocialFacebook extends Social
         }
     }
 
-    public static void reconfigureFriendsAndLikes()
+    public void reconfigureFriendsAndLikes()
     {
         if (! isLoggedIn()) return;
 
@@ -454,15 +447,14 @@ public class SocialFacebook extends Social
 
     //region Cache maintenance
 
-    private static long totalInterval = 3600;
-    private static long lastReconfigure;
-    private static long nextInterval;
-    private static long nextAction;
-    private static File cachedir;
+    private long totalInterval = 3600;
+    private long lastReconfigure;
+    private long nextInterval;
+    private long nextAction;
 
-    private static JSONArray feedList;
+    private JSONArray feedList;
 
-    public static void commTick()
+    public void commTick()
     {
         long now = Simple.nowAsTimeStamp();
 

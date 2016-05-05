@@ -31,14 +31,18 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
         return header;
     }
 
+    private final SocialFacebook facebook;
+
     public PreferencesSocialFacebook()
     {
         super();
 
-        iconres = CommonConfigs.IconResSocialFacebook;
         keyprefix = "social.facebook";
+        iconres = CommonConfigs.IconResSocialFacebook;
         masterenable = Simple.getTrans(R.string.pref_social_facebook_enable);
         summaryres = R.string.pref_social_facebook_summary;
+
+        facebook = SocialFacebook.getInstance();
     }
 
     ArrayList<String> knownpfids = new ArrayList<>();
@@ -88,11 +92,11 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
 
         facebookLogi = new NicedPreferences.NiceDisplayTextPreference(context);
 
-        facebookLogi.setTitle(SocialFacebook.isLoggedIn()
+        facebookLogi.setTitle(facebook.isLoggedIn()
                 ? R.string.pref_social_facebook_logout
                 : R.string.pref_social_facebook_login);
 
-        facebookLogi.setText(Simple.getTrans(SocialFacebook.isLoggedIn()
+        facebookLogi.setText(Simple.getTrans(facebook.isLoggedIn()
                 ? R.string.pref_social_facebook_isloggedin
                 : R.string.pref_social_facebook_isloggedout));
 
@@ -103,13 +107,13 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                if (SocialFacebook.isLoggedIn())
+                if (facebook.isLoggedIn())
                 {
-                    SocialFacebook.logout();
+                    facebook.logout();
                 }
                 else
                 {
-                    SocialFacebook.login();
+                    facebook.login();
                 }
 
                 return false;
@@ -119,7 +123,7 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
         preferences.add(facebookLogi);
 
         dp = new NicedPreferences.NiceDisplayTextPreference(context);
-        dp.setTitle(SocialFacebook.isLoggedIn() ? "Etwas testen" : "Nix machen");
+        dp.setTitle(facebook.isLoggedIn() ? "Etwas testen" : "Nix machen");
         dp.setEnabled(enabled);
 
         dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -127,9 +131,9 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                Log.d(LOGTAG, "Permissions=" + SocialFacebook.getUserPermissions());
+                Log.d(LOGTAG, "Permissions=" + facebook.getUserPermissions());
 
-                SocialFacebook.getUserLikeslist();
+                facebook.getUserLikeslist();
 
                 return false;
             }
@@ -152,7 +156,7 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
         // Preset all current friends and likes preferences.
         //
 
-        SocialFacebook.reconfigureFriendsAndLikes();
+        facebook.reconfigureFriendsAndLikes();
 
         registerFriends(context, true);
         registerLikes(context, true);
@@ -301,9 +305,9 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
             // preferences.
             //
 
-            String pfid = SocialFacebook.getUserId();
-            String name = SocialFacebook.getUserDisplayName();
-            String expi = SocialFacebook.getUserTokenExpiration();
+            String pfid = facebook.getUserId();
+            String name = facebook.getUserDisplayName();
+            String expi = facebook.getUserTokenExpiration();
 
             if (pfid != null) Simple.setSharedPrefString(keyprefix + ".pfid", pfid);
             if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);
@@ -320,15 +324,15 @@ public class PreferencesSocialFacebook extends PreferenceFragments.EnableFragmen
                 facebookExpi.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
             }
 
-            facebookLogi.setTitle(SocialFacebook.isLoggedIn()
+            facebookLogi.setTitle(facebook.isLoggedIn()
                     ? R.string.pref_social_facebook_logout
                     : R.string.pref_social_facebook_login);
 
-            facebookLogi.setText(Simple.getTrans(SocialFacebook.isLoggedIn()
+            facebookLogi.setText(Simple.getTrans(facebook.isLoggedIn()
                     ? R.string.pref_social_facebook_isloggedin
                     : R.string.pref_social_facebook_isloggedout));
 
-            SocialFacebook.reconfigureFriendsAndLikes();
+            facebook.reconfigureFriendsAndLikes();
 
             registerFriends(Simple.getActContext(), false);
             registerLikes(Simple.getActContext(), false);

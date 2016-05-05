@@ -661,8 +661,9 @@ public class CommService extends Service
             WebAppCache.commTick();
             EventManager.commTick();
             BatteryManager.commTick();
-            SocialFacebook.commTick();
-            SocialInstagram.commTick();
+
+            SocialFacebook.getInstance().commTick();
+            SocialInstagram.getInstance().commTick();
 
             if (! checkSocket()) continue;
 

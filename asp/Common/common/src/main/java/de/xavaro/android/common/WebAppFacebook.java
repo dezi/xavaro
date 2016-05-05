@@ -20,6 +20,15 @@ public class WebAppFacebook
     private String name;
     private String type;
 
+    private final SocialFacebook facebook;
+    private final SocialInstagram instagram;
+
+    public WebAppFacebook()
+    {
+        facebook = SocialFacebook.getInstance();
+        instagram = SocialInstagram.getInstance();
+    }
+
     public void setTarget(String platform, String pfid, String name, String type)
     {
         this.plat = platform;
@@ -59,12 +68,12 @@ public class WebAppFacebook
         }
         else
         {
-            if (SocialFacebook.isLoggedIn() && SocialFacebook.isLoggedIn())
+            if (facebook.isLoggedIn() && facebook.isLoggedIn())
             {
                 JSONObject target = new JSONObject();
 
-                String actuser = SocialFacebook.getUserId();
-                String actname = SocialFacebook.getUserDisplayName();
+                String actuser = facebook.getUserId();
+                String actname = facebook.getUserDisplayName();
                 icon = ProfileImages.getFacebookProfileImageFile(actuser);
 
                 Json.put(target, "id", actuser);
@@ -76,12 +85,12 @@ public class WebAppFacebook
                 Json.put(targets, target);
             }
 
-            if (SocialInstagram.isLoggedIn() && SocialInstagram.isLoggedIn())
+            if (instagram.isLoggedIn() && instagram.isLoggedIn())
             {
                 JSONObject target = new JSONObject();
 
-                String actuser = SocialInstagram.getUserId();
-                String actname = SocialInstagram.getUserDisplayName();
+                String actuser = instagram.getUserId();
+                String actname = instagram.getUserDisplayName();
                 icon = ProfileImages.getInstagramProfileImageFile(actuser);
 
                 Json.put(target, "id", actuser);
@@ -100,7 +109,7 @@ public class WebAppFacebook
     @JavascriptInterface
     public String getUserFeeds()
     {
-        return SocialFacebook.getUserFeeds(true).toString();
+        return facebook.getUserFeeds(true).toString();
     }
 
     @JavascriptInterface
@@ -108,7 +117,7 @@ public class WebAppFacebook
     {
         Log.d(LOGTAG, "getPost:" + postid);
 
-        JSONObject post = SocialFacebook.getPost(postid);
+        JSONObject post = facebook.getPost(postid);
         return (post == null) ? "{}" : post.toString();
     }
 
@@ -117,7 +126,7 @@ public class WebAppFacebook
     {
         Log.d(LOGTAG, "getFeed:" + userid);
 
-        JSONArray feed = SocialFacebook.getFeed(userid);
+        JSONArray feed = facebook.getFeed(userid);
         return (feed == null) ? "[]" : feed.toString();
     }
 
@@ -131,7 +140,7 @@ public class WebAppFacebook
     public String getGraphSync(String edge, String params)
     {
         JSONObject jparams = (params != null) ? Json.fromString(params) : null;
-        JSONObject response = SocialFacebook.getGraphRequest(edge, jparams);
+        JSONObject response = facebook.getGraphRequest(edge, jparams);
 
         return (response == null) ? "{}" : response.toString();
     }
@@ -139,7 +148,7 @@ public class WebAppFacebook
     @JavascriptInterface
     public void setVerbose(boolean yesno)
     {
-        SocialFacebook.setVerbose(yesno);
-        SocialInstagram.setVerbose(yesno);
+        facebook.setVerbose(yesno);
+        instagram.setVerbose(yesno);
     }
 }

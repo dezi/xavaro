@@ -517,7 +517,7 @@ public class ProfileImages
 
         if (! imagefile.exists())
         {
-            Simple.putFileBytes(imagefile, SocialFacebook.getUserIconData(facebookid));
+            Simple.putFileBytes(imagefile, SocialFacebook.getInstance().getUserIconData(facebookid));
         }
     }
 
@@ -530,7 +530,7 @@ public class ProfileImages
 
         if (! imagefile.exists())
         {
-            Simple.putFileBytes(imagefile, SocialFacebook.getUserIconData(facebookid));
+            Simple.putFileBytes(imagefile, SocialFacebook.getInstance().getUserIconData(facebookid));
         }
 
         if (imagefile.exists())
@@ -579,7 +579,7 @@ public class ProfileImages
 
         if (! imagefile.exists())
         {
-            Simple.putFileBytes(imagefile, SocialInstagram.getUserIconData(instagramid));
+            Simple.putFileBytes(imagefile, SocialInstagram.getInstance().getUserIconData(instagramid));
         }
     }
 
@@ -592,7 +592,7 @@ public class ProfileImages
 
         if (! imagefile.exists())
         {
-            Simple.putFileBytes(imagefile, SocialInstagram.getUserIconData(instagramid));
+            Simple.putFileBytes(imagefile, SocialInstagram.getInstance().getUserIconData(instagramid));
         }
 
         if (imagefile.exists())
