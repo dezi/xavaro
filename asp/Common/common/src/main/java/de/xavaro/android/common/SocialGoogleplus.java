@@ -1,55 +1,44 @@
 package de.xavaro.android.common;
 
-import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
 import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
 
-import android.webkit.CookieManager;
+import android.app.AlertDialog;
+import android.app.Application;
+import android.graphics.drawable.Drawable;
+import android.view.MotionEvent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.app.AlertDialog;
-import android.app.Application;
-import android.text.TextUtils;
-import android.view.MotionEvent;
 import android.view.View;
+import android.text.TextUtils;
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Log;
-
-import com.facebook.AccessToken;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-public class SocialInstagram extends Social implements Social.SocialInterface
+public class SocialGoogleplus extends Social implements Social.SocialInterface
 {
-    private static final String LOGTAG = SocialInstagram.class.getSimpleName();
-    private static SocialInstagram instance;
+    private static final String LOGTAG = SocialGoogleplus.class.getSimpleName();
+    private static SocialGoogleplus instance;
 
-    private static final String appsecret = "ab19aa46d88f4fb9a433f6d6cc1d4df3";
-    private static final String appkey = "63afb3307ec24f4886230f44d2fda884";
-    private static final String appurl = "http://www.xavaro.de/instagram";
-    private static final String apiurl = "https://api.instagram.com/v1";
-
-    private static final String tokenpref = "social.instagram.token";
+    private static final String appsecret = "D65banXZZN55o3Cn1qNc3bSy";
+    private static final String appkey = "404416935707-b7o1okeho0c3s2oj9qipksprnn8bshoi.apps.googleusercontent.com";
+    private static final String appurl = "http://www.xavaro.de/googleplus";
+    private static final String apiurl = "https://www.googleapis.com/plus/v1";
+    private static final String tokenpref = "social.googleplus.token";
 
     private static final Set<String> permissions = new HashSet<String>(Arrays.asList
             (
-                    "basic",
-                    "public_content",
-                    "follower_list",
-                    "likes"
+                    "plus.login",
+                    "plus.me",
+                    "userinfo.profile"
             ));
 
     private JSONObject user;
@@ -58,17 +47,17 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     public static void initialize(Application app)
     {
         if (instance != null) return;
-        instance = new SocialInstagram();
+        instance = new SocialGoogleplus();
     }
 
-    public static SocialInstagram getInstance()
+    public static SocialGoogleplus getInstance()
     {
         return instance;
     }
 
-    public SocialInstagram()
+    public SocialGoogleplus()
     {
-        super("instagram");
+        super("googleplus");
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -118,7 +107,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
                     Json.put(postdata, "redirect_uri", appurl);
                     Json.put(postdata, "grant_type", "authorization_code");
 
-                    String tokenurl = "https://api.instagram.com/oauth/access_token";
+                    String tokenurl = "https://www.googleapis.com/oauth2/v4/token";
                     String content = SimpleRequest.readContent(tokenurl, postdata);
 
                     Log.d(LOGTAG, "=====>" + content);
@@ -149,7 +138,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
         dummy.setPadding(0, 0, 0, 0);
 
         FrameLayout frame = new FrameLayout(Simple.getActContext());
-        frame.setLayoutParams(new FrameLayout.LayoutParams(Simple.MP, 400));
+        frame.setLayoutParams(new FrameLayout.LayoutParams(Simple.MP, 500));
         frame.setBackgroundColor(0x88880000);
         frame.setPadding(0, 0, 0, 0);
 
@@ -198,23 +187,28 @@ public class SocialInstagram extends Social implements Social.SocialInterface
         // Fire up auth url in dialog.
         //
 
-        String url = "https://www.instagram.com/oauth/authorize/"
+        String scope = "";
+
+        for (String permission : permissions)
+        {
+            if (scope.length() > 0) scope += "%20";
+
+            scope += "https://www.googleapis.com/auth/" + permission;
+        }
+
+        String url = "https://accounts.google.com/o/oauth2/v2/auth"
                 + "?client_id=" + appkey
                 + "&redirect_uri=" + appurl
-                + "&scope=" + TextUtils.join("+", permissions)
+                + "&scope=" + scope
                 + "&response_type=code";
+
+        Log.d(LOGTAG, "====>" + url);
 
         webview.loadUrl(url);
     }
 
     public void logout()
     {
-        //
-        // Nuke preference and session id.
-        //
-
-        CookieManager.getInstance().setCookie("https://www.instagram.com", "sessionid=");
-
         Simple.removeSharedPref(tokenpref);
 
         token = null;
@@ -230,8 +224,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     @Nullable
     public String getUserId()
     {
-        JSONObject userdata = getCurrentUser();
-        return Json.getString(userdata, "id");
+        return null;
     }
 
     @Nullable
@@ -266,15 +259,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     {
         if (pfid == null) return null;
 
-        JSONObject userdata = getCurrentUser();
-
-        if ((userdata == null) || ! Simple.equals(pfid, Json.getString(userdata, "username")))
-        {
-            userdata = getUser(pfid);
-        }
-
-        String iconurl = Json.getString(userdata, "profile_picture");
-        return SimpleRequest.readData(iconurl);
+        return null;
     }
 
     @Nullable
@@ -286,15 +271,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     @Nullable
     public JSONObject getCurrentUser()
     {
-        if (user == null)
-        {
-            JSONObject response = getGraphRequest("/users/self");
-            user = Json.getObject(response, "data");
-
-            if (user != null) Log.d(LOGTAG, "=================>" + user.toString());
-        }
-
-        return user;
+        return null;
     }
 
     @Nullable
@@ -317,50 +294,10 @@ public class SocialInstagram extends Social implements Social.SocialInterface
         return null;
     }
 
-    @Override
-    protected JSONObject getGraphPost(String postid)
-    {
-        JSONObject response = getGraphRequest("/media/" + postid);
-        return Json.getObject(response, "data");
-    }
-
-    @Override
-    protected JSONArray getGraphFeed(String userid)
-    {
-        if (userid == null) return null;
-
-        JSONObject response = getGraphRequest("/users/" + userid  + "/media/recent");
-        return Json.getArray(response, "data");
-    }
-
-    @Nullable
-    public JSONObject getGraphRequest(String path, Bundle parameters)
-    {
-        if (path == null) return null;
-        if (token == null) token = getAccessToken();
-        if (token == null) return null;
-
-        maintainStatistic(path);
-
-        String url = apiurl + path + "?access_token=" + token;
-        String content = SimpleRequest.readContent(url);
-
-        if (content == null)
-        {
-            Log.d(LOGTAG, "getGraphRequest: failed=" + url);
-        }
-        else
-        {
-            Log.d(LOGTAG, "getGraphRequest: success=" + url);
-            if (verbose) Log.d(LOGTAG, "getGraphRequest: " + content);
-        }
-
-        return Json.fromString(content);
-    }
-
     @Nullable
     public Drawable getProfileDrawable(String pfid, boolean circle)
     {
         return ProfileImages.getInstagramProfileDrawable(pfid, true);
     }
+
 }

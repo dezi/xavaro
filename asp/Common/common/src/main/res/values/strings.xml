@@ -414,6 +414,12 @@
     <string name="pref_social_instagram_account_summary">todo</string>
     <string name="pref_social_instagram_friends_summary">todo</string>
 
+    <string name="pref_social_googleplus">Google+</string>
+    <string name="pref_social_googleplus_enable">Enable Google+</string>
+    <string name="pref_social_googleplus_summary">todo</string>
+    <string name="pref_social_googleplus_account_summary">todo</string>
+    <string name="pref_social_googleplus_friends_summary">todo</string>
+
     <string name="battery_manager_remind">Please plug Your tablet into the charger soon.</string>
     <string name="battery_manager_warn">Please plug Your tablet into the charger now.</string>
     <string name="battery_manager_assist_warn">%1$s tablet desperatly needs some charging.</string>
