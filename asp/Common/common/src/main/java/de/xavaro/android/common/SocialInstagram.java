@@ -327,7 +327,7 @@ public class SocialInstagram extends Social
         if (token == null) token = getAccessToken();
         if (token == null) return null;
 
-        maintainStatistic(path, parameters);
+        maintainStatistic(path);
 
         String url = apiurl + path + "?access_token=" + token;
         String content = SimpleRequest.readContent(url);

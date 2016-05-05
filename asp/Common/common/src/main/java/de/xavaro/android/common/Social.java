@@ -408,7 +408,7 @@ public class Social
     protected JSONObject statData;
     protected boolean statDirty;
 
-    protected void maintainStatistic(String path, Bundle parameters)
+    protected void maintainStatistic(String path)
     {
         getStorage();
 

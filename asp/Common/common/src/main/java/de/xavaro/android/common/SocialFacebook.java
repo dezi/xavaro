@@ -276,7 +276,12 @@ public class SocialFacebook extends Social
     {
         if (userid == null) return null;
 
-        JSONObject response = getGraphRequest(userid + "/feed");
+        String[] fields = { "object_attachment" };
+
+        Bundle params = new Bundle();
+        params.putString("fields", TextUtils.join(",", fields));
+
+        JSONObject response = getGraphRequest(userid + "/feed", params);
         return Json.getArray(response, "data");
     }
 
@@ -290,7 +295,7 @@ public class SocialFacebook extends Social
         if (parameters == null) parameters = new Bundle();
         parameters.putString("locale", locale);
 
-        maintainStatistic(path, parameters);
+        maintainStatistic(path);
 
         synchronized (graphrequest)
         {
