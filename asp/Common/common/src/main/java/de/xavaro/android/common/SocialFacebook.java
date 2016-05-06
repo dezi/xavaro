@@ -149,6 +149,24 @@ public class SocialFacebook extends Social implements Social.SocialInterface
     }
 
     @Override
+    protected String getScopeParameter()
+    {
+        return TextUtils.join(",", permissions);
+    }
+
+    @Override
+    protected String getAccessToken()
+    {
+        return null;
+    }
+
+    @Override
+    protected JSONObject getGraphCurrentUser()
+    {
+        return null;
+    }
+
+    @Override
     public boolean isLoggedIn()
     {
         AccessToken token = AccessToken.getCurrentAccessToken();

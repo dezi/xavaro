@@ -1,8 +1,9 @@
 package de.xavaro.android.common;
 
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
+import android.graphics.drawable.Drawable;
+import android.webkit.CookieManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -16,18 +17,39 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class Social
+public abstract class Social
 {
     private static final String LOGTAG = Social.class.getSimpleName();
 
-    protected String platform;
+    protected final String platform;
+    protected final String locale;
+
+    protected final String expirationpref;
+    protected final String accesstokenpref;
+    protected final String refreshtokenpref;
+
+    protected String apiurl;
+    protected String apiextraparam;
+
+    protected long expiration;
+    protected String accessToken;
+    protected String refreshToken;
+
+    protected JSONObject user;
     protected boolean verbose;
-    protected String locale;
     protected File cachedir;
 
     public Social(String platform)
     {
         this.platform = platform;
+
+        expirationpref = "social." + platform + ".expiration";
+        accesstokenpref = "social." + platform + ".accesstoken";
+        refreshtokenpref = "social." + platform + ".refreshtoken";
+
+        expiration = Simple.getTimeStamp(Simple.getSharedPrefString(expirationpref));
+        accessToken = Simple.getSharedPrefString(accesstokenpref);
+        refreshToken = Simple.getSharedPrefString(refreshtokenpref);
 
         locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
         cachedir = new File(Simple.getExternalCacheDir(), platform);
@@ -38,11 +60,7 @@ public class Social
         return Simple.getSharedPrefBoolean("social." + platform + ".enable");
     }
 
-    public boolean isLoggedIn()
-    {
-        Log.d(LOGTAG, "isLoggedIn: not overridden.");
-        return false;
-    }
+    public abstract boolean isLoggedIn();
 
     public boolean isReady()
     {
@@ -53,6 +71,31 @@ public class Social
     {
         verbose = yesno;
     }
+
+    protected void clearCookies(String domain)
+    {
+        CookieManager cookieManager = CookieManager.getInstance();
+        String cookiestring = cookieManager.getCookie(domain);
+
+        if (cookiestring != null)
+        {
+            String expire = "=; Expires=Wed, 31 Dec 2000 23:59:59 GMT";
+
+            String[] cookies = cookiestring.split(";");
+
+            for (String cookie : cookies)
+            {
+                Log.d(LOGTAG, "clearCookies:" + cookie);
+
+                String[] cookieparts = cookie.split("=");
+                cookieManager.setCookie(domain, cookieparts[ 0 ].trim() + expire);
+            }
+        }
+    }
+
+    protected abstract String getScopeParameter();
+
+    protected abstract String getAccessToken();
 
     protected Bundle getParameters(JSONObject jparams)
     {
@@ -113,6 +156,32 @@ public class Social
         return bparams;
     }
 
+    protected abstract JSONObject getGraphCurrentUser();
+
+    @Nullable
+    public JSONObject getCurrentUser()
+    {
+        if (! isReady()) return null;
+
+        if (user == null)
+        {
+            File socialdir = Simple.getMediaPath("social");
+            File userfile = new File(socialdir, platform + ".user.json");
+
+            user = Simple.getFileJSONObject(userfile);
+
+            if (user == null)
+            {
+                user = getGraphCurrentUser();
+                Simple.putFileJSON(userfile, user);
+            }
+
+            Log.d(LOGTAG, "=================>" + Json.toPretty(user));
+        }
+
+        return user;
+    }
+
     protected File getUserImageFile(String pfid)
     {
         File icon = null;
@@ -127,6 +196,11 @@ public class Social
             icon = ProfileImages.getInstagramProfileImageFile(pfid);
         }
 
+        if (Simple.equals(platform, "googleplus"))
+        {
+            icon = ProfileImages.getGoogleplusProfileImageFile(pfid);
+        }
+
         return icon;
     }
 
@@ -134,13 +208,17 @@ public class Social
     {
         if (Simple.equals(platform, "facebook"))
         {
-
             ProfileImages.getFacebookLoadProfileImage(pfid);
         }
 
         if (Simple.equals(platform, "instagram"))
         {
             ProfileImages.getInstagramLoadProfileImage(pfid);
+        }
+
+        if (Simple.equals(platform, "googleplus"))
+        {
+            ProfileImages.getGoogleplusLoadProfileImage(pfid);
         }
     }
 
@@ -378,8 +456,29 @@ public class Social
     @Nullable
     public JSONObject getGraphRequest(String path, Bundle parameters)
     {
-        Log.d(LOGTAG, "getGraphRequest: not overridden.");
-        return null;
+        String token = getAccessToken();
+
+        if ((path == null) || (token == null) || (apiurl == null)) return null;
+
+        maintainStatistic(path);
+
+        String url = apiurl + path + "?access_token=" + token;
+        if (apiextraparam != null) url += apiextraparam;
+
+        String content = SimpleRequest.readContent(url);
+
+        if (content == null)
+        {
+            Log.d(LOGTAG, "getGraphRequest: failed=" + url);
+        }
+        else
+        {
+            Log.d(LOGTAG, "getGraphRequest: success=" + url);
+
+            if (verbose) Log.d(LOGTAG, "getGraphRequest: " + content);
+        }
+
+        return Json.fromString(content);
     }
 
     //region Graph call statistic

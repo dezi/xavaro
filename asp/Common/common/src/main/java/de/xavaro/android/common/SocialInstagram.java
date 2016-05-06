@@ -44,13 +44,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
 
     private static final String tokenpref = "social.instagram.token";
 
-    private static final Set<String> permissions = new HashSet<String>(Arrays.asList
-            (
-                    "basic",
-                    "public_content",
-                    "follower_list",
-                    "likes"
-            ));
+    private static final String[] scopes = {"basic", "public_content", "follower_list", "likes" };
 
     private JSONObject user;
     private String token;
@@ -201,7 +195,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
         String url = "https://www.instagram.com/oauth/authorize/"
                 + "?client_id=" + appkey
                 + "&redirect_uri=" + appurl
-                + "&scope=" + TextUtils.join("+", permissions)
+                + "&scope=" + getScopeParameter()
                 + "&response_type=code";
 
         webview.loadUrl(url);
@@ -222,6 +216,18 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     }
 
     @Override
+    protected String getScopeParameter()
+    {
+        return TextUtils.join("+", scopes);
+    }
+
+    @Override
+    protected String getAccessToken()
+    {
+        return Simple.getSharedPrefString(tokenpref);
+    }
+
+    @Override
     public boolean isLoggedIn()
     {
         return (Simple.getSharedPrefString(tokenpref) != null);
@@ -237,21 +243,13 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     @Nullable
     public Set<String> getUserPermissions()
     {
-        return permissions;
+        return null;
     }
 
     @Nullable
     public String getUserTokenExpiration()
     {
-        if (isLoggedIn())
-        {
-            long now = Simple.nowAsTimeStamp();
-            now += 60L * 86400 * 1000;
-
-            return Simple.timeStampAsISO(now);
-        }
-
-        return null;
+        return isLoggedIn() ? Simple.timeStampAsISO(0) : null;
     }
 
     @Nullable
@@ -278,23 +276,12 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     }
 
     @Nullable
-    public String getAccessToken()
+    protected JSONObject getGraphCurrentUser()
     {
-        return Simple.getSharedPrefString(tokenpref);
-    }
+        if (! isReady()) return null;
 
-    @Nullable
-    public JSONObject getCurrentUser()
-    {
-        if (user == null)
-        {
-            JSONObject response = getGraphRequest("/users/self");
-            user = Json.getObject(response, "data");
-
-            if (user != null) Log.d(LOGTAG, "=================>" + user.toString());
-        }
-
-        return user;
+        JSONObject response = getGraphRequest("/users/self");
+        return Json.getObject(response, "data");
     }
 
     @Nullable

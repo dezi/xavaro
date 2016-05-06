@@ -32,19 +32,8 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     private static final String appsecret = "D65banXZZN55o3Cn1qNc3bSy";
     private static final String appkey = "404416935707-b7o1okeho0c3s2oj9qipksprnn8bshoi.apps.googleusercontent.com";
     private static final String appurl = "http://www.xavaro.de/googleplus";
-    private static final String apiurl = "https://www.googleapis.com/plus/v1";
-    private static final String accesstokenpref = "social.googleplus.token";
-    private static final String refreshtokenpref = "social.googleplus.refresh";
-
-    private static final Set<String> permissions = new HashSet<String>(Arrays.asList
-            (
-                    "plus.login",
-                    "plus.me",
-                    "userinfo.profile"
-            ));
-
-    private JSONObject user;
-    private String token;
+    private static final String oauthurl = "https://accounts.google.com/o/oauth2/v2/auth";
+    private static final String[] scopes = { "plus.login", "plus.me", "userinfo.profile" };
 
     public static void initialize(Application app)
     {
@@ -60,6 +49,9 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     public SocialGoogleplus()
     {
         super("googleplus");
+
+        apiurl = "https://www.googleapis.com/plus/v1";
+        apiextraparam = "&prettyPrint=true";
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -116,11 +108,17 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
 
                     if (content != null)
                     {
-                        user = Json.fromString(content);
-                        token = Json.getString(user, "access_token");
-                        String refreshtoken = Json.getString(user, "refresh_token");
-                        Simple.setSharedPrefString(accesstokenpref, token);
-                        Simple.setSharedPrefString(refreshtokenpref, refreshtoken);
+                        JSONObject jcontent = Json.fromString(content);
+
+                        accessToken = Json.getString(jcontent, "access_token");
+                        refreshToken = Json.getString(jcontent, "refresh_token");
+
+                        int expiseconds = Json.getInt(jcontent, "expires_in");
+                        expiration = Simple.nowAsTimeStamp() + (expiseconds - 10) * 1000;
+
+                        Simple.setSharedPrefString(expirationpref, Simple.timeStampAsISO(expiration));
+                        Simple.setSharedPrefString(accesstokenpref, accessToken);
+                        Simple.setSharedPrefString(refreshtokenpref, refreshToken);
 
                         File socialdir = Simple.getMediaPath("social");
                         File oauthfile = new File(socialdir, platform + ".oauth.json");
@@ -195,19 +193,10 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
         // Fire up auth url in dialog.
         //
 
-        String scope = "";
-
-        for (String permission : permissions)
-        {
-            if (scope.length() > 0) scope += "%20";
-
-            scope += "https://www.googleapis.com/auth/" + permission;
-        }
-
-        String url = "https://accounts.google.com/o/oauth2/v2/auth"
+        String url = oauthurl
                 + "?client_id=" + appkey
                 + "&redirect_uri=" + appurl
-                + "&scope=" + scope
+                + "&scope=" + getScopeParameter()
                 + "&response_type=code"
                 + "&access_type=offline"
                 + "&approval_prompt=force";
@@ -217,28 +206,22 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
         webview.loadUrl(url);
     }
 
-    public void clearCookies(String domain)
-    {
-        CookieManager cookieManager = CookieManager.getInstance();
-        String cookiestring = cookieManager.getCookie(domain);
-        String[] cookies = cookiestring.split(";");
-
-        for (String cookie : cookies)
-        {
-            Log.d(LOGTAG, "clearCookies:" + cookie);
-
-            String[] cookieparts = cookie.split("=");
-            cookieManager.setCookie(domain, cookieparts[ 0 ].trim() + "=; Expires=Wed, 31 Dec 2000 23:59:59 GMT");
-        }
-    }
-
     public void logout()
     {
         clearCookies("https://accounts.google.com");
 
-        Simple.removeSharedPref(accesstokenpref);
+        File socialdir = Simple.getMediaPath("social");
 
-        token = null;
+        File oauthfile = new File(socialdir, platform + ".oauth.json");
+        Simple.removeFile(oauthfile);
+
+        File userfile = new File(socialdir, platform + ".user.json");
+        Simple.removeFile(userfile);
+
+        Simple.removeSharedPref(expirationpref);
+        Simple.removeSharedPref(accesstokenpref);
+        Simple.removeSharedPref(refreshtokenpref);
+
         user = null;
     }
 
@@ -249,36 +232,45 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     }
 
     @Nullable
-    public String getUserId()
+    public Set<String> getUserPermissions()
     {
         return null;
     }
 
-    @Nullable
-    public Set<String> getUserPermissions()
+    @Override
+    protected String getScopeParameter()
     {
-        return permissions;
+        String scopeval = "";
+
+        for (String scope : scopes)
+        {
+            if (scopeval.length() > 0) scopeval += "%20";
+
+            scopeval += "https://www.googleapis.com/auth/" + scope;
+        }
+
+        return scopeval;
     }
+
 
     @Nullable
     public String getUserTokenExpiration()
     {
-        if (isLoggedIn())
-        {
-            long now = Simple.nowAsTimeStamp();
-            now += 60L * 86400 * 1000;
+        return isLoggedIn() ? Simple.timeStampAsISO(0) : null;
+    }
 
-            return Simple.timeStampAsISO(now);
-        }
-
-        return null;
+    @Nullable
+    public String getUserId()
+    {
+        JSONObject userdata = getCurrentUser();
+        return Json.getString(userdata, "id");
     }
 
     @Nullable
     public String getUserDisplayName()
     {
         JSONObject userdata = getCurrentUser();
-        return Json.getString(userdata, "full_name");
+        return Json.getString(userdata, "displayName");
     }
 
     @Nullable
@@ -286,33 +278,55 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     {
         if (pfid == null) return null;
 
-        return null;
+        JSONObject userdata = getCurrentUser();
+
+        if ((userdata == null) || !Simple.equals(pfid, Json.getString(userdata, "id")))
+        {
+            userdata = getGraphUser(pfid);
+        }
+
+        JSONObject image = Json.getObject(userdata, "image");
+        String iconurl = Json.getString(image, "url");
+        if (iconurl != null) iconurl = iconurl.replace("?sz=50", "?sz=400");
+        return SimpleRequest.readData(iconurl);
     }
 
     @Nullable
     public String getAccessToken()
     {
+        // todo check expiration and refresh.
+
+        String validdate = Simple.getSharedPrefString(expirationpref);
+        if (validdate == null) return null;
+
+        if (validdate.compareTo(Simple.nowAsISO()) < 0)
+        {
+            //
+            // Token is expired.
+            //
+
+            Log.d(LOGTAG,"getAccessToken: expired...");
+        }
+
         return Simple.getSharedPrefString(accesstokenpref);
     }
 
     @Nullable
-    public JSONObject getCurrentUser()
+    public JSONObject getGraphCurrentUser()
     {
-        return null;
+        return isLoggedIn() ? getGraphRequest("/people/me") : null;
     }
 
     @Nullable
-    public JSONObject getUser(String pfid)
+    public JSONObject getGraphUser(String pfid)
     {
-        JSONObject response = getGraphRequest("/users/" + pfid);
-        return Json.getObject(response, "data");
+        return isLoggedIn() ? getGraphRequest("/people/" + pfid) : null;
     }
 
     @Override
     public JSONArray getUserFriendlist()
     {
-        JSONObject response = getGraphRequest("/users/self/follows");
-        return Json.getArray(response, "data");
+        return null;
     }
 
     @Override
@@ -324,7 +338,6 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     @Nullable
     public Drawable getProfileDrawable(String pfid, boolean circle)
     {
-        return ProfileImages.getInstagramProfileDrawable(pfid, true);
+        return ProfileImages.getGoogleplusProfileDrawable(pfid, true);
     }
-
 }

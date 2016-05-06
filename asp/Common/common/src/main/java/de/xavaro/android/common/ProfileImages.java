@@ -508,7 +508,6 @@ public class ProfileImages
         return imagefile.exists() ? imagefile : null;
     }
 
-    @Nullable
     public static void getFacebookLoadProfileImage(String facebookid)
     {
         if (facebookid == null) return;
@@ -556,7 +555,7 @@ public class ProfileImages
     public static File getInstagramProfileImageFile(String instagramid)
     {
         File profilespath = Simple.getMediaPath("profiles");
-        String profilename = "Instagram.image." + instagramid + ".jpg";
+        String profilename = "instagram.image." + instagramid + ".jpg";
         return new File(profilespath, profilename);
     }
 
@@ -570,7 +569,6 @@ public class ProfileImages
         return imagefile.exists() ? imagefile : null;
     }
 
-    @Nullable
     public static void getInstagramLoadProfileImage(String instagramid)
     {
         if (instagramid == null) return;
@@ -611,7 +609,68 @@ public class ProfileImages
         return Simple.getDrawable(getInstagramProfileBitmap(instagramid, circle));
     }
 
-    //endregion Facebook profiles
+    //endregion Instagram profiles
+
+    //region Googleplus profiles
+
+    public static File getGoogleplusProfileImageFile(String googleplusid)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "googleplus.image." + googleplusid + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    public static File getGoogleplusProfileFile(String googleplusid)
+    {
+        if (googleplusid == null) return null;
+
+        File imagefile = getGoogleplusProfileImageFile(googleplusid);
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    public static void getGoogleplusLoadProfileImage(String googleplusid)
+    {
+        if (googleplusid == null) return;
+
+        File imagefile = getGoogleplusProfileImageFile(googleplusid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, SocialGoogleplus.getInstance().getUserIconData(googleplusid));
+        }
+    }
+
+    @Nullable
+    public static Bitmap getGoogleplusProfileBitmap(String googleplusid, boolean circle)
+    {
+        if (googleplusid == null) return null;
+
+        File imagefile = getGoogleplusProfileImageFile(googleplusid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, SocialGoogleplus.getInstance().getUserIconData(googleplusid));
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getGoogleplusProfileDrawable(String googleplusid, boolean circle)
+    {
+        return Simple.getDrawable(getGoogleplusProfileBitmap(googleplusid, circle));
+    }
+
+    //endregion Googleplus profiles
 
     private static final Map<String, Drawable> drawableCache = new HashMap<>();
 

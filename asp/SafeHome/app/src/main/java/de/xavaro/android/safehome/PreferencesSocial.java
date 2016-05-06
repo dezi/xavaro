@@ -302,11 +302,19 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             if (name == null) name = Simple.getSharedPrefString(keyprefix + ".name");
             if (expi == null) expi = Simple.getSharedPrefString(keyprefix + ".expi");
 
-            if (!Simple.equals(userPref.getText(), name))
+            if (! Simple.equals(userPref.getText(), name))
             {
+                String expiration = (expi == null) ? null : Simple.getLocalDateLong(expi);
+
+                if ((expi != null) && (Simple.getTimeStamp(expi) == 0))
+                {
+                    expiration = Simple.getTrans(R.string.pref_social_noexpiration);
+                }
+
                 userPref.setText(name);
                 categoryPref.setIcon(social.getProfileDrawable(pfid, true));
-                expirationPref.setText((expi == null) ? null : Simple.getLocalDateLong(expi));
+
+                expirationPref.setText(expiration);
             }
 
             loginPref.setTitle(social.isLoggedIn()

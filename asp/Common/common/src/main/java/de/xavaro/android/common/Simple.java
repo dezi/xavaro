@@ -944,9 +944,9 @@ public class Simple
             File dir = getExternalFilesDir();
             File profiles = new File(dir, "profiles");
 
-            if (! (profiles.exists() || ! profiles.mkdirs()))
+            if (! (profiles.exists() || profiles.mkdirs()))
             {
-                Log.d(LOGTAG, "getMediaPath: failed create pofile:" + profiles.toString());
+                Log.d(LOGTAG, "getMediaPath: create failed:" + profiles.toString());
             }
 
             return profiles;
@@ -957,9 +957,9 @@ public class Simple
             File dir = getExternalFilesDir();
             File social = new File(dir, "social");
 
-            if (! (social.exists() || ! social.mkdirs()))
+            if (! (social.exists() || social.mkdirs()))
             {
-                Log.d(LOGTAG, "getMediaPath: failed create pofile:" + social.toString());
+                Log.d(LOGTAG, "getMediaPath: create failed:" + social.toString());
             }
 
             return social;
@@ -973,6 +973,14 @@ public class Simple
 
         File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
         return new File(dir, "Miscellanous");
+    }
+
+    public static void removeFile(File file)
+    {
+        if ((file != null) && file.exists() && file.delete())
+        {
+            Log.d(LOGTAG,"removeFile: " + file);
+        }
     }
 
     public static void removeFiles(File dir, String suffix)
@@ -1569,6 +1577,20 @@ public class Simple
         return (bytes == null) ? null : new String(bytes);
     }
 
+    @Nullable
+    public static JSONObject getFileJSONObject(File file)
+    {
+        byte[] bytes = getFileBytes(file);
+        return (bytes == null) ? null : Json.fromStringObject(new String(bytes));
+    }
+
+    @Nullable
+    public static JSONArray getFileJSONArray(File file)
+    {
+        byte[] bytes = getFileBytes(file);
+        return (bytes == null) ? null : Json.fromStringArray(new String(bytes));
+    }
+
     public static boolean putFileBytes(File file, byte[] bytes)
     {
         if (bytes == null) return false;
@@ -1591,7 +1613,12 @@ public class Simple
 
     public static boolean putFileContent(File file, String content)
     {
-        return putFileBytes(file, content.getBytes());
+        return (content != null) && putFileBytes(file, content.getBytes());
+    }
+
+    public static boolean putFileJSON(File file, JSONObject json)
+    {
+        return (json != null) && putFileContent(file, Json.toPretty(json));
     }
 
     public static File changeExtension(File file, String extension)

@@ -354,6 +354,7 @@
     <string name="pref_social_account">Account</string>
     <string name="pref_social_user">Benutzer</string>
     <string name="pref_social_validuntil">Gültig bis</string>
+    <string name="pref_social_noexpiration">auf Widerruf</string>
     <string name="pref_social_login">Login</string>
     <string name="pref_social_logout">Logout</string>
     <string name="pref_social_isloggedin">ist eingeloggt</string>
