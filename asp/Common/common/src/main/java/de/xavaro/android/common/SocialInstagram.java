@@ -103,7 +103,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
             {
                 Log.d(LOGTAG, "shouldOverrideUrlLoading=" + url);
 
-                if (url.contains(appurl))
+                if (url.startsWith(appurl))
                 {
                     Uri uri = Uri.parse(url);
                     String code = uri.getQueryParameter("code");

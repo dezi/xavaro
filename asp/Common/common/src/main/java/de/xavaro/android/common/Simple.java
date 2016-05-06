@@ -952,6 +952,19 @@ public class Simple
             return profiles;
         }
 
+        if (disposition.equals("social"))
+        {
+            File dir = getExternalFilesDir();
+            File social = new File(dir, "social");
+
+            if (! (social.exists() || ! social.mkdirs()))
+            {
+                Log.d(LOGTAG, "getMediaPath: failed create pofile:" + social.toString());
+            }
+
+            return social;
+        }
+
         if (disposition.equals("misc"))
         {
             File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
