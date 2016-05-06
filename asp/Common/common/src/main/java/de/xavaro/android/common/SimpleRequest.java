@@ -409,6 +409,8 @@ public class SimpleRequest
                 connection.connect();
             }
 
+            Log.d(LOGTAG, "readContent:" + connection.getResponseCode() + "=" + connection.getResponseMessage());
+
             InputStream input = connection.getInputStream();
             StringBuilder string = new StringBuilder();
             byte[] buffer = new byte[ 4096 ];

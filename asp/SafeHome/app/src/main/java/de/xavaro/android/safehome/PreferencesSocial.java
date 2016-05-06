@@ -9,7 +9,6 @@ import java.util.Map;
 
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
-import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Social;
 
@@ -116,7 +115,9 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                Log.d(LOGTAG, "Permissions=" + social.getUserPermissions());
+                //Log.d(LOGTAG, "Permissions=" + social.getUserPermissions());
+
+                social.getTest();
 
                 return false;
             }
@@ -260,7 +261,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             lp = new NicedPreferences.NiceListPreference(context);
             lp.setKey(likesmode + fpfid);
             lp.setTitle(fname);
-            lp.setIcon(ProfileImages.getFacebookProfileDrawable(fpfid, true));
+            lp.setIcon(social.getProfileDrawable(fpfid, true));
             lp.setEntryValues(R.array.pref_social_newlikes_keys);
             lp.setEntries(R.array.pref_social_newlikes_vals);
             lp.setEnabled(enabled);
@@ -292,7 +293,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
 
             String pfid = social.getUserId();
             String name = social.getUserDisplayName();
-            String expi = social.getUserTokenExpiration();
+            String expi = social.getAccessExpiration();
 
             if (pfid != null) Simple.setSharedPrefString(keyprefix + ".pfid", pfid);
             if (name != null) Simple.setSharedPrefString(keyprefix + ".name", name);

@@ -1,9 +1,18 @@
 package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
+import android.annotation.SuppressLint;
 
+import android.app.AlertDialog;
 import android.graphics.drawable.Drawable;
 import android.webkit.CookieManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.view.MotionEvent;
+import android.view.View;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,7 +24,6 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class Social
 {
@@ -28,12 +36,17 @@ public abstract class Social
     protected final String accesstokenpref;
     protected final String refreshtokenpref;
 
+    protected String appurl;
+    protected String appsecret;
+    protected String appkey;
+
+    protected String oauthurl;
+    protected String tokenurl;
+
+    protected String[] scopes;
+
     protected String apiurl;
     protected String apiextraparam;
-
-    protected long expiration;
-    protected String accessToken;
-    protected String refreshToken;
 
     protected JSONObject user;
     protected boolean verbose;
@@ -47,10 +60,6 @@ public abstract class Social
         accesstokenpref = "social." + platform + ".accesstoken";
         refreshtokenpref = "social." + platform + ".refreshtoken";
 
-        expiration = Simple.getTimeStamp(Simple.getSharedPrefString(expirationpref));
-        accessToken = Simple.getSharedPrefString(accesstokenpref);
-        refreshToken = Simple.getSharedPrefString(refreshtokenpref);
-
         locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
         cachedir = new File(Simple.getExternalCacheDir(), platform);
     }
@@ -60,7 +69,10 @@ public abstract class Social
         return Simple.getSharedPrefBoolean("social." + platform + ".enable");
     }
 
-    public abstract boolean isLoggedIn();
+    public boolean isLoggedIn()
+    {
+        return (Simple.getSharedPrefString(accesstokenpref) != null);
+    }
 
     public boolean isReady()
     {
@@ -71,6 +83,212 @@ public abstract class Social
     {
         verbose = yesno;
     }
+
+    @Nullable
+    public String getAccessExpiration()
+    {
+        return isLoggedIn() ? Simple.timeStampAsISO(0) : null;
+    }
+
+    @Nullable
+    public String[] getAccessScope()
+    {
+        return scopes;
+    }
+
+    @Nullable
+    protected String getAccessToken()
+    {
+        return Simple.getSharedPrefString(accesstokenpref);
+    }
+
+    @Nullable
+    public Drawable getProfileDrawable(String pfid, boolean circle)
+    {
+        return ProfileImages.getSocialProfileDrawable(platform, pfid, circle);
+    }
+
+    //region Login and logout
+
+    @SuppressLint("SetJavaScriptEnabled")
+    public void login()
+    {
+        //
+        // Make sure, session cookies are invalidated
+        // to be able to switch account.
+        //
+
+        logout();
+
+        //
+        // Precreate dialog.
+        //
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
+
+        builder.setNegativeButton("Abbrechenxx", null);
+
+        final AlertDialog dialog = builder.create();
+
+        //
+        // Load control webview client will intercept
+        // redirect url with access code.
+        //
+
+        WebViewClient webclient = new WebViewClient()
+        {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url)
+            {
+                Log.d(LOGTAG, "shouldOverrideUrlLoading=" + url);
+
+                if (url.startsWith(appurl))
+                {
+                    Uri uri = Uri.parse(url);
+                    String code = uri.getQueryParameter("code");
+
+                    Log.d(LOGTAG, "shouldOverrideUrlLoading: code=" + code);
+
+                    JSONObject postdata = new JSONObject();
+
+                    Json.put(postdata, "code", code);
+                    Json.put(postdata, "client_id", appkey);
+                    Json.put(postdata, "client_secret", appsecret);
+                    Json.put(postdata, "redirect_uri", appurl);
+                    Json.put(postdata, "grant_type", "authorization_code");
+
+                    String content = SimpleRequest.readContent(tokenurl, postdata);
+
+                    Log.d(LOGTAG, "=====>" + content);
+
+                    if (content != null)
+                    {
+                        JSONObject jcontent = Json.fromString(content);
+
+                        String accessToken = Json.getString(jcontent, "access_token");
+                        Simple.setSharedPrefString(accesstokenpref, accessToken);
+
+                        if (Json.has(jcontent, "expires_in"))
+                        {
+                            int expiseconds = Json.getInt(jcontent, "expires_in");
+                            long expiration = Simple.nowAsTimeStamp() + (expiseconds - 10) * 1000;
+                            Simple.setSharedPrefString(expirationpref, Simple.timeStampAsISO(expiration));
+                        }
+
+                        if (Json.has(jcontent, "refresh_token"))
+                        {
+                            String refreshToken = Json.getString(jcontent, "refresh_token");
+                            Simple.setSharedPrefString(refreshtokenpref, refreshToken);
+
+                            File socialdir = Simple.getMediaPath("social");
+                            File oauthfile = new File(socialdir, platform + ".oauth.json");
+                            Simple.putFileContent(oauthfile, content);
+                        }
+                    }
+
+                    dialog.cancel();
+
+                    return true;
+                }
+
+                return false;
+            }
+        };
+
+        //
+        // Upgrade dialog with nice web view.
+        //
+
+        FrameLayout dummy = new FrameLayout(Simple.getActContext());
+        dummy.setLayoutParams(new FrameLayout.LayoutParams(Simple.MP, Simple.WC));
+        dummy.setBackgroundColor(0x88008800);
+        dummy.setPadding(0, 0, 0, 0);
+
+        FrameLayout frame = new FrameLayout(Simple.getActContext());
+        frame.setLayoutParams(new FrameLayout.LayoutParams(Simple.MP, 500));
+        frame.setBackgroundColor(0x88880000);
+        frame.setPadding(0, 0, 0, 0);
+
+        WebView webview = new WebView(Simple.getActContext())
+        {
+            @Override
+            public boolean onCheckIsTextEditor()
+            {
+                return true;
+            }
+        };
+
+        webview.setWebViewClient(webclient);
+
+        webview.getSettings().setJavaScriptEnabled(true);
+        webview.getSettings().setDomStorageEnabled(false);
+        webview.getSettings().setSupportZoom(true);
+        webview.getSettings().setAppCacheEnabled(false);
+        webview.getSettings().setDatabaseEnabled(false);
+        webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+        webview.requestFocus(View.FOCUS_DOWN);
+
+        webview.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View view, MotionEvent event)
+            {
+                switch (event.getAction())
+                {
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_DOWN:
+                        if (!view.hasFocus()) view.requestFocus();
+                        break;
+                }
+                return false;
+            }
+        });
+
+        frame.addView(webview);
+        dummy.addView(frame);
+        dialog.setView(dummy);
+        dialog.show();
+
+        //
+        // Fire up auth url in dialog.
+        //
+
+        String url = oauthurl
+                + "?client_id=" + appkey
+                + "&redirect_uri=" + appurl
+                + "&scope=" + getScopeParameter()
+                + "&response_type=code"
+                + "&access_type=offline"
+                + "&approval_prompt=force";
+
+        Log.d(LOGTAG, "====>" + url);
+
+        webview.loadUrl(url);
+    }
+
+    public void logout()
+    {
+        Uri uri = Uri.parse(oauthurl);
+
+        clearCookies(uri.getScheme() + "://" + uri.getHost());
+
+        File socialdir = Simple.getMediaPath("social");
+
+        File oauthfile = new File(socialdir, platform + ".oauth.json");
+        Simple.removeFile(oauthfile);
+
+        File userfile = new File(socialdir, platform + ".user.json");
+        Simple.removeFile(userfile);
+
+        Simple.removeSharedPref(expirationpref);
+        Simple.removeSharedPref(accesstokenpref);
+        Simple.removeSharedPref(refreshtokenpref);
+
+        user = null;
+    }
+
+    protected abstract String getScopeParameter();
 
     protected void clearCookies(String domain)
     {
@@ -93,11 +311,209 @@ public abstract class Social
         }
     }
 
-    protected abstract String getScopeParameter();
+    //endregion Login and logout
 
-    protected abstract String getAccessToken();
+    //region Cache driven publics
 
-    protected Bundle getParameters(JSONObject jparams)
+    @Nullable
+    public JSONObject getUserProfile()
+    {
+        if (! isReady()) return null;
+
+        if (user == null)
+        {
+            File socialdir = Simple.getMediaPath("social");
+            File userfile = new File(socialdir, platform + ".user.json");
+
+            user = Simple.getFileJSONObject(userfile);
+
+            if (user == null)
+            {
+                user = getGraphUserProfile();
+                Simple.putFileJSON(userfile, user);
+            }
+        }
+
+        return user;
+    }
+
+    public JSONArray getUserFeeds(boolean feedonly)
+    {
+        JSONArray data = new JSONArray();
+
+        getOwnerFeed(data);
+
+        getUserFeeds(data, "friend", feedonly);
+        getUserFeeds(data, "like", feedonly);
+
+        return data;
+    }
+
+    protected JSONArray getOwnerFeed(JSONArray data)
+    {
+        //
+        // Add account owner as an owner feed.
+        //
+
+        JSONObject owner = new JSONObject();
+
+        String pfid = Simple.getSharedPrefString("social." + platform + ".pfid");
+        String name = Simple.getSharedPrefString("social." + platform + ".name");
+
+        if ((pfid != null) && (name != null))
+        {
+            Json.put(owner, "id", pfid);
+            Json.put(owner, "name", name);
+            Json.put(owner, "type", "owner");
+            Json.put(owner, "plat", platform);
+
+            File icon = ProfileImages.getSocialUserImageFile(platform, pfid);
+            if (icon != null) Json.put(owner, "icon", icon.toString());
+
+            Json.put(data, owner);
+        }
+
+        return data;
+    }
+
+    protected JSONArray getUserFeeds(JSONArray data, String type, boolean feedonly)
+    {
+        String modeprefix = "social." + platform + "." + type + ".mode.";
+        String nameprefix = "social." + platform + "." + type + ".name.";
+
+        Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
+
+        for (Map.Entry<String, Object> entry : friends.entrySet())
+        {
+            Object fmode = entry.getValue();
+            if (!(fmode instanceof String)) continue;
+
+            String mode = (String) fmode;
+            if (feedonly && !mode.contains("feed")) continue;
+            if (mode.equals("inactive")) continue;
+
+            String pfid = entry.getKey().substring(modeprefix.length());
+            String name = Simple.getSharedPrefString(nameprefix + pfid);
+            if (name == null) continue;
+
+            JSONObject item = new JSONObject();
+
+            Json.put(item, "id", pfid);
+            Json.put(item, "name", name);
+            Json.put(item, "type", type);
+            Json.put(item, "plat", platform);
+
+            File icon = ProfileImages.getSocialUserImageFile(platform, pfid);
+            if (icon != null) Json.put(item, "icon", icon.toString());
+
+            Json.put(data, item);
+        }
+
+        return data;
+    }
+
+    @Nullable
+    public JSONObject getPost(String postid)
+    {
+        if (postid == null) return null;
+
+        File postfile = new File(cachedir, postid + ".post.json");
+
+        if (postfile.exists())
+        {
+            return Json.fromString(Simple.getFileContent(postfile));
+        }
+
+        return getGraphPost(postid);
+    }
+
+    @Nullable
+    public JSONArray getFeed(String userid)
+    {
+        if (userid == null) return null;
+
+        File feedfile = new File(cachedir, userid + ".feed.json");
+
+        if (feedfile.exists())
+        {
+            return Json.fromStringArray(Simple.getFileContent(feedfile));
+        }
+
+        return getGraphFeed(userid);
+    }
+
+    //endregion Cache driven publics
+
+    //region Graph accessing methods
+
+    @Nullable
+    protected abstract JSONObject getGraphUserProfile();
+
+    @Nullable
+    protected abstract JSONArray getGraphUserFriendlist();
+
+    @Nullable
+    protected abstract JSONArray getGraphUserLikeslist();
+
+    @Nullable
+    protected abstract JSONArray getGraphFeed(String userid);
+
+    @Nullable
+    protected abstract JSONObject getGraphPost(String postid);
+
+    @Nullable
+    public JSONObject getGraphRequest(String path)
+    {
+        return getGraphRequest(path, new Bundle());
+    }
+
+    @Nullable
+    public JSONObject getGraphRequest(String path, JSONObject parameters)
+    {
+        return getGraphRequest(path, getParameters(parameters));
+    }
+
+    @Nullable
+    public JSONObject getGraphRequest(String path, Bundle parameters)
+    {
+        return getGraphRequest(apiurl, path, parameters);
+    }
+
+    @Nullable
+    public JSONObject getGraphRequest(String requesturl, String path)
+    {
+        return getGraphRequest(requesturl, path, null);
+    }
+
+    @Nullable
+    public JSONObject getGraphRequest(String requesturl, String path, Bundle parameters)
+    {
+        String token = getAccessToken();
+
+        if ((path == null) || (token == null) || (requesturl == null)) return null;
+
+        maintainStatistic(path);
+
+        String url = requesturl + path + "?access_token=" + token;
+        if (apiextraparam != null) url += apiextraparam;
+
+        String content = SimpleRequest.readContent(url);
+
+        if (content == null)
+        {
+            Log.d(LOGTAG, "getGraphRequest: failed=" + url);
+        }
+        else
+        {
+            Log.d(LOGTAG, "getGraphRequest: success=" + url);
+
+            if (verbose) Log.d(LOGTAG, "getGraphRequest: " + content);
+        }
+
+        return Json.fromString(content);
+    }
+
+    private Bundle getParameters(JSONObject jparams)
     {
         Bundle bparams = new Bundle();
 
@@ -156,330 +572,7 @@ public abstract class Social
         return bparams;
     }
 
-    protected abstract JSONObject getGraphCurrentUser();
-
-    @Nullable
-    public JSONObject getCurrentUser()
-    {
-        if (! isReady()) return null;
-
-        if (user == null)
-        {
-            File socialdir = Simple.getMediaPath("social");
-            File userfile = new File(socialdir, platform + ".user.json");
-
-            user = Simple.getFileJSONObject(userfile);
-
-            if (user == null)
-            {
-                user = getGraphCurrentUser();
-                Simple.putFileJSON(userfile, user);
-            }
-
-            Log.d(LOGTAG, "=================>" + Json.toPretty(user));
-        }
-
-        return user;
-    }
-
-    protected File getUserImageFile(String pfid)
-    {
-        File icon = null;
-
-        if (Simple.equals(platform, "facebook"))
-        {
-            icon = ProfileImages.getFacebookProfileImageFile(pfid);
-        }
-
-        if (Simple.equals(platform, "instagram"))
-        {
-            icon = ProfileImages.getInstagramProfileImageFile(pfid);
-        }
-
-        if (Simple.equals(platform, "googleplus"))
-        {
-            icon = ProfileImages.getGoogleplusProfileImageFile(pfid);
-        }
-
-        return icon;
-    }
-
-    protected void loadUserImageFile(String pfid)
-    {
-        if (Simple.equals(platform, "facebook"))
-        {
-            ProfileImages.getFacebookLoadProfileImage(pfid);
-        }
-
-        if (Simple.equals(platform, "instagram"))
-        {
-            ProfileImages.getInstagramLoadProfileImage(pfid);
-        }
-
-        if (Simple.equals(platform, "googleplus"))
-        {
-            ProfileImages.getGoogleplusLoadProfileImage(pfid);
-        }
-    }
-
-    protected JSONArray getOwnerFeed(JSONArray data)
-    {
-        //
-        // Add account owner as an owner feed.
-        //
-
-        JSONObject owner = new JSONObject();
-
-        String pfid = Simple.getSharedPrefString("social." + platform + ".pfid");
-        String name = Simple.getSharedPrefString("social." + platform + ".name");
-
-        if ((pfid != null) && (name != null))
-        {
-            Json.put(owner, "id", pfid);
-            Json.put(owner, "name", name);
-            Json.put(owner, "type", "owner");
-            Json.put(owner, "plat", platform);
-
-            File icon = getUserImageFile(pfid);
-            if (icon != null) Json.put(owner, "icon", icon.toString());
-
-            Json.put(data, owner);
-        }
-
-        return data;
-    }
-
-    public JSONArray getUserFeeds(boolean feedonly)
-    {
-        JSONArray data = new JSONArray();
-
-        getOwnerFeed(data);
-
-        getUserFeeds(data, "friend", feedonly);
-        getUserFeeds(data, "like", feedonly);
-
-        return data;
-    }
-
-    protected JSONArray getUserFeeds(JSONArray data, String type, boolean feedonly)
-    {
-        String modeprefix = "social." + platform + "." + type + ".mode.";
-        String nameprefix = "social." + platform + "." + type + ".name.";
-
-        Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
-
-        for (Map.Entry<String, Object> entry : friends.entrySet())
-        {
-            Object fmode = entry.getValue();
-            if (!(fmode instanceof String)) continue;
-
-            String mode = (String) fmode;
-            if (feedonly && !mode.contains("feed")) continue;
-            if (mode.equals("inactive")) continue;
-
-            String pfid = entry.getKey().substring(modeprefix.length());
-            String name = Simple.getSharedPrefString(nameprefix + pfid);
-            if (name == null) continue;
-
-            JSONObject item = new JSONObject();
-
-            Json.put(item, "id", pfid);
-            Json.put(item, "name", name);
-            Json.put(item, "type", type);
-            Json.put(item, "plat", platform);
-
-            File icon = getUserImageFile(pfid);
-            if (icon != null) Json.put(item, "icon", icon.toString());
-
-            Json.put(data, item);
-        }
-
-        return data;
-    }
-
-    @Nullable
-    public JSONArray getUserFriendlist()
-    {
-        Log.d(LOGTAG, "getUserFriendlist: not overridden.");
-        return null;
-    }
-
-    @Nullable
-    public JSONArray getUserLikeslist()
-    {
-        Log.d(LOGTAG, "getUserLikelist: not overridden.");
-        return null;
-    }
-
-    @Nullable
-    public JSONObject getPost(String postid)
-    {
-        if (postid == null) return null;
-
-        File postfile = new File(cachedir, postid + ".post.json");
-
-        if (postfile.exists())
-        {
-            return Json.fromString(Simple.getFileContent(postfile));
-        }
-
-        return getGraphPost(postid);
-    }
-
-    @Nullable
-    protected JSONObject getGraphPost(String postid)
-    {
-        Log.d(LOGTAG, "getGraphPost: not overridden.");
-        return null;
-    }
-
-    @Nullable
-    public JSONArray getFeed(String userid)
-    {
-        if (userid == null) return null;
-
-        File feedfile = new File(cachedir, userid + ".feed.json");
-
-        if (feedfile.exists())
-        {
-            return Json.fromStringArray(Simple.getFileContent(feedfile));
-        }
-
-        return getGraphFeed(userid);
-    }
-
-    protected JSONArray getGraphFeed(String userid)
-    {
-        Log.d(LOGTAG, "getGraphFeed: not overridden.");
-        return null;
-    }
-
-    public void reconfigureFriendsAndLikes()
-    {
-        if (!isLoggedIn()) return;
-
-        JSONArray friends = getUserFriendlist();
-
-        if (friends != null)
-        {
-            Map<String, Object> oldfriends = Simple.getAllPreferences("social." + platform + ".friend.");
-
-            String dfmode = Simple.getSharedPrefString("social." + platform + ".newfriends.default");
-            if (dfmode == null) dfmode = "feed+folder";
-
-            for (int inx = 0; inx < friends.length(); inx++)
-            {
-                JSONObject friend = Json.getObject(friends, inx);
-                if (friend == null) continue;
-
-                String pfid = Json.getString(friend, "id");
-                String name = Json.getString(friend, "full_name");
-                if (name == null) name = Json.getString(friend, "name");
-                if ((pfid == null) || (name == null)) continue;
-
-                String fnamepref = "social." + platform + ".friend.name." + pfid;
-                String fmodepref = "social." + platform + ".friend.mode." + pfid;
-
-                Simple.setSharedPrefString(fnamepref, name);
-
-                if (Simple.getSharedPrefString(fmodepref) == null)
-                {
-                    Simple.setSharedPrefString(fmodepref, dfmode);
-                }
-
-                loadUserImageFile(pfid);
-
-                if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
-                if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
-            }
-
-            for (Map.Entry<String, ?> entry : oldfriends.entrySet())
-            {
-                Simple.removeSharedPref(entry.getKey());
-            }
-        }
-
-        JSONArray likes = getUserLikeslist();
-
-        if (likes != null)
-        {
-            Map<String, Object> oldlikes = Simple.getAllPreferences("social." + platform + ".like.");
-
-            String dfmode = Simple.getSharedPrefString("social." + platform + ".newlikes.default");
-            if (dfmode == null) dfmode = "folder";
-
-            for (int inx = 0; inx < likes.length(); inx++)
-            {
-                JSONObject like = Json.getObject(likes, inx);
-                if (like == null) continue;
-
-                String pfid = Json.getString(like, "id");
-                String name = Json.getString(like, "full_name");
-                if (name == null) name = Json.getString(like, "name");
-                if ((pfid == null) || (name == null)) continue;
-
-                String fnamepref = "social." + platform + ".like.name." + pfid;
-                String fmodepref = "social." + platform + ".like.mode." + pfid;
-
-                Simple.setSharedPrefString(fnamepref, name);
-
-                if (Simple.getSharedPrefString(fmodepref) == null)
-                {
-                    Simple.setSharedPrefString(fmodepref, dfmode);
-                }
-
-                loadUserImageFile(pfid);
-
-                if (oldlikes.containsKey(fnamepref)) oldlikes.remove(fnamepref);
-                if (oldlikes.containsKey(fmodepref)) oldlikes.remove(fmodepref);
-            }
-
-            for (Map.Entry<String, ?> entry : oldlikes.entrySet())
-            {
-                Simple.removeSharedPref(entry.getKey());
-            }
-        }
-    }
-
-    @Nullable
-    public JSONObject getGraphRequest(String path)
-    {
-        return getGraphRequest(path, new Bundle());
-    }
-
-    @Nullable
-    public JSONObject getGraphRequest(String path, JSONObject parameters)
-    {
-        return getGraphRequest(path, getParameters(parameters));
-    }
-
-    @Nullable
-    public JSONObject getGraphRequest(String path, Bundle parameters)
-    {
-        String token = getAccessToken();
-
-        if ((path == null) || (token == null) || (apiurl == null)) return null;
-
-        maintainStatistic(path);
-
-        String url = apiurl + path + "?access_token=" + token;
-        if (apiextraparam != null) url += apiextraparam;
-
-        String content = SimpleRequest.readContent(url);
-
-        if (content == null)
-        {
-            Log.d(LOGTAG, "getGraphRequest: failed=" + url);
-        }
-        else
-        {
-            Log.d(LOGTAG, "getGraphRequest: success=" + url);
-
-            if (verbose) Log.d(LOGTAG, "getGraphRequest: " + content);
-        }
-
-        return Json.fromString(content);
-    }
+    //endregion Graph accessing methods
 
     //region Graph call statistic
 
@@ -615,6 +708,97 @@ public abstract class Social
 
     //endregion Graph call statistic
 
+    //region Reconfiguration
+
+    public void reconfigureFriendsAndLikes()
+    {
+        if (!isLoggedIn()) return;
+
+        JSONArray friends = getGraphUserFriendlist();
+
+        if (friends != null)
+        {
+            Map<String, Object> oldfriends = Simple.getAllPreferences("social." + platform + ".friend.");
+
+            String dfmode = Simple.getSharedPrefString("social." + platform + ".newfriends.default");
+            if (dfmode == null) dfmode = "feed+folder";
+
+            for (int inx = 0; inx < friends.length(); inx++)
+            {
+                JSONObject friend = Json.getObject(friends, inx);
+                if (friend == null) continue;
+
+                String pfid = Json.getString(friend, "id");
+                String name = Json.getString(friend, "full_name");
+                if (name == null) name = Json.getString(friend, "name");
+                if ((pfid == null) || (name == null)) continue;
+
+                String fnamepref = "social." + platform + ".friend.name." + pfid;
+                String fmodepref = "social." + platform + ".friend.mode." + pfid;
+
+                Simple.setSharedPrefString(fnamepref, name);
+
+                if (Simple.getSharedPrefString(fmodepref) == null)
+                {
+                    Simple.setSharedPrefString(fmodepref, dfmode);
+                }
+
+                ProfileImages.loadSocialUserImageFile(platform, pfid);
+
+                if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
+                if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
+            }
+
+            for (Map.Entry<String, ?> entry : oldfriends.entrySet())
+            {
+                Simple.removeSharedPref(entry.getKey());
+            }
+        }
+
+        JSONArray likes = getGraphUserLikeslist();
+
+        if (likes != null)
+        {
+            Map<String, Object> oldlikes = Simple.getAllPreferences("social." + platform + ".like.");
+
+            String dfmode = Simple.getSharedPrefString("social." + platform + ".newlikes.default");
+            if (dfmode == null) dfmode = "folder";
+
+            for (int inx = 0; inx < likes.length(); inx++)
+            {
+                JSONObject like = Json.getObject(likes, inx);
+                if (like == null) continue;
+
+                String pfid = Json.getString(like, "id");
+                String name = Json.getString(like, "full_name");
+                if (name == null) name = Json.getString(like, "name");
+                if ((pfid == null) || (name == null)) continue;
+
+                String fnamepref = "social." + platform + ".like.name." + pfid;
+                String fmodepref = "social." + platform + ".like.mode." + pfid;
+
+                Simple.setSharedPrefString(fnamepref, name);
+
+                if (Simple.getSharedPrefString(fmodepref) == null)
+                {
+                    Simple.setSharedPrefString(fmodepref, dfmode);
+                }
+
+                ProfileImages.loadSocialUserImageFile(platform, pfid);
+
+                if (oldlikes.containsKey(fnamepref)) oldlikes.remove(fnamepref);
+                if (oldlikes.containsKey(fmodepref)) oldlikes.remove(fmodepref);
+            }
+
+            for (Map.Entry<String, ?> entry : oldlikes.entrySet())
+            {
+                Simple.removeSharedPref(entry.getKey());
+            }
+        }
+    }
+
+    //endregion Reconfiguration
+
     //region Cache maintenance
 
     private final long totalInterval = 3600;
@@ -744,6 +928,8 @@ public abstract class Social
 
     //endregion Cache maintenance
 
+    //region Social interface
+
     public interface SocialInterface
     {
         boolean isEnabled();
@@ -753,10 +939,11 @@ public abstract class Social
         void login();
         void logout();
 
+        String getAccessExpiration();
+        String[] getAccessScope();
+
         String getUserId();
         String getUserDisplayName();
-        String getUserTokenExpiration();
-        Set<String> getUserPermissions();
 
         Drawable getProfileDrawable(String pfid, boolean circle);
 
@@ -764,5 +951,9 @@ public abstract class Social
 
         int getHourStatistic();
         int getTodayStatistic();
+
+        void getTest();
     }
+
+    //endregion Social interface
 }

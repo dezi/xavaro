@@ -672,6 +672,68 @@ public class ProfileImages
 
     //endregion Googleplus profiles
 
+    //region Social profiles
+
+    public static File getSocialUserImageFile(String platform, String pfid)
+    {
+        if (Simple.equals(platform, "facebook"))
+        {
+            return ProfileImages.getFacebookProfileImageFile(pfid);
+        }
+
+        if (Simple.equals(platform, "instagram"))
+        {
+            return ProfileImages.getInstagramProfileImageFile(pfid);
+        }
+
+        if (Simple.equals(platform, "googleplus"))
+        {
+            return ProfileImages.getGoogleplusProfileImageFile(pfid);
+        }
+
+        return null;
+    }
+
+    public static void loadSocialUserImageFile(String platform, String pfid)
+    {
+        if (Simple.equals(platform, "facebook"))
+        {
+            ProfileImages.getFacebookLoadProfileImage(pfid);
+        }
+
+        if (Simple.equals(platform, "instagram"))
+        {
+            ProfileImages.getInstagramLoadProfileImage(pfid);
+        }
+
+        if (Simple.equals(platform, "googleplus"))
+        {
+            ProfileImages.getGoogleplusLoadProfileImage(pfid);
+        }
+    }
+
+    public static Drawable getSocialProfileDrawable(String platform, String pfid, boolean circle)
+    {
+        if (Simple.equals(platform, "facebook"))
+        {
+            return ProfileImages.getFacebookProfileDrawable(pfid, circle);
+        }
+
+        if (Simple.equals(platform, "instagram"))
+        {
+            return ProfileImages.getInstagramProfileDrawable(pfid, circle);
+        }
+
+        if (Simple.equals(platform, "googleplus"))
+        {
+            return ProfileImages.getGoogleplusProfileDrawable(pfid, circle);
+        }
+
+        return null;
+    }
+
+    //endregion Social profiles
+
     private static final Map<String, Drawable> drawableCache = new HashMap<>();
 
     private static File getAnonProfileFile()

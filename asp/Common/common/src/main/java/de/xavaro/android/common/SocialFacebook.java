@@ -155,13 +155,18 @@ public class SocialFacebook extends Social implements Social.SocialInterface
     }
 
     @Override
+    public void getTest()
+    {
+    }
+
+    @Override
     protected String getAccessToken()
     {
         return null;
     }
 
     @Override
-    protected JSONObject getGraphCurrentUser()
+    protected JSONObject getGraphUserProfile()
     {
         return null;
     }
@@ -202,7 +207,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
     }
 
     @Override
-    public JSONArray getUserFriendlist()
+    protected JSONArray getGraphUserFriendlist()
     {
         JSONObject json = getGraphRequest("/" + getUserId() + "/friends");
         JSONArray data = Json.getArray(json, "data");
@@ -213,7 +218,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
     }
 
     @Override
-    public JSONArray getUserLikeslist()
+    protected JSONArray getGraphUserLikeslist()
     {
         JSONObject json = getGraphRequest("/" + getUserId() + "/likes");
         JSONArray data = Json.getArray(json, "data");
@@ -321,11 +326,5 @@ public class SocialFacebook extends Social implements Social.SocialInterface
 
             return graphresponse.getJSONObject();
         }
-    }
-
-    @Nullable
-    public Drawable getProfileDrawable(String pfid, boolean circle)
-    {
-        return ProfileImages.getFacebookProfileDrawable(pfid, true);
     }
 }
