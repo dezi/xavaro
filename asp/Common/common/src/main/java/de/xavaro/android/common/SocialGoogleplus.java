@@ -3,13 +3,12 @@ package de.xavaro.android.common;
 import android.support.annotation.Nullable;
 
 import android.app.Application;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Set;
+import java.io.File;
 
 public class SocialGoogleplus extends Social implements Social.SocialInterface
 {
@@ -49,10 +48,16 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
         return (Simple.getSharedPrefString(accesstokenpref) != null);
     }
 
-    @Nullable
-    public Set<String> getUserPermissions()
+    @Override
+    public boolean hasFriends()
     {
-        return null;
+        return true;
+    }
+
+    @Override
+    public boolean hasLikes()
+    {
+        return true;
     }
 
     @Override
@@ -68,13 +73,6 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
         }
 
         return scopeval;
-    }
-
-
-    @Nullable
-    public String getUserTokenExpiration()
-    {
-        return isLoggedIn() ? Simple.timeStampAsISO(0) : null;
     }
 
     @Nullable
@@ -121,12 +119,28 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
             // Token is expired.
             //
 
-            Log.d(LOGTAG, "getAccessToken: valid=" + validdate);
-            Log.d(LOGTAG,"getAccessToken: expired...");
+            String refreshToken = Simple.getSharedPrefString(refreshtokenpref);
+
+            Log.d(LOGTAG, "getAccessToken: expired=" + validdate);
+            Log.d(LOGTAG, "getAccessToken: refresh=" + refreshToken);
+
+            if (refreshToken == null)
+            {
+                //
+                // Recover from oauth file.
+                //
+
+                File socialdir = Simple.getMediaPath("social");
+                File oauthfile = new File(socialdir, platform + ".oauth.json");
+
+                JSONObject joauth = Simple.getFileJSONObject(oauthfile);
+                Log.d(LOGTAG, "========================>" + Json.toPretty(joauth));
+
+                refreshToken = Json.getString(joauth, "refresh_token");
+                Simple.setSharedPrefString(refreshtokenpref, refreshToken);
+            }
 
             JSONObject postdata = new JSONObject();
-
-            String refreshToken = Simple.getSharedPrefString(refreshtokenpref);
 
             Json.put(postdata, "client_id", appkey);
             Json.put(postdata, "client_secret", appsecret);
@@ -168,21 +182,20 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     @Nullable
     protected JSONArray getGraphFeed(String userid)
     {
-        return null;
+        JSONObject response = getGraphRequest("/people/" +  userid + "/activities/public");
+        return Json.getArray(response, "items");
     }
 
     @Nullable
     protected JSONObject getGraphPost(String postid)
     {
-        return null;
+        return getGraphRequest("/activities/" + postid);
     }
 
     @Override
     public void getTest()
     {
-        JSONObject response = getGraphRequest(
-                "https://www.googleapis.com/plusDomains/v1",
-                "/people/" +  getUserId() + "/circles");
+        JSONObject response = getGraphRequest("/people/" +  getUserId() + "/activities/public");
 
         Log.d(LOGTAG,"getTestDat:" + Json.toPretty(response));
     }
@@ -190,12 +203,31 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     @Override
     public JSONArray getGraphUserFriendlist()
     {
-        return null;
+        return getGraphUserList("person");
     }
 
     @Override
     public JSONArray getGraphUserLikeslist()
     {
-        return null;
+        return getGraphUserList("page");
+    }
+
+    @Nullable
+    private JSONArray getGraphUserList(String type)
+    {
+        JSONObject response = getGraphRequest("/people/" +  getUserId() + "/people/visible");
+        JSONArray items = Json.getArray(response, "items");
+        if (items == null) return null;
+
+        for (int inx = 0; inx < items.length(); inx++)
+        {
+            JSONObject item = Json.getObject(items, inx);
+            String objectType = Json.getString(item, "objectType");
+            if (Simple.equals(objectType, type)) continue;
+
+            Json.remove(items, inx--);
+        }
+
+        return items;
     }
 }

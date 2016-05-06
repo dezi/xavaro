@@ -664,6 +664,7 @@ public class CommService extends Service
 
             SocialFacebook.getInstance().commTick();
             SocialInstagram.getInstance().commTick();
+            SocialGoogleplus.getInstance().commTick();
 
             if (! checkSocket()) continue;
 

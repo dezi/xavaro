@@ -149,6 +149,18 @@ public class SocialFacebook extends Social implements Social.SocialInterface
     }
 
     @Override
+    public boolean hasFriends()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasLikes()
+    {
+        return true;
+    }
+
+    @Override
     protected String getScopeParameter()
     {
         return TextUtils.join(",", permissions);

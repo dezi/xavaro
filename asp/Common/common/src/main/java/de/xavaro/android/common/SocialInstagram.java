@@ -35,9 +35,21 @@ public class SocialInstagram extends Social implements Social.SocialInterface
         oauthurl = "https://www.instagram.com/oauth/authorize/";
         tokenurl = "https://api.instagram.com/oauth/access_token";
 
-        scopes = new String[]{ "basic", "public_content", "follower_list", "likes" };
+        scopes = new String[]{ "basic", "public_content", "follower_list" };
 
         apiurl = "https://api.instagram.com/v1";
+    }
+
+    @Override
+    public boolean hasFriends()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasLikes()
+    {
+        return false;
     }
 
     @Override

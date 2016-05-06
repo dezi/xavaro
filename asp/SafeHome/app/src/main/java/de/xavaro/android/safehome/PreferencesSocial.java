@@ -150,6 +150,8 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
 
     public void registerFriends(Context context, boolean initial)
     {
+        if (! social.hasFriends()) return;
+
         NicedPreferences.NiceInfoPreference ip;
         NicedPreferences.NiceListPreference lp;
 
@@ -215,6 +217,8 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
 
     public void registerLikes(Context context, boolean initial)
     {
+        if (! social.hasLikes()) return;
+
         NicedPreferences.NiceInfoPreference ip;
         NicedPreferences.NiceListPreference lp;
 
@@ -337,6 +341,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             if ((monitorSequence++ % 10) == 0)
             {
                 social.reconfigureFriendsAndLikes();
+
                 registerFriends(Simple.getActContext(), false);
                 registerLikes(Simple.getActContext(), false);
             }

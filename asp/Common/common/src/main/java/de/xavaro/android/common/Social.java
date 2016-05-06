@@ -61,7 +61,13 @@ public abstract class Social
         refreshtokenpref = "social." + platform + ".refreshtoken";
 
         locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
+
         cachedir = new File(Simple.getExternalCacheDir(), platform);
+
+        if (! cachedir.exists())
+        {
+            if (cachedir.mkdirs()) Log.d(LOGTAG, "Constructor: created cache:" + cachedir);
+        }
     }
 
     public boolean isEnabled()
@@ -126,7 +132,7 @@ public abstract class Social
 
         AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
 
-        builder.setNegativeButton("Abbrechenxx", null);
+        builder.setNegativeButton("Abbrechen", null);
 
         final AlertDialog dialog = builder.create();
 
@@ -227,24 +233,6 @@ public abstract class Social
         webview.getSettings().setDatabaseEnabled(false);
         webview.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-        webview.requestFocus(View.FOCUS_DOWN);
-
-        webview.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View view, MotionEvent event)
-            {
-                switch (event.getAction())
-                {
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_DOWN:
-                        if (!view.hasFocus()) view.requestFocus();
-                        break;
-                }
-                return false;
-            }
-        });
-
         frame.addView(webview);
         dummy.addView(frame);
         dialog.setView(dummy);
@@ -260,7 +248,7 @@ public abstract class Social
                 + "&scope=" + getScopeParameter()
                 + "&response_type=code"
                 + "&access_type=offline"
-                + "&approval_prompt=force";
+                + "&prompt=consent";
 
         Log.d(LOGTAG, "====>" + url);
 
@@ -730,6 +718,7 @@ public abstract class Social
 
                 String pfid = Json.getString(friend, "id");
                 String name = Json.getString(friend, "full_name");
+                if (name == null) name = Json.getString(friend, "displayName");
                 if (name == null) name = Json.getString(friend, "name");
                 if ((pfid == null) || (name == null)) continue;
 
@@ -771,6 +760,7 @@ public abstract class Social
 
                 String pfid = Json.getString(like, "id");
                 String name = Json.getString(like, "full_name");
+                if (name == null) name = Json.getString(like, "displayName");
                 if (name == null) name = Json.getString(like, "name");
                 if ((pfid == null) || (name == null)) continue;
 
@@ -807,6 +797,7 @@ public abstract class Social
     private long nextAction;
 
     private JSONArray feedList;
+    private ArrayList<String> postFiles;
 
     public void commTick()
     {
@@ -834,6 +825,25 @@ public abstract class Social
 
         if ((feedList == null) || feedList.length() == 0)
         {
+            if ((! cachedir.exists()) && cachedir.mkdirs()) Log.d(LOGTAG, "commtick: created cache");
+
+            //
+            // Remove outdated posts.
+            //
+
+            if (postFiles != null)
+            {
+                while (postFiles.size() > 0)
+                {
+                    File obsolete = new File(cachedir, postFiles.remove(0));
+                    if (obsolete.delete()) Log.d(LOGTAG, "commTick: deleted:" + obsolete);
+                }
+            }
+
+            //
+            // Get all user feeds.
+            //
+
             feedList = getUserFeeds(false);
 
             if (feedList.length() == 0)
@@ -851,6 +861,12 @@ public abstract class Social
                 if (now < (60 * 1000)) now = 60 * 1000;
 
                 nextAction = now;
+
+                //
+                // Collect all existing post files for this run.
+                //
+
+                postFiles = Simple.getDirectoryAsList(cachedir, postsfilter);
             }
 
             return;
@@ -882,18 +898,6 @@ public abstract class Social
         // Check feed stories.
         //
 
-        FilenameFilter postsfilter = new FilenameFilter()
-        {
-            @Override
-            public boolean accept(File dir, String filename)
-            {
-                return filename.startsWith(feedpfid + "_") && filename.endsWith(".post.json");
-            }
-        };
-
-        if ((! cachedir.exists()) && cachedir.mkdirs()) Log.d(LOGTAG, "commtick: created cache");
-        ArrayList<String> postfiles = Simple.getDirectoryAsList(cachedir, postsfilter);
-
         for (int inx = 0; inx < feeddata.length(); inx++)
         {
             JSONObject post = Json.getObject(feeddata, inx);
@@ -903,9 +907,9 @@ public abstract class Social
             String postname = postid + ".post.json";
             File postfile = new File(cachedir, postname);
 
-            if (postfiles.contains(postname))
+            if (postFiles.contains(postname))
             {
-                postfiles.remove(postname);
+                postFiles.remove(postname);
                 continue;
             }
 
@@ -914,17 +918,16 @@ public abstract class Social
 
             Simple.putFileContent(postfile, Json.toPretty(postdata));
         }
-
-        //
-        // Remove outdated posts.
-        //
-
-        while (postfiles.size() > 0)
-        {
-            File obsolete = new File(cachedir, postfiles.remove(0));
-            if (obsolete.delete()) Log.d(LOGTAG, "commTick: deleted:" + obsolete);
-        }
     }
+
+    private final FilenameFilter postsfilter = new FilenameFilter()
+    {
+        @Override
+        public boolean accept(File dir, String filename)
+        {
+            return filename.endsWith(".post.json");
+        }
+    };
 
     //endregion Cache maintenance
 
@@ -935,6 +938,9 @@ public abstract class Social
         boolean isEnabled();
         boolean isLoggedIn();
         boolean isReady();
+
+        boolean hasFriends();
+        boolean hasLikes();
 
         void login();
         void logout();
