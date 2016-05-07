@@ -17,109 +17,126 @@ import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VoiceIntent;
 
-public class LaunchGroupSocial
+public class LaunchGroupSocial extends LaunchGroup
 {
-    public static class FacebookGroup extends LaunchGroup
+    private static final String LOGTAG = LaunchGroupSocial.class.getSimpleName();
+
+    public LaunchGroupSocial(Context context)
     {
-        private static final String LOGTAG = FacebookGroup.class.getSimpleName();
+        super(context);
+    }
 
-        public FacebookGroup(Context context)
+    @Nullable
+    public static JSONArray getConfig()
+    {
+        JSONArray home = new JSONArray();
+        JSONArray cdir = new JSONArray();
+
+        JSONArray fbdir = new JSONArray();
+        JSONArray igdir = new JSONArray();
+        JSONArray gpdir = new JSONArray();
+
+        if (Simple.getSharedPrefBoolean("social.facebook.enable"))
         {
-            super(context);
+            configPrefs("facebook", "friend", home, fbdir, cdir);
+            configPrefs("facebook", "like", home, fbdir, cdir);
         }
 
-        @Nullable
-        public static JSONArray getConfig()
+        if (Simple.getSharedPrefBoolean("social.instagram.enable"))
         {
-            JSONArray home = new JSONArray();
-            JSONArray cdir = new JSONArray();
-            JSONArray fbdir = new JSONArray();
-            JSONArray igdir = new JSONArray();
-
-            if (Simple.getSharedPrefBoolean("social.facebook.enable"))
-            {
-                configPrefs("facebook", "friend", home, fbdir, cdir);
-                configPrefs("facebook", "like", home, fbdir, cdir);
-            }
-
-            if (Simple.getSharedPrefBoolean("social.instagram.enable"))
-            {
-                configPrefs("instagram", "friend", home, igdir, cdir);
-            }
-
-            if (fbdir.length() > 0)
-            {
-                JSONObject entry = new JSONObject();
-
-                Json.put(entry, "type", "facebook");
-                Json.put(entry, "label", "Facebook");
-                Json.put(entry, "order", 550);
-
-                Json.put(entry, "launchitems", fbdir);
-                Json.put(home, entry);
-            }
-
-            if (igdir.length() > 0)
-            {
-                JSONObject entry = new JSONObject();
-
-                Json.put(entry, "type", "instagram");
-                Json.put(entry, "label", "Instagram");
-                Json.put(entry, "order", 550);
-
-                Json.put(entry, "launchitems", igdir);
-                Json.put(home, entry);
-            }
-
-            if (cdir.length() > 0)
-            {
-                JSONObject entry = new JSONObject();
-
-                Json.put(entry, "type", "contacts");
-                Json.put(entry, "label", "Kontakte");
-                Json.put(entry, "order", 950);
-
-                Json.put(entry, "launchitems", cdir);
-                Json.put(home, entry);
-            }
-
-            return home;
+            configPrefs("instagram", "friend", home, igdir, cdir);
         }
 
-        private static void configPrefs(String platform, String type,
-                                        JSONArray home, JSONArray adir, JSONArray cdir)
+        if (Simple.getSharedPrefBoolean("social.googleplus.enable"))
         {
-            String modeprefix = "social." + platform + "." + type + ".mode.";
-            String nameprefix = "social." + platform + "." + type + ".name.";
+            configPrefs("googleplus", "friend", home, gpdir, cdir);
+            configPrefs("googleplus", "like", home, gpdir, cdir);
+        }
 
-            Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
+        if (fbdir.length() > 0)
+        {
+            JSONObject entry = new JSONObject();
 
-            for (Map.Entry<String, Object> item : friends.entrySet())
-            {
-                Object fmode = item.getValue();
+            Json.put(entry, "type", "facebook");
+            Json.put(entry, "label", "Facebook");
+            Json.put(entry, "order", 550);
 
-                if ((fmode == null) || !(fmode instanceof String)) continue;
+            Json.put(entry, "launchitems", fbdir);
+            Json.put(home, entry);
+        }
 
-                String mode = (String) fmode;
-                String pfid = item.getKey().substring(modeprefix.length());
-                String name = Simple.getSharedPrefString(nameprefix + pfid);
-                if (name == null) continue;
+        if (igdir.length() > 0)
+        {
+            JSONObject entry = new JSONObject();
 
-                JSONObject entry = new JSONObject();
+            Json.put(entry, "type", "instagram");
+            Json.put(entry, "label", "Instagram");
+            Json.put(entry, "order", 550);
 
-                Json.put(entry, "label", name);
-                Json.put(entry, "type", platform);
-                Json.put(entry, "subtype", type);
-                Json.put(entry, "pfid", pfid);
-                Json.put(entry, "order", 500);
+            Json.put(entry, "launchitems", igdir);
+            Json.put(home, entry);
+        }
 
-                if (mode.contains("home")) Json.put(home, entry);
-                if (mode.contains("home")) Json.put(adir, entry);
-                if (mode.contains("folder")) Json.put(adir, entry);
-                if (mode.contains("contacts")) Json.put(cdir, entry);
+        if (gpdir.length() > 0)
+        {
+            JSONObject entry = new JSONObject();
 
-                Log.d(LOGTAG, "Prefe:" + item.getKey() + "=id=" + pfid + "=" + name);
-            }
+            Json.put(entry, "type", "googleplus");
+            Json.put(entry, "label", "Google+");
+            Json.put(entry, "order", 550);
+
+            Json.put(entry, "launchitems", gpdir);
+            Json.put(home, entry);
+        }
+
+        if (cdir.length() > 0)
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "contacts");
+            Json.put(entry, "label", "Kontakte");
+            Json.put(entry, "order", 950);
+
+            Json.put(entry, "launchitems", cdir);
+            Json.put(home, entry);
+        }
+
+        return home;
+    }
+
+    private static void configPrefs(String platform, String type,
+                                    JSONArray home, JSONArray adir, JSONArray cdir)
+    {
+        String modeprefix = "social." + platform + "." + type + ".mode.";
+        String nameprefix = "social." + platform + "." + type + ".name.";
+
+        Map<String, Object> friends = Simple.getAllPreferences(modeprefix);
+
+        for (Map.Entry<String, Object> item : friends.entrySet())
+        {
+            Object fmode = item.getValue();
+
+            if ((fmode == null) || !(fmode instanceof String)) continue;
+
+            String mode = (String) fmode;
+            String pfid = item.getKey().substring(modeprefix.length());
+            String name = Simple.getSharedPrefString(nameprefix + pfid);
+            if (name == null) continue;
+
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "label", name);
+            Json.put(entry, "type", platform);
+            Json.put(entry, "subtype", type);
+            Json.put(entry, "pfid", pfid);
+            Json.put(entry, "order", 500);
+
+            if (mode.contains("home")) Json.put(home, entry);
+            if (mode.contains("home")) Json.put(adir, entry);
+            if (mode.contains("folder")) Json.put(adir, entry);
+            if (mode.contains("contacts")) Json.put(cdir, entry);
+
+            Log.d(LOGTAG, "Prefe:" + item.getKey() + "=id=" + pfid + "=" + name);
         }
     }
 }

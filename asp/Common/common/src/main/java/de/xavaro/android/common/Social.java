@@ -93,6 +93,12 @@ public abstract class Social
     @Nullable
     public String getAccessExpiration()
     {
+        if ((Simple.getSharedPrefString(expirationpref) != null) &&
+                Simple.getSharedPrefString(refreshtokenpref) == null)
+        {
+            return Simple.getSharedPrefString(expirationpref);
+        }
+
         return isLoggedIn() ? Simple.timeStampAsISO(0) : null;
     }
 

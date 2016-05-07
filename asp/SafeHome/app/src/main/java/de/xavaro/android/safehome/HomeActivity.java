@@ -205,8 +205,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         Simple.setActContext(this);
 
-        SocialFacebook.logEvent("HomeActivity");
-
         if (wasPaused && ! lostFocus)
         {
             //

@@ -36,6 +36,7 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
 
         oauthurl = "https://accounts.google.com/o/oauth2/v2/auth";
         tokenurl = "https://www.googleapis.com/oauth2/v4/token";
+
         scopes = new String[]{ "userinfo.profile", "plus.login", "plus.me", "plus.circles.read" };
 
         apiurl = "https://www.googleapis.com/plus/v1";

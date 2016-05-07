@@ -20,11 +20,13 @@ public class WebAppFacebook
 
     private final SocialFacebook facebook;
     private final SocialInstagram instagram;
+    private final SocialGoogleplus googleplus;
 
     public WebAppFacebook()
     {
         facebook = SocialFacebook.getInstance();
         instagram = SocialInstagram.getInstance();
+        googleplus = SocialGoogleplus.getInstance();
     }
 
     public void setTarget(String platform, String pfid, String name, String type)
@@ -44,15 +46,7 @@ public class WebAppFacebook
 
         if (plat != null)
         {
-            if (Simple.equals(plat, "facebook"))
-            {
-                icon = ProfileImages.getFacebookProfileImageFile(pfid);
-            }
-
-            if (Simple.equals(plat, "instagram"))
-            {
-                icon = ProfileImages.getFacebookProfileImageFile(pfid);
-            }
+            icon = ProfileImages.getSocialUserImageFile(plat, pfid);
 
             JSONObject target = new JSONObject();
 
@@ -72,7 +66,7 @@ public class WebAppFacebook
 
                 String actuser = facebook.getUserId();
                 String actname = facebook.getUserDisplayName();
-                icon = ProfileImages.getFacebookProfileImageFile(actuser);
+                icon = ProfileImages.getSocialUserImageFile("facebook", actuser);
 
                 Json.put(target, "id", actuser);
                 Json.put(target, "name", actname);
@@ -89,12 +83,29 @@ public class WebAppFacebook
 
                 String actuser = instagram.getUserId();
                 String actname = instagram.getUserDisplayName();
-                icon = ProfileImages.getInstagramProfileImageFile(actuser);
+                icon = ProfileImages.getSocialUserImageFile("instagram", actuser);
 
                 Json.put(target, "id", actuser);
                 Json.put(target, "name", actname);
                 Json.put(target, "type", "owner");
                 Json.put(target, "plat", "instagram" );
+                Json.put(target, "icon", (icon != null) ? icon.toString() : null);
+
+                Json.put(targets, target);
+            }
+
+            if (googleplus.isReady())
+            {
+                JSONObject target = new JSONObject();
+
+                String actuser = googleplus.getUserId();
+                String actname = googleplus.getUserDisplayName();
+                icon = ProfileImages.getSocialUserImageFile("googleplus", actuser);
+
+                Json.put(target, "id", actuser);
+                Json.put(target, "name", actname);
+                Json.put(target, "type", "owner");
+                Json.put(target, "plat", "googleplus" );
                 Json.put(target, "icon", (icon != null) ? icon.toString() : null);
 
                 Json.put(targets, target);
@@ -121,6 +132,12 @@ public class WebAppFacebook
             Json.append(allfeeds, feeds);
         }
 
+        if (googleplus.isReady())
+        {
+            JSONArray feeds = googleplus.getUserFeeds(true);
+            Json.append(allfeeds, feeds);
+        }
+
         return allfeeds.toString();
     }
 
@@ -133,6 +150,7 @@ public class WebAppFacebook
 
         if (isFacebook(platform)) post = facebook.getPost(postid);
         if (isInstagram(platform)) post = instagram.getPost(postid);
+        if (isGoogleplus(platform)) post = googleplus.getPost(postid);
 
         return (post == null) ? "{}" : post.toString();
     }
@@ -146,6 +164,7 @@ public class WebAppFacebook
 
         if (isFacebook(platform)) feed = facebook.getFeed(userid);
         if (isInstagram(platform)) feed = instagram.getFeed(userid);
+        if (isGoogleplus(platform)) feed = googleplus.getFeed(userid);
 
         return (feed == null) ? "[]" : feed.toString();
     }
@@ -165,6 +184,7 @@ public class WebAppFacebook
 
         if (isFacebook(platform)) response = facebook.getGraphRequest(edge, jparams);
         if (isInstagram(platform)) response = instagram.getGraphRequest(edge, jparams);
+        if (isGoogleplus(platform)) response = googleplus.getGraphRequest(edge, jparams);
 
         return (response == null) ? "{}" : response.toString();
     }
@@ -180,6 +200,7 @@ public class WebAppFacebook
     {
         if ((platform == null) || isFacebook(platform)) facebook.setVerbose(yesno);
         if ((platform == null) || isInstagram(platform)) instagram.setVerbose(yesno);
+        if ((platform == null) || isGoogleplus(platform)) googleplus.setVerbose(yesno);
     }
 
     private boolean isFacebook(String platform)
@@ -190,5 +211,10 @@ public class WebAppFacebook
     private boolean isInstagram(String platform)
     {
         return Simple.equals(platform, "instagram");
+    }
+
+    private boolean isGoogleplus(String platform)
+    {
+        return Simple.equals(platform, "googleplus");
     }
 }

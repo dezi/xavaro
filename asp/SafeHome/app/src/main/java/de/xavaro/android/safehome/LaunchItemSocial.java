@@ -6,9 +6,9 @@ import android.widget.ImageView;
 import java.io.File;
 
 import de.xavaro.android.common.CommonConfigs;
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.Json;
 
 public class LaunchItemSocial extends LaunchItem
 {
@@ -29,7 +29,7 @@ public class LaunchItemSocial extends LaunchItem
             if (config.has("pfid"))
             {
                 String pfid = Json.getString(config, "pfid");
-                File profile = ProfileImages.getFacebookProfileImageFile(pfid);
+                File profile = ProfileImages.getSocialUserImageFile("facebook", pfid);
 
                 if (profile != null)
                 {
@@ -50,7 +50,7 @@ public class LaunchItemSocial extends LaunchItem
             if (config.has("pfid"))
             {
                 String pfid = Json.getString(config, "pfid");
-                File profile = ProfileImages.getInstagramProfileImageFile(pfid);
+                File profile = ProfileImages.getSocialUserImageFile("instagram", pfid);
 
                 if (profile != null)
                 {
@@ -63,6 +63,27 @@ public class LaunchItemSocial extends LaunchItem
             else
             {
                 icon.setImageResource(CommonConfigs.IconResSocialInstagram);
+            }
+        }
+
+        if (type.equals("googleplus"))
+        {
+            if (config.has("pfid"))
+            {
+                String pfid = Json.getString(config, "pfid");
+                File profile = ProfileImages.getSocialUserImageFile("googleplus", pfid);
+
+                if (profile != null)
+                {
+                    icon.setImageResource(profile.toString(), false);
+                    targetIcon = overicon;
+                }
+
+                targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
+            }
+            else
+            {
+                icon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
             }
         }
 
@@ -113,7 +134,7 @@ public class LaunchItemSocial extends LaunchItem
 
         if (directory == null)
         {
-            directory = new LaunchGroupSocial.FacebookGroup(context);
+            directory = new LaunchGroupSocial(context);
             directory.setConfig(this, Json.getArray(config, "launchitems"));
         }
 

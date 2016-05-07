@@ -266,8 +266,6 @@ public class ChatActivity extends AppCompatActivity implements
         super.onResume();
 
         Simple.setActContext(this);
-
-        SocialFacebook.logEvent("ChatActivity");
     }
 
     @Override

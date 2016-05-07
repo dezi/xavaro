@@ -34,8 +34,6 @@ public class SettingsActivity extends PreferenceActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         Log.d(LOGTAG, "onActivityResult");
-
-        SocialFacebook.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -75,8 +73,6 @@ public class SettingsActivity extends PreferenceActivity
         super.onResume();
 
         Simple.setActContext(this);
-
-        SocialFacebook.logEvent("SettingsActivity");
     }
 
     @Override
