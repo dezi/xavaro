@@ -248,10 +248,12 @@ public abstract class Social
         // Fire up auth url in dialog.
         //
 
+        String scopes = getScopeParameter();
+
         String url = oauthurl
                 + "?client_id=" + appkey
                 + "&redirect_uri=" + appurl
-                + "&scope=" + getScopeParameter()
+                + ((scopes != null) ? "&scope=" + scopes : "")
                 + "&response_type=code"
                 + "&access_type=offline"
                 + "&prompt=consent";

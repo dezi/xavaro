@@ -1,41 +1,38 @@
 package de.xavaro.android.common;
 
-import android.support.annotation.Nullable;
-
 import android.app.Application;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class SocialInstagram extends Social implements Social.SocialInterface
+public class SocialTwitter extends Social implements Social.SocialInterface
 {
-    private static final String LOGTAG = SocialInstagram.class.getSimpleName();
-    private static SocialInstagram instance;
+    private static final String LOGTAG = SocialTwitter.class.getSimpleName();
+    private static SocialTwitter instance;
 
     public static void initialize()
     {
         if (instance != null) return;
-        instance = new SocialInstagram();
+        instance = new SocialTwitter();
     }
 
-    public static SocialInstagram getInstance()
+    public static SocialTwitter getInstance()
     {
         return instance;
     }
 
-    public SocialInstagram()
+    public SocialTwitter()
     {
-        super("instagram");
+        super("twitter");
 
-        appurl = "http://www.xavaro.de/instagram";
-        appkey = "63afb3307ec24f4886230f44d2fda884";
-        appsecret = "ab19aa46d88f4fb9a433f6d6cc1d4df3";
+        appurl = "http://www.xavaro.de/twitter";
+        appkey = "ECWy6Av3vqdx9yUzQE6euMuTJ";
+        appsecret = "LN4kGTVrmqlw2pyUg11nJme8LoehJSGP2PkiRi6Ae7mPqBjDOw";
 
-        oauthurl = "https://www.instagram.com/oauth/authorize/";
-        tokenurl = "https://api.instagram.com/oauth/access_token";
-
-        scopes = new String[]{ "basic", "public_content", "follower_list" };
+        oauthurl = " https://api.twitter.com/oauth/authorize";
+        tokenurl = "https://api.twitter.com/oauth/access_token";
 
         apiurl = "https://api.instagram.com/v1";
     }
@@ -55,7 +52,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     @Override
     protected String getScopeParameter()
     {
-        return TextUtils.join("+", scopes);
+        return null;
     }
 
     @Override

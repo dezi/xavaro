@@ -1,7 +1,6 @@
 package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
-import android.app.Application;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,7 +14,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
 
     private static SocialFacebook instance;
 
-    public static void initialize(Application app)
+    public static void initialize()
     {
         if (instance != null) return;
         instance = new SocialFacebook();

@@ -15,7 +15,7 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     private static final String LOGTAG = SocialGoogleplus.class.getSimpleName();
     private static SocialGoogleplus instance;
 
-    public static void initialize(Application app)
+    public static void initialize()
     {
         if (instance != null) return;
         instance = new SocialGoogleplus();

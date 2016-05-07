@@ -129,9 +129,10 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesCommXavaro.getHeader());
 
         category = new Header();
-        category.title = "Social Media";
+        category.title = "Social Networks";
         target.add(category);
 
+        target.add(PreferencesSocialTwitter.getHeader());
         target.add(PreferencesSocialFacebook.getHeader());
         target.add(PreferencesSocialInstagram.getHeader());
         target.add(PreferencesSocialGoogleplus.getHeader());

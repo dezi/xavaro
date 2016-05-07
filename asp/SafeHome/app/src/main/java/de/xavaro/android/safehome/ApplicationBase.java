@@ -9,6 +9,7 @@ import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SocialGoogleplus;
 import de.xavaro.android.common.SocialInstagram;
+import de.xavaro.android.common.SocialTwitter;
 import de.xavaro.android.common.WebCookie;
 
 public class ApplicationBase extends Application
@@ -54,9 +55,10 @@ public class ApplicationBase extends Application
         // Initialize social plugin.
         //
 
-        SocialFacebook.initialize(this);
-        SocialInstagram.initialize(this);
-        SocialGoogleplus.initialize(this);
+        SocialTwitter.initialize();
+        SocialFacebook.initialize();
+        SocialInstagram.initialize();
+        SocialGoogleplus.initialize();
     }
 
     public final Runnable setFontScale = new Runnable()

@@ -402,6 +402,13 @@
         <item>Folder</item>
     </string-array>
 
+    <string name="pref_social_twitter">Twitter</string>
+    <string name="pref_social_twitter_enable">Enable Twitter</string>
+    <string name="pref_social_twitter_summary">todo</string>
+    <string name="pref_social_twitter_account_summary">todo</string>
+    <string name="pref_social_twitter_friends_summary">todo</string>
+    <string name="pref_social_twitter_likes_summary">todo</string>
+
     <string name="pref_social_facebook">Facebook</string>
     <string name="pref_social_facebook_enable">Enable Facebook</string>
     <string name="pref_social_facebook_summary">todo</string>
