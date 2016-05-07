@@ -5,13 +5,12 @@ import android.annotation.SuppressLint;
 
 import android.app.AlertDialog;
 import android.graphics.drawable.Drawable;
+import android.util.Base64;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.view.MotionEvent;
-import android.view.View;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,9 +20,19 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public abstract class Social
 {
@@ -46,7 +55,7 @@ public abstract class Social
     protected String[] scopes;
 
     protected String apiurl;
-    protected String apiextraparam;
+    protected Bundle apiextraparam;
 
     protected JSONObject user;
     protected boolean verbose;
@@ -490,8 +499,11 @@ public abstract class Social
 
         maintainStatistic(path);
 
-        String url = requesturl + path + "?access_token=" + token;
-        if (apiextraparam != null) url += apiextraparam;
+        if (parameters == null) parameters = new Bundle();
+        if (apiextraparam != null) parameters.putAll(apiextraparam);
+        parameters.putString("access_token", token);
+
+        String url = requesturl + path + getQueryString(parameters);
 
         String content = SimpleRequest.readContent(url);
 
@@ -507,6 +519,27 @@ public abstract class Social
         }
 
         return Json.fromString(content);
+    }
+
+    private String getQueryString(Bundle parameters)
+    {
+        String query = "";
+
+        if (parameters != null)
+        {
+            Set<String> keys = parameters.keySet();
+
+            for (String key : keys)
+            {
+                Object obj = parameters.get(key);
+                if (obj == null) continue;
+
+                query += (query.length() == 0) ? "?" : "&";
+                query += Simple.getUrlEncoded(key) + "=" + Simple.getUrlEncoded(obj.toString());
+            }
+        }
+
+        return query;
     }
 
     private Bundle getParameters(JSONObject jparams)
@@ -566,6 +599,105 @@ public abstract class Social
         }
 
         return bparams;
+    }
+
+    @Nullable
+    private Bundle getSignedOAuthParams(String method, String url, Bundle parameters)
+    {
+        if (parameters == null) parameters = new Bundle();
+
+        String nonce = UUID.randomUUID().toString().replace("-", "");
+        String timst = "" + (Simple.nowAsTimeStamp() / 1000);
+
+        parameters.putString("oauth_version", "1.0");
+        parameters.putString("oauth_consumer_key", appkey);
+        parameters.putString("oauth_signature_method", "HMAC-SHA1");
+        parameters.putString("oauth_timestamp", timst);
+        parameters.putString("oauth_nonce", nonce);
+
+        //
+        // Sort shit for checksum.
+        //
+
+        List<String> sorted = new ArrayList<String>(parameters.keySet());
+        Collections.sort(sorted);
+
+        //
+        // Build sorted query string.
+        //
+
+        String querystring = "";
+
+        for (String key : sorted)
+        {
+            if (querystring.length() > 0) querystring += "&";
+
+            querystring += Simple.getUrlEncoded(key) + "=";
+            querystring += Simple.getUrlEncoded("" + parameters.get(key));
+        }
+
+        // Build signature string.
+        //
+
+        String basestring = method.toUpperCase();
+        basestring += "&" + Simple.getUrlEncoded(url);
+        basestring += "&" + Simple.getUrlEncoded(querystring);
+
+        String keystring = Simple.getUrlEncoded(appsecret) + "&";
+        if (getAccessToken() != null) keystring += Simple.getUrlEncoded(getAccessToken());
+
+        String signature = computeSignature(basestring, keystring);
+
+        Log.d(LOGTAG,"getSignedOAuth: base=" + basestring);
+        Log.d(LOGTAG,"getSignedOAuth: keys=" + keystring);
+        Log.d(LOGTAG,"getSignedOAuth: sign=" + signature);
+
+        parameters.putString("oauth_signature", signature);
+
+        return parameters;
+    }
+
+    @Nullable
+    private String getSignedOAuthHeader(Bundle parameters)
+    {
+        String header = "OAuth ";
+
+        List<String> detach = new ArrayList<String>(parameters.keySet());
+
+        for (String key : detach)
+        {
+            if (! key.startsWith("oauth_")) continue;
+
+            if (! header.equals("OAuth ")) header += ", ";
+
+            header += key + "=" + "\"" + parameters.get(key) + "\"";
+
+            parameters.remove(key);
+        }
+
+        return header;
+    }
+
+    @Nullable
+    private String computeSignature(String baseString, String keyString)
+    {
+        try
+        {
+            byte[] keyBytes = keyString.getBytes();
+            SecretKey secretKey = new SecretKeySpec(keyBytes, "HmacSHA1");
+
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(secretKey);
+
+            byte[] text = baseString.getBytes();
+            return Base64.encodeToString(mac.doFinal(text), 0).trim();
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
     }
 
     //endregion Graph accessing methods

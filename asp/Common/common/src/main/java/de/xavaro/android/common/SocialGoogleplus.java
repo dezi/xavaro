@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import android.app.Application;
@@ -40,7 +41,9 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
         scopes = new String[]{ "userinfo.profile", "plus.login", "plus.me", "plus.circles.read" };
 
         apiurl = "https://www.googleapis.com/plus/v1";
-        apiextraparam = "&prettyPrint=true";
+
+        apiextraparam = new Bundle();
+        apiextraparam.putString("prettyPrint", "true");
     }
 
     @Override

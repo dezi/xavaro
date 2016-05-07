@@ -39,6 +39,9 @@ public class SocialFacebook extends Social implements Social.SocialInterface
         scopes = new String[]{ "public_profile", "user_friends", "user_likes", "user_posts" };
 
         apiurl = "https://graph.facebook.com/v2.6";
+
+        apiextraparam = new Bundle();
+        apiextraparam.putString("locale", locale);
     }
 
     @Override

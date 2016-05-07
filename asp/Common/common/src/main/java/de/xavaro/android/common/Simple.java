@@ -66,6 +66,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
@@ -1428,6 +1429,22 @@ public class Simple
         if (bytes == null) return null;
 
         return getHexBytesToString(bytes, 0, bytes.length);
+    }
+
+    @Nullable
+    public static String getUrlEncoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return URLEncoder.encode(str, "UTF-8");
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
     }
 
     public static String getHexBytesToString(byte[] bytes, int offset, int length)
