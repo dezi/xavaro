@@ -194,12 +194,8 @@ WebLibSocial.getPostImgs = function(platform, post)
 
 WebLibSocial.getPostSuitable = function(platform, post)
 {
-    if (platform == "facebook")
-    {
-        return (post.attachments != null);
-    }
-
-    return true;
+    var imgs = WebLibSocial.getPostImgs(platform, post);
+    return imgs.length > 0;
 }
 
 

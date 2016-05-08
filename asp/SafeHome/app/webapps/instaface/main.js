@@ -73,6 +73,10 @@ instaface.displayPost = function(plat, post)
     var ic = instaface;
 
     var postdiv = WebLibSimple.createAnyAppend("div", ic.contentscoll);
+    postdiv.style.position  = "relative";
+    postdiv.style.margin  = "16px";
+    postdiv.style.padding = "16px";
+    postdiv.style.border = "1px solid black";
 
     var date = WebLibSocial.getPostDate(plat, post);
     var name = WebLibSocial.getPostName(plat, post);
@@ -96,7 +100,7 @@ instaface.displayPost = function(plat, post)
 
 instaface.createConts = function()
 {
-    for (var inx = 0; inx < 10; inx++)
+    for (var inx = 0; inx < 20; inx++)
     {
         instaface.retrieveBestPost();
     }
@@ -136,10 +140,7 @@ instaface.retrieveBestPost = function()
                 //
 
                 var post = JSON.parse(WebAppSocial.getPost(feed.plat, postid));
-
                 var suitable = WebLibSocial.getPostSuitable(feed.plat, post);
-
-                console.log("===>" + postid + "=" + postdate + "=" + suitable);
 
                 if (suitable)
                 {
@@ -149,14 +150,18 @@ instaface.retrieveBestPost = function()
                     candipost = post;
                     candidate = postdate;
 
-                    console.log("===>picked" + postid + "=" + postdate + "=" + suitable);
-
                     //
                     // Continue with next feed.
                     //
 
                     break;
                 }
+
+                //
+                // Remove post from feed.
+                //
+
+                data.splice(pinx--, 1);
             }
         }
     }
