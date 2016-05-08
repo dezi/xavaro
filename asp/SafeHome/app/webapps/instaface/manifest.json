@@ -8,9 +8,9 @@
     "events": false,
 
     "permissions": [
+      "social",
       "request",
-      "utility",
-      "facebook"
+      "utility"
     ],
 
     "weblibs": [

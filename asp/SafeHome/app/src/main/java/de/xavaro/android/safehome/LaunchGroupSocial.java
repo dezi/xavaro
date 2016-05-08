@@ -35,6 +35,7 @@ public class LaunchGroupSocial extends LaunchGroup
         JSONArray fbdir = new JSONArray();
         JSONArray igdir = new JSONArray();
         JSONArray gpdir = new JSONArray();
+        JSONArray twdir = new JSONArray();
 
         if (Simple.getSharedPrefBoolean("social.facebook.enable"))
         {
@@ -51,6 +52,24 @@ public class LaunchGroupSocial extends LaunchGroup
         {
             configPrefs("googleplus", "friend", home, gpdir, cdir);
             configPrefs("googleplus", "like", home, gpdir, cdir);
+        }
+
+        if (Simple.getSharedPrefBoolean("social.twitter.enable"))
+        {
+            configPrefs("twitter", "friend", home, twdir, cdir);
+            configPrefs("twitter", "like", home, twdir, cdir);
+        }
+
+        if (twdir.length() > 0)
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "twitter");
+            Json.put(entry, "label", "Twitter");
+            Json.put(entry, "order", 550);
+
+            Json.put(entry, "launchitems", twdir);
+            Json.put(home, entry);
         }
 
         if (fbdir.length() > 0)

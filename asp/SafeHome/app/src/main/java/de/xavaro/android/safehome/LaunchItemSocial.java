@@ -24,6 +24,23 @@ public class LaunchItemSocial extends LaunchItem
     {
         ImageView targetIcon = icon;
 
+        if (type.equals("twitter"))
+        {
+            if (config.has("pfid"))
+            {
+                String pfid = Json.getString(config, "pfid");
+                File profile = ProfileImages.getSocialUserImageFile("twitter", pfid);
+
+                if (profile != null)
+                {
+                    icon.setImageResource(profile.toString(), false);
+                    targetIcon = overicon;
+                }
+            }
+
+            targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
+        }
+
         if (type.equals("facebook"))
         {
             if (config.has("pfid"))
@@ -36,13 +53,9 @@ public class LaunchItemSocial extends LaunchItem
                     icon.setImageResource(profile.toString(), false);
                     targetIcon = overicon;
                 }
+            }
 
-                targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
-            }
-            else
-            {
-                icon.setImageResource(CommonConfigs.IconResSocialFacebook);
-            }
+            targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
         }
 
         if (type.equals("instagram"))
@@ -57,13 +70,9 @@ public class LaunchItemSocial extends LaunchItem
                     icon.setImageResource(profile.toString(), false);
                     targetIcon = overicon;
                 }
+            }
 
-                targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
-            }
-            else
-            {
-                icon.setImageResource(CommonConfigs.IconResSocialInstagram);
-            }
+            targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
         }
 
         if (type.equals("googleplus"))
@@ -78,13 +87,9 @@ public class LaunchItemSocial extends LaunchItem
                     icon.setImageResource(profile.toString(), false);
                     targetIcon = overicon;
                 }
+            }
 
-                targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
-            }
-            else
-            {
-                icon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
-            }
+            targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
         }
 
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
@@ -117,14 +122,14 @@ public class LaunchItemSocial extends LaunchItem
             webappFrame.setWebAppName("instaface");
             webappFrame.setParent(this);
 
-            if (webappFrame.getWebAppView().facebook != null)
+            if (webappFrame.getWebAppView().social != null)
             {
                 String plat = Json.getString(config, "type");
                 String pfid = Json.getString(config, "pfid");
                 String name = Json.getString(config, "label");
                 String type = Json.getString(config, "subtype");
 
-                webappFrame.getWebAppView().facebook.setTarget(plat, pfid, name, type);
+                webappFrame.getWebAppView().social.setTarget(plat, pfid, name, type);
             }
 
             ((HomeActivity) context).addViewToBackStack(webappFrame);

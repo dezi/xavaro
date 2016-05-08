@@ -9,9 +9,9 @@ import org.json.JSONObject;
 import java.io.File;
 
 @SuppressWarnings("unused")
-public class WebAppFacebook
+public class WebAppSocial
 {
-    private static final String LOGTAG = WebAppFacebook.class.getSimpleName();
+    private static final String LOGTAG = WebAppSocial.class.getSimpleName();
 
     private String plat;
     private String pfid;
@@ -22,7 +22,7 @@ public class WebAppFacebook
     private final SocialInstagram instagram;
     private final SocialGoogleplus googleplus;
 
-    public WebAppFacebook()
+    public WebAppSocial()
     {
         facebook = SocialFacebook.getInstance();
         instagram = SocialInstagram.getInstance();

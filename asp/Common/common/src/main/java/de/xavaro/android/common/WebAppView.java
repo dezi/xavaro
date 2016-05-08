@@ -25,6 +25,7 @@ public class WebAppView extends WebView
     public WebAppPrefs prefs;
     public WebAppSpeak speak;
     public WebAppMedia media;
+    public WebAppSocial social;
     public WebAppEvents events;
     public WebAppHealth health;
     public WebAppPrices prices;
@@ -32,7 +33,6 @@ public class WebAppView extends WebView
     public WebAppRequest request;
     public WebAppUtility utility;
     public WebAppStorage storage;
-    public WebAppFacebook facebook;
     public WebAppActivity activity;
     public WebAppIntercept intercept;
     public WebAppAssistance assistance;
@@ -129,10 +129,10 @@ public class WebAppView extends WebView
             addJavascriptInterface(activity, "WebAppActivity");
         }
 
-        if (permissions.contains("facebook"))
+        if (permissions.contains("social"))
         {
-            facebook = new WebAppFacebook();
-            addJavascriptInterface(facebook, "WebAppFacebook");
+            social = new WebAppSocial();
+            addJavascriptInterface(social, "WebAppSocial");
         }
 
         if (permissions.contains("weather"))

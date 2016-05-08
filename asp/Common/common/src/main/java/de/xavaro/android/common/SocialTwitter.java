@@ -99,6 +99,7 @@ public class SocialTwitter extends Social implements Social.SocialInterface
         }
 
         String iconurl = Json.getString(userdata, "profile_image_url");
+        if (iconurl != null) iconurl = iconurl.replace("_normal.", "_400x400.");
         return SimpleRequest.readData(iconurl);
     }
 
