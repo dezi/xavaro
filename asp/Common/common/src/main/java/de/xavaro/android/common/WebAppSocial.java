@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
 import android.webkit.JavascriptInterface;
 import android.util.Log;
 
@@ -7,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public class WebAppSocial
@@ -18,15 +20,28 @@ public class WebAppSocial
     private String name;
     private String type;
 
-    private final SocialFacebook facebook;
-    private final SocialInstagram instagram;
-    private final SocialGoogleplus googleplus;
+    private final ArrayList<Social.SocialInterface> platforms = new ArrayList<>();
 
     public WebAppSocial()
     {
-        facebook = SocialFacebook.getInstance();
-        instagram = SocialInstagram.getInstance();
-        googleplus = SocialGoogleplus.getInstance();
+        platforms.add(SocialTwitter.getInstance());
+        platforms.add(SocialFacebook.getInstance());
+        platforms.add(SocialInstagram.getInstance());
+        platforms.add(SocialGoogleplus.getInstance());
+    }
+
+    @Nullable
+    public Social.SocialInterface getPlatform(String name)
+    {
+        for (Social.SocialInterface platform : platforms)
+        {
+            if (Simple.equals(name, platform.getPlatform()))
+            {
+                return platform;
+            }
+        }
+
+        return null;
     }
 
     public void setTarget(String platform, String pfid, String name, String type)
@@ -42,11 +57,9 @@ public class WebAppSocial
     {
         JSONArray targets = new JSONArray();
 
-        File icon = null;
-
         if (plat != null)
         {
-            icon = ProfileImages.getSocialUserImageFile(plat, pfid);
+            File icon = ProfileImages.getSocialUserImageFile(plat, pfid);
 
             JSONObject target = new JSONObject();
 
@@ -60,55 +73,24 @@ public class WebAppSocial
         }
         else
         {
-            if (facebook.isReady())
+            for (Social.SocialInterface platform : platforms)
             {
-                JSONObject target = new JSONObject();
+                if (platform.isReady())
+                {
+                    JSONObject target = new JSONObject();
 
-                String actuser = facebook.getUserId();
-                String actname = facebook.getUserDisplayName();
-                icon = ProfileImages.getSocialUserImageFile("facebook", actuser);
+                    String actuser = platform.getUserId();
+                    String actname = platform.getUserDisplayName();
+                    File icon = ProfileImages.getSocialUserImageFile("facebook", actuser);
 
-                Json.put(target, "id", actuser);
-                Json.put(target, "name", actname);
-                Json.put(target, "type", "owner");
-                Json.put(target, "plat", "facebook" );
-                Json.put(target, "icon", (icon != null) ? icon.toString() : null);
+                    Json.put(target, "id", actuser);
+                    Json.put(target, "name", actname);
+                    Json.put(target, "type", "owner");
+                    Json.put(target, "plat", platform.getPlatform());
+                    Json.put(target, "icon", (icon != null) ? icon.toString() : null);
 
-                Json.put(targets, target);
-            }
-
-            if (instagram.isReady())
-            {
-                JSONObject target = new JSONObject();
-
-                String actuser = instagram.getUserId();
-                String actname = instagram.getUserDisplayName();
-                icon = ProfileImages.getSocialUserImageFile("instagram", actuser);
-
-                Json.put(target, "id", actuser);
-                Json.put(target, "name", actname);
-                Json.put(target, "type", "owner");
-                Json.put(target, "plat", "instagram" );
-                Json.put(target, "icon", (icon != null) ? icon.toString() : null);
-
-                Json.put(targets, target);
-            }
-
-            if (googleplus.isReady())
-            {
-                JSONObject target = new JSONObject();
-
-                String actuser = googleplus.getUserId();
-                String actname = googleplus.getUserDisplayName();
-                icon = ProfileImages.getSocialUserImageFile("googleplus", actuser);
-
-                Json.put(target, "id", actuser);
-                Json.put(target, "name", actname);
-                Json.put(target, "type", "owner");
-                Json.put(target, "plat", "googleplus" );
-                Json.put(target, "icon", (icon != null) ? icon.toString() : null);
-
-                Json.put(targets, target);
+                    Json.put(targets, target);
+                }
             }
         }
 
@@ -120,22 +102,13 @@ public class WebAppSocial
     {
         JSONArray allfeeds = new JSONArray();
 
-        if (facebook.isReady())
+        for (Social.SocialInterface platform : platforms)
         {
-            JSONArray feeds = facebook.getUserFeeds(true);
-            Json.append(allfeeds, feeds);
-        }
-
-        if (instagram.isReady())
-        {
-            JSONArray feeds = instagram.getUserFeeds(true);
-            Json.append(allfeeds, feeds);
-        }
-
-        if (googleplus.isReady())
-        {
-            JSONArray feeds = googleplus.getUserFeeds(true);
-            Json.append(allfeeds, feeds);
+            if (platform.isReady())
+            {
+                JSONArray feeds = platform.getUserFeeds(true);
+                Json.append(allfeeds, feeds);
+            }
         }
 
         return allfeeds.toString();
@@ -148,9 +121,8 @@ public class WebAppSocial
 
         JSONObject post = null;
 
-        if (isFacebook(platform)) post = facebook.getPost(postid);
-        if (isInstagram(platform)) post = instagram.getPost(postid);
-        if (isGoogleplus(platform)) post = googleplus.getPost(postid);
+        Social.SocialInterface socialplatform = getPlatform(platform);
+        if (socialplatform != null) post = socialplatform.getPost(postid);
 
         return (post == null) ? "{}" : post.toString();
     }
@@ -162,9 +134,8 @@ public class WebAppSocial
 
         JSONArray feed = null;
 
-        if (isFacebook(platform)) feed = facebook.getFeed(userid);
-        if (isInstagram(platform)) feed = instagram.getFeed(userid);
-        if (isGoogleplus(platform)) feed = googleplus.getFeed(userid);
+        Social.SocialInterface socialplatform = getPlatform(platform);
+        if (socialplatform != null) feed = socialplatform.getFeed(userid);
 
         return (feed == null) ? "[]" : feed.toString();
     }
@@ -182,9 +153,8 @@ public class WebAppSocial
 
         JSONObject response = null;
 
-        if (isFacebook(platform)) response = facebook.getGraphRequest(edge, jparams);
-        if (isInstagram(platform)) response = instagram.getGraphRequest(edge, jparams);
-        if (isGoogleplus(platform)) response = googleplus.getGraphRequest(edge, jparams);
+        Social.SocialInterface socialplatform = getPlatform(platform);
+        if (socialplatform != null) response = socialplatform.getGraphRequest(edge, jparams);
 
         return (response == null) ? "{}" : response.toString();
     }
@@ -198,23 +168,12 @@ public class WebAppSocial
     @JavascriptInterface
     public void setVerbose(String platform, boolean yesno)
     {
-        if ((platform == null) || isFacebook(platform)) facebook.setVerbose(yesno);
-        if ((platform == null) || isInstagram(platform)) instagram.setVerbose(yesno);
-        if ((platform == null) || isGoogleplus(platform)) googleplus.setVerbose(yesno);
-    }
-
-    private boolean isFacebook(String platform)
-    {
-        return Simple.equals(platform, "facebook");
-    }
-
-    private boolean isInstagram(String platform)
-    {
-        return Simple.equals(platform, "instagram");
-    }
-
-    private boolean isGoogleplus(String platform)
-    {
-        return Simple.equals(platform, "googleplus");
+        for (Social.SocialInterface socialplatform : platforms)
+        {
+            if ((platform == null) || (Simple.equals(platform, socialplatform.getPlatform())))
+            {
+                socialplatform.setVerbose(yesno);
+            }
+        }
     }
 }

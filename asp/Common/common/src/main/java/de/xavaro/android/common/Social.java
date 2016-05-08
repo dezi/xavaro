@@ -115,6 +115,12 @@ public abstract class Social
     }
 
     @Nullable
+    public String getPlatform()
+    {
+        return platform;
+    }
+
+    @Nullable
     public String[] getAccessScope()
     {
         return scopes;
@@ -1220,11 +1226,20 @@ public abstract class Social
         void login();
         void logout();
 
+        void setVerbose(boolean yesno);
+
         String getAccessExpiration();
         String[] getAccessScope();
 
+        String getPlatform();
         String getUserId();
         String getUserDisplayName();
+
+        JSONArray getUserFeeds(boolean feedonly);
+
+        JSONObject getPost(String postid);
+        JSONArray getFeed(String userid);
+        JSONObject getGraphRequest(String path, JSONObject params);
 
         Drawable getProfileDrawable(String pfid, boolean circle);
 

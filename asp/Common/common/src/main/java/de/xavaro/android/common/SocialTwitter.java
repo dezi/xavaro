@@ -194,7 +194,7 @@ public class SocialTwitter extends Social implements Social.SocialInterface
         params.putString("count", "20");
         params.putString("contributor_details", "true");
 
-        JSONObject response = getGraphRequest("/statuses/user_timeline.json");
+        JSONObject response = getGraphRequest("/statuses/user_timeline.json", params);
         return Json.getArray(response, "data");
     }
 

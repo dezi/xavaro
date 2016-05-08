@@ -21,7 +21,8 @@ instaface.createTest = function()
 
     if (ic.feed.length > 0)
     {
-        var postid = ic.feed[ 0 ].id;
+        var postid = ic.feed[ 0 ].id_str ? ic.feed[ 0 ].id_str : ic.feed[ 0 ].id;
+        
         var platform = ic.targets[ 0 ].plat;
         ic.post = JSON.parse(WebAppSocial.getPost(platform, postid));
 
