@@ -1,8 +1,10 @@
 package de.xavaro.android.common;
 
 import android.app.Application;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,7 +36,10 @@ public class SocialTwitter extends Social implements Social.SocialInterface
         oauthurl = " https://api.twitter.com/oauth/authorize";
         tokenurl = "https://api.twitter.com/oauth/access_token";
 
-        apiurl = "https://api.instagram.com/v1";
+        apiurl = "https://api.twitter.com/1.1";
+
+        apioauth10 = true;
+        apisigned = true;
     }
 
     @Override
@@ -46,7 +51,7 @@ public class SocialTwitter extends Social implements Social.SocialInterface
     @Override
     public boolean hasLikes()
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -58,6 +63,8 @@ public class SocialTwitter extends Social implements Social.SocialInterface
     @Override
     public void getTest()
     {
+        JSONObject response = getGraphRequest("/account/verify_credentials.json");
+        Log.d(LOGTAG, "====>" + Json.toPretty(response));
     }
 
     //region User profile
@@ -66,14 +73,14 @@ public class SocialTwitter extends Social implements Social.SocialInterface
     public String getUserId()
     {
         JSONObject userdata = getUserProfile();
-        return Json.getString(userdata, "id");
+        return Json.getString(userdata, "id_str");
     }
 
     @Nullable
     public String getUserDisplayName()
     {
         JSONObject userdata = getUserProfile();
-        return Json.getString(userdata, "full_name");
+        return Json.getString(userdata, "name");
     }
 
     @Nullable
@@ -83,12 +90,12 @@ public class SocialTwitter extends Social implements Social.SocialInterface
 
         JSONObject userdata = getUserProfile();
 
-        if ((userdata == null) || ! Simple.equals(pfid, Json.getString(userdata, "username")))
+        if ((userdata == null) || ! Simple.equals(pfid, Json.getString(userdata, "id_str")))
         {
             userdata = getGraphUserProfile(pfid);
         }
 
-        String iconurl = Json.getString(userdata, "profile_picture");
+        String iconurl = Json.getString(userdata, "profile_image_url");
         return SimpleRequest.readData(iconurl);
     }
 
@@ -99,30 +106,71 @@ public class SocialTwitter extends Social implements Social.SocialInterface
     @Nullable
     protected JSONObject getGraphUserProfile()
     {
-        if (! isReady()) return null;
+        if (!isReady()) return null;
 
-        JSONObject response = getGraphRequest("/users/self");
-        return Json.getObject(response, "data");
+        return getGraphRequest("/account/verify_credentials.json");
     }
 
     @Nullable
     protected JSONObject getGraphUserProfile(String pfid)
     {
-        JSONObject response = getGraphRequest("/users/" + pfid);
-        return Json.getObject(response, "data");
+        Bundle params = new Bundle();
+
+        params.putString("user_id", pfid);
+
+        return getGraphRequest("/users/show.json", params);
     }
 
     @Override
     protected JSONArray getGraphUserFriendlist()
     {
-        JSONObject response = getGraphRequest("/users/self/follows");
-        return Json.getArray(response, "data");
+        Bundle params = new Bundle();
+
+        params.putString("user_id", getUserId());
+        params.putString("skip_status", "true");
+
+        JSONObject response = getGraphRequest("/friends/list.json", params);
+        JSONArray users = Json.getArray(response, "users");
+
+        if (users != null)
+        {
+            for (int inx = 0; inx < users.length(); inx++)
+            {
+                JSONObject user = Json.getObject(users, inx);
+                if (user == null) continue;
+
+                int followers = Json.getInt(user, "followers_count");
+                if (followers >= 10000) Json.remove(users, inx--);
+            }
+        }
+
+        return users;
     }
 
     @Override
     protected JSONArray getGraphUserLikeslist()
     {
-        return null;
+        Bundle params = new Bundle();
+
+        params.putString("user_id", getUserId());
+        params.putString("skip_status", "true");
+
+        JSONObject response = getGraphRequest("/friends/list.json", params);
+        JSONArray users = Json.getArray(response, "users");
+
+        if (users != null)
+        {
+            for (int inx = 0; inx < users.length(); inx++)
+            {
+                JSONObject user = Json.getObject(users, inx);
+                if (user == null) continue;
+
+                int followers = Json.getInt(user, "followers_count");
+                if (followers < 10000) Json.remove(users, inx--);
+            }
+        }
+
+        return users;
     }
 
     @Override

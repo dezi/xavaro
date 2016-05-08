@@ -33,7 +33,8 @@ public class PreferencesSocialTwitter extends PreferencesSocial
 
         accountSummary = R.string.pref_social_twitter_account_summary;
         friendsSummary = R.string.pref_social_twitter_friends_summary;
-
+        likesSummary = R.string.pref_social_twitter_likes_summary;
+        
         social = SocialTwitter.getInstance();
     }
 }

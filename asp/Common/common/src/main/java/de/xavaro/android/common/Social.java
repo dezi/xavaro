@@ -43,6 +43,7 @@ public abstract class Social
 
     protected final String expirationpref;
     protected final String accesstokenpref;
+    protected final String accesssecretpref;
     protected final String refreshtokenpref;
 
     protected String appurl;
@@ -56,6 +57,8 @@ public abstract class Social
 
     protected String apiurl;
     protected Bundle apiextraparam;
+    protected boolean apisigned;
+    protected boolean apioauth10;
 
     protected JSONObject user;
     protected boolean verbose;
@@ -67,6 +70,7 @@ public abstract class Social
 
         expirationpref = "social." + platform + ".expiration";
         accesstokenpref = "social." + platform + ".accesstoken";
+        accesssecretpref = "social." + platform + ".accesssecret";
         refreshtokenpref = "social." + platform + ".refreshtoken";
 
         locale = Simple.getLocaleLanguage() + "_" + Simple.getLocaleCountry();
@@ -124,6 +128,12 @@ public abstract class Social
     }
 
     @Nullable
+    protected String getAccessSecret()
+    {
+        return Simple.getSharedPrefString(accesssecretpref);
+    }
+
+    @Nullable
     public Drawable getProfileDrawable(String pfid, boolean circle)
     {
         return ProfileImages.getSocialProfileDrawable(platform, pfid, circle);
@@ -166,44 +176,82 @@ public abstract class Social
                 if (url.startsWith(appurl))
                 {
                     Uri uri = Uri.parse(url);
+
                     String code = uri.getQueryParameter("code");
+                    String oauth_token = uri.getQueryParameter("oauth_token");
+                    String oauth_verifier = uri.getQueryParameter("oauth_verifier");
 
-                    Log.d(LOGTAG, "shouldOverrideUrlLoading: code=" + code);
-
-                    JSONObject postdata = new JSONObject();
-
-                    Json.put(postdata, "code", code);
-                    Json.put(postdata, "client_id", appkey);
-                    Json.put(postdata, "client_secret", appsecret);
-                    Json.put(postdata, "redirect_uri", appurl);
-                    Json.put(postdata, "grant_type", "authorization_code");
-
-                    String content = SimpleRequest.readContent(tokenurl, postdata);
-
-                    Log.d(LOGTAG, "=====>" + content);
-
-                    if (content != null)
+                    if (code != null)
                     {
-                        JSONObject jcontent = Json.fromString(content);
+                        Log.d(LOGTAG, "shouldOverrideUrlLoading: code=" + code);
 
-                        String accessToken = Json.getString(jcontent, "access_token");
-                        Simple.setSharedPrefString(accesstokenpref, accessToken);
+                        JSONObject postdata = new JSONObject();
 
-                        if (Json.has(jcontent, "expires_in"))
+                        Json.put(postdata, "code", code);
+                        Json.put(postdata, "client_id", appkey);
+                        Json.put(postdata, "client_secret", appsecret);
+                        Json.put(postdata, "redirect_uri", appurl);
+                        Json.put(postdata, "grant_type", "authorization_code");
+
+                        String content = SimpleRequest.readContent(tokenurl, postdata);
+
+                        Log.d(LOGTAG, "=====>" + content);
+
+                        if (content != null)
                         {
-                            int expiseconds = Json.getInt(jcontent, "expires_in");
-                            long expiration = Simple.nowAsTimeStamp() + (expiseconds - 10) * 1000;
-                            Simple.setSharedPrefString(expirationpref, Simple.timeStampAsISO(expiration));
+                            JSONObject jcontent = Json.fromString(content);
+
+                            String accessToken = Json.getString(jcontent, "access_token");
+                            Simple.setSharedPrefString(accesstokenpref, accessToken);
+
+                            if (Json.has(jcontent, "expires_in"))
+                            {
+                                int expiseconds = Json.getInt(jcontent, "expires_in");
+                                long expiration = Simple.nowAsTimeStamp() + (expiseconds - 10) * 1000;
+                                Simple.setSharedPrefString(expirationpref, Simple.timeStampAsISO(expiration));
+                            }
+
+                            if (Json.has(jcontent, "refresh_token"))
+                            {
+                                String refreshToken = Json.getString(jcontent, "refresh_token");
+                                Simple.setSharedPrefString(refreshtokenpref, refreshToken);
+
+                                File socialdir = Simple.getMediaPath("social");
+                                File oauthfile = new File(socialdir, platform + ".oauth.json");
+                                Simple.putFileContent(oauthfile, content);
+                            }
                         }
+                    }
 
-                        if (Json.has(jcontent, "refresh_token"))
+                    if ((oauth_token != null) && (oauth_verifier != null))
+                    {
+                        Log.d(LOGTAG, "shouldOverrideUrlLoading: oauth_token="
+                                + oauth_token + " => " + oauth_verifier);
+
+                        Bundle params = new Bundle();
+                        params.putString("oauth_token", oauth_token);
+                        params.putString("oauth_verifier", oauth_verifier);
+
+                        params = getSignedOAuthParams("POST", tokenurl, params);
+                        String oauth = getSignedOAuthHeader(params);
+
+                        Log.d(LOGTAG, "==============oauth=" + oauth);
+                        String content = SimpleRequest.readContent(tokenurl, oauth, new JSONObject());
+                        Log.d(LOGTAG, "==============content=" + content);
+
+                        if (content != null)
                         {
-                            String refreshToken = Json.getString(jcontent, "refresh_token");
-                            Simple.setSharedPrefString(refreshtokenpref, refreshToken);
+                            JSONObject jcontent = getQuery(content);
 
                             File socialdir = Simple.getMediaPath("social");
                             File oauthfile = new File(socialdir, platform + ".oauth.json");
-                            Simple.putFileContent(oauthfile, content);
+                            Simple.putFileJSON(oauthfile, jcontent);
+
+                            String accessToken = Json.getString(jcontent, "oauth_token");
+                            Simple.setSharedPrefString(accesstokenpref, accessToken);
+
+                            String accessSecret = Json.getString(jcontent, "oauth_token_secret");
+                            Simple.setSharedPrefString(accesssecretpref, accessSecret);
                         }
                     }
 
@@ -254,6 +302,32 @@ public abstract class Social
         dialog.show();
 
         //
+        // Get base token.
+        //
+
+        String oauth_token = null;
+
+        if (apioauth10)
+        {
+            String url = "https://api.twitter.com/oauth/request_token";
+            Bundle params = new Bundle();
+            params.putString("oauth_callback", appurl);
+
+            params = getSignedOAuthParams("POST", url, params);
+            String oauth = getSignedOAuthHeader(params);
+
+            Log.d(LOGTAG, "==============oauth=" + oauth);
+            String content = SimpleRequest.readContent(url, oauth, new JSONObject());
+            Log.d(LOGTAG, "==============content=" + content);
+
+            if (content != null)
+            {
+                JSONObject query = getQuery(content);
+                oauth_token = Json.getString(query, "oauth_token");
+            }
+        }
+
+        //
         // Fire up auth url in dialog.
         //
 
@@ -263,6 +337,7 @@ public abstract class Social
                 + "?client_id=" + appkey
                 + "&redirect_uri=" + appurl
                 + ((scopes != null) ? "&scope=" + scopes : "")
+                + ((oauth_token != null) ? "&oauth_token=" + oauth_token : "")
                 + "&response_type=code"
                 + "&access_type=offline"
                 + "&prompt=consent";
@@ -314,6 +389,28 @@ public abstract class Social
                 cookieManager.setCookie(domain, cookieparts[ 0 ].trim() + expire);
             }
         }
+    }
+
+    protected JSONObject getQuery(String querystr)
+    {
+        JSONObject jquery = new JSONObject();
+
+        if (querystr != null)
+        {
+            String[] parts = querystr.split("&");
+
+            for (String part : parts)
+            {
+                String[] pparts = part.split("=");
+                if (pparts.length != 2) continue;
+
+                Json.put(jquery,
+                        Simple.getUrlDecoded(pparts[ 0 ]),
+                        Simple.getUrlDecoded(pparts[ 1 ]));
+            }
+        }
+
+        return jquery;
     }
 
     //endregion Login and logout
@@ -501,11 +598,32 @@ public abstract class Social
 
         if (parameters == null) parameters = new Bundle();
         if (apiextraparam != null) parameters.putAll(apiextraparam);
-        parameters.putString("access_token", token);
 
-        String url = requesturl + path + getQueryString(parameters);
+        String url = null;
+        String content = null;
 
-        String content = SimpleRequest.readContent(url);
+        if (apisigned)
+        {
+            parameters.putString("oauth_token", token);
+
+            url = requesturl + path;
+
+            parameters = getSignedOAuthParams("GET", url, parameters);
+            String oauth = getSignedOAuthHeader(parameters);
+
+            url += getQueryString(parameters);
+
+            Log.d(LOGTAG, "==============oauth=" + oauth);
+            content = SimpleRequest.readContent(url, oauth);
+        }
+        else
+        {
+            parameters.putString("access_token", token);
+
+            url = requesturl + path + getQueryString(parameters);
+
+            content = SimpleRequest.readContent(url);
+        }
 
         if (content == null)
         {
@@ -542,7 +660,7 @@ public abstract class Social
         return query;
     }
 
-    private Bundle getParameters(JSONObject jparams)
+    protected Bundle getParameters(JSONObject jparams)
     {
         Bundle bparams = new Bundle();
 
@@ -602,7 +720,7 @@ public abstract class Social
     }
 
     @Nullable
-    private Bundle getSignedOAuthParams(String method, String url, Bundle parameters)
+    protected Bundle getSignedOAuthParams(String method, String url, Bundle parameters)
     {
         if (parameters == null) parameters = new Bundle();
 
@@ -619,7 +737,7 @@ public abstract class Social
         // Sort shit for checksum.
         //
 
-        List<String> sorted = new ArrayList<String>(parameters.keySet());
+        List<String> sorted = new ArrayList<>(parameters.keySet());
         Collections.sort(sorted);
 
         //
@@ -644,7 +762,7 @@ public abstract class Social
         basestring += "&" + Simple.getUrlEncoded(querystring);
 
         String keystring = Simple.getUrlEncoded(appsecret) + "&";
-        if (getAccessToken() != null) keystring += Simple.getUrlEncoded(getAccessToken());
+        if (getAccessToken() != null) keystring += Simple.getUrlEncoded(getAccessSecret());
 
         String signature = computeSignature(basestring, keystring);
 
@@ -658,19 +776,20 @@ public abstract class Social
     }
 
     @Nullable
-    private String getSignedOAuthHeader(Bundle parameters)
+    protected String getSignedOAuthHeader(Bundle parameters)
     {
         String header = "OAuth ";
 
-        List<String> detach = new ArrayList<String>(parameters.keySet());
+        List<String> sorted = new ArrayList<>(parameters.keySet());
+        Collections.sort(sorted);
 
-        for (String key : detach)
+        for (String key : sorted)
         {
             if (! key.startsWith("oauth_")) continue;
 
             if (! header.equals("OAuth ")) header += ", ";
 
-            header += key + "=" + "\"" + parameters.get(key) + "\"";
+            header += key + "=" + "\"" + Simple.getUrlEncoded("" + parameters.get(key)) + "\"";
 
             parameters.remove(key);
         }
@@ -857,9 +976,12 @@ public abstract class Social
                 if (friend == null) continue;
 
                 String pfid = Json.getString(friend, "id");
+                if (pfid == null) pfid = Json.getString(friend, "id_str");
+
                 String name = Json.getString(friend, "full_name");
                 if (name == null) name = Json.getString(friend, "displayName");
                 if (name == null) name = Json.getString(friend, "name");
+
                 if ((pfid == null) || (name == null)) continue;
 
                 String fnamepref = "social." + platform + ".friend.name." + pfid;
@@ -899,9 +1021,12 @@ public abstract class Social
                 if (like == null) continue;
 
                 String pfid = Json.getString(like, "id");
+                if (pfid == null) pfid = Json.getString(like, "id_str");
+
                 String name = Json.getString(like, "full_name");
                 if (name == null) name = Json.getString(like, "displayName");
                 if (name == null) name = Json.getString(like, "name");
+
                 if ((pfid == null) || (name == null)) continue;
 
                 String fnamepref = "social." + platform + ".like.name." + pfid;

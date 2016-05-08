@@ -672,6 +672,67 @@ public class ProfileImages
 
     //endregion Googleplus profiles
 
+    //region Twitter profiles
+
+    public static File getTwitterProfileImageFile(String twitterid)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "twitter.image." + twitterid + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    public static File getTwitterProfileFile(String twitterid)
+    {
+        if (twitterid == null) return null;
+
+        File imagefile = getTwitterProfileImageFile(twitterid);
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    public static void getTwitterLoadProfileImage(String twitterid)
+    {
+        if (twitterid == null) return;
+
+        File imagefile = getTwitterProfileImageFile(twitterid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, SocialTwitter.getInstance().getUserIconData(twitterid));
+        }
+    }
+
+    @Nullable
+    public static Bitmap getTwitterProfileBitmap(String twitterid, boolean circle)
+    {
+        if (twitterid == null) return null;
+
+        File imagefile = getTwitterProfileImageFile(twitterid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, SocialTwitter.getInstance().getUserIconData(twitterid));
+        }
+
+        if (imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Drawable getTwitterProfileDrawable(String twitterid, boolean circle)
+    {
+        return Simple.getDrawable(getTwitterProfileBitmap(twitterid, circle));
+    }
+
+    //endregion Twitter profiles
+
     //region Social profiles
 
     public static File getSocialUserImageFile(String platform, String pfid)
@@ -689,6 +750,11 @@ public class ProfileImages
         if (Simple.equals(platform, "googleplus"))
         {
             return ProfileImages.getGoogleplusProfileImageFile(pfid);
+        }
+
+        if (Simple.equals(platform, "twitter"))
+        {
+            return ProfileImages.getTwitterProfileImageFile(pfid);
         }
 
         return null;
@@ -710,6 +776,11 @@ public class ProfileImages
         {
             ProfileImages.getGoogleplusLoadProfileImage(pfid);
         }
+
+        if (Simple.equals(platform, "twitter"))
+        {
+            ProfileImages.getTwitterLoadProfileImage(pfid);
+        }
     }
 
     public static Drawable getSocialProfileDrawable(String platform, String pfid, boolean circle)
@@ -727,6 +798,11 @@ public class ProfileImages
         if (Simple.equals(platform, "googleplus"))
         {
             return ProfileImages.getGoogleplusProfileDrawable(pfid, circle);
+        }
+
+        if (Simple.equals(platform, "twitter"))
+        {
+            return ProfileImages.getTwitterProfileDrawable(pfid, circle);
         }
 
         return null;

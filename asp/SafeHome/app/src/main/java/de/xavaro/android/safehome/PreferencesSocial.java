@@ -107,7 +107,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
         }
 
         dp = new NicedPreferences.NiceDisplayTextPreference(context);
-        dp.setTitle(social.isLoggedIn() ? "Etwas testen" : "Nix machen");
+        dp.setTitle("Etwas testen");
         dp.setEnabled(enabled);
 
         dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
@@ -115,8 +115,6 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             @Override
             public boolean onPreferenceClick(Preference preference)
             {
-                //Log.d(LOGTAG, "Permissions=" + social.getUserPermissions());
-
                 social.getTest();
 
                 return false;
@@ -338,6 +336,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
                 apicallsPref.setText(hourcount + "/" + todaycount);
             }
 
+            /*
             if ((monitorSequence++ % 10) == 0)
             {
                 social.reconfigureFriendsAndLikes();
@@ -345,6 +344,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
                 registerFriends(Simple.getActContext(), false);
                 registerLikes(Simple.getActContext(), false);
             }
+            */
 
             Simple.makePost(monitorPrefs, 1000);
         }

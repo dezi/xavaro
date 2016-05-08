@@ -66,6 +66,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -1439,6 +1440,22 @@ public class Simple
         try
         {
             return URLEncoder.encode(str, "UTF-8");
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getUrlDecoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return URLDecoder.decode(str, "UTF-8");
         }
         catch (Exception ignore)
         {

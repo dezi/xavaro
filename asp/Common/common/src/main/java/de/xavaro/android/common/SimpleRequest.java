@@ -357,11 +357,23 @@ public class SimpleRequest
     @Nullable
     public static String readContent(String url)
     {
-        return readContent(url, null);
+        return readContent(url, null, null);
+    }
+
+    @Nullable
+    public static String readContent(String url, String oauth)
+    {
+        return readContent(url, oauth, null);
     }
 
     @Nullable
     public static String readContent(String url, JSONObject post)
+    {
+        return readContent(url, null, post);
+    }
+
+    @Nullable
+    public static String readContent(String url, String oauth, JSONObject post)
     {
         if (url == null) return null;
 
@@ -373,6 +385,12 @@ public class SimpleRequest
             connection.setDoInput(true);
 
             connection.setRequestMethod((post == null) ? "GET" : "POST");
+
+            if (oauth != null)
+            {
+                connection.setRequestProperty("Authorization", oauth);
+                Log.d(LOGTAG, "readContent: Authorization: " + oauth);
+            }
 
             if (post != null)
             {
