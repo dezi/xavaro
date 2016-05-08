@@ -189,8 +189,6 @@ WebLibSocial.getPostImgs = function(platform, post)
         }
     }
 
-    console.log("have images..." + JSON.stringify(images));
-
     return images;
 }
 

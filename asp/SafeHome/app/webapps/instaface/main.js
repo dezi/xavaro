@@ -149,6 +149,8 @@ instaface.retrieveBestPost = function()
                     candipost = post;
                     candidate = postdate;
 
+                    console.log("===>picked" + postid + "=" + postdate + "=" + suitable);
+
                     //
                     // Continue with next feed.
                     //
@@ -165,7 +167,7 @@ instaface.retrieveBestPost = function()
         // Remove post from feed data.
         //
 
-        candifeed.splice(pinx, 1);
+        candifeed.splice(candipinx, 1);
 
         instaface.displayPost(ic.feeds[ candifinx ].plat, candipost);
     }
