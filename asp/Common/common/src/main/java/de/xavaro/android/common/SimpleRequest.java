@@ -386,11 +386,7 @@ public class SimpleRequest
 
             connection.setRequestMethod((post == null) ? "GET" : "POST");
 
-            if (oauth != null)
-            {
-                connection.setRequestProperty("Authorization", oauth);
-                Log.d(LOGTAG, "readContent: Authorization: " + oauth);
-            }
+            if (oauth != null) connection.setRequestProperty("Authorization", oauth);
 
             if (post != null)
             {
@@ -405,12 +401,10 @@ public class SimpleRequest
                     if (val == null) continue;
 
                     payload += ((payload.length() > 0) ? "&" : "")
-                        + URLEncoder.encode(key, "UTF-8")
+                        + Simple.getUrlEncoded(key)
                         + "="
-                        + URLEncoder.encode(val, "UTF-8");
+                        + Simple.getUrlEncoded(val);
                 }
-
-                Log.d(LOGTAG, "======================payload=" + payload);
 
                 connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 connection.setRequestProperty("Content-Length", "" + payload.getBytes().length);
@@ -427,7 +421,11 @@ public class SimpleRequest
                 connection.connect();
             }
 
-            Log.d(LOGTAG, "readContent:" + connection.getResponseCode() + "=" + connection.getResponseMessage());
+            int httpres = connection.getResponseCode();
+            String httpmsg = connection.getResponseMessage();
+
+            Log.d(LOGTAG, "readContent:" + httpres + "=" + httpmsg);
+            if ((httpres >= 400) && (httpres <= 499)) return null;
 
             InputStream input = connection.getInputStream();
             StringBuilder string = new StringBuilder();

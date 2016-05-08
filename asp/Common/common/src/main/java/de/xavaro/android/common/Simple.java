@@ -2173,6 +2173,13 @@ public class Simple
         return df.format(new Date(getTimeStamp(isodate)));
     }
 
+    public static String getLocalDateInternal(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(new Date(timeStamp));
+    }
+
     public static String getLocalDate(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());

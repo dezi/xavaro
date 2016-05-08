@@ -1,9 +1,8 @@
 package de.xavaro.android.common;
 
-import android.app.Application;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
+
+import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -40,6 +39,10 @@ public class SocialTwitter extends Social implements Social.SocialInterface
 
         apioauth10 = true;
         apisigned = true;
+
+        apifeedhasposts = true;
+
+        windowSecs = 15 * 60;
     }
 
     @Override
@@ -176,8 +179,7 @@ public class SocialTwitter extends Social implements Social.SocialInterface
     @Override
     protected JSONObject getGraphPost(String postid)
     {
-        JSONObject response = getGraphRequest("/media/" + postid);
-        return Json.getObject(response, "data");
+        return null;
     }
 
     @Override
@@ -185,7 +187,13 @@ public class SocialTwitter extends Social implements Social.SocialInterface
     {
         if (userid == null) return null;
 
-        JSONObject response = getGraphRequest("/users/" + userid  + "/media/recent");
+        Bundle params = new Bundle();
+
+        params.putString("user_id", userid);
+        params.putString("count", "20");
+        params.putString("contributor_details", "true");
+
+        JSONObject response = getGraphRequest("/statuses/user_timeline.json");
         return Json.getArray(response, "data");
     }
 

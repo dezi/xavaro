@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 
 import android.app.AlertDialog;
 import android.graphics.drawable.Drawable;
-import android.util.Base64;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -13,6 +12,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -20,8 +20,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Array;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -59,6 +57,7 @@ public abstract class Social
     protected Bundle apiextraparam;
     protected boolean apisigned;
     protected boolean apioauth10;
+    protected boolean apifeedhasposts;
 
     protected JSONObject user;
     protected boolean verbose;
@@ -634,6 +633,14 @@ public abstract class Social
             Log.d(LOGTAG, "getGraphRequest: success=" + url);
 
             if (verbose) Log.d(LOGTAG, "getGraphRequest: " + content);
+
+            if (content.trim().startsWith("["))
+            {
+                JSONArray array = Json.fromStringArray(content);
+                JSONObject object = new JSONObject();
+                Json.put(object, "data", array);
+                return object;
+            }
         }
 
         return Json.fromString(content);
@@ -823,13 +830,13 @@ public abstract class Social
 
     //region Graph call statistic
 
-    public int getHourStatistic()
+    public int getWindowStatistic()
     {
         getStorage();
 
         synchronized (LOGTAG)
         {
-            JSONArray hour = Json.getArray(statData, "hour");
+            JSONArray hour = Json.getArray(statData, "window");
             return (hour == null) ? 0 : hour.length();
         }
     }
@@ -840,12 +847,13 @@ public abstract class Social
 
         synchronized (LOGTAG)
         {
-            int today = Json.getInt(statData, Simple.getLocalDate(Simple.nowAsTimeStamp()));
-            JSONArray hour = Json.getArray(statData, "hour");
+            int today = Json.getInt(statData, Simple.getLocalDateInternal(Simple.nowAsTimeStamp()));
+            JSONArray hour = Json.getArray(statData, "window");
             return (hour == null) ? today : (today  + hour.length());
         }
     }
 
+    protected int windowSecs = 3600;
     protected JSONObject statData;
     protected boolean statDirty;
 
@@ -853,7 +861,7 @@ public abstract class Social
     {
         getStorage();
 
-        JSONArray hour = Json.getArray(statData, "hour");
+        JSONArray hour = Json.getArray(statData, "window");
         JSONObject stat = new JSONObject();
 
         Json.put(stat, "dst", Simple.nowAsISO());
@@ -884,22 +892,22 @@ public abstract class Social
     protected void removeOutdated()
     {
         long now = Simple.nowAsTimeStamp();
-        String out = Simple.timeStampAsISO(now - (3600 * 1000));
+        String out = Simple.timeStampAsISO(now - (windowSecs * 1000));
 
-        if (! Json.has(statData, "hour")) Json.put(statData, "hour", new JSONArray());
+        if (! Json.has(statData, "window")) Json.put(statData, "window", new JSONArray());
 
-        JSONArray hour = Json.getArray(statData, "hour");
+        JSONArray window = Json.getArray(statData, "window");
 
-        String today = Simple.getLocalDate(Simple.nowAsTimeStamp());
+        String today = Simple.getLocalDateInternal(Simple.nowAsTimeStamp());
 
-        while ((hour != null) && (hour.length() > 0))
+        while ((window != null) && (window.length() > 0))
         {
-            JSONObject old = Json.getObject(hour, 0);
+            JSONObject old = Json.getObject(window, 0);
             String dst = Json.getString(old, "dst");
 
             if ((dst == null) || (dst.compareTo(out) < 0))
             {
-                hour.remove(0);
+                window.remove(0);
 
                 Json.put(statData, today, Json.getInt(statData, today) + 1);
             }
@@ -1166,7 +1174,9 @@ public abstract class Social
         for (int inx = 0; inx < feeddata.length(); inx++)
         {
             JSONObject post = Json.getObject(feeddata, inx);
+
             String postid = Json.getString(post, "id");
+            if (postid == null) postid = Json.getString(post, "id_str");
             if (postid == null) continue;
 
             String postname = postid + ".post.json";
@@ -1178,7 +1188,7 @@ public abstract class Social
                 continue;
             }
 
-            JSONObject postdata = getGraphPost(postid);
+            JSONObject postdata = apifeedhasposts ? post : getGraphPost(postid);
             if (postdata == null) continue;
 
             Simple.putFileContent(postfile, Json.toPretty(postdata));
@@ -1220,7 +1230,7 @@ public abstract class Social
 
         void reconfigureFriendsAndLikes();
 
-        int getHourStatistic();
+        int getWindowStatistic();
         int getTodayStatistic();
 
         void getTest();

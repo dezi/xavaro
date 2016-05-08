@@ -330,13 +330,12 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
 
             if (apicallsPref != null)
             {
-                int hourcount = social.getHourStatistic();
+                int windowcount = social.getWindowStatistic();
                 int todaycount = social.getTodayStatistic();
 
-                apicallsPref.setText(hourcount + "/" + todaycount);
+                apicallsPref.setText(windowcount + "/" + todaycount);
             }
 
-            /*
             if ((monitorSequence++ % 10) == 0)
             {
                 social.reconfigureFriendsAndLikes();
@@ -344,7 +343,6 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
                 registerFriends(Simple.getActContext(), false);
                 registerLikes(Simple.getActContext(), false);
             }
-            */
 
             Simple.makePost(monitorPrefs, 1000);
         }
