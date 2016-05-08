@@ -129,7 +129,7 @@ public class LaunchItemSocial extends LaunchItem
                 String name = Json.getString(config, "label");
                 String type = Json.getString(config, "subtype");
 
-                webappFrame.getWebAppView().social.setTarget(plat, pfid, name, type);
+                webappFrame.getWebAppView().social.setPlatform(plat, pfid, name, type);
             }
 
             ((HomeActivity) context).addViewToBackStack(webappFrame);

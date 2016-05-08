@@ -44,7 +44,7 @@ public class WebAppSocial
         return null;
     }
 
-    public void setTarget(String platform, String pfid, String name, String type)
+    public void setPlatform(String platform, String pfid, String name, String type)
     {
         this.plat = platform;
         this.pfid = pfid;
@@ -53,7 +53,7 @@ public class WebAppSocial
     }
 
     @JavascriptInterface
-    public String getTargets()
+    public String getPlatforms()
     {
         JSONArray targets = new JSONArray();
 
@@ -112,6 +112,22 @@ public class WebAppSocial
         }
 
         return allfeeds.toString();
+    }
+
+    @JavascriptInterface
+    public String getUserFeeds(String platform)
+    {
+        JSONArray allfeeds = new JSONArray();
+
+        for (Social.SocialInterface socialplatform : platforms)
+        {
+            if (socialplatform.isReady() && Simple.equals(platform, socialplatform.getPlatform()))
+            {
+                allfeeds = socialplatform.getUserFeeds(true);
+            }
+        }
+
+        return (allfeeds == null) ? "[]" : allfeeds.toString();
     }
 
     @JavascriptInterface

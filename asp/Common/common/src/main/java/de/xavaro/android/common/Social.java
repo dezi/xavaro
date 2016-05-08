@@ -531,7 +531,10 @@ public abstract class Social
             return Json.fromString(Simple.getFileContent(postfile));
         }
 
-        return getGraphPost(postid);
+        JSONObject post = getGraphPost(postid);
+        Simple.putFileJSON(postfile, post);
+
+        return post;
     }
 
     @Nullable

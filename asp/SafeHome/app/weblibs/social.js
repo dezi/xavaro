@@ -1,0 +1,5 @@
+//
+// Social utility library.
+//
+
+WebLibSocial = {};

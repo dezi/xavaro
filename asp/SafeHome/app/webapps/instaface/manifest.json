@@ -14,9 +14,10 @@
     ],
 
     "weblibs": [
-      "simple",
       "touch",
+      "simple",
       "strings",
+      "social",
       "dialog"
     ],
 
