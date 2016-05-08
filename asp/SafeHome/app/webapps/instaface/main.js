@@ -5,13 +5,12 @@ instaface.createFrame = function()
     ic.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
     ic.topdiv.style.overflow = "hidden";
 
-    ic.contentdiv = WebLibSimple.createDiv(0, 0, 0, "50%", "contentdiv", ic.topdiv);
+    ic.contentdiv = WebLibSimple.createDiv(0, 0, 0, 0, "contentdiv", ic.topdiv);
     ic.contentdiv.style.overflow = "hidden";
-    ic.contentscoll = WebLibSimple.createDivHeight(0, 0, 0, null, "contentscoll", ic.contentdiv);
-    ic.contentscoll.scrollVertical = true;
 
+    ic.contentscoll = WebLibSimple.createDivHeight(0, 0, 0, null, "contentscoll", ic.contentdiv);
     WebLibSimple.setBGColor(ic.contentscoll, "#dddddddd");
-    ic.contentscoll.innerHTML = "bla";
+    ic.contentscoll.scrollVertical = true;
 }
 
 instaface.createFeeds = function()
@@ -67,9 +66,116 @@ instaface.createFeeds = function()
     }
 }
 
+instaface.postDivs = [];
+
+instaface.displayPost = function(plat, post)
+{
+    var ic = instaface;
+
+    var postdiv = WebLibSimple.createAnyAppend("div", ic.contentscoll);
+
+    var date = WebLibSocial.getPostDate(plat, post);
+    var name = WebLibSocial.getPostName(plat, post);
+    var text = WebLibSocial.getPostText(plat, post);
+    var imgs = WebLibSocial.getPostImgs(plat, post);
+
+    var namediv = WebLibSimple.createAnyAppend("div", postdiv);
+    namediv.innerHTML = WebLibSimple.getNiceDate(date) + " => " + name;
+
+    var textdiv = WebLibSimple.createAnyAppend("div", postdiv);
+    textdiv.innerHTML = text;
+
+    var imgsdiv = WebLibSimple.createAnyAppend("div", postdiv);
+
+    for (var inx = 0; inx < imgs.length; inx++)
+    {
+        var imgtag = WebLibSimple.createAnyAppend("img", imgsdiv);
+        imgtag.src = imgs[ inx ].src ? imgs[ inx ].src : imgs[ inx ].url;
+    }
+}
+
+instaface.createConts = function()
+{
+    for (var inx = 0; inx < 10; inx++)
+    {
+        instaface.retrieveBestPost();
+    }
+}
+
+instaface.retrieveBestPost = function()
+{
+    //
+    // Loop over all feeds and find the most recent
+    // and suitable post.
+    //
+
+    var ic = instaface;
+
+    var candipost = null;
+    var candifeed = null;
+    var candifinx = 0;
+    var candipinx = 0;
+    var candidate = 0;
+
+    for (var finx = 0; finx < ic.feeds.length; finx++)
+    {
+        var feed = ic.feeds[ finx ];
+        var data = ic.feedsdata[ finx ];
+
+        for (var pinx = 0; pinx < data.length; pinx++)
+        {
+            var post = data[ pinx ];
+
+            var postid = WebLibSocial.getPostId(feed.plat, post);
+            var postdate = WebLibSocial.getPostDate(feed.plat, post);
+
+            if (postdate > candidate)
+            {
+                //
+                // Read in complete post and inspect.
+                //
+
+                var post = JSON.parse(WebAppSocial.getPost(feed.plat, postid));
+
+                var suitable = WebLibSocial.getPostSuitable(feed.plat, post);
+
+                console.log("===>" + postid + "=" + postdate + "=" + suitable);
+
+                if (suitable)
+                {
+                    candifinx = finx;
+                    candifeed = data;
+                    candipinx = pinx;
+                    candipost = post;
+                    candidate = postdate;
+
+                    //
+                    // Continue with next feed.
+                    //
+
+                    break;
+                }
+            }
+        }
+    }
+
+    if (candipost)
+    {
+        //
+        // Remove post from feed data.
+        //
+
+        candifeed.splice(pinx, 1);
+
+        instaface.displayPost(ic.feeds[ candifinx ].plat, candipost);
+    }
+}
+
 instaface.createDebug = function()
 {
     var ic = instaface;
+
+    ic.contentdiv.style.height = "50%";
 
     ic.debugdiv = WebLibSimple.createDiv(0, "50%", 0, 0, "debugdiv", ic.topdiv);
     ic.debugdiv.style.overflow = "hidden";
@@ -83,27 +189,10 @@ instaface.createDebug = function()
 
     ic.debugpre.innerHTML += "===============>feeds\n";
     ic.debugpre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.feeds)) + "\n";
-
-    /*
-    ic.feed = JSON.parse(WebAppSocial.getFeed(ic.platforms[ 0 ].plat, ic.platforms[ 0 ].id));
-
-    if (ic.feed.length > 0)
-    {
-        var postid = ic.feed[ 0 ].id_str ? ic.feed[ 0 ].id_str : ic.feed[ 0 ].id;
-
-        var platform = ic.platforms[ 0 ].plat;
-        ic.post = JSON.parse(WebAppSocial.getPost(platform, postid));
-
-        ic.debugpre.innerHTML += "===============>post\n";
-        ic.debugpre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.post)) + "\n";
-    }
-
-    ic.debugpre.innerHTML += "===============>feed\n";
-    ic.debugpre.innerHTML += WebAppUtility.getPrettyJson(JSON.stringify(ic.feed)) + "\n";
-    */
 }
 
 instaface.createFrame();
 instaface.createFeeds();
-instaface.createDebug();
+instaface.createConts();
 
+//instaface.createDebug();

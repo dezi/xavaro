@@ -183,12 +183,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
     {
         if (userid == null) return null;
 
-        String[] fields = { "object_attachment" };
-
-        Bundle params = new Bundle();
-        params.putString("fields", TextUtils.join(",", fields));
-
-        JSONObject response = getGraphRequest("/" + userid + "/feed", params);
+        JSONObject response = getGraphRequest("/" + userid + "/feed");
         return Json.getArray(response, "data");
     }
 }
