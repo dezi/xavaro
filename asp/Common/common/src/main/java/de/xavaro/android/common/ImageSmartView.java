@@ -45,8 +45,6 @@ public class ImageSmartView extends ImageView
 
     public void setImageResource(String restag, boolean circle)
     {
-        //Log.d(LOGTAG, "setImageResource: " + restag);
-
         if (Simple.equals(this.restag, restag)) return;
 
         //
