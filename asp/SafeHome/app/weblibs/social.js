@@ -198,4 +198,22 @@ WebLibSocial.getPostSuitable = function(platform, post)
     return imgs.length > 0;
 }
 
+WebLibSocial.getPlatformIcon = function(platform)
+{
+    return "/weblibs/social/social_" + platform + "_400x400.png";
+}
+
+WebLibSocial.getUserIcon = function(platform, pfid)
+{
+    var iconpath = WebAppSocial.getUserIcon(platform, pfid);
+
+    if (iconpath && iconpath.length)
+    {
+        return ("local://" + iconpath);
+    }
+
+    return "/weblibs/social/social_anon_300x300.png";
+}
+
+
 

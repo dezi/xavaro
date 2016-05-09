@@ -98,6 +98,13 @@ public class WebAppSocial
     }
 
     @JavascriptInterface
+    public String getUserIcon(String platform, String pfid)
+    {
+        File iconfile = ProfileImages.getSocialUserImageFile(platform, pfid);
+        return (iconfile == null) ? "" : iconfile.toString();
+    }
+
+    @JavascriptInterface
     public String getUserFeeds()
     {
         JSONArray allfeeds = new JSONArray();

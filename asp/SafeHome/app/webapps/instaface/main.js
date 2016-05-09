@@ -72,24 +72,51 @@ instaface.displayPost = function(plat, post)
 {
     var ic = instaface;
 
-    var postdiv = WebLibSimple.createAnyAppend("div", ic.contentscoll);
-    postdiv.style.position  = "relative";
-    postdiv.style.margin  = "16px";
-    postdiv.style.padding = "16px";
-    postdiv.style.border = "1px solid black";
-
+    var user = WebLibSocial.getPostUserid(plat, post);
     var date = WebLibSocial.getPostDate(plat, post);
     var name = WebLibSocial.getPostName(plat, post);
     var text = WebLibSocial.getPostText(plat, post);
     var imgs = WebLibSocial.getPostImgs(plat, post);
 
-    var namediv = WebLibSimple.createAnyAppend("div", postdiv);
-    namediv.innerHTML = WebLibSimple.getNiceDate(date) + " => " + name;
+    var postdiv = WebLibSimple.createAnyAppend("div", ic.contentscoll);
+    postdiv.style.position  = "relative";
+    postdiv.style.margin  = "16px";
+    postdiv.style.border = "1px solid black";
 
-    var textdiv = WebLibSimple.createAnyAppend("div", postdiv);
+    var leftdif = WebLibSimple.createDivWidth(0, 0, 80, 0, "leftdif", postdiv);
+    WebLibSimple.setBGColor(leftdif, "#cccccccc");
+    leftdif.style.overflow = "hidden";
+
+    var picn = WebLibSimple.createAnyAppend("img", leftdif);
+    picn.style.width = "100%";
+    picn.style.height = "auto";
+    picn.src = WebLibSocial.getPlatformIcon(plat);
+
+    var uicn = WebLibSimple.createAnyAppend("img", leftdif);
+    uicn.style.width = "100%";
+    uicn.style.height = "auto";
+    uicn.src = WebLibSocial.getUserIcon(plat, user);
+
+    var rightdif = WebLibSimple.createAnyAppend("div", postdiv);
+    WebLibSimple.setBGColor(rightdif, "#aaaaaaaa");
+    rightdif.style.overflow = "hidden";
+    rightdif.style.marginLeft = "80px";
+
+    var titlediv = WebLibSimple.createAnyAppend("div", rightdif);
+    WebLibSimple.setBGColor(titlediv, "#88888888");
+    titlediv.style.height = "80px";
+    titlediv.style.margin = "16px";
+    titlediv.style.padding = "8px";
+
+    var namediv = WebLibSimple.createAnyAppend("div", titlediv);
+    namediv.innerHTML = "Von" + " " + name + " – " + WebLibSimple.getNiceDate(date);
+
+    var textdiv = WebLibSimple.createAnyAppend("div", titlediv);
     textdiv.innerHTML = text;
 
-    var imgsdiv = WebLibSimple.createAnyAppend("div", postdiv);
+    var imgsdiv = WebLibSimple.createAnyAppend("div", rightdif);
+    imgsdiv.style.margin = "16px";
+    imgsdiv.style.overflow = "hidden";
 
     for (var inx = 0; inx < imgs.length; inx++)
     {

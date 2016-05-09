@@ -739,22 +739,22 @@ public class ProfileImages
     {
         if (Simple.equals(platform, "facebook"))
         {
-            return ProfileImages.getFacebookProfileImageFile(pfid);
+            return getFacebookProfileImageFile(pfid);
         }
 
         if (Simple.equals(platform, "instagram"))
         {
-            return ProfileImages.getInstagramProfileImageFile(pfid);
+            return getInstagramProfileImageFile(pfid);
         }
 
         if (Simple.equals(platform, "googleplus"))
         {
-            return ProfileImages.getGoogleplusProfileImageFile(pfid);
+            return getGoogleplusProfileImageFile(pfid);
         }
 
         if (Simple.equals(platform, "twitter"))
         {
-            return ProfileImages.getTwitterProfileImageFile(pfid);
+            return getTwitterProfileImageFile(pfid);
         }
 
         return null;
