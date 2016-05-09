@@ -34,6 +34,7 @@ public class PreferencesSocialGoogleplus extends PreferencesSocial
 
         accountSummary = R.string.pref_social_googleplus_account_summary;
         friendsSummary = R.string.pref_social_googleplus_friends_summary;
+        likesSummary = R.string.pref_social_googleplus_likes_summary;
 
         social = SocialGoogleplus.getInstance();
     }

@@ -147,7 +147,7 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
             JSONObject postdata = new JSONObject();
 
             Json.put(postdata, "client_id", appfix);
-            Json.put(postdata, "client_secret", appfox);
+            Json.put(postdata, "client_secret", check(appfox));
             Json.put(postdata, "refresh_token", refreshToken);
             Json.put(postdata, "grant_type", "refresh_token");
 

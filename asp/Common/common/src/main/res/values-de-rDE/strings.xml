@@ -361,8 +361,8 @@
     <string name="pref_social_isloggedout">ist ausgeloggt</string>
     <string name="pref_social_friends">Freunde</string>
     <string name="pref_social_autofriends">Automatik neue Freunde</string>
-    <string name="pref_social_likes">Likes</string>
-    <string name="pref_social_autolikes">Automatik neue Likes</string>
+    <string name="pref_social_likes">Abonnements</string>
+    <string name="pref_social_autolikes">Automatik neue Abonnements</string>
 
     <string-array name="pref_social_newfriends_vals">
         <item>Inaktiv</item>
@@ -387,8 +387,11 @@
     <string name="pref_social_facebook">Facebook</string>
     <string name="pref_social_facebook_enable">Facebook freischalten</string>
     <string name="pref_social_facebook_summary">
-        Facebook ermöglicht es dem Anwender auf einfachste Art und Weise
-        mit allen Menschen in Kontakt zu bleiben. Bla bla.
+        Facebook ist ein soziales Netzwerk, das vom gleichnamigen US-amerikanischen
+        Unternehmen Facebook Inc. betrieben wird. Der Name bezieht sich auf die
+        sogenannten Facebooks (Englisch wörtlich: „Gesichtsbuch“, sinngemäß: „Jahrbuch“)
+        mit Abbildungen von Studenten, die an manchen US-amerikanischen Colleges
+        verteilt werden.
         \n\nOle/Zimmel: Facebook hat April 2015 seine Policy bezüglich der
         Privatsphäre grundsätzlich geändert. Das hat zur Folge, dass eine
         App (wir sind eine App) grundsätzlich keinen Zugriff mehr auf die
@@ -412,33 +415,160 @@
         einen individuellen Account bei Facebook anlegen, oder einfach ihren
         eigenen Account benutzen, wenn Sie eine Betreuungsperson aus der Familie
         sind.
-        \n\nDer Anwender kann diejenigen Posts verfolgen, die im weiteren aktiviert
-        sind. Er kann jedoch weder kommentieren, liken oder posten. Der gesammte
-        Feed wird ausschließlich lesend zur Verfügung gestellt.
+        \n\nDer Anwender kann diejenigen Freunde und Abonnements verfolgen,
+        die im weiteren aktiviert sind. Er kann jedoch weder kommentieren,
+        liken oder posten. Der gesamte Feed wird ausschließlich lesend zur
+        Verfügung gestellt.
+    </string>
+    <string name="pref_social_facebook_friends_summary">
+        Sie können hier entscheiden, wo die Posts individueller Freunde erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Alle Posts werden für den Benutzer des Tablets in seiner Chronik aggregiert.
+        \n\nHome: Eine individuelle Chronik des Freundes wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Ein individuelle Chronik des Freundes wird im Facebook-Ordner angezeigt.
+        \n\nKontakte: Ein individuelle Chronik des Freundes wird im Kontakte-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Freunden verfahren wird.
         \n\nAchtung: Aufgrund der Facebook Privacy Policy muss jeder Facebook
         Benutzer, dessen Profil und Posts hier angezeigt werden sollen, dem
         dediziert zustimmen. Solange er dies nicht gemacht hat, wird er nicht
         in der Freundesliste erscheinen.
         \n\nBitte veranlassen Sie, dass relevante Personen einmal die Seite
-        http:/www.xavaro.de/facebook.php besuchen und dort Xavaro authorisieren.
-    </string>
-    <string name="pref_social_facebook_friends_summary">
-        Sie können hier entscheiden, wo die Posts individueller Freunde erscheinen sollen:
-        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
-        \n\nFeed: Die Posts werden wie auf der Facebook Homepage aggregiert.
-        \n\nHome: Ein individueller Feed des Freundes wird auf dem Home-Screen angezeigt.
-        \n\nOrdner: Ein individueller Feed des Freundes wird im Facebook-Ordner angezeigt.
-        \n\nKontakte: Ein individueller Feed des Freundes wird im Kontakte-Ordner angezeigt.
-        \n\nWeiter können Sie festlegen, wie mit neuen Freunden verfahren wird.
+        http:/www.xavaro.de/facebook besuchen und dort Xavaro authorisieren.
     </string>
     <string name="pref_social_facebook_likes_summary">
-        Sie können hier entscheiden, wo die Posts von Likes (wie z.B. Celebrieties oder
-        Fanpages) erscheinen sollen:
+        Sie können hier entscheiden, wo die Posts von Abonnements
+        (wie z.B. Celebrieties oder Fanpages) erscheinen sollen:
         \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
-        \n\nFeed: Die Posts werden wie auf der Facebook Homepage aggregiert.
-        \n\nHome: Ein individueller Feed des Likes wird auf dem Home-Screen angezeigt.
-        \n\nOrdner: Ein individueller Feed des Likes wird im Facebook-Ordner angezeigt.
-        \n\nWeiter können Sie festlegen, wie mit neuen Likes verfahren wird.
+        \n\nFeed: Alle Posts werden für den Benutzer des Tablets in seiner Chronik aggregiert.
+        \n\nHome: Eine individuelle Chronik des Abonnements wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Eine individuelle Chronik des Abonnements wird im Facebook-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Abonnements verfahren wird.
+    </string>
+
+    <string name="pref_social_twitter">Twitter</string>
+    <string name="pref_social_twitter_enable">Twitter freischalten</string>
+    <string name="pref_social_twitter_summary">
+        Twitter (englisch für Gezwitscher) ist ein Mikroblogging-Dienst des Unternehmens Twitter Inc.
+        Auf Twitter können angemeldete Nutzer telegrammartige Kurznachrichten verbreiten.
+        Die Nachrichten werden „Tweets“ (von englisch tweet „zwitschern“) genannt.
+    </string>
+    <string name="pref_social_twitter_account_summary">
+        Wenn Sie Twitter benutzen wollen, müssen Sie sich hier mit demjenigen
+        Account einloggen, den der Anwender lesen können soll. Sie können dazu
+        einen individuellen Account bei Twitter anlegen, oder einfach ihren
+        eigenen Account benutzen, wenn Sie eine Betreuungsperson aus der Familie
+        sind.
+        \n\nDer Anwender kann diejenigen Freunde und Abonnements verfolgen,
+        die im weiteren aktiviert sind. Er kann jedoch weder kommentieren,
+        liken oder posten. Der gesamte Feed wird ausschließlich lesend zur
+        Verfügung gestellt.
+   </string>
+    <string name="pref_social_twitter_friends_summary">
+        Sie können hier entscheiden, wo die Posts individueller Freunde erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Alle Posts werden für den Benutzer des Tablets in seiner Chronik aggregiert.
+        \n\nHome: Eine individuelle Chronik des Freundes wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Ein individuelle Chronik des Freundes wird im Twitter-Ordner angezeigt.
+        \n\nKontakte: Ein individuelle Chronik des Freundes wird im Kontakte-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Freunden verfahren wird.
+        \n\nAchtung: Da Twitter das Konzept von Abonnements nicht kennt, haben wir hier
+        einen Workaround implementiert. Ein Freund ist jemand, der weniger als
+        als 10.000 eigene Follower hat. Alles andere sind Rockstars und werden unter
+        Abonnements gelistet.
+    </string>
+    <string name="pref_social_twitter_likes_summary">
+        Sie können hier entscheiden, wo die Posts von Abonnements
+        (wie z.B. Celebrieties oder Fanpages) erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Alle Posts werden für den Benutzer des Tablets in seiner Chronik aggregiert.
+        \n\nHome: Eine individuelle Chronik des Abonnements wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Eine individuelle Chronik des Abonnements wird im Twitter-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Abonnements verfahren wird.
+    </string>
+
+    <string name="pref_social_googleplus">Google+</string>
+    <string name="pref_social_googleplus_enable">Google+ freischalten</string>
+    <string name="pref_social_googleplus_summary">
+        Google+ ist ein soziales Netzwerk des US-amerikanischen Unternehmens Google Inc.
+        Nach eigenen Angaben ist das Netzwerk eine „soziale Schicht“, die viele der
+        unternehmenseigenen Produkte erweitert. Es unterscheidet sich damit von den
+        meisten anderen sozialen Netzwerken, deren Zugang sich auf einen einzigen
+        Webauftritt beschränkt.
+        \n\nNach anderen Quellen wird das Netzwerk jedoch auch als reines Wettbewerbsprodukt
+        gesehen. Das Netzwerk ist weltweit das zweitgrößte soziale Netzwerk.
+    </string>
+    <string name="pref_social_googleplus_account_summary">
+        Wenn Sie Google+ benutzen wollen, müssen Sie sich hier mit demjenigen
+        Account einloggen, den der Anwender lesen können soll. Sie können dazu
+        einen individuellen Account bei Google+ anlegen, oder einfach ihren
+        eigenen Account benutzen, wenn Sie eine Betreuungsperson aus der Familie
+        sind.
+        \n\nDer Anwender kann diejenigen Freunde und Abonnements verfolgen,
+        die im weiteren aktiviert sind. Er kann jedoch weder kommentieren,
+        liken oder posten. Der gesamte Feed wird ausschließlich lesend zur
+        Verfügung gestellt.
+   </string>
+    <string name="pref_social_googleplus_friends_summary">
+        Sie können hier entscheiden, wo die Posts individueller Freunde erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Alle Posts werden für den Benutzer des Tablets in seiner Chronik aggregiert.
+        \n\nHome: Eine individuelle Chronik des Freundes wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Ein individuelle Chronik des Freundes wird im Google+-Ordner angezeigt.
+        \n\nKontakte: Ein individuelle Chronik des Freundes wird im Kontakte-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Freunden verfahren wird.
+    </string>
+    <string name="pref_social_googleplus_likes_summary">
+        Sie können hier entscheiden, wo die Posts von Abonnements
+        (wie z.B. Celebrieties oder Fanpages) erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Alle Posts werden für den Benutzer des Tablets in seiner Chronik aggregiert.
+        \n\nHome: Eine individuelle Chronik des Abonnements wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Eine individuelle Chronik des Abonnements wird im Google+-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Abonnements verfahren wird.
+    </string>
+
+    <string name="pref_social_instagram">Instagram</string>
+    <string name="pref_social_instagrams_enable">Instagram freischalten</string>
+    <string name="pref_social_instagram_summary">
+        Instagram gehört zu Facebook und ist ein kostenloser Online-Dienst zum Teilen
+        von Fotos und Videos. Zur Nutzung steht eine App für Android, iOS und Windows Phone
+        zur Verfügung. Nutzer können ihre Fotos und Videos mit Filtern versehen. In Anlehnung
+        an die Kodak Instamatic und an Polaroid-Kameras hatten mit Instagram gemachte
+        Fotos und Videos ursprünglich eine quadratische Form.
+        \n\nInstagram ist eine Mischung aus Microblog und audiovisueller Plattform und
+        ermöglicht es, Fotos auch in anderen sozialen Netzwerken zu verbreiten.
+    </string>
+    <string name="pref_social_instagram_account_summary">
+        Wenn Sie Instagram benutzen wollen, müssen Sie sich hier mit demjenigen
+        Account einloggen, den der Anwender lesen können soll. Sie können dazu
+        einen individuellen Account bei Instagram anlegen, oder einfach ihren
+        eigenen Account benutzen, wenn Sie eine Betreuungsperson aus der Familie
+        sind.
+        \n\nDer Anwender kann diejenigen Freunde und Abonnements* verfolgen,
+        die im weiteren aktiviert sind. Er kann jedoch weder kommentieren,
+        liken oder posten. Der gesamte Feed wird ausschließlich lesend zur
+        Verfügung gestellt.
+        \n\n* Abonnements bzw. Profile von öffentlichen oder rechtlichen
+        Personen können hier nicht abgerufen werden, weil das unter die
+        Datenschutz-Policy von Instagram fällt. Auch diese Personen müssen
+        den Zugriff mit der Xavaro App dediziert authorisieren.
+        \n\nWir denken aber, das Instagram zeitnah eine Änderung der Policy
+        veranlassen wird, daher werden Abonnements hier perspektivisch erwähnt.
+    </string>
+    <string name="pref_social_instagram_friends_summary">
+        Sie können hier entscheiden, wo die Posts individueller Freunde erscheinen sollen:
+        \n\nInaktiv: Die Posts werden nirgendwo angezeigt.
+        \n\nFeed: Alle Posts werden für den Benutzer des Tablets in seiner Chronik aggregiert.
+        \n\nHome: Eine individuelle Chronik des Freundes wird auf dem Home-Screen angezeigt.
+        \n\nOrdner: Ein individuelle Chronik des Freundes wird im Instagram-Ordner angezeigt.
+        \n\nKontakte: Ein individuelle Chronik des Freundes wird im Kontakte-Ordner angezeigt.
+        \n\nWeiter können Sie festlegen, wie mit neuen Freunden verfahren wird.
+        \n\nAchtung: Aufgrund der Instagram Privacy Policy muss jeder Instagram
+        Benutzer, dessen Profil und Posts hier angezeigt werden sollen, dem
+        dediziert zustimmen. Solange er dies nicht gemacht hat, wird er nicht
+        in der Freundesliste erscheinen.
+        \n\nBitte veranlassen Sie, dass relevante Personen einmal die Seite
+        http:/www.xavaro.de/instagram besuchen und dort Xavaro authorisieren.
     </string>
 
     <string name="battery_manager_remind">Bitte verbinden Sie ihr Tablet demnächst mit der Ladestation.</string>
