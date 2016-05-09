@@ -87,9 +87,7 @@ public abstract class Social
     protected String checkDat(String value)
     {
         value = Simple.getBase64Encoded(Simple.dezify(value));
-
         Log.d(LOGTAG, "checkDat: platform=" + platform + "=" + value);
-
         return value;
     }
     */

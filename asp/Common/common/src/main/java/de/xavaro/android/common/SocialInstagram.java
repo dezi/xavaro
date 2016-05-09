@@ -29,7 +29,6 @@ public class SocialInstagram extends Social implements Social.SocialInterface
 
         appurl = "http://www.xavaro.de/instagram";
         appfix = "63afb3307ec24f4886230f44d2fda884";
-        appfox = "ab19aa46d88f4fb9a433f6d6cc1d4df3";
         appfox = "aGc4O2hkPTRtPTFkPWNrO2gxOjFvM200amY4Zj1hbzE=";
 
         oauthurl = "https://www.instagram.com/oauth/authorize/";

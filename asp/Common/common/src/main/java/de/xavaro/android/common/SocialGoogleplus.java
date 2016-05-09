@@ -32,7 +32,6 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
 
         appurl = "http://www.xavaro.de/googleplus";
         appfix = "404416935707-b7o1okeho0c3s2oj9qipksprnn8bshoi.apps.googleusercontent.com";
-        appfox = "D65banXZZN55o3Cn1qNc3bSy";
         appfox = "TTM8YGhrUVhTSzw3ZjZKbDh0R2E6Z1p7";
 
         oauthurl = "https://accounts.google.com/o/oauth2/v2/auth";

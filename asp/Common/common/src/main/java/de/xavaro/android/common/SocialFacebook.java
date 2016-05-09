@@ -31,7 +31,6 @@ public class SocialFacebook extends Social implements Social.SocialInterface
 
         appurl = "http://www.xavaro.de/facebook";
         appfix = "610331582448824";
-        appfox = "9db8d13a21307cd99c5ba0d8dff0b6e2";
         appfox = "MGFrOm00OmM7NDoyPmZtOzBmPGBoNW06bWNvMmszbDA=";
 
         oauthurl = "https://www.facebook.com/dialog/oauth";
