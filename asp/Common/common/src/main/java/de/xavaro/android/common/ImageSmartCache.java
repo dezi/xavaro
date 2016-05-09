@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.io.File;
 
@@ -49,8 +50,6 @@ public class ImageSmartCache
             cacheDesc.refcount = 1;
 
             cacheDesc.bitmap = getBitmap(restag, width, height, circle);
-
-            Log.d(LOGTAG, "claimImage: aquired: " + restag + ":" + width + "x" + height);
 
             cacheDescs.add(cacheDesc);
         }
@@ -136,6 +135,67 @@ public class ImageSmartCache
 
     @Nullable
     private static Bitmap getBitmap(String restag, int width, int height, boolean circle)
+    {
+        String cachename = restag.replace("|", ".");
+
+        int resid = Simple.parseNumber(restag);
+
+        if (resid > 0)
+        {
+            cachename = "resource." + Simple.getResourceName(resid) + ".icon";
+        }
+
+        if (restag.startsWith("/"))
+        {
+            File file = new File(restag);
+            cachename = "file." + file.getName();
+        }
+
+        if (! cachename.contains(".")) cachename = "webapp." + cachename + ".icon";
+
+        cachename = width + "x" + height + "." + (circle ? "circle" : "normal") + "." + cachename;
+
+        File cachedir = new File(Simple.getExternalCacheDir(), "screenicons");
+        File cachefile = new File(cachedir, cachename);
+
+        if ((! cachedir.exists()) && cachedir.mkdirs())
+        {
+            Log.d(LOGTAG, "getBitmap: cache dir created.");
+        }
+
+        Log.d(LOGTAG, "getBitmap: load: " + cachename);
+
+        if (cachefile.exists())
+        {
+            byte[] data = Simple.getFileBytes(cachefile);
+
+            if (data != null)
+            {
+                return BitmapFactory.decodeByteArray(data, 0, data.length);
+            }
+        }
+
+        Bitmap bitmap = getNewBitmap(restag, width, height, circle);
+
+        if (bitmap != null)
+        {
+            try
+            {
+                FileOutputStream out = new FileOutputStream(cachefile);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                out.close();
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+        }
+
+        return bitmap;
+    }
+
+    @Nullable
+    private static Bitmap getNewBitmap(String restag, int width, int height, boolean circle)
     {
         //
         // In the first step we just like to get the size of bitmap.

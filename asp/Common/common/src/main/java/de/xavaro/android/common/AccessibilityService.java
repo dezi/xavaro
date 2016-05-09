@@ -30,6 +30,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         {
             //
             // Will throw if feature not available.
+            //
         }
 
         return false;

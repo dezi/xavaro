@@ -115,6 +115,11 @@ public class HomeActivity extends AppCompatActivity implements
 
         File contacts = new File(Simple.getExternalFilesDir(), "contacts.json");
         Simple.putFileContent(contacts, Json.toPretty(ContactsHandler.getJSONData(this)));
+
+        if (! AccessibilityService.checkEnabled())
+        {
+            Simple.makeAlert("Accessibility Service not enabled.");
+        }
     }
 
     private final Runnable makeFullscreen = new Runnable()

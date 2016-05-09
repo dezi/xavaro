@@ -137,6 +137,11 @@ public class Simple
         return appContext.getResources();
     }
 
+    public static String getResourceName(int resid)
+    {
+        return appContext.getResources().getResourceEntryName(resid);
+    }
+
     public static Object getSystemService(String service)
     {
         return anyContext.getSystemService(service);
