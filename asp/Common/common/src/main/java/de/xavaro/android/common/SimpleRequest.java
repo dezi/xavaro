@@ -4,7 +4,6 @@ import android.support.annotation.Nullable;
 
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -16,7 +15,6 @@ import java.net.URL;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.util.Iterator;
 
 public class SimpleRequest

@@ -14,10 +14,10 @@
           {
             "title": "Soziale Netzwerke.",
             "summary": [
-              "Konfiguration von Credentials und Feeds",
-              "Facebook, Twitter, Google+ und Instagram",
-              "Anbindung ohne SDKs nur mit REST-APis",
-              "POC Feed-Funktionalität vorhanden."
+              "Konfiguration von Credentials und Feeds.",
+              "Facebook, Twitter, Google+ und Instagram.",
+              "Anbindung ohne SDKs nur mit REST-APIs.",
+              "POC Feed-Funktionalität implementiert."
             ]
           }
         ]
