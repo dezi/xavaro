@@ -32,6 +32,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class Social
 {
     private static final String LOGTAG = Social.class.getSimpleName();
@@ -45,18 +46,18 @@ public abstract class Social
     protected final String refreshtokenpref;
 
     protected String appurl;
-    protected String appsecret;
-    protected String appkey;
+    protected String appfox;
+    protected String appfix;
 
     protected String oauthurl;
     protected String tokenurl;
+    protected String requesturl;
 
     protected String[] scopes;
 
     protected String apiurl;
     protected Bundle apiextraparam;
     protected boolean apisigned;
-    protected boolean apioauth10;
     protected boolean apifeedhasposts;
 
     protected JSONObject user;
@@ -76,10 +77,26 @@ public abstract class Social
 
         cachedir = new File(Simple.getExternalCacheDir(), platform);
 
-        if (! cachedir.exists())
+        if ((! cachedir.exists()) && cachedir.mkdirs())
         {
-            if (cachedir.mkdirs()) Log.d(LOGTAG, "Constructor: created cache:" + cachedir);
+            Log.d(LOGTAG, "Constructor: created cache:" + cachedir);
         }
+    }
+
+    /*
+    protected String checkDat(String value)
+    {
+        value = Simple.getBase64Encoded(Simple.dezify(value));
+
+        Log.d(LOGTAG, "checkDat: platform=" + platform + "=" + value);
+
+        return value;
+    }
+    */
+
+    protected String check(String value)
+    {
+        return Simple.dezify(Simple.getBase64Decoded(value));
     }
 
     public boolean isEnabled()
@@ -118,12 +135,6 @@ public abstract class Social
     public String getPlatform()
     {
         return platform;
-    }
-
-    @Nullable
-    public String[] getAccessScope()
-    {
-        return scopes;
     }
 
     @Nullable
@@ -180,85 +191,7 @@ public abstract class Social
 
                 if (url.startsWith(appurl))
                 {
-                    Uri uri = Uri.parse(url);
-
-                    String code = uri.getQueryParameter("code");
-                    String oauth_token = uri.getQueryParameter("oauth_token");
-                    String oauth_verifier = uri.getQueryParameter("oauth_verifier");
-
-                    if (code != null)
-                    {
-                        Log.d(LOGTAG, "shouldOverrideUrlLoading: code=" + code);
-
-                        JSONObject postdata = new JSONObject();
-
-                        Json.put(postdata, "code", code);
-                        Json.put(postdata, "client_id", appkey);
-                        Json.put(postdata, "client_secret", appsecret);
-                        Json.put(postdata, "redirect_uri", appurl);
-                        Json.put(postdata, "grant_type", "authorization_code");
-
-                        String content = SimpleRequest.readContent(tokenurl, postdata);
-
-                        Log.d(LOGTAG, "=====>" + content);
-
-                        if (content != null)
-                        {
-                            JSONObject jcontent = Json.fromString(content);
-
-                            String accessToken = Json.getString(jcontent, "access_token");
-                            Simple.setSharedPrefString(accesstokenpref, accessToken);
-
-                            if (Json.has(jcontent, "expires_in"))
-                            {
-                                int expiseconds = Json.getInt(jcontent, "expires_in");
-                                long expiration = Simple.nowAsTimeStamp() + (expiseconds - 10) * 1000;
-                                Simple.setSharedPrefString(expirationpref, Simple.timeStampAsISO(expiration));
-                            }
-
-                            if (Json.has(jcontent, "refresh_token"))
-                            {
-                                String refreshToken = Json.getString(jcontent, "refresh_token");
-                                Simple.setSharedPrefString(refreshtokenpref, refreshToken);
-
-                                File socialdir = Simple.getMediaPath("social");
-                                File oauthfile = new File(socialdir, platform + ".oauth.json");
-                                Simple.putFileContent(oauthfile, content);
-                            }
-                        }
-                    }
-
-                    if ((oauth_token != null) && (oauth_verifier != null))
-                    {
-                        Log.d(LOGTAG, "shouldOverrideUrlLoading: oauth_token="
-                                + oauth_token + " => " + oauth_verifier);
-
-                        Bundle params = new Bundle();
-                        params.putString("oauth_token", oauth_token);
-                        params.putString("oauth_verifier", oauth_verifier);
-
-                        params = getSignedOAuthParams("POST", tokenurl, params);
-                        String oauth = getSignedOAuthHeader(params);
-
-                        Log.d(LOGTAG, "==============oauth=" + oauth);
-                        String content = SimpleRequest.readContent(tokenurl, oauth, new JSONObject());
-                        Log.d(LOGTAG, "==============content=" + content);
-
-                        if (content != null)
-                        {
-                            JSONObject jcontent = getQuery(content);
-
-                            File socialdir = Simple.getMediaPath("social");
-                            File oauthfile = new File(socialdir, platform + ".oauth.json");
-                            Simple.putFileJSON(oauthfile, jcontent);
-
-                            String accessToken = Json.getString(jcontent, "oauth_token");
-                            Simple.setSharedPrefString(accesstokenpref, accessToken);
-
-                            String accessSecret = Json.getString(jcontent, "oauth_token_secret");
-                            Simple.setSharedPrefString(accesssecretpref, accessSecret);
-                        }
-                    }
+                    exchangeCodeforToken(url);
 
                     dialog.cancel();
 
@@ -312,18 +245,18 @@ public abstract class Social
 
         String oauth_token = null;
 
-        if (apioauth10)
+        if (requesturl != null)
         {
-            String url = "https://api.twitter.com/oauth/request_token";
+            //
+            // Platform desires an oauth token for authorization.
+            //
+
             Bundle params = new Bundle();
             params.putString("oauth_callback", appurl);
 
-            params = getSignedOAuthParams("POST", url, params);
+            params = getSignedOAuthParams("POST", requesturl, params);
             String oauth = getSignedOAuthHeader(params);
-
-            Log.d(LOGTAG, "==============oauth=" + oauth);
-            String content = SimpleRequest.readContent(url, oauth, new JSONObject());
-            Log.d(LOGTAG, "==============content=" + content);
+            String content = SimpleRequest.readContent(requesturl, oauth, new JSONObject());
 
             if (content != null)
             {
@@ -333,13 +266,13 @@ public abstract class Social
         }
 
         //
-        // Fire up auth url in dialog.
+        // Fire up authorization url in dialog.
         //
 
         String scopes = getScopeParameter();
 
         String url = oauthurl
-                + "?client_id=" + appkey
+                + "?client_id=" + appfix
                 + "&redirect_uri=" + appurl
                 + ((scopes != null) ? "&scope=" + scopes : "")
                 + ((oauth_token != null) ? "&oauth_token=" + oauth_token : "")
@@ -347,9 +280,99 @@ public abstract class Social
                 + "&access_type=offline"
                 + "&prompt=consent";
 
-        Log.d(LOGTAG, "====>" + url);
+        Log.d(LOGTAG, "login: " + url);
 
         webview.loadUrl(url);
+    }
+
+    private void exchangeCodeforToken(String url)
+    {
+        //
+        // Final oauth step. The user has accepted access or not
+        // and now we try to exchange our code from authorization
+        // against a valid access token and eventually access token
+        // secret for Twitter.
+        //
+
+        Uri uri = Uri.parse(url);
+
+        String code = uri.getQueryParameter("code");
+        String oauth_token = uri.getQueryParameter("oauth_token");
+        String oauth_verifier = uri.getQueryParameter("oauth_verifier");
+
+        if (code != null)
+        {
+            Log.d(LOGTAG, "exchangeCodeforToken: code=" + code);
+
+            JSONObject postdata = new JSONObject();
+
+            Json.put(postdata, "code", code);
+            Json.put(postdata, "client_id", appfix);
+            Json.put(postdata, "client_secret", check(appfox));
+            Json.put(postdata, "redirect_uri", appurl);
+            Json.put(postdata, "grant_type", "authorization_code");
+
+            String content = SimpleRequest.readContent(tokenurl, postdata);
+
+            Log.d(LOGTAG, "=====>" + content);
+
+            if (content != null)
+            {
+                JSONObject jcontent = Json.fromString(content);
+
+                String accessToken = Json.getString(jcontent, "access_token");
+                Simple.setSharedPrefString(accesstokenpref, accessToken);
+
+                if (Json.has(jcontent, "expires_in"))
+                {
+                    int expiseconds = Json.getInt(jcontent, "expires_in");
+                    long expiration = Simple.nowAsTimeStamp() + (expiseconds - 10) * 1000;
+                    Simple.setSharedPrefString(expirationpref, Simple.timeStampAsISO(expiration));
+                }
+
+                if (Json.has(jcontent, "refresh_token"))
+                {
+                    String refreshToken = Json.getString(jcontent, "refresh_token");
+                    Simple.setSharedPrefString(refreshtokenpref, refreshToken);
+
+                    File socialdir = Simple.getMediaPath("social");
+                    File oauthfile = new File(socialdir, platform + ".oauth.json");
+                    Simple.putFileContent(oauthfile, content);
+                }
+            }
+        }
+
+        if ((oauth_token != null) && (oauth_verifier != null))
+        {
+            Log.d(LOGTAG, "exchangeCodeforToken: oauth_token="
+                    + oauth_token + " => " + oauth_verifier);
+
+            Bundle params = new Bundle();
+            params.putString("oauth_token", oauth_token);
+            params.putString("oauth_verifier", oauth_verifier);
+
+            params = getSignedOAuthParams("POST", tokenurl, params);
+            String oauth = getSignedOAuthHeader(params);
+
+            Log.d(LOGTAG, "==============oauth=" + oauth);
+            String content = SimpleRequest.readContent(tokenurl, oauth, new JSONObject());
+            Log.d(LOGTAG, "==============content=" + content);
+
+            if (content != null)
+            {
+                JSONObject jcontent = getQuery(content);
+
+                File socialdir = Simple.getMediaPath("social");
+                File oauthfile = new File(socialdir, platform + ".oauth.json");
+                Simple.putFileJSON(oauthfile, jcontent);
+
+                String accessToken = Json.getString(jcontent, "oauth_token");
+                Simple.setSharedPrefString(accesstokenpref, accessToken);
+
+                String accessSecret = Json.getString(jcontent, "oauth_token_secret");
+                Simple.setSharedPrefString(accesssecretpref, accessSecret);
+            }
+        }
     }
 
     public void logout()
@@ -456,7 +479,7 @@ public abstract class Social
         return data;
     }
 
-    protected JSONArray getOwnerFeed(JSONArray data)
+    protected void getOwnerFeed(JSONArray data)
     {
         //
         // Add account owner as an owner feed.
@@ -479,11 +502,9 @@ public abstract class Social
 
             Json.put(data, owner);
         }
-
-        return data;
     }
 
-    protected JSONArray getUserFeeds(JSONArray data, String type, boolean feedonly)
+    protected void getUserFeeds(JSONArray data, String type, boolean feedonly)
     {
         String modeprefix = "social." + platform + "." + type + ".mode.";
         String nameprefix = "social." + platform + "." + type + ".name.";
@@ -515,8 +536,6 @@ public abstract class Social
 
             Json.put(data, item);
         }
-
-        return data;
     }
 
     @Nullable
@@ -607,8 +626,8 @@ public abstract class Social
         if (parameters == null) parameters = new Bundle();
         if (apiextraparam != null) parameters.putAll(apiextraparam);
 
-        String url = null;
-        String content = null;
+        String url;
+        String content;
 
         if (apisigned)
         {
@@ -621,7 +640,6 @@ public abstract class Social
 
             url += getQueryString(parameters);
 
-            Log.d(LOGTAG, "==============oauth=" + oauth);
             content = SimpleRequest.readContent(url, oauth);
         }
         else
@@ -744,7 +762,7 @@ public abstract class Social
         String timst = "" + (Simple.nowAsTimeStamp() / 1000);
 
         parameters.putString("oauth_version", "1.0");
-        parameters.putString("oauth_consumer_key", appkey);
+        parameters.putString("oauth_consumer_key", appfix);
         parameters.putString("oauth_signature_method", "HMAC-SHA1");
         parameters.putString("oauth_timestamp", timst);
         parameters.putString("oauth_nonce", nonce);
@@ -777,7 +795,7 @@ public abstract class Social
         basestring += "&" + Simple.getUrlEncoded(url);
         basestring += "&" + Simple.getUrlEncoded(querystring);
 
-        String keystring = Simple.getUrlEncoded(appsecret) + "&";
+        String keystring = Simple.getUrlEncoded(check(appfox)) + "&";
         if (getAccessToken() != null) keystring += Simple.getUrlEncoded(getAccessSecret());
 
         String signature = computeSignature(basestring, keystring);
@@ -1073,7 +1091,9 @@ public abstract class Social
 
     //region Cache maintenance
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final long totalInterval = 3600;
+
     private long lastReconfigure;
     private long nextInterval;
     private long nextAction;
@@ -1232,7 +1252,6 @@ public abstract class Social
         void setVerbose(boolean yesno);
 
         String getAccessExpiration();
-        String[] getAccessScope();
 
         String getPlatform();
         String getUserId();

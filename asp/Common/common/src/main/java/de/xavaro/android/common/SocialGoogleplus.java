@@ -3,7 +3,6 @@ package de.xavaro.android.common;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import android.app.Application;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -32,8 +31,9 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
         super("googleplus");
 
         appurl = "http://www.xavaro.de/googleplus";
-        appkey = "404416935707-b7o1okeho0c3s2oj9qipksprnn8bshoi.apps.googleusercontent.com";
-        appsecret = "D65banXZZN55o3Cn1qNc3bSy";
+        appfix = "404416935707-b7o1okeho0c3s2oj9qipksprnn8bshoi.apps.googleusercontent.com";
+        appfox = "D65banXZZN55o3Cn1qNc3bSy";
+        appfox = "TTM8YGhrUVhTSzw3ZjZKbDh0R2E6Z1p7";
 
         oauthurl = "https://accounts.google.com/o/oauth2/v2/auth";
         tokenurl = "https://www.googleapis.com/oauth2/v4/token";
@@ -146,8 +146,8 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
 
             JSONObject postdata = new JSONObject();
 
-            Json.put(postdata, "client_id", appkey);
-            Json.put(postdata, "client_secret", appsecret);
+            Json.put(postdata, "client_id", appfix);
+            Json.put(postdata, "client_secret", appfox);
             Json.put(postdata, "refresh_token", refreshToken);
             Json.put(postdata, "grant_type", "refresh_token");
 

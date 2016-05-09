@@ -29,16 +29,16 @@ public class SocialTwitter extends Social implements Social.SocialInterface
         super("twitter");
 
         appurl = "http://www.xavaro.de/twitter";
-        appkey = "ECWy6Av3vqdx9yUzQE6euMuTJ";
-        appsecret = "LN4kGTVrmqlw2pyUg11nJme8LoehJSGP2PkiRi6Ae7mPqBjDOw";
+        appfix = "ECWy6Av3vqdx9yUzQE6euMuTJ";
+        appfox = "LN4kGTVrmqlw2pyUg11nJme8LoehJSGP2PkiRi6Ae7mPqBjDOw";
+        appfox = "RUs9aU5RX3BkdGV1O3VwV240OGxDaGw6RWpsakNWTlI7VWJrW2w/Q2wyZFJ4R2NGRnI=";
 
         oauthurl = " https://api.twitter.com/oauth/authorize";
         tokenurl = "https://api.twitter.com/oauth/access_token";
+        requesturl = "https://api.twitter.com/oauth/request_token";
 
-        apiurl = "https://api.twitter.com/1.1";
-
-        apioauth10 = true;
         apisigned = true;
+        apiurl = "https://api.twitter.com/1.1";
 
         apifeedhasposts = true;
 

@@ -19,6 +19,7 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
+import android.util.Base64;
 import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
@@ -1435,6 +1436,38 @@ public class Simple
         if (bytes == null) return null;
 
         return getHexBytesToString(bytes, 0, bytes.length);
+    }
+
+    @Nullable
+    public static String getBase64Encoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return Base64.encodeToString(str.getBytes(), 0);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getBase64Decoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return new String(Base64.decode(str, 0));
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
     }
 
     @Nullable
