@@ -50,15 +50,6 @@ public class ApplicationBase extends Application
         //
 
         WebCookie.initCookies();
-
-        //
-        // Initialize social plugin.
-        //
-
-        SocialTwitter.initialize();
-        SocialFacebook.initialize();
-        SocialInstagram.initialize();
-        SocialGoogleplus.initialize();
     }
 
     public final Runnable setFontScale = new Runnable()

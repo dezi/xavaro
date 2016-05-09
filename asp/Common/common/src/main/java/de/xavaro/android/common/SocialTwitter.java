@@ -13,14 +13,10 @@ public class SocialTwitter extends Social implements Social.SocialInterface
     private static final String LOGTAG = SocialTwitter.class.getSimpleName();
     private static SocialTwitter instance;
 
-    public static void initialize()
-    {
-        if (instance != null) return;
-        instance = new SocialTwitter();
-    }
-
     public static SocialTwitter getInstance()
     {
+        if (instance == null) instance = new SocialTwitter();
+
         return instance;
     }
 
@@ -190,7 +186,7 @@ public class SocialTwitter extends Social implements Social.SocialInterface
         Bundle params = new Bundle();
 
         params.putString("user_id", userid);
-        params.putString("count", "20");
+        params.putString("count", "100");
         params.putString("contributor_details", "true");
 
         JSONObject response = getGraphRequest("/statuses/user_timeline.json", params);

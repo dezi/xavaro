@@ -1219,6 +1219,8 @@ public abstract class Social
             if (postdata == null) continue;
 
             Simple.putFileContent(postfile, Json.toPretty(postdata));
+
+            SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, 1);
         }
     }
 

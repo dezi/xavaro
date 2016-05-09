@@ -1,12 +1,15 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.File;
 
+import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.ProfileImages;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.Json;
 
@@ -24,75 +27,59 @@ public class LaunchItemSocial extends LaunchItem
     {
         ImageView targetIcon = icon;
 
+        if (config.has("pfid"))
+        {
+            String pfid = Json.getString(config, "pfid");
+            File profile = ProfileImages.getSocialUserImageFile(type, pfid);
+
+            if (profile != null)
+            {
+                icon.setImageResource(profile.toString(), false);
+                overlay.setVisibility(VISIBLE);
+                targetIcon = overicon;
+            }
+        }
+
+        if (type.equals("social"))
+        {
+            targetIcon.setImageResource(CommonConfigs.IconResSocial);
+        }
+
         if (type.equals("twitter"))
         {
-            if (config.has("pfid"))
-            {
-                String pfid = Json.getString(config, "pfid");
-                File profile = ProfileImages.getSocialUserImageFile("twitter", pfid);
-
-                if (profile != null)
-                {
-                    icon.setImageResource(profile.toString(), false);
-                    targetIcon = overicon;
-                }
-            }
-
             targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
         }
 
         if (type.equals("facebook"))
         {
-            if (config.has("pfid"))
-            {
-                String pfid = Json.getString(config, "pfid");
-                File profile = ProfileImages.getSocialUserImageFile("facebook", pfid);
-
-                if (profile != null)
-                {
-                    icon.setImageResource(profile.toString(), false);
-                    targetIcon = overicon;
-                }
-            }
-
             targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
         }
 
         if (type.equals("instagram"))
         {
-            if (config.has("pfid"))
-            {
-                String pfid = Json.getString(config, "pfid");
-                File profile = ProfileImages.getSocialUserImageFile("instagram", pfid);
-
-                if (profile != null)
-                {
-                    icon.setImageResource(profile.toString(), false);
-                    targetIcon = overicon;
-                }
-            }
-
             targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
         }
 
         if (type.equals("googleplus"))
         {
-            if (config.has("pfid"))
-            {
-                String pfid = Json.getString(config, "pfid");
-                File profile = ProfileImages.getSocialUserImageFile("googleplus", pfid);
-
-                if (profile != null)
-                {
-                    icon.setImageResource(profile.toString(), false);
-                    targetIcon = overicon;
-                }
-            }
-
             targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
         }
+    }
 
-        if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
+    @Override
+    protected void onAttachedToWindow()
+    {
+        super.onAttachedToWindow();
+
+        Simple.makePost(feednews);
+    }
+
+    @Override
+    protected void onDetachedFromWindow()
+    {
+        super.onDetachedFromWindow();
+
+        Simple.removePost(feednews);
     }
 
     @Override
@@ -116,6 +103,17 @@ public class LaunchItemSocial extends LaunchItem
 
     private void launchAny()
     {
+        if (type.equals("social"))
+        {
+            final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
+            webappFrame.setWebAppName("instaface");
+            webappFrame.setParent(this);
+
+            ((HomeActivity) context).addViewToBackStack(webappFrame);
+
+            return;
+        }
+
         if (config.has("pfid"))
         {
             final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
@@ -145,4 +143,14 @@ public class LaunchItemSocial extends LaunchItem
 
         ((HomeActivity) context).addViewToBackStack(directory);
     }
+
+    private final Runnable feednews = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+
+            Simple.makePost(feednews, 60 * 1000);
+        }
+    };
 }

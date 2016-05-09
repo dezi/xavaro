@@ -1,8 +1,8 @@
 package de.xavaro.android.safehome;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+
+import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -11,11 +11,8 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.ProfileImages;
-import de.xavaro.android.common.RemoteContacts;
-import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.WebApp;
 
 public class LaunchGroupSocial extends LaunchGroup
 {
@@ -25,6 +22,8 @@ public class LaunchGroupSocial extends LaunchGroup
     {
         super(context);
     }
+
+    private static boolean haveownerfeed;
 
     @Nullable
     public static JSONArray getConfig()
@@ -120,6 +119,21 @@ public class LaunchGroupSocial extends LaunchGroup
             Json.put(home, entry);
         }
 
+        if (haveownerfeed)
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "social");
+            Json.put(entry, "subtype", "instaface");
+            Json.put(entry, "label", "Soziales Netzwerk");
+            Json.put(entry, "order", 200);
+
+            JSONArray intents = WebApp.getVoiceIntents("instaface");
+            if (intents != null) Json.put(entry, "intents", intents);
+
+            Json.put(home, entry);
+        }
+
         return home;
     }
 
@@ -154,6 +168,8 @@ public class LaunchGroupSocial extends LaunchGroup
             if (mode.contains("home")) Json.put(adir, entry);
             if (mode.contains("folder")) Json.put(adir, entry);
             if (mode.contains("contacts")) Json.put(cdir, entry);
+
+            if (mode.contains("feed")) haveownerfeed = true;
 
             Log.d(LOGTAG, "Prefe:" + item.getKey() + "=id=" + pfid + "=" + name);
         }

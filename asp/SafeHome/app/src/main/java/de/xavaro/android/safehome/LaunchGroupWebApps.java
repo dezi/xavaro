@@ -40,6 +40,12 @@ public class LaunchGroupWebApps extends LaunchGroup
 
         String prefix = "webapps.mode.";
 
+        //
+        // Legacy remove.
+        //
+
+        Simple.removeSharedPref(prefix + "instaface");
+
         Map<String, Object> webapps = Simple.getAllPreferences(prefix);
 
         for (String prefkey : webapps.keySet())

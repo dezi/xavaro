@@ -14,14 +14,10 @@ public class SocialFacebook extends Social implements Social.SocialInterface
 
     private static SocialFacebook instance;
 
-    public static void initialize()
-    {
-        if (instance != null) return;
-        instance = new SocialFacebook();
-    }
-
     public static SocialFacebook getInstance()
     {
+        if (instance == null) instance = new SocialFacebook();
+
         return instance;
     }
 

@@ -1,7 +1,7 @@
 {
   "manifest": {
 
-    "label": "Soziales Netzwerk",
+    "label": "instaface",
     "appname": "instaface",
     "appicon": "instaface_600x600.png",
     "preferences": false,

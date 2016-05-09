@@ -167,6 +167,7 @@ instaface.retrieveBestPost = function()
                 //
 
                 var post = JSON.parse(WebAppSocial.getPost(feed.plat, postid));
+
                 var suitable = WebLibSocial.getPostSuitable(feed.plat, post);
 
                 if (suitable)
@@ -230,3 +231,4 @@ instaface.createFeeds();
 instaface.createConts();
 
 //instaface.createDebug();
+

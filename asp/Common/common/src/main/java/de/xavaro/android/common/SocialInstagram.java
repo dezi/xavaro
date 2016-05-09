@@ -12,14 +12,10 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     private static final String LOGTAG = SocialInstagram.class.getSimpleName();
     private static SocialInstagram instance;
 
-    public static void initialize()
-    {
-        if (instance != null) return;
-        instance = new SocialInstagram();
-    }
-
     public static SocialInstagram getInstance()
     {
+        if (instance == null) instance = new SocialInstagram();
+
         return instance;
     }
 

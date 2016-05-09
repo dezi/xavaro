@@ -61,6 +61,11 @@ public class SimpleStorage
         return Json.getInt(getStorage(name), property);
     }
 
+    public static void addInt(String name, String property, int value)
+    {
+        put(name, property, getInt(name, property) + value);
+    }
+
     public static boolean getBool(String name, String property)
     {
         return Json.getBoolean(getStorage(name), property);
@@ -133,7 +138,7 @@ public class SimpleStorage
         return Json.getObject(container, "data");
     }
 
-    private static Runnable flusher = new Runnable()
+    private static final Runnable flusher = new Runnable()
     {
         @Override
         public void run()

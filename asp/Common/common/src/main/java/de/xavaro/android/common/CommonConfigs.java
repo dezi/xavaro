@@ -21,6 +21,7 @@ public class CommonConfigs
     public static final int IconResBetaVersion      = R.drawable.betaversion_256x256;
     public static final int IconResMonitoring       = R.drawable.monitoring_626x626;
     public static final int IconResBattery          = R.drawable.battery_charge_100_600x600;
+    public static final int IconResSocial           = R.drawable.social_600x600;
     public static final int IconResSocialTwitter    = R.drawable.social_twitter_400x400;
     public static final int IconResSocialFacebook   = R.drawable.social_facebook_400x400;
     public static final int IconResSocialGoogleplus = R.drawable.social_googleplus_400x400;
