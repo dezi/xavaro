@@ -140,8 +140,6 @@ public class WebAppSocial
     @JavascriptInterface
     public String getPost(String platform, String postid)
     {
-        Log.d(LOGTAG, "getPost:" + platform + "=" + postid);
-
         JSONObject post = null;
 
         Social.SocialInterface socialplatform = getPlatform(platform);

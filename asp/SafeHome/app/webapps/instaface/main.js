@@ -1,3 +1,8 @@
+instaface.config =
+{
+    "iconsize" : 120
+}
+
 instaface.createFrame = function()
 {
     var ic = instaface;
@@ -5,17 +10,71 @@ instaface.createFrame = function()
     ic.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
     ic.topdiv.style.overflow = "hidden";
 
-    ic.titlediv = WebLibSimple.createDivHeight(0, 0, 0, 88, "titlediv", ic.topdiv);
+    var theight = ic.config.iconsize + 8 + 8
+
+    ic.titlediv = WebLibSimple.createDivHeight(0, 0, 0, theight, "titlediv", ic.topdiv);
     WebLibSimple.setBGColor(ic.titlediv, "#ff7755cc");
     ic.titlediv.style.overflow = "hidden";
-    ic.titlediv.style.padding = "8px";
 
-    ic.contentdiv = WebLibSimple.createDiv(0, 104, 0, 0, "contentdiv", ic.topdiv);
+    ic.titlescroll = WebLibSimple.createDivWidth(0, 0, null, 0, "titlescroll", ic.titlediv);
+    ic.titlescroll.scrollHorizontal = true;
+
+    ic.contentdiv = WebLibSimple.createDiv(0, theight, 0, 0, "contentdiv", ic.topdiv);
     ic.contentdiv.style.overflow = "hidden";
 
-    ic.contentscoll = WebLibSimple.createDivHeight(0, 0, 0, null, "contentscoll", ic.contentdiv);
-    WebLibSimple.setBGColor(ic.contentscoll, "#dddddddd");
-    ic.contentscoll.scrollVertical = true;
+    ic.contentscroll = WebLibSimple.createDivHeight(0, 0, 0, null, "contentscroll", ic.contentdiv);
+    WebLibSimple.setBGColor(ic.contentscroll, "#dddddddd");
+    ic.contentscroll.scrollVertical = true;
+}
+
+instaface.getSelector = function(target)
+{
+    var ic = instaface;
+
+    for (var inx = 0; inx < ic.contentselectors.length; inx++)
+    {
+        if (target == ic.contentselectors[ inx ].pdiv)
+        {
+            return ic.contentselectors[ inx ];
+        }
+    }
+
+    return null;
+}
+
+instaface.onTitelImageClick = function(ctarget, target)
+{
+    WebAppUtility.makeClick();
+
+    var ic = instaface;
+
+    var selector = ic.getSelector(ctarget);
+    if (selector == null) return;
+
+    if (selector == ic.activeselector)
+    {
+        if (selector.activated)
+        {
+            WebLibSimple.setBGColor(selector.pdiv, "#00000000");
+            selector.activated = false;
+            ic.activeselector = null;
+        }
+    }
+    else
+    {
+        if (ic.activeselector)
+        {
+            WebLibSimple.setBGColor(ic.activeselector.pdiv, "#00000000");
+            ic.activeselector.activated = false;
+        }
+
+        WebLibSimple.setBGColor(selector.pdiv, "#ffff0000");
+        selector.activated = true;
+
+        ic.activeselector = selector;
+    }
+
+    ic.createConts();
 }
 
 instaface.createFeeds = function()
@@ -28,8 +87,8 @@ instaface.createFeeds = function()
 
     ic.platforms = JSON.parse(WebAppSocial.getPlatforms());
 
-    ic.plattitles = {};
-    ic.platsorter = [];
+    ic.icontitles = {};
+    ic.iconsorter = [];
 
     //
     // Build a list with all feeds of all platforms
@@ -38,6 +97,7 @@ instaface.createFeeds = function()
 
     ic.feeds = [];
     ic.feedsdata = [];
+    ic.feedsdinx = [];
 
     for (var inx = 0; inx < ic.platforms.length; inx++)
     {
@@ -51,16 +111,13 @@ instaface.createFeeds = function()
             // Get all his configured feeds for this platform.
             //
 
-            if (! ic.plattitles[ platform.plat ])
+            if ((ic.platforms.length > 1) && (! ic.icontitles[ platform.plat ]))
             {
                 var picn = WebLibSimple.createAnyAppend("img");
-                picn.style.width = "80px";
-                picn.style.height = "80px";
                 picn.src = WebLibSocial.getPlatformIcon(platform.plat);
-                picn.style.padding = "4px";
 
-                ic.plattitles[ platform.plat ] = picn;
-                ic.platsorter.push("1|" + platform.plat);
+                ic.icontitles[ platform.plat ] = picn;
+                ic.iconsorter.push("1|" + platform.plat);
             }
 
             var ownerfeeds = JSON.parse(WebAppSocial.getUserFeeds(platform.plat));
@@ -69,22 +126,20 @@ instaface.createFeeds = function()
             {
                 var ownerfeed = ownerfeeds[ fnz ];
 
-                if (! ic.plattitles[ ownerfeed.name ])
+                if (! ic.icontitles[ ownerfeed.name ])
                 {
                     var sort = (ownerfeed.type == "owner") ? "2" : "3";
 
                     var picn = WebLibSimple.createAnyAppend("img");
-                    picn.style.width = "80px";
-                    picn.style.height = "80px";
                     picn.src = WebLibSocial.getUserIcon(platform.plat, ownerfeed.id);
-                    picn.style.padding = "4px";
 
-                    ic.plattitles[ ownerfeed.name ] = picn;
-                    ic.platsorter.push(sort + "|" + ownerfeed.name);
+                    ic.icontitles[ ownerfeed.name ] = picn;
+                    ic.iconsorter.push(sort + "|" + ownerfeed.name);
                 }
 
                 ic.feeds.push(ownerfeed);
                 ic.feedsdata.push(JSON.parse(WebAppSocial.getFeed(platform.plat, ownerfeed.id)));
+                ic.feedsdinx.push(0);
             }
         }
         else
@@ -96,17 +151,58 @@ instaface.createFeeds = function()
 
             ic.feeds.push(platform);
             ic.feedsdata.push(JSON.parse(WebAppSocial.getFeed(platform.plat, platform.id)));
+            ic.feedsdinx.push(0);
         }
     }
 
-    ic.platsorter.sort();
-
-    for (var inx = 0; inx < ic.platsorter.length; inx++)
+    if (ic.iconsorter.length == 0)
     {
-        var skey = ic.platsorter[ inx ].substring(2);
-        var picn = ic.plattitles[ skey ];
+        ic.titlediv.style.display = "none";
+        ic.contentdiv.style.top = "0px";
+    }
+    else
+    {
+        ic.iconsorter.sort();
 
-        ic.titlediv.appendChild(picn);
+        ic.contentselectors = [];
+
+        var titlewid = 0;
+
+        for (var inx = 0; inx < ic.iconsorter.length; inx++)
+        {
+            var stag = ic.iconsorter[ inx ];
+            var skey = stag.substring(2);
+            var picn = ic.icontitles[ skey ];
+
+            var pdiv = WebLibSimple.createDivWidHei(
+                                (titlewid + 4), 4,
+                                ic.config.iconsize + 8, ic.config.iconsize + 8,
+                                null, ic.titlescroll);
+
+            pdiv.onTouchClick = ic.onTitelImageClick;
+            pdiv.appendChild(picn);
+
+            picn.style.position = "absolute";
+            picn.style.top = "4px";
+            picn.style.left = "4px";
+            picn.style.width = ic.config.iconsize + "px";
+            picn.style.height = ic.config.iconsize + "px";
+
+            var selector = {};
+
+            selector.stag = stag;
+            selector.pdiv = pdiv;
+            selector.picn = picn;
+            selector.activated = false;
+
+            ic.contentselectors.push(selector);
+
+            titlewid += ic.config.iconsize + 4 + 4;
+        }
+
+        titlewid += 8;
+
+        ic.titlescroll.style.width = titlewid + "px";
     }
 }
 
@@ -122,7 +218,7 @@ instaface.displayPost = function(plat, post)
     var text = WebLibSocial.getPostText(plat, post);
     var imgs = WebLibSocial.getPostImgs(plat, post);
 
-    var postdiv = WebLibSimple.createAnyAppend("div", ic.contentscoll);
+    var postdiv = WebLibSimple.createAnyAppend("div", ic.contentscroll);
     postdiv.style.position  = "relative";
     postdiv.style.margin  = "16px";
     postdiv.style.border = "1px solid black";
@@ -171,9 +267,31 @@ instaface.displayPost = function(plat, post)
 
 instaface.createConts = function()
 {
+    var ic = instaface;
+
+    //
+    // Nuke current content if any.
+    //
+
+    ic.contentscroll.innerHTML = "";
+    ic.contentscroll.style.top = "0px";
+
+    //
+    // Reset feed indices.
+    //
+
+    for (var inx = 0; inx < ic.feedsdinx.length; inx++)
+    {
+        ic.feedsdinx[ inx ] = 0;
+    }
+
+    //
+    // Collect some posts.
+    //
+
     for (var inx = 0; inx < 20; inx++)
     {
-        instaface.retrieveBestPost();
+        ic.retrieveBestPost();
     }
 }
 
@@ -189,17 +307,43 @@ instaface.retrieveBestPost = function()
     var candipost = null;
     var candifeed = null;
     var candifinx = 0;
-    var candipinx = 0;
     var candidate = 0;
+
+    var stag = ic.activeselector ? ic.activeselector.stag : false;
 
     for (var finx = 0; finx < ic.feeds.length; finx++)
     {
         var feed = ic.feeds[ finx ];
         var data = ic.feedsdata[ finx ];
+        var dinx = ic.feedsdinx[ finx ];
 
-        for (var pinx = 0; pinx < data.length; pinx++)
+        if (stag)
         {
-            var post = data[ pinx ];
+            var mode = stag.substring(0, 1);
+            var valu = stag.substring(2);
+
+            if (mode == "1")
+            {
+                //
+                // Platform selector does not match.
+                //
+
+               if (feed.plat != valu) continue;
+            }
+
+            if ((mode == "2") || (mode == "3"))
+            {
+                //
+                // User name selector does not match.
+                //
+
+                if (feed.name != valu) continue;
+            }
+        }
+
+        while (dinx < data.length)
+        {
+            var post = data[ dinx++ ];
 
             var postid = WebLibSocial.getPostId(feed.plat, post);
             var postdate = WebLibSocial.getPostDate(feed.plat, post);
@@ -218,7 +362,6 @@ instaface.retrieveBestPost = function()
                 {
                     candifinx = finx;
                     candifeed = data;
-                    candipinx = pinx;
                     candipost = post;
                     candidate = postdate;
 
@@ -228,24 +371,14 @@ instaface.retrieveBestPost = function()
 
                     break;
                 }
-
-                //
-                // Remove post from feed.
-                //
-
-                data.splice(pinx--, 1);
             }
         }
+
+        ic.feedsdinx[ finx ] = dinx;
     }
 
     if (candipost)
     {
-        //
-        // Remove post from feed data.
-        //
-
-        candifeed.splice(candipinx, 1);
-
         instaface.displayPost(ic.feeds[ candifinx ].plat, candipost);
     }
 }
