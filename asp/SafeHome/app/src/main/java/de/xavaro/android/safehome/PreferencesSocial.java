@@ -45,6 +45,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
         super.registerAll(context);
 
         NicedPreferences.NiceDisplayTextPreference dp;
+        NicedPreferences.NiceListPreference lp;
 
         categoryPref = new NicedPreferences.NiceInfoPreference(context);
         categoryPref.setTitle(R.string.pref_social_account);
@@ -97,6 +98,18 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
 
         preferences.add(loginPref);
 
+        Simple.removeSharedPref("social." + social.getPlatform() + ".mode");
+
+        lp = new NicedPreferences.NiceListPreference(context);
+        lp.setKey("social." + social.getPlatform() + ".owner.mode");
+        lp.setTitle("Anzeige");
+        lp.setEntryValues(R.array.pref_social_newfriends_keys);
+        lp.setEntries(R.array.pref_social_newfriends_vals);
+        lp.setDefaultValue("feed+folder");
+        lp.setEnabled(enabled);
+
+        preferences.add(lp);
+
         if (GlobalConfigs.BetaFlag)
         {
             apicallsPref = new NicedPreferences.NiceDisplayTextPreference(context);
@@ -104,24 +117,24 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             apicallsPref.setEnabled(enabled);
 
             preferences.add(apicallsPref);
-        }
 
-        dp = new NicedPreferences.NiceDisplayTextPreference(context);
-        dp.setTitle("Etwas testen");
-        dp.setEnabled(enabled);
+            dp = new NicedPreferences.NiceDisplayTextPreference(context);
+            dp.setTitle("Etwas testen");
+            dp.setEnabled(enabled);
 
-        dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
+            dp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
             {
-                social.getTest();
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    social.getTest();
 
-                return false;
-            }
-        });
+                    return false;
+                }
+            });
 
-        preferences.add(dp);
+            preferences.add(dp);
+        }
 
         //
         // Define preference order.

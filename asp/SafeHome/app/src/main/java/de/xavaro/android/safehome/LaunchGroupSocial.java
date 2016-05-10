@@ -12,6 +12,11 @@ import java.util.Map;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Social;
+import de.xavaro.android.common.SocialFacebook;
+import de.xavaro.android.common.SocialGoogleplus;
+import de.xavaro.android.common.SocialInstagram;
+import de.xavaro.android.common.SocialTwitter;
 import de.xavaro.android.common.WebApp;
 
 public class LaunchGroupSocial extends LaunchGroup
@@ -38,23 +43,27 @@ public class LaunchGroupSocial extends LaunchGroup
 
         if (Simple.getSharedPrefBoolean("social.facebook.enable"))
         {
+            configPrefs("facebook", "owner", home, fbdir, cdir);
             configPrefs("facebook", "friend", home, fbdir, cdir);
             configPrefs("facebook", "like", home, fbdir, cdir);
         }
 
         if (Simple.getSharedPrefBoolean("social.instagram.enable"))
         {
+            configPrefs("instagram", "owner", home, igdir, cdir);
             configPrefs("instagram", "friend", home, igdir, cdir);
         }
 
         if (Simple.getSharedPrefBoolean("social.googleplus.enable"))
         {
+            configPrefs("googleplus", "owner", home, gpdir, cdir);
             configPrefs("googleplus", "friend", home, gpdir, cdir);
             configPrefs("googleplus", "like", home, gpdir, cdir);
         }
 
         if (Simple.getSharedPrefBoolean("social.twitter.enable"))
         {
+            configPrefs("twitter", "owner", home, twdir, cdir);
             configPrefs("twitter", "friend", home, twdir, cdir);
             configPrefs("twitter", "like", home, twdir, cdir);
         }
@@ -140,6 +149,55 @@ public class LaunchGroupSocial extends LaunchGroup
     private static void configPrefs(String platform, String type,
                                     JSONArray home, JSONArray adir, JSONArray cdir)
     {
+        if (type.equals("owner"))
+        {
+            String mode = Simple.getSharedPrefString("social." + platform + ".owner.mode");
+            String name = null;
+            String pfid = null;
+
+            if (Simple.equals(platform, "twitter"))
+            {
+                pfid = SocialTwitter.getInstance().getUserId();
+                name = SocialTwitter.getInstance().getUserDisplayName();
+            }
+
+            if (Simple.equals(platform, "facebook"))
+            {
+                pfid = SocialFacebook.getInstance().getUserId();
+                name = SocialFacebook.getInstance().getUserDisplayName();
+            }
+
+            if (Simple.equals(platform, "instagram"))
+            {
+                pfid = SocialInstagram.getInstance().getUserId();
+                name = SocialInstagram.getInstance().getUserDisplayName();
+            }
+
+            if (Simple.equals(platform, "googleplus"))
+            {
+                pfid = SocialGoogleplus.getInstance().getUserId();
+                name = SocialGoogleplus.getInstance().getUserDisplayName();
+            }
+
+            if ((mode != null) && (pfid != null) && (name != null))
+            {
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", name);
+                Json.put(entry, "type", platform);
+                Json.put(entry, "subtype", type);
+                Json.put(entry, "pfid", pfid);
+                Json.put(entry, "order", 500);
+
+                if (mode.contains("home")) Json.put(home, entry);
+                if (mode.contains("home")) Json.put(adir, entry);
+                if (mode.contains("folder")) Json.put(adir, entry);
+                if (mode.contains("contacts")) Json.put(cdir, entry);
+
+                if (mode.contains("feed")) haveownerfeed = true;
+            }
+        }
+
         String modeprefix = "social." + platform + "." + type + ".mode.";
         String nameprefix = "social." + platform + "." + type + ".name.";
 
