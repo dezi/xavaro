@@ -1087,6 +1087,20 @@ public abstract class Social
 
     //endregion Reconfiguration
 
+    //region Searching
+
+    public boolean canSearchUsers()
+    {
+        return false;
+    }
+
+    public JSONArray getSearchUsers(String query, int max)
+    {
+        return null;
+    }
+
+    //endregion Searching
+
     //region Cache maintenance
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -1266,6 +1280,9 @@ public abstract class Social
         Drawable getProfileDrawable(String pfid, boolean circle);
 
         void reconfigureFriendsAndLikes();
+
+        boolean canSearchUsers();
+        JSONArray getSearchUsers(String query, int max);
 
         int getWindowStatistic();
         int getTodayStatistic();

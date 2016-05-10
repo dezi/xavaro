@@ -1,5 +1,9 @@
 package de.xavaro.android.common;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import android.util.Log;
@@ -476,5 +480,23 @@ public class SimpleRequest
         }
 
         return null;
+    }
+
+    @Nullable
+    public static Bitmap readBitmap(String url)
+    {
+        byte[] data = readData(url);
+        if (data == null) return null;
+
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
+    }
+
+    @Nullable
+    public static Drawable readDrawable(String url)
+    {
+        Bitmap bitmap = readBitmap(url);
+        if (bitmap == null) return null;
+
+        return new BitmapDrawable(Simple.getResources(), bitmap);
     }
 }

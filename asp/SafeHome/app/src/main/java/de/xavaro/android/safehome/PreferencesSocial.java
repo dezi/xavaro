@@ -4,12 +4,17 @@ import android.preference.Preference;
 import android.content.Context;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Map;
 
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SimpleRequest;
 import de.xavaro.android.common.Social;
 
 public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
@@ -21,6 +26,7 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
     protected int accountSummary;
     protected int friendsSummary;
     protected int likesSummary;
+    protected boolean manualSearch;
 
     protected ArrayList<String> knownpfids = new ArrayList<>();
 
@@ -44,7 +50,10 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
     {
         super.registerAll(context);
 
+        manualSearch = social.canSearchUsers();
+
         NicedPreferences.NiceDisplayTextPreference dp;
+        NicedPreferences.NiceSearchPreference sp;
         NicedPreferences.NiceListPreference lp;
 
         categoryPref = new NicedPreferences.NiceInfoPreference(context);
@@ -156,10 +165,102 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
         registerFriends(context, true);
         registerLikes(context, true);
 
+        //
+        // Manual search.
+        //
+
+        if (manualSearch)
+        {
+            sp = new NicedPreferences.NiceSearchPreference(context);
+
+            sp.setTitle("Suchen");
+            sp.setOrder(1000000);
+
+            sp.setSearchCallback(new NicedPreferences.NiceSearchPreference.SearchCallback()
+            {
+                @Override
+                public void onSearchCancel(String prefkey)
+                {
+
+                }
+
+                @Override
+                public void onSearchRequest(String prefkey, String query)
+                {
+                    performSearch(query);
+                }
+            });
+
+            preferences.add(sp);
+        }
+
         monitorPrefs.run();
     }
 
-    public void registerFriends(Context context, boolean initial)
+    private ArrayList<Preference> lastEntries;
+
+    private void performSearch(String query)
+    {
+        ArrayList<Preference> nextEntries = null;
+
+        JSONArray users = social.getSearchUsers(query, 20);
+
+        if (users != null)
+        {
+            nextEntries = new ArrayList<>();
+
+            NicedPreferences.NiceListPreference lp;
+
+            for (int inx = 0; inx < users.length(); inx++)
+            {
+                JSONObject user = Json.getObject(users, inx);
+
+                String pfid = Json.getString(user, "pfid");
+                String name = Json.getString(user, "name");
+                String icon = Json.getString(user, "icon");
+                String type = Json.getString(user, "type");
+
+                if ((pfid == null) || (name == null) || (icon == null) || (type == null)) continue;
+                if (name.isEmpty()) continue;
+
+                lp = new NicedPreferences.NiceListPreference(Simple.getActContext());
+
+                String veryfied = Json.getBoolean(user, "very") ? " (" + "verified" + ")" : "";
+
+                lp.setTitle(name + veryfied);
+                lp.setIcon(SimpleRequest.readDrawable(icon));
+                lp.setOrder(1000001 + inx);
+
+                if (Simple.equals(type, "like"))
+                {
+                    lp.setEntryValues(R.array.pref_social_newlikes_keys);
+                    lp.setEntries(R.array.pref_social_newlikes_vals);
+                }
+                else
+                {
+                    lp.setEntryValues(R.array.pref_social_newfriends_keys);
+                    lp.setEntries(R.array.pref_social_newfriends_vals);
+                }
+
+                lp.setValue("inactive");
+
+                getPreferenceScreen().addPreference(lp);
+                nextEntries.add(lp);
+            }
+        }
+
+        if (lastEntries != null)
+        {
+            for (Preference nukeme : lastEntries)
+            {
+                getPreferenceScreen().removePreference(nukeme);
+            }
+        }
+
+        lastEntries = nextEntries;
+    }
+
+    private void registerFriends(Context context, boolean initial)
     {
         if (! social.hasFriends()) return;
 
