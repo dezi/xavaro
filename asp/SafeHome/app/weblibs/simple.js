@@ -11,7 +11,7 @@ WebLibSimple = {};
 WebLibSimple.createAnyAppend = function(type, parent)
 {
     var div = document.createElement(type);
-    parent.appendChild(div);
+    if (parent) parent.appendChild(div);
 
     return div;
 }
