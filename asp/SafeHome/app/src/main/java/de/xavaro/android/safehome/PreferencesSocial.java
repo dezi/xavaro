@@ -230,6 +230,8 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
                 lp.setTitle(name + veryfied);
                 lp.setIcon(SimpleRequest.readDrawable(icon));
                 lp.setOrder(1000001 + inx);
+                lp.setSlug(user);
+                lp.setOnPreferenceChangeListener(searchResultClick);
 
                 if (Simple.equals(type, "like"))
                 {
@@ -259,6 +261,39 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
 
         lastEntries = nextEntries;
     }
+
+    private final Preference.OnPreferenceChangeListener searchResultClick
+            = new Preference.OnPreferenceChangeListener()
+    {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object newValue)
+        {
+            NicedPreferences.NiceListPreference lp
+                    = (NicedPreferences.NiceListPreference) preference;
+
+            JSONObject user = lp.getSlug();
+
+            Log.d(LOGTAG, "searchResultClick: " + Json.toPretty(lp.getSlug()));
+
+            String pfid = Json.getString(user, "pfid");
+            String name = Json.getString(user, "name");
+            String icon = Json.getString(user, "icon");
+            String type = Json.getString(user, "type");
+            String mode = (String) newValue;
+
+            String platform = social.getPlatform();
+
+            String fnamepref = "social." + platform + "." + type + ".name." + pfid;
+            String fmodepref = "social." + platform + "." + type + ".mode." + pfid;
+            String ficonpref = "social." + platform + "." + type + ".icon." + pfid;
+
+            Simple.setSharedPrefString(fnamepref, name);
+            Simple.setSharedPrefString(fmodepref, mode);
+            Simple.setSharedPrefString(ficonpref, icon);
+
+            return true;
+        }
+    };
 
     private void registerFriends(Context context, boolean initial)
     {

@@ -45,7 +45,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     @Override
     public boolean hasLikes()
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -84,6 +84,18 @@ public class SocialInstagram extends Social implements Social.SocialInterface
 
         if ((userdata == null) || ! Simple.equals(pfid, Json.getString(userdata, "username")))
         {
+            //
+            // Check for manually added friends and likes.
+            //
+
+            String ficonpreflike = "social.instagram.like.icon." + pfid;
+            String iconlikeurl = Simple.getSharedPrefString(ficonpreflike);
+            if (iconlikeurl != null) return SimpleRequest.readData(iconlikeurl);
+
+            String ficonpreffriend = "social.instagram.friend.icon." + pfid;
+            String iconfriendurl = Simple.getSharedPrefString(ficonpreffriend);
+            if (iconfriendurl != null) return SimpleRequest.readData(iconfriendurl);
+
             userdata = getGraphUserProfile(pfid);
         }
 
@@ -129,6 +141,8 @@ public class SocialInstagram extends Social implements Social.SocialInterface
             String icon = Json.getString(user, "profile_pic_url");
             String type = (Json.getInt(user, "follower_count") >= 10000) ? "like" : "friend";
             Boolean very = Json.getBoolean(user, "is_verified");
+
+            //Log.d(LOGTAG, "getSearchUsers: " + Json.toPretty(user));
 
             if ((pfid == null) || (name == null) || (icon == null)) continue;
 

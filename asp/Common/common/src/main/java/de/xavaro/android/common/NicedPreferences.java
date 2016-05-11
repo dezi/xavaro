@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -728,12 +729,23 @@ public class NicedPreferences
         private CharSequence[] entries;
         private CharSequence[] values;
         private Runnable onClickRunner;
+        private JSONObject jsonSlug;
 
         public NiceListPreference(Context context)
         {
             super(context);
 
             setOnPreferenceChangeListener(this);
+        }
+
+        public void setSlug(JSONObject slug)
+        {
+            jsonSlug = slug;
+        }
+
+        public JSONObject getSlug()
+        {
+            return jsonSlug;
         }
 
         @Override

@@ -46,13 +46,6 @@ public class SimpleRequest
         return doHTTPGet(src, null);
     }
 
-    private static void logStuff(String string)
-    {
-        String[] lines = string.split("\r\n");
-
-        for (String line : lines) Log.d(LOGTAG,"logStuff:<" + line + ">");
-    }
-
     @Nullable
     public static String doHTTPGet(String src, String referrer)
     {
@@ -388,6 +381,7 @@ public class SimpleRequest
 
             connection.setRequestMethod((post == null) ? "GET" : "POST");
 
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 Gecko/20100101 Firefox/40.1");
             if (oauth != null) connection.setRequestProperty("Authorization", oauth);
 
             if (post != null)

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 
 import android.app.AlertDialog;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -1019,6 +1020,7 @@ public abstract class Social
 
                 String fnamepref = "social." + platform + ".friend.name." + pfid;
                 String fmodepref = "social." + platform + ".friend.mode." + pfid;
+                String ficonpref = "social." + platform + ".friend.icon." + pfid;
 
                 Simple.setSharedPrefString(fnamepref, name);
 
@@ -1031,10 +1033,30 @@ public abstract class Social
 
                 if (oldfriends.containsKey(fnamepref)) oldfriends.remove(fnamepref);
                 if (oldfriends.containsKey(fmodepref)) oldfriends.remove(fmodepref);
+                if (oldfriends.containsKey(ficonpref)) oldfriends.remove(ficonpref);
             }
 
             for (Map.Entry<String, ?> entry : oldfriends.entrySet())
             {
+                //
+                // Pre check manually added friends or likes
+                // by search not contained in lists. Manually
+                // entries are identified by having an icon
+                // preference.
+                //
+
+                String key = entry.getKey();
+                String[] parts = key.split("\\.");
+
+                if (parts.length >= 5)
+                {
+                    parts[ 3 ] = "icon";
+
+                    String checkpref = TextUtils.join(".", parts);
+                    String checkvalue = Simple.getSharedPrefString(checkpref);
+                    if (checkvalue != null) continue;
+                }
+
                 Simple.removeSharedPref(entry.getKey());
             }
         }
@@ -1064,6 +1086,7 @@ public abstract class Social
 
                 String fnamepref = "social." + platform + ".like.name." + pfid;
                 String fmodepref = "social." + platform + ".like.mode." + pfid;
+                String ficonpref = "social." + platform + ".like.icon." + pfid;
 
                 Simple.setSharedPrefString(fnamepref, name);
 
@@ -1076,11 +1099,31 @@ public abstract class Social
 
                 if (oldlikes.containsKey(fnamepref)) oldlikes.remove(fnamepref);
                 if (oldlikes.containsKey(fmodepref)) oldlikes.remove(fmodepref);
+                if (oldlikes.containsKey(ficonpref)) oldlikes.remove(ficonpref);
             }
 
             for (Map.Entry<String, ?> entry : oldlikes.entrySet())
             {
-                Simple.removeSharedPref(entry.getKey());
+                //
+                // Pre check manually added friends or likes
+                // by search not contained in lists. Manually
+                // entries are identified by having an icon
+                // preference.
+                //
+
+                String key = entry.getKey();
+                String[] parts = key.split("\\.");
+
+                if (parts.length >= 5)
+                {
+                    parts[ 3 ] = "icon";
+
+                    String checkpref = TextUtils.join(".", parts);
+                    String checkvalue = Simple.getSharedPrefString(checkpref);
+                    if (checkvalue != null) continue;
+                }
+
+                Simple.removeSharedPref(key);
             }
         }
     }
