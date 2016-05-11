@@ -787,6 +787,7 @@ public abstract class Social
             querystring += Simple.getUrlEncoded("" + parameters.get(key));
         }
 
+        //
         // Build signature string.
         //
 
@@ -1153,6 +1154,7 @@ public abstract class Social
     private long nextInterval;
     private long nextAction;
 
+    private final JSONObject feedSync = new JSONObject();
     private JSONArray feedList;
     private ArrayList<String> postFiles;
 
@@ -1252,32 +1254,43 @@ public abstract class Social
         Simple.putFileContent(feedfile, Json.toPretty(feeddata));
 
         //
-        // Check feed stories.
+        // Check and cache feed stories.
         //
 
-        for (int inx = 0; inx < feeddata.length(); inx++)
+        cacheFeedStories(feedpfid, feeddata);
+    }
+
+    protected void cacheFeedStories(String feedpfid, JSONArray feeddata)
+    {
+        if (feeddata != null)
         {
-            JSONObject post = Json.getObject(feeddata, inx);
-
-            String postid = Json.getString(post, "id");
-            if (postid == null) postid = Json.getString(post, "id_str");
-            if (postid == null) continue;
-
-            String postname = postid + ".post.json";
-            File postfile = new File(cachedir, postname);
-
-            if (postFiles.contains(postname))
+            synchronized (feedSync)
             {
-                postFiles.remove(postname);
-                continue;
+                for (int inx = 0; inx < feeddata.length(); inx++)
+                {
+                    JSONObject post = Json.getObject(feeddata, inx);
+
+                    String postid = Json.getString(post, "id");
+                    if (postid == null) postid = Json.getString(post, "id_str");
+                    if (postid == null) continue;
+
+                    String postname = postid + ".post.json";
+                    File postfile = new File(cachedir, postname);
+
+                    if ((postFiles != null) && postFiles.contains(postname))
+                    {
+                        postFiles.remove(postname);
+                        continue;
+                    }
+
+                    JSONObject postdata = apifeedhasposts ? post : getGraphPost(postid);
+                    if (postdata == null) continue;
+
+                    Simple.putFileContent(postfile, Json.toPretty(postdata));
+
+                    SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, 1);
+                }
             }
-
-            JSONObject postdata = apifeedhasposts ? post : getGraphPost(postid);
-            if (postdata == null) continue;
-
-            Simple.putFileContent(postfile, Json.toPretty(postdata));
-
-            SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, 1);
         }
     }
 

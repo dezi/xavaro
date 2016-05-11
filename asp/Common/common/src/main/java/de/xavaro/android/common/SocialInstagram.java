@@ -34,6 +34,8 @@ public class SocialInstagram extends Social implements Social.SocialInterface
         scopes = new String[]{ "basic", "public_content", "follower_list" };
 
         apiurl = "https://api.instagram.com/v1";
+
+        apifeedhasposts = true;
     }
 
     @Override
@@ -134,8 +136,6 @@ public class SocialInstagram extends Social implements Social.SocialInterface
             user = Json.getObject(user, "user");
             if (user == null) continue;
 
-            Log.d(LOGTAG, "===" + Json.toPretty(user));
-
             String pfid = Json.getString(user, "username");
             String name = Json.getString(user, "full_name");
             String icon = Json.getString(user, "profile_pic_url");
@@ -178,6 +178,21 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     @Nullable
     protected JSONObject getGraphUserProfile(String pfid)
     {
+        if (pfid == null) return null;
+
+        if (! pfid.matches("[0-9]*"))
+        {
+            //
+            // Access via public json url.
+            //
+
+            String url = "https://www.instagram.com/" + pfid + "/media";
+            JSONObject response = Json.fromString(SimpleRequest.readContent(url));
+            JSONArray items = Json.getArray(response, "items");
+            JSONObject item = Json.getObject(items, 0);
+            return Json.getObject(item, "user");
+        }
+
         JSONObject response = getGraphRequest("/users/" + pfid);
         return Json.getObject(response, "data");
     }
@@ -207,7 +222,33 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     {
         if (userid == null) return null;
 
-        JSONObject response = getGraphRequest("/users/" + userid  + "/media/recent");
+        JSONObject response;
+
+        if (! userid.matches("[0-9]*"))
+        {
+            //
+            // Access via public json url.
+            //
+
+            String url = "https://www.instagram.com/" + userid + "/media";
+            response = Json.fromString(SimpleRequest.readContent(url));
+            JSONArray feeddata = Json.getArray(response, "items");
+
+            //
+            // Make sure all items are cached because they
+            // cannot be accessed via api.
+            //
+
+            cacheFeedStories(userid, feeddata);
+
+            return feeddata;
+        }
+
+        //
+        // Access via api.
+        //
+
+        response = getGraphRequest("/users/" + userid + "/media/recent");
         return Json.getArray(response, "data");
     }
 

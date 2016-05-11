@@ -49,7 +49,7 @@ WebLibSocial.getPostDate = function(platform, post)
 
     if (platform == "instagram")
     {
-        if (post.created_time) return new Date(parseInt(post.created_time)).getTime();
+        if (post.created_time) return new Date(parseInt(post.created_time) * 1000).getTime();
     }
 
     return 0;
@@ -103,6 +103,21 @@ WebLibSocial.getPostUserid = function(platform, post)
     }
 
     return "Unknown Name";
+}
+
+WebLibSocial.getPostUsername = function(platform, post)
+{
+    if (platform == "instagram")
+    {
+        //
+        // On instagram public profiles are accessably only
+        // by the screen user name, which functions as an id.
+        //
+
+        if (post.user && post.user.username) return post.user.username;
+    }
+
+    return null;
 }
 
 WebLibSocial.getPostText = function(platform, post)
@@ -203,13 +218,23 @@ WebLibSocial.getPlatformIcon = function(platform)
     return "/weblibs/social/social_" + platform + "_400x400.png";
 }
 
-WebLibSocial.getUserIcon = function(platform, pfid)
+WebLibSocial.getUserIcon = function(platform, pfid, pfname)
 {
     var iconpath = WebAppSocial.getUserIcon(platform, pfid);
 
     if (iconpath && iconpath.length)
     {
         return ("local://" + iconpath);
+    }
+
+    if (pfname)
+    {
+        iconpath = WebAppSocial.getUserIcon(platform, pfname);
+
+        if (iconpath && iconpath.length)
+        {
+            return ("local://" + iconpath);
+        }
     }
 
     return "/weblibs/social/social_anon_300x300.png";

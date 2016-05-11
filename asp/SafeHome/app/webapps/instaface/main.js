@@ -125,16 +125,17 @@ instaface.createFeeds = function()
             for (var fnz = 0; fnz < ownerfeeds.length; fnz++)
             {
                 var ownerfeed = ownerfeeds[ fnz ];
+                var ownername = ownerfeed.name.toLowerCase();
 
-                if (! ic.icontitles[ ownerfeed.name ])
+                if (! ic.icontitles[ ownername ])
                 {
                     var sort = (ownerfeed.type == "owner") ? "2" : "3";
 
                     var picn = WebLibSimple.createAnyAppend("img");
                     picn.src = WebLibSocial.getUserIcon(platform.plat, ownerfeed.id);
 
-                    ic.icontitles[ ownerfeed.name ] = picn;
-                    ic.iconsorter.push(sort + "|" + ownerfeed.name);
+                    ic.icontitles[ ownername ] = picn;
+                    ic.iconsorter.push(sort + "|" + ownername);
                 }
 
                 ic.feeds.push(ownerfeed);
@@ -212,7 +213,8 @@ instaface.displayPost = function(plat, post)
 {
     var ic = instaface;
 
-    var user = WebLibSocial.getPostUserid(plat, post);
+    var pfid = WebLibSocial.getPostUserid(plat, post);
+    var pfna = WebLibSocial.getPostUsername(plat, post);
     var date = WebLibSocial.getPostDate(plat, post);
     var name = WebLibSocial.getPostName(plat, post);
     var text = WebLibSocial.getPostText(plat, post);
@@ -235,7 +237,7 @@ instaface.displayPost = function(plat, post)
     var uicn = WebLibSimple.createAnyAppend("img", leftdif);
     uicn.style.width = "100%";
     uicn.style.height = "auto";
-    uicn.src = WebLibSocial.getUserIcon(plat, user);
+    uicn.src = WebLibSocial.getUserIcon(plat, pfid, pfna);
 
     var rightdif = WebLibSimple.createAnyAppend("div", postdiv);
     WebLibSimple.setBGColor(rightdif, "#aaaaaaaa");
@@ -306,6 +308,7 @@ instaface.retrieveBestPost = function()
 
     var candipost = null;
     var candifeed = null;
+    var candidinx = 0;
     var candifinx = 0;
     var candidate = 0;
 
@@ -337,7 +340,7 @@ instaface.retrieveBestPost = function()
                 // User name selector does not match.
                 //
 
-                if (feed.name != valu) continue;
+                if (feed.name.toLowerCase() != valu.toLowerCase()) continue;
             }
         }
 
@@ -361,6 +364,7 @@ instaface.retrieveBestPost = function()
                 if (suitable)
                 {
                     candifinx = finx;
+                    candidinx = dinx;
                     candifeed = data;
                     candipost = post;
                     candidate = postdate;
@@ -373,12 +377,16 @@ instaface.retrieveBestPost = function()
                 }
             }
         }
-
-        ic.feedsdinx[ finx ] = dinx;
     }
 
     if (candipost)
     {
+        //
+        // Move winning feed ahead.
+        //
+
+        ic.feedsdinx[ candifinx ] = candidinx;
+        
         instaface.displayPost(ic.feeds[ candifinx ].plat, candipost);
     }
 }

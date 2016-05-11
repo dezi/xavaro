@@ -421,6 +421,7 @@
     <string name="pref_social_instagram_summary">todo</string>
     <string name="pref_social_instagram_account_summary">todo</string>
     <string name="pref_social_instagram_friends_summary">todo</string>
+    <string name="pref_social_instagram_likes_summary">todo</string>
 
     <string name="pref_social_googleplus">Google+</string>
     <string name="pref_social_googleplus_enable">Enable Google+</string>

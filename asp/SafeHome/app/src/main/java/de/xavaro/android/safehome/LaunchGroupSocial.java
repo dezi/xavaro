@@ -52,6 +52,7 @@ public class LaunchGroupSocial extends LaunchGroup
         {
             configPrefs("instagram", "owner", home, igdir, cdir);
             configPrefs("instagram", "friend", home, igdir, cdir);
+            configPrefs("instagram", "like", home, igdir, cdir);
         }
 
         if (Simple.getSharedPrefBoolean("social.googleplus.enable"))

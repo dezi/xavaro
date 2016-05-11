@@ -662,10 +662,10 @@ public class CommService extends Service
             EventManager.commTick();
             BatteryManager.commTick();
 
-            SocialTwitter.getInstance().commTick();
-            SocialFacebook.getInstance().commTick();
-            SocialInstagram.getInstance().commTick();
-            SocialGoogleplus.getInstance().commTick();
+            //SocialTwitter.getInstance().commTick();
+            //SocialFacebook.getInstance().commTick();
+            //SocialInstagram.getInstance().commTick();
+            //SocialGoogleplus.getInstance().commTick();
 
             if (! checkSocket()) continue;
 

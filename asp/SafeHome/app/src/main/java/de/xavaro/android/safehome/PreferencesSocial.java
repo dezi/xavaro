@@ -291,6 +291,9 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             Simple.setSharedPrefString(fmodepref, mode);
             Simple.setSharedPrefString(ficonpref, icon);
 
+            Simple.removePost(monitorPrefs);
+            Simple.makePost(monitorPrefs);
+
             return true;
         }
     };

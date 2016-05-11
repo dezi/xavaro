@@ -45,6 +45,7 @@ public class PreferencesSocialInstagram extends PreferencesSocial
 
         accountSummary = R.string.pref_social_instagram_account_summary;
         friendsSummary = R.string.pref_social_instagram_friends_summary;
+        likesSummary = R.string.pref_social_instagram_likes_summary;
 
         social = SocialInstagram.getInstance();
 
