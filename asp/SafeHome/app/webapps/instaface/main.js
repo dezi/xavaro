@@ -375,6 +375,14 @@ instaface.retrieveBestPost = function()
 
                     break;
                 }
+                else
+                {
+                    //
+                    // Remove post from feed for better performance.
+                    //
+
+                    data.splice(--dinx, 1);
+                }
             }
         }
     }
@@ -386,7 +394,7 @@ instaface.retrieveBestPost = function()
         //
 
         ic.feedsdinx[ candifinx ] = candidinx;
-        
+
         instaface.displayPost(ic.feeds[ candifinx ].plat, candipost);
     }
 }

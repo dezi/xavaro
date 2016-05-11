@@ -107,12 +107,8 @@ public class WebAppLoader extends WebViewClient
     {
         if (! url.startsWith("local://")) return denyLoad();
 
-        Log.d(LOGTAG, "getLocalFile:" + url);
-
         byte[] bytes = Simple.getFileBytes(new File(url.substring(8)));
         if (bytes == null) return denyLoad();
-
-        Log.d(LOGTAG, "getLocalFile:" + bytes.length);
 
         String mime = "image/jpeg";
         String enco = "UTF-8";
