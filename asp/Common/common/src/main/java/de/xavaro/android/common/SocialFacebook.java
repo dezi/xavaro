@@ -99,6 +99,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
                 //
 
                 JSONObject subattachments = Json.getObject(data, inx);
+                subattachments = Json.getObject(subattachments, "subattachments");
                 JSONArray subdata = Json.getArray(subattachments, "data");
 
                 if (subdata != null)

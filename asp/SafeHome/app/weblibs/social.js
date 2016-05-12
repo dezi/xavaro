@@ -179,7 +179,29 @@ WebLibSocial.getPostImgs = function(platform, post)
            for (var inx = 0; inx < post.attachments.data.length; inx++)
             {
                 var media = post.attachments.data[ inx ].media;
-                if (media && media.image) images.push(media.image);
+
+                if (media && media.image)
+                {
+                    images.push(media.image);
+                }
+                else
+                {
+                    var subattachments = post.attachments.data[ inx ].subattachments
+
+                    if (subattachments && subattachments.data)
+                    {
+                        for (var sinx = 0; sinx < subattachments.data.length; sinx++)
+                        {
+                            var media = subattachments.data[ sinx ].media;
+                            if (media && media.image)
+
+                            if (media && media.image)
+                            {
+                                images.push(media.image);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
