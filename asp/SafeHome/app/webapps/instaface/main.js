@@ -267,7 +267,7 @@ instaface.displayPost = function(plat, post)
         imgtag.src = imgs[ inx ].src ? imgs[ inx ].src : imgs[ inx ].url;
 
         if ((imgs[ inx ].width > imgsdiv.clientWidth) ||
-            ((imgsdiv.clientWidth - imgs[ inx ].width) < 50))
+            ((imgsdiv.clientWidth - imgs[ inx ].width) < 100))
         {
             imgtag.style.width = "100%";
             imgtag.style.height = "auto";
