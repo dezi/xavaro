@@ -269,8 +269,16 @@ instaface.displayPost = function(plat, post)
         if ((imgs[ inx ].width > imgsdiv.clientWidth) ||
             ((imgsdiv.clientWidth - imgs[ inx ].width) < 100))
         {
-            imgtag.style.width = "100%";
-            imgtag.style.height = "auto";
+            var width = imgsdiv.clientWidth;
+            var height = Math.floor(imgs[ inx ].height * width / imgs[ inx ].width);
+
+            imgtag.style.width  = width  + "px";
+            imgtag.style.height = height + "px";
+        }
+        else
+        {
+            imgtag.style.width  = imgs[ inx ].width  + "px";
+            imgtag.style.height = imgs[ inx ].height + "px";
         }
     }
 }
