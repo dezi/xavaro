@@ -148,8 +148,9 @@ public class SocialInstagram extends Social implements Social.SocialInterface
             String pfid = Json.getString(user, "username");
             String name = Json.getString(user, "full_name");
             String icon = Json.getString(user, "profile_pic_url");
-            String type = (Json.getInt(user, "follower_count") >= 10000) ? "like" : "friend";
-            Boolean very = Json.getBoolean(user, "is_verified");
+            boolean very = Json.getBoolean(user, "is_verified");
+            int follower = Json.getInt(user, "follower_count");
+            String type = ((follower >= 2500) || very) ? "like" : "friend";
 
             //Log.d(LOGTAG, "getSearchUsers: " + Json.toPretty(user));
 

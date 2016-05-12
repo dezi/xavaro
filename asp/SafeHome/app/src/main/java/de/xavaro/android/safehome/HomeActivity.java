@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
@@ -12,24 +11,21 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.util.ArrayList;
 
+import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Speak;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
-import de.xavaro.android.common.SocialFacebook;
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
 import de.xavaro.android.common.AccessibilityService;
-import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.WebCookie;
@@ -50,7 +46,6 @@ public class HomeActivity extends AppCompatActivity implements
         return instance;
     }
 
-    private JSONObject config;
     private FrameLayout topscreen;
     private FrameLayout videoSurface;
     private LaunchGroupRoot launchGroup;
@@ -71,12 +66,16 @@ public class HomeActivity extends AppCompatActivity implements
         Simple.setActContext(this);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
         instance = this;
 
-        topscreen = (FrameLayout) findViewById(R.id.top_screen);
-        topscreen.setSystemUiVisibility(UI_HIDE);
+        //setContentView(R.layout.activity_home);
+        //topscreen = (FrameLayout) findViewById(R.id.top_screen);
+        //topscreen.setSystemUiVisibility(UI_HIDE);
+
+        topscreen = new FrameLayout(this);
+        topscreen.setSystemUiVisibility(topscreen.getSystemUiVisibility() + UI_HIDE);
+        setContentView(topscreen);
 
         ArchievementManager.reset("alertcall.shortclick");
 
@@ -433,18 +432,6 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         Log.d(LOGTAG,"onActivityResult: request:" + requestCode + " result:" + resultCode);
-
-        if (requestCode == 1)
-        {
-            if (resultCode == Activity.RESULT_OK)
-            {
-                String result = data.getStringExtra("result");
-            }
-
-            if (resultCode == Activity.RESULT_CANCELED)
-            {
-            }
-        }
     }
 
     @Override

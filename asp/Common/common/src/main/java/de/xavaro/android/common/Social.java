@@ -404,17 +404,22 @@ public abstract class Social
 
         if (cookiestring != null)
         {
-            String expire = "=; Expires=Wed, 31 Dec 2000 23:59:59 GMT";
+            Log.d(LOGTAG, "clearCookies: vorher=" + cookiestring);
+
+            String expire = "=x;"; // Expires=Wed, 31 Dec 2000 23:59:59 GMT";
 
             String[] cookies = cookiestring.split(";");
 
             for (String cookie : cookies)
             {
-                Log.d(LOGTAG, "clearCookies:" + cookie);
+                Log.d(LOGTAG, "clearCookies: " + domain + "=" + cookie.trim());
 
-                String[] cookieparts = cookie.split("=");
-                cookieManager.setCookie(domain, cookieparts[ 0 ].trim() + expire);
+                String[] cookieparts = cookie.trim().split("=");
+                cookieManager.setCookie(domain, cookieparts[ 0 ] + expire);
             }
+
+            cookiestring = cookieManager.getCookie(domain);
+            Log.d(LOGTAG, "clearCookies: nachher=" + cookiestring);
         }
     }
 

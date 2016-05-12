@@ -29,7 +29,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
         appfix = "610331582448824";
         appfox = "MGFrOm00OmM7NDoyPmZtOzBmPGBoNW06bWNvMmszbDA=";
 
-        oauthurl = "https://www.facebook.com/dialog/oauth";
+        oauthurl = "https://m.facebook.com/dialog/oauth";
         tokenurl = "https://graph.facebook.com/v2.3/oauth/access_token";
 
         scopes = new String[]{ "public_profile", "user_friends", "user_likes", "user_posts" };
