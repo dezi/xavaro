@@ -61,6 +61,15 @@ public class SocialInstagram extends Social implements Social.SocialInterface
     {
     }
 
+    public boolean getPostSuitable(JSONObject post)
+    {
+        //
+        // All Instagram posts are suitable.
+        //
+
+        return true;
+    }
+
     //region User profile
 
     @Nullable

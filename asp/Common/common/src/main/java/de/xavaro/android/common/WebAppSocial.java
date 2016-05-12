@@ -109,11 +109,11 @@ public class WebAppSocial
     {
         JSONArray allfeeds = new JSONArray();
 
-        for (Social.SocialInterface platform : platforms)
+        for (Social.SocialInterface socialplatform : platforms)
         {
-            if (platform.isReady())
+            if (socialplatform.isReady())
             {
-                JSONArray feeds = platform.getUserFeeds(true);
+                JSONArray feeds = socialplatform.getUserFeeds(true);
                 Json.append(allfeeds, feeds);
             }
         }
@@ -135,6 +135,14 @@ public class WebAppSocial
         }
 
         return (allfeeds == null) ? "[]" : allfeeds.toString();
+    }
+
+    @JavascriptInterface
+    public boolean getPostSuitable(String platform, String post)
+    {
+        JSONObject jpost = Json.fromString(post);
+        Social.SocialInterface socialplatform = getPlatform(platform);
+        return (socialplatform != null) && socialplatform.getPostSuitable(jpost);
     }
 
     @JavascriptInterface

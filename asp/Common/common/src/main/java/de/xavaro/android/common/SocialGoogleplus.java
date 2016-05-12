@@ -74,6 +74,42 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
         return scopeval;
     }
 
+    @Override
+    public void getTest()
+    {
+        JSONObject response = getGraphRequest("/people/" +  getUserId() + "/activities/public");
+
+        Log.d(LOGTAG,"getTestDat:" + Json.toPretty(response));
+    }
+
+    public boolean getPostSuitable(JSONObject post)
+    {
+        //
+        // Check if post has an image.
+        //
+
+        JSONObject object = Json.getObject(post, "object");
+        JSONArray attachments = Json.getArray(object, "attachments");
+
+        if (attachments != null)
+        {
+            for (int inx = 0; inx < attachments.length(); inx++)
+            {
+                JSONObject media = Json.getObject(attachments, inx);
+                if ((media != null) && Json.has(media, "image"))
+                {
+                    //
+                    // Found image attachment.
+                    //
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     @Nullable
     public String getUserId()
     {
@@ -189,14 +225,6 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
     protected JSONObject getGraphPost(String postid)
     {
         return getGraphRequest("/activities/" + postid);
-    }
-
-    @Override
-    public void getTest()
-    {
-        JSONObject response = getGraphRequest("/people/" +  getUserId() + "/activities/public");
-
-        Log.d(LOGTAG,"getTestDat:" + Json.toPretty(response));
     }
 
     @Override

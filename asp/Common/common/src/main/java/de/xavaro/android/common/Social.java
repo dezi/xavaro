@@ -537,6 +537,8 @@ public abstract class Social
         }
     }
 
+    public abstract boolean getPostSuitable(JSONObject post);
+
     @Nullable
     public JSONObject getPost(String postid)
     {
@@ -1266,6 +1268,8 @@ public abstract class Social
         {
             synchronized (feedSync)
             {
+                int newposts = 0;
+
                 for (int inx = 0; inx < feeddata.length(); inx++)
                 {
                     JSONObject post = Json.getObject(feeddata, inx);
@@ -1288,8 +1292,10 @@ public abstract class Social
 
                     Simple.putFileContent(postfile, Json.toPretty(postdata));
 
-                    SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, 1);
+                    if (getPostSuitable(postdata)) newposts++;
                 }
+
+                SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, newposts);
             }
         }
     }
@@ -1334,6 +1340,7 @@ public abstract class Social
         JSONObject getGraphRequest(String path, JSONObject params);
 
         Drawable getProfileDrawable(String pfid, boolean circle);
+        boolean getPostSuitable(JSONObject post);
 
         void reconfigureFriendsAndLikes();
 

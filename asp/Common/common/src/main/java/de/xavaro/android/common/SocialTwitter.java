@@ -65,6 +65,40 @@ public class SocialTwitter extends Social implements Social.SocialInterface
         Log.d(LOGTAG, "====>" + Json.toPretty(response));
     }
 
+    public boolean getPostSuitable(JSONObject post)
+    {
+        //
+        // Check if post has an image.
+        //
+
+        JSONObject object = Json.getObject(post, "entities");
+        JSONArray media = Json.getArray(object, "media");
+
+        if (media != null)
+        {
+            for (int inx = 0; inx < media.length(); inx++)
+            {
+                JSONObject item = Json.getObject(media, inx);
+
+                if ((item != null) && Json.has(item, "media_url") && Json.has(item, "sizes"))
+                {
+                    JSONObject sizes = Json.getObject(item, "sizes");
+
+                    if ((sizes != null) && Json.has(sizes, "large"))
+                    {
+                        //
+                        // Found image attachment.
+                        //
+
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     //region User profile
 
     @Nullable

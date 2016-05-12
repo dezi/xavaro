@@ -42,7 +42,7 @@ instaface.getSelector = function(target)
     return null;
 }
 
-instaface.onTitelImageClick = function(ctarget, target)
+instaface.onTitleImageClick = function(ctarget, target)
 {
     WebAppUtility.makeClick();
 
@@ -180,7 +180,7 @@ instaface.createFeeds = function()
                                 ic.config.iconsize + 8, ic.config.iconsize + 8,
                                 null, ic.titlescroll);
 
-            pdiv.onTouchClick = ic.onTitelImageClick;
+            pdiv.onTouchClick = ic.onTitleImageClick;
             pdiv.appendChild(picn);
 
             picn.style.position = "absolute";
@@ -440,4 +440,3 @@ instaface.createFeeds();
 instaface.createConts();
 
 //instaface.createDebug();
-

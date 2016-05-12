@@ -63,7 +63,7 @@ public class SimpleStorage
 
     public static void addInt(String name, String property, int value)
     {
-        put(name, property, getInt(name, property) + value);
+        if (value != 0) put(name, property, getInt(name, property) + value);
     }
 
     public static boolean getBool(String name, String property)

@@ -65,6 +65,35 @@ public class SocialFacebook extends Social implements Social.SocialInterface
         Log.d(LOGTAG, "==============>" + Json.toPretty(response));
     }
 
+    public boolean getPostSuitable(JSONObject post)
+    {
+        //
+        // Check if post has an image.
+        //
+
+        JSONObject attachments = Json.getObject(post, "attachments");
+        JSONArray data = Json.getArray(attachments, "data");
+
+        if (data != null)
+        {
+            for (int inx = 0; inx < data.length(); inx++)
+            {
+                JSONObject media = Json.getObject(data, inx);
+
+                if ((media != null) && Json.has(media, "image"))
+                {
+                    //
+                    // Found image attachment.
+                    //
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     //region User profile
 
     @Nullable

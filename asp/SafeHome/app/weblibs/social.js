@@ -209,8 +209,7 @@ WebLibSocial.getPostImgs = function(platform, post)
 
 WebLibSocial.getPostSuitable = function(platform, post)
 {
-    var imgs = WebLibSocial.getPostImgs(platform, post);
-    return imgs.length > 0;
+    return WebAppSocial.getPostSuitable(platform, JSON.stringify(post));
 }
 
 WebLibSocial.getPlatformIcon = function(platform)
