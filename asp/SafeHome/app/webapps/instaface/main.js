@@ -241,6 +241,7 @@ instaface.displayPost = function(plat, post)
 
     var rightdif = WebLibSimple.createAnyAppend("div", postdiv);
     WebLibSimple.setBGColor(rightdif, "#aaaaaaaa");
+    rightdif.style.position = "relative";
     rightdif.style.overflow = "hidden";
     rightdif.style.marginLeft = "80px";
 
@@ -256,6 +257,7 @@ instaface.displayPost = function(plat, post)
     textdiv.innerHTML = text;
 
     var imgsdiv = WebLibSimple.createAnyAppend("div", rightdif);
+    imgsdiv.style.position = "relative";
     imgsdiv.style.margin = "16px";
     imgsdiv.style.overflow = "hidden";
 
@@ -263,6 +265,13 @@ instaface.displayPost = function(plat, post)
     {
         var imgtag = WebLibSimple.createAnyAppend("img", imgsdiv);
         imgtag.src = imgs[ inx ].src ? imgs[ inx ].src : imgs[ inx ].url;
+
+        if ((imgs[ inx ].width > imgsdiv.clientWidth) ||
+            ((imgsdiv.clientWidth - imgs[ inx ].width) < 50))
+        {
+            imgtag.style.width = "100%";
+            imgtag.style.height = "auto";
+        }
     }
 }
 
