@@ -246,7 +246,6 @@ instaface.displayPost = function(plat, post)
 
     var titlediv = WebLibSimple.createAnyAppend("div", rightdif);
     WebLibSimple.setBGColor(titlediv, "#88888888");
-    titlediv.style.height = "80px";
     titlediv.style.margin = "16px";
     titlediv.style.padding = "8px";
 
