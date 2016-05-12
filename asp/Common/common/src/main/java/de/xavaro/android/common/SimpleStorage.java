@@ -23,7 +23,7 @@ public class SimpleStorage
     {
         Simple.removePost(flusher);
 
-        JSONObject container = getStorage(name);
+        JSONObject container = getContainer(name);
 
         synchronized (storages)
         {
@@ -35,6 +35,8 @@ public class SimpleStorage
             Json.put(container, "updated", Simple.nowAsISO());
             Json.put(container, "dirty", true);
         }
+
+        Log.d(LOGTAG, "put: " + name + "=" + property);
 
         Simple.makePost(flusher, 1000);
     }
@@ -100,6 +102,11 @@ public class SimpleStorage
 
     private static JSONObject getStorage(String name)
     {
+        return Json.getObject(getContainer(name), "data");
+    }
+
+    private static JSONObject getContainer(String name)
+    {
         JSONObject container;
 
         synchronized (storages)
@@ -135,7 +142,7 @@ public class SimpleStorage
             Json.put(container, "accessed", Simple.nowAsISO());
         }
 
-        return Json.getObject(container, "data");
+        return container;
     }
 
     private static final Runnable flusher = new Runnable()
@@ -149,7 +156,6 @@ public class SimpleStorage
                 {
                     JSONObject container = storages.get(name);
                     if (! Json.getBoolean(container, "dirty")) continue;
-
                     Json.remove(container, "dirty");
 
                     File storageDir = getStorageDir();

@@ -215,17 +215,21 @@ public class LaunchItemSocial extends LaunchItem
         {
             int newposts = 0;
 
-            for (int inx = 0; inx < allFeeds.length(); inx++)
+            if (allFeeds != null)
             {
-                JSONObject feed = Json.getObject(allFeeds, inx);
-                String platform = Json.getString(feed, "plat");
-                String feedpfid = Json.getString(feed, "id");
-                if ((platform == null) || (feedpfid == null)) continue;
+                for (int inx = 0; inx < allFeeds.length(); inx++)
+                {
+                    JSONObject feed = Json.getObject(allFeeds, inx);
+                    String platform = Json.getString(feed, "plat");
+                    String feedpfid = Json.getString(feed, "id");
+                    if ((platform == null) || (feedpfid == null)) continue;
 
-                newposts += SimpleStorage.getInt("socialfeednews", platform + ".count." + feedpfid);
+                    newposts += SimpleStorage.getInt("socialfeednews", platform + ".count." + feedpfid);
+                }
             }
 
-            Log.d(LOGTAG, "feednews:" + type + ":" + labelText + "=" + newposts);
+            String label = Json.getString(config, "label");
+            Log.d(LOGTAG, "feednews:" + type + ":" + label + "=" + newposts);
 
             Simple.makePost(feednews, 60 * 1000);
         }

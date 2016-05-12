@@ -1266,10 +1266,10 @@ public abstract class Social
     {
         if (feeddata != null)
         {
+            int newposts = 0;
+
             synchronized (feedSync)
             {
-                int newposts = 0;
-
                 for (int inx = 0; inx < feeddata.length(); inx++)
                 {
                     JSONObject post = Json.getObject(feeddata, inx);
@@ -1287,6 +1287,8 @@ public abstract class Social
                         continue;
                     }
 
+                    if (postfile.exists()) continue;
+
                     JSONObject postdata = apifeedhasposts ? post : getGraphPost(postid);
                     if (postdata == null) continue;
 
@@ -1294,9 +1296,10 @@ public abstract class Social
 
                     if (getPostSuitable(postdata)) newposts++;
                 }
-
-                SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, newposts);
             }
+
+            SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, newposts);
+            SimpleStorage.put("socialfeednews", platform + ".stamp." + feedpfid, Simple.nowAsISO());
         }
     }
 
