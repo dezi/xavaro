@@ -79,6 +79,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
             for (int inx = 0; inx < data.length(); inx++)
             {
                 JSONObject media = Json.getObject(data, inx);
+                media = Json.getObject(media, "media");
 
                 if ((media != null) && Json.has(media, "image"))
                 {
