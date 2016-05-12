@@ -78,6 +78,10 @@ public class SocialFacebook extends Social implements Social.SocialInterface
         {
             for (int inx = 0; inx < data.length(); inx++)
             {
+                //
+                // Check for plain single media.
+                //
+
                 JSONObject media = Json.getObject(data, inx);
                 media = Json.getObject(media, "media");
 
@@ -88,6 +92,31 @@ public class SocialFacebook extends Social implements Social.SocialInterface
                     //
 
                     return true;
+                }
+
+                //
+                // Check for subattachments media.
+                //
+
+                JSONObject subattachments = Json.getObject(data, inx);
+                JSONArray subdata = Json.getArray(subattachments, "data");
+
+                if (subdata != null)
+                {
+                    for (int sinx = 0; sinx < subdata.length(); sinx++)
+                    {
+                        media = Json.getObject(subdata, sinx);
+                        media = Json.getObject(media, "media");
+
+                        if ((media != null) && Json.has(media, "image"))
+                        {
+                            //
+                            // Found image attachment.
+                            //
+
+                            return true;
+                        }
+                    }
                 }
             }
         }
