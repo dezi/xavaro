@@ -15,8 +15,6 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
@@ -27,7 +25,9 @@ public class HomeBottom extends FrameLayout
 
     private int layoutSize;
 
-    private JSONArray contacts;
+    private JSONArray baseContacts;
+    private JSONArray moreContacts;
+    private JSONArray socialLikes;
 
     private LayoutParams layoutParams;
 
@@ -41,8 +41,6 @@ public class HomeBottom extends FrameLayout
     private LayoutParams vertLayout;
     private LayoutParams horzLayout;
     private int orientation;
-
-    private ArrayList<LaunchItem> peopleList = new ArrayList<>();
 
     public HomeBottom(Context context)
     {
@@ -96,24 +94,79 @@ public class HomeBottom extends FrameLayout
 
     public void setConfig(JSONObject config)
     {
-        contacts = new JSONArray();
+        baseContacts = new JSONArray();
+        moreContacts = new JSONArray();
+        socialLikes = new JSONArray();
+
         peopleView.removeAllViews();
 
         extractConfig(config);
 
-        for (int inx = 0; inx < contacts.length(); inx++)
+        for (int inx = 0; inx < baseContacts.length(); inx++)
         {
-            JSONObject contact = Json.getObject(contacts, inx);
+            JSONObject contact = Json.getObject(baseContacts, inx);
             if (contact == null) continue;
 
-            LaunchItem li = LaunchItem.createLaunchItem(getContext(), null, contact);
+            final LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, contact);
 
-            li.setFrameLess();
-            li.setSize(layoutSize, layoutSize);
+            launchItem.setFrameLess();
+            launchItem.setSize(layoutSize, layoutSize);
 
-            peopleList.add(li);
-            peopleView.addView(li);
+            peopleView.addView(launchItem);
         }
+    }
+
+    private boolean isCommUser(JSONObject li)
+    {
+        String subtype = Json.getString(li, "subtype");
+
+        return Simple.equals(subtype, "chat")
+            || Simple.equals(subtype, "text")
+            || Simple.equals(subtype, "voip")
+            || Simple.equals(subtype, "vica");
+    }
+
+    private boolean isSocialUser(JSONObject li)
+    {
+        String pfid = Json.getString(li, "pfid");
+        if (pfid == null) return false;
+
+        String type = Json.getString(li, "type");
+
+        return Simple.equals(type, "twitter")
+            || Simple.equals(type, "facebook")
+            || Simple.equals(type, "instagram")
+            || Simple.equals(type, "googleplus");
+    }
+
+    private boolean isSocialFriend(JSONObject li)
+    {
+        String pfid = Json.getString(li, "pfid");
+        if (pfid == null) return false;
+
+        String type = Json.getString(li, "type");
+        String subtype = Json.getString(li, "subtype");
+
+        return Simple.equals(subtype, "friend")
+                && (Simple.equals(type, "twitter")
+                || Simple.equals(type, "facebook")
+                || Simple.equals(type, "instagram")
+                || Simple.equals(type, "googleplus"));
+    }
+
+    private boolean isSocialLike(JSONObject li)
+    {
+        String pfid = Json.getString(li, "pfid");
+        if (pfid == null) return false;
+
+        String type = Json.getString(li, "type");
+        String subtype = Json.getString(li, "subtype");
+
+        return Simple.equals(subtype, "like")
+                && (Simple.equals(type, "twitter")
+                || Simple.equals(type, "facebook")
+                || Simple.equals(type, "instagram")
+                || Simple.equals(type, "googleplus"));
     }
 
     private void extractConfig(JSONObject config)
@@ -127,21 +180,18 @@ public class HomeBottom extends FrameLayout
         //
 
         JSONObject nameList = new JSONObject();
-
-        JSONObject contactli = null;
+        JSONArray appfolders = new JSONArray();
 
         for (int inx = 0; inx < lis.length(); inx++)
         {
             JSONObject li = Json.getObject(lis, inx);
-            String type = Json.getString(li, "type");
-            String subtype = Json.getString(li, "subtype");
+            if (Json.getBoolean(li, "used")) continue;
+
             String label = Json.getString(li, "label");
             if (label == null) continue;
+            label = label.toLowerCase();
 
-            if (Simple.equals(subtype, "chat")
-                    || Simple.equals(subtype, "text")
-                    || Simple.equals(subtype, "voip")
-                    || Simple.equals(subtype, "vica"))
+            if (isCommUser(li) || isSocialUser(li))
             {
                 if (! Json.has(nameList, label))
                 {
@@ -149,12 +199,8 @@ public class HomeBottom extends FrameLayout
                     // Initial occurrence.
                     //
 
-                    JSONArray choices = new JSONArray();
-
-                    Json.put(li, "choices", choices);
-                    Json.put(nameList, label, choices);
-
-                    Json.put(contacts, li);
+                    Json.put(nameList, label, new JSONArray());
+                    Json.put(baseContacts, li);
                 }
 
                 //
@@ -163,6 +209,7 @@ public class HomeBottom extends FrameLayout
 
                 JSONArray choices = Json.getArray(nameList, label);
                 Json.put(choices, Json.clone(li));
+                Json.put(li, "used", true);
 
                 //
                 // Remove from original launch pages.
@@ -172,19 +219,125 @@ public class HomeBottom extends FrameLayout
             }
             else
             {
-                if (Simple.equals(type, "contacts"))
-                {
-                    //
-                    // Put contacts folder at end later.
-                    //
+                String type = Json.getString(li, "type");
 
-                    contactli = li;
+                if (Simple.equals(type, "contacts")
+                        || Simple.equals(type, "phone")
+                        || Simple.equals(type, "skype")
+                        || Simple.equals(type, "xavaro")
+                        || Simple.equals(type, "whatsapp")
+                        || Simple.equals(type, "twitter")
+                        || Simple.equals(type, "facebook")
+                        || Simple.equals(type, "instagram")
+                        || Simple.equals(type, "googleplus"))
+                {
+                    Json.put(appfolders, li);
                     lis.remove(inx--);
                 }
             }
         }
 
-        if (contactli != null) Json.put(contacts, contactli);
+        //
+        // Now loop over all app folders inclusive contacts
+        // and distribute entrys to people.
+        //
+
+        for (int finx = 0; finx < appfolders.length(); finx++)
+        {
+            JSONObject appfolder = Json.getObject(appfolders, finx);
+            JSONArray applis = Json.getArray(appfolder, "launchitems");
+            if (applis == null) continue;
+
+            for (int inx = 0; inx < applis.length(); inx++)
+            {
+                JSONObject li = Json.getObject(applis, inx);
+                if (Json.getBoolean(li, "used")) continue;
+
+                String label = Json.getString(li, "label");
+                if (label == null) continue;
+                label = label.toLowerCase();
+
+                if (isCommUser(li) || isSocialFriend(li))
+                {
+                    if (! Json.has(nameList, label))
+                    {
+                        //
+                        // Initial occurrence.
+                        //
+
+                        Json.put(nameList, label, new JSONArray());
+                        Json.put(moreContacts, li);
+                    }
+
+                    //
+                    // Add every item also to communication choices.
+                    //
+
+                    JSONArray choices = Json.getArray(nameList, label);
+                    Json.put(choices, Json.clone(li));
+                    Json.put(li, "used", true);
+
+                    continue;
+                }
+
+                if (isSocialLike(li))
+                {
+                    if (! Json.has(nameList, label))
+                    {
+                        //
+                        // Initial occurrence.
+                        //
+
+                        Json.put(nameList, label, new JSONArray());
+                        Json.put(socialLikes, li);
+                    }
+
+                    //
+                    // Add every item also to communication choices.
+                    //
+
+                    JSONArray choices = Json.getArray(nameList, label);
+                    Json.put(choices, Json.clone(li));
+                    Json.put(li, "used", true);
+                }
+            }
+        }
+
+        if (baseContacts.length() > 0)
+        {
+            for (int inx = 0; inx < baseContacts.length(); inx++)
+            {
+                JSONObject li = Json.getObject(baseContacts, inx);
+                String label = Json.getString(li, "label");
+                if (label == null) continue;
+                label = label.toLowerCase();
+
+                JSONArray choices = Json.getArray(nameList, label);
+                Json.put(li, "launchitems", choices);
+            }
+        }
+
+        if (moreContacts.length() > 0)
+        {
+            for (int inx = 0; inx < moreContacts.length(); inx++)
+            {
+                JSONObject li = Json.getObject(moreContacts, inx);
+                String label = Json.getString(li, "label");
+                if (label == null) continue;
+                label = label.toLowerCase();
+
+                JSONArray choices = Json.getArray(nameList, label);
+                Json.put(li, "launchitems", choices);
+            }
+
+            JSONObject contacts = new JSONObject();
+
+            Json.put(contacts, "type", "contacts");
+            Json.put(contacts, "label", "weitere");
+            Json.put(contacts, "launchitems", moreContacts);
+
+            Json.put(baseContacts, contacts);
+        }
     }
 
     private Runnable changeOrientation = new Runnable()

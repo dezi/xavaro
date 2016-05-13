@@ -422,6 +422,20 @@ public class LaunchItem extends FrameLayout implements
         // To be overridden...
         //
 
+        JSONArray launchItems = Json.getArray(config, "launchitems");
+
+        if (launchItems != null)
+        {
+            Simple.makeClick();
+
+            LaunchGroup directory = new LaunchGroup(getContext());
+            directory.setConfig(null, launchItems);
+
+            ((HomeActivity) getContext()).addViewToBackStack(directory);
+
+            return true;
+        }
+
         return false;
     }
 
