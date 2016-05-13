@@ -1250,11 +1250,12 @@ public abstract class Social
         }
 
         //
-        // Load one feed.
+        // Load one random feed.
         //
 
-        JSONObject feed = Json.getObject(feedList, 0);
-        Json.remove(feedList, 0);
+        int random = (int) Math.floor(Math.random() * feedList.length());
+        JSONObject feed = Json.getObject(feedList, random);
+        Json.remove(feedList, random);
         if (feed == null) return;
 
         final String feedpfid = Json.getString(feed, "id");

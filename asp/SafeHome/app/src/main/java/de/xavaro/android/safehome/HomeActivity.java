@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -49,6 +50,7 @@ public class HomeActivity extends AppCompatActivity implements
     private FrameLayout topScreen;
     private FrameLayout videoSurface;
     private FrameLayout launchScreen;
+    private HomeBottom bottomScreen;
     private LaunchGroupRoot launchGroup;
 
     private boolean wasPaused = false;
@@ -73,8 +75,11 @@ public class HomeActivity extends AppCompatActivity implements
         topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
         setContentView(topScreen);
 
-        launchScreen = new FrameLayout(this);
+        launchScreen = new HomeLaunch(this);
         topScreen.addView(launchScreen);
+
+        bottomScreen = new HomeBottom(this);
+        topScreen.addView(bottomScreen);
 
         ArchievementManager.reset("alertcall.shortclick");
 

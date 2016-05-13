@@ -1336,6 +1336,11 @@ public class Simple
         return wInfo.getMacAddress();
     }
 
+    public static int getOrientation()
+    {
+        return getResources().getConfiguration().orientation;
+    }
+
     public static int getDeviceWidth()
     {
         if (anyContext == null) return 0;
