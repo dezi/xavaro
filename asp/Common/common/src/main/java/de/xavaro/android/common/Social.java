@@ -1179,6 +1179,7 @@ public abstract class Social
             Log.d(LOGTAG, "commTick: reconfigureFriendsAndLikes");
 
             reconfigureFriendsAndLikes();
+
             lastReconfigure = now;
             nextAction = now;
 
@@ -1189,7 +1190,10 @@ public abstract class Social
 
         if ((feedList == null) || feedList.length() == 0)
         {
-            if ((! cachedir.exists()) && cachedir.mkdirs()) Log.d(LOGTAG, "commtick: created cache");
+            if ((! cachedir.exists()) && cachedir.mkdirs())
+            {
+                Log.d(LOGTAG, "commtick: created cache");
+            }
 
             //
             // Remove outdated posts.
@@ -1238,6 +1242,8 @@ public abstract class Social
 
         nextAction += nextInterval;
 
+        if (! Simple.isInternetConnected()) return;
+
         //
         // Load one feed.
         //
@@ -1268,7 +1274,7 @@ public abstract class Social
         // Check and cache feed stories and store feed to cache.
         //
 
-        if (feeddata == null)
+        if (feeddata != null)
         {
             cacheFeedStories(feedpfid, feeddata);
 
@@ -1309,6 +1315,8 @@ public abstract class Social
                     Simple.putFileContent(postfile, Json.toPretty(postdata));
 
                     if (getPostSuitable(postdata)) newposts++;
+
+                    Log.d(LOGTAG, "cacheFeedStories: " + postfile.toString());
                 }
             }
 

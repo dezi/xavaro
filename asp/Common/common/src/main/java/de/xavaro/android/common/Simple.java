@@ -1264,6 +1264,24 @@ public class Simple
         return null;
     }
 
+    public static boolean isInternetConnected()
+    {
+        ConnectivityManager cm = getConnectivityManager();
+
+        if (cm != null)
+        {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            if (activeNetwork != null)
+            {
+                return (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)
+                        || (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE);
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isWifiConnected()
     {
         ConnectivityManager cm = getConnectivityManager();
