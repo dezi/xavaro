@@ -10,7 +10,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.view.Gravity;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,9 +18,9 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
-public class HomeBottom extends FrameLayout
+public class HomeBuddies extends FrameLayout
 {
-    private static final String LOGTAG = HomeBottom.class.getSimpleName();
+    private static final String LOGTAG = HomeBuddies.class.getSimpleName();
 
     private int layoutSize;
 
@@ -42,7 +41,7 @@ public class HomeBottom extends FrameLayout
     private LayoutParams horzLayout;
     private int orientation;
 
-    public HomeBottom(Context context)
+    public HomeBuddies(Context context)
     {
         super(context);
 

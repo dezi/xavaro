@@ -50,8 +50,11 @@ public class HomeActivity extends AppCompatActivity implements
 
     private FrameLayout topScreen;
     private FrameLayout videoSurface;
+    private HomeNotify notifyScreen;
     private HomeLaunch launchScreen;
-    private HomeBottom bottomScreen;
+    private FrameLayout launchFrame;
+    private HomeBuddies buddyScreen;
+    private HomeSocial socialScreen;
     private LaunchGroupRoot launchGroup;
     private JSONObject launchConfig;
 
@@ -73,19 +76,31 @@ public class HomeActivity extends AppCompatActivity implements
 
         instance = this;
 
-        int basesize = Simple.getDevicePixels(160);
+        int buddysize = Simple.getDevicePixels(160);
+        int socialsize = Simple.getDevicePixels(320);
+        int notifysize = Simple.getDevicePixels(320);
 
         topScreen = new FrameLayout(this);
         topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
         setContentView(topScreen);
 
+        notifyScreen = new HomeNotify(this);
+        notifyScreen.setSize(notifysize, buddysize);
+        topScreen.addView(notifyScreen);
+
         launchScreen = new HomeLaunch(this);
-        launchScreen.setSize(basesize);
+        launchScreen.setSize(buddysize, socialsize, notifysize);
         topScreen.addView(launchScreen);
 
-        bottomScreen = new HomeBottom(this);
-        bottomScreen.setSize(basesize);
-        topScreen.addView(bottomScreen);
+        socialScreen = new HomeSocial(this);
+        socialScreen.setSize(socialsize, buddysize, notifysize);
+        topScreen.addView(socialScreen);
+
+        buddyScreen = new HomeBuddies(this);
+        buddyScreen.setSize(buddysize);
+        topScreen.addView(buddyScreen);
+
+        launchFrame = launchScreen.getPayloadFrame();
 
         ArchievementManager.reset("alertcall.shortclick");
 
@@ -168,7 +183,7 @@ public class HomeActivity extends AppCompatActivity implements
         {
             if (launchGroup != null)
             {
-                launchScreen.removeAllViews();
+                launchFrame.removeAllViews();
                 backStack.clear();
                 launchGroup = null;
 
@@ -178,10 +193,10 @@ public class HomeActivity extends AppCompatActivity implements
             launchConfig = LaunchGroupRoot.getConfig();
             launchGroup = new LaunchGroupRoot(this);
 
-            bottomScreen.setConfig(launchConfig);
+            buddyScreen.setConfig(launchConfig);
             launchGroup.setConfig(null, launchConfig);
 
-            launchScreen.addView(launchGroup);
+            launchFrame.addView(launchGroup);
 
             CommonStatic.settingschanged = false;
         }
@@ -232,7 +247,7 @@ public class HomeActivity extends AppCompatActivity implements
             while (backStack.size() > 0)
             {
                 Object lastview = backStack.remove(backStack.size() - 1);
-                launchScreen.removeView((FrameLayout) lastview);
+                launchFrame.removeView((FrameLayout) lastview);
             }
         }
 
@@ -306,7 +321,7 @@ public class HomeActivity extends AppCompatActivity implements
     {
         if (((ViewGroup) view).getParent() == null)
         {
-            launchScreen.addView((FrameLayout) view);
+            launchFrame.addView((FrameLayout) view);
             backStack.add(view);
 
             if (videoSurface != null) videoSurface.bringToFront();
@@ -315,7 +330,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void addView(Object view, ViewGroup.LayoutParams params)
     {
-        launchScreen.addView((FrameLayout) view, params);
+        launchFrame.addView((FrameLayout) view, params);
     }
 
     public void addVideoSurface(FrameLayout video)
@@ -366,7 +381,7 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 Object lastview = backStack.get(backStack.size() - 1);
 
-                launchScreen.removeView((FrameLayout) lastview);
+                launchFrame.removeView((FrameLayout) lastview);
                 backStack.remove(backStack.size() - 1);
 
                 if (lastview instanceof LaunchFrame)
@@ -392,7 +407,7 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
-                    launchScreen.removeView((FrameLayout) lastview);
+                    launchFrame.removeView((FrameLayout) lastview);
                     backStack.remove(backStack.size() - 1);
 
                     ((BackKeyClient) lastview).onBackKeyExecuted();
@@ -400,7 +415,7 @@ public class HomeActivity extends AppCompatActivity implements
             }
             else
             {
-                launchScreen.removeView((FrameLayout) lastview);
+                launchFrame.removeView((FrameLayout) lastview);
                 backStack.remove(backStack.size() - 1);
             }
 
