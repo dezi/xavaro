@@ -44,8 +44,6 @@ public class LaunchItemCommXavaro extends LaunchItem implements
     @Override
     protected void setConfig()
     {
-        Log.d(LOGTAG, "===================================setconfig");
-
         ImageView targetIcon = icon;
 
         if (config.has("subtype"))

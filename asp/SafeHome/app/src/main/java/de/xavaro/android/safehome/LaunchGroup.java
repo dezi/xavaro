@@ -241,6 +241,8 @@ public class LaunchGroup extends FrameLayout implements
 
     public boolean onTouch(View view, MotionEvent motionEvent)
     {
+        Log.d(LOGTAG, "====================onTouch");
+
         if (view == this)
         {
             //

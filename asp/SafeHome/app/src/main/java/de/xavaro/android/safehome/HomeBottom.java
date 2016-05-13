@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.view.Gravity;
@@ -12,6 +14,8 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -29,11 +33,16 @@ public class HomeBottom extends FrameLayout
 
     private LaunchItem alertLaunchItem;
     private LaunchItem voiceLaunchItem;
-    private ScrollView friendsFrame;
     private LinearLayout.LayoutParams peopleLayout;
-    private LinearLayout peopleList;
+    private LinearLayout peopleView;
 
-    private LayoutParams friendsLayout;
+    private ScrollView vertFrame;
+    private HorizontalScrollView horzFrame;
+    private LayoutParams vertLayout;
+    private LayoutParams horzLayout;
+    private int orientation;
+
+    private ArrayList<LaunchItem> peopleList = new ArrayList<>();
 
     public HomeBottom(Context context)
     {
@@ -41,6 +50,7 @@ public class HomeBottom extends FrameLayout
 
         layoutParams = new LayoutParams(Simple.MP, Simple.MP);
         setLayoutParams(layoutParams);
+        //setBackgroundColor(0x88880000);
 
         JSONObject alertConfig = Json.getObject(LaunchItemAlertcall.getConfig(), 0);
 
@@ -60,15 +70,21 @@ public class HomeBottom extends FrameLayout
             this.addView(voiceLaunchItem);
         }
 
-        friendsLayout = new LayoutParams(Simple.MP, Simple.MP);
-        friendsFrame = new ScrollView(context);
-        friendsFrame.setLayoutParams(friendsLayout);
-        this.addView(friendsFrame);
+        horzLayout = new LayoutParams(Simple.MP, Simple.MP);
+        horzFrame = new HorizontalScrollView(context);
+        horzFrame.setLayoutParams(horzLayout);
+        addView(horzFrame);
+
+        vertLayout = new LayoutParams(Simple.MP, Simple.MP);
+        vertFrame = new ScrollView(context);
+        vertFrame.setLayoutParams(vertLayout);
+        addView(vertFrame);
 
         peopleLayout = new LinearLayout.LayoutParams(Simple.WC, Simple.WC);
-        peopleList = new LinearLayout(context);
-        peopleList.setLayoutParams(peopleLayout);
-        friendsFrame.addView(peopleList);
+        peopleView = new LinearLayout(context);
+        peopleView.setLayoutParams(peopleLayout);
+
+        orientation = Configuration.ORIENTATION_UNDEFINED;
     }
 
     public void setSize(int pixels)
@@ -82,7 +98,7 @@ public class HomeBottom extends FrameLayout
     public void setConfig(JSONObject config)
     {
         contacts = new JSONArray();
-        peopleList.removeAllViews();
+        peopleView.removeAllViews();
 
         extractConfig(config);
 
@@ -96,7 +112,8 @@ public class HomeBottom extends FrameLayout
             li.setFrameLess();
             li.setSize(layoutSize, layoutSize);
 
-            peopleList.addView(li);
+            peopleList.add(li);
+            peopleView.addView(li);
         }
     }
 
@@ -121,64 +138,84 @@ public class HomeBottom extends FrameLayout
         }
     }
 
+    private Runnable changeOrientation = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if ((orientation != Configuration.ORIENTATION_PORTRAIT) &&
+                    (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT))
+            {
+                int width = ((View) getParent()).getWidth();
+                int items = ((int) Math.floor(width / layoutSize)) - 1;
+                int margin = (width - (items * layoutSize)) / 2;
+
+                layoutParams.width = Simple.MP;
+                layoutParams.height = layoutSize;
+                layoutParams.gravity = Gravity.BOTTOM;
+
+                if (alertLaunchItem != null)
+                {
+                    alertLaunchItem.setGravity(Gravity.LEFT);
+                    horzLayout.leftMargin = margin;
+                }
+
+                if (voiceLaunchItem != null)
+                {
+                    voiceLaunchItem.setGravity(Gravity.RIGHT);
+                    horzLayout.rightMargin = margin;
+                }
+
+                vertFrame.removeAllViews();
+                horzFrame.addView(peopleView);
+
+                peopleLayout.width = Simple.WC;
+                peopleLayout.height = Simple.MP;
+                peopleView.setOrientation(LinearLayout.HORIZONTAL);
+
+                orientation = Configuration.ORIENTATION_PORTRAIT;
+            }
+
+            if ((orientation != Configuration.ORIENTATION_LANDSCAPE) &&
+                    (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE))
+            {
+                int height = ((View) getParent()).getHeight();
+                int items = ((int) Math.floor(height / layoutSize)) - 1;
+                int margin = (height - (items * layoutSize)) / 2;
+
+                layoutParams.width = layoutSize;
+                layoutParams.height = Simple.MP;
+                layoutParams.gravity = Gravity.RIGHT;
+
+                if (alertLaunchItem != null)
+                {
+                    alertLaunchItem.setGravity(Gravity.TOP);
+                    vertLayout.topMargin = margin;
+                }
+
+                if (voiceLaunchItem != null)
+                {
+                    voiceLaunchItem.setGravity(Gravity.BOTTOM);
+                    vertLayout.bottomMargin = margin;
+                }
+
+                horzFrame.removeAllViews();
+                vertFrame.addView(peopleView);
+
+                peopleLayout.width = Simple.MP;
+                peopleLayout.height = Simple.WC;
+                peopleView.setOrientation(LinearLayout.VERTICAL);
+
+                orientation = Configuration.ORIENTATION_LANDSCAPE;
+            }
+        }
+    };
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        if (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT)
-        {
-            layoutParams.width = Simple.MP;
-            layoutParams.height = layoutSize;
-            layoutParams.gravity = Gravity.BOTTOM;
-
-            friendsLayout.leftMargin = 0;
-            friendsLayout.rightMargin = 0;
-            friendsLayout.topMargin = 0;
-            friendsLayout.bottomMargin = 0;
-
-            if (alertLaunchItem != null)
-            {
-                alertLaunchItem.setGravity(Gravity.LEFT);
-                friendsLayout.rightMargin = layoutSize;
-            }
-
-            if (voiceLaunchItem != null)
-            {
-                voiceLaunchItem.setGravity(Gravity.RIGHT);
-                friendsLayout.leftMargin = layoutSize;
-            }
-
-            peopleLayout.width = Simple.WC;
-            peopleLayout.height = Simple.MP;
-            peopleList.setOrientation(LinearLayout.HORIZONTAL);
-        }
-        else
-        {
-            layoutParams.width = layoutSize;
-            layoutParams.height = Simple.MP;
-            layoutParams.gravity = Gravity.RIGHT;
-
-            friendsLayout.leftMargin = 0;
-            friendsLayout.rightMargin = 0;
-            friendsLayout.topMargin = 0;
-            friendsLayout.bottomMargin = 0;
-
-            if (alertLaunchItem != null)
-            {
-                alertLaunchItem.setGravity(Gravity.TOP);
-                friendsLayout.topMargin = layoutSize;
-            }
-
-            if (voiceLaunchItem != null)
-            {
-                voiceLaunchItem.setGravity(Gravity.BOTTOM);
-                friendsLayout.bottomMargin = layoutSize;
-            }
-
-            peopleLayout.width = Simple.MP;
-            peopleLayout.height = Simple.WC;
-            peopleList.setOrientation(LinearLayout.VERTICAL);
-        }
+        Simple.makePost(changeOrientation);
     }
 }
