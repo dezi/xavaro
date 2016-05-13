@@ -1256,12 +1256,7 @@ public class Simple
     @Nullable
     public static ConnectivityManager getConnectivityManager()
     {
-        if (anyContext != null)
-        {
-            return (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        }
-
-        return null;
+        return (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     public static boolean isInternetConnected()

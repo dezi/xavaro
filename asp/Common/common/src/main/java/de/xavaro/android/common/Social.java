@@ -1242,7 +1242,12 @@ public abstract class Social
 
         nextAction += nextInterval;
 
-        if (! Simple.isInternetConnected()) return;
+        if (! Simple.isInternetConnected())
+        {
+            Log.d(LOGTAG, "commTick: no internet.");
+
+            return;
+        }
 
         //
         // Load one feed.

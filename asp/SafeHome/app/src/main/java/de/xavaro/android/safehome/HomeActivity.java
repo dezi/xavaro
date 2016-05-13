@@ -46,8 +46,9 @@ public class HomeActivity extends AppCompatActivity implements
         return instance;
     }
 
-    private FrameLayout topscreen;
+    private FrameLayout topScreen;
     private FrameLayout videoSurface;
+    private FrameLayout launchScreen;
     private LaunchGroupRoot launchGroup;
 
     private boolean wasPaused = false;
@@ -55,8 +56,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     private final Handler handler = new Handler();
 
-    private static final int UI_HIDE = 0
-            | View.SYSTEM_UI_FLAG_FULLSCREEN
+    private static final int UI_HIDE = View.SYSTEM_UI_FLAG_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 
@@ -69,13 +69,12 @@ public class HomeActivity extends AppCompatActivity implements
 
         instance = this;
 
-        //setContentView(R.layout.activity_home);
-        //topscreen = (FrameLayout) findViewById(R.id.top_screen);
-        //topscreen.setSystemUiVisibility(UI_HIDE);
+        topScreen = new FrameLayout(this);
+        topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
+        setContentView(topScreen);
 
-        topscreen = new FrameLayout(this);
-        topscreen.setSystemUiVisibility(topscreen.getSystemUiVisibility() + UI_HIDE);
-        setContentView(topscreen);
+        launchScreen = new FrameLayout(this);
+        topScreen.addView(launchScreen);
 
         ArchievementManager.reset("alertcall.shortclick");
 
@@ -106,7 +105,7 @@ public class HomeActivity extends AppCompatActivity implements
         super.onPostCreate(savedInstanceState);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        topscreen.setOnSystemUiVisibilityChangeListener(this);
+        topScreen.setOnSystemUiVisibilityChangeListener(this);
 
         //
         // Debug update external contacts.
@@ -132,7 +131,7 @@ public class HomeActivity extends AppCompatActivity implements
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
 
-            topscreen.setSystemUiVisibility(UI_HIDE);
+            topScreen.setSystemUiVisibility(UI_HIDE);
         }
     };
 
@@ -158,7 +157,7 @@ public class HomeActivity extends AppCompatActivity implements
         {
             if (launchGroup != null)
             {
-                topscreen.removeAllViews();
+                launchScreen.removeAllViews();
                 backStack.clear();
                 launchGroup = null;
 
@@ -167,7 +166,7 @@ public class HomeActivity extends AppCompatActivity implements
 
             launchGroup = new LaunchGroupRoot(this);
             launchGroup.setConfig(null, LaunchGroupRoot.getConfig());
-            topscreen.addView(launchGroup);
+            launchScreen.addView(launchGroup);
 
             CommonStatic.settingschanged = false;
         }
@@ -218,7 +217,7 @@ public class HomeActivity extends AppCompatActivity implements
             while (backStack.size() > 0)
             {
                 Object lastview = backStack.remove(backStack.size() - 1);
-                topscreen.removeView((FrameLayout) lastview);
+                launchScreen.removeView((FrameLayout) lastview);
             }
         }
 
@@ -292,7 +291,7 @@ public class HomeActivity extends AppCompatActivity implements
     {
         if (((ViewGroup) view).getParent() == null)
         {
-            topscreen.addView((FrameLayout) view);
+            launchScreen.addView((FrameLayout) view);
             backStack.add(view);
 
             if (videoSurface != null) videoSurface.bringToFront();
@@ -301,23 +300,23 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void addView(Object view, ViewGroup.LayoutParams params)
     {
-        topscreen.addView((FrameLayout) view, params);
+        launchScreen.addView((FrameLayout) view, params);
     }
 
     public void addVideoSurface(FrameLayout video)
     {
         if (videoSurface == null)
         {
-            topscreen.addView(video);
+            topScreen.addView(video);
             videoSurface = video;
         }
     }
 
     public void removeVideoSurface()
     {
-        if ((videoSurface != null) &&  (videoSurface.getParent() == topscreen))
+        if ((videoSurface != null) &&  (videoSurface.getParent() == topScreen))
         {
-            topscreen.removeView(videoSurface);
+            topScreen.removeView(videoSurface);
             videoSurface = null;
         }
     }
@@ -352,7 +351,7 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 Object lastview = backStack.get(backStack.size() - 1);
 
-                topscreen.removeView((FrameLayout) lastview);
+                launchScreen.removeView((FrameLayout) lastview);
                 backStack.remove(backStack.size() - 1);
 
                 if (lastview instanceof LaunchFrame)
@@ -378,7 +377,7 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
-                    topscreen.removeView((FrameLayout) lastview);
+                    launchScreen.removeView((FrameLayout) lastview);
                     backStack.remove(backStack.size() - 1);
 
                     ((BackKeyClient) lastview).onBackKeyExecuted();
@@ -386,7 +385,7 @@ public class HomeActivity extends AppCompatActivity implements
             }
             else
             {
-                topscreen.removeView((FrameLayout) lastview);
+                launchScreen.removeView((FrameLayout) lastview);
                 backStack.remove(backStack.size() - 1);
             }
 
