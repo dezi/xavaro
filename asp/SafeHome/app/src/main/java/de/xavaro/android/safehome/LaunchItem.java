@@ -221,7 +221,7 @@ public class LaunchItem extends FrameLayout implements
     public void setFrameLess()
     {
         setBackgroundResource(0);
-        icon.setPadding(10, 0, 10, 20);
+        icon.setPadding(14, 0, 14, 28);
     }
 
     public void setSize(int width, int height)

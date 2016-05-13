@@ -48,9 +48,8 @@ public class HomeBottom extends FrameLayout
     {
         super(context);
 
-        layoutParams = new LayoutParams(Simple.MP, Simple.MP);
+        layoutParams = new LayoutParams(0, 0);
         setLayoutParams(layoutParams);
-        //setBackgroundColor(0x88880000);
 
         JSONObject alertConfig = Json.getObject(LaunchItemAlertcall.getConfig(), 0);
 
@@ -122,20 +121,70 @@ public class HomeBottom extends FrameLayout
         JSONArray lis = Json.getArray(config, "launchitems");
         if (lis == null) return;
 
+        //
+        // First scan. Get every contact located on the home screen.
+        // Remove all consumed contacts from original config.
+        //
+
+        JSONObject nameList = new JSONObject();
+
+        JSONObject contactli = null;
+
         for (int inx = 0; inx < lis.length(); inx++)
         {
             JSONObject li = Json.getObject(lis, inx);
+            String type = Json.getString(li, "type");
             String subtype = Json.getString(li, "subtype");
-            if (subtype == null) continue;
+            String label = Json.getString(li, "label");
+            if (label == null) continue;
 
             if (Simple.equals(subtype, "chat")
                     || Simple.equals(subtype, "text")
                     || Simple.equals(subtype, "voip")
                     || Simple.equals(subtype, "vica"))
             {
-                Json.put(contacts, li);
+                if (! Json.has(nameList, label))
+                {
+                    //
+                    // Initial occurrence.
+                    //
+
+                    JSONArray choices = new JSONArray();
+
+                    Json.put(li, "choices", choices);
+                    Json.put(nameList, label, choices);
+
+                    Json.put(contacts, li);
+                }
+
+                //
+                // Add every item also to communication choices.
+                //
+
+                JSONArray choices = Json.getArray(nameList, label);
+                Json.put(choices, Json.clone(li));
+
+                //
+                // Remove from original launch pages.
+                //
+
+                lis.remove(inx--);
+            }
+            else
+            {
+                if (Simple.equals(type, "contacts"))
+                {
+                    //
+                    // Put contacts folder at end later.
+                    //
+
+                    contactli = li;
+                    lis.remove(inx--);
+                }
             }
         }
+
+        if (contactli != null) Json.put(contacts, contactli);
     }
 
     private Runnable changeOrientation = new Runnable()
