@@ -36,6 +36,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
         apiurl = "https://api.instagram.com/v1";
 
         apifeedhasposts = true;
+        cacheInterval = 3600;
     }
 
     @Override

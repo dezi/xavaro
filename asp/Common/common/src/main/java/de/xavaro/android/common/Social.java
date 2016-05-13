@@ -64,6 +64,7 @@ public abstract class Social
     protected JSONObject user;
     protected boolean verbose;
     protected File cachedir;
+    protected long cacheInterval = 3600;
 
     public Social(String platform)
     {
@@ -1153,10 +1154,7 @@ public abstract class Social
     //endregion Searching
 
     //region Cache maintenance
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private final long totalInterval = 3600;
-
+    
     private long lastReconfigure;
     private long nextInterval;
     private long nextAction;
@@ -1214,11 +1212,11 @@ public abstract class Social
 
             if (feedList.length() == 0)
             {
-                nextAction = now + (totalInterval * 1000);
+                nextAction = now + (cacheInterval * 1000);
             }
             else
             {
-                nextInterval = (totalInterval * 1000) / feedList.length();
+                nextInterval = (cacheInterval * 1000) / feedList.length();
 
                 //
                 // Impose a rate limit on too many feeds.
@@ -1251,20 +1249,31 @@ public abstract class Social
         final String feedpfid = Json.getString(feed, "id");
         String feedname = Json.getString(feed, "full_name");
         if (feedname == null) feedname = Json.getString(feed, "name");
+        File feedfile = new File(cachedir, feedpfid + ".feed.json");
 
         Log.d(LOGTAG, "commTick: feed:" + feedpfid + " => " + feedname);
 
         JSONArray feeddata = getGraphFeed(feedpfid);
-        if (feeddata == null) return;
 
-        File feedfile = new File(cachedir, feedpfid + ".feed.json");
-        Simple.putFileContent(feedfile, Json.toPretty(feeddata));
+        if (feeddata == null)
+        {
+            //
+            // Get recent stored feed to avoid cache file deletion.
+            //
+
+            feeddata = Simple.getFileJSONArray(feedfile);
+        }
 
         //
-        // Check and cache feed stories.
+        // Check and cache feed stories and store feed to cache.
         //
 
-        cacheFeedStories(feedpfid, feeddata);
+        if (feeddata == null)
+        {
+            cacheFeedStories(feedpfid, feeddata);
+
+            Simple.putFileContent(feedfile, Json.toPretty(feeddata));
+        }
     }
 
     protected void cacheFeedStories(String feedpfid, JSONArray feeddata)
