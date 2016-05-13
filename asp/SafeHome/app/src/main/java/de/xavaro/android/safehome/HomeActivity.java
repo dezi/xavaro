@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     private FrameLayout topScreen;
     private FrameLayout videoSurface;
-    private FrameLayout launchScreen;
+    private HomeLaunch launchScreen;
     private HomeBottom bottomScreen;
     private LaunchGroupRoot launchGroup;
 
@@ -71,14 +71,18 @@ public class HomeActivity extends AppCompatActivity implements
 
         instance = this;
 
+        int basesize = Simple.getDevicePixels(160);
+
         topScreen = new FrameLayout(this);
         topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
         setContentView(topScreen);
 
         launchScreen = new HomeLaunch(this);
+        launchScreen.setSize(basesize);
         topScreen.addView(launchScreen);
 
         bottomScreen = new HomeBottom(this);
+        bottomScreen.setSize(basesize);
         topScreen.addView(bottomScreen);
 
         ArchievementManager.reset("alertcall.shortclick");

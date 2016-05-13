@@ -87,11 +87,12 @@ public class LaunchGroupRoot extends LaunchGroup
 
         ArrayList<JSONArray> configs = new ArrayList<>();
 
+        //configs.add(LaunchItemAlertcall.getConfig());
+        //configs.add(LaunchItemVoice.getConfig());
+
         configs.add(LaunchItemBeta.getConfig());
         configs.add(LaunchItemToday.getConfig());
-        configs.add(LaunchItemVoice.getConfig());
         configs.add(LaunchItemBattery.getConfig());
-        configs.add(LaunchItemAlertcall.getConfig());
 
         configs.add(LaunchGroupCalls.getConfig("calls","monitors"));
         configs.add(LaunchGroupCalls.getConfig("calls","important"));

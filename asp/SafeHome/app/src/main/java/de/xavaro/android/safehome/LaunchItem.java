@@ -218,6 +218,12 @@ public class LaunchItem extends FrameLayout implements
         });
     }
 
+    public void setFrameLess()
+    {
+        setBackgroundResource(0);
+        icon.setPadding(10, 0, 10, 20);
+    }
+
     public void setSize(int width, int height)
     {
         layout.width = width;
@@ -241,6 +247,11 @@ public class LaunchItem extends FrameLayout implements
         //
 
         if (config.has("label")) setLabelText(Json.getString(config, "label"));
+    }
+
+    public void setGravity(int gravity)
+    {
+        layout.gravity = gravity;
     }
 
     public void setPosition(int left, int top)

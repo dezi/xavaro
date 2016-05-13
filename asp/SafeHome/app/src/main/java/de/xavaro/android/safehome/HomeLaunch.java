@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import de.xavaro.android.common.Simple;
@@ -12,33 +11,21 @@ import de.xavaro.android.common.Simple;
 @SuppressLint("RtlHardcoded")
 public class HomeLaunch extends FrameLayout
 {
+    private int layoutSize;
+
+    private LayoutParams layoutParams;
+
     public HomeLaunch(Context context)
     {
         super(context);
 
-        init();
-    }
-
-    public HomeLaunch(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
-
-        init();
-    }
-
-    public HomeLaunch(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
-
-        init();
-    }
-
-    private LayoutParams layoutParams;
-
-    private void init()
-    {
         layoutParams = new LayoutParams(Simple.MP, Simple.MP);
         setLayoutParams(layoutParams);
+    }
+
+    public void setSize(int pixels)
+    {
+        layoutSize = pixels;
     }
 
     @Override
@@ -49,11 +36,11 @@ public class HomeLaunch extends FrameLayout
         if (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT)
         {
             layoutParams.rightMargin = 0;
-            layoutParams.bottomMargin = Simple.getDevicePixels(200);
+            layoutParams.bottomMargin = layoutSize;
         }
         else
         {
-            layoutParams.rightMargin = Simple.getDevicePixels(200);
+            layoutParams.rightMargin = layoutSize;
             layoutParams.bottomMargin = 0;
         }
     }

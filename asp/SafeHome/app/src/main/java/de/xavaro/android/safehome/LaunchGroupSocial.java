@@ -12,7 +12,6 @@ import java.util.Map;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.Social;
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.SocialGoogleplus;
 import de.xavaro.android.common.SocialInstagram;
@@ -45,28 +44,28 @@ public class LaunchGroupSocial extends LaunchGroup
         {
             configPrefs("facebook", "owner", home, fbdir, cdir);
             configPrefs("facebook", "friend", home, fbdir, cdir);
-            configPrefs("facebook", "like", home, fbdir, cdir);
+            configPrefs("facebook", "like", home, fbdir, null);
         }
 
         if (Simple.getSharedPrefBoolean("social.instagram.enable"))
         {
             configPrefs("instagram", "owner", home, igdir, cdir);
             configPrefs("instagram", "friend", home, igdir, cdir);
-            configPrefs("instagram", "like", home, igdir, cdir);
+            configPrefs("instagram", "like", home, igdir, null);
         }
 
         if (Simple.getSharedPrefBoolean("social.googleplus.enable"))
         {
             configPrefs("googleplus", "owner", home, gpdir, cdir);
             configPrefs("googleplus", "friend", home, gpdir, cdir);
-            configPrefs("googleplus", "like", home, gpdir, cdir);
+            configPrefs("googleplus", "like", home, gpdir, null);
         }
 
         if (Simple.getSharedPrefBoolean("social.twitter.enable"))
         {
             configPrefs("twitter", "owner", home, twdir, cdir);
             configPrefs("twitter", "friend", home, twdir, cdir);
-            configPrefs("twitter", "like", home, twdir, cdir);
+            configPrefs("twitter", "like", home, twdir, null);
         }
 
         if (twdir.length() > 0)
@@ -193,7 +192,8 @@ public class LaunchGroupSocial extends LaunchGroup
                 if (mode.contains("home")) Json.put(home, entry);
                 if (mode.contains("home")) Json.put(adir, entry);
                 if (mode.contains("folder")) Json.put(adir, entry);
-                if (mode.contains("contacts")) Json.put(cdir, entry);
+
+                if ((cdir != null) && mode.contains("contacts")) Json.put(cdir, entry);
 
                 if (mode.contains("feed")) haveownerfeed = true;
             }

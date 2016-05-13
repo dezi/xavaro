@@ -69,8 +69,9 @@ public class LaunchGroupComm
                 Json.put(entry, "order", 500);
 
                 if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
-                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Json.put(adir, entry);
+                Json.put(cdir, entry);
 
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
             }
@@ -107,8 +108,9 @@ public class LaunchGroupComm
                 Json.put(entry, "order", Simple.equals(gtype, "alertcall") ? 200 : 550);
 
                 if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
-                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Json.put(adir, entry);
+                Json.put(cdir, entry);
 
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
             }
@@ -145,7 +147,6 @@ public class LaunchGroupComm
 
                 if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
                 if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
 
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=padm=" + ident + "=" + label);
             }
