@@ -23,6 +23,7 @@ public class HomeBuddies extends FrameLayout
     private static final String LOGTAG = HomeBuddies.class.getSimpleName();
 
     private int layoutSize;
+    private int peopleSize;
 
     private JSONArray baseContacts;
     private JSONArray moreContacts;
@@ -83,12 +84,13 @@ public class HomeBuddies extends FrameLayout
         orientation = Configuration.ORIENTATION_UNDEFINED;
     }
 
-    public void setSize(int pixels)
+    public void setSize(int layoutSize, int peopleSize)
     {
-        layoutSize = pixels;
+        this.layoutSize = layoutSize;
+        this.peopleSize = peopleSize;
 
-        if (alertLaunchItem != null) alertLaunchItem.setSize(layoutSize, layoutSize);
-        if (voiceLaunchItem != null) voiceLaunchItem.setSize(layoutSize, layoutSize);
+        if (alertLaunchItem != null) alertLaunchItem.setSize(peopleSize, peopleSize);
+        if (voiceLaunchItem != null) voiceLaunchItem.setSize(peopleSize, peopleSize);
     }
 
     public void setConfig(JSONObject config)
@@ -109,7 +111,7 @@ public class HomeBuddies extends FrameLayout
             final LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, contact);
 
             launchItem.setFrameLess();
-            launchItem.setSize(layoutSize, layoutSize);
+            launchItem.setSize(peopleSize, peopleSize);
 
             peopleView.addView(launchItem);
         }
@@ -348,9 +350,10 @@ public class HomeBuddies extends FrameLayout
                     (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT))
             {
                 int width = ((View) getParent()).getWidth();
-                int items = ((int) Math.floor(width / layoutSize)) - 1;
-                int margin = (width - (items * layoutSize)) / 2;
+                int items = ((int) Math.floor(width / peopleSize)) - 1;
+                int margin = (width - (items * peopleSize)) / 2;
 
+                setPadding(0, (layoutSize - peopleSize) / 2, 0, 0);
                 layoutParams.width = Simple.MP;
                 layoutParams.height = layoutSize;
                 layoutParams.gravity = Gravity.BOTTOM;
@@ -381,8 +384,10 @@ public class HomeBuddies extends FrameLayout
                     (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE))
             {
                 int height = ((View) getParent()).getHeight();
-                int items = ((int) Math.floor(height / layoutSize)) - 1;
-                int margin = (height - (items * layoutSize)) / 2;
+                int items = ((int) Math.floor(height / peopleSize)) - 1;
+                int margin = (height - (items * peopleSize)) / 2;
+
+                setPadding((layoutSize - peopleSize) / 2, 0, 0, 0);
 
                 layoutParams.width = layoutSize;
                 layoutParams.height = Simple.MP;

@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 
 import android.graphics.Bitmap;
@@ -96,8 +97,6 @@ public class LaunchGroup extends FrameLayout implements
     {
         this.context = context;
 
-        setBackgroundColor(GlobalConfigs.LaunchPageBackgroundColor);
-
         FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
@@ -128,7 +127,7 @@ public class LaunchGroup extends FrameLayout implements
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_left);
         bmpDraw = new BitmapDrawable(getResources(), bmp);
         bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
-        ali.setBackground(bmpDraw);
+        //ali.setBackground(bmpDraw);
 
         arrowLeft.addView(ali);
         this.addView(arrowLeft);
@@ -143,7 +142,7 @@ public class LaunchGroup extends FrameLayout implements
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_right);
         bmpDraw = new BitmapDrawable(getResources(), bmp);
         bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
-        ari.setBackground(bmpDraw);
+        //ari.setBackground(bmpDraw);
 
         arrowRight.addView(ari);
         this.addView(arrowRight);
@@ -444,7 +443,7 @@ public class LaunchGroup extends FrameLayout implements
         {
             JSONArray lis = config.getJSONArray(configTree);
 
-            int bgcol = GlobalConfigs.LaunchPageBackgroundColor;
+            int bgcol = Color.WHITE; //GlobalConfigs.LaunchPageBackgroundColor;
 
             FrameLayout lp = new FrameLayout(context);
             lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth, realHeight));

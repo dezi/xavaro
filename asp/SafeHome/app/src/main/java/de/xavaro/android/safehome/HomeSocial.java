@@ -40,7 +40,7 @@ public class HomeSocial extends FrameLayout
 
         layoutParams = new LayoutParams(0, 0);
         setLayoutParams(layoutParams);
-        setPadding(8, 8, 8, 8);
+        setPadding(8, 0, 0, 8);
 
         innerFrame = new FrameLayout(context);
         addView(innerFrame);

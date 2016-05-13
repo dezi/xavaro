@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
@@ -150,13 +151,18 @@ public class LaunchItem extends FrameLayout implements
     {
         this.context = context;
 
-        setBackgroundResource(R.drawable.shadow_black_400x400);
-
         layout = new LayoutParams(0, 0);
         setLayoutParams(layout);
 
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(16);
+        gd.setColor(GlobalConfigs.LaunchPageBackgroundColor);
+        gd.setStroke(2, 0xffcccccc);
+
+        setBackground(gd);
+
         icon = new ImageSmartView(context);
-        icon.setPadding(20, 0, 20, 40);
+        icon.setPadding(14, 0, 14, 28);
         addView(icon);
 
         label = new TextView(context);
@@ -220,8 +226,7 @@ public class LaunchItem extends FrameLayout implements
 
     public void setFrameLess()
     {
-        setBackgroundResource(0);
-        icon.setPadding(14, 0, 14, 28);
+        setBackground(null);
     }
 
     public void setSize(int width, int height)
@@ -239,7 +244,7 @@ public class LaunchItem extends FrameLayout implements
         // value if dimensions are known.
         //
 
-        padding = layout.width / 12;
+        padding = layout.width / 20;
         setPadding(padding, padding, padding, padding);
 
         //

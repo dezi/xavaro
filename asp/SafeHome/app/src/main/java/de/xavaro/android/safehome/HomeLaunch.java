@@ -28,7 +28,7 @@ public class HomeLaunch extends FrameLayout
 
         layoutParams = new LayoutParams(Simple.MP, Simple.MP);
         setLayoutParams(layoutParams);
-        setPadding(8, 8, 8, 8);
+        setPadding(8, 0, 8, 8);
 
         innerFrame = new FrameLayout(context);
         addView(innerFrame);

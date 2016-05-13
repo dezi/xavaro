@@ -76,28 +76,30 @@ public class HomeActivity extends AppCompatActivity implements
 
         instance = this;
 
-        int buddysize = Simple.getDevicePixels(160);
-        int socialsize = Simple.getDevicePixels(320);
-        int notifysize = Simple.getDevicePixels(320);
+        int personsize = Simple.getDevicePixels(160);
+        int peoplesize = Simple.getDevicePixels(200);
+        int socialsize = Simple.getDevicePixels(340);
+        int notifysize = Simple.getDevicePixels(340);
 
         topScreen = new FrameLayout(this);
         topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
+        topScreen.setBackgroundColor(0xfffbfbfb);
         setContentView(topScreen);
 
         notifyScreen = new HomeNotify(this);
-        notifyScreen.setSize(notifysize, buddysize);
+        notifyScreen.setSize(notifysize, peoplesize);
         topScreen.addView(notifyScreen);
 
         launchScreen = new HomeLaunch(this);
-        launchScreen.setSize(buddysize, socialsize, notifysize);
+        launchScreen.setSize(peoplesize, socialsize, notifysize);
         topScreen.addView(launchScreen);
 
         socialScreen = new HomeSocial(this);
-        socialScreen.setSize(socialsize, buddysize, notifysize);
+        socialScreen.setSize(socialsize, peoplesize, notifysize);
         topScreen.addView(socialScreen);
 
         buddyScreen = new HomeBuddies(this);
-        buddyScreen.setSize(buddysize);
+        buddyScreen.setSize(peoplesize, personsize);
         topScreen.addView(buddyScreen);
 
         launchFrame = launchScreen.getPayloadFrame();
