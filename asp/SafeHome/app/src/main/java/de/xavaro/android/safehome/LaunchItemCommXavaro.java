@@ -158,7 +158,7 @@ public class LaunchItemCommXavaro extends LaunchItem implements
 
         Log.d(LOGTAG, "onAttachedToWindow");
 
-        if (subtype.equals("padm"))
+        if (Simple.equals(subtype, "padm"))
         {
             CommService.subscribeMessage(this, "recvPrepaidBalance");
 
@@ -173,7 +173,7 @@ public class LaunchItemCommXavaro extends LaunchItem implements
 
         Log.d(LOGTAG, "onDetachedFromWindow");
 
-        if (subtype.equals("padm"))
+        if (Simple.equals(subtype, "padm"))
         {
             CommService.unsubscribeMessage(this, "recvPrepaidBalance");
         }

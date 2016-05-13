@@ -4,8 +4,11 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.view.Gravity;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.view.Gravity;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,13 +19,19 @@ import de.xavaro.android.common.Simple;
 @SuppressLint("RtlHardcoded")
 public class HomeBottom extends FrameLayout
 {
+    private static final String LOGTAG = HomeBottom.class.getSimpleName();
+
     private int layoutSize;
+
+    private JSONArray contacts;
 
     private LayoutParams layoutParams;
 
     private LaunchItem alertLaunchItem;
     private LaunchItem voiceLaunchItem;
-    private FrameLayout friendsFrame;
+    private ScrollView friendsFrame;
+    private LinearLayout.LayoutParams peopleLayout;
+    private LinearLayout peopleList;
 
     private LayoutParams friendsLayout;
 
@@ -52,9 +61,14 @@ public class HomeBottom extends FrameLayout
         }
 
         friendsLayout = new LayoutParams(Simple.MP, Simple.MP);
-        friendsFrame = new FrameLayout(context);
+        friendsFrame = new ScrollView(context);
         friendsFrame.setLayoutParams(friendsLayout);
         this.addView(friendsFrame);
+
+        peopleLayout = new LinearLayout.LayoutParams(Simple.WC, Simple.WC);
+        peopleList = new LinearLayout(context);
+        peopleList.setLayoutParams(peopleLayout);
+        friendsFrame.addView(peopleList);
     }
 
     public void setSize(int pixels)
@@ -63,6 +77,48 @@ public class HomeBottom extends FrameLayout
 
         if (alertLaunchItem != null) alertLaunchItem.setSize(layoutSize, layoutSize);
         if (voiceLaunchItem != null) voiceLaunchItem.setSize(layoutSize, layoutSize);
+    }
+
+    public void setConfig(JSONObject config)
+    {
+        contacts = new JSONArray();
+        peopleList.removeAllViews();
+
+        extractConfig(config);
+
+        for (int inx = 0; inx < contacts.length(); inx++)
+        {
+            JSONObject contact = Json.getObject(contacts, inx);
+            if (contact == null) continue;
+
+            LaunchItem li = LaunchItem.createLaunchItem(getContext(), null, contact);
+
+            li.setFrameLess();
+            li.setSize(layoutSize, layoutSize);
+
+            peopleList.addView(li);
+        }
+    }
+
+    private void extractConfig(JSONObject config)
+    {
+        JSONArray lis = Json.getArray(config, "launchitems");
+        if (lis == null) return;
+
+        for (int inx = 0; inx < lis.length(); inx++)
+        {
+            JSONObject li = Json.getObject(lis, inx);
+            String subtype = Json.getString(li, "subtype");
+            if (subtype == null) continue;
+
+            if (Simple.equals(subtype, "chat")
+                    || Simple.equals(subtype, "text")
+                    || Simple.equals(subtype, "voip")
+                    || Simple.equals(subtype, "vica"))
+            {
+                Json.put(contacts, li);
+            }
+        }
     }
 
     @Override
@@ -92,6 +148,10 @@ public class HomeBottom extends FrameLayout
                 voiceLaunchItem.setGravity(Gravity.RIGHT);
                 friendsLayout.leftMargin = layoutSize;
             }
+
+            peopleLayout.width = Simple.WC;
+            peopleLayout.height = Simple.MP;
+            peopleList.setOrientation(LinearLayout.HORIZONTAL);
         }
         else
         {
@@ -115,6 +175,10 @@ public class HomeBottom extends FrameLayout
                 voiceLaunchItem.setGravity(Gravity.BOTTOM);
                 friendsLayout.bottomMargin = layoutSize;
             }
+
+            peopleLayout.width = Simple.MP;
+            peopleLayout.height = Simple.WC;
+            peopleList.setOrientation(LinearLayout.VERTICAL);
         }
     }
 }

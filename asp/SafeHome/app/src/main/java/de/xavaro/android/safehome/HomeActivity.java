@@ -6,11 +6,12 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class HomeActivity extends AppCompatActivity implements
     private HomeLaunch launchScreen;
     private HomeBottom bottomScreen;
     private LaunchGroupRoot launchGroup;
+    private JSONObject launchConfig;
 
     private boolean wasPaused = false;
     private boolean lostFocus = true;
@@ -162,7 +164,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         Log.d(LOGTAG, "onStart...");
 
-        if ((launchGroup == null) || CommonStatic.settingschanged)
+        if ((launchConfig == null) || CommonStatic.settingschanged)
         {
             if (launchGroup != null)
             {
@@ -173,8 +175,12 @@ public class HomeActivity extends AppCompatActivity implements
                 System.gc();
             }
 
+            launchConfig = LaunchGroupRoot.getConfig();
             launchGroup = new LaunchGroupRoot(this);
-            launchGroup.setConfig(null, LaunchGroupRoot.getConfig());
+
+            bottomScreen.setConfig(launchConfig);
+            launchGroup.setConfig(null, launchConfig);
+
             launchScreen.addView(launchGroup);
 
             CommonStatic.settingschanged = false;
@@ -291,10 +297,10 @@ public class HomeActivity extends AppCompatActivity implements
     // serveral times or return to android system.
     //
 
-    private long backPressedTime = 0;
-    private int backPressedCount = 0;
+    private long backPressedTime;
+    private int backPressedCount;
 
-    private ArrayList backStack = new ArrayList();
+    private ArrayList<Object> backStack = new ArrayList<>();
 
     public void addViewToBackStack(Object view)
     {
