@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,16 +27,22 @@ public class HomeSocial extends FrameLayout
 {
     private static final String LOGTAG = HomeSocial.class.getSimpleName();
 
+    private int headspace = Simple.getDevicePixels(40);
+
     private int layoutSize;
     private int buddySize;
     private int notifySize;
 
     private LayoutParams layoutParams;
+    private LayoutParams titleLayout;
+    private TextView titleText;
+    private LayoutParams innerLayout;
     private FrameLayout innerFrame;
     private FrameLayout payloadFrame;
     private WebAppView webView;
 
     private int orientation;
+    private boolean fullscreen;
 
     public HomeSocial(Context context)
     {
@@ -45,15 +52,33 @@ public class HomeSocial extends FrameLayout
         setLayoutParams(layoutParams);
         setPadding(8, 0, 0, 8);
 
+        innerLayout = new LayoutParams(Simple.MP, Simple.MP);
+        innerLayout.topMargin = headspace;
+
         innerFrame = new FrameLayout(context);
         addView(innerFrame);
 
-        GradientDrawable gd = new GradientDrawable();
-        gd.setCornerRadius(16);
-        gd.setColor(0xffffffff);
-        gd.setStroke(2, 0xffcccccc);
+        titleLayout = new LayoutParams(Simple.MP, headspace);
 
-        innerFrame.setBackground(gd);
+        titleText = new TextView(context);
+        titleText.setLayoutParams(titleLayout);
+        titleText.setText("Neuigkeiten");
+        titleText.setTextSize(headspace * 2 / 3);
+        titleText.setPadding(16, 0, 0, 0);
+
+        titleText.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                toogleFullscreen();
+            }
+        });
+
+        addView(titleText);
+
+        innerFrame.setLayoutParams(innerLayout);
+        innerFrame.setBackground(Simple.getRoundedBorders());
         innerFrame.setPadding(8, 8, 8, 8);
 
         payloadFrame = new FrameLayout(context);
@@ -68,6 +93,52 @@ public class HomeSocial extends FrameLayout
         orientation = Configuration.ORIENTATION_UNDEFINED;
     }
 
+    private void toogleFullscreen()
+    {
+        bringToFront();
+
+        if (fullscreen)
+        {
+            setPadding(8, 0, 0, 8);
+
+            layoutParams.width = layoutSize;
+
+            layoutParams.topMargin = notifySize;
+            layoutParams.rightMargin = 8;
+            layoutParams.bottomMargin = buddySize;
+
+            innerLayout.topMargin = headspace;
+            innerFrame.setBackgroundColor(Color.TRANSPARENT);
+            innerFrame.setBackground(Simple.getRoundedBorders());
+
+            titleLayout.height = headspace;
+            titleText.setBackgroundColor(Color.TRANSPARENT);
+            titleText.setGravity(Gravity.START);
+
+            fullscreen = false;
+        }
+        else
+        {
+            setPadding(0, 0, 0, 0);
+
+            layoutParams.width = Simple.MP;
+
+            layoutParams.topMargin = 0;
+            layoutParams.rightMargin = 0;
+            layoutParams.bottomMargin = 0;
+
+            innerLayout.topMargin = headspace * 2;
+            innerFrame.setBackground(null);
+            innerFrame.setBackgroundColor(0xffffffff);
+
+            titleLayout.height = headspace * 2;
+            titleText.setBackgroundColor(0xffcccccc);
+            titleText.setGravity(Gravity.CENTER);
+
+            fullscreen = true;
+        }
+    }
+
     public void setSize(int layoutSize, int buddySize, int notifySize)
     {
         this.layoutSize = layoutSize;
@@ -78,7 +149,6 @@ public class HomeSocial extends FrameLayout
         layoutParams.height = Simple.MP;
         layoutParams.gravity = Gravity.LEFT;
 
-        layoutParams.rightMargin = 0;
         layoutParams.topMargin = notifySize;
     }
 

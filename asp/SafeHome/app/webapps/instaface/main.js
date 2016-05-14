@@ -286,6 +286,8 @@ instaface.displayPostCompact = function(plat, post)
 
     var namediv = WebLibSimple.createAnyAppend("div", infodiv);
     WebLibSimple.setFontSpecs(namediv, 24, "bold");
+    namediv.style.whiteSpace = "nowrap";
+    namediv.style.textOverflow = "ellipsis";
     namediv.innerHTML = name;
 
     var timediv = WebLibSimple.createAnyAppend("div", infodiv);
@@ -344,14 +346,19 @@ instaface.displayPostCompact = function(plat, post)
             imghei = Math.floor(image.height * scaley);
         }
 
-        console.log("=====:" + wid + "x" + hei + "===>" + imgwid + "x" + imghei);
+        imgtag.width  = imgwid;
+        imgtag.height = imghei;
 
-        imgtag.style.width  = imgwid + "px";
-        imgtag.style.height = imghei + "px";
-
-        imgtag.style.left = Math.floor((imgsdiv.offsetWidth  - imgwid) / 2) + "px";
-        imgtag.style.top  = Math.floor((imgsdiv.offsetHeight - imghei) / 2) + "px";
+        imgtag.style.left   = Math.floor((imgsdiv.offsetWidth  - imgwid) / 2) + "px";
+        imgtag.style.top    = Math.floor((imgsdiv.offsetHeight - imghei) / 2) + "px";
+        imgtag.style.right  = Math.floor((imgwid - imgsdiv.offsetWidth ) / 2) + "px";
+        imgtag.style.bottom = Math.floor((imghei - imgsdiv.offsetHeight) / 2) + "px";
     }
+}
+
+instaface.onWindowResize = function()
+{
+    console.log("onWindowResize:");
 }
 
 instaface.displayPostNormal = function(plat, post)
@@ -459,7 +466,8 @@ instaface.createConts = function()
         ic.retrieveBestPost();
     }
 
-    setTimeout(instaface.updateConts, 5000);
+    addEventListener("resize", instaface.onWindowResize);
+    if (ic.mode == "news") setTimeout(instaface.updateConts, 5000);
 }
 
 instaface.retrieveBestPost = function()
@@ -596,3 +604,4 @@ instaface.createFeeds();
 instaface.createConts();
 
 //instaface.createDebug();
+

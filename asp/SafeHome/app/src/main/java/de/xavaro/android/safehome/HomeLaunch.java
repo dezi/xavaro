@@ -5,7 +5,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
+import android.view.Gravity;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import de.xavaro.android.common.Simple;
 
@@ -19,6 +21,8 @@ public class HomeLaunch extends FrameLayout
     private int orientation;
 
     private LayoutParams layoutParams;
+    private TextView titleText;
+    private LayoutParams innerLayout;
     private FrameLayout innerFrame;
     private FrameLayout payloadFrame;
 
@@ -26,9 +30,21 @@ public class HomeLaunch extends FrameLayout
     {
         super(context);
 
+        int headspace = Simple.getDevicePixels(40);
+
         layoutParams = new LayoutParams(Simple.MP, Simple.MP);
         setLayoutParams(layoutParams);
         setPadding(8, 0, 8, 8);
+
+        titleText = new TextView(context);
+        titleText.setLayoutParams(new LayoutParams(Simple.MP, headspace));
+        titleText.setText("Mein Safehome");
+        titleText.setTextSize(headspace * 2 / 3);
+        titleText.setPadding(16, 0, 0, 0);
+        addView(titleText);
+
+        innerLayout = new LayoutParams(Simple.MP, Simple.MP);
+        innerLayout.topMargin = headspace;
 
         innerFrame = new FrameLayout(context);
         addView(innerFrame);
@@ -38,6 +54,7 @@ public class HomeLaunch extends FrameLayout
         gd.setColor(0xffffffff);
         gd.setStroke(2, 0xffcccccc);
 
+        innerFrame.setLayoutParams(innerLayout);
         innerFrame.setBackground(gd);
         innerFrame.setPadding(8, 8, 8, 8);
 

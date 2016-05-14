@@ -666,6 +666,16 @@ public class Simple
         return anyContext.getResources().getDisplayMetrics().density;
     }
 
+    public static GradientDrawable getRoundedBorders()
+    {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(16);
+        gd.setColor(0xffffffff);
+        gd.setStroke(2, 0xffcccccc);
+
+        return gd;
+    }
+
     public static int getDevicePixels(int pixels)
     {
         return (pixels * getDensityDPI()) / 160;
