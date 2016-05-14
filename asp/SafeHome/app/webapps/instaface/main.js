@@ -36,6 +36,11 @@ instaface.createFrame = function()
     ic.adjustMode();
 }
 
+instaface.onExpandClick = function()
+{
+    WebAppUtility.makeClick();
+}
+
 instaface.adjustMode = function()
 {
     var ic = instaface;
@@ -47,6 +52,7 @@ instaface.adjustMode = function()
         ic.contentscroll.style.bottom = null;
         ic.contentscroll.style.height = null;
         ic.contentscroll.scrollVertical = true;
+        ic.contentscroll.onTouchClick = null;
     }
 
     if (ic.mode == "news")
@@ -56,6 +62,7 @@ instaface.adjustMode = function()
         ic.contentscroll.style.bottom = "0px";
         ic.contentscroll.style.height = null;
         ic.contentscroll.scrollVertical = false;
+        ic.contentscroll.onTouchClick = instaface.onExpandClick;
     }
 }
 
@@ -121,6 +128,7 @@ instaface.createFeeds = function()
 
     ic.icontitles = {};
     ic.iconsorter = [];
+    ic.usertype = {};
 
     //
     // Build a list with all feeds of all platforms
@@ -168,6 +176,8 @@ instaface.createFeeds = function()
 
                     ic.icontitles[ ownername ] = picn;
                     ic.iconsorter.push(sort + "|" + ownername);
+
+                    ic.usertype[ ownername ] = ownerfeed.type;
                 }
 
                 ic.feeds.push(ownerfeed);
@@ -253,6 +263,7 @@ instaface.displayPostCompact = function(plat, post)
     var name = WebLibSocial.getPostName(plat, post);
     var text = WebLibSocial.getPostText(plat, post);
     var imgs = WebLibSocial.getPostImgs(plat, post);
+    var type = (name != null) ? ic.usertype[ name.toLowerCase() ] : null;
 
     var postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
     postdiv.style.marginTop = "4px";
@@ -283,7 +294,10 @@ instaface.displayPostCompact = function(plat, post)
 
     var platdiv = WebLibSimple.createAnyAppend("div", infodiv);
     WebLibSimple.setFontSpecs(platdiv, 18, "bold", "#888888");
-    platdiv.innerHTML = WebLibSocial.getPlatformName(plat);
+
+    platdiv.innerHTML = WebLibSocial.getPlatformName(plat)
+                      + " – "
+                      + WebLibStrings.getTransTrans("social.type.keys", type);
 
     spacediv.style.height = (80 - infodiv.scrollHeight) + "px";
 

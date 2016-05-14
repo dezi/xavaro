@@ -7,5 +7,8 @@
   "simple.day.keys" : [ "0", "1", "2", "3", "4", "5", "6" ],
   "simple.day.vals" : [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
 
+  "social.type.keys" : [ "owner", "friend", "like" ],
+  "social.type.vals" : [ "You",   "Friend", "Subscription" ],
+
   "EOL" : true
 }
