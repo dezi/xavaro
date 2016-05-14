@@ -18,9 +18,9 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
-public class HomeBuddies extends FrameLayout
+public class HomePeople extends FrameLayout
 {
-    private static final String LOGTAG = HomeBuddies.class.getSimpleName();
+    private static final String LOGTAG = HomePeople.class.getSimpleName();
 
     private int layoutSize;
     private int peopleSize;
@@ -42,7 +42,7 @@ public class HomeBuddies extends FrameLayout
     private LayoutParams horzLayout;
     private int orientation;
 
-    public HomeBuddies(Context context)
+    public HomePeople(Context context)
     {
         super(context);
 

@@ -50,11 +50,13 @@ public class HomeActivity extends AppCompatActivity implements
 
     private FrameLayout topScreen;
     private FrameLayout videoSurface;
+    private FrameLayout launchFrame;
+
     private HomeNotify notifyScreen;
     private HomeLaunch launchScreen;
-    private FrameLayout launchFrame;
-    private HomeBuddies buddyScreen;
+    private HomePeople peopleScreen;
     private HomeSocial socialScreen;
+    
     private LaunchGroupRoot launchGroup;
     private JSONObject launchConfig;
 
@@ -98,9 +100,9 @@ public class HomeActivity extends AppCompatActivity implements
         socialScreen.setSize(socialsize, peoplesize, notifysize);
         topScreen.addView(socialScreen);
 
-        buddyScreen = new HomeBuddies(this);
-        buddyScreen.setSize(peoplesize, personsize);
-        topScreen.addView(buddyScreen);
+        peopleScreen = new HomePeople(this);
+        peopleScreen.setSize(peoplesize, personsize);
+        topScreen.addView(peopleScreen);
 
         launchFrame = launchScreen.getPayloadFrame();
 
@@ -195,7 +197,7 @@ public class HomeActivity extends AppCompatActivity implements
             launchConfig = LaunchGroupRoot.getConfig();
             launchGroup = new LaunchGroupRoot(this);
 
-            buddyScreen.setConfig(launchConfig);
+            peopleScreen.setConfig(launchConfig);
             launchGroup.setConfig(null, launchConfig);
 
             launchFrame.addView(launchGroup);
