@@ -122,6 +122,10 @@ WebLibSimple.createAnyHeight = function(type, left, toporbottom, right, height, 
             div.style.height = WebLibSimple.addPixel(height);
         }
     }
+    else
+    {
+        if (toporbottom !== null) div.style.top = WebLibSimple.addPixel(toporbottom);
+    }
 
     if (id) div.id = id;
 
@@ -446,30 +450,48 @@ WebLibSimple.getPickerDate = function(pickerdate)
     return null;
 }
 
+WebLibSimple.ellipsizeTextBox = function(elem, maxheight)
+{
+    var wordArray = elem.innerHTML.split(' ');
+
+    while (elem.scrollHeight > maxheight)
+    {
+        wordArray.pop();
+
+        elem.innerHTML = wordArray.join(' ') + '…';
+    }
+
+    return elem.scrollHeight;
+}
+
 WebLibSimple.getNiceDate = function(date)
 {
     var work = new Date(date);
-    var workmilli = work.getTime();
 
-    var today = WebLibSimple.getTodayDate().getTime();
-    var yester = today - 86400 * 1000;
-    var midnig = today + 86400 * 1000;
+    var todays = WebLibSimple.getTodayDate().getTime();
+    var yester = todays - 86400 * 1000;
+    var midnig = todays + 86400 * 1000;
     var tomoro = midnig + 86400 * 1000;
+    var inweek = todays - 86400 * 1000 * 6;
 
     var nicedate = null;
 
-    if ((yester <= work) && (work < today )) nicedate = WebLibStrings.getTrans("simple.yesterday");
-    if ((today  <= work) && (work < midnig)) nicedate = WebLibStrings.getTrans("simple.today");
+    if ((yester <= work) && (work < todays)) nicedate = WebLibStrings.getTrans("simple.yesterday");
+    if ((todays <= work) && (work < midnig)) nicedate = WebLibStrings.getTrans("simple.today");
     if ((midnig <= work) && (work < tomoro)) nicedate = WebLibStrings.getTrans("simple.tomorrow");
 
     if (! nicedate)
     {
-        var prefix = WebLibStrings.getTransTrans("simple.day.keys", (work.getDay() + 6) % 7);
-
-        nicedate = prefix + ", "
-                 + WebLibSimple.padNum(work.getDate(), 2) + "."
-                 + WebLibSimple.padNum(work.getMonth() + 1, 2) + "."
-                 + WebLibSimple.padNum(work.getFullYear(), 4);
+        if (inweek <= work)
+        {
+            nicedate = WebLibStrings.getTransTrans("simple.day.keys", (work.getDay() + 6) % 7);
+        }
+        else
+        {
+            nicedate = WebLibSimple.padNum(work.getDate(), 2) + "."
+                     + WebLibSimple.padNum(work.getMonth() + 1, 2) + "."
+                     + WebLibSimple.padNum(work.getFullYear(), 4);
+        }
     }
 
     nicedate += " " + WebLibStrings.getTrans("simple.at");
@@ -482,7 +504,6 @@ WebLibSimple.getNiceDate = function(date)
 WebLibSimple.getNiceDay = function(date)
 {
     var work = new Date(date);
-    var workmilli = work.getTime();
 
     var today  = WebLibSimple.getTodayDate().getTime();
     var yester = today  - 86400 * 1000;

@@ -169,7 +169,7 @@ public class LaunchItemSocial extends LaunchItem
     {
         if (type.equals("social"))
         {
-            final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
+            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
             webappFrame.setWebAppName("instaface");
             webappFrame.setParent(this);
 
@@ -180,7 +180,7 @@ public class LaunchItemSocial extends LaunchItem
 
         if (config.has("pfid"))
         {
-            final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
+            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
             webappFrame.setWebAppName("instaface");
             webappFrame.setParent(this);
 

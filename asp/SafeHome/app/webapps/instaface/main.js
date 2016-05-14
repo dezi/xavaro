@@ -3,28 +3,60 @@ instaface.config =
     "iconsize" : 120
 }
 
+instaface.updateConts = function()
+{
+    instaface.retrieveBestPost();
+
+    setTimeout(instaface.updateConts, 5000);
+}
+
 instaface.createFrame = function()
 {
     var ic = instaface;
 
+    ic.mode = WebAppSocial.getMode();
+
     ic.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
     ic.topdiv.style.overflow = "hidden";
 
-    var theight = ic.config.iconsize + 8 + 8
+    ic.theight = ic.config.iconsize + 8 + 8
 
-    ic.titlediv = WebLibSimple.createDivHeight(0, 0, 0, theight, "titlediv", ic.topdiv);
+    ic.titlediv = WebLibSimple.createDivHeight(0, 0, 0, ic.theight, "titlediv", ic.topdiv);
     WebLibSimple.setBGColor(ic.titlediv, "#ff7755cc");
     ic.titlediv.style.overflow = "hidden";
 
     ic.titlescroll = WebLibSimple.createDivWidth(0, 0, null, 0, "titlescroll", ic.titlediv);
     ic.titlescroll.scrollHorizontal = true;
 
-    ic.contentdiv = WebLibSimple.createDiv(0, theight, 0, 0, "contentdiv", ic.topdiv);
+    ic.contentdiv = WebLibSimple.createDiv(0, 0, 0, 0, "contentdiv", ic.topdiv);
     ic.contentdiv.style.overflow = "hidden";
 
-    ic.contentscroll = WebLibSimple.createDivHeight(0, 0, 0, null, "contentscroll", ic.contentdiv);
-    WebLibSimple.setBGColor(ic.contentscroll, "#dddddddd");
-    ic.contentscroll.scrollVertical = true;
+    ic.contentscroll = WebLibSimple.createDivHeight(0, 0, 0, 0, "contentscroll", ic.contentdiv);
+
+    ic.adjustMode();
+}
+
+instaface.adjustMode = function()
+{
+    var ic = instaface;
+
+    if (ic.mode == "normal")
+    {
+        ic.titlediv.style.display = "block";
+        ic.contentdiv.style.top = ic.theight + "px";
+        ic.contentscroll.style.bottom = null;
+        ic.contentscroll.style.height = null;
+        ic.contentscroll.scrollVertical = true;
+    }
+
+    if (ic.mode == "news")
+    {
+        ic.titlediv.style.display = "none";
+        ic.contentdiv.style.top = "0px";
+        ic.contentscroll.style.bottom = "0px";
+        ic.contentscroll.style.height = null;
+        ic.contentscroll.scrollVertical = false;
+    }
 }
 
 instaface.getSelector = function(target)
@@ -209,7 +241,106 @@ instaface.createFeeds = function()
 
 instaface.postDivs = [];
 
-instaface.displayPost = function(plat, post)
+instaface.displayPostCompact = function(plat, post)
+{
+    var ic = instaface;
+
+    ic.contentscroll.innerHTML = null;
+
+    var pfid = WebLibSocial.getPostUserid(plat, post);
+    var pfna = WebLibSocial.getPostUsername(plat, post);
+    var date = WebLibSocial.getPostDate(plat, post);
+    var name = WebLibSocial.getPostName(plat, post);
+    var text = WebLibSocial.getPostText(plat, post);
+    var imgs = WebLibSocial.getPostImgs(plat, post);
+
+    var postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
+    postdiv.style.marginTop = "4px";
+    postdiv.style.marginLeft = "4px";
+    postdiv.style.marginRight = "4px";
+    postdiv.style.marginBottom = "4px";
+
+    var headdiv = WebLibSimple.createDivHeight(0, 0, 0, 80, null, postdiv);
+
+    var uicn = WebLibSimple.createAnyAppend("img", headdiv);
+    uicn.style.width = "auto";
+    uicn.style.height = "100%";
+    uicn.style.float = "left";
+    uicn.style.marginRight = "16px";
+    uicn.src = WebLibSocial.getUserIcon(plat, pfid, pfna);
+
+    var infodiv = WebLibSimple.createAnyAppend("div", headdiv);
+
+    var spacediv = WebLibSimple.createAnyAppend("div", infodiv);
+
+    var namediv = WebLibSimple.createAnyAppend("div", infodiv);
+    WebLibSimple.setFontSpecs(namediv, 24, "bold");
+    namediv.innerHTML = name;
+
+    var timediv = WebLibSimple.createAnyAppend("div", infodiv);
+    WebLibSimple.setFontSpecs(timediv, 18, "normal");
+    timediv.innerHTML = WebLibSimple.getNiceDate(date);
+
+    var platdiv = WebLibSimple.createAnyAppend("div", infodiv);
+    WebLibSimple.setFontSpecs(platdiv, 18, "bold", "#888888");
+    platdiv.innerHTML = WebLibSocial.getPlatformName(plat);
+
+    spacediv.style.height = (80 - infodiv.scrollHeight) + "px";
+
+    var sepadiv = WebLibSimple.createDivHeight(0, 82, 0, 2, null, postdiv);
+    WebLibSimple.setBGColor(sepadiv, "#dddddd");
+
+    var textdiv = WebLibSimple.createDivHeight(0, 90, 0, null, null, postdiv);
+    WebLibSimple.setFontSpecs(textdiv, 20, "normal");
+    textdiv.style.overflow = "hidden";
+    textdiv.innerHTML = text;
+
+    var textHeight = WebLibSimple.ellipsizeTextBox(textdiv, 80);
+
+    var imgsdiv = WebLibSimple.createDiv(0, 94 + textHeight, 0, 0, null, postdiv);
+    imgsdiv.style.overflow = "hidden";
+
+    if (imgs && imgs.length)
+    {
+        var image = imgs[ 0 ];
+
+        var imgtag = WebLibSimple.createAnyAppend("img", imgsdiv);
+        imgtag.src = image.src ? image.src : image.url;
+        imgtag.style.position = "absolute";
+
+        var zoom = 20;
+
+        var wid = zoom + imgsdiv.offsetWidth;
+        var hei = zoom + imgsdiv.offsetHeight;
+
+        var scalex = wid / image.width;
+        var scaley = hei / image.height;
+
+        var imgwid;
+        var imghei;
+
+        if (scalex > scaley)
+        {
+            imgwid = Math.floor(image.width  * scalex);
+            imghei = Math.floor(image.height * scalex);
+        }
+        else
+        {
+            imgwid = Math.floor(image.width  * scaley);
+            imghei = Math.floor(image.height * scaley);
+        }
+
+        console.log("=====:" + wid + "x" + hei + "===>" + imgwid + "x" + imghei);
+
+        imgtag.style.width  = imgwid + "px";
+        imgtag.style.height = imghei + "px";
+
+        imgtag.style.left = Math.floor((imgsdiv.offsetWidth  - imgwid) / 2) + "px";
+        imgtag.style.top  = Math.floor((imgsdiv.offsetHeight - imghei) / 2) + "px";
+    }
+}
+
+instaface.displayPostNormal = function(plat, post)
 {
     var ic = instaface;
 
@@ -307,10 +438,14 @@ instaface.createConts = function()
     // Collect some posts.
     //
 
-    for (var inx = 0; inx < 20; inx++)
+    var max = (ic.mode == "normal") ? 20 : 1;
+
+    for (var inx = 0; inx < max; inx++)
     {
         ic.retrieveBestPost();
     }
+
+    setTimeout(instaface.updateConts, 5000);
 }
 
 instaface.retrieveBestPost = function()
@@ -411,7 +546,14 @@ instaface.retrieveBestPost = function()
 
         ic.feedsdinx[ candifinx ] = candidinx;
 
-        instaface.displayPost(ic.feeds[ candifinx ].plat, candipost);
+        if (ic.mode == "normal")
+        {
+            instaface.displayPostNormal(ic.feeds[ candifinx ].plat, candipost);
+        }
+        else
+        {
+            instaface.displayPostCompact(ic.feeds[ candifinx ].plat, candipost);
+        }
     }
 }
 

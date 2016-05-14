@@ -19,6 +19,7 @@ public class WebAppSocial
     private String pfid;
     private String name;
     private String type;
+    private String mode;
 
     private final ArrayList<Social.SocialInterface> platforms = new ArrayList<>();
 
@@ -30,26 +31,23 @@ public class WebAppSocial
         platforms.add(SocialGoogleplus.getInstance());
     }
 
-    @Nullable
-    public Social.SocialInterface getPlatform(String name)
-    {
-        for (Social.SocialInterface platform : platforms)
-        {
-            if (Simple.equals(name, platform.getPlatform()))
-            {
-                return platform;
-            }
-        }
-
-        return null;
-    }
-
     public void setPlatform(String platform, String pfid, String name, String type)
     {
         this.plat = platform;
         this.pfid = pfid;
         this.name = name;
         this.type = type;
+    }
+
+    public void setMode(String mode)
+    {
+        this.mode = mode;
+    }
+
+    @JavascriptInterface
+    public String getMode()
+    {
+        return (mode == null) ? "normal" : mode;
     }
 
     @JavascriptInterface
@@ -204,5 +202,19 @@ public class WebAppSocial
                 socialplatform.setVerbose(yesno);
             }
         }
+    }
+
+    @Nullable
+    private Social.SocialInterface getPlatform(String name)
+    {
+        for (Social.SocialInterface platform : platforms)
+        {
+            if (Simple.equals(name, platform.getPlatform()))
+            {
+                return platform;
+            }
+        }
+
+        return null;
     }
 }

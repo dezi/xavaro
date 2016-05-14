@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WebAppView;
 
 @SuppressLint("RtlHardcoded")
 public class HomeSocial extends FrameLayout
@@ -31,6 +32,8 @@ public class HomeSocial extends FrameLayout
 
     private LayoutParams layoutParams;
     private FrameLayout innerFrame;
+    private FrameLayout payloadFrame;
+    private WebAppView webView;
 
     private int orientation;
 
@@ -51,6 +54,16 @@ public class HomeSocial extends FrameLayout
         gd.setStroke(2, 0xffcccccc);
 
         innerFrame.setBackground(gd);
+        innerFrame.setPadding(8, 8, 8, 8);
+
+        payloadFrame = new FrameLayout(context);
+        innerFrame.addView(payloadFrame);
+
+        webView = new WebAppView(getContext());
+        webView.loadWebView("instaface", "main");
+        if (webView.social != null) webView.social.setMode("news");
+
+        payloadFrame.addView(webView);
 
         orientation = Configuration.ORIENTATION_UNDEFINED;
     }

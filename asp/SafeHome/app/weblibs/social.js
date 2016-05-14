@@ -234,6 +234,16 @@ WebLibSocial.getPostSuitable = function(platform, post)
     return WebAppSocial.getPostSuitable(platform, JSON.stringify(post));
 }
 
+WebLibSocial.getPlatformName = function(platform)
+{
+    if (platform == "twitter") return "Twitter";
+    if (platform == "facebook") return "Facebook";
+    if (platform == "instagram") return "Instagram";
+    if (platform == "googleplus") return "Google+";
+
+    return "Unknown";
+}
+
 WebLibSocial.getPlatformIcon = function(platform)
 {
     return "/weblibs/social/social_" + platform + "_400x400.png";
