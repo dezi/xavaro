@@ -78,6 +78,23 @@ public class HomeActivity extends AppCompatActivity implements
 
         instance = this;
 
+        //
+        // Allow cross fuck domain HTTP shit.
+        //
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        //
+        // Set common cookie store between webkit and java.net
+        //
+
+        WebCookie.initCookies();
+
+        //
+        // Build views.
+        //
+
         int personsize = Simple.getDevicePixels(160);
         int peoplesize = Simple.getDevicePixels(200);
         int socialsize = Simple.getDevicePixels(340);
@@ -114,19 +131,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         startService(new Intent(this, GCMRegistrationService.class));
         startService(new Intent(this, AccessibilityService.class));
-
-        //
-        // Allow cross fuck domain HTTP shit.
-        //
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        //
-        // Set common cookie store between webkit and java.net
-        //
-
-        WebCookie.initCookies();
     }
 
     @Override

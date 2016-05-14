@@ -333,12 +333,11 @@ public class LaunchGroup extends FrameLayout implements
         @Override
         public void run()
         {
-            if ((measuredWidth != realWidth) || (measuredHeight != realHeight))
+            if (((measuredWidth != realWidth) || (measuredHeight != realHeight)) &&
+                    ((measuredWidth / horzSize) != 0) && ((measuredHeight / vertSize) != 0))
             {
                 realWidth = measuredWidth;
                 realHeight = measuredHeight;
-
-                if (Simple.hasNavigationBar()) realHeight -= Simple.getNavigationBarHeight();
 
                 horzItems = realWidth / horzSize;
                 vertItems = realHeight / vertSize;

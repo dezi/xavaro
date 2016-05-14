@@ -6,6 +6,7 @@ instaface.config =
 instaface.updateConts = function()
 {
     instaface.retrieveBestPost();
+    instaface.adjustImageSizes()
 
     setTimeout(instaface.updateConts, 5000);
 }
@@ -249,7 +250,55 @@ instaface.createFeeds = function()
     }
 }
 
-instaface.postDivs = [];
+instaface.adjustImageSizes = function()
+{
+    var ic = instaface;
+
+    if (ic.postDivs)
+    {
+        for (var inx = 0; inx < ic.postDivs.length; inx++)
+        {
+            var postdiv = ic.postDivs[ inx ];
+
+            if (postdiv.myimgsdiv && postdiv.myimgtag && postdiv.myimage)
+            {
+                var imgsdiv = postdiv.myimgsdiv;
+                var imgtag  = postdiv.myimgtag;
+                var image   = postdiv.myimage;
+
+                var zoom = 20;
+
+                var wid = zoom + imgsdiv.offsetWidth;
+                var hei = zoom + imgsdiv.offsetHeight;
+
+                var scalex = wid / image.width;
+                var scaley = hei / image.height;
+
+                var imgwid;
+                var imghei;
+
+                if (scalex > scaley)
+                {
+                    imgwid = Math.floor(image.width  * scalex);
+                    imghei = Math.floor(image.height * scalex);
+                }
+                else
+                {
+                    imgwid = Math.floor(image.width  * scaley);
+                    imghei = Math.floor(image.height * scaley);
+                }
+
+                imgtag.width  = imgwid;
+                imgtag.height = imghei;
+
+                imgtag.style.left   = Math.floor((imgsdiv.offsetWidth  - imgwid) / 2) + "px";
+                imgtag.style.top    = Math.floor((imgsdiv.offsetHeight - imghei) / 2) + "px";
+                imgtag.style.right  = Math.floor((imgwid - imgsdiv.offsetWidth ) / 2) + "px";
+                imgtag.style.bottom = Math.floor((imghei - imgsdiv.offsetHeight) / 2) + "px";
+            }
+        }
+    }
+}
 
 instaface.displayPostCompact = function(plat, post)
 {
@@ -286,6 +335,7 @@ instaface.displayPostCompact = function(plat, post)
 
     var namediv = WebLibSimple.createAnyAppend("div", infodiv);
     WebLibSimple.setFontSpecs(namediv, 24, "bold");
+    namediv.style.overflow = "hidden";
     namediv.style.whiteSpace = "nowrap";
     namediv.style.textOverflow = "ellipsis";
     namediv.innerHTML = name;
@@ -324,41 +374,19 @@ instaface.displayPostCompact = function(plat, post)
         imgtag.src = image.src ? image.src : image.url;
         imgtag.style.position = "absolute";
 
-        var zoom = 20;
-
-        var wid = zoom + imgsdiv.offsetWidth;
-        var hei = zoom + imgsdiv.offsetHeight;
-
-        var scalex = wid / image.width;
-        var scaley = hei / image.height;
-
-        var imgwid;
-        var imghei;
-
-        if (scalex > scaley)
-        {
-            imgwid = Math.floor(image.width  * scalex);
-            imghei = Math.floor(image.height * scalex);
-        }
-        else
-        {
-            imgwid = Math.floor(image.width  * scaley);
-            imghei = Math.floor(image.height * scaley);
-        }
-
-        imgtag.width  = imgwid;
-        imgtag.height = imghei;
-
-        imgtag.style.left   = Math.floor((imgsdiv.offsetWidth  - imgwid) / 2) + "px";
-        imgtag.style.top    = Math.floor((imgsdiv.offsetHeight - imghei) / 2) + "px";
-        imgtag.style.right  = Math.floor((imgwid - imgsdiv.offsetWidth ) / 2) + "px";
-        imgtag.style.bottom = Math.floor((imghei - imgsdiv.offsetHeight) / 2) + "px";
+        postdiv.myimgsdiv = imgsdiv;
+        postdiv.myimgtag  = imgtag;
+        postdiv.myimage   = image;
     }
+
+    instaface.postDivs.push(postdiv);
 }
 
 instaface.onWindowResize = function()
 {
     console.log("onWindowResize:");
+
+    instaface.adjustImageSizes();
 }
 
 instaface.displayPostNormal = function(plat, post)
@@ -459,12 +487,16 @@ instaface.createConts = function()
     // Collect some posts.
     //
 
+    ic.postDivs = [];
+
     var max = (ic.mode == "normal") ? 20 : 1;
 
     for (var inx = 0; inx < max; inx++)
     {
         ic.retrieveBestPost();
     }
+
+    ic.adjustImageSizes()
 
     addEventListener("resize", instaface.onWindowResize);
     if (ic.mode == "news") setTimeout(instaface.updateConts, 5000);
