@@ -102,6 +102,18 @@ public class WebAppUtility
     }
 
     @JavascriptInterface
+    public int getDeviceWidth()
+    {
+        return Simple.getDeviceWidth();
+    }
+
+    @JavascriptInterface
+    public int getDeviceHeight()
+    {
+        return Simple.getDeviceHeight();
+    }
+
+    @JavascriptInterface
     public String getDezify(String input)
     {
         return Simple.dezify(input);

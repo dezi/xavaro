@@ -5,10 +5,21 @@ instaface.config =
 
 instaface.updateConts = function()
 {
-    instaface.retrieveBestPost();
-    instaface.adjustImageSizes()
+    var ic = instaface;
 
-    setTimeout(instaface.updateConts, 5000);
+    ic.updaterTimeout = null;
+
+    //
+    // Nuke last content.
+    //
+
+    ic.postDivs = [];
+    ic.contentscroll.innerHTML = null;
+
+    ic.retrieveBestPost();
+    ic.adjustImageSizes()
+
+    ic.updaterTimeout = setTimeout(instaface.updateConts, 5000);
 }
 
 instaface.createFrame = function()
@@ -34,12 +45,8 @@ instaface.createFrame = function()
 
     ic.contentscroll = WebLibSimple.createDivHeight(0, 0, 0, 0, "contentscroll", ic.contentdiv);
 
-    ic.adjustMode();
-}
-
-instaface.onExpandClick = function()
-{
-    WebAppUtility.makeClick();
+    addEventListener("resize", instaface.onWindowResize);
+    instaface.onWindowResize();
 }
 
 instaface.adjustMode = function()
@@ -48,22 +55,25 @@ instaface.adjustMode = function()
 
     if (ic.mode == "normal")
     {
+        if (ic.updaterTimeout)
+        {
+            clearTimeout(ic.updaterTimeout);
+            ic.updaterTimeout = null;
+        }
+
         ic.titlediv.style.display = "block";
         ic.contentdiv.style.top = ic.theight + "px";
-        ic.contentscroll.style.bottom = null;
-        ic.contentscroll.style.height = null;
-        ic.contentscroll.scrollVertical = true;
-        ic.contentscroll.onTouchClick = null;
     }
 
     if (ic.mode == "news")
     {
+        if (! ic.updaterTimeout)
+        {
+            ic.updaterTimeout = setTimeout(instaface.updateConts, 5000);
+        }
+
         ic.titlediv.style.display = "none";
         ic.contentdiv.style.top = "0px";
-        ic.contentscroll.style.bottom = "0px";
-        ic.contentscroll.style.height = null;
-        ic.contentscroll.scrollVertical = false;
-        ic.contentscroll.onTouchClick = instaface.onExpandClick;
     }
 }
 
@@ -260,14 +270,37 @@ instaface.adjustImageSizes = function()
         {
             var postdiv = ic.postDivs[ inx ];
 
-            if (postdiv.myimgsdiv && postdiv.myimgtag && postdiv.myimage)
+            if (postdiv.myimgtag && postdiv.myimage)
             {
+                var headdiv = postdiv.myheaddiv;
                 var imgsdiv = postdiv.myimgsdiv;
                 var imgtag  = postdiv.myimgtag;
                 var image   = postdiv.myimage;
 
-                var zoom = 20;
+                var useheight = (postdiv.clientHeight - headdiv.clientHeight);
 
+                if (useheight > 0)
+                {
+                    //
+                    // We have a predeterninated height which we must use.
+                    // To make nice images, we zoom into it a little bit.
+                    //
+
+                    imgsdiv.style.height = useheight + "px";
+                }
+                else
+                {
+                    if (Math.abs(image.width - imgsdiv.clientWidth) < 100)
+                    {
+                        imgsdiv.style.height = Math.floor(image.height * imgsdiv.clientWidth / image.width) + "px";
+                    }
+                    else
+                    {
+                        imgsdiv.style.height = image.height + "px";
+                    }
+                }
+
+                var zoom = 20;
                 var wid = zoom + imgsdiv.offsetWidth;
                 var hei = zoom + imgsdiv.offsetHeight;
 
@@ -288,6 +321,8 @@ instaface.adjustImageSizes = function()
                     imghei = Math.floor(image.height * scaley);
                 }
 
+                console.log("===============> useheight:" + useheight);
+
                 imgtag.width  = imgwid;
                 imgtag.height = imghei;
 
@@ -304,8 +339,6 @@ instaface.displayPostCompact = function(plat, post)
 {
     var ic = instaface;
 
-    ic.contentscroll.innerHTML = null;
-
     var pfid = WebLibSocial.getPostUserid(plat, post);
     var pfna = WebLibSocial.getPostUsername(plat, post);
     var date = WebLibSocial.getPostDate(plat, post);
@@ -314,17 +347,31 @@ instaface.displayPostCompact = function(plat, post)
     var imgs = WebLibSocial.getPostImgs(plat, post);
     var type = (name != null) ? ic.usertype[ name.toLowerCase() ] : null;
 
-    var postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
-    postdiv.style.marginTop = "4px";
-    postdiv.style.marginLeft = "4px";
-    postdiv.style.marginRight = "4px";
-    postdiv.style.marginBottom = "4px";
+    var postdiv;
 
-    var headdiv = WebLibSimple.createDivHeight(0, 0, 0, 80, null, postdiv);
+    if (ic.mode == "normal")
+    {
+        var paddiv = WebLibSimple.createAnyAppend("div", ic.contentscroll);
+        paddiv.style.margin = "48px";
+        paddiv.style.padding = "16px";
+        paddiv.style.border = "4px solid grey";
+        paddiv.style.backgroundColor = "#dddddd";
+
+        postdiv = WebLibSimple.createAnyAppend("div", paddiv);
+        postdiv.style.position = "relative";
+    }
+
+    if (ic.mode == "news")
+    {
+        postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
+        postdiv.style.margin = "8px";
+    }
+
+    var headdiv = WebLibSimple.createAnyAppend("div", postdiv);
 
     var uicn = WebLibSimple.createAnyAppend("img", headdiv);
     uicn.style.width = "auto";
-    uicn.style.height = "100%";
+    uicn.style.height = "80px";
     uicn.style.float = "left";
     uicn.style.marginRight = "16px";
     uicn.src = WebLibSocial.getUserIcon(plat, pfid, pfna);
@@ -353,17 +400,19 @@ instaface.displayPostCompact = function(plat, post)
 
     spacediv.style.height = (80 - infodiv.scrollHeight) + "px";
 
-    var sepadiv = WebLibSimple.createDivHeight(0, 82, 0, 2, null, postdiv);
+    var sepadiv = WebLibSimple.createAnyAppend("div", headdiv);
     WebLibSimple.setBGColor(sepadiv, "#dddddd");
+    sepadiv.style.clear = "both";
+    sepadiv.style.height = "2px";
 
-    var textdiv = WebLibSimple.createDivHeight(0, 90, 0, null, null, postdiv);
+    var textdiv = WebLibSimple.createAnyAppend("div", headdiv);
     WebLibSimple.setFontSpecs(textdiv, 20, "normal");
     textdiv.style.overflow = "hidden";
     textdiv.innerHTML = text;
+    WebLibSimple.ellipsizeTextBox(textdiv, 80);
 
-    var textHeight = WebLibSimple.ellipsizeTextBox(textdiv, 80);
-
-    var imgsdiv = WebLibSimple.createDiv(0, 94 + textHeight, 0, 0, null, postdiv);
+    var imgsdiv = WebLibSimple.createAnyAppend("div", postdiv);
+    imgsdiv.style.position = "relative";
     imgsdiv.style.overflow = "hidden";
 
     if (imgs && imgs.length)
@@ -374,19 +423,33 @@ instaface.displayPostCompact = function(plat, post)
         imgtag.src = image.src ? image.src : image.url;
         imgtag.style.position = "absolute";
 
-        postdiv.myimgsdiv = imgsdiv;
         postdiv.myimgtag  = imgtag;
         postdiv.myimage   = image;
     }
 
+    postdiv.myheaddiv = headdiv;
+    postdiv.myimgsdiv = imgsdiv;
+
     instaface.postDivs.push(postdiv);
+}
+
+instaface.isFullScreen = function()
+{
+    return (WebAppUtility.getDeviceWidth()  == instaface.topdiv.clientWidth) ||
+           (WebAppUtility.getDeviceHeight() == instaface.topdiv.clientHeight);
 }
 
 instaface.onWindowResize = function()
 {
-    console.log("onWindowResize:");
+    var ic = instaface;
 
-    instaface.adjustImageSizes();
+    ic.mode = ic.isFullScreen() ? "normal" : "news";
+
+    console.log("onWindowResize:" + ic.mode);
+
+    ic.adjustMode();
+
+    ic.adjustImageSizes();
 }
 
 instaface.displayPostNormal = function(plat, post)
@@ -474,6 +537,20 @@ instaface.createConts = function()
     ic.contentscroll.innerHTML = "";
     ic.contentscroll.style.top = "0px";
 
+    if (ic.mode == "normal")
+    {
+         ic.contentscroll.style.bottom = null;
+         ic.contentscroll.style.height = null;
+         ic.contentscroll.scrollVertical = true;
+    }
+
+    if (ic.mode == "news")
+    {
+        ic.contentscroll.style.bottom = "0px";
+        ic.contentscroll.style.height = null;
+        ic.contentscroll.scrollVertical = false;
+    }
+
     //
     // Reset feed indices.
     //
@@ -497,9 +574,6 @@ instaface.createConts = function()
     }
 
     ic.adjustImageSizes()
-
-    addEventListener("resize", instaface.onWindowResize);
-    if (ic.mode == "news") setTimeout(instaface.updateConts, 5000);
 }
 
 instaface.retrieveBestPost = function()
@@ -600,14 +674,7 @@ instaface.retrieveBestPost = function()
 
         ic.feedsdinx[ candifinx ] = candidinx;
 
-        if (ic.mode == "normal")
-        {
-            instaface.displayPostNormal(ic.feeds[ candifinx ].plat, candipost);
-        }
-        else
-        {
-            instaface.displayPostCompact(ic.feeds[ candifinx ].plat, candipost);
-        }
+        instaface.displayPostCompact(ic.feeds[ candifinx ].plat, candipost);
     }
 }
 

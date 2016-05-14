@@ -41,6 +41,7 @@ public class HomeSocial extends FrameLayout
     private TextView titleText;
     private LayoutParams innerLayout;
     private FrameLayout innerFrame;
+    private FrameLayout innerClick;
     private FrameLayout payloadFrame;
     private WebAppView webView;
 
@@ -54,12 +55,6 @@ public class HomeSocial extends FrameLayout
         layoutParams = new LayoutParams(0, 0);
         setLayoutParams(layoutParams);
         setPadding(8, 0, 0, 8);
-
-        innerLayout = new LayoutParams(Simple.MP, Simple.MP);
-        innerLayout.topMargin = headspace;
-
-        innerFrame = new FrameLayout(context);
-        addView(innerFrame);
 
         titleLayout = new LayoutParams(Simple.MP, headspace);
 
@@ -79,10 +74,14 @@ public class HomeSocial extends FrameLayout
         titleClose.setVisibility(GONE);
         addView(titleClose);
 
+        innerLayout = new LayoutParams(Simple.MP, Simple.MP);
+        innerLayout.topMargin = headspace;
+
+        innerFrame = new FrameLayout(context);
         innerFrame.setLayoutParams(innerLayout);
         innerFrame.setBackground(Simple.getRoundedBorders());
         innerFrame.setPadding(8, 8, 8, 8);
-        innerFrame.setOnClickListener(onClickListener);
+        addView(innerFrame);
 
         payloadFrame = new FrameLayout(context);
         innerFrame.addView(payloadFrame);
@@ -92,6 +91,10 @@ public class HomeSocial extends FrameLayout
         if (webView.social != null) webView.social.setMode("news");
 
         payloadFrame.addView(webView);
+
+        innerClick = new FrameLayout(context);
+        innerClick.setOnClickListener(onClickListener);
+        addView(innerClick);
 
         orientation = Configuration.ORIENTATION_UNDEFINED;
     }
@@ -121,9 +124,10 @@ public class HomeSocial extends FrameLayout
                 innerLayout.topMargin = headspace;
                 titleLayout.height = headspace;
 
-                innerFrame.setOnClickListener(onClickListener);
+                innerClick.setVisibility(VISIBLE);
                 innerFrame.setBackgroundColor(Color.TRANSPARENT);
                 innerFrame.setBackground(Simple.getRoundedBorders());
+                innerFrame.setPadding(8, 8, 8, 8);
                 titleText.setBackgroundColor(Color.TRANSPARENT);
                 titleText.setGravity(Gravity.START);
                 titleClose.setVisibility(GONE);
@@ -141,9 +145,10 @@ public class HomeSocial extends FrameLayout
                 innerLayout.topMargin = headspace * 2;
                 titleLayout.height = headspace * 2;
 
-                innerFrame.setOnClickListener(null);
+                innerClick.setVisibility(GONE);
                 innerFrame.setBackground(null);
                 innerFrame.setBackgroundColor(0xffffffff);
+                innerFrame.setPadding(0, 0, 0, 0);
                 titleText.setBackgroundColor(0xffcccccc);
                 titleText.setGravity(Gravity.CENTER);
                 titleClose.setVisibility(VISIBLE);
