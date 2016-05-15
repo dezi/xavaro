@@ -38,6 +38,8 @@ instaface.animateTitle = function()
             ic.contentdiv.style.top = "0px";
         }
     }
+
+    ic.adjustPostDivs();
 }
 
 instaface.updateConts = function()
@@ -51,10 +53,25 @@ instaface.updateConts = function()
     //
 
     ic.postDivs = [];
-    ic.contentscroll.innerHTML = null;
 
-    ic.retrieveBestPost();
-    ic.adjustPostDivs()
+    ic.contentscroll.innerHTML = null;
+    ic.contentscroll.style.top = "0px";
+
+    if (! ic.retrieveBestPost())
+    {
+        //
+        // Restart content.
+        //
+
+        for (var inx = 0; inx < ic.feedsdinx.length; inx++)
+        {
+            ic.feedsdinx[ inx ] = 0;
+        }
+
+        ic.retrieveBestPost();
+    }
+
+    ic.adjustPostDivs();
 
     ic.updaterTimeout = setTimeout(instaface.updateConts, 5000);
 }
@@ -110,7 +127,7 @@ instaface.adjustMode = function()
 
         if ((ic.contentdiv.offsetTop == 0) && ! ic.animateTimeout)
         {
-            ic.animateTimeout = setTimeout(instaface.animateTitle, 1500)
+            ic.animateTimeout = setTimeout(instaface.animateTitle, 1500);
         }
     }
 
@@ -123,7 +140,21 @@ instaface.adjustMode = function()
 
         if ((ic.titlediv.offsetTop == 0) && ! ic.animateTimeout)
         {
-            ic.animateTimeout = setTimeout(instaface.animateTitle, 0)
+            //
+            // Remove all posts leaving only one.
+            //
+
+            ic.contentscroll.style.top = "0px";
+
+            while (ic.postDivs.length > 1)
+            {
+                var postdiv = ic.postDivs.pop();
+                var padddiv = postdiv.mypadddiv;
+
+                WebLibSimple.detachElement(padddiv);
+            }
+
+            ic.animateTimeout = setTimeout(instaface.animateTitle, 0);
         }
     }
 }
@@ -327,6 +358,14 @@ instaface.adjustPostDivs = function()
 
             if (ic.mode == "normal")
             {
+                ic.contentscroll.style.bottom = null;
+                ic.contentscroll.style.height = null;
+                ic.contentscroll.scrollVertical = true;
+
+                padddiv.style.position = "relative";
+                postdiv.style.position = "relative";
+                postdiv.style.margin = "0px";
+
                 WebLibSimple.setBGColor(sepadiv, "#444444");
 
                 padddiv.style.margin = "48px";
@@ -338,6 +377,14 @@ instaface.adjustPostDivs = function()
 
             if (ic.mode == "news")
             {
+                ic.contentscroll.style.bottom = "0px";
+                ic.contentscroll.style.height = null;
+                ic.contentscroll.scrollVertical = false;
+
+                padddiv.style.position = "absolute";
+                postdiv.style.position = "absolute";
+                postdiv.style.margin = "8px";
+
                 WebLibSimple.setBGColor(sepadiv, "#dddddd");
 
                 padddiv.style.margin = "0px";
@@ -365,26 +412,11 @@ instaface.adjustPostDivs = function()
                 }
                 else
                 {
-                    if (Math.abs(image.width - imgsdiv.clientWidth) < 100)
-                    {
-                        //
-                        // Image would fit so la la into frame.
-                        //
-
-                        imgsdiv.style.height = Math.floor(image.height * imgsdiv.clientWidth / image.width) + "px";
-                    }
-                    else
-                    {
-                        //
-                        // Image is disproportioned for our purpose.
-                        //
-
-                        imgsdiv.style.height = image.height + "px";
-                    }
+                    imgsdiv.style.height = Math.floor(image.height * imgsdiv.clientWidth / image.width) + "px";
                 }
 
-                var wid = zoom + imgsdiv.offsetWidth;
-                var hei = zoom + imgsdiv.offsetHeight;
+                var wid = zoom + imgsdiv.clientWidth;
+                var hei = zoom + imgsdiv.clientHeight;
 
                 var scalex = wid / image.width;
                 var scaley = hei / image.height;
@@ -406,10 +438,10 @@ instaface.adjustPostDivs = function()
                 imgtag.width  = imgwid;
                 imgtag.height = imghei;
 
-                imgtag.style.left   = Math.floor((imgsdiv.offsetWidth  - imgwid) / 2) + "px";
-                imgtag.style.top    = Math.floor((imgsdiv.offsetHeight - imghei) / 2) + "px";
-                imgtag.style.right  = Math.floor((imgwid - imgsdiv.offsetWidth ) / 2) + "px";
-                imgtag.style.bottom = Math.floor((imghei - imgsdiv.offsetHeight) / 2) + "px";
+                imgtag.style.left   = Math.floor((imgsdiv.clientWidth  - imgwid) / 2) + "px";
+                imgtag.style.top    = Math.floor((imgsdiv.clientHeight - imghei) / 2) + "px";
+                imgtag.style.right  = Math.floor((imgwid - imgsdiv.clientWidth ) / 2) + "px";
+                imgtag.style.bottom = Math.floor((imghei - imgsdiv.clientHeight) / 2) + "px";
             }
         }
     }
@@ -427,23 +459,8 @@ instaface.displayPostCompact = function(plat, post)
     var imgs = WebLibSocial.getPostImgs(plat, post);
     var type = (name != null) ? ic.usertype[ name.toLowerCase() ] : null;
 
-    var padddiv;
-    var postdiv;
-
-    if (ic.mode == "normal")
-    {
-        padddiv = WebLibSimple.createAnyAppend("div", ic.contentscroll);
-        postdiv = WebLibSimple.createAnyAppend("div", padddiv);
-        postdiv.style.position = "relative";
-    }
-
-    if (ic.mode == "news")
-    {
-        padddiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
-        postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, padddiv);
-        postdiv.style.margin = "8px";
-    }
-
+    var padddiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
+    var postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, padddiv);
     var headdiv = WebLibSimple.createAnyAppend("div", postdiv);
 
     var uicn = WebLibSimple.createAnyAppend("img", headdiv);
@@ -543,20 +560,6 @@ instaface.createConts = function()
 
     ic.contentscroll.innerHTML = "";
     ic.contentscroll.style.top = "0px";
-
-    if (ic.mode == "normal")
-    {
-         ic.contentscroll.style.bottom = null;
-         ic.contentscroll.style.height = null;
-         ic.contentscroll.scrollVertical = true;
-    }
-
-    if (ic.mode == "news")
-    {
-        ic.contentscroll.style.bottom = "0px";
-        ic.contentscroll.style.height = null;
-        ic.contentscroll.scrollVertical = false;
-    }
 
     //
     // Reset feed indices.
@@ -683,6 +686,8 @@ instaface.retrieveBestPost = function()
 
         instaface.displayPostCompact(ic.feeds[ candifinx ].plat, candipost);
     }
+
+    return candipost;
 }
 
 instaface.createDebug = function()
