@@ -14,11 +14,11 @@ import de.xavaro.android.common.Simple;
 @SuppressLint("RtlHardcoded")
 public class HomeLaunch extends FrameLayout
 {
-    private int buddySize;
+    private int peopleSize;
     private int socialSize;
     private int notifySize;
 
-    private int orientation;
+    private int orientation = Configuration.ORIENTATION_UNDEFINED;
 
     private LayoutParams layoutParams;
     private TextView titleText;
@@ -34,7 +34,6 @@ public class HomeLaunch extends FrameLayout
 
         layoutParams = new LayoutParams(Simple.MP, Simple.MP);
         setLayoutParams(layoutParams);
-        setPadding(8, 0, 8, 8);
 
         titleText = new TextView(context);
         titleText.setLayoutParams(new LayoutParams(Simple.MP, headspace));
@@ -49,26 +48,21 @@ public class HomeLaunch extends FrameLayout
         innerFrame = new FrameLayout(context);
         addView(innerFrame);
 
-        GradientDrawable gd = new GradientDrawable();
-        gd.setCornerRadius(16);
-        gd.setColor(0xffffffff);
-        gd.setStroke(2, 0xffcccccc);
-
         innerFrame.setLayoutParams(innerLayout);
-        innerFrame.setBackground(gd);
+        innerFrame.setBackground(Simple.getRoundedBorders());
         innerFrame.setPadding(8, 8, 8, 8);
 
         payloadFrame = new FrameLayout(context);
         innerFrame.addView(payloadFrame);
-
-        orientation = Configuration.ORIENTATION_UNDEFINED;
     }
 
-    public void setSize(int buddySize, int socialSize, int notifySize)
+    public void setSize(int peopleSize, int socialSize, int notifySize)
     {
-        this.buddySize = buddySize;
+        this.peopleSize = peopleSize;
         this.socialSize = socialSize;
         this.notifySize = notifySize;
+
+        setPadding(8, 0, 8, 8);
 
         layoutParams.topMargin = notifySize;
         layoutParams.leftMargin = socialSize;
@@ -88,7 +82,7 @@ public class HomeLaunch extends FrameLayout
                 (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT))
         {
             layoutParams.rightMargin = 0;
-            layoutParams.bottomMargin = buddySize;
+            layoutParams.bottomMargin = peopleSize;
 
             orientation = Configuration.ORIENTATION_PORTRAIT;
         }
@@ -96,7 +90,7 @@ public class HomeLaunch extends FrameLayout
         if ((orientation != Configuration.ORIENTATION_LANDSCAPE) &&
                 (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE))
         {
-            layoutParams.rightMargin = buddySize;
+            layoutParams.rightMargin = peopleSize;
             layoutParams.bottomMargin = 0;
 
             orientation = Configuration.ORIENTATION_LANDSCAPE;

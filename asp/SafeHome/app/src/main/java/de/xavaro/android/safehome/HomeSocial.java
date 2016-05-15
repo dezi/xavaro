@@ -1,27 +1,19 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
+import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.ImageSmartView;
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebAppView;
 
@@ -33,7 +25,7 @@ public class HomeSocial extends FrameLayout
     private int headspace = Simple.getDevicePixels(40);
 
     private int layoutSize;
-    private int buddySize;
+    private int peopleSize;
     private int notifySize;
 
     private LayoutParams layoutParams;
@@ -46,7 +38,7 @@ public class HomeSocial extends FrameLayout
     private FrameLayout payloadFrame;
     private WebAppView webView;
 
-    private int orientation;
+    private int orientation = Configuration.ORIENTATION_UNDEFINED;
     private boolean fullscreen;
 
     public HomeSocial(Context context)
@@ -55,17 +47,15 @@ public class HomeSocial extends FrameLayout
 
         layoutParams = new LayoutParams(0, 0);
         setLayoutParams(layoutParams);
-        setPadding(8, 0, 0, 8);
 
         titleLayout = new LayoutParams(Simple.MP, headspace);
 
         titleText = new TextView(context);
         titleText.setLayoutParams(titleLayout);
-        titleText.setText("Neuigkeiten");
         titleText.setTextSize(headspace * 2 / 3);
         titleText.setPadding(16, 0, 0, 0);
         titleText.setOnClickListener(onClickListener);
-
+        titleText.setVisibility(GONE);
         addView(titleText);
 
         titleClose = new ImageSmartView(context);
@@ -76,7 +66,6 @@ public class HomeSocial extends FrameLayout
         addView(titleClose);
 
         innerLayout = new LayoutParams(Simple.MP, Simple.MP);
-        innerLayout.topMargin = headspace;
 
         innerFrame = new FrameLayout(context);
         innerFrame.setLayoutParams(innerLayout);
@@ -96,8 +85,31 @@ public class HomeSocial extends FrameLayout
         innerClick = new FrameLayout(context);
         innerClick.setOnClickListener(onClickListener);
         addView(innerClick);
+    }
 
-        orientation = Configuration.ORIENTATION_UNDEFINED;
+    public void setSize(int layoutSize, int peopleSize, int notifySize)
+    {
+        this.layoutSize = layoutSize;
+        this.peopleSize = peopleSize;
+        this.notifySize = notifySize;
+
+        setPadding(8, 0, 0, 8);
+
+        layoutParams.width = layoutSize;
+        layoutParams.height = Simple.MP;
+        layoutParams.gravity = Gravity.LEFT;
+        layoutParams.topMargin = notifySize;
+        layoutParams.bottomMargin = isPortrait() ? peopleSize : 0;;
+    }
+
+    public void setConfig(String title, JSONObject config)
+    {
+        if (title != null)
+        {
+            titleText.setText(title);
+            titleText.setVisibility(VISIBLE);
+            innerLayout.topMargin = headspace;
+        }
     }
 
     private final OnClickListener onClickListener = new OnClickListener()
@@ -114,7 +126,7 @@ public class HomeSocial extends FrameLayout
         @Override
         public void run()
         {
-            if (animationSteps-- > 0)
+            if (animationSteps > 0)
             {
                 if (fullscreen)
                 {
@@ -137,6 +149,7 @@ public class HomeSocial extends FrameLayout
 
                 setLayoutParams(layoutParams);
 
+                animationSteps -= 1;
                 Simple.makePost(toggleAnimator, 0);
 
                 return;
@@ -146,7 +159,7 @@ public class HomeSocial extends FrameLayout
             {
                 layoutParams.width = layoutSize;
                 layoutParams.topMargin = notifySize;
-                layoutParams.bottomMargin = isPortrait() ? buddySize : 0;
+                layoutParams.bottomMargin = isPortrait() ? peopleSize : 0;
 
                 innerLayout.topMargin = headspace;
                 titleLayout.height = headspace;
@@ -177,6 +190,8 @@ public class HomeSocial extends FrameLayout
 
                 fullscreen = true;
             }
+
+            setLayoutParams(layoutParams);
         }
     };
 
@@ -192,7 +207,7 @@ public class HomeSocial extends FrameLayout
         animationSteps = 10;
 
         animationTop = notifySize / animationSteps;
-        animationBottom = (isPortrait() ? buddySize : 0) / animationSteps;
+        animationBottom = (isPortrait() ? peopleSize : 0) / animationSteps;
         animationWidth = ((View) getParent()).getWidth() / animationSteps;
 
         if (layoutParams.width == Simple.MP) layoutParams.width = ((View) getParent()).getWidth();
@@ -207,26 +222,14 @@ public class HomeSocial extends FrameLayout
         Simple.makePost(toggleAnimator);
     }
 
-    public void setSize(int layoutSize, int buddySize, int notifySize)
-    {
-        this.layoutSize = layoutSize;
-        this.buddySize = buddySize;
-        this.notifySize = notifySize;
-
-        layoutParams.width = layoutSize;
-        layoutParams.height = Simple.MP;
-        layoutParams.gravity = Gravity.LEFT;
-        layoutParams.topMargin = notifySize;
-        layoutParams.bottomMargin = isPortrait() ? buddySize : 0;;
-    }
-
-    public void setConfig(JSONObject config)
-    {
-    }
-
     private boolean isPortrait()
     {
         return (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    private boolean isLandscape()
+    {
+        return (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE);
     }
 
     private Runnable changeOrientation = new Runnable()
@@ -234,16 +237,14 @@ public class HomeSocial extends FrameLayout
         @Override
         public void run()
         {
-            if ((orientation != Configuration.ORIENTATION_PORTRAIT) &&
-                    (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT))
+            if ((orientation != Configuration.ORIENTATION_PORTRAIT) && isPortrait())
             {
-                layoutParams.bottomMargin = buddySize;
+                layoutParams.bottomMargin = peopleSize;
 
                 orientation = Configuration.ORIENTATION_PORTRAIT;
             }
 
-            if ((orientation != Configuration.ORIENTATION_LANDSCAPE) &&
-                    (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE))
+            if ((orientation != Configuration.ORIENTATION_LANDSCAPE) && isLandscape())
             {
                 layoutParams.bottomMargin = 0;
 

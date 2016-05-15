@@ -81,6 +81,7 @@ instaface.createFrame = function()
     var ic = instaface;
 
     ic.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
+    WebLibSimple.setBGColor(ic.topdiv, "#dddddd");
     ic.topdiv.style.overflow = "hidden";
 
     ic.mode = ic.isFullScreen() ? "normal" : "news";
@@ -372,7 +373,6 @@ instaface.adjustPostDivs = function()
                 padddiv.style.padding = "24px";
                 padddiv.style.border = "2px solid #cccccc";
                 padddiv.style.borderRadius = "16px";
-                WebLibSimple.setBGColor(padddiv, "#dddddd");
             }
 
             if (ic.mode == "news")
@@ -391,7 +391,6 @@ instaface.adjustPostDivs = function()
                 padddiv.style.padding = "0px";
                 padddiv.style.border = "0px solid grey";
                 padddiv.style.borderRadius = "0px";
-                WebLibSimple.setBGColor(padddiv, "#00000000");
             }
 
             if (postdiv.myimgtag && postdiv.myimage)
@@ -460,6 +459,8 @@ instaface.displayPostCompact = function(plat, post)
     var type = (name != null) ? ic.usertype[ name.toLowerCase() ] : null;
 
     var padddiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
+    WebLibSimple.setBGColor(padddiv, "#ffffff");
+
     var postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, padddiv);
     var headdiv = WebLibSimple.createAnyAppend("div", postdiv);
 
