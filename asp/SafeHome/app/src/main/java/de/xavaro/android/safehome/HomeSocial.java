@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,14 +114,40 @@ public class HomeSocial extends FrameLayout
         @Override
         public void run()
         {
+            if (animationSteps-- > 0)
+            {
+                if (fullscreen)
+                {
+                    setPadding(8, 0, 0, 8);
+                    layoutParams.rightMargin = 8;
+
+                    layoutParams.width -= animationWidth;
+                    layoutParams.topMargin += animationTop;
+                    layoutParams.bottomMargin += animationBottom;
+                }
+                else
+                {
+                    setPadding(0, 0, 0, 0);
+                    layoutParams.rightMargin = 0;
+
+                    layoutParams.width += animationWidth;
+                    layoutParams.topMargin -= animationTop;
+                    layoutParams.bottomMargin -= animationBottom;
+                }
+
+                setLayoutParams(layoutParams);
+
+                Simple.makePost(toggleAnimator, 0);
+
+                return;
+            }
+
             if (fullscreen)
             {
-                setPadding(8, 0, 0, 8);
                 layoutParams.width = layoutSize;
-                layoutParams.rightMargin = 8;
-
                 layoutParams.topMargin = notifySize;
                 layoutParams.bottomMargin = isPortrait() ? buddySize : 0;
+
                 innerLayout.topMargin = headspace;
                 titleLayout.height = headspace;
 
@@ -128,20 +155,15 @@ public class HomeSocial extends FrameLayout
                 innerFrame.setBackgroundColor(Color.TRANSPARENT);
                 innerFrame.setBackground(Simple.getRoundedBorders());
                 innerFrame.setPadding(8, 8, 8, 8);
-                titleText.setBackgroundColor(Color.TRANSPARENT);
-                titleText.setGravity(Gravity.START);
-                titleClose.setVisibility(GONE);
 
                 fullscreen = false;
             }
             else
             {
-                setPadding(0, 0, 0, 0);
                 layoutParams.width = Simple.MP;
-                layoutParams.rightMargin = 0;
-
                 layoutParams.topMargin = 0;
                 layoutParams.bottomMargin = 0;
+
                 innerLayout.topMargin = headspace * 2;
                 titleLayout.height = headspace * 2;
 
@@ -158,9 +180,29 @@ public class HomeSocial extends FrameLayout
         }
     };
 
+    private int animationSteps;
+    private int animationTop;
+    private int animationBottom;
+    private int animationWidth;
+
     private void toogleFullscreen()
     {
         bringToFront();
+
+        animationSteps = 10;
+
+        animationTop = notifySize / animationSteps;
+        animationBottom = (isPortrait() ? buddySize : 0) / animationSteps;
+        animationWidth = ((View) getParent()).getWidth() / animationSteps;
+
+        if (layoutParams.width == Simple.MP) layoutParams.width = ((View) getParent()).getWidth();
+
+        if (fullscreen)
+        {
+            titleText.setBackgroundColor(Color.TRANSPARENT);
+            titleText.setGravity(Gravity.START);
+            titleClose.setVisibility(GONE);
+        }
 
         Simple.makePost(toggleAnimator);
     }
@@ -174,8 +216,8 @@ public class HomeSocial extends FrameLayout
         layoutParams.width = layoutSize;
         layoutParams.height = Simple.MP;
         layoutParams.gravity = Gravity.LEFT;
-
         layoutParams.topMargin = notifySize;
+        layoutParams.bottomMargin = isPortrait() ? buddySize : 0;;
     }
 
     public void setConfig(JSONObject config)
@@ -215,6 +257,6 @@ public class HomeSocial extends FrameLayout
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        Simple.makePost(changeOrientation);
+        if (animationSteps == 0) Simple.makePost(changeOrientation);
     }
 }
