@@ -214,14 +214,17 @@ WebLibSocial.getPostImgs = function(platform, post)
             {
                 var media = post.object.attachments[ inx ];
 
-                if (media.fullImage)
+                if (media.fullImage && media.fullImage.width && media.fullImage.height)
                 {
                     images.push(media.fullImage);
 
                     continue;
                 }
 
-                if (media.image) images.push(media.image);
+                if (media.image && media.image.width && media.image.height)
+                {
+                    images.push(media.image);
+                }
             }
         }
     }

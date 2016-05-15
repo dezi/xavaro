@@ -486,8 +486,8 @@ instaface.displayPostCompact = function(plat, post)
     var textdiv = WebLibSimple.createAnyAppend("div", headdiv);
     WebLibSimple.setFontSpecs(textdiv, 20, "normal");
     textdiv.style.overflow = "hidden";
-    textdiv.style.marginTop = "4px";
-    textdiv.style.marginBottom = "4px";
+    textdiv.style.paddingTop = "4px";
+    textdiv.style.paddingBottom = "4px";
     textdiv.innerHTML = text;
     WebLibSimple.ellipsizeTextBox(textdiv, 80);
 

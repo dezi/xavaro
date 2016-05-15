@@ -96,13 +96,33 @@ public class SocialGoogleplus extends Social implements Social.SocialInterface
             for (int inx = 0; inx < attachments.length(); inx++)
             {
                 JSONObject media = Json.getObject(attachments, inx);
-                if ((media != null) && Json.has(media, "image"))
-                {
-                    //
-                    // Found image attachment.
-                    //
 
-                    return true;
+                if (Json.has(media, "fullImage"))
+                {
+                    JSONObject image = Json.getObject(media, "fullImage");
+
+                    if (Json.has(image, "width") && Json.has(image, "height"))
+                    {
+                        //
+                        // Found image attachment.
+                        //
+
+                        return true;
+                    }
+                }
+
+                if (Json.has(media, "image"))
+                {
+                    JSONObject image = Json.getObject(media, "image");
+
+                    if (Json.has(image, "width") && Json.has(image, "height"))
+                    {
+                        //
+                        // Found image attachment.
+                        //
+
+                        return true;
+                    }
                 }
             }
         }
