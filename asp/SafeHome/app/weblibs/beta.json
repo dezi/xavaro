@@ -1,10 +1,28 @@
 {
   "SafeHome": {
 
-    "latest": "0.8.010",
-    "latestdate": "2016-05-08T23:00:00Z",
+    "latest": "0.8.011",
+    "latestdate": "2016-05-15T23:00:00Z",
 
     "versions": {
+
+      "0.8.011": {
+
+        "date": "2016-05-15T23:00:00Z",
+
+        "notes": [
+          {
+            "title": "Neues Design Teil 1.",
+            "summary": [
+              "Umsetzung des neuen Designs Teil 1.",
+              "Buddy-Liste.",
+              "Social-News.",
+              "SafeHome-Screens.",
+              "Notification noch leer..."
+            ]
+          }
+        ]
+      },
 
       "0.8.010": {
 
