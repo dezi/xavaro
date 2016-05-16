@@ -431,7 +431,7 @@ public class LaunchGroup extends FrameLayout implements
         launchItems = new ArrayList<>();
         launchPages = new ArrayList<>();
 
-        if ((config == null) || !config.has(configTree))
+        if ((config == null) || ! config.has(configTree))
         {
             Toast.makeText(context, "Keine <" + configTree + "> gefunden.", Toast.LENGTH_LONG).show();
 
@@ -442,7 +442,7 @@ public class LaunchGroup extends FrameLayout implements
         {
             JSONArray lis = config.getJSONArray(configTree);
 
-            int bgcol = Color.WHITE; //GlobalConfigs.LaunchPageBackgroundColor;
+            int bgcol = Color.WHITE;
 
             FrameLayout lp = new FrameLayout(context);
             lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth, realHeight));
