@@ -68,8 +68,9 @@ public class LaunchGroup extends FrameLayout implements
     protected FrameLayout arrowLeft;
     protected FrameLayout arrowRight;
 
-    protected ArrayList<FrameLayout> launchPages = null;
-    protected ArrayList<LaunchItem> launchItems = null;
+    protected ArrayList<FrameLayout> launchPages;
+    protected ArrayList<LaunchItem> launchItems;
+
     protected int launchPage;
 
     public LaunchGroup(Context context)
@@ -112,39 +113,16 @@ public class LaunchGroup extends FrameLayout implements
 
     private void addSliderButtons()
     {
-        Bitmap bmp;
-        BitmapDrawable bmpDraw;
-
-        final int MP = FrameLayout.LayoutParams.MATCH_PARENT;
-
         arrowLeft = new FrameLayout(getContext());
-        arrowLeft.setLayoutParams(new FrameLayout.LayoutParams(32, MP, Gravity.START));
-        arrowLeft.setBackgroundColor(GlobalConfigs.LaunchArrowBackgroundColor);
+        arrowLeft.setLayoutParams(new FrameLayout.LayoutParams(32, Simple.MP, Gravity.START));
         arrowLeft.setOnTouchListener(this);
 
-        FrameLayout ali = new FrameLayout(getContext());
-        ali.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_left);
-        bmpDraw = new BitmapDrawable(getResources(), bmp);
-        bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
-        //ali.setBackground(bmpDraw);
-
-        arrowLeft.addView(ali);
         this.addView(arrowLeft);
 
         arrowRight = new FrameLayout(getContext());
-        arrowRight.setLayoutParams(new FrameLayout.LayoutParams(32, MP, Gravity.END));
-        arrowRight.setBackgroundColor(GlobalConfigs.LaunchArrowBackgroundColor);
+        arrowRight.setLayoutParams(new FrameLayout.LayoutParams(32, Simple.MP, Gravity.END));
         arrowRight.setOnTouchListener(this);
 
-        FrameLayout ari = new FrameLayout(getContext());
-        ari.setLayoutParams(new FrameLayout.LayoutParams(MP, 6 * 96, Gravity.CENTER_VERTICAL));
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_right);
-        bmpDraw = new BitmapDrawable(getResources(), bmp);
-        bmpDraw.setTileModeXY(Shader.TileMode.CLAMP, Shader.TileMode.REPEAT);
-        //ari.setBackground(bmpDraw);
-
-        arrowRight.addView(ari);
         this.addView(arrowRight);
     }
 
@@ -179,14 +157,14 @@ public class LaunchGroup extends FrameLayout implements
             if (clickmove)
             {
                 LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
-                lparams.leftMargin = -lpage.getWidth();
+                lparams.leftMargin = -getWidth();
                 lpage.bringToFront();
             }
             else
             {
                 if (xDirTouch < 0)
                 {
-                    finalMargin = -lpage.getWidth();
+                    finalMargin = -getWidth();
                     launchPage++;
                 }
             }
@@ -201,14 +179,14 @@ public class LaunchGroup extends FrameLayout implements
             if (clickmove)
             {
                 LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
-                lparams.leftMargin = lpage.getWidth();
+                lparams.leftMargin = getWidth();
                 lpage.bringToFront();
             }
             else
             {
                 if (xDirTouch > 0)
                 {
-                    finalMargin = lpage.getWidth();
+                    finalMargin = getWidth();
                     launchPage--;
                 }
             }
@@ -288,7 +266,7 @@ public class LaunchGroup extends FrameLayout implements
                 FrameLayout lpage = launchPages.get(launchPage - 1);
 
                 LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
-                lparams.leftMargin = xscreen - lpage.getWidth();
+                lparams.leftMargin = xscreen - getWidth();
                 lpage.bringToFront();
             }
 
@@ -312,7 +290,7 @@ public class LaunchGroup extends FrameLayout implements
 
     private void adjustArrows()
     {
-        arrowLeft.setVisibility((launchPage > 0) ? VISIBLE : INVISIBLE);
+        arrowLeft.setVisibility(((launchPage - 1) >= 0) ? VISIBLE : INVISIBLE);
         arrowRight.setVisibility(((launchPage + 1) < launchPages.size()) ? VISIBLE : INVISIBLE);
 
         arrowLeft.bringToFront();
@@ -342,29 +320,24 @@ public class LaunchGroup extends FrameLayout implements
                 horzItems = realWidth / horzSize;
                 vertItems = realHeight / vertSize;
 
-                horzSpace = (realWidth - (horzItems * horzSize)) / (horzItems + 1);
-                vertSpace = (realHeight - (vertItems * vertSize)) / vertItems;
-
-                horzStart = ((realWidth - (horzItems * horzSize)) % (horzItems + 1)) / 2;
-                vertStart = ((realHeight - (vertItems * vertSize)) % vertItems) / 2;
-
-                horzStart += horzSpace;
-                vertStart += vertSpace / 2;
-
-                if (launchItems == null)
+                while (true)
                 {
-                    createLaunchItems();
+                    horzSpace = (realWidth - (horzItems * horzSize)) / (horzItems + 1);
+                    vertSpace = (realHeight - (vertItems * vertSize)) / vertItems;
+
+                    horzStart = ((realWidth - (horzItems * horzSize)) % (horzItems + 1)) / 2;
+                    vertStart = ((realHeight - (vertItems * vertSize)) % vertItems) / 2;
+
+                    horzStart += horzSpace;
+                    vertStart += vertSpace / 2;
+
+                    if ((horzSpace >= 4) && (vertSpace >= 4)) break;
+
+                    if (horzSpace < 6) horzItems--;
+                    if (vertSpace < 6) vertItems--;
                 }
-                else
-                {
-                    for (FrameLayout lp : launchPages)
-                    {
-                        LayoutParams lpar = (LayoutParams) lp.getLayoutParams();
-                        lpar.width = realWidth;
-                        lpar.height = realHeight;
-                        lp.setLayoutParams(lpar);
-                    }
-                }
+
+                if (launchItems == null) createLaunchItems();
 
                 positionLaunchItems();
             }
@@ -394,36 +367,137 @@ public class LaunchGroup extends FrameLayout implements
         positionLaunchItems();
     }
 
+    private int getXpos(int slot)
+    {
+        return horzStart + (slot % horzItems) * (horzSize + horzSpace);
+    }
+
+    private int getYpos(int slot)
+    {
+        return vertStart + (slot / horzItems) * (vertSize + vertSpace);
+    }
+
+    private FrameLayout recycleLaunchPage()
+    {
+        if (launchPages.size() > 0)
+        {
+            FrameLayout lp = launchPages.remove(0);
+
+            int childs = lp.getChildCount();
+
+            for (int inx = 0; inx < childs; inx++)
+            {
+                if (lp.getChildAt(inx) instanceof LaunchItemNextPrev)
+                {
+                    lp.removeView(lp.getChildAt(inx--));
+                }
+            }
+
+            return lp;
+        }
+
+        FrameLayout lp = new FrameLayout(context);
+        lp.setBackgroundColor(Color.WHITE);
+        this.addView(lp);
+
+        return lp;
+    }
+
     protected void positionLaunchItems()
     {
-        int col = 0;
-        int row = 0;
+        ArrayList<FrameLayout> newPages = new ArrayList<>();
 
-        int xpos = horzStart;
-        int ypos = vertStart;
+        int maxSlots = horzItems * vertItems;
+
+        int nextSlot = 0;
+
+        FrameLayout lp = recycleLaunchPage();
+        newPages.add(lp);
 
         for (LaunchItem li : launchItems)
         {
-            li.setPosition(xpos, ypos);
-
-            xpos += horzSize + horzSpace;
-
-            if (++col >= horzItems)
+            if ((nextSlot == 0) && (parent != null))
             {
-                xpos = horzStart;
+                JSONObject prev = new JSONObject();
+                Json.put(prev, "type", "prev");
+                Json.put(prev, "label", "Zurück");
 
-                ypos += vertSize + vertSpace;
+                LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
 
-                col = 0;
+                liprev.setSize(horzSize, vertSize);
+                liprev.setPosition(getXpos(nextSlot), getYpos(nextSlot));
 
-                if (++row >= vertItems)
-                {
-                    ypos = vertStart;
+                lp.addView(liprev);
 
-                    row = 0;
-                }
+                nextSlot++;
+            }
+
+            if (li.getParent() != lp)
+            {
+                Simple.removeFromParent(li);
+                lp.addView(li);
+            }
+
+            li.setPosition(getXpos(nextSlot), getYpos(nextSlot));
+
+            nextSlot++;
+
+            if ((nextSlot + 1) >= maxSlots)
+            {
+                //
+                // Next icon on last position of page.
+                //
+
+                JSONObject next = new JSONObject();
+                Json.put(next, "type", "next");
+                Json.put(next, "label", "Weiter");
+
+                LaunchItem linext = LaunchItem.createLaunchItem(context, this, next);
+
+                linext.setSize(horzSize, vertSize);
+                linext.setPosition(getXpos(nextSlot), getYpos(nextSlot));
+
+                lp.addView(linext);
+
+                //
+                // Create new page.
+                //
+
+                nextSlot = 0;
+
+                lp = recycleLaunchPage();
+                newPages.add(lp);
+
+                //
+                // Prev icon on first position of page.
+                //
+
+                JSONObject prev = new JSONObject();
+                Json.put(prev, "type", "prev");
+                Json.put(prev, "label", "Zurück");
+
+                LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
+
+                liprev.setSize(horzSize, vertSize);
+                liprev.setPosition(getXpos(nextSlot), getYpos(nextSlot));
+                lp.addView(liprev);
+
+                nextSlot++;
             }
         }
+
+        while (launchPages.size() > 0)
+        {
+            lp = launchPages.remove(0);
+            Simple.removeFromParent(lp);
+        }
+
+        launchPages = newPages;
+
+        launchPage = 0;
+        launchPages.get(launchPage).bringToFront();
+
+        adjustArrows();
     }
 
     protected void createLaunchItems()
@@ -442,34 +516,10 @@ public class LaunchGroup extends FrameLayout implements
         {
             JSONArray lis = config.getJSONArray(configTree);
 
-            int bgcol = Color.WHITE;
-
-            FrameLayout lp = new FrameLayout(context);
-            lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth, realHeight));
-            lp.setBackgroundColor(bgcol);
-            launchPages.add(lp);
-            this.addView(lp);
-
             int numItems = lis.length();
-            int maxSlots = horzItems * vertItems;
-            int nextSlot = 0;
 
             for (int inx = 0; inx < numItems; inx++)
             {
-                if ((nextSlot == 0) && (parent != null))
-                {
-                    JSONObject prev = new JSONObject();
-                    Json.put(prev, "type", "prev");
-                    Json.put(prev, "label", "Zurück");
-
-                    LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
-                    liprev.setSize(horzSize, vertSize);
-                    launchItems.add(liprev);
-                    lp.addView(liprev);
-
-                    nextSlot++;
-                }
-
                 JSONObject lit = lis.getJSONObject(inx);
 
                 if (lit.has("enable"))
@@ -482,65 +532,15 @@ public class LaunchGroup extends FrameLayout implements
                     }
                 }
 
-                if ((nextSlot + 1) >= maxSlots)
-                {
-                    //
-                    // Next icon on last position of page.
-                    //
-
-                    JSONObject next = new JSONObject();
-                    Json.put(next, "type", "next");
-                    Json.put(next, "label", "Weiter");
-
-                    LaunchItem linext = LaunchItem.createLaunchItem(context, this, next);
-                    linext.setSize(horzSize, vertSize);
-                    launchItems.add(linext);
-                    lp.addView(linext);
-
-                    //
-                    // Create new page.
-                    //
-
-                    lp = new FrameLayout(context);
-                    lp.setLayoutParams(new FrameLayout.LayoutParams(realWidth, realHeight));
-                    lp.setBackgroundColor(bgcol);
-                    launchPages.add(lp);
-                    this.addView(lp);
-
-                    nextSlot = 0;
-
-                    //
-                    // Prev icon on first position of page.
-                    //
-
-                    JSONObject prev = new JSONObject();
-                    Json.put(prev, "type", "prev");
-                    Json.put(prev, "label", "Zurück");
-
-                    LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
-                    liprev.setSize(horzSize, vertSize);
-                    launchItems.add(liprev);
-                    lp.addView(liprev);
-
-                    nextSlot++;
-                }
-
                 LaunchItem li = LaunchItem.createLaunchItem(context, this, lit);
                 li.setSize(horzSize, vertSize);
                 launchItems.add(li);
-                lp.addView(li);
-                nextSlot++;
             }
         }
         catch (JSONException ex)
         {
             ex.printStackTrace();
         }
-
-        launchPage = 0;
-        launchPages.get(launchPage).bringToFront();
-
-        adjustArrows();
     }
 
     public void setConfig(LaunchItem parent, JSONObject config)

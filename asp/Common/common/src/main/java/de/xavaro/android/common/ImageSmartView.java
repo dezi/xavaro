@@ -92,7 +92,11 @@ public class ImageSmartView extends ImageView
     {
         super.onAttachedToWindow();
 
-        //Log.d(LOGTAG, "onAttachedToWindow");
+        //
+        // Stop any image detach runner now.
+        //
+
+        Simple.removePost(detachRunner);
 
         if ((width > 0) && (height > 0) && ! reffed)
         {
@@ -101,18 +105,31 @@ public class ImageSmartView extends ImageView
         }
     }
 
+    protected final Runnable detachRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (reffed)
+            {
+                ImageSmartCache.releaseImage(restag, width, height, circle);
+                reffed = false;
+            }
+        }
+    };
+
     @Override
     protected void onDetachedFromWindow()
     {
         super.onDetachedFromWindow();
 
-        //Log.d(LOGTAG, "onDetachedFromWindow");
+        //
+        // Schedule a final release on image to make sure,
+        // if view is only detached for rearrangement
+        // the image does not get delallocted.
+        //
 
-        if (reffed)
-        {
-            ImageSmartCache.releaseImage(restag, width, height, circle);
-            reffed = false;
-        }
+        Simple.makePost(detachRunner, 1000);
     }
 
     @Override
