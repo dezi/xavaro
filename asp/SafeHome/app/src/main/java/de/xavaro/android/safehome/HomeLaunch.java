@@ -9,51 +9,22 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
+import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WebAppView;
 
 @SuppressLint("RtlHardcoded")
-public class HomeLaunch extends FrameLayout
+public class HomeLaunch extends HomeFrame
 {
     private int peopleSize;
     private int socialSize;
     private int notifySize;
 
-    private int orientation = Configuration.ORIENTATION_UNDEFINED;
-
-    private LayoutParams layoutParams;
-    private TextView titleText;
-    private LayoutParams innerLayout;
-    private FrameLayout innerFrame;
-    private FrameLayout payloadFrame;
-
     public HomeLaunch(Context context)
     {
         super(context);
-
-        int headspace = Simple.getDevicePixels(40);
-
-        layoutParams = new LayoutParams(Simple.MP, Simple.MP);
-        setLayoutParams(layoutParams);
-
-        titleText = new TextView(context);
-        titleText.setLayoutParams(new LayoutParams(Simple.MP, headspace));
-        titleText.setText("Mein Safehome");
-        titleText.setTextSize(headspace * 2 / 3);
-        titleText.setPadding(16, 0, 0, 0);
-        addView(titleText);
-
-        innerLayout = new LayoutParams(Simple.MP, Simple.MP);
-        innerLayout.topMargin = headspace;
-
-        innerFrame = new FrameLayout(context);
-        addView(innerFrame);
-
-        innerFrame.setLayoutParams(innerLayout);
-        innerFrame.setBackground(Simple.getRoundedBorders());
-        innerFrame.setPadding(8, 8, 8, 8);
-
-        payloadFrame = new FrameLayout(context);
-        innerFrame.addView(payloadFrame);
     }
 
     public void setSize(int peopleSize, int socialSize, int notifySize)
@@ -62,38 +33,38 @@ public class HomeLaunch extends FrameLayout
         this.socialSize = socialSize;
         this.notifySize = notifySize;
 
-        setPadding(8, 0, 8, 8);
+        layoutParams.width = Simple.MP;
+        layoutParams.height = Simple.MP;
 
-        layoutParams.topMargin = notifySize;
         layoutParams.leftMargin = socialSize;
+        layoutParams.topMargin = notifySize;
+        layoutParams.rightMargin = isPortrait() ? 8 : peopleSize;
+        layoutParams.bottomMargin = isPortrait() ? peopleSize : 8;
     }
 
-    public FrameLayout getPayloadFrame()
+    public void setConfig(JSONObject config)
     {
-        return payloadFrame;
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    protected void onToogleFullscreen()
     {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        bringToFront();
+    }
 
-        if ((orientation != Configuration.ORIENTATION_PORTRAIT) &&
-                (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT))
+    @Override
+    protected void onChangeOrientation()
+    {
+        if (isPortrait())
         {
-            layoutParams.rightMargin = 0;
+            layoutParams.rightMargin = 8;
             layoutParams.bottomMargin = peopleSize;
-
-            orientation = Configuration.ORIENTATION_PORTRAIT;
         }
 
-        if ((orientation != Configuration.ORIENTATION_LANDSCAPE) &&
-                (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE))
+        if (isLandscape())
         {
             layoutParams.rightMargin = peopleSize;
-            layoutParams.bottomMargin = 0;
-
-            orientation = Configuration.ORIENTATION_LANDSCAPE;
+            layoutParams.bottomMargin = 8;
         }
     }
 }

@@ -118,6 +118,8 @@ instaface.adjustMode = function()
 {
     var ic = instaface;
 
+    ic.mode = ic.isFullScreen() ? "normal" : "news";
+
     if (ic.mode == "normal")
     {
         if (ic.updaterTimeout)
@@ -541,14 +543,10 @@ instaface.isFullScreen = function()
 
 instaface.onWindowResize = function()
 {
-    var ic = instaface;
+    instaface.adjustMode();
+    instaface.adjustPostDivs();
 
-    ic.mode = ic.isFullScreen() ? "normal" : "news";
-
-    console.log("onWindowResize:" + ic.mode);
-
-    ic.adjustMode();
-    ic.adjustPostDivs();
+    console.log("onWindowResize:" + instaface.mode);
 }
 
 instaface.createConts = function()
@@ -584,6 +582,7 @@ instaface.createConts = function()
         ic.retrieveBestPost();
     }
 
+    ic.adjustMode();
     ic.adjustPostDivs()
 }
 

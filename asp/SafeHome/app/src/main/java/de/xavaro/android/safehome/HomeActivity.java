@@ -141,7 +141,11 @@ public class HomeActivity extends AppCompatActivity implements
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         topScreen.setOnSystemUiVisibilityChangeListener(this);
 
-        socialScreen.setConfig("Neuigkeiten", null);
+        socialScreen.setTitle("Neuigkeiten");
+        socialScreen.setConfig(null);
+
+        launchScreen.setTitle("Mein Safehome");
+        launchScreen.setConfig(null);
 
         //
         // Debug update external contacts.
