@@ -44,6 +44,50 @@ public class WebAppCache
         }
     }
 
+    private static void removeDirectories(File dir)
+    {
+        File[] list = dir.listFiles();
+
+        for (File item : list)
+        {
+            if (item.isDirectory()) removeDirectories(item);
+
+            if (! item.delete())
+            {
+                Log.d(LOGTAG, "removeDirectories: failed:" + item);
+            }
+        }
+    }
+
+    public static void checkWebAppCache()
+    {
+        String version = Simple.getBetaVersion();
+        String lastversion = Simple.getSharedPrefString("system.version");
+
+        if (! Simple.equals(version, lastversion))
+        {
+            nukeWebAppCache();
+
+            Simple.setSharedPrefString("system.version", version);
+        }
+    }
+
+    public static void nukeWebAppCache()
+    {
+        File file = new File(Simple.getCacheDir(), "webappcache");
+        removeDirectories(file);
+
+        freeMemory.run();
+
+        File act = new File(Simple.getFilesDir(), "webappcache.act.json");
+        File bak = new File(Simple.getFilesDir(), "webappcache.bak.json");
+
+        if (act.delete() && bak.delete())
+        {
+            Log.d(LOGTAG, "nukeWebAppCache: deleted caches.");
+        }
+    }
+
     //
     // Get content from cache. If interval is greater zero reflect age of cached
     // item and get a fresh copy if required. If interval equals zero, always get
@@ -505,7 +549,7 @@ public class WebAppCache
             if (webappcache != null) return;
 
             File file = new File(Simple.getFilesDir(), "webappcache.act.json");
-            if (!file.exists()) file = new File(Simple.getFilesDir(), "webappcache.bak.json");
+            if (! file.exists()) file = new File(Simple.getFilesDir(), "webappcache.bak.json");
 
             try
             {

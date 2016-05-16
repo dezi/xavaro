@@ -576,6 +576,19 @@ public class Simple
         return false;
     }
 
+    @Nullable
+    public static String getBetaVersion()
+    {
+        Context appcontext = Simple.getActContext();
+
+        if (appcontext instanceof AppInfoHandler)
+        {
+            return ((AppInfoHandler) appcontext).getBetaVersion();
+        }
+
+        return "";
+    }
+
     //endregion All purpose simple methods
 
     //region Haptic feedback

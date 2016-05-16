@@ -20,6 +20,7 @@ import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.WebAppCache;
 import de.xavaro.android.common.WebCookie;
 
 public class SettingsActivity extends PreferenceActivity
@@ -55,6 +56,12 @@ public class SettingsActivity extends PreferenceActivity
         //
 
         WebCookie.initCookies();
+
+        //
+        // Check version of web app cache.
+        //
+
+        WebAppCache.checkWebAppCache();
     }
 
     @Override

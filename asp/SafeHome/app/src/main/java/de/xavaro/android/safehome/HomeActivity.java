@@ -30,6 +30,7 @@ import de.xavaro.android.common.MediaSurface;
 import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
+import de.xavaro.android.common.WebAppCache;
 import de.xavaro.android.common.WebCookie;
 
 public class HomeActivity extends AppCompatActivity implements
@@ -90,6 +91,12 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
+
+        //
+        // Check version of web app cache.
+        //
+
+        WebAppCache.checkWebAppCache();
 
         //
         // Build views.

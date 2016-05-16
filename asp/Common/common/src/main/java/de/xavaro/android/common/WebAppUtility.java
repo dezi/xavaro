@@ -18,14 +18,8 @@ public class WebAppUtility
     @JavascriptInterface
     public String getBetaVersion()
     {
-        Context appcontext = Simple.getActContext();
-
-        if (appcontext instanceof AppInfoHandler)
-        {
-            return ((AppInfoHandler) appcontext).getBetaVersion();
-        }
-
-        return "";
+        String version = Simple.getBetaVersion();
+        return (version != null) ? version : "";
     }
 
     @JavascriptInterface
