@@ -459,7 +459,7 @@ public class LaunchGroup extends FrameLayout implements
 
         for (LaunchItem li : launchItems)
         {
-            if ((nextSlot == 0) && (parent != null))
+            if ((nextSlot == 0) && (parent != null) && (maxSlots > 4))
             {
                 LaunchItem liprev = getRecycledNextPrevItem("prev");
                 liprev.setSize(horzSize, vertSize);
@@ -480,7 +480,7 @@ public class LaunchGroup extends FrameLayout implements
 
             nextSlot++;
 
-            if ((nextSlot + 1) >= maxSlots)
+            if (((nextSlot + 1) >= maxSlots) && (maxSlots > 4))
             {
                 //
                 // Next icon on last position of page.
@@ -517,6 +517,15 @@ public class LaunchGroup extends FrameLayout implements
                 lp.addView(liprev);
 
                 nextSlot++;
+
+                if ((maxSlots <= 4) && (nextSlot == maxSlots))
+                {
+                    //
+                    // Small preview page. Break after 4 items.
+                    //
+
+                    break;
+                }
             }
         }
 

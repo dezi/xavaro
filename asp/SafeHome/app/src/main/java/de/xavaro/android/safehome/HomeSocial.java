@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 
 import org.json.JSONObject;
 
@@ -21,6 +22,7 @@ public class HomeSocial extends HomeFrame
 
         layoutParams.width = Simple.MP;
         layoutParams.height = Simple.MP;
+        layoutParams.gravity = Gravity.LEFT;
 
         layoutParams.leftMargin = 8;
         layoutParams.topMargin = notifySize;
