@@ -133,20 +133,6 @@ public class LaunchItem extends FrameLayout implements
         myInit(context);
     }
 
-    public LaunchItem(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
-
-        myInit(context);
-    }
-
-    public LaunchItem(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
-
-        myInit(context);
-    }
-
     private void myInit(Context context)
     {
         this.context = context;
@@ -405,6 +391,12 @@ public class LaunchItem extends FrameLayout implements
     public LaunchGroup getLaunchGroup()
     {
         return parent;
+    }
+
+    @Nullable
+    public String getType()
+    {
+        return type;
     }
 
     protected void setConfig()

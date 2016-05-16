@@ -3,18 +3,12 @@ package de.xavaro.android.safehome;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -26,13 +20,10 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.Animator;
-import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommonConfigs;
-import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.VersionUtils;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 
@@ -70,6 +61,9 @@ public class LaunchGroup extends FrameLayout implements
 
     protected ArrayList<FrameLayout> launchPages;
     protected ArrayList<LaunchItem> launchItems;
+
+    protected ArrayList<LaunchItem> recyledNextItems = new ArrayList<>();
+    protected ArrayList<LaunchItem> recyledPrevItems = new ArrayList<>();
 
     protected int launchPage;
 
@@ -153,10 +147,12 @@ public class LaunchGroup extends FrameLayout implements
             launchPage--;
 
             lpage = launchPages.get(launchPage);
+            lpage.setVisibility(VISIBLE);
 
             if (clickmove)
             {
                 LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
+                lparams.width = getWidth();
                 lparams.leftMargin = -getWidth();
                 lpage.bringToFront();
             }
@@ -175,6 +171,7 @@ public class LaunchGroup extends FrameLayout implements
             launchPage++;
 
             lpage = launchPages.get(launchPage);
+            lpage.setVisibility(VISIBLE);
 
             if (clickmove)
             {
@@ -194,6 +191,8 @@ public class LaunchGroup extends FrameLayout implements
 
         if (lpage != null)
         {
+            final FrameLayout cblpage = lpage;
+
             LayoutParams from = (LayoutParams) lpage.getLayoutParams();
             LayoutParams toto = new LayoutParams(lpage.getLayoutParams());
             toto.leftMargin = finalMargin;
@@ -202,7 +201,22 @@ public class LaunchGroup extends FrameLayout implements
 
             animator.setDuration(500);
             animator.setLayout(lpage, from, toto);
-            animator.setFinalCall(animationFinished);
+
+            animator.setFinalCall(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    //
+                    // Set page back to match parent.
+                    //
+
+                    LayoutParams lparams = (LayoutParams) cblpage.getLayoutParams();
+                    lparams.width = Simple.MP;
+
+                    adjustArrows();
+                }
+            });
 
             this.startAnimation(animator);
         }
@@ -266,7 +280,9 @@ public class LaunchGroup extends FrameLayout implements
                 FrameLayout lpage = launchPages.get(launchPage - 1);
 
                 LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
+                lparams.width = getWidth();
                 lparams.leftMargin = xscreen - getWidth();
+                lpage.setVisibility(VISIBLE);
                 lpage.bringToFront();
             }
 
@@ -276,6 +292,7 @@ public class LaunchGroup extends FrameLayout implements
 
                 LayoutParams lparams = (LayoutParams) lpage.getLayoutParams();
                 lparams.leftMargin = xscreen;
+                lpage.setVisibility(VISIBLE);
                 lpage.bringToFront();
             }
         }
@@ -290,21 +307,12 @@ public class LaunchGroup extends FrameLayout implements
 
     private void adjustArrows()
     {
-        arrowLeft.setVisibility(((launchPage - 1) >= 0) ? VISIBLE : INVISIBLE);
-        arrowRight.setVisibility(((launchPage + 1) < launchPages.size()) ? VISIBLE : INVISIBLE);
+        arrowLeft.setVisibility(((launchPage - 1) >= 0) ? VISIBLE : GONE);
+        arrowRight.setVisibility(((launchPage + 1) < launchPages.size()) ? VISIBLE : GONE);
 
         arrowLeft.bringToFront();
         arrowRight.bringToFront();
     }
-
-    private final Runnable animationFinished = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            adjustArrows();
-        }
-    };
 
     private final Runnable afterMeasure = new Runnable()
     {
@@ -377,11 +385,12 @@ public class LaunchGroup extends FrameLayout implements
         return vertStart + (slot / horzItems) * (vertSize + vertSpace);
     }
 
-    private FrameLayout recycleLaunchPage()
+    private FrameLayout getRecycledLaunchPage()
     {
         if (launchPages.size() > 0)
         {
             FrameLayout lp = launchPages.remove(0);
+            lp.setVisibility(GONE);
 
             int childs = lp.getChildCount();
 
@@ -389,7 +398,17 @@ public class LaunchGroup extends FrameLayout implements
             {
                 if (lp.getChildAt(inx) instanceof LaunchItemNextPrev)
                 {
-                    lp.removeView(lp.getChildAt(inx--));
+                    LaunchItemNextPrev li = (LaunchItemNextPrev) lp.getChildAt(inx--);
+                    lp.removeView(li);
+
+                    if (Simple.equals(li.getType(), "next"))
+                    {
+                        recyledNextItems.add(li);
+                    }
+                    else
+                    {
+                        recyledPrevItems.add(li);
+                    }
                 }
             }
 
@@ -398,9 +417,33 @@ public class LaunchGroup extends FrameLayout implements
 
         FrameLayout lp = new FrameLayout(context);
         lp.setBackgroundColor(Color.WHITE);
+        lp.setVisibility(GONE);
         this.addView(lp);
 
         return lp;
+    }
+
+    private LaunchItem getRecycledNextPrevItem(String type)
+    {
+        JSONObject config = new JSONObject();
+
+        if (type.equals("next"))
+        {
+            if (recyledNextItems.size() > 0) return recyledNextItems.remove(0);
+
+            Json.put(config, "type", "next");
+            Json.put(config, "label", "Weiter");
+        }
+
+        if (type.equals("prev"))
+        {
+            if (recyledPrevItems.size() > 0) return recyledPrevItems.remove(0);
+
+            Json.put(config, "type", "prev");
+            Json.put(config, "label", "Zurück");
+        }
+
+        return LaunchItem.createLaunchItem(context, this, config);
     }
 
     protected void positionLaunchItems()
@@ -411,19 +454,14 @@ public class LaunchGroup extends FrameLayout implements
 
         int nextSlot = 0;
 
-        FrameLayout lp = recycleLaunchPage();
+        FrameLayout lp = getRecycledLaunchPage();
         newPages.add(lp);
 
         for (LaunchItem li : launchItems)
         {
             if ((nextSlot == 0) && (parent != null))
             {
-                JSONObject prev = new JSONObject();
-                Json.put(prev, "type", "prev");
-                Json.put(prev, "label", "Zurück");
-
-                LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
-
+                LaunchItem liprev = getRecycledNextPrevItem("prev");
                 liprev.setSize(horzSize, vertSize);
                 liprev.setPosition(getXpos(nextSlot), getYpos(nextSlot));
 
@@ -448,11 +486,7 @@ public class LaunchGroup extends FrameLayout implements
                 // Next icon on last position of page.
                 //
 
-                JSONObject next = new JSONObject();
-                Json.put(next, "type", "next");
-                Json.put(next, "label", "Weiter");
-
-                LaunchItem linext = LaunchItem.createLaunchItem(context, this, next);
+                LaunchItem linext = getRecycledNextPrevItem("next");
 
                 linext.setSize(horzSize, vertSize);
                 linext.setPosition(getXpos(nextSlot), getYpos(nextSlot));
@@ -465,7 +499,7 @@ public class LaunchGroup extends FrameLayout implements
 
                 nextSlot = 0;
 
-                lp = recycleLaunchPage();
+                lp = getRecycledLaunchPage();
                 newPages.add(lp);
 
                 //
@@ -495,7 +529,10 @@ public class LaunchGroup extends FrameLayout implements
         launchPages = newPages;
 
         launchPage = 0;
-        launchPages.get(launchPage).bringToFront();
+        lp = launchPages.get(launchPage);
+
+        lp.setVisibility(VISIBLE);
+        lp.bringToFront();
 
         adjustArrows();
     }
