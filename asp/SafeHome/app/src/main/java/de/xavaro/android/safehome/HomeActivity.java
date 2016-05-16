@@ -95,26 +95,21 @@ public class HomeActivity extends AppCompatActivity implements
         // Build views.
         //
 
-        int personsize = Simple.getDevicePixels(160);
-        int peoplesize = Simple.getDevicePixels(200);
-        int socialsize = Simple.getDevicePixels(340);
-        int notifysize = Simple.getDevicePixels(340);
-
         topScreen = new FrameLayout(this);
         topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
         topScreen.setBackgroundColor(0xfffbfbfb);
         setContentView(topScreen);
 
+        int personsize = Simple.getDevicePixels(160);
+        int peoplesize = Simple.getDevicePixels(200);
+
         notifyScreen = new HomeNotify(this);
-        notifyScreen.setSize(notifysize, peoplesize);
         topScreen.addView(notifyScreen);
 
         launchScreen = new HomeLaunch(this);
-        launchScreen.setSize(peoplesize, socialsize, notifysize);
         topScreen.addView(launchScreen);
 
         socialScreen = new HomeSocial(this);
-        socialScreen.setSize(socialsize, peoplesize, notifysize);
         topScreen.addView(socialScreen);
 
         peopleScreen = new HomePeople(this);

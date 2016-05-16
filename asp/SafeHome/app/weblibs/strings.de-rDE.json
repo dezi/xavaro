@@ -6,7 +6,7 @@
 
   "simple.day.vals" : [ "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag" ],
 
-  "social.type.vals" : [ "Du", "Freund", "Abonnement" ],
+  "social.type.vals" : [ "Du", "Freund", "Abo" ],
 
   "EOL" : true
 }

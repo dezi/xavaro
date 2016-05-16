@@ -2,16 +2,16 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 
-import android.content.Context;
 import android.content.res.Configuration;
+import android.content.Context;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.util.Log;
 
-import org.json.JSONObject;
-
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
 
@@ -20,7 +20,12 @@ public abstract class HomeFrame extends FrameLayout
 {
     private static final String LOGTAG = HomeFrame.class.getSimpleName();
 
-    protected int headspace = Simple.getDevicePixels(40);
+    protected int titleSpace = Simple.getDevicePixels(40);
+    protected int peopleSize = Simple.getDevicePixels(200);
+    protected int notifySize = 0;
+
+    protected int launchWid = CommonConfigs.LaunchItemSize * 2 + 32;
+    protected int launchHei = CommonConfigs.LaunchItemSize * 2 + 32 + titleSpace;
 
     protected LayoutParams layoutParams;
     protected LayoutParams layoutNormal;
@@ -50,19 +55,20 @@ public abstract class HomeFrame extends FrameLayout
 
         layoutParams = new LayoutParams(0, 0);
         setLayoutParams(layoutParams);
+        setVisibility(INVISIBLE);
 
-        titleLayout = new LayoutParams(Simple.MP, headspace);
+        titleLayout = new LayoutParams(Simple.MP, titleSpace);
 
         titleText = new TextView(context);
         titleText.setLayoutParams(titleLayout);
-        titleText.setTextSize(headspace * 2 / 3);
+        titleText.setTextSize(titleSpace * 2 / 3);
         titleText.setPadding(16, 0, 0, 0);
         titleText.setOnClickListener(onClickListener);
         titleText.setVisibility(GONE);
         addView(titleText);
 
         titleClose = new ImageSmartView(context);
-        titleClose.setLayoutParams(new LayoutParams(headspace * 2, headspace * 2, Gravity.END));
+        titleClose.setLayoutParams(new LayoutParams(titleSpace * 2, titleSpace * 2, Gravity.END));
         titleClose.setImageResource(R.drawable.close_button_313x313);
         titleClose.setPadding(15, 15, 15, 15);
         titleClose.setVisibility(GONE);
@@ -95,7 +101,7 @@ public abstract class HomeFrame extends FrameLayout
         {
             titleText.setText(title);
             titleText.setVisibility(VISIBLE);
-            innerLayout.topMargin = headspace;
+            innerLayout.topMargin = titleSpace;
         }
     }
 
@@ -123,7 +129,16 @@ public abstract class HomeFrame extends FrameLayout
         @Override
         public void run()
         {
-            onChangeOrientation();
+            int wid = ((View) getParent()).getWidth();
+            int hei = ((View) getParent()).getHeight();
+
+            if ((wid != 0) && (hei != 0))
+            {
+                notifySize = hei - launchHei - (isPortrait() ? peopleSize : 8);
+
+                onChangeOrientation();
+                setVisibility(VISIBLE);
+            }
         }
     };
 
@@ -132,7 +147,10 @@ public abstract class HomeFrame extends FrameLayout
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        if ((animationSteps == 0) && ! fullscreen) Simple.makePost(changeOrientation);
+        if ((animationSteps == 0) && ! fullscreen)
+        {
+            Simple.makePost(changeOrientation);
+        }
     }
 
     protected void onToogleFullscreen()
@@ -237,8 +255,8 @@ public abstract class HomeFrame extends FrameLayout
                 layoutParams.rightMargin = layoutNormal.rightMargin;
                 layoutParams.bottomMargin = layoutNormal.bottomMargin;
 
-                innerLayout.topMargin = headspace;
-                titleLayout.height = headspace;
+                innerLayout.topMargin = titleSpace;
+                titleLayout.height = titleSpace;
 
                 innerClick.setVisibility(VISIBLE);
                 innerFrame.setBackgroundColor(Color.TRANSPARENT);
@@ -257,8 +275,8 @@ public abstract class HomeFrame extends FrameLayout
                 layoutParams.rightMargin = 0;
                 layoutParams.bottomMargin = 0;
 
-                innerLayout.topMargin = headspace * 2;
-                titleLayout.height = headspace * 2;
+                innerLayout.topMargin = titleSpace * 2;
+                titleLayout.height = titleSpace * 2;
 
                 innerClick.setVisibility(GONE);
                 innerFrame.setBackground(null);
