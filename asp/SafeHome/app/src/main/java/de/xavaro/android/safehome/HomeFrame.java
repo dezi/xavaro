@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -22,6 +23,8 @@ public abstract class HomeFrame extends FrameLayout
     protected int headspace = Simple.getDevicePixels(40);
 
     protected LayoutParams layoutParams;
+    protected LayoutParams layoutNormal;
+
     protected LayoutParams titleLayout;
     protected ImageSmartView titleClose;
     protected TextView titleText;
@@ -33,6 +36,13 @@ public abstract class HomeFrame extends FrameLayout
     protected boolean fullscreen;
 
     protected int animationSteps;
+    protected int animationWidth;
+    protected int animationHeight;
+    protected int animationLeft;
+    protected int animationTop;
+    protected int animationRight;
+    protected int animationBottom;
+    protected int animationPad;
 
     public HomeFrame(Context context)
     {
@@ -122,9 +132,147 @@ public abstract class HomeFrame extends FrameLayout
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        if (animationSteps == 0) Simple.makePost(changeOrientation);
+        if ((animationSteps == 0) && ! fullscreen) Simple.makePost(changeOrientation);
     }
 
-    protected abstract void onToogleFullscreen();
-    protected abstract void onChangeOrientation();
+    protected void onToogleFullscreen()
+    {
+        //
+        // Animation steps should correspond to inner
+        // padding size to make things smooth.
+        //
+
+        animationSteps = 8;
+
+        animationPad = fullscreen ? animationSteps : 0;
+
+        animationWidth = 0;
+        animationHeight = 0;
+
+        if ((layoutNormal.gravity == Gravity.LEFT) || (layoutNormal.gravity == Gravity.RIGHT))
+        {
+            int max = ((View) getParent()).getWidth();
+            if (layoutParams.width == Simple.MP) layoutParams.width = max;
+            animationWidth = Math.abs(max - layoutNormal.width) / animationSteps;
+        }
+
+        if ((layoutNormal.gravity == Gravity.TOP) || (layoutNormal.gravity == Gravity.BOTTOM))
+        {
+            int max = ((View) getParent()).getHeight();
+            if (layoutParams.height == Simple.MP) layoutParams.height = max;
+            animationHeight = Math.abs(max - layoutNormal.height) / animationSteps;
+        }
+
+        animationLeft = layoutNormal.leftMargin / animationSteps;
+        animationTop = layoutNormal.topMargin / animationSteps;
+        animationRight = layoutNormal.rightMargin / animationSteps;
+        animationBottom = layoutNormal.bottomMargin / animationSteps;
+
+        if (fullscreen)
+        {
+            titleText.setBackgroundColor(Color.TRANSPARENT);
+            titleText.setGravity(Gravity.START);
+            titleClose.setVisibility(GONE);
+        }
+
+        bringToFront();
+
+        Simple.makePost(toggleAnimator);
+    }
+
+    protected void onChangeOrientation()
+    {
+    }
+
+    protected final Runnable toggleAnimator = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (animationSteps > 0)
+            {
+                if (fullscreen)
+                {
+                    layoutParams.width -= animationWidth;
+                    layoutParams.height -= animationHeight;
+
+                    layoutParams.leftMargin += animationLeft;
+                    layoutParams.topMargin += animationTop;
+                    layoutParams.rightMargin += animationRight;
+                    layoutParams.bottomMargin += animationBottom;
+
+                    animationPad++;
+                }
+                else
+                {
+                    layoutParams.width += animationWidth;
+                    layoutParams.height += animationHeight;
+
+                    layoutParams.leftMargin -= animationLeft;
+                    layoutParams.topMargin -= animationTop;
+                    layoutParams.rightMargin -= animationRight;
+                    layoutParams.bottomMargin -= animationBottom;
+
+                    animationPad--;
+                }
+
+                innerFrame.setPadding(animationPad, animationPad, animationPad, animationPad);
+
+                setLayoutParams(layoutParams);
+
+                animationSteps -= 1;
+
+                Simple.makePost(toggleAnimator, 0);
+
+                return;
+            }
+
+            if (fullscreen)
+            {
+                layoutParams.width = layoutNormal.width;
+                layoutParams.height = layoutNormal.height;
+
+                layoutParams.leftMargin = layoutNormal.leftMargin;
+                layoutParams.topMargin = layoutNormal.topMargin;
+                layoutParams.rightMargin = layoutNormal.rightMargin;
+                layoutParams.bottomMargin = layoutNormal.bottomMargin;
+
+                innerLayout.topMargin = headspace;
+                titleLayout.height = headspace;
+
+                innerClick.setVisibility(VISIBLE);
+                innerFrame.setBackgroundColor(Color.TRANSPARENT);
+                innerFrame.setBackground(Simple.getRoundedBorders());
+                innerFrame.setPadding(8, 8, 8, 8);
+
+                fullscreen = false;
+            }
+            else
+            {
+                layoutParams.width = Simple.MP;
+                layoutParams.height = Simple.MP;
+
+                layoutParams.leftMargin = 0;
+                layoutParams.topMargin = 0;
+                layoutParams.rightMargin = 0;
+                layoutParams.bottomMargin = 0;
+
+                innerLayout.topMargin = headspace * 2;
+                titleLayout.height = headspace * 2;
+
+                innerClick.setVisibility(GONE);
+                innerFrame.setBackground(null);
+                innerFrame.setBackgroundColor(0xffffffff);
+                innerFrame.setPadding(0, 0, 0, 0);
+
+                titleText.setBackgroundColor(0xffcccccc);
+                titleText.setGravity(Gravity.CENTER);
+                titleClose.setVisibility(VISIBLE);
+
+                fullscreen = true;
+            }
+
+            setLayoutParams(layoutParams);
+        }
+    };
 }

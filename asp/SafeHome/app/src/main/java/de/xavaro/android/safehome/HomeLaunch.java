@@ -19,8 +19,6 @@ import de.xavaro.android.common.WebAppView;
 public class HomeLaunch extends HomeFrame
 {
     private int peopleSize;
-    private int socialSize;
-    private int notifySize;
 
     public HomeLaunch(Context context)
     {
@@ -30,8 +28,6 @@ public class HomeLaunch extends HomeFrame
     public void setSize(int peopleSize, int socialSize, int notifySize)
     {
         this.peopleSize = peopleSize;
-        this.socialSize = socialSize;
-        this.notifySize = notifySize;
 
         layoutParams.width = Simple.MP;
         layoutParams.height = Simple.MP;
@@ -40,6 +36,8 @@ public class HomeLaunch extends HomeFrame
         layoutParams.topMargin = notifySize;
         layoutParams.rightMargin = isPortrait() ? 8 : peopleSize;
         layoutParams.bottomMargin = isPortrait() ? peopleSize : 8;
+
+        layoutNormal = new LayoutParams(layoutParams);
     }
 
     public void setConfig(JSONObject config)
@@ -47,24 +45,24 @@ public class HomeLaunch extends HomeFrame
     }
 
     @Override
-    protected void onToogleFullscreen()
-    {
-        bringToFront();
-    }
-
-    @Override
     protected void onChangeOrientation()
     {
         if (isPortrait())
         {
-            layoutParams.rightMargin = 8;
-            layoutParams.bottomMargin = peopleSize;
+            layoutNormal.rightMargin = 8;
+            layoutNormal.bottomMargin = peopleSize;
         }
 
         if (isLandscape())
         {
-            layoutParams.rightMargin = peopleSize;
-            layoutParams.bottomMargin = 8;
+            layoutNormal.rightMargin = peopleSize;
+            layoutNormal.bottomMargin = 8;
+        }
+
+        if (! fullscreen)
+        {
+            layoutParams.rightMargin = layoutNormal.rightMargin;
+            layoutParams.bottomMargin = layoutNormal.bottomMargin;
         }
     }
 }
