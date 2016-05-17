@@ -95,6 +95,11 @@ public abstract class HomeFrame extends FrameLayout
         return payloadFrame;
     }
 
+    public void setDisablefullscreen()
+    {
+        innerClick.setOnClickListener(null);
+    }
+
     public void setTitle(String title)
     {
         if (title != null)
