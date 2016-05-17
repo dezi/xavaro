@@ -8,8 +8,12 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
@@ -22,6 +26,8 @@ public class HomeNotify extends HomeFrame
     protected HomeEvent topFrame;
     protected HomeEvent event1Frame;
     protected HomeEvent event2Frame;
+
+    protected final ArrayList<LaunchItem> candidatesLaunch = new ArrayList<>();
 
     public HomeNotify(Context context)
     {
@@ -41,16 +47,16 @@ public class HomeNotify extends HomeFrame
         //
         // Notify content areas.
         //
-        
+
         setDisablefullscreen();
 
         int padh = Simple.getDevicePixels(16);
         int padv = Simple.getDevicePixels(4);
 
-        LayoutParams barLayout = new LayoutParams(Simple.MP, Simple.getDevicePixels(2));
+        LayoutParams barFrameLayout = new LayoutParams(Simple.MP, Simple.WC);
+        LayoutParams barRulerLayout = new LayoutParams(Simple.MP, Simple.getDevicePixels(2));
         FrameLayout barFrame;
-
-        payloadFrame.setPadding(padh, 0, padh, 0);
+        FrameLayout barRuler;
 
         contentFrame = new LinearLayout(context);
         contentFrame.setOrientation(LinearLayout.VERTICAL);
@@ -60,18 +66,24 @@ public class HomeNotify extends HomeFrame
         contentFrame.addView(topFrame);
 
         barFrame = new FrameLayout(context);
-        barFrame.setLayoutParams(barLayout);
-        barFrame.setPadding(0, padv, 0, padv);
-        barFrame.setBackgroundColor(0xffcccccc);
+        barFrame.setLayoutParams(barFrameLayout);
+        barFrame.setPadding(padh, padv, padh, padv);
+        barRuler = new FrameLayout(context);
+        barRuler.setLayoutParams(barRulerLayout);
+        barRuler.setBackgroundColor(0xffcccccc);
+        barFrame.addView(barRuler);
         contentFrame.addView(barFrame);
 
         event1Frame = new HomeEvent(context);
         contentFrame.addView(event1Frame);
 
         barFrame = new FrameLayout(context);
-        barFrame.setLayoutParams(barLayout);
-        barFrame.setPadding(0, padv, 0, padv);
-        barFrame.setBackgroundColor(0xffcccccc);
+        barFrame.setLayoutParams(barFrameLayout);
+        barFrame.setPadding(padh, padv, padh, padv);
+        barRuler = new FrameLayout(context);
+        barRuler.setBackgroundColor(0xffcccccc);
+        barRuler.setLayoutParams(barRulerLayout);
+        barFrame.addView(barRuler);
         contentFrame.addView(barFrame);
 
         event2Frame = new HomeEvent(context);
@@ -80,6 +92,57 @@ public class HomeNotify extends HomeFrame
 
     public void setConfig(JSONObject config)
     {
+        extractConfig(config);
+    }
+
+    private void extractConfig(JSONObject config)
+    {
+        JSONArray lis = Json.getArray(config, "launchitems");
+        if (lis == null) return;
+
+        for (int inx = 0; inx < lis.length(); inx++)
+        {
+            JSONObject li = Json.getObject(lis, inx);
+
+            if (Json.has(li, "launchitems"))
+            {
+                extractConfig(li);
+                continue;
+            }
+
+            String type = Json.getString(li, "type");
+            String subitem = Json.getString(li, "subitem");
+
+            if (Simple.equals(type, "beta") ||
+                    Simple.equals(type, "today") ||
+                    Simple.equals(type, "battery") ||
+                    (Simple.equals(type, "calls") && Simple.equals(subitem, "prepaid")))
+            {
+                LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, li);
+
+                launchItem.setFrameLess();
+                launchItem.setSize(140, 140);
+
+                candidatesLaunch.add(launchItem);
+                lis.remove(inx--);
+            }
+        }
+    }
+
+    @Override
+    public void onAttachedToWindow()
+    {
+        super.onAttachedToWindow();
+
+        Simple.makePost(manageNotificationsRun);
+    }
+
+    @Override
+    public void onDetachedFromWindow()
+    {
+        super.onDetachedFromWindow();
+
+        Simple.removePost(manageNotificationsRun);
     }
 
     @Override
@@ -109,6 +172,33 @@ public class HomeNotify extends HomeFrame
             topFrame.setLayoutHeight(height * 2);
             event1Frame.setLayoutHeight(height);
             event2Frame.setLayoutHeight(height);
+
+            for (LaunchItem launchItem : candidatesLaunch)
+            {
+                launchItem.setSize(height * 2, height * 2);
+            }
         }
     }
+
+    protected void manageNotifications()
+    {
+        if (candidatesLaunch.size() == 0) return;
+
+        LaunchItem launchItem = candidatesLaunch.remove(0);
+        candidatesLaunch.add(launchItem);
+
+        topFrame.removeAllViews();
+        topFrame.addView(launchItem);
+    }
+
+    protected final Runnable manageNotificationsRun = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            manageNotifications();
+
+            Simple.makePost(manageNotificationsRun, 5000);
+        }
+    };
 }

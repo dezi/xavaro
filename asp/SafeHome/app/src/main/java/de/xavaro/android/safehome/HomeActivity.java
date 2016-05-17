@@ -209,7 +209,9 @@ public class HomeActivity extends AppCompatActivity implements
             launchConfig = LaunchGroupRoot.getConfig();
             launchGroup = new LaunchGroupRoot(this);
 
+            notifyScreen.setConfig(launchConfig);
             peopleScreen.setConfig(launchConfig);
+
             launchGroup.setConfig(null, launchConfig);
 
             launchFrame.addView(launchGroup);

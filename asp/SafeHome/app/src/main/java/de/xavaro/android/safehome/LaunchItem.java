@@ -148,7 +148,13 @@ public class LaunchItem extends FrameLayout implements
         setBackground(gd);
 
         icon = new ImageSmartView(context);
-        icon.setPadding(14, 0, 14, 28);
+
+        icon.setPadding(
+                Simple.getDevicePixels(14),
+                Simple.getDevicePixels( 0),
+                Simple.getDevicePixels(14),
+                Simple.getDevicePixels(28));
+
         addView(icon);
 
         label = new TextView(context);
@@ -217,8 +223,20 @@ public class LaunchItem extends FrameLayout implements
 
     public void setSize(int width, int height)
     {
+        //
+        // Original font sizes based on 200 pixels height.
+        //
+
+        float scale = height / 200.0f;
+
         layout.width = width;
         layout.height = height;
+
+        icon.setPadding(
+                Simple.getDevicePixels(Math.round(14 * scale)),
+                Simple.getDevicePixels(Math.round( 0 * scale)),
+                Simple.getDevicePixels(Math.round(14 * scale)),
+                Simple.getDevicePixels(Math.round(28 * scale)));
 
         oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;

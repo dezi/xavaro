@@ -45,9 +45,13 @@ public class LaunchItemCall extends LaunchItem implements
 
             if (Simple.equals(subitem, "prepaid"))
             {
+                int devpad16 = Simple.getDevicePixels(16);
+                int devpad20 = Simple.getDevicePixels(20);
+                int devpad36 = Simple.getDevicePixels(36);
+
                 prepaidDateView = new TextView(getContext());
                 prepaidDateView.setLayoutParams(Simple.layoutParamsMW());
-                prepaidDateView.setPadding(0, 16, 0, 0);
+                prepaidDateView.setPadding(0, devpad16, 0, 0);
                 prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f));
                 prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
                 prepaidDateView.setTextColor(Color.WHITE);
@@ -57,7 +61,7 @@ public class LaunchItemCall extends LaunchItem implements
 
                 prepaidMoneyView = new TextView(getContext());
                 prepaidMoneyView.setLayoutParams(Simple.layoutParamsMM());
-                prepaidMoneyView.setPadding(0, 20, 0, icon.getPaddingBottom() + 36);
+                prepaidMoneyView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad36);
                 prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f));
                 prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
                 prepaidMoneyView.setTextColor(Color.WHITE);
@@ -98,6 +102,31 @@ public class LaunchItemCall extends LaunchItem implements
                 directory = new LaunchGroupCalls(context);
                 directory.setConfig(this, Json.getArray(config, "launchitems"));
             }
+        }
+    }
+
+    @Override
+    public void setSize(int width, int height)
+    {
+        super.setSize(width, height);
+
+        if (Json.equals(config, "subitem", "prepaid"))
+        {
+            //
+            // Original font sizes based on 200 pixels height.
+            //
+
+            float scale = height / 200.0f;
+
+            prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f * scale));
+            prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f * scale));
+
+            int devpad16 = Simple.getDevicePixels(Math.round(16 * scale));
+            int devpad20 = Simple.getDevicePixels(Math.round(20 * scale));
+            int devpad36 = Simple.getDevicePixels(Math.round(36 * scale));
+
+            prepaidDateView.setPadding(0, devpad16, 0, 0);
+            prepaidMoneyView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad36);
         }
     }
 
