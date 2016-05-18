@@ -23,6 +23,7 @@ public class BatteryManager
     private static int sequence;
     private static int lastStatus;
     private static int lastPercent;
+    private static String lastMessage;
 
     public static void commTick()
     {
@@ -79,6 +80,18 @@ public class BatteryManager
         }
     }
 
+    public static String getBatteryMessage()
+    {
+        if (lastMessage == null)
+        {
+            int percent = Json.getInt(batteryStatus, "percent");
+
+            return "Die Batterie ist zu " + percent + "% geladen.";
+        }
+
+        return lastMessage;
+    }
+
     private static void checkWarnings()
     {
         int status = Json.getInt(batteryStatus, "status");
@@ -103,6 +116,8 @@ public class BatteryManager
             //
             // Reset all warning times.
             //
+
+            lastMessage = null;
 
             Simple.removeSharedPref("monitors.battery.lastremind");
             Simple.removeSharedPref("monitors.battery.lastwarn");
@@ -143,7 +158,8 @@ public class BatteryManager
 
             if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
             {
-                Speak.speak(Simple.getTrans(R.string.battery_manager_remind), 50);
+                lastMessage = Simple.getTrans(R.string.battery_manager_remind);
+                Speak.speak(lastMessage, 50);
                 Simple.setSharedPrefString("monitors.battery.lastremind", Simple.nowAsISO());
             }
         }
@@ -155,7 +171,8 @@ public class BatteryManager
 
             if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
             {
-                Speak.speak(Simple.getTrans(R.string.battery_manager_warn), 100);
+                lastMessage = Simple.getTrans(R.string.battery_manager_warn);
+                Speak.speak(lastMessage, 100);
                 Simple.setSharedPrefString("monitors.battery.lastwarn", Simple.nowAsISO());
             }
         }

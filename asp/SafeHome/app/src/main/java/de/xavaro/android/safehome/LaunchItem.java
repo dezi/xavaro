@@ -175,12 +175,14 @@ public class LaunchItem extends FrameLayout implements
         overlay.addView(overicon);
 
         overtext = new TextView(context);
+
         overtext.setLayoutParams(Simple.layoutParamsMM());
         overtext.setGravity(Gravity.CENTER);
         overtext.setTextSize(Simple.getDeviceTextSize(24f));
         overtext.setPadding(2, 0, 0, 4);
         overtext.setTextColor(Color.WHITE);
         overtext.setTypeface(null, Typeface.BOLD);
+
         overlay.addView(overtext);
 
         dimmer = new FrameLayout(context);
@@ -264,6 +266,13 @@ public class LaunchItem extends FrameLayout implements
 
         oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;
+
+        overtext.setTextSize(Simple.getDeviceTextSize(24f * scale));
+        overtext.setPadding(
+                Simple.getDevicePixels(Math.round(2 * scale)),
+                Simple.getDevicePixels(Math.round(0 * scale)),
+                Simple.getDevicePixels(Math.round(0 * scale)),
+                Simple.getDevicePixels(Math.round(4 * scale)));
 
         //
         // Nine patch background does not scale implicit

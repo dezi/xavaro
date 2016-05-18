@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
@@ -94,10 +95,6 @@ public class HomeNotify extends HomeFrame
 
         event2Frame = new HomeEvent(context, false);
         contentFrame.addView(event2Frame);
-
-        topFrame.setButtonText("Prepaid aufladen");
-        event1Frame.setButtonText("Blutdruck eingeben");
-        event2Frame.setButtonText("Gewicht eingeben");
     }
 
     public void setConfig(JSONObject config)
@@ -199,6 +196,29 @@ public class HomeNotify extends HomeFrame
         }
     }
 
+    protected void setupNotification(LaunchItem launchItem, HomeEvent eventFrame)
+    {
+        if (launchItem instanceof NotifyIntent.NotifiyService)
+        {
+            NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
+
+            if (intent != null)
+            {
+                eventFrame.setTitleText(intent.title);
+                eventFrame.setFollowButtonText(intent.followText);
+                eventFrame.setDeclineButtonText(intent.declineText);
+            }
+        }
+        else
+        {
+            eventFrame.setTitleText(null);
+            eventFrame.setFollowButtonText(null);
+            eventFrame.setDeclineButtonText(null);
+        }
+
+        eventFrame.addView(launchItem);
+    }
+
     protected void manageNotifications()
     {
         if (candidatesLaunch.size() == 0) return;
@@ -211,20 +231,20 @@ public class HomeNotify extends HomeFrame
         candidatesLaunch.add(topLaunch);
 
         topLaunch.setSize(tops, tops);
-        topFrame.addView(topLaunch);
+        setupNotification(topLaunch, topFrame);
 
         if (candidatesLaunch.size() > 1)
         {
             event1Launch = candidatesLaunch.get(1);
             event1Launch.setSize(size, size);
-            event1Frame.addView(event1Launch);
+            setupNotification(event1Launch, event1Frame);
         }
 
         if (candidatesLaunch.size() > 2)
         {
             event2Launch = candidatesLaunch.get(2);
             event2Launch.setSize(size, size);
-            event2Frame.addView(event2Launch);
+            setupNotification(event2Launch, event2Frame);
         }
     }
 

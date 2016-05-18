@@ -227,4 +227,21 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
     }
 
     //region Prepaid load dialog
+
+    private static String lastMessage;
+
+    public static String getPrepaidMessage()
+    {
+        if (lastMessage == null)
+        {
+            String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
+            int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+            String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
+
+            return "Ihr Guthaben beträgt" + " " + value;
+        }
+
+        return lastMessage;
+    }
+
 }

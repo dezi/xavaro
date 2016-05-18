@@ -8,10 +8,11 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebLib;
 
-public class LaunchItemBeta extends LaunchItem
+public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiyService
 {
     private final static String LOGTAG = LaunchItemBeta.class.getSimpleName();
 
@@ -46,6 +47,9 @@ public class LaunchItemBeta extends LaunchItem
         Simple.makePost(checkBeta);
     }
 
+    private String latestVersion;
+    private boolean actionDue;
+
     private final Runnable checkBeta = new Runnable()
     {
         @Override
@@ -61,13 +65,15 @@ public class LaunchItemBeta extends LaunchItem
 
                 if (betaapp != null)
                 {
-                    String latest = Json.getString(betaapp, "latest");
+                    latestVersion = Json.getString(betaapp, "latest");
 
-                    if ((latest != null) && (latest.compareTo(GlobalConfigs.BetaVersion) > 0))
+                    if ((latestVersion != null) && (latestVersion.compareTo(GlobalConfigs.BetaVersion) > 0))
                     {
                         overicon.setImageResource(R.drawable.circle_green_256x256);
                         overtext.setText(R.string.simple_new);
                         overlay.setVisibility(VISIBLE);
+
+                        actionDue = true;
                     }
                 }
             }
@@ -75,6 +81,29 @@ public class LaunchItemBeta extends LaunchItem
             Simple.makePost(checkBeta, 3600 * 1000);
         }
     };
+
+    @Override
+    public NotifyIntent onGetNotifiyIntent()
+    {
+        NotifyIntent intent = new NotifyIntent();
+
+        intent.actionDue = actionDue;
+
+        if (actionDue)
+        {
+            intent.title = "Es ist eine neue Version verfügbar.";
+            intent.declineText = "Morgen erinnern";
+            intent.followText = "Version installieren";
+        }
+        else
+        {
+            intent.title = "Sie haben bereits die aktuelle Version.";
+            intent.declineText = null;
+            intent.followText = null;
+        }
+
+        return intent;
+    }
 
     @Override
     protected void onMyClick()

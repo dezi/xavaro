@@ -12,7 +12,9 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.AssistanceMessage;
+import de.xavaro.android.common.BatteryManager;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PrepaidManager;
 import de.xavaro.android.common.ProcessManager;
@@ -20,7 +22,8 @@ import de.xavaro.android.common.Simple;
 
 public class LaunchItemCall extends LaunchItem implements
         PrepaidManager.PrepaidManagerBalanceCallback,
-        PrepaidManager.PrepaidManagerCashcodeCallback
+        PrepaidManager.PrepaidManagerCashcodeCallback,
+        NotifyIntent.NotifiyService
 {
     private final static String LOGTAG = LaunchItemCall.class.getSimpleName();
 
@@ -128,6 +131,24 @@ public class LaunchItemCall extends LaunchItem implements
             prepaidDateView.setPadding(0, devpad16, 0, 0);
             prepaidMoneyView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad36);
         }
+    }
+
+    @Override
+    public NotifyIntent onGetNotifiyIntent()
+    {
+        if (Json.equals(config, "subitem", "prepaid"))
+        {
+            NotifyIntent intent = new NotifyIntent();
+
+            intent.title = PrepaidManager.getPrepaidMessage();
+
+            intent.declineText = "Konto aufladen";
+            intent.followText = "Neu abfragen";
+
+            return intent;
+        }
+
+        return null;
     }
 
     public void onPrepaidReceived(int money, String date)

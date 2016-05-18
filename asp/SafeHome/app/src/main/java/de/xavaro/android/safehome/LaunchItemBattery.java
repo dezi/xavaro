@@ -9,9 +9,10 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.BatteryManager;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.Simple;
 
-public class LaunchItemBattery extends LaunchItem
+public class LaunchItemBattery extends LaunchItem implements NotifyIntent.NotifiyService
 {
     private final static String LOGTAG = LaunchItemBattery.class.getSimpleName();
 
@@ -46,6 +47,16 @@ public class LaunchItemBattery extends LaunchItem
         icon.setImageResource(R.drawable.battery_discon_0_600x600);
 
         postDelayed(updateBatteryPost, 1000);
+    }
+
+    @Override
+    public NotifyIntent onGetNotifiyIntent()
+    {
+        NotifyIntent intent = new NotifyIntent();
+
+        intent.title = BatteryManager.getBatteryMessage();
+
+        return intent;
     }
 
     @Override
