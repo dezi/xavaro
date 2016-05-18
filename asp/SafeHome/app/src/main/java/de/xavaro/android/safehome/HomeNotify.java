@@ -121,7 +121,6 @@ public class HomeNotify extends HomeFrame
                 LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, li);
 
                 launchItem.setFrameLess();
-                launchItem.setSize(140, 140);
 
                 candidatesLaunch.add(launchItem);
                 lis.remove(inx--);
@@ -134,7 +133,7 @@ public class HomeNotify extends HomeFrame
     {
         super.onAttachedToWindow();
 
-        Simple.makePost(manageNotificationsRun);
+        Simple.makePost(manageNotificationsRun, 1000);
     }
 
     @Override
@@ -172,11 +171,6 @@ public class HomeNotify extends HomeFrame
             topFrame.setLayoutHeight(height * 2);
             event1Frame.setLayoutHeight(height);
             event2Frame.setLayoutHeight(height);
-
-            for (LaunchItem launchItem : candidatesLaunch)
-            {
-                launchItem.setSize(height * 2, height * 2);
-            }
         }
     }
 
@@ -184,7 +178,10 @@ public class HomeNotify extends HomeFrame
     {
         if (candidatesLaunch.size() == 0) return;
 
+        int height = payloadFrame.getHeight() / 4;
+
         LaunchItem launchItem = candidatesLaunch.remove(0);
+        launchItem.setSize(height * 2, height * 2);
         candidatesLaunch.add(launchItem);
 
         topFrame.removeAllViews();

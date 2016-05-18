@@ -232,6 +232,8 @@ public class LaunchItem extends FrameLayout implements
         layout.width = width;
         layout.height = height;
 
+        setLayoutParams(layout);
+
         icon.setPadding(
                 Simple.getDevicePixels(Math.round(14 * scale)),
                 Simple.getDevicePixels(Math.round( 0 * scale)),

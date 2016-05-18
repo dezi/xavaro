@@ -142,7 +142,7 @@ public class ImageSmartView extends ImageView
 
         dstrect.set(left, top, left + width, top + height);
 
-        //Log.d(LOGTAG, "onMeasure: " + width + "x" + height);
+        Log.d(LOGTAG, "onMeasure: " + width + "x" + height);
 
         if (! reffed)
         {
