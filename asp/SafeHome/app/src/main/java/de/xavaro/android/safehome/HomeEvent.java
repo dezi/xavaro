@@ -22,9 +22,11 @@ public class HomeEvent extends FrameLayout
         this.istopevent = istopevent;
 
         layoutParams = new LinearLayout.LayoutParams(Simple.MP, 0);
+        layoutParams.leftMargin = this.istopevent ? Simple.getDevicePixels(32) : 0;
         setLayoutParams(layoutParams);
 
         followButton = new HomeButton(context, this.istopevent);
+        followButton.setVisibility(GONE);
 
         addView(followButton);
     }
@@ -46,5 +48,6 @@ public class HomeEvent extends FrameLayout
     public void setButtonText(String text)
     {
         followButton.setText(text);
+        followButton.setVisibility((text == null) ? GONE : VISIBLE);
     }
 }

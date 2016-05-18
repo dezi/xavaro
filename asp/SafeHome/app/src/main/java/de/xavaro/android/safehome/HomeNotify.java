@@ -170,12 +170,12 @@ public class HomeNotify extends HomeFrame
 
         if (isPortrait())
         {
-            size = (payloadFrame.getHeight() - ((padv + padv + 2) * 2)) / 5;
+            size = (payloadFrame.getHeight() - (padv + padv + 2) * 2) / 5;
             tops = size * 3 + size % 5;
         }
         else
         {
-            size = (payloadFrame.getHeight() - ((padv + padv + 2)  * 2)) / 4;
+            size = (payloadFrame.getHeight() - (padv + padv + 2) * 2) / 4;
             tops = size * 2 + size % 4;
         }
 
@@ -203,12 +203,28 @@ public class HomeNotify extends HomeFrame
         if (candidatesLaunch.size() == 0) return;
 
         if (topLaunch != null) Simple.removeFromParent(topLaunch);
+        if (event1Launch != null) Simple.removeFromParent(event1Launch);
+        if (event2Launch != null) Simple.removeFromParent(event2Launch);
 
         topLaunch = candidatesLaunch.remove(0);
-        topLaunch.setSize(tops, tops);
         candidatesLaunch.add(topLaunch);
 
+        topLaunch.setSize(tops, tops);
         topFrame.addView(topLaunch);
+
+        if (candidatesLaunch.size() > 1)
+        {
+            event1Launch = candidatesLaunch.get(1);
+            event1Launch.setSize(size, size);
+            event1Frame.addView(event1Launch);
+        }
+
+        if (candidatesLaunch.size() > 2)
+        {
+            event2Launch = candidatesLaunch.get(2);
+            event2Launch.setSize(size, size);
+            event2Frame.addView(event2Launch);
+        }
     }
 
     protected final Runnable manageNotificationsRun = new Runnable()
