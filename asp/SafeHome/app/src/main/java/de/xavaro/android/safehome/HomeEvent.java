@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.view.Gravity;
 import android.widget.FrameLayout;
@@ -57,6 +58,16 @@ public class HomeEvent extends FrameLayout
         }
     }
 
+    protected boolean isPortrait()
+    {
+        return (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    protected boolean isLandscape()
+    {
+        return (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE);
+    }
+
     public void setLayoutHeight(int height)
     {
         if (layoutParams.height != height)
@@ -68,7 +79,7 @@ public class HomeEvent extends FrameLayout
             {
                 titleParams.height = height / 3;
 
-                titleParams.topMargin = height / 10;
+                titleParams.topMargin = isPortrait() ? height / 10 : 0;
                 titleParams.leftMargin = height + height / 10;
                 titleParams.rightMargin = height / 8;
             }

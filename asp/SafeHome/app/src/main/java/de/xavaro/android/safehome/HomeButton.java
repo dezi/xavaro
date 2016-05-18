@@ -13,7 +13,7 @@ public class HomeButton extends TextView
     private static final String LOGTAG = HomeButton.class.getSimpleName();
 
     public static int buttonWidth = Simple.getDevicePixels(220);
-    public static int buttonHeight = Simple.getDevicePixels(45);
+    public static int buttonHeight = Simple.getDevicePixels(42);
 
     private boolean istopevent;
 
