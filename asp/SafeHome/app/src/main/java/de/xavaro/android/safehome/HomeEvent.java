@@ -22,7 +22,7 @@ public class HomeEvent extends FrameLayout
         this.istopevent = istopevent;
 
         layoutParams = new LinearLayout.LayoutParams(Simple.MP, 0);
-        layoutParams.leftMargin = this.istopevent ? Simple.getDevicePixels(32) : 0;
+        layoutParams.leftMargin = this.istopevent ? 0 : Simple.getDevicePixels(12);
         setLayoutParams(layoutParams);
 
         followButton = new HomeButton(context, this.istopevent);

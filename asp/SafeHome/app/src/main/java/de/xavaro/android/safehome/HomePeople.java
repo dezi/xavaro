@@ -54,7 +54,7 @@ public class HomePeople extends FrameLayout
         if (alertConfig != null)
         {
             alertLaunchItem = LaunchItem.createLaunchItem(context, null, alertConfig);
-            alertLaunchItem.setFrameLess();
+            alertLaunchItem.setFrameLess(true);
             this.addView(alertLaunchItem);
         }
 
@@ -63,7 +63,7 @@ public class HomePeople extends FrameLayout
         if (voiceConfig != null)
         {
             voiceLaunchItem = LaunchItem.createLaunchItem(context, null, voiceConfig);
-            voiceLaunchItem.setFrameLess();
+            voiceLaunchItem.setFrameLess(true);
             this.addView(voiceLaunchItem);
         }
 
@@ -110,7 +110,7 @@ public class HomePeople extends FrameLayout
 
             final LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, contact);
 
-            launchItem.setFrameLess();
+            launchItem.setFrameLess(true);
             launchItem.setSize(peopleSize, peopleSize);
 
             peopleView.addView(launchItem);

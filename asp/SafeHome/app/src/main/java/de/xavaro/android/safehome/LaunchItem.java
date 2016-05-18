@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.view.Gravity;
@@ -107,6 +106,7 @@ public class LaunchItem extends FrameLayout implements
 
     protected LayoutParams layout;
     protected LayoutParams oversize;
+    protected boolean textless;
     protected int textsize;
     protected int padding;
 
@@ -216,9 +216,23 @@ public class LaunchItem extends FrameLayout implements
         });
     }
 
-    public void setFrameLess()
+    public void setFrameLess(boolean yesno)
     {
-        setBackground(null);
+        if (yesno)
+        {
+            setBackground(null);
+        }
+    }
+
+    public void setTextLess(boolean yesno)
+    {
+        textless = yesno;
+
+        if (textless)
+        {
+            icon.setPadding(0, 0, 0, 0);
+            label.setVisibility(GONE);
+        }
     }
 
     public void setSize(int width, int height)
@@ -234,11 +248,19 @@ public class LaunchItem extends FrameLayout implements
 
         setLayoutParams(layout);
 
-        icon.setPadding(
-                Simple.getDevicePixels(Math.round(14 * scale)),
-                Simple.getDevicePixels(Math.round( 0 * scale)),
-                Simple.getDevicePixels(Math.round(14 * scale)),
-                Simple.getDevicePixels(Math.round(28 * scale)));
+        if (textless)
+        {
+            icon.setPadding(0, 0, 0, 0);
+            label.setVisibility(GONE);
+        }
+        else
+        {
+            icon.setPadding(
+                    Simple.getDevicePixels(Math.round(14 * scale)),
+                    Simple.getDevicePixels(Math.round(0 * scale)),
+                    Simple.getDevicePixels(Math.round(14 * scale)),
+                    Simple.getDevicePixels(Math.round(28 * scale)));
+        }
 
         oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;

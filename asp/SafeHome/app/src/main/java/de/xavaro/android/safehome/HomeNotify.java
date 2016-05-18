@@ -129,7 +129,8 @@ public class HomeNotify extends HomeFrame
                     (Simple.equals(type, "calls") && Simple.equals(subitem, "prepaid")))
             {
                 LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, li);
-                launchItem.setFrameLess();
+                launchItem.setFrameLess(true);
+                launchItem.setTextLess(true);
                 candidatesLaunch.add(launchItem);
                 lis.remove(inx--);
             }
@@ -170,8 +171,8 @@ public class HomeNotify extends HomeFrame
 
         if (isPortrait())
         {
-            size = (payloadFrame.getHeight() - (padv + padv + 2) * 2) / 5;
-            tops = size * 3 + size % 5;
+            size = (payloadFrame.getHeight() - (padv + padv + 2) * 2) / 4;
+            tops = size * 2 + size % 4;
         }
         else
         {
