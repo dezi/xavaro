@@ -1,7 +1,6 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.util.Log;
@@ -13,22 +12,19 @@ public class HomeEvent extends FrameLayout
     private static final String LOGTAG = HomeEvent.class.getSimpleName();
 
     private LinearLayout.LayoutParams layoutParams;
-    private FrameLayout.LayoutParams followParams;
     private HomeButton followButton;
+    private boolean istopevent;
 
-    public HomeEvent(Context context)
+    public HomeEvent(Context context, boolean istopevent)
     {
         super(context);
 
+        this.istopevent = istopevent;
+
         layoutParams = new LinearLayout.LayoutParams(Simple.MP, 0);
         setLayoutParams(layoutParams);
-        setPadding(0, 0, Simple.getDevicePixels(16), 0);
 
-        followParams = new FrameLayout.LayoutParams(200, 40, Gravity.END + Gravity.CENTER_VERTICAL);
-        followButton = new HomeButton(context);
-        followButton.setLayoutParams(followParams);
-        followButton.setGravity(Gravity.CENTER_VERTICAL + Gravity.CENTER_HORIZONTAL);
-        followButton.setText("Ja doch");
+        followButton = new HomeButton(context, this.istopevent);
 
         addView(followButton);
     }
@@ -45,5 +41,10 @@ public class HomeEvent extends FrameLayout
     public int getLayoutHeight()
     {
         return layoutParams.height;
+    }
+
+    public void setButtonText(String text)
+    {
+        followButton.setText(text);
     }
 }

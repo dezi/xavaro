@@ -33,6 +33,8 @@ public class HomeNotify extends HomeFrame
 
     protected int padh = Simple.getDevicePixels(16);
     protected int padv = Simple.getDevicePixels(4);
+    protected int size;
+    protected int tops;
 
     protected final ArrayList<LaunchItem> candidatesLaunch = new ArrayList<>();
 
@@ -66,7 +68,7 @@ public class HomeNotify extends HomeFrame
         contentFrame.setOrientation(LinearLayout.VERTICAL);
         payloadFrame.addView(contentFrame);
 
-        topFrame = new HomeEvent(context);
+        topFrame = new HomeEvent(context, true);
         contentFrame.addView(topFrame);
 
         barFrame = new FrameLayout(context);
@@ -78,7 +80,7 @@ public class HomeNotify extends HomeFrame
         barFrame.addView(barRuler);
         contentFrame.addView(barFrame);
 
-        event1Frame = new HomeEvent(context);
+        event1Frame = new HomeEvent(context, false);
         contentFrame.addView(event1Frame);
 
         barFrame = new FrameLayout(context);
@@ -90,8 +92,12 @@ public class HomeNotify extends HomeFrame
         barFrame.addView(barRuler);
         contentFrame.addView(barFrame);
 
-        event2Frame = new HomeEvent(context);
+        event2Frame = new HomeEvent(context, false);
         contentFrame.addView(event2Frame);
+
+        topFrame.setButtonText("Prepaid aufladen");
+        event1Frame.setButtonText("Blutdruck eingeben");
+        event2Frame.setButtonText("Gewicht eingeben");
     }
 
     public void setConfig(JSONObject config)
@@ -162,7 +168,16 @@ public class HomeNotify extends HomeFrame
         // Get current height minus rulers.
         //
 
-        int size = (payloadFrame.getHeight() + ((padv + padv + 2)  * 2)) / 4;
+        if (isPortrait())
+        {
+            size = (payloadFrame.getHeight() - ((padv + padv + 2) * 2)) / 5;
+            tops = size * 3 + size % 5;
+        }
+        else
+        {
+            size = (payloadFrame.getHeight() - ((padv + padv + 2)  * 2)) / 4;
+            tops = size * 2 + size % 4;
+        }
 
         //
         // Important: Only set dimensions if different from
@@ -170,10 +185,10 @@ public class HomeNotify extends HomeFrame
         // resize events if not.
         //
 
-        if (topFrame.getLayoutHeight() != (size * 2))
+        if (topFrame.getLayoutHeight() != tops)
         {
-            topFrame.setLayoutHeight(size * 2);
-            if (topLaunch != null) topLaunch.setSize(size * 2, size * 2);
+            topFrame.setLayoutHeight(tops);
+            if (topLaunch != null) topLaunch.setSize(tops, tops);
 
             event1Frame.setLayoutHeight(size);
             if (event1Launch != null) event1Launch.setSize(size, size);
@@ -187,12 +202,10 @@ public class HomeNotify extends HomeFrame
     {
         if (candidatesLaunch.size() == 0) return;
 
-        int size = payloadFrame.getHeight() / 4;
-
         if (topLaunch != null) Simple.removeFromParent(topLaunch);
 
         topLaunch = candidatesLaunch.remove(0);
-        topLaunch.setSize(size * 2, size * 2);
+        topLaunch.setSize(tops, tops);
         candidatesLaunch.add(topLaunch);
 
         topFrame.addView(topLaunch);
