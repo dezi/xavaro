@@ -79,12 +79,20 @@ public class ImageSmartView extends ImageView
     @Override
     public void setPadding(int left, int top, int right, int bottom)
     {
+        if (reffed)
+        {
+            ImageSmartCache.releaseImage(restag, width, height, circle);
+            reffed = false;
+        }
+
         super.setPadding(left, top, right, bottom);
 
         this.left = left;
         this.top = top;
         this.right = right;
         this.bottom = bottom;
+
+        requestLayout();
     }
 
     @Override
@@ -137,12 +145,28 @@ public class ImageSmartView extends ImageView
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        width = MeasureSpec.getSize(widthMeasureSpec) - left - right;
-        height = MeasureSpec.getSize(heightMeasureSpec) - top - bottom;
+        int newwidth = MeasureSpec.getSize(widthMeasureSpec) - left - right;
+        int newheight = MeasureSpec.getSize(heightMeasureSpec) - top - bottom;
+
+        if ((newwidth != width) || (newheight != height))
+        {
+            if (reffed)
+            {
+                ImageSmartCache.releaseImage(restag, width, height, circle);
+                reffed = false;
+            }
+        }
+
+        width = newwidth;
+        height = newheight;
 
         dstrect.set(left, top, left + width, top + height);
 
-        Log.d(LOGTAG, "onMeasure: " + width + "x" + height);
+        Log.d(LOGTAG, "onMeasure: "
+                + width + "x" + height + ":"
+                + left + ":" + top + ":"
+                + right + ":" + bottom
+                + "=" + this.restag);
 
         if (! reffed)
         {

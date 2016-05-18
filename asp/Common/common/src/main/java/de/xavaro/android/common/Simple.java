@@ -680,12 +680,12 @@ public class Simple
         return anyContext.getResources().getDisplayMetrics().density;
     }
 
-    public static GradientDrawable getRoundedBorders()
+    public static GradientDrawable getRoundedBorders(int radius, int color, int stroke)
     {
         GradientDrawable gd = new GradientDrawable();
-        gd.setCornerRadius(16);
-        gd.setColor(0xffffffff);
-        gd.setStroke(2, 0xffcccccc);
+        gd.setCornerRadius(radius);
+        gd.setColor(color);
+        gd.setStroke(2, stroke);
 
         return gd;
     }

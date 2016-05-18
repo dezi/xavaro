@@ -3,10 +3,10 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +26,13 @@ public class HomeNotify extends HomeFrame
     protected HomeEvent topFrame;
     protected HomeEvent event1Frame;
     protected HomeEvent event2Frame;
+
+    protected LaunchItem topLaunch;
+    protected LaunchItem event1Launch;
+    protected LaunchItem event2Launch;
+
+    protected int padh = Simple.getDevicePixels(16);
+    protected int padv = Simple.getDevicePixels(4);
 
     protected final ArrayList<LaunchItem> candidatesLaunch = new ArrayList<>();
 
@@ -49,9 +56,6 @@ public class HomeNotify extends HomeFrame
         //
 
         setDisablefullscreen();
-
-        int padh = Simple.getDevicePixels(16);
-        int padv = Simple.getDevicePixels(4);
 
         LayoutParams barFrameLayout = new LayoutParams(Simple.MP, Simple.WC);
         LayoutParams barRulerLayout = new LayoutParams(Simple.MP, Simple.getDevicePixels(2));
@@ -119,9 +123,7 @@ public class HomeNotify extends HomeFrame
                     (Simple.equals(type, "calls") && Simple.equals(subitem, "prepaid")))
             {
                 LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, li);
-
                 launchItem.setFrameLess();
-
                 candidatesLaunch.add(launchItem);
                 lis.remove(inx--);
             }
@@ -156,9 +158,11 @@ public class HomeNotify extends HomeFrame
             layoutParams.rightMargin = layoutNormal.rightMargin;
         }
 
-        int height = payloadFrame.getHeight() / 4;
+        //
+        // Get current height minus rulers.
+        //
 
-        Log.d(LOGTAG, "========================> " + payloadFrame.getHeight() + "x" + payloadFrame.getWidth());
+        int size = (payloadFrame.getHeight() + ((padv + padv + 2)  * 2)) / 4;
 
         //
         // Important: Only set dimensions if different from
@@ -166,11 +170,16 @@ public class HomeNotify extends HomeFrame
         // resize events if not.
         //
 
-        if (topFrame.getLayoutHeight() != (height * 2))
+        if (topFrame.getLayoutHeight() != (size * 2))
         {
-            topFrame.setLayoutHeight(height * 2);
-            event1Frame.setLayoutHeight(height);
-            event2Frame.setLayoutHeight(height);
+            topFrame.setLayoutHeight(size * 2);
+            if (topLaunch != null) topLaunch.setSize(size * 2, size * 2);
+
+            event1Frame.setLayoutHeight(size);
+            if (event1Launch != null) event1Launch.setSize(size, size);
+
+            event2Frame.setLayoutHeight(size);
+            if (event2Launch != null) event2Launch.setSize(size, size);
         }
     }
 
@@ -178,14 +187,15 @@ public class HomeNotify extends HomeFrame
     {
         if (candidatesLaunch.size() == 0) return;
 
-        int height = payloadFrame.getHeight() / 4;
+        int size = payloadFrame.getHeight() / 4;
 
-        LaunchItem launchItem = candidatesLaunch.remove(0);
-        launchItem.setSize(height * 2, height * 2);
-        candidatesLaunch.add(launchItem);
+        if (topLaunch != null) Simple.removeFromParent(topLaunch);
 
-        topFrame.removeAllViews();
-        topFrame.addView(launchItem);
+        topLaunch = candidatesLaunch.remove(0);
+        topLaunch.setSize(size * 2, size * 2);
+        candidatesLaunch.add(topLaunch);
+
+        topFrame.addView(topLaunch);
     }
 
     protected final Runnable manageNotificationsRun = new Runnable()

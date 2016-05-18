@@ -78,7 +78,7 @@ public abstract class HomeFrame extends FrameLayout
 
         innerFrame = new FrameLayout(context);
         innerFrame.setLayoutParams(innerLayout);
-        innerFrame.setBackground(Simple.getRoundedBorders());
+        innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
         innerFrame.setPadding(8, 8, 8, 8);
         addView(innerFrame);
 
@@ -265,7 +265,7 @@ public abstract class HomeFrame extends FrameLayout
 
                 innerClick.setVisibility(VISIBLE);
                 innerFrame.setBackgroundColor(Color.TRANSPARENT);
-                innerFrame.setBackground(Simple.getRoundedBorders());
+                innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
                 innerFrame.setPadding(8, 8, 8, 8);
 
                 fullscreen = false;
