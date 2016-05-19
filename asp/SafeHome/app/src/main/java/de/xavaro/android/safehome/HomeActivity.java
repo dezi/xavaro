@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
@@ -14,19 +13,24 @@ import android.widget.FrameLayout;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Speak;
+import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
+import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
+import de.xavaro.android.common.WebAppCache;
 import de.xavaro.android.common.WebCookie;
 
 public class HomeActivity extends AppCompatActivity implements
@@ -45,41 +49,35 @@ public class HomeActivity extends AppCompatActivity implements
         return instance;
     }
 
-    private JSONObject config;
-    private FrameLayout topscreen;
+    private FrameLayout topScreen;
     private FrameLayout videoSurface;
+    private FrameLayout launchFrame;
+
+    private HomeNotify notifyScreen;
+    private HomeLaunch launchScreen;
+    private HomePeople peopleScreen;
+    private HomeSocial socialScreen;
+    
     private LaunchGroupRoot launchGroup;
+    private JSONObject launchConfig;
 
     private boolean wasPaused = false;
     private boolean lostFocus = true;
 
     private final Handler handler = new Handler();
 
-    private static final int UI_HIDE = 0
-            | View.SYSTEM_UI_FLAG_FULLSCREEN
+    private static final int UI_HIDE = View.SYSTEM_UI_FLAG_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
         instance = this;
-
-        topscreen = (FrameLayout) findViewById(R.id.top_screen);
-        topscreen.setSystemUiVisibility(UI_HIDE);
-
-        ArchievementManager.reset("alertcall.shortclick");
-
-        startService(new Intent(this, KioskService.class));
-        startService(new Intent(this, CommService.class));
-        startService(new Intent(this, OopsService.class));
-
-        startService(new Intent(this, GCMRegistrationService.class));
 
         //
         // Allow cross fuck domain HTTP shit.
@@ -93,6 +91,48 @@ public class HomeActivity extends AppCompatActivity implements
         //
 
         WebCookie.initCookies();
+
+        //
+        // Check version of web app cache.
+        //
+
+        WebAppCache.checkWebAppCache();
+
+        //
+        // Build views.
+        //
+
+        topScreen = new FrameLayout(this);
+        topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
+        topScreen.setBackgroundColor(0xfffbfbfb);
+        setContentView(topScreen);
+
+        int personsize = Simple.getDevicePixels(160);
+        int peoplesize = Simple.getDevicePixels(200);
+
+        notifyScreen = new HomeNotify(this);
+        topScreen.addView(notifyScreen);
+
+        launchScreen = new HomeLaunch(this);
+        topScreen.addView(launchScreen);
+
+        socialScreen = new HomeSocial(this);
+        topScreen.addView(socialScreen);
+
+        peopleScreen = new HomePeople(this);
+        peopleScreen.setSize(peoplesize, personsize);
+        topScreen.addView(peopleScreen);
+
+        launchFrame = launchScreen.getPayloadFrame();
+
+        ArchievementManager.reset("alertcall.shortclick");
+
+        startService(new Intent(this, KioskService.class));
+        startService(new Intent(this, CommService.class));
+        startService(new Intent(this, OopsService.class));
+
+        startService(new Intent(this, GCMRegistrationService.class));
+        startService(new Intent(this, AccessibilityService.class));
     }
 
     @Override
@@ -101,7 +141,25 @@ public class HomeActivity extends AppCompatActivity implements
         super.onPostCreate(savedInstanceState);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        topscreen.setOnSystemUiVisibilityChangeListener(this);
+        topScreen.setOnSystemUiVisibilityChangeListener(this);
+
+        socialScreen.setTitle("Neuigkeiten");
+        socialScreen.setConfig(null);
+
+        launchScreen.setTitle("Mein Safehome");
+        launchScreen.setConfig(null);
+
+        //
+        // Debug update external contacts.
+        //
+
+        File contacts = new File(Simple.getExternalFilesDir(), "contacts.json");
+        Simple.putFileContent(contacts, Json.toPretty(ContactsHandler.getJSONData(this)));
+
+        if (! AccessibilityService.checkEnabled())
+        {
+            Simple.makeAlert("Accessibility Service not enabled.");
+        }
     }
 
     private final Runnable makeFullscreen = new Runnable()
@@ -115,7 +173,7 @@ public class HomeActivity extends AppCompatActivity implements
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
 
-            topscreen.setSystemUiVisibility(UI_HIDE);
+            topScreen.setSystemUiVisibility(UI_HIDE);
         }
     };
 
@@ -137,18 +195,28 @@ public class HomeActivity extends AppCompatActivity implements
 
         Log.d(LOGTAG, "onStart...");
 
-        if ((launchGroup == null) || CommonStatic.settingschanged)
+        if ((launchConfig == null) || CommonStatic.settingschanged)
         {
             if (launchGroup != null)
             {
-                topscreen.removeAllViews();
+                launchFrame.removeAllViews();
                 backStack.clear();
                 launchGroup = null;
+
+                System.gc();
             }
 
+            launchConfig = LaunchGroupRoot.getConfig();
             launchGroup = new LaunchGroupRoot(this);
-            launchGroup.setConfig(null, LaunchGroupRoot.getConfig());
-            topscreen.addView(launchGroup);
+
+            notifyScreen.setConfig(launchConfig);
+            peopleScreen.setConfig(launchConfig);
+
+            launchGroup.setConfig(null, launchConfig);
+
+            launchFrame.addView(launchGroup);
+
+            CommonStatic.settingschanged = false;
         }
 
         DitUndDat.InternetState.subscribe(this);
@@ -186,7 +254,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
 
         if (wasPaused && ! lostFocus)
         {
@@ -197,7 +265,7 @@ public class HomeActivity extends AppCompatActivity implements
             while (backStack.size() > 0)
             {
                 Object lastview = backStack.remove(backStack.size() - 1);
-                topscreen.removeView((FrameLayout) lastview);
+                launchFrame.removeView((FrameLayout) lastview);
             }
         }
 
@@ -222,6 +290,8 @@ public class HomeActivity extends AppCompatActivity implements
         super.onStop();
 
         DitUndDat.InternetState.unsubscribe(this);
+
+        Speak.shutdown();
     }
 
     @Override
@@ -260,16 +330,16 @@ public class HomeActivity extends AppCompatActivity implements
     // serveral times or return to android system.
     //
 
-    private long backPressedTime = 0;
-    private int backPressedCount = 0;
+    private long backPressedTime;
+    private int backPressedCount;
 
-    private ArrayList backStack = new ArrayList();
+    private ArrayList<Object> backStack = new ArrayList<>();
 
     public void addViewToBackStack(Object view)
     {
         if (((ViewGroup) view).getParent() == null)
         {
-            topscreen.addView((FrameLayout) view);
+            launchFrame.addView((FrameLayout) view);
             backStack.add(view);
 
             if (videoSurface != null) videoSurface.bringToFront();
@@ -278,23 +348,23 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void addView(Object view, ViewGroup.LayoutParams params)
     {
-        topscreen.addView((FrameLayout) view, params);
+        launchFrame.addView((FrameLayout) view, params);
     }
 
     public void addVideoSurface(FrameLayout video)
     {
         if (videoSurface == null)
         {
-            topscreen.addView(video);
+            topScreen.addView(video);
             videoSurface = video;
         }
     }
 
     public void removeVideoSurface()
     {
-        if ((videoSurface != null) &&  (videoSurface.getParent() == topscreen))
+        if ((videoSurface != null) &&  (videoSurface.getParent() == topScreen))
         {
-            topscreen.removeView(videoSurface);
+            topScreen.removeView(videoSurface);
             videoSurface = null;
         }
     }
@@ -310,7 +380,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void executeOnBackPressed()
     {
-        if (! DefaultApps.isDefaultHome(this))
+        if (! DefaultApps.isDefaultHome())
         {
             //
             // Finally release user to system.
@@ -329,7 +399,7 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 Object lastview = backStack.get(backStack.size() - 1);
 
-                topscreen.removeView((FrameLayout) lastview);
+                launchFrame.removeView((FrameLayout) lastview);
                 backStack.remove(backStack.size() - 1);
 
                 if (lastview instanceof LaunchFrame)
@@ -355,7 +425,7 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
-                    topscreen.removeView((FrameLayout) lastview);
+                    launchFrame.removeView((FrameLayout) lastview);
                     backStack.remove(backStack.size() - 1);
 
                     ((BackKeyClient) lastview).onBackKeyExecuted();
@@ -363,7 +433,7 @@ public class HomeActivity extends AppCompatActivity implements
             }
             else
             {
-                topscreen.removeView((FrameLayout) lastview);
+                launchFrame.removeView((FrameLayout) lastview);
                 backStack.remove(backStack.size() - 1);
             }
 
@@ -409,18 +479,6 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         Log.d(LOGTAG,"onActivityResult: request:" + requestCode + " result:" + resultCode);
-
-        if (requestCode == 1)
-        {
-            if (resultCode == Activity.RESULT_OK)
-            {
-                String result = data.getStringExtra("result");
-            }
-
-            if (resultCode == Activity.RESULT_CANCELED)
-            {
-            }
-        }
     }
 
     @Override

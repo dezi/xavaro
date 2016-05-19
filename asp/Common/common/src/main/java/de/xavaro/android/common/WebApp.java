@@ -24,15 +24,8 @@ public class WebApp
     {
         String httpserver = CommonConfigs.WebappsServerName;
         String httpport = "" + CommonConfigs.WebappsServerPort;
-        String wifiname = Simple.getWifiName();
 
-        if (Simple.getSharedPrefBoolean("developer.webapps.httpbypass." + wifiname))
-        {
-            httpserver = Simple.getSharedPrefString("developer.webapps.httpserver." + wifiname);
-            httpport = Simple.getSharedPrefString("developer.webapps.httpport." + wifiname);
-        }
-
-        if ((httpport == null) || httpport.equals("80"))
+        if (httpport.equals("80"))
         {
             return "http://" + httpserver;
         }
@@ -108,12 +101,28 @@ public class WebApp
 
 
     @Nullable
-    public static Drawable getAppIcon(String webappname)
+    public static byte[] getAppIconData(String webappname)
     {
         String appiconpng = Json.getString(getManifest(webappname), "appicon");
+        if (appiconpng == null) return null;
+
         String appiconsrc = getHTTPAppRoot(webappname) + appiconpng;
 
-        return getImage(webappname, appiconsrc);
+        int interval = getWebAppInterval();
+
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, appiconsrc, interval);
+
+        return wcr.content;
+    }
+
+    @Nullable
+    public static Drawable getAppIcon(String webappname)
+    {
+        byte[] imgdata = getAppIconData(webappname);
+        if (imgdata == null) return null;
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imgdata, 0, imgdata.length);
+        return new BitmapDrawable(Simple.getResources(), bitmap);
     }
 
     public static ArrayList<String> getPermissions(String webappname)
@@ -133,28 +142,18 @@ public class WebApp
         return list;
     }
 
-    @Nullable
-    private static Drawable getImage(String webappname, String src)
+    public static int getWebAppInterval()
     {
+        boolean devel = Simple.getSharedPrefBoolean("developer.enable");
         String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
 
-        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
-
-        if (wcr.content != null)
-        {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(wcr.content, 0, wcr.content.length);
-            return new BitmapDrawable(Simple.getResources(), bitmap);
-        }
-
-        return null;
+        return (devel && Simple.getSharedPrefBoolean(bypass)) ? 0 : 24;
     }
 
     @Nullable
     private static String getStringContent(String webappname, String src)
     {
-        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+        int interval = getWebAppInterval();
 
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
 

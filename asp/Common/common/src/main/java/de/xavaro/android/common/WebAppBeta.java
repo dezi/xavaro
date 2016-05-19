@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.FileOutputStream;
@@ -86,6 +88,8 @@ public class WebAppBeta
     {
         try
         {
+            WebAppCache.nukeWebAppCache();
+
             String localname = Simple.getPackageName() + ".apk";
             File localfile = new File(Simple.getCacheDir(), localname);
 

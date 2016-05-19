@@ -2,22 +2,18 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.widget.ImageView;
+import android.net.Uri;
 import android.util.Log;
 
-import org.json.JSONObject;
+import java.io.File;
 
-import de.xavaro.android.common.CommService;
-import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
-import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.StaticUtils;
-import de.xavaro.android.common.SystemIdentity;
+import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.OopsService;
+import de.xavaro.android.common.ProcessManager;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.VoiceIntent;
 
 public class LaunchItemComm extends LaunchItem
@@ -39,13 +35,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("phonenumber"))
             {
                 String phone = Json.getString(config, "phonenumber");
-                Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
+                File profile = ProfileImages.getProfileFile(phone);
 
-                if (thumbnail != null)
+                if (profile != null)
                 {
-                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
@@ -71,13 +65,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("skypename"))
             {
                 String skypename = Json.getString(config, "skypename");
-                Bitmap thumbnail = ProfileImages.getSkypeProfileBitmap(context, skypename);
+                File profile = ProfileImages.getProfileFile(skypename);
 
-                if (thumbnail != null)
+                if (profile != null)
                 {
-                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
@@ -107,13 +99,11 @@ public class LaunchItemComm extends LaunchItem
             if (config.has("waphonenumber"))
             {
                 String phone = Json.getString(config, "waphonenumber");
-                Bitmap thumbnail = ProfileImages.getWhatsAppProfileBitmap(context, phone);
+                File profile = ProfileImages.getProfileFile(phone);
 
-                if (thumbnail != null)
+                if (profile != null)
                 {
-                    thumbnail = StaticUtils.getCircleBitmap(thumbnail);
-
-                    icon.setImageDrawable(new BitmapDrawable(context.getResources(), thumbnail));
+                    icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
@@ -132,33 +122,6 @@ public class LaunchItemComm extends LaunchItem
             }
         }
 
-        if (type.equals("xavaro"))
-        {
-            if (config.has("subtype"))
-            {
-                if (Json.equals(config, "chattype", "user"))
-                {
-                    icon.setImageResource(GlobalConfigs.IconResCommChatUser);
-                }
-
-                if (Json.equals(config, "chattype", "group"))
-                {
-                    if (Json.equals(config, "grouptype", "alertcall"))
-                    {
-                        icon.setImageResource(GlobalConfigs.IconResCommChatAlert);
-                    }
-                    else
-                    {
-                        icon.setImageResource(GlobalConfigs.IconResCommChatGroup);
-                    }
-                }
-            }
-            else
-            {
-                icon.setImageResource(GlobalConfigs.IconResCommunication);
-            }
-        }
-
         if (type.equals("contacts"))
         {
             icon.setImageResource(GlobalConfigs.IconResContacts);
@@ -168,19 +131,10 @@ public class LaunchItemComm extends LaunchItem
     }
 
     @Override
-    protected boolean onMyLongClick()
-    {
-        if (type.equals("xavaro")) launchXavaroLong();
-
-        return true;
-    }
-
-    @Override
     protected void onMyClick()
     {
         if (type.equals("phone"   )) launchPhone();
         if (type.equals("skype"   )) launchSkype();
-        if (type.equals("xavaro"  )) launchXavaro();
         if (type.equals("whatsapp")) launchWhatsApp();
         if (type.equals("contacts")) launchContacts();
     }
@@ -192,7 +146,6 @@ public class LaunchItemComm extends LaunchItem
         {
             if (type.equals("phone"   )) launchPhone();
             if (type.equals("skype"   )) launchSkype();
-            if (type.equals("xavaro"  )) launchXavaro();
             if (type.equals("whatsapp")) launchWhatsApp();
             if (type.equals("contacts")) launchContacts();
 
@@ -217,7 +170,8 @@ public class LaunchItemComm extends LaunchItem
                     Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
                     sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     sendIntent.setPackage("com.android.mms");
-                    context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                    ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
                 }
 
                 if (subtype.equals("voip"))
@@ -226,7 +180,8 @@ public class LaunchItemComm extends LaunchItem
                     Intent sendIntent = new Intent(Intent.ACTION_CALL, uri);
                     sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     sendIntent.setPackage("com.android.server.telecom");
-                    context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                    ProcessManager.launchIntent(Intent.createChooser(sendIntent, ""));
                 }
             }
             catch (Exception ex)
@@ -275,7 +230,8 @@ public class LaunchItemComm extends LaunchItem
                 Intent skype = new Intent(Intent.ACTION_VIEW);
                 skype.setData(uri);
                 skype.setPackage("com.skype.raider");
-                context.startActivity(skype);
+
+                ProcessManager.launchIntent(skype);
             }
             catch (Exception ex)
             {
@@ -305,7 +261,8 @@ public class LaunchItemComm extends LaunchItem
                 Intent sendIntent = new Intent(Intent.ACTION_SENDTO, uri);
                 sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 sendIntent.setPackage("com.whatsapp");
-                context.startActivity(Intent.createChooser(sendIntent, ""));
+
+                ProcessManager.launchIntent(sendIntent);
             }
             catch (Exception ex)
             {
@@ -322,75 +279,6 @@ public class LaunchItemComm extends LaunchItem
         }
 
         ((HomeActivity) context).addViewToBackStack(directory);
-    }
-
-    private void launchXavaro()
-    {
-        if (config.has("identity"))
-        {
-            try
-            {
-                String ident = Json.getString(config, "identity");
-
-                if (subtype.equals("chat"))
-                {
-                    Intent intent = new Intent(context, ChatActivity.class);
-                    intent.putExtra("idremote", ident);
-                    context.startActivity(intent);
-                }
-            }
-            catch (Exception ex)
-            {
-                OopsService.log(LOGTAG, ex);
-            }
-
-            return;
-        }
-
-        if (directory == null)
-        {
-            directory = new LaunchGroupComm.XavaroGroup(context);
-            directory.setConfig(this, Json.getArray(config, "launchitems"));
-        }
-
-        ((HomeActivity) context).addViewToBackStack(directory);
-    }
-
-    private boolean launchXavaroLong()
-    {
-        if (config.has("grouptype"))
-        {
-            if (Json.equals(config, "grouptype", "alertcall"))
-            {
-                //
-                // Check if user is allowed to initiate a
-                // skype call back from the remote side.
-                //
-
-                String groupidentity = Json.getString(config, "identity");
-                String identity = SystemIdentity.getIdentity();
-                String skypecallback = RemoteGroups.getSkypeCallback(groupidentity, identity);
-
-                if (skypecallback != null)
-                {
-                    String groupowner = RemoteGroups.getGroupOwner(groupidentity);
-
-                    JSONObject skypecall = new JSONObject();
-
-                    Json.put(skypecall, "type", "skypeCallback");
-                    Json.put(skypecall, "idremote", groupowner);
-                    Json.put(skypecall, "groupidentity", groupidentity);
-                    Json.put(skypecall, "skypecallback", skypecallback);
-
-                    CommService.sendEncryptedReliable(skypecall, true);
-
-                    Simple.makeToast("Der Skype Rückruf wurde übertragen. "
-                            + "Bitte einen Moment Gelduld.");
-                }
-            }
-        }
-
-        return false;
     }
 
     private void launchContacts()

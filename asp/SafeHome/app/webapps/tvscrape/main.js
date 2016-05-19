@@ -60,6 +60,10 @@ tvscrape.onClickTitle = function(event)
         sender = sender.replace("ZDF info", "ZDFinfo");
         sender = sender.replace("ZDF Kultur", "ZDFKultur");
         sender = sender.replace("ZDF neo", "ZDFneo");
+        sender = sender.replace("ARTE Deutsch", "ARTE");
+
+        sender = sender.replace("-", " ");
+        sender = sender.replace(":", " ");
 
         sender = sender.replace("  ", " ");
         sender = sender.replace("  ", " ");

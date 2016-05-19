@@ -17,6 +17,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -138,24 +139,29 @@ public class DitUndDat
 
             title.setGravity(Gravity.BOTTOM);
             title.setTextColor(Color.WHITE);
-            title.setTextSize(24f);
+            title.setTextSize(Simple.getDeviceTextSize(24f));
             title.setSingleLine();
+            title.setEllipsize(TextUtils.TruncateAt.END);
 
             int magic = abheight / 16;
 
             lp = new FrameLayout.LayoutParams(Simple.WC, abheight / 2 + magic, Gravity.TOP);
             lp.leftMargin = abheight;
+            lp.rightMargin = abheight;
 
             addView(title, lp);
 
             subtitle = new TextView(getContext());
 
             subtitle.setGravity(Gravity.TOP);
+            subtitle.setTextSize(Simple.getDeviceTextSize(16f));
             subtitle.setTextColor(Color.WHITE);
             subtitle.setSingleLine();
+            subtitle.setEllipsize(TextUtils.TruncateAt.END);
 
             lp = new FrameLayout.LayoutParams(Simple.WC, abheight / 2 - magic, Gravity.BOTTOM);
             lp.leftMargin = abheight;
+            lp.rightMargin = abheight;
 
             addView(subtitle, lp);
 
@@ -169,48 +175,6 @@ public class DitUndDat
     }
 
     //endregion public static class Toolbar
-
-    //region public static class ImageAntiAliasView extends ImageView
-
-    public static class ImageAntiAliasView extends ImageView
-    {
-        public ImageAntiAliasView(Context context)
-        {
-            super(context);
-        }
-
-        @Override
-        @SuppressLint("DrawAllocation")
-        protected void onLayout(boolean changed, int left, int top, int right, int bottom)
-        {
-            super.onLayout(changed, left, top, right, bottom);
-
-            if (getDrawable() instanceof  BitmapDrawable)
-            {
-                Bitmap orig = ((BitmapDrawable) getDrawable()).getBitmap();
-                Bitmap anti = StaticUtils.downscaleAntiAliasBitmap(orig, right - left, bottom - top);
-
-                setImageDrawable(new BitmapDrawable(getResources(), anti));
-            }
-        }
-    }
-
-    //endregion public static class ImageAntiAliasView extends ImageView
-
-    //region public static class StreamOptions
-
-    public static class StreamOptions
-    {
-        public String streamUrl;
-
-        public int quality;
-        public int bandWidth;
-
-        public int width;
-        public int height;
-    }
-
-    //endregion public static class StreamOptions
 
     //region public static class InternetState extends BroadcastReceiver
 

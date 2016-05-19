@@ -100,6 +100,26 @@ public class RemoteGroups
         return null;
     }
 
+    @Nullable
+    public static JSONObject getGroupMember(String groupidentity, String memberidentity)
+    {
+        JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
+        if (rg == null) return null;
+
+        JSONArray members = Json.getArray(rg, "members");
+        if (members == null) return null;
+
+        for (int inx = 0; inx < members.length(); inx++)
+        {
+            JSONObject member = Json.getObject(members, inx);
+            String ident = Json.getString(member, "identity");
+
+            if (Simple.equals(ident, memberidentity)) return member;
+        }
+
+        return null;
+    }
+
     public static String getDisplayName(String groupidentity)
     {
         JSONObject rg = PersistManager.getXpathJSONObject(xPathRoot + "/" + groupidentity);
@@ -192,6 +212,12 @@ public class RemoteGroups
             String skypecallback = Simple.getSharedPrefString(skypecallbackpref);
             if (skypecallback == null) skypecallback = "";
 
+            String skypeenablepref = groupprefix + ".skypeenable." + memberident;
+            boolean skypeenable = Simple.getSharedPrefBoolean(skypeenablepref);
+
+            String prepaidadminpref = groupprefix + ".prepaidadmin." + memberident;
+            boolean prepaidadmin = Simple.getSharedPrefBoolean(prepaidadminpref);
+
             if (memberident.equals(SystemIdentity.getIdentity()))
             {
                 //
@@ -207,6 +233,8 @@ public class RemoteGroups
             Json.put(minfo, "identity", memberident);
             Json.put(minfo, "groupstatus", memberstatus);
             Json.put(minfo, "skypecallback", skypecallback);
+            Json.put(minfo, "skypeenable", skypeenable);
+            Json.put(minfo, "prepaidadmin", prepaidadmin);
 
             updateMember(groupidentity, minfo);
         }
@@ -221,36 +249,33 @@ public class RemoteGroups
 
         if (finalMembers != null)
         {
-            if (dirty)
+            JSONObject pubgroup = Json.clone(finalGroup);
+            Json.remove(pubgroup, "members");
+
+            for (int send = 0; send < finalMembers.length(); send++)
             {
-                JSONObject pubgroup = Json.clone(finalGroup);
-                Json.remove(pubgroup, "members");
+                JSONObject finalMember = Json.getObject(finalMembers, send);
+                String fmIdentity = Json.getString(finalMember, "identity");
+                if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
 
-                for (int send = 0; send < finalMembers.length(); send++)
-                {
-                    JSONObject finalMember = Json.getObject(finalMembers, send);
-                    String fmIdentity = Json.getString(finalMember, "identity");
-                    if (Simple.equals(fmIdentity, SystemIdentity.getIdentity())) continue;
+                JSONObject groupStatusUpdate = new JSONObject();
 
-                    JSONObject groupStatusUpdate = new JSONObject();
+                Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
+                Json.put(groupStatusUpdate, "idremote", fmIdentity);
+                Json.put(groupStatusUpdate, "remotegroup", pubgroup);
 
-                    Json.put(groupStatusUpdate, "type", "groupStatusUpdate");
-                    Json.put(groupStatusUpdate, "idremote", fmIdentity);
-                    Json.put(groupStatusUpdate, "remotegroup", pubgroup);
+                Log.d(LOGTAG, "updateGroup=============>" + fmIdentity);
 
-                    Log.d(LOGTAG, "updateGroup=============>" + fmIdentity);
-
-                    CommService.sendEncrypted(groupStatusUpdate, true);
-                }
+                CommService.sendEncrypted(groupStatusUpdate, true);
             }
 
             for (int inx = 0; inx < finalMembers.length(); inx++)
             {
                 JSONObject pubmember = Json.clone(Json.getObject(finalMembers, inx));
 
-                JSONObject pubgroup = new JSONObject();
-                Json.put(pubgroup, "groupidentity", groupidentity);
-                Json.put(pubgroup, "member", pubmember);
+                JSONObject pubgroupdata = new JSONObject();
+                Json.put(pubgroupdata, "groupidentity", groupidentity);
+                Json.put(pubgroupdata, "member", pubmember);
 
                 for (int send = 0; send < finalMembers.length(); send++)
                 {
@@ -262,7 +287,7 @@ public class RemoteGroups
 
                     Json.put(groupMemberUpdate, "type", "groupMemberUpdate");
                     Json.put(groupMemberUpdate, "idremote", fmIdentity);
-                    Json.put(groupMemberUpdate, "remotegroup", pubgroup);
+                    Json.put(groupMemberUpdate, "remotegroup", pubgroupdata);
 
                     Log.d(LOGTAG, "updateMember=============>" + fmIdentity);
 
@@ -326,6 +351,7 @@ public class RemoteGroups
 
             IdentityManager.put(groupidentity, "passPhrase", passPhrase);
 
+            Log.d(LOGTAG, "groupStatusUpdate=" + groupidentity + " => " + passPhrase);
             Simple.makeToast("groupStatusUpdate=" + groupidentity + " => " + passPhrase);
         }
 
@@ -336,6 +362,7 @@ public class RemoteGroups
     {
         boolean dirty = false;
 
+        Log.d(LOGTAG, "updateMember=" + member.toString());
         Simple.makeToast("groupMemberUpdate=" + member.toString());
 
         synchronized (LOGTAG)
@@ -369,6 +396,18 @@ public class RemoteGroups
                 if (! Json.equals(oldmember, "skypecallback", member))
                 {
                     Json.copy(oldmember, "skypecallback", member);
+                    dirty = true;
+                }
+
+                if (! Json.equals(oldmember, "skypeenable", member))
+                {
+                    Json.copy(oldmember, "skypeenable", member);
+                    dirty = true;
+                }
+
+                if (! Json.equals(oldmember, "prepaidadmin", member))
+                {
+                    Json.copy(oldmember, "prepaidadmin", member);
                     dirty = true;
                 }
 

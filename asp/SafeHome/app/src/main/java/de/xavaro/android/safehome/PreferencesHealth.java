@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.WebApp;
 
@@ -45,7 +46,7 @@ public class PreferencesHealth
 
     //region Health Person preferences
 
-    public static class HealthPersonalFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class HealthPersonalFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -150,7 +151,7 @@ public class PreferencesHealth
 
     //region Health Units preferences
 
-    public static class HealthUnitsFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class HealthUnitsFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -626,7 +627,7 @@ public class PreferencesHealth
     //region BlueTooth preferences stub
 
     @SuppressWarnings("WeakerAccess")
-    public static class BlueToothFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class BlueToothFragment extends PreferenceFragments.EnableFragmentStub
             implements
             DialogInterface.OnClickListener,
             BlueTooth.BlueToothDiscoverCallback

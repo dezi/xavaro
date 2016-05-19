@@ -4,9 +4,11 @@ import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.util.Log;
 
@@ -32,6 +34,7 @@ public class SystemIdentity
     private static String identity;
     private static String randomiz;
 
+    private static String foundInPrefers;
     private static String foundInContact;
     private static String foundInStorage;
     private static String foundInCookies;
@@ -53,9 +56,23 @@ public class SystemIdentity
 
         Context context = Simple.getAnyContext();
 
+        retrieveFromPrefers(context);
         retrieveFromStorage(context);
         retrieveFromCookies(context);
         retrieveFromContact(context);
+
+        try
+        {
+            if ((foundInPrefers != null) && (identity == null))
+            {
+                appsname = foundInPrefers.split(":")[ 0 ];
+                identity = foundInPrefers.split(":")[ 1 ];
+                randomiz = foundInPrefers.split(":")[ 2 ];
+            }
+        }
+        catch (Exception ignore)
+        {
+        }
 
         try
         {
@@ -65,14 +82,26 @@ public class SystemIdentity
                 identity = foundInContact.split(":")[ 1 ];
                 randomiz = foundInContact.split(":")[ 2 ];
             }
+        }
+        catch (Exception ignore)
+        {
+        }
 
+        try
+        {
             if ((foundInCookies != null) && (identity == null))
             {
                 appsname = foundInCookies.split(":")[ 0 ];
                 identity = foundInCookies.split(":")[ 1 ];
                 randomiz = foundInCookies.split(":")[ 2 ];
             }
+        }
+        catch (Exception ignore)
+        {
+        }
 
+        try
+        {
             if ((foundInContact != null) && (identity == null))
             {
                 String[] packageName = context.getPackageName().split("\\.");
@@ -94,9 +123,6 @@ public class SystemIdentity
         }
         catch (Exception ignore)
         {
-            //
-            // Should not happen, oops service not yet up.
-            //
         }
 
         if ((identity == null) || (randomiz == null))
@@ -116,11 +142,37 @@ public class SystemIdentity
             foundInContact = null;
         }
 
+        if (foundInPrefers == null) storeIntoPrefers(context);
         if (foundInStorage == null) storeIntoStorage(context);
         if (foundInContact == null) storeIntoContact(context);
         if (foundInCookies == null) storeIntoCookies(context);
+    }
 
-        storeIntoCookies(context);
+    private static void retrieveFromPrefers(Context context)
+    {
+        try
+        {
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+            foundInPrefers = sp.getString("system.identity", null);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        if (foundInPrefers != null) Log.d(LOGTAG, "foundInPrefers: " + foundInPrefers);
+    }
+
+    private static void storeIntoPrefers(Context context)
+    {
+        try
+        {
+            String value = appsname + ":" + identity + ":" + randomiz;
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+            sp.edit().putString("system.identity", value).apply();
+        }
+        catch (Exception ignore)
+        {
+        }
     }
 
     private static void retrieveFromContact(Context context)
@@ -274,7 +326,7 @@ public class SystemIdentity
         try
         {
             JSONObject ident = new JSONObject();
-            ident.put("identity",appsname + ":" + identity + ":" + randomiz);
+            ident.put("identity", appsname + ":" + identity + ":" + randomiz);
 
             outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
             outputStream.write(ident.toString(2).getBytes());

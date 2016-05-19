@@ -162,7 +162,7 @@ public class LaunchItemVoice extends LaunchItem implements
             return;
         }
 
-        Context app = Simple.getAppContext();
+        Context app = Simple.getActContext();
 
         if ((app != null) && (app instanceof VoiceIntentResolver))
         {

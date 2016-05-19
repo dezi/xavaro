@@ -1,19 +1,17 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.AttributeSet;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.Gravity;
 import android.view.View;
 import android.os.Handler;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +19,7 @@ import org.json.JSONObject;
 import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.VersionUtils;
@@ -52,8 +51,10 @@ public class LaunchItem extends FrameLayout implements
         if (Simple.equals(type, "beta"        )) item = new LaunchItemBeta(context);
         if (Simple.equals(type, "today"       )) item = new LaunchItemToday(context);
         if (Simple.equals(type, "voice"       )) item = new LaunchItemVoice(context);
+        if (Simple.equals(type, "battery"     )) item = new LaunchItemBattery(context);
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
+        if (Simple.equals(type, "calls"       )) item = new LaunchItemCall(context);
 
         if (Simple.equals(type, "apps"        )) item = new LaunchItemApps(context);
         if (Simple.equals(suty, "media/image" )) item = new LaunchItemMediaImage(context);
@@ -61,9 +62,16 @@ public class LaunchItem extends FrameLayout implements
 
         if (Simple.equals(type, "phone"       )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "skype"       )) item = new LaunchItemComm(context);
-        if (Simple.equals(type, "xavaro"      )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "whatsapp"    )) item = new LaunchItemComm(context);
         if (Simple.equals(type, "contacts"    )) item = new LaunchItemComm(context);
+
+        if (Simple.equals(type, "social"      )) item = new LaunchItemSocial(context);
+        if (Simple.equals(type, "facebook"    )) item = new LaunchItemSocial(context);
+        if (Simple.equals(type, "instagram"   )) item = new LaunchItemSocial(context);
+        if (Simple.equals(type, "googleplus"  )) item = new LaunchItemSocial(context);
+        if (Simple.equals(type, "twitter"     )) item = new LaunchItemSocial(context);
+
+        if (Simple.equals(type, "xavaro"      )) item = new LaunchItemCommXavaro(context);
 
         if (Simple.equals(type, "webapp"      )) item = new LaunchItemWebApp(context);
         if (Simple.equals(type, "webframe"    )) item = new LaunchItemWebFrame(context);
@@ -98,6 +106,7 @@ public class LaunchItem extends FrameLayout implements
 
     protected LayoutParams layout;
     protected LayoutParams oversize;
+    protected boolean textless;
     protected int textsize;
     protected int padding;
 
@@ -106,12 +115,12 @@ public class LaunchItem extends FrameLayout implements
     protected String type;
     protected String subtype;
 
-    protected ImageView icon;
+    protected ImageSmartView icon;
     protected TextView label;
     protected String labelText;
 
     protected FrameLayout overlay;
-    protected ImageView overicon;
+    protected ImageSmartView overicon;
     protected TextView overtext;
     protected FrameLayout dimmer;
 
@@ -124,31 +133,28 @@ public class LaunchItem extends FrameLayout implements
         myInit(context);
     }
 
-    public LaunchItem(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
-
-        myInit(context);
-    }
-
-    public LaunchItem(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
-
-        myInit(context);
-    }
-
     private void myInit(Context context)
     {
         this.context = context;
 
-        setBackgroundResource(R.drawable.shadow_black_400x400);
-
         layout = new LayoutParams(0, 0);
         setLayoutParams(layout);
 
-        icon = new ImageView(context);
-        icon.setPadding(0, 0, 0, 40);
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(16);
+        gd.setColor(GlobalConfigs.LaunchPageBackgroundColor);
+        gd.setStroke(2, 0xffcccccc);
+
+        setBackground(gd);
+
+        icon = new ImageSmartView(context);
+
+        icon.setPadding(
+                Simple.getDevicePixels(14),
+                Simple.getDevicePixels( 0),
+                Simple.getDevicePixels(14),
+                Simple.getDevicePixels(28));
+
         addView(icon);
 
         label = new TextView(context);
@@ -165,16 +171,18 @@ public class LaunchItem extends FrameLayout implements
         overlay.setVisibility(INVISIBLE);
         addView(overlay);
 
-        overicon = new DitUndDat.ImageAntiAliasView(context);
+        overicon = new ImageSmartView(context);
         overlay.addView(overicon);
 
         overtext = new TextView(context);
+
         overtext.setLayoutParams(Simple.layoutParamsMM());
         overtext.setGravity(Gravity.CENTER);
         overtext.setTextSize(Simple.getDeviceTextSize(24f));
         overtext.setPadding(2, 0, 0, 4);
         overtext.setTextColor(Color.WHITE);
         overtext.setTypeface(null, Typeface.BOLD);
+
         overlay.addView(overtext);
 
         dimmer = new FrameLayout(context);
@@ -210,13 +218,61 @@ public class LaunchItem extends FrameLayout implements
         });
     }
 
+    public void setFrameLess(boolean yesno)
+    {
+        if (yesno)
+        {
+            setBackground(null);
+        }
+    }
+
+    public void setTextLess(boolean yesno)
+    {
+        textless = yesno;
+
+        if (textless)
+        {
+            icon.setPadding(0, 0, 0, 0);
+            label.setVisibility(GONE);
+        }
+    }
+
     public void setSize(int width, int height)
     {
+        //
+        // Original font sizes based on 200 pixels height.
+        //
+
+        float scale = height / 200.0f;
+
         layout.width = width;
         layout.height = height;
 
+        setLayoutParams(layout);
+
+        if (textless)
+        {
+            icon.setPadding(0, 0, 0, 0);
+            label.setVisibility(GONE);
+        }
+        else
+        {
+            icon.setPadding(
+                    Simple.getDevicePixels(Math.round(14 * scale)),
+                    Simple.getDevicePixels(Math.round(0 * scale)),
+                    Simple.getDevicePixels(Math.round(14 * scale)),
+                    Simple.getDevicePixels(Math.round(28 * scale)));
+        }
+
         oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;
+
+        overtext.setTextSize(Simple.getDeviceTextSize(24f * scale));
+        overtext.setPadding(
+                Simple.getDevicePixels(Math.round(2 * scale)),
+                Simple.getDevicePixels(Math.round(0 * scale)),
+                Simple.getDevicePixels(Math.round(0 * scale)),
+                Simple.getDevicePixels(Math.round(4 * scale)));
 
         //
         // Nine patch background does not scale implicit
@@ -225,7 +281,7 @@ public class LaunchItem extends FrameLayout implements
         // value if dimensions are known.
         //
 
-        padding = layout.width / 12;
+        padding = layout.width / 20;
         setPadding(padding, padding, padding, padding);
 
         //
@@ -233,6 +289,11 @@ public class LaunchItem extends FrameLayout implements
         //
 
         if (config.has("label")) setLabelText(Json.getString(config, "label"));
+    }
+
+    public void setGravity(int gravity)
+    {
+        layout.gravity = gravity;
     }
 
     public void setPosition(int left, int top)
@@ -278,6 +339,7 @@ public class LaunchItem extends FrameLayout implements
 
             textsize = layout.height / 12;
             label.setTextSize(Simple.getDeviceTextSize(textsize));
+            label.setLineSpacing(-3 * Simple.getDensity(), 1);
 
             //
             // This might lead to a shitty breaking
@@ -302,7 +364,7 @@ public class LaunchItem extends FrameLayout implements
                     // maximum width to last good value.
                     //
 
-                    label.setMaxWidth(++laywid);
+                    label.setMaxWidth(laywid + (laywid / 4));
                     break;
                 }
             }
@@ -333,8 +395,8 @@ public class LaunchItem extends FrameLayout implements
                 if (config.has("name"))
                 {
                     String iconname = Json.getString(config, "name");
-                    Drawable drawable = CacheManager.getWebIcon(iconname, iconref);
-                    icon.setImageDrawable(drawable);
+                    String iconpath = CacheManager.getWebIconPath(iconname, iconref);
+                    icon.setImageResource(iconpath);
                 }
             }
             else
@@ -382,6 +444,12 @@ public class LaunchItem extends FrameLayout implements
         return parent;
     }
 
+    @Nullable
+    public String getType()
+    {
+        return type;
+    }
+
     protected void setConfig()
     {
         //
@@ -401,6 +469,20 @@ public class LaunchItem extends FrameLayout implements
         //
         // To be overridden...
         //
+
+        JSONArray launchItems = Json.getArray(config, "launchitems");
+
+        if (launchItems != null)
+        {
+            Simple.makeClick();
+
+            LaunchGroup directory = new LaunchGroup(getContext());
+            directory.setConfig(null, launchItems);
+
+            ((HomeActivity) getContext()).addViewToBackStack(directory);
+
+            return true;
+        }
 
         return false;
     }

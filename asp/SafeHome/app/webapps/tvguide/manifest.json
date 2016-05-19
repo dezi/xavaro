@@ -38,17 +38,11 @@
     ],
 
     "cachedefs": [
-      { "interval": 24, "pattern": ".*\\.js" },
-      { "interval": 72, "pattern": ".*\\.png" },
-      { "interval": 72, "pattern": ".*\\.jpg" },
-      { "interval": 24, "pattern": ".*\\.json" },
-      { "interval": 24, "pattern": ".*\\.json\\.gz" },
-
       { "interval": -1, "pattern": "https://.*?.wikipedia.org/.*" },
       { "interval": -1, "pattern": "https://.*?.wikimedia.org/.*" },
       { "interval": -1, "pattern": "http://epg.xavaro.de/pgminfo/.*" },
-      { "interval":  0, "pattern": "http://epg.xavaro.de/epgdata/.*" },
-      { "interval":  0, "pattern": "http://epg.xavaro.de/channels/.*" }
+      { "interval": 24, "pattern": "http://epg.xavaro.de/epgdata/.*" },
+      { "interval": 24, "pattern": "http://epg.xavaro.de/channels/.*" }
     ]
   }
 }

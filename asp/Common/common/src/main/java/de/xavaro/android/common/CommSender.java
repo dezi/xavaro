@@ -504,7 +504,16 @@ public class CommSender
             if (uuid == null) return;
 
             JSONObject recvFile = getRecvFile(uuid, false);
-            if (recvFile == null) return;
+
+            if (recvFile == null)
+            {
+                synchronized (recvFiles)
+                {
+                    recvFiles.add(message);
+                }
+
+                recvFile = message;
+            }
 
             Json.put(recvFile, "fileTransferUploaded", true);
         }
@@ -715,7 +724,7 @@ public class CommSender
 
         nb.setAutoCancel(true);
         nb.setSmallIcon(iconRes);
-        nb.setLargeIcon(Simple.getBitmapFromResource(iconRes));
+        nb.setLargeIcon(Simple.getBitmap(iconRes));
         nb.setContentTitle(title);
         nb.setContentText(message);
         nb.setSound(soundUri);
@@ -767,6 +776,7 @@ public class CommSender
         String idremote = Json.getString(recvFile, "identity");
         String filename = Json.getString(recvFile, "filename");
         String disposition = Json.getString(recvFile, "disposition");
+        boolean clobber = Json.getBoolean(recvFile, "clobber");
 
         if ((idremote == null) || (filename == null) || (disposition == null)) return;
 
@@ -778,26 +788,32 @@ public class CommSender
 
         if (! mediapath.exists())
         {
-            //noinspection ResultOfMethodCallIgnored
-            mediapath.mkdir();
+            Log.d(LOGTAG, "notifyReceived: mkdir:" + mediapath.mkdir());
         }
 
         if (mediafile.exists())
         {
-            //
-            // Clobber file name.
-            //
-
-            String clobpath = mediafile.getParent();
-            String clobfile = mediafile.getName();
-            String clobname = Simple.getFileNameOnly(clobfile);
-            String clobfext = Simple.getFileExtensionOnly(clobfile);
-
-            for (int inx = 1; ; inx++)
+            if (clobber)
             {
-                mediafile = new File(clobpath, clobname + " (" +  inx + ")" + clobfext);
+                //
+                // Clobber file name.
+                //
 
-                if (! mediafile.exists()) break;
+                String clobpath = mediafile.getParent();
+                String clobfile = mediafile.getName();
+                String clobname = Simple.getFileNameOnly(clobfile);
+                String clobfext = Simple.getFileExtensionOnly(clobfile);
+
+                for (int inx = 1; ; inx++)
+                {
+                    mediafile = new File(clobpath, clobname + " (" + inx + ")" + clobfext);
+
+                    if (!mediafile.exists()) break;
+                }
+            }
+            else
+            {
+                Log.d(LOGTAG, "notifyReceived: delete old:" + mediafile.delete());
             }
         }
 

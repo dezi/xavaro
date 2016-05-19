@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
@@ -140,7 +141,7 @@ public class ArchievementManager implements
     {
         currentTag = tag;
         currentPost = postonclose;
-        context = Simple.getAppContext();
+        context = Simple.getActContext();
         if (config == null) readConfig();
     }
 
@@ -286,8 +287,8 @@ public class ArchievementManager implements
 
             final TextView textview = new TextView(context);
 
-            textview.setPadding(40, 40, 40, 40);
-            textview.setTextSize(24f);
+            Simple.setPadding(textview, 20, 20, 20, 20);
+            textview.setTextSize(Simple.getPreferredTextSize());
             textview.setText(message);
 
             builder.setView(textview);
@@ -311,13 +312,7 @@ public class ArchievementManager implements
 
             dialog.show();
 
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(24f);
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTransformationMethod(null);
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(24f);
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTransformationMethod(null);
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(24f);
-            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTransformationMethod(null);
-
+            Simple.adjustAlertDialog(dialog);
             dialog.setOnDismissListener(this);
 
             String dpath = currentXpathpref + "/displays";
@@ -381,14 +376,19 @@ public class ArchievementManager implements
 
     private void follow()
     {
+        if (currentTag.equals("configure.settings.accessibility"))
+        {
+            AccessibilityService.selectAccessibility.run();
+        }
+
         if (currentTag.equals("configure.settings.homebutton"))
         {
-            DefaultApps.setDefaultHome(context);
+            DefaultApps.setDefaultHome();
         }
 
         if (currentTag.equals("configure.settings.assistbutton"))
         {
-            DefaultApps.setDefaultAssist(context);
+            DefaultApps.setDefaultAssist();
         }
     }
 }

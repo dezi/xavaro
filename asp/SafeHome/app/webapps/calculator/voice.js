@@ -4,12 +4,17 @@ WebAppRequest.onVoiceIntent = function(intent)
 
     ca.command = intent.command.toLowerCase();
 
+    //console.log(WebAppUtility.getPrettyJson(JSON.stringify(intent)));
+
     //
-    // Remove action vom command.
+    // Remove action from command.
     //
 
-    ca.command = ca.command.replace("was ergibt", "").trim();
-    ca.command = ca.command.replace("wie viel ist", "").trim();
+    for (var inx = 0; inx < intent.triggers.length; inx++)
+    {
+        var trigger = intent.triggers[ inx ].toLowerCase();
+        ca.command = ca.command.replace(trigger, "").trim();
+    }
 
     //
     // Reformat written numbers.

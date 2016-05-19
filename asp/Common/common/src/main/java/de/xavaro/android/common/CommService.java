@@ -80,6 +80,14 @@ public class CommService extends Service
         }
     }
 
+    public static void sendMessage(JSONObject message, boolean allowGCM)
+    {
+        synchronized (messageBacklog)
+        {
+            messageBacklog.add(new MessageClass(message, MessageClass.NONE, allowGCM));
+        }
+    }
+
     public static void sendEncrypted(JSONObject message, boolean allowGCM)
     {
         synchronized (messageBacklog)
@@ -166,8 +174,6 @@ public class CommService extends Service
         super.onCreate();
 
         Log.d(LOGTAG, "onCreate: running with " + getApplicationContext().getPackageName());
-
-        Simple.setAnyContext(getApplicationContext());
 
         instance = this;
         identity = SystemIdentity.getIdentity();
@@ -296,8 +302,11 @@ public class CommService extends Service
             {
                 String remoteIdentity = json.getString("identity");
                 String remotePublicKey = json.getString("publicKey");
+                String gcmtoken = Json.getString(json, "gcmtoken");
+                if (gcmtoken == null) gcmtoken = Json.getString(json, "gcmUuid");
 
                 IdentityManager.put(remoteIdentity, "publicKey", remotePublicKey);
+                RemoteContacts.setGCMTokenTemp(remoteIdentity, gcmtoken);
 
                 Log.d(LOGTAG, "onMessageReceived: requestPublicKeyXChange"
                         + " remoteIdentity=" + remoteIdentity
@@ -307,10 +316,10 @@ public class CommService extends Service
 
                 responsePublicKeyXChange.put("type", "responsePublicKeyXChange");
                 responsePublicKeyXChange.put("idremote", remoteIdentity);
-                responsePublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey(getApplicationContext()));
+                responsePublicKeyXChange.put("publicKey", CryptUtils.RSAgetPublicKey());
                 responsePublicKeyXChange.put("status", "success");
 
-                CommService.sendMessage(responsePublicKeyXChange);
+                CommService.sendMessage(responsePublicKeyXChange, true);
 
                 return true;
             }
@@ -319,7 +328,7 @@ public class CommService extends Service
             {
                 String remoteIdentity = json.getString("identity");
                 String encoPassPhrase = json.getString("encodedPassPhrase");
-                String privateKey = CryptUtils.RSAgetPrivateKey(getApplicationContext());
+                String privateKey = CryptUtils.RSAgetPrivateKey();
                 String passPhrase = CryptUtils.RSADecrypt(privateKey, encoPassPhrase);
 
                 IdentityManager.put(remoteIdentity, "passPhrase", passPhrase);
@@ -334,7 +343,7 @@ public class CommService extends Service
                 responseAESpassXChange.put("idremote", remoteIdentity);
                 responseAESpassXChange.put("status", "success");
 
-                CommService.sendEncrypted(responseAESpassXChange, false);
+                CommService.sendEncrypted(responseAESpassXChange, true);
 
                 return true;
             }
@@ -357,9 +366,45 @@ public class CommService extends Service
 
                 RemoteContacts.deliverOwnContact(responseOwnerIdentity);
 
-                CommService.sendEncrypted(responseOwnerIdentity, false);
+                CommService.sendEncrypted(responseOwnerIdentity, true);
+
+                ProfileImages.sendOwnerImage(remoteIdentity);
 
                 return true;
+            }
+
+            if (type.equals("recvPrepaidBalance"))
+            {
+                //
+                // Inspect remote prepaid balance messages
+                // and store results into preferences.
+                //
+
+                int money = Json.getInt(json, "money");
+
+                if (money >= 0)
+                {
+                    //
+                    // The identity could either be a direct response
+                    // for a prepaid request or an assistance broadcast.
+                    //
+
+                    String identity = Json.getString(json, "identity");
+
+                    if (RemoteGroups.isGroup(identity))
+                    {
+                        identity = RemoteGroups.getGroupOwner(identity);
+                    }
+
+                    String date = Json.getString(json, "date");
+                    if (date == null) date = Simple.nowAsISO();
+
+                    String pfix = "monitoring.prepaid.remote.";
+                    Simple.setSharedPrefInt(pfix + "money:" + identity, money);
+                    Simple.setSharedPrefString(pfix + "stamp:" + identity, date);
+                }
+
+                return false;
             }
         }
         catch (JSONException ex)
@@ -517,7 +562,7 @@ public class CommService extends Service
         if (onMessageReceived(json))
         {
             //
-            // Message was handled by commservice itself.
+            // Message was handled by comm service itself.
             //
 
             return;
@@ -610,11 +655,17 @@ public class CommService extends Service
 
             StaticUtils.sleep(sleeptime);
 
-            checkPing();
+            //checkPing();
 
             CommSender.commTick();
             WebAppCache.commTick();
             EventManager.commTick();
+            BatteryManager.commTick();
+
+            SocialTwitter.getInstance().commTick();
+            SocialFacebook.getInstance().commTick();
+            SocialInstagram.getInstance().commTick();
+            SocialGoogleplus.getInstance().commTick();
 
             if (! checkSocket()) continue;
 
@@ -667,6 +718,11 @@ public class CommService extends Service
                 System.arraycopy(Simple.getUUIDBytes(ident), 0, ping, 4 , 16);
 
                 datagramPacket.setData(ping);
+            }
+
+            if ((mc.enc == MessageClass.NONE) && mc.msg.has("idremote"))
+            {
+                idrem = Simple.JSONgetString(mc.msg, "idremote");
             }
 
             if ((mc.enc == MessageClass.CLIENT_ACK) && mc.msg.has("uuid"))
@@ -748,13 +804,16 @@ public class CommService extends Service
 
                 Log.d(LOGTAG, "sendThread"
                         + ": " + datagramPacket.getData().length
-                        + "=" + mc.msg.getString("type"));
+                        + "=" + mc.msg.getString("type")
+                        + "=" + idrem + ":" + mc.gcm);
 
                 if (mc.gcm && (idrem != null) && Simple.isGCMInitialized())
                 {
                     //
                     // GCM allowed and initialized.
                     //
+
+                    Log.d(LOGTAG,"sendThread: send via GCM");
 
                     if (GCMMessageService.sendMessage(idrem, datagramPacket.getData()))
                     {

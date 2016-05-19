@@ -1,4 +1,42 @@
 {
+  "essential":
+  {
+    "com.whatsapp":
+    {
+      "label": "WhatsApp",
+      "score": "14",
+
+      "summary": [
+        "WhatsApp Kommunikation. Unentbehrlich.",
+        "WhatsApp ist ein Instant-Messaging-Dienst, der seit 2014 Facebook gehört. ",
+        "Benutzer können über WhatsApp Textnachrichten, Bild-, Video- und Ton-Dateien ",
+        "sowie Standortinformationen, Dokumente und Kontaktdaten zwischen zwei Personen ",
+        "oder in Gruppen austauschen. Das kalifornische Unternehmen Whatsapp Inc. bietet ",
+        "dabei das eigentliche mobile Anwendungsprogramm (App) namens WhatsApp-Messenger ",
+        "für verschiedene Smartphone-Betriebssysteme an und betreibt die dazugehörigen Server. ",
+        "Im Frühjahr 2015 wurde den Nutzern auch das internetbasierte Telefonieren über die ",
+        "App möglich gemacht. Dem lange Zeit kostenlosen, zwischenzeitlich jedoch teilweise ",
+        "kostenpflichtigen Dienst wird die weitgehende Ablösung der SMS zugeschrieben. ",
+        "Am 18. Januar 2016 wurde bekannt, dass WhatsApp wieder kostenlos werden soll"
+      ]
+    },
+
+    "com.skype.raider":
+    {
+      "label": "Skype",
+      "score": "10",
+
+      "summary": [
+        "Skype Kommunikation. Nahezu unentbehrlich. ",
+        "Skype ermöglicht das kostenlose Telefonieren zwischen Skype-Kunden via Internet. ",
+        "Internettelefonate mit Kunden anderer Online-Dienste sind nicht möglich. ",
+        "Verbindungen ins Telefon-Festnetz und zu Mobiltelefonen sind gegen Gebühren ",
+        "möglich (SkypeOut). Um Anrufe aus dem herkömmlichen Telefonnetz entgegenzunehmen, ",
+        "kann eine Festnetztelefonnummer erworben werden (SkypeIn)."
+      ]
+    }
+  },
+
   "musthave":
   {
     "org.wikipedia":

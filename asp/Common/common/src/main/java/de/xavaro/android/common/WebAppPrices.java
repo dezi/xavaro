@@ -47,13 +47,19 @@ public class WebAppPrices
     @JavascriptInterface
     public String getProducts(String product)
     {
-        return getQuery(3, product);
+        return getQuery(3, product, false);
+    }
+
+    @JavascriptInterface
+    public String getProducts(String product, boolean caseignore)
+    {
+        return getQuery(3, product, caseignore);
     }
 
     @JavascriptInterface
     public String getCategories(String product)
     {
-        return getQuery(1, product);
+        return getQuery(1, product, false);
     }
 
     @JavascriptInterface
@@ -70,14 +76,15 @@ public class WebAppPrices
             query += "\\|" + Json.getString(catlist, inx) + "\\|";
         }
 
-        return getQuery(3, query);
+        return getQuery(3, query, false);
     }
 
-    private String getQuery(int recordtype, String query)
+    private String getQuery(int recordtype, String query, boolean caseignore)
     {
         JSONArray json = new JSONArray();
 
-        Pattern pattern = Pattern.compile(query);
+        int flags = caseignore ? Pattern.CASE_INSENSITIVE : 0;
+        Pattern pattern = Pattern.compile(query, flags);
         String recordstart = recordtype + "|";
 
         if (makeServer())

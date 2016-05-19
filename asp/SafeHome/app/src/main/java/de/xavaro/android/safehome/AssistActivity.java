@@ -14,6 +14,7 @@ public class AssistActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_assist);
-        Simple.setAppContext(this);
+
+        Simple.setActContext(this);
     }
 }

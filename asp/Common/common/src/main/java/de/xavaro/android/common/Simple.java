@@ -1,8 +1,11 @@
 package de.xavaro.android.common;
 
-import android.os.Vibrator;
+import android.app.Application;
 import android.support.annotation.Nullable;
-
+import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.res.Configuration;
+import android.provider.Settings;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.preference.PreferenceManager;
@@ -14,6 +17,12 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.telephony.TelephonyManager;
+import android.text.InputType;
+import android.util.Base64;
+import android.view.Gravity;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,12 +39,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.view.SoundEffectConstants;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.os.Handler;
-import android.os.Environment;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.DhcpInfo;
 import android.net.Uri;
+import android.os.Vibrator;
+import android.os.Handler;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.util.Log;
@@ -55,13 +67,18 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Currency;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -83,36 +100,62 @@ public class Simple
 
     //region Initialisation
 
-    private static Activity appContext;
-    private static Handler appHandler;
+    private static Activity actContext;
+    private static Context appContext;
     private static Context anyContext;
+    private static Handler appHandler;
     private static WifiManager wifiManager;
 
-    public static void setAppContext(Activity context)
+    public static void setAppContext(Context context)
     {
-        Simple.appContext = context;
-        Simple.anyContext = context;
-        Simple.appHandler = new Handler();
+        appContext = context;
+        anyContext = context;
+        appHandler = new Handler();
     }
 
-    public static Activity getAppContext()
+    public static Context getAppContext()
     {
-        return Simple.appContext;
+        return appContext;
     }
 
-    public static void setAnyContext(Context context)
+    public static void setActContext(Activity context)
     {
-        Simple.anyContext = context;
+        actContext = context;
+    }
+
+    public static Activity getActContext()
+    {
+        return actContext;
     }
 
     public static Context getAnyContext()
     {
-        return Simple.anyContext;
+        return appContext;
     }
 
     public static Resources getResources()
     {
-        return Simple.anyContext.getResources();
+        return appContext.getResources();
+    }
+
+    public static String getResourceName(int resid)
+    {
+        return appContext.getResources().getResourceEntryName(resid);
+    }
+
+    public static Object getSystemService(String service)
+    {
+        return anyContext.getSystemService(service);
+    }
+
+    public static ContentResolver getContentResolver()
+    {
+        return appContext.getContentResolver();
+    }
+
+    public static int getIdentifier(String name, String type, String pack)
+    {
+        return getResources().getIdentifier(name, type, pack);
     }
 
     //endregion Initialisation
@@ -165,7 +208,7 @@ public class Simple
     {
         if (anyContext == null) return;
 
-        InputMethodManager imm = (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
@@ -180,7 +223,7 @@ public class Simple
             @Override
             public void run()
             {
-                InputMethodManager imm = (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(runview, 0);
             }
         }, 500);
@@ -221,23 +264,19 @@ public class Simple
 
     public static void installAppFromPlaystore(String packagename)
     {
-        if (appContext == null) return;
-
         Intent goToMarket = new Intent(Intent.ACTION_VIEW);
         goToMarket.setData(Uri.parse("market://details?id=" + packagename));
 
-        ProcessManager.launchIntent(appContext, goToMarket);
+        ProcessManager.launchIntent(goToMarket);
     }
 
     public static void uninstallApp(String packagename)
     {
-        if (anyContext == null) return;
-
         try
         {
             Uri packageUri = Uri.parse("package:" + packagename);
             Intent unInstall = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
-            anyContext.startActivity(unInstall);
+            ProcessManager.launchIntent(unInstall);
         }
         catch (Exception ex)
         {
@@ -247,28 +286,34 @@ public class Simple
 
     public static void launchApp(String packagename)
     {
-        ProcessManager.launchApp(appContext, packagename);
-    }
-
-    public static void startActivityForResult(Intent intent, int tag)
-    {
-        appContext.startActivityForResult(intent, tag);
+        ProcessManager.launchApp(packagename);
     }
 
     //endregion Application stuff
 
     //region All purpose simple methods
 
+    public static int parseNumber(String restag)
+    {
+        try
+        {
+            return Integer.parseInt(restag);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return 0;
+    }
+
     public static boolean equals(String str1, String str2)
     {
-        if ((str1 == null) && (str2 == null)) return true;
-        return (str1 != null) && (str2 != null) && str1.equals(str2);
+        return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equals(str2);
     }
 
     public static boolean equalsIgnoreCase(String str1, String str2)
     {
-        if ((str1 == null) && (str2 == null)) return true;
-        return (str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2);
+        return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2);
     }
 
     public static boolean startsWith(String str1, String str2)
@@ -334,7 +379,8 @@ public class Simple
 
     public static View removeFromParent(View view)
     {
-        ((ViewGroup) view.getParent()).removeView(view);
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) parent.removeView(view);
 
         return view;
     }
@@ -371,21 +417,39 @@ public class Simple
         }
     }
 
+    public static void makeAlert(String text)
+    {
+        makeAlert(text, null);
+    }
+
+    public static void makeAlert(String text , String title)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
+
+        builder.setTitle(title);
+        builder.setMessage(text);
+        builder.setPositiveButton("Ok", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        Simple.adjustAlertDialog(dialog);
+    }
+
     public static void makeToast(String text)
     {
-        if (appHandler != null)
-        {
-            final String phtext = text;
+        final String cbtext = text;
 
-            appHandler.post(new Runnable()
+        makePost(new Runnable()
+        {
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
-                    Toast.makeText(anyContext, phtext, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+                Toast toast = Toast.makeText(anyContext, cbtext, Toast.LENGTH_LONG);
+                TextView view = (TextView) toast.getView().findViewById(android.R.id.message);
+                if (view != null) view.setGravity(Gravity.CENTER);
+                toast.show();
+            }
+        });
     }
 
     public static void makePost(Runnable runnable)
@@ -431,7 +495,7 @@ public class Simple
             int xfer = inputStream.read(content);
             inputStream.close();
 
-            return content;
+            return (xfer == size) ? content : null;
         }
         catch (FileNotFoundException ignore)
         {
@@ -512,6 +576,19 @@ public class Simple
         return false;
     }
 
+    @Nullable
+    public static String getBetaVersion()
+    {
+        Context appcontext = Simple.getActContext();
+
+        if (appcontext instanceof AppInfoHandler)
+        {
+            return ((AppInfoHandler) appcontext).getBetaVersion();
+        }
+
+        return "";
+    }
+
     //endregion All purpose simple methods
 
     //region Haptic feedback
@@ -520,7 +597,7 @@ public class Simple
     {
         if (appContext != null)
         {
-            AudioManager am = (AudioManager) appContext.getSystemService(Context.AUDIO_SERVICE);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             am.playSoundEffect(SoundEffectConstants.CLICK);
         }
     }
@@ -531,26 +608,49 @@ public class Simple
         {
             long pattern[] = {0, 200, 100, 300, 400};
 
-            Vibrator vibrator = (Vibrator) anyContext.getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(pattern, -1);
         }
     }
 
-    public static void unmuteSpeech()
+    public static void raiseSpeechVolume(int percent)
     {
         if (anyContext != null)
         {
-            AudioManager am = (AudioManager) anyContext.getSystemService(Context.AUDIO_SERVICE);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
             int maxvol = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             int curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int dstvol = (maxvol * percent) / 100;
+            if (dstvol > maxvol) dstvol = maxvol;
 
-            while (curvol < (maxvol / 2))
-            {
-                am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
-                curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-            }
+            if (curvol < dstvol) am.setStreamVolume(AudioManager.STREAM_MUSIC, dstvol, 0);
+            curvol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+            Log.d(LOGTAG, "raiseSpeechVolume: percent=" + percent + " " + dstvol + "=>" + curvol);
         }
+    }
+
+    public static void setSpeechVolume(int index)
+    {
+        if (anyContext != null)
+        {
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0);
+        }
+    }
+
+    public static int getSpeechVolume()
+    {
+        if (anyContext != null)
+        {
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+            return am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        }
+
+        return 0;
     }
 
     //endregion Haptic feedback
@@ -565,14 +665,70 @@ public class Simple
         return !(hasBackKey && hasHomeKey);
     }
 
-    public static int getDP(int pixels)
+    public static int getDensityDPI()
     {
-        return (int) ((pixels / (float) getDeviceDPI()) * 160);
+        return anyContext.getResources().getDisplayMetrics().densityDpi;
+    }
+
+    public static float getScaledDensity()
+    {
+        return anyContext.getResources().getDisplayMetrics().scaledDensity;
+    }
+
+    public static float getDensity()
+    {
+        return anyContext.getResources().getDisplayMetrics().density;
+    }
+
+    public static GradientDrawable getRoundedBorders(int radius, int color, int stroke)
+    {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(radius);
+        gd.setColor(color);
+        gd.setStroke(2, stroke);
+
+        return gd;
+    }
+
+    public static int getDevicePixels(int pixels)
+    {
+        return (pixels * getDensityDPI()) / 160;
     }
 
     public static float getDeviceTextSize(float textsize)
     {
-        return (textsize / getDeviceDPI()) * 160;
+        return textsize / getDensity();
+    }
+
+    public static void setPadding(View view, int left, int top, int right, int bottom)
+    {
+        view.setPadding(getDevicePixels(left),
+                getDevicePixels(top),
+                getDevicePixels(right),
+                getDevicePixels(bottom));
+    }
+
+    public static void adjustAlertDialog(AlertDialog dialog)
+    {
+        View titleView = dialog.findViewById(getIdentifier("alertTitle", "id", "android"));
+
+        if ((titleView != null) && (titleView instanceof TextView))
+        {
+            ((TextView) titleView).setTextSize(getPreferredTitleSize());
+        }
+
+        Button button;
+
+        float textSize = Simple.getPreferredTextSize();
+
+        button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (button != null) button.setTextSize(textSize);
+
+        button = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if (button != null) button.setTextSize(textSize);
+
+        button = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+        if (button != null) button.setTextSize(textSize);
     }
 
     @Nullable
@@ -583,6 +739,12 @@ public class Simple
         if (!matcher.find()) return null;
 
         return matcher.group(1);
+    }
+
+    public static String getCurrencySymbol()
+    {
+        Currency currency = Currency.getInstance(Locale.getDefault());
+        return currency.getSymbol();
     }
 
     public static String getTrans(int resid, Object... args)
@@ -606,6 +768,12 @@ public class Simple
         return String.format(message, args);
     }
 
+    public static int getResArrayIdentifier(String resname)
+    {
+        Resources res = anyContext.getResources();
+        return res.getIdentifier(resname, "array", anyContext.getPackageName());
+    }
+
     public static String[] getTransArray(int resid)
     {
         return appContext.getResources().getStringArray(resid);
@@ -616,7 +784,7 @@ public class Simple
         String[] array = getTransArray(resid);
         List<String> list = new ArrayList<>();
 
-        for (String string : array) list.add(string);
+        Collections.addAll(list, array);
 
         return list;
     }
@@ -717,9 +885,15 @@ public class Simple
         return result;
     }
 
+    private static final Map<String, File> externalDirs = new HashMap<>();
+
     public static File getMediaDirType(String dirtype)
     {
-        return Environment.getExternalStoragePublicDirectory(dirtype);
+        if (externalDirs.containsKey(dirtype)) return externalDirs.get(dirtype);
+        File extdir = Environment.getExternalStoragePublicDirectory(dirtype);
+        externalDirs.put(dirtype, extdir);
+
+        return extdir;
     }
 
     public static void makeDirectory(File path)
@@ -786,12 +960,6 @@ public class Simple
             return new File(dir, "Incoming");
         }
 
-        if (disposition.equals("misc"))
-        {
-            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
-            return new File(dir, "Miscellanous");
-        }
-
         if (disposition.equals("download"))
         {
             return getMediaDirType(Environment.DIRECTORY_DOWNLOADS);
@@ -799,12 +967,52 @@ public class Simple
 
         if (disposition.equals("whatsapp"))
         {
-            File dir = Environment.getExternalStorageDirectory();
+            File dir = getExternalStorageDir();
             return new File(dir, "WhatsApp/Media/WhatsApp Images");
+        }
+
+        if (disposition.equals("profiles"))
+        {
+            File dir = getExternalFilesDir();
+            File profiles = new File(dir, "profiles");
+
+            if (! (profiles.exists() || profiles.mkdirs()))
+            {
+                Log.d(LOGTAG, "getMediaPath: create failed:" + profiles.toString());
+            }
+
+            return profiles;
+        }
+
+        if (disposition.equals("social"))
+        {
+            File dir = getExternalFilesDir();
+            File social = new File(dir, "social");
+
+            if (! (social.exists() || social.mkdirs()))
+            {
+                Log.d(LOGTAG, "getMediaPath: create failed:" + social.toString());
+            }
+
+            return social;
+        }
+
+        if (disposition.equals("misc"))
+        {
+            File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
+            return new File(dir, "Miscellanous");
         }
 
         File dir = getMediaDirType(Environment.DIRECTORY_DCIM);
         return new File(dir, "Miscellanous");
+    }
+
+    public static void removeFile(File file)
+    {
+        if ((file != null) && file.exists() && file.delete())
+        {
+            Log.d(LOGTAG,"removeFile: " + file);
+        }
     }
 
     public static void removeFiles(File dir, String suffix)
@@ -822,22 +1030,60 @@ public class Simple
 
     public static File getFilesDir()
     {
-        return Simple.getAnyContext().getFilesDir();
+        return getAnyContext().getFilesDir();
     }
+
+    private static File externalFilesDir;
+    private static File externalCacheDir;
 
     public static File getExternalFilesDir()
     {
-        return Simple.getAnyContext().getExternalFilesDir(null);
+        if (externalFilesDir != null) return externalFilesDir;
+        externalFilesDir = getAnyContext().getExternalFilesDir(null);
+        return externalFilesDir;
+    }
+
+    public static File getExternalCacheDir()
+    {
+        if (externalCacheDir != null) return externalCacheDir;
+        externalCacheDir = getAnyContext().getExternalCacheDir();
+        return externalCacheDir;
     }
 
     public static File getCacheDir()
     {
-        return Simple.getAnyContext().getCacheDir();
+        return getAnyContext().getCacheDir();
+    }
+
+    private static File externalStorageDir;
+
+    public static File getExternalStorageDir()
+    {
+        //
+        // Avoid extremly annoying system log message if
+        // SD-Card is not installed.
+        //
+
+        if (externalStorageDir != null) return externalStorageDir;
+        externalStorageDir = Environment.getExternalStorageDirectory();
+        return externalStorageDir;
     }
 
     public static File getPackageFile(String name)
     {
         return new File(Simple.getFilesDir(), Simple.getPackageName() + "." + name);
+    }
+
+    public static File getIdentityFile(String name)
+    {
+        File identdir =  new File(Simple.getExternalFilesDir(), SystemIdentity.getIdentity());
+
+        if ((! identdir.exists()) && ! identdir.mkdirs())
+        {
+            Log.d(LOGTAG, "Creating identity directory failed:" + identdir.toString());
+        }
+
+        return new File(identdir, name);
     }
 
     public static String getTempfile(String filename)
@@ -884,11 +1130,6 @@ public class Simple
         return new File(filepath).getParent();
     }
 
-    public static int getDeviceDPI()
-    {
-        return anyContext.getResources().getDisplayMetrics().densityDpi;
-    }
-
     public static int getRandom(int min, int max)
     {
         return new Random().nextInt(max - min) + min;
@@ -901,12 +1142,12 @@ public class Simple
 
     public static NotificationManager getNotificationManager()
     {
-        return (NotificationManager) anyContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     public static InputMethodManager getInputMethodManager()
     {
-        return (InputMethodManager) anyContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        return (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     public static String getAppName()
@@ -949,7 +1190,7 @@ public class Simple
         {
             if (wifiManager == null)
             {
-                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+                wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             }
 
             DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
@@ -970,6 +1211,23 @@ public class Simple
     }
 
     @Nullable
+    public static String getPhoneNumber()
+    {
+        try
+        {
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+            return tm.getLine1Number();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static String getWifiIPAddress()
     {
         if (anyContext == null) return null;
@@ -978,7 +1236,7 @@ public class Simple
         {
             if (wifiManager == null)
             {
-                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+                wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             }
 
             DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
@@ -1007,7 +1265,7 @@ public class Simple
         {
             if (wifiManager == null)
             {
-                wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+                wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             }
 
             return wifiManager.getConnectionInfo().getSSID().replace("\"", "");
@@ -1017,6 +1275,64 @@ public class Simple
         }
 
         return null;
+    }
+
+    @Nullable
+    public static ConnectivityManager getConnectivityManager()
+    {
+        return (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    public static boolean isInternetConnected()
+    {
+        ConnectivityManager cm = getConnectivityManager();
+
+        if (cm != null)
+        {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            if (activeNetwork != null)
+            {
+                return (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)
+                        || (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE);
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isWifiConnected()
+    {
+        ConnectivityManager cm = getConnectivityManager();
+
+        if (cm != null)
+        {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            if (activeNetwork != null)
+            {
+                if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isMobileConnected()
+    {
+        ConnectivityManager cm = getConnectivityManager();
+
+        if (cm != null)
+        {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+            if (activeNetwork != null)
+            {
+                if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean isSameSubnet(String ip1, String ip2)
@@ -1039,9 +1355,14 @@ public class Simple
     {
         if (anyContext == null) return null;
 
-        WifiManager wifiManager = (WifiManager) anyContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         return wInfo.getMacAddress();
+    }
+
+    public static int getOrientation()
+    {
+        return getResources().getConfiguration().orientation;
     }
 
     public static int getDeviceWidth()
@@ -1062,28 +1383,42 @@ public class Simple
 
     public static float getPreferredEditSize()
     {
-        if (anyContext == null) return 16f;
-
-        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
-
-        int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
-
-        if (pixels < 500) return 17f;
-
-        return 24f;
+        return getDeviceTextSize(24f);
     }
 
     public static float getPreferredTextSize()
     {
-        if (anyContext == null) return 17f;
+        return getDeviceTextSize(22f);
+    }
 
-        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
+    public static float getPreferredTitleSize()
+    {
+        return getDeviceTextSize(24f);
+    }
 
-        int pixels = Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
+    public static void setFontScale()
+    {
+        if (getResources().getConfiguration().fontScale > 1.0f)
+        {
+            Settings.System.putFloat(getContentResolver(), Settings.System.FONT_SCALE, 1.0f);
 
-        if (pixels < 500) return 17f;
+            Configuration configuration = getResources().getConfiguration();
+            configuration.fontScale = 1.0f;
 
-        return 18f;
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+
+            getResources().updateConfiguration(configuration, metrics);
+
+            Log.d(LOGTAG, "setFontScale: adjusted.");
+        }
+    }
+
+    public static boolean isTablet()
+    {
+        return (getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     public static int getActionBarHeight()
@@ -1145,6 +1480,70 @@ public class Simple
         return getHexBytesToString(bytes, 0, bytes.length);
     }
 
+    @Nullable
+    public static String getBase64Encoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return Base64.encodeToString(str.getBytes(), 0);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getBase64Decoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return new String(Base64.decode(str, 0));
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getUrlEncoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return URLEncoder.encode(str, "UTF-8");
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getUrlDecoded(String str)
+    {
+        if (str == null) return null;
+
+        try
+        {
+            return URLDecoder.decode(str, "UTF-8");
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
     public static String getHexBytesToString(byte[] bytes, int offset, int length)
     {
         char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -1176,6 +1575,50 @@ public class Simple
         }
 
         return bytes;
+    }
+
+    public static byte[] appendBytes(byte[] buffer, byte[] append)
+    {
+        if (append == null) return buffer;
+
+        return appendBytes(buffer, append, 0, append.length);
+    }
+
+    public static byte[] appendBytes(byte[] buffer, byte[] append, int offset, int size)
+    {
+        if (append == null) return buffer;
+        if (buffer == null) return null;
+
+        byte[] newbuf = new byte[ buffer.length + size ];
+
+        System.arraycopy(buffer, 0, newbuf, 0, buffer.length);
+        System.arraycopy(append, offset, newbuf, buffer.length, size);
+
+        return newbuf;
+    }
+
+    @Nullable
+    public static byte[] getAllInputData(InputStream input)
+    {
+        byte[] buffer = new byte[ 0 ];
+        byte[] chunk = new byte[ 8192 ];
+        int xfer;
+
+        try
+        {
+            while ((xfer = input.read(chunk)) > 0)
+            {
+                buffer = appendBytes(buffer, chunk, 0, xfer);
+            }
+        }
+        catch (IOException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+
+            return null;
+        }
+
+        return buffer;
     }
 
     public static String getAllInput(InputStream input)
@@ -1226,14 +1669,46 @@ public class Simple
     }
 
     @Nullable
+    public static InputStream getInputStream(String contentUrl)
+    {
+        try
+        {
+            Uri contentUri = Uri.parse(contentUrl);
+            return anyContext.getContentResolver().openInputStream(contentUri);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    @Nullable
     public static String getFileContent(File file)
     {
         byte[] bytes = getFileBytes(file);
         return (bytes == null) ? null : new String(bytes);
     }
 
+    @Nullable
+    public static JSONObject getFileJSONObject(File file)
+    {
+        byte[] bytes = getFileBytes(file);
+        return (bytes == null) ? null : Json.fromStringObject(new String(bytes));
+    }
+
+    @Nullable
+    public static JSONArray getFileJSONArray(File file)
+    {
+        byte[] bytes = getFileBytes(file);
+        return (bytes == null) ? null : Json.fromStringArray(new String(bytes));
+    }
+
     public static boolean putFileBytes(File file, byte[] bytes)
     {
+        if (bytes == null) return false;
+
         try
         {
             OutputStream out = new FileOutputStream(file);
@@ -1252,7 +1727,12 @@ public class Simple
 
     public static boolean putFileContent(File file, String content)
     {
-        return putFileBytes(file, content.getBytes());
+        return (content != null) && putFileBytes(file, content.getBytes());
+    }
+
+    public static boolean putFileJSON(File file, JSONObject json)
+    {
+        return (json != null) && putFileContent(file, Json.toPretty(json));
     }
 
     public static File changeExtension(File file, String extension)
@@ -1336,14 +1816,14 @@ public class Simple
     @Nullable
     public static Drawable getDrawableFromFile(String file)
     {
-        Bitmap myBitmap = getBitmapFromFile(file);
+        Bitmap myBitmap = getBitmap(file);
         if (myBitmap == null) return null;
 
         return new BitmapDrawable(appContext.getResources(), myBitmap);
     }
 
     @Nullable
-    public static Bitmap getBitmapFromFile(String file)
+    public static Bitmap getBitmap(String file)
     {
         try
         {
@@ -1357,7 +1837,22 @@ public class Simple
         return null;
     }
 
-    public static Bitmap getBitmapFromResource(int resid)
+    @Nullable
+    public static Bitmap getBitmap(File file)
+    {
+        try
+        {
+            return BitmapFactory.decodeFile(file.toString());
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return null;
+    }
+
+    public static Bitmap getBitmap(int resid)
     {
         return BitmapFactory.decodeResource(anyContext.getResources(), resid);
     }
@@ -1579,6 +2074,27 @@ public class Simple
         return null;
     }
 
+    @Nullable
+    public static String UTF8defuck(String utf8)
+    {
+        //
+        // Remove
+        //
+        // LEFT-TO-RIGHT EMBEDDING
+        // POP DIRECTIONAL FORMATTING
+        //
+        // fuck characters.
+        //
+
+        if (utf8 != null)
+        {
+            utf8 = utf8.replace("\u202A", "");
+            utf8 = utf8.replace("\u202C", "");
+        }
+
+        return utf8;
+    }
+
     public static String JSONdefuck(String json)
     {
         //
@@ -1608,8 +2124,6 @@ public class Simple
 
     public static long todayAsTimeStamp()
     {
-        long now = (nowAsTimeStamp() / (1000 * 86400)) * (1000 * 86400);
-
         Calendar calendar = new GregorianCalendar();
 
         int year = calendar.get(Calendar.YEAR);
@@ -1650,6 +2164,8 @@ public class Simple
 
     public static long getTimeStamp(String isodate)
     {
+        if (isodate == null) return 0;
+
         try
         {
             SimpleDateFormat df = new SimpleDateFormat(ISO8601DATEFORMAT, Locale.getDefault());
@@ -1690,9 +2206,23 @@ public class Simple
         return 0;
     }
 
-    public static String getLocalDay(long timeStamp)
+    public static String getLocalDayOfMonth(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("d", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(timeStamp);
+    }
+
+    public static String getLocalDayOfWeek(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("EEEE", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(timeStamp);
+    }
+
+    public static String getLocalMonth(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("MMMM", Locale.getDefault());
         df.setTimeZone(TimeZone.getDefault());
         return df.format(timeStamp);
     }
@@ -1721,6 +2251,13 @@ public class Simple
         DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
         df.setTimeZone(TimeZone.getDefault());
         return df.format(new Date(getTimeStamp(isodate)));
+    }
+
+    public static String getLocalDateInternal(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(new Date(timeStamp));
     }
 
     public static String getLocalDate(long timeStamp)
@@ -1894,6 +2431,27 @@ public class Simple
         }
 
         return Json.sort(list, "time", desc);
+    }
+
+    public static String[] getDirectoryAsArray(File dir, FilenameFilter filter)
+    {
+        String[] files = null;
+
+        try
+        {
+            files = dir.list(filter);
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return (files != null) ? files : new String[ 0 ];
+    }
+
+    public static ArrayList<String> getDirectoryAsList(File dir, FilenameFilter filter)
+    {
+        return new ArrayList<>(Arrays.asList(getDirectoryAsArray(dir, filter)));
     }
 
     public static class FileFilter implements FilenameFilter
@@ -2104,6 +2662,11 @@ public class Simple
 
     public static HttpURLConnection openUnderscoreConnection(String src) throws Exception
     {
+        return openUnderscoreConnection(src, true);
+    }
+
+    public static HttpURLConnection openUnderscoreConnection(String src, boolean connect) throws Exception
+    {
         URL url = new URL(src);
 
         String host = null;
@@ -2122,7 +2685,8 @@ public class Simple
 
         connection.setUseCaches(false);
         connection.setDoInput(true);
-        connection.connect();
+
+        if (connect) connection.connect();
 
         return connection;
     }

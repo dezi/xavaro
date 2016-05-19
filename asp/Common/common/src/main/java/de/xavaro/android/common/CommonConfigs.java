@@ -11,12 +11,21 @@ public class CommonConfigs
     //region Global icons
 
     // @formatter:off
-    public static final int IconResNext         = R.drawable.next_600x600;
-    public static final int IconResPrev         = R.drawable.prev_600x600;
-    public static final int IconResVoice        = R.drawable.voice_256x256;
-    public static final int IconResVoiceListen  = R.drawable.voice_ear_256x256;
-    public static final int IconResActivity     = R.drawable.activity_256x256;
-    public static final int IconResBetaVersion  = R.drawable.betaversion_256x256;
+    public static final int IconResAnon             = R.drawable.anon_300x300;
+    public static final int IconResNext             = R.drawable.next_600x600;
+    public static final int IconResPrev             = R.drawable.prev_600x600;
+    public static final int IconResVoice            = R.drawable.voice_256x256;
+    public static final int IconResPrepaid          = R.drawable.prepaid_600x600;
+    public static final int IconResVoiceListen      = R.drawable.voice_ear_256x256;
+    public static final int IconResActivity         = R.drawable.activity_256x256;
+    public static final int IconResBetaVersion      = R.drawable.betaversion_256x256;
+    public static final int IconResMonitoring       = R.drawable.monitoring_626x626;
+    public static final int IconResBattery          = R.drawable.battery_charge_100_600x600;
+    public static final int IconResSocial           = R.drawable.social_600x600;
+    public static final int IconResSocialTwitter    = R.drawable.social_twitter_400x400;
+    public static final int IconResSocialFacebook   = R.drawable.social_facebook_400x400;
+    public static final int IconResSocialGoogleplus = R.drawable.social_googleplus_400x400;
+    public static final int IconResSocialInstagram  = R.drawable.social_instagram_400x400;
     // @formatter:on
 
     //endregion Global icons
@@ -59,7 +68,7 @@ public class CommonConfigs
 
     //region Colors and styles
 
-    public static final int LaunchItemSize = 220;
+    public static final int LaunchItemSize = 190;
 
     // @formatter:off
     public static final int PreferenceTextEnabledColor  = 0xff444444;

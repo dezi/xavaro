@@ -110,7 +110,7 @@ public class WebAppLoader extends WebViewClient
         byte[] bytes = Simple.getFileBytes(new File(url.substring(8)));
         if (bytes == null) return denyLoad();
 
-        String mime = "application/binary";
+        String mime = "image/jpeg";
         String enco = "UTF-8";
 
         return new WebResourceResponse(mime, enco, new ByteArrayInputStream(bytes));

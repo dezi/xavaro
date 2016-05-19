@@ -1,0 +1,24 @@
+{
+  "name":"BeIn Sports 3 HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "Globecast",
+    "HDTV",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "17:CanalSat France"
+  ],
+  "providers":
+  [
+    "GlobeCast"
+  ]
+}

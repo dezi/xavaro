@@ -3,6 +3,9 @@ package de.xavaro.android.safehome;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.OperationApplicationException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
@@ -30,8 +33,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
+import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
 
@@ -411,7 +416,7 @@ public class ContactsHandler
         }
     }
 
-    public static long getContactID(Context context,String name)
+    public static long getContactID(Context context, String name)
     {
         Cursor cursor = null;
 
@@ -445,16 +450,14 @@ public class ContactsHandler
             if (cursor != null)
             {
                 cursor.close();
-                cursor = null;
             }
         }
 
         return -1;
     }
 
-    public static void WritePhoneContact(Context context,String name, String number)
+    public static void WritePhoneContact(Context context, String name, String number)
     {
-
         getContactID(context,"XAVARO");
 
         ArrayList<ContentProviderOperation> contProOper = new ArrayList<>();

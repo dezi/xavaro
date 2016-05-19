@@ -12,9 +12,9 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final boolean  BetaFlag        = true;
-    public static final String   BetaVersion     = "0.8.002";
-    public static final String   BetaVersionDate = "2016-03-23T23:00:00Z";
-    public static final String   BetaExpiration  = "2016-05-21T23:00:00Z";
+    public static final String   BetaVersion     = "0.8.011";
+    public static final String   BetaVersionDate = "2016-05-15T23:00:00Z";
+    public static final String   BetaExpiration  = "2016-06-21T23:00:00Z";
     // @formatter:on
 
     //endregion
@@ -23,7 +23,7 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final int LaunchPageBackgroundColor   = 0xffffffee;
-    public static final int LaunchArrowBackgroundColor  = 0x40ddddcc;
+    public static final int LaunchArrowBackgroundColor  = 0x00ddddcc;
     public static final int ChatActivityBackgroundColor = 0x88ffffee;
     // @formatter:on
 
@@ -90,6 +90,7 @@ public class GlobalConfigs
     public static final int IconResHealthGlucose      = R.drawable.health_glucose_512x512;
     public static final int IconResBlueTooth          = R.drawable.bluetooth_256x256;
     public static final int IconResAppsDiscounter     = R.drawable.discounter_512x512;
+    public static final int IconResCallImportant      = R.drawable.call_important_600x600;
     // @formatter:on
 
     //endregion

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 
+import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -30,29 +31,21 @@ public class LaunchItemApps extends LaunchItem
         if (config.has("apkname"))
         {
             String apkname = Json.getString(config, "apkname");
+            String iconpath = CacheManager.getAppIconPath(apkname);
 
             CommonConfigs.weLikeThis(apkname);
-            Drawable appIcon = Simple.getIconFromApplication(apkname);
 
-            if (appIcon != null)
+            if (Simple.isAppInstalled(apkname))
             {
-                icon.setImageDrawable(appIcon);
+                icon.setImageResource(iconpath);
             }
             else
             {
-                Drawable psicon = Simple.getIconFromApplication(CommonConfigs.packagePlaystore);
-                Drawable appicon = Simple.getIconFromAppStore(apkname);
+                String psiconpath = CacheManager.getAppIconPath(CommonConfigs.packagePlaystore);
 
-                if ((psicon != null) && (appicon != null))
-                {
-                    icon.setImageDrawable(psicon);
-                    overicon.setImageDrawable(appicon);
-                    overlay.setVisibility(VISIBLE);
-                }
-                else
-                {
-                    icon.setImageResource(R.drawable.stop_512x512);
-                }
+                icon.setImageResource(psiconpath);
+                overicon.setImageResource(iconpath);
+                overlay.setVisibility(VISIBLE);
             }
         }
         else

@@ -147,6 +147,54 @@ function json_nukeempty(&$data)
 	}
 } 
 
+function json_decomment($json)
+{
+	if (strpos($json, "//") === false) return $json;
+	
+	$lines = explode("\n", $json);
+	
+	for ($inx = 0; $inx < count($lines); $inx++)
+	{
+		$line = $lines[ $inx ];
+		
+		if (strpos($line, "//") === false) continue;
+		
+		$quote = false;
+		$slash = false;
+		
+		for ($cnt = 0; $cnt < strlen($line); $cnt++)
+		{
+			if ($line[ $cnt ] == "\"")
+			{
+				$quote = ! $quote;
+				$slash = false;
+				continue;
+			}
+			
+			if ($quote) continue;
+			
+			if ($line[ $cnt ] == "/")
+			{
+				if ($slash)
+				{
+					$lines[ $inx ] = substr($line, 0, $cnt - 1);
+					
+					break;
+				}
+				
+				$slash = true;
+				continue;
+			}
+			
+			$slash = false;
+		}
+	}
+	
+	$json = implode("\n", $lines);
+	
+	return $json;
+}
+
 function json_defuck($file)
 {
 	$fd = fopen($file,"r");

@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 
@@ -15,190 +16,17 @@ import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PersistManager;
+import de.xavaro.android.common.PreferenceFragments;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SystemIdentity;
+import de.xavaro.android.common.WebLib;
 
 public class PreferencesComm
 {
     private static final String LOGTAG = PreferencesComm.class.getSimpleName();
-
-    //region Xavaro communication preferences
-
-    public static class XavaroFragment extends PreferencesBasics.EnablePreferenceFragment
-    {
-        public static PreferenceActivity.Header getHeader()
-        {
-            PreferenceActivity.Header header;
-
-            header = new PreferenceActivity.Header();
-            header.title = "Xavaro";
-            header.iconRes = GlobalConfigs.IconResXavaro;
-            header.fragment = XavaroFragment.class.getName();
-
-            return header;
-        }
-
-        protected final CharSequence[] sendtoText= {
-                "Nicht aktiviert",
-                "Home-Bildschirm",
-                "App-Verzeichnis",
-                "Kontakte-Verzeichnis"};
-
-        protected final CharSequence[] sendtoVals = {
-                "inact",
-                "home",
-                "appdir",
-                "comdir" };
-
-        public XavaroFragment()
-        {
-            super();
-
-            iconres = GlobalConfigs.IconResXavaro;
-            keyprefix = "xavaro";
-            masterenable = "Xavaro Kommunikation freischalten";
-        }
-
-        @Override
-        public void registerAll(Context context)
-        {
-            super.registerAll(context);
-
-            //
-            // Confirmed connects.
-            //
-
-            registerRemotes(context, true);
-        }
-
-        private final ArrayList<String> remoteContacts = new ArrayList<>();
-
-        private void registerRemotes(Context context, boolean initial)
-        {
-            NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceListPreference cb;
-
-            activekeys.clear();
-
-            //
-            // Remote user contacts.
-            //
-
-            String usersxpath = "RemoteContacts/identities";
-            JSONObject rcs = PersistManager.getXpathJSONObject(usersxpath);
-
-            if (rcs != null)
-            {
-                Iterator<String> keysIterator = rcs.keys();
-
-                while (keysIterator.hasNext())
-                {
-                    String ident = keysIterator.next();
-
-                    if (remoteContacts.contains(ident)) continue;
-                    remoteContacts.add(ident);
-
-                    String prefkey = keyprefix + ".remote.users";
-
-                    String name = RemoteContacts.getDisplayName(ident);
-
-                    pc = new NicedPreferences.NiceCategoryPreference(context);
-                    pc.setTitle(name);
-
-                    preferences.add(pc);
-                    if (!initial) getPreferenceScreen().addPreference(pc);
-
-                    cb = new NicedPreferences.NiceListPreference(context);
-                    cb.setKey(prefkey + ".chat." + ident);
-                    cb.setEntries(sendtoText);
-                    cb.setEntryValues(sendtoVals);
-                    cb.setDefaultValue("inact");
-                    cb.setTitle("Nachricht");
-
-                    preferences.add(cb);
-                    activekeys.add(cb.getKey());
-
-                    if (!initial) getPreferenceScreen().addPreference(cb);
-                }
-            }
-
-            //
-            // Remote group contacts.
-            //
-
-            String groupsxpath = "RemoteGroups/groupidentities";
-            JSONObject rgs = PersistManager.getXpathJSONObject(groupsxpath);
-
-            if (rgs != null)
-            {
-                Iterator<String> keysIterator = rgs.keys();
-
-                while (keysIterator.hasNext())
-                {
-                    String ident = keysIterator.next();
-
-                    if (remoteContacts.contains(ident)) continue;
-                    remoteContacts.add(ident);
-
-                    String grouptype = RemoteGroups.getGroupType(ident);
-                    String groupowner = RemoteGroups.getGroupOwner(ident);
-
-                    if (Simple.equals(grouptype, "alertcall") &&
-                            Simple.equals(groupowner, SystemIdentity.getIdentity()))
-                    {
-                        //
-                        // This alertgroup is owned by the owner. The chat dialog
-                        // will always be available under the alerter icon.
-                        //
-
-                        continue;
-                    }
-
-                    String prefkey = keyprefix + ".remote.groups";
-
-                    String name = RemoteGroups.getDisplayName(ident);
-
-                    pc = new NicedPreferences.NiceCategoryPreference(context);
-                    pc.setTitle(name);
-
-                    preferences.add(pc);
-                    if (!initial) getPreferenceScreen().addPreference(pc);
-
-                    cb = new NicedPreferences.NiceListPreference(context);
-                    cb.setKey(prefkey + ".chat." + ident);
-                    cb.setEntries(sendtoText);
-                    cb.setEntryValues(sendtoVals);
-                    cb.setDefaultValue("inact");
-                    cb.setTitle("Nachricht");
-
-                    preferences.add(cb);
-                    activekeys.add(cb.getKey());
-
-                    if (!initial) getPreferenceScreen().addPreference(cb);
-                }
-            }
-
-            //
-            // Remove disabled or obsoleted preferences.
-            //
-
-            String websiteprefix = keyprefix + ".";
-
-            Map<String, ?> exists = Simple.getAllPreferences(keyprefix + ".remote.");
-
-            for (Map.Entry<String, ?> entry : exists.entrySet())
-            {
-                if (activekeys.contains(entry.getKey())) continue;
-
-                Simple.removeSharedPref(entry.getKey());
-            }
-
-        }
-    }
-
-    //endregion Xavaro remote preferences
 
     //region Phone preferences
 
@@ -253,7 +81,7 @@ public class PreferencesComm
             iconres = GlobalConfigs.IconResSkype;
             keyprefix = "skype";
             masterenable = "Skype freischalten";
-            installtext = "Skype App";
+            installtext = "Skype";
             installpack = CommonConfigs.packageSkype;
         }
     }
@@ -284,7 +112,7 @@ public class PreferencesComm
             iconres = GlobalConfigs.IconResWhatsApp;
             keyprefix = "whatsapp";
             masterenable = "WhatsApp freischalten";
-            installtext = "WhatsApp App";
+            installtext = "WhatsApp";
             installpack = CommonConfigs.packageWhatsApp;
         }
     }
@@ -293,7 +121,7 @@ public class PreferencesComm
 
     //region Contacts preferences stub
 
-    public static class ContactsFragmentStub extends PreferencesBasics.EnablePreferenceFragment
+    public static class ContactsFragmentStub extends PreferenceFragments.EnableFragmentStub
     {
         protected boolean isPhone;
         protected boolean isSkype;
@@ -353,41 +181,89 @@ public class PreferencesComm
             super.registerAll(context);
 
             NicedPreferences.NiceCategoryPreference nc;
+            NicedPreferences.NiceScorePreference sp;
             NicedPreferences.NiceListPreference lp;
 
             boolean enabled = Simple.getSharedPrefBoolean(keyprefix + ".enable");
 
             if (installpack != null)
             {
-                lp = new NicedPreferences.NiceListPreference(context);
-
                 boolean installed = Simple.isAppInstalled(installpack);
 
-                lp.setEntries(installText);
-                lp.setEntryValues(installVals);
-                lp.setKey(keyprefix + ".installed");
-                lp.setTitle(installtext);
-                lp.setEnabled(enabled);
+                JSONObject config = WebLib.getLocaleConfig("appstore");
+                config = Json.getObject(config, "essential");
+                config = Json.getObject(config, installpack);
 
-                //
-                // This is nice about Java. No clue how it is done!
-                //
-
-                final String installName = installpack;
-
-                lp.setOnclick(new Runnable()
+                if (config != null)
                 {
-                    @Override
-                    public void run()
+                    nc = new NicedPreferences.NiceCategoryPreference(context);
+                    nc.setTitle(Json.getString(config, "label") + " – " + "Anwendung");
+                    nc.setEnabled(enabled);
+
+                    preferences.add(nc);
+
+                    //
+                    // Score preference.
+                    //
+
+                    sp = new NicedPreferences.NiceScorePreference(context);
+
+                    sp.setKey(keyprefix + ".installed");
+                    sp.setEntries(installText);
+                    sp.setEntryValues(installVals);
+                    sp.setTitle(Json.getString(config, "label"));
+                    sp.setSummary(Json.getString(config, "summary"));
+                    sp.setEnabled(enabled);
+
+                    String score = Json.getString(config, "score");
+                    sp.setScore((score == null) ? -1 : Integer.parseInt(score));
+                    sp.setAPKName(installpack);
+
+                    Simple.setSharedPrefString(sp.getKey(), installed ? "ready" : "notinst");
+
+                    preferences.add(sp);
+                    activekeys.add(sp.getKey());
+                }
+                else
+                {
+                    nc = new NicedPreferences.NiceCategoryPreference(context);
+                    nc.setTitle(installtext + " – " + "Anwendung");
+                    nc.setEnabled(enabled);
+
+                    preferences.add(nc);
+
+                    //
+                    // Legacy preference.
+                    //
+
+                    lp = new NicedPreferences.NiceListPreference(context);
+
+                    lp.setEntries(installText);
+                    lp.setEntryValues(installVals);
+                    lp.setKey(keyprefix + ".installed");
+                    lp.setTitle(installtext);
+                    lp.setEnabled(enabled);
+
+                    //
+                    // This is nice about Java. No clue how it is done!
+                    //
+
+                    final String installName = installpack;
+
+                    lp.setOnclick(new Runnable()
                     {
-                        Simple.installAppFromPlaystore(installName);
-                    }
-                });
+                        @Override
+                        public void run()
+                        {
+                            Simple.installAppFromPlaystore(installName);
+                        }
+                    });
 
-                Simple.setSharedPrefString(lp.getKey(), installed ? "ready" : "notinst");
+                    Simple.setSharedPrefString(lp.getKey(), installed ? "ready" : "notinst");
 
-                preferences.add(lp);
-                activekeys.add(lp.getKey());
+                    preferences.add(lp);
+                    activekeys.add(lp.getKey());
+                }
             }
 
             JSONObject contacts = ContactsHandler.getJSONData(context);
@@ -434,8 +310,9 @@ public class PreferencesComm
                         // the numbers with spaces.
                         //
 
-                        String isspacenum = Json.getString(item, "NUMBER");
+                        String isspacenum = Simple.UTF8defuck(Json.getString(item, "NUMBER"));
                         if (isspacenum == null) continue;
+
                         String nospacenum = isspacenum.replace(" ", "");
 
                         JSONObject number;
@@ -457,6 +334,15 @@ public class PreferencesComm
                             Json.put(number, "nicephone", isspacenum);
                             Json.put(number, "label", Json.getString(item, "LABEL"));
                             Json.put(number, "type", Json.getInt(item, "TYPE"));
+
+                            int type = Json.getInt(item, "TYPE");
+
+                            if (type != 0)
+                            {
+                                String tkey = "" + type;
+                                String label = Simple.getTransVal(R.array.phone_labels_keys, tkey);
+                                Json.put(number, "label", label);
+                            }
                         }
                     }
 
@@ -464,8 +350,11 @@ public class PreferencesComm
                     {
                         if (Simple.equals(kind, "Phone"))
                         {
-                            putNumberType(numbers, "voipphone", Json.getString(item, "NUMBER"));
-                            putNumberType(numbers, "textphone", Json.getString(item, "NUMBER"));
+                            putNumberType(numbers, "voipphone",
+                                    Simple.UTF8defuck(Json.getString(item, "NUMBER")));
+
+                            putNumberType(numbers, "textphone",
+                                    Simple.UTF8defuck(Json.getString(item, "NUMBER")));
                         }
                     }
 
@@ -543,22 +432,27 @@ public class PreferencesComm
                         multi = numbersIterator.hasNext();
                         first = false;
 
+                        Drawable icon = ProfileImages.getProfileDrawable(nicephone, true);
+
                         nc = new NicedPreferences.NiceCategoryPreference(context);
                         nc.setTitle(name + (multi ? "" : " " + nicephone));
+                        nc.setIcon(icon);
                         nc.setEnabled(enabled);
+
                         preferences.add(nc);
                     }
 
                     if (chatphone != null)
                     {
-                        String key = keyprefix + ".chat." + chatphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".chat." + chatphone);
+                        lp.setTitle("Nachricht" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("Nachricht" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);
@@ -567,14 +461,15 @@ public class PreferencesComm
 
                     if (textphone != null)
                     {
-                        String key = keyprefix + ".text." + voipphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".text." + voipphone);
+                        lp.setTitle("SMS" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("SMS" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);
@@ -583,14 +478,15 @@ public class PreferencesComm
 
                     if (voipphone != null)
                     {
-                        String key = keyprefix + ".voip." + voipphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".voip." + voipphone);
+                        lp.setTitle("Anruf" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("Anruf" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);
@@ -599,14 +495,15 @@ public class PreferencesComm
 
                     if (vicaphone != null)
                     {
-                        String key = keyprefix + ".vica." + vicaphone;
                         lp = new NicedPreferences.NiceListPreference(context);
 
+                        lp.setKey(keyprefix + ".vica." + vicaphone);
+                        lp.setTitle("Videoanruf" + (multi ? " " + nicephone : ""));
+
+                        if (multi) lp.setSummary(Json.getString(number, "label"));
                         lp.setEntries(destText);
                         lp.setEntryValues(destVals);
                         lp.setDefaultValue("inact");
-                        lp.setKey(key);
-                        lp.setTitle("Videoanruf" + (multi ? " " + nicephone : ""));
                         lp.setEnabled(enabled);
 
                         preferences.add(lp);

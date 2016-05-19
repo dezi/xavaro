@@ -87,10 +87,15 @@ public class LaunchGroupRoot extends LaunchGroup
 
         ArrayList<JSONArray> configs = new ArrayList<>();
 
+        //configs.add(LaunchItemAlertcall.getConfig());
+        //configs.add(LaunchItemVoice.getConfig());
+
         configs.add(LaunchItemBeta.getConfig());
         configs.add(LaunchItemToday.getConfig());
-        configs.add(LaunchItemVoice.getConfig());
-        configs.add(LaunchItemAlertcall.getConfig());
+        configs.add(LaunchItemBattery.getConfig());
+
+        configs.add(LaunchGroupCalls.getConfig("calls","monitors"));
+        configs.add(LaunchGroupCalls.getConfig("calls","important"));
 
         configs.add(LaunchGroupHealth.getConfig());
 
@@ -98,6 +103,8 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchGroupComm.SkypeGroup.getConfig());
         configs.add(LaunchGroupComm.WhatsappGroup.getConfig());
         configs.add(LaunchGroupComm.XavaroGroup.getConfig());
+
+        configs.add(LaunchGroupSocial.getConfig());
 
         configs.add(LaunchGroupWebStream.getConfig("iptv"));
         configs.add(LaunchGroupWebStream.getConfig("iprd"));

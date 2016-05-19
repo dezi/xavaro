@@ -1,0 +1,25 @@
+{
+  "name":"Téva HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "12:Orange France",
+    "17:CanalSat France",
+    "28:SFR"
+  ],
+  "providers":
+  [
+    "CSAT"
+  ]
+}

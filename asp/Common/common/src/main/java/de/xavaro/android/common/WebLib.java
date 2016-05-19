@@ -1,5 +1,8 @@
 package de.xavaro.android.common;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
@@ -12,8 +15,7 @@ public class WebLib
     @Nullable
     public static JSONObject getConfig(String weblib)
     {
-        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval = Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+        int interval = WebApp.getWebAppInterval();
 
         String src = WebApp.getHTTPLibRoot() + weblib + ".json";
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);
@@ -35,8 +37,7 @@ public class WebLib
     @Nullable
     public static JSONObject getLocaleConfig(String weblib)
     {
-        String bypass = "developer.webapps.httpbypass." + Simple.getWifiName();
-        int interval =  Simple.getSharedPrefBoolean(bypass) ? 0 : 24;
+        int interval = WebApp.getWebAppInterval();
 
         String src = WebApp.getHTTPLibRoot() + weblib + ".json";
         WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);
@@ -66,5 +67,30 @@ public class WebLib
         }
 
         return null;
+    }
+
+    @Nullable
+    public static byte[] getIconData(String weblib, String iconurl)
+    {
+        int interval = WebApp.getWebAppInterval();
+
+        String src = WebApp.getHTTPLibRoot() + weblib + "/" + iconurl;
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile("weblibs", src, interval);
+        return wcr.content;
+    }
+
+    @Nullable
+    public static Bitmap getIconBitmap(String weblib, String iconurl)
+    {
+        byte[] data = getIconData(weblib, iconurl);
+        if (data == null) return null;
+
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
+    }
+
+    @Nullable
+    public static Drawable getIconDrawable(String weblib, String iconurl)
+    {
+        return Simple.getDrawable(getIconBitmap(weblib, iconurl));
     }
 }

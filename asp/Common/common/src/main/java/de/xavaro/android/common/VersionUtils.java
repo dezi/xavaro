@@ -5,7 +5,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.system.ErrnoException;
+import android.telephony.PhoneNumberUtils;
 import android.util.DisplayMetrics;
 import android.os.Build;
 import android.view.KeyCharacterMap;
@@ -18,6 +20,20 @@ import android.view.ViewConfiguration;
 
 public class VersionUtils
 {
+    @Nullable
+    public static String formatPhoneNumber(String phone)
+    {
+        if (phone == null) return null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            return PhoneNumberUtils.formatNumber(phone, Simple.getLocaleCountry());
+        }
+
+        //noinspection deprecation
+        return PhoneNumberUtils.formatNumber(phone);
+    }
+
     //
     // Get SDK compliant drawable resource.
     //

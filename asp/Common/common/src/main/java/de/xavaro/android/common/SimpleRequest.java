@@ -1,9 +1,16 @@
 package de.xavaro.android.common;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -12,6 +19,7 @@ import java.net.URL;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 
 public class SimpleRequest
 {
@@ -38,15 +46,15 @@ public class SimpleRequest
         return doHTTPGet(src, null);
     }
 
-    private static void logStuff(String string)
+    @Nullable
+    public static String doHTTPGet(String src, String referrer)
     {
-        String[] lines = string.split("\r\n");
-
-        for (String line : lines) Log.d(LOGTAG,"logStuff:<" + line + ">");
+        byte[] data = doHTTPGetData(src, referrer);
+        return (data == null) ? null : new String(data);
     }
 
     @Nullable
-    public static String doHTTPGet(String src, String referrer)
+    public static byte[] doHTTPGetData(String src, String referrer)
     {
         try
         {
@@ -213,7 +221,7 @@ public class SimpleRequest
                 input.close();
                 output.close();
 
-                return new String(response);
+                return response;
             }
             else
             {
@@ -241,7 +249,7 @@ public class SimpleRequest
                 input.close();
                 output.close();
 
-                return new String(response);
+                return response;
             }
         }
         catch (Exception ex)
@@ -305,6 +313,8 @@ public class SimpleRequest
     @Nullable
     public static String[] readLines(String url)
     {
+        if (url == null) return null;
+
         try
         {
             HttpURLConnection connection = Simple.openUnderscoreConnection(url);
@@ -342,9 +352,76 @@ public class SimpleRequest
     @Nullable
     public static String readContent(String url)
     {
+        return readContent(url, null, null);
+    }
+
+    @Nullable
+    public static String readContent(String url, String oauth)
+    {
+        return readContent(url, oauth, null);
+    }
+
+    @Nullable
+    public static String readContent(String url, JSONObject post)
+    {
+        return readContent(url, null, post);
+    }
+
+    @Nullable
+    public static String readContent(String url, String oauth, JSONObject post)
+    {
+        if (url == null) return null;
+
         try
         {
-            HttpURLConnection connection = Simple.openUnderscoreConnection(url);
+            HttpURLConnection connection = Simple.openUnderscoreConnection(url, false);
+
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
+
+            connection.setRequestMethod((post == null) ? "GET" : "POST");
+
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 Gecko/20100101 Firefox/40.1");
+            if (oauth != null) connection.setRequestProperty("Authorization", oauth);
+
+            if (post != null)
+            {
+                String payload = "";
+
+                Iterator<String> keysIterator = post.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String key = keysIterator.next();
+                    String val = Json.getString(post, key);
+                    if (val == null) continue;
+
+                    payload += ((payload.length() > 0) ? "&" : "")
+                        + Simple.getUrlEncoded(key)
+                        + "="
+                        + Simple.getUrlEncoded(val);
+                }
+
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty("Content-Length", "" + payload.getBytes().length);
+                connection.setDoOutput(true);
+
+                connection.connect();
+
+                OutputStream output = connection.getOutputStream();
+                output.write(payload.getBytes());
+                output.close();
+            }
+            else
+            {
+                connection.connect();
+            }
+
+            int httpres = connection.getResponseCode();
+            String httpmsg = connection.getResponseMessage();
+
+            Log.d(LOGTAG, "readContent:" + httpres + "=" + httpmsg);
+            if ((httpres >= 400) && (httpres <= 499)) return null;
 
             InputStream input = connection.getInputStream();
             StringBuilder string = new StringBuilder();
@@ -362,8 +439,58 @@ public class SimpleRequest
         }
         catch (Exception ignore)
         {
+            ignore.printStackTrace();
         }
 
         return null;
+    }
+
+    @Nullable
+    public static byte[] readData(String url)
+    {
+        if (url == null) return null;
+
+        try
+        {
+            HttpURLConnection connection = Simple.openUnderscoreConnection(url);
+
+            InputStream input = connection.getInputStream();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[ 4096 ];
+            int xfer;
+
+            while ((xfer = input.read(buffer)) >= 0)
+            {
+                output.write(buffer, 0, xfer);
+            }
+
+            input.close();
+
+            return output.toByteArray();
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Bitmap readBitmap(String url)
+    {
+        byte[] data = readData(url);
+        if (data == null) return null;
+
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
+    }
+
+    @Nullable
+    public static Drawable readDrawable(String url)
+    {
+        Bitmap bitmap = readBitmap(url);
+        if (bitmap == null) return null;
+
+        return new BitmapDrawable(Simple.getResources(), bitmap);
     }
 }

@@ -26,7 +26,7 @@ public class LaunchItemWebApp extends LaunchItem
         if (subtype != null)
         {
             Json.put(config, "label", WebApp.getLabel(subtype));
-            icon.setImageDrawable(WebApp.getAppIcon(subtype));
+            icon.setImageResource(subtype);
         }
         else
         {

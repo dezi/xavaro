@@ -3,11 +3,13 @@ package de.xavaro.android.safehome;
 import android.webkit.JavascriptInterface;
 import android.support.annotation.Nullable;
 
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.content.Context;
-import android.webkit.WebView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,12 +18,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.StaticUtils;
@@ -32,7 +33,7 @@ public class PreferencesWebApps
 {
     //region Webapps preferences
 
-    public static class WebappFragment extends PreferencesBasics.BasePreferenceFragment
+    public static class WebappFragment extends PreferenceFragments.BasicFragmentStub
     {
         private static final String LOGTAG = WebappFragment.class.getSimpleName();
 
@@ -79,6 +80,7 @@ public class PreferencesWebApps
             keyprefix = "webapps";
             webappname = getArguments().getString("webappname");
             webappkeyprefix = keyprefix + ".pref." + webappname + ".";
+            icondraw = WebApp.getAppIcon(webappname);
 
             super.onCreate(savedInstanceState);
         }
@@ -99,7 +101,6 @@ public class PreferencesWebApps
             lp.setEntries(vals);
             lp.setEntryValues(keys);
             lp.setDefaultValue("inact");
-            lp.setIcon(WebApp.getAppIcon(webappname));
             lp.setTitle("Aktiviert");
 
             lp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
@@ -122,7 +123,7 @@ public class PreferencesWebApps
 
             if ((webprefs == null) && WebApp.hasPreferences(webappname))
             {
-                webprefs = new WebAppView(Simple.getAppContext());
+                webprefs = new WebAppView(Simple.getActContext());
                 webprefs.loadWebView(webappname, "pref");
 
                 Object builder = new WebAppPrefBuilder();
@@ -142,6 +143,52 @@ public class PreferencesWebApps
                 NicedPreferences.NiceDeletePreference.DeleteCallback
         {
             private final String LOGTAG = WebAppPrefBuilder.class.getSimpleName();
+
+            private final ArrayList<IconPrefData> iconmap = new ArrayList<>();
+            private final Drawable nixpix;
+            private Thread worker;
+
+            public WebAppPrefBuilder()
+            {
+                nixpix = Simple.getDrawable(Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888));
+            }
+
+            private class IconPrefData
+            {
+                public final String icon;
+                public final Preference ap;
+
+                IconPrefData(String icon, Preference ap)
+                {
+                    this.icon = icon;
+                    this.ap = ap;
+                }
+            }
+
+            private Runnable iconload = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (iconmap.size() > 0)
+                    {
+                        IconPrefData ip = iconmap.remove(0);
+
+                        byte[] idata = webprefs.webapploader.getRequestData(ip.icon);
+
+                        if (idata != null)
+                        {
+                            Bitmap bm = BitmapFactory.decodeByteArray(idata, 0, idata.length);
+                            ip.ap.setIcon(Simple.getDrawable(bm));
+                        }
+                    }
+
+                    if (iconmap.size() > 0)
+                    {
+                        handler.postDelayed(iconload, 0);
+                    }
+                }
+            };
 
             @Override
             public boolean onPreferenceChange(Preference preference, Object obj)
@@ -177,6 +224,7 @@ public class PreferencesWebApps
                 if (pref == null) return null;
 
                 String key = Json.getString(pref, "key");
+                String icon = Json.getString(pref, "icon");
                 String type = Json.getString(pref, "type");
                 String title = Json.getString(pref, "title");
                 String summary = Json.getString(pref, "summary");
@@ -201,14 +249,14 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "search"))
                 {
-                    ap = qp = new NicedPreferences.NiceSearchPreference(Simple.getAppContext());
+                    ap = qp = new NicedPreferences.NiceSearchPreference(Simple.getActContext());
 
                     qp.setSearchCallback(this);
                 }
 
                 if (Simple.equals(type, "delete"))
                 {
-                    ap = xp = new NicedPreferences.NiceDeletePreference(Simple.getAppContext());
+                    ap = xp = new NicedPreferences.NiceDeletePreference(Simple.getActContext());
 
                     xp.setDeleteCallback(this);
 
@@ -217,42 +265,42 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "category"))
                 {
-                    ap = ct = new NicedPreferences.NiceCategoryPreference(Simple.getAppContext());
+                    ap = ct = new NicedPreferences.NiceCategoryPreference(Simple.getActContext());
 
                     ct.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "date"))
                 {
-                    ap = dp = new NicedPreferences.NiceDatePreference(Simple.getAppContext());
+                    ap = dp = new NicedPreferences.NiceDatePreference(Simple.getActContext());
 
                     dp.setDefaultValue(Json.getString(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "switch"))
                 {
-                    ap = sp = new NicedPreferences.NiceSwitchPreference(Simple.getAppContext());
+                    ap = sp = new NicedPreferences.NiceSwitchPreference(Simple.getActContext());
 
                     sp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "check"))
                 {
-                    ap = cp = new NicedPreferences.NiceCheckboxPreference(Simple.getAppContext());
+                    ap = cp = new NicedPreferences.NiceCheckboxPreference(Simple.getActContext());
 
                     cp.setDefaultValue(Json.getBoolean(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "edit"))
                 {
-                    ap = ep = new NicedPreferences.NiceEditTextPreference(Simple.getAppContext());
+                    ap = ep = new NicedPreferences.NiceEditTextPreference(Simple.getActContext());
 
                     ep.setDefaultValue(Json.getString(pref, "defvalue"));
                 }
 
                 if (Simple.equals(type, "list"))
                 {
-                    ap = lp = new NicedPreferences.NiceListPreference(Simple.getAppContext());
+                    ap = lp = new NicedPreferences.NiceListPreference(Simple.getActContext());
 
                     lp.setEntries(Json.getArray(pref, "vals"));
                     lp.setEntryValues(Json.getArray(pref, "keys"));
@@ -261,7 +309,7 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "multi"))
                 {
-                    ap = mp = new NicedPreferences.NiceMultiListPreference(Simple.getAppContext());
+                    ap = mp = new NicedPreferences.NiceMultiListPreference(Simple.getActContext());
 
                     mp.setEntries(Json.getArray(pref, "vals"));
                     mp.setEntryValues(Json.getArray(pref, "keys"));
@@ -270,7 +318,7 @@ public class PreferencesWebApps
 
                 if (Simple.equals(type, "number"))
                 {
-                    ap = np = new NicedPreferences.NiceNumberPreference(Simple.getAppContext());
+                    ap = np = new NicedPreferences.NiceNumberPreference(Simple.getActContext());
 
                     int min = Json.getInt(pref, "min");
                     int max = Json.getInt(pref, "max");
@@ -283,6 +331,12 @@ public class PreferencesWebApps
 
                 if (ap != null)
                 {
+                    if (icon != null)
+                    {
+                        iconmap.add(new IconPrefData(icon, ap));
+                        ap.setIcon(nixpix);
+                    }
+
                     ap.setKey(key);
                     ap.setTitle(title);
                     ap.setSummary(summary);
@@ -372,6 +426,8 @@ public class PreferencesWebApps
                 }
 
                 preferences = newprefs;
+
+                if (iconmap.size() > 0) handler.post(iconload);
             }
 
             @JavascriptInterface

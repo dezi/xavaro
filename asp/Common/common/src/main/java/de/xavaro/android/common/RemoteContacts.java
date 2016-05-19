@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RemoteContacts
@@ -17,6 +19,7 @@ public class RemoteContacts
     private static final String LOGTAG = RemoteContacts.class.getSimpleName();
 
     private static final String xPathRoot = "RemoteContacts/identities";
+    private static final Map<String, String> tempGCMTokens = new HashMap<>();
 
     public static void deliverOwnContact(JSONObject rc)
     {
@@ -30,6 +33,9 @@ public class RemoteContacts
             rc.put("gcmUuid", Simple.getGCMToken());
             rc.put("ownerFirstName", sp.getString("owner.firstname", null));
             rc.put("ownerGivenName", sp.getString("owner.givenname", null));
+            rc.put("ownerNickName", sp.getString("owner.nickname", null));
+            rc.put("ownerSkypeName", sp.getString("owner.skypename", null));
+            rc.put("ownerPhoneNumber", sp.getString("owner.phonenumber", null));
         }
         catch (JSONException ex)
         {
@@ -39,28 +45,28 @@ public class RemoteContacts
 
     public static boolean registerContact(JSONObject rc)
     {
-        try
+        String ident = Json.getString(rc, "identity");
+
+        if (ident != null)
         {
-            String ident = rc.getString("identity");
             String xpath = xPathRoot + "/"  + ident;
             JSONObject recontact = PersistManager.getXpathJSONObject(xpath);
             if (recontact == null) recontact = new JSONObject();
 
-            recontact.put("appName", rc.getString("appName"));
-            recontact.put("devName", rc.getString("devName"));
-            recontact.put("macAddr", rc.getString("macAddr"));
-            recontact.put("gcmUuid", rc.getString("gcmUuid"));
-            recontact.put("ownerFirstName", rc.getString("ownerFirstName"));
-            recontact.put("ownerGivenName", rc.getString("ownerGivenName"));
+            Json.copy(recontact, "appName", rc);
+            Json.copy(recontact, "devName", rc);
+            Json.copy(recontact, "macAddr", rc);
+            Json.copy(recontact, "gcmUuid", rc);
+            Json.copy(recontact, "ownerFirstName", rc);
+            Json.copy(recontact, "ownerGivenName", rc);
+            Json.copy(recontact, "ownerNickName", rc);
+            Json.copy(recontact, "ownerSkypeName", rc);
+            Json.copy(recontact, "ownerPhoneNumber", rc);
 
             PersistManager.putXpath(xpath, recontact);
             PersistManager.flush();
 
             return true;
-        }
-        catch (JSONException ex)
-        {
-            OopsService.log(LOGTAG, ex);
         }
 
         return false;
@@ -77,6 +83,7 @@ public class RemoteContacts
         {
             String ident = rc.getString("identity");
             String xpath = xPathRoot + "/" + ident;
+
             PersistManager.putXpath(xpath, rc);
             PersistManager.flush();
 
@@ -96,24 +103,32 @@ public class RemoteContacts
         return PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
     }
 
+    public static void setGCMTokenTemp(String ident, String gcmUuid)
+    {
+        if ((ident != null) && (gcmUuid != null))
+        {
+            tempGCMTokens.put(ident, gcmUuid);
+        }
+    }
+
     @Nullable
     public static String getGCMToken(String ident)
     {
         JSONObject rc = PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
 
-        if (rc != null)
-        {
-            try
-            {
-                if (rc.has("gcmUuid")) return rc.getString("gcmUuid");
-            }
-            catch (JSONException ex)
-            {
-                OopsService.log(LOGTAG, ex);
-            }
-        }
+        if (rc != null) return Json.getString(rc, "gcmUuid");
+
+        if (tempGCMTokens.containsKey(ident))  return tempGCMTokens.get(ident);
 
         return null;
+    }
+
+    @Nullable
+    public static String getSkypeName(String ident)
+    {
+        JSONObject rc = PersistManager.getXpathJSONObject(xPathRoot + "/" + ident);
+
+        return Json.getString(rc, "ownerSkypeName");
     }
 
     public static JSONObject getAllContacts()
@@ -215,5 +230,11 @@ public class RemoteContacts
         //
 
         IdentityManager.removeIdentityFinally(identity);
+
+        //
+        // Remove profile image.
+        //
+
+        ProfileImages.removeXavaroProfileImageFile(identity);
     }
 }

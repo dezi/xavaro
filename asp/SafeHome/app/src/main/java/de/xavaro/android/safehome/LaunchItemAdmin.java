@@ -35,14 +35,14 @@ public class LaunchItemAdmin extends LaunchItem
 
             if (subtype.equals("home"))
             {
-                packageName = DefaultApps.getDefaultHome(context);
+                packageName = DefaultApps.getDefaultHome();
 
                 icon.setImageResource(GlobalConfigs.IconResSelectHome);
             }
 
             if (subtype.equals("assist"))
             {
-                packageName = DefaultApps.getDefaultAssist(context);
+                packageName = DefaultApps.getDefaultAssist();
 
                 icon.setImageResource(GlobalConfigs.IconResSelectAssist);
             }
@@ -89,15 +89,15 @@ public class LaunchItemAdmin extends LaunchItem
 
     private void launchSelect()
     {
-        if (Simple.equals(subtype, "home"  )) DefaultApps.setDefaultHome(context);
-        if (Simple.equals(subtype, "assist")) DefaultApps.setDefaultAssist(context);
+        if (Simple.equals(subtype, "home"  )) DefaultApps.setDefaultHome();
+        if (Simple.equals(subtype, "assist")) DefaultApps.setDefaultAssist();
     }
 
     private void launchSettings()
     {
         if (Simple.equals(subtype, "android"))
         {
-            ProcessManager.launchApp(context, "com.android.settings");
+            ProcessManager.launchApp("com.android.settings");
         }
 
         if (Simple.equals(subtype, "safehome"))
@@ -128,7 +128,7 @@ public class LaunchItemAdmin extends LaunchItem
                 // Package is installed.
                 //
 
-                ProcessManager.launchApp(context, packagename);
+                ProcessManager.launchApp(packagename);
 
                 return;
             }

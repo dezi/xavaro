@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
+import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.ChatManager;
@@ -57,6 +58,8 @@ public class ChatActivity extends AppCompatActivity implements
     private boolean isalert;
     private String idremote;
     private String groupStatus;
+    private String groupOwner;
+    private String groupType;
     private String label;
 
     private FrameLayout.LayoutParams lp;
@@ -74,7 +77,10 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onCreate(savedInstanceState);
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
+
+        int toolbarIcon = R.drawable.communication_400x400;
+        int toolbarColor = 0xff448844;
 
         chatManager = ChatManager.getInstance();
 
@@ -88,7 +94,25 @@ public class ChatActivity extends AppCompatActivity implements
 
         if (RemoteGroups.isGroup(idremote))
         {
-            label = RemoteGroups.getDisplayName(idremote);
+            groupOwner = RemoteGroups.getGroupOwner(idremote);
+            groupType = RemoteGroups.getGroupType(idremote);
+
+            if (Simple.equals(groupOwner, SystemIdentity.getIdentity()) &&
+                    Simple.equals(groupType, "alertcall"))
+            {
+                label = "Assistenz für Dich";
+
+                toolbarIcon = R.drawable.alertgroup_300x300;
+                toolbarColor = 0xff444444;
+            }
+            else
+            {
+                label = RemoteGroups.getDisplayName(idremote);
+
+                toolbarIcon = R.drawable.commchatalert_300x300;
+                toolbarColor = 0xff888888;
+            }
+
             isgroup = true;
         }
 
@@ -105,8 +129,9 @@ public class ChatActivity extends AppCompatActivity implements
 
         toolbar = new DitUndDat.Toolbar(this);
 
+        toolbar.setBackgroundColor(toolbarColor);
         toolbar.title.setText(label);
-        toolbar.icon.setImageResource(R.drawable.communication_400x400);
+        toolbar.icon.setImageResource(toolbarIcon);
         toolbar.trash.setOnClickListener(onTrashClick);
 
         topscreen.addView(toolbar);
@@ -150,7 +175,7 @@ public class ChatActivity extends AppCompatActivity implements
         input.setLayoutParams(lp);
         input.setPadding(16, 12, 16, 12);
         input.setFocusable(false);
-        input.setTextSize(30f);
+        input.setTextSize(Simple.getDeviceTextSize(30f));
         input.setText("Nachricht");
         input.setTextColor(0x33333333);
         input.setTag(0);
@@ -240,7 +265,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         super.onResume();
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
     }
 
     @Override
@@ -607,7 +632,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         if ((group == null) || ! group.has("members"))
         {
-            groupStatus = "unbekannt";
+            groupStatus = "Gruppe hat keine Mitglieder";
             toolbar.subtitle.setText(groupStatus);
 
             return;
@@ -617,6 +642,9 @@ public class ChatActivity extends AppCompatActivity implements
         {
             SharedPreferences sp = Simple.getSharedPrefs();
             JSONArray members = group.getJSONArray("members");
+
+            String grouptype = Json.getString(group, "type");
+            String groupowner = Json.getString(group, "owner");
 
             groupStatus = "";
 
@@ -629,6 +657,15 @@ public class ChatActivity extends AppCompatActivity implements
                 {
                     //
                     // Surprise, we are in the group.
+                    //
+
+                    continue;
+                }
+
+                if (Simple.equals(groupType, "alertcall") && Simple.equals(groupowner, ident))
+                {
+                    //
+                    // The goup owner name is already in title of group.
                     //
 
                     continue;

@@ -1,6 +1,55 @@
-console.log("alive........ locale=" + WebAppUtility.getLocaleCountry());
+WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
+{
+    console.log("=========================>" + prefkey);
+}
 
 tvguide.buildBasicPreference = function()
+{
+//    WebAppPrefs.removeAllPrefs("");
+
+    tvguide.prefs = [];
+
+    var StringsKeys = WebLibStrings.strings[ "tvguide.senderlists.keys" ];
+    var StringsVals = WebLibStrings.strings[ "tvguide.senderlists.vals" ];
+
+    for (var key in StringsKeys)
+    {
+        var category = StringsKeys[ key ];
+        var name     = StringsVals[ key ];
+
+        var pref = {};
+        pref.key = "cat." + category;
+        pref.type = "category";
+        pref.title = name;
+        tvguide.prefs.push(pref);
+
+        var channels = "tvguide.list." + category;
+        var channelList = WebLibStrings.strings[ channels ];
+
+        for (var channel in channelList)
+        {
+            channel = channelList[ channel ];
+
+            var pref = {};
+            pref.key = "channel." + channel;
+            pref.type = "check";
+
+            var title = channel.split("/");
+
+            pref.title = title[ title.length - 1 ];
+            pref.icon = encodeURI("http://" + WebApp.manifest.appserver + "/channels/" + channel + ".png");
+            pref.defvalue = false;
+
+            if (category == "default") pref.defvalue = true;
+
+            tvguide.prefs.push(pref);
+        }
+    }
+
+    WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
+}
+
+tvguide.buildBasicPreferenceSample = function()
 {
     tvguide.prefs = [];
 
@@ -62,7 +111,7 @@ tvguide.buildBasicPreference = function()
     pref.vals = [ "SD", "HD", "Free-TV", "Pay-TV", "Inland",   "Ausland", "Sky", "Antenne", "Kabel", "Satellit" ];
     tvguide.prefs.push(pref);
 
-    WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
+//    WebAppPrefBuilder.updatePreferences(JSON.stringify(tvguide.prefs));
 }
 
 tvguide.buildBasicPreference();

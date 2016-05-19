@@ -10,9 +10,11 @@
 
     "m.bild.de": {
       "url": "http://m.bild.de/",
-      "icon": "http://pbs.twimg.com/profile_images/672813907057229824/g3MBf6VF_400x400.png",
+      "icon": "http://pbs.twimg.com/profile_images/719453746158301185/OmA9DZxW_400x400.jpg",
+
       "label": "Bild Online",
       "default": true,
+      "region": "de",
 
       "intent": {
         "action": "view",
@@ -36,6 +38,7 @@
 
       "label": "Sport Bild",
       "default": true,
+      "region": "de",
 
       "intent": {
         "action": "view",
@@ -53,11 +56,127 @@
       ]
     },
 
+    "m.faz.net": {
+      "url": "http://m.faz.net/",
+      "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg",
+
+      "label": "FAZ Online",
+      "default": true,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "FAZ", "F A Z", "Frankfurter Allgemeine" ],
+        "response": "Ich öffne die FAZ",
+        "sample": "Ich möchte die FAZ lesen"
+      },
+
+      "subdomains": [ "static.faz.net", "gets.faz.net" ]
+    },
+
+    "www.taz.de": {
+      "url": "http://www.taz.de/",
+      "icon": "http://pbs.twimg.com/profile_images/454280998159532032/Pq43tr1F_400x400.png",
+
+      "label": "TAZ",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "TAZ" ],
+        "response": "Ich öffne die TAZ",
+        "sample": "Ich möchte die TAZ lesen"
+      }
+    },
+
+    "www.sueddeutsche.de": {
+      "url": "http://www.sueddeutsche.de/",
+      "icon": "http://pbs.twimg.com/profile_images/654959930663936000/WDymQKHU_400x400.png",
+
+      "label": "Süddeutsche Zeitung",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Süddeutsche Zeitung" ],
+        "response": "Ich öffne die Süddeutsche Zeitung",
+        "sample": "Ich möchte die Süddeutsche Zeitung lesen"
+      }
+    },
+
+    "mobil.fr-online.de": {
+      "url": "http://mobil.fr-online.de/",
+      "icon": "http://pbs.twimg.com/profile_images/378800000730203118/4cc42b7be5291c568b05b651a903d3d3_400x400.jpeg",
+
+      "label": "Frankfurter Rundschau",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Frankfurter Rundschau" ],
+        "response": "Ich öffne die Frankfurter Rundschau",
+        "sample": "Ich möchte die Frankfurter Rundschau lesen"
+      }
+    },
+
+    "www.neues-deutschland.de": {
+      "url": "http://www.neues-deutschland.de/m/",
+      "icon": "http://pbs.twimg.com/profile_images/610769623605243904/uVFqXxAx_400x400.png",
+
+      "label": "Neues Deutschland",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Neues Deutschland", "Neue Deutschland" ],
+        "response": "Ich öffne die Zeitung Neues Deutschland",
+        "sample": "Ich möchte das Neue Deutschland lesen"
+      }
+    },
+
+    "m.welt.de": {
+      "url": "http://m.welt.de/",
+      "icon": "http://pbs.twimg.com/profile_images/671295032259948544/3QSKkel-_400x400.png",
+
+      "label": "Die Welt",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Die Welt" ],
+        "response": "Ich öffne Die Welt",
+        "sample": "Ich möchte Die Welt lesen"
+      }
+    },
+
+    "app.handelsblatt.com": {
+      "url": "http://app.handelsblatt.com/",
+      "icon": "http://pbs.twimg.com/profile_images/562563461171798017/AkHF4keI_400x400.png",
+
+      "label": "Handelsblatt",
+      "default": false,
+      "region": "de",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Handelsblatt" ],
+        "response": "Ich öffne das Handelsblatt",
+        "sample": "Ich möchte das Handelsblatt lesen"
+      }
+    },
+
     "mobil.mopo.de": {
       "url": "http://mobil.mopo.de/",
       "icon": "http://pbs.twimg.com/profile_images/700585031912153090/LPBp5cA4_400x400.png",
+
       "label": "MOPO",
       "default": true,
+      "region": "de.hh",
 
       "intent": {
         "action" : "view",
@@ -69,20 +188,52 @@
       "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
     },
 
-    "m.faz.net": {
-      "url": "http://m.faz.net/",
-      "icon": "http://pbs.twimg.com/profile_images/477438671151304705/8XlAQ509_400x400.jpeg",
-      "label": "FAZ Online",
-      "default": true,
+    "t.haz.de": {
+      "url": "http://t.haz.de/",
+      "icon": "http://pbs.twimg.com/profile_images/603240721072726016/PyXJlsR9_400x400.png",
+
+      "label": "Hannoversche Allgemeine",
+      "default": false,
+      "region": "de.ni",
 
       "intent": {
         "action" : "view",
-        "keywords": [ "FAZ", "F A Z", "Frankfurter Allgemeine" ],
-        "response": "Ich öffne die FAZ",
-        "sample": "Ich möchte die FAZ lesen"
-      },
+        "keywords": [ "HAZ", "Hannoversche Allgemeine" ],
+        "response": "Ich öffne die Hannoversche Allgemeine Zeitung",
+        "sample": "Ich möchte die HAZ lesen"
+      }
+    },
 
-      "subdomains": [ "static.faz.net", "gets.faz.net" ]
+    "t.lvz.de": {
+      "url": "http://t.lvz.de/",
+      "icon": "http://pbs.twimg.com/profile_images/647002421013688320/HKqUkitP_400x400.jpg",
+
+      "label": "Leipziger Volkszeitung",
+      "default": false,
+      "region": "de.sn",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "LVZ", "Leipziger Volkszeitung" ],
+        "response": "Ich öffne die Leipziger Volkszeitung",
+        "sample": "Ich möchte die Leipziger Volkszeitung lesen"
+      }
+    },
+
+    "www.express.de": {
+      "url": "http://www.express.de/",
+      "icon": "http://pbs.twimg.com/profile_images/643385266275684352/b9N1TTZ__200x200.png",
+
+      "label": "Kölner Express",
+      "default": false,
+      "region": "de.nw",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "Express", "Kölner Express" ],
+        "response": "Ich öffne den Kölner Express",
+        "sample": "Ich möchte den Kölner Express lesen"
+      }
     }
   },
 
@@ -188,7 +339,7 @@
 
     "m.gala.de": {
       "url": "http://m.gala.de/",
-      "icon": "http://pbs.twimg.com/profile_images/568402279900794880/PSCQkXzW_400x400.png",
+      "icon": "http://pbs.twimg.com/profile_images/715190744017973249/p20G1C6T_400x400.jpg",
       "label": "Gala",
       "default": true,
 
@@ -234,7 +385,7 @@
 
     "m.petra.de": {
       "url": "http://m.petra.de/",
-      "icon": "http://pbs.twimg.com/profile_images/596289501439352832/hNJc9jOK_400x400.jpg",
+      "icon": "http://pbs.twimg.com/profile_images/724958484022853637/EDdOYHBE_400x400.jpg",
       "label": "Petra",
       "default": true,
 
@@ -349,7 +500,7 @@
 
     "de.m.xhamster.com": {
       "url": "http://de.m.xhamster.com/",
-      "icon": "http://pbs.twimg.com/profile_images/715800836291575808/D9cur1Ni_400x400.jpg",
+      "icon": "http://pbs.twimg.com/profile_images/721993159471792128/01hXCMYF_400x400.jpg",
       "label": "xHamster",
       "default": true,
 
@@ -441,7 +592,7 @@
 
     "www.pornhub.com": {
       "url": "http://www.pornhub.com/",
-      "icon": "http://pbs.twimg.com/profile_images/615525585826222080/W9b7zw3R_400x400.jpg",
+      "icon": "http://pbs.twimg.com/profile_images/716139129227124737/-qjHx0ur_400x400.jpg",
       "label": "Pornhub",
       "default": true,
 
@@ -567,7 +718,7 @@
 
     "www.redtube.com": {
       "url": "http://www.redtube.com/",
-      "icon": "http://pbs.twimg.com/profile_images/619269637096628224/f5A48Q44_400x400.png",
+      "icon": "http://pbs.twimg.com/profile_images/724584327263203328/hqlZmmOK_400x400.jpg",
       "label": "RedTube",
       "default": true,
 

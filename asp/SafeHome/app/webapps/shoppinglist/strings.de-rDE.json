@@ -60,6 +60,12 @@
 
   ],
 
+  "category.extra.display": {
+
+    "Tiefkühl" : "TK"
+
+  },
+
   "quantity.units": [
 
     { "unit": "st", "phrase": "x" },

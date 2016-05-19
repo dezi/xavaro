@@ -1,0 +1,25 @@
+{
+  "name":"BeIn Sports 1 HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "DVB-S",
+    "Globecast",
+    "HDTV",
+    "SDTV"
+  ],
+  "packs":
+  [
+    "12:Orange France",
+    "17:CanalSat France"
+  ],
+  "providers":
+  [
+    "GlobeCast"
+  ]
+}

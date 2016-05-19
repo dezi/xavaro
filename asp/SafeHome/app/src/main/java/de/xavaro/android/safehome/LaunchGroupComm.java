@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
@@ -32,6 +33,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("xavaro.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
@@ -66,8 +69,9 @@ public class LaunchGroupComm
                 Json.put(entry, "order", 500);
 
                 if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
-                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Json.put(adir, entry);
+                Json.put(cdir, entry);
 
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
             }
@@ -89,6 +93,7 @@ public class LaunchGroupComm
                 String ident = prefkey.substring(keyprefix.length());
                 String label = RemoteGroups.getDisplayName(ident);
                 String gtype = RemoteGroups.getGroupType(ident);
+                String owner = RemoteGroups.getGroupOwner(ident);
 
                 JSONObject entry = new JSONObject();
 
@@ -97,15 +102,53 @@ public class LaunchGroupComm
                 Json.put(entry, "subtype", "chat");
                 Json.put(entry, "chattype", "group");
                 Json.put(entry, "grouptype", gtype);
+                Json.put(entry, "groupowner", owner);
                 Json.put(entry, "identity", ident);
 
                 Json.put(entry, "order", Simple.equals(gtype, "alertcall") ? 200 : 550);
 
                 if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
-                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
-                if (Simple.sharedPrefEquals(prefkey, "comdir")) Json.put(cdir, entry);
+
+                Json.put(adir, entry);
+                Json.put(cdir, entry);
 
                 Log.d(LOGTAG, "Prefe:" + prefkey + "=chat=" + ident + "=" + label);
+            }
+
+            //
+            // Xavaro prepaid admins.
+            //
+
+            for (String prefkey : prefs.keySet())
+            {
+                String keyprefix = "xavaro.remote.groups.padm.";
+
+                if (! prefkey.startsWith(keyprefix)) continue;
+
+                String what = sp.getString(prefkey, null);
+
+                if ((what == null) || what.equals("inact")) continue;
+
+                String ident = prefkey.substring(keyprefix.length());
+                String owner = RemoteGroups.getGroupOwner(ident);
+                String label = RemoteContacts.getDisplayName(owner);
+
+                label = "Prepaid von" + " " + label;
+
+                JSONObject entry = new JSONObject();
+
+                Json.put(entry, "label", label);
+                Json.put(entry, "type", "xavaro");
+                Json.put(entry, "subtype", "padm");
+                Json.put(entry, "identity", ident);
+                Json.put(entry, "groupowner", owner);
+
+                Json.put(entry, "order", 200);
+
+                if (Simple.sharedPrefEquals(prefkey, "home")) Json.put(home, entry);
+                if (Simple.sharedPrefEquals(prefkey, "appdir")) Json.put(adir, entry);
+
+                Log.d(LOGTAG, "Prefe:" + prefkey + "=padm=" + ident + "=" + label);
             }
 
             if (adir.length() > 0)
@@ -147,6 +190,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("phone.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
@@ -167,7 +212,7 @@ public class LaunchGroupComm
 
                 String phonenumber = prefkey.substring(11);
                 String subtype = prefkey.substring(6, 10);
-                String label = ProfileImages.getDisplayFromPhoneOrSkype(phonenumber);
+                String label = ProfileImages.getDisplayName(phonenumber);
 
                 JSONObject entry = new JSONObject();
 
@@ -260,6 +305,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("skype.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
@@ -282,7 +329,7 @@ public class LaunchGroupComm
 
                 String skypename = prefkey.substring(11);
                 String subtype = prefkey.substring(6, 10);
-                String label = ProfileImages.getDisplayFromPhoneOrSkype(skypename);
+                String label = ProfileImages.getDisplayName(skypename);
 
                 JSONObject entry = new JSONObject();
 
@@ -366,6 +413,8 @@ public class LaunchGroupComm
 
         public static JSONArray getConfig()
         {
+            if (! Simple.getSharedPrefBoolean("whatsapp.enable")) return null;
+
             JSONArray home = new JSONArray();
             JSONArray adir = new JSONArray();
             JSONArray cdir = new JSONArray();
@@ -386,7 +435,7 @@ public class LaunchGroupComm
 
                 String waphonenumber = prefkey.substring(14);
                 String subtype = prefkey.substring(9, 13);
-                String label = ProfileImages.getDisplayFromPhoneOrSkype(waphonenumber);
+                String label = ProfileImages.getDisplayName(waphonenumber);
 
                 JSONObject entry = new JSONObject();
 

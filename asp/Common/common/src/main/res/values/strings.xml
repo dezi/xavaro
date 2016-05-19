@@ -1,7 +1,8 @@
 <resources>
 
     <string name="app_name" translatable="false">SafeHome</string>
-
+    <string name="facebook_app_id" translatable="false">610331582448824</string>
+    
     <string name="simple_and">and</string>
     <string name="simple_new">new</string>
 
@@ -15,6 +16,16 @@
         <item>None</item>
         <item>Home</item>
         <item>Folder</item>
+    </string-array>
+
+    <string-array name="pref_calls_subtype_keys">
+        <item>important</item>
+        <item>delivery</item>
+    </string-array>
+
+    <string-array name="pref_calls_subtype_vals">
+        <item>Quick Dialing</item>
+        <item>Delivery Services</item>
     </string-array>
 
     <string-array name="pref_ioc_where_keys">
@@ -159,6 +170,270 @@
         <item>Filme</item>
     </string-array>
 
+    <string name="pref_basic_safety">Sicherheit</string>
+    <string name="pref_basic_safety_summary">todo</string>
+
+    <string name="pref_basic_safety_access">Access</string>
+    <string name="pref_basic_safety_access_summary">todo</string>
+    <string name="pref_basic_safety_password">Admin Password</string>
+
+    <string name="pref_basic_safety_services">Services</string>
+    <string name="pref_basic_safety_services_summary">todo</string>
+    <string name="pref_basic_safety_accessibility_service">Accessibility</string>
+    <string name="pref_basic_safety_accessibility_unavailable">
+        There are no Accessibility Services on this device.
+    </string>
+    <string name="pref_basic_safety_kioskmode_service">Kiosk-Mode</string>
+
+    <string name="pref_basic_safety_buttons">Buttons</string>
+    <string name="pref_basic_safety_buttons_summary">todo</string>
+    <string name="pref_basic_safety_home_button">Home</string>
+    <string name="pref_basic_safety_assistance_button">Assistance</string>
+    <string name="pref_basic_safety_menu_button">Menu</string>
+
+    <string-array name="pref_basic_safety_service_keys">
+        <item>inactive</item>
+        <item>active</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_service_vals">
+        <item>Inactive</item>
+        <item>Active</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_accessibility_keys">
+        <item>unavailable</item>
+        <item>inactive</item>
+        <item>active</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_accessibility_vals">
+        <item>Not available</item>
+        <item>Inactive</item>
+        <item>Active</item>
+    </string-array>
+
+    <string name="pref_basic_owner">User</string>
+    <string name="pref_basic_owner_summary">todo</string>
+
+    <string name="pref_basic_owner_profile">Owner Profile</string>
+    <string name="pref_basic_owner_profile_summary">todo</string>
+    <string name="pref_basic_owner_personal">Personal</string>
+    <string name="pref_basic_owner_personal_summary">todo</string>
+    <string name="pref_basic_owner_address">Address</string>
+    <string name="pref_basic_owner_firstname">First Name (from Profile)</string>
+    <string name="pref_basic_owner_givenname">Given Name (from Profile)</string>
+    <string name="pref_basic_owner_nickname">Nick Name</string>
+    <string name="pref_basic_owner_duzen">User likes to be</string>
+    <string name="pref_basic_owner_profileimage_share">Share profile image</string>
+
+    <string name="pref_basic_owner_communication">Communication</string>
+    <string name="pref_basic_owner_communication_summary">todo</string>
+    <string name="pref_basic_owner_phonenumber">Phone number</string>
+    <string name="pref_basic_owner_skypename">Skype Name</string>
+
+    <string name="pref_basic_community">Community</string>
+    <string name="pref_basic_community_summary">todo</string>
+    <string name="pref_basic_community_pincode">Connect via Pincode</string>
+    <string name="pref_basic_community_pincode_summary">todo</string>
+    <string name="pref_basic_community_wifi">Connect via Wifi</string>
+    <string name="pref_basic_community_wifi_summary">todo</string>
+
+    <string name="pref_basic_assistance">Assistance</string>
+    <string name="pref_basic_assistance_summary">todo</string>
+    <string name="pref_basic_assistance_enable">Enable Assistance</string>
+    <string name="pref_basic_assistance_asmember">As member</string>
+    <string name="pref_basic_assistance_skypename">Skype name</string>
+    <string name="pref_basic_assistance_skypecall">Skype callback</string>
+    <string name="pref_basic_assistance_prepaidadmin">Prepaid Admin</string>
+
+    <string name="pref_basic_calls">Shortcuts</string>
+    <string name="pref_basic_calls_summary">todo</string>
+    <string name="pref_basic_calls_enable">Enable Shortcuts</string>
+
+    <string name="pref_basic_monitoring">Monitoring</string>
+    <string name="pref_basic_monitoring_summary">todo</string>
+    <string name="pref_basic_monitoring_enable">Enable Monitoring</string>
+
+    <string name="pref_basic_monitoring_warnings">Warnings</string>
+    <string name="pref_basic_monitoring_remind">Reminder</string>
+    <string name="pref_basic_monitoring_warn">Warning</string>
+    <string name="pref_basic_monitoring_assistance">Assistance</string>
+    <string name="pref_basic_monitoring_repeat">Interval</string>
+    <string name="pref_basic_monitoring_record">Record progress</string>
+
+    <string name="pref_basic_monitoring_prepaid_auto">Automatic request</string>
+    <string name="pref_basic_monitoring_prepaid_call">Request after call</string>
+
+    <string-array name="pref_basic_monitoring_prepaid_warn_keys">
+        <item>never</item>
+        <item>50</item>
+        <item>25</item>
+        <item>10</item>
+        <item>5</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_prepaid_warn_vals">
+        <item>Never</item>
+        <item>50$</item>
+        <item>25$</item>
+        <item>10$</item>
+        <item>5$</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_prepaid_repeat_keys">
+        <item>once</item>
+        <item>8</item>
+        <item>24</item>
+        <item>48</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_prepaid_repeat_vals">
+        <item>Only once</item>
+        <item>Every 8 Hours</item>
+        <item>Every 24 Hours</item>
+        <item>Every 48 Hours</item>
+    </string-array>
+
+    <string name="pref_basic_monitoring_battery">Battery</string>
+    <string name="pref_basic_monitoring_battery_summary">todo</string>
+    <string name="pref_basic_monitoring_battery_where">Icon</string>
+
+    <string-array name="pref_basic_monitoring_battery_where_keys">
+        <item>inact</item>
+        <item>home</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_where_vals">
+        <item>Inactive</item>
+        <item>Home</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_warn_keys">
+        <item>never</item>
+        <item>96</item>
+        <item>95</item>
+        <item>75</item>
+        <item>50</item>
+        <item>40</item>
+        <item>30</item>
+        <item>20</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_warn_vals">
+        <item>Never</item>
+        <item>96%</item>
+        <item>95%</item>
+        <item>75%</item>
+        <item>50%</item>
+        <item>40%</item>
+        <item>30%</item>
+        <item>20%</item>
+        <item>10%</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_repeat_keys">
+        <item>once</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_battery_repeat_vals">
+        <item>Only once</item>
+        <item>Every 10 Minutes</item>
+        <item>Every 20 Minutes</item>
+        <item>Every 30 Minutes</item>
+        <item>Every 60 Minutes</item>
+    </string-array>
+
+    <string name="pref_social_account">Account</string>
+    <string name="pref_social_user">User</string>
+    <string name="pref_social_validuntil">Valid until</string>
+    <string name="pref_social_noexpiration">revoked by user</string>
+    <string name="pref_social_login">Login</string>
+    <string name="pref_social_logout">Logout</string>
+    <string name="pref_social_isloggedin">is logged in</string>
+    <string name="pref_social_isloggedout">is logged out</string>
+    <string name="pref_social_friends">Friends</string>
+    <string name="pref_social_autofriends">Automated new friends</string>
+    <string name="pref_social_likes">Likes</string>
+    <string name="pref_social_autolikes">Automated new likes</string>
+
+    <string-array name="pref_social_newfriends_keys">
+        <item>inactive</item>
+        <item>feed</item>
+        <item>feed+home</item>
+        <item>feed+folder</item>
+        <item>feed+contacts</item>
+        <item>home</item>
+        <item>folder</item>
+        <item>contacts</item>
+    </string-array>
+
+    <string-array name="pref_social_newfriends_vals">
+        <item>Inaktive</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Folder</item>
+        <item>Feed + Contacts</item>
+        <item>Home</item>
+        <item>Folder</item>
+        <item>Contacts</item>
+    </string-array>
+
+    <string-array name="pref_social_newlikes_keys">
+        <item>inactive</item>
+        <item>feed</item>
+        <item>feed+home</item>
+        <item>feed+folder</item>
+        <item>home</item>
+        <item>folder</item>
+    </string-array>
+
+    <string-array name="pref_social_newlikes_vals">
+        <item>Inaktive</item>
+        <item>Feed</item>
+        <item>Feed + Home</item>
+        <item>Feed + Folder</item>
+        <item>Home</item>
+        <item>Folder</item>
+    </string-array>
+
+    <string name="pref_social_twitter">Twitter</string>
+    <string name="pref_social_twitter_enable">Enable Twitter</string>
+    <string name="pref_social_twitter_summary">todo</string>
+    <string name="pref_social_twitter_account_summary">todo</string>
+    <string name="pref_social_twitter_friends_summary">todo</string>
+    <string name="pref_social_twitter_likes_summary">todo</string>
+
+    <string name="pref_social_facebook">Facebook</string>
+    <string name="pref_social_facebook_enable">Enable Facebook</string>
+    <string name="pref_social_facebook_summary">todo</string>
+    <string name="pref_social_facebook_account_summary">todo</string>
+    <string name="pref_social_facebook_friends_summary">todo</string>
+    <string name="pref_social_facebook_likes_summary">todo</string>
+
+    <string name="pref_social_instagram">Instagram</string>
+    <string name="pref_social_instagram_enable">Enable Instagram</string>
+    <string name="pref_social_instagram_summary">todo</string>
+    <string name="pref_social_instagram_account_summary">todo</string>
+    <string name="pref_social_instagram_friends_summary">todo</string>
+    <string name="pref_social_instagram_likes_summary">todo</string>
+
+    <string name="pref_social_googleplus">Google+</string>
+    <string name="pref_social_googleplus_enable">Enable Google+</string>
+    <string name="pref_social_googleplus_summary">todo</string>
+    <string name="pref_social_googleplus_account_summary">todo</string>
+    <string name="pref_social_googleplus_friends_summary">todo</string>
+
+    <string name="battery_manager_remind">Please plug Your tablet into the charger soon.</string>
+    <string name="battery_manager_warn">Please plug Your tablet into the charger now.</string>
+    <string name="battery_manager_assist_warn">%1$s tablet desperatly needs some charging.</string>
+    <string name="battery_manager_assist_clear">%1$s is now charging his tablet.</string>
+    <string name="battery_manager_assist_level">The level is now at %1$d percent.</string>
 
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>
@@ -198,9 +473,35 @@
     <string name="today_label">Logbook</string>
 
     <string name="healt_bpm_spoken">The last reading resulted in a blood pressure of %1$d to %2$d The pulse was %3$d</string>
-    <string name="healt_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s.</string>
+    <string name="healt_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
     <string name="healt_bpm_lowpb">The blood pressure is alarming high.</string>
     <string name="healt_bpm_highbp">The blood pressure is alarming low.</string>
     <string name="healt_bpm_activity">You have a blood pressure of %1$d to %2$d. The pulse is %3$d.</string>
+
+    <string-array name="phone_labels_keys">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="phone_labels_vals">
+        <item>Home</item>
+        <item>Mobile</item>
+        <item>Work</item>
+        <item>Fax Work</item>
+        <item>Fax Home</item>
+        <item>Pager</item>
+        <item>Other</item>
+        <item>Callback</item>
+        <item>Car</item>
+        <item>Company Main</item>
+    </string-array>
 
 </resources>

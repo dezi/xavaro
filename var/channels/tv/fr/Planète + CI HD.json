@@ -1,0 +1,23 @@
+{
+  "name":"Planète + CI HD",
+  "type":"tv",
+  "isocc":"fr",
+  "isolang":"fre",
+  "isen":true,
+  "ishd":true,
+  "isbd":false,
+  "tags":
+  [
+    "CSAT",
+    "DVB-S",
+    "HDTV"
+  ],
+  "packs":
+  [
+    "17:CanalSat France"
+  ],
+  "providers":
+  [
+    "CSAT"
+  ]
+}

@@ -26,7 +26,7 @@ public class LaunchItemGeneric extends LaunchItem
     private void launchGenericApp()
     {
         String packagename = Json.getString(config, "packagename");
-        ProcessManager.launchApp(context, packagename);
+        ProcessManager.launchApp(packagename);
     }
 
     private void launchDirectory()

@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.content.Intent;
 import android.os.StrictMode;
 import android.preference.PreferenceActivity;
 import android.content.Context;
@@ -9,7 +10,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -17,8 +17,10 @@ import android.widget.TextView;
 import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.SocialFacebook;
+import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.WebApp;
+import de.xavaro.android.common.WebAppCache;
 import de.xavaro.android.common.WebCookie;
 
 public class SettingsActivity extends PreferenceActivity
@@ -28,9 +30,17 @@ public class SettingsActivity extends PreferenceActivity
     private static List<Header> headers;
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(LOGTAG, "onActivityResult");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
 
         super.onCreate(savedInstanceState);
 
@@ -46,6 +56,20 @@ public class SettingsActivity extends PreferenceActivity
         //
 
         WebCookie.initCookies();
+
+        //
+        // Check version of web app cache.
+        //
+
+        WebAppCache.checkWebAppCache();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState)
+    {
+        super.onPostCreate(savedInstanceState);
+
+        getListView().setKeepScreenOn(true);
     }
 
     @Override
@@ -55,7 +79,7 @@ public class SettingsActivity extends PreferenceActivity
 
         super.onResume();
 
-        Simple.setAppContext(this);
+        Simple.setActContext(this);
     }
 
     @Override
@@ -90,23 +114,35 @@ public class SettingsActivity extends PreferenceActivity
 
         category = new Header();
         category.title = "Wichtige Einstellungen";
+
         target.add(category);
 
-        target.add(PreferencesBasics.OwnerFragment.getHeader());
-        target.add(PreferencesBasics.AdminFragment.getHeader());
-        target.add(PreferencesBasics.CommunityFragment.getHeader());
-        target.add(PreferencesBasics.AlertgroupFragment.getHeader());
-
-        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
+        target.add(PreferencesBasicsOwner.getHeader());
+        target.add(PreferencesBasicsCommunity.getHeader());
+        target.add(PreferencesBasicsAssistance.getHeader());
+        target.add(PreferencesBasicsMonitors.getHeader());
+        target.add(PreferencesBasicsSafety.getHeader());
 
         category = new Header();
         category.title = "Kommunikation";
         target.add(category);
 
+        target.add(PreferencesBasicsCalls.getHeader());
+
         target.add(PreferencesComm.PhoneFragment.getHeader());
         target.add(PreferencesComm.SkypeFragment.getHeader());
         target.add(PreferencesComm.WhatsAppFragment.getHeader());
-        target.add(PreferencesComm.XavaroFragment.getHeader());
+
+        target.add(PreferencesCommXavaro.getHeader());
+
+        category = new Header();
+        category.title = "Social Networks";
+        target.add(category);
+
+        target.add(PreferencesSocialFacebook.getHeader());
+        target.add(PreferencesSocialTwitter.getHeader());
+        target.add(PreferencesSocialGoogleplus.getHeader());
+        target.add(PreferencesSocialInstagram.getHeader());
 
         category = new Header();
         category.title = "Web-Apps";
@@ -139,6 +175,7 @@ public class SettingsActivity extends PreferenceActivity
         target.add(PreferencesHealth.HealthSensorFragment.getHeader());
         target.add(PreferencesHealth.HealthGlucoseFragment.getHeader());
         target.add(PreferencesHealth.HealthUnitsFragment.getHeader());
+        target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
 
         category = new Header();
         category.title = "Internet Media Streaming";
@@ -205,7 +242,7 @@ public class SettingsActivity extends PreferenceActivity
 
         private static class HeaderViewHolder
         {
-            ImageView icon;
+            ImageSmartView icon;
             TextView title;
         }
 
@@ -282,7 +319,7 @@ public class SettingsActivity extends PreferenceActivity
 
                 if (headerType == HEADER_TYPE_NORMAL)
                 {
-                    holder.icon = new DitUndDat.ImageAntiAliasView(context);
+                    holder.icon = new ImageSmartView(context);
                     holder.icon.setPadding(24, 12, 0, 12);
                     flview.addView(holder.icon, new LinearLayout.LayoutParams(
                             56, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -344,7 +381,12 @@ public class SettingsActivity extends PreferenceActivity
 
                         if (webappname != null)
                         {
-                            holder.icon.setImageDrawable(WebApp.getAppIcon(webappname));
+                            if ((holder.icon.getTag() == null) ||
+                                    ! Simple.equals((String) holder.icon.getTag(), webappname))
+                            {
+                                holder.icon.setTag(webappname);
+                                holder.icon.setImageResource(webappname);
+                            }
                         }
                     }
                 }

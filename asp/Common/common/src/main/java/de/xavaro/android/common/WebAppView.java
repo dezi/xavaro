@@ -25,6 +25,7 @@ public class WebAppView extends WebView
     public WebAppPrefs prefs;
     public WebAppSpeak speak;
     public WebAppMedia media;
+    public WebAppSocial social;
     public WebAppEvents events;
     public WebAppHealth health;
     public WebAppPrices prices;
@@ -36,11 +37,14 @@ public class WebAppView extends WebView
     public WebAppIntercept intercept;
     public WebAppAssistance assistance;
 
+    public WebAppLoader webapploader;
     public ArrayList<String> permissions;
 
     @SuppressLint("SetJavaScriptEnabled")
     public void loadWebView(String webappname, String mode)
     {
+        Log.d(LOGTAG, "loadWebView: " + webappname + " mode=" + mode);
+
         setWebChromeClient(new WebChromeClient());
 
         //
@@ -50,7 +54,7 @@ public class WebAppView extends WebView
 
         String agent = getSettings().getUserAgentString().replace("Chrome","");
 
-        WebAppLoader webapploader = new WebAppLoader(webappname, agent, mode);
+        webapploader = new WebAppLoader(webappname, agent, mode);
         setWebViewClient(webapploader);
 
         //
@@ -123,6 +127,12 @@ public class WebAppView extends WebView
         {
             activity = new WebAppActivity();
             addJavascriptInterface(activity, "WebAppActivity");
+        }
+
+        if (permissions.contains("social"))
+        {
+            social = new WebAppSocial();
+            addJavascriptInterface(social, "WebAppSocial");
         }
 
         if (permissions.contains("weather"))

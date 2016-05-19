@@ -2,12 +2,6 @@ package de.xavaro.android.common;
 
 import android.annotation.SuppressLint;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
@@ -15,11 +9,11 @@ import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.SwitchPreference;
-import android.text.InputType;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -28,9 +22,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.text.InputType;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -691,7 +692,7 @@ public class NicedPreferences
             {
                 current = new TextView(getContext());
                 current.setGravity(Gravity.END);
-                current.setTextSize(18f);
+                current.setTextSize(Simple.getPreferredTextSize());
 
                 current.setTextColor(disabled
                         ? CommonConfigs.PreferenceTextDisabledColor
@@ -728,12 +729,23 @@ public class NicedPreferences
         private CharSequence[] entries;
         private CharSequence[] values;
         private Runnable onClickRunner;
+        private JSONObject jsonSlug;
 
         public NiceListPreference(Context context)
         {
             super(context);
 
             setOnPreferenceChangeListener(this);
+        }
+
+        public void setSlug(JSONObject slug)
+        {
+            jsonSlug = slug;
+        }
+
+        public JSONObject getSlug()
+        {
+            return jsonSlug;
         }
 
         @Override
@@ -878,6 +890,14 @@ public class NicedPreferences
         }
 
         @Override
+        public void setValue(String value)
+        {
+            super.setValue(value);
+
+            if (current != null) current.setText(getDisplayValue(value));
+        }
+
+        @Override
         protected void onBindView(View view)
         {
             super.onBindView(view);
@@ -894,7 +914,6 @@ public class NicedPreferences
             newlayout.setOrientation(LinearLayout.HORIZONTAL);
             newlayout.setLayoutParams(new ViewGroup.LayoutParams(Simple.MP, Simple.WC));
             newlayout.setPadding(0, 0, 16, 0);
-            //newlayout.setBackgroundColor(0x88880000);
 
             ViewGroup vg = (ViewGroup) view;
 
@@ -911,7 +930,7 @@ public class NicedPreferences
             //
 
             ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            vg.setPadding(16, 8, 0, 8);
+            Simple.setPadding(vg, 16, 8, 0, 8);
 
             //
             // Step three: Fuck linear layout of icon to be square and nice.
@@ -949,7 +968,7 @@ public class NicedPreferences
             {
                 current = new TextView(getContext());
                 current.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
-                current.setTextSize(18f);
+                current.setTextSize(Simple.getPreferredTextSize());
 
                 current.setTextColor(disabled
                         ? CommonConfigs.PreferenceTextDisabledColor
@@ -1001,6 +1020,7 @@ public class NicedPreferences
         protected boolean disabled;
         private boolean isPassword;
         private boolean isUppercase;
+        private boolean isPhonenumber;
         private Runnable onClickRunner;
         private String emptytext;
 
@@ -1053,7 +1073,14 @@ public class NicedPreferences
                 }
                 else
                 {
-                    current.setText(text);
+                    if (isPhonenumber)
+                    {
+                        current.setText(VersionUtils.formatPhoneNumber(getText()));
+                    }
+                    else
+                    {
+                        current.setText(text);
+                    }
                 }
             }
         }
@@ -1073,6 +1100,11 @@ public class NicedPreferences
             isUppercase = true;
         }
 
+        public void setIsPhonenumber()
+        {
+            isPhonenumber = true;
+        }
+
         public void setOnclick(Runnable onclick)
         {
             onClickRunner = onclick;
@@ -1084,6 +1116,24 @@ public class NicedPreferences
             if (onClickRunner == null)
             {
                 super.showDialog(state);
+
+                View view = getDialog().getWindow().getDecorView();
+                View edit = view.findViewById(android.R.id.edit);
+
+                if ((edit != null) && (edit instanceof EditText))
+                {
+                    ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
+                    if (isUppercase)
+                    {
+                        ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                    }
+
+                    if (isPhonenumber)
+                    {
+                        ((EditText) edit).setInputType(InputType.TYPE_CLASS_PHONE);
+                    }
+                }
 
                 return;
             }
@@ -1179,7 +1229,7 @@ public class NicedPreferences
 
                 if (view.getTag().toString().equals("open"))
                 {
-                    ProcessManager.launchApp(getContext(), apkname);
+                    ProcessManager.launchApp(apkname);
                 }
 
                 if (view.getTag().toString().equals("install"))
@@ -1338,7 +1388,16 @@ public class NicedPreferences
             //
 
             ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            vg.setPadding(20, 8, 0, 8);
+            Simple.setPadding(vg, 14, 8, 10, 8);
+
+            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
+
+            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
+            {
+                LinearLayout icon_frame = (LinearLayout) icon.getParent();
+                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+                icon_frame.setPadding(0, 0, 0, 0);
+            }
 
             //
             // Step three: remove summary from horizontal layout and add
@@ -1361,6 +1420,16 @@ public class NicedPreferences
         }
     }
 
+    public static class NiceSeparatorPreference extends NiceCategoryPreference
+    {
+        public NiceSeparatorPreference(Context context)
+        {
+            super(context);
+
+            textSize = 20f;
+        }
+    }
+
     public static class NiceCategoryPreference extends Preference implements
             View.OnClickListener,
             View.OnLongClickListener
@@ -1370,10 +1439,10 @@ public class NicedPreferences
             super(context);
         }
 
+        protected float textSize = 24f;
         protected Runnable onClickRunner;
         protected Runnable onLongClickRunner;
         protected ImageView actionIcon;
-
         public void setOnClick(Runnable onclick)
         {
             onClickRunner = onclick;
@@ -1398,7 +1467,7 @@ public class NicedPreferences
             LinearLayout newlayout = new LinearLayout(getContext());
             newlayout.setLayoutParams(Simple.layoutParamsMW());
             newlayout.setOrientation(LinearLayout.HORIZONTAL);
-            newlayout.setPadding(16, 0, 0, 0);
+            newlayout.setPadding(12, 0, 0, 0);
 
             while (((ViewGroup) view).getChildCount() > 0)
             {
@@ -1413,12 +1482,21 @@ public class NicedPreferences
             //
 
             ((LinearLayout) view).setOrientation(LinearLayout.VERTICAL);
-            view.setPadding(0, 0, 0, 8);
+            view.setPadding(0, 4, 0, 4);
 
             //
             // Step three: remove summary from horizontal layout and add
             // to top layout now beeing vertical.
             //
+
+            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
+
+            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
+            {
+                LinearLayout icon_frame = (LinearLayout) icon.getParent();
+                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+                icon_frame.setPadding(0, 0, 0, 0);
+            }
 
             TextView summary = (TextView) view.findViewById(android.R.id.summary);
             summary.setPadding(16, 0, 16, 0);
@@ -1434,8 +1512,7 @@ public class NicedPreferences
             view.setBackgroundColor(0xcccccccc);
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setPadding(0, 6, 0, 0);
-            title.setTextSize(Simple.getDeviceTextSize(24f));
+            title.setTextSize(Simple.getDeviceTextSize(textSize));
 
             //
             // Add an action icon.
@@ -1448,6 +1525,8 @@ public class NicedPreferences
 
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
+
+            //StaticUtils.dumpViewsChildren(view);
         }
 
         @Override
@@ -1462,6 +1541,59 @@ public class NicedPreferences
             if (onLongClickRunner != null) onLongClickRunner.run();
 
             return false;
+        }
+    }
+
+    public static class NiceInfoPreference extends NiceCategoryPreference
+    {
+        public NiceInfoPreference(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        protected void onBindView(View view)
+        {
+            super.onBindView(view);
+
+            if ((summaryResid != 0) || (summaryText != null))
+            {
+                actionIcon.setImageResource(android.R.drawable.ic_menu_info_details);
+            }
+        }
+
+        private int summaryResid;
+        private String summaryText;
+        private boolean summaryOpen;
+
+        @Override
+        public void setSummary(int resid)
+        {
+            summaryResid = resid;
+        }
+
+        @Override
+        public void setSummary(CharSequence summary)
+        {
+            if (summary != null) summaryText = summary.toString();
+        }
+
+        @Override
+        public void onClick(View view)
+        {
+            if ((summaryResid != 0) || (summaryText != null))
+            {
+                if (summaryOpen)
+                {
+                    super.setSummary(null);
+                    summaryOpen = false;
+                }
+                else
+                {
+                    super.setSummary((summaryText != null) ? summaryText : Simple.getTrans(summaryResid));
+                    summaryOpen = true;
+                }
+            }
         }
     }
 
@@ -1500,25 +1632,23 @@ public class NicedPreferences
             dialog = builder.create();
             dialog.show();
 
-            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-            negative.setTextSize(24f);
+            Simple.adjustAlertDialog(dialog);
 
+            Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
             negative.setOnClickListener(new View.OnClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(View view)
                 {
                     onCancelClick();
                 }
             });
 
             Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            positive.setTextSize(24f);
-
             positive.setOnClickListener(new View.OnClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(View view)
                 {
                     onDeleteClick();
                 }
@@ -1538,7 +1668,6 @@ public class NicedPreferences
             dialog.cancel();
             dialog = null;
         }
-
 
         public interface DeleteCallback
         {

@@ -175,11 +175,11 @@ public class CryptUtils
     }
 
     @Nullable
-    public static String RSAgetPrivateKey(Context context)
+    public static String RSAgetPrivateKey()
     {
         try
         {
-            JSONObject keys = RSAretrieveFromStorage(context);
+            JSONObject keys = RSAretrieveFromStorage();
 
             if (keys != null) return keys.getString("private");
         }
@@ -192,11 +192,11 @@ public class CryptUtils
     }
 
     @Nullable
-    public static String RSAgetPublicKey(Context context)
+    public static String RSAgetPublicKey()
     {
         try
         {
-            JSONObject keys = RSAretrieveFromStorage(context);
+            JSONObject keys = RSAretrieveFromStorage();
 
             if (keys != null) return keys.getString("public");
         }
@@ -209,21 +209,22 @@ public class CryptUtils
     }
 
     @Nullable
-    public static JSONObject RSAretrieveFromStorage(Context context)
+    public static JSONObject RSAretrieveFromStorage()
     {
-        String filename = context.getPackageName() + ".rsakeys.json";
-
-        if (! new File(context.getFilesDir(), filename).exists())
-        {
-            JSONObject keys = RSAgenerateKeys();
-
-            RSAstoreIntoStorage(context, keys);
-
-            return keys;
-        }
-
         try
         {
+            Context context = Simple.getAnyContext();
+            String filename = context.getPackageName() + ".rsakeys.json";
+
+            if (! new File(context.getFilesDir(), filename).exists())
+            {
+                JSONObject keys = RSAgenerateKeys();
+
+                RSAstoreIntoStorage(keys);
+
+                return keys;
+            }
+
             FileInputStream inputStream;
             byte[] content = new byte[ 4096 ];
 
@@ -241,11 +242,13 @@ public class CryptUtils
         return null;
     }
 
-    public static void RSAstoreIntoStorage(Context context, JSONObject keys)
+    public static void RSAstoreIntoStorage(JSONObject keys)
     {
         try
         {
+            Context context = Simple.getAnyContext();
             String filename = context.getPackageName() + ".rsakeys.json";
+
             FileOutputStream outputStream;
 
             outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);

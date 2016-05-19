@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.TextView;
 
@@ -38,17 +39,21 @@ public class LaunchItemToday extends LaunchItem
 
     private TextView dayView;
     private TextView timeView;
+    private TextView dateView;
 
     @Override
     protected void setConfig()
     {
         icon.setImageResource(GlobalConfigs.IconResToday);
 
+        int devpad16 = Simple.getDevicePixels(16);
+        int devpad20 = Simple.getDevicePixels(20);
+
         dayView = new TextView(getContext());
         dayView.setLayoutParams(Simple.layoutParamsMW());
-        dayView.setPadding(0, 20, 0, 0);
+        dayView.setPadding(0, devpad16, 0, 0);
         dayView.setTextSize(Simple.getDeviceTextSize(22f));
-        dayView.setGravity(Gravity.CENTER_HORIZONTAL);
+        dayView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
         dayView.setTextColor(Color.WHITE);
         dayView.setTypeface(null, Typeface.BOLD);
 
@@ -56,7 +61,7 @@ public class LaunchItemToday extends LaunchItem
 
         timeView = new TextView(getContext());
         timeView.setLayoutParams(Simple.layoutParamsMM());
-        timeView.setPadding(0, 20, 0, icon.getPaddingBottom());
+        timeView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad16);
         timeView.setTextSize(Simple.getDeviceTextSize(44f));
         timeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
         timeView.setTextColor(Color.WHITE);
@@ -64,7 +69,40 @@ public class LaunchItemToday extends LaunchItem
 
         addView(timeView);
 
+        dateView = new TextView(getContext());
+        dateView.setLayoutParams(Simple.layoutParamsMM());
+        dateView.setPadding(0, 0, 0, icon.getPaddingBottom() + devpad16);
+        dateView.setTextSize(Simple.getDeviceTextSize(20f));
+        dateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+        dateView.setTextColor(Color.WHITE);
+        dateView.setTypeface(null, Typeface.BOLD);
+
+        addView(dateView);
+
         updateTime.run();
+    }
+
+    @Override
+    public void setSize(int width, int height)
+    {
+        super.setSize(width, height);
+
+        //
+        // Original font sizes based on 200 pixels height.
+        //
+
+        float scale = height / 200.0f;
+
+        dayView.setTextSize(Simple.getDeviceTextSize(22f * scale));
+        timeView.setTextSize(Simple.getDeviceTextSize(44f * scale));
+        dateView.setTextSize(Simple.getDeviceTextSize(20f * scale));
+
+        int devpad16 = Simple.getDevicePixels(Math.round(16 * scale));
+        int devpad20 = Simple.getDevicePixels(Math.round(20 * scale));
+
+        dayView.setPadding(0, devpad16, 0, 0);
+        timeView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad16);
+        dateView.setPadding(0, 0, 0, icon.getPaddingBottom() + devpad16);
     }
 
     @Override
@@ -81,8 +119,11 @@ public class LaunchItemToday extends LaunchItem
         public void run()
         {
             long now = Simple.nowAsTimeStamp();
-            dayView.setText(Simple.getLocalDay(now));
+            String dom = Simple.getLocalDayOfMonth(now) + ". " + Simple.getLocalMonth(now);
+
+            dayView.setText(Simple.getLocalDayOfWeek(now));
             timeView.setText(Simple.getLocal24HTime(now));
+            dateView.setText(dom);
 
             postDelayed(updateTime, 1000);
         }

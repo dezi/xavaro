@@ -26,7 +26,7 @@ public class Json
 
     public static void putFileContent(File jsonfile, JSONObject content)
     {
-        Simple.putFileContent(jsonfile, Json.toPretty(content));
+        Simple.putFileContent(jsonfile, Json.defuck(Json.toPretty(content)));
     }
 
     public static JSONObject fromString(String jsonstr)
@@ -117,10 +117,10 @@ public class Json
 
     public static boolean equals(JSONObject j1, String k1, JSONObject j2)
     {
-        String s1 = getString(j1, k1);
-        String s2 = getString(j2, k1);
+        Object s1 = get(j1, k1);
+        Object s2 = get(j2, k1);
 
-        return ((s1 != null) && (s2 != null) && s1.equals(s2));
+        return ((s1 == null) && (s2 == null)) || ((s1 != null) && s1.equals(s2));
     }
 
     public static void copy(JSONObject dst, String dkey, JSONObject src, String skey)
@@ -147,6 +147,19 @@ public class Json
         }
     }
 
+    public static JSONArray append(JSONArray dst, JSONArray src)
+    {
+        if ((dst != null) && (src != null))
+        {
+            for (int inx = 0; inx < src.length(); inx++)
+            {
+                put(dst, get(src, inx));
+            }
+        }
+
+        return dst;
+    }
+
     public static void put(JSONObject json, String key, Object val)
     {
         try
@@ -170,6 +183,20 @@ public class Json
         try
         {
             return json.get(key);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Object get(JSONArray json, int index)
+    {
+        try
+        {
+            return json.get(index);
         }
         catch (Exception ignore)
         {

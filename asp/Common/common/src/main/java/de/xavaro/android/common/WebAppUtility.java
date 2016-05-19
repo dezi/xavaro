@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.content.Context;
 
@@ -17,20 +18,14 @@ public class WebAppUtility
     @JavascriptInterface
     public String getBetaVersion()
     {
-        Context appcontext = Simple.getAppContext();
-
-        if (appcontext instanceof AppInfoHandler)
-        {
-            return ((AppInfoHandler) appcontext).getBetaVersion();
-        }
-
-        return "";
+        String version = Simple.getBetaVersion();
+        return (version != null) ? version : "";
     }
 
     @JavascriptInterface
     public String getBetaVersionDate()
     {
-        Context appcontext = Simple.getAppContext();
+        Context appcontext = Simple.getActContext();
 
         if (appcontext instanceof AppInfoHandler)
         {
@@ -92,6 +87,24 @@ public class WebAppUtility
         }
 
         return "";
+    }
+
+    @JavascriptInterface
+    public void makePrettyLog(String json)
+    {
+        Log.d(LOGTAG, "makePrettyLog:" + getPrettyJson(json));
+    }
+
+    @JavascriptInterface
+    public int getDeviceWidth()
+    {
+        return Simple.getDeviceWidth();
+    }
+
+    @JavascriptInterface
+    public int getDeviceHeight()
+    {
+        return Simple.getDeviceHeight();
     }
 
     @JavascriptInterface

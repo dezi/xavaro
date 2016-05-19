@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.Simple;
 
@@ -18,7 +19,7 @@ public class PreferencesMedia
 {
     //region Media image preferences
 
-    public static class MediaImageFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class MediaImageFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -170,7 +171,7 @@ public class PreferencesMedia
 
     //region Media video preferences
 
-    public static class MediaVideoFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class MediaVideoFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -249,7 +250,7 @@ public class PreferencesMedia
 
     //region Media audio preferences
 
-    public static class MediaAudioFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class MediaAudioFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {
@@ -312,7 +313,7 @@ public class PreferencesMedia
 
     //region Media ebook preferences
 
-    public static class MediaEbookFragment extends PreferencesBasics.EnablePreferenceFragment
+    public static class MediaEbookFragment extends PreferenceFragments.EnableFragmentStub
     {
         public static PreferenceActivity.Header getHeader()
         {

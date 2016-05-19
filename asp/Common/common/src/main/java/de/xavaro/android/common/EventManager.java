@@ -191,8 +191,6 @@ public class EventManager
         File arch = Simple.getPackageFile("events." + suffix + ".json");
         if (arch.exists()) return;
 
-        Log.d(LOGTAG,"migrateOutdatedArchive: lastdate=" + lastdate + "=" + arch.toString());
-
         JSONObject passed = Json.getObject(eventcache, "passed");
 
         JSONObject archive = new JSONObject();
@@ -226,6 +224,8 @@ public class EventManager
         }
 
         if (! dirty) return;
+
+        Log.d(LOGTAG,"migrateOutdatedArchive: lastdate=" + lastdate + "=" + arch.toString());
 
         if (Simple.putFileContent(arch, Json.defuck(Json.toPretty(archive))))
         {

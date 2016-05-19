@@ -16,6 +16,14 @@
       "prio": 100
     },
 
+    "configure.settings.accessibility":
+    {
+      "title": "important",
+      "message": "Die Anwendung sollte noch als Eingabehilfe zugelassen werden.",
+      "buttons": "later|noshow|follow",
+      "prio": 150
+    },
+
     "configure.settings.homebutton":
     {
       "title": "important",
