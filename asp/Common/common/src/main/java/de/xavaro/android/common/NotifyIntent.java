@@ -9,7 +9,6 @@ public class NotifyIntent
     public static final int WARNING = 3;
 
     public boolean actionDue;
-    public boolean speakDat;
     public long actionDueTime;
     public int importance;
 
@@ -17,6 +16,9 @@ public class NotifyIntent
     public String declineText;
     public String title;
     public String summary;
+
+    public Runnable followRunner;
+    public Runnable declineRunner;
 
     public interface NotifiyService
     {

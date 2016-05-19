@@ -137,7 +137,12 @@ public class LaunchItemCall extends LaunchItem implements
     {
         if (Json.equals(config, "subitem", "prepaid"))
         {
-            return PrepaidManager.getNotifyEvent();
+            NotifyIntent intent = PrepaidManager.getNotifyEvent();
+
+            intent.followRunner = launchPrepaidRequestRunner;
+            intent.declineRunner = launchPrepaidRechargeRunner;
+
+            return intent;
         }
 
         return null;
@@ -182,7 +187,7 @@ public class LaunchItemCall extends LaunchItem implements
     @Override
     protected boolean onMyLongClick()
     {
-        return launchPrepaidLoad();
+        return launchPrepaidRecharge();
     }
 
     @Override
@@ -191,7 +196,30 @@ public class LaunchItemCall extends LaunchItem implements
         launchCall();
     }
 
-    private boolean launchPrepaidLoad()
+    private final Runnable launchPrepaidRequestRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            launchPrepaidRequest();
+        }
+    };
+    
+    private final Runnable launchPrepaidRechargeRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            launchPrepaidRecharge();
+        }
+    };
+
+    private void launchPrepaidRequest()
+    {
+        PrepaidManager.makeRequest(this, false, null, null);
+    }
+
+    private boolean launchPrepaidRecharge()
     {
         if (config.has("subitem"))
         {
@@ -203,7 +231,7 @@ public class LaunchItemCall extends LaunchItem implements
 
                 if (prepaidload != null)
                 {
-                    Log.d(LOGTAG,"launchPrepaidLoad:" + prepaidload);
+                    Log.d(LOGTAG,"launchPrepaidRecharge:" + prepaidload);
 
                     PrepaidManager.createPrepaidLoadDialog(this);
 
@@ -228,7 +256,7 @@ public class LaunchItemCall extends LaunchItem implements
 
                 if (subitem.equals("prepaid"))
                 {
-                    PrepaidManager.makeRequest(this, false, null, null);
+                    launchPrepaidRequest();
                 }
                 else
                 {

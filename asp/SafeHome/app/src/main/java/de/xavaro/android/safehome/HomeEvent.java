@@ -1,14 +1,15 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.view.Gravity;
+import android.view.View;
 import android.util.Log;
 
+import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.Simple;
 
 public class HomeEvent extends FrameLayout
@@ -22,6 +23,7 @@ public class HomeEvent extends FrameLayout
     private HomeButton declineButton;
     private HomeButton followButton;
     private boolean istopevent;
+    private NotifyIntent intent;
 
     public HomeEvent(Context context, boolean istopevent)
     {
@@ -46,6 +48,14 @@ public class HomeEvent extends FrameLayout
 
         followButton = new HomeButton(context, this.istopevent, 1);
         followButton.setVisibility(GONE);
+        followButton.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                onFollowButtonClick();
+            }
+        });
 
         addView(followButton);
 
@@ -53,19 +63,55 @@ public class HomeEvent extends FrameLayout
         {
             declineButton = new HomeButton(context, this.istopevent, 2);
             declineButton.setVisibility(GONE);
+            declineButton.setOnClickListener(new OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    onDeclineButtonClick();
+                }
+            });
 
             addView(declineButton);
         }
     }
 
-    protected boolean isPortrait()
+    protected void onFollowButtonClick()
     {
-        return (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT);
+        Log.d(LOGTAG, "onFollowButtonClick:");
+
+        if ((intent != null) && (intent.followRunner != null))
+        {
+            intent.followRunner.run();
+        }
     }
 
-    protected boolean isLandscape()
+    protected void onDeclineButtonClick()
     {
-        return (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE);
+        Log.d(LOGTAG, "onDeclineButtonClick:");
+
+        if ((intent != null) && (intent.declineRunner != null))
+        {
+            intent.declineRunner.run();
+        }
+    }
+
+    public void setNotifyIntent(NotifyIntent intent)
+    {
+        this.intent = intent;
+
+        if (intent == null)
+        {
+            setTitleText(null);
+            setFollowButtonText(null);
+            setDeclineButtonText(null);
+        }
+        else
+        {
+            setTitleText(intent.title);
+            setFollowButtonText(intent.followText);
+            setDeclineButtonText(intent.declineText);
+        }
     }
 
     public void setLayoutHeight(int height)
@@ -79,7 +125,7 @@ public class HomeEvent extends FrameLayout
             {
                 titleParams.height = height / 2;
 
-                titleParams.topMargin = isPortrait() ? height / 10 : 0;
+                titleParams.topMargin = Simple.isPortrait() ? height / 10 : 0;
                 titleParams.leftMargin = height + height / 10;
                 titleParams.rightMargin = Simple.getDevicePixels(16);
             }

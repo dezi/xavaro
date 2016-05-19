@@ -1369,6 +1369,16 @@ public class Simple
         return getResources().getConfiguration().orientation;
     }
 
+    public static boolean isPortrait()
+    {
+        return (getOrientation() == Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    public static boolean isLandscape()
+    {
+        return (getOrientation() == Configuration.ORIENTATION_LANDSCAPE);
+    }
+
     public static int getDeviceWidth()
     {
         if (anyContext == null) return 0;
@@ -1431,7 +1441,7 @@ public class Simple
 
         if (anyContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
         {
-            DisplayMetrics dm = anyContext.getResources().getDisplayMetrics();
+            DisplayMetrics dm = getResources().getDisplayMetrics();
             return TypedValue.complexToDimensionPixelSize(tv.data, dm);
         }
 
@@ -1440,20 +1450,16 @@ public class Simple
 
     public static int getStatusBarHeight()
     {
-        int resourceId = anyContext.getResources()
-                .getIdentifier("status_bar_height", "dimen", "android");
-
-        if (resourceId > 0) return anyContext.getResources().getDimensionPixelSize(resourceId);
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) return getResources().getDimensionPixelSize(resourceId);
 
         return 20;
     }
 
     public static int getNavigationBarHeight()
     {
-        int resourceId = anyContext.getResources()
-                .getIdentifier("navigation_bar_height", "dimen", "android");
-
-        if (resourceId > 0) return anyContext.getResources().getDimensionPixelSize(resourceId);
+        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) return getResources().getDimensionPixelSize(resourceId);
 
         return 64;
     }

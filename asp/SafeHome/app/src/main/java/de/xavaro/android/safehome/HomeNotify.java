@@ -198,24 +198,14 @@ public class HomeNotify extends HomeFrame
 
     protected void setupNotification(LaunchItem launchItem, HomeEvent eventFrame)
     {
+        NotifyIntent intent = null;
+
         if (launchItem instanceof NotifyIntent.NotifiyService)
         {
-            NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
-
-            if (intent != null)
-            {
-                eventFrame.setTitleText(intent.title);
-                eventFrame.setFollowButtonText(intent.followText);
-                eventFrame.setDeclineButtonText(intent.declineText);
-            }
-        }
-        else
-        {
-            eventFrame.setTitleText(null);
-            eventFrame.setFollowButtonText(null);
-            eventFrame.setDeclineButtonText(null);
+            intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
         }
 
+        eventFrame.setNotifyIntent(intent);
         eventFrame.addView(launchItem);
     }
 

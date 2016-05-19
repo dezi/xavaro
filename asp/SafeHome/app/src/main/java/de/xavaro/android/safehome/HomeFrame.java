@@ -2,7 +2,6 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 
-import android.content.res.Configuration;
 import android.content.Context;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -97,7 +96,12 @@ public abstract class HomeFrame extends FrameLayout
 
     public void setDisablefullscreen()
     {
-        innerClick.setOnClickListener(null);
+        if (innerClick != null)
+        {
+            innerClick.setOnClickListener(null);
+            removeView(innerClick);
+            innerClick = null;
+        }
     }
 
     public void setTitle(String title)
@@ -108,16 +112,6 @@ public abstract class HomeFrame extends FrameLayout
             titleText.setVisibility(VISIBLE);
             innerLayout.topMargin = titleSpace;
         }
-    }
-
-    protected boolean isPortrait()
-    {
-        return (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT);
-    }
-
-    protected boolean isLandscape()
-    {
-        return (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE);
     }
 
     protected final OnClickListener onClickListener = new OnClickListener()
@@ -139,7 +133,7 @@ public abstract class HomeFrame extends FrameLayout
 
             if ((wid != 0) && (hei != 0))
             {
-                notifySize = hei - launchHei - (isPortrait() ? peopleSize : 8);
+                notifySize = hei - launchHei - (Simple.isPortrait() ? peopleSize : 8);
 
                 onChangeOrientation();
                 setVisibility(VISIBLE);
