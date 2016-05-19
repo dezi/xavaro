@@ -26,7 +26,17 @@ public class GCMMessageService extends GcmListenerService
     @Override
     public void onCreate()
     {
+        //
+        // The listener service is either started when the application
+        // is started or by Android operating system, when a GCM message
+        // is coming in (wake up).
+        //
+
         super.onCreate();
+
+        //
+        // Make sure our internal messaging service is also started up.
+        //
 
         startService(new Intent(this, CommService.class));
     }
@@ -34,24 +44,46 @@ public class GCMMessageService extends GcmListenerService
     @Override
     public void onMessageReceived(String from, Bundle data)
     {
+        //
+        // We come here eventually from a wake up through GCM.
+        // If this is the very first message, our comm server might
+        // not yet be fully started from onCreate method.
+        //
+
         while (! CommService.getIsRunning())
         {
             Log.d(LOGTAG, "onMessageReceived: Waiting for " + CommService.class.getSimpleName());
 
+            //
+            // Hard synchronizing of threads.
+            //
+
             Simple.sleep(100);
         }
+
+        //
+        // Extract message from bundle.
+        //
 
         String message = data.getString("message");
 
         if (from.startsWith("/topics/"))
         {
-            // message received from some topic.
+            //
+            // Message received from some topic. Feature
+            // is not used at this time.
+            //
 
             return;
         }
 
         if ((message != null) && message.startsWith("{\"base64\":"))
         {
+            //
+            // Message is serialized JSON and contains our base64 tag
+            // on first position. Decode and deliver to comm service.
+            //
+
             try
             {
                 JSONObject jmess= new JSONObject(message);
@@ -69,7 +101,12 @@ public class GCMMessageService extends GcmListenerService
 
     public static boolean sendMessage(String receiver, byte[] message)
     {
-        String base64 = Base64.encodeToString(message,0).trim();
+        //
+        // Message is either crypted or not. Anyway we are given bytes,
+        // which we put into message as a base64 encoded string.
+        //
+
+        String base64 = Base64.encodeToString(message, 0).trim();
 
         JSONObject base64message = new JSONObject();
         Simple.JSONput(base64message, "base64", base64);
@@ -159,14 +196,25 @@ public class GCMMessageService extends GcmListenerService
 
     public static boolean sendMessage(String receiver, JSONObject message)
     {
+        //
+        // Send one message to receivers. The receiver is a guid identity.
+        //
+
         JSONArray tokens = null;
 
         Log.d(LOGTAG, "sendMessage");
+
+        //
+        // Try to obtain GCM token from our remote contacts.
+        //
 
         String token = RemoteContacts.getGCMToken(receiver);
 
         if (token == null)
         {
+            //
+            // Try to obtain token from a remote group (alertgroup or other).
+
             tokens = RemoteGroups.getGCMTokens(receiver);
 
             if ((tokens == null) || (tokens.length() == 0))
@@ -184,11 +232,19 @@ public class GCMMessageService extends GcmListenerService
 
         try
         {
+            //
+            // Pack our message how Google likes it.
+            //
+
             JSONObject jData = new JSONObject();
             jData.put("message", message);
 
             JSONObject jGcmData = new JSONObject();
             jGcmData.put("data", jData);
+
+            //
+            // Receiver token or tokens.
+            //
 
             if (tokens != null)
             {
@@ -199,11 +255,24 @@ public class GCMMessageService extends GcmListenerService
                 jGcmData.put("to", token);
             }
 
+            //
+            // IOS compliance flags.
+            //
+
             jGcmData.put("priority", "high");
             jGcmData.put("content_available", true);
 
+            //
+            // GCM only sends via post api.
+            //
+
             URL url = new URL("https://android.googleapis.com/gcm/send");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            //
+            // Add authorization stuff.
+            //
+
             conn.setRequestProperty("Authorization", "key=" + Simple.dezify(Simple.getGCMapeyki()));
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestMethod("POST");

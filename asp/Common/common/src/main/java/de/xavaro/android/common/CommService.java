@@ -467,6 +467,15 @@ public class CommService extends Service
 
         if (ptype.equals("CRYP"))
         {
+            //
+            // Packet consists of:
+            //
+            // -  4 bytes header "CRYP" => crypted
+            // - 16 bytes remote identity from sender perspektive
+            // - 16 bytes owner identity from sender perspektive
+            // -  n bytes payload with serialized json
+            //
+
             byte[] idremBytes = new byte[ 16 ];
             System.arraycopy(data, 4, idremBytes, 0, 16);
             String idrem = Simple.getUUIDString(idremBytes);
@@ -494,11 +503,25 @@ public class CommService extends Service
 
             if (data == null) return;
 
+            //
+            // ptype should be JSON after decrypt.
+            //
+
             ptype = new String(data, 0, 4);
         }
 
         if (ptype.equals("CARL"))
         {
+            //
+            // Packet consists of:
+            //
+            // -  4 bytes header "CARL" => crypted with reliable ack
+            // - 16 bytes remote identity from sender perspektive
+            // - 16 bytes owner identity from sender perspektive
+            // - 16 bytes message uuid for acknowledgement
+            // -  n bytes payload with serialized json
+            //
+
             byte[] idremBytes = new byte[ 16 ];
             System.arraycopy(data, 4, idremBytes, 0, 16);
             String idrem = Simple.getUUIDString(idremBytes);
@@ -543,11 +566,25 @@ public class CommService extends Service
 
             if (data == null) return;
 
+            //
+            // ptype should be JSON after decrypt.
+            //
+
             ptype = new String(data, 0, 4);
         }
 
         if (ptype.equals("CACK"))
         {
+            //
+            // Packet consists of:
+            //
+            // -  4 bytes header "CACK" => crypted acknowledgement
+            // - 16 bytes remote identity from sender perspektive
+            // - 16 bytes owner identity from sender perspektive
+            // - 16 bytes message uuid from acknowledgement
+            // - no payload (is acknowledgement only)
+            //
+
             byte[] idremBytes = new byte[ 16 ];
             System.arraycopy(data, 4, idremBytes, 0, 16);
             String idrem = Simple.getUUIDString(idremBytes);
@@ -560,6 +597,10 @@ public class CommService extends Service
             System.arraycopy(data, 36, ackidBytes, 0, 16);
             String ackid = Simple.getUUIDString(ackidBytes);
 
+            //
+            // Build a virtual json packet from acknowlegdement info.
+            //
+
             JSONObject feedbackMessage = new JSONObject();
 
             Simple.JSONput(feedbackMessage, "type", "feedbackMessage");
@@ -569,16 +610,30 @@ public class CommService extends Service
             Simple.JSONput(feedbackMessage, "uuid", ackid);
 
             String ackmess = "JSON" + feedbackMessage.toString();
-
             data = ackmess.getBytes();
             ptype = new String(data, 0, 4);
         }
 
-        if (! ptype.equals("JSON")) return;
+        if (! ptype.equals("JSON"))
+        {
+            //
+            // Decrypt failed or packet is junk.
+            //
+
+            return;
+        }
 
         try
         {
+            //
+            // Get json object from sequence after JSON magic.
+            //
+
             JSONObject json = new JSONObject(new String(data, 4, data.length - 4));
+
+            //
+            // Dispatch clear message to whom it might concern.
+            //
 
             deliverMessage(json);
         }

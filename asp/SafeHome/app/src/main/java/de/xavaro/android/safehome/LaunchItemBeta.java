@@ -93,7 +93,9 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
         {
             intent.title = "Es ist eine neue Version verfügbar.";
             intent.declineText = "Morgen erinnern";
+            intent.declineRunner = declineRunner;
             intent.followText = "Version installieren";
+            intent.followRunner = launchBetaRunner;
             intent.importance = NotifyIntent.REMINDER;
         }
         else
@@ -101,6 +103,7 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
             intent.title = "Sie haben bereits die aktuelle Version.";
             intent.declineText = null;
             intent.followText = "Infos anzeigen";
+            intent.followRunner = launchBetaRunner;
             intent.importance = NotifyIntent.INFOONLY;
         }
 
