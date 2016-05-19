@@ -29,7 +29,9 @@ public class HomeButton extends TextView
 
         if (this.istopevent)
         {
-            layout.bottomMargin = (Simple.getDevicePixels(6) + buttonHeight) * (buttonnumber - 1);
+            layout.bottomMargin = Simple.getDevicePixels(6);
+            layout.rightMargin = Simple.getDevicePixels(16);
+            layout.rightMargin += (Simple.getDevicePixels(6) + buttonWidth) * (buttonnumber - 1);
         }
 
         setLayoutParams(layout);

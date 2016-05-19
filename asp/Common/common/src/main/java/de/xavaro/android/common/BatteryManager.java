@@ -7,23 +7,23 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Calendar;
 import java.io.File;
 
 public class BatteryManager
 {
     private static final String LOGTAG = BatteryManager.class.getSimpleName();
 
-    private static final ArrayList<BatteryManagerCallback> callbacks = new ArrayList<>();
     private static final JSONObject batteryStatus = new JSONObject();
 
     private static long nextCheck;
     private static int sequence;
     private static int lastStatus;
     private static int lastPercent;
+
     private static String lastMessage;
+    private static int lastImportance;
 
     public static void commTick()
     {
@@ -43,33 +43,7 @@ public class BatteryManager
             }
         }
 
-        Simple.makePost(doCallbacks);
-
         if ((sequence % 20) == 0) checkWarnings();
-    }
-
-    public static void subscribe(BatteryManagerCallback callback)
-    {
-        synchronized (callbacks)
-        {
-            if (! callbacks.contains(callback)) callbacks.add(callback);
-        }
-    }
-
-    public static void unsubscribe(BatteryManagerCallback callback)
-    {
-        synchronized (callbacks)
-        {
-            if (callbacks.contains(callback)) callbacks.remove(callback);
-        }
-    }
-
-    public static void unsubscribeAll()
-    {
-        synchronized (callbacks)
-        {
-            callbacks.clear();
-        }
     }
 
     public static JSONObject getBatteryStatus()
@@ -80,16 +54,55 @@ public class BatteryManager
         }
     }
 
-    public static String getBatteryMessage()
+    public static NotifyIntent getNotifyEvent()
     {
+        NotifyIntent intent = new NotifyIntent();
+
         if (lastMessage == null)
         {
             int percent = Json.getInt(batteryStatus, "percent");
 
-            return "Die Batterie ist zu " + percent + "% geladen.";
+            intent.title = Simple.getTrans(R.string.battery_manager_info, percent);
+            intent.importance = NotifyIntent.INFOONLY;
+        }
+        else
+        {
+            intent.title = lastMessage;
+            intent.importance = lastImportance;
         }
 
-        return lastMessage;
+        return intent;
+    }
+
+    private static void resetWarnings()
+    {
+        //
+        // Check if an assistance warning was send.
+        //
+
+        String date = Simple.getSharedPrefString("monitors.battery.lastassist");
+
+        if (date != null)
+        {
+            String owner = Simple.getOwnerName();
+            int percent = Json.getInt(batteryStatus, "percent");
+
+            String text1 = Simple.getTrans(R.string.battery_manager_assist_clear, owner);
+            String text2 = Simple.getTrans(R.string.battery_manager_assist_level, percent);
+
+            AssistanceMessage.informAssistance(text1 + " " + text2);
+        }
+
+        //
+        // Reset all warning times.
+        //
+
+        lastMessage = null;
+        lastImportance = 0;
+
+        Simple.removeSharedPref("monitors.battery.lastremind");
+        Simple.removeSharedPref("monitors.battery.lastwarn");
+        Simple.removeSharedPref("monitors.battery.lastassist");
     }
 
     private static void checkWarnings()
@@ -102,27 +115,7 @@ public class BatteryManager
 
         if (status == android.os.BatteryManager.BATTERY_STATUS_CHARGING)
         {
-            //
-            // Check if an assistance warning was send.
-            //
-
-            String date = Simple.getSharedPrefString("monitors.battery.lastassist");
-
-            if (date != null)
-            {
-                // assist clear.
-            }
-
-            //
-            // Reset all warning times.
-            //
-
-            lastMessage = null;
-
-            Simple.removeSharedPref("monitors.battery.lastremind");
-            Simple.removeSharedPref("monitors.battery.lastwarn");
-            Simple.removeSharedPref("monitors.battery.lastassist");
-
+            resetWarnings();
             return;
         }
 
@@ -139,7 +132,12 @@ public class BatteryManager
         String assist = Simple.getSharedPrefString("monitors.battery.assistance");
         if ((assist != null) && ! assist.equals("never")) assistval = Integer.parseInt(assist);
 
-        if ((percent > remindval) && (percent > warnval) && (percent > assistval)) return;
+        if ((percent > remindval) && (percent > warnval) && (percent > assistval))
+        {
+            if (percent > remindval) resetWarnings();
+
+            return;
+        }
 
         //
         // Some warnings might be due.
@@ -159,7 +157,8 @@ public class BatteryManager
             if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
             {
                 lastMessage = Simple.getTrans(R.string.battery_manager_remind);
-                Speak.speak(lastMessage, 50);
+                lastImportance = NotifyIntent.REMINDER;
+
                 Simple.setSharedPrefString("monitors.battery.lastremind", Simple.nowAsISO());
             }
         }
@@ -172,7 +171,8 @@ public class BatteryManager
             if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
             {
                 lastMessage = Simple.getTrans(R.string.battery_manager_warn);
-                Speak.speak(lastMessage, 100);
+                lastImportance = NotifyIntent.WARNING;
+
                 Simple.setSharedPrefString("monitors.battery.lastwarn", Simple.nowAsISO());
             }
         }
@@ -184,7 +184,22 @@ public class BatteryManager
 
             if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
             {
-                // assist warn.
+                //
+                // Perform assistance warning.
+                //
+
+                String owner = Simple.getOwnerName();
+
+                String text1 = Simple.getTrans(R.string.battery_manager_assist_warn, owner);
+                String text2 = Simple.getTrans(R.string.battery_manager_assist_level, percent);
+
+                AssistanceMessage.informAssistance(text1 + " " + text2);
+
+                lastMessage = Simple.getTrans(R.string.battery_manager_warn)
+                        + " "
+                        + Simple.getTrans(R.string.battery_manager_assist);
+
+                lastImportance = NotifyIntent.WARNING;
 
                 Simple.setSharedPrefString("monitors.battery.lastassist", Simple.nowAsISO());
             }
@@ -259,27 +274,5 @@ public class BatteryManager
         Json.put(values, saveit);
 
         Simple.putFileContent(statusfile, Json.toPretty(values));
-    }
-
-    private static final Runnable doCallbacks = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            JSONObject status = getBatteryStatus();
-
-            synchronized (callbacks)
-            {
-                for (BatteryManagerCallback callback : callbacks)
-                {
-                    callback.onBatteryStatus(status);
-                }
-            }
-        }
-    };
-
-    public interface BatteryManagerCallback
-    {
-        void onBatteryStatus(JSONObject status);
     }
 }

@@ -743,8 +743,12 @@ public class Simple
 
     public static String getCurrencySymbol()
     {
-        Currency currency = Currency.getInstance(Locale.getDefault());
-        return currency.getSymbol();
+        return Currency.getInstance(Locale.getDefault()).getSymbol();
+    }
+
+    public static String getCurrencyValue(int moneycents)
+    {
+        return String.format("%.02f\u00A0", moneycents / 100f) + getCurrencySymbol();
     }
 
     public static String getTrans(int resid, Object... args)

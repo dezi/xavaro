@@ -429,11 +429,17 @@
     <string name="pref_social_googleplus_account_summary">todo</string>
     <string name="pref_social_googleplus_friends_summary">todo</string>
 
+    <string name="battery_manager_info">The battery charge is at %1$d percent.</string>
     <string name="battery_manager_remind">Please plug Your tablet into the charger soon.</string>
     <string name="battery_manager_warn">Please plug Your tablet into the charger now.</string>
+    <string name="battery_manager_assist">I also informed Your assistance.</string>
     <string name="battery_manager_assist_warn">%1$s tablet desperatly needs some charging.</string>
     <string name="battery_manager_assist_clear">%1$s is now charging his tablet.</string>
     <string name="battery_manager_assist_level">The level is now at %1$d percent.</string>
+
+    <string name="prepaid_manager_info">Your prepaid balance is %1$s</string>
+    <string name="prepaid_manager_request">Request Balance</string>
+    <string name="prepaid_manager_recharge">Recharge Balance</string>
 
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>

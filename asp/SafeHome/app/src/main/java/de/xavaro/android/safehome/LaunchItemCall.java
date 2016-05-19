@@ -66,7 +66,7 @@ public class LaunchItemCall extends LaunchItem implements
                 prepaidMoneyView.setLayoutParams(Simple.layoutParamsMM());
                 prepaidMoneyView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad36);
                 prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f));
-                prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+                prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
                 prepaidMoneyView.setTextColor(Color.WHITE);
                 prepaidMoneyView.setTypeface(null, Typeface.BOLD);
 
@@ -124,12 +124,11 @@ public class LaunchItemCall extends LaunchItem implements
             prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f * scale));
             prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f * scale));
 
-            int devpad16 = Simple.getDevicePixels(Math.round(16 * scale));
-            int devpad20 = Simple.getDevicePixels(Math.round(20 * scale));
-            int devpad36 = Simple.getDevicePixels(Math.round(36 * scale));
+            int devpad28 = Simple.getDevicePixels(Math.round(28 * scale));
+            int devpad48 = Simple.getDevicePixels(Math.round(56 * scale));
 
-            prepaidDateView.setPadding(0, devpad16, 0, 0);
-            prepaidMoneyView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad36);
+            prepaidDateView.setPadding(0, devpad28, 0, 0);
+            prepaidMoneyView.setPadding(0, devpad48, 0, 0);
         }
     }
 
@@ -138,14 +137,7 @@ public class LaunchItemCall extends LaunchItem implements
     {
         if (Json.equals(config, "subitem", "prepaid"))
         {
-            NotifyIntent intent = new NotifyIntent();
-
-            intent.title = PrepaidManager.getPrepaidMessage();
-
-            intent.declineText = "Konto aufladen";
-            intent.followText = "Neu abfragen";
-
-            return intent;
+            return PrepaidManager.getNotifyEvent();
         }
 
         return null;

@@ -2,13 +2,13 @@ package de.xavaro.android.common;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.text.InputType;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.view.View;
+import android.net.Uri;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -226,22 +226,31 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
         dialog.cancel();
     }
 
-    //region Prepaid load dialog
+    //endregion Prepaid load dialog
 
     private static String lastMessage;
 
-    public static String getPrepaidMessage()
+    public static NotifyIntent getNotifyEvent()
     {
+        NotifyIntent intent = new NotifyIntent();
+
         if (lastMessage == null)
         {
-            String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
-            int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
-            String value = String.format("%.02f", money / 100f) + Simple.getCurrencySymbol();
+            //String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
 
-            return "Ihr Guthaben beträgt" + " " + value;
+            int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+            String value = Simple.getCurrencyValue(money);
+
+            intent.title =  Simple.getTrans(R.string.prepaid_manager_info, value);
+            intent.followText = Simple.getTrans(R.string.prepaid_manager_request);
+            intent.declineText = Simple.getTrans(R.string.prepaid_manager_recharge);
+            intent.importance = NotifyIntent.INFOONLY;
+        }
+        else
+        {
+            intent.title = lastMessage;
         }
 
-        return lastMessage;
+        return intent;
     }
-
 }

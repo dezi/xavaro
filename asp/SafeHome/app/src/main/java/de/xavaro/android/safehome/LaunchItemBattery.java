@@ -52,11 +52,7 @@ public class LaunchItemBattery extends LaunchItem implements NotifyIntent.Notifi
     @Override
     public NotifyIntent onGetNotifiyIntent()
     {
-        NotifyIntent intent = new NotifyIntent();
-
-        intent.title = BatteryManager.getBatteryMessage();
-
-        return intent;
+        return BatteryManager.getNotifyEvent();
     }
 
     @Override

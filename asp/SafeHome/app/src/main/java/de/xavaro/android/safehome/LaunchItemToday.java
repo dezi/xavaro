@@ -46,13 +46,8 @@ public class LaunchItemToday extends LaunchItem
     {
         icon.setImageResource(GlobalConfigs.IconResToday);
 
-        int devpad16 = Simple.getDevicePixels(16);
-        int devpad20 = Simple.getDevicePixels(20);
-
         dayView = new TextView(getContext());
         dayView.setLayoutParams(Simple.layoutParamsMW());
-        dayView.setPadding(0, devpad16, 0, 0);
-        dayView.setTextSize(Simple.getDeviceTextSize(22f));
         dayView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
         dayView.setTextColor(Color.WHITE);
         dayView.setTypeface(null, Typeface.BOLD);
@@ -61,8 +56,6 @@ public class LaunchItemToday extends LaunchItem
 
         timeView = new TextView(getContext());
         timeView.setLayoutParams(Simple.layoutParamsMM());
-        timeView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad16);
-        timeView.setTextSize(Simple.getDeviceTextSize(44f));
         timeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
         timeView.setTextColor(Color.WHITE);
         timeView.setTypeface(null, Typeface.BOLD);
@@ -71,8 +64,6 @@ public class LaunchItemToday extends LaunchItem
 
         dateView = new TextView(getContext());
         dateView.setLayoutParams(Simple.layoutParamsMM());
-        dateView.setPadding(0, 0, 0, icon.getPaddingBottom() + devpad16);
-        dateView.setTextSize(Simple.getDeviceTextSize(20f));
         dateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
         dateView.setTextColor(Color.WHITE);
         dateView.setTypeface(null, Typeface.BOLD);
@@ -93,16 +84,15 @@ public class LaunchItemToday extends LaunchItem
 
         float scale = height / 200.0f;
 
-        dayView.setTextSize(Simple.getDeviceTextSize(22f * scale));
-        timeView.setTextSize(Simple.getDeviceTextSize(44f * scale));
+        dayView.setTextSize(Simple.getDeviceTextSize(24f * scale));
+        timeView.setTextSize(Simple.getDeviceTextSize(52f * scale));
         dateView.setTextSize(Simple.getDeviceTextSize(20f * scale));
 
-        int devpad16 = Simple.getDevicePixels(Math.round(16 * scale));
-        int devpad20 = Simple.getDevicePixels(Math.round(20 * scale));
+        int devpad28 = Simple.getDevicePixels(Math.round(28 * scale));
 
-        dayView.setPadding(0, devpad16, 0, 0);
-        timeView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad16);
-        dateView.setPadding(0, 0, 0, icon.getPaddingBottom() + devpad16);
+        dayView.setPadding(0, devpad28, 0, 0);
+        timeView.setPadding(0, devpad28, 0, icon.getPaddingBottom() + devpad28);
+        dateView.setPadding(0, 0, 0, icon.getPaddingBottom() + devpad28);
     }
 
     @Override

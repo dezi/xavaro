@@ -77,11 +77,11 @@ public class HomeEvent extends FrameLayout
 
             if (istopevent)
             {
-                titleParams.height = height / 3;
+                titleParams.height = height / 2;
 
                 titleParams.topMargin = isPortrait() ? height / 10 : 0;
                 titleParams.leftMargin = height + height / 10;
-                titleParams.rightMargin = height / 8;
+                titleParams.rightMargin = Simple.getDevicePixels(16);
             }
             else
             {
@@ -89,7 +89,12 @@ public class HomeEvent extends FrameLayout
 
                 titleParams.topMargin = 0;
                 titleParams.leftMargin = height + height / 8;
-                titleParams.rightMargin = HomeButton.buttonWidth + HomeButton.buttonWidth / 8;
+                titleParams.rightMargin = Simple.getDevicePixels(16);
+
+                if ((followButton != null) && (followButton.getVisibility() == VISIBLE))
+                {
+                    titleParams.rightMargin += HomeButton.buttonWidth;
+                }
             }
 
             titleView.setLayoutParams(titleParams);
@@ -108,8 +113,19 @@ public class HomeEvent extends FrameLayout
 
     public void setFollowButtonText(String text)
     {
-        followButton.setText(text);
-        followButton.setVisibility((text == null) ? GONE : VISIBLE);
+        if (followButton != null)
+        {
+            followButton.setText(text);
+            followButton.setVisibility((text == null) ? GONE : VISIBLE);
+
+            if (! istopevent)
+            {
+                titleParams.rightMargin = Simple.getDevicePixels(16);
+                if (text != null) titleParams.rightMargin += HomeButton.buttonWidth;
+
+                titleView.setLayoutParams(titleParams);
+            }
+        }
     }
 
     public void setDeclineButtonText(String text)
