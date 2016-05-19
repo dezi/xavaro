@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 public class GCMMessageService extends GcmListenerService
 {
@@ -76,11 +77,91 @@ public class GCMMessageService extends GcmListenerService
         return sendMessage(receiver, base64message);
     }
 
+    private static int badge = 88;
+
+    public static boolean testMessage()
+    {
+        String token = "f2fTysDraaQ:APA91bG_wuERj35amcc7227eVB8CzmRGCxn_IWSdatpClTSVXIRTktV04NGeRvNgRmm9jay0S-vo4q7_EosGR3i-wg0ipQBnz8ngdGtVZ3Rk2jvYloNrWFVzXq7W5DsFSPEQvS_qVrOV";
+        String message = "Hallo Pallo";
+        JSONArray tokens = null;
+
+        try
+        {
+            JSONObject jData = new JSONObject();
+            jData.put("message", message);
+            jData.put("guid", UUID.randomUUID().toString());
+
+            JSONObject jSub = new JSONObject();
+            jSub.put("a", "1");
+            jSub.put("b", "2");
+            jData.put("myjson", jSub);
+
+            JSONObject jAPS = new JSONObject();
+            jAPS.put("alert", "zickezacke");
+
+            //jData.put("aps", "zickezacke");
+
+            JSONObject jGcmData = new JSONObject();
+            jGcmData.put("data", jData);
+
+            JSONObject noti = new JSONObject();
+            //noti.put("title", "Schnullerbacke");
+            //noti.put("sound", "1.wav");
+            noti.put("badge", "7");
+            //noti.put("body", "ich bin der bodey");
+
+            jGcmData.put("priority", "high");
+            jGcmData.put("content_available", true);
+            //jGcmData.put("notification", noti);
+
+            if (tokens != null)
+            {
+                jGcmData.put("registration_ids", tokens);
+            }
+            else
+            {
+                jGcmData.put("to", token);
+            }
+
+            Log.d(LOGTAG,"testMessage: vor post:" + Json.toPretty(jGcmData));
+
+            URL url = new URL("https://android.googleapis.com/gcm/send");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Authorization", "key=" + Simple.dezify(Simple.getGCMapeyki()));
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+
+            OutputStream outputStream = conn.getOutputStream();
+            outputStream.write(jGcmData.toString().getBytes());
+
+            InputStream inputStream = conn.getInputStream();
+            String response = Simple.getAllInput(inputStream);
+
+            outputStream.close();
+            inputStream.close();
+
+            Log.d(LOGTAG, "testMessage: nach post");
+
+            boolean success = response.contains("\"success\":1");
+
+            Log.d(LOGTAG,"testMessage: success:" + success + "=>" + token);
+
+            return success;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
     public static boolean sendMessage(String receiver, JSONObject message)
     {
         JSONArray tokens = null;
 
-        Log.d(LOGTAG,"sendMessage");
+        Log.d(LOGTAG, "sendMessage");
 
         String token = RemoteContacts.getGCMToken(receiver);
 
@@ -90,7 +171,7 @@ public class GCMMessageService extends GcmListenerService
 
             if ((tokens == null) || (tokens.length() == 0))
             {
-                Log.d(LOGTAG,"sendMessage: das war nix...");
+                Log.d(LOGTAG, "sendMessage: das war nix...");
 
                 return false;
             }
@@ -117,6 +198,9 @@ public class GCMMessageService extends GcmListenerService
             {
                 jGcmData.put("to", token);
             }
+
+            jGcmData.put("priority", "high");
+            jGcmData.put("content_available", true);
 
             URL url = new URL("https://android.googleapis.com/gcm/send");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.GCMMessageService;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;

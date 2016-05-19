@@ -43,13 +43,15 @@ public class HomeNotify extends HomeFrame
     {
         super(context);
 
+        Log.d(LOGTAG,"HomeNotify: creating.");
+
         layoutParams.width = Simple.MP;
         layoutParams.height = notifySize - 16;
         layoutParams.gravity = Gravity.TOP;
 
         layoutParams.leftMargin = 8;
         layoutParams.topMargin = 8;
-        layoutParams.rightMargin = isPortrait() ? 8 : peopleSize;
+        layoutParams.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
         layoutParams.bottomMargin = 8;
 
         layoutNormal = new LayoutParams(layoutParams);
@@ -154,7 +156,7 @@ public class HomeNotify extends HomeFrame
     protected void onChangeOrientation()
     {
         layoutNormal.height = notifySize - 16;
-        layoutNormal.rightMargin = isPortrait() ? 8 : peopleSize;
+        layoutNormal.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
 
         if (! fullscreen)
         {
@@ -166,7 +168,7 @@ public class HomeNotify extends HomeFrame
         // Get current height minus rulers.
         //
 
-        if (isPortrait())
+        if (Simple.isPortrait())
         {
             size = (payloadFrame.getHeight() - (padv + padv + 2) * 2) / 4;
             tops = size * 2 + size % 4;
@@ -225,14 +227,14 @@ public class HomeNotify extends HomeFrame
 
         if (candidatesLaunch.size() > 1)
         {
-            event1Launch = candidatesLaunch.get(1);
+            event1Launch = candidatesLaunch.get(0);
             event1Launch.setSize(size, size);
             setupNotification(event1Launch, event1Frame);
         }
 
         if (candidatesLaunch.size() > 2)
         {
-            event2Launch = candidatesLaunch.get(2);
+            event2Launch = candidatesLaunch.get(1);
             event2Launch.setSize(size, size);
             setupNotification(event2Launch, event2Frame);
         }

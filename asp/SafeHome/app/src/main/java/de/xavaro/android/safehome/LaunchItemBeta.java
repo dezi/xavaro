@@ -94,16 +94,35 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
             intent.title = "Es ist eine neue Version verfügbar.";
             intent.declineText = "Morgen erinnern";
             intent.followText = "Version installieren";
+            intent.importance = NotifyIntent.REMINDER;
         }
         else
         {
             intent.title = "Sie haben bereits die aktuelle Version.";
             intent.declineText = null;
-            intent.followText = null;
+            intent.followText = "Infos anzeigen";
+            intent.importance = NotifyIntent.INFOONLY;
         }
 
         return intent;
     }
+
+    private final Runnable launchBetaRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            launchBeta();
+        }
+    };
+
+    private final Runnable declineRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+        }
+    };
 
     @Override
     protected void onMyClick()

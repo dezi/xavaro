@@ -913,19 +913,30 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
     public void requestKeyExchange(JSONObject message)
     {
         //
-        // Setup temporary identity to allow GCM messages.
+        // Message obtained from pin code or wifi connect.
         //
 
         String idremote = Json.getString(message, "idremote");
-        String publickey = CryptUtils.RSAgetPublicKey();
         String gcmtoken = Json.getString(message, "gcmtoken");
+
         if (gcmtoken == null) gcmtoken = Json.getString(message, "gcmUuid");
         if ((idremote == null) || (gcmtoken == null)) return;
 
         Log.d(LOGTAG, "requestKeyExchange: " + idremote);
         Log.d(LOGTAG, "requestKeyExchange: " + gcmtoken);
 
+        //
+        // Setup temporary identity from pincode or
+        // wifi connect to allow GCM messages.
+        //
+
         RemoteContacts.setGCMTokenTemp(idremote, gcmtoken);
+
+        //
+        // Json packet to request public key exchange.
+        //
+
+        String publickey = CryptUtils.RSAgetPublicKey();
 
         JSONObject requestPublicKeyXChange = new JSONObject();
 
@@ -1005,11 +1016,21 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
 
                         String remoteIdentity = message.getString("identity");
                         String remotePublicKey = message.getString("publicKey");
+
+                        //
+                        // Generate a new AES passphrase. I always use a guid.
+                        // Encode this with remote public key.
+                        //
+
                         String passPhrase = UUID.randomUUID().toString();
                         String encoPassPhrase = CryptUtils.RSAEncrypt(remotePublicKey, passPhrase);
 
                         IdentityManager.put(remoteIdentity, "publicKey", remotePublicKey);
                         IdentityManager.put(remoteIdentity, "passPhrase", passPhrase);
+
+                        //
+                        // Setup json to send AES pass phrase.
+                        //
 
                         JSONObject requestAESpassXChange = new JSONObject();
 
@@ -1039,12 +1060,22 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                         String remoteIdentity = message.getString("identity");
 
                         JSONObject requestOwnerIdentity = new JSONObject();
+
                         requestOwnerIdentity.put("type", "requestOwnerIdentity");
                         requestOwnerIdentity.put("idremote", remoteIdentity);
+
+                        //
+                        // Add owners information to packet.
+                        //
 
                         RemoteContacts.deliverOwnContact(requestOwnerIdentity);
 
                         CommService.sendEncrypted(requestOwnerIdentity, true);
+
+                        //
+                        // Send owner image with file exchange mechanism.
+                        //
+
                         ProfileImages.sendOwnerImage(remoteIdentity);
 
                         return;
@@ -1055,6 +1086,10 @@ public class PreferencesBasicsCommunity extends PreferenceFragments.BasicFragmen
                 {
                     if (status.equals("success"))
                     {
+                        //
+                        // Message holds infos about remote contact.
+                        //
+
                         remoteContact = message;
 
                         handler.post(gotContact);

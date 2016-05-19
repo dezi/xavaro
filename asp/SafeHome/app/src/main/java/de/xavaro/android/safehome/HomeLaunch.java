@@ -22,8 +22,8 @@ public class HomeLaunch extends HomeFrame
 
         layoutParams.leftMargin = 8;
         layoutParams.topMargin = notifySize;
-        layoutParams.rightMargin = isPortrait() ? 8 : peopleSize;
-        layoutParams.bottomMargin = isPortrait() ? peopleSize : 8;
+        layoutParams.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
+        layoutParams.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
 
         layoutNormal = new LayoutParams(layoutParams);
     }
@@ -36,8 +36,8 @@ public class HomeLaunch extends HomeFrame
     protected void onChangeOrientation()
     {
         layoutNormal.topMargin = notifySize;
-        layoutNormal.rightMargin = isPortrait() ? 8 : peopleSize;
-        layoutNormal.bottomMargin = isPortrait() ? peopleSize : 8;
+        layoutNormal.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
+        layoutNormal.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
 
         if (! fullscreen)
         {

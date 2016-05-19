@@ -303,14 +303,32 @@ public class CommService extends Service
                 String remoteIdentity = json.getString("identity");
                 String remotePublicKey = json.getString("publicKey");
                 String gcmtoken = Json.getString(json, "gcmtoken");
+
+                //
+                // Legacy token name...
+                //
+
                 if (gcmtoken == null) gcmtoken = Json.getString(json, "gcmUuid");
 
+                //
+                // Store remote public key for remote identity.
+                //
+
                 IdentityManager.put(remoteIdentity, "publicKey", remotePublicKey);
+
+                //
+                // Store GCM token temporary until contact validated.
+                //
+
                 RemoteContacts.setGCMTokenTemp(remoteIdentity, gcmtoken);
 
                 Log.d(LOGTAG, "onMessageReceived: requestPublicKeyXChange"
                         + " remoteIdentity=" + remoteIdentity
                         + " remotePublicKey=" + remotePublicKey);
+
+                //
+                // Respond to requester with own public key.
+                //
 
                 JSONObject responsePublicKeyXChange = new JSONObject();
 
@@ -328,6 +346,11 @@ public class CommService extends Service
             {
                 String remoteIdentity = json.getString("identity");
                 String encoPassPhrase = json.getString("encodedPassPhrase");
+
+                //
+                // Decode AES passphrase with private key.
+                //
+
                 String privateKey = CryptUtils.RSAgetPrivateKey();
                 String passPhrase = CryptUtils.RSADecrypt(privateKey, encoPassPhrase);
 
@@ -337,11 +360,19 @@ public class CommService extends Service
                         + " remoteIdentity=" + remoteIdentity
                         + " passPhrase=" + passPhrase);
 
+                //
+                // Prepare and send hand shake packet.
+                //
+
                 JSONObject responseAESpassXChange = new JSONObject();
 
                 responseAESpassXChange.put("type", "responseAESpassXChange");
                 responseAESpassXChange.put("idremote", remoteIdentity);
                 responseAESpassXChange.put("status", "success");
+
+                //
+                // Success packet already send encrypted.
+                //
 
                 CommService.sendEncrypted(responseAESpassXChange, true);
 
@@ -687,6 +718,8 @@ public class CommService extends Service
             //
 
             Simple.JSONput(mc.msg, "identity", identity);
+            Simple.JSONput(mc.msg, "date", Simple.nowAsISO());
+
             String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
             datagramPacket.setData(body.getBytes());
 

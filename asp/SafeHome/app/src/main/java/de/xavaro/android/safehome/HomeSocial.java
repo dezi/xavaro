@@ -26,8 +26,8 @@ public class HomeSocial extends HomeFrame
 
         layoutParams.leftMargin = 8;
         layoutParams.topMargin = notifySize;
-        layoutParams.rightMargin = launchWid + 8 + (isPortrait() ? 8 : peopleSize);
-        layoutParams.bottomMargin = isPortrait() ? peopleSize : 8;
+        layoutParams.rightMargin = launchWid + 8 + (Simple.isPortrait() ? 8 : peopleSize);
+        layoutParams.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
 
         layoutNormal = new LayoutParams(layoutParams);
     }
@@ -44,8 +44,8 @@ public class HomeSocial extends HomeFrame
     protected void onChangeOrientation()
     {
         layoutNormal.topMargin = notifySize;
-        layoutNormal.rightMargin = launchWid + 8 + (isPortrait() ? 8 : peopleSize);
-        layoutNormal.bottomMargin = isPortrait() ? peopleSize : 8;
+        layoutNormal.rightMargin = launchWid + 8 + (Simple.isPortrait() ? 8 : peopleSize);
+        layoutNormal.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
 
         if (! fullscreen)
         {
