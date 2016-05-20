@@ -24,6 +24,7 @@ public class BatteryManager
 
     private static String lastMessage;
     private static int lastImportance;
+    private static String lastSpokenTimePref;
 
     public static void commTick()
     {
@@ -69,6 +70,8 @@ public class BatteryManager
         {
             intent.title = lastMessage;
             intent.importance = lastImportance;
+            intent.spokenTimePref = lastSpokenTimePref;
+            intent.spokenRepeatMinutes = getRepeatMinutes();
         }
 
         return intent;
@@ -103,6 +106,15 @@ public class BatteryManager
         Simple.removeSharedPref("monitors.battery.lastremind");
         Simple.removeSharedPref("monitors.battery.lastwarn");
         Simple.removeSharedPref("monitors.battery.lastassist");
+    }
+
+    private static int getRepeatMinutes()
+    {
+        int repeatval = 0;
+        String repeat = Simple.getSharedPrefString("monitors.battery.repeat");
+        if ((repeat != null) && ! repeat.equals("once")) repeatval = Integer.parseInt(repeat);
+
+        return repeatval;
     }
 
     private static void checkWarnings()
@@ -143,49 +155,43 @@ public class BatteryManager
         // Some warnings might be due.
         //
 
-        int repeatval = 0;
-        String repeat = Simple.getSharedPrefString("monitors.battery.repeat");
-        if ((repeat != null) && ! repeat.equals("once")) repeatval = Integer.parseInt(repeat);
-        repeatval *= 60 * 1000;
-
         if ((percent <= remindval) && (percent > warnval)
                 && (plugged != android.os.BatteryManager.BATTERY_PLUGGED_USB))
         {
-            String date = Simple.getSharedPrefString("monitors.battery.lastremind");
-            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
-
-            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
-            {
-                lastMessage = Simple.getTrans(R.string.battery_manager_remind);
-                lastImportance = NotifyIntent.REMINDER;
-
-                Simple.setSharedPrefString("monitors.battery.lastremind", Simple.nowAsISO());
-            }
+            lastMessage = Simple.getTrans(R.string.battery_manager_remind);
+            lastImportance = NotifyIntent.REMINDER;
+            lastSpokenTimePref = "monitors.battery.lastremind";
         }
 
         if (percent <= warnval)
         {
-            String date = Simple.getSharedPrefString("monitors.battery.lastwarn");
-            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
-
-            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
-            {
-                lastMessage = Simple.getTrans(R.string.battery_manager_warn);
-                lastImportance = NotifyIntent.WARNING;
-
-                Simple.setSharedPrefString("monitors.battery.lastwarn", Simple.nowAsISO());
-            }
+            lastMessage = Simple.getTrans(R.string.battery_manager_warn);
+            lastImportance = NotifyIntent.WARNING;
+            lastSpokenTimePref = "monitors.battery.lastwarn";
         }
 
         if (percent <= assistval)
         {
-            String date = Simple.getSharedPrefString("monitors.battery.lastassist");
-            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
+            lastMessage = Simple.getTrans(R.string.battery_manager_warn)
+                    + " "
+                    + Simple.getTrans(R.string.battery_manager_assist);
 
-            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
+            lastImportance = NotifyIntent.ASSISTANCE;
+            lastSpokenTimePref = "monitors.prepaid.lastassist";
+
+            //
+            // Handle assistance calls quiet in background.
+            //
+
+            int repeat = getRepeatMinutes() * 60 * 1000;
+
+            String date = Simple.getSharedPrefString("monitors.battery.lastassist");
+            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeat);
+
+            if ((date == null) || ((repeat > 0) && (date.compareTo(ddue) <= 0)))
             {
                 //
-                // Perform assistance warning.
+                // Perform assistance warning now.
                 //
 
                 String owner = Simple.getOwnerName();
@@ -194,12 +200,6 @@ public class BatteryManager
                 String text2 = Simple.getTrans(R.string.battery_manager_assist_level, percent);
 
                 AssistanceMessage.informAssistance(text1 + " " + text2);
-
-                lastMessage = Simple.getTrans(R.string.battery_manager_warn)
-                        + " "
-                        + Simple.getTrans(R.string.battery_manager_assist);
-
-                lastImportance = NotifyIntent.ASSISTANCE;
 
                 Simple.setSharedPrefString("monitors.battery.lastassist", Simple.nowAsISO());
             }

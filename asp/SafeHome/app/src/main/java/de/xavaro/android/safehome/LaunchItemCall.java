@@ -141,14 +141,63 @@ public class LaunchItemCall extends LaunchItem implements
         {
             NotifyIntent intent = PrepaidManager.getNotifyEvent();
 
-            intent.followRunner = launchPrepaidRequestRunner;
-            intent.declineRunner = launchPrepaidRechargeRunner;
+            if (intent.importance == NotifyIntent.INFOONLY)
+            {
+                intent.followRunner = launchPrepaidRequestRunner;
+                intent.declineRunner = launchPrepaidRechargeRunner;
+            }
+
+            if (intent.importance == NotifyIntent.REMINDER)
+            {
+                intent.declineText = "Morgen erinnern";
+                intent.declineRunner = declineRunner;
+                intent.followRunner = launchPrepaidRechargeRunner;
+
+                if (isDeclined()) return null;
+            }
+
+            if ((intent.importance == NotifyIntent.WARNING) ||
+                    (intent.importance == NotifyIntent.ASSISTANCE))
+            {
+                intent.followRunner = launchPrepaidRechargeRunner;
+            }
 
             return intent;
         }
 
         return null;
     }
+
+    private boolean isDeclined()
+    {
+        String delaydate = Simple.getSharedPrefString(notifyDelayPref);
+
+        if (delaydate != null)
+        {
+            if (Simple.compareTo(delaydate, Simple.nowAsISO()) > 0)
+            {
+                return true;
+            }
+
+            Simple.removeSharedPref(notifyDelayPref);
+        }
+
+        return false;
+    }
+
+    private final Runnable declineRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            //
+            // Store delay notification date.
+            //
+
+            String delaydate = Simple.timeStampAsISO(Simple.nowAsTimeStamp() + 24 * 3600 * 1000);
+            Simple.setSharedPrefString(notifyDelayPref, delaydate);
+        }
+    };
 
     public void onPrepaidReceived(int money, String date)
     {

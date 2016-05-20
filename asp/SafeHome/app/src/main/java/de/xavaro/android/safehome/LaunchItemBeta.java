@@ -88,8 +88,6 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
     @Override
     public NotifyIntent onGetNotifiyIntent()
     {
-        Simple.removeSharedPref("system.betaversion.notfifydelay");
-
         String delaydate = Simple.getSharedPrefString(notifyDelayPref);
 
         if (delaydate != null)

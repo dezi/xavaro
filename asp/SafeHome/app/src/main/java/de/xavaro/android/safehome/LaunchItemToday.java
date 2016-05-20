@@ -56,7 +56,7 @@ public class LaunchItemToday extends LaunchItem
 
         timeView = new TextView(getContext());
         timeView.setLayoutParams(Simple.layoutParamsMM());
-        timeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+        timeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
         timeView.setTextColor(Color.WHITE);
         timeView.setTypeface(null, Typeface.BOLD);
 
@@ -82,17 +82,18 @@ public class LaunchItemToday extends LaunchItem
         // Original font sizes based on 200 pixels height.
         //
 
-        float scale = height / 200.0f;
+        float scale = (height - icon.getPaddingBottom()) / 200.0f;
 
-        dayView.setTextSize(Simple.getDeviceTextSize(24f * scale));
-        timeView.setTextSize(Simple.getDeviceTextSize(52f * scale));
-        dateView.setTextSize(Simple.getDeviceTextSize(20f * scale));
+        dayView.setTextSize(Simple.getDeviceTextSize(28f * scale));
+        timeView.setTextSize(Simple.getDeviceTextSize(56f * scale));
+        dateView.setTextSize(Simple.getDeviceTextSize(24f * scale));
 
-        int devpad28 = Simple.getDevicePixels(Math.round(28 * scale));
+        int devpad20 = Simple.getDevicePixels(Math.round(20 * scale));
+        int devpad54 = Simple.getDevicePixels(Math.round(54 * scale));
 
-        dayView.setPadding(0, devpad28, 0, 0);
-        timeView.setPadding(0, devpad28, 0, icon.getPaddingBottom() + devpad28);
-        dateView.setPadding(0, 0, 0, icon.getPaddingBottom() + devpad28);
+        dayView.setPadding(0, devpad20, 0, 0);
+        timeView.setPadding(0, devpad54, 0, 0);
+        dateView.setPadding(0, 0, 0, devpad20 + icon.getPaddingBottom());
     }
 
     @Override

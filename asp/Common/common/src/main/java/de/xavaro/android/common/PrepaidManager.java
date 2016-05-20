@@ -305,7 +305,7 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
         String repeat = Simple.getSharedPrefString("monitors.prepaid.repeat");
         if ((repeat != null) && ! repeat.equals("once")) repeatval = Integer.parseInt(repeat);
 
-        return repeatval;
+        return repeatval * 60;
     }
 
     private static void checkWarnings()
