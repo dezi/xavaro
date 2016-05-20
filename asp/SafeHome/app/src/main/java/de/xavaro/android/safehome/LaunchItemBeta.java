@@ -83,9 +83,25 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
         }
     };
 
+    private final String notifyDelayPref = "notfify.delay.betaversion";
+
     @Override
     public NotifyIntent onGetNotifiyIntent()
     {
+        Simple.removeSharedPref("system.betaversion.notfifydelay");
+
+        String delaydate = Simple.getSharedPrefString(notifyDelayPref);
+
+        if (delaydate != null)
+        {
+            if (Simple.compareTo(delaydate, Simple.nowAsISO()) > 0)
+            {
+                return null;
+            }
+
+            Simple.removeSharedPref(notifyDelayPref);
+        }
+
         NotifyIntent intent = new NotifyIntent();
 
         intent.actionDue = actionDue;
@@ -125,6 +141,12 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
         @Override
         public void run()
         {
+            //
+            // Store delay notification date.
+            //
+
+            String delaydate = Simple.timeStampAsISO(Simple.nowAsTimeStamp() + 3600 * 1000);
+            Simple.setSharedPrefString(notifyDelayPref, delaydate);
         }
     };
 

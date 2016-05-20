@@ -229,28 +229,162 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
     //endregion Prepaid load dialog
 
     private static String lastMessage;
+    private static int lastImportance;
 
     public static NotifyIntent getNotifyEvent()
     {
+        checkWarnings();
+
+        int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+        String moneyvalue = Simple.getCurrencyValue(money);
+
         NotifyIntent intent = new NotifyIntent();
 
         if (lastMessage == null)
         {
-            //String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
-
-            int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
-            String value = Simple.getCurrencyValue(money);
-
-            intent.title =  Simple.getTrans(R.string.prepaid_manager_info, value);
+            intent.title =  Simple.getTrans(R.string.prepaid_manager_info, moneyvalue);
+            intent.importance = NotifyIntent.INFOONLY;
             intent.followText = Simple.getTrans(R.string.prepaid_manager_request);
             intent.declineText = Simple.getTrans(R.string.prepaid_manager_recharge);
-            intent.importance = NotifyIntent.INFOONLY;
         }
         else
         {
-            intent.title = lastMessage;
+            String lowmess = Simple.getTrans(R.string.prepaid_manager_infolow, moneyvalue);
+
+            intent.title = lowmess + " " + lastMessage;
+            intent.importance = lastImportance;
+            intent.followText = Simple.getTrans(R.string.prepaid_manager_recharge);
         }
 
         return intent;
+    }
+
+    private static void resetWarnings()
+    {
+        //
+        // Check if an assistance warning was send.
+        //
+
+        String date = Simple.getSharedPrefString("monitors.prepaid.lastassist");
+
+        if (date != null)
+        {
+            //
+            // Tell assistance problem is solved.
+            //
+
+            int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+            String moneyval = Simple.getCurrencyValue(money);
+            String owner = Simple.getOwnerName();
+
+            String text1 = Simple.getTrans(R.string.prepaid_manager_assist_clear, owner);
+            String text2 = Simple.getTrans(R.string.prepaid_manager_assist_level, moneyval);
+
+            AssistanceMessage.informAssistance(text1 + " " + text2);
+        }
+
+        //
+        // Reset all warning times.
+        //
+
+        lastMessage = null;
+        lastImportance = 0;
+
+        Simple.removeSharedPref("monitors.prepaid.lastremind");
+        Simple.removeSharedPref("monitors.prepaid.lastwarn");
+        Simple.removeSharedPref("monitors.prepaid.lastassist");
+    }
+
+    private static void checkWarnings()
+    {
+        int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+
+        int remindval = 0;
+        int warnval = 0;
+        int assistval = 0;
+
+        String remind = Simple.getSharedPrefString("monitors.prepaid.remind");
+        if ((remind != null) && ! remind.equals("never")) remindval = Integer.parseInt(remind) * 100;
+
+        String warn = Simple.getSharedPrefString("monitors.prepaid.warn");
+        if ((warn != null) && ! warn.equals("never")) warnval = Integer.parseInt(warn) * 100;
+
+        String assist = Simple.getSharedPrefString("monitors.prepaid.assistance");
+        if ((assist != null) && ! assist.equals("never")) assistval = Integer.parseInt(assist) * 100;
+
+        Log.d(LOGTAG, "checkWarnings:" + money + "/" + remindval + "/" + warnval + "/" + assistval);
+
+        if ((money > remindval) && (money > warnval) && (money > assistval))
+        {
+            if (money > remindval) resetWarnings();
+
+            return;
+        }
+
+        //
+        // Some warnings might be due.
+        //
+
+        int repeatval = 0;
+        String repeat = Simple.getSharedPrefString("monitors.prepaid.repeat");
+        if ((repeat != null) && ! repeat.equals("once")) repeatval = Integer.parseInt(repeat);
+        repeatval *= 60 * 1000;
+
+        if ((money <= remindval) && (money > warnval))
+        {
+            lastMessage = Simple.getTrans(R.string.prepaid_manager_remind);
+            lastImportance = NotifyIntent.REMINDER;
+
+            String date = Simple.getSharedPrefString("monitors.prepaid.lastremind");
+            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
+
+            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
+            {
+                Simple.setSharedPrefString("monitors.prepaid.lastremind", Simple.nowAsISO());
+            }
+        }
+
+        if (money <= warnval)
+        {
+            lastMessage = Simple.getTrans(R.string.prepaid_manager_warn);
+            lastImportance = NotifyIntent.WARNING;
+
+            String date = Simple.getSharedPrefString("monitors.prepaid.lastwarn");
+            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
+
+            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
+            {
+                Simple.setSharedPrefString("monitors.prepaid.lastwarn", Simple.nowAsISO());
+            }
+        }
+
+        if (money <= assistval)
+        {
+            lastMessage = Simple.getTrans(R.string.prepaid_manager_warn)
+                    + " "
+                    + Simple.getTrans(R.string.prepaid_manager_assist);
+
+            lastImportance = NotifyIntent.ASSISTANCE;
+
+            String date = Simple.getSharedPrefString("monitors.prepaid.lastassist");
+            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
+
+            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
+            {
+                //
+                // Perform assistance warning.
+                //
+
+                String owner = Simple.getOwnerName();
+                String moneyval = Simple.getCurrencyValue(money);
+
+                String text1 = Simple.getTrans(R.string.prepaid_manager_assist_warn, owner);
+                String text2 = Simple.getTrans(R.string.prepaid_manager_assist_level, moneyval);
+
+                AssistanceMessage.informAssistance(text1 + " " + text2);
+
+                Simple.setSharedPrefString("monitors.prepaid.lastassist", Simple.nowAsISO());
+            }
+        }
     }
 }

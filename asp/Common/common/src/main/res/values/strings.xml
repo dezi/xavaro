@@ -438,8 +438,15 @@
     <string name="battery_manager_assist_level">The level is now at %1$d percent.</string>
 
     <string name="prepaid_manager_info">Your prepaid balance is %1$s</string>
+    <string name="prepaid_manager_infolow">Your prepaid balance is only %1$s.</string>
     <string name="prepaid_manager_request">Request Balance</string>
     <string name="prepaid_manager_recharge">Recharge Balance</string>
+    <string name="prepaid_manager_remind">Please recharge Your prepaid balance soon.</string>
+    <string name="prepaid_manager_warn">Please recharge Your prepaid balance now.</string>
+    <string name="prepaid_manager_assist">I also informed Your assistance.</string>
+    <string name="prepaid_manager_assist_warn">%1$s prepaid balance is very low.</string>
+    <string name="prepaid_manager_assist_clear">%1$s has now recharged the prepaid balance.</string>
+    <string name="prepaid_manager_assist_level">The prepaid balance is currently %1$s</string>
 
     <string name="launch_media_image_simple_send">The image will be send to %s.</string>
     <string name="launch_media_image_simple_yousend">You send an image to %s.</string>

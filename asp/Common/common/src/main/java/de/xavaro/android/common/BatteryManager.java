@@ -199,7 +199,7 @@ public class BatteryManager
                         + " "
                         + Simple.getTrans(R.string.battery_manager_assist);
 
-                lastImportance = NotifyIntent.WARNING;
+                lastImportance = NotifyIntent.ASSISTANCE;
 
                 Simple.setSharedPrefString("monitors.battery.lastassist", Simple.nowAsISO());
             }

@@ -41,7 +41,6 @@ public class HomeEvent extends FrameLayout
         titleView.setLayoutParams(layoutParams);
         titleView.setGravity(Gravity.CENTER_VERTICAL);
         titleView.setTypeface(null, istopevent ? Typeface.BOLD : Typeface.NORMAL);
-        titleView.setTextSize(Simple.getDeviceTextSize(istopevent ? 30f : 24f));
         titleView.setTextColor(istopevent ? 0xff444444 : 0xff888888);
 
         addView(titleView);
@@ -155,6 +154,26 @@ public class HomeEvent extends FrameLayout
     public void setTitleText(String text)
     {
         titleView.setText(text);
+        titleView.setMaxWidth(titleView.getWidth());
+
+        float textsize = Simple.getDeviceTextSize(istopevent ? 30f : 24f);
+
+        while (true)
+        {
+            titleView.setTextSize(textsize);
+            titleView.measure(0, 0);
+
+            if (titleView.getMeasuredHeight() <= titleView.getHeight())
+            {
+                //
+                // Text fits view.
+                //
+
+                break;
+            }
+
+            textsize -= 1.0f;
+        }
     }
 
     public void setFollowButtonText(String text)

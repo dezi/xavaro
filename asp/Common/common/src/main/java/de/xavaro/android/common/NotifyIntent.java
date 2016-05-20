@@ -7,6 +7,7 @@ public class NotifyIntent
     public static final int INFOONLY = 1;
     public static final int REMINDER = 2;
     public static final int WARNING = 3;
+    public static final int ASSISTANCE = 4;
 
     public boolean actionDue;
     public long actionDueTime;

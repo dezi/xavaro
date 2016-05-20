@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -119,19 +120,20 @@ public class HomeNotify extends HomeFrame
                 continue;
             }
 
-            String type = Json.getString(li, "type");
-            String subitem = Json.getString(li, "subitem");
+            String notify = Json.getString(li, "notify");
 
-            if (Simple.equals(type, "beta") ||
-                    Simple.equals(type, "today") ||
-                    Simple.equals(type, "battery") ||
-                    (Simple.equals(type, "calls") && Simple.equals(subitem, "prepaid")))
+            if (Simple.equals(notify, "only") || Simple.equals(notify, "both"))
             {
                 LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, li);
-                launchItem.setFrameLess(true);
-                launchItem.setTextLess(true);
-                candidatesLaunch.add(launchItem);
-                lis.remove(inx--);
+
+                if (launchItem instanceof NotifyIntent.NotifiyService)
+                {
+                    launchItem.setFrameLess(true);
+                    launchItem.setTextLess(true);
+                    candidatesLaunch.add(launchItem);
+                }
+
+                if (Simple.equals(notify, "only")) lis.remove(inx--);
             }
         }
     }
@@ -198,45 +200,85 @@ public class HomeNotify extends HomeFrame
         }
     }
 
-    protected void setupNotification(LaunchItem launchItem, HomeEvent eventFrame)
+    protected LaunchItem setupNotification(LaunchItem launchItem, HomeEvent eventFrame)
     {
-        NotifyIntent intent = null;
+        eventFrame.setNotifyIntent(null);
+        if (launchItem == null) return null;
 
-        if (launchItem instanceof NotifyIntent.NotifiyService)
+        NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
+
+        if (intent == null)
         {
-            intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
+            candidatesLaunch.add(launchItem);
+            return null;
         }
+
+        launchItem.setSize(eventFrame.getHeight(), eventFrame.getHeight());
 
         eventFrame.setNotifyIntent(intent);
         eventFrame.addView(launchItem);
+
+        return launchItem;
+    }
+
+    @Nullable
+    protected LaunchItem getNextCandidate()
+    {
+        Log.d(LOGTAG, "getNextCandidate:" + candidatesLaunch.size());
+
+        int count = candidatesLaunch.size();
+
+        for (int inx = 0; inx < count; inx++)
+        {
+            LaunchItem launchItem = candidatesLaunch.remove(0);
+
+            NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
+            Log.d(LOGTAG, "getNextCandidate:" + inx + "=" + intent);
+            if (intent != null) return launchItem;
+
+            candidatesLaunch.add(launchItem);
+        }
+
+        return null;
     }
 
     protected void manageNotifications()
     {
-        if (candidatesLaunch.size() == 0) return;
-
-        if (topLaunch != null) Simple.removeFromParent(topLaunch);
-        if (event1Launch != null) Simple.removeFromParent(event1Launch);
-        if (event2Launch != null) Simple.removeFromParent(event2Launch);
-
-        topLaunch = candidatesLaunch.remove(0);
-        candidatesLaunch.add(topLaunch);
-
-        topLaunch.setSize(tops, tops);
-        setupNotification(topLaunch, topFrame);
-
-        if (candidatesLaunch.size() > 1)
+        if (topLaunch != null)
         {
-            event1Launch = candidatesLaunch.get(0);
-            event1Launch.setSize(size, size);
-            setupNotification(event1Launch, event1Frame);
+            Simple.removeFromParent(topLaunch);
+            topFrame.setNotifyIntent(null);
+            candidatesLaunch.add(topLaunch);
+            topLaunch = null;
         }
 
-        if (candidatesLaunch.size() > 2)
+        if (event1Launch != null)
         {
-            event2Launch = candidatesLaunch.get(1);
-            event2Launch.setSize(size, size);
-            setupNotification(event2Launch, event2Frame);
+            Simple.removeFromParent(event1Launch);
+            topLaunch = setupNotification(event1Launch, topFrame);
+            event1Launch = null;
+        }
+
+        if (event2Launch != null)
+        {
+            Simple.removeFromParent(event2Launch);
+            event1Launch = setupNotification(event2Launch, event1Frame);
+            event2Launch = null;
+        }
+
+        if (topLaunch == null)
+        {
+            topLaunch = setupNotification(getNextCandidate(), topFrame);
+        }
+
+        if (event1Launch == null)
+        {
+            event1Launch = setupNotification(getNextCandidate(), event1Frame);
+        }
+
+        if (event2Launch == null)
+        {
+            event2Launch = setupNotification(getNextCandidate(), event2Frame);
         }
     }
 

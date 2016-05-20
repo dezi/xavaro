@@ -132,6 +132,8 @@ public class LaunchItemCall extends LaunchItem implements
         }
     }
 
+    private final String notifyDelayPref = "notfify.delay.prepaid";
+
     @Override
     public NotifyIntent onGetNotifiyIntent()
     {
