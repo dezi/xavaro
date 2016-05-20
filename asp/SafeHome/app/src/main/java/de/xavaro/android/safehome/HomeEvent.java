@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.widget.FrameLayout;
@@ -11,7 +12,9 @@ import android.util.Log;
 
 import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
+@SuppressLint("ViewConstructor")
 public class HomeEvent extends FrameLayout
 {
     private static final String LOGTAG = HomeEvent.class.getSimpleName();
@@ -110,6 +113,28 @@ public class HomeEvent extends FrameLayout
             setTitleText(intent.title);
             setFollowButtonText(intent.followText);
             setDeclineButtonText(intent.declineText);
+
+            //
+            // Check for spoken text and repeat intervals.
+            //
+
+            if (intent.spokenTimePref != null)
+            {
+                int repeatval = intent.spokenRepeatMinutes * 60 * 1000;
+                String date = Simple.getSharedPrefString(intent.spokenTimePref);
+                String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
+
+                if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
+                {
+                    int volume = 50;
+
+                    if (intent.importance == NotifyIntent.WARNING) volume = 75;
+                    if (intent.importance == NotifyIntent.ASSISTANCE) volume = 100;
+
+                    Speak.speak(intent.title, volume);
+                    Simple.setSharedPrefString(intent.spokenTimePref, Simple.nowAsISO());
+                }
+            }
         }
     }
 
@@ -138,7 +163,7 @@ public class HomeEvent extends FrameLayout
 
                 if ((followButton != null) && (followButton.getVisibility() == VISIBLE))
                 {
-                    titleParams.rightMargin += HomeButton.buttonWidth;
+                    titleParams.rightMargin += Simple.getDevicePixels(16) + HomeButton.buttonWidth;
                 }
             }
 
@@ -185,8 +210,14 @@ public class HomeEvent extends FrameLayout
 
             if (! istopevent)
             {
-                titleParams.rightMargin = Simple.getDevicePixels(16);
-                if (text != null) titleParams.rightMargin += HomeButton.buttonWidth;
+                if (text != null)
+                {
+                    titleParams.rightMargin += Simple.getDevicePixels(32) + HomeButton.buttonWidth;
+                }
+                else
+                {
+                    titleParams.rightMargin = Simple.getDevicePixels(16);
+                }
 
                 titleView.setLayoutParams(titleParams);
             }

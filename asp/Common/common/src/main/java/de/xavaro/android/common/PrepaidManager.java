@@ -230,6 +230,7 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
 
     private static String lastMessage;
     private static int lastImportance;
+    private static String lastSpokenTimePref;
 
     public static NotifyIntent getNotifyEvent()
     {
@@ -253,6 +254,8 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
 
             intent.title = lowmess + " " + lastMessage;
             intent.importance = lastImportance;
+            intent.spokenTimePref = lastSpokenTimePref;
+            intent.spokenRepeatMinutes = getRepeatMinutes();
             intent.followText = Simple.getTrans(R.string.prepaid_manager_recharge);
         }
 
@@ -289,10 +292,20 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
 
         lastMessage = null;
         lastImportance = 0;
+        lastSpokenTimePref = null;
 
         Simple.removeSharedPref("monitors.prepaid.lastremind");
         Simple.removeSharedPref("monitors.prepaid.lastwarn");
         Simple.removeSharedPref("monitors.prepaid.lastassist");
+    }
+
+    private static int getRepeatMinutes()
+    {
+        int repeatval = 0;
+        String repeat = Simple.getSharedPrefString("monitors.prepaid.repeat");
+        if ((repeat != null) && ! repeat.equals("once")) repeatval = Integer.parseInt(repeat);
+
+        return repeatval;
     }
 
     private static void checkWarnings()
@@ -325,37 +338,18 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
         // Some warnings might be due.
         //
 
-        int repeatval = 0;
-        String repeat = Simple.getSharedPrefString("monitors.prepaid.repeat");
-        if ((repeat != null) && ! repeat.equals("once")) repeatval = Integer.parseInt(repeat);
-        repeatval *= 60 * 1000;
-
         if ((money <= remindval) && (money > warnval))
         {
             lastMessage = Simple.getTrans(R.string.prepaid_manager_remind);
             lastImportance = NotifyIntent.REMINDER;
-
-            String date = Simple.getSharedPrefString("monitors.prepaid.lastremind");
-            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
-
-            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
-            {
-                Simple.setSharedPrefString("monitors.prepaid.lastremind", Simple.nowAsISO());
-            }
+            lastSpokenTimePref = "monitors.prepaid.lastremind";
         }
 
         if (money <= warnval)
         {
             lastMessage = Simple.getTrans(R.string.prepaid_manager_warn);
             lastImportance = NotifyIntent.WARNING;
-
-            String date = Simple.getSharedPrefString("monitors.prepaid.lastwarn");
-            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
-
-            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
-            {
-                Simple.setSharedPrefString("monitors.prepaid.lastwarn", Simple.nowAsISO());
-            }
+            lastSpokenTimePref = "monitors.prepaid.lastwarn";
         }
 
         if (money <= assistval)
@@ -365,14 +359,20 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
                     + Simple.getTrans(R.string.prepaid_manager_assist);
 
             lastImportance = NotifyIntent.ASSISTANCE;
+            lastSpokenTimePref = "monitors.prepaid.lastwarn";
 
+            //
+            // Handle assistance calls quiet in background.
+            //
+
+            int repeat = getRepeatMinutes() * 60 * 1000;
             String date = Simple.getSharedPrefString("monitors.prepaid.lastassist");
-            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeatval);
+            String ddue = Simple.timeStampAsISO(Simple.nowAsTimeStamp() - repeat);
 
-            if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
+            if ((date == null) || ((repeat > 0) && (date.compareTo(ddue) <= 0)))
             {
                 //
-                // Perform assistance warning.
+                // Perform assistance warning now.
                 //
 
                 String owner = Simple.getOwnerName();

@@ -49,7 +49,7 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
     }
 
     private String latestVersion;
-    private boolean actionDue;
+    private boolean isNewVersion;
 
     private final Runnable checkBeta = new Runnable()
     {
@@ -74,7 +74,7 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
                         overtext.setText(R.string.simple_new);
                         overlay.setVisibility(VISIBLE);
 
-                        actionDue = true;
+                        isNewVersion = true;
                     }
                 }
             }
@@ -104,9 +104,7 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
 
         NotifyIntent intent = new NotifyIntent();
 
-        intent.actionDue = actionDue;
-
-        if (actionDue)
+        if (isNewVersion)
         {
             intent.title = "Es ist eine neue Version verfügbar.";
             intent.declineText = "Morgen erinnern";

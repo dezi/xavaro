@@ -5,6 +5,8 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Speak extends UtteranceProgressListener implements TextToSpeech.OnInitListener
 {
@@ -30,6 +32,40 @@ public class Speak extends UtteranceProgressListener implements TextToSpeech.OnI
     public static void speak(String text, int volume, SpeakDoneCallback callback)
     {
         if (instance == null) instance = new Speak();
+
+        //
+        // Replace non breaking spaces and Dezi nerving words.
+        //
+
+        text = text.replace("-", " ");
+        text = text.replace("\u00A0", " ");
+
+        text = text.replace("Prepaid", "Pre-päd");
+        text = text.replace("prepaid", "pre-päd");
+
+        //
+        // Check text for money patterns.
+        //
+
+        Pattern pattern = Pattern.compile("([0-9]+)([.,]+)([0-9]+)([ ]*)(€|Euro)");
+        Matcher matcher = pattern.matcher(text);
+
+        if (matcher.find())
+        {
+            String target = matcher.group(1) + " Euro";
+
+            int cents = Integer.parseInt(matcher.group(3), 10);
+
+            if (cents > 0)
+            {
+                target += " " + Simple.getTrans(R.string.simple_and)
+                        + " " + cents + " Cents";
+            }
+
+            text = text.replace(matcher.group(0), target);
+
+            Log.d(LOGTAG, "speak: money=" + text);
+        }
 
         SpeakData data = new SpeakData(text);
 

@@ -601,11 +601,11 @@
     <string name="prepaid_manager_infolow">Ihr Prepaid-Guthaben beträgt nur noch %1$s.</string>
     <string name="prepaid_manager_infolow_du">Dein Prepaid-Guthaben beträgt nur noch %1$s.</string>
     <string name="prepaid_manager_request">Erneut abfragen</string>
-    <string name="prepaid_manager_recharge">Konto aufladen</string>
-    <string name="prepaid_manager_remind">Bitte laden Sie Ihr Prepaid-Guthaben demnächst auf.</string>
-    <string name="prepaid_manager_remind_du">Bitte lade Dein Prepaid-Guthaben demnächst auf.</string>
-    <string name="prepaid_manager_warn">Bitte laden Sie Ihr Prepaid-Guthaben jetzt auf.</string>
-    <string name="prepaid_manager_warn_du">Bitte laden Dein Prepaid-Guthaben jetzt auf.</string>
+    <string name="prepaid_manager_recharge">Guthaben aufladen</string>
+    <string name="prepaid_manager_remind">Bitte laden Sie Ihr Guthaben demnächst auf.</string>
+    <string name="prepaid_manager_remind_du">Bitte lade Dein Guthaben demnächst auf.</string>
+    <string name="prepaid_manager_warn">Bitte laden Sie Ihr Guthaben jetzt auf.</string>
+    <string name="prepaid_manager_warn_du">Bitte lade Dein Guthaben jetzt auf.</string>
     <string name="prepaid_manager_assist">Ausserdem habe ich Ihre Assistenz benachrichtigt.</string>
     <string name="prepaid_manager_assist_du">Ausserdem habe ich Deine Assistenz benachrichtigt.</string>
     <string name="prepaid_manager_assist_warn">%1$s Prepaid-Guthaben ist sehr niedrig.</string>
