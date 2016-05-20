@@ -306,6 +306,11 @@ public class Simple
         return 0;
     }
 
+    public static boolean isEmpty(String str1)
+    {
+        return (str1 == null) || equals(str1, "");
+    }
+
     public static boolean equals(String str1, String str2)
     {
         return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equals(str2);

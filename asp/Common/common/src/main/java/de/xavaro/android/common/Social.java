@@ -1022,14 +1022,17 @@ public abstract class Social
                 if (pfid == null) pfid = Json.getString(friend, "id_str");
 
                 String name = Json.getString(friend, "full_name");
-                if (name == null) name = Json.getString(friend, "displayName");
-                if (name == null) name = Json.getString(friend, "name");
+                if (Simple.isEmpty(name)) name = Json.getString(friend, "displayName");
+                if (Simple.isEmpty(name)) name = Json.getString(friend, "name");
+                if (Simple.isEmpty(name)) name = Json.getString(friend, "username");
 
                 if ((pfid == null) || (name == null)) continue;
 
                 String fnamepref = "social." + platform + ".friend.name." + pfid;
                 String fmodepref = "social." + platform + ".friend.mode." + pfid;
                 String ficonpref = "social." + platform + ".friend.icon." + pfid;
+
+                Log.d(LOGTAG, "====>>>>>>" + platform + "=" + pfid + "=" + name);
 
                 Simple.setSharedPrefString(fnamepref, name);
 
@@ -1088,8 +1091,9 @@ public abstract class Social
                 if (pfid == null) pfid = Json.getString(like, "id_str");
 
                 String name = Json.getString(like, "full_name");
-                if (name == null) name = Json.getString(like, "displayName");
-                if (name == null) name = Json.getString(like, "name");
+                if (Simple.isEmpty(name)) name = Json.getString(like, "displayName");
+                if (Simple.isEmpty(name)) name = Json.getString(like, "name");
+                if (Simple.isEmpty(name)) name = Json.getString(like, "username");
 
                 if ((pfid == null) || (name == null)) continue;
 

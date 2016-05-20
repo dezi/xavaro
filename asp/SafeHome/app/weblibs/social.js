@@ -74,7 +74,15 @@ WebLibSocial.getPostName = function(platform, post)
 
     if (platform == "instagram")
     {
-        if (post.user && post.user.full_name) return post.user.full_name;
+        if (post.user && post.user.full_name && post.user.full_name != "")
+        {
+            return post.user.full_name;
+        }
+
+        if (post.user && post.user.username && post.user.username != "")
+        {
+            return post.user.username;
+        }
     }
 
     return "Unknown Name";
