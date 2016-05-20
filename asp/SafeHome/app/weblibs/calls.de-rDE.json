@@ -9,6 +9,7 @@
       "defaultvalue": "*100#",
       "loadtext": "Aufladecode",
       "loadvalue": "*101*",
+      "notify": "only",
       "summary": [
         "Das Prepaid-Guthaben kann mit einfachen Codes über das normale",
         "Tastenfeld des Telefons abgerufen und aufgeladen werden. ",
@@ -22,7 +23,7 @@
         "action": "call",
         "keywords": [ "Guthaben", "pre paid" ],
         "response": "Ich rufe das Guthaben ab.",
-        "sample": "Ich mein Guthaben abrufen"
+        "sample": "Ich möchte mein Guthaben abrufen"
       }
     }
   },
