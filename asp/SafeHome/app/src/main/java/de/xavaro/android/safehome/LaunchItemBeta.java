@@ -31,6 +31,7 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
 
             Json.put(launchitem, "type", "beta");
             Json.put(launchitem, "label", "Version");
+            Json.put(launchitem, "notify", "only");
             Json.put(launchitem, "order", 175);
 
             Json.put(launchitems, launchitem);
