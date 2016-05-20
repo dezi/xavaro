@@ -220,6 +220,16 @@ public class ImageSmartCache
             tmp = BitmapFactory.decodeResource(Simple.getAnyContext().getResources(), resid, options);
         }
 
+        if ((tmp == null) && restag.startsWith("webapp|"))
+        {
+            String[] parts = restag.split("\\|");
+
+            if (parts.length == 3)
+            {
+                data = WebApp.getIconData(parts[ 1 ], parts[ 2 ]);
+            }
+        }
+
         if ((tmp == null) && restag.startsWith("weblib|"))
         {
             String[] parts = restag.split("\\|");

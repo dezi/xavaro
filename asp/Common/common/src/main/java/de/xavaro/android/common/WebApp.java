@@ -61,6 +61,17 @@ public class WebApp
     }
 
     @Nullable
+    public static byte[] getIconData(String webappname, String iconurl)
+    {
+        int interval = WebApp.getWebAppInterval();
+
+        String src = WebApp.getHTTPAppRoot(webappname) + "/" + iconurl;
+        WebAppCache.WebAppCacheResponse wcr = WebAppCache.getCacheFile(webappname, src, interval);
+        return wcr.content;
+    }
+
+
+    @Nullable
     public static JSONArray getVoiceIntents(String webappname)
     {
         JSONObject manifest = getManifest(webappname);

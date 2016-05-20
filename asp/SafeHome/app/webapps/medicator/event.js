@@ -83,8 +83,6 @@ medicator.getNextEvents = function()
         if (medicator.remindConfig(config)) action = true;
     }
 
-    if (action) WebAppSpeak.vibrate();
-
     medicator.getNextEventsTimer = setTimeout(medicator.getNextEvents,  10 * 1000);
     medicator.requestUnloadTimer = setTimeout(medicator.requestUnload, 100 * 1000);
 }
@@ -132,8 +130,14 @@ medicator.remindConfig = function(config)
 
     if ((config.mediflat == "AAA") && ! medicator.pillsreminder)
     {
-        WebAppSpeak.unmute();
-        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.pills"));
+        var notify = {};
+
+        notify.key   = "medicator.take.pills";
+        notify.title = WebLibStrings.getTrans("events.take.pills");
+        notify.icon  = "health_medication_512x512.png";"
+
+        WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppSpeak.speak(notify.title, 50);
 
         if (((reminded + 1) >= medicator.remindMaximum) && WebAppAssistance.hasAssistance())
         {
@@ -150,24 +154,42 @@ medicator.remindConfig = function(config)
 
     if ((config.mediflat == "ZZB") && ! medicator.bloodpressurereminder)
     {
-        WebAppSpeak.unmute();
-        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodpressure"));
+        var notify = {};
+
+        notify.key   = "medicator.take.bloodpressure";
+        notify.title = WebLibStrings.getTrans("events.take.bloodpressure");
+        notify.icon  = "health_bpm_256x256.png";"
+
+        WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppSpeak.speak(notify.title, 50);
 
         medicator.bloodpressurereminder = action = true;
     }
 
     if ((config.mediform == "ZZG") && ! medicator.bloodglucosereminder)
     {
-        WebAppSpeak.unmute();
-        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.bloodglucose"));
+        var notify = {};
+
+        notify.key   = "medicator.take.bloodglucose";
+        notify.title = WebLibStrings.getTrans("events.take.bloodglucose");
+        notify.icon  = "health_glucose_512x512.png";"
+
+        WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppSpeak.speak(notify.title, 50);
 
         medicator.bloodglucosereminder = action = true;
     }
 
     if ((config.mediflat == "ZZW") && ! medicator.weightreminder)
     {
-        WebAppSpeak.unmute();
-        WebAppSpeak.speak(WebLibStrings.getTrans("events.take.weight"));
+        var notify = {};
+
+        notify.key   = "medicator.take.weight";
+        notify.title = WebLibStrings.getTrans("events.take.weight");
+        notify.icon  = "health_scale_280x280.png";"
+
+        WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppSpeak.speak(notify.title, 50);
 
         medicator.weightreminder = action = true;
     }

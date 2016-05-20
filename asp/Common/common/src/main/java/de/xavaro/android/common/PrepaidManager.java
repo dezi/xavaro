@@ -325,8 +325,6 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
         String assist = Simple.getSharedPrefString("monitors.prepaid.assistance");
         if ((assist != null) && ! assist.equals("never")) assistval = Integer.parseInt(assist) * 100;
 
-        Log.d(LOGTAG, "checkWarnings:" + money + "/" + remindval + "/" + warnval + "/" + assistval);
-
         if ((money > remindval) && (money > warnval) && (money > assistval))
         {
             if (money > remindval) resetWarnings();

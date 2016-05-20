@@ -29,6 +29,7 @@ public class WebAppView extends WebView
     public WebAppEvents events;
     public WebAppHealth health;
     public WebAppPrices prices;
+    public WebAppNotify notify;
     public WebAppWeather weather;
     public WebAppRequest request;
     public WebAppUtility utility;
@@ -85,6 +86,12 @@ public class WebAppView extends WebView
         {
             prices = new WebAppPrices(webappname, this, webapploader);
             addJavascriptInterface(prices, "WebAppPrices");
+        }
+
+        if (permissions.contains("notify"))
+        {
+            notify = new WebAppNotify(webappname);
+            addJavascriptInterface(notify, "WebAppNotify");
         }
 
         if (permissions.contains("health"))

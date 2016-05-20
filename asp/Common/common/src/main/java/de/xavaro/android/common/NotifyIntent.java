@@ -9,12 +9,14 @@ public class NotifyIntent
     public static final int WARNING = 3;
     public static final int ASSISTANCE = 4;
 
-    public int importance;
-
-    public String followText;
-    public String declineText;
+    public String key;
     public String title;
     public String summary;
+    public String iconres;
+    public String followText;
+    public String declineText;
+
+    public int importance;
 
     public String spokenTimePref;
     public int spokenRepeatMinutes;
