@@ -1032,8 +1032,6 @@ public abstract class Social
                 String fmodepref = "social." + platform + ".friend.mode." + pfid;
                 String ficonpref = "social." + platform + ".friend.icon." + pfid;
 
-                Log.d(LOGTAG, "====>>>>>>" + platform + "=" + pfid + "=" + name);
-
                 Simple.setSharedPrefString(fnamepref, name);
 
                 if (Simple.getSharedPrefString(fmodepref) == null)
