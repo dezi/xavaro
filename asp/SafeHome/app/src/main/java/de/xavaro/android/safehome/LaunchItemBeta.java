@@ -139,6 +139,6 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifiySe
         webappFrame.setWebAppName("betaversion");
         webappFrame.setParent(this);
 
-        ((HomeActivity) context).addViewToBackStack(webappFrame);
+        ((HomeActivity) context).addWorkerToBackStack("Beta Version", webappFrame);
     }
 }

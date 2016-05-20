@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.opengl.Visibility;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
@@ -57,7 +58,8 @@ public class HomeActivity extends AppCompatActivity implements
     private HomeLaunch launchScreen;
     private HomePeople peopleScreen;
     private HomeSocial socialScreen;
-    
+    private HomeWorker workerScreen;
+
     private LaunchGroupRoot launchGroup;
     private JSONObject launchConfig;
 
@@ -122,6 +124,11 @@ public class HomeActivity extends AppCompatActivity implements
         peopleScreen = new HomePeople(this);
         peopleScreen.setSize(peoplesize, personsize);
         topScreen.addView(peopleScreen);
+
+        workerScreen = new HomeWorker(this);
+        workerScreen.setVisibility(View.GONE);
+        workerScreen.setFullscreen();
+        topScreen.addView(workerScreen);
 
         launchFrame = launchScreen.getPayloadFrame();
 
@@ -335,6 +342,19 @@ public class HomeActivity extends AppCompatActivity implements
 
     private ArrayList<Object> backStack = new ArrayList<>();
 
+    public void addWorkerToBackStack(String title, ViewGroup view)
+    {
+        workerScreen.getPayloadFrame().removeAllViews();
+        workerScreen.getPayloadFrame().addView(view);
+        workerScreen.setVisibility(View.VISIBLE);
+        workerScreen.setTitle(title);
+        workerScreen.bringToFront();
+
+        backStack.add(workerScreen);
+
+        if (videoSurface != null) videoSurface.bringToFront();
+    }
+
     public void addViewToBackStack(Object view)
     {
         if (((ViewGroup) view).getParent() == null)
@@ -397,14 +417,24 @@ public class HomeActivity extends AppCompatActivity implements
             @Override
             public void run()
             {
-                Object lastview = backStack.get(backStack.size() - 1);
-
-                launchFrame.removeView((FrameLayout) lastview);
-                backStack.remove(backStack.size() - 1);
-
-                if (lastview instanceof LaunchFrame)
+                if (backStack.size() > 0)
                 {
-                    ((LaunchFrame) lastview).onBackKeyExecuted();
+                    Object lastview = backStack.remove(backStack.size() - 1);
+
+                    if (lastview instanceof HomeWorker)
+                    {
+                        ((HomeWorker) lastview).getPayloadFrame().removeAllViews();
+                        ((HomeWorker) lastview).setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        launchFrame.removeView((FrameLayout) lastview);
+
+                        if (lastview instanceof LaunchFrame)
+                        {
+                            ((LaunchFrame) lastview).onBackKeyExecuted();
+                        }
+                    }
                 }
             }
         });

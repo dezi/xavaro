@@ -31,6 +31,7 @@ public abstract class HomeFrame extends FrameLayout
 
     protected LayoutParams titleLayout;
     protected ImageSmartView titleClose;
+    protected ImageSmartView titleBacka;
     protected TextView titleText;
     protected LayoutParams innerLayout;
     protected FrameLayout innerFrame;
@@ -73,6 +74,13 @@ public abstract class HomeFrame extends FrameLayout
         titleClose.setVisibility(GONE);
         addView(titleClose);
 
+        titleBacka = new ImageSmartView(context);
+        titleBacka.setLayoutParams(new LayoutParams(titleSpace * 2, titleSpace * 2, Gravity.START));
+        titleBacka.setImageResource(R.drawable.back_button_256x256);
+        titleBacka.setPadding(15, 15, 15, 15);
+        titleBacka.setVisibility(GONE);
+        addView(titleBacka);
+
         innerLayout = new LayoutParams(Simple.MP, Simple.MP);
 
         innerFrame = new FrameLayout(context);
@@ -110,7 +118,7 @@ public abstract class HomeFrame extends FrameLayout
         {
             titleText.setText(title);
             titleText.setVisibility(VISIBLE);
-            innerLayout.topMargin = titleSpace;
+            innerLayout.topMargin = titleSpace * (fullscreen ? 2 : 1);
         }
     }
 
@@ -190,6 +198,7 @@ public abstract class HomeFrame extends FrameLayout
             titleText.setBackgroundColor(Color.TRANSPARENT);
             titleText.setGravity(Gravity.START);
             titleClose.setVisibility(GONE);
+            titleBacka.setVisibility(GONE);
         }
 
         bringToFront();
@@ -199,6 +208,35 @@ public abstract class HomeFrame extends FrameLayout
 
     protected void onChangeOrientation()
     {
+    }
+
+    public void setFullscreen()
+    {
+        layoutParams.width = Simple.MP;
+        layoutParams.height = Simple.MP;
+
+        layoutParams.leftMargin = 0;
+        layoutParams.topMargin = 0;
+        layoutParams.rightMargin = 0;
+        layoutParams.bottomMargin = 0;
+
+        innerLayout.topMargin = titleSpace * 2;
+        titleLayout.height = titleSpace * 2;
+
+        innerClick.setVisibility(GONE);
+        innerFrame.setBackground(null);
+        innerFrame.setBackgroundColor(0xffffffff);
+        innerFrame.setPadding(0, 0, 0, 0);
+
+        titleText.setBackgroundColor(0xffcccccc);
+        titleText.setGravity(Gravity.CENTER);
+        titleText.setVisibility(VISIBLE);
+        titleClose.setVisibility(VISIBLE);
+        titleBacka.setVisibility(VISIBLE);
+
+        setLayoutParams(layoutParams);
+
+        fullscreen = true;
     }
 
     protected final Runnable toggleAnimator = new Runnable()
@@ -263,33 +301,14 @@ public abstract class HomeFrame extends FrameLayout
                 innerFrame.setPadding(8, 8, 8, 8);
 
                 fullscreen = false;
+
+                setLayoutParams(layoutParams);
             }
             else
             {
-                layoutParams.width = Simple.MP;
-                layoutParams.height = Simple.MP;
-
-                layoutParams.leftMargin = 0;
-                layoutParams.topMargin = 0;
-                layoutParams.rightMargin = 0;
-                layoutParams.bottomMargin = 0;
-
-                innerLayout.topMargin = titleSpace * 2;
-                titleLayout.height = titleSpace * 2;
-
-                innerClick.setVisibility(GONE);
-                innerFrame.setBackground(null);
-                innerFrame.setBackgroundColor(0xffffffff);
-                innerFrame.setPadding(0, 0, 0, 0);
-
-                titleText.setBackgroundColor(0xffcccccc);
-                titleText.setGravity(Gravity.CENTER);
-                titleClose.setVisibility(VISIBLE);
-
-                fullscreen = true;
+                setFullscreen();
             }
 
-            setLayoutParams(layoutParams);
         }
     };
 }
