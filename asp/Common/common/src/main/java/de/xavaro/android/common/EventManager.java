@@ -333,12 +333,12 @@ public class EventManager
         }
     }
 
-    private static long nextLoadTime = 30 + Simple.nowAsTimeStamp() / 1000;
+    private static long nextLoadTime = Simple.nowAsTimeStamp() + 30 * 1000;
 
     public static void commTick()
     {
-        if (nextLoadTime > (Simple.nowAsTimeStamp() / 1000)) return;
-        nextLoadTime = (Simple.nowAsTimeStamp() / 1000) / 60 * 60 + 60;
+        if (nextLoadTime > Simple.nowAsTimeStamp()) return;
+        nextLoadTime = Simple.nowAsTimeStamp() + 60 * 1000;
 
         Simple.removePost(freeMemory);
         getStorage();

@@ -224,8 +224,6 @@ public class HomeNotify extends HomeFrame
     @Nullable
     protected LaunchItem getNextCandidate()
     {
-        Log.d(LOGTAG, "getNextCandidate:" + candidatesLaunch.size());
-
         int count = candidatesLaunch.size();
 
         for (int inx = 0; inx < count; inx++)
@@ -233,7 +231,6 @@ public class HomeNotify extends HomeFrame
             LaunchItem launchItem = candidatesLaunch.remove(0);
 
             NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
-            Log.d(LOGTAG, "getNextCandidate:" + inx + "=" + intent);
             if (intent != null) return launchItem;
 
             candidatesLaunch.add(launchItem);

@@ -9,7 +9,7 @@ medicator.getNextEvents = function()
         medicator.requestUnloadTimer = null;
     }
 
-    var events = JSON.parse(WebAppEvents.getCurrentEvents());
+    var events = JSON.parse(WebAppEvents.getCurrentEventsClear());
 
     var configs = {};
 
@@ -134,7 +134,7 @@ medicator.remindConfig = function(config)
 
         notify.key   = "medicator.take.pills";
         notify.title = WebLibStrings.getTrans("events.take.pills");
-        notify.icon  = "health_medication_512x512.png";"
+        notify.icon  = "health_medication_512x512.png";
 
         WebAppNotify.addNotification(JSON.stringify(notify));
         WebAppSpeak.speak(notify.title, 50);
@@ -158,7 +158,7 @@ medicator.remindConfig = function(config)
 
         notify.key   = "medicator.take.bloodpressure";
         notify.title = WebLibStrings.getTrans("events.take.bloodpressure");
-        notify.icon  = "health_bpm_256x256.png";"
+        notify.icon  = "health_bpm_256x256.png";
 
         WebAppNotify.addNotification(JSON.stringify(notify));
         WebAppSpeak.speak(notify.title, 50);
@@ -172,7 +172,7 @@ medicator.remindConfig = function(config)
 
         notify.key   = "medicator.take.bloodglucose";
         notify.title = WebLibStrings.getTrans("events.take.bloodglucose");
-        notify.icon  = "health_glucose_512x512.png";"
+        notify.icon  = "health_glucose_512x512.png";
 
         WebAppNotify.addNotification(JSON.stringify(notify));
         WebAppSpeak.speak(notify.title, 50);
@@ -186,7 +186,7 @@ medicator.remindConfig = function(config)
 
         notify.key   = "medicator.take.weight";
         notify.title = WebLibStrings.getTrans("events.take.weight");
-        notify.icon  = "health_scale_280x280.png";"
+        notify.icon  = "health_scale_280x280.png";
 
         WebAppNotify.addNotification(JSON.stringify(notify));
         WebAppSpeak.speak(notify.title, 50);

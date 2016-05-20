@@ -38,7 +38,7 @@ medicator.planEvent = function(date, hour, medication, dose, ondemand)
     // Comment next line for testing...
     //
 
-    if (datetime.getTime() < new Date().getTime()) return;
+    //if (datetime.getTime() < new Date().getTime()) return;
 
     var event = {};
 

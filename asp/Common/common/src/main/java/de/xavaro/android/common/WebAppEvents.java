@@ -48,6 +48,24 @@ public class WebAppEvents
     }
 
     @JavascriptInterface
+    public String getCurrentEventsClear()
+    {
+        synchronized (eventSchedule)
+        {
+            if (eventSchedule.size() > 0)
+            {
+                String events = eventSchedule.remove(eventSchedule.size() - 1).toString();
+
+                eventSchedule.clear();
+
+                return events;
+            }
+        }
+
+        return new JSONArray().toString();
+    }
+
+    @JavascriptInterface
     public String getComingEvents()
     {
         return EventManager.getComingEvents(keyprefix).toString();

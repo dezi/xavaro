@@ -195,6 +195,7 @@ public class WebApp
         if (! hasEvents(webappname))
         {
             OopsService.log(LOGTAG, "handleEventUI: no event.js:" + webappname);
+
             return;
         }
 
