@@ -186,30 +186,40 @@ instaface.onTitleImageClick = function(ctarget, target)
     var selector = ic.getSelector(ctarget);
     if (selector == null) return;
 
-    if (selector == ic.activeselector)
-    {
-        if (selector.activated)
-        {
-            WebLibSimple.setBGColor(selector.pdiv, "#00000000");
-            selector.activated = false;
-            ic.activeselector = null;
-        }
-    }
-    else
-    {
-        if (ic.activeselector)
-        {
-            WebLibSimple.setBGColor(ic.activeselector.pdiv, "#00000000");
-            ic.activeselector.activated = false;
-        }
+    if (selector == ic.activeselector) return;
 
-        WebLibSimple.setBGColor(selector.pdiv, "#ffff0000");
-        selector.activated = true;
-
-        ic.activeselector = selector;
+    if (ic.activeselector)
+    {
+        WebLibSimple.setBGColor(ic.activeselector.pdiv, "#00000000");
+        ic.activeselector.activated = false;
     }
 
+    WebLibSimple.setBGColor(selector.pdiv, "#ffff0000");
+    selector.activated = true;
+
+    ic.activeselector = selector;
+
+    ic.markFeedsAsRead();
     ic.createConts();
+}
+
+instaface.updateNewsCounts = function()
+{
+    var ic = instaface;
+
+    for (var inx = 0; inx < ic.contentselectors.length; inx++)
+    {
+        var selector = ic.contentselectors[ inx ];
+
+        var styp = selector.styp;
+        var skey = selector.skey;
+        var pcnt = selector.pcnt;
+
+        var newscount = (styp == "1") ? ic.platnews[ skey ] : ic.usernews[ skey ];
+
+        pcnt.style.display = newscount ? "block" : "none";
+        pcnt.innerHTML = newscount;
+    }
 }
 
 instaface.createFeeds = function()
@@ -242,6 +252,7 @@ instaface.createFeeds = function()
     for (var inx = 0; inx < ic.platforms.length; inx++)
     {
         var platform = ic.platforms[ inx ];
+        ic.platnews[ platform.plat ] = 0;
 
         if (platform.type == "owner")
         {
@@ -277,29 +288,15 @@ instaface.createFeeds = function()
                     ic.icontitles[ ownername ] = picn;
                     ic.iconsorter.push(sort + "|" + ownername);
 
-                    var newstag = platform.plat + ".count." + ownerfeed.id;
-                    var newscount = ic.feednews[ newstag ] ? ic.feednews[ newstag ] : 0;
-
                     ic.usertype[ ownername ] = ownerfeed.type;
-
-                    if (! ic.usernews[ ownername ])
-                    {
-                        ic.usernews[ ownername ] = newscount;
-                    }
-                    else
-                    {
-                        ic.usernews[ ownername ] += newscount;
-                    }
-
-                    if (! ic.platnews[ platform.plat ])
-                    {
-                        ic.platnews[ platform.plat ] = newscount;
-                    }
-                    else
-                    {
-                        ic.platnews[ platform.plat ] += newscount;
-                    }
+                    ic.usernews[ ownername ] = 0;
                 }
+
+                var newstag = platform.plat + ".count." + ownerfeed.id;
+                var newscount = ic.feednews[ newstag ] ? ic.feednews[ newstag ] : 0;
+
+                ic.usernews[ ownername ] += newscount;
+                ic.platnews[ platform.plat ] += newscount;
 
                 ic.feeds.push(ownerfeed);
                 ic.feedsdata.push(JSON.parse(WebAppSocial.getFeed(platform.plat, ownerfeed.id)));
@@ -353,24 +350,24 @@ instaface.createFeeds = function()
             picn.style.width = ic.config.iconsize + "px";
             picn.style.height = ic.config.iconsize + "px";
 
-            var newscount = (styp == "1") ? ic.platnews[ skey ] : ic.usernews[ skey ];
-
             var pcnt = WebLibSimple.createAnyAppend("div", pdiv);
-            WebLibSimple.setFontSpecs(pcnt, 16, "bold");
-            WebLibSimple.setBGColor(pcnt, "#44ff44");
-            pcnt.style.display = newscount ? "block" : "none";
+            WebLibSimple.setFontSpecs(pcnt, 20, "bold");
+            WebLibSimple.setBGColor(pcnt, "#44cc44");
+            pcnt.style.display = "none";
             pcnt.style.position = "absolute";
+            pcnt.style.textAlign = "center";
             pcnt.style.top = "12px";
             pcnt.style.right = "12px";
             pcnt.style.height = "24px";
             pcnt.style.minWidth = "24px";
-            pcnt.style.padding = "4px";
-            pcnt.style.borderRadius = "16px";
-            pcnt.innerHTML = newscount;
+            pcnt.style.padding = "6px";
+            pcnt.style.borderRadius = "20px";
 
             var selector = {};
 
+            selector.styp = styp;
             selector.stag = stag;
+            selector.skey = skey;
             selector.pdiv = pdiv;
             selector.picn = picn;
             selector.pcnt = pcnt;
@@ -384,16 +381,20 @@ instaface.createFeeds = function()
         titlewid += 8;
 
         ic.titlescroll.style.width = titlewid + "px";
+
+        ic.updateNewsCounts();
     }
 }
 
-instaface.adjustPostDivs = function()
+instaface.adjustPostDivs = function(startinx)
 {
+    if (! startinx) startinx = 0;
+
     var ic = instaface;
 
     if (ic.postDivs)
     {
-        for (var inx = 0; inx < ic.postDivs.length; inx++)
+        for (var inx = startinx; inx < ic.postDivs.length; inx++)
         {
             var postdiv = ic.postDivs[ inx ];
             var padddiv = postdiv.mypadddiv;
@@ -501,7 +502,6 @@ instaface.displayPostCompact = function(plat, post)
     var text = WebLibSocial.getPostText(plat, post);
     var imgs = WebLibSocial.getPostImgs(plat, post);
     var type = (name != null) ? ic.usertype[ name.toLowerCase() ] : null;
-    var news = (name != null) ? ic.usernews[ name.toLowerCase() ] : 0;
 
     var padddiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
     WebLibSimple.setBGColor(padddiv, "#ffffff");
@@ -536,9 +536,7 @@ instaface.displayPostCompact = function(plat, post)
 
     platdiv.innerHTML = WebLibSocial.getPlatformName(plat)
                       + " – "
-                      + WebLibStrings.getTransTrans("social.type.keys", type)
-                      + " "
-                      + news;
+                      + WebLibStrings.getTransTrans("social.type.keys", type);
 
     spacediv.style.height = (80 - infodiv.scrollHeight) + "px";
 
@@ -567,8 +565,6 @@ instaface.displayPostCompact = function(plat, post)
         var imgtag = WebLibSimple.createAnyAppend("img", imgsdiv);
         imgtag.src = image.src ? image.src : image.url;
         imgtag.style.position = "absolute";
-
-        console.log("IMAGE: " + imgtag.src);
 
         postdiv.myimgtag  = imgtag;
         postdiv.myimage   = image;
@@ -617,20 +613,94 @@ instaface.createConts = function()
     }
 
     //
-    // Collect some posts.
+    // Collect one post upfront.
     //
 
     ic.postDivs = [];
 
-    var max = (ic.mode == "normal") ? 20 : 1;
-
-    for (var inx = 0; inx < max; inx++)
+    if (ic.deferredTimeout)
     {
-        ic.retrieveBestPost();
+        clearTimeout(ic.deferredTimeout);
+        ic.deferredTimeout = null;
     }
 
-    ic.adjustMode();
-    ic.adjustPostDivs()
+    if (ic.retrieveBestPost())
+    {
+        ic.adjustMode();
+        ic.adjustPostDivs()
+
+        if (ic.mode == "normal")
+        {
+            //
+            // Retrieve more posts in deferred mode.
+            //
+
+            ic.deferredTodo = 19;
+            ic.deferredTimeout = setTimeout(instaface.retrieveDeferred, 100);
+        }
+    }
+}
+
+instaface.retrieveDeferred = function()
+{
+    var ic = instaface;
+
+    ic.deferredTimeout = null;
+
+    if (ic.deferredTodo > 0)
+    {
+        ic.deferredTodo--;
+
+        if (ic.retrieveBestPost())
+        {
+            ic.adjustPostDivs(ic.postDivs.length - 1);
+
+            if (ic.deferredTodo > 0)
+            {
+                ic.deferredTimeout = setTimeout(instaface.retrieveDeferred, 100);
+            }
+        }
+    }
+}
+
+instaface.markFeedsAsRead = function()
+{
+    var ic = instaface;
+
+    if (! ic.activeselector) return;
+
+    var stag = ic.activeselector.stag;
+    var mode = stag.substring(0, 1);
+    var valu = stag.substring(2);
+
+    for (var finx = 0; finx < ic.feeds.length; finx++)
+    {
+        var feed = ic.feeds[ finx ];
+
+        if ((mode == "1") && (feed.plat != valu)) continue;
+        if ((mode == "2") && (feed.name.toLowerCase() != valu.toLowerCase())) continue;
+        if ((mode == "3") && (feed.name.toLowerCase() != valu.toLowerCase())) continue;
+
+        var ownername = feed.name.toLowerCase();
+        var newstag = feed.plat + ".count." + feed.id;
+
+        //
+        // Reset feed news count.
+        //
+
+        var newscount = ic.feednews[ newstag ] ? ic.feednews[ newstag ] : 0;
+
+        console.log("=====>>>>>>> " + newstag + "=" + ownername + "=" + feed.plat + "=" + newscount);
+
+        if (newscount == 0) continue;
+
+        ic.feednews[ newstag ] = 0;
+
+        ic.usernews[ ownername ] -= newscount;
+        ic.platnews[ feed.plat ] -= newscount;
+     }
+
+    ic.updateNewsCounts();
 }
 
 instaface.retrieveBestPost = function()
@@ -639,8 +709,6 @@ instaface.retrieveBestPost = function()
     // Loop over all feeds and find the most recent
     // and suitable post.
     //
-
-    console.log("instaface.retrieveBestPost: start...");
 
     var ic = instaface;
 
@@ -724,8 +792,6 @@ instaface.retrieveBestPost = function()
             }
         }
     }
-
-    console.log("instaface.retrieveBestPost: done.");
 
     if (candipost)
     {
