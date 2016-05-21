@@ -100,7 +100,7 @@ public class SimpleStorage
         return storageDir;
     }
 
-    private static JSONObject getStorage(String name)
+    public static JSONObject getStorage(String name)
     {
         return Json.getObject(getContainer(name), "data");
     }

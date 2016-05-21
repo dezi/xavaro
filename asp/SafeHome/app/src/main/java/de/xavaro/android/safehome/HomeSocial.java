@@ -16,6 +16,8 @@ public class HomeSocial extends HomeFrame
 {
     private static final String LOGTAG = HomeSocial.class.getSimpleName();
 
+    private WebAppView webView;
+
     public HomeSocial(Context context)
     {
         super(context);
@@ -34,10 +36,15 @@ public class HomeSocial extends HomeFrame
 
     public void setConfig(JSONObject config)
     {
-        WebAppView webView = new WebAppView(getContext());
-        webView.loadWebView("instaface", "main");
+        Log.d(LOGTAG, "=====================================> start webapp");
 
-        payloadFrame.addView(webView);
+        if (webView == null)
+        {
+            WebAppView webView = new WebAppView(getContext());
+            webView.loadWebView("instaface", "main");
+
+            payloadFrame.addView(webView);
+        }
     }
 
     @Override

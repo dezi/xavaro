@@ -220,11 +220,15 @@ instaface.createFeeds = function()
     // Get all platforms the user is present on.
     //
 
+    ic.feednews = JSON.parse(WebAppSocial.getFeedNews());
     ic.platforms = JSON.parse(WebAppSocial.getPlatforms());
 
     ic.icontitles = {};
     ic.iconsorter = [];
+
     ic.usertype = {};
+    ic.usernews = {};
+    ic.platnews = {};
 
     //
     // Build a list with all feeds of all platforms
@@ -273,7 +277,28 @@ instaface.createFeeds = function()
                     ic.icontitles[ ownername ] = picn;
                     ic.iconsorter.push(sort + "|" + ownername);
 
+                    var newstag = platform.plat + ".count." + ownerfeed.id;
+                    var newscount = ic.feednews[ newstag ] ? ic.feednews[ newstag ] : 0;
+
                     ic.usertype[ ownername ] = ownerfeed.type;
+
+                    if (! ic.usernews[ ownername ])
+                    {
+                        ic.usernews[ ownername ] = newscount;
+                    }
+                    else
+                    {
+                        ic.usernews[ ownername ] += newscount;
+                    }
+
+                    if (! ic.platnews[ platform.plat ])
+                    {
+                        ic.platnews[ platform.plat ] = newscount;
+                    }
+                    else
+                    {
+                        ic.platnews[ platform.plat ] += newscount;
+                    }
                 }
 
                 ic.feeds.push(ownerfeed);
@@ -310,6 +335,7 @@ instaface.createFeeds = function()
         for (var inx = 0; inx < ic.iconsorter.length; inx++)
         {
             var stag = ic.iconsorter[ inx ];
+            var styp = stag.substring(0, 1);
             var skey = stag.substring(2);
             var picn = ic.icontitles[ skey ];
 
@@ -327,11 +353,27 @@ instaface.createFeeds = function()
             picn.style.width = ic.config.iconsize + "px";
             picn.style.height = ic.config.iconsize + "px";
 
+            var newscount = (styp == "1") ? ic.platnews[ skey ] : ic.usernews[ skey ];
+
+            var pcnt = WebLibSimple.createAnyAppend("div", pdiv);
+            WebLibSimple.setFontSpecs(pcnt, 16, "bold");
+            WebLibSimple.setBGColor(pcnt, "#44ff44");
+            pcnt.style.display = newscount ? "block" : "none";
+            pcnt.style.position = "absolute";
+            pcnt.style.top = "12px";
+            pcnt.style.right = "12px";
+            pcnt.style.height = "24px";
+            pcnt.style.minWidth = "24px";
+            pcnt.style.padding = "4px";
+            pcnt.style.borderRadius = "16px";
+            pcnt.innerHTML = newscount;
+
             var selector = {};
 
             selector.stag = stag;
             selector.pdiv = pdiv;
             selector.picn = picn;
+            selector.pcnt = pcnt;
             selector.activated = false;
 
             ic.contentselectors.push(selector);
@@ -459,6 +501,7 @@ instaface.displayPostCompact = function(plat, post)
     var text = WebLibSocial.getPostText(plat, post);
     var imgs = WebLibSocial.getPostImgs(plat, post);
     var type = (name != null) ? ic.usertype[ name.toLowerCase() ] : null;
+    var news = (name != null) ? ic.usernews[ name.toLowerCase() ] : 0;
 
     var padddiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
     WebLibSimple.setBGColor(padddiv, "#ffffff");
@@ -493,7 +536,9 @@ instaface.displayPostCompact = function(plat, post)
 
     platdiv.innerHTML = WebLibSocial.getPlatformName(plat)
                       + " – "
-                      + WebLibStrings.getTransTrans("social.type.keys", type);
+                      + WebLibStrings.getTransTrans("social.type.keys", type)
+                      + " "
+                      + news;
 
     spacediv.style.height = (80 - infodiv.scrollHeight) + "px";
 
@@ -522,6 +567,8 @@ instaface.displayPostCompact = function(plat, post)
         var imgtag = WebLibSimple.createAnyAppend("img", imgsdiv);
         imgtag.src = image.src ? image.src : image.url;
         imgtag.style.position = "absolute";
+
+        console.log("IMAGE: " + imgtag.src);
 
         postdiv.myimgtag  = imgtag;
         postdiv.myimage   = image;
@@ -592,6 +639,8 @@ instaface.retrieveBestPost = function()
     // Loop over all feeds and find the most recent
     // and suitable post.
     //
+
+    console.log("instaface.retrieveBestPost: start...");
 
     var ic = instaface;
 
@@ -675,6 +724,8 @@ instaface.retrieveBestPost = function()
             }
         }
     }
+
+    console.log("instaface.retrieveBestPost: done.");
 
     if (candipost)
     {

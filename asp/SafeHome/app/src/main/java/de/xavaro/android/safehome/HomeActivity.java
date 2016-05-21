@@ -79,6 +79,8 @@ public class HomeActivity extends AppCompatActivity implements
 
         super.onCreate(savedInstanceState);
 
+        Log.d(LOGTAG, "========================> onCreate");
+
         instance = this;
 
         //
@@ -147,6 +149,8 @@ public class HomeActivity extends AppCompatActivity implements
     {
         super.onPostCreate(savedInstanceState);
 
+        Log.d(LOGTAG, "========================> onPostCreate");
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         topScreen.setOnSystemUiVisibilityChangeListener(this);
 
@@ -167,6 +171,16 @@ public class HomeActivity extends AppCompatActivity implements
         {
             Simple.makeAlert("Accessibility Service not enabled.");
         }
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        Log.d(LOGTAG, "========================> onDestroy");
+
+        System.exit(0);
     }
 
     private final Runnable makeFullscreen = new Runnable()

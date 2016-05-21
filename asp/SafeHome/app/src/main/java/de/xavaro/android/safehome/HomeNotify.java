@@ -286,7 +286,7 @@ public class HomeNotify extends HomeFrame
         {
             manageNotifications();
 
-            Simple.makePost(manageNotificationsRun, 5000);
+            Simple.makePost(manageNotificationsRun, 60 * 1000);
         }
     };
 }

@@ -354,9 +354,7 @@ public abstract class Social
             params = getSignedOAuthParams("POST", tokenurl, params);
             String oauth = getSignedOAuthHeader(params);
 
-            Log.d(LOGTAG, "==============oauth=" + oauth);
             String content = SimpleRequest.readContent(tokenurl, oauth, new JSONObject());
-            Log.d(LOGTAG, "==============content=" + content);
 
             if (content != null)
             {
@@ -808,9 +806,9 @@ public abstract class Social
 
         String signature = computeSignature(basestring, keystring);
 
-        Log.d(LOGTAG,"getSignedOAuth: base=" + basestring);
-        Log.d(LOGTAG,"getSignedOAuth: keys=" + keystring);
-        Log.d(LOGTAG,"getSignedOAuth: sign=" + signature);
+        //Log.d(LOGTAG,"getSignedOAuth: base=" + basestring);
+        //Log.d(LOGTAG,"getSignedOAuth: keys=" + keystring);
+        //Log.d(LOGTAG,"getSignedOAuth: sign=" + signature);
 
         parameters.putString("oauth_signature", signature);
 
@@ -1168,6 +1166,17 @@ public abstract class Social
     public void commTick()
     {
         long now = Simple.nowAsTimeStamp();
+
+        if (nextAction == 0)
+        {
+            //
+            // Do not immediately start actions.
+            //
+
+            nextAction = now + 10 * 60 * 1000;
+
+            return;
+        }
 
         if ((now - lastReconfigure) > 24 * 3600 * 1000)
         {

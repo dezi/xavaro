@@ -136,6 +136,13 @@ public class WebAppSocial
     }
 
     @JavascriptInterface
+    public String getFeedNews()
+    {
+        JSONObject storage = SimpleStorage.getStorage("socialfeednews");
+        return (storage == null) ? "{}" : storage.toString();
+    }
+
+    @JavascriptInterface
     public boolean getPostSuitable(String platform, String post)
     {
         JSONObject jpost = Json.fromString(post);
