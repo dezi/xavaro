@@ -2,6 +2,7 @@
 
     <string name="simple_and">und</string>
     <string name="simple_new">neu</string>
+    <string name="simple_none">keine</string>
 
     <string-array name="de_regions_keys">
         <item>de</item>

@@ -8,7 +8,6 @@ import android.widget.TextView;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
-import android.util.Log;
 
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.ImageSmartView;
@@ -32,7 +31,8 @@ public abstract class HomeFrame extends FrameLayout
     protected LayoutParams titleLayout;
     protected ImageSmartView titleClose;
     protected ImageSmartView titleBacka;
-    protected TextView titleText;
+    protected TextView titleView;
+
     protected LayoutParams innerLayout;
     protected FrameLayout innerFrame;
     protected FrameLayout innerClick;
@@ -59,13 +59,14 @@ public abstract class HomeFrame extends FrameLayout
 
         titleLayout = new LayoutParams(Simple.MP, titleSpace);
 
-        titleText = new TextView(context);
-        titleText.setLayoutParams(titleLayout);
-        titleText.setTextSize(titleSpace * 2 / 3);
-        titleText.setPadding(16, 0, 0, 0);
-        titleText.setOnClickListener(onClickListener);
-        titleText.setVisibility(GONE);
-        addView(titleText);
+        titleView = new TextView(context);
+        titleView.setLayoutParams(titleLayout);
+        titleView.setTextSize(titleSpace * 2 / 3);
+        titleView.setTextColor(0xff888888);
+        titleView.setPadding(16, 0, 0, 0);
+        titleView.setOnClickListener(onClickListener);
+        titleView.setVisibility(GONE);
+        addView(titleView);
 
         titleClose = new ImageSmartView(context);
         titleClose.setLayoutParams(new LayoutParams(titleSpace * 2, titleSpace * 2, Gravity.END));
@@ -116,8 +117,8 @@ public abstract class HomeFrame extends FrameLayout
     {
         if (title != null)
         {
-            titleText.setText(title);
-            titleText.setVisibility(VISIBLE);
+            titleView.setText(title);
+            titleView.setVisibility(VISIBLE);
             innerLayout.topMargin = titleSpace * (fullscreen ? 2 : 1);
         }
     }
@@ -195,8 +196,8 @@ public abstract class HomeFrame extends FrameLayout
 
         if (fullscreen)
         {
-            titleText.setBackgroundColor(Color.TRANSPARENT);
-            titleText.setGravity(Gravity.START);
+            titleView.setBackgroundColor(Color.TRANSPARENT);
+            titleView.setGravity(Gravity.START);
             titleClose.setVisibility(GONE);
             titleBacka.setVisibility(GONE);
         }
@@ -228,9 +229,9 @@ public abstract class HomeFrame extends FrameLayout
         innerFrame.setBackgroundColor(0xffffffff);
         innerFrame.setPadding(0, 0, 0, 0);
 
-        titleText.setBackgroundColor(0xffcccccc);
-        titleText.setGravity(Gravity.CENTER);
-        titleText.setVisibility(VISIBLE);
+        titleView.setBackgroundColor(0xffcccccc);
+        titleView.setGravity(Gravity.CENTER);
+        titleView.setVisibility(VISIBLE);
         titleClose.setVisibility(VISIBLE);
         titleBacka.setVisibility(VISIBLE);
 

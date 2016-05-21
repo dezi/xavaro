@@ -22,6 +22,8 @@ public class WebAppSocial
     private String mode;
 
     private final ArrayList<Social.SocialInterface> platforms = new ArrayList<>();
+    private Runnable newsPostRunner;
+    private int newsTotalCount;
 
     public WebAppSocial()
     {
@@ -42,6 +44,16 @@ public class WebAppSocial
     public void setMode(String mode)
     {
         this.mode = mode;
+    }
+
+    public void setNewsPostRunner(Runnable newsPostRunner)
+    {
+        this.newsPostRunner = newsPostRunner;
+    }
+
+    public int getNewsTotalCount()
+    {
+        return newsTotalCount;
     }
 
     @JavascriptInterface
@@ -140,6 +152,21 @@ public class WebAppSocial
     {
         JSONObject storage = SimpleStorage.getStorage("socialfeednews");
         return (storage == null) ? "{}" : storage.toString();
+    }
+
+    @JavascriptInterface
+    public void resetFeedNews(String platform, String pfid)
+    {
+        String key = platform + ".count." + pfid;
+        SimpleStorage.put("socialfeednews", key, 0);
+    }
+
+    @JavascriptInterface
+    public void postTotalNewsCount(int newsTotalCount)
+    {
+        this.newsTotalCount = newsTotalCount;
+
+        if (newsPostRunner != null) Simple.makePost(newsPostRunner);
     }
 
     @JavascriptInterface

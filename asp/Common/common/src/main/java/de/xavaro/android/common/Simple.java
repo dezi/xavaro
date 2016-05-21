@@ -459,7 +459,7 @@ public class Simple
 
     public static void makePost(Runnable runnable)
     {
-        if (appHandler != null) appHandler.post(runnable);
+        if ((appHandler != null) && (runnable != null)) appHandler.post(runnable);
     }
 
     public static void makePost(Runnable runnable, int delay)
@@ -754,6 +754,11 @@ public class Simple
     public static String getCurrencyValue(int moneycents)
     {
         return String.format("%.02f\u00A0", moneycents / 100f) + getCurrencySymbol();
+    }
+
+    public static String getFirstCap(String text)
+    {
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
     public static String getTrans(int resid, Object... args)

@@ -3,7 +3,6 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
 
 import org.json.JSONObject;
@@ -17,6 +16,9 @@ public class HomeSocial extends HomeFrame
     private static final String LOGTAG = HomeSocial.class.getSimpleName();
 
     private WebAppView webView;
+
+    private String titleText;
+    private int titleColor;
 
     public HomeSocial(Context context)
     {
@@ -36,16 +38,61 @@ public class HomeSocial extends HomeFrame
 
     public void setConfig(JSONObject config)
     {
-        Log.d(LOGTAG, "=====================================> start webapp");
-
         if (webView == null)
         {
-            WebAppView webView = new WebAppView(getContext());
+            webView = new WebAppView(getContext());
             webView.loadWebView("instaface", "main");
+
+            if (webView.social != null)
+            {
+                webView.social.setNewsPostRunner(newsPostRunner);
+            }
 
             payloadFrame.addView(webView);
         }
     }
+
+    @Override
+    public void setTitle(String title)
+    {
+        super.setTitle(title);
+
+        titleText = title;
+        titleColor = titleView.getCurrentTextColor();
+    }
+
+    protected void newsPostUpdateTitle()
+    {
+        if ((webView != null) && (webView.social != null))
+        {
+            int newsTotalCount = webView.social.getNewsTotalCount();
+
+            String message = "" + newsTotalCount;
+
+            if (newsTotalCount == 0)
+            {
+                message = Simple.getFirstCap(Simple.getTrans(R.string.simple_none));
+
+                titleView.setTextColor(titleColor);
+            }
+            else
+            {
+                titleView.setTextColor(0x8888000);
+            }
+
+            message += " " + titleText;
+            titleView.setText(message);
+        }
+    }
+
+    protected final Runnable newsPostRunner = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            newsPostUpdateTitle();
+        }
+    };
 
     @Override
     protected void onChangeOrientation()
