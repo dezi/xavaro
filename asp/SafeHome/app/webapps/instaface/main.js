@@ -57,7 +57,7 @@ instaface.updateConts = function()
     ic.contentscroll.innerHTML = null;
     ic.contentscroll.style.top = "0px";
 
-    if (! ic.retrieveBestPost())
+    if (! ic.retrieveBestPost(false))
     {
         //
         // Restart content.
@@ -65,10 +65,15 @@ instaface.updateConts = function()
 
         for (var inx = 0; inx < ic.feedsdinx.length; inx++)
         {
+            ic.feedsused[ inx ] = 0;
             ic.feedsdinx[ inx ] = 0;
         }
 
-        ic.retrieveBestPost();
+        //
+        // Retrieve at least the latest post even if old.
+        //
+
+        ic.retrieveBestPost(true);
     }
 
     ic.adjustPostDivs();
@@ -257,7 +262,9 @@ instaface.createFeeds = function()
 
     ic.feeds = [];
     ic.feedsdata = [];
+    ic.feedsnews = [];
     ic.feedsdinx = [];
+    ic.feedsused = [];
 
     for (var inx = 0; inx < ic.platforms.length; inx++)
     {
@@ -312,7 +319,9 @@ instaface.createFeeds = function()
 
                 ic.feeds.push(ownerfeed);
                 ic.feedsdata.push(JSON.parse(WebAppSocial.getFeed(platform.plat, ownerfeed.id)));
+                ic.feedsnews.push(newscount);
                 ic.feedsdinx.push(0);
+                ic.feedsused.push(0);
             }
         }
         else
@@ -322,9 +331,14 @@ instaface.createFeeds = function()
             // Append the platform entry as an single feed.
             //
 
+            var newstag = platform.plat + ".count." + platform.id;
+            var newscount = ic.feednews[ newstag ] ? ic.feednews[ newstag ] : 0;
+
             ic.feeds.push(platform);
             ic.feedsdata.push(JSON.parse(WebAppSocial.getFeed(platform.plat, platform.id)));
+            ic.feedsnews.push(newscount);
             ic.feedsdinx.push(0);
+            ic.feedsused.push(0);
         }
     }
 
@@ -617,6 +631,7 @@ instaface.createConts = function()
 
     for (var inx = 0; inx < ic.feedsdinx.length; inx++)
     {
+        ic.feedsused[ inx ] = 0;
         ic.feedsdinx[ inx ] = 0;
     }
 
@@ -632,7 +647,7 @@ instaface.createConts = function()
         ic.deferredTimeout = null;
     }
 
-    if (ic.retrieveBestPost())
+    if (ic.retrieveBestPost(true))
     {
         ic.adjustMode();
         ic.adjustPostDivs()
@@ -659,7 +674,7 @@ instaface.retrieveDeferred = function()
     {
         ic.deferredTodo--;
 
-        if (ic.retrieveBestPost())
+        if (ic.retrieveBestPost(true))
         {
             ic.adjustPostDivs(ic.postDivs.length - 1);
 
@@ -697,9 +712,6 @@ instaface.markFeedsAsRead = function()
         //
 
         var newscount = ic.feednews[ newstag ] ? ic.feednews[ newstag ] : 0;
-
-        console.log("=====>>>>>>> " + newstag + "=" + ownername + "=" + feed.plat + "=" + newscount);
-
         if (newscount == 0) continue;
 
         ic.feednews[ newstag ] = 0;
@@ -713,7 +725,7 @@ instaface.markFeedsAsRead = function()
     ic.updateNewsCounts();
 }
 
-instaface.retrieveBestPost = function()
+instaface.retrieveBestPost = function(anypost)
 {
     //
     // Loop over all feeds and find the most recent
@@ -733,6 +745,16 @@ instaface.retrieveBestPost = function()
     for (var finx = 0; finx < ic.feeds.length; finx++)
     {
         var feed = ic.feeds[ finx ];
+
+        if ((ic.feedsused[ finx ] >= ic.feedsnews[ finx ]) && (ic.mode == "news") && ! anypost)
+        {
+            //
+            // All new posts have been displayed.
+            //
+
+            continue;
+        }
+
         var data = ic.feedsdata[ finx ];
         var dinx = ic.feedsdinx[ finx ];
 
@@ -810,6 +832,7 @@ instaface.retrieveBestPost = function()
         //
 
         ic.feedsdinx[ candifinx ] = candidinx;
+        ic.feedsused[ candifinx ]++;
 
         instaface.displayPostCompact(ic.feeds[ candifinx ].plat, candipost);
     }

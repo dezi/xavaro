@@ -3,6 +3,8 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 
 import org.json.JSONObject;
@@ -77,11 +79,13 @@ public class HomeSocial extends HomeFrame
             }
             else
             {
-                titleView.setTextColor(0x8888000);
+                titleView.setTextColor(Color.RED);
             }
 
             message += " " + titleText;
             titleView.setText(message);
+
+            Log.d(LOGTAG, "===================================>>>>>>>>>> fucka " + message);
         }
     }
 
