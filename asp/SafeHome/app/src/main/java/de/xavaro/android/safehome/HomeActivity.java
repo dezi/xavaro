@@ -469,7 +469,7 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
-                    launchFrame.removeView((FrameLayout) lastview);
+                    Simple.removeFromParent((ViewGroup) lastview);
                     backStack.remove(backStack.size() - 1);
 
                     ((BackKeyClient) lastview).onBackKeyExecuted();
@@ -477,7 +477,7 @@ public class HomeActivity extends AppCompatActivity implements
             }
             else
             {
-                launchFrame.removeView((FrameLayout) lastview);
+                Simple.removeFromParent((ViewGroup) lastview);
                 backStack.remove(backStack.size() - 1);
             }
 

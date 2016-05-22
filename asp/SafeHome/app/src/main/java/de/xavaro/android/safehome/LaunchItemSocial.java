@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 
+import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;
@@ -185,7 +186,18 @@ public class LaunchItemSocial extends LaunchItem
 
         if (config.has("pfid"))
         {
-            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
+            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context)
+            {
+                @Override
+                protected void onDetachedFromWindow()
+                {
+                    super.onDetachedFromWindow();
+                    getWebAppView().destroy();
+
+                    Log.d(LOGTAG, "onDetachedFromWindow: destroyed web view.");
+                }
+            };
+
             webappFrame.setWebAppName("instaface");
             webappFrame.setParent(this);
 
