@@ -194,6 +194,8 @@ WebLibTouch.onTouchEnd = function(event)
         if (touch.newY > 0) touch.newY = 0;
 
         WebLibTouch.setOffsets();
+
+        WebLibTouch.swingTimeout = setTimeout(WebLibTouch.onTouchEndSwing, 0);
     }
 
     if (touch.ctarget)
@@ -202,6 +204,48 @@ WebLibTouch.onTouchEnd = function(event)
     }
 
     event.preventDefault();
+}
+
+WebLibTouch.onTouchEndSwing = function()
+{
+    var touch = WebLibTouch.touch;
+
+    if ((Math.abs(touch.speedX) > 5) || (Math.abs(touch.speedY) > 5))
+    {
+        touch.newX = touch.starget.offsetLeft + (touch.speedX * 2);
+        touch.newY = touch.starget.offsetTop  + (touch.speedY * 2);
+
+        if ((touch.newX + touch.clientWidth) < touch.parentWidth)
+        {
+            touch.newX = touch.parentWidth - touch.clientWidth;
+            touch.speedX = 0;
+        }
+
+        if ((touch.newY + touch.clientHeight) < touch.parentHeight)
+        {
+            touch.newY = touch.parentHeight - touch.clientHeight;
+            touch.speedY = 0;
+        }
+
+        if (touch.newX > 0)
+        {
+            touch.newX = 0;
+            touch.speedX = 0;
+        }
+
+        if (touch.newY > 0)
+        {
+            touch.newY = 0;
+            touch.speedY = 0;
+        }
+
+        WebLibTouch.setOffsets();
+
+        touch.speedX *= 0.98;
+        touch.speedY *= 0.98;
+
+        WebLibTouch.swingTimeout = setTimeout(WebLibTouch.onTouchEndSwing, 0);
+    }
 }
 
 WebLibTouch.setOffsets = function()
@@ -236,19 +280,11 @@ WebLibTouch.computeOffsets = function(touchobj)
     touch.clientX = touchobj.clientX;
     touch.clientY = touchobj.clientY;
 
-    touch.speedX = Math.abs((touchobj.clientX - touch.startX) / touch.moves);
-    touch.speedY = Math.abs((touchobj.clientY - touch.startY) / touch.moves);
+    touch.speedX = (touchobj.clientX - touch.startX) / touch.moves;
+    touch.speedY = (touchobj.clientY - touch.startY) / touch.moves;
 
-    if (touch.speedX < 1.0) touch.speedX = 1.0;
-    if (touch.speedY < 1.0) touch.speedY = 1.0;
-    if (touch.speedX > 5.0) touch.speedX = 5.0;
-    if (touch.speedY > 5.0) touch.speedY = 5.0;
-
-    touch.speedX = 2.0;
-    touch.speedY = 2.0;
-
-    touch.deltaX = (touchobj.clientX - touch.startX) * touch.speedX;
-    touch.deltaY = (touchobj.clientY - touch.startY) * touch.speedY;
+    touch.deltaX = (touchobj.clientX - touch.startX) * 2.0;
+    touch.deltaY = (touchobj.clientY - touch.startY) * 2.0;
 
     if (touch.starget)
     {

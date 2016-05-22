@@ -450,15 +450,21 @@ instaface.adjustPostDivs = function(startinx)
                 ic.contentscroll.scrollVertical = true;
 
                 padddiv.style.position = "relative";
-                postdiv.style.position = "relative";
-                postdiv.style.margin = "0px";
-
-                WebLibSimple.setBGColor(sepadiv, "#444444");
-
                 padddiv.style.margin = "48px";
                 padddiv.style.padding = "24px";
                 padddiv.style.border = "2px solid #cccccc";
                 padddiv.style.borderRadius = "16px";
+
+                padddiv.style.left = null;
+                padddiv.style.top = null;
+                padddiv.style.right = null;
+                padddiv.style.bottom = null;
+
+                postdiv.style.position = "relative";
+                postdiv.style.margin = "0px";
+
+                WebLibSimple.setBGColor(padddiv, "#ffffff");
+                WebLibSimple.setBGColor(sepadiv, "#444444");
             }
 
             if (ic.mode == "news")
@@ -468,15 +474,21 @@ instaface.adjustPostDivs = function(startinx)
                 ic.contentscroll.scrollVertical = false;
 
                 padddiv.style.position = "absolute";
-                postdiv.style.position = "absolute";
-                postdiv.style.margin = "8px";
-
-                WebLibSimple.setBGColor(sepadiv, "#dddddd");
-
                 padddiv.style.margin = "0px";
                 padddiv.style.padding = "0px";
                 padddiv.style.border = "0px solid grey";
                 padddiv.style.borderRadius = "0px";
+
+                padddiv.style.left = "0px";
+                padddiv.style.top = "0px";
+                padddiv.style.right = "0px";
+                padddiv.style.bottom = "0px";
+
+                postdiv.style.position = "absolute";
+                postdiv.style.margin = "8px";
+
+                WebLibSimple.setBGColor(padddiv, "#ffffff");
+                WebLibSimple.setBGColor(sepadiv, "#dddddd");
             }
 
             if (postdiv.myimgtag && postdiv.myimage)
@@ -484,24 +496,26 @@ instaface.adjustPostDivs = function(startinx)
                 var imgtag = postdiv.myimgtag;
                 var image  = postdiv.myimage;
 
-                var zoom = ic.isFullScreen() ? 0 : 20;
-                var useheight = (postdiv.clientHeight - headdiv.clientHeight);
-
-                if (useheight > 0)
+                if (ic.mode == "news")
                 {
                     //
                     // We have a predeterminated height which we must use.
                     //
 
+                    var useheight = (postdiv.clientHeight - headdiv.clientHeight);
                     imgsdiv.style.height = useheight + "px";
                 }
                 else
                 {
+                    //
+                    // We can just fit in the image.
+                    //
+
                     imgsdiv.style.height = Math.floor(image.height * imgsdiv.clientWidth / image.width) + "px";
                 }
 
-                var wid = zoom + imgsdiv.clientWidth;
-                var hei = zoom + imgsdiv.clientHeight;
+                var wid = imgsdiv.clientWidth;
+                var hei = imgsdiv.clientHeight;
 
                 var scalex = wid / image.width;
                 var scaley = hei / image.height;
@@ -545,8 +559,6 @@ instaface.displayPostCompact = function(plat, post)
     var type = (name != null) ? ic.usertype[ name.toLowerCase() ] : null;
 
     var padddiv = WebLibSimple.createDiv(0, 0, 0, 0, null, ic.contentscroll);
-    WebLibSimple.setBGColor(padddiv, "#ffffff");
-
     var postdiv = WebLibSimple.createDiv(0, 0, 0, 0, null, padddiv);
     var headdiv = WebLibSimple.createAnyAppend("div", postdiv);
 

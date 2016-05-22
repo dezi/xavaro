@@ -1,18 +1,10 @@
 package de.xavaro.android.safehome;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 
-import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.VoiceIntent;
-import de.xavaro.android.common.WebApp;
-import de.xavaro.android.common.WebAppRequest;
-import de.xavaro.android.common.WebAppLoader;
 import de.xavaro.android.common.WebAppView;
 
 public class LaunchFrameWebApp extends LaunchFrame

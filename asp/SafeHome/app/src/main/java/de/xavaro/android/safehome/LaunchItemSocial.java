@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;

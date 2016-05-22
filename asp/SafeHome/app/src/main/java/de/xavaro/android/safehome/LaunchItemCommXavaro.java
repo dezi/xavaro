@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.util.Log;
-import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.view.Gravity;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -16,11 +15,9 @@ import java.io.File;
 
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
-import de.xavaro.android.common.ImageSmartCache;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PrepaidManager;
-import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
