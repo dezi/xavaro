@@ -8,6 +8,12 @@ WebLibTouch.minDist = 20;
 
 WebLibTouch.onTouchStart = function(event)
 {
+    if (WebLibTouch.swingTimeout)
+    {
+        clearTimeout(WebLibTouch.swingTimeout);
+        WebLibTouch.swingTimeout = null;
+    }
+
     var touchobj = event.changedTouches[ 0 ];
     var touch = WebLibTouch.touch = {};
     var target = touchobj.target;
@@ -95,6 +101,9 @@ WebLibTouch.onTouchMove = function(event)
     if (! (touch.starget || touch.ctarget || touch.ltarget)) return;
 
     touch.moves += 1;
+
+    touch.speedX = (touchobj.clientX - touch.clientX);
+    touch.speedY = (touchobj.clientY - touch.clientY);
 
     WebLibTouch.computeOffsets(touchobj);
 
@@ -195,6 +204,8 @@ WebLibTouch.onTouchEnd = function(event)
 
         WebLibTouch.setOffsets();
 
+console.log("=============================>" + touch.speedX + "=" + touch.speedY);
+
         WebLibTouch.swingTimeout = setTimeout(WebLibTouch.onTouchEndSwing, 0);
     }
 
@@ -212,8 +223,8 @@ WebLibTouch.onTouchEndSwing = function()
 
     if ((Math.abs(touch.speedX) > 1.0) || (Math.abs(touch.speedY) > 1.0))
     {
-        touch.newX = touch.starget.offsetLeft + (touch.speedX * 2);
-        touch.newY = touch.starget.offsetTop  + (touch.speedY * 2);
+        touch.newX = touch.starget.offsetLeft + touch.speedX;
+        touch.newY = touch.starget.offsetTop  + touch.speedY;
 
         if ((touch.newX + touch.clientWidth) < touch.parentWidth)
         {
@@ -241,8 +252,8 @@ WebLibTouch.onTouchEndSwing = function()
 
         WebLibTouch.setOffsets();
 
-        touch.speedX *= 0.98;
-        touch.speedY *= 0.98;
+        touch.speedX *= 0.99;
+        touch.speedY *= 0.99;
 
         WebLibTouch.swingTimeout = setTimeout(WebLibTouch.onTouchEndSwing, 0);
     }
@@ -279,9 +290,6 @@ WebLibTouch.computeOffsets = function(touchobj)
 
     touch.clientX = touchobj.clientX;
     touch.clientY = touchobj.clientY;
-
-    touch.speedX = (touchobj.clientX - touch.startX) / touch.moves;
-    touch.speedY = (touchobj.clientY - touch.startY) / touch.moves;
 
     touch.deltaX = (touchobj.clientX - touch.startX) * 2.0;
     touch.deltaY = (touchobj.clientY - touch.startY) * 2.0;

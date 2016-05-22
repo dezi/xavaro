@@ -19,9 +19,6 @@ public class HomeSocial extends HomeFrame
 
     private WebAppView webView;
 
-    private String titleText;
-    private int titleColor;
-
     public HomeSocial(Context context)
     {
         super(context);
@@ -54,15 +51,6 @@ public class HomeSocial extends HomeFrame
         }
     }
 
-    @Override
-    public void setTitle(String title)
-    {
-        super.setTitle(title);
-
-        titleText = title;
-        titleColor = titleView.getCurrentTextColor();
-    }
-
     protected void newsPostUpdateTitle()
     {
         if ((webView != null) && (webView.social != null))
@@ -76,7 +64,7 @@ public class HomeSocial extends HomeFrame
                 message = Simple.getFirstCap(Simple.getTrans(R.string.simple_none));
                 message += " " + "Neuigkeiten";
 
-                titleView.setTextColor(titleColor);
+                titleView.setTextColor(fullscreen ? 0xff444444 : 0xff888888);
             }
             else
             {
