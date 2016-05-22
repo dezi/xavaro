@@ -119,17 +119,17 @@ public class HomeEvent extends FrameLayout
 
         if (intent == null)
         {
+            setTitleText(null);
+
             setFollowButtonText(null);
             setDeclineButtonText(null);
-
-            setTitleText(null);
         }
         else
         {
+            setTitleText(intent.title);
+
             setFollowButtonText(intent.followText);
             setDeclineButtonText(intent.declineText);
-
-            setTitleText(intent.title);
 
             //
             // Check for spoken text and repeat intervals.
@@ -224,10 +224,11 @@ public class HomeEvent extends FrameLayout
 
     public void setTitleText(String text)
     {
+        titleViewTextAdjust = true;
+
         titleView.setText(text);
         titleView.setTextSize(Simple.getDeviceTextSize(istopevent ? 30f : 24f));
-
-        titleViewTextAdjust = true;
+        titleView.measure(0,0);
     }
 
     public void setFollowButtonText(String text)
