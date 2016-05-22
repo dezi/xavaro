@@ -170,6 +170,32 @@ public class HomePeople extends FrameLayout
                 || Simple.equals(type, "googleplus"));
     }
 
+    private void addChoices(JSONArray choices, JSONObject li)
+    {
+        if ((choices == null) || (li == null)) return;
+
+        //
+        // Clone launch item config and mark as noprofile
+        // display, means the function of the launch item
+        // becomes the label and large icon.
+        //
+
+        JSONObject liclone = Json.clone(li);
+        Json.put(liclone, "noprofile", true);
+
+        //
+        // Add to user chcoices.
+        //
+
+        Json.put(choices, liclone);
+
+        //
+        // Mark entry as used.
+        //
+
+        Json.put(li, "used", true);
+    }
+
     private void extractConfig(JSONObject config)
     {
         JSONArray lis = Json.getArray(config, "launchitems");
@@ -208,9 +234,7 @@ public class HomePeople extends FrameLayout
                 // Add every item also to communication choices.
                 //
 
-                JSONArray choices = Json.getArray(nameList, label);
-                Json.put(choices, Json.clone(li));
-                Json.put(li, "used", true);
+                addChoices(Json.getArray(nameList, label), li);
 
                 //
                 // Remove from original launch pages.
@@ -274,9 +298,7 @@ public class HomePeople extends FrameLayout
                     // Add every item also to communication choices.
                     //
 
-                    JSONArray choices = Json.getArray(nameList, label);
-                    Json.put(choices, Json.clone(li));
-                    Json.put(li, "used", true);
+                    addChoices(Json.getArray(nameList, label), li);
 
                     continue;
                 }
@@ -297,9 +319,7 @@ public class HomePeople extends FrameLayout
                     // Add every item also to communication choices.
                     //
 
-                    JSONArray choices = Json.getArray(nameList, label);
-                    Json.put(choices, Json.clone(li));
-                    Json.put(li, "used", true);
+                    addChoices(Json.getArray(nameList, label), li);
                 }
             }
         }

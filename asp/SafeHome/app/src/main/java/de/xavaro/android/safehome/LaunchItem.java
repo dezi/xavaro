@@ -218,6 +218,15 @@ public class LaunchItem extends FrameLayout implements
         });
     }
 
+    protected boolean isNoProfile()
+    {
+        //
+        // Return if icon and overlay icon relation is reversed.
+        //
+
+        return Json.getBoolean(config, "noprofile");
+    }
+
     public void setFrameLess(boolean yesno)
     {
         if (yesno)
@@ -469,20 +478,6 @@ public class LaunchItem extends FrameLayout implements
         //
         // To be overridden...
         //
-
-        JSONArray launchItems = Json.getArray(config, "launchitems");
-
-        if (launchItems != null)
-        {
-            Simple.makeClick();
-
-            LaunchGroup directory = new LaunchGroup(getContext());
-            directory.setConfig(null, launchItems);
-
-            ((HomeActivity) getContext()).addViewToBackStack(directory);
-
-            return true;
-        }
 
         return false;
     }

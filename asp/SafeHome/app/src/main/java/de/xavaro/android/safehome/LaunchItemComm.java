@@ -2,12 +2,14 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.Intent;
-import android.widget.ImageView;
 import android.net.Uri;
 import android.util.Log;
 
+import org.json.JSONArray;
+
 import java.io.File;
 
+import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.CommonConfigs;
@@ -28,7 +30,7 @@ public class LaunchItemComm extends LaunchItem
     @Override
     protected void setConfig()
     {
-        ImageView targetIcon = icon;
+        ImageSmartView targetIcon = icon;
 
         if (type.equals("phone"))
         {
@@ -37,19 +39,21 @@ public class LaunchItemComm extends LaunchItem
                 String phone = Json.getString(config, "phonenumber");
                 File profile = ProfileImages.getProfileFile(phone);
 
-                if (profile != null)
+                if ((profile != null) && ! isNoProfile())
                 {
-                    icon.setImageResource(profile.toString(), true);
+                    targetIcon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
                 if (Simple.equals(subtype, "text"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppText);
+                    if (isNoProfile()) labelText = "SMS – Nachricht";
                 }
                 if (Simple.equals(subtype, "voip"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppCall);
+                    if (isNoProfile()) labelText = "Anrufen";
                 }
             }
             else
@@ -67,23 +71,28 @@ public class LaunchItemComm extends LaunchItem
                 String skypename = Json.getString(config, "skypename");
                 File profile = ProfileImages.getProfileFile(skypename);
 
-                if (profile != null)
+                if ((profile != null) && ! isNoProfile())
                 {
-                    icon.setImageResource(profile.toString(), true);
+                    targetIcon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
                 if (Simple.equals(subtype, "chat"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResSkypeChat);
+                    if (isNoProfile()) labelText = "Skype – Chat";
                 }
+
                 if (Simple.equals(subtype, "voip"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResSkypeVoip);
+                    if (isNoProfile()) labelText = "Skype – Anruf";
                 }
+
                 if (Simple.equals(subtype, "vica"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResSkypeVica);
+                    if (isNoProfile()) labelText = "Skype – Video";
                 }
             }
             else
@@ -101,19 +110,21 @@ public class LaunchItemComm extends LaunchItem
                 String phone = Json.getString(config, "waphonenumber");
                 File profile = ProfileImages.getProfileFile(phone);
 
-                if (profile != null)
+                if ((profile != null) && ! isNoProfile())
                 {
-                    icon.setImageResource(profile.toString(), true);
+                    targetIcon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;
                 }
 
                 if (Simple.equals(subtype, "chat"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppChat);
+                    if (isNoProfile()) labelText = "WhatsApp – Chat";
                 }
                 if (Simple.equals(subtype, "voip"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppVoip);
+                    if (isNoProfile()) labelText = "WhatsApp – Anruf";
                 }
             }
             else
@@ -137,6 +148,13 @@ public class LaunchItemComm extends LaunchItem
         if (type.equals("skype"   )) launchSkype();
         if (type.equals("whatsapp")) launchWhatsApp();
         if (type.equals("contacts")) launchContacts();
+    }
+
+    protected boolean onMyLongClick()
+    {
+        Simple.makeClick();
+        launchContacts();
+        return true;
     }
 
     @Override
@@ -283,12 +301,17 @@ public class LaunchItemComm extends LaunchItem
 
     private void launchContacts()
     {
-        if (directory == null)
-        {
-            directory = new LaunchGroup(context);
-            directory.setConfig(this, Json.getArray(config, "launchitems"));
-        }
+        JSONArray launchItems = Json.getArray(config, "launchitems");
 
-        ((HomeActivity) context).addViewToBackStack(directory);
+        if (launchItems != null)
+        {
+            LaunchGroup directory = new LaunchGroup(getContext());
+            directory.setConfig(null, launchItems);
+
+            String label = Json.getString(config, "label") + " – " + "Kontaktmöglichkeiten";
+            if (Simple.equals(type, "contacts")) label = "Weitere Kontakte";
+
+            ((HomeActivity) getContext()).addWorkerToBackStack(label, directory);
+        }
     }
 }

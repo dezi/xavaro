@@ -77,7 +77,7 @@ public class LaunchItemCommXavaro extends LaunchItem implements
                 String ident = Json.getString(config, "identity");
                 File profile = ProfileImages.getProfileFile(ident);
 
-                if (profile != null)
+                if ((profile != null) && ! isNoProfile())
                 {
                     icon.setImageResource(profile.toString(), true);
                     targetIcon = overicon;

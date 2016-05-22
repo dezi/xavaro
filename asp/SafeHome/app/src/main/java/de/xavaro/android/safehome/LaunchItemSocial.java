@@ -40,7 +40,7 @@ public class LaunchItemSocial extends LaunchItem
             String pfid = Json.getString(config, "pfid");
             File profile = ProfileImages.getSocialUserImageFile(type, pfid);
 
-            if (profile != null)
+            if ((profile != null) && ! isNoProfile())
             {
                 icon.setImageResource(profile.toString(), false);
                 overlay.setVisibility(VISIBLE);
@@ -57,24 +57,28 @@ public class LaunchItemSocial extends LaunchItem
         {
             platformName = SocialTwitter.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
+            if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("facebook"))
         {
             platformName = SocialFacebook.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
+            if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("instagram"))
         {
             platformName = SocialInstagram.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
+            if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("googleplus"))
         {
             platformName = SocialGoogleplus.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
+            if (isNoProfile()) labelText = platformName;
         }
 
         setFeeds();
@@ -156,6 +160,26 @@ public class LaunchItemSocial extends LaunchItem
     protected void onMyClick()
     {
         launchAny();
+    }
+
+    protected boolean onMyLongClick()
+    {
+        JSONArray launchItems = Json.getArray(config, "launchitems");
+
+        if (launchItems != null)
+        {
+            Simple.makeClick();
+
+            LaunchGroup directory = new LaunchGroup(getContext());
+            directory.setConfig(null, launchItems);
+
+            String label = Json.getString(config, "label") + " – " + "Soziale Netzwerke";
+            ((HomeActivity) getContext()).addWorkerToBackStack(label, directory);
+
+            return true;
+        }
+
+        return false;
     }
 
     @Override

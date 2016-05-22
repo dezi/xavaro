@@ -128,8 +128,8 @@ public class HomeActivity extends AppCompatActivity implements
         topScreen.addView(peopleScreen);
 
         workerScreen = new HomeWorker(this);
-        workerScreen.setVisibility(View.GONE);
         workerScreen.setFullscreen();
+        workerScreen.setVisibility(View.GONE);
         topScreen.addView(workerScreen);
 
         launchFrame = launchScreen.getPayloadFrame();
@@ -469,9 +469,17 @@ public class HomeActivity extends AppCompatActivity implements
             {
                 if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
-                    Simple.removeFromParent((ViewGroup) lastview);
-                    backStack.remove(backStack.size() - 1);
+                    if (lastview instanceof HomeWorker)
+                    {
+                        ((HomeWorker) lastview).getPayloadFrame().removeAllViews();
+                        ((HomeWorker) lastview).setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        Simple.removeFromParent((ViewGroup) lastview);
+                    }
 
+                    backStack.remove(backStack.size() - 1);
                     ((BackKeyClient) lastview).onBackKeyExecuted();
                 }
             }

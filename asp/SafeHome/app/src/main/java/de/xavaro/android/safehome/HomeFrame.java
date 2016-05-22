@@ -198,6 +198,7 @@ public abstract class HomeFrame extends FrameLayout
         {
             titleView.setBackgroundColor(Color.TRANSPARENT);
             titleView.setGravity(Gravity.START);
+            titleView.setTextColor(0xff888888);
             titleClose.setVisibility(GONE);
             titleBacka.setVisibility(GONE);
         }
@@ -232,6 +233,7 @@ public abstract class HomeFrame extends FrameLayout
         titleView.setBackgroundColor(0xffcccccc);
         titleView.setGravity(Gravity.CENTER);
         titleView.setVisibility(VISIBLE);
+        titleView.setTextColor(0xff444444);
         titleClose.setVisibility(VISIBLE);
         titleBacka.setVisibility(VISIBLE);
 
@@ -309,7 +311,6 @@ public abstract class HomeFrame extends FrameLayout
             {
                 setFullscreen();
             }
-
         }
     };
 }
