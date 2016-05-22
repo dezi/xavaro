@@ -22,7 +22,7 @@ public class SocialTwitter extends Social implements Social.SocialInterface
 
     public SocialTwitter()
     {
-        super("twitter");
+        super("twitter", "Twitter");
 
         appurl = "http://www.xavaro.de/twitter";
         appfix = "ECWy6Av3vqdx9yUzQE6euMuTJ";

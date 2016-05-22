@@ -119,17 +119,15 @@ public class HomeEvent extends FrameLayout
 
         if (intent == null)
         {
-            setTitleText(null);
-
             setFollowButtonText(null);
             setDeclineButtonText(null);
+            setTitleText(null);
         }
         else
         {
-            setTitleText(intent.title);
-
             setFollowButtonText(intent.followText);
             setDeclineButtonText(intent.declineText);
+            setTitleText(intent.title);
 
             //
             // Check for spoken text and repeat intervals.

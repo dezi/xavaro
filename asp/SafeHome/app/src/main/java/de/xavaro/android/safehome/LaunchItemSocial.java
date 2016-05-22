@@ -54,21 +54,25 @@ public class LaunchItemSocial extends LaunchItem
 
         if (type.equals("twitter"))
         {
+            platformName = SocialTwitter.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
         }
 
         if (type.equals("facebook"))
         {
+            platformName = SocialFacebook.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
         }
 
         if (type.equals("instagram"))
         {
+            platformName = SocialInstagram.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
         }
 
         if (type.equals("googleplus"))
         {
+            platformName = SocialGoogleplus.getInstance().getPlatformName();
             targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
         }
 
@@ -76,6 +80,7 @@ public class LaunchItemSocial extends LaunchItem
     }
 
     private JSONArray allFeeds;
+    private String platformName;
 
     private void setFeeds()
     {
@@ -184,17 +189,19 @@ public class LaunchItemSocial extends LaunchItem
             webappFrame.setWebAppName("instaface");
             webappFrame.setParent(this);
 
+            String name = Json.getString(config, "label");
+
             if (webappFrame.getWebAppView().social != null)
             {
                 String plat = Json.getString(config, "type");
                 String pfid = Json.getString(config, "pfid");
-                String name = Json.getString(config, "label");
                 String type = Json.getString(config, "subtype");
 
                 webappFrame.getWebAppView().social.setPlatform(plat, pfid, name, type);
             }
 
-            ((HomeActivity) context).addViewToBackStack(webappFrame);
+            String label = name + " – " + platformName;
+            ((HomeActivity) context).addWorkerToBackStack(label, webappFrame);
 
             return;
         }

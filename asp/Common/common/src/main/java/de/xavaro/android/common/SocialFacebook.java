@@ -23,7 +23,7 @@ public class SocialFacebook extends Social implements Social.SocialInterface
 
     public SocialFacebook()
     {
-        super("facebook");
+        super("facebook", "Facebook");
 
         appurl = "http://www.xavaro.de/facebook";
         appfix = "610331582448824";

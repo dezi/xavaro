@@ -22,7 +22,7 @@ public class SocialInstagram extends Social implements Social.SocialInterface
 
     public SocialInstagram()
     {
-        super("instagram");
+        super("instagram", "Instagram");
 
         appurl = "http://www.xavaro.de/instagram";
         appfix = "63afb3307ec24f4886230f44d2fda884";

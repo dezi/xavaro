@@ -38,6 +38,7 @@ public abstract class Social
 {
     private static final String LOGTAG = Social.class.getSimpleName();
 
+    protected final String platformname;
     protected final String platform;
     protected final String locale;
 
@@ -66,9 +67,10 @@ public abstract class Social
     protected File cachedir;
     protected long cacheInterval = 3600;
 
-    public Social(String platform)
+    public Social(String platform, String platformname)
     {
         this.platform = platform;
+        this.platformname = platformname;
 
         expirationpref = "social." + platform + ".expiration";
         accesstokenpref = "social." + platform + ".accesstoken";
@@ -83,6 +85,11 @@ public abstract class Social
         {
             Log.d(LOGTAG, "Constructor: created cache:" + cachedir);
         }
+    }
+
+    public String getPlatformName()
+    {
+        return this.platformname;
     }
 
     /*
@@ -1372,6 +1379,7 @@ public abstract class Social
         String getAccessExpiration();
 
         String getPlatform();
+        String getPlatformName();
         String getUserId();
         String getUserDisplayName();
 

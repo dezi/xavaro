@@ -133,7 +133,7 @@ instaface.adjustMode = function()
             ic.updaterTimeout = null;
         }
 
-        if ((ic.contentdiv.offsetTop == 0) && ! ic.animateTimeout)
+        if ((ic.contentdiv.offsetTop == 0) && ! ic.animateTimeout && (ic.iconsorter.length > 0))
         {
             ic.animateTimeout = setTimeout(instaface.animateTitle, 1500);
         }
@@ -331,8 +331,19 @@ instaface.createFeeds = function()
             // Append the platform entry as an single feed.
             //
 
+            var feedname = platform.name.toLowerCase();
+
+            if (! ic.usertype[ feedname ])
+            {
+                ic.usertype[ feedname ] = platform.type;
+                ic.usernews[ feedname ] = 0;
+            }
+
             var newstag = platform.plat + ".count." + platform.id;
             var newscount = ic.feednews[ newstag ] ? ic.feednews[ newstag ] : 0;
+
+            ic.usernews[ ownername ] += newscount;
+            ic.platnews[ platform.plat ] += newscount;
 
             ic.feeds.push(platform);
             ic.feedsdata.push(JSON.parse(WebAppSocial.getFeed(platform.plat, platform.id)));
@@ -346,66 +357,74 @@ instaface.createFeeds = function()
     // Build title list user icons.
     //
 
-    ic.iconsorter.sort();
-
-    var titlewid = 0;
-
-    for (var inx = 0; inx < ic.iconsorter.length; inx++)
+    if (ic.iconsorter.length == 0)
     {
-        var stag = ic.iconsorter[ inx ];
-        var styp = stag.substring(0, 1);
-        var skey = stag.substring(2);
-        var picn = ic.icontitles[ skey ];
-
-        var pdiv = WebLibSimple.createDivWidHei(
-                            (titlewid + 4), 4,
-                            ic.config.iconsize + 8, ic.config.iconsize + 8,
-                            null, ic.titlescroll);
-
-        pdiv.onTouchClick = ic.onTitleImageClick;
-        pdiv.appendChild(picn);
-
-        picn.style.position = "absolute";
-        picn.style.top = "4px";
-        picn.style.left = "4px";
-        picn.style.width = ic.config.iconsize + "px";
-        picn.style.height = ic.config.iconsize + "px";
-
-        var pcnt = WebLibSimple.createAnyAppend("div", pdiv);
-        WebLibSimple.setFontSpecs(pcnt, 20, "bold");
-        WebLibSimple.setBGColor(pcnt, "#44cc44");
-        pcnt.style.display = "none";
-        pcnt.style.position = "absolute";
-        pcnt.style.textAlign = "center";
-        pcnt.style.bottom = "12px";
-        pcnt.style.right = "12px";
-        pcnt.style.height = "24px";
-        pcnt.style.minWidth = "24px";
-        pcnt.style.padding = "6px";
-        pcnt.style.borderRadius = "20px";
-
-        var selector = {};
-
-        selector.styp = styp;
-        selector.stag = stag;
-        selector.skey = skey;
-        selector.pdiv = pdiv;
-        selector.picn = picn;
-        selector.pcnt = pcnt;
-        selector.activated = false;
-
-        ic.contentselectors.push(selector);
-
-        titlewid += ic.config.iconsize + 4 + 4;
+        ic.titlediv.style.top = -ic.theight + "px";
+        ic.contentdiv.style.top = 0 + "px";
     }
+    else
+    {
+        ic.iconsorter.sort();
 
-    titlewid += 8;
+        var titlewid = 0;
 
-    ic.titlescroll.style.width = titlewid + "px";
+        for (var inx = 0; inx < ic.iconsorter.length; inx++)
+        {
+            var stag = ic.iconsorter[ inx ];
+            var styp = stag.substring(0, 1);
+            var skey = stag.substring(2);
+            var picn = ic.icontitles[ skey ];
 
-    ic.updateNewsCounts();
+            var pdiv = WebLibSimple.createDivWidHei(
+                                (titlewid + 4), 4,
+                                ic.config.iconsize + 8, ic.config.iconsize + 8,
+                                null, ic.titlescroll);
 
-    ic.createFeedsTimeout = setTimeout(ic.createFeeds, 600 * 1000);
+            pdiv.onTouchClick = ic.onTitleImageClick;
+            pdiv.appendChild(picn);
+
+            picn.style.position = "absolute";
+            picn.style.top = "4px";
+            picn.style.left = "4px";
+            picn.style.width = ic.config.iconsize + "px";
+            picn.style.height = ic.config.iconsize + "px";
+
+            var pcnt = WebLibSimple.createAnyAppend("div", pdiv);
+            WebLibSimple.setFontSpecs(pcnt, 20, "bold");
+            WebLibSimple.setBGColor(pcnt, "#44cc44");
+            pcnt.style.display = "none";
+            pcnt.style.position = "absolute";
+            pcnt.style.textAlign = "center";
+            pcnt.style.bottom = "12px";
+            pcnt.style.right = "12px";
+            pcnt.style.height = "24px";
+            pcnt.style.minWidth = "24px";
+            pcnt.style.padding = "6px";
+            pcnt.style.borderRadius = "20px";
+
+            var selector = {};
+
+            selector.styp = styp;
+            selector.stag = stag;
+            selector.skey = skey;
+            selector.pdiv = pdiv;
+            selector.picn = picn;
+            selector.pcnt = pcnt;
+            selector.activated = false;
+
+            ic.contentselectors.push(selector);
+
+            titlewid += ic.config.iconsize + 4 + 4;
+        }
+
+        titlewid += 8;
+
+        ic.titlescroll.style.width = titlewid + "px";
+
+        ic.updateNewsCounts();
+
+        ic.createFeedsTimeout = setTimeout(ic.createFeeds, 600 * 1000);
+    }
 }
 
 instaface.adjustPostDivs = function(startinx)
