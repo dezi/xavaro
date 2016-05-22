@@ -27,7 +27,7 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.VoiceIntent;
 
-public class LaunchItemCommXavaro extends LaunchItem implements
+public class LaunchItemCommXavaro extends LaunchItemComm implements
         CommService.CommServiceCallback,
         PrepaidManager.PrepaidManagerCashcodeCallback
 {
@@ -86,6 +86,7 @@ public class LaunchItemCommXavaro extends LaunchItem implements
                 if (Json.equals(config, "chattype", "user"))
                 {
                     targetIcon.setImageResource(GlobalConfigs.IconResCommChatUser);
+                    if (isNoProfile()) labelText = "Xavaro – Chat";
                 }
 
                 if (Json.equals(config, "chattype", "group"))
@@ -95,17 +96,19 @@ public class LaunchItemCommXavaro extends LaunchItem implements
                         String owner = Json.getString(config, "groupowner");
                         profile = ProfileImages.getProfileFile(owner);
 
-                        if (profile != null)
+                        if ((profile != null) && ! isNoProfile())
                         {
                             icon.setImageResource(profile.toString(), true);
                             targetIcon = overicon;
                         }
 
                         targetIcon.setImageResource(GlobalConfigs.IconResCommChatAlert);
+                        if (isNoProfile()) labelText = "Assistenz – Gruppe";
                     }
                     else
                     {
                         targetIcon.setImageResource(GlobalConfigs.IconResCommChatGroup);
+                        if (isNoProfile()) labelText = "Xavaro – Gruppe";
                     }
                 }
             }
@@ -173,6 +176,7 @@ public class LaunchItemCommXavaro extends LaunchItem implements
         }
     }
 
+    /*
     @Override
     protected boolean onMyLongClick()
     {
@@ -180,6 +184,7 @@ public class LaunchItemCommXavaro extends LaunchItem implements
 
         return true;
     }
+    */
 
     @Override
     protected void onMyClick()

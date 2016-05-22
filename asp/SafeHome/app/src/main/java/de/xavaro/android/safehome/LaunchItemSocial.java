@@ -164,12 +164,12 @@ public class LaunchItemSocial extends LaunchItem
 
     protected boolean onMyLongClick()
     {
+        Simple.makeClick();
+
         JSONArray launchItems = Json.getArray(config, "launchitems");
 
         if (launchItems != null)
         {
-            Simple.makeClick();
-
             LaunchGroup directory = new LaunchGroup(getContext());
             directory.setConfig(null, launchItems);
 
@@ -179,7 +179,9 @@ public class LaunchItemSocial extends LaunchItem
             return true;
         }
 
-        return false;
+        launchAny();
+
+        return true;
     }
 
     @Override

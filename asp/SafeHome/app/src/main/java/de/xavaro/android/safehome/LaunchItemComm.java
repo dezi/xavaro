@@ -153,7 +153,9 @@ public class LaunchItemComm extends LaunchItem
     protected boolean onMyLongClick()
     {
         Simple.makeClick();
-        launchContacts();
+
+        if (! launchContacts()) onMyClick();
+
         return true;
     }
 
@@ -299,7 +301,7 @@ public class LaunchItemComm extends LaunchItem
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
-    private void launchContacts()
+    private boolean launchContacts()
     {
         JSONArray launchItems = Json.getArray(config, "launchitems");
 
@@ -312,6 +314,10 @@ public class LaunchItemComm extends LaunchItem
             if (Simple.equals(type, "contacts")) label = "Weitere Kontakte";
 
             ((HomeActivity) getContext()).addWorkerToBackStack(label, directory);
+
+            return true;
         }
+
+        return false;
     }
 }

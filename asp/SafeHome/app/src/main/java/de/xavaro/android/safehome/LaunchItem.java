@@ -475,11 +475,9 @@ public class LaunchItem extends FrameLayout implements
 
     protected boolean onMyLongClick()
     {
-        //
-        // To be overridden...
-        //
+        onMyClick();
 
-        return false;
+        return true;
     }
 
     protected void onMyOverlayClick()
