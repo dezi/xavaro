@@ -210,7 +210,7 @@ WebLibTouch.onTouchEndSwing = function()
 {
     var touch = WebLibTouch.touch;
 
-    if ((Math.abs(touch.speedX) > 5) || (Math.abs(touch.speedY) > 5))
+    if ((Math.abs(touch.speedX) > 1.0) || (Math.abs(touch.speedY) > 1.0))
     {
         touch.newX = touch.starget.offsetLeft + (touch.speedX * 2);
         touch.newY = touch.starget.offsetTop  + (touch.speedY * 2);
