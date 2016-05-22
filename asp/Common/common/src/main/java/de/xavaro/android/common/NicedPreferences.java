@@ -678,7 +678,10 @@ public class NicedPreferences
         {
             Log.d(LOGTAG, "onPreferenceChange: " + obj);
 
-            if (current != null) current.setText(getDisplayValue((Set<String>) obj));
+            if ((current != null) && (obj instanceof Set))
+            {
+                current.setText(getDisplayValue((Set<String>) obj));
+            }
 
             return true;
         }
@@ -721,8 +724,9 @@ public class NicedPreferences
         }
     }
 
-    public static class NiceListPreference extends ListPreference
-            implements Preference.OnPreferenceChangeListener
+    public static class NiceListPreference extends ListPreference implements
+            Preference.OnPreferenceChangeListener,
+            View.OnLongClickListener
     {
         private TextView current;
         private boolean disabled;
@@ -731,11 +735,18 @@ public class NicedPreferences
         private Runnable onClickRunner;
         private JSONObject jsonSlug;
 
+        private Runnable onLongClickRunner;
+
         public NiceListPreference(Context context)
         {
             super(context);
 
             setOnPreferenceChangeListener(this);
+        }
+
+        public void setOnLongClick(Runnable onclick)
+        {
+            onLongClickRunner = onclick;
         }
 
         public void setSlug(JSONObject slug)
@@ -943,6 +954,8 @@ public class NicedPreferences
                 LinearLayout icon_frame = (LinearLayout) icon.getParent();
                 icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
                 icon_frame.setPadding(0, 0, 0, 0);
+
+                icon_frame.setOnLongClickListener(this);
             }
 
             //
@@ -994,6 +1007,19 @@ public class NicedPreferences
                     Gravity.END);
 
             newlayout.addView(current, lp);
+        }
+
+        @Override
+        public boolean onLongClick(View view)
+        {
+            if (onLongClickRunner != null)
+            {
+                onLongClickRunner.run();
+
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -1186,8 +1212,8 @@ public class NicedPreferences
             super(context);
         }
 
-        private int score = -1;
         private String apkname;
+        private int score = -1;
 
         private final ImageView stars[] = new ImageView[ 5 ];
 
@@ -1199,16 +1225,6 @@ public class NicedPreferences
                 "befriedigend", "befriedigend", "befriedigend",
                 "gut", "gut", "gut",
                 "sehr gut", "sehr gut", "sehr gut"
-        };
-
-        private String[] degreeNote = {
-
-                "6",
-                "5", "5", "5",
-                "4", "4", "4",
-                "3", "3", "3",
-                "2", "2", "2",
-                "1", "1", "1"
         };
 
         public void setScore(int score)
@@ -1443,6 +1459,7 @@ public class NicedPreferences
         protected Runnable onClickRunner;
         protected Runnable onLongClickRunner;
         protected ImageView actionIcon;
+
         public void setOnClick(Runnable onclick)
         {
             onClickRunner = onclick;

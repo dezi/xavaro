@@ -128,21 +128,6 @@ public class LaunchGroupSocial extends LaunchGroup
             Json.put(home, entry);
         }
 
-        if (haveownerfeed)
-        {
-            JSONObject entry = new JSONObject();
-
-            Json.put(entry, "type", "social");
-            Json.put(entry, "subtype", "instaface");
-            Json.put(entry, "label", "Soziales Netzwerk");
-            Json.put(entry, "order", 200);
-
-            JSONArray intents = WebApp.getVoiceIntents("instaface");
-            if (intents != null) Json.put(entry, "intents", intents);
-
-            Json.put(home, entry);
-        }
-
         return home;
     }
 

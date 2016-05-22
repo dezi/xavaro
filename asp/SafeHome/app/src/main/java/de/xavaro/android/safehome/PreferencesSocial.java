@@ -298,6 +298,37 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
         }
     };
 
+    private void onLongClick(Preference pref)
+    {
+        //
+        // Dirty remove friend or like function.
+        // If the entry has an icon pref, this
+        // friend or like ist not linked to the
+        // user but resulst from a search. In
+        // this case it can be deleted.
+        //
+
+        String prefmode = pref.getKey();
+        String prefname = prefmode.replace(".mode.", ".name.");
+        String preficon = prefmode.replace(".mode.", ".icon.");
+
+        Log.d(LOGTAG, "onLongClick:" + prefmode + "=" + Simple.getSharedPrefString(prefmode));
+        Log.d(LOGTAG, "onLongClick:" + prefname + "=" + Simple.getSharedPrefString(prefname));
+        Log.d(LOGTAG, "onLongClick:" + preficon + "=" + Simple.getSharedPrefString(preficon));
+
+        if (Simple.getSharedPrefString(preficon) != null)
+        {
+            Simple.makeClick();
+
+            Simple.removeSharedPref(prefmode);
+            Simple.removeSharedPref(prefname);
+            Simple.removeSharedPref(preficon);
+
+            preferences.remove(pref);
+            getPreferenceScreen().removePreference(pref);
+        }
+    }
+
     private void registerFriends(Context context, boolean initial)
     {
         if (! social.hasFriends()) return;
@@ -352,6 +383,17 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             lp.setEntryValues(R.array.pref_social_newfriends_keys);
             lp.setEntries(R.array.pref_social_newfriends_vals);
             lp.setEnabled(enabled);
+
+            final NicedPreferences.NiceListPreference lpfinal = lp;
+
+            lp.setOnLongClick(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    onLongClick(lpfinal);
+                }
+            });
 
             //
             // Updated items get first.
@@ -419,6 +461,17 @@ public class PreferencesSocial extends PreferenceFragments.EnableFragmentStub
             lp.setEntryValues(R.array.pref_social_newlikes_keys);
             lp.setEntries(R.array.pref_social_newlikes_vals);
             lp.setEnabled(enabled);
+
+            final NicedPreferences.NiceListPreference lpfinal = lp;
+
+            lp.setOnLongClick(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    onLongClick(lpfinal);
+                }
+            });
 
             //
             // Updated items get first.
