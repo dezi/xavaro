@@ -23,6 +23,7 @@ public class HomeEvent extends FrameLayout
 
     private FrameLayout.LayoutParams titleParams;
     private TextView titleView;
+    private boolean titleViewTextAdjust;
     private HomeButton declineButton;
     private HomeButton followButton;
     private boolean istopevent;
@@ -38,10 +39,24 @@ public class HomeEvent extends FrameLayout
         layoutParams.leftMargin = this.istopevent ? 0 : Simple.getDevicePixels(12);
         setLayoutParams(layoutParams);
 
-        titleView = new TextView(context);
+        titleView = new TextView(context)
+        {
+            @Override
+            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+            {
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+                if (titleViewTextAdjust)
+                {
+                    titleViewTextAdjust = false;
+                    Simple.makePost(setTitleTextSize);
+                }
+            }
+        };
+
         titleParams = new FrameLayout.LayoutParams(Simple.MP, 0);
 
-        titleView.setLayoutParams(layoutParams);
+        titleView.setLayoutParams(titleParams);
         titleView.setGravity(Gravity.CENTER_VERTICAL);
         titleView.setTypeface(null, istopevent ? Typeface.BOLD : Typeface.NORMAL);
         titleView.setTextColor(istopevent ? 0xff444444 : 0xff888888);
@@ -104,15 +119,17 @@ public class HomeEvent extends FrameLayout
 
         if (intent == null)
         {
-            setTitleText(null);
             setFollowButtonText(null);
             setDeclineButtonText(null);
+
+            setTitleText(null);
         }
         else
         {
-            setTitleText(intent.title);
             setFollowButtonText(intent.followText);
             setDeclineButtonText(intent.declineText);
+
+            setTitleText(intent.title);
 
             //
             // Check for spoken text and repeat intervals.
@@ -176,29 +193,41 @@ public class HomeEvent extends FrameLayout
         return layoutParams.height;
     }
 
+    private final Runnable setTitleTextSize = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            titleView.setMaxWidth(titleView.getWidth());
+            titleView.measure(0, 0);
+
+            float textsize = titleView.getTextSize();
+
+            while (textsize > 0)
+            {
+                if (titleView.getMeasuredHeight() <= titleView.getHeight())
+                {
+                    //
+                    // Text fits view.
+                    //
+
+                    break;
+                }
+
+                textsize -= 1.0f;
+
+                titleView.setTextSize(textsize);
+                titleView.measure(0, 0);
+            }
+        }
+    };
+
     public void setTitleText(String text)
     {
         titleView.setText(text);
-        titleView.setMaxWidth(titleView.getWidth());
+        titleView.setTextSize(Simple.getDeviceTextSize(istopevent ? 30f : 24f));
 
-        float textsize = Simple.getDeviceTextSize(istopevent ? 30f : 24f);
-
-        while (true)
-        {
-            titleView.setTextSize(textsize);
-            titleView.measure(0, 0);
-
-            if (titleView.getMeasuredHeight() <= titleView.getHeight())
-            {
-                //
-                // Text fits view.
-                //
-
-                break;
-            }
-
-            textsize -= 1.0f;
-        }
+        titleViewTextAdjust = true;
     }
 
     public void setFollowButtonText(String text)

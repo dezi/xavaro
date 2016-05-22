@@ -69,23 +69,26 @@ public class HomeSocial extends HomeFrame
         {
             int newsTotalCount = webView.social.getNewsTotalCount();
 
-            String message = "" + newsTotalCount;
+            String message = newsTotalCount + " " + "Neuigkeiten";
 
             if (newsTotalCount == 0)
             {
                 message = Simple.getFirstCap(Simple.getTrans(R.string.simple_none));
+                message += " " + "Neuigkeiten";
 
                 titleView.setTextColor(titleColor);
             }
             else
             {
+                if (newsTotalCount == 1)
+                {
+                    message = newsTotalCount + " " + "Neuigkeit";
+                }
+
                 titleView.setTextColor(Color.RED);
             }
 
-            message += " " + titleText;
             titleView.setText(message);
-
-            Log.d(LOGTAG, "===================================>>>>>>>>>> fucka " + message);
         }
     }
 
