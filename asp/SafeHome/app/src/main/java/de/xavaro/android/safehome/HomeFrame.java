@@ -50,7 +50,6 @@ public abstract class HomeFrame extends FrameLayout
 
         titleFullSize = HomeActivity.titleSpace * (Simple.isTablet() ? 2 : 1);
 
-        int dp16 = Simple.getDevicePixels(16);
         int ipad = Simple.getDevicePixels(Simple.isTablet() ? 16 : 4);
 
         layoutParams = new LayoutParams(0, 0);
@@ -67,7 +66,7 @@ public abstract class HomeFrame extends FrameLayout
         titleText.setTextSize(Simple.getDeviceTextSize(HomeActivity.titleSpace * 2 / 3));
         titleText.setGravity(Gravity.START);
         titleText.setTextColor(0xff888888);
-        titleText.setPadding(dp16, 0, 0, 0);
+        titleText.setPadding(ipad, 0, 0, 0);
         titleText.setOnClickListener(onClickListener);
         titleText.setVisibility(GONE);
         titleFrame.addView(titleText);

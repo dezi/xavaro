@@ -34,7 +34,7 @@ public class HomeNotify extends HomeFrame
     protected LaunchItem event2Launch;
 
     protected int padh = Simple.getDevicePixels(Simple.isTablet() ? 16 : 8);
-    protected int padv = Simple.getDevicePixels(4);
+    protected int padv = Simple.getDevicePixels(Simple.isTablet() ?  4 : 2);
     protected int size;
     protected int tops;
 
