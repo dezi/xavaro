@@ -16,14 +16,14 @@ public class HomeLaunch extends HomeFrame
     {
         super(context);
 
-        layoutParams.width = launchWid;
-        layoutParams.height = launchHei;
+        layoutParams.width = HomeActivity.launchWid;
+        layoutParams.height = HomeActivity.launchHei;
         layoutParams.gravity = Gravity.RIGHT;
 
         layoutParams.leftMargin = 8;
-        layoutParams.topMargin = notifySize;
-        layoutParams.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
-        layoutParams.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
+        layoutParams.topMargin = HomeActivity.notifySize;
+        layoutParams.rightMargin = Simple.isPortrait() ? 8 : HomeActivity.peopleSize;
+        layoutParams.bottomMargin = Simple.isPortrait() ? HomeActivity.peopleSize : 8;
 
         layoutNormal = new LayoutParams(layoutParams);
     }
@@ -35,9 +35,9 @@ public class HomeLaunch extends HomeFrame
     @Override
     protected void onChangeOrientation()
     {
-        layoutNormal.topMargin = notifySize;
-        layoutNormal.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
-        layoutNormal.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
+        layoutNormal.topMargin = HomeActivity.notifySize;
+        layoutNormal.rightMargin = Simple.isPortrait() ? 8 : HomeActivity.peopleSize;
+        layoutNormal.bottomMargin = Simple.isPortrait() ? HomeActivity.peopleSize : 8;
 
         if (! fullscreen)
         {

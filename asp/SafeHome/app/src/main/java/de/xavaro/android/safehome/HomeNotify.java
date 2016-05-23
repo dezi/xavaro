@@ -1,9 +1,9 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -47,12 +47,12 @@ public class HomeNotify extends HomeFrame
         Log.d(LOGTAG,"HomeNotify: creating.");
 
         layoutParams.width = Simple.MP;
-        layoutParams.height = notifySize - 16;
+        layoutParams.height = HomeActivity.notifySize - 16;
         layoutParams.gravity = Gravity.TOP;
 
         layoutParams.leftMargin = 8;
         layoutParams.topMargin = 8;
-        layoutParams.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
+        layoutParams.rightMargin = Simple.isPortrait() ? 8 : HomeActivity.peopleSize;
         layoutParams.bottomMargin = 8;
 
         layoutNormal = new LayoutParams(layoutParams);
@@ -157,8 +157,8 @@ public class HomeNotify extends HomeFrame
     @Override
     protected void onChangeOrientation()
     {
-        layoutNormal.height = notifySize - 16;
-        layoutNormal.rightMargin = Simple.isPortrait() ? 8 : peopleSize;
+        layoutNormal.height = HomeActivity.notifySize - 16;
+        layoutNormal.rightMargin = Simple.isPortrait() ? 8 : HomeActivity.peopleSize;
 
         if (! fullscreen)
         {

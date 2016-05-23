@@ -18,13 +18,6 @@ public abstract class HomeFrame extends FrameLayout
 {
     private static final String LOGTAG = HomeFrame.class.getSimpleName();
 
-    protected int titleSpace = Simple.getDevicePixels(40);
-    protected int peopleSize = Simple.getDevicePixels(200);
-    protected int notifySize = 0;
-
-    protected int launchWid = CommonConfigs.LaunchItemSize * 2 + 32;
-    protected int launchHei = CommonConfigs.LaunchItemSize * 2 + 32 + titleSpace;
-
     protected LayoutParams layoutParams;
     protected LayoutParams layoutNormal;
 
@@ -57,11 +50,11 @@ public abstract class HomeFrame extends FrameLayout
         setLayoutParams(layoutParams);
         setVisibility(INVISIBLE);
 
-        titleLayout = new LayoutParams(Simple.MP, titleSpace);
+        titleLayout = new LayoutParams(Simple.MP, HomeActivity.titleSpace);
 
         titleView = new TextView(context);
         titleView.setLayoutParams(titleLayout);
-        titleView.setTextSize(titleSpace * 2 / 3);
+        titleView.setTextSize(HomeActivity.titleSpace * 2 / 3);
         titleView.setTextColor(0xff888888);
         titleView.setPadding(16, 0, 0, 0);
         titleView.setOnClickListener(onClickListener);
@@ -69,14 +62,14 @@ public abstract class HomeFrame extends FrameLayout
         addView(titleView);
 
         titleClose = new ImageSmartView(context);
-        titleClose.setLayoutParams(new LayoutParams(titleSpace * 2, titleSpace * 2, Gravity.END));
+        titleClose.setLayoutParams(new LayoutParams(HomeActivity.titleSpace * 2, HomeActivity.titleSpace * 2, Gravity.END));
         titleClose.setImageResource(R.drawable.close_button_313x313);
         titleClose.setPadding(15, 15, 15, 15);
         titleClose.setVisibility(GONE);
         addView(titleClose);
 
         titleBacka = new ImageSmartView(context);
-        titleBacka.setLayoutParams(new LayoutParams(titleSpace * 2, titleSpace * 2, Gravity.START));
+        titleBacka.setLayoutParams(new LayoutParams(HomeActivity.titleSpace * 2, HomeActivity.titleSpace * 2, Gravity.START));
         titleBacka.setImageResource(R.drawable.back_button_256x256);
         titleBacka.setPadding(15, 15, 15, 15);
         titleBacka.setVisibility(GONE);
@@ -119,7 +112,7 @@ public abstract class HomeFrame extends FrameLayout
         {
             titleView.setText(title);
             titleView.setVisibility(VISIBLE);
-            innerLayout.topMargin = titleSpace * (fullscreen ? 2 : 1);
+            innerLayout.topMargin = HomeActivity.titleSpace * (fullscreen ? 2 : 1);
         }
     }
 
@@ -142,7 +135,7 @@ public abstract class HomeFrame extends FrameLayout
 
             if ((wid != 0) && (hei != 0))
             {
-                notifySize = hei - launchHei - (Simple.isPortrait() ? peopleSize : 8);
+                HomeActivity.notifySize = hei - HomeActivity.launchHei - (Simple.isPortrait() ? HomeActivity.peopleSize : 8);
 
                 onChangeOrientation();
                 setVisibility(VISIBLE);
@@ -222,8 +215,8 @@ public abstract class HomeFrame extends FrameLayout
         layoutParams.rightMargin = 0;
         layoutParams.bottomMargin = 0;
 
-        innerLayout.topMargin = titleSpace * 2;
-        titleLayout.height = titleSpace * 2;
+        innerLayout.topMargin = HomeActivity.titleSpace * 2;
+        titleLayout.height = HomeActivity.titleSpace * 2;
 
         innerClick.setVisibility(GONE);
         innerFrame.setBackground(null);
@@ -295,8 +288,8 @@ public abstract class HomeFrame extends FrameLayout
                 layoutParams.rightMargin = layoutNormal.rightMargin;
                 layoutParams.bottomMargin = layoutNormal.bottomMargin;
 
-                innerLayout.topMargin = titleSpace;
-                titleLayout.height = titleSpace;
+                innerLayout.topMargin = HomeActivity.titleSpace;
+                titleLayout.height = HomeActivity.titleSpace;
 
                 innerClick.setVisibility(VISIBLE);
                 innerFrame.setBackgroundColor(Color.TRANSPARENT);

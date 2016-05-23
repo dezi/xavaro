@@ -28,9 +28,9 @@ public class HomeSocial extends HomeFrame
         layoutParams.gravity = Gravity.LEFT;
 
         layoutParams.leftMargin = 8;
-        layoutParams.topMargin = notifySize;
-        layoutParams.rightMargin = launchWid + 8 + (Simple.isPortrait() ? 8 : peopleSize);
-        layoutParams.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
+        layoutParams.topMargin = HomeActivity.notifySize;
+        layoutParams.rightMargin = HomeActivity.launchWid + 8 + (Simple.isPortrait() ? 8 : HomeActivity.peopleSize);
+        layoutParams.bottomMargin = Simple.isPortrait() ? HomeActivity.peopleSize : 8;
 
         layoutNormal = new LayoutParams(layoutParams);
     }
@@ -92,9 +92,9 @@ public class HomeSocial extends HomeFrame
     @Override
     protected void onChangeOrientation()
     {
-        layoutNormal.topMargin = notifySize;
-        layoutNormal.rightMargin = launchWid + 8 + (Simple.isPortrait() ? 8 : peopleSize);
-        layoutNormal.bottomMargin = Simple.isPortrait() ? peopleSize : 8;
+        layoutNormal.topMargin = HomeActivity.notifySize;
+        layoutNormal.rightMargin = HomeActivity.launchWid + 8 + (Simple.isPortrait() ? 8 : HomeActivity.peopleSize);
+        layoutNormal.bottomMargin = Simple.isPortrait() ? HomeActivity.peopleSize : 8;
 
         if (! fullscreen)
         {

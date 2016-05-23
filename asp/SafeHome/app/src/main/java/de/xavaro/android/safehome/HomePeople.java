@@ -22,9 +22,6 @@ public class HomePeople extends FrameLayout
 {
     private static final String LOGTAG = HomePeople.class.getSimpleName();
 
-    private int layoutSize;
-    private int peopleSize;
-
     private JSONArray baseContacts;
     private JSONArray moreContacts;
     private JSONArray socialLikes;
@@ -54,6 +51,7 @@ public class HomePeople extends FrameLayout
         if (alertConfig != null)
         {
             alertLaunchItem = LaunchItem.createLaunchItem(context, null, alertConfig);
+            alertLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
             alertLaunchItem.setFrameLess(true);
             this.addView(alertLaunchItem);
         }
@@ -63,6 +61,7 @@ public class HomePeople extends FrameLayout
         if (voiceConfig != null)
         {
             voiceLaunchItem = LaunchItem.createLaunchItem(context, null, voiceConfig);
+            voiceLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
             voiceLaunchItem.setFrameLess(true);
             this.addView(voiceLaunchItem);
         }
@@ -81,16 +80,8 @@ public class HomePeople extends FrameLayout
         peopleView = new LinearLayout(context);
         peopleView.setLayoutParams(peopleLayout);
 
+
         orientation = Configuration.ORIENTATION_UNDEFINED;
-    }
-
-    public void setSize(int layoutSize, int peopleSize)
-    {
-        this.layoutSize = layoutSize;
-        this.peopleSize = peopleSize;
-
-        if (alertLaunchItem != null) alertLaunchItem.setSize(peopleSize, peopleSize);
-        if (voiceLaunchItem != null) voiceLaunchItem.setSize(peopleSize, peopleSize);
     }
 
     public void setConfig(JSONObject config)
@@ -111,7 +102,7 @@ public class HomePeople extends FrameLayout
             final LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, contact);
 
             launchItem.setFrameLess(true);
-            launchItem.setSize(peopleSize, peopleSize);
+            launchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
 
             peopleView.addView(launchItem);
         }
@@ -370,12 +361,12 @@ public class HomePeople extends FrameLayout
                     (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT))
             {
                 int width = ((View) getParent()).getWidth();
-                int items = ((int) Math.floor(width / peopleSize)) - 1;
-                int margin = (width - (items * peopleSize)) / 2;
+                int items = ((int) Math.floor(width / HomeActivity.personSize)) - 1;
+                int margin = (width - (items * HomeActivity.personSize)) / 2;
 
-                setPadding(0, (layoutSize - peopleSize) / 2, 0, 0);
+                setPadding(0, (HomeActivity.peopleSize - HomeActivity.personSize) / 2, 0, 0);
                 layoutParams.width = Simple.MP;
-                layoutParams.height = layoutSize;
+                layoutParams.height = HomeActivity.peopleSize;
                 layoutParams.gravity = Gravity.BOTTOM;
 
                 if (alertLaunchItem != null)
@@ -404,12 +395,12 @@ public class HomePeople extends FrameLayout
                     (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE))
             {
                 int height = ((View) getParent()).getHeight();
-                int items = ((int) Math.floor(height / peopleSize)) - 1;
-                int margin = (height - (items * peopleSize)) / 2;
+                int items = ((int) Math.floor(height / HomeActivity.personSize)) - 1;
+                int margin = (height - (items * HomeActivity.personSize)) / 2;
 
-                setPadding((layoutSize - peopleSize) / 2, 0, 0, 0);
+                setPadding((HomeActivity.peopleSize - HomeActivity.personSize) / 2, 0, 0, 0);
 
-                layoutParams.width = layoutSize;
+                layoutParams.width = HomeActivity.peopleSize;
                 layoutParams.height = Simple.MP;
                 layoutParams.gravity = Gravity.RIGHT;
 

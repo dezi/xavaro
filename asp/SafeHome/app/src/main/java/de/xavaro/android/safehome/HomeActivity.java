@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.Simple;
@@ -44,11 +45,17 @@ public class HomeActivity extends AppCompatActivity implements
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
     public static HomeActivity instance;
-
     public static HomeActivity getInstance()
     {
         return instance;
     }
+
+    public static int titleSpace;
+    public static int notifySize;
+    public static int personSize;
+    public static int peopleSize;
+    public static int launchWid;
+    public static int launchHei;
 
     private FrameLayout topScreen;
     private FrameLayout videoSurface;
@@ -103,6 +110,18 @@ public class HomeActivity extends AppCompatActivity implements
         WebAppCache.checkWebAppCache();
 
         //
+        // Layout basic sizes.
+        //
+
+        titleSpace = Simple.getDevicePixels(40);
+        personSize = Simple.getDevicePixels(160);
+        peopleSize = Simple.getDevicePixels(200);
+        notifySize = 0;
+
+        launchWid = CommonConfigs.LaunchItemSize * 2 + 32;
+        launchHei = CommonConfigs.LaunchItemSize * 2 + 32 + HomeActivity.titleSpace;
+
+        //
         // Build views.
         //
 
@@ -110,9 +129,6 @@ public class HomeActivity extends AppCompatActivity implements
         topScreen.setSystemUiVisibility(topScreen.getSystemUiVisibility() + UI_HIDE);
         topScreen.setBackgroundColor(0xfffbfbfb);
         setContentView(topScreen);
-
-        int personsize = Simple.getDevicePixels(160);
-        int peoplesize = Simple.getDevicePixels(200);
 
         notifyScreen = new HomeNotify(this);
         topScreen.addView(notifyScreen);
@@ -124,7 +140,6 @@ public class HomeActivity extends AppCompatActivity implements
         topScreen.addView(socialScreen);
 
         peopleScreen = new HomePeople(this);
-        peopleScreen.setSize(peoplesize, personsize);
         topScreen.addView(peopleScreen);
 
         workerScreen = new HomeWorker(this);
