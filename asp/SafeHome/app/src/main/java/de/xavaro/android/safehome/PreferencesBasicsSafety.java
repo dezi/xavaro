@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 
 import de.xavaro.android.common.AccessibilityService;
+import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.Simple;
@@ -34,6 +35,7 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         summaryres = R.string.pref_basic_safety_summary;
     }
 
+    private NicedPreferences.NiceListPreference notificationsPref;
     private NicedPreferences.NiceListPreference accessibilityPref;
     private NicedPreferences.NiceEditTextPreference homeButtonPref;
     private NicedPreferences.NiceEditTextPreference assistButtonPref;
@@ -81,7 +83,35 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         preferences.add(ep);
 
         //
-        // System services.
+        // Notification services.
+        //
+
+        cp = new NicedPreferences.NiceInfoPreference(context);
+        cp.setTitle(R.string.pref_basic_safety_notifications_service);
+        cp.setSummary(R.string.pref_basic_safety_notifications_summary);
+        preferences.add(cp);
+
+        sp = new NicedPreferences.NiceSwitchPreference(context);
+
+        sp.setKey("admin.notifications.enabled");
+        sp.setTitle(R.string.pref_basic_safety_notifications_enable);
+
+        preferences.add(sp);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey("admin.notifications.service");
+        lp.setTitle(R.string.pref_basic_safety_notifications_activate);
+        lp.setEntries(Simple.getTransArray(R.array.pref_basic_safety_notifications_vals));
+        lp.setEntryValues(Simple.getTransArray(R.array.pref_basic_safety_notifications_keys));
+        lp.setDefaultValue("inactive");
+        lp.setOnclick(selectNotifications);
+
+        preferences.add(lp);
+        notificationsPref = lp;
+
+        //
+        // Accessibility services.
         //
 
         cp = new NicedPreferences.NiceInfoPreference(context);
@@ -99,7 +129,7 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         lp = new NicedPreferences.NiceListPreference(context);
 
         lp.setKey("admin.accessibility.service");
-        lp.setTitle(R.string.pref_basic_safety_accessibility_service);
+        lp.setTitle(R.string.pref_basic_safety_accessibility_activate);
         lp.setEntries(Simple.getTransArray(R.array.pref_basic_safety_accessibility_vals));
         lp.setEntryValues(Simple.getTransArray(R.array.pref_basic_safety_accessibility_keys));
         lp.setDefaultValue("inactive");
@@ -169,6 +199,29 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         Simple.makePost(monitorSettings);
     }
 
+    public final static Runnable selectNotifications = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (NotificationService.checkAvailable())
+            {
+                NotificationService.selectNotificationsSettings.run();
+
+                return;
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(Simple.getActContext());
+
+            builder.setTitle(R.string.pref_basic_safety_notifications_unavailable);
+            builder.setPositiveButton("Ok", null);
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            Simple.adjustAlertDialog(dialog);
+        }
+    };
+
     public final static Runnable selectAccessibility = new Runnable()
     {
         @Override
@@ -217,6 +270,28 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         @Override
         public void run()
         {
+            String notify = "unavailable";
+
+            if (NotificationService.checkAvailable())
+            {
+                notify = NotificationService.checkEnabled() ? "active" : "inactive";
+            }
+
+            if (! Simple.equals(notify, Simple.getSharedPrefString("admin.notifications.service")))
+            {
+                Simple.setSharedPrefString("admin.notifications.service", notify);
+                notificationsPref.setValue(notify);
+
+                if (Simple.equals(notify, "active") || Simple.equals(notify, "unavailable"))
+                {
+                    ArchievementManager.archieved("configure.settings.notifications");
+                }
+                else
+                {
+                    ArchievementManager.revoke("configure.settings.notifications");
+                }
+            }
+
             String access = "unavailable";
 
             if (AccessibilityService.checkAvailable())

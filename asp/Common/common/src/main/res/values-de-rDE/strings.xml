@@ -137,35 +137,37 @@
     </string>
     <string name="pref_basic_safety_password">Admin Passwort</string>
 
-    <string name="pref_basic_safety_notification_service">Benachrichtigungen</string>
-    <string name="pref_basic_safety_notification_enable">Funktion erwünscht</string>
-    <string name="pref_basic_safety_notification_summary">
+    <string name="pref_basic_safety_notifications_service">Benachrichtigungen</string>
+    <string name="pref_basic_safety_notifications_enable">Funktion erwünscht</string>
+    <string name="pref_basic_safety_notifications_activate">Funktion aktivieren</string>
+    <string name="pref_basic_safety_notifications_summary">
         Benachrichtigungen werden von vielen Apps benutzt, um den Anwender auf
-        irgendtetwas hinzuweisen oder ihn zu informieren.
-        \n\nUnsere Anwendung möchte Zugriff auf Benachrichtigungen haben, um
+        irgend etwas hinzuweisen oder ihn zu informieren.
+        \n\nUnsere Anwendung benötigt den Zugriff auf Benachrichtigungen, um
         für externe Anwendungen wie zum Beispiel WhatsApp und Skype Hinweise
         auf Neuigkeiten direkt im SafeHome anzeigen und bearbeiten zu können.
         \n\nWenn Sie eine dieser Funktionen benutzen wollen, sollten Sie der SafeHome
         Anwendung den Zugriff auf die Benachrichtigungen gestatten.
     </string>
-    <string name="pref_basic_safety_notification_unavailable">
+    <string name="pref_basic_safety_notifications_unavailable">
         Auf diesem Gerät ist das Auslesen von Benachrichtigungen zur Zeit nicht möglich.
     </string>
 
-    <string-array name="pref_basic_safety_notification_keys">
+    <string-array name="pref_basic_safety_notifications_keys">
         <item>unavailable</item>
         <item>inactive</item>
         <item>active</item>
     </string-array>
 
-    <string-array name="pref_basic_safety_notification_vals">
-        <item>Not available</item>
-        <item>Inactive</item>
-        <item>Active</item>
+    <string-array name="pref_basic_safety_notifications_vals">
+        <item>Nicht verfügbar</item>
+        <item>Inaktiv</item>
+        <item>Aktiviert</item>
     </string-array>
 
     <string name="pref_basic_safety_accessibility_service">Eingabehilfe</string>
     <string name="pref_basic_safety_accessibility_enable">Funktion erwünscht</string>
+    <string name="pref_basic_safety_accessibility_activate">Funktion aktivieren</string>
     <string name="pref_basic_safety_accessibility_summary">
         Die Eingabehilfe ist eigentlich dafür vorgesehen, behinderten Menschen den
         Inhalt von Popup-Fenstern vorzulesen. Sie ist nicht auf allen Android

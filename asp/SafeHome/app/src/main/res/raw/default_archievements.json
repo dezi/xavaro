@@ -27,7 +27,7 @@
     "configure.settings.notifications":
     {
       "title": "important",
-      "message": "Die Anwendung sollte noch die Benachritigungen lesen dürfen.",
+      "message": "Die Anwendung sollte noch die Benachrichtigungen lesen dürfen.",
       "buttons": "later|noshow|follow",
       "prio": 150
     },

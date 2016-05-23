@@ -178,20 +178,20 @@
     <string name="pref_basic_safety_access_summary">todo</string>
     <string name="pref_basic_safety_password">Admin Password</string>
 
-    <string name="pref_basic_safety_notification_service">Notifications</string>
-    <string name="pref_basic_safety_notification_enable">Functionalty requested</string>
-    <string name="pref_basic_safety_notification_summary">todo</string>
-    <string name="pref_basic_safety_notification_unavailable">
+    <string name="pref_basic_safety_notifications_service">Notifications</string>
+    <string name="pref_basic_safety_notifications_enable">Functionalty requested</string>
+    <string name="pref_basic_safety_notifications_summary">todo</string>
+    <string name="pref_basic_safety_notifications_unavailable">
         There are no Notification Services on this device.
     </string>
 
-    <string-array name="pref_basic_safety_notification_keys">
+    <string-array name="pref_basic_safety_notifications_keys">
         <item>unavailable</item>
         <item>inactive</item>
         <item>active</item>
     </string-array>
 
-    <string-array name="pref_basic_safety_notification_vals">
+    <string-array name="pref_basic_safety_notifications_vals">
         <item>Not available</item>
         <item>Inactive</item>
         <item>Active</item>
