@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 
 import org.json.JSONObject;
@@ -23,6 +22,8 @@ public class HomeSocial extends HomeFrame
     {
         super(context);
 
+        setVisibility(GONE);
+
         layoutParams.width = Simple.MP;
         layoutParams.height = Simple.MP;
         layoutParams.gravity = Gravity.LEFT;
@@ -37,7 +38,7 @@ public class HomeSocial extends HomeFrame
 
     public void setConfig(JSONObject config)
     {
-        if (webView == null)
+        if (Simple.isTablet() && (webView == null))
         {
             webView = new WebAppView(getContext());
             webView.loadWebView("instaface", "main");
@@ -48,6 +49,8 @@ public class HomeSocial extends HomeFrame
             }
 
             payloadFrame.addView(webView);
+
+            setVisibility(VISIBLE);
         }
     }
 
@@ -64,7 +67,7 @@ public class HomeSocial extends HomeFrame
                 message = Simple.getFirstCap(Simple.getTrans(R.string.simple_none));
                 message += " " + "Neuigkeiten";
 
-                titleView.setTextColor(fullscreen ? 0xff444444 : 0xff888888);
+                titleText.setTextColor(fullscreen ? 0xff444444 : 0xff888888);
             }
             else
             {
@@ -73,10 +76,10 @@ public class HomeSocial extends HomeFrame
                     message = newsTotalCount + " " + "Neuigkeit";
                 }
 
-                titleView.setTextColor(Color.RED);
+                titleText.setTextColor(Color.RED);
             }
 
-            titleView.setText(message);
+            titleText.setText(message);
         }
     }
 

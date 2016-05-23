@@ -3,7 +3,6 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.TextView;
 
@@ -37,7 +36,7 @@ public class LaunchItemToday extends LaunchItem
         super(context);
     }
 
-    private TextView dayView;
+    private TextView wdayView;
     private TextView timeView;
     private TextView dateView;
 
@@ -46,27 +45,24 @@ public class LaunchItemToday extends LaunchItem
     {
         icon.setImageResource(GlobalConfigs.IconResToday);
 
-        dayView = new TextView(getContext());
-        dayView.setLayoutParams(Simple.layoutParamsMW());
-        dayView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-        dayView.setTextColor(Color.WHITE);
-        dayView.setTypeface(null, Typeface.BOLD);
+        wdayView = new TextView(getContext());
+        wdayView.setGravity(Gravity.CENTER_HORIZONTAL);
+        wdayView.setTypeface(null, Typeface.BOLD);
+        wdayView.setTextColor(Color.WHITE);
 
-        addView(dayView);
+        addView(wdayView);
 
         timeView = new TextView(getContext());
-        timeView.setLayoutParams(Simple.layoutParamsMM());
-        timeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-        timeView.setTextColor(Color.WHITE);
+        timeView.setGravity(Gravity.CENTER_HORIZONTAL);
         timeView.setTypeface(null, Typeface.BOLD);
+        timeView.setTextColor(Color.WHITE);
 
         addView(timeView);
 
         dateView = new TextView(getContext());
-        dateView.setLayoutParams(Simple.layoutParamsMM());
-        dateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
-        dateView.setTextColor(Color.WHITE);
+        dateView.setGravity(Gravity.CENTER_HORIZONTAL);
         dateView.setTypeface(null, Typeface.BOLD);
+        dateView.setTextColor(Color.WHITE);
 
         addView(dateView);
 
@@ -84,16 +80,13 @@ public class LaunchItemToday extends LaunchItem
 
         float scale = (height - icon.getPaddingBottom()) / 200.0f;
 
-        dayView.setTextSize(Simple.getDeviceTextSize(28f * scale));
+        wdayView.setTextSize(Simple.getDeviceTextSize(28f * scale));
         timeView.setTextSize(Simple.getDeviceTextSize(56f * scale));
         dateView.setTextSize(Simple.getDeviceTextSize(24f * scale));
 
-        int devpad20 = Simple.getDevicePixels(Math.round(20 * scale));
-        int devpad54 = Simple.getDevicePixels(Math.round(54 * scale));
-
-        dayView.setPadding(0, devpad20, 0, 0);
-        timeView.setPadding(0, devpad54, 0, 0);
-        dateView.setPadding(0, 0, 0, devpad20 + icon.getPaddingBottom());
+        wdayView.setPadding(0, Math.round( 20 * scale), 0, 0);
+        timeView.setPadding(0, Math.round( 50 * scale), 0, 0);
+        dateView.setPadding(0, Math.round(120 * scale), 0, 0);
     }
 
     @Override
@@ -112,7 +105,7 @@ public class LaunchItemToday extends LaunchItem
             long now = Simple.nowAsTimeStamp();
             String dom = Simple.getLocalDayOfMonth(now) + ". " + Simple.getLocalMonth(now);
 
-            dayView.setText(Simple.getLocalDayOfWeek(now));
+            wdayView.setText(Simple.getLocalDayOfWeek(now));
             timeView.setText(Simple.getLocal24HTime(now));
             dateView.setText(dom);
 

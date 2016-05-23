@@ -16,7 +16,7 @@ public class HomeLaunch extends HomeFrame
     {
         super(context);
 
-        layoutParams.width = HomeActivity.launchWid;
+        layoutParams.width = Simple.isTablet() ? HomeActivity.launchWid : Simple.MP;
         layoutParams.height = HomeActivity.launchHei;
         layoutParams.gravity = Gravity.RIGHT;
 

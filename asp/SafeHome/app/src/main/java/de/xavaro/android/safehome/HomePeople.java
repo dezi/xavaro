@@ -37,6 +37,8 @@ public class HomePeople extends FrameLayout
     private HorizontalScrollView horzFrame;
     private LayoutParams vertLayout;
     private LayoutParams horzLayout;
+
+    private int navbarSize;
     private int orientation;
 
     public HomePeople(Context context)
@@ -80,7 +82,7 @@ public class HomePeople extends FrameLayout
         peopleView = new LinearLayout(context);
         peopleView.setLayoutParams(peopleLayout);
 
-
+        navbarSize = Simple.getNavigationBarHeight();
         orientation = Configuration.ORIENTATION_UNDEFINED;
     }
 
@@ -360,14 +362,17 @@ public class HomePeople extends FrameLayout
             if ((orientation != Configuration.ORIENTATION_PORTRAIT) &&
                     (Simple.getOrientation() == Configuration.ORIENTATION_PORTRAIT))
             {
+                int items = 3;
                 int width = ((View) getParent()).getWidth();
-                int items = ((int) Math.floor(width / HomeActivity.personSize)) - 1;
                 int margin = (width - (items * HomeActivity.personSize)) / 2;
 
-                setPadding(0, (HomeActivity.peopleSize - HomeActivity.personSize) / 2, 0, 0);
+                setPadding(0, (HomeActivity.peopleSize - HomeActivity.personSize - navbarSize) / 2, 0, 0);
+
                 layoutParams.width = Simple.MP;
-                layoutParams.height = HomeActivity.peopleSize;
+                layoutParams.height = HomeActivity.peopleSize - navbarSize;
                 layoutParams.gravity = Gravity.BOTTOM;
+                layoutParams.bottomMargin = navbarSize;
+                layoutParams.rightMargin = 0;
 
                 if (alertLaunchItem != null)
                 {
@@ -394,15 +399,17 @@ public class HomePeople extends FrameLayout
             if ((orientation != Configuration.ORIENTATION_LANDSCAPE) &&
                     (Simple.getOrientation() == Configuration.ORIENTATION_LANDSCAPE))
             {
+                int items = 3;
                 int height = ((View) getParent()).getHeight();
-                int items = ((int) Math.floor(height / HomeActivity.personSize)) - 1;
                 int margin = (height - (items * HomeActivity.personSize)) / 2;
 
-                setPadding((HomeActivity.peopleSize - HomeActivity.personSize) / 2, 0, 0, 0);
+                setPadding((HomeActivity.peopleSize - HomeActivity.personSize - navbarSize) / 2, 0, 0, 0);
 
-                layoutParams.width = HomeActivity.peopleSize;
+                layoutParams.width = HomeActivity.peopleSize - navbarSize;
                 layoutParams.height = Simple.MP;
                 layoutParams.gravity = Gravity.RIGHT;
+                layoutParams.rightMargin = navbarSize;
+                layoutParams.bottomMargin = 0;
 
                 if (alertLaunchItem != null)
                 {

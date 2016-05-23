@@ -116,9 +116,23 @@ public class HomeActivity extends AppCompatActivity implements
         Log.d(LOGTAG,"onCreate: getDensityDPI=" + Simple.getDensityDPI());
         Log.d(LOGTAG,"onCreate: getScaledDensity=" + Simple.getScaledDensity());
 
+        //
+        // Determinate person size in people navigation bar.
+        //
+
+        if (Simple.isTablet())
+        {
+            CommonStatic.LaunchItemSize = Simple.getDeviceSmallestSize() / 4;
+        }
+        else
+        {
+            CommonStatic.LaunchItemSize = (Simple.getDeviceSmallestSize() - 64) / 3;
+        }
+
+        personSize = Simple.getDeviceSmallestSize() / 5;
+        peopleSize = Simple.getNavigationBarHeight() + (personSize * 6 / 4);
+
         titleSpace = Simple.getDevicePixels(40);
-        personSize = Simple.getDevicePixels(160);
-        peopleSize = Simple.getDevicePixels(200);
         notifySize = 0;
 
         launchWid = CommonStatic.LaunchItemSize * 2 + 32;
@@ -139,11 +153,11 @@ public class HomeActivity extends AppCompatActivity implements
         launchScreen = new HomeLaunch(this);
         topScreen.addView(launchScreen);
 
-        socialScreen = new HomeSocial(this);
-        topScreen.addView(socialScreen);
-
         peopleScreen = new HomePeople(this);
         topScreen.addView(peopleScreen);
+
+        socialScreen = new HomeSocial(this);
+        topScreen.addView(socialScreen);
 
         workerScreen = new HomeWorker(this);
         workerScreen.setFullscreen();

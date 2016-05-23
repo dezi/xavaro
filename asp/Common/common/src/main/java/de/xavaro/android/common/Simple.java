@@ -2713,5 +2713,11 @@ public class Simple
         return displayMetrics.heightPixels;
     }
 
+    public static int getDeviceSmallestSize()
+    {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
+    }
+
     //endregion Display dimension methods.
 }
