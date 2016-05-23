@@ -178,13 +178,31 @@
     <string name="pref_basic_safety_access_summary">todo</string>
     <string name="pref_basic_safety_password">Admin Password</string>
 
-    <string name="pref_basic_safety_services">Services</string>
-    <string name="pref_basic_safety_services_summary">todo</string>
+    <string name="pref_basic_safety_notification_service">Notifications</string>
+    <string name="pref_basic_safety_notification_enable">Functionalty requested</string>
+    <string name="pref_basic_safety_notification_summary">todo</string>
+    <string name="pref_basic_safety_notification_unavailable">
+        There are no Notification Services on this device.
+    </string>
+
+    <string-array name="pref_basic_safety_notification_keys">
+        <item>unavailable</item>
+        <item>inactive</item>
+        <item>active</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_notification_vals">
+        <item>Not available</item>
+        <item>Inactive</item>
+        <item>Active</item>
+    </string-array>
+
     <string name="pref_basic_safety_accessibility_service">Accessibility</string>
+    <string name="pref_basic_safety_accessibility_enable">Functionalty requested</string>
+    <string name="pref_basic_safety_accessibility_summary">todo</string>
     <string name="pref_basic_safety_accessibility_unavailable">
         There are no Accessibility Services on this device.
     </string>
-    <string name="pref_basic_safety_kioskmode_service">Kiosk-Mode</string>
 
     <string-array name="pref_basic_safety_accessibility_keys">
         <item>unavailable</item>
@@ -198,12 +216,15 @@
         <item>Active</item>
     </string-array>
 
-    <string-array name="pref_basic_safety_service_keys">
+    <string name="pref_basic_safety_kioskmode_service">Kiosk-Mode</string>
+    <string name="pref_basic_safety_kioskmode_summary">todo</string>
+
+    <string-array name="pref_basic_safety_kioskmode_keys">
         <item>inactive</item>
         <item>active</item>
     </string-array>
 
-    <string-array name="pref_basic_safety_service_vals">
+    <string-array name="pref_basic_safety_kioskmode_vals">
         <item>Inactive</item>
         <item>Active</item>
     </string-array>
