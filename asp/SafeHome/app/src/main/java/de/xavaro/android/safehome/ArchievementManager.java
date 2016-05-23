@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.util.Iterator;
 
 import de.xavaro.android.common.AccessibilityService;
+import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
@@ -376,9 +377,14 @@ public class ArchievementManager implements
 
     private void follow()
     {
+        if (currentTag.equals("configure.settings.notifications"))
+        {
+            NotificationService.selectNotificationsSettings.run();
+        }
+
         if (currentTag.equals("configure.settings.accessibility"))
         {
-            AccessibilityService.selectAccessibility.run();
+            AccessibilityService.selectAccessibilitySettings.run();
         }
 
         if (currentTag.equals("configure.settings.homebutton"))

@@ -77,6 +77,14 @@
         </service>
 
         <service
+            android:name="de.xavaro.android.common.NotificationService"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <service
             android:name="de.xavaro.android.common.GCMRegistrationService"
             android:exported="false">
         </service>

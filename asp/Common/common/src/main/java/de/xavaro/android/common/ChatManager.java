@@ -533,6 +533,11 @@ public class ChatManager implements
 
             nb.setVibrate(getSOSPattern());
         }
+        else
+        {
+            SimpleStorage.addInt("chatsnews", "xavaro" + ".count." + idremote, 1);
+            SimpleStorage.put("chatsnews", "xavaro" + ".stamp." + idremote, Simple.nowAsISO());
+        }
 
         nb.setAutoCancel(true);
         nb.setSmallIcon(iconRes);

@@ -173,7 +173,7 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         {
             if (AccessibilityService.checkAvailable())
             {
-                AccessibilityService.selectAccessibility.run();
+                AccessibilityService.selectAccessibilitySettings.run();
 
                 return;
             }

@@ -87,7 +87,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         return false;
     }
 
-    public static final Runnable selectAccessibility = new Runnable()
+    public static final Runnable selectAccessibilitySettings = new Runnable()
     {
         @Override
         public void run()

@@ -146,16 +146,6 @@ public class Simple
         return getResources().getIdentifier(name, type, pack);
     }
 
-    public static Object getSystemService(String service)
-    {
-        return anyContext.getSystemService(service);
-    }
-
-    public static ContentResolver getContentResolver()
-    {
-        return appContext.getContentResolver();
-    }
-
     //endregion Initialisation
 
     //region GCM stuff
@@ -1127,16 +1117,6 @@ public class Simple
     public static String getUUID()
     {
         return UUID.randomUUID().toString();
-    }
-
-    public static NotificationManager getNotificationManager()
-    {
-        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-
-    public static InputMethodManager getInputMethodManager()
-    {
-        return (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     public static String getAppName()
@@ -2735,4 +2715,29 @@ public class Simple
     }
 
     //endregion Display dimension methods.
+
+    //region System services.
+
+    public static Object getSystemService(String service)
+    {
+        return appContext.getSystemService(service);
+    }
+
+    public static NotificationManager getNotificationManager()
+    {
+        return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    public static InputMethodManager getInputMethodManager()
+    {
+        return (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+    }
+
+    public static ContentResolver getContentResolver()
+    {
+        return appContext.getContentResolver();
+    }
+
+
+    //endregion System services.
 }
