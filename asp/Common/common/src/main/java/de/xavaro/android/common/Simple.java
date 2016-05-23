@@ -1205,16 +1205,31 @@ public class Simple
         try
         {
             TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
             return tm.getLine1Number();
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            OopsService.log(LOGTAG, ex);
         }
 
         return null;
     }
+
+    public static boolean isSimReady()
+    {
+        try
+        {
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            return tm.getSimState() == TelephonyManager.SIM_STATE_READY;
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return false;
+    }
+
 
     @Nullable
     public static String getWifiIPAddress()

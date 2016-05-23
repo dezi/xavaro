@@ -48,27 +48,17 @@ public class LaunchItemCall extends LaunchItem implements
 
             if (Simple.equals(subitem, "prepaid"))
             {
-                int devpad16 = Simple.getDevicePixels(16);
-                int devpad20 = Simple.getDevicePixels(20);
-                int devpad36 = Simple.getDevicePixels(36);
-
                 prepaidDateView = new TextView(getContext());
-                prepaidDateView.setLayoutParams(Simple.layoutParamsMW());
-                prepaidDateView.setPadding(0, devpad16, 0, 0);
-                prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f));
-                prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-                prepaidDateView.setTextColor(Color.WHITE);
+                prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL);
                 prepaidDateView.setTypeface(null, Typeface.BOLD);
+                prepaidDateView.setTextColor(Color.WHITE);
 
                 addView(prepaidDateView);
 
                 prepaidMoneyView = new TextView(getContext());
-                prepaidMoneyView.setLayoutParams(Simple.layoutParamsMM());
-                prepaidMoneyView.setPadding(0, devpad20, 0, icon.getPaddingBottom() + devpad36);
-                prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f));
-                prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-                prepaidMoneyView.setTextColor(Color.WHITE);
+                prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL);
                 prepaidMoneyView.setTypeface(null, Typeface.BOLD);
+                prepaidMoneyView.setTextColor(Color.WHITE);
 
                 addView(prepaidMoneyView);
 
@@ -82,14 +72,21 @@ public class LaunchItemCall extends LaunchItem implements
                 }
                 else
                 {
-                    Simple.makePost(new Runnable()
+                    if (Simple.isSimReady())
                     {
-                        @Override
-                        public void run()
+                        Simple.makePost(new Runnable()
                         {
-                            launchCall();
-                        }
-                    });
+                            @Override
+                            public void run()
+                            {
+                                launchCall();
+                            }
+                        });
+                    }
+                    else
+                    {
+                        prepaidMoneyView.setText("No SIM");
+                    }
                 }
             }
         }
@@ -124,11 +121,8 @@ public class LaunchItemCall extends LaunchItem implements
             prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f * scale));
             prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f * scale));
 
-            int devpad28 = Simple.getDevicePixels(Math.round(28 * scale));
-            int devpad48 = Simple.getDevicePixels(Math.round(56 * scale));
-
-            prepaidDateView.setPadding(0, devpad28, 0, 0);
-            prepaidMoneyView.setPadding(0, devpad48, 0, 0);
+            prepaidDateView.setPadding(0, Math.round(28 * scale), 0, 0);
+            prepaidMoneyView.setPadding(0, Math.round(56 * scale), 0, 0);
         }
     }
 

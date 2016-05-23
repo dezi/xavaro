@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.view.Gravity;
@@ -322,7 +323,7 @@ public class LaunchItem extends FrameLayout implements
         // Set reasonable size of text according to height.
         //
 
-        textsize = layout.height / 10;
+        textsize = layout.height / 8;
         label.setTextSize(Simple.getDeviceTextSize(textsize));
 
         //
@@ -341,12 +342,14 @@ public class LaunchItem extends FrameLayout implements
 
         if (layoutHeight > onelineHeight)
         {
+            Log.d(LOGTAG, "setLabelText: height=" + onelineHeight + "=" + layoutHeight);
+
             //
             // Text will use at least two lines in
             // layout. Make it a little bit smaller.
             //
 
-            textsize = layout.height / 12;
+            textsize = layout.height / 9;
             label.setTextSize(Simple.getDeviceTextSize(textsize));
             label.setLineSpacing(-3 * Simple.getDensity(), 1);
 

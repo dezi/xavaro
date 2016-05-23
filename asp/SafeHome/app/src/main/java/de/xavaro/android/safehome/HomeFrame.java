@@ -159,9 +159,28 @@ public abstract class HomeFrame extends FrameLayout
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        if ((animationSteps == 0) && ! fullscreen)
+        if (animationSteps == 0)
         {
-            Simple.makePost(changeOrientation);
+            if (fullscreen)
+            {
+                if (Simple.hasNavigationBar())
+                {
+                    if (Simple.isPortrait())
+                    {
+                        layoutParams.rightMargin = 0;
+                        layoutParams.bottomMargin = Simple.getNavigationBarHeight();
+                    }
+                    else
+                    {
+                        layoutParams.rightMargin = Simple.getNavigationBarHeight();
+                        layoutParams.bottomMargin = 0;
+                    }
+                }
+            }
+            else
+            {
+                Simple.makePost(changeOrientation);
+            }
         }
     }
 
