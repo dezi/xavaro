@@ -12,8 +12,8 @@ public class HomeButton extends TextView
 {
     private static final String LOGTAG = HomeButton.class.getSimpleName();
 
-    public static int buttonWidth = Simple.getDevicePixels(220);
-    public static int buttonHeight = Simple.getDevicePixels(42);
+    public static int buttonWidth = Simple.getDevicePixels(Simple.isTablet() ? 220 : 80);
+    public static int buttonHeight = Simple.getDevicePixels(Simple.isTablet() ? 42 : 32);
 
     private boolean istopevent;
 
@@ -25,20 +25,19 @@ public class HomeButton extends TextView
 
         FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(buttonWidth, buttonHeight);
         layout.gravity = Gravity.END + (this.istopevent ? Gravity.BOTTOM : Gravity.CENTER_VERTICAL);
-        layout.rightMargin = Simple.getDevicePixels(16);
+        layout.rightMargin = Simple.getDevicePixels(Simple.isTablet() ? 16 : 8);
 
         if (this.istopevent)
         {
-            layout.bottomMargin = Simple.getDevicePixels(6);
-            layout.rightMargin = Simple.getDevicePixels(16);
+            layout.bottomMargin = Simple.getDevicePixels(Simple.isTablet() ? 6 : 2);
             layout.rightMargin += (Simple.getDevicePixels(6) + buttonWidth) * (buttonnumber - 1);
         }
 
         setLayoutParams(layout);
         setBackground(Simple.getRoundedBorders(8, 0xff66afff, 0xff0a80ff));
         setGravity(Gravity.CENTER_VERTICAL + Gravity.CENTER_HORIZONTAL);
-        setPadding(0, 0, 0, Simple.getDevicePixels(4));
-        setTextSize(Simple.getDeviceTextSize(22f));
+        setTextSize(Simple.getDeviceTextSize(Simple.isTablet() ? 22f : 16f));
+        setPadding(0, 0, 0, Simple.getDevicePixels(Simple.isTablet() ? 4 : 2));
         setTypeface(null, Typeface.BOLD);
         setTextColor(0xffffffff);
     }

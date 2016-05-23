@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.graphics.Color;
@@ -89,8 +90,13 @@ public abstract class HomeFrame extends FrameLayout
 
         innerFrame = new FrameLayout(context);
         innerFrame.setLayoutParams(innerLayout);
-        innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
-        innerFrame.setPadding(8, 8, 8, 8);
+
+        if (Simple.isTablet())
+        {
+            innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
+            innerFrame.setPadding(8, 8, 8, 8);
+        }
+
         addView(innerFrame);
 
         payloadFrame = new FrameLayout(context);
@@ -201,21 +207,30 @@ public abstract class HomeFrame extends FrameLayout
         if ((layoutNormal.gravity == Gravity.LEFT) || (layoutNormal.gravity == Gravity.RIGHT))
         {
             int max = ((View) getParent()).getWidth();
+            int org = layoutNormal.width > 0 ? layoutNormal.width : max;
             if (layoutParams.width == Simple.MP) layoutParams.width = max;
-            animationWidth = Math.abs(max - layoutNormal.width) / animationSteps;
+            animationWidth = Math.abs(max - org) / animationSteps;
         }
 
         if ((layoutNormal.gravity == Gravity.TOP) || (layoutNormal.gravity == Gravity.BOTTOM))
         {
             int max = ((View) getParent()).getHeight();
+            int org = layoutNormal.height > 0 ? layoutNormal.height : max;
             if (layoutParams.height == Simple.MP) layoutParams.height = max;
-            animationHeight = Math.abs(max - layoutNormal.height) / animationSteps;
+            animationHeight = Math.abs(max - org) / animationSteps;
         }
 
         animationLeft = layoutNormal.leftMargin / animationSteps;
         animationTop = layoutNormal.topMargin / animationSteps;
         animationRight = layoutNormal.rightMargin / animationSteps;
         animationBottom = layoutNormal.bottomMargin / animationSteps;
+
+        Log.d(LOGTAG, "onToogleFullscreen: animationWidth=" + animationWidth);
+        Log.d(LOGTAG, "onToogleFullscreen: animationHeight=" + animationHeight);
+        Log.d(LOGTAG, "onToogleFullscreen: animationLeft=" + animationLeft);
+        Log.d(LOGTAG, "onToogleFullscreen: animationTop=" + animationTop);
+        Log.d(LOGTAG, "onToogleFullscreen: animationRight=" + animationRight);
+        Log.d(LOGTAG, "onToogleFullscreen: animationBottom=" + animationBottom);
 
         if (fullscreen)
         {
@@ -301,7 +316,10 @@ public abstract class HomeFrame extends FrameLayout
                     animationPad--;
                 }
 
-                innerFrame.setPadding(animationPad, animationPad, animationPad, animationPad);
+                if (Simple.isTablet())
+                {
+                    innerFrame.setPadding(animationPad, animationPad, animationPad, animationPad);
+                }
 
                 setLayoutParams(layoutParams);
 
@@ -327,8 +345,12 @@ public abstract class HomeFrame extends FrameLayout
 
                 innerClick.setVisibility(VISIBLE);
                 innerFrame.setBackgroundColor(Color.TRANSPARENT);
-                innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
-                innerFrame.setPadding(8, 8, 8, 8);
+
+                if (Simple.isTablet())
+                {
+                    innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
+                    innerFrame.setPadding(8, 8, 8, 8);
+                }
 
                 fullscreen = false;
 

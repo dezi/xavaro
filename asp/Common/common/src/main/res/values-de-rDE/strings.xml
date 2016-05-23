@@ -591,8 +591,8 @@
     <string name="battery_manager_remind_du">Bitte verbinde Dein Tablet demnächst mit der Ladestation.</string>
     <string name="battery_manager_warn">Bitte verbinden Sie ihr Tablet jetzt mit der Ladestation.</string>
     <string name="battery_manager_warn_du">Bitte verbinde Dein Tablet jetzt mit der Ladestation.</string>
-    <string name="battery_manager_assist">Ausserdem habe ich Ihre Assistenz benachrichtigt.</string>
-    <string name="battery_manager_assist_du">Ausserdem habe ich Deine Assistenz benachrichtigt.</string>
+    <string name="battery_manager_assist">Außerdem habe ich Ihre Assistenz benachrichtigt.</string>
+    <string name="battery_manager_assist_du">Außerdem habe ich Deine Assistenz benachrichtigt.</string>
     <string name="battery_manager_assist_warn">%1$s Tablet muss geladen werden.</string>
     <string name="battery_manager_assist_clear">%1$s lädt nun sein Tablet.</string>
     <string name="battery_manager_assist_level">Der Batteriestatus ist bei %1$d Prozent.</string>
@@ -607,8 +607,8 @@
     <string name="prepaid_manager_remind_du">Bitte lade Dein Guthaben demnächst auf.</string>
     <string name="prepaid_manager_warn">Bitte laden Sie Ihr Guthaben jetzt auf.</string>
     <string name="prepaid_manager_warn_du">Bitte lade Dein Guthaben jetzt auf.</string>
-    <string name="prepaid_manager_assist">Ausserdem habe ich Ihre Assistenz benachrichtigt.</string>
-    <string name="prepaid_manager_assist_du">Ausserdem habe ich Deine Assistenz benachrichtigt.</string>
+    <string name="prepaid_manager_assist">Außerdem habe ich Ihre Assistenz benachrichtigt.</string>
+    <string name="prepaid_manager_assist_du">Außerdem habe ich Deine Assistenz benachrichtigt.</string>
     <string name="prepaid_manager_assist_warn">%1$s Prepaid-Guthaben ist sehr niedrig.</string>
     <string name="prepaid_manager_assist_clear">%1$s hat gerade das Prepaid-Guthaben aufgeladen.</string>
     <string name="prepaid_manager_assist_level">Das Prepaid-Guthaben beträgt aktuell %1$s</string>
