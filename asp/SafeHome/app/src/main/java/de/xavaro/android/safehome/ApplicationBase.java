@@ -10,6 +10,7 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SocialGoogleplus;
 import de.xavaro.android.common.SocialInstagram;
 import de.xavaro.android.common.SocialTwitter;
+import de.xavaro.android.common.WebAppCache;
 import de.xavaro.android.common.WebCookie;
 
 public class ApplicationBase extends Application
@@ -50,6 +51,12 @@ public class ApplicationBase extends Application
         //
 
         WebCookie.initCookies();
+
+        //
+        // Check version of web app cache.
+        //
+
+        WebAppCache.checkWebAppCache();
     }
 
     public final Runnable setFontScale = new Runnable()

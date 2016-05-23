@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.Animator;
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.StaticUtils;
@@ -43,8 +44,8 @@ public class LaunchGroup extends FrameLayout implements
     protected JSONObject config;
     protected String configTree;
 
-    protected int horzSize = CommonConfigs.LaunchItemSize;
-    protected int vertSize = CommonConfigs.LaunchItemSize;
+    protected int horzSize = CommonStatic.LaunchItemSize;
+    protected int vertSize = CommonStatic.LaunchItemSize;
 
     protected int realWidth;
     protected int realHeight;

@@ -56,12 +56,6 @@ public class SettingsActivity extends PreferenceActivity
         //
 
         WebCookie.initCookies();
-
-        //
-        // Check version of web app cache.
-        //
-
-        WebAppCache.checkWebAppCache();
     }
 
     @Override

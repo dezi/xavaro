@@ -12,6 +12,12 @@ public class CommonStatic
 {
     private static final String LOGTAG = CommonStatic.class.getSimpleName();
 
+    //region Global layout stuff.
+
+    public static int LaunchItemSize = 190;
+
+    //endregion
+
     //region Google cloud messaging stuff
 
     public static String gcm_token;

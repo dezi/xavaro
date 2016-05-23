@@ -1,13 +1,13 @@
 package de.xavaro.android.common;
 
-import android.app.Application;
 import android.support.annotation.Nullable;
+
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.res.Configuration;
 import android.provider.Settings;
-import android.app.Activity;
-import android.app.NotificationManager;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
 import android.content.Context;
@@ -18,11 +18,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.telephony.TelephonyManager;
-import android.text.InputType;
-import android.util.Base64;
-import android.view.Gravity;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,12 +29,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.BitmapDrawable;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.view.SoundEffectConstants;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
+import android.view.Gravity;
+import android.view.View;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -50,6 +47,7 @@ import android.os.Handler;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -100,9 +98,9 @@ public class Simple
 
     //region Initialisation
 
-    private static Activity actContext;
     private static Context appContext;
     private static Context anyContext;
+    private static Activity actContext;
     private static Handler appHandler;
     private static WifiManager wifiManager;
 
@@ -140,7 +138,12 @@ public class Simple
 
     public static String getResourceName(int resid)
     {
-        return appContext.getResources().getResourceEntryName(resid);
+        return getResources().getResourceEntryName(resid);
+    }
+
+    public static int getIdentifier(String name, String type, String pack)
+    {
+        return getResources().getIdentifier(name, type, pack);
     }
 
     public static Object getSystemService(String service)
@@ -151,11 +154,6 @@ public class Simple
     public static ContentResolver getContentResolver()
     {
         return appContext.getContentResolver();
-    }
-
-    public static int getIdentifier(String name, String type, String pack)
-    {
-        return getResources().getIdentifier(name, type, pack);
     }
 
     //endregion Initialisation
@@ -661,29 +659,6 @@ public class Simple
     //endregion Haptic feedback
 
     //region All purpose simple getters
-
-    public static boolean hasNavigationBar()
-    {
-        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
-        boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
-
-        return !(hasBackKey && hasHomeKey);
-    }
-
-    public static int getDensityDPI()
-    {
-        return anyContext.getResources().getDisplayMetrics().densityDpi;
-    }
-
-    public static float getScaledDensity()
-    {
-        return anyContext.getResources().getDisplayMetrics().scaledDensity;
-    }
-
-    public static float getDensity()
-    {
-        return anyContext.getResources().getDisplayMetrics().density;
-    }
 
     public static GradientDrawable getRoundedBorders(int radius, int color, int stroke)
     {
@@ -1372,106 +1347,6 @@ public class Simple
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         WifiInfo wInfo = wifiManager.getConnectionInfo();
         return wInfo.getMacAddress();
-    }
-
-    public static int getOrientation()
-    {
-        return getResources().getConfiguration().orientation;
-    }
-
-    public static boolean isPortrait()
-    {
-        return (getOrientation() == Configuration.ORIENTATION_PORTRAIT);
-    }
-
-    public static boolean isLandscape()
-    {
-        return (getOrientation() == Configuration.ORIENTATION_LANDSCAPE);
-    }
-
-    public static int getDeviceWidth()
-    {
-        if (anyContext == null) return 0;
-
-        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
-        return displayMetrics.widthPixels;
-    }
-
-    public static int getDeviceHeight()
-    {
-        if (anyContext == null) return 0;
-
-        DisplayMetrics displayMetrics = anyContext.getResources().getDisplayMetrics();
-        return displayMetrics.heightPixels;
-    }
-
-    public static float getPreferredEditSize()
-    {
-        return getDeviceTextSize(24f);
-    }
-
-    public static float getPreferredTextSize()
-    {
-        return getDeviceTextSize(22f);
-    }
-
-    public static float getPreferredTitleSize()
-    {
-        return getDeviceTextSize(24f);
-    }
-
-    public static void setFontScale()
-    {
-        if (getResources().getConfiguration().fontScale > 1.0f)
-        {
-            Settings.System.putFloat(getContentResolver(), Settings.System.FONT_SCALE, 1.0f);
-
-            Configuration configuration = getResources().getConfiguration();
-            configuration.fontScale = 1.0f;
-
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            metrics.scaledDensity = configuration.fontScale * metrics.density;
-
-            getResources().updateConfiguration(configuration, metrics);
-
-            Log.d(LOGTAG, "setFontScale: adjusted.");
-        }
-    }
-
-    public static boolean isTablet()
-    {
-        return (getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    public static int getActionBarHeight()
-    {
-        TypedValue tv = new TypedValue();
-
-        if (anyContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-        {
-            DisplayMetrics dm = getResources().getDisplayMetrics();
-            return TypedValue.complexToDimensionPixelSize(tv.data, dm);
-        }
-
-        return 64;
-    }
-
-    public static int getStatusBarHeight()
-    {
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) return getResources().getDimensionPixelSize(resourceId);
-
-        return 20;
-    }
-
-    public static int getNavigationBarHeight()
-    {
-        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId > 0) return getResources().getDimensionPixelSize(resourceId);
-
-        return 64;
     }
 
     @SuppressWarnings("SameReturnValue")
@@ -2710,4 +2585,133 @@ public class Simple
 
         return connection;
     }
+
+    //region Display dimension methods.
+
+    public static void setFontScale()
+    {
+        if (getResources().getConfiguration().fontScale > 1.0f)
+        {
+            Settings.System.putFloat(getContentResolver(), Settings.System.FONT_SCALE, 1.0f);
+
+            Configuration configuration = getResources().getConfiguration();
+            configuration.fontScale = 1.0f;
+
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+
+            getResources().updateConfiguration(configuration, metrics);
+
+            Log.d(LOGTAG, "setFontScale: adjusted.");
+        }
+    }
+
+    public static boolean isTablet()
+    {
+        return (getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    public static boolean isPortrait()
+    {
+        return (getOrientation() == Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    public static boolean isLandscape()
+    {
+        return (getOrientation() == Configuration.ORIENTATION_LANDSCAPE);
+    }
+
+    public static int getOrientation()
+    {
+        return getResources().getConfiguration().orientation;
+    }
+
+    public static int getDensityDPI()
+    {
+        return getResources().getDisplayMetrics().densityDpi;
+    }
+
+    public static float getScaledDensity()
+    {
+        return getResources().getDisplayMetrics().scaledDensity;
+    }
+
+    public static float getDensity()
+    {
+        return getResources().getDisplayMetrics().density;
+    }
+
+    public static float getPreferredTitleSize()
+    {
+        return getDeviceTextSize(24f);
+    }
+
+    public static float getPreferredEditSize()
+    {
+        return getDeviceTextSize(24f);
+    }
+
+    public static float getPreferredTextSize()
+    {
+        return getDeviceTextSize(22f);
+    }
+
+    public static int getActionBarHeight()
+    {
+        if (actContext != null)
+        {
+            TypedValue tv = new TypedValue();
+
+            if (actContext.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+            {
+                DisplayMetrics dm = getResources().getDisplayMetrics();
+                return TypedValue.complexToDimensionPixelSize(tv.data, dm);
+            }
+        }
+
+        return 64;
+    }
+
+    public static int getStatusBarHeight()
+    {
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) return getResources().getDimensionPixelSize(resourceId);
+
+        return 25;
+    }
+
+    public static int getNavigationBarHeight()
+    {
+        if (hasNavigationBar())
+        {
+            int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+            if (resourceId > 0) return getResources().getDimensionPixelSize(resourceId);
+        }
+
+        return 0;
+    }
+
+    public static boolean hasNavigationBar()
+    {
+        boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+        boolean hasHomeKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_HOME);
+
+        return !(hasBackKey && hasHomeKey);
+    }
+
+    public static int getDeviceWidth()
+    {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return displayMetrics.widthPixels;
+    }
+
+    public static int getDeviceHeight()
+    {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return displayMetrics.heightPixels;
+    }
+
+    //endregion Display dimension methods.
 }

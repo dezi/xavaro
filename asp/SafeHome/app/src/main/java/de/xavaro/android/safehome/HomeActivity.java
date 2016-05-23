@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.opengl.Visibility;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
@@ -17,7 +16,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 
-import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.Simple;
@@ -104,22 +102,27 @@ public class HomeActivity extends AppCompatActivity implements
         WebCookie.initCookies();
 
         //
-        // Check version of web app cache.
-        //
-
-        WebAppCache.checkWebAppCache();
-
-        //
         // Layout basic sizes.
         //
+
+        Log.d(LOGTAG,"onCreate: getDeviceWidth=" + Simple.getDeviceWidth());
+        Log.d(LOGTAG,"onCreate: getDeviceHeight=" + Simple.getDeviceHeight());
+
+        Log.d(LOGTAG,"onCreate: getActionBarHeight=" + Simple.getActionBarHeight());
+        Log.d(LOGTAG,"onCreate: getStatusBarHeight=" + Simple.getStatusBarHeight());
+        Log.d(LOGTAG,"onCreate: getNavigationBarHeight=" + Simple.getNavigationBarHeight());
+
+        Log.d(LOGTAG,"onCreate: getDensity=" + Simple.getDensity());
+        Log.d(LOGTAG,"onCreate: getDensityDPI=" + Simple.getDensityDPI());
+        Log.d(LOGTAG,"onCreate: getScaledDensity=" + Simple.getScaledDensity());
 
         titleSpace = Simple.getDevicePixels(40);
         personSize = Simple.getDevicePixels(160);
         peopleSize = Simple.getDevicePixels(200);
         notifySize = 0;
 
-        launchWid = CommonConfigs.LaunchItemSize * 2 + 32;
-        launchHei = CommonConfigs.LaunchItemSize * 2 + 32 + HomeActivity.titleSpace;
+        launchWid = CommonStatic.LaunchItemSize * 2 + 32;
+        launchHei = CommonStatic.LaunchItemSize * 2 + 32 + HomeActivity.titleSpace;
 
         //
         // Build views.

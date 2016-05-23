@@ -62,7 +62,7 @@ public class WebAppUtility
     @JavascriptInterface
     public int getLaunchItemSize()
     {
-        return CommonConfigs.LaunchItemSize;
+        return CommonStatic.LaunchItemSize;
     }
 
     @JavascriptInterface
