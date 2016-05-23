@@ -88,17 +88,12 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         cp.setSummary(R.string.pref_basic_safety_services_summary);
         preferences.add(cp);
 
-        CharSequence[] kioskText = Simple.getTransArray(R.array.pref_basic_safety_service_vals);
-        CharSequence[] kioskKeys = Simple.getTransArray(R.array.pref_basic_safety_service_keys);
-        CharSequence[] accessText = Simple.getTransArray(R.array.pref_basic_safety_accessibility_vals);
-        CharSequence[] accessKeys = Simple.getTransArray(R.array.pref_basic_safety_accessibility_keys);
-
         lp = new NicedPreferences.NiceListPreference(context);
 
         lp.setKey("admin.accessibility.service");
         lp.setTitle(R.string.pref_basic_safety_accessibility_service);
-        lp.setEntries(accessText);
-        lp.setEntryValues(accessKeys);
+        lp.setEntries(Simple.getTransArray(R.array.pref_basic_safety_accessibility_vals));
+        lp.setEntryValues(Simple.getTransArray(R.array.pref_basic_safety_accessibility_keys));
         lp.setDefaultValue("inactive");
         lp.setOnclick(selectAccessibility);
 
@@ -109,8 +104,8 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
 
         lp.setKey("admin.kioskmode.service");
         lp.setTitle(R.string.pref_basic_safety_kioskmode_service);
-        lp.setEntries(kioskText);
-        lp.setEntryValues(kioskKeys);
+        lp.setEntries(Simple.getTransArray(R.array.pref_basic_safety_service_vals));
+        lp.setEntryValues(Simple.getTransArray(R.array.pref_basic_safety_service_keys));
         lp.setDefaultValue("inactive");
 
         preferences.add(lp);

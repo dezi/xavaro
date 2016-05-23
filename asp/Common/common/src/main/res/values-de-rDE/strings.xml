@@ -156,6 +156,17 @@
     </string>
     <string name="pref_basic_safety_kioskmode_service">Kioskmodus</string>
 
+    <string-array name="pref_basic_safety_accessibility_vals">
+        <item>Nicht verfügbar</item>
+        <item>Inaktiv</item>
+        <item>Aktiviert</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_service_vals">
+        <item>Inaktiv</item>
+        <item>Aktiviert</item>
+    </string-array>
+
     <string name="pref_basic_safety_buttons">Tasten</string>
     <string name="pref_basic_safety_buttons_summary">
         Diese Einstellungen beziehen sich auf die Funktion der Hardware-Tasten.
@@ -177,17 +188,6 @@
     <string name="pref_basic_safety_home_button">Home</string>
     <string name="pref_basic_safety_assistance_button">Assistenz</string>
     <string name="pref_basic_safety_menu_button">Menü</string>
-
-    <string-array name="pref_basic_safety_service_vals">
-        <item>Inaktiv</item>
-        <item>Aktiviert</item>
-    </string-array>
-
-    <string-array name="pref_basic_safety_accessibility_vals">
-        <item>Nicht verfügbar</item>
-        <item>Inaktiv</item>
-        <item>Aktiviert</item>
-    </string-array>
 
     <string name="pref_basic_owner">Anwender</string>
     <string name="pref_basic_owner_summary">

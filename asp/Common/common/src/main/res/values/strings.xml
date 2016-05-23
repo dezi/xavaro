@@ -186,22 +186,6 @@
     </string>
     <string name="pref_basic_safety_kioskmode_service">Kiosk-Mode</string>
 
-    <string name="pref_basic_safety_buttons">Buttons</string>
-    <string name="pref_basic_safety_buttons_summary">todo</string>
-    <string name="pref_basic_safety_home_button">Home</string>
-    <string name="pref_basic_safety_assistance_button">Assistance</string>
-    <string name="pref_basic_safety_menu_button">Menu</string>
-
-    <string-array name="pref_basic_safety_service_keys">
-        <item>inactive</item>
-        <item>active</item>
-    </string-array>
-
-    <string-array name="pref_basic_safety_service_vals">
-        <item>Inactive</item>
-        <item>Active</item>
-    </string-array>
-
     <string-array name="pref_basic_safety_accessibility_keys">
         <item>unavailable</item>
         <item>inactive</item>
@@ -213,6 +197,22 @@
         <item>Inactive</item>
         <item>Active</item>
     </string-array>
+
+    <string-array name="pref_basic_safety_service_keys">
+        <item>inactive</item>
+        <item>active</item>
+    </string-array>
+
+    <string-array name="pref_basic_safety_service_vals">
+        <item>Inactive</item>
+        <item>Active</item>
+    </string-array>
+
+    <string name="pref_basic_safety_buttons">Buttons</string>
+    <string name="pref_basic_safety_buttons_summary">todo</string>
+    <string name="pref_basic_safety_home_button">Home</string>
+    <string name="pref_basic_safety_assistance_button">Assistance</string>
+    <string name="pref_basic_safety_menu_button">Menu</string>
 
     <string name="pref_basic_owner">User</string>
     <string name="pref_basic_owner_summary">todo</string>

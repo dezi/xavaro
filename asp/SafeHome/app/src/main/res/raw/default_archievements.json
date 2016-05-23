@@ -24,6 +24,14 @@
       "prio": 150
     },
 
+    "configure.settings.notifications":
+    {
+      "title": "important",
+      "message": "Die Anwendung sollte noch die Benachritigungen lesen dürfen.",
+      "buttons": "later|noshow|follow",
+      "prio": 150
+    },
+
     "configure.settings.homebutton":
     {
       "title": "important",
