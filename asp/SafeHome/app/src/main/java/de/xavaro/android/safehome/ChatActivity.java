@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.app.NotificationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
+import de.xavaro.android.common.NotificationService;
+import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -266,6 +269,23 @@ public class ChatActivity extends AppCompatActivity implements
         super.onResume();
 
         Simple.setActContext(this);
+
+        //
+        // Remove internal notifications.
+        //
+
+        SimpleStorage.put("notifications", "xavaro" + ".count." + idremote, 0);
+        SimpleStorage.remove("notifications", "xavaro" + ".texts." + idremote);
+        SimpleStorage.put("notifications", "xavaro" + ".stamp." + idremote, Simple.nowAsISO());
+
+        NotificationService.doCallbacks("xavaro", idremote);
+
+        //
+        // Remove Android notifications.
+        //
+
+        NotificationManager nm = Simple.getNotificationManager();
+        nm.cancel("xavaro" + "." + idremote, 0);
     }
 
     @Override

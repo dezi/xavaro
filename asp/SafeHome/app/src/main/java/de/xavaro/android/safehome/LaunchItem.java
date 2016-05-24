@@ -125,6 +125,9 @@ public class LaunchItem extends FrameLayout implements
     protected TextView overtext;
     protected FrameLayout dimmer;
 
+    protected LayoutParams notifyLayout;
+    protected TextView notifyText;
+
     protected LaunchGroup directory;
 
     public LaunchItem(Context context)
@@ -185,6 +188,18 @@ public class LaunchItem extends FrameLayout implements
         overtext.setTypeface(null, Typeface.BOLD);
 
         overlay.addView(overtext);
+
+        notifyLayout = Simple.layoutParamsWW(Gravity.CENTER_HORIZONTAL);
+
+        notifyText = new TextView(context);
+        notifyText.setLayoutParams(notifyLayout);
+        notifyText.setBackground(Simple.getRoundedBorders(8, 0xffff0000, 1));
+        notifyText.setGravity(Gravity.CENTER_HORIZONTAL);
+        notifyText.setTypeface(null, Typeface.BOLD);
+        notifyText.setTextColor(Color.WHITE);
+        notifyText.setVisibility(GONE);
+
+        addView(notifyText);
 
         dimmer = new FrameLayout(context);
         dimmer.setBackgroundColor(Color.TRANSPARENT);
@@ -253,7 +268,7 @@ public class LaunchItem extends FrameLayout implements
         // Original font sizes based on 200 pixels height.
         //
 
-        float scale = height / 200.0f;
+        float scale = (height - icon.getPaddingBottom()) / 200.0f;
 
         layout.width = width;
         layout.height = height;
@@ -295,6 +310,14 @@ public class LaunchItem extends FrameLayout implements
         setPadding(padding, padding, padding, padding);
 
         //
+        // Take care for notify element.
+        //
+
+        notifyLayout.topMargin = Math.round(120 * scale);
+        Simple.setPadding(notifyText, 8, 2, 8, 4);
+        notifyText.setTextSize(Simple.getDeviceTextSize(20f * scale));
+
+        //
         // Now fill in label text if present.
         //
 
@@ -323,7 +346,7 @@ public class LaunchItem extends FrameLayout implements
         // Set reasonable size of text according to height.
         //
 
-        textsize = layout.height / 8;
+        textsize = layout.height / 9;
         label.setTextSize(Simple.getDeviceTextSize(textsize));
 
         //
@@ -349,7 +372,7 @@ public class LaunchItem extends FrameLayout implements
             // layout. Make it a little bit smaller.
             //
 
-            textsize = layout.height / 9;
+            textsize = layout.height / 10;
             label.setTextSize(Simple.getDeviceTextSize(textsize));
             label.setLineSpacing(-3 * Simple.getDensity(), 1);
 

@@ -29,40 +29,9 @@ public class LaunchItemComm extends LaunchItem
 {
     private final static String LOGTAG = LaunchItemComm.class.getSimpleName();
 
-    private LayoutParams notifyLayout;
-    private TextView notifyText;
-
     public LaunchItemComm(Context context)
     {
         super(context);
-
-        notifyLayout = Simple.layoutParamsWW(Gravity.CENTER_HORIZONTAL);
-
-        notifyText = new TextView(context);
-        notifyText.setLayoutParams(notifyLayout);
-        notifyText.setBackground(Simple.getRoundedBorders(8, 0xffff0000, 1));
-        notifyText.setGravity(Gravity.CENTER_HORIZONTAL);
-        notifyText.setTypeface(null, Typeface.BOLD);
-        notifyText.setTextColor(Color.WHITE);
-        notifyText.setVisibility(GONE);
-
-        addView(notifyText);
-    }
-
-    @Override
-    public void setSize(int width, int height)
-    {
-        super.setSize(width, height);
-
-        //
-        // Original font sizes based on 200 pixels height.
-        //
-
-        float scale = (height - icon.getPaddingBottom()) / 200.0f;
-
-        notifyLayout.topMargin = Math.round(120 * scale);
-        Simple.setPadding(notifyText, 8, 2, 8, 4);
-        notifyText.setTextSize(Simple.getDeviceTextSize(20f * scale));
     }
 
     @Override

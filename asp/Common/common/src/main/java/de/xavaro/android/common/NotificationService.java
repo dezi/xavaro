@@ -269,7 +269,7 @@ public class NotificationService extends NotificationListenerService
         }
     }
 
-    private static void doCallbacks(String appname, String pfid)
+    public static void doCallbacks(String appname, String pfid)
     {
         String mapkey = appname + "." + pfid;
         Log.d(LOGTAG, "doCallbacks: " + mapkey);

@@ -13,14 +13,17 @@ import org.json.JSONObject;
 
 import java.io.File;
 
+import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.PrepaidManager;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.RemoteGroups;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.VoiceIntent;
 
@@ -160,6 +163,12 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
 
             checkPrepaidBalance();
         }
+
+        if (Simple.equals(type,"xavaro") && config.has("identity"))
+        {
+            String identity = Json.getString(config, "identity");
+            NotificationService.subscribe(type, identity, onNotification);
+        }
     }
 
     @Override
@@ -171,7 +180,34 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
         {
             CommService.unsubscribeMessage(this, "recvPrepaidBalance");
         }
+
+        if (Simple.equals(type,"xavaro") && config.has("identity"))
+        {
+            String identity = Json.getString(config, "identity");
+            NotificationService.subscribe(type, identity, onNotification);
+        }
     }
+
+    protected final Runnable onNotification = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (Simple.equals(type,"xavaro") && config.has("identity"))
+            {
+                String identity = Json.getString(config, "identity");
+
+                int count = SimpleStorage.getInt("notifications", type + ".count." + identity);
+                String date = SimpleStorage.getString("notifications", type + ".stamp." + identity);
+
+                Log.d(LOGTAG, "onNotification: count=" + count);
+                Log.d(LOGTAG, "onNotification: date=" + date);
+
+                notifyText.setText(count + " " + "Nachrichten");
+                notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+            }
+        }
+    };
 
     /*
     @Override

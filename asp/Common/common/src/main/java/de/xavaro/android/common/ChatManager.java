@@ -15,6 +15,7 @@ import android.net.Uri;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -511,6 +512,20 @@ public class ChatManager implements
             sender = RemoteContacts.getDisplayName(idremote);
         }
 
+        //
+        // Internal notification service.
+        //
+
+        SimpleStorage.addInt("notifications", "xavaro" + ".count." + idremote, 1);
+        SimpleStorage.addArray("notifications", "xavaro" + ".texts." + idremote, message);
+        SimpleStorage.put("notifications", "xavaro" + ".stamp." + idremote, Simple.nowAsISO());
+
+        NotificationService.doCallbacks("xavaro", idremote);
+
+        //
+        // Android notification service.
+        //
+
         Intent intent = new Intent("de.xavaro.android.common.ChatActivity");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("idremote", idremote);
@@ -533,11 +548,6 @@ public class ChatManager implements
 
             nb.setVibrate(getSOSPattern());
         }
-        else
-        {
-            SimpleStorage.addInt("chatsnews", "xavaro" + ".count." + idremote, 1);
-            SimpleStorage.put("chatsnews", "xavaro" + ".stamp." + idremote, Simple.nowAsISO());
-        }
 
         nb.setAutoCancel(true);
         nb.setSmallIcon(iconRes);
@@ -548,7 +558,7 @@ public class ChatManager implements
         nb.setContentIntent(pendingIntent);
 
         NotificationManager nm = Simple.getNotificationManager();
-        nm.notify(0, nb.build());
+        nm.notify("xavaro" + "." + idremote, 0, nb.build());
     }
 
     private long[] getSOSPattern()
