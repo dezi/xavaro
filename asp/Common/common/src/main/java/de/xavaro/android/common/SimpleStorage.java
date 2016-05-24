@@ -19,6 +19,28 @@ public class SimpleStorage
 
     private static File storageDir;
 
+    public static void remove(String name, String property)
+    {
+        Simple.removePost(flusher);
+
+        JSONObject container = getContainer(name);
+
+        synchronized (storages)
+        {
+            if (! Json.has(container, "data")) Json.put(container, "data", new JSONObject());
+
+            JSONObject data = Json.getObject(container, "data");
+            Json.remove(data, property);
+
+            Json.put(container, "updated", Simple.nowAsISO());
+            Json.put(container, "dirty", true);
+        }
+
+        Log.d(LOGTAG, "remove: " + name + "=" + property);
+
+        Simple.makePost(flusher, 1000);
+    }
+
     public static void put(String name, String property, Object value)
     {
         Simple.removePost(flusher);
@@ -63,11 +85,6 @@ public class SimpleStorage
         return Json.getInt(getStorage(name), property);
     }
 
-    public static void addInt(String name, String property, int value)
-    {
-        if (value != 0) put(name, property, getInt(name, property) + value);
-    }
-
     public static boolean getBool(String name, String property)
     {
         return Json.getBoolean(getStorage(name), property);
@@ -83,6 +100,22 @@ public class SimpleStorage
     public static JSONArray getJSONArray(String name, String property)
     {
         return Json.clone(Json.getArray(getStorage(name), property));
+    }
+
+    public static void addInt(String name, String property, int value)
+    {
+        if (value != 0) put(name, property, getInt(name, property) + value);
+    }
+
+    public static void addArray(String name, String property, String value)
+    {
+        if (value != null)
+        {
+            JSONArray array = getJSONArray(name, property);
+            if (array == null) array = new JSONArray();
+            Json.put(array, value);
+            put(name, property, array);
+        }
     }
 
     private static File getStorageDir()

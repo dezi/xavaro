@@ -1,7 +1,6 @@
 package de.xavaro.android.common;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.app.AlertDialog;
 import android.provider.Settings;
 import android.view.accessibility.AccessibilityEvent;
 import android.content.Intent;
