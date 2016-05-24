@@ -2,29 +2,67 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Gravity;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 
 import java.io.File;
 
+import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.ProfileImages;
+import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.VoiceIntent;
 
 public class LaunchItemComm extends LaunchItem
 {
     private final static String LOGTAG = LaunchItemComm.class.getSimpleName();
 
+    private LayoutParams notifyLayout;
+    private TextView notifyText;
+
     public LaunchItemComm(Context context)
     {
         super(context);
+
+        notifyLayout = Simple.layoutParamsWW(Gravity.CENTER_HORIZONTAL);
+
+        notifyText = new TextView(context);
+        notifyText.setLayoutParams(notifyLayout);
+        notifyText.setBackground(Simple.getRoundedBorders(8, 0xffff0000, 1));
+        notifyText.setGravity(Gravity.CENTER_HORIZONTAL);
+        notifyText.setTypeface(null, Typeface.BOLD);
+        notifyText.setTextColor(Color.WHITE);
+        notifyText.setVisibility(GONE);
+
+        addView(notifyText);
+    }
+
+    @Override
+    public void setSize(int width, int height)
+    {
+        super.setSize(width, height);
+
+        //
+        // Original font sizes based on 200 pixels height.
+        //
+
+        float scale = (height - icon.getPaddingBottom()) / 200.0f;
+
+        notifyLayout.topMargin = Math.round(120 * scale);
+        Simple.setPadding(notifyText, 8, 2, 8, 4);
+        notifyText.setTextSize(Simple.getDeviceTextSize(20f * scale));
     }
 
     @Override
@@ -139,7 +177,54 @@ public class LaunchItemComm extends LaunchItem
         }
 
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
+
+        Simple.makePost(onNotification);
     }
+
+    @Override
+    protected void onAttachedToWindow()
+    {
+        super.onAttachedToWindow();
+
+        if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
+        {
+            String waphonenumber = Json.getString(config, "waphonenumber");
+            NotificationService.subscribe(type, waphonenumber, onNotification);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow()
+    {
+        super.onDetachedFromWindow();
+
+        if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
+        {
+            String waphonenumber = Json.getString(config, "waphonenumber");
+            NotificationService.unsubscribe(type, waphonenumber, onNotification);
+        }
+    }
+
+    protected final Runnable onNotification = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
+            {
+                String waphonenumber = Json.getString(config, "waphonenumber");
+
+                int count = SimpleStorage.getInt("notifications", type + ".count." + waphonenumber);
+                String date = SimpleStorage.getString("notifications", type + ".stamp." + waphonenumber);
+
+                Log.d(LOGTAG, "onNotification: count=" + count);
+                Log.d(LOGTAG, "onNotification: date=" + date);
+
+                notifyText.setText(count + " " + "Nachrichten");
+                notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+            }
+        }
+    };
 
     @Override
     protected void onMyClick()

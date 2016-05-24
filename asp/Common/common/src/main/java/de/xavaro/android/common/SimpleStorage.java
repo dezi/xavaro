@@ -93,13 +93,15 @@ public class SimpleStorage
     @Nullable
     public static JSONObject getJSONObject(String name, String property)
     {
-        return Json.clone(Json.getObject(getStorage(name), property));
+        JSONObject object = Json.getObject(getStorage(name), property);
+        return (object != null) ? Json.clone(object) : null;
     }
 
     @Nullable
     public static JSONArray getJSONArray(String name, String property)
     {
-        return Json.clone(Json.getArray(getStorage(name), property));
+        JSONArray array = Json.getArray(getStorage(name), property);
+        return (array != null) ? Json.clone(array) : null;
     }
 
     public static void addInt(String name, String property, int value)

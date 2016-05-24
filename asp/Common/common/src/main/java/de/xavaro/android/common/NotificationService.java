@@ -99,6 +99,17 @@ public class NotificationService extends NotificationListenerService
 
         String whatsappid = intent.hasExtra("jid") ? intent.getExtras().getString("jid") : null;
         if (whatsappid == null) whatsappid = sbn.getTag();
+        if (whatsappid == null) return;
+
+        if (whatsappid.endsWith("@s.whatsapp.net"))
+        {
+            whatsappid = whatsappid.substring(0, whatsappid.length() - 15);
+        }
+
+        if (! whatsappid.startsWith("+"))
+        {
+            whatsappid = "+" + whatsappid;
+        }
 
         String sender = extras.getString("android.title");
         String text = extras.getString("android.text");
@@ -130,7 +141,7 @@ public class NotificationService extends NotificationListenerService
 
         SimpleStorage.put("notifications", "whatsapp" + ".stamp." + whatsappid, Simple.nowAsISO());
 
-        doCallbacks("whatsapp");
+        doCallbacks("whatsapp", whatsappid);
     }
 
     @Override
@@ -223,31 +234,49 @@ public class NotificationService extends NotificationListenerService
         if (pi != null) dumpExtras(type + ": intent", pi.getExtras());
     }
 
-    public static void subscribe(String appname, Runnable runner)
+    public static void subscribe(String appname, String pfid, Runnable runner)
     {
+        String mapkey = appname + "." + pfid;
+        Log.d(LOGTAG, "subscribe: " + mapkey);
+
         synchronized (callbacks)
         {
-            ArrayList<Runnable> runners = callbacks.get(appname);
-            if (runners == null) runners = new ArrayList<>();
+            ArrayList<Runnable> runners = callbacks.get(mapkey);
+
+            if (runners == null)
+            {
+                runners = new ArrayList<>();
+                callbacks.put(mapkey, runners);
+            }
+
             if (! runners.contains(runner)) runners.add(runner);
         }
     }
 
-    public static void unsubscribe(String appname, Runnable runner)
+    public static void unsubscribe(String appname, String pfid, Runnable runner)
     {
+        String mapkey = appname + "." + pfid;
+        Log.d(LOGTAG, "unsubscribe: " + mapkey);
+
         synchronized (callbacks)
         {
-            ArrayList<Runnable> runners = callbacks.get(appname);
-            if (runners == null) runners = new ArrayList<>();
-            if (runners.contains(runner)) runners.remove(runner);
+            ArrayList<Runnable> runners = callbacks.get(mapkey);
+
+            if ((runners != null) && runners.contains(runner))
+            {
+                runners.remove(runner);
+            }
         }
     }
 
-    private static void doCallbacks(String appname)
+    private static void doCallbacks(String appname, String pfid)
     {
+        String mapkey = appname + "." + pfid;
+        Log.d(LOGTAG, "doCallbacks: " + mapkey);
+
         synchronized (callbacks)
         {
-            ArrayList<Runnable> runners = callbacks.get(appname);
+            ArrayList<Runnable> runners = callbacks.get(mapkey);
 
             if (runners != null)
             {
