@@ -155,7 +155,17 @@ public class LaunchItemComm extends LaunchItem
     {
         super.onAttachedToWindow();
 
-        if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
+        if (Simple.equals(type, "phone") && config.has("phonenumber"))
+        {
+            String phonenumber = Json.getString(config, "phonenumber");
+
+            if (Simple.equals(subtype, "text"))
+            {
+                NotificationService.subscribe("smsmms", phonenumber, onNotification);
+            }
+        }
+
+        if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
         {
             String waphonenumber = Json.getString(config, "waphonenumber");
             NotificationService.subscribe(type, waphonenumber, onNotification);
@@ -167,7 +177,17 @@ public class LaunchItemComm extends LaunchItem
     {
         super.onDetachedFromWindow();
 
-        if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
+        if (Simple.equals(type, "phone") && config.has("phonenumber"))
+        {
+            String phonenumber = Json.getString(config, "phonenumber");
+
+            if (Simple.equals(subtype, "text"))
+            {
+                NotificationService.unsubscribe("smsmms", phonenumber, onNotification);
+            }
+        }
+
+        if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
         {
             String waphonenumber = Json.getString(config, "waphonenumber");
             NotificationService.unsubscribe(type, waphonenumber, onNotification);
@@ -179,6 +199,27 @@ public class LaunchItemComm extends LaunchItem
         @Override
         public void run()
         {
+            if (Simple.equals(type, "phone") && config.has("phonenumber"))
+            {
+                String phonenumber = Json.getString(config, "phonenumber");
+
+                if (Simple.equals(subtype, "text"))
+                {
+                    int count = SimpleStorage.getInt("notifications", "smsmms" + ".count." + phonenumber);
+                    String date = SimpleStorage.getString("notifications", "smsmms" + ".stamp." + phonenumber);
+
+                    Log.d(LOGTAG, "onNotification: count=" + count);
+                    Log.d(LOGTAG, "onNotification: date=" + date);
+
+                    String message = count + " " + Simple.getTrans((count == 1)
+                            ? R.string.simple_message
+                            : R.string.simple_messages);
+
+                    notifyText.setText(message);
+                    notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+                }
+            }
+
             if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
             {
                 String waphonenumber = Json.getString(config, "waphonenumber");

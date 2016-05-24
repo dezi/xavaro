@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -12,6 +11,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.view.Gravity;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -77,11 +77,7 @@ public class HomePeople extends FrameLayout
             @Override
             public boolean onTouchEvent(MotionEvent motionEvent)
             {
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP)
-                {
-                    Simple.makePost(onScrollEnded);
-                }
-
+                onPeopleTouchEvent(motionEvent);
                 return super.onTouchEvent(motionEvent);
             }
         };
@@ -96,11 +92,7 @@ public class HomePeople extends FrameLayout
             @Override
             public boolean onTouchEvent(MotionEvent motionEvent)
             {
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP)
-                {
-                    Simple.makePost(onScrollEnded);
-                }
-
+                onPeopleTouchEvent(motionEvent);
                 return super.onTouchEvent(motionEvent);
             }
         };
@@ -116,7 +108,41 @@ public class HomePeople extends FrameLayout
         orientation = Configuration.ORIENTATION_UNDEFINED;
     }
 
-    private final Runnable onScrollEnded = new Runnable()
+    private int xLastTouch;
+    private int yLastTouch;
+    private int xDirTouch;
+    private int yDirTouch;
+
+    private void onPeopleTouchEvent(MotionEvent motionEvent)
+    {
+        int xscreen = (int) motionEvent.getRawX();
+        int yscreen = (int) motionEvent.getRawY();
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+        {
+            xDirTouch = 0;
+            yDirTouch = 0;
+
+            xLastTouch = xscreen;
+            yLastTouch = yscreen;
+        }
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_MOVE)
+        {
+            xDirTouch = (xLastTouch > xscreen) ? -1 : 1;
+            yDirTouch = (yLastTouch > yscreen) ? -1 : 1;
+
+            xLastTouch = xscreen;
+            yLastTouch = yscreen;
+        }
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+        {
+            Simple.makePost(onPeopleScrollEnded);
+        }
+    }
+
+    private final Runnable onPeopleScrollEnded = new Runnable()
     {
         @Override
         public void run()
@@ -127,7 +153,7 @@ public class HomePeople extends FrameLayout
                 int leftrest = xoffset % HomeActivity.personSize;
                 int rightrest = HomeActivity.personSize - leftrest;
 
-                horzFrame.smoothScrollBy((leftrest < rightrest) ? -leftrest : rightrest, 0);
+                horzFrame.smoothScrollBy((xDirTouch > 0) ? -leftrest : rightrest, 0);
             }
             else
             {
@@ -135,7 +161,7 @@ public class HomePeople extends FrameLayout
                 int toprest = yoffset % HomeActivity.personSize;
                 int bottomrest = HomeActivity.personSize - toprest;
 
-                vertFrame.smoothScrollBy((toprest < bottomrest) ? -toprest : bottomrest, 0);
+                vertFrame.smoothScrollBy((yDirTouch > 0) ? -toprest : bottomrest, 0);
             }
         }
     };
@@ -382,6 +408,12 @@ public class HomePeople extends FrameLayout
 
                 JSONArray choices = Json.getArray(nameList, label);
                 Json.put(li, "launchitems", choices);
+
+                //
+                // Add copy to all contacts at end of other contacts.
+                //
+
+                Json.put(moreContacts, li);
             }
         }
 

@@ -85,6 +85,102 @@ public class NotificationService extends NotificationListenerService
         }
     };
 
+    private void onSMSMessage(StatusBarNotification sbn, boolean removed)
+    {
+        Bundle extras = sbn.getNotification().extras;
+
+        if (extras == null) return;
+
+        String sender = extras.getString("android.title");
+        String ticker = (String) sbn.getNotification().tickerText;
+
+        Log.d(LOGTAG, "onSMSMessage: ---------------------------" + removed);
+        Log.d(LOGTAG, "onSMSMessage: Package:" + sbn.getPackageName());
+        Log.d(LOGTAG, "onSMSMessage: Ticker:" + ticker);
+        Log.d(LOGTAG, "onSMSMessage: Text:" + extras.getCharSequence("android.text"));
+
+        if ((sender == null) || (ticker == null)) return;
+
+        Log.d(LOGTAG, "onSMSMessage: Sender:" + sender);
+
+        if (! ticker.startsWith(sender + ": ")) return;
+
+        String text = ticker.substring(sender.length() + 2);
+        String phone = ProfileImages.getPhoneFromName(sender);
+
+        Log.d(LOGTAG, "onSMSMessage: Message:" + text);
+        Log.d(LOGTAG, "onSMSMessage: Phone:" + phone);
+
+        //
+        // The SMS service removes an old notification when
+        // a new notification is setup. We cannot tell, if
+        // the remove is due to clearing the list as such or
+        // due to another message beeing notified.
+        //
+        // So we perform the removal with a delay. If in the
+        // meantime a new message comes in, the phone number
+        // ist removed from the removal list.
+        //
+
+        Simple.removePost(onSMSMessageRemoveAll);
+
+        if (removed)
+        {
+            synchronized (removeSMSPhones)
+            {
+                if (! removeSMSPhones.contains(phone))
+                {
+                    removeSMSPhones.add(phone);
+                }
+            }
+        }
+        else
+        {
+            synchronized (removeSMSPhones)
+            {
+                if (removeSMSPhones.contains(phone))
+                {
+                    removeSMSPhones.add(phone);
+                }
+            }
+
+            SimpleStorage.addInt("notifications", "smsmms" + ".count." + phone, 1);
+            SimpleStorage.addArray("notifications", "smsmms" + ".texts." + phone, text);
+            SimpleStorage.put("notifications", "smsmms" + ".stamp." + phone, Simple.nowAsISO());
+
+            doCallbacks("smsmms", phone);
+        }
+
+        //
+        // Make sure, all removals are delayed by the given interval.
+        //
+
+        Simple.makePost(onSMSMessageRemoveAll, 1000);
+    }
+
+    private final ArrayList<String> removeSMSPhones = new ArrayList<>();
+
+    private final Runnable onSMSMessageRemoveAll = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            synchronized (removeSMSPhones)
+            {
+                for (String phone : removeSMSPhones)
+                {
+                    SimpleStorage.put("notifications", "smsmms" + ".count." + phone, 0);
+                    SimpleStorage.remove("notifications", "smsmms" + ".texts." + phone);
+                    SimpleStorage.put("notifications", "smsmms" + ".stamp." + phone, Simple.nowAsISO());
+
+                    doCallbacks("smsmms", phone);
+                }
+
+                removeSMSPhones.clear();
+            }
+        }
+    };
+
     private void onWhatsAppMessage(StatusBarNotification sbn, boolean removed)
     {
         Intent intent = getIntent(sbn.getNotification().contentIntent);
@@ -155,6 +251,12 @@ public class NotificationService extends NotificationListenerService
             return;
         }
 
+        if (Simple.equals(pack, "com.android.mms"))
+        {
+            onSMSMessage(sbn, false);
+            return;
+        }
+
         dumpNotification("onNotificationPosted", sbn);
     }
 
@@ -169,11 +271,17 @@ public class NotificationService extends NotificationListenerService
             return;
         }
 
+        if (Simple.equals(pack, "com.android.mms"))
+        {
+            onSMSMessage(sbn, true);
+            return;
+        }
+
         dumpNotification("onNotificationRemoved", sbn);
     }
 
     @Nullable
-    private Intent getIntent(PendingIntent pendingIntent)
+    private static Intent getIntent(PendingIntent pendingIntent)
     {
         if (pendingIntent != null)
         {
@@ -195,7 +303,7 @@ public class NotificationService extends NotificationListenerService
         return null;
     }
 
-    private void dumpExtras(String type, Bundle extras)
+    private static void dumpExtras(String type, Bundle extras)
     {
         if (extras == null)
         {
@@ -215,7 +323,7 @@ public class NotificationService extends NotificationListenerService
         }
     }
 
-    private void dumpNotification(String type, StatusBarNotification sbn)
+    private static void dumpNotification(String type, StatusBarNotification sbn)
     {
         Bundle extras = sbn.getNotification().extras;
 
@@ -230,8 +338,14 @@ public class NotificationService extends NotificationListenerService
 
         dumpExtras(type + ": extras", extras);
 
-        Intent pi = getIntent(sbn.getNotification().contentIntent);
-        if (pi != null) dumpExtras(type + ": intent", pi.getExtras());
+        Intent intent = getIntent(sbn.getNotification().contentIntent);
+
+        if (intent != null)
+        {
+            Log.d(LOGTAG, type + ": intent: data:" + intent.getDataString());
+
+            dumpExtras(type + ": intent", intent.getExtras());
+        }
     }
 
     public static void subscribe(String appname, String pfid, Runnable runner)

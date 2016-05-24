@@ -958,7 +958,74 @@ public class ProfileImages
     }
 
     @Nullable
-    private static String getPhoneFromSkype(String skypename)
+    public static String getPhoneFromName(String name)
+    {
+        if (name == null) return null;
+
+        if (contacts == null) contacts = ContactsHandler.getJSONData();
+        if (contacts == null) return null;
+
+        try
+        {
+            Iterator<?> ids = contacts.keys();
+
+            while (ids.hasNext())
+            {
+                String id = (String) ids.next();
+                JSONArray contact = contacts.getJSONArray(id);
+                if (contact == null) continue;
+
+                boolean ismatch = false;
+                String phone = null;
+
+                for (int inx = 0; inx < contact.length(); inx++)
+                {
+                    JSONObject item = contact.getJSONObject(inx);
+
+                    if (item.has("NUMBER"))
+                    {
+                        phone = item.getString("NUMBER");
+
+                        if (phone != null) phone = phone.replaceAll(" ", "");
+                    }
+
+                    if (item.has("DISPLAY_NAME"))
+                    {
+                        //
+                        // Workaround for Skype which puts
+                        // nickname as display name and
+                        // duplicates it into given name.
+                        //
+
+                        String disp = item.getString("DISPLAY_NAME");
+
+
+                        if (disp.equals(name))
+                        {
+                            ismatch = true;
+                        }
+                    }
+                }
+
+                if (ismatch && (phone != null))
+                {
+                    //
+                    // We have found a phone number from display name.
+                    //
+
+                    return phone;
+                }
+            }
+        }
+        catch (JSONException ignore)
+        {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getPhoneFromSkype(String skypename)
     {
         if (contacts == null) contacts = ContactsHandler.getJSONData();
         if (contacts == null) return null;
