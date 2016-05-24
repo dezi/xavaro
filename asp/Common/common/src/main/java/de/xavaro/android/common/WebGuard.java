@@ -429,8 +429,6 @@ public class WebGuard extends WebViewClient
 
             if ((config != null) && config.has("webguard"))
             {
-                OopsService.log(LOGTAG, "checkUrlResource: " + url);
-
                 //
                 // Check for any static cookies to be added.
                 //
