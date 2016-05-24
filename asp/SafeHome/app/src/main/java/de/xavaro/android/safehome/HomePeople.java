@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -69,12 +71,40 @@ public class HomePeople extends FrameLayout
         }
 
         horzLayout = new LayoutParams(Simple.MP, Simple.MP);
-        horzFrame = new HorizontalScrollView(context);
+
+        horzFrame = new HorizontalScrollView(context)
+        {
+            @Override
+            public boolean onTouchEvent(MotionEvent motionEvent)
+            {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+                {
+                    Simple.makePost(onScrollEnded);
+                }
+
+                return super.onTouchEvent(motionEvent);
+            }
+        };
+
         horzFrame.setLayoutParams(horzLayout);
         addView(horzFrame);
 
         vertLayout = new LayoutParams(Simple.MP, Simple.MP);
-        vertFrame = new ScrollView(context);
+
+        vertFrame = new ScrollView(context)
+        {
+            @Override
+            public boolean onTouchEvent(MotionEvent motionEvent)
+            {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP)
+                {
+                    Simple.makePost(onScrollEnded);
+                }
+
+                return super.onTouchEvent(motionEvent);
+            }
+        };
+
         vertFrame.setLayoutParams(vertLayout);
         addView(vertFrame);
 
@@ -85,6 +115,30 @@ public class HomePeople extends FrameLayout
         navbarSize = Simple.getNavigationBarHeight();
         orientation = Configuration.ORIENTATION_UNDEFINED;
     }
+
+    private final Runnable onScrollEnded = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (Simple.isPortrait())
+            {
+                int xoffset = horzFrame.getScrollX();
+                int leftrest = xoffset % HomeActivity.personSize;
+                int rightrest = HomeActivity.personSize - leftrest;
+
+                horzFrame.smoothScrollBy((leftrest < rightrest) ? -leftrest : rightrest, 0);
+            }
+            else
+            {
+                int yoffset = vertFrame.getScrollX();
+                int toprest = yoffset % HomeActivity.personSize;
+                int bottomrest = HomeActivity.personSize - toprest;
+
+                vertFrame.smoothScrollBy((toprest < bottomrest) ? -toprest : bottomrest, 0);
+            }
+        }
+    };
 
     public void setConfig(JSONObject config)
     {

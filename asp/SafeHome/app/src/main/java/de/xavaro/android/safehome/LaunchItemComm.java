@@ -189,7 +189,11 @@ public class LaunchItemComm extends LaunchItem
                 Log.d(LOGTAG, "onNotification: count=" + count);
                 Log.d(LOGTAG, "onNotification: date=" + date);
 
-                notifyText.setText(count + " " + "Nachrichten");
+                String message = count + " " + Simple.getTrans((count == 1)
+                        ? R.string.simple_message
+                        : R.string.simple_messages);
+
+                notifyText.setText(message);
                 notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
             }
         }

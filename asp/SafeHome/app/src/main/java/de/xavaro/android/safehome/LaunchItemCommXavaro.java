@@ -119,6 +119,8 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
         }
 
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
+
+        Simple.makePost(onNotification);
     }
 
     private void checkPrepaidBalance()
@@ -203,7 +205,12 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
                 Log.d(LOGTAG, "onNotification: count=" + count);
                 Log.d(LOGTAG, "onNotification: date=" + date);
 
-                notifyText.setText(count + " " + "Nachrichten");
+                String message = count + " " + Simple.getTrans((count == 1)
+                        ? R.string.simple_message
+                        : R.string.simple_messages);
+
+                notifyText.setText(message);
+
                 notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
             }
         }

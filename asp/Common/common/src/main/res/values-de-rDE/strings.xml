@@ -4,6 +4,9 @@
     <string name="simple_new">neu</string>
     <string name="simple_none">keine</string>
 
+    <string name="simple_message">Nachricht</string>
+    <string name="simple_messages">Nachrichten</string>
+
     <string-array name="de_regions_keys">
         <item>de</item>
         <item>de.bw</item>

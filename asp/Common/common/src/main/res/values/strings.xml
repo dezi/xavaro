@@ -7,6 +7,9 @@
     <string name="simple_new">new</string>
     <string name="simple_none">no</string>
 
+    <string name="simple_message">Message</string>
+    <string name="simple_messages">Messages</string>
+
     <string-array name="pref_where_keys">
         <item>inact</item>
         <item>home</item>

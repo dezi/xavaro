@@ -313,9 +313,9 @@ public class LaunchItem extends FrameLayout implements
         // Take care for notify element.
         //
 
-        notifyLayout.topMargin = Math.round(120 * scale);
-        Simple.setPadding(notifyText, 8, 2, 8, 4);
+        notifyLayout.topMargin = Simple.getDevicePixels(Math.round(140 * scale));
         notifyText.setTextSize(Simple.getDeviceTextSize(20f * scale));
+        Simple.setPadding(notifyText, 8, 2, 8, 4);
 
         //
         // Now fill in label text if present.
