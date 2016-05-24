@@ -163,12 +163,23 @@ public class LaunchItemComm extends LaunchItem
             {
                 NotificationService.subscribe("smsmms", phonenumber, onNotification);
             }
+
+            if (Simple.equals(subtype, "voip"))
+            {
+                NotificationService.subscribe("phonecall", phonenumber, onNotification);
+            }
         }
 
         if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
         {
             String waphonenumber = Json.getString(config, "waphonenumber");
             NotificationService.subscribe(type, waphonenumber, onNotification);
+        }
+
+        if (Simple.equals(type, "skype") && config.has("skypename"))
+        {
+            String skypename = Json.getString(config, "skypename");
+            NotificationService.subscribe(type, skypename, onNotification);
         }
     }
 
@@ -185,12 +196,23 @@ public class LaunchItemComm extends LaunchItem
             {
                 NotificationService.unsubscribe("smsmms", phonenumber, onNotification);
             }
+
+            if (Simple.equals(subtype, "voip"))
+            {
+                NotificationService.unsubscribe("phonecall", phonenumber, onNotification);
+            }
         }
 
         if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
         {
             String waphonenumber = Json.getString(config, "waphonenumber");
             NotificationService.unsubscribe(type, waphonenumber, onNotification);
+        }
+
+        if (Simple.equals(type, "skype") && config.has("skypename"))
+        {
+            String skypename = Json.getString(config, "skypename");
+            NotificationService.unsubscribe(type, skypename, onNotification);
         }
     }
 
@@ -218,6 +240,22 @@ public class LaunchItemComm extends LaunchItem
                     notifyText.setText(message);
                     notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
                 }
+
+                if (Simple.equals(subtype, "voip"))
+                {
+                    int count = SimpleStorage.getInt("notifications", "phonecall" + ".count." + phonenumber);
+                    String date = SimpleStorage.getString("notifications", "phonecall" + ".stamp." + phonenumber);
+
+                    Log.d(LOGTAG, "onNotification: count=" + count);
+                    Log.d(LOGTAG, "onNotification: date=" + date);
+
+                    String message = count + " " + Simple.getTrans((count == 1)
+                            ? R.string.simple_call
+                            : R.string.simple_calls);
+
+                    notifyText.setText(message);
+                    notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+                }
             }
 
             if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
@@ -233,6 +271,24 @@ public class LaunchItemComm extends LaunchItem
                 String message = count + " " + Simple.getTrans((count == 1)
                         ? R.string.simple_message
                         : R.string.simple_messages);
+
+                notifyText.setText(message);
+                notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+            }
+
+            if (Simple.equals(type,"skype") && config.has("skypename"))
+            {
+                String skypename = Json.getString(config, "skypename");
+
+                int count = SimpleStorage.getInt("notifications", type + ".count." + skypename);
+                String date = SimpleStorage.getString("notifications", type + ".stamp." + skypename);
+
+                Log.d(LOGTAG, "onNotification: count=" + count);
+                Log.d(LOGTAG, "onNotification: date=" + date);
+
+                String message = count + " " + Simple.getTrans((count == 1)
+                        ? R.string.simple_call
+                        : R.string.simple_calls);
 
                 notifyText.setText(message);
                 notifyText.setVisibility((count == 0) ? GONE : VISIBLE);

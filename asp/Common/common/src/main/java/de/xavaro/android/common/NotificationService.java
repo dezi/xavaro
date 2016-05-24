@@ -85,6 +85,46 @@ public class NotificationService extends NotificationListenerService
         }
     };
 
+    private void onPhoneCall(StatusBarNotification sbn, boolean removed)
+    {
+        Bundle extras = sbn.getNotification().extras;
+
+        if (extras == null) return;
+
+        String sender = extras.getString("android.text");
+        String title = extras.getString("android.title");
+
+        Log.d(LOGTAG, "onPhoneCall: ---------------------------" + removed);
+        Log.d(LOGTAG, "onPhoneCall: Package:" + sbn.getPackageName());
+        Log.d(LOGTAG, "onPhoneCall: Title:" + title);
+        Log.d(LOGTAG, "onPhoneCall: Sender:" + sender);
+
+        if ((sender == null) || (title == null)) return;
+
+        Log.d(LOGTAG, "onPhoneCall: Sender:" + sender);
+
+        String phone = ProfileImages.getPhoneFromName(sender);
+
+        if (phone == null) return;
+
+        if (removed)
+        {
+            SimpleStorage.put("notifications", "phonecall" + ".count." + phone, 0);
+            SimpleStorage.remove("notifications", "phonecall" + ".texts." + phone);
+        }
+        else
+        {
+            String[] parts = title.split(" ");
+            int calls = Simple.parseNumber(parts[ 0 ]);
+
+            SimpleStorage.put("notifications", "phonecall" + ".count." + phone, calls);
+        }
+
+        SimpleStorage.put("notifications", "phonecall" + ".stamp." + phone, Simple.nowAsISO());
+
+        doCallbacks("phonecall", phone);
+    }
+
     private void onSMSMessage(StatusBarNotification sbn, boolean removed)
     {
         Bundle extras = sbn.getNotification().extras;
@@ -110,6 +150,8 @@ public class NotificationService extends NotificationListenerService
 
         Log.d(LOGTAG, "onSMSMessage: Message:" + text);
         Log.d(LOGTAG, "onSMSMessage: Phone:" + phone);
+
+        if (phone == null) return;
 
         //
         // The SMS service removes an old notification when
@@ -181,6 +223,38 @@ public class NotificationService extends NotificationListenerService
         }
     };
 
+    private void onSkypeCall(StatusBarNotification sbn, boolean removed)
+    {
+        Intent intent = getIntent(sbn.getNotification().contentIntent);
+        Bundle extras = sbn.getNotification().extras;
+
+        if ((intent == null) || (extras == null)) return;
+
+        String skypename = intent.hasExtra("com.skype.identitiy")
+                ? intent.getExtras().getString("com.skype.identitiy")
+                : null;
+
+        if (skypename == null) return;
+
+        Log.d(LOGTAG, "onSkypeCall: ------------------" + removed);
+        Log.d(LOGTAG, "onSkypeCall: removed=" + removed);
+        Log.d(LOGTAG, "onSkypeCall: skypename=" + skypename);
+
+        if (removed)
+        {
+            SimpleStorage.put("notifications", "skype" + ".count." + skypename, 0);
+            SimpleStorage.remove("notifications", "skype" + ".texts." + skypename);
+        }
+        else
+        {
+            SimpleStorage.addInt("notifications", "skype" + ".count." + skypename, 1);
+        }
+
+        SimpleStorage.put("notifications", "skype" + ".stamp." + skypename, Simple.nowAsISO());
+
+        doCallbacks("skype", skypename);
+    }
+
     private void onWhatsAppMessage(StatusBarNotification sbn, boolean removed)
     {
         Intent intent = getIntent(sbn.getNotification().contentIntent);
@@ -218,7 +292,7 @@ public class NotificationService extends NotificationListenerService
 
         if (Simple.equals(summary, text)) return;
 
-        Log.d(LOGTAG, "onWhatsAppMessage: ------------------");
+        Log.d(LOGTAG, "onWhatsAppMessage: ------------------" + removed);
         Log.d(LOGTAG, "onWhatsAppMessage: removed=" + removed);
         Log.d(LOGTAG, "onWhatsAppMessage: whatsappid=" + whatsappid);
         Log.d(LOGTAG, "onWhatsAppMessage: sender=" + sender);
@@ -245,6 +319,12 @@ public class NotificationService extends NotificationListenerService
     {
         String pack = sbn.getPackageName();
 
+        if (Simple.equals(pack, "com.skype.raider"))
+        {
+            onSkypeCall(sbn, false);
+            return;
+        }
+
         if (Simple.equals(pack, "com.whatsapp"))
         {
             onWhatsAppMessage(sbn, false);
@@ -257,6 +337,12 @@ public class NotificationService extends NotificationListenerService
             return;
         }
 
+        if (Simple.equals(pack, "com.android.server.telecom"))
+        {
+            onPhoneCall(sbn, false);
+            return;
+        }
+
         dumpNotification("onNotificationPosted", sbn);
     }
 
@@ -264,6 +350,12 @@ public class NotificationService extends NotificationListenerService
     public void onNotificationRemoved(StatusBarNotification sbn)
     {
         String pack = sbn.getPackageName();
+
+        if (Simple.equals(pack, "com.skype.raider"))
+        {
+            onSkypeCall(sbn, true);
+            return;
+        }
 
         if (Simple.equals(pack, "com.whatsapp"))
         {
@@ -274,6 +366,12 @@ public class NotificationService extends NotificationListenerService
         if (Simple.equals(pack, "com.android.mms"))
         {
             onSMSMessage(sbn, true);
+            return;
+        }
+
+        if (Simple.equals(pack, "com.android.server.telecom"))
+        {
+            onPhoneCall(sbn, false);
             return;
         }
 
