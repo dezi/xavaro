@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -95,6 +96,15 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
 
         sp.setKey("admin.notifications.enabled");
         sp.setTitle(R.string.pref_basic_safety_notifications_enable);
+        sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue)
+            {
+                notificationsPref.setEnabled((Boolean) newValue);
+                return true;
+            }
+        });
 
         preferences.add(sp);
 
@@ -106,6 +116,7 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         lp.setEntryValues(Simple.getTransArray(R.array.pref_basic_safety_notifications_keys));
         lp.setDefaultValue("inactive");
         lp.setOnclick(selectNotifications);
+        lp.setEnabled(Simple.getSharedPrefBoolean(sp.getKey()));
 
         preferences.add(lp);
         notificationsPref = lp;
@@ -123,6 +134,15 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
 
         sp.setKey("admin.accessibility.enabled");
         sp.setTitle(R.string.pref_basic_safety_accessibility_enable);
+        sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue)
+            {
+                accessibilityPref.setEnabled((Boolean) newValue);
+                return true;
+            }
+        });
 
         preferences.add(sp);
 
@@ -134,9 +154,19 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         lp.setEntryValues(Simple.getTransArray(R.array.pref_basic_safety_accessibility_keys));
         lp.setDefaultValue("inactive");
         lp.setOnclick(selectAccessibility);
+        lp.setEnabled(Simple.getSharedPrefBoolean(sp.getKey()));
 
         preferences.add(lp);
         accessibilityPref = lp;
+
+        //
+        // Accessibility services.
+        //
+
+        cp = new NicedPreferences.NiceInfoPreference(context);
+        cp.setTitle(R.string.pref_basic_safety_kioskmode_service);
+        cp.setSummary(R.string.pref_basic_safety_kioskmode_summary);
+        preferences.add(cp);
 
         lp = new NicedPreferences.NiceListPreference(context);
 

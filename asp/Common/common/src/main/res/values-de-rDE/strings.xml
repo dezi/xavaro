@@ -194,14 +194,12 @@
 
     <string name="pref_basic_safety_kioskmode_service">Kioskmodus</string>
     <string name="pref_basic_safety_kioskmode_summary">
-        Diese Einstellungen ermöglichen es, den Benutzer in der Anwendung festzuhalten.
+        Diese Einstellung ermöglicht es, den Benutzer in der Anwendung festzuhalten.
         Dazu muss die Eingabehilfe über die Android-Einstellungen von Ihnen aktiviert werden.
         Ist Ihnen dieses gelungen, wird die Eingabehilfe als aktiviert angezeigt.
-        \n\nDanach können Sie über den Kioskmodus steuern, ob der Benutzer unkonsolidierte
-        Anwendungen starten kann oder nicht.
-        \n\nManche Hersteller bieten diese Option nicht an. In diesem Fall kann keine
-        automatische Prepaid-Guthaben Abfrage durchgeführt werden. Auch der Kioskmode
-        ist dann unter Umständen nicht nutzbar.
+        \n\nDanach können Sie hier steuern, ob der Benutzer unkonsolidierte
+        Anwendungen starten kann oder nicht. Ist der Kioskmodus aktiviert, können
+        nur solche Anwendungen benutzt werden, die in den Einstellungen freigeschaltet sind.
     </string>
 
     <string-array name="pref_basic_safety_kioskmode_vals">
