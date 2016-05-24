@@ -1314,6 +1314,14 @@ public abstract class Social
 
             synchronized (feedSync)
             {
+                //
+                // Feeds tend to get unexact at the end. Never
+                // insert a post as new if there were already
+                // cached entries before that.
+                //
+
+                boolean havecached = false;
+
                 for (int inx = 0; inx < feeddata.length(); inx++)
                 {
                     JSONObject post = Json.getObject(feeddata, inx);
@@ -1328,10 +1336,31 @@ public abstract class Social
                     if ((postFiles != null) && postFiles.contains(postname))
                     {
                         postFiles.remove(postname);
+
+                        havecached = true;
+
                         continue;
                     }
 
-                    if (postfile.exists()) continue;
+                    if (postfile.exists())
+                    {
+                        havecached = true;
+
+                        continue;
+                    }
+
+                    if (havecached)
+                    {
+                        //
+                        // We are about to cache a new entry, but we have found
+                        // already cached entries. So this entry cannot be new.
+                        // Some we remove this from feed and continue;
+                        //
+
+                        Json.remove(feeddata, inx--);
+
+                        continue;
+                    }
 
                     JSONObject postdata = apifeedhasposts ? post : getGraphPost(postid);
                     if (postdata == null) continue;
