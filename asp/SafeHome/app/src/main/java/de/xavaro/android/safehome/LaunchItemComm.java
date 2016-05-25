@@ -198,7 +198,7 @@ public class LaunchItemComm extends LaunchItem
     @Override
     protected void onMyClick()
     {
-        if (Json.getBoolean(config, "nofunc"))
+        if (isNoFunction())
         {
             launchContacts();
         }

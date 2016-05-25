@@ -44,8 +44,6 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
     @Override
     protected void setConfig()
     {
-        boolean isFunc = ! Json.getBoolean(config, "nofunc");
-
         ImageView targetIcon = icon;
 
         if (config.has("subtype"))
@@ -87,7 +85,7 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
 
                 if (Json.equals(config, "chattype", "user"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResCommChatUser);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResCommChatUser);
                     if (isNoProfile()) labelText = "Xavaro – Chat";
                 }
 

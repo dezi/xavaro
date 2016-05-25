@@ -190,13 +190,38 @@ public class LaunchItemSocial extends LaunchItem
     @Override
     protected void onMyClick()
     {
-        launchAny();
+        if (isNoFunction())
+        {
+            launchDir();
+        }
+        else
+        {
+            launchAny();
+        }
     }
 
     protected boolean onMyLongClick()
     {
         Simple.makeClick();
 
+        return launchDir();
+    }
+
+    @Override
+    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
+    {
+        if (super.onExecuteVoiceIntent(voiceintent, index))
+        {
+            launchAny();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean launchDir()
+    {
         JSONArray launchItems = Json.getArray(config, "launchitems");
 
         if (launchItems != null)
@@ -213,19 +238,6 @@ public class LaunchItemSocial extends LaunchItem
         launchAny();
 
         return true;
-    }
-
-    @Override
-    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
-    {
-        if (super.onExecuteVoiceIntent(voiceintent, index))
-        {
-            launchAny();
-
-            return true;
-        }
-
-        return false;
     }
 
     private void launchAny()
