@@ -7,6 +7,8 @@
     <string name="simple_new">new</string>
     <string name="simple_none">no</string>
 
+    <string name="simple_news">News</string>
+    <string name="simple_newss">News</string>
     <string name="simple_call">Call</string>
     <string name="simple_calls">Calls</string>
     <string name="simple_message">Message</string>

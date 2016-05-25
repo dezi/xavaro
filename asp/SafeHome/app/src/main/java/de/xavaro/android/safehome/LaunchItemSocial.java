@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.File;
 
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SimpleStorage;
@@ -81,6 +82,8 @@ public class LaunchItemSocial extends LaunchItem
         }
 
         setFeeds();
+
+        Simple.makePost(onNotification);
     }
 
     private JSONArray allFeeds;
@@ -145,6 +148,12 @@ public class LaunchItemSocial extends LaunchItem
         super.onAttachedToWindow();
 
         Simple.makePost(feednews);
+
+        if (config.has("pfid"))
+        {
+            String pfid = Json.getString(config, "pfid");
+            NotificationService.subscribe(type, pfid, onNotification);
+        }
     }
 
     @Override
@@ -153,7 +162,34 @@ public class LaunchItemSocial extends LaunchItem
         super.onDetachedFromWindow();
 
         Simple.removePost(feednews);
+
+        if (config.has("pfid"))
+        {
+            String pfid = Json.getString(config, "pfid");
+            NotificationService.unsubscribe(type, pfid, onNotification);
+        }
     }
+
+    protected final Runnable onNotification = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (Json.has(config, "pfid"))
+            {
+                String pfid = Json.getString(config, "pfid");
+
+                int count = SimpleStorage.getInt("socialfeednews", type + ".count." + pfid);
+
+                String message = count + " " + Simple.getTrans((count == 1)
+                        ? R.string.simple_news
+                        : R.string.simple_newss);
+
+                notifyText.setText(message);
+                notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+            }
+        }
+    };
 
     @Override
     protected void onMyClick()

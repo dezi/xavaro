@@ -4,6 +4,8 @@
     <string name="simple_new">neu</string>
     <string name="simple_none">keine</string>
 
+    <string name="simple_news">Neuigkeit</string>
+    <string name="simple_newss">Neuigkeiten</string>
     <string name="simple_call">Anruf</string>
     <string name="simple_calls">Anrufe</string>
     <string name="simple_message">Nachricht</string>

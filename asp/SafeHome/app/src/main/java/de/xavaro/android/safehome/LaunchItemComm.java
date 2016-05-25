@@ -221,74 +221,47 @@ public class LaunchItemComm extends LaunchItem
         @Override
         public void run()
         {
+            String typetag = null;
+            String pfidtag = null;
+
+            int singular = R.string.simple_call;
+            int plural = R.string.simple_calls;
+
             if (Simple.equals(type, "phone") && config.has("phonenumber"))
             {
-                String phonenumber = Json.getString(config, "phonenumber");
+                pfidtag = Json.getString(config, "phonenumber");
 
                 if (Simple.equals(subtype, "text"))
                 {
-                    int count = SimpleStorage.getInt("notifications", "smsmms" + ".count." + phonenumber);
-                    String date = SimpleStorage.getString("notifications", "smsmms" + ".stamp." + phonenumber);
+                    typetag = "smsmms";
 
-                    Log.d(LOGTAG, "onNotification: count=" + count);
-                    Log.d(LOGTAG, "onNotification: date=" + date);
-
-                    String message = count + " " + Simple.getTrans((count == 1)
-                            ? R.string.simple_message
-                            : R.string.simple_messages);
-
-                    notifyText.setText(message);
-                    notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+                    singular = R.string.simple_message;
+                    plural = R.string.simple_messages;
                 }
 
-                if (Simple.equals(subtype, "voip"))
-                {
-                    int count = SimpleStorage.getInt("notifications", "phonecall" + ".count." + phonenumber);
-                    String date = SimpleStorage.getString("notifications", "phonecall" + ".stamp." + phonenumber);
-
-                    Log.d(LOGTAG, "onNotification: count=" + count);
-                    Log.d(LOGTAG, "onNotification: date=" + date);
-
-                    String message = count + " " + Simple.getTrans((count == 1)
-                            ? R.string.simple_call
-                            : R.string.simple_calls);
-
-                    notifyText.setText(message);
-                    notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
-                }
+                if (Simple.equals(subtype, "voip")) typetag = "phonecall";
             }
 
-            if (Simple.equals(type,"whatsapp") && config.has("waphonenumber"))
+            if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
             {
-                String waphonenumber = Json.getString(config, "waphonenumber");
+                pfidtag = Json.getString(config, "waphonenumber");
+                typetag = type;
 
-                int count = SimpleStorage.getInt("notifications", type + ".count." + waphonenumber);
-                String date = SimpleStorage.getString("notifications", type + ".stamp." + waphonenumber);
-
-                Log.d(LOGTAG, "onNotification: count=" + count);
-                Log.d(LOGTAG, "onNotification: date=" + date);
-
-                String message = count + " " + Simple.getTrans((count == 1)
-                        ? R.string.simple_message
-                        : R.string.simple_messages);
-
-                notifyText.setText(message);
-                notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
+                singular = R.string.simple_message;
+                plural = R.string.simple_messages;
             }
 
-            if (Simple.equals(type,"skype") && config.has("skypename"))
+            if (Simple.equals(type, "skype") && config.has("skypename"))
             {
-                String skypename = Json.getString(config, "skypename");
+                pfidtag = Json.getString(config, "skypename");
+                typetag = type;
+            }
 
-                int count = SimpleStorage.getInt("notifications", type + ".count." + skypename);
-                String date = SimpleStorage.getString("notifications", type + ".stamp." + skypename);
+            if ((typetag != null) && (pfidtag != null))
+            {
+                int count = SimpleStorage.getInt("notifications", typetag + ".count." + pfidtag);
 
-                Log.d(LOGTAG, "onNotification: count=" + count);
-                Log.d(LOGTAG, "onNotification: date=" + date);
-
-                String message = count + " " + Simple.getTrans((count == 1)
-                        ? R.string.simple_call
-                        : R.string.simple_calls);
+                String message = count + " " + Simple.getTrans((count == 1) ? singular : plural);
 
                 notifyText.setText(message);
                 notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
