@@ -30,8 +30,6 @@ public class LaunchItemComm extends LaunchItem
     @Override
     protected void setConfig()
     {
-        boolean isFunc = ! Json.getBoolean(config, "nofunc");
-
         ImageSmartView targetIcon = icon;
 
         if (type.equals("phone"))
@@ -49,12 +47,12 @@ public class LaunchItemComm extends LaunchItem
 
                 if (Simple.equals(subtype, "text"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppText);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppText);
                     if (isNoProfile()) labelText = "SMS – Nachricht";
                 }
                 if (Simple.equals(subtype, "voip"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppCall);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppCall);
                     if (isNoProfile()) labelText = "Anrufen";
                 }
             }
@@ -81,19 +79,19 @@ public class LaunchItemComm extends LaunchItem
 
                 if (Simple.equals(subtype, "chat"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResSkypeChat);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResSkypeChat);
                     if (isNoProfile()) labelText = "Skype – Chat";
                 }
 
                 if (Simple.equals(subtype, "voip"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResSkypeVoip);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResSkypeVoip);
                     if (isNoProfile()) labelText = "Skype – Anruf";
                 }
 
                 if (Simple.equals(subtype, "vica"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResSkypeVica);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResSkypeVica);
                     if (isNoProfile()) labelText = "Skype – Video";
                 }
             }
@@ -120,12 +118,12 @@ public class LaunchItemComm extends LaunchItem
 
                 if (Simple.equals(subtype, "chat"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppChat);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppChat);
                     if (isNoProfile()) labelText = "WhatsApp – Chat";
                 }
                 if (Simple.equals(subtype, "voip"))
                 {
-                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppVoip);
+                    if (! isNoFunction()) targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppVoip);
                     if (isNoProfile()) labelText = "WhatsApp – Anruf";
                 }
             }
@@ -140,7 +138,7 @@ public class LaunchItemComm extends LaunchItem
             icon.setImageResource(GlobalConfigs.IconResContacts);
         }
 
-        if ((targetIcon == overicon) && isFunc) overlay.setVisibility(VISIBLE);
+        if ((targetIcon == overicon) && ! isNoFunction()) overlay.setVisibility(VISIBLE);
 
         Simple.makePost(onNotification);
     }
@@ -150,7 +148,10 @@ public class LaunchItemComm extends LaunchItem
     {
         super.onAttachedToWindow();
 
-        LaunchItem.subscribeNotification(config, onNotification);
+        if (! isNoFunction())
+        {
+            LaunchItem.subscribeNotification(config, onNotification);
+        }
     }
 
     @Override
@@ -158,7 +159,10 @@ public class LaunchItemComm extends LaunchItem
     {
         super.onDetachedFromWindow();
 
-        LaunchItem.unsubscribeNotification(config, onNotification);
+        if (! isNoFunction())
+        {
+            LaunchItem.unsubscribeNotification(config, onNotification);
+        }
     }
 
     protected final Runnable onNotification = new Runnable()

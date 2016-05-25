@@ -428,7 +428,7 @@ public class HomePeople extends FrameLayout
 
                 JSONArray choices = Json.getArray(nameList, label);
                 Json.put(li, "launchitems", choices);
-                Json.put(li, "nofunc", true);
+                Json.put(li, "nofunction", true);
             }
 
             JSONObject contacts = new JSONObject();

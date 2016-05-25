@@ -328,6 +328,15 @@ public class LaunchItem extends FrameLayout implements
         return Json.getBoolean(config, "noprofile");
     }
 
+    protected boolean isNoFunction()
+    {
+        //
+        // Return if icon and overlay icon relation is reversed.
+        //
+
+        return Json.getBoolean(config, "nofunction");
+    }
+
     public void setFrameLess(boolean yesno)
     {
         if (yesno)

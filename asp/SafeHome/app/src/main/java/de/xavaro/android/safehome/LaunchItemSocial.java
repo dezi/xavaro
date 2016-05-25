@@ -33,8 +33,6 @@ public class LaunchItemSocial extends LaunchItem
     @Override
     protected void setConfig()
     {
-        boolean isFunc = ! Json.getBoolean(config, "nofunc");
-
         ImageView targetIcon = icon;
 
         if (config.has("pfid"))
@@ -58,28 +56,28 @@ public class LaunchItemSocial extends LaunchItem
         if (type.equals("twitter"))
         {
             platformName = SocialTwitter.getInstance().getPlatformName();
-            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
+            if (! isNoFunction()) targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
             if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("facebook"))
         {
             platformName = SocialFacebook.getInstance().getPlatformName();
-            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
+            if (! isNoFunction()) targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
             if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("instagram"))
         {
             platformName = SocialInstagram.getInstance().getPlatformName();
-            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
+            if (! isNoFunction()) targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
             if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("googleplus"))
         {
             platformName = SocialGoogleplus.getInstance().getPlatformName();
-            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
+            if (! isNoFunction()) targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
             if (isNoProfile()) labelText = platformName;
         }
 
@@ -151,7 +149,7 @@ public class LaunchItemSocial extends LaunchItem
 
         Simple.makePost(feednews);
 
-        if (config.has("pfid"))
+        if (config.has("pfid") && ! isNoFunction())
         {
             LaunchItem.subscribeNotification(config, onNotification);
         }
@@ -164,7 +162,7 @@ public class LaunchItemSocial extends LaunchItem
 
         Simple.removePost(feednews);
 
-        if (config.has("pfid"))
+        if (config.has("pfid") && ! isNoFunction())
         {
             LaunchItem.subscribeNotification(config, onNotification);
         }
