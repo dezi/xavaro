@@ -218,20 +218,23 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
         }
     };
 
-    /*
     @Override
     protected boolean onMyLongClick()
     {
-        launchXavaroLong();
-
-        return true;
+        return launchXavaroLong() || super.onMyLongClick();
     }
-    */
 
     @Override
     protected void onMyClick()
     {
-        launchXavaro();
+        if (Json.getBoolean(config, "nofunc"))
+        {
+            super.launchContacts();
+        }
+        else
+        {
+            launchXavaro();
+        }
     }
 
     @Override
@@ -373,6 +376,8 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
         if (subtype.equals("padm"))
         {
             PrepaidManager.createPrepaidLoadDialog(this);
+
+            return true;
         }
 
         if (config.has("grouptype"))
@@ -407,6 +412,8 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
 
                     Simple.makeToast("Der Skype Rückruf wurde übertragen.");
                     Simple.makeToast("Bitte einen Moment Gelduld.");
+
+                    return true;
                 }
             }
         }

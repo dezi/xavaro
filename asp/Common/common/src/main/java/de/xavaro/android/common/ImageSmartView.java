@@ -180,8 +180,6 @@ public class ImageSmartView extends ImageView
     {
         Bitmap bitmap = ImageSmartCache.getCachedBitmap(restag, width, height, circle);
 
-        //(LOGTAG, "onDraw bitmap:" + bitmap);
-
         if (bitmap != null)
         {
             srcrect.set(0, 0, bitmap.getWidth(), bitmap.getHeight());

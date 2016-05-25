@@ -10,6 +10,8 @@
     <string name="simple_calls">Anrufe</string>
     <string name="simple_message">Nachricht</string>
     <string name="simple_messages">Nachrichten</string>
+    <string name="simple_event">Ereignis</string>
+    <string name="simple_events">Ereignisse</string>
 
     <string-array name="de_regions_keys">
         <item>de</item>

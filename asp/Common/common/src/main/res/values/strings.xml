@@ -13,6 +13,8 @@
     <string name="simple_calls">Calls</string>
     <string name="simple_message">Message</string>
     <string name="simple_messages">Messages</string>
+    <string name="simple_event">Event</string>
+    <string name="simple_events">Events</string>
 
     <string-array name="pref_where_keys">
         <item>inact</item>

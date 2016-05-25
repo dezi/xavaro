@@ -269,10 +269,17 @@ public class LaunchItemComm extends LaunchItem
     @Override
     protected void onMyClick()
     {
-        if (type.equals("phone"   )) launchPhone();
-        if (type.equals("skype"   )) launchSkype();
-        if (type.equals("whatsapp")) launchWhatsApp();
-        if (type.equals("contacts")) launchContacts();
+        if (Json.getBoolean(config, "nofunc"))
+        {
+            launchContacts();
+        }
+        else
+        {
+            if (type.equals("phone")) launchPhone();
+            if (type.equals("skype")) launchSkype();
+            if (type.equals("whatsapp")) launchWhatsApp();
+            if (type.equals("contacts")) launchContacts();
+        }
     }
 
     protected boolean onMyLongClick()
@@ -426,7 +433,7 @@ public class LaunchItemComm extends LaunchItem
         ((HomeActivity) context).addViewToBackStack(directory);
     }
 
-    private boolean launchContacts()
+    protected boolean launchContacts()
     {
         JSONArray launchItems = Json.getArray(config, "launchitems");
 
