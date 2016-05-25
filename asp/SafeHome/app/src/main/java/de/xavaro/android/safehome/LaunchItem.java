@@ -22,7 +22,9 @@ import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.VersionUtils;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
@@ -99,6 +101,93 @@ public class LaunchItem extends FrameLayout implements
         item.setConfig(parent, config);
 
         return item;
+    }
+
+    public static String getSubscribeNotificationType(JSONObject config)
+    {
+        String typetag = null;
+
+        String type = Json.getString(config, "type");
+        String subtype = Json.getString(config, "subtype");
+
+        if (Simple.equals(type, "phone"))
+        {
+            if (Simple.equals(subtype, "text")) typetag = "smsmms";
+            if (Simple.equals(subtype, "voip")) typetag = "phonecall";
+        }
+
+        if (Simple.equals(type, "skype") ||
+                Simple.equals(type, "xavaro") ||
+                Simple.equals(type, "whatsapp") ||
+                Simple.equals(type, "twitter") ||
+                Simple.equals(type, "facebook") ||
+                Simple.equals(type, "instagram") ||
+                Simple.equals(type, "googleplus"))
+        {
+            typetag = type;
+        }
+
+        return typetag;
+    }
+
+    public static String getSubscribeNotificationPfid(JSONObject config)
+    {
+        String pfidtag = null;
+
+        String type = Json.getString(config, "type");
+
+        if (Simple.equals(type, "phone")) pfidtag = Json.getString(config, "phonenumber");
+        if (Simple.equals(type, "skype")) pfidtag = Json.getString(config, "skypename");
+        if (Simple.equals(type, "xavaro")) pfidtag = Json.getString(config, "identity");
+        if (Simple.equals(type, "whatsapp")) pfidtag = Json.getString(config, "waphonenumber");
+
+        if (Simple.equals(type, "twitter") ||
+                Simple.equals(type, "facebook") ||
+                Simple.equals(type, "instagram") ||
+                Simple.equals(type, "googleplus"))
+        {
+            pfidtag = Json.getString(config, "pfid");;
+        }
+
+        return pfidtag;
+    }
+
+    public static void subscribeNotification(JSONObject config, Runnable callback)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return;
+
+        NotificationService.subscribe(typetag, pfidtag, callback);
+    }
+
+    public static void unsubscribeNotification(JSONObject config, Runnable callback)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return;
+
+        NotificationService.unsubscribe(typetag, pfidtag, callback);
+    }
+
+    public static int getNotificationCount(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return -1;
+
+        if (Simple.equals(typetag, "twitter") ||
+                Simple.equals(typetag, "facebook") ||
+                Simple.equals(typetag, "instagram") ||
+                Simple.equals(typetag, "googleplus"))
+        {
+            return SimpleStorage.getInt("socialfeednews", typetag + ".count." + pfidtag);
+        }
+
+        return SimpleStorage.getInt("notifications", typetag + ".count." + pfidtag);
     }
 
     protected Context context;

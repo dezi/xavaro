@@ -153,8 +153,7 @@ public class LaunchItemSocial extends LaunchItem
 
         if (config.has("pfid"))
         {
-            String pfid = Json.getString(config, "pfid");
-            NotificationService.subscribe(type, pfid, onNotification);
+            LaunchItem.subscribeNotification(config, onNotification);
         }
     }
 
@@ -167,8 +166,7 @@ public class LaunchItemSocial extends LaunchItem
 
         if (config.has("pfid"))
         {
-            String pfid = Json.getString(config, "pfid");
-            NotificationService.unsubscribe(type, pfid, onNotification);
+            LaunchItem.subscribeNotification(config, onNotification);
         }
     }
 
@@ -177,12 +175,10 @@ public class LaunchItemSocial extends LaunchItem
         @Override
         public void run()
         {
-            if (Json.has(config, "pfid"))
+            int count = LaunchItem.getNotificationCount(config);
+
+            if (count >= 0)
             {
-                String pfid = Json.getString(config, "pfid");
-
-                int count = SimpleStorage.getInt("socialfeednews", type + ".count." + pfid);
-
                 String message = count + " " + Simple.getTrans((count == 1)
                         ? R.string.simple_news
                         : R.string.simple_newss);

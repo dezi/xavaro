@@ -25,20 +25,7 @@ public class NotificationService extends NotificationListenerService
 
     public static boolean checkAvailable()
     {
-        try
-        {
-            String binds = Settings.Secure.getString(
-                    Simple.getContentResolver(),
-                    "enabled_notification_listeners");
-
-            return (binds != null);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-
-        return false;
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2);
     }
 
     public static boolean checkEnabled()
@@ -77,11 +64,8 @@ public class NotificationService extends NotificationListenerService
         @Override
         public void run()
         {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
-            {
-                Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-                ProcessManager.launchIntent(intent);
-            }
+            Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+            ProcessManager.launchIntent(intent);
         }
     };
 

@@ -167,12 +167,6 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
 
             checkPrepaidBalance();
         }
-
-        if (Simple.equals(type,"xavaro") && config.has("identity"))
-        {
-            String identity = Json.getString(config, "identity");
-            NotificationService.subscribe(type, identity, onNotification);
-        }
     }
 
     @Override
@@ -184,39 +178,7 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
         {
             CommService.unsubscribeMessage(this, "recvPrepaidBalance");
         }
-
-        if (Simple.equals(type,"xavaro") && config.has("identity"))
-        {
-            String identity = Json.getString(config, "identity");
-            NotificationService.subscribe(type, identity, onNotification);
-        }
     }
-
-    protected final Runnable onNotification = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            if (Simple.equals(type,"xavaro") && config.has("identity"))
-            {
-                String identity = Json.getString(config, "identity");
-
-                int count = SimpleStorage.getInt("notifications", type + ".count." + identity);
-                String date = SimpleStorage.getString("notifications", type + ".stamp." + identity);
-
-                Log.d(LOGTAG, "onNotification: count=" + count);
-                Log.d(LOGTAG, "onNotification: date=" + date);
-
-                String message = count + " " + Simple.getTrans((count == 1)
-                        ? R.string.simple_message
-                        : R.string.simple_messages);
-
-                notifyText.setText(message);
-
-                notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
-            }
-        }
-    };
 
     @Override
     protected boolean onMyLongClick()

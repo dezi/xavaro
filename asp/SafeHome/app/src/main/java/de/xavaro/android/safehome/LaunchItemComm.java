@@ -10,15 +10,13 @@ import org.json.JSONArray;
 import java.io.File;
 
 import de.xavaro.android.common.ImageSmartView;
-import de.xavaro.android.common.Json;
-import de.xavaro.android.common.NotificationService;
-import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.ProfileImages;
-import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Json;
 
 public class LaunchItemComm extends LaunchItem
 {
@@ -152,32 +150,7 @@ public class LaunchItemComm extends LaunchItem
     {
         super.onAttachedToWindow();
 
-        if (Simple.equals(type, "phone") && config.has("phonenumber"))
-        {
-            String phonenumber = Json.getString(config, "phonenumber");
-
-            if (Simple.equals(subtype, "text"))
-            {
-                NotificationService.subscribe("smsmms", phonenumber, onNotification);
-            }
-
-            if (Simple.equals(subtype, "voip"))
-            {
-                NotificationService.subscribe("phonecall", phonenumber, onNotification);
-            }
-        }
-
-        if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
-        {
-            String waphonenumber = Json.getString(config, "waphonenumber");
-            NotificationService.subscribe(type, waphonenumber, onNotification);
-        }
-
-        if (Simple.equals(type, "skype") && config.has("skypename"))
-        {
-            String skypename = Json.getString(config, "skypename");
-            NotificationService.subscribe(type, skypename, onNotification);
-        }
+        LaunchItem.subscribeNotification(config, onNotification);
     }
 
     @Override
@@ -185,32 +158,7 @@ public class LaunchItemComm extends LaunchItem
     {
         super.onDetachedFromWindow();
 
-        if (Simple.equals(type, "phone") && config.has("phonenumber"))
-        {
-            String phonenumber = Json.getString(config, "phonenumber");
-
-            if (Simple.equals(subtype, "text"))
-            {
-                NotificationService.unsubscribe("smsmms", phonenumber, onNotification);
-            }
-
-            if (Simple.equals(subtype, "voip"))
-            {
-                NotificationService.unsubscribe("phonecall", phonenumber, onNotification);
-            }
-        }
-
-        if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
-        {
-            String waphonenumber = Json.getString(config, "waphonenumber");
-            NotificationService.unsubscribe(type, waphonenumber, onNotification);
-        }
-
-        if (Simple.equals(type, "skype") && config.has("skypename"))
-        {
-            String skypename = Json.getString(config, "skypename");
-            NotificationService.unsubscribe(type, skypename, onNotification);
-        }
+        LaunchItem.unsubscribeNotification(config, onNotification);
     }
 
     protected final Runnable onNotification = new Runnable()
@@ -218,45 +166,22 @@ public class LaunchItemComm extends LaunchItem
         @Override
         public void run()
         {
-            String typetag = null;
-            String pfidtag = null;
+            int count = LaunchItem.getNotificationCount(config);
 
-            int singular = R.string.simple_call;
-            int plural = R.string.simple_calls;
-
-            if (Simple.equals(type, "phone") && config.has("phonenumber"))
+            if (count >= 0)
             {
-                pfidtag = Json.getString(config, "phonenumber");
+                String typetag = LaunchItem.getSubscribeNotificationType(config);
 
-                if (Simple.equals(subtype, "text"))
+                int singular = R.string.simple_call;
+                int plural = R.string.simple_calls;
+
+                if (Simple.equals(typetag, "smsmms")
+                        || Simple.equals(typetag, "xavaro")
+                        || Simple.equals(typetag, "whatsapp"))
                 {
-                    typetag = "smsmms";
-
                     singular = R.string.simple_message;
                     plural = R.string.simple_messages;
                 }
-
-                if (Simple.equals(subtype, "voip")) typetag = "phonecall";
-            }
-
-            if (Simple.equals(type, "whatsapp") && config.has("waphonenumber"))
-            {
-                pfidtag = Json.getString(config, "waphonenumber");
-                typetag = type;
-
-                singular = R.string.simple_message;
-                plural = R.string.simple_messages;
-            }
-
-            if (Simple.equals(type, "skype") && config.has("skypename"))
-            {
-                pfidtag = Json.getString(config, "skypename");
-                typetag = type;
-            }
-
-            if ((typetag != null) && (pfidtag != null))
-            {
-                int count = SimpleStorage.getInt("notifications", typetag + ".count." + pfidtag);
 
                 String message = count + " " + Simple.getTrans((count == 1) ? singular : plural);
 
