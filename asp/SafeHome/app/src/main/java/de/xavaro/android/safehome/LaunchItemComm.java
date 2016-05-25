@@ -2,18 +2,13 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 
 import java.io.File;
 
-import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NotificationService;
@@ -37,6 +32,8 @@ public class LaunchItemComm extends LaunchItem
     @Override
     protected void setConfig()
     {
+        boolean isFunc = ! Json.getBoolean(config, "nofunc");
+
         ImageSmartView targetIcon = icon;
 
         if (type.equals("phone"))
@@ -54,12 +51,12 @@ public class LaunchItemComm extends LaunchItem
 
                 if (Simple.equals(subtype, "text"))
                 {
-                    targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppText);
+                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppText);
                     if (isNoProfile()) labelText = "SMS – Nachricht";
                 }
                 if (Simple.equals(subtype, "voip"))
                 {
-                    targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppCall);
+                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResPhoneAppCall);
                     if (isNoProfile()) labelText = "Anrufen";
                 }
             }
@@ -86,19 +83,19 @@ public class LaunchItemComm extends LaunchItem
 
                 if (Simple.equals(subtype, "chat"))
                 {
-                    targetIcon.setImageResource(GlobalConfigs.IconResSkypeChat);
+                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResSkypeChat);
                     if (isNoProfile()) labelText = "Skype – Chat";
                 }
 
                 if (Simple.equals(subtype, "voip"))
                 {
-                    targetIcon.setImageResource(GlobalConfigs.IconResSkypeVoip);
+                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResSkypeVoip);
                     if (isNoProfile()) labelText = "Skype – Anruf";
                 }
 
                 if (Simple.equals(subtype, "vica"))
                 {
-                    targetIcon.setImageResource(GlobalConfigs.IconResSkypeVica);
+                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResSkypeVica);
                     if (isNoProfile()) labelText = "Skype – Video";
                 }
             }
@@ -125,12 +122,12 @@ public class LaunchItemComm extends LaunchItem
 
                 if (Simple.equals(subtype, "chat"))
                 {
-                    targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppChat);
+                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppChat);
                     if (isNoProfile()) labelText = "WhatsApp – Chat";
                 }
                 if (Simple.equals(subtype, "voip"))
                 {
-                    targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppVoip);
+                    if (isFunc) targetIcon.setImageResource(GlobalConfigs.IconResWhatsAppVoip);
                     if (isNoProfile()) labelText = "WhatsApp – Anruf";
                 }
             }
@@ -145,7 +142,7 @@ public class LaunchItemComm extends LaunchItem
             icon.setImageResource(GlobalConfigs.IconResContacts);
         }
 
-        if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
+        if ((targetIcon == overicon) && isFunc) overlay.setVisibility(VISIBLE);
 
         Simple.makePost(onNotification);
     }

@@ -33,6 +33,8 @@ public class LaunchItemSocial extends LaunchItem
     @Override
     protected void setConfig()
     {
+        boolean isFunc = ! Json.getBoolean(config, "nofunc");
+
         ImageView targetIcon = icon;
 
         if (config.has("pfid"))
@@ -56,28 +58,28 @@ public class LaunchItemSocial extends LaunchItem
         if (type.equals("twitter"))
         {
             platformName = SocialTwitter.getInstance().getPlatformName();
-            targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
+            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialTwitter);
             if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("facebook"))
         {
             platformName = SocialFacebook.getInstance().getPlatformName();
-            targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
+            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialFacebook);
             if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("instagram"))
         {
             platformName = SocialInstagram.getInstance().getPlatformName();
-            targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
+            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialInstagram);
             if (isNoProfile()) labelText = platformName;
         }
 
         if (type.equals("googleplus"))
         {
             platformName = SocialGoogleplus.getInstance().getPlatformName();
-            targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
+            if (isFunc) targetIcon.setImageResource(CommonConfigs.IconResSocialGoogleplus);
             if (isNoProfile()) labelText = platformName;
         }
 

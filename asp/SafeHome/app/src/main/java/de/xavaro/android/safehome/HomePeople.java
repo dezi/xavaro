@@ -413,7 +413,7 @@ public class HomePeople extends FrameLayout
                 // Add copy to all contacts at end of other contacts.
                 //
 
-                Json.put(moreContacts, li);
+                Json.put(moreContacts, Json.clone(li));
             }
         }
 
@@ -428,6 +428,7 @@ public class HomePeople extends FrameLayout
 
                 JSONArray choices = Json.getArray(nameList, label);
                 Json.put(li, "launchitems", choices);
+                Json.put(li, "nofunc", true);
             }
 
             JSONObject contacts = new JSONObject();

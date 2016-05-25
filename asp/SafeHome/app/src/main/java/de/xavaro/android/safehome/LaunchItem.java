@@ -107,7 +107,6 @@ public class LaunchItem extends FrameLayout implements
 
     protected LayoutParams layout;
     protected LayoutParams oversize;
-    protected boolean textless;
     protected int textsize;
     protected int padding;
 
@@ -129,6 +128,10 @@ public class LaunchItem extends FrameLayout implements
     protected TextView notifyText;
 
     protected LaunchGroup directory;
+
+    protected boolean isTextless;
+    protected boolean isFrameless;
+    protected boolean isDirectory;
 
     public LaunchItem(Context context)
     {
@@ -152,13 +155,6 @@ public class LaunchItem extends FrameLayout implements
         setBackground(gd);
 
         icon = new ImageSmartView(context);
-
-        icon.setPadding(
-                Simple.getDevicePixels(14),
-                Simple.getDevicePixels( 0),
-                Simple.getDevicePixels(14),
-                Simple.getDevicePixels(28));
-
         addView(icon);
 
         label = new TextView(context);
@@ -248,14 +244,15 @@ public class LaunchItem extends FrameLayout implements
         if (yesno)
         {
             setBackground(null);
+            isFrameless = true;
         }
     }
 
     public void setTextLess(boolean yesno)
     {
-        textless = yesno;
+        isTextless = yesno;
 
-        if (textless)
+        if (isTextless)
         {
             icon.setPadding(0, 0, 0, 0);
             label.setVisibility(GONE);
@@ -275,7 +272,7 @@ public class LaunchItem extends FrameLayout implements
 
         setLayoutParams(layout);
 
-        if (textless)
+        if (isTextless)
         {
             icon.setPadding(0, 0, 0, 0);
             label.setVisibility(GONE);
@@ -283,10 +280,10 @@ public class LaunchItem extends FrameLayout implements
         else
         {
             icon.setPadding(
-                    Simple.getDevicePixels(Math.round(14 * scale)),
+                    Simple.getDevicePixels(Math.round(18 * scale)),
                     Simple.getDevicePixels(Math.round(0 * scale)),
-                    Simple.getDevicePixels(Math.round(14 * scale)),
-                    Simple.getDevicePixels(Math.round(28 * scale)));
+                    Simple.getDevicePixels(Math.round(18 * scale)),
+                    Simple.getDevicePixels(Math.round(36 * scale)));
         }
 
         oversize.width = layout.width / 4;
@@ -414,6 +411,7 @@ public class LaunchItem extends FrameLayout implements
         type = config.has("type") ? Json.getString(config, "type") : null;
         subtype = config.has("subtype") ? Json.getString(config, "subtype") : null;
         identifier = config.has("identifier") ? Json.getString(config, "identifier") : null;
+        isDirectory = config.has("launchitems");
 
         if (config.has("iconres"))
         {
