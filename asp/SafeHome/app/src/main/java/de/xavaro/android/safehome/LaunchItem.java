@@ -331,7 +331,7 @@ public class LaunchItem extends FrameLayout implements
     protected boolean isNoFunction()
     {
         //
-        // Return if icon and overlay icon relation is reversed.
+        // Return if item is used as a directory.
         //
 
         return Json.getBoolean(config, "nofunction");

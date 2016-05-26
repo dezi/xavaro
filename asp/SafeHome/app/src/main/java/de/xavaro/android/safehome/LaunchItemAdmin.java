@@ -11,6 +11,7 @@ import android.net.Uri;
 
 import java.io.File;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.ProcessManager;
@@ -68,7 +69,7 @@ public class LaunchItemAdmin extends LaunchItem
 
             if (subtype.equals("android"))
             {
-                icon.setImageResource(GlobalConfigs.IconResSettingsAndroid);
+                icon.setImageResource(CommonConfigs.IconResSettingsAndroid);
             }
         }
 

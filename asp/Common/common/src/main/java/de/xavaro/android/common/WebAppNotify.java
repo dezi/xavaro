@@ -32,7 +32,7 @@ public class WebAppNotify
 
         if (Json.has(json, "icon"))
         {
-            notification.iconres = "webapp|" + webappname + "|" + Json.getString(json, "icon");
+            notification.iconpath = "webapp|" + webappname + "|" + Json.getString(json, "icon");
         }
 
         Log.d(LOGTAG, "addNotification: " + json.toString());

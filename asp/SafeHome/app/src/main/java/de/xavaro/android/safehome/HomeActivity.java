@@ -13,26 +13,24 @@ import android.widget.FrameLayout;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NotificationService;
-import de.xavaro.android.common.Speak;
-import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
+import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
 import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
-import de.xavaro.android.common.WebAppCache;
 import de.xavaro.android.common.WebCookie;
+import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Speak;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
@@ -197,15 +195,8 @@ public class HomeActivity extends AppCompatActivity implements
         // Check important settings.
         //
 
-        if (! AccessibilityService.checkEnabled())
-        {
-            Simple.makeAlert("Accessibility Service not enabled.");
-        }
-
-        if (! NotificationService.checkEnabled())
-        {
-            Simple.makeAlert("Notification Service not enabled.");
-        }
+        NotificationService.checkStatus();
+        AccessibilityService.checkStatus();
     }
 
     @Override
@@ -214,6 +205,10 @@ public class HomeActivity extends AppCompatActivity implements
         super.onDestroy();
 
         Log.d(LOGTAG, "========================> onDestroy");
+
+        //
+        // Make sure we are not a zombie.
+        //
 
         System.exit(0);
     }

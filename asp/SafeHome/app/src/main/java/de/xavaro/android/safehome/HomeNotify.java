@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NotifyIntent;
+import de.xavaro.android.common.NotifyManager;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
@@ -24,6 +25,8 @@ public class HomeNotify extends HomeFrame
     private static final String LOGTAG = HomeNotify.class.getSimpleName();
 
     protected LinearLayout contentFrame;
+
+    protected ArrayList<HomeEvent> slots = new ArrayList<>();
 
     protected HomeEvent topFrame;
     protected HomeEvent event1Frame;
@@ -74,6 +77,7 @@ public class HomeNotify extends HomeFrame
 
         topFrame = new HomeEvent(context, true);
         contentFrame.addView(topFrame);
+        slots.add(topFrame);
 
         barFrame = new FrameLayout(context);
         barFrame.setLayoutParams(barFrameLayout);
@@ -86,6 +90,7 @@ public class HomeNotify extends HomeFrame
 
         event1Frame = new HomeEvent(context, false);
         contentFrame.addView(event1Frame);
+        slots.add(event1Frame);
 
         barFrame = new FrameLayout(context);
         barFrame.setLayoutParams(barFrameLayout);
@@ -98,6 +103,7 @@ public class HomeNotify extends HomeFrame
 
         event2Frame = new HomeEvent(context, false);
         contentFrame.addView(event2Frame);
+        slots.add(event2Frame);
     }
 
     public void setConfig(JSONObject config)
@@ -200,82 +206,59 @@ public class HomeNotify extends HomeFrame
         }
     }
 
-    protected LaunchItem setupNotification(LaunchItem launchItem, HomeEvent eventFrame)
-    {
-        eventFrame.setNotifyIntent(null);
-        if (launchItem == null) return null;
-
-        NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
-
-        if (intent == null)
-        {
-            candidatesLaunch.add(launchItem);
-            return null;
-        }
-
-        launchItem.setSize(eventFrame.getHeight(), eventFrame.getHeight());
-
-        eventFrame.setNotifyIntent(intent);
-        eventFrame.addView(launchItem);
-
-        return launchItem;
-    }
-
     @Nullable
-    protected LaunchItem getNextCandidate()
+    protected NotifyIntent getNextIntent(ArrayList<NotifyIntent> intents)
     {
-        int count = candidatesLaunch.size();
+        int bestIndex = -1;
+        int bestLevel = -1;
 
-        for (int inx = 0; inx < count; inx++)
+        for (int inx = 0; inx < intents.size(); inx++)
         {
-            LaunchItem launchItem = candidatesLaunch.remove(0);
+            NotifyIntent intent = intents.get(inx);
 
-            NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
-            if (intent != null) return launchItem;
-
-            candidatesLaunch.add(launchItem);
+            if (intent.importance > bestLevel)
+            {
+                bestIndex = inx;
+                bestLevel = intent.importance;
+            }
         }
 
-        return null;
+        return (bestIndex >= 0) ? intents.remove(bestIndex) : null;
     }
 
     protected void manageNotifications()
     {
-        if (topLaunch != null)
+
+        ArrayList<NotifyIntent> intents = new ArrayList<>();
+
+        //
+        // Collect pending intents.
+        //
+
+        ArrayList<NotifyIntent> pendings = NotifyManager.getPendingIntents();
+        for (NotifyIntent pending : pendings) intents.add(pending);
+
+        //
+        // Add notify intents from all lauch items.
+        //
+
+        for (LaunchItem launchItem : candidatesLaunch)
         {
-            Simple.removeFromParent(topLaunch);
-            topFrame.setNotifyIntent(null);
-            candidatesLaunch.add(topLaunch);
-            topLaunch = null;
+            NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
+            if (intent == null) continue;
+
+            intent.iconFrame = launchItem;
+            intents.add(intent);
         }
 
-        if (event1Launch != null)
-        {
-            Simple.removeFromParent(event1Launch);
-            topLaunch = setupNotification(event1Launch, topFrame);
-            event1Launch = null;
-        }
+        //
+        // Display best candidates.
+        //
 
-        if (event2Launch != null)
+        for (int inx = 0; inx < slots.size(); inx++)
         {
-            Simple.removeFromParent(event2Launch);
-            event1Launch = setupNotification(event2Launch, event1Frame);
-            event2Launch = null;
-        }
-
-        if (topLaunch == null)
-        {
-            topLaunch = setupNotification(getNextCandidate(), topFrame);
-        }
-
-        if (event1Launch == null)
-        {
-            event1Launch = setupNotification(getNextCandidate(), event1Frame);
-        }
-
-        if (event2Launch == null)
-        {
-            event2Launch = setupNotification(getNextCandidate(), event2Frame);
+            NotifyIntent intent = getNextIntent(intents);
+            slots.get(inx).setNotifyIntent(intent);
         }
     }
 

@@ -711,4 +711,12 @@
         <item>Firma Zentrale</item>
     </string-array>
 
+    <string name="accessibility_service_alert_text">Die Eingabehilfe in den Android Einstellungen ist deaktiviert.</string>
+    <string name="accessibility_service_alert_button">Dienst aktivieren</string>
+    <string name="accessibility_service_alert_about">Was ist das?</string>
+
+    <string name="notification_service_alert_text">Der Zugriff auf die Benachrichtigungen in den Android Einstellungen ist deaktiviert.</string>
+    <string name="notification_service_alert_button">Zugriff aktivieren</string>
+    <string name="notification_service_alert_about">Was ist das?</string>
+
 </resources>

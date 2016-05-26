@@ -23,6 +23,31 @@ public class NotificationService extends NotificationListenerService
 
     private static final Map<String, ArrayList<Runnable>> callbacks = new HashMap<>();
 
+    public static void checkStatus()
+    {
+        //if (isRequested() && ! checkEnabled())
+        {
+            NotifyIntent alert = new NotifyIntent();
+
+            alert.title = Simple.getTrans(R.string.notification_service_alert_text);
+            alert.importance = NotifyIntent.URGENT;
+            alert.iconres = CommonConfigs.IconResSettingsAndroid;
+
+            alert.followText = Simple.getTrans(R.string.notification_service_alert_button);
+            alert.followRunner = selectNotificationsSettings;
+
+            alert.declineText = Simple.getTrans(R.string.notification_service_alert_about);
+            alert.declineRunner = aboutNotificationsSettings;
+
+            NotifyManager.addNotification(alert);
+        }
+    }
+
+    public static boolean isRequested()
+    {
+        return Simple.getSharedPrefBoolean("admin.notifications.enabled");
+    }
+
     public static boolean checkAvailable()
     {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2);
@@ -58,6 +83,17 @@ public class NotificationService extends NotificationListenerService
 
         return false;
     }
+
+    public static final Runnable aboutNotificationsSettings = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Simple.makeAlert(
+                    Simple.getTrans(R.string.pref_basic_safety_notifications_summary),
+                    Simple.getTrans(R.string.pref_basic_safety_notifications_service));
+        }
+    };
 
     public static final Runnable selectNotificationsSettings = new Runnable()
     {

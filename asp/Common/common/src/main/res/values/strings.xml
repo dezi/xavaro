@@ -548,4 +548,12 @@
         <item>Company Main</item>
     </string-array>
 
+    <string name="accessibility_service_alert_text">The Accessibility Service is not enabled.</string>
+    <string name="accessibility_service_alert_button">Enable Service</string>
+    <string name="accessibility_service_alert_about">What is this?</string>
+
+    <string name="notification_service_alert_text">The Notification Service is not enabled.</string>
+    <string name="notification_service_alert_button">Enable Service</string>
+    <string name="notification_service_alert_about">What is this?</string>
+
 </resources>

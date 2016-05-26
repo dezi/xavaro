@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
+import android.widget.FrameLayout;
 
 public class NotifyIntent
 {
@@ -8,11 +9,11 @@ public class NotifyIntent
     public static final int REMINDER = 2;
     public static final int WARNING = 3;
     public static final int ASSISTANCE = 4;
+    public static final int URGENT = 5;
 
     public String key;
     public String title;
     public String summary;
-    public String iconres;
     public String followText;
     public String declineText;
 
@@ -23,6 +24,10 @@ public class NotifyIntent
 
     public Runnable followRunner;
     public Runnable declineRunner;
+
+    public int iconres;
+    public String iconpath;
+    public FrameLayout iconFrame;
 
     public interface NotifiyService
     {

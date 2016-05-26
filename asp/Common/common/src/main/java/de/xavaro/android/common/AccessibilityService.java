@@ -15,6 +15,32 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
     private static final String LOGTAG = AccessibilityService.class.getSimpleName();
     private static final ArrayList<MessageServiceCallback> callbacks = new ArrayList<>();
 
+    public static void checkStatus()
+    {
+        //if (isRequested() && ! checkEnabled())
+        {
+            NotifyIntent alert = new NotifyIntent();
+
+            alert.title = Simple.getTrans(R.string.accessibility_service_alert_text);
+            alert.importance = NotifyIntent.URGENT;
+            alert.iconres = CommonConfigs.IconResSettingsAndroid;
+
+            alert.followText = Simple.getTrans(R.string.accessibility_service_alert_button);
+            alert.followRunner = selectAccessibilitySettings;
+
+            alert.declineText = Simple.getTrans(R.string.accessibility_service_alert_about);
+            alert.declineRunner = aboutAccessibilitySettings;
+
+
+            NotifyManager.addNotification(alert);
+        }
+    }
+
+    public static boolean isRequested()
+    {
+        return Simple.getSharedPrefBoolean("admin.accessibility.enabled");
+    }
+
     public static boolean checkAvailable()
     {
         try
@@ -85,6 +111,17 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
         return false;
     }
+
+    public static final Runnable aboutAccessibilitySettings = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Simple.makeAlert(
+                    Simple.getTrans(R.string.pref_basic_safety_accessibility_summary),
+                    Simple.getTrans(R.string.pref_basic_safety_accessibility_service));
+        }
+    };
 
     public static final Runnable selectAccessibilitySettings = new Runnable()
     {

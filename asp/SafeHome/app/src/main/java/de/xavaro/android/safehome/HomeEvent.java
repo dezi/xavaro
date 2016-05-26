@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.util.Log;
 
+import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
@@ -28,6 +29,7 @@ public class HomeEvent extends FrameLayout
     private HomeButton followButton;
     private boolean istopevent;
     private NotifyIntent intent;
+    private FrameLayout iconFrame;
 
     public HomeEvent(Context context, boolean istopevent)
     {
@@ -119,12 +121,50 @@ public class HomeEvent extends FrameLayout
 
         if (intent == null)
         {
+            if (iconFrame != null)
+            {
+                Simple.removeFromParent(iconFrame);
+                iconFrame = null;
+            }
+
             setFollowButtonText(null);
             setDeclineButtonText(null);
             setTitleText(null);
         }
         else
         {
+            if ((iconFrame == null) || (iconFrame != intent.iconFrame))
+            {
+                if (iconFrame != null) Simple.removeFromParent(iconFrame);
+
+                if (intent.iconFrame == null)
+                {
+                    ImageSmartView iconView = new ImageSmartView(getContext());
+                    iconView.setLayoutParams(Simple.layoutParamsXX(getHeight(), getHeight()));
+
+                    if (intent.iconres != 0) iconView.setImageResource(intent.iconres);
+                    if (intent.iconpath != null) iconView.setImageResource(intent.iconpath);
+
+                    intent.iconFrame = new FrameLayout(getContext());
+                    intent.iconFrame.setLayoutParams(Simple.layoutParamsXX(getHeight(), getHeight()));
+                    intent.iconFrame.addView(iconView);
+                }
+
+                iconFrame = intent.iconFrame;
+
+                if (iconFrame instanceof LaunchItem)
+                {
+                    ((LaunchItem) iconFrame).setSize(getHeight(), getHeight());
+                }
+
+                if (iconFrame instanceof FrameLayout)
+                {
+                    Simple.removeFromParent(iconFrame);
+                }
+
+                addView(iconFrame);
+            }
+
             setFollowButtonText(intent.followText);
             setDeclineButtonText(intent.declineText);
             setTitleText(intent.title);
@@ -196,9 +236,6 @@ public class HomeEvent extends FrameLayout
         @Override
         public void run()
         {
-            titleView.setMaxWidth(titleView.getWidth());
-            titleView.measure(0, 0);
-
             float textsize = titleView.getTextSize();
 
             while (textsize > 0)
@@ -240,7 +277,7 @@ public class HomeEvent extends FrameLayout
             {
                 if (text != null)
                 {
-                    titleParams.rightMargin += Simple.getDevicePixels(32) + HomeButton.buttonWidth;
+                    titleParams.rightMargin = Simple.getDevicePixels(32) + HomeButton.buttonWidth;
                 }
                 else
                 {

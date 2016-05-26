@@ -24,4 +24,9 @@ public class NotifyManager
 
         pendingIntents.add(intent);
     }
+
+    public static ArrayList<NotifyIntent> getPendingIntents()
+    {
+        return pendingIntents;
+    }
 }

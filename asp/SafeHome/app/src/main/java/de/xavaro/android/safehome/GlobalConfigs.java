@@ -53,7 +53,6 @@ public class GlobalConfigs
     public static final int IconResCommChatAlert      = R.drawable.commchatalert_300x300;
     public static final int IconResSelectHome         = R.drawable.home_512x512;
     public static final int IconResSelectAssist       = R.drawable.assistant_512x512;
-    public static final int IconResSettingsAndroid    = R.drawable.settings_android_512x512;
     public static final int IconResSettingsSafehome   = R.drawable.settings_safehome_512x512;
     public static final int IconResOwner              = R.drawable.owner_512x512;
     public static final int IconResAdministrator      = R.drawable.admin_512x512;
