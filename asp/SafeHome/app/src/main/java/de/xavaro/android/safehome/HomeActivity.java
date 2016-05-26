@@ -517,13 +517,17 @@ public class HomeActivity extends AppCompatActivity implements
             return;
         }
 
+        if (socialScreen.onBackKeyWanted()) return;
+        if (launchScreen.onBackKeyWanted()) return;
+        if (workerScreen.onBackKeyWanted()) return;
+
         //
         // Top level back press handling.
         //
 
         long now = System.currentTimeMillis();
 
-        if ((now - backPressedTime) > 1000)
+        if ((now - backPressedTime) > 750)
         {
             backPressedCount = 0;
         }
@@ -546,7 +550,7 @@ public class HomeActivity extends AppCompatActivity implements
             // Execute back press within given time.
             //
 
-            handler.postDelayed(delayOnBackPressed,1500);
+            handler.postDelayed(delayOnBackPressed,750);
         }
     }
 

@@ -10,11 +10,12 @@ import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 
+import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
-public abstract class HomeFrame extends FrameLayout
+public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 {
     private static final String LOGTAG = HomeFrame.class.getSimpleName();
 
@@ -361,4 +362,48 @@ public abstract class HomeFrame extends FrameLayout
             }
         }
     };
+
+    public boolean isFullscreen()
+    {
+        return fullscreen;
+    }
+
+    public boolean onBackKeyWanted()
+    {
+        Log.d(LOGTAG, "onBackKeyWanted");
+
+        if (getVisibility() == VISIBLE)
+        {
+            View content = payloadFrame.getChildAt(0);
+
+            if (content instanceof BackKeyClient)
+            {
+                if (((BackKeyClient) content).onBackKeyWanted())
+                {
+                    return true;
+                }
+            }
+
+            if (fullscreen)
+            {
+                onToogleFullscreen();
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void onBackKeyExecuted()
+    {
+        Log.d(LOGTAG, "onBackKeyExecuted");
+
+        View content = payloadFrame.getChildAt(0);
+
+        if (content instanceof BackKeyClient)
+        {
+            ((BackKeyClient) content).onBackKeyExecuted();
+        }
+    }
 }
