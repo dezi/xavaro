@@ -158,6 +158,9 @@ medicator.remindConfig = function(config)
         notify.declineText = WebLibStrings.getTrans("events.take.pills.decline");
         notify.speakOnce   = (newtime < nowtime);
 
+        notify.followJavaCall  = "medicator.onTakePills(true);"
+        notify.declineJavaCall = "medicator.onTakePills(false);"
+
         WebAppNotify.addNotification(JSON.stringify(notify));
 
         medicator.pillsreminder = true;
@@ -174,6 +177,9 @@ medicator.remindConfig = function(config)
         notify.followText  = WebLibStrings.getTrans("events.take.bloodpressure.follow");
         notify.declineText = WebLibStrings.getTrans("events.take.bloodpressure.decline");
         notify.speakOnce   = (newtime < nowtime);
+
+        notify.followJavaCall  = "medicator.onTakeBloodPressure(true);"
+        notify.declineJavaCall = "medicator.onTakeBloodPressure(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
 
@@ -192,6 +198,9 @@ medicator.remindConfig = function(config)
         notify.declineText = WebLibStrings.getTrans("events.take.bloodglucose.decline");
         notify.speakOnce   = (newtime < nowtime);
 
+        notify.followJavaCall  = "medicator.onTakeBloodGlucose(true);"
+        notify.declineJavaCall = "medicator.onTakeBloodGlucose(false);"
+
         WebAppNotify.addNotification(JSON.stringify(notify));
 
         medicator.bloodglucosereminder = true;
@@ -208,6 +217,9 @@ medicator.remindConfig = function(config)
         notify.followText  = WebLibStrings.getTrans("events.take.weight.follow");
         notify.declineText = WebLibStrings.getTrans("events.take.weight.decline");
         notify.speakOnce   = (newtime < nowtime);
+
+        notify.followJavaCall  = "medicator.onTakeWeight(true);"
+        notify.declineJavaCall = "medicator.onTakeWeight(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
 

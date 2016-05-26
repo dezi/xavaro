@@ -3,7 +3,6 @@ package de.xavaro.android.safehome;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,29 +14,29 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.AppWorkerHandler;
 import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.BackKeyMaster;
 import de.xavaro.android.common.CommService;
 import de.xavaro.android.common.CommonStatic;
-import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
 import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
-import de.xavaro.android.common.WebCookie;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
 
 public class HomeActivity extends AppCompatActivity implements
         View.OnSystemUiVisibilityChangeListener,
         MediaSurface.VideoSurfaceHandler,
-        BackKeyMaster,
+        VoiceIntentResolver,
+        AppWorkerHandler,
         AppInfoHandler,
-        VoiceIntentResolver
+        BackKeyMaster
 {
     private static final String LOGTAG = HomeActivity.class.getSimpleName();
 
@@ -348,7 +347,14 @@ public class HomeActivity extends AppCompatActivity implements
         lostFocus = ! hasFocus;
     }
 
-    //region app info handling
+    @Override
+    public void onStartWorker(JSONObject config)
+    {
+        LaunchItem launchItem = LaunchItem.createLaunchItem(this, null, config);
+        launchItem.onMyClick();
+    }
+
+    //region App info handling
 
     public String getBetaVersion()
     {
@@ -360,7 +366,7 @@ public class HomeActivity extends AppCompatActivity implements
         return GlobalConfigs.BetaVersionDate;
     }
 
-    //endregion app info handling
+    //endregion App info handling
 
     //region onBackPressed handling
 

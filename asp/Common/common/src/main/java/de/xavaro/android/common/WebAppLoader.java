@@ -287,4 +287,23 @@ public class WebAppLoader extends WebViewClient
         ByteArrayInputStream bais = new ByteArrayInputStream(initialHTML.getBytes());
         return new WebResourceResponse("text/html", "UTF-8", bais);
     }
+
+    private Runnable onPageFinishedRunner;
+
+    public void setOnPageFinishedRunner(Runnable runner)
+    {
+        onPageFinishedRunner = runner;
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url)
+    {
+        Log.d(LOGTAG, "onPageFinished:" + url);
+
+        if (onPageFinishedRunner != null)
+        {
+            Simple.makePost(onPageFinishedRunner);
+            onPageFinishedRunner = null;
+        }
+    }
 }

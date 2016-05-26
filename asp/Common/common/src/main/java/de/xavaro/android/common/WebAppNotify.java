@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.content.Context;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
@@ -50,6 +51,16 @@ public class WebAppNotify
         return NotifyIntent.INFOONLY;
     }
 
+    private void startActivity(JSONObject config)
+    {
+        Context activity = Simple.getActContext();
+
+        if (activity instanceof AppWorkerHandler)
+        {
+            ((AppWorkerHandler) activity).onStartWorker(config);
+        }
+    }
+
     @JavascriptInterface
     public void addNotification(String intent)
     {
@@ -60,9 +71,51 @@ public class WebAppNotify
         notification.key = Json.getString(json, "key");
         notification.title = Json.getString(json, "title");
         notification.importance  = Json.getInt(json, "importance");
-        notification.followText  = Json.getString(json, "followText");;
-        notification.declineText = Json.getString(json, "declineText");;
         notification.speakOnce = Json.getBoolean(json, "speakOnce");
+
+        notification.followText  = Json.getString(json, "followText");;
+
+        if (notification.followText != null)
+        {
+            final String javacall = Json.getString(json, "followJavaCall");
+
+            notification.followRunner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    JSONObject config = new JSONObject();
+
+                    Json.put(config, "type", "webapp");
+                    Json.put(config, "subtype", webappname);
+                    Json.put(config, "javacall", javacall);
+
+                    startActivity(config);
+                }
+            };
+        }
+
+        notification.declineText = Json.getString(json, "declineText");;
+
+        if (notification.declineText != null)
+        {
+            final String javacall = Json.getString(json, "declineJavaCall");
+
+            notification.declineRunner = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    JSONObject config = new JSONObject();
+
+                    Json.put(config, "type", "webapp");
+                    Json.put(config, "subtype", webappname);
+                    Json.put(config, "javacall", javacall);
+
+                    startActivity(config);
+                }
+            };
+        }
 
         if (Json.has(json, "icon"))
         {

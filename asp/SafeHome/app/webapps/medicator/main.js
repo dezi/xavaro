@@ -7,6 +7,50 @@ WebAppRequest.onVoiceIntent = function(intent)
     console.log("WebAppRequest.onVoiceIntent: ====================>" + JSON.stringify(intent));
 }
 
+medicator.onTakePills = function(doit)
+{
+    medicator.onTakeThat(doit, "AAA");
+}
+
+medicator.onTakeBloodPressure = function(doit)
+{
+    medicator.onTakeThat(doit, "ZZB");
+}
+
+medicator.onTakeBloodGlucose = function(doit)
+{
+    medicator.onTakeThat(doit, "ZZG");
+}
+
+medicator.onTakeWeight = function(doit)
+{
+    medicator.onTakeThat(doit, "ZZW");
+}
+
+medicator.onTakeThat = function(doit, mediform)
+{
+    for (var formkey in medicator.configs)
+    {
+        var config = medicator.configs[ formkey ];
+
+        if (config.ondemand || config.taken) continue;
+
+        //
+        // Identify which medication form is suitable.
+        //
+
+        var confmediform = config.medisets[ 0 ].mediform;
+        if (! confmediform.startsWith("ZZ")) confmediform = "AAA";
+
+        if (confmediform != mediform) continue;
+
+        var lauchitem = medicator.lauchis[ formkey ];
+        medicator.onClickEventItem(lauchitem, null, true);
+
+        break;
+    }
+}
+
 medicator.updateMedisetEvent = function(mediset)
 {
     var eventdate = mediset.date;
@@ -381,11 +425,11 @@ medicator.createNumberInput = function(parent, value, title, focus)
     return numberInput;
 }
 
-medicator.onClickEventItem = function(target)
+medicator.onClickEventItem = function(target, ctarget, noclick)
 {
     if (! (target && target.config)) return;
 
-    WebAppUtility.makeClick();
+    if (! noclick) WebAppUtility.makeClick();
 
     var liconfig = medicator.currentConfig = target.config;
     var dlconfig = medicator.currentDialog = {};
@@ -778,9 +822,8 @@ medicator.createEvents = function()
             config.pillindex++;
         }
     }
-
-    setTimeout(medicator.updateEvents, 0);
 }
 
 WebLibLaunch.createFrame();
 medicator.createEvents();
+medicator.updateEvents();

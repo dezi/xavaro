@@ -66,7 +66,26 @@ public class LaunchItemWebApp extends LaunchItem
                 webappFrame.setParent(this);
             }
 
-            ((HomeActivity) context).addViewToBackStack(webappFrame);
+            if (Json.has(config, "javacall"))
+            {
+                //
+                // Execute this when page is done with loading.
+                //
+
+                final String javacall = Json.getString(config, "javacall");
+
+                webappFrame.getWebAppView().webapploader.setOnPageFinishedRunner(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        webappFrame.getWebAppView().evaluateJavascript(javacall, null);
+                    }
+                });
+            }
+
+            String label = Json.getString(config, "label");
+            ((HomeActivity) context).addWorkerToBackStack(label, webappFrame);
         }
         else
         {
