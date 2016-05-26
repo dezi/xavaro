@@ -104,6 +104,8 @@ public class HomeNotify extends HomeFrame
 
     public void setConfig(JSONObject config)
     {
+        candidatesLaunch.clear();
+
         extractConfig(config);
     }
 

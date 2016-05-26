@@ -21,6 +21,36 @@ public class WebAppNotify
     }
 
     @JavascriptInterface
+    public int getImportanceUrgent()
+    {
+        return NotifyIntent.URGENT;
+    }
+
+    @JavascriptInterface
+    public int getImportanceAssistance()
+    {
+        return NotifyIntent.ASSISTANCE;
+    }
+
+    @JavascriptInterface
+    public int getImportanceWarning()
+    {
+        return NotifyIntent.WARNING;
+    }
+
+    @JavascriptInterface
+    public int getImportanceReminder()
+    {
+        return NotifyIntent.REMINDER;
+    }
+
+    @JavascriptInterface
+    public int getImportanceInfoOnly()
+    {
+        return NotifyIntent.INFOONLY;
+    }
+
+    @JavascriptInterface
     public void addNotification(String intent)
     {
         JSONObject json = Json.fromStringObject(intent);
@@ -29,6 +59,9 @@ public class WebAppNotify
 
         notification.key = Json.getString(json, "key");
         notification.title = Json.getString(json, "title");
+        notification.importance  = Json.getInt(json, "importance");
+        notification.followText  = Json.getString(json, "followText");;
+        notification.declineText = Json.getString(json, "declineText");;
 
         if (Json.has(json, "icon"))
         {

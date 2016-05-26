@@ -48,10 +48,20 @@
   "medication.mode.measure.keys" : [ "time1",         "time2",          "time3",          "time4"           ],
   "medication.mode.measure.vals" : [ "Erste Messung", "Zweite Messung", "Dritte Messung", "Vierte Messung"  ],
 
-  "events.take.pills" : "You have to take Your medication",
-  "events.take.weight" : "You have to weigh yourself",
-  "events.take.bloodglucose" : "You have to measure Your blood sugar",
-  "events.take.bloodpressure" : "You have to measure Your blood pressure",
+  "events.take.pills" : "You have to take Your medication.",
+  "events.take.weight" : "You have to weigh yourself.",
+  "events.take.bloodglucose" : "You have to measure Your blood sugar.",
+  "events.take.bloodpressure" : "You have to measure Your blood pressure.",
+
+  "events.take.pills.follow" : "Take now",
+  "events.take.weight.follow" : "Weigh now",
+  "events.take.bloodglucose.follow" : "Measure now",
+  "events.take.bloodpressure.follow" : "Measure now",
+
+  "events.take.pills.decline" : "Not taken",
+  "events.take.weight.decline" : "Not weighed",
+  "events.take.bloodglucose.decline" : "Not measured",
+  "events.take.bloodpressure.decline" : "Not measured",
 
   "events.didnotyettake.pills" : "%1$s did not yet take his medication.",
   "events.didnotyettake.weight" : "%1$s did not yet take his weight.",
