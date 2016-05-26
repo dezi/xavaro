@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 
 import android.app.Activity;
@@ -131,19 +132,10 @@ public class Simple
         return appContext;
     }
 
-    public static Resources getResources()
+    public static void setThreadPolicy()
     {
-        return appContext.getResources();
-    }
-
-    public static String getResourceName(int resid)
-    {
-        return getResources().getResourceEntryName(resid);
-    }
-
-    public static int getIdentifier(String name, String type, String pack)
-    {
-        return getResources().getIdentifier(name, type, pack);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
     }
 
     //endregion Initialisation
@@ -2741,6 +2733,19 @@ public class Simple
         return appContext.getContentResolver();
     }
 
+    public static Resources getResources()
+    {
+        return appContext.getResources();
+    }
 
+    public static String getResourceName(int resid)
+    {
+        return getResources().getResourceEntryName(resid);
+    }
+
+    public static int getIdentifier(String name, String type, String pack)
+    {
+        return getResources().getIdentifier(name, type, pack);
+    }
     //endregion System services.
 }

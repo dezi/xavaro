@@ -132,6 +132,17 @@ medicator.getImportance = function(config)
 medicator.remindConfig = function(config)
 {
     //
+    // Take current reminded date and count from first event.
+    //
+
+    var reminded = config.events[ 0 ].reminded;
+    var remindeddate = config.events[ 0 ].remindeddate;
+
+    var nowtime = new Date().getTime();
+    var remtime = remindeddate ? new Date(remindeddate).getTime() : 0;
+    var newtime = remtime + medicator.remindIntervall * 1000;
+
+    //
     // Build or rebuild notifications.
     //
 
@@ -145,6 +156,7 @@ medicator.remindConfig = function(config)
         notify.importance  = medicator.getImportance(config);
         notify.followText  = WebLibStrings.getTrans("events.take.pills.follow");
         notify.declineText = WebLibStrings.getTrans("events.take.pills.decline");
+        notify.speakOnce   = (newtime < nowtime);
 
         WebAppNotify.addNotification(JSON.stringify(notify));
 
@@ -161,6 +173,7 @@ medicator.remindConfig = function(config)
         notify.importance  = medicator.getImportance(config);
         notify.followText  = WebLibStrings.getTrans("events.take.bloodpressure.follow");
         notify.declineText = WebLibStrings.getTrans("events.take.bloodpressure.decline");
+        notify.speakOnce   = (newtime < nowtime);
 
         WebAppNotify.addNotification(JSON.stringify(notify));
 
@@ -177,6 +190,7 @@ medicator.remindConfig = function(config)
         notify.importance  = medicator.getImportance(config);
         notify.followText  = WebLibStrings.getTrans("events.take.bloodglucose.follow");
         notify.declineText = WebLibStrings.getTrans("events.take.bloodglucose.decline");
+        notify.speakOnce   = (newtime < nowtime);
 
         WebAppNotify.addNotification(JSON.stringify(notify));
 
@@ -193,23 +207,14 @@ medicator.remindConfig = function(config)
         notify.importance  = medicator.getImportance(config);
         notify.followText  = WebLibStrings.getTrans("events.take.weight.follow");
         notify.declineText = WebLibStrings.getTrans("events.take.weight.decline");
+        notify.speakOnce   = (newtime < nowtime);
 
         WebAppNotify.addNotification(JSON.stringify(notify));
 
         medicator.weightreminder = true;
     }
 
-    //
-    // Take current reminded date and count from first event.
-    //
-
-    var reminded = config.events[ 0 ].reminded;
-    var remindeddate = config.events[ 0 ].remindeddate;
-
-    var nowtime = new Date().getTime();
-    var remtime = remindeddate ? new Date(remindeddate).getTime() : 0;
-
-    if ((remtime + (medicator.remindIntervall * 1000)) >= nowtime)
+    if (newtime >= nowtime)
     {
         //
         // Time not yet due to increase reminder count or close event.

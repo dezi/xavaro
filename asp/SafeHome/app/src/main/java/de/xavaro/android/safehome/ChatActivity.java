@@ -82,6 +82,8 @@ public class ChatActivity extends AppCompatActivity implements
 
         Simple.setActContext(this);
 
+        Simple.setThreadPolicy();
+
         int toolbarIcon = R.drawable.communication_400x400;
         int toolbarColor = 0xff448844;
 
@@ -270,12 +272,15 @@ public class ChatActivity extends AppCompatActivity implements
 
         Simple.setActContext(this);
 
+        Simple.setThreadPolicy();
+
         //
         // Remove internal notifications.
         //
 
-        SimpleStorage.put("notifications", "xavaro" + ".count." + idremote, 0);
         SimpleStorage.remove("notifications", "xavaro" + ".texts." + idremote);
+
+        SimpleStorage.put("notifications", "xavaro" + ".count." + idremote, 0);
         SimpleStorage.put("notifications", "xavaro" + ".stamp." + idremote, Simple.nowAsISO());
 
         NotificationService.doCallbacks("xavaro", idremote);

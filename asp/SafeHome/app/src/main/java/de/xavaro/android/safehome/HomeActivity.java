@@ -87,18 +87,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         instance = this;
 
-        //
-        // Allow cross fuck domain HTTP shit.
-        //
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        //
-        // Set common cookie store between webkit and java.net
-        //
-
-        WebCookie.initCookies();
+        Simple.setThreadPolicy();
 
         //
         // Layout basic sizes.

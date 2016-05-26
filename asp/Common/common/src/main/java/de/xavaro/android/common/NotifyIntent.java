@@ -19,6 +19,7 @@ public class NotifyIntent
 
     public int importance;
 
+    public boolean speakOnce;
     public String spokenTimePref;
     public int spokenRepeatMinutes;
 

@@ -62,6 +62,7 @@ public class WebAppNotify
         notification.importance  = Json.getInt(json, "importance");
         notification.followText  = Json.getString(json, "followText");;
         notification.declineText = Json.getString(json, "declineText");;
+        notification.speakOnce = Json.getBoolean(json, "speakOnce");
 
         if (Json.has(json, "icon"))
         {
@@ -71,5 +72,19 @@ public class WebAppNotify
         Log.d(LOGTAG, "addNotification: " + json.toString());
 
         NotifyManager.addNotification(notification);
+    }
+
+    @JavascriptInterface
+    public void removeNotification(String intent)
+    {
+        JSONObject json = Json.fromStringObject(intent);
+
+        NotifyIntent notification = new NotifyIntent();
+
+        notification.key = Json.getString(json, "key");
+
+        Log.d(LOGTAG, "removeNotification: " + json.toString());
+
+        NotifyManager.removeNotification(notification);
     }
 }

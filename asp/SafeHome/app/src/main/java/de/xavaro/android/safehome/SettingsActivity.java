@@ -1,27 +1,23 @@
 package de.xavaro.android.safehome;
 
-import android.content.Intent;
-import android.os.StrictMode;
 import android.preference.PreferenceActivity;
+import android.content.Intent;
 import android.content.Context;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.view.ViewGroup;
+import android.view.Gravity;
+import android.view.View;
+import android.os.Bundle;
+import android.util.Log;
 
 import java.util.List;
 
 import de.xavaro.android.common.CommonStatic;
-import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.WebAppCache;
-import de.xavaro.android.common.WebCookie;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -41,21 +37,9 @@ public class SettingsActivity extends PreferenceActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         Simple.setActContext(this);
+        Simple.setThreadPolicy();
 
         super.onCreate(savedInstanceState);
-
-        //
-        // Allow cross fuck domain HTTP shit.
-        //
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        //
-        // Set common cookie store between webkit and java.net
-        //
-
-        WebCookie.initCookies();
     }
 
     @Override

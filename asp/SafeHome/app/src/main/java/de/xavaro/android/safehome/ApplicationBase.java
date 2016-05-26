@@ -31,20 +31,16 @@ public class ApplicationBase extends Application
         Simple.setAppContext(getApplicationContext());
 
         //
+        // Set thread policy for internet accesses.
+        //
+
+        Simple.setThreadPolicy();
+
+        //
         // Ignore users system setting regarding font scaling.
         //
 
         Simple.setFontScale();
-
-        Log.d(LOGTAG, "font SCALE=" + getResources().getConfiguration().fontScale);
-        Log.d(LOGTAG, "density DPI=" + getResources().getConfiguration().densityDpi);
-
-        //
-        // Allow cross fuck domain HTTP shit.
-        //
-
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
 
         //
         // Set common cookie store between webkit and java.net

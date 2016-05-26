@@ -166,6 +166,7 @@ public class HomeEvent extends FrameLayout
             //
             // Check for spoken text and repeat intervals.
             //
+            boolean speakdat = intent.speakOnce;
 
             if (intent.spokenTimePref != null)
             {
@@ -175,14 +176,22 @@ public class HomeEvent extends FrameLayout
 
                 if ((date == null) || ((repeatval > 0) && (date.compareTo(ddue) <= 0)))
                 {
-                    int volume = 50;
-
-                    if (intent.importance == NotifyIntent.WARNING) volume = 75;
-                    if (intent.importance == NotifyIntent.ASSISTANCE) volume = 100;
-
-                    Speak.speak(intent.title, volume);
                     Simple.setSharedPrefString(intent.spokenTimePref, Simple.nowAsISO());
+
+                    speakdat = true;
                 }
+            }
+
+            if (speakdat)
+            {
+                int volume = 50;
+
+                if (intent.importance == NotifyIntent.WARNING) volume = 75;
+                if (intent.importance == NotifyIntent.ASSISTANCE) volume = 100;
+
+                Speak.speak(intent.title, volume);
+
+                intent.speakOnce = false;
             }
         }
     }
@@ -261,6 +270,7 @@ public class HomeEvent extends FrameLayout
                 titleView.setTextSize(textsize);
                 titleView.measure(0, 0);
 
+                /*
                 Log.d(LOGTAG,"setTitleTextSize:"
                         + titleView.getMeasuredHeight()
                         + ":"
@@ -270,6 +280,7 @@ public class HomeEvent extends FrameLayout
                         + ":"
                         + titleView.getWidth()
                         + " " + titleView.getText());
+                */
 
                 if (titleView.getMeasuredHeight() <= titleView.getHeight())
                 {

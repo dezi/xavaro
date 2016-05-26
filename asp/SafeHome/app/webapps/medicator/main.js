@@ -189,6 +189,16 @@ medicator.onClickTaken = function(event)
 
     WebAppActivity.recordActivity(WebLibStrings.getTrans("activity.took.pills"));
 
+    //
+    // Remove any pending notification.
+    //
+
+    var notify = {};
+
+    notify.key = "medicator.take.pills";
+
+    WebAppNotify.removeNotification(JSON.stringify(notify));
+
     return true;
 }
 
@@ -225,6 +235,18 @@ medicator.onClickMeasured = function(target)
     if (mediform.startsWith("ZZB")) meditext = "activity.took.bloodpressure";
 
     if (meditext != null) WebAppActivity.recordActivity(WebLibStrings.getTrans(meditext));
+
+    //
+    // Remove any pending notification.
+    //
+
+    var notify = {};
+
+    if (mediform.startsWith("ZZB")) notify.key = "medicator.take.bloodpressure";
+    if (mediform.startsWith("ZZG")) notify.key = "medicator.take.bloodglucose";
+    if (mediform.startsWith("ZZW")) notify.key = "medicator.take.weight";
+
+    if (notify.key) WebAppNotify.removeNotification(JSON.stringify(notify));
 
     return true;
 }
