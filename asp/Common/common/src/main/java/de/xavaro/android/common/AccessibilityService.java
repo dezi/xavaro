@@ -17,7 +17,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
 
     public static void checkStatus()
     {
-        //if (isRequested() && ! checkEnabled())
+        if (isRequested() && ! checkEnabled())
         {
             NotifyIntent alert = new NotifyIntent();
 
@@ -31,6 +31,7 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
             alert.declineText = Simple.getTrans(R.string.accessibility_service_alert_about);
             alert.declineRunner = aboutAccessibilitySettings;
 
+            alert.checkCondition = checkAccessibilitySettings;
 
             NotifyManager.addNotification(alert);
         }
@@ -112,6 +113,15 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         return false;
     }
 
+    public static final NotifyChecker checkAccessibilitySettings = new NotifyChecker()
+    {
+        @Override
+        public boolean onCheckNotifyCondition(NotifyIntent intent)
+        {
+            return (isRequested() && ! checkEnabled());
+        }
+    };
+
     public static final Runnable aboutAccessibilitySettings = new Runnable()
     {
         @Override
@@ -146,14 +156,6 @@ public class AccessibilityService extends android.accessibilityservice.Accessibi
         synchronized (callbacks)
         {
             if (callbacks.contains(callback)) callbacks.remove(callback);
-        }
-    }
-
-    public static void unsubscribeAll()
-    {
-        synchronized (callbacks)
-        {
-            callbacks.clear();
         }
     }
 

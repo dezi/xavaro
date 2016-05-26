@@ -12,7 +12,6 @@ import android.widget.TextView;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.AssistanceMessage;
-import de.xavaro.android.common.BatteryManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.OopsService;
@@ -23,7 +22,7 @@ import de.xavaro.android.common.Simple;
 public class LaunchItemCall extends LaunchItem implements
         PrepaidManager.PrepaidManagerBalanceCallback,
         PrepaidManager.PrepaidManagerCashcodeCallback,
-        NotifyIntent.NotifiyService
+        NotifyIntent.NotifyService
 {
     private final static String LOGTAG = LaunchItemCall.class.getSimpleName();
 
@@ -65,12 +64,10 @@ public class LaunchItemCall extends LaunchItem implements
                 String mdate = Simple.getSharedPrefString("monitoring.prepaid.stamp");
                 long mstamp = (mdate == null) ? 0 : Simple.getTimeStamp(mdate);
 
-                if ((Simple.nowAsTimeStamp() - mstamp) < (86400 * 1000))
-                {
-                    int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
-                    onPrepaidReceived(money, mdate);
-                }
-                else
+                int money = Simple.getSharedPrefInt("monitoring.prepaid.money");
+                onPrepaidReceived(money, mdate);
+
+                if ((Simple.nowAsTimeStamp() - mstamp) >= (86400 * 1000))
                 {
                     if (Simple.isSimReady())
                     {

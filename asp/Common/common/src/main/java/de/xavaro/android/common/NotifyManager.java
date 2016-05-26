@@ -25,6 +25,11 @@ public class NotifyManager
         pendingIntents.add(intent);
     }
 
+    public static void removeNotification(NotifyIntent intent)
+    {
+        if (pendingIntents.contains(intent)) pendingIntents.remove(intent);
+    }
+
     public static ArrayList<NotifyIntent> getPendingIntents()
     {
         return pendingIntents;

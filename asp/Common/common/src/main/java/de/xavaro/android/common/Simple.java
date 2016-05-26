@@ -372,8 +372,11 @@ public class Simple
 
     public static View removeFromParent(View view)
     {
-        ViewGroup parent = (ViewGroup) view.getParent();
-        if (parent != null) parent.removeView(view);
+        if (view != null)
+        {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null) parent.removeView(view);
+        }
 
         return view;
     }

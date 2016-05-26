@@ -32,10 +32,6 @@ public class HomeNotify extends HomeFrame
     protected HomeEvent event1Frame;
     protected HomeEvent event2Frame;
 
-    protected LaunchItem topLaunch;
-    protected LaunchItem event1Launch;
-    protected LaunchItem event2Launch;
-
     protected int padh = Simple.getDevicePixels(Simple.isTablet() ? 16 : 8);
     protected int padv = Simple.getDevicePixels(Simple.isTablet() ?  4 : 2);
     protected int size;
@@ -132,7 +128,7 @@ public class HomeNotify extends HomeFrame
             {
                 LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, li);
 
-                if (launchItem instanceof NotifyIntent.NotifiyService)
+                if (launchItem instanceof NotifyIntent.NotifyService)
                 {
                     launchItem.setFrameLess(true);
                     launchItem.setTextLess(true);
@@ -196,13 +192,11 @@ public class HomeNotify extends HomeFrame
         if (topFrame.getLayoutHeight() != tops)
         {
             topFrame.setLayoutHeight(tops);
-            if (topLaunch != null) topLaunch.setSize(tops, tops);
 
-            event1Frame.setLayoutHeight(size);
-            if (event1Launch != null) event1Launch.setSize(size, size);
-
-            event2Frame.setLayoutHeight(size);
-            if (event2Launch != null) event2Launch.setSize(size, size);
+            for (int inx = 1; inx < slots.size(); inx++)
+            {
+                slots.get(inx).setLayoutHeight(size);
+            }
         }
     }
 
@@ -215,6 +209,19 @@ public class HomeNotify extends HomeFrame
         for (int inx = 0; inx < intents.size(); inx++)
         {
             NotifyIntent intent = intents.get(inx);
+
+            if ((intent.checkCondition != null) &&
+                    ! intent.checkCondition.onCheckNotifyCondition(intent))
+            {
+                //
+                // Intent is not required anymore.
+                //
+
+                NotifyManager.removeNotification(intent);
+                intents.remove(inx--);
+
+                continue;
+            }
 
             if (intent.importance > bestLevel)
             {
@@ -244,7 +251,7 @@ public class HomeNotify extends HomeFrame
 
         for (LaunchItem launchItem : candidatesLaunch)
         {
-            NotifyIntent intent = ((NotifyIntent.NotifiyService) launchItem).onGetNotifiyIntent();
+            NotifyIntent intent = ((NotifyIntent.NotifyService) launchItem).onGetNotifiyIntent();
             if (intent == null) continue;
 
             intent.iconFrame = launchItem;
@@ -269,7 +276,7 @@ public class HomeNotify extends HomeFrame
         {
             manageNotifications();
 
-            Simple.makePost(manageNotificationsRun, 60 * 1000);
+            Simple.makePost(manageNotificationsRun, 5 * 1000);
         }
     };
 }

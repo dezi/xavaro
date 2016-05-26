@@ -25,7 +25,7 @@ public class NotificationService extends NotificationListenerService
 
     public static void checkStatus()
     {
-        //if (isRequested() && ! checkEnabled())
+        if (isRequested() && ! checkEnabled())
         {
             NotifyIntent alert = new NotifyIntent();
 
@@ -38,6 +38,8 @@ public class NotificationService extends NotificationListenerService
 
             alert.declineText = Simple.getTrans(R.string.notification_service_alert_about);
             alert.declineRunner = aboutNotificationsSettings;
+
+            alert.checkCondition = checkNotificationsSettings;
 
             NotifyManager.addNotification(alert);
         }
@@ -83,6 +85,15 @@ public class NotificationService extends NotificationListenerService
 
         return false;
     }
+
+    public static final NotifyChecker checkNotificationsSettings = new NotifyChecker()
+    {
+        @Override
+        public boolean onCheckNotifyCondition(NotifyIntent intent)
+        {
+            return (isRequested() && ! checkEnabled());
+        }
+    };
 
     public static final Runnable aboutNotificationsSettings = new Runnable()
     {

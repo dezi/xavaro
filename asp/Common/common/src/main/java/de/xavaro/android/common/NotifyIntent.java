@@ -28,8 +28,9 @@ public class NotifyIntent
     public int iconres;
     public String iconpath;
     public FrameLayout iconFrame;
+    public NotifyChecker checkCondition;
 
-    public interface NotifiyService
+    public interface NotifyService
     {
         @Nullable
         NotifyIntent onGetNotifiyIntent();

@@ -12,7 +12,7 @@ import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.Simple;
 
-public class LaunchItemBattery extends LaunchItem implements NotifyIntent.NotifiyService
+public class LaunchItemBattery extends LaunchItem implements NotifyIntent.NotifyService
 {
     private final static String LOGTAG = LaunchItemBattery.class.getSimpleName();
 

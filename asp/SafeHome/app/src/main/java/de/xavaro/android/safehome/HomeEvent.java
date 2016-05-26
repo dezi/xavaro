@@ -22,6 +22,9 @@ public class HomeEvent extends FrameLayout
 
     private LinearLayout.LayoutParams layoutParams;
 
+    private FrameLayout.LayoutParams iconParams;
+    private FrameLayout iconHolder;
+    private FrameLayout iconFrame;
     private FrameLayout.LayoutParams titleParams;
     private TextView titleView;
     private boolean titleViewTextAdjust;
@@ -29,7 +32,6 @@ public class HomeEvent extends FrameLayout
     private HomeButton followButton;
     private boolean istopevent;
     private NotifyIntent intent;
-    private FrameLayout iconFrame;
 
     public HomeEvent(Context context, boolean istopevent)
     {
@@ -40,6 +42,12 @@ public class HomeEvent extends FrameLayout
         layoutParams = new LinearLayout.LayoutParams(Simple.MP, 0);
         layoutParams.leftMargin = this.istopevent ? 0 : Simple.getDevicePixels(12);
         setLayoutParams(layoutParams);
+
+        iconHolder = new FrameLayout(context);
+
+        iconParams = new FrameLayout.LayoutParams(0, Simple.MP);
+        iconHolder.setLayoutParams(iconParams);
+        addView(iconHolder);
 
         titleView = new TextView(context)
         {
@@ -121,11 +129,8 @@ public class HomeEvent extends FrameLayout
 
         if (intent == null)
         {
-            if (iconFrame != null)
-            {
-                Simple.removeFromParent(iconFrame);
-                iconFrame = null;
-            }
+            iconHolder.removeAllViews();
+            iconFrame = null;
 
             setFollowButtonText(null);
             setDeclineButtonText(null);
@@ -133,36 +138,39 @@ public class HomeEvent extends FrameLayout
         }
         else
         {
-            if ((iconFrame == null) || (iconFrame != intent.iconFrame))
+            //
+            // Construct a display icon frame if required.
+            //
+
+            if (intent.iconFrame == null)
             {
-                if (iconFrame != null) Simple.removeFromParent(iconFrame);
+                ImageSmartView iconView = new ImageSmartView(getContext());
+                iconView.setLayoutParams(Simple.layoutParamsMM());
 
-                if (intent.iconFrame == null)
+                if (intent.iconres != 0) iconView.setImageResource(intent.iconres);
+                if (intent.iconpath != null) iconView.setImageResource(intent.iconpath);
+
+                intent.iconFrame = new FrameLayout(getContext());
+                intent.iconFrame.setLayoutParams(Simple.layoutParamsXX(getHeight(), getHeight()));
+                intent.iconFrame.addView(iconView);
+            }
+
+            if (iconFrame != intent.iconFrame)
+            {
+                iconHolder.removeAllViews();
+                Simple.removeFromParent(intent.iconFrame);
+
+                if (intent.iconFrame instanceof LaunchItem)
                 {
-                    ImageSmartView iconView = new ImageSmartView(getContext());
-                    iconView.setLayoutParams(Simple.layoutParamsXX(getHeight(), getHeight()));
-
-                    if (intent.iconres != 0) iconView.setImageResource(intent.iconres);
-                    if (intent.iconpath != null) iconView.setImageResource(intent.iconpath);
-
-                    intent.iconFrame = new FrameLayout(getContext());
+                    ((LaunchItem) intent.iconFrame).setSize(getHeight(), getHeight());
+                }
+                else
+                {
                     intent.iconFrame.setLayoutParams(Simple.layoutParamsXX(getHeight(), getHeight()));
-                    intent.iconFrame.addView(iconView);
                 }
 
+                iconHolder.addView(intent.iconFrame);
                 iconFrame = intent.iconFrame;
-
-                if (iconFrame instanceof LaunchItem)
-                {
-                    ((LaunchItem) iconFrame).setSize(getHeight(), getHeight());
-                }
-
-                if (iconFrame instanceof FrameLayout)
-                {
-                    Simple.removeFromParent(iconFrame);
-                }
-
-                addView(iconFrame);
             }
 
             setFollowButtonText(intent.followText);
@@ -193,19 +201,35 @@ public class HomeEvent extends FrameLayout
         }
     }
 
-    public void setLayoutHeight(int height)
+    public void setLayoutHeight(int size)
     {
-        if (layoutParams.height != height)
+        if (layoutParams.height != size)
         {
-            layoutParams.height = height;
+            layoutParams.height = size;
             setLayoutParams(layoutParams);
+
+            iconParams.width = size;
+            iconParams.height = size;
+            iconHolder.setLayoutParams(iconParams);
+
+            if (iconFrame != null)
+            {
+                if (iconFrame instanceof LaunchItem)
+                {
+                    ((LaunchItem) iconFrame).setSize(size, size);
+                }
+                else
+                {
+                    iconFrame.setLayoutParams(Simple.layoutParamsXX(size, size));
+                }
+            }
 
             if (istopevent)
             {
-                titleParams.height = height / 2;
+                titleParams.height = size / 2;
 
-                titleParams.topMargin = Simple.isPortrait() ? height / 10 : 0;
-                titleParams.leftMargin = height + height / 10;
+                titleParams.topMargin = Simple.isPortrait() ? size / 10 : 0;
+                titleParams.leftMargin = size + size / 10;
                 titleParams.rightMargin = Simple.getDevicePixels(16);
             }
             else
@@ -213,7 +237,7 @@ public class HomeEvent extends FrameLayout
                 titleParams.height = Simple.MP;
 
                 titleParams.topMargin = 0;
-                titleParams.leftMargin = height + height / 8;
+                titleParams.leftMargin = size + size / 8;
                 titleParams.rightMargin = Simple.getDevicePixels(16);
 
                 if ((followButton != null) && (followButton.getVisibility() == VISIBLE))
