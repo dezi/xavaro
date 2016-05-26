@@ -145,6 +145,7 @@ public class HomeNotify extends HomeFrame
     {
         super.onAttachedToWindow();
 
+        Simple.removePost(manageNotificationsRun);
         Simple.makePost(manageNotificationsRun, 1000);
     }
 
@@ -236,36 +237,39 @@ public class HomeNotify extends HomeFrame
     protected void manageNotifications()
     {
 
-        ArrayList<NotifyIntent> intents = new ArrayList<>();
-
-        //
-        // Collect pending intents.
-        //
-
-        ArrayList<NotifyIntent> pendings = NotifyManager.getPendingIntents();
-        for (NotifyIntent pending : pendings) intents.add(pending);
-
-        //
-        // Add notify intents from all lauch items.
-        //
-
-        for (LaunchItem launchItem : candidatesLaunch)
+        synchronized (LOGTAG)
         {
-            NotifyIntent intent = ((NotifyIntent.NotifyService) launchItem).onGetNotifiyIntent();
-            if (intent == null) continue;
+            ArrayList<NotifyIntent> intents = new ArrayList<>();
 
-            intent.iconFrame = launchItem;
-            intents.add(intent);
-        }
+            //
+            // Collect pending intents.
+            //
 
-        //
-        // Display best candidates.
-        //
+            ArrayList<NotifyIntent> pendings = NotifyManager.getPendingIntents();
+            for (NotifyIntent pending : pendings) intents.add(pending);
 
-        for (int inx = 0; inx < slots.size(); inx++)
-        {
-            NotifyIntent intent = getNextIntent(intents);
-            slots.get(inx).setNotifyIntent(intent);
+            //
+            // Add notify intents from all lauch items.
+            //
+
+            for (LaunchItem launchItem : candidatesLaunch)
+            {
+                NotifyIntent intent = ((NotifyIntent.NotifyService) launchItem).onGetNotifiyIntent();
+                if (intent == null) continue;
+
+                intent.iconFrame = launchItem;
+                intents.add(intent);
+            }
+
+            //
+            // Display best candidates.
+            //
+
+            for (int inx = 0; inx < slots.size(); inx++)
+            {
+                NotifyIntent intent = getNextIntent(intents);
+                slots.get(inx).setNotifyIntent(intent);
+            }
         }
     }
 
