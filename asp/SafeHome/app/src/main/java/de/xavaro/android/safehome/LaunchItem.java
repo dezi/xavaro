@@ -189,11 +189,7 @@ public class LaunchItem extends FrameLayout implements
 
         int singular = R.string.simple_call;
 
-        if (typetag == null)
-        {
-            Log.d(LOGTAG, "getSubscribeNotificationMessage:" + Json.toPretty(config));
-        }
-        else
+        if (typetag != null)
         {
             switch (typetag)
             {
@@ -207,7 +203,7 @@ public class LaunchItem extends FrameLayout implements
                 case "facebook":
                 case "instagram":
                 case "googleplus":
-                    singular = R.string.simple_message;
+                    singular = R.string.simple_news;
                     break;
             }
         }
