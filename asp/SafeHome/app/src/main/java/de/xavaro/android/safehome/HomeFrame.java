@@ -370,7 +370,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
     public boolean onBackKeyWanted()
     {
-        Log.d(LOGTAG, "onBackKeyWanted");
+        Log.d(LOGTAG, "onBackKeyWanted:" + fullscreen);
 
         if (getVisibility() == VISIBLE)
         {
@@ -378,8 +378,11 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
             if (content instanceof BackKeyClient)
             {
+                Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient");
+
                 if (((BackKeyClient) content).onBackKeyWanted())
                 {
+                    Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient wanted");
                     return true;
                 }
             }
