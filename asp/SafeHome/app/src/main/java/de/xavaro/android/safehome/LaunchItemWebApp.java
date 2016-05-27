@@ -49,7 +49,21 @@ public class LaunchItemWebApp extends LaunchItem
     @Override
     public void onBackKeyExecuted()
     {
-        if (subtype != null) webappFrame = null;
+        Log.d(LOGTAG, "onBackKeyExecuted:");
+
+        if ((subtype != null) && (webappFrame != null))
+        {
+            WebAppView webappView = webappFrame.getWebAppView();
+
+            if (webappView != null)
+            {
+                Simple.removeFromParent(webappView);
+                webappView.destroy();
+            }
+
+            Simple.removeFromParent(webappFrame);
+            webappFrame = null;
+        }
     }
 
     private LaunchFrameWebApp webappFrame;

@@ -1,19 +1,19 @@
 package de.xavaro.android.common;
 
-import android.content.Context;
-import android.util.Base64;
 import android.webkit.JavascriptInterface;
-import android.util.Log;
+
+import android.content.Context;
 import android.webkit.WebView;
+import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public class WebAppRequest
@@ -72,24 +72,38 @@ public class WebAppRequest
 
     //region Back key handling
 
-    public void doBackPressed()
-    {
-        //
-        // Register fake callback function in case
-        // webapp did not define one itself.
-        //
+    private ArrayList<String> backKeyRequests = new ArrayList<>();
 
-        final String cbscript = ""
-                + "if (! WebAppRequest.onBackkeyPressed)"
-                + "{"
-                + "    WebAppRequest.onBackkeyPressed = function()"
-                + "    {"
-                + "        WebAppRequest.haveBackkeyPressed(false);"
-                + "    }"
-                + "}"
-                + "WebAppRequest.onBackkeyPressed();";
+    public boolean onBackKeyWanted()
+    {
+        if (backKeyRequests.size() == 0) return false;
+
+        String method = backKeyRequests.get(backKeyRequests.size() - 1);
+        String cbscript = method + "();";
 
         webview.evaluateJavascript(cbscript, null);
+
+        return true;
+    }
+
+    @JavascriptInterface
+    public void requestBackKey(String method)
+    {
+        if (! backKeyRequests.contains(method)) backKeyRequests.add(method);
+    }
+
+    @JavascriptInterface
+    public void releaseBackKey(String method)
+    {
+        if (backKeyRequests.contains(method)) backKeyRequests.remove(method);
+    }
+
+    @JavascriptInterface
+    public void requestKeyboard()
+    {
+        Log.d(LOGTAG, "requestKeyboard:" + webview);
+
+        webview.requestFocus();
     }
 
     @JavascriptInterface

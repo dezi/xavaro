@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.Gravity;
 import android.util.Log;
+import android.view.View;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
@@ -37,7 +39,15 @@ public class HomeWorker extends HomeFrame
     @Override
     protected void onToogleFullscreen()
     {
+        View content = payloadFrame.getChildAt(0);
+
+        if (content instanceof BackKeyClient)
+        {
+            ((BackKeyClient) content).onBackKeyExecuted();
+        }
+
         payloadFrame.removeAllViews();
+
         setVisibility(GONE);
     }
 

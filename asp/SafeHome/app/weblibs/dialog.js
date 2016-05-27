@@ -30,12 +30,7 @@ WebLibDialog.onClickOk = function(target)
             close = wld.currentConfig.onClickOk(target);
         }
 
-        if (close)
-        {
-            WebLibSimple.detachElement(wld.currentDialog.topDiv);
-            wld.currentConfig = null;
-            wld.currentDialog = null;
-        }
+        if (close) WebLibDialog.closeDialog();
     }
 }
 
@@ -54,12 +49,7 @@ WebLibDialog.onClickOther = function(target)
             close = wld.currentConfig.onClickOther(target);
         }
 
-        if (close)
-        {
-            WebLibSimple.detachElement(wld.currentDialog.topDiv);
-            wld.currentConfig = null;
-            wld.currentDialog = null;
-       }
+        if (close) WebLibDialog.closeDialog();
     }
 }
 
@@ -67,7 +57,21 @@ WebLibDialog.onClickCancel = function(target)
 {
     WebAppUtility.makeClick();
 
+    WebLibDialog.closeDialog();
+}
+
+WebLibDialog.onBackKeyPressed = function()
+{
+    console.log("WebLibDialog.onBackKeyPressed:");
+
+    WebLibDialog.closeDialog();
+}
+
+WebLibDialog.closeDialog = function()
+{
     var wld = WebLibDialog;
+
+    WebAppRequest.releaseBackKey("WebLibDialog.onBackKeyPressed");
 
     WebLibSimple.detachElement(wld.currentDialog.topDiv);
 
@@ -144,4 +148,6 @@ WebLibDialog.createDialog = function(config)
     dialog.dialogDiv.style.top  = WebLibSimple.addPixel(- (dhei >> 1));
 
     WebLibSimple.findFocus(dialog.topDiv);
+
+    WebAppRequest.requestBackKey("WebLibDialog.onBackKeyPressed");
 }

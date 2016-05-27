@@ -368,6 +368,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         return fullscreen;
     }
 
+    @Override
     public boolean onBackKeyWanted()
     {
         Log.d(LOGTAG, "onBackKeyWanted:" + fullscreen);
@@ -378,16 +379,17 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
             if (content instanceof BackKeyClient)
             {
-                Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient");
+                Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient:" + content);
 
                 if (((BackKeyClient) content).onBackKeyWanted())
                 {
                     Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient wanted");
+
                     return true;
                 }
             }
 
-            if (fullscreen)
+            if (isFullscreen())
             {
                 onToogleFullscreen();
 
@@ -398,6 +400,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         return false;
     }
 
+    @Override
     public void onBackKeyExecuted()
     {
         Log.d(LOGTAG, "onBackKeyExecuted");
@@ -408,5 +411,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         {
             ((BackKeyClient) content).onBackKeyExecuted();
         }
+
+        payloadFrame.removeAllViews();
     }
 }

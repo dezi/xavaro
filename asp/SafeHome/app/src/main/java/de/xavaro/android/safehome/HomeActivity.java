@@ -496,16 +496,17 @@ public class HomeActivity extends AppCompatActivity implements
                 {
                     if (lastview instanceof HomeWorker)
                     {
+                        ((HomeWorker) lastview).onBackKeyExecuted();
                         ((HomeWorker) lastview).getPayloadFrame().removeAllViews();
                         ((HomeWorker) lastview).setVisibility(View.GONE);
                     }
                     else
                     {
+                        ((BackKeyClient) lastview).onBackKeyExecuted();
                         Simple.removeFromParent((ViewGroup) lastview);
                     }
 
                     backStack.remove(backStack.size() - 1);
-                    ((BackKeyClient) lastview).onBackKeyExecuted();
                 }
             }
             else

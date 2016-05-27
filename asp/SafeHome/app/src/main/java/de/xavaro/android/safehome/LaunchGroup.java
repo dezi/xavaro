@@ -433,7 +433,7 @@ public class LaunchGroup extends FrameLayout implements
             if (recyledNextItems.size() > 0) return recyledNextItems.remove(0);
 
             Json.put(config, "type", "next");
-            Json.put(config, "label", "Weiter");
+            Json.put(config, "label", "weiter");
         }
 
         if (type.equals("prev"))
@@ -441,7 +441,7 @@ public class LaunchGroup extends FrameLayout implements
             if (recyledPrevItems.size() > 0) return recyledPrevItems.remove(0);
 
             Json.put(config, "type", "prev");
-            Json.put(config, "label", "Zurück");
+            Json.put(config, "label", "zurück");
         }
 
         return LaunchItem.createLaunchItem(context, this, config);
@@ -509,7 +509,7 @@ public class LaunchGroup extends FrameLayout implements
 
                 JSONObject prev = new JSONObject();
                 Json.put(prev, "type", "prev");
-                Json.put(prev, "label", "Zurück");
+                Json.put(prev, "label", "zurück");
 
                 LaunchItem liprev = LaunchItem.createLaunchItem(context, this, prev);
 

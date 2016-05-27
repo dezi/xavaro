@@ -146,7 +146,7 @@ WebLibLaunch.createLaunchItem = function(config)
     {
         var next = {};
 
-        next.label = "Weiter";
+        next.label = "weiter";
         next.icon = "/weblibs/launch/next_600x600.png";
 
         next.onTouchClick = WebLibLaunch.onClickNextItem;
@@ -156,11 +156,11 @@ WebLibLaunch.createLaunchItem = function(config)
         nextSlot++;
     }
 
-    if ((nextSlot % maxSlots) == 0)
+    if (wl.launchItems.length && ((nextSlot % maxSlots) == 0))
     {
         var prev = {};
 
-        prev.label = "Zurück";
+        prev.label = "zurück";
         prev.icon = "/weblibs/launch/prev_600x600.png";
 
         prev.onTouchClick = (nextSlot == 0)

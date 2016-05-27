@@ -194,15 +194,16 @@ public class Simple
 
     public static void showKeyboard(View view)
     {
-        if (anyContext == null) return;
-
         final View runview = view;
 
-        appHandler.postDelayed(new Runnable()
+        makePost(new Runnable()
         {
             @Override
             public void run()
             {
+                Log.d(LOGTAG, "showKeyboard:" + runview);
+
+                runview.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(runview, 0);
             }

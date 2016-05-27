@@ -62,16 +62,7 @@ public class LaunchFrameWebApp extends LaunchFrame
     {
         Log.d(LOGTAG, "onBackKeyWanted");
 
-        /*
-        if (webview.request != null)
-        {
-            webview.request.doBackPressed();
-
-            return true;
-        }
-        */
-        
-        return false;
+        return (webview.request != null) && webview.request.onBackKeyWanted();
     }
 
     @Override

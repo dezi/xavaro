@@ -399,7 +399,12 @@ WebLibSimple.findFocus = function(target)
 
         if (child.autofocus)
         {
+            console.log("WebLibSimple.findFocus:" + child);
+
             child.focus();
+
+            if (WebAppRequest) WebAppRequest.requestKeyboard();
+
             return true;
         }
 
