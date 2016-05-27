@@ -187,7 +187,7 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
     @Override
     protected void onMyClick()
     {
-        if (Json.getBoolean(config, "nofunc"))
+        if (isNoFunction() || (totalnews != mainnews))
         {
             super.launchContacts();
         }

@@ -143,40 +143,10 @@ public class LaunchItemComm extends LaunchItemNotify
         Simple.makePost(onNotification);
     }
 
-    protected final Runnable onNotification = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            int count = LaunchItem.getNotificationCount(config);
-
-            if (count >= 0)
-            {
-                String typetag = LaunchItem.getSubscribeNotificationType(config);
-
-                int singular = R.string.simple_call;
-                int plural = R.string.simple_calls;
-
-                if (Simple.equals(typetag, "smsmms")
-                        || Simple.equals(typetag, "xavaro")
-                        || Simple.equals(typetag, "whatsapp"))
-                {
-                    singular = R.string.simple_message;
-                    plural = R.string.simple_messages;
-                }
-
-                String message = count + " " + Simple.getTrans((count == 1) ? singular : plural);
-
-                notifyText.setText(message);
-                notifyText.setVisibility((count == 0) ? GONE : VISIBLE);
-            }
-        }
-    };
-
     @Override
     protected void onMyClick()
     {
-        if (isNoFunction())
+        if (isNoFunction() || (totalnews != mainnews))
         {
             launchContacts();
         }

@@ -211,7 +211,7 @@ public class LaunchItem extends FrameLayout implements
                     break;
             }
         }
-        
+
         return singular;
     }
 
