@@ -18,7 +18,7 @@ import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Json;
 
-public class LaunchItemComm extends LaunchItem
+public class LaunchItemComm extends LaunchItemNotify
 {
     private final static String LOGTAG = LaunchItemComm.class.getSimpleName();
 
@@ -141,28 +141,6 @@ public class LaunchItemComm extends LaunchItem
         if ((targetIcon == overicon) && ! isNoFunction()) overlay.setVisibility(VISIBLE);
 
         Simple.makePost(onNotification);
-    }
-
-    @Override
-    protected void onAttachedToWindow()
-    {
-        super.onAttachedToWindow();
-
-        if (! isNoFunction())
-        {
-            LaunchItem.subscribeNotification(config, onNotification);
-        }
-    }
-
-    @Override
-    protected void onDetachedFromWindow()
-    {
-        super.onDetachedFromWindow();
-
-        if (! isNoFunction())
-        {
-            LaunchItem.unsubscribeNotification(config, onNotification);
-        }
     }
 
     protected final Runnable onNotification = new Runnable()

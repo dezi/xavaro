@@ -722,20 +722,30 @@ public class Simple
         return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
+    public static int getPlural(int residsingular)
+    {
+        Resources res = getResources();
+
+        String resname = res.getResourceEntryName(residsingular) + "s";
+        int residplural = res.getIdentifier(resname, "string", getPackageName());
+
+        return (residplural != 0) ? residplural : residsingular;
+    }
+
     public static String getTrans(int resid, Object... args)
     {
         //
         // Check for You can say You to me.
         //
 
-        Resources res = anyContext.getResources();
+        Resources res = getResources();
 
         int residdu = 0;
 
         if (Simple.equals(Simple.getSharedPrefString("owner.siezen"), "duzen"))
         {
             String resname = res.getResourceEntryName(resid) + "_du";
-            residdu = res.getIdentifier(resname, "string", anyContext.getPackageName());
+            residdu = res.getIdentifier(resname, "string", getPackageName());
         }
 
         String message = res.getString(residdu > 0 ? residdu : resid);

@@ -114,9 +114,20 @@ public class LaunchItemNotify extends LaunchItem
 
                     if (totalnews >= 0)
                     {
-                        String message = totalnews + " " + Simple.getTrans((totalnews == 1)
-                                ? R.string.simple_news
-                                : R.string.simple_newss);
+                        int mesgresid = LaunchItem.getSubscribeNotificationMessage(config);
+
+                        if (totalnews != mainnews)
+                        {
+                            //
+                            // We have notifications from different areas.
+                            // Adjust message to be "news".
+                            //
+
+                            mesgresid = R.string.simple_news;
+                        }
+
+                        String message = totalnews + " " + Simple.getTrans(
+                                (totalnews == 1) ? mesgresid : Simple.getPlural(mesgresid));
 
                         notifyText.setText(message);
                         notifyText.setVisibility((totalnews == 0) ? GONE : VISIBLE);
@@ -129,9 +140,10 @@ public class LaunchItemNotify extends LaunchItem
 
                 if (count >= 0)
                 {
-                    String message = count + " " + Simple.getTrans((count == 1)
-                            ? R.string.simple_news
-                            : R.string.simple_newss);
+                    int mesgresid = LaunchItem.getSubscribeNotificationMessage(config);
+
+                    String message = count + " " + Simple.getTrans(
+                            (count == 1) ? mesgresid : Simple.getPlural(mesgresid));
 
                     notifyText.setText(message);
                     notifyText.setVisibility((count == 0) ? GONE : VISIBLE);

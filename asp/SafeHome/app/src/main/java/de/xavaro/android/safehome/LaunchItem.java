@@ -183,6 +183,38 @@ public class LaunchItem extends FrameLayout implements
         return typetag + "." + pfidtag;
     }
 
+    public static int getSubscribeNotificationMessage(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+
+        int singular = R.string.simple_call;
+
+        if (typetag == null)
+        {
+            Log.d(LOGTAG, "getSubscribeNotificationMessage:" + Json.toPretty(config));
+        }
+        else
+        {
+            switch (typetag)
+            {
+                case "smsmms":
+                case "xavaro":
+                case "whatsapp":
+                    singular = R.string.simple_message;
+                    break;
+
+                case "twitter":
+                case "facebook":
+                case "instagram":
+                case "googleplus":
+                    singular = R.string.simple_message;
+                    break;
+            }
+        }
+        
+        return singular;
+    }
+
     public static int getNotificationCount(JSONObject config)
     {
         String typetag = getSubscribeNotificationType(config);
