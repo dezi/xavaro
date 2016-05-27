@@ -812,7 +812,7 @@ public class ProfileImages
 
     private static final Map<String, Drawable> drawableCache = new HashMap<>();
 
-    private static File getAnonProfileFile()
+    public static File getAnonProfileFile()
     {
         return new File("" + CommonConfigs.IconResAnon);
     }

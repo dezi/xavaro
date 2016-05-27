@@ -21,11 +21,11 @@ public class HomeEvent extends FrameLayout
     private static final String LOGTAG = HomeEvent.class.getSimpleName();
 
     private LinearLayout.LayoutParams layoutParams;
-
+    private FrameLayout.LayoutParams titleParams;
     private FrameLayout.LayoutParams iconParams;
+
     private FrameLayout iconHolder;
     private FrameLayout iconFrame;
-    private FrameLayout.LayoutParams titleParams;
     private TextView titleView;
     private HomeButton declineButton;
     private HomeButton followButton;
@@ -131,13 +131,20 @@ public class HomeEvent extends FrameLayout
             if (intent.iconFrame == null)
             {
                 ImageSmartView iconView = new ImageSmartView(getContext());
-                iconView.setLayoutParams(Simple.layoutParamsMM());
 
-                if (intent.iconres != 0) iconView.setImageResource(intent.iconres);
-                if (intent.iconpath != null) iconView.setImageResource(intent.iconpath);
+                if (intent.iconres != 0)
+                {
+                    iconView.setImageResource(intent.iconres);
+                }
+                else
+                {
+                    if (intent.iconpath != null)
+                    {
+                        iconView.setImageResource(intent.iconpath, intent.iconcircle);
+                    }
+                }
 
                 intent.iconFrame = new FrameLayout(getContext());
-                intent.iconFrame.setLayoutParams(Simple.layoutParamsXX(getHeight(), getHeight()));
                 intent.iconFrame.addView(iconView);
             }
 
@@ -149,10 +156,6 @@ public class HomeEvent extends FrameLayout
                 if (intent.iconFrame instanceof LaunchItem)
                 {
                     ((LaunchItem) intent.iconFrame).setSize(getHeight(), getHeight());
-                }
-                else
-                {
-                    intent.iconFrame.setLayoutParams(Simple.layoutParamsXX(getHeight(), getHeight()));
                 }
 
                 iconHolder.addView(intent.iconFrame);
@@ -207,16 +210,9 @@ public class HomeEvent extends FrameLayout
             iconParams.height = size;
             iconHolder.setLayoutParams(iconParams);
 
-            if (iconFrame != null)
+            if (iconFrame instanceof LaunchItem)
             {
-                if (iconFrame instanceof LaunchItem)
-                {
-                    ((LaunchItem) iconFrame).setSize(size, size);
-                }
-                else
-                {
-                    iconFrame.setLayoutParams(Simple.layoutParamsXX(size, size));
-                }
+                ((LaunchItem) iconFrame).setSize(size, size);
             }
 
             if (istopevent)

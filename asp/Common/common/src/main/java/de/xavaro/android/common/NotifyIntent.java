@@ -28,6 +28,7 @@ public class NotifyIntent
 
     public int iconres;
     public String iconpath;
+    public boolean iconcircle;
     public FrameLayout iconFrame;
     public NotifyChecker checkCondition;
 

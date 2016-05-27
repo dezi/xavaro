@@ -5,8 +5,12 @@ import android.content.Context;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import de.xavaro.android.common.NotifyIntent;
+import de.xavaro.android.common.NotifyManager;
+import de.xavaro.android.common.ProfileImages;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Json;
 
@@ -35,6 +39,12 @@ public class LaunchItemNotify extends LaunchItem
                 JSONObject liconfig = Json.getObject(launchItems, inx);
                 if (liconfig == null) continue;
 
+                if (liconfig.has("launchitems"))
+                {
+                    subscribeLaunchItems(liconfig, subscribe);
+                    continue;
+                }
+
                 if (subscribe)
                 {
                     LaunchItem.subscribeNotification(liconfig, onNotification);
@@ -42,11 +52,6 @@ public class LaunchItemNotify extends LaunchItem
                 else
                 {
                     LaunchItem.unsubscribeNotification(liconfig, onNotification);
-                }
-
-                if (liconfig.has("launchitems"))
-                {
-                    subscribeLaunchItems(liconfig, subscribe);
                 }
             }
         }
@@ -63,6 +68,12 @@ public class LaunchItemNotify extends LaunchItem
                 JSONObject liconfig = Json.getObject(launchItems, inx);
                 if (liconfig == null) continue;
 
+                if (liconfig.has("launchitems"))
+                {
+                    countEventsLaunchItems(liconfig, mainitemkey);
+                    continue;
+                }
+
                 String subitemkey = LaunchItem.getNotificationKey(liconfig);
 
                 if (! dupscount.contains(subitemkey))
@@ -70,17 +81,125 @@ public class LaunchItemNotify extends LaunchItem
                     dupscount.add(subitemkey);
 
                     int subnews = LaunchItem.getNotificationCount(liconfig);
-                    if (subnews < 0) continue;
 
-                    totalnews += subnews;
-
-                    if (Simple.equals(mainitemkey, subitemkey))
+                    if (subnews >= 0)
                     {
-                        mainnews += subnews;
+                        totalnews += subnews;
+
+                        if (Simple.equals(mainitemkey, subitemkey))
+                        {
+                            mainnews += subnews;
+                        }
+
+                        //
+                        // Register or unregister the notification intent.
+                        //
+
+                        NotifyIntent intent = new NotifyIntent();
+
+                        intent.key = subitemkey;
+
+                        if (subnews == 0)
+                        {
+                            NotifyManager.removeNotification(intent);
+                        }
+                        else
+                        {
+                            String type = Json.getString(liconfig, "type");
+                            String pfid = LaunchItem.getSubscribeNotificationPfid(liconfig);
+
+                            boolean issocial;
+                            File profile;
+
+                            if (Simple.equals(type, "twitter") ||
+                                    Simple.equals(type, "facebook") ||
+                                    Simple.equals(type, "instagram") ||
+                                    Simple.equals(type, "googleplus"))
+                            {
+                                profile = ProfileImages.getSocialUserImageFile(type, pfid);
+                                issocial = true;
+                            }
+                            else
+                            {
+                                profile = ProfileImages.getProfileFile(pfid);
+                                issocial = false;
+                            }
+
+                            if (profile == null) profile = ProfileImages.getAnonProfileFile();
+
+                            int typeresid = LaunchItem.getSubscribeNotificationMessage(liconfig);
+
+                            String howmuch = "" + subnews;
+                            String who = Json.getString(liconfig, "label");
+
+                            int whereid = R.string.notify_where_phone;
+
+                            if (Simple.equals(type, "twitter")) whereid = R.string.notify_where_twitter;
+                            if (Simple.equals(type, "facebook")) whereid = R.string.notify_where_facebook;
+                            if (Simple.equals(type, "instagram")) whereid = R.string.notify_where_instagram;
+                            if (Simple.equals(type, "googleplus")) whereid = R.string.notify_where_googleplus;
+
+                            if (Simple.equals(type, "phone")) whereid = R.string.notify_where_phone;
+                            if (Simple.equals(type, "skype")) whereid = R.string.notify_where_skype;
+                            if (Simple.equals(type, "xavaro")) whereid = R.string.notify_where_xavaro;
+                            if (Simple.equals(type, "whatsapp")) whereid = R.string.notify_where_whatsapp;
+
+                            String where = Simple.getTrans(whereid);
+                            String message;
+
+                            if (issocial)
+                            {
+                                if (subnews == 1)
+                                {
+                                    message = Simple.getTrans(R.string.notify_social_news_singular,
+                                            who, where);
+                                }
+                                else
+                                {
+                                    message = Simple.getTrans(R.string.notify_social_news_plural,
+                                            howmuch, who, where);
+                                }
+                            }
+                            else
+                            {
+                                if (typeresid == R.string.simple_call)
+                                {
+                                    if (subnews == 1)
+                                    {
+                                        message = Simple.getTrans(R.string.notify_friend_call_singular,
+                                                who, where);
+                                    }
+                                    else
+                                    {
+                                        message = Simple.getTrans(R.string.notify_friend_call_plural,
+                                                howmuch, who, where);
+                                    }
+                                }
+                                else
+                                {
+                                    if (subnews == 1)
+                                    {
+                                        message = Simple.getTrans(R.string.notify_friend_message_singular,
+                                                who, where);
+                                    }
+                                    else
+                                    {
+                                        message = Simple.getTrans(R.string.notify_friend_message_plural,
+                                                howmuch, who, where);
+                                    }
+                                }
+                            }
+
+                            intent.title = message;
+                            intent.followText = "Aufrufen";
+                            intent.declineText = "Wegmachen";
+                            intent.iconpath = profile.toString();
+                            intent.iconcircle = ! issocial;
+
+                            NotifyManager.addNotification(intent);
+                        }
                     }
                 }
-
-                if (liconfig.has("launchitems")) countEventsLaunchItems(liconfig, mainitemkey);
             }
         }
     }

@@ -6,6 +6,8 @@
     <string name="simple_and">and</string>
     <string name="simple_new">new</string>
     <string name="simple_none">no</string>
+    <string name="simple_from">from</string>
+    <string name="simple_on">on</string>
 
     <string name="simple_news">News</string>
     <string name="simple_newss">News</string>
@@ -15,6 +17,26 @@
     <string name="simple_messages">Messages</string>
     <string name="simple_event">Event</string>
     <string name="simple_events">Events</string>
+
+    <string name="simple_you_have">You have</string>
+    <string name="simple_there_are">There are</string>
+
+    <string name="notify_social_news_singular">There is something new from %1$s %2$s.</string>
+    <string name="notify_social_news_plural">There are %1$s news from %2$s %3$s.</string>
+    <string name="notify_friend_call_singular">You have one new call from %1$s %2$s.</string>
+    <string name="notify_friend_call_plural">You have %1$s new calls from %2$s %3$s.</string>
+    <string name="notify_friend_message_singular">You have one new message from %1$s %2$s.</string>
+    <string name="notify_friend_message_plural">You have %1$s new messages from %2$s %3$s.</string>
+
+    <string name="notify_where_twitter">on Twitter</string>
+    <string name="notify_where_facebook">on Facebook</string>
+    <string name="notify_where_instagram">on Instagram</string>
+    <string name="notify_where_googleplus">on Google+</string>
+
+    <string name="notify_where_phone">on the phone</string>
+    <string name="notify_where_skype">on Skype</string>
+    <string name="notify_where_xavaro">in the chat</string>
+    <string name="notify_where_whatsapp">on WhatsApp</string>
 
     <string-array name="pref_where_keys">
         <item>inact</item>

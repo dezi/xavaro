@@ -3,6 +3,8 @@
     <string name="simple_and">und</string>
     <string name="simple_new">neu</string>
     <string name="simple_none">keine</string>
+    <string name="simple_from">von</string>
+    <string name="simple_on">auf</string>
 
     <string name="simple_news">Neuigkeit</string>
     <string name="simple_newss">Neuigkeiten</string>
@@ -12,6 +14,31 @@
     <string name="simple_messages">Nachrichten</string>
     <string name="simple_event">Ereignis</string>
     <string name="simple_events">Ereignisse</string>
+
+    <string name="simple_you_have">Sie haben</string>
+    <string name="simple_you_have_du">Du hast</string>
+    <string name="simple_there_are">Es gibt</string>
+
+    <string name="notify_social_news_singular">Es gibt etwas Neues von %1$s %2$s.</string>
+    <string name="notify_social_news_plural">Es gibt %1$s Neuigkeiten von %2$s %3$s.</string>
+    <string name="notify_friend_call_singular">Sie haben einen neuen Anruf von %1$s %2$s.</string>
+    <string name="notify_friend_call_singular_du">Du hast einen neuen Anruf von %1$s %2$s.</string>
+    <string name="notify_friend_call_plural">Sie haben %1$s neue Anrufe von %2$s %3$s.</string>
+    <string name="notify_friend_call_plural_du">Du hast %1$s neue Anrufe von %2$s %3$s.</string>
+    <string name="notify_friend_message_singular">Sie haben eine neue Nachricht von %1$s %2$s.</string>
+    <string name="notify_friend_message_singular_du">Du hast eine neue Nachricht von %1$s %2$s.</string>
+    <string name="notify_friend_message_plural">Sie haben %1$s neue Nachrichten von %2$s %3$s.</string>
+    <string name="notify_friend_message_plural_du">Du hast %1$s neue Nachrichten von %2$s %3$s.</string>
+
+    <string name="notify_where_twitter">auf Twitter</string>
+    <string name="notify_where_facebook">auf Facebook</string>
+    <string name="notify_where_instagram">auf Instagram</string>
+    <string name="notify_where_googleplus">auf Google+</string>
+
+    <string name="notify_where_phone">auf dem Telefon</string>
+    <string name="notify_where_skype">auf Skype</string>
+    <string name="notify_where_xavaro">im Chat</string>
+    <string name="notify_where_whatsapp">auf WhatsApp</string>
 
     <string-array name="de_regions_keys">
         <item>de</item>
