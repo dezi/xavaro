@@ -96,6 +96,8 @@ public class HomeEvent extends FrameLayout
         if ((intent != null) && (intent.followRunner != null))
         {
             intent.followRunner.run();
+
+            HomeNotify.getInstance().onManageNotifications();
         }
     }
 
@@ -106,6 +108,8 @@ public class HomeEvent extends FrameLayout
         if ((intent != null) && (intent.declineRunner != null))
         {
             intent.declineRunner.run();
+
+            HomeNotify.getInstance().onManageNotifications();
         }
     }
 

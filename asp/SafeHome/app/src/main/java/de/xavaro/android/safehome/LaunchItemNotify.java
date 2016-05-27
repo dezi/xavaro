@@ -158,6 +158,24 @@ public class LaunchItemNotify extends LaunchItem
         return SimpleStorage.getInt("notifications", typetag + ".count." + pfidtag);
     }
 
+    protected String getNotificationStamp(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return null;
+
+        if (Simple.equals(typetag, "twitter") ||
+                Simple.equals(typetag, "facebook") ||
+                Simple.equals(typetag, "instagram") ||
+                Simple.equals(typetag, "googleplus"))
+        {
+            return SimpleStorage.getString("socialfeednews", typetag + ".stamp." + pfidtag);
+        }
+
+        return SimpleStorage.getString("notifications", typetag + ".stamp." + pfidtag);
+    }
+
     protected void resetNotificationCount(JSONObject config)
     {
         String typetag = getSubscribeNotificationType(config);
@@ -350,6 +368,7 @@ public class LaunchItemNotify extends LaunchItem
                                 }
                             }
 
+                            intent.dst = getNotificationStamp(liconfig);
                             intent.title = message;
                             intent.followText = "Aufrufen";
                             intent.declineText = "Ignorieren";
@@ -376,6 +395,8 @@ public class LaunchItemNotify extends LaunchItem
                             };
 
                             NotifyManager.addNotification(intent);
+
+                            HomeNotify.getInstance().onManageNotifications();
                         }
                     }
                 }

@@ -1,7 +1,7 @@
 package de.xavaro.android.safehome;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
+import android.annotation.SuppressLint;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -24,6 +24,13 @@ public class HomeNotify extends HomeFrame
 {
     private static final String LOGTAG = HomeNotify.class.getSimpleName();
 
+    private static HomeNotify instance;
+
+    public static HomeNotify getInstance()
+    {
+        return instance;
+    }
+
     protected LinearLayout contentFrame;
 
     protected ArrayList<HomeEvent> slots = new ArrayList<>();
@@ -42,6 +49,8 @@ public class HomeNotify extends HomeFrame
     public HomeNotify(Context context)
     {
         super(context);
+
+        instance = this;
 
         Log.d(LOGTAG,"HomeNotify: creating.");
 
@@ -203,11 +212,19 @@ public class HomeNotify extends HomeFrame
         }
     }
 
+    public void onManageNotifications()
+    {
+        Simple.removePost(manageNotificationsRun);
+        Simple.makePost(manageNotificationsRun, 100);
+    }
+
     @Nullable
     protected NotifyIntent getNextIntent(ArrayList<NotifyIntent> intents)
     {
         int bestIndex = -1;
         int bestLevel = -1;
+
+        String bestDate = null;
 
         for (int inx = 0; inx < intents.size(); inx++)
         {
@@ -226,10 +243,14 @@ public class HomeNotify extends HomeFrame
                 continue;
             }
 
-            if (intent.importance > bestLevel)
+            Log.d(LOGTAG, "=====================getNextIntent:" + intent.dst + "=" + intent.title);
+
+            if ((intent.importance >= bestLevel) &&
+                ((bestDate == null) || (Simple.compareTo(intent.dst, bestDate) > 0)))
             {
                 bestIndex = inx;
                 bestLevel = intent.importance;
+                bestDate = intent.dst;
             }
         }
 
@@ -238,7 +259,6 @@ public class HomeNotify extends HomeFrame
 
     protected void manageNotifications()
     {
-
         synchronized (LOGTAG)
         {
             ArrayList<NotifyIntent> intents = new ArrayList<>();
@@ -282,7 +302,7 @@ public class HomeNotify extends HomeFrame
         {
             manageNotifications();
 
-            Simple.makePost(manageNotificationsRun, 5 * 1000);
+            Simple.makePost(manageNotificationsRun, 60 * 1000);
         }
     };
 }

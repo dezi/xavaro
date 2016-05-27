@@ -11,6 +11,8 @@ public class NotifyIntent
     public static final int ASSISTANCE = 4;
     public static final int URGENT = 5;
 
+    public String dst = Simple.nowAsISO();
+
     public String key;
     public String title;
     public String summary;
