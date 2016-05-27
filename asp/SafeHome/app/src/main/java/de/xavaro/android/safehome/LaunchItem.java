@@ -172,6 +172,17 @@ public class LaunchItem extends FrameLayout implements
         NotificationService.unsubscribe(typetag, pfidtag, callback);
     }
 
+    @Nullable
+    public static String getNotificationKey(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return null;
+
+        return typetag + "." + pfidtag;
+    }
+
     public static int getNotificationCount(JSONObject config)
     {
         String typetag = getSubscribeNotificationType(config);

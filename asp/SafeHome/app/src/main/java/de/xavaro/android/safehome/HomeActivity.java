@@ -520,7 +520,6 @@ public class HomeActivity extends AppCompatActivity implements
 
         if (socialScreen.onBackKeyWanted()) return;
         if (launchScreen.onBackKeyWanted()) return;
-        if (workerScreen.onBackKeyWanted()) return;
 
         //
         // Top level back press handling.

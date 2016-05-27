@@ -159,6 +159,8 @@ public class WebAppSocial
     {
         String key = platform + ".count." + pfid;
         SimpleStorage.put("socialfeednews", key, 0);
+
+        NotificationService.doCallbacks(platform, pfid);
     }
 
     @JavascriptInterface
