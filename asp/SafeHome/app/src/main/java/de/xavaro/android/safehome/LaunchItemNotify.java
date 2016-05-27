@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.support.annotation.Nullable;
+
 import android.content.Context;
 
 import org.json.JSONArray;
@@ -8,9 +10,11 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 
+import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.NotifyManager;
 import de.xavaro.android.common.ProfileImages;
+import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Json;
 
@@ -18,17 +22,173 @@ public class LaunchItemNotify extends LaunchItem
 {
     private final static String LOGTAG = LaunchItemNotify.class.getSimpleName();
 
-    public LaunchItemNotify(Context context)
-    {
-        super(context);
-    }
-
     protected final ArrayList<String> dupscount = new ArrayList<>();
 
     protected int mainnews;
     protected int totalnews;
 
-    private void subscribeLaunchItems(JSONObject config, boolean subscribe)
+    public LaunchItemNotify(Context context)
+    {
+        super(context);
+    }
+
+    protected String getSubscribeNotificationType(JSONObject config)
+    {
+        String typetag = null;
+
+        String type = Json.getString(config, "type");
+        String subtype = Json.getString(config, "subtype");
+
+        if (Simple.equals(type, "phone"))
+        {
+            if (Simple.equals(subtype, "text")) typetag = "smsmms";
+            if (Simple.equals(subtype, "voip")) typetag = "phonecall";
+        }
+
+        if (Simple.equals(type, "skype") ||
+                Simple.equals(type, "xavaro") ||
+                Simple.equals(type, "whatsapp") ||
+                Simple.equals(type, "twitter") ||
+                Simple.equals(type, "facebook") ||
+                Simple.equals(type, "instagram") ||
+                Simple.equals(type, "googleplus"))
+        {
+            typetag = type;
+        }
+
+        return typetag;
+    }
+
+    protected String getSubscribeNotificationPfid(JSONObject config)
+    {
+        String pfidtag = null;
+
+        String type = Json.getString(config, "type");
+
+        if (Simple.equals(type, "phone")) pfidtag = Json.getString(config, "phonenumber");
+        if (Simple.equals(type, "skype")) pfidtag = Json.getString(config, "skypename");
+        if (Simple.equals(type, "xavaro")) pfidtag = Json.getString(config, "identity");
+        if (Simple.equals(type, "whatsapp")) pfidtag = Json.getString(config, "waphonenumber");
+
+        if (Simple.equals(type, "twitter") ||
+                Simple.equals(type, "facebook") ||
+                Simple.equals(type, "instagram") ||
+                Simple.equals(type, "googleplus"))
+        {
+            pfidtag = Json.getString(config, "pfid");;
+        }
+
+        return pfidtag;
+    }
+
+    protected void subscribeNotification(JSONObject config, Runnable callback)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return;
+
+        NotificationService.subscribe(typetag, pfidtag, callback);
+    }
+
+    protected void unsubscribeNotification(JSONObject config, Runnable callback)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return;
+
+        NotificationService.unsubscribe(typetag, pfidtag, callback);
+    }
+
+    @Nullable
+    protected String getNotificationKey(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return null;
+
+        return typetag + "." + pfidtag;
+    }
+
+    protected int getSubscribeNotificationMessage(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+
+        int singular = R.string.simple_call;
+
+        if (typetag != null)
+        {
+            switch (typetag)
+            {
+                case "smsmms":
+                case "xavaro":
+                case "whatsapp":
+                    singular = R.string.simple_message;
+                    break;
+
+                case "twitter":
+                case "facebook":
+                case "instagram":
+                case "googleplus":
+                    singular = R.string.simple_news;
+                    break;
+            }
+        }
+
+        return singular;
+    }
+
+    protected int getNotificationCount(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return -1;
+
+        if (Simple.equals(typetag, "twitter") ||
+                Simple.equals(typetag, "facebook") ||
+                Simple.equals(typetag, "instagram") ||
+                Simple.equals(typetag, "googleplus"))
+        {
+            return SimpleStorage.getInt("socialfeednews", typetag + ".count." + pfidtag);
+        }
+
+        return SimpleStorage.getInt("notifications", typetag + ".count." + pfidtag);
+    }
+
+    protected void resetNotificationCount(JSONObject config)
+    {
+        String typetag = getSubscribeNotificationType(config);
+        String pfidtag = getSubscribeNotificationPfid(config);
+
+        if ((typetag == null) || (pfidtag == null)) return;
+
+        if (Simple.equals(typetag, "twitter") ||
+                Simple.equals(typetag, "facebook") ||
+                Simple.equals(typetag, "instagram") ||
+                Simple.equals(typetag, "googleplus"))
+        {
+            SimpleStorage.put("socialfeednews", typetag + ".count." + pfidtag, 0);
+        }
+        else
+        {
+            SimpleStorage.put("notifications", typetag + ".count." + pfidtag, 0);
+        }
+
+        NotificationService.doCallbacks(typetag, pfidtag);
+    }
+
+    protected void showLaunchItemInWorker(JSONObject config)
+    {
+        LaunchItem launchItem = LaunchItem.createLaunchItem(context, null, config);
+        launchItem.onMyClick();
+
+        resetNotificationCount(config);
+    }
+
+    protected void subscribeLaunchItems(JSONObject config, boolean subscribe)
     {
         JSONArray launchItems = Json.getArray(config, "launchitems");
 
@@ -47,17 +207,17 @@ public class LaunchItemNotify extends LaunchItem
 
                 if (subscribe)
                 {
-                    LaunchItem.subscribeNotification(liconfig, onNotification);
+                    subscribeNotification(liconfig, onNotification);
                 }
                 else
                 {
-                    LaunchItem.unsubscribeNotification(liconfig, onNotification);
+                    unsubscribeNotification(liconfig, onNotification);
                 }
             }
         }
     }
 
-    private void countEventsLaunchItems(JSONObject config, String mainitemkey)
+    protected void countEventsLaunchItems(JSONObject config, String mainitemkey)
     {
         JSONArray launchItems = Json.getArray(config, "launchitems");
 
@@ -65,7 +225,7 @@ public class LaunchItemNotify extends LaunchItem
         {
             for (int inx = 0; inx < launchItems.length(); inx++)
             {
-                JSONObject liconfig = Json.getObject(launchItems, inx);
+                final JSONObject liconfig = Json.getObject(launchItems, inx);
                 if (liconfig == null) continue;
 
                 if (liconfig.has("launchitems"))
@@ -74,13 +234,13 @@ public class LaunchItemNotify extends LaunchItem
                     continue;
                 }
 
-                String subitemkey = LaunchItem.getNotificationKey(liconfig);
+                String subitemkey = getNotificationKey(liconfig);
 
                 if (! dupscount.contains(subitemkey))
                 {
                     dupscount.add(subitemkey);
 
-                    int subnews = LaunchItem.getNotificationCount(liconfig);
+                    int subnews = getNotificationCount(liconfig);
 
                     if (subnews >= 0)
                     {
@@ -106,7 +266,7 @@ public class LaunchItemNotify extends LaunchItem
                         else
                         {
                             String type = Json.getString(liconfig, "type");
-                            String pfid = LaunchItem.getSubscribeNotificationPfid(liconfig);
+                            String pfid = getSubscribeNotificationPfid(liconfig);
 
                             boolean issocial;
                             File profile;
@@ -127,7 +287,7 @@ public class LaunchItemNotify extends LaunchItem
 
                             if (profile == null) profile = ProfileImages.getAnonProfileFile();
 
-                            int typeresid = LaunchItem.getSubscribeNotificationMessage(liconfig);
+                            int typeresid = getSubscribeNotificationMessage(liconfig);
 
                             String howmuch = "" + subnews;
                             String who = Json.getString(liconfig, "label");
@@ -192,9 +352,28 @@ public class LaunchItemNotify extends LaunchItem
 
                             intent.title = message;
                             intent.followText = "Aufrufen";
-                            intent.declineText = "Wegmachen";
+                            intent.declineText = "Ignorieren";
                             intent.iconpath = profile.toString();
                             intent.iconcircle = ! issocial;
+                            intent.importance = NotifyIntent.REMINDER;
+
+                            intent.followRunner = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    showLaunchItemInWorker(liconfig);
+                                }
+                            };
+
+                            intent.declineRunner = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    resetNotificationCount(liconfig);
+                                }
+                            };
 
                             NotifyManager.addNotification(intent);
                         }
@@ -217,7 +396,7 @@ public class LaunchItemNotify extends LaunchItem
         {
             if (config.has("pfid") && !isNoFunction())
             {
-                LaunchItem.subscribeNotification(config, onNotification);
+                subscribeNotification(config, onNotification);
             }
         }
     }
@@ -235,7 +414,7 @@ public class LaunchItemNotify extends LaunchItem
         {
             if (config.has("pfid") && !isNoFunction())
             {
-                LaunchItem.unsubscribeNotification(config, onNotification);
+                unsubscribeNotification(config, onNotification);
             }
         }
     }
@@ -251,12 +430,12 @@ public class LaunchItemNotify extends LaunchItem
                 totalnews = 0;
                 dupscount.clear();
 
-                String mainitemkey = LaunchItem.getNotificationKey(config);
+                String mainitemkey = getNotificationKey(config);
                 countEventsLaunchItems(config, mainitemkey);
 
                 if (totalnews >= 0)
                 {
-                    int mesgresid = LaunchItem.getSubscribeNotificationMessage(config);
+                    int mesgresid = getSubscribeNotificationMessage(config);
 
                     if (totalnews != mainnews)
                     {
@@ -277,11 +456,11 @@ public class LaunchItemNotify extends LaunchItem
             }
             else
             {
-                int count = LaunchItem.getNotificationCount(config);
+                int count = getNotificationCount(config);
 
                 if (count >= 0)
                 {
-                    int mesgresid = LaunchItem.getSubscribeNotificationMessage(config);
+                    int mesgresid = getSubscribeNotificationMessage(config);
 
                     String message = count + " " + Simple.getTrans(
                             (count == 1) ? mesgresid : Simple.getPlural(mesgresid));
