@@ -221,7 +221,7 @@ public class HomePeople extends FrameLayout
         String type = Json.getString(li, "type");
         String subtype = Json.getString(li, "subtype");
 
-        return Simple.equals(subtype, "friend")
+        return (Simple.equals(subtype, "friend") || Simple.equals(subtype, "owner"))
                 && (Simple.equals(type, "twitter")
                 || Simple.equals(type, "facebook")
                 || Simple.equals(type, "instagram")
