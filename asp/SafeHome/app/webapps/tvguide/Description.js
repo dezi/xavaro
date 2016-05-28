@@ -490,6 +490,8 @@ tvguide.animateInfoIn = function()
     else
     {
         tvguide.animateInfoStatus = "Finish";
+
+        WebAppRequest.requestBackKey("tvguide.animateInfoOut");
     }
 }
 
@@ -514,7 +516,9 @@ tvguide.animateInfoOut = function()
 
         tvguide.animateInfoStatus = null;
         tvguide.description = null;
-    }
+
+        WebAppRequest.releaseBackKey("tvguide.animateInfoOut");
+   }
 }
 
 tvguide.checkInfoStatus = function()

@@ -764,6 +764,10 @@ tvguide.onEPGTouchScroll = function(newX, newY)
     }
 }
 
+//
+// This fuunction has been obsoleted.
+//
+
 WebAppRequest.onBackkeyPressed = function()
 {
     if (tvguide.description)

@@ -582,6 +582,8 @@ WebLibSimple.nukeWiki = function()
 {
     WebLibSimple.wikiFrame.style.display = "none";
     WebLibSimple.wikiFrame = null;
+
+    WebAppRequest.releaseBackKey("WebLibSimple.nukeWiki");
 }
 
 WebLibSimple.openWiki = function(target, element)
@@ -616,4 +618,6 @@ WebLibSimple.openWiki = function(target, element)
     iframe.style.border = "0px solid black";
 
     iframe.src = wikiArticle;
+
+    WebAppRequest.requestBackKey("WebLibSimple.nukeWiki");
 }
