@@ -73,6 +73,7 @@ public class LaunchItem extends FrameLayout implements
         if (Simple.equals(type, "instagram"   )) item = new LaunchItemSocial(context);
         if (Simple.equals(type, "googleplus"  )) item = new LaunchItemSocial(context);
         if (Simple.equals(type, "twitter"     )) item = new LaunchItemSocial(context);
+        if (Simple.equals(type, "likes"       )) item = new LaunchItemSocial(context);
 
         if (Simple.equals(type, "xavaro"      )) item = new LaunchItemCommXavaro(context);
 

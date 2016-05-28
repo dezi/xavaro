@@ -52,6 +52,11 @@ public class LaunchItemSocial extends LaunchItemNotify
             targetIcon.setImageResource(CommonConfigs.IconResSocial);
         }
 
+        if (type.equals("likes"))
+        {
+            targetIcon.setImageResource(GlobalConfigs.IconResWebConfigInternet);
+        }
+
         if (type.equals("twitter"))
         {
             platformName = SocialTwitter.getInstance().getPlatformName();
@@ -136,6 +141,25 @@ public class LaunchItemSocial extends LaunchItemNotify
         return true;
     }
 
+    protected boolean launchLikes()
+    {
+        JSONArray launchItems = Json.getArray(config, "launchitems");
+
+        if (launchItems != null)
+        {
+            LaunchGroup directory = new LaunchGroup(getContext());
+            directory.setConfig(null, launchItems);
+
+            String label = Json.getString(config, "label") + " – " + "Soziale Netzwerke";
+
+            ((HomeActivity) getContext()).addWorkerToBackStack(label, directory);
+
+            return true;
+        }
+
+        return false;
+    }
+
     private void launchAny()
     {
         if (type.equals("social"))
@@ -145,6 +169,13 @@ public class LaunchItemSocial extends LaunchItemNotify
             webappFrame.setParent(this);
 
             ((HomeActivity) context).addViewToBackStack(webappFrame);
+
+            return;
+        }
+
+        if (type.equals("likes"))
+        {
+            launchLikes();
 
             return;
         }

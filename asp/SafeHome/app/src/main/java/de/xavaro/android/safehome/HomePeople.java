@@ -439,6 +439,29 @@ public class HomePeople extends FrameLayout
 
             Json.put(baseContacts, contacts);
         }
+
+        if (socialLikes.length() > 0)
+        {
+            for (int inx = 0; inx < socialLikes.length(); inx++)
+            {
+                JSONObject li = Json.getObject(socialLikes, inx);
+                String label = Json.getString(li, "label");
+                if (label == null) continue;
+                label = label.toLowerCase();
+
+                JSONArray choices = Json.getArray(nameList, label);
+                Json.put(li, "launchitems", choices);
+                Json.put(li, "nofunction", true);
+            }
+
+            JSONObject contacts = new JSONObject();
+
+            Json.put(contacts, "type", "likes");
+            Json.put(contacts, "label", "Abonnements");
+            Json.put(contacts, "launchitems", socialLikes);
+
+            Json.put(baseContacts, contacts);
+        }
     }
 
     private Runnable changeOrientation = new Runnable()
