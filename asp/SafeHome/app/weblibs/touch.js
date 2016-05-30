@@ -204,8 +204,6 @@ WebLibTouch.onTouchEnd = function(event)
 
         WebLibTouch.setOffsets();
 
-console.log("=============================>" + touch.speedX + "=" + touch.speedY);
-
         WebLibTouch.swingTimeout = setTimeout(WebLibTouch.onTouchEndSwing, 0);
     }
 
@@ -256,6 +254,15 @@ WebLibTouch.onTouchEndSwing = function()
         touch.speedY *= 0.99;
 
         WebLibTouch.swingTimeout = setTimeout(WebLibTouch.onTouchEndSwing, 0);
+    }
+}
+
+WebLibTouch.onTouchEndSwingTerminate = function()
+{
+    if (WebLibTouch.swingTimeout)
+    {
+        clearTimeout(WebLibTouch.swingTimeout);
+        WebLibTouch.swingTimeout = null;
     }
 }
 

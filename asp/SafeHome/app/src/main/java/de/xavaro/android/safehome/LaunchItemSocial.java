@@ -164,6 +164,10 @@ public class LaunchItemSocial extends LaunchItemNotify
     {
         if (type.equals("social"))
         {
+            //
+            // Launch mode owner plus all related feeds.
+            //
+
             LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
             webappFrame.setWebAppName("instaface");
             webappFrame.setParent(this);
@@ -204,6 +208,17 @@ public class LaunchItemSocial extends LaunchItemNotify
                 String plat = Json.getString(config, "type");
                 String pfid = Json.getString(config, "pfid");
                 String type = Json.getString(config, "subtype");
+
+                if (Simple.equals(type, "owner"))
+                {
+                    //
+                    // Launch item in the role as a plain user, even
+                    // it is belonging to the social owner. Set type
+                    // to friend mode, to enable normal display.
+                    //
+
+                    type = "friend";
+                }
 
                 webappFrame.getWebAppView().social.setPlatform(plat, pfid, name, type);
             }

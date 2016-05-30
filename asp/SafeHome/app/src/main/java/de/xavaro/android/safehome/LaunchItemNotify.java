@@ -254,150 +254,159 @@ public class LaunchItemNotify extends LaunchItem
 
                 String subitemkey = getNotificationKey(liconfig);
 
-                if (! dupscount.contains(subitemkey))
+                if (dupscount.contains(subitemkey))
                 {
-                    dupscount.add(subitemkey);
+                    //
+                    // Non functional launch items contain reference
+                    // to functional launch item in config. Therefor
+                    // duplicates can occur.
+                    //
 
-                    int subnews = getNotificationCount(liconfig);
+                    continue;
+                }
 
-                    if (subnews >= 0)
+                dupscount.add(subitemkey);
+
+                int subnews = getNotificationCount(liconfig);
+
+                if (subnews >= 0)
+                {
+                    totalnews += subnews;
+
+                    if (Simple.equals(mainitemkey, subitemkey))
                     {
-                        totalnews += subnews;
+                        mainnews += subnews;
+                    }
 
-                        if (Simple.equals(mainitemkey, subitemkey))
+                    //
+                    // Register or unregister the notification intent.
+                    //
+
+                    NotifyIntent intent = new NotifyIntent();
+
+                    intent.key = subitemkey;
+
+                    if (subnews == 0)
+                    {
+                        NotifyManager.removeNotification(intent);
+                    }
+                    else
+                    {
+                        String type = Json.getString(liconfig, "type");
+                        String pfid = getSubscribeNotificationPfid(liconfig);
+
+                        boolean issocial;
+                        File profile;
+
+                        if (Simple.equals(type, "twitter") ||
+                                Simple.equals(type, "facebook") ||
+                                Simple.equals(type, "instagram") ||
+                                Simple.equals(type, "googleplus"))
                         {
-                            mainnews += subnews;
-                        }
-
-                        //
-                        // Register or unregister the notification intent.
-                        //
-
-                        NotifyIntent intent = new NotifyIntent();
-
-                        intent.key = subitemkey;
-
-                        if (subnews == 0)
-                        {
-                            NotifyManager.removeNotification(intent);
+                            profile = ProfileImages.getSocialUserImageFile(type, pfid);
+                            issocial = true;
                         }
                         else
                         {
-                            String type = Json.getString(liconfig, "type");
-                            String pfid = getSubscribeNotificationPfid(liconfig);
+                            profile = ProfileImages.getProfileFile(pfid);
+                            issocial = false;
+                        }
 
-                            boolean issocial;
-                            File profile;
+                        if (profile == null) profile = ProfileImages.getAnonProfileFile();
 
-                            if (Simple.equals(type, "twitter") ||
-                                    Simple.equals(type, "facebook") ||
-                                    Simple.equals(type, "instagram") ||
-                                    Simple.equals(type, "googleplus"))
+                        int typeresid = getSubscribeNotificationMessage(liconfig);
+
+                        String howmuch = "" + subnews;
+                        String who = Json.getString(liconfig, "label");
+
+                        int whereid = R.string.notify_where_phone;
+
+                        // @formatter:off
+                        if (Simple.equals(type, "twitter")) whereid = R.string.notify_where_twitter;
+                        if (Simple.equals(type, "facebook")) whereid = R.string.notify_where_facebook;
+                        if (Simple.equals(type, "instagram")) whereid = R.string.notify_where_instagram;
+                        if (Simple.equals(type, "googleplus")) whereid = R.string.notify_where_googleplus;
+                        if (Simple.equals(type, "phone")) whereid = R.string.notify_where_phone;
+                        if (Simple.equals(type, "skype")) whereid = R.string.notify_where_skype;
+                        if (Simple.equals(type, "xavaro")) whereid = R.string.notify_where_xavaro;
+                        if (Simple.equals(type, "whatsapp")) whereid = R.string.notify_where_whatsapp;
+                        // @formatter:on
+
+                        String where = Simple.getTrans(whereid);
+                        String message;
+
+                        if (issocial)
+                        {
+                            if (subnews == 1)
                             {
-                                profile = ProfileImages.getSocialUserImageFile(type, pfid);
-                                issocial = true;
+                                message = Simple.getTrans(R.string.notify_social_news_singular,
+                                        who, where);
                             }
                             else
                             {
-                                profile = ProfileImages.getProfileFile(pfid);
-                                issocial = false;
+                                message = Simple.getTrans(R.string.notify_social_news_plural,
+                                        howmuch, who, where);
                             }
-
-                            if (profile == null) profile = ProfileImages.getAnonProfileFile();
-
-                            int typeresid = getSubscribeNotificationMessage(liconfig);
-
-                            String howmuch = "" + subnews;
-                            String who = Json.getString(liconfig, "label");
-
-                            int whereid = R.string.notify_where_phone;
-
-                            if (Simple.equals(type, "twitter")) whereid = R.string.notify_where_twitter;
-                            if (Simple.equals(type, "facebook")) whereid = R.string.notify_where_facebook;
-                            if (Simple.equals(type, "instagram")) whereid = R.string.notify_where_instagram;
-                            if (Simple.equals(type, "googleplus")) whereid = R.string.notify_where_googleplus;
-
-                            if (Simple.equals(type, "phone")) whereid = R.string.notify_where_phone;
-                            if (Simple.equals(type, "skype")) whereid = R.string.notify_where_skype;
-                            if (Simple.equals(type, "xavaro")) whereid = R.string.notify_where_xavaro;
-                            if (Simple.equals(type, "whatsapp")) whereid = R.string.notify_where_whatsapp;
-
-                            String where = Simple.getTrans(whereid);
-                            String message;
-
-                            if (issocial)
+                        }
+                        else
+                        {
+                            if (typeresid == R.string.simple_call)
                             {
                                 if (subnews == 1)
                                 {
-                                    message = Simple.getTrans(R.string.notify_social_news_singular,
+                                    message = Simple.getTrans(R.string.notify_friend_call_singular,
                                             who, where);
                                 }
                                 else
                                 {
-                                    message = Simple.getTrans(R.string.notify_social_news_plural,
+                                    message = Simple.getTrans(R.string.notify_friend_call_plural,
                                             howmuch, who, where);
                                 }
                             }
                             else
                             {
-                                if (typeresid == R.string.simple_call)
+                                if (subnews == 1)
                                 {
-                                    if (subnews == 1)
-                                    {
-                                        message = Simple.getTrans(R.string.notify_friend_call_singular,
-                                                who, where);
-                                    }
-                                    else
-                                    {
-                                        message = Simple.getTrans(R.string.notify_friend_call_plural,
-                                                howmuch, who, where);
-                                    }
+                                    message = Simple.getTrans(R.string.notify_friend_message_singular,
+                                            who, where);
                                 }
                                 else
                                 {
-                                    if (subnews == 1)
-                                    {
-                                        message = Simple.getTrans(R.string.notify_friend_message_singular,
-                                                who, where);
-                                    }
-                                    else
-                                    {
-                                        message = Simple.getTrans(R.string.notify_friend_message_plural,
-                                                howmuch, who, where);
-                                    }
+                                    message = Simple.getTrans(R.string.notify_friend_message_plural,
+                                            howmuch, who, where);
                                 }
                             }
-
-                            intent.dst = getNotificationStamp(liconfig);
-                            intent.title = message;
-                            intent.followText = "Aufrufen";
-                            intent.declineText = "Ignorieren";
-                            intent.iconpath = profile.toString();
-                            intent.iconcircle = ! issocial;
-                            intent.importance = NotifyIntent.REMINDER;
-
-                            intent.followRunner = new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    showLaunchItemInWorker(liconfig);
-                                }
-                            };
-
-                            intent.declineRunner = new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    resetNotificationCount(liconfig);
-                                }
-                            };
-
-                            NotifyManager.addNotification(intent);
-
-                            HomeNotify.getInstance().onManageNotifications();
                         }
+
+                        intent.dst = getNotificationStamp(liconfig);
+                        intent.title = message;
+                        intent.followText = "Aufrufen";
+                        intent.declineText = "Ignorieren";
+                        intent.iconpath = profile.toString();
+                        intent.iconcircle = !issocial;
+                        intent.importance = NotifyIntent.REMINDER;
+
+                        intent.followRunner = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                showLaunchItemInWorker(liconfig);
+                            }
+                        };
+
+                        intent.declineRunner = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                resetNotificationCount(liconfig);
+                            }
+                        };
+
+                        NotifyManager.addNotification(intent);
+
+                        HomeNotify.getInstance().onManageNotifications();
                     }
                 }
             }
@@ -447,32 +456,35 @@ public class LaunchItemNotify extends LaunchItem
         {
             if (config.has("launchitems"))
             {
-                mainnews = 0;
-                totalnews = 0;
-                dupscount.clear();
-
-                String mainitemkey = getNotificationKey(config);
-                countEventsLaunchItems(config, mainitemkey);
-
-                if (totalnews >= 0)
+                synchronized (LOGTAG)
                 {
-                    int mesgresid = getSubscribeNotificationMessage(config);
+                    mainnews = 0;
+                    totalnews = 0;
+                    dupscount.clear();
 
-                    if (totalnews != mainnews)
+                    String mainitemkey = getNotificationKey(config);
+                    countEventsLaunchItems(config, mainitemkey);
+
+                    if (totalnews >= 0)
                     {
-                        //
-                        // We have notifications from different areas.
-                        // Adjust message to be "news".
-                        //
+                        int mesgresid = getSubscribeNotificationMessage(config);
 
-                        mesgresid = R.string.simple_news;
+                        if (totalnews != mainnews)
+                        {
+                            //
+                            // We have notifications from different areas.
+                            // Adjust message to be "news".
+                            //
+
+                            mesgresid = R.string.simple_news;
+                        }
+
+                        String message = totalnews + " " + Simple.getTrans(
+                                (totalnews == 1) ? mesgresid : Simple.getPlural(mesgresid));
+
+                        notifyText.setText(message);
+                        notifyText.setVisibility((totalnews == 0) ? GONE : VISIBLE);
                     }
-
-                    String message = totalnews + " " + Simple.getTrans(
-                            (totalnews == 1) ? mesgresid : Simple.getPlural(mesgresid));
-
-                    notifyText.setText(message);
-                    notifyText.setVisibility((totalnews == 0) ? GONE : VISIBLE);
                 }
             }
             else

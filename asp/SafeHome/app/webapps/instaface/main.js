@@ -123,6 +123,8 @@ instaface.adjustMode = function()
 {
     var ic = instaface;
 
+    ic.lastmode = ic.mode;
+
     ic.mode = ic.isFullScreen() ? "normal" : "news";
 
     if (ic.mode == "normal")
@@ -141,6 +143,14 @@ instaface.adjustMode = function()
 
     if (ic.mode == "news")
     {
+        WebLibTouch.onTouchEndSwingTerminate();
+
+        if (ic.deferredTimeout)
+        {
+            clearTimeout(ic.deferredTimeout);
+            ic.deferredTimeout = null;
+        }
+
         if (! ic.updaterTimeout)
         {
             ic.updaterTimeout = setTimeout(instaface.updateConts, 5000);
@@ -162,6 +172,16 @@ instaface.adjustMode = function()
                 WebLibSimple.detachElement(padddiv);
             }
 
+            //
+            // Clear any user selected channel.
+            //
+
+            ic.activeselector = null;
+
+            //
+            // Animate title icons bar out.
+            //
+            
             ic.animateTimeout = setTimeout(instaface.animateTitle, 0);
         }
     }

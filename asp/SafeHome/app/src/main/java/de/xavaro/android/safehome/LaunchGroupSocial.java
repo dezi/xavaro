@@ -27,8 +27,6 @@ public class LaunchGroupSocial extends LaunchGroup
         super(context);
     }
 
-    private static boolean haveownerfeed;
-
     @Nullable
     public static JSONArray getConfig()
     {
@@ -179,8 +177,6 @@ public class LaunchGroupSocial extends LaunchGroup
                 if (mode.contains("folder")) Json.put(adir, entry);
 
                 if ((cdir != null) && mode.contains("contacts")) Json.put(cdir, entry);
-
-                if (mode.contains("feed")) haveownerfeed = true;
             }
         }
 
@@ -212,10 +208,6 @@ public class LaunchGroupSocial extends LaunchGroup
             if (mode.contains("home")) Json.put(adir, entry);
             if (mode.contains("folder")) Json.put(adir, entry);
             if (mode.contains("contacts")) Json.put(cdir, entry);
-
-            if (mode.contains("feed")) haveownerfeed = true;
-
-            Log.d(LOGTAG, "Prefe:" + item.getKey() + "=id=" + pfid + "=" + name);
         }
     }
 }
