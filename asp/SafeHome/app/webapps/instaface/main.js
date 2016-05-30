@@ -181,7 +181,7 @@ instaface.adjustMode = function()
             //
             // Animate title icons bar out.
             //
-            
+
             ic.animateTimeout = setTimeout(instaface.animateTitle, 0);
         }
     }
@@ -224,7 +224,6 @@ instaface.onTitleImageClick = function(ctarget, target)
 
     ic.activeselector = selector;
 
-    ic.markFeedsAsRead();
     ic.createConts();
 }
 
@@ -713,6 +712,8 @@ instaface.createConts = function()
             ic.deferredTimeout = setTimeout(instaface.retrieveDeferred, 100);
         }
     }
+
+    ic.markFeedsAsRead();
 }
 
 instaface.retrieveDeferred = function()
@@ -741,19 +742,40 @@ instaface.markFeedsAsRead = function()
 {
     var ic = instaface;
 
-    if (! ic.activeselector) return;
+    var stag = null;
+    var mode = null;
+    var valu = null;
 
-    var stag = ic.activeselector.stag;
-    var mode = stag.substring(0, 1);
-    var valu = stag.substring(2);
+    if (ic.activeselector)
+    {
+        stag = ic.activeselector.stag;
+        mode = stag.substring(0, 1);
+        valu = stag.substring(2);
+    }
+    else
+    {
+        if (ic.feeds.length > 1)
+        {
+            //
+            // We have more than one feed inside.
+            // Only reset if user selects icon
+            // from title.
+            //
+
+            return;
+        }
+    }
 
     for (var finx = 0; finx < ic.feeds.length; finx++)
     {
         var feed = ic.feeds[ finx ];
 
-        if ((mode == "1") && (feed.plat != valu)) continue;
-        if ((mode == "2") && (feed.name.toLowerCase() != valu.toLowerCase())) continue;
-        if ((mode == "3") && (feed.name.toLowerCase() != valu.toLowerCase())) continue;
+        if (mode && valu)
+        {
+            if ((mode == "1") && (feed.plat != valu)) continue;
+            if ((mode == "2") && (feed.name.toLowerCase() != valu.toLowerCase())) continue;
+            if ((mode == "3") && (feed.name.toLowerCase() != valu.toLowerCase())) continue;
+        }
 
         var ownername = feed.name.toLowerCase();
         var newstag = feed.plat + ".count." + feed.id;
