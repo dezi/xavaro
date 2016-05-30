@@ -239,6 +239,24 @@ public class SocialFacebook extends Social implements Social.SocialInterface
     {
         if (userid == null) return null;
 
+        //
+        // Shakira work around: Shakira lets everybody post shit to her
+        // Facebook page. So if we get feeds of public people, we only
+        // want to see the geniune posts of these guys.
+        //
+
+        String fnamepref = "social." + platform + ".like.name." + userid;
+
+        if (Simple.getSharedPrefString(fnamepref) != null)
+        {
+            //
+            // This is a facebook like / public abonnement page.
+            //
+
+            JSONObject response = getGraphRequest("/" + userid + "/posts");
+            return Json.getArray(response, "data");
+        }
+
         JSONObject response = getGraphRequest("/" + userid + "/feed");
         return Json.getArray(response, "data");
     }

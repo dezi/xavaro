@@ -243,8 +243,6 @@ public class HomeNotify extends HomeFrame
                 continue;
             }
 
-            Log.d(LOGTAG, "=====================getNextIntent:" + intent.dst + "=" + intent.title);
-
             if ((intent.importance >= bestLevel) &&
                 ((bestDate == null) || (Simple.compareTo(intent.dst, bestDate) > 0)))
             {

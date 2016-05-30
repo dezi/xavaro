@@ -75,7 +75,7 @@ public class LaunchItemNotify extends LaunchItem
                 Simple.equals(type, "instagram") ||
                 Simple.equals(type, "googleplus"))
         {
-            pfidtag = Json.getString(config, "pfid");;
+            pfidtag = Json.getString(config, "pfid");
         }
 
         return pfidtag;
