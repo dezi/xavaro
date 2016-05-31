@@ -262,12 +262,6 @@ public class LaunchItemNotify extends LaunchItem
 
                 String subitemkey = getNotificationKey(liconfig);
 
-                if (logdat)
-                {
-                    String label = Json.getString(liconfig, "label");
-                    Log.d(LOGTAG, "countEventsLaunchItems: " + subitemkey + "=" + label);
-                }
-
                 if (dupscount.contains(subitemkey))
                 {
                     //
@@ -282,6 +276,12 @@ public class LaunchItemNotify extends LaunchItem
                 dupscount.add(subitemkey);
 
                 int subnews = getNotificationCount(liconfig);
+
+                if (logdat)
+                {
+                    String label = Json.getString(liconfig, "label");
+                    Log.d(LOGTAG, "countEventsLaunchItems: " + subnews + "=" + subitemkey + "=" + label);
+                }
 
                 if (subnews >= 0)
                 {

@@ -1377,7 +1377,7 @@ public abstract class Social
             SimpleStorage.addInt("socialfeednews", platform + ".count." + feedpfid, newposts);
             SimpleStorage.put("socialfeednews", platform + ".stamp." + feedpfid, Simple.nowAsISO());
 
-            doCallbacks(platform, feedpfid);
+            NotificationService.doCallbacks(platform, feedpfid);
         }
     }
 
@@ -1391,66 +1391,6 @@ public abstract class Social
     };
 
     //endregion Cache maintenance
-
-    //region Subscribing methods
-
-    private static final Map<String, ArrayList<Runnable>> callbacks = new HashMap<>();
-
-    public static void subscribe(String platform, String pfid, Runnable runner)
-    {
-        String mapkey = platform + "." + pfid;
-        Log.d(LOGTAG, "subscribe: " + mapkey);
-
-        synchronized (callbacks)
-        {
-            ArrayList<Runnable> runners = callbacks.get(mapkey);
-
-            if (runners == null)
-            {
-                runners = new ArrayList<>();
-                callbacks.put(mapkey, runners);
-            }
-
-            if (! runners.contains(runner)) runners.add(runner);
-        }
-    }
-
-    public static void unsubscribe(String platform, String pfid, Runnable runner)
-    {
-        String mapkey = platform + "." + pfid;
-        Log.d(LOGTAG, "unsubscribe: " + mapkey);
-
-        synchronized (callbacks)
-        {
-            ArrayList<Runnable> runners = callbacks.get(mapkey);
-
-            if ((runners != null) && runners.contains(runner))
-            {
-                runners.remove(runner);
-            }
-        }
-    }
-
-    public static void doCallbacks(String platform, String pfid)
-    {
-        String mapkey = platform + "." + pfid;
-        Log.d(LOGTAG, "doCallbacks: " + mapkey);
-
-        synchronized (callbacks)
-        {
-            ArrayList<Runnable> runners = callbacks.get(mapkey);
-
-            if (runners != null)
-            {
-                for (Runnable runner : runners)
-                {
-                    Simple.makePost(runner);
-                }
-            }
-        }
-    }
-
-    //endregion Subscribing methods
 
     //region Social interface
 
