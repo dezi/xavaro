@@ -235,6 +235,6 @@ public class RemoteContacts
         // Remove profile image.
         //
 
-        ProfileImages.removeXavaroProfileImageFile(identity);
+        ProfileImages.removeXavaroProfileFile(identity);
     }
 }

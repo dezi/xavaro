@@ -21,11 +21,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.io.InputStream;
+import java.io.File;
 
 public class ProfileImages
 {
@@ -49,7 +49,7 @@ public class ProfileImages
         return photoUrl;
     }
 
-    private static File getOwnerProfileImageFile()
+    private static File getOwnerProfilePath()
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "xavaro.image." + SystemIdentity.getIdentity() + ".jpg";
@@ -75,7 +75,7 @@ public class ProfileImages
             // Save data to profiles directory under own identity.
             //
 
-            Simple.putFileBytes(getOwnerProfileImageFile(), data);
+            Simple.putFileBytes(getOwnerProfilePath(), data);
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
             if (circle) bitmap = getCircleBitmap(bitmap);
@@ -131,7 +131,7 @@ public class ProfileImages
 
     public static void sendOwnerImage(String remoteIdentity)
     {
-        File ownerimage = getOwnerProfileImageFile();
+        File ownerimage = getOwnerProfilePath();
 
         if (ownerimage.exists())
         {
@@ -143,7 +143,7 @@ public class ProfileImages
 
     //region Xavaro profiles
 
-    private static File getXavaroProfileImageFile(String identity)
+    private static File getXavaroProfilePath(String identity)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "xavaro.image." + identity + ".jpg";
@@ -153,7 +153,7 @@ public class ProfileImages
     @Nullable
     private static File getXavaroProfileFile(String identity)
     {
-        File imagefile = getXavaroProfileImageFile(identity);
+        File imagefile = getXavaroProfilePath(identity);
 
         return imagefile.exists() ? imagefile : null;
     }
@@ -161,7 +161,7 @@ public class ProfileImages
     @Nullable
     private static Bitmap getXavaroProfileBitmap(String identity, boolean circle)
     {
-        File imagefile = getXavaroProfileImageFile(identity);
+        File imagefile = getXavaroProfilePath(identity);
 
         if (imagefile.exists())
         {
@@ -173,13 +173,13 @@ public class ProfileImages
         return null;
     }
 
-    public static void removeXavaroProfileImageFile(String identity)
+    public static void removeXavaroProfileFile(String identity)
     {
-        File file = getXavaroProfileImageFile(identity);
+        File file = getXavaroProfilePath(identity);
 
         if (file.exists() && file.delete())
         {
-            Log.d(LOGTAG, "removeXavaroProfileImageFile: deleted=" + identity);
+            Log.d(LOGTAG, "removeXavaroProfilePath: deleted=" + identity);
         }
     }
 
@@ -189,7 +189,7 @@ public class ProfileImages
 
     private static JSONObject contacts = null;
 
-    private static File getContactsProfileImageFile(String phonenumber)
+    private static File getContactsProfilePath(String phonenumber)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "contacts.image." + phonenumber.replaceAll(" ", "") + ".jpg";
@@ -266,7 +266,7 @@ public class ProfileImages
     {
         if (phonenumber == null) return null;
 
-        File imagefile = getContactsProfileImageFile(phonenumber);
+        File imagefile = getContactsProfilePath(phonenumber);
 
         if (! imagefile.exists())
         {
@@ -282,7 +282,7 @@ public class ProfileImages
     {
         if (phonenumber == null) return null;
 
-        File imagefile = getContactsProfileImageFile(phonenumber);
+        File imagefile = getContactsProfilePath(phonenumber);
 
         if (! imagefile.exists())
         {
@@ -303,7 +303,7 @@ public class ProfileImages
 
     //region WhatsApp profiles
 
-    private static File getWhatsAppProfileImageFile(String phonenumber)
+    private static File getWhatsAppProfilePath(String phonenumber)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "whatsapp.image." + phonenumber.replaceAll(" ", "") + ".jpg";
@@ -337,7 +337,7 @@ public class ProfileImages
     {
         if (phonenumber == null) return null;
 
-        File imagefile = getWhatsAppProfileImageFile(phonenumber);
+        File imagefile = getWhatsAppProfilePath(phonenumber);
 
         if (! imagefile.exists())
         {
@@ -361,7 +361,7 @@ public class ProfileImages
     {
         if (phonenumber == null) return null;
 
-        File imagefile = getWhatsAppProfileImageFile(phonenumber);
+        File imagefile = getWhatsAppProfilePath(phonenumber);
 
         if (! imagefile.exists())
         {
@@ -391,7 +391,7 @@ public class ProfileImages
 
     //region Skype profiles
 
-    private static File getSkypeProfileImageFile(String skypename)
+    private static File getSkypeProfilePath(String skypename)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "skype.image." + skypename + ".jpg";
@@ -403,7 +403,7 @@ public class ProfileImages
     {
         if (skypename == null) return null;
 
-        File imagefile = getSkypeProfileImageFile(skypename);
+        File imagefile = getSkypeProfilePath(skypename);
 
         if (! imagefile.exists())
         {
@@ -432,7 +432,7 @@ public class ProfileImages
     {
         if (skypename == null) return null;
 
-        File imagefile = getSkypeProfileImageFile(skypename);
+        File imagefile = getSkypeProfilePath(skypename);
 
         if (! imagefile.exists())
         {
@@ -467,7 +467,7 @@ public class ProfileImages
 
     //region Facebook profiles
 
-    public static File getFacebookProfileImageFile(String facebookid)
+    public static File getFacebookProfilePath(String facebookid)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "facebook.image." + facebookid + ".jpg";
@@ -479,7 +479,7 @@ public class ProfileImages
     {
         if (facebookid == null) return null;
 
-        File imagefile = getFacebookProfileImageFile(facebookid);
+        File imagefile = getFacebookProfilePath(facebookid);
 
         return imagefile.exists() ? imagefile : null;
     }
@@ -489,7 +489,7 @@ public class ProfileImages
     {
         if (facebookid == null) return null;
 
-        File imagefile = getFacebookProfileImageFile(facebookid);
+        File imagefile = getFacebookProfilePath(facebookid);
 
         if (! imagefile.exists())
         {
@@ -518,7 +518,7 @@ public class ProfileImages
 
     //region Instagram profiles
 
-    public static File getInstagramProfileImageFile(String instagramid)
+    public static File getInstagramProfilePath(String instagramid)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "instagram.image." + instagramid + ".jpg";
@@ -530,7 +530,7 @@ public class ProfileImages
     {
         if (instagramid == null) return null;
 
-        File imagefile = getInstagramProfileImageFile(instagramid);
+        File imagefile = getInstagramProfilePath(instagramid);
 
         return imagefile.exists() ? imagefile : null;
     }
@@ -540,7 +540,7 @@ public class ProfileImages
     {
         if (instagramid == null) return null;
 
-        File imagefile = getInstagramProfileImageFile(instagramid);
+        File imagefile = getInstagramProfilePath(instagramid);
 
         if (! imagefile.exists())
         {
@@ -569,7 +569,7 @@ public class ProfileImages
 
     //region Googleplus profiles
 
-    public static File getGoogleplusProfileImageFile(String googleplusid)
+    public static File getGoogleplusProfilePath(String googleplusid)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "googleplus.image." + googleplusid + ".jpg";
@@ -581,7 +581,7 @@ public class ProfileImages
     {
         if (googleplusid == null) return null;
 
-        File imagefile = getGoogleplusProfileImageFile(googleplusid);
+        File imagefile = getGoogleplusProfilePath(googleplusid);
 
         return imagefile.exists() ? imagefile : null;
     }
@@ -591,7 +591,7 @@ public class ProfileImages
     {
         if (googleplusid == null) return null;
 
-        File imagefile = getGoogleplusProfileImageFile(googleplusid);
+        File imagefile = getGoogleplusProfilePath(googleplusid);
 
         if (! imagefile.exists())
         {
@@ -620,7 +620,7 @@ public class ProfileImages
 
     //region Twitter profiles
 
-    public static File getTwitterProfileImageFile(String twitterid)
+    public static File getTwitterProfilePath(String twitterid)
     {
         File profilespath = Simple.getMediaPath("profiles");
         String profilename = "twitter.image." + twitterid + ".jpg";
@@ -632,7 +632,7 @@ public class ProfileImages
     {
         if (twitterid == null) return null;
 
-        File imagefile = getTwitterProfileImageFile(twitterid);
+        File imagefile = getTwitterProfilePath(twitterid);
 
         return imagefile.exists() ? imagefile : null;
     }
@@ -642,7 +642,7 @@ public class ProfileImages
     {
         if (twitterid == null) return null;
 
-        File imagefile = getTwitterProfileImageFile(twitterid);
+        File imagefile = getTwitterProfilePath(twitterid);
 
         if (! imagefile.exists())
         {

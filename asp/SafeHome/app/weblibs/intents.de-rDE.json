@@ -72,8 +72,8 @@
     "whatsapp.register": [
       {
         "type": "whatsapp",
-        "action": "whatsapp",
-        "keywords": [ "jemanden", "jemandem" ],
+        "action": "text",
+        "keywords": [ "WhatsApp", "jemanden", "jemandem" ],
         "response": "Ich öffne das WhatsApp-Verzeichnis",
         "sample": "Ich möchte jemanden per WhatsApp schreiben"
       }
