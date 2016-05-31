@@ -3,6 +3,7 @@ package de.xavaro.android.safehome;
 import android.support.annotation.Nullable;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,6 +25,7 @@ public class LaunchItemNotify extends LaunchItem
 
     protected final ArrayList<String> dupscount = new ArrayList<>();
 
+    protected boolean logdat;
     protected int mainnews;
     protected int totalnews;
 
@@ -85,6 +87,12 @@ public class LaunchItemNotify extends LaunchItem
     {
         String typetag = getSubscribeNotificationType(config);
         String pfidtag = getSubscribeNotificationPfid(config);
+
+        if (logdat)
+        {
+            String label = Json.getString(config, "label");
+            Log.d(LOGTAG, "subscribeNotification: " + typetag + "=" + pfidtag + "=" + label);
+        }
 
         if ((typetag == null) || (pfidtag == null)) return;
 
@@ -253,6 +261,12 @@ public class LaunchItemNotify extends LaunchItem
                 }
 
                 String subitemkey = getNotificationKey(liconfig);
+
+                if (logdat)
+                {
+                    String label = Json.getString(liconfig, "label");
+                    Log.d(LOGTAG, "countEventsLaunchItems: " + subitemkey + "=" + label);
+                }
 
                 if (dupscount.contains(subitemkey))
                 {

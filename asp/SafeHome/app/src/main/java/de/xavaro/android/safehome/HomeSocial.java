@@ -22,8 +22,6 @@ public class HomeSocial extends HomeFrame
     {
         super(context);
 
-        setVisibility(GONE);
-
         layoutParams.width = Simple.MP;
         layoutParams.height = Simple.MP;
         layoutParams.gravity = Gravity.LEFT;
@@ -49,8 +47,6 @@ public class HomeSocial extends HomeFrame
             }
 
             payloadFrame.addView(webView);
-
-            setVisibility(VISIBLE);
         }
     }
 

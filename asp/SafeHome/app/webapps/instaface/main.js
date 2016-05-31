@@ -139,6 +139,8 @@ instaface.adjustMode = function()
         {
             ic.animateTimeout = setTimeout(instaface.animateTitle, 1500);
         }
+
+        if (ic.lastmode == "news") ic.createConts();
     }
 
     if (ic.mode == "news")
@@ -458,6 +460,7 @@ instaface.adjustPostDivs = function(startinx)
         {
             var postdiv = ic.postDivs[ inx ];
             var padddiv = postdiv.mypadddiv;
+            var textdiv = postdiv.mytextdiv;
             var sepadiv = postdiv.mysepadiv;
             var headdiv = postdiv.myheaddiv;
             var imgsdiv = postdiv.myimgsdiv;
@@ -509,6 +512,8 @@ instaface.adjustPostDivs = function(startinx)
                 WebLibSimple.setBGColor(padddiv, "#ffffff");
                 WebLibSimple.setBGColor(sepadiv, "#dddddd");
             }
+
+            WebLibSimple.ellipsizeTextBox(textdiv, 80);
 
             if (postdiv.myimgtag && postdiv.myimage)
             {
@@ -643,6 +648,7 @@ instaface.displayPostCompact = function(plat, post)
     }
 
     postdiv.mypadddiv = padddiv;
+    postdiv.mytextdiv = textdiv;
     postdiv.mysepadiv = sepadiv;
     postdiv.myheaddiv = headdiv;
     postdiv.myimgsdiv = imgsdiv;

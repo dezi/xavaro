@@ -155,6 +155,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
                         - (Simple.isPortrait() ? HomeActivity.peopleSize : 8);
 
                 onChangeOrientation();
+
                 setVisibility(VISIBLE);
             }
         }

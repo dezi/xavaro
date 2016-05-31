@@ -55,6 +55,8 @@ public class LaunchItemSocial extends LaunchItemNotify
         if (type.equals("likes"))
         {
             targetIcon.setImageResource(GlobalConfigs.IconResWebConfigInternet);
+
+            logdat = true;
         }
 
         if (type.equals("twitter"))
