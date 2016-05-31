@@ -62,15 +62,17 @@ tvscrape.onClickTitle = function(event)
         sender = sender.replace("ZDF neo", "ZDFneo");
         sender = sender.replace("ARTE Deutsch", "ARTE");
 
-        sender = sender.replace("-", " ");
-        sender = sender.replace(":", " ");
-
-        sender = sender.replace("  ", " ");
-        sender = sender.replace("  ", " ");
-
         tvscrape.info.search += " " + sender;
         tvscrape.info.issender = true;
+
     }
+
+    tvscrape.info.search = tvscrape.info.search.replace("_", " ");
+    tvscrape.info.search = tvscrape.info.search.replace("-", " ");
+    tvscrape.info.search = tvscrape.info.search.replace(":", " ");
+
+    tvscrape.info.search = tvscrape.info.search.replace("  ", " ");
+    tvscrape.info.search = tvscrape.info.search.replace("  ", " ");
 
     tvscrape.iframe.src = search + encodeURIComponent(tvscrape.info.search);
 
