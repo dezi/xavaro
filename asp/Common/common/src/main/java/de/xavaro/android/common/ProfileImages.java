@@ -173,12 +173,6 @@ public class ProfileImages
         return null;
     }
 
-    @Nullable
-    private static Drawable getXavaroProfileDrawable(String identity, boolean circle)
-    {
-        return Simple.getDrawable(getXavaroProfileBitmap(identity, circle));
-    }
-
     public static void removeXavaroProfileImageFile(String identity)
     {
         File file = getXavaroProfileImageFile(identity);
@@ -305,12 +299,6 @@ public class ProfileImages
         return null;
     }
 
-    @Nullable
-    private static Drawable getContactsProfileDrawable(String phonenumber, boolean circle)
-    {
-        return Simple.getDrawable(getContactsProfileBitmap(phonenumber, circle));
-    }
-
     //endregion Contacts profiles
 
     //region WhatsApp profiles
@@ -399,12 +387,6 @@ public class ProfileImages
         return null;
     }
 
-    @Nullable
-    private static Drawable getWhatsAppProfileDrawable(String phonenumber, boolean circle)
-    {
-        return Simple.getDrawable(getWhatsAppProfileBitmap(phonenumber, circle));
-    }
-
     //endregion WhatsApp profiles
 
     //region Skype profiles
@@ -481,12 +463,6 @@ public class ProfileImages
         return null;
     }
 
-    @Nullable
-    private static Drawable getSkypeProfileDrawable(String skypename, boolean circle)
-    {
-        return Simple.getDrawable(getSkypeProfileBitmap(skypename, circle));
-    }
-
     //endregion Skype profiles
 
     //region Facebook profiles
@@ -508,20 +484,8 @@ public class ProfileImages
         return imagefile.exists() ? imagefile : null;
     }
 
-    public static void getFacebookLoadProfileImage(String facebookid)
-    {
-        if (facebookid == null) return;
-
-        File imagefile = getFacebookProfileImageFile(facebookid);
-
-        if (! imagefile.exists())
-        {
-            Simple.putFileBytes(imagefile, SocialFacebook.getInstance().getUserIconData(facebookid));
-        }
-    }
-
     @Nullable
-    public static Bitmap getFacebookProfileBitmap(String facebookid, boolean circle)
+    public static File getFacebookLoadProfileImage(String facebookid)
     {
         if (facebookid == null) return null;
 
@@ -532,7 +496,15 @@ public class ProfileImages
             Simple.putFileBytes(imagefile, SocialFacebook.getInstance().getUserIconData(facebookid));
         }
 
-        if (imagefile.exists())
+        return imagefile;
+    }
+
+    @Nullable
+    public static Bitmap getFacebookProfileBitmap(String facebookid, boolean circle)
+    {
+         File imagefile = getFacebookLoadProfileImage(facebookid);
+
+        if ((imagefile != null) && imagefile.exists())
         {
             Bitmap bitmap = Simple.getBitmap(imagefile);
             if (circle) bitmap = getCircleBitmap(bitmap);
@@ -540,12 +512,6 @@ public class ProfileImages
         }
 
         return null;
-    }
-
-    @Nullable
-    public static Drawable getFacebookProfileDrawable(String facebookid, boolean circle)
-    {
-        return Simple.getDrawable(getFacebookProfileBitmap(facebookid, circle));
     }
 
     //endregion Facebook profiles
@@ -569,20 +535,8 @@ public class ProfileImages
         return imagefile.exists() ? imagefile : null;
     }
 
-    public static void getInstagramLoadProfileImage(String instagramid)
-    {
-        if (instagramid == null) return;
-
-        File imagefile = getInstagramProfileImageFile(instagramid);
-
-        if (! imagefile.exists())
-        {
-            Simple.putFileBytes(imagefile, SocialInstagram.getInstance().getUserIconData(instagramid));
-        }
-    }
-
     @Nullable
-    public static Bitmap getInstagramProfileBitmap(String instagramid, boolean circle)
+    public static File getInstagramLoadProfileImage(String instagramid)
     {
         if (instagramid == null) return null;
 
@@ -593,7 +547,15 @@ public class ProfileImages
             Simple.putFileBytes(imagefile, SocialInstagram.getInstance().getUserIconData(instagramid));
         }
 
-        if (imagefile.exists())
+        return imagefile;
+    }
+
+    @Nullable
+    public static Bitmap getInstagramProfileBitmap(String instagramid, boolean circle)
+    {
+        File imagefile = getInstagramLoadProfileImage(instagramid);
+
+        if ((imagefile != null) && imagefile.exists())
         {
             Bitmap bitmap = Simple.getBitmap(imagefile);
             if (circle) bitmap = getCircleBitmap(bitmap);
@@ -601,12 +563,6 @@ public class ProfileImages
         }
 
         return null;
-    }
-
-    @Nullable
-    public static Drawable getInstagramProfileDrawable(String instagramid, boolean circle)
-    {
-        return Simple.getDrawable(getInstagramProfileBitmap(instagramid, circle));
     }
 
     //endregion Instagram profiles
@@ -630,20 +586,8 @@ public class ProfileImages
         return imagefile.exists() ? imagefile : null;
     }
 
-    public static void getGoogleplusLoadProfileImage(String googleplusid)
-    {
-        if (googleplusid == null) return;
-
-        File imagefile = getGoogleplusProfileImageFile(googleplusid);
-
-        if (! imagefile.exists())
-        {
-            Simple.putFileBytes(imagefile, SocialGoogleplus.getInstance().getUserIconData(googleplusid));
-        }
-    }
-
     @Nullable
-    public static Bitmap getGoogleplusProfileBitmap(String googleplusid, boolean circle)
+    public static File getGoogleplusLoadProfileImage(String googleplusid)
     {
         if (googleplusid == null) return null;
 
@@ -654,7 +598,15 @@ public class ProfileImages
             Simple.putFileBytes(imagefile, SocialGoogleplus.getInstance().getUserIconData(googleplusid));
         }
 
-        if (imagefile.exists())
+        return imagefile;
+    }
+
+    @Nullable
+    public static Bitmap getGoogleplusProfileBitmap(String googleplusid, boolean circle)
+    {
+        File imagefile = getGoogleplusLoadProfileImage(googleplusid);
+
+        if ((imagefile != null) && imagefile.exists())
         {
             Bitmap bitmap = Simple.getBitmap(imagefile);
             if (circle) bitmap = getCircleBitmap(bitmap);
@@ -662,12 +614,6 @@ public class ProfileImages
         }
 
         return null;
-    }
-
-    @Nullable
-    public static Drawable getGoogleplusProfileDrawable(String googleplusid, boolean circle)
-    {
-        return Simple.getDrawable(getGoogleplusProfileBitmap(googleplusid, circle));
     }
 
     //endregion Googleplus profiles
@@ -691,20 +637,8 @@ public class ProfileImages
         return imagefile.exists() ? imagefile : null;
     }
 
-    public static void getTwitterLoadProfileImage(String twitterid)
-    {
-        if (twitterid == null) return;
-
-        File imagefile = getTwitterProfileImageFile(twitterid);
-
-        if (! imagefile.exists())
-        {
-            Simple.putFileBytes(imagefile, SocialTwitter.getInstance().getUserIconData(twitterid));
-        }
-    }
-
     @Nullable
-    public static Bitmap getTwitterProfileBitmap(String twitterid, boolean circle)
+    public static File getTwitterLoadProfileImage(String twitterid)
     {
         if (twitterid == null) return null;
 
@@ -715,7 +649,15 @@ public class ProfileImages
             Simple.putFileBytes(imagefile, SocialTwitter.getInstance().getUserIconData(twitterid));
         }
 
-        if (imagefile.exists())
+        return imagefile;
+    }
+
+    @Nullable
+    public static Bitmap getTwitterProfileBitmap(String twitterid, boolean circle)
+    {
+        File imagefile = getTwitterLoadProfileImage(twitterid);
+
+        if ((imagefile != null) && imagefile.exists())
         {
             Bitmap bitmap = Simple.getBitmap(imagefile);
             if (circle) bitmap = getCircleBitmap(bitmap);
@@ -723,12 +665,6 @@ public class ProfileImages
         }
 
         return null;
-    }
-
-    @Nullable
-    public static Drawable getTwitterProfileDrawable(String twitterid, boolean circle)
-    {
-        return Simple.getDrawable(getTwitterProfileBitmap(twitterid, circle));
     }
 
     //endregion Twitter profiles
@@ -785,27 +721,29 @@ public class ProfileImages
 
     public static Drawable getSocialProfileDrawable(String platform, String pfid, boolean circle)
     {
+        Bitmap bitmap = null;
+
         if (Simple.equals(platform, "facebook"))
         {
-            return ProfileImages.getFacebookProfileDrawable(pfid, circle);
+            bitmap = ProfileImages.getFacebookProfileBitmap(pfid, circle);
         }
 
         if (Simple.equals(platform, "instagram"))
         {
-            return ProfileImages.getInstagramProfileDrawable(pfid, circle);
+            bitmap = ProfileImages.getInstagramProfileBitmap(pfid, circle);
         }
 
         if (Simple.equals(platform, "googleplus"))
         {
-            return ProfileImages.getGoogleplusProfileDrawable(pfid, circle);
+            bitmap = ProfileImages.getGoogleplusProfileBitmap(pfid, circle);
         }
 
         if (Simple.equals(platform, "twitter"))
         {
-            return ProfileImages.getTwitterProfileDrawable(pfid, circle);
+            bitmap = ProfileImages.getTwitterProfileBitmap(pfid, circle);
         }
 
-        return null;
+        return Simple.getDrawable(bitmap);
     }
 
     //endregion Social profiles
@@ -817,16 +755,16 @@ public class ProfileImages
         return new File("" + CommonConfigs.IconResAnon);
     }
 
-    private static Drawable getAnonProfileDrawable(boolean circle)
+    private static Bitmap getAnonProfileBitmap(boolean circle)
     {
         Bitmap bitmap = BitmapFactory.decodeResource(Simple.getResources(), CommonConfigs.IconResAnon);
 
         if (circle && (bitmap != null))
         {
-            return Simple.getDrawable(getCircleBitmap(bitmap));
+            return getCircleBitmap(bitmap);
         }
 
-        return Simple.getDrawable(bitmap);
+        return bitmap;
     }
 
     @Nullable
@@ -847,7 +785,6 @@ public class ProfileImages
         if (file == null) file = getXavaroProfileFile(identtag);
         if (file == null) file = getContactsProfileFile(identtag);
         if (file == null) file = getSkypeProfileFile(identtag);
-        if (file == null) file = getFacebookProfileFile(identtag);
 
         return (file == null);
     }
@@ -864,14 +801,15 @@ public class ProfileImages
             return drawableCache.get(cachetag);
         }
 
-        Drawable drawable = getWhatsAppProfileDrawable(identtag, circle);
-        if (drawable == null) drawable = getXavaroProfileDrawable(identtag, circle);
-        if (drawable == null) drawable = getContactsProfileDrawable(identtag, circle);
-        if (drawable == null) drawable = getSkypeProfileDrawable(identtag, circle);
+        Bitmap bitmap = getWhatsAppProfileBitmap(identtag, circle);
+        if (bitmap == null) bitmap = getXavaroProfileBitmap(identtag, circle);
+        if (bitmap == null) bitmap = getContactsProfileBitmap(identtag, circle);
+        if (bitmap == null) bitmap = getSkypeProfileBitmap(identtag, circle);
+        if (bitmap == null) bitmap = getAnonProfileBitmap(circle);
+
+        Drawable drawable = Simple.getDrawable(bitmap);
 
         if (drawable != null) drawableCache.put(cachetag, drawable);
-
-        if (drawable == null) drawable = getAnonProfileDrawable(circle);
 
         return drawable;
     }
