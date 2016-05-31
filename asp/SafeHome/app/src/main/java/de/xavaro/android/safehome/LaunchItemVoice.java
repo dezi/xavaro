@@ -90,6 +90,8 @@ public class LaunchItemVoice extends LaunchItem implements
     @Override
     protected boolean onMyLongClick()
     {
+        Simple.makeClick();
+
         if (collected == null)
         {
             collected = new VoiceIntent();

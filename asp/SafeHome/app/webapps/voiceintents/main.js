@@ -52,6 +52,15 @@ voiceintents.createFrame = function()
     vi.imgTry.style.height = "100%";
     vi.imgTry.src = "voiceintents_256x256.png";
 
+    vi.imgEar = WebLibSimple.createAnyAppend("img", vi.divPadd);
+    vi.imgEar.style.display = "none";
+    vi.imgEar.style.position = "absolute";
+    vi.imgEar.style.right = "0px";
+    vi.imgEar.style.top = "0px";
+    vi.imgEar.style.width = "auto";
+    vi.imgEar.style.height = "100%";
+    vi.imgEar.src = "voice_ear_256x256.png";
+
     vi.intents = JSON.parse(WebAppVoice.getCollectedIntents());
     vi.intents.sort(voiceintents.sortCompare);
     vi.createIntentData();
@@ -115,6 +124,58 @@ voiceintents.onClickLess = function(target)
         else
         {
             break;
+        }
+    }
+
+    voiceintents.adjustScroll();
+}
+
+voiceintents.adjustScroll = function(firstMarked)
+{
+    var vi = voiceintents;
+
+    //
+    // Check if scroll needs resetting.
+    //
+
+    var displayheight = vi.listDiv.parentNode.clientHeight;
+    var scrollheight = vi.listDiv.clientHeight;
+    var offsettop = -vi.listDiv.offsetTop;
+
+    console.log("voiceintents.adjustScroll:"
+        + displayheight + "=" + scrollheight
+        + "="
+        + offsettop + "=" + firstMarked
+        );
+
+    if (scrollheight < displayheight)
+    {
+        //
+        // View fits display. Reset list div offset to 0px.
+        //
+
+        vi.listDiv.style.top = "0px";
+    }
+    else
+    {
+        if (firstMarked != null)
+        {
+            var newtopoffset = firstMarked - (displayheight >> 1);
+            if (newtopoffset < 0) newtopoffset = 0;
+
+            if ((scrollheight - newtopoffset) < displayheight)
+            {
+                newtopoffset = - (displayheight - scrollheight);
+            }
+            else
+            {
+                if (newtopoffset > (scrollheight - displayheight))
+                {
+                    newtopoffset = scrollheight - displayheight;
+                }
+            }
+
+            vi.listDiv.style.top = -newtopoffset + "px";
         }
     }
 }
@@ -236,7 +297,8 @@ WebAppVoice.onReadyForSpeech = function()
 {
     var vi = voiceintents;
 
-    vi.imgTry.src = "voice_ear_256x256.png";
+    vi.imgTry.style.display = "none";
+    vi.imgEar.style.display = "block";
 
     vi.resultDiv.style.color = "#cccccc";
     vi.resultDiv.innerHTML = "Bitte sprechen Sie nun..."
@@ -255,7 +317,9 @@ WebAppVoice.onError = function()
     var vi = voiceintents;
 
     vi.trying = false;
-    vi.imgTry.src = "voiceintents_256x256.png";
+
+    vi.imgTry.style.display = "block";
+    vi.imgEar.style.display = "none";
 
     vi.resultDiv.style.color = "#cccccc";
     vi.resultDiv.innerHTML = "Das hat nicht geklappt..."
@@ -266,7 +330,9 @@ WebAppVoice.onResults = function(results)
     var vi = voiceintents;
 
     vi.trying = false;
-    vi.imgTry.src = "voiceintents_256x256.png";
+
+    vi.imgTry.style.display = "block";
+    vi.imgEar.style.display = "none";
 
     vi.results = results;
 
@@ -278,6 +344,7 @@ WebAppVoice.onResults = function(results)
         vi.matches = JSON.parse(WebAppVoice.evaluateCommand(vi.results[ 0 ].spoken));
 
         var lastOuter = null;
+        var firstMarked = 0;
 
         for (var inx = 0; inx < vi.intentDivs.length; inx++)
         {
@@ -319,8 +386,12 @@ WebAppVoice.onResults = function(results)
 
                 lastOuter = divOuter;
             }
+
+            if (ismatch && ! firstMarked) firstMarked = divOuter.offsetTop;
         }
-    }
+
+        voiceintents.adjustScroll(firstMarked);
+   }
 }
 
 voiceintents.createFrame();

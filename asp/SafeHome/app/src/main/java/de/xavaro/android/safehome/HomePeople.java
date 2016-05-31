@@ -33,6 +33,7 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
     private JSONArray baseContacts;
     private JSONArray moreContacts;
     private JSONArray socialLikes;
+    private JSONArray appFolders;
 
     private LayoutParams layoutParams;
 
@@ -181,6 +182,7 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
         baseContacts = new JSONArray();
         moreContacts = new JSONArray();
         socialLikes = new JSONArray();
+        appFolders = new JSONArray();
 
         peopleView.removeAllViews();
 
@@ -291,7 +293,6 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
         //
 
         JSONObject nameList = new JSONObject();
-        JSONArray appfolders = new JSONArray();
 
         for (int inx = 0; inx < lis.length(); inx++)
         {
@@ -340,7 +341,7 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
                         || Simple.equals(type, "instagram")
                         || Simple.equals(type, "googleplus"))
                 {
-                    Json.put(appfolders, li);
+                    Json.put(appFolders, li);
                     lis.remove(inx--);
                 }
             }
@@ -351,9 +352,9 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
         // and distribute entrys to people.
         //
 
-        for (int finx = 0; finx < appfolders.length(); finx++)
+        for (int finx = 0; finx < appFolders.length(); finx++)
         {
-            JSONObject appfolder = Json.getObject(appfolders, finx);
+            JSONObject appfolder = Json.getObject(appFolders, finx);
             JSONArray applis = Json.getArray(appfolder, "launchitems");
             if (applis == null) continue;
 
@@ -567,24 +568,67 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
     @Override
     public void onCollectVoiceIntent(VoiceIntent voiceintent)
     {
+        //
+        // Recursivly collect from configured launch items.
+        //
+
         for (LaunchItem launchItem : launchItems)
         {
             launchItem.onCollectVoiceIntent(voiceintent);
+        }
+
+        //
+        // Collect from disconfigured app folder launch items.
+        //
+
+        for (int inx = 0; inx < appFolders.length(); inx++)
+        {
+            JSONObject liconfig = Json.getObject(appFolders, inx);
+
+            JSONObject intent = Json.getObject(liconfig, "intent");
+            voiceintent.collectIntent(liconfig, intent);
+
+            JSONArray intents = Json.getArray(liconfig, "intents");
+            voiceintent.collectIntents(liconfig, intents);
         }
     }
 
     @Override
     public void onResolveVoiceIntent(VoiceIntent voiceintent)
     {
+        //
+        // Recursivly resolve from configured launch items.
+        //
+
         for (LaunchItem launchItem : launchItems)
         {
             launchItem.onResolveVoiceIntent(voiceintent);
+        }
+
+        //
+        // Reolve from disconfigured app folder launch items.
+        //
+
+        for (int inx = 0; inx < appFolders.length(); inx++)
+        {
+            JSONObject liconfig = Json.getObject(appFolders, inx);
+            if (liconfig == null) continue;
+
+            JSONObject intent = Json.getObject(liconfig, "intent");
+            voiceintent.evaluateIntent(liconfig, intent);
+
+            JSONArray intents = Json.getArray(liconfig, "intents");
+            voiceintent.evaluateIntents(liconfig, intents);
         }
     }
 
     @Override
     public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
+        //
+        // Recursivly try to execute from configured launch items.
+        //
+
         for (LaunchItem launchItem : launchItems)
         {
             if (launchItem.onExecuteVoiceIntent(voiceintent, index))

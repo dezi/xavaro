@@ -30,6 +30,13 @@
 
   "important": {
 
+    "intent": {
+      "action": "view",
+      "keywords": [ "Kurzwahlverzeichnis" ],
+      "response": "Ich öffne das Kurzwahlverzeichnis.",
+      "sample": "Ich möchte das Kurzwahlverzeichnis sehen"
+    },
+
     "pharmacie": {
       "label": "Apotheke",
       "icon": "call_pharmacie_600x600.png",

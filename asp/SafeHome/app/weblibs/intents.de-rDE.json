@@ -38,7 +38,7 @@
         "type": "phone",
         "subtype": "voip",
         "action": "call",
-        "keywords": [ "jemanden" ],
+        "keywords": [ "jemanden", "jemandem" ],
         "response": "Ich öffne das Telefonbuch",
         "sample": "Ich möchte jemanden anrufen"
       },
@@ -47,7 +47,7 @@
         "type": "phone",
         "subtype": "text",
         "action": "text",
-        "keywords": [ "jemanden" ],
+        "keywords": [ "SMS", "jemanden", "jemandem" ],
         "response": "Ich öffne das Telefonbuch",
         "sample": "Ich möchte jemanden eine SMS schreiben"
       }
@@ -73,7 +73,7 @@
       {
         "type": "whatsapp",
         "action": "whatsapp",
-        "keywords": [ "jemanden" ],
+        "keywords": [ "jemanden", "jemandem" ],
         "response": "Ich öffne das WhatsApp-Verzeichnis",
         "sample": "Ich möchte jemanden per WhatsApp schreiben"
       }
@@ -101,9 +101,9 @@
       {
         "type": "skype",
         "action": "skype",
-        "keywords": [ "jemanden" ],
+        "keywords": [ "jemanden", "jemandem" ],
         "response": "Ich öffne das Skype-Verzeichnis",
-        "sample": "Ich möchte mit jemanden skypen"
+        "sample": "Ich möchte mit jemandem skypen"
       }
     ],
 
