@@ -161,22 +161,47 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
 
         if (alertConfig != null)
         {
-            alertLaunchItem = LaunchItem.createLaunchItem(getContext(), null, alertConfig);
-            alertLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
-            alertLaunchItem.setFrameLess(true);
+            if (alertLaunchItem == null)
+            {
+                alertLaunchItem = LaunchItem.createLaunchItem(getContext(), null, alertConfig);
+                alertLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
+                alertLaunchItem.setFrameLess(true);
+
+                addView(alertLaunchItem);
+            }
+
             launchItems.add(alertLaunchItem);
-            addView(alertLaunchItem);
+        }
+        else
+        {
+            if (alertLaunchItem != null)
+            {
+                Simple.removeFromParent(alertLaunchItem);
+                alertLaunchItem = null;
+            }
         }
 
         JSONObject voiceConfig = Json.getObject(LaunchItemVoice.getConfig(), 0);
 
         if (voiceConfig != null)
         {
-            voiceLaunchItem = LaunchItem.createLaunchItem(getContext(), null, voiceConfig);
-            voiceLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
-            voiceLaunchItem.setFrameLess(true);
+            if (voiceLaunchItem == null)
+            {
+                voiceLaunchItem = LaunchItem.createLaunchItem(getContext(), null, voiceConfig);
+                voiceLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
+                voiceLaunchItem.setFrameLess(true);
+                addView(voiceLaunchItem);
+            }
+
             launchItems.add(voiceLaunchItem);
-            addView(voiceLaunchItem);
+        }
+        else
+        {
+            if (voiceLaunchItem != null)
+            {
+                Simple.removeFromParent(voiceLaunchItem);
+                voiceLaunchItem = null;
+            }
         }
 
         baseContacts = new JSONArray();

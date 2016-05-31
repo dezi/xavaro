@@ -428,16 +428,16 @@ public class HomeActivity extends AppCompatActivity implements
         }
     }
 
-    private final Runnable delayOnBackPressed = new Runnable()
+    private final Runnable delayOnBackPressedFinal = new Runnable()
     {
         @Override
         public void run()
         {
-            executeOnBackPressed();
+            executeOnBackPressedFinal();
         }
     };
 
-    public void executeOnBackPressed()
+    public void executeOnBackPressedFinal()
     {
         if (! DefaultApps.isDefaultHome())
         {
@@ -547,7 +547,7 @@ public class HomeActivity extends AppCompatActivity implements
 
         backPressedTime = now;
 
-        handler.removeCallbacks(delayOnBackPressed);
+        handler.removeCallbacks(delayOnBackPressedFinal);
 
         if (backPressedCount >= 4)
         {
@@ -559,7 +559,7 @@ public class HomeActivity extends AppCompatActivity implements
             // Execute back press within given time.
             //
 
-            handler.postDelayed(delayOnBackPressed,750);
+            handler.postDelayed(delayOnBackPressedFinal,750);
         }
     }
 
