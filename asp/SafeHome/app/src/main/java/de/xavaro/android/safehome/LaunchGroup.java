@@ -692,13 +692,13 @@ public class LaunchGroup extends FrameLayout implements
 
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
-                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    JSONObject liconfig = Json.getObject(launchitems, inx);
 
-                    JSONObject intent = Json.getObject(launchitem, "intent");
-                    voiceintent.collectIntent(launchitem, intent);
+                    JSONObject intent = Json.getObject(liconfig, "intent");
+                    voiceintent.collectIntent(liconfig, intent);
 
-                    JSONArray intents = Json.getArray(launchitem, "intents");
-                    voiceintent.collectIntents(launchitem, intents);
+                    JSONArray intents = Json.getArray(liconfig, "intents");
+                    voiceintent.collectIntents(liconfig, intents);
                 }
             }
         }

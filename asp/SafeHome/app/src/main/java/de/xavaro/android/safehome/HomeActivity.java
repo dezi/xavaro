@@ -566,17 +566,20 @@ public class HomeActivity extends AppCompatActivity implements
     public void onCollectVoiceIntent(VoiceIntent voiceintent)
     {
         launchGroup.onCollectVoiceIntent(voiceintent);
+        peopleScreen.onCollectVoiceIntent(voiceintent);
     }
 
     @Override
     public void onResolveVoiceIntent(VoiceIntent voiceintent)
     {
         launchGroup.onResolveVoiceIntent(voiceintent);
+        peopleScreen.onResolveVoiceIntent(voiceintent);
     }
 
     @Override
     public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
     {
-        return launchGroup.onExecuteVoiceIntent(voiceintent, index);
+        return launchGroup.onExecuteVoiceIntent(voiceintent, index)
+                || peopleScreen.onExecuteVoiceIntent(voiceintent, index);
     }
 }

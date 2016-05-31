@@ -16,13 +16,19 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.VoiceIntent;
+import de.xavaro.android.common.VoiceIntentResolver;
 
 @SuppressLint("RtlHardcoded")
-public class HomePeople extends FrameLayout
+public class HomePeople extends FrameLayout implements VoiceIntentResolver
 {
     private static final String LOGTAG = HomePeople.class.getSimpleName();
+
+    private final ArrayList<LaunchItem> launchItems = new ArrayList<>();
 
     private JSONArray baseContacts;
     private JSONArray moreContacts;
@@ -49,26 +55,6 @@ public class HomePeople extends FrameLayout
 
         layoutParams = new LayoutParams(0, 0);
         setLayoutParams(layoutParams);
-
-        JSONObject alertConfig = Json.getObject(LaunchItemAlertcall.getConfig(), 0);
-
-        if (alertConfig != null)
-        {
-            alertLaunchItem = LaunchItem.createLaunchItem(context, null, alertConfig);
-            alertLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
-            alertLaunchItem.setFrameLess(true);
-            this.addView(alertLaunchItem);
-        }
-
-        JSONObject voiceConfig = Json.getObject(LaunchItemVoice.getConfig(), 0);
-
-        if (voiceConfig != null)
-        {
-            voiceLaunchItem = LaunchItem.createLaunchItem(context, null, voiceConfig);
-            voiceLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
-            voiceLaunchItem.setFrameLess(true);
-            this.addView(voiceLaunchItem);
-        }
 
         horzLayout = new LayoutParams(Simple.MP, Simple.MP);
 
@@ -168,6 +154,30 @@ public class HomePeople extends FrameLayout
 
     public void setConfig(JSONObject config)
     {
+        launchItems.clear();
+
+        JSONObject alertConfig = Json.getObject(LaunchItemAlertcall.getConfig(), 0);
+
+        if (alertConfig != null)
+        {
+            alertLaunchItem = LaunchItem.createLaunchItem(getContext(), null, alertConfig);
+            alertLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
+            alertLaunchItem.setFrameLess(true);
+            launchItems.add(alertLaunchItem);
+            addView(alertLaunchItem);
+        }
+
+        JSONObject voiceConfig = Json.getObject(LaunchItemVoice.getConfig(), 0);
+
+        if (voiceConfig != null)
+        {
+            voiceLaunchItem = LaunchItem.createLaunchItem(getContext(), null, voiceConfig);
+            voiceLaunchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
+            voiceLaunchItem.setFrameLess(true);
+            launchItems.add(voiceLaunchItem);
+            addView(voiceLaunchItem);
+        }
+
         baseContacts = new JSONArray();
         moreContacts = new JSONArray();
         socialLikes = new JSONArray();
@@ -181,11 +191,12 @@ public class HomePeople extends FrameLayout
             JSONObject contact = Json.getObject(baseContacts, inx);
             if (contact == null) continue;
 
-            final LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, contact);
+            LaunchItem launchItem = LaunchItem.createLaunchItem(getContext(), null, contact);
 
             launchItem.setFrameLess(true);
             launchItem.setSize(HomeActivity.personSize, HomeActivity.personSize);
 
+            launchItems.add(launchItem);
             peopleView.addView(launchItem);
         }
     }
@@ -551,5 +562,37 @@ public class HomePeople extends FrameLayout
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         Simple.makePost(changeOrientation);
+    }
+
+    @Override
+    public void onCollectVoiceIntent(VoiceIntent voiceintent)
+    {
+        for (LaunchItem launchItem : launchItems)
+        {
+            launchItem.onCollectVoiceIntent(voiceintent);
+        }
+    }
+
+    @Override
+    public void onResolveVoiceIntent(VoiceIntent voiceintent)
+    {
+        for (LaunchItem launchItem : launchItems)
+        {
+            launchItem.onResolveVoiceIntent(voiceintent);
+        }
+    }
+
+    @Override
+    public boolean onExecuteVoiceIntent(VoiceIntent voiceintent, int index)
+    {
+        for (LaunchItem launchItem : launchItems)
+        {
+            if (launchItem.onExecuteVoiceIntent(voiceintent, index))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -93,7 +93,8 @@ public class LaunchItemVoice extends LaunchItem implements
         if (collected == null)
         {
             collected = new VoiceIntent();
-            Context appcontext = Simple.getAppContext();
+
+            Context appcontext = Simple.getActContext();
 
             if ((appcontext != null) && (appcontext instanceof VoiceIntentResolver))
             {
@@ -112,7 +113,7 @@ public class LaunchItemVoice extends LaunchItem implements
             webappFrame.getWebAppView().voice.setCollectedIntents(collected);
         }
 
-        ((HomeActivity) context).addViewToBackStack(webappFrame);
+        ((HomeActivity) context).addWorkerToBackStack("Spracheingabe", webappFrame);
 
         return true;
     }

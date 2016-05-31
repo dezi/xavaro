@@ -572,13 +572,13 @@ public class LaunchItem extends FrameLayout implements
 
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
-                    JSONObject launchitem = Json.getObject(launchitems, inx);
+                    JSONObject liconfig = Json.getObject(launchitems, inx);
 
-                    JSONObject intent = Json.getObject(launchitem, "intent");
-                    voiceintent.collectIntent(launchitem, intent);
+                    JSONObject intent = Json.getObject(liconfig, "intent");
+                    voiceintent.collectIntent(liconfig, intent);
 
-                    JSONArray intents = Json.getArray(launchitem, "intents");
-                    voiceintent.collectIntents(launchitem, intents);
+                    JSONArray intents = Json.getArray(liconfig, "intents");
+                    voiceintent.collectIntents(liconfig, intents);
                 }
             }
         }
@@ -619,14 +619,14 @@ public class LaunchItem extends FrameLayout implements
 
                 for (int inx = 0; inx < launchitems.length(); inx++)
                 {
-                    JSONObject launchitem = Json.getObject(launchitems, inx);
-                    if (launchitem == null) continue;
+                    JSONObject liconfig = Json.getObject(launchitems, inx);
+                    if (liconfig == null) continue;
 
-                    JSONObject intent = Json.getObject(launchitem, "intent");
-                    voiceintent.evaluateIntent(launchitem, intent);
+                    JSONObject intent = Json.getObject(liconfig, "intent");
+                    voiceintent.evaluateIntent(liconfig, intent);
 
-                    JSONArray intents = Json.getArray(launchitem, "intents");
-                    voiceintent.evaluateIntents(launchitem, intents);
+                    JSONArray intents = Json.getArray(liconfig, "intents");
+                    voiceintent.evaluateIntents(liconfig, intents);
                 }
             }
         }
