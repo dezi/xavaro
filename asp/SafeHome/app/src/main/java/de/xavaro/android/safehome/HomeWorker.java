@@ -30,6 +30,8 @@ public class HomeWorker extends HomeFrame
         layoutParams.bottomMargin = Simple.isPortrait() ? HomeActivity.peopleSize : 8;
 
         layoutNormal = new LayoutParams(layoutParams);
+
+        onlyfullscreen = true;
     }
 
     public void setConfig(JSONObject config)

@@ -486,25 +486,31 @@ public class HomeActivity extends AppCompatActivity implements
         // Internal back stack operation.
         //
 
+        Log.d(LOGTAG, "==========================>onBackPressed: 1=" + backStack.size());
+
         if (backStack.size() > 0)
         {
+            for (Object fl : backStack)
+            {
+                Log.d(LOGTAG, "==========================>onBackPressed: 1=" + fl.toString());
+            }
+
             Object lastview = backStack.get(backStack.size() - 1);
 
             if (lastview instanceof BackKeyClient)
             {
+                Log.d(LOGTAG, "==========================>onBackPressed: 1wanted=?");
+
                 if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
-                    if (lastview instanceof HomeWorker)
+                    Log.d(LOGTAG, "==========================>onBackPressed: 1wanted=true");
+
+                    if (! (lastview instanceof HomeWorker))
                     {
-                        ((HomeWorker) lastview).onBackKeyExecuted();
-                        ((HomeWorker) lastview).getPayloadFrame().removeAllViews();
-                        ((HomeWorker) lastview).setVisibility(View.GONE);
-                    }
-                    else
-                    {
-                        ((BackKeyClient) lastview).onBackKeyExecuted();
                         Simple.removeFromParent((ViewGroup) lastview);
                     }
+
+                    ((BackKeyClient) lastview).onBackKeyExecuted();
 
                     backStack.remove(backStack.size() - 1);
                 }
@@ -518,8 +524,11 @@ public class HomeActivity extends AppCompatActivity implements
             return;
         }
 
+        Log.d(LOGTAG, "==========================>onBackPressed: 2");
         if (socialScreen.onBackKeyWanted()) return;
+        Log.d(LOGTAG, "==========================>onBackPressed: 3");
         if (launchScreen.onBackKeyWanted()) return;
+        Log.d(LOGTAG, "==========================>onBackPressed: 4");
 
         //
         // Top level back press handling.

@@ -33,6 +33,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
     protected FrameLayout innerClick;
     protected FrameLayout payloadFrame;
 
+    protected boolean onlyfullscreen;
     protected boolean fullscreen;
     protected int titleFullSize;
 
@@ -68,7 +69,6 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         titleText.setGravity(Gravity.START);
         titleText.setTextColor(0xff888888);
         titleText.setPadding(ipad, 0, 0, 0);
-        titleText.setOnClickListener(onClickListener);
         titleText.setVisibility(GONE);
         titleFrame.addView(titleText);
 
@@ -77,6 +77,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         titleClose.setImageResource(R.drawable.close_button_313x313);
         titleClose.setPadding(ipad, ipad, ipad, ipad);
         titleClose.setVisibility(GONE);
+        titleClose.setOnClickListener(onBackClickListener);
         titleFrame.addView(titleClose);
 
         titleBacka = new ImageSmartView(context);
@@ -84,6 +85,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         titleBacka.setImageResource(R.drawable.back_button_256x256);
         titleBacka.setPadding(ipad, ipad, ipad, ipad);
         titleBacka.setVisibility(GONE);
+        titleBacka.setOnClickListener(onBackClickListener);
         titleFrame.addView(titleBacka);
 
         innerLayout = new LayoutParams(Simple.MP, Simple.MP);
@@ -103,7 +105,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         innerFrame.addView(payloadFrame);
 
         innerClick = new FrameLayout(context);
-        innerClick.setOnClickListener(onClickListener);
+        innerClick.setOnClickListener(onInnerClickListener);
         addView(innerClick);
     }
 
@@ -132,12 +134,22 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         }
     }
 
-    protected final OnClickListener onClickListener = new OnClickListener()
+    protected final OnClickListener onInnerClickListener = new OnClickListener()
     {
         @Override
         public void onClick(View view)
         {
             onToogleFullscreen();
+        }
+    };
+
+
+    protected final OnClickListener onBackClickListener = new OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            HomeActivity.getInstance().onBackPressed();
         }
     };
 
@@ -390,7 +402,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
                 }
             }
 
-            if (isFullscreen())
+            if (isFullscreen() && ! onlyfullscreen)
             {
                 onToogleFullscreen();
 
@@ -414,5 +426,6 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         }
 
         payloadFrame.removeAllViews();
+        setVisibility(View.GONE);
     }
 }
