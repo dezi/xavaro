@@ -525,6 +525,8 @@ public class NotificationService extends NotificationListenerService
             {
                 for (Runnable runner : runners)
                 {
+                    Log.d(LOGTAG, "doCallbacks: " + appname + "=" + pfid);
+
                     Simple.makePost(runner);
                 }
             }
