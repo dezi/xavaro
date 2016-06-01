@@ -26,10 +26,9 @@ public class HealthFrame extends LaunchFrame
     private TextView jsonListing;
     private ImageView schwalbe;
 
-    public HealthFrame(Context context)
+    public HealthFrame(Context context, LaunchItem parent)
     {
-        super(context);
-
+        super(context, parent);
         myInit();
     }
 

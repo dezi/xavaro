@@ -18,23 +18,9 @@ public class LaunchFrameWebFrame extends LaunchFrame
     private WebView webview;
     private WebGuard webguard;
 
-    public LaunchFrameWebFrame(Context context)
+    public LaunchFrameWebFrame(Context context, LaunchItem parent)
     {
-        super(context);
-
-        myInit(context);
-    }
-
-    public LaunchFrameWebFrame(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
-
-        myInit(context);
-    }
-
-    public LaunchFrameWebFrame(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
+        super(context, parent);
 
         myInit(context);
     }

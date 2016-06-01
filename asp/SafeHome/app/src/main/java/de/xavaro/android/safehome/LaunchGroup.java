@@ -1,17 +1,18 @@
 package de.xavaro.android.safehome;
 
-import android.graphics.Color;
 import android.support.annotation.Nullable;
 
 import android.content.Context;
-import android.util.AttributeSet;
-import android.util.Log;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import android.util.AttributeSet;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,7 +21,6 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.Animator;
-import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -223,6 +223,14 @@ public class LaunchGroup extends FrameLayout implements
         }
     }
 
+    @Override
+    protected void onAttachedToWindow()
+    {
+        super.onAttachedToWindow();
+
+        adjustArrows();
+    }
+
     private boolean touchValid;
     private int xStartTouch;
     private int yStartTouch;
@@ -306,13 +314,35 @@ public class LaunchGroup extends FrameLayout implements
         return true;
     }
 
-    private void adjustArrows()
+    public void adjustArrows()
     {
+        if (launchPages == null) return;
+
         arrowLeft.setVisibility(((launchPage - 1) >= 0) ? VISIBLE : GONE);
         arrowRight.setVisibility(((launchPage + 1) < launchPages.size()) ? VISIBLE : GONE);
 
         arrowLeft.bringToFront();
         arrowRight.bringToFront();
+
+        //
+        // Adjust pages bullets.
+        //
+
+        ViewParent parentview = getParent();
+
+        while (parentview != null)
+        {
+            if (parentview instanceof HomeFrame)
+            {
+                String label = (parent != null) ? (String) parent.label.getText() : null;
+
+                ((HomeFrame) parentview).setActivePage(launchPage, launchPages.size(), label);
+
+                break;
+            }
+
+            parentview = parentview.getParent();
+        }
     }
 
     private final Runnable afterMeasure = new Runnable()
@@ -452,14 +482,18 @@ public class LaunchGroup extends FrameLayout implements
         ArrayList<FrameLayout> newPages = new ArrayList<>();
 
         int maxSlots = horzItems * vertItems;
+        int allSlots = launchItems.size();
 
         int nextSlot = 0;
 
         FrameLayout lp = getRecycledLaunchPage();
         newPages.add(lp);
 
-        for (LaunchItem li : launchItems)
+        for (int inx = 0; inx < allSlots; inx++)
         {
+            LaunchItem li = launchItems.get(inx);
+
+            /*
             if ((nextSlot == 0) && (parent != null) && (maxSlots > 4))
             {
                 LaunchItem liprev = getRecycledNextPrevItem("prev");
@@ -470,6 +504,7 @@ public class LaunchGroup extends FrameLayout implements
 
                 nextSlot++;
             }
+            */
 
             if (li.getParent() != lp)
             {
@@ -481,7 +516,7 @@ public class LaunchGroup extends FrameLayout implements
 
             nextSlot++;
 
-            if (((nextSlot + 1) >= maxSlots) && (maxSlots > 4))
+            if (((nextSlot + 1) >= maxSlots) && (maxSlots > 4) && ((inx + 1) < allSlots))
             {
                 //
                 // Next icon on last position of page.

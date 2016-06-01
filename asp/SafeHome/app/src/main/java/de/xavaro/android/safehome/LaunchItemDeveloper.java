@@ -109,7 +109,7 @@ public class LaunchItemDeveloper extends LaunchItem
         {
             if (developerFrame == null)
             {
-                developerFrame = new LaunchFrameDeveloper(context);
+                developerFrame = new LaunchFrameDeveloper(context, this);
                 developerFrame.setSubtype(subtype);
             }
 

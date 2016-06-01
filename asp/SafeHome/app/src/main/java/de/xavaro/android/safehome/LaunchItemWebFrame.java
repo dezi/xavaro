@@ -32,7 +32,7 @@ public class LaunchItemWebFrame extends LaunchItem
             String url = Json.getString(config, "url");
             String name = Json.getString(config, "name");
 
-            LaunchFrameWebFrame webframe = new LaunchFrameWebFrame(context);
+            LaunchFrameWebFrame webframe = new LaunchFrameWebFrame(context, this);
             webframe.setLoadURL(config, name, url);
 
             ((HomeActivity) context).addViewToBackStack(webframe);

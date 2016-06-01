@@ -66,7 +66,7 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
     {
         if (subtype != null)
         {
-            healthFrame = new HealthFrame(context);
+            healthFrame = new HealthFrame(context, this);
             healthFrame.setSubtype(subtype);
 
             ((HomeActivity) context).addViewToBackStack(healthFrame);

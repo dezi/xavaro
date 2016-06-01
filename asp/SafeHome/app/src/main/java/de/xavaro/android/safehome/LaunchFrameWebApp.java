@@ -13,19 +13,9 @@ public class LaunchFrameWebApp extends LaunchFrame
 
     private WebAppView webview;
 
-    public LaunchFrameWebApp(Context context)
+    public LaunchFrameWebApp(Context context, LaunchItem parent)
     {
-        this(context, null, 0);
-    }
-
-    public LaunchFrameWebApp(Context context, AttributeSet attrs)
-    {
-        this(context, attrs, 0);
-    }
-
-    public LaunchFrameWebApp(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
+        super(context, parent);
     }
 
     public void setWebAppName(String webappname)

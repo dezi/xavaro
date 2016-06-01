@@ -63,7 +63,7 @@ public class HomeSocial extends HomeFrame
                 message = Simple.getFirstCap(Simple.getTrans(R.string.simple_none));
                 message += " " + "Neuigkeiten";
 
-                titleText.setTextColor(fullscreen ? 0xff444444 : 0xff888888);
+                titleView.setTextColor(fullscreen ? 0xff444444 : 0xff888888);
             }
             else
             {
@@ -72,10 +72,10 @@ public class HomeSocial extends HomeFrame
                     message = newsTotalCount + " " + "Neuigkeit";
                 }
 
-                titleText.setTextColor(Color.RED);
+                titleView.setTextColor(Color.RED);
             }
 
-            titleText.setText(message);
+            titleView.setText(message);
         }
     }
 

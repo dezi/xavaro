@@ -42,9 +42,9 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
     private JSONArray jsonprefs;
 
-    public LaunchFrameDeveloper(Context context)
+    public LaunchFrameDeveloper(Context context, LaunchItem parent)
     {
-        super(context);
+        super(context, parent);
 
         FrameLayout.LayoutParams lp;
 

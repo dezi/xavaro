@@ -106,9 +106,8 @@ public class LaunchItemVoice extends LaunchItem implements
 
         Log.d(LOGTAG, "LaunchFrameVoice: intents:" + collected.getNumMatches());
 
-        final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
+        final LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context, this);
         webappFrame.setWebAppName("voiceintents");
-        webappFrame.setParent(this);
 
         if (webappFrame.getWebAppView().voice != null)
         {

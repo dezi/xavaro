@@ -5,10 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
+
+import java.util.ArrayList;
 
 import de.xavaro.android.common.BackKeyClient;
 import de.xavaro.android.common.ImageSmartView;
@@ -26,7 +30,13 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
     protected FrameLayout titleFrame;
     protected ImageSmartView titleClose;
     protected ImageSmartView titleBacka;
-    protected TextView titleText;
+    protected TextView titleView;
+    protected String titleText;
+
+    protected LayoutParams pageLayout;
+    protected LinearLayout pageBullets;
+
+    protected ArrayList<ImageView> pageBulletsImages = new ArrayList<>();
 
     protected LayoutParams innerLayout;
     protected FrameLayout innerFrame;
@@ -64,13 +74,22 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         titleFrame.setLayoutParams(titleLayout);
         addView(titleFrame);
 
-        titleText = new TextView(context);
-        titleText.setTextSize(Simple.getDeviceTextSize(HomeActivity.titleSpace * 2 / 3));
-        titleText.setGravity(Gravity.START);
-        titleText.setTextColor(0xff888888);
-        titleText.setPadding(ipad, 0, 0, 0);
-        titleText.setVisibility(GONE);
-        titleFrame.addView(titleText);
+        titleView = new TextView(context);
+        titleView.setTextSize(Simple.getDeviceTextSize(HomeActivity.titleSpace * 2 / 3));
+        titleView.setGravity(Gravity.START);
+        titleView.setTextColor(0xff888888);
+        titleView.setPadding(ipad, 0, 0, ipad / 2);
+        titleView.setVisibility(GONE);
+        titleFrame.addView(titleView);
+
+        pageLayout = new LayoutParams(Simple.WC, Simple.getDevicePixels(16));
+        pageLayout.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+        pageLayout.bottomMargin = Simple.getDevicePixels(8);
+
+        pageBullets = new LinearLayout(context);
+        pageBullets.setLayoutParams(pageLayout);
+        pageBullets.setVisibility(GONE);
+        titleFrame.addView(pageBullets);
 
         titleClose = new ImageSmartView(context);
         titleClose.setLayoutParams(new LayoutParams(titleFullSize, titleFullSize, Gravity.END));
@@ -114,6 +133,19 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         return payloadFrame;
     }
 
+    public void checkPayloadFrame()
+    {
+        if (payloadFrame.getChildCount() > 0)
+        {
+            Object view = payloadFrame.getChildAt(0);
+
+            if (view instanceof LaunchGroup)
+            {
+                ((LaunchGroup) view).adjustArrows();
+            }
+        }
+    }
+
     public void setDisablefullscreen()
     {
         if (innerClick != null)
@@ -124,12 +156,54 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         }
     }
 
+    public void setActivePage(int act, int max, String subtitle)
+    {
+        if (subtitle == null)
+        {
+            titleView.setText(titleText);
+        }
+        else
+        {
+            String newtitle = titleText + " – " + subtitle;
+            titleView.setText(newtitle);
+        }
+
+        int dp16 = Simple.getDevicePixels(16);
+
+        while (pageBulletsImages.size() > max)
+        {
+            ImageView bullet = pageBulletsImages.remove(0);
+            Simple.removeFromParent(bullet);
+        }
+
+        while (pageBulletsImages.size() < max)
+        {
+            ImageView bullet = new ImageView(getContext());
+            bullet.setLayoutParams(new LayoutParams(dp16, dp16));
+            pageBulletsImages.add(bullet);
+            pageBullets.addView(bullet);
+        }
+
+        for (int inx = 0; inx < max; inx++)
+        {
+            ImageView bullet = pageBulletsImages.get(inx);
+
+            bullet.setImageResource(inx == act
+                    ? R.drawable.bullet_black_32x32
+                    : R.drawable.bullet_white_32x32);
+        }
+
+        pageBullets.setVisibility((max > 1) ? VISIBLE : GONE);
+    }
+
     public void setTitle(String title)
     {
+        titleText = title;
+
         if (title != null)
         {
-            titleText.setText(title);
-            titleText.setVisibility(VISIBLE);
+            titleView.setText(title);
+            titleView.setVisibility(VISIBLE);
             innerLayout.topMargin = fullscreen ? titleFullSize : HomeActivity.titleSpace;
         }
     }
@@ -249,11 +323,13 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         {
             titleFrame.setBackgroundColor(Color.TRANSPARENT);
 
-            titleText.setGravity(Gravity.START);
-            titleText.setTextColor(0xff888888);
+            titleView.setGravity(Gravity.START);
+            titleView.setTextColor(0xff888888);
 
             titleClose.setVisibility(GONE);
             titleBacka.setVisibility(GONE);
+
+            pageBullets.setVisibility(GONE);
         }
 
         bringToFront();
@@ -285,9 +361,11 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
         titleFrame.setBackgroundColor(0xffcccccc);
 
-        titleText.setGravity(Gravity.CENTER);
-        titleText.setVisibility(VISIBLE);
-        titleText.setTextColor(0xff444444);
+        titleView.setGravity(Gravity.CENTER);
+        titleView.setVisibility(VISIBLE);
+        titleView.setTextColor(0xff444444);
+
+        pageBullets.setVisibility(VISIBLE);
 
         titleClose.setVisibility(VISIBLE);
         titleBacka.setVisibility(VISIBLE);

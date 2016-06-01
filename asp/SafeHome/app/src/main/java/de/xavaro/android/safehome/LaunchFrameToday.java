@@ -19,9 +19,9 @@ public class LaunchFrameToday extends LaunchFrame
 {
     private static final String LOGTAG = LaunchFrameToday.class.getSimpleName();
 
-    public LaunchFrameToday(Context context)
+    public LaunchFrameToday(Context context, LaunchItem parent)
     {
-        super(context);
+        super(context, parent);
 
         myInit();
     }

@@ -1,6 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
 
 import android.graphics.Color;
@@ -8,6 +7,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.view.Gravity;
@@ -21,13 +21,11 @@ import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.ImageSmartView;
-import de.xavaro.android.common.Json;
-import de.xavaro.android.common.NotificationService;
-import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.VersionUtils;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
+import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.Json;
 
 //
 // Launch item view on home screen.
@@ -150,12 +148,7 @@ public class LaunchItem extends FrameLayout implements
         layout = new LayoutParams(0, 0);
         setLayoutParams(layout);
 
-        GradientDrawable gd = new GradientDrawable();
-        gd.setCornerRadius(16);
-        gd.setColor(GlobalConfigs.LaunchPageBackgroundColor);
-        gd.setStroke(2, 0xffcccccc);
-
-        setBackground(gd);
+        setBackground(Simple.getRoundedBorders(16, GlobalConfigs.LaunchPageBackgroundColor, 0xffcccccc));
 
         icon = new ImageSmartView(context);
         addView(icon);

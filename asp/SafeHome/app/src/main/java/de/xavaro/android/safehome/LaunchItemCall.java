@@ -138,19 +138,15 @@ public class LaunchItemCall extends LaunchItem implements
                 intent.declineRunner = launchPrepaidRechargeRunner;
             }
 
-            if (intent.importance == NotifyIntent.REMINDER)
+            if ((intent.importance == NotifyIntent.REMINDER) ||
+                    (intent.importance == NotifyIntent.WARNING) ||
+                    (intent.importance == NotifyIntent.ASSISTANCE))
             {
                 intent.declineText = "Morgen erinnern";
                 intent.declineRunner = declineRunner;
                 intent.followRunner = launchPrepaidRechargeRunner;
 
                 if (isDeclined()) return null;
-            }
-
-            if ((intent.importance == NotifyIntent.WARNING) ||
-                    (intent.importance == NotifyIntent.ASSISTANCE))
-            {
-                intent.followRunner = launchPrepaidRechargeRunner;
             }
 
             return intent;

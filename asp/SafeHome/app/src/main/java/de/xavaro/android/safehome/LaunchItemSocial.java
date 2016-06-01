@@ -168,9 +168,7 @@ public class LaunchItemSocial extends LaunchItemNotify
             // Launch mode owner plus all related feeds.
             //
 
-            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context);
-            webappFrame.setWebAppName("instaface");
-            webappFrame.setParent(this);
+            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context, this);
 
             ((HomeActivity) context).addViewToBackStack(webappFrame);
 
@@ -186,12 +184,13 @@ public class LaunchItemSocial extends LaunchItemNotify
 
         if (config.has("pfid"))
         {
-            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context)
+            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context, this)
             {
                 @Override
                 protected void onDetachedFromWindow()
                 {
                     super.onDetachedFromWindow();
+
                     getWebAppView().destroy();
 
                     Log.d(LOGTAG, "onDetachedFromWindow: destroyed web view.");
@@ -199,7 +198,6 @@ public class LaunchItemSocial extends LaunchItemNotify
             };
 
             webappFrame.setWebAppName("instaface");
-            webappFrame.setParent(this);
 
             String name = Json.getString(config, "label");
 

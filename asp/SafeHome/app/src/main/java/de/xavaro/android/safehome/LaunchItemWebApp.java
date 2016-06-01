@@ -75,9 +75,8 @@ public class LaunchItemWebApp extends LaunchItem
         {
             if (webappFrame == null)
             {
-                webappFrame = new LaunchFrameWebApp(context);
+                webappFrame = new LaunchFrameWebApp(context, this);
                 webappFrame.setWebAppName(subtype);
-                webappFrame.setParent(this);
             }
 
             if (Json.has(config, "javacall"))

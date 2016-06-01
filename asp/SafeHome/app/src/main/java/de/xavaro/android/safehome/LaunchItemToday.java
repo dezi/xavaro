@@ -117,7 +117,7 @@ public class LaunchItemToday extends LaunchItem
     {
         if (todayFrame == null)
         {
-            todayFrame = new LaunchFrameToday(context);
+            todayFrame = new LaunchFrameToday(context, this);
         }
 
         ((HomeActivity) context).addViewToBackStack(todayFrame);

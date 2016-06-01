@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -11,26 +12,39 @@ public class LaunchFrame extends FrameLayout implements BackKeyClient
 {
     private static final String LOGTAG = LaunchFrame.class.getSimpleName();
 
-    protected LaunchItem parent;
+    protected final LaunchItem parent;
 
-    public LaunchFrame(Context context)
+    public LaunchFrame(Context context, LaunchItem parent)
     {
         super(context);
-    }
 
-    public LaunchFrame(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
-    }
-
-    public LaunchFrame(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
-    }
-
-    public void setParent(LaunchItem parent)
-    {
         this.parent = parent;
+    }
+
+    @Override
+    protected void onAttachedToWindow()
+    {
+        super.onAttachedToWindow();
+
+        //
+        // Adjust pages bullets and subtitle.
+        //
+
+        ViewParent parentview = getParent();
+
+        while (parentview != null)
+        {
+            if (parentview instanceof HomeFrame)
+            {
+                String sublabel = (parent != null) ? (String) parent.label.getText() : null;
+
+                ((HomeFrame) parentview).setActivePage(1, 1, sublabel);
+
+                break;
+            }
+
+            parentview = parentview.getParent();
+        }
     }
 
     public boolean onBackKeyWanted()

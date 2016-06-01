@@ -521,6 +521,23 @@ public class HomeActivity extends AppCompatActivity implements
                 backStack.remove(backStack.size() - 1);
             }
 
+            if (backStack.size() == 0)
+            {
+                launchScreen.checkPayloadFrame();
+                workerScreen.checkPayloadFrame();
+            }
+            else
+            {
+                lastview = backStack.get(backStack.size() - 1);
+
+                Log.d(LOGTAG, "==========================>onBackPressed: lastview=" + lastview);
+
+                if (lastview instanceof LaunchGroup)
+                {
+                    ((LaunchGroup) lastview).adjustArrows();
+                }
+            }
+
             return;
         }
 
