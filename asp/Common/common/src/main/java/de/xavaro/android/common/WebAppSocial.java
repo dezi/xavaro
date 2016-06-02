@@ -253,4 +253,12 @@ public class WebAppSocial
 
         return null;
     }
+
+    @JavascriptInterface
+    public String getTinderRecommendations()
+    {
+        JSONObject data = SocialTinder.getInstance().getRecommendations();
+        JSONArray feed = Json.getArray(data, "results");
+        return (feed == null) ? "[]" : feed.toString();
+    }
 }

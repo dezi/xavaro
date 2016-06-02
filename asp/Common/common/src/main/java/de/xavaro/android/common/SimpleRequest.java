@@ -352,31 +352,33 @@ public class SimpleRequest
     @Nullable
     public static String readContent(String url)
     {
-        return readContent(url, null, null, false);
+        return readContent(url, null, null, null, false);
     }
 
     @Nullable
     public static String readContent(String url, String oauth)
     {
-        return readContent(url, oauth, null, false);
+        return readContent(url, oauth, null, null, false);
     }
 
     @Nullable
     public static String readContent(String url, JSONObject post)
     {
-        return readContent(url, null, post, false);
+        return readContent(url, null, null, post, false);
     }
 
     @Nullable
     public static String readContent(String url, JSONObject post, boolean asjson)
     {
-        return readContent(url, null, post, asjson);
+        return readContent(url, null, null, post, asjson);
     }
 
     @Nullable
-    public static String readContent(String url, String oauth, JSONObject post, boolean asjson)
+    public static String readContent(String url, String oauth, String agent, JSONObject post, boolean asjson)
     {
         if (url == null) return null;
+
+        if (agent == null) agent = "Mozilla/5.0 Gecko/20100101 Firefox/40.1";
 
         try
         {
@@ -387,8 +389,13 @@ public class SimpleRequest
 
             connection.setRequestMethod((post == null) ? "GET" : "POST");
 
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 Gecko/20100101 Firefox/40.1");
-            if (oauth != null) connection.setRequestProperty("Authorization", oauth);
+            connection.setRequestProperty("User-Agent", agent);
+
+            if (oauth != null)
+            {
+                connection.setRequestProperty("Authorization", oauth);
+                connection.setRequestProperty("X-Auth-Token", oauth);
+            }
 
             if (post != null)
             {

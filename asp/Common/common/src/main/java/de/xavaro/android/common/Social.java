@@ -264,7 +264,7 @@ public abstract class Social
 
             params = getSignedOAuthParams("POST", requesturl, params);
             String oauth = getSignedOAuthHeader(params);
-            String content = SimpleRequest.readContent(requesturl, oauth, new JSONObject(), false);
+            String content = SimpleRequest.readContent(requesturl, oauth, null, new JSONObject(), false);
 
             if (content != null)
             {
@@ -368,7 +368,7 @@ public abstract class Social
             params = getSignedOAuthParams("POST", tokenurl, params);
             String oauth = getSignedOAuthHeader(params);
 
-            String content = SimpleRequest.readContent(tokenurl, oauth, new JSONObject(), false);
+            String content = SimpleRequest.readContent(tokenurl, oauth, null, new JSONObject(), false);
 
             if (content != null)
             {

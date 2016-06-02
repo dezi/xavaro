@@ -22,6 +22,8 @@ public class SocialTinder extends Social implements Social.SocialInterface
         return instance;
     }
 
+    private String agent = "Tinder/4.8.2 (iPhone; iOS 9.2; Scale/2.00)";
+
     public SocialTinder()
     {
         super("tinder", "Tinder");
@@ -193,6 +195,22 @@ public class SocialTinder extends Social implements Social.SocialInterface
     protected JSONArray getGraphFeed(String userid)
     {
         return null;
+    }
+
+    @Nullable
+    public JSONObject getRecommendations()
+    {
+        //
+        // curl https://api.gotinder.com/user/recs
+        //  -H 'X-Auth-Token: a9c59454-546b-47b5-854b-ad022b755f14'
+        //  -H 'User-Agent: Tinder/4.8.2 (iPhone; iOS 9.2; Scale/2.00)'
+        //  -H 'Content-Type: application/json'
+        //
+
+        String url = apiurl + "/user/recs";
+        String response = SimpleRequest.readContent(url, getAccessToken(), agent, null, false);
+
+        return Json.fromStringObject(response);
     }
 
     //endregion Graph accessing methods
