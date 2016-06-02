@@ -261,4 +261,11 @@ public class WebAppSocial
         JSONArray feed = Json.getArray(data, "results");
         return (feed == null) ? "[]" : feed.toString();
     }
+
+    @JavascriptInterface
+    public String getTinderUpdates(String date)
+    {
+        JSONObject data = SocialTinder.getInstance().getUpdates(date);
+        return (data == null) ? "{}" : data.toString();
+    }
 }

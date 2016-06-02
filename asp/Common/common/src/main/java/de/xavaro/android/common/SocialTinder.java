@@ -209,8 +209,42 @@ public class SocialTinder extends Social implements Social.SocialInterface
 
         String url = apiurl + "/user/recs";
         String response = SimpleRequest.readContent(url, getAccessToken(), agent, null, false);
+        JSONObject jresponse = Json.fromStringObject(response);
 
-        return Json.fromStringObject(response);
+        if ((jresponse == null) || ! jresponse.has("results"))
+        {
+            Log.d(LOGTAG, "getRecommendations:" + response);
+        }
+
+        return jresponse;
+    }
+
+    @Nullable
+    public JSONObject getUpdates(String date)
+    {
+        //
+        // curl https://api.gotinder.com/updates
+        //  -H 'X-Auth-Token: a9c59454-546b-47b5-854b-ad022b755f14'
+        //  -H 'User-Agent: Tinder/4.8.2 (iPhone; iOS 9.2; Scale/2.00)'
+        //  -H 'Content-Type: application/json'
+        //  --data '{"last_activity_date": "2014-04-10T10:17:54.379Z"}'
+        //
+
+        if (date == null) date = Simple.timeStampAsISO(0);
+
+        JSONObject data = new JSONObject();
+        Json.put(data, "last_activity_date", date);
+
+        String url = apiurl + "/updates";
+        String response = SimpleRequest.readContent(url, getAccessToken(), agent, data, true);
+        JSONObject jresponse = Json.fromStringObject(response);
+
+        if ((jresponse == null) || ! jresponse.has("matches"))
+        {
+            Log.d(LOGTAG, "getUpdates:" + response);
+        }
+
+        return jresponse;
     }
 
     //endregion Graph accessing methods
