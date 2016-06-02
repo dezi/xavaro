@@ -748,6 +748,7 @@ public class CommService extends Service
             EventManager.commTick();
             BatteryManager.commTick();
 
+            SocialTinder.getInstance().commTick();
             SocialTwitter.getInstance().commTick();
             SocialFacebook.getInstance().commTick();
             SocialInstagram.getInstance().commTick();

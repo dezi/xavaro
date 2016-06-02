@@ -46,14 +46,14 @@ tinderella.onClickLike = function(target, ctarget)
     tinderella.contentscroll.style.top = "0px";
 }
 
-tinderella.onClickGone = function(target, ctarget)
+tinderella.onClickPass = function(target, ctarget)
 {
     WebAppUtility.makeClick();
 
     if (! (target && target.rec)) return;
 
     var match = WebAppSocial.getTinderLikePass("pass", target.rec[ "_id" ]);
-    console.log("tinderella.onClickGone: " + match);
+    console.log("tinderella.onClickPass: " + match);
 
     WebLibSimple.detachElement(target.rec.recdiv);
 
@@ -69,6 +69,51 @@ tinderella.onClickMore = function(target, ctarget)
     tinderella.createRecs();
 }
 
+tinderella.onTitleImageClick = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+}
+
+tinderella.createMatch = function(match)
+{
+    var ti = tinderella;
+
+    if (! (match.person && match.person.photos && match.person.photos.length)) return;
+
+    var photo = match.person.photos[ 0 ];
+
+    var pdiv = WebLibSimple.createDivWidHei(
+                        (ti.titlewid + 4), 4,
+                        ti.config.iconsize + 8, ti.config.iconsize + 8,
+                        null, ti.titlescroll);
+
+    pdiv.onTouchClick = ti.onTitleImageClick;
+
+    var picn = WebLibSimple.createAnyAppend("img", pdiv);
+
+    picn.style.position = "absolute";
+    picn.style.top = "4px";
+    picn.style.left = "4px";
+    picn.style.width = ti.config.iconsize + "px";
+    picn.style.height = ti.config.iconsize + "px";
+    picn.src = photo.url;
+
+    var pcnt = WebLibSimple.createAnyAppend("div", pdiv);
+    WebLibSimple.setFontSpecs(pcnt, 20, "bold");
+    WebLibSimple.setBGColor(pcnt, "#44cc44");
+    pcnt.style.display = "none";
+    pcnt.style.position = "absolute";
+    pcnt.style.textAlign = "center";
+    pcnt.style.bottom = "12px";
+    pcnt.style.right = "12px";
+    pcnt.style.height = "24px";
+    pcnt.style.minWidth = "24px";
+    pcnt.style.padding = "6px";
+    pcnt.style.borderRadius = "20px";
+
+    ti.titlewid += ti.config.iconsize + 4 + 4;
+}
+
 tinderella.createUpdates = function()
 {
     var ti = tinderella;
@@ -78,9 +123,21 @@ tinderella.createUpdates = function()
 
     ti.updates = JSON.parse(WebAppSocial.getTinderUpdates(lastdate));
 
-    if (! ti.updates) return;
+    if ((! ti.updates) && ! ti.updates.matches) return;
 
-    ti.contentscroll.innerHTML = JSON.stringify(ti.updates);
+    ti.titlewid = 0;
+
+    for (var inx = 0; inx < ti.updates.matches.length; inx++)
+    {
+        ti.createMatch(ti.updates.matches[ inx ]);
+    }
+
+    ti.titlewid += 8;
+
+    ti.titlescroll.style.width = ti.titlewid + "px";
+
+    var prediv = WebLibSimple.createAnyAppend("pre", ti.contentscroll);
+    prediv.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(ti.updates));
 }
 
 tinderella.createRecs = function()
@@ -174,25 +231,28 @@ tinderella.createRecs = function()
 
             outoflikes = true;
 
+            var prediv = WebLibSimple.createAnyAppend("pre", ti.contentscroll);
+            prediv.innerHTML = WebAppUtility.getPrettyJson(JSON.stringify(rec));
+            
             break;
         }
 
         var butdiv = WebLibSimple.createAnyAppend("center", recdiv);
         WebLibSimple.setFontSpecs(butdiv, 20, "bold");
 
-        var gonediv = WebLibSimple.createAnyAppend("div", butdiv);
-        WebLibSimple.setBGColor(gonediv, "#66afff");
-        gonediv.style.display = "inline-block";
-        gonediv.style.border = "2px solid #0a80ff";
-        gonediv.style.borderRadius = "16px";
-        gonediv.style.padding = "16px";
-        gonediv.style.margin = "16px";
-        gonediv.style.marginBottom = "0px";
-        gonediv.style.width = "200px";
-        gonediv.innerHTML = "Gefällt mir nicht";
+        var passdiv = WebLibSimple.createAnyAppend("div", butdiv);
+        WebLibSimple.setBGColor(passdiv, "#66afff");
+        passdiv.style.display = "inline-block";
+        passdiv.style.border = "2px solid #0a80ff";
+        passdiv.style.borderRadius = "16px";
+        passdiv.style.padding = "16px";
+        passdiv.style.margin = "16px";
+        passdiv.style.marginBottom = "0px";
+        passdiv.style.width = "200px";
+        passdiv.innerHTML = "Gefällt mir nicht";
 
-        gonediv.onTouchClick = tinderella.onClickGone;
-        gonediv.rec = rec;
+        passdiv.onTouchClick = tinderella.onClickPass;
+        passdiv.rec = rec;
 
         var likediv = WebLibSimple.createAnyAppend("div", butdiv);
         WebLibSimple.setBGColor(likediv, "#66afff");
@@ -231,6 +291,6 @@ tinderella.createRecs = function()
 }
 
 tinderella.createFrame();
-//tinderella.createUpdates();
-tinderella.createRecs();
+tinderella.createUpdates();
+//tinderella.createRecs();
 

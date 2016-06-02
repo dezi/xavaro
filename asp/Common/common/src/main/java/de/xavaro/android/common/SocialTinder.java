@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class SocialTinder extends Social implements Social.SocialInterface
 {
@@ -270,4 +271,134 @@ public class SocialTinder extends Social implements Social.SocialInterface
     }
 
     //endregion Graph accessing methods
+
+    //region Cache maintenance
+
+    private long lastReconfigure;
+    private long nextAction;
+
+    public void commTick()
+    {
+        long now = Simple.nowAsTimeStamp();
+
+        if (nextAction == 0)
+        {
+            //
+            // Do not immediately start actions.
+            //
+
+            nextAction = now; // + 2 * 60 * 1000;
+
+            return;
+        }
+
+        if ((now - lastReconfigure) > 24 * 3600 * 1000)
+        {
+            cachedir = new File(Simple.getExternalCacheDir(), platform);
+
+            if (! cachedir.exists())
+            {
+                if (cachedir.mkdirs()) Log.d(LOGTAG, "commTick: created cache:" + cachedir);
+            }
+
+            lastReconfigure = now;
+            nextAction = now;
+        }
+
+        if (now < nextAction) return;
+        nextAction += 60 * 1000;
+
+        final String feedpfid = getUserId();
+        String feedname = getUserDisplayName();
+        if (feedpfid == null) return;
+
+        Log.d(LOGTAG, "commTick: feed:" + feedpfid + " => " + feedname);
+
+        File feedfile = new File(cachedir, feedpfid + ".feed.json");
+        JSONObject updates = Simple.getFileJSONObject(feedfile);
+        String lastdate = Json.getString(updates, "last_activity_date");
+
+        updates = getUpdates(lastdate);
+
+        if (updates != null)
+        {
+            cacheFeedMatches(feedpfid, updates);
+
+            Simple.putFileContent(feedfile, Json.toPretty(updates));
+        }
+    }
+
+    protected void cacheFeedMatches(String feedpfid, JSONObject updates)
+    {
+        JSONArray matches = Json.getArray(updates, "matches");
+        if (matches == null) return;
+
+        for (int inx = 0; inx < matches.length(); inx++)
+        {
+            JSONObject umatch = Json.getObject(matches, inx);
+            String matchid = Json.getString(umatch, "_id");
+            if (matchid == null) continue;
+
+            File matchfile = new File(cachedir, matchid + ".match.json");
+            JSONObject omatch = Simple.getFileJSONObject(matchfile);
+            if (omatch == null) omatch = umatch;
+
+            Json.copy(omatch, "dead", umatch);
+            Json.copy(omatch, "muted", umatch);
+            Json.copy(omatch, "closed", umatch);
+            Json.copy(omatch, "pending", umatch);
+
+            Json.copy(omatch, "message_count", umatch);
+            Json.copy(omatch, "last_activity_date", umatch);
+
+            JSONArray umessages = Json.getArray(umatch, "messages");
+            JSONArray omessages = Json.getArray(omatch, "messages");
+
+            int newmessages = 0;
+
+            if ((umessages != null) && (omessages != null))
+            {
+                for (int uinx = 0; uinx < umessages.length(); uinx++)
+                {
+                    JSONObject umessage = Json.getObject(umessages, uinx);
+                    String umid = Json.getString(umessage, "_id");
+                    if (umid == null) continue;
+
+                    boolean duplicate = false;
+
+                    for (int oinx = 0; oinx < omessages.length(); oinx++)
+                    {
+                        JSONObject omessage = Json.getObject(omessages, oinx);
+                        String omid = Json.getString(omessage, "_id");
+                        if (omid == null) continue;
+
+                        if (Simple.equals(umid, omid))
+                        {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+
+                    if (duplicate) continue;
+
+                    String to = Json.getString(umessage, "to");
+                    if (Simple.equals(to, feedpfid)) newmessages++;
+
+                    omessages.put(umessage);
+                }
+            }
+
+            Simple.putFileContent(matchfile, Json.toPretty(omatch));
+
+            if (newmessages > 0)
+            {
+                SimpleStorage.addInt("socialfeednews", platform + ".count." + matchid, newmessages);
+                SimpleStorage.put("socialfeednews", platform + ".stamp." + matchid, Simple.nowAsISO());
+
+                NotificationService.doCallbacks(platform, matchid);
+            }
+        }
+    }
+
+    //endregion Cache maintenance
 }
