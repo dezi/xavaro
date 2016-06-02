@@ -352,23 +352,29 @@ public class SimpleRequest
     @Nullable
     public static String readContent(String url)
     {
-        return readContent(url, null, null);
+        return readContent(url, null, null, false);
     }
 
     @Nullable
     public static String readContent(String url, String oauth)
     {
-        return readContent(url, oauth, null);
+        return readContent(url, oauth, null, false);
     }
 
     @Nullable
     public static String readContent(String url, JSONObject post)
     {
-        return readContent(url, null, post);
+        return readContent(url, null, post, false);
     }
 
     @Nullable
-    public static String readContent(String url, String oauth, JSONObject post)
+    public static String readContent(String url, JSONObject post, boolean asjson)
+    {
+        return readContent(url, null, post, asjson);
+    }
+
+    @Nullable
+    public static String readContent(String url, String oauth, JSONObject post, boolean asjson)
     {
         if (url == null) return null;
 
@@ -388,21 +394,31 @@ public class SimpleRequest
             {
                 String payload = "";
 
-                Iterator<String> keysIterator = post.keys();
-
-                while (keysIterator.hasNext())
+                if (asjson)
                 {
-                    String key = keysIterator.next();
-                    String val = Json.getString(post, key);
-                    if (val == null) continue;
+                    connection.setRequestProperty("Content-Type", "application/json");
 
-                    payload += ((payload.length() > 0) ? "&" : "")
-                        + Simple.getUrlEncoded(key)
-                        + "="
-                        + Simple.getUrlEncoded(val);
+                    payload = post.toString();
+                }
+                else
+                {
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+                    Iterator<String> keysIterator = post.keys();
+
+                    while (keysIterator.hasNext())
+                    {
+                        String key = keysIterator.next();
+                        String val = Json.getString(post, key);
+                        if (val == null) continue;
+
+                        payload += ((payload.length() > 0) ? "&" : "")
+                                + Simple.getUrlEncoded(key)
+                                + "="
+                                + Simple.getUrlEncoded(val);
+                    }
                 }
 
-                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 connection.setRequestProperty("Content-Length", "" + payload.getBytes().length);
                 connection.setDoOutput(true);
 

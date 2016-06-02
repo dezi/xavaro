@@ -26,6 +26,7 @@ public class CommonConfigs
     public static final int IconResSocialFacebook   = R.drawable.social_facebook_400x400;
     public static final int IconResSocialGoogleplus = R.drawable.social_googleplus_400x400;
     public static final int IconResSocialInstagram  = R.drawable.social_instagram_400x400;
+    public static final int IconResSocialTinder     = R.drawable.social_tinder_300x300;
     public static final int IconResSettingsAndroid  = R.drawable.settings_android_512x512;
     // @formatter:on
 

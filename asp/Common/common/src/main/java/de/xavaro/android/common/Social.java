@@ -264,7 +264,7 @@ public abstract class Social
 
             params = getSignedOAuthParams("POST", requesturl, params);
             String oauth = getSignedOAuthHeader(params);
-            String content = SimpleRequest.readContent(requesturl, oauth, new JSONObject());
+            String content = SimpleRequest.readContent(requesturl, oauth, new JSONObject(), false);
 
             if (content != null)
             {
@@ -283,17 +283,23 @@ public abstract class Social
                 + "?client_id=" + appfix
                 + "&redirect_uri=" + appurl
                 + ((scopes != null) ? "&scope=" + scopes : "")
-                + ((oauth_token != null) ? "&oauth_token=" + oauth_token : "")
-                + "&response_type=code"
-                + "&access_type=offline"
-                + "&prompt=consent";
+                + ((oauth_token != null) ? "&oauth_token=" + oauth_token : "");
+
+        if (platform.equals("tinder"))
+        {
+            url += "&response_type=token";
+        }
+        else
+        {
+            url += "&response_type=code" + "&access_type=offline" + "&prompt=consent";
+        }
 
         Log.d(LOGTAG, "login: " + url);
 
         webview.loadUrl(url);
     }
 
-    private void exchangeCodeforToken(String url)
+    protected void exchangeCodeforToken(String url)
     {
         //
         // Final oauth step. The user has accepted access or not
@@ -362,7 +368,7 @@ public abstract class Social
             params = getSignedOAuthParams("POST", tokenurl, params);
             String oauth = getSignedOAuthHeader(params);
 
-            String content = SimpleRequest.readContent(tokenurl, oauth, new JSONObject());
+            String content = SimpleRequest.readContent(tokenurl, oauth, new JSONObject(), false);
 
             if (content != null)
             {
@@ -428,6 +434,8 @@ public abstract class Social
             cookiestring = cookieManager.getCookie(domain);
             Log.d(LOGTAG, "clearCookies: nachher=" + cookiestring);
         }
+
+        cookieManager.removeAllCookies(null);
     }
 
     protected JSONObject getQuery(String querystr)

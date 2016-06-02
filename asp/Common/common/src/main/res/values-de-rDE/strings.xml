@@ -662,6 +662,18 @@
         \n\nWeiter können Sie festlegen, wie mit neuen Abonnements verfahren wird.
     </string>
 
+    <string name="pref_social_tinder">Tinder</string>
+    <string name="pref_social_tinder_enable">Tinder freischalten</string>
+    <string name="pref_social_tinder_summary">
+        Tinder (dt. Zunder) ist eine kommerzielle mobile Dating-App, die das Ziel hat,
+        ihren Benutzern das Kennenlernen von Menschen in der näheren Umgebung zu erleichtern.
+        Sie wird zur Anbahnung von Flirts oder zum Knüpfen von Bekanntschaften verwendet.
+    </string>
+    <string name="pref_social_tinder_account_summary">
+        Wenn Sie Tinder benutzen wollen, müssen Sie sich hier mit Ihrem
+        Facebook-Account einloggen.
+   </string>
+
     <string name="battery_manager_info">Die Batterie ist zu %1$d Prozent geladen.</string>
     <string name="battery_manager_remind">Bitte verbinden Sie ihr Tablet demnächst mit der Ladestation.</string>
     <string name="battery_manager_remind_du">Bitte verbinde Dein Tablet demnächst mit der Ladestation.</string>

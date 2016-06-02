@@ -482,6 +482,11 @@
     <string name="pref_social_googleplus_account_summary">todo</string>
     <string name="pref_social_googleplus_friends_summary">todo</string>
 
+    <string name="pref_social_tinder">Tinder</string>
+    <string name="pref_social_tinder_enable">Enable Tinder</string>
+    <string name="pref_social_tinder_summary">todo</string>
+    <string name="pref_social_tinder_account_summary">todo</string>
+
     <string name="battery_manager_info">The battery charge is at %1$d percent.</string>
     <string name="battery_manager_remind">Please plug Your tablet into the charger soon.</string>
     <string name="battery_manager_warn">Please plug Your tablet into the charger now.</string>

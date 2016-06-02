@@ -669,6 +669,57 @@ public class ProfileImages
 
     //endregion Twitter profiles
 
+    //region Tinder profiles
+
+    public static File getTinderProfilePath(String tinderid)
+    {
+        File profilespath = Simple.getMediaPath("profiles");
+        String profilename = "tinder.image." + tinderid + ".jpg";
+        return new File(profilespath, profilename);
+    }
+
+    @Nullable
+    public static File getTinderProfileFile(String tinderid)
+    {
+        if (tinderid == null) return null;
+
+        File imagefile = getTinderProfilePath(tinderid);
+
+        return imagefile.exists() ? imagefile : null;
+    }
+
+    @Nullable
+    public static File getTinderLoadProfileImage(String tinderid)
+    {
+        if (tinderid == null) return null;
+
+        File imagefile = getTinderProfilePath(tinderid);
+
+        if (! imagefile.exists())
+        {
+            Simple.putFileBytes(imagefile, SocialTinder.getInstance().getUserIconData(tinderid));
+        }
+
+        return imagefile;
+    }
+
+    @Nullable
+    public static Bitmap getTinderProfileBitmap(String tinderid, boolean circle)
+    {
+        File imagefile = getTinderLoadProfileImage(tinderid);
+
+        if ((imagefile != null) && imagefile.exists())
+        {
+            Bitmap bitmap = Simple.getBitmap(imagefile);
+            if (circle) bitmap = getCircleBitmap(bitmap);
+            return bitmap;
+        }
+
+        return null;
+    }
+
+    //endregion Tinder profiles
+
     //region Social profiles
 
     public static File getSocialUserImageFile(String platform, String pfid)
@@ -691,6 +742,11 @@ public class ProfileImages
         if (Simple.equals(platform, "twitter"))
         {
             return getTwitterProfileFile(pfid);
+        }
+
+        if (Simple.equals(platform, "tinder"))
+        {
+            return getTinderProfileFile(pfid);
         }
 
         return null;
@@ -717,6 +773,11 @@ public class ProfileImages
         {
             ProfileImages.getTwitterLoadProfileImage(pfid);
         }
+
+        if (Simple.equals(platform, "tinder"))
+        {
+            ProfileImages.getTinderLoadProfileImage(pfid);
+        }
     }
 
     public static Drawable getSocialProfileDrawable(String platform, String pfid, boolean circle)
@@ -741,6 +802,11 @@ public class ProfileImages
         if (Simple.equals(platform, "twitter"))
         {
             bitmap = ProfileImages.getTwitterProfileBitmap(pfid, circle);
+        }
+
+        if (Simple.equals(platform, "tinder"))
+        {
+            bitmap = ProfileImages.getTinderProfileBitmap(pfid, circle);
         }
 
         return Simple.getDrawable(bitmap);
