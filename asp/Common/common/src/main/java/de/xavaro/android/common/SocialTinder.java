@@ -220,6 +220,28 @@ public class SocialTinder extends Social implements Social.SocialInterface
     }
 
     @Nullable
+    public boolean getLikePass(String what, String userid)
+    {
+        //
+        // curl https://api.gotinder.com/user/recs
+        //  -H 'X-Auth-Token: a9c59454-546b-47b5-854b-ad022b755f14'
+        //  -H 'User-Agent: Tinder/4.8.2 (iPhone; iOS 9.2; Scale/2.00)'
+        //  -H 'Content-Type: application/json'
+        //
+
+        String url = apiurl + "/" + what + "/" + userid;
+        String response = SimpleRequest.readContent(url, getAccessToken(), agent, null, false);
+        JSONObject jresponse = Json.fromStringObject(response);
+
+        if ((jresponse == null) || ! jresponse.has("match"))
+        {
+            Log.d(LOGTAG, "getLikePass:" + response);
+        }
+
+        return Json.getBoolean(jresponse, "match");
+    }
+
+    @Nullable
     public JSONObject getUpdates(String date)
     {
         //

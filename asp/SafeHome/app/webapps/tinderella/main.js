@@ -38,7 +38,12 @@ tinderella.onClickLike = function(target, ctarget)
 
     if (! (target && target.rec)) return;
 
+    var match = WebAppSocial.getTinderLikePass("like", target.rec[ "_id" ]);
+    console.log("tinderella.onClickLike: " + match);
+
     WebLibSimple.detachElement(target.rec.recdiv);
+
+    tinderella.contentscroll.style.top = "0px";
 }
 
 tinderella.onClickGone = function(target, ctarget)
@@ -47,7 +52,12 @@ tinderella.onClickGone = function(target, ctarget)
 
     if (! (target && target.rec)) return;
 
+    var match = WebAppSocial.getTinderLikePass("pass", target.rec[ "_id" ]);
+    console.log("tinderella.onClickGone: " + match);
+
     WebLibSimple.detachElement(target.rec.recdiv);
+
+    tinderella.contentscroll.style.top = "0px";
 }
 
 tinderella.onClickMore = function(target, ctarget)
@@ -81,6 +91,8 @@ tinderella.createRecs = function()
 
     if (! ti.recs) return;
 
+    var outoflikes = false;
+
     for (var inx = 0; inx < ti.recs.length; inx++)
     {
         var rec = ti.recs[ inx ];
@@ -112,7 +124,15 @@ tinderella.createRecs = function()
 
         var namediv = WebLibSimple.createAnyAppend("center", recdiv);
         WebLibSimple.setFontSpecs(namediv, 36, "bold");
-        namediv.innerHTML = rec.name + " (" + age + ") – " + distance + " km – " + onltag;
+
+        if (rec.name == "Tinder Team")
+        {
+            namediv.innerHTML = rec.name;
+        }
+        else
+        {
+            namediv.innerHTML = rec.name + " (" + age + ") – " + distance + " km – " + onltag;
+        }
 
         if (rec.teaser && rec.teaser.string)
         {
@@ -144,6 +164,17 @@ tinderella.createRecs = function()
             imgtag.style.width = "100%";
             imgtag.style.height = "100%";
             imgtag.src = photo.url;
+        }
+
+        if (rec.name == "Tinder Team")
+        {
+            //
+            // Out of likes today.
+            //
+
+            outoflikes = true;
+
+            break;
         }
 
         var butdiv = WebLibSimple.createAnyAppend("center", recdiv);
@@ -180,23 +211,26 @@ tinderella.createRecs = function()
         rec.recdiv = recdiv;
     }
 
-    var morediv = WebLibSimple.createAnyAppend("center", ti.contentscroll);
-    WebLibSimple.setFontSpecs(morediv, 20, "bold");
+    if (! outoflikes)
+    {
+        var morediv = WebLibSimple.createAnyAppend("center", ti.contentscroll);
+        WebLibSimple.setFontSpecs(morediv, 20, "bold");
 
-    var morebut = WebLibSimple.createAnyAppend("div", morediv);
-    WebLibSimple.setBGColor(morebut, "#66afff");
-    morebut.style.display = "inline-block";
-    morebut.style.border = "2px solid #0a80ff";
-    morebut.style.borderRadius = "16px";
-    morebut.style.padding = "16px";
-    morebut.style.margin = "16px";
-    morebut.style.width = "200px";
-    morebut.innerHTML = "Weitere...";
+        var morebut = WebLibSimple.createAnyAppend("div", morediv);
+        WebLibSimple.setBGColor(morebut, "#66afff");
+        morebut.style.display = "inline-block";
+        morebut.style.border = "2px solid #0a80ff";
+        morebut.style.borderRadius = "16px";
+        morebut.style.padding = "16px";
+        morebut.style.margin = "16px";
+        morebut.style.width = "200px";
+        morebut.innerHTML = "Weitere...";
 
-    morebut.onTouchClick = tinderella.onClickMore;
+        morebut.onTouchClick = tinderella.onClickMore;
+    }
 }
 
 tinderella.createFrame();
-tinderella.createUpdates();
-//tinderella.createRecs();
+//tinderella.createUpdates();
+tinderella.createRecs();
 

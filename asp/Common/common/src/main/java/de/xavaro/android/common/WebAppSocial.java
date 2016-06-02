@@ -268,4 +268,10 @@ public class WebAppSocial
         JSONObject data = SocialTinder.getInstance().getUpdates(date);
         return (data == null) ? "{}" : data.toString();
     }
+
+    @JavascriptInterface
+    public boolean getTinderLikePass(String what, String userid)
+    {
+        return SocialTinder.getInstance().getLikePass(what, userid);
+    }
 }
