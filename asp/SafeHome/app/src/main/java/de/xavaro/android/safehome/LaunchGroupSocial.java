@@ -66,6 +66,17 @@ public class LaunchGroupSocial extends LaunchGroup
             configPrefs("twitter", "like", home, twdir, null);
         }
 
+        if (Simple.getSharedPrefBoolean("social.tinder.enable"))
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "tinder");
+            Json.put(entry, "label", "Tinder");
+            Json.put(entry, "order", 550);
+
+            Json.put(home, entry);
+        }
+
         if (twdir.length() > 0)
         {
             JSONObject entry = new JSONObject();

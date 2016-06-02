@@ -1,0 +1,45 @@
+{
+  "manifest": {
+
+    "label": "tinderella",
+    "appname": "tinderella",
+    "appicon": "tinder_300x300.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "social",
+      "request",
+      "utility"
+    ],
+
+    "weblibs": [
+      "touch",
+      "simple",
+      "strings",
+      "social",
+      "dialog"
+    ],
+
+    "preload": [],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": [
+      { "interval": -1, "pattern": "(http|https)://.*?.gotinder.com/.*" },
+
+      { "interval": -1, "pattern": "(http|https)://.*?.twimg.com/.*" },
+
+      { "interval": -1, "pattern": "(http|https)://.*?.facebook.net/.*" },
+      { "interval": -1, "pattern": "(http|https)://.*?.facebook.com/.*" },
+      { "interval": -1, "pattern": "(http|https)://.*?.fbcdn.net/.*" },
+
+      { "interval": -1, "pattern": "(http|https)://.*?.googleusercontent.com/.*" },
+
+      { "interval": -1, "pattern": "(http|https)://.*?.cdninstagram.com/.*" }
+    ]
+  }
+}

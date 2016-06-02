@@ -1,0 +1,155 @@
+{
+  "token": "a9c59454-546b-47b5-854b-ad022b755f14",
+  "user": {
+    "_id": "574ef7b3e597994f0f00a462",
+    "active_time": "2016-06-02T08:40:44.169Z",
+    "can_create_squad": false,
+    "create_date": "2016-06-01T14:56:51.233Z",
+    "age_filter_max": 1000,
+    "age_filter_min": 42,
+    "api_token": "a9c59454-546b-47b5-854b-ad022b755f14",
+    "bio": "",
+    "birth_date": "1962-05-29T00:00:00.000Z",
+    "connection_count": 25,
+    "distance_filter": 51,
+    "full_name": "Dennis Zierahn",
+    "groups": [
+      "plus_subscription_1999"
+    ],
+    "gender": 0,
+    "gender_filter": 1,
+    "interests": [
+      {
+        "created_time": "2016-05-29T09:51:09+0000",
+        "id": "5027904559",
+        "category": "Musician/Band",
+        "name": "Shakira"
+      },
+      {
+        "created_time": "2016-05-16T04:20:39+0000",
+        "id": "403751746422059",
+        "category": "Personal Website",
+        "name": "Trittau Aktuell"
+      },
+      {
+        "created_time": "2016-05-16T04:20:27+0000",
+        "id": "1476144382621338",
+        "category": "News/Media Website",
+        "name": "Trittau Online"
+      },
+      {
+        "created_time": "2016-05-16T04:19:49+0000",
+        "id": "116878791733088",
+        "category": "Home/Garden Website",
+        "name": "Fräulein Fröhlich Deko-und Onlineshop"
+      },
+      {
+        "created_time": "2016-05-16T04:19:19+0000",
+        "id": "540204432811791",
+        "category": "Community",
+        "name": "Trittau Events"
+      },
+      {
+        "created_time": "2016-05-02T09:58:01+0000",
+        "id": "19614945368",
+        "category": "Musician/Band",
+        "name": "Taylor Swift"
+      },
+      {
+        "created_time": "2016-05-02T05:22:43+0000",
+        "id": "7126051465",
+        "category": "Musician/Band",
+        "name": "Katy Perry"
+      },
+      {
+        "created_time": "2016-04-29T10:16:57+0000",
+        "id": "199199516786992",
+        "category": "Public Figure",
+        "name": "Oliver Kalkofe"
+      },
+      {
+        "created_time": "2016-04-29T10:16:43+0000",
+        "id": "205584177784",
+        "category": "Public Figure",
+        "name": "Atze Schröder"
+      },
+      {
+        "created_time": "2016-04-29T10:12:58+0000",
+        "id": "38246844868",
+        "category": "News/Media Website",
+        "name": "SPIEGEL ONLINE"
+      }
+    ],
+    "name": "Dennis",
+    "ping_time": "2016-06-02T08:40:44.169Z",
+    "discoverable": true,
+    "photos": [
+      {
+        "url": "http://images.gotinder.com/574ef7b3e597994f0f00a462/f43c4fd9-9ef5-4082-9cd3-5774d66aacbf.jpg",
+        "processedFiles": [
+          {
+            "url": "http://images.gotinder.com/574ef7b3e597994f0f00a462/640x640_f43c4fd9-9ef5-4082-9cd3-5774d66aacbf.jpg",
+            "height": 640,
+            "width": 640
+          },
+          {
+            "url": "http://images.gotinder.com/574ef7b3e597994f0f00a462/320x320_f43c4fd9-9ef5-4082-9cd3-5774d66aacbf.jpg",
+            "height": 320,
+            "width": 320
+          },
+          {
+            "url": "http://images.gotinder.com/574ef7b3e597994f0f00a462/172x172_f43c4fd9-9ef5-4082-9cd3-5774d66aacbf.jpg",
+            "height": 172,
+            "width": 172
+          },
+          {
+            "url": "http://images.gotinder.com/574ef7b3e597994f0f00a462/84x84_f43c4fd9-9ef5-4082-9cd3-5774d66aacbf.jpg",
+            "height": 84,
+            "width": 84
+          }
+        ],
+        "extension": "jpg",
+        "fbId": "1137276679666234",
+        "fileName": "f43c4fd9-9ef5-4082-9cd3-5774d66aacbf.jpg",
+        "shape": "center_square",
+        "main": "main",
+        "id": "f43c4fd9-9ef5-4082-9cd3-5774d66aacbf"
+      }
+    ],
+    "photos_processing": false,
+    "jobs": [],
+    "schools": [],
+    "squads_discoverable": true,
+    "squads_only": false,
+    "purchases": [],
+    "is_new_user": false
+  },
+  "versions": {
+    "active_text": "0.0.0",
+    "age_filter": "2.1.0",
+    "matchmaker": "2.1.0",
+    "trending": "10.0.0",
+    "trending_active_text": "10.0.0"
+  },
+  "globals": {
+    "friends": true,
+    "invite_type": "client",
+    "recs_interval": 20000,
+    "updates_interval": 2000,
+    "recs_size": 40,
+    "matchmaker_default_message": "I want you to meet someone. I introduced you on Tinder www.gotinder.com/app",
+    "share_default_text": "<style>body{color:#fff;text-align:center;font-family:HelveticaNeue;text-shadow:0 1px 1px rgba(0,0,0,0.63);}h1{font-size:24px;line-height:24px;margin:0;}p{font-size:16px;margin:8px;}</style><h1>Get a Boost</h1><p><strong>Invite friends</strong> to show up <br/><strong>even higher</strong> in recommendations.</p>",
+    "boost_decay": 180,
+    "boost_up": 7,
+    "boost_down": 8,
+    "sparks": false,
+    "kontagent": false,
+    "sparks_enabled": false,
+    "kontagent_enabled": false,
+    "mqtt": false,
+    "tinder_sparks": true,
+    "moments_interval": 30000,
+    "fetch_connections": true,
+    "plus": true
+  }
+}

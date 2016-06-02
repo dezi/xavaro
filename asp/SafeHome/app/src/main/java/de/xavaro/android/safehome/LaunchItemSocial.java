@@ -52,6 +52,11 @@ public class LaunchItemSocial extends LaunchItemNotify
             targetIcon.setImageResource(CommonConfigs.IconResSocial);
         }
 
+        if (type.equals("tinder"))
+        {
+            targetIcon.setImageResource(CommonConfigs.IconResSocialTinder);
+        }
+
         if (type.equals("likes"))
         {
             targetIcon.setImageResource(GlobalConfigs.IconResWebConfigInternet);
@@ -169,6 +174,17 @@ public class LaunchItemSocial extends LaunchItemNotify
             //
 
             LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context, this);
+            webappFrame.setWebAppName("instaface");
+
+            ((HomeActivity) context).addViewToBackStack(webappFrame);
+
+            return;
+        }
+
+        if (type.equals("tinder"))
+        {
+            LaunchFrameWebApp webappFrame = new LaunchFrameWebApp(context, this);
+            webappFrame.setWebAppName("tinderella");
 
             ((HomeActivity) context).addViewToBackStack(webappFrame);
 
