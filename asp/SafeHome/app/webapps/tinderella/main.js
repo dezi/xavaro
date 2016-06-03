@@ -291,6 +291,6 @@ tinderella.createRecs = function()
 }
 
 tinderella.createFrame();
-tinderella.createUpdates();
-//tinderella.createRecs();
+//tinderella.createUpdates();
+tinderella.createRecs();
 
