@@ -239,7 +239,49 @@ public class SocialTinder extends Social implements Social.SocialInterface
             Log.d(LOGTAG, "getLikePass:" + response);
         }
 
+        //
+        // Maintain a twelve hour statistic of likes and passes.
+        //
+
+        String ownerid = getUserId();
+        JSONArray likes = SimpleStorage.getJSONArray("tinderlikes", ownerid + "." + what);
+        if (likes == null) likes = new JSONArray();
+
+        long nowminus12 = Simple.nowAsTimeStamp() - (12 * 3600 * 1000);
+        String twelvehours = Simple.timeStampAsISO(nowminus12);
+
+        for (int inx = 0; inx < likes.length(); inx++)
+        {
+            String like = Json.getString(likes, inx);
+
+            if (Simple.compareTo(like, twelvehours) < 0)
+            {
+                Json.remove(likes, inx--);
+            }
+        }
+
+        Json.put(likes, Simple.nowAsISO());
+
+        SimpleStorage.put("tinderlikes", ownerid + "." + what, likes);
+
+        Log.d(LOGTAG, "getLikePass: last twelve hours: " + what + "=" + likes.length());
+
         return Json.getBoolean(jresponse, "match");
+    }
+
+    public JSONObject getLikePassNumbers()
+    {
+        JSONObject counts = new JSONObject();
+
+        String ownerid = getUserId();
+
+        JSONArray like = SimpleStorage.getJSONArray("tinderlikes", ownerid + ".like");
+        JSONArray pass = SimpleStorage.getJSONArray("tinderlikes", ownerid + ".pass");
+
+        Json.put(counts, "like", (like == null) ? 0 : like.length());
+        Json.put(counts, "pass", (pass == null) ? 0 : pass.length());
+
+        return counts;
     }
 
     @Nullable

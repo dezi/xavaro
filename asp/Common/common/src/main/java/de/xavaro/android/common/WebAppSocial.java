@@ -76,7 +76,7 @@ public class WebAppSocial
             Json.put(target, "id", pfid);
             Json.put(target, "name", name);
             Json.put(target, "type", type);
-            Json.put(target, "plat", plat );
+            Json.put(target, "plat", plat);
             Json.put(target, "icon", (icon != null) ? icon.toString() : null);
 
             Json.put(targets, target);
@@ -273,5 +273,11 @@ public class WebAppSocial
     public boolean getTinderLikePass(String what, String userid)
     {
         return SocialTinder.getInstance().getLikePass(what, userid);
+    }
+
+    @JavascriptInterface
+    public String getLikePassNumbers()
+    {
+        return SocialTinder.getInstance().getLikePassNumbers().toString();
     }
 }

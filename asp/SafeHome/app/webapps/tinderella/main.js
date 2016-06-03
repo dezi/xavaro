@@ -1,6 +1,7 @@
 tinderella.config =
 {
-    "iconsize" : 120
+    "iconsize" : 120,
+    "imgssize" : 300
 }
 
 tinderella.createFrame = function()
@@ -28,8 +29,78 @@ tinderella.createFrame = function()
     ti.contentscroll.style.height = null;
     ti.contentscroll.scrollVertical = true;
 
-    ti.titlediv.style.top = 0 + "px";
-    ti.contentdiv.style.top = ti.theight + "px";
+    ti.titlediv.style.top = -ti.theight + "px";
+    ti.contentdiv.style.top = 0 + "px";
+}
+
+tinderella.adjustCounts = function()
+{
+    var ti = tinderella;
+
+    var counts = JSON.parse(WebAppSocial.getLikePassNumbers());
+    var childs = ti.contentscroll.childNodes;
+
+    for (var inx = 0; inx < childs.length; inx++)
+    {
+        var recdiv = childs[ inx ];
+
+        if (recdiv.likediv)
+        {
+            recdiv.likediv.innerHTML = "Gefällt mir gut" + " (" + counts.like + ")";
+        }
+
+        if (recdiv.passdiv)
+        {
+            recdiv.passdiv.innerHTML = "Gefällt mir nicht" + " (" + counts.pass + ")";
+        }
+    }
+}
+
+tinderella.adjustScroll = function(firstMarked)
+{
+    var ti = tinderella;
+
+    //
+    // Check if scroll needs resetting.
+    //
+
+    var displayheight = ti.contentscroll.parentNode.clientHeight;
+    var scrollheight = ti.contentscroll.clientHeight;
+    var offsettop = -ti.contentscroll.offsetTop;
+
+    console.log("tinderella.adjustScroll:"
+        + displayheight + "=" + scrollheight
+        + "="
+        + offsettop + "=" + firstMarked
+        );
+
+    if (scrollheight < displayheight)
+    {
+        //
+        // View fits display. Reset list div offset to 0px.
+        //
+
+        ti.contentscroll.style.top = "0px";
+    }
+    else
+    {
+        if (firstMarked != null)
+        {
+            if ((scrollheight - firstMarked) < displayheight)
+            {
+                firstMarked = - (displayheight - scrollheight);
+            }
+            else
+            {
+                if (firstMarked > (scrollheight - displayheight))
+                {
+                    firstMarked = scrollheight - displayheight;
+                }
+            }
+
+            ti.contentscroll.style.top = -firstMarked + "px";
+        }
+    }
 }
 
 tinderella.onClickLike = function(target, ctarget)
@@ -38,12 +109,16 @@ tinderella.onClickLike = function(target, ctarget)
 
     if (! (target && target.rec)) return;
 
+    var ti = tinderella;
+
     var match = WebAppSocial.getTinderLikePass("like", target.rec[ "_id" ]);
     console.log("tinderella.onClickLike: " + match);
 
+    var offset = target.rec.recdiv.offsetTop - 16;
     WebLibSimple.detachElement(target.rec.recdiv);
 
-    tinderella.contentscroll.style.top = "0px";
+    ti.adjustScroll(offset);
+    ti.adjustCounts();
 }
 
 tinderella.onClickPass = function(target, ctarget)
@@ -52,12 +127,16 @@ tinderella.onClickPass = function(target, ctarget)
 
     if (! (target && target.rec)) return;
 
+    var ti = tinderella;
+
     var match = WebAppSocial.getTinderLikePass("pass", target.rec[ "_id" ]);
     console.log("tinderella.onClickPass: " + match);
 
+    var offset = target.rec.recdiv.offsetTop - 16;
     WebLibSimple.detachElement(target.rec.recdiv);
 
-    tinderella.contentscroll.style.top = "0px";
+    ti.adjustScroll(offset);
+    ti.adjustCounts();
 }
 
 tinderella.onClickMore = function(target, ctarget)
@@ -148,6 +227,7 @@ tinderella.createRecs = function()
 
     if (! ti.recs) return;
 
+    var counts = JSON.parse(WebAppSocial.getLikePassNumbers());
     var outoflikes = false;
 
     for (var inx = 0; inx < ti.recs.length; inx++)
@@ -211,11 +291,10 @@ tinderella.createRecs = function()
 
             var imgdiv = WebLibSimple.createAnyAppend("div", imgsdiv);
             imgdiv.style.display = "inline-block";
-            imgdiv.style.margin = "0px";
-            imgdiv.style.paddingLeft = "4px";
-            imgdiv.style.paddingLRight = "4px";
-            imgdiv.style.width = "328px";
-            imgdiv.style.height = "320px";
+            imgdiv.style.marginLeft = "4px";
+            imgdiv.style.marginLRight = "4px";
+            imgdiv.style.width = ti.config.imgssize + "px";
+            imgdiv.style.height = ti.config.imgssize + "px";
 
             var imgtag = WebLibSimple.createAnyAppend("img", imgdiv);
             imgtag.style.width = "100%";
@@ -249,7 +328,7 @@ tinderella.createRecs = function()
         passdiv.style.margin = "16px";
         passdiv.style.marginBottom = "0px";
         passdiv.style.width = "200px";
-        passdiv.innerHTML = "Gefällt mir nicht";
+        passdiv.innerHTML = "Gefällt mir nicht" + " (" + counts.pass + ")";
 
         passdiv.onTouchClick = tinderella.onClickPass;
         passdiv.rec = rec;
@@ -263,10 +342,13 @@ tinderella.createRecs = function()
         likediv.style.margin = "16px";
         likediv.style.marginBottom = "0px";
         likediv.style.width = "200px";
-        likediv.innerHTML = "Gefällt mir gut";
+        likediv.innerHTML = "Gefällt mir gut" + " (" + counts.like + ")";
 
         likediv.onTouchClick = tinderella.onClickLike;
         likediv.rec = rec;
+
+        recdiv.likediv = likediv;
+        recdiv.passdiv = passdiv;
 
         rec.recdiv = recdiv;
     }
