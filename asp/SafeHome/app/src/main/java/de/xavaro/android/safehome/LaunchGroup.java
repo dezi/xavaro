@@ -712,8 +712,6 @@ public class LaunchGroup extends FrameLayout implements
             {
                 launchItem.onCollectVoiceIntent(voiceintent);
             }
-
-            return;
         }
 
         if (config != null)

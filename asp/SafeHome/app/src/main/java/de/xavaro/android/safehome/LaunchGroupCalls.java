@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +54,10 @@ public class LaunchGroupCalls extends LaunchGroup
             Json.put(webitem, "subitem", subitem);
             Json.put(webitem, "order", 500);
 
+            String iconurl = Json.getString(webitem, "icon");
+            String iconpath = "weblib|calls|" + iconurl;
+            Json.put(webitem, "icon", iconpath);
+
             String nametag = Simple.getSharedPrefString(keyprefix + ".nametag:" + subitem);
             if ((nametag != null) && (nametag.length() > 0)) Json.put(webitem, "label", nametag);
 
@@ -61,6 +66,8 @@ public class LaunchGroupCalls extends LaunchGroup
 
             String prepaidload = Simple.getSharedPrefString(keyprefix + ".prepaidload:" + subitem);
             if (prepaidload != null) Json.put(webitem, "prepaidload", prepaidload);
+
+            if (Simple.isEmpty(phonenumber)) continue;
 
             String mode = Simple.getSharedPrefString(key);
 

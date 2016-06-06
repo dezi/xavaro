@@ -399,6 +399,12 @@ public class VoiceIntent
                 {
                     String iconref = Json.getString(intent, "icon");
 
+                    if (Simple.startsWith(iconref, "weblib|"))
+                    {
+                        iconref = WebApp.getHTTPLibRoot() + iconref.substring(7).replace("|", "/");
+                        Json.put(intent, "icon", iconref);
+                    }
+                    else
                     if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
                     {
                         if (config.has("name"))

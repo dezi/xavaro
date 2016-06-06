@@ -102,6 +102,8 @@ public class LaunchItemVoice extends LaunchItem implements
             {
                 ((VoiceIntentResolver) appcontext).onCollectVoiceIntent(collected);
             }
+
+            Log.d(LOGTAG, "===================>bla: " + Json.toPretty(collected.getMatches()));
         }
 
         Log.d(LOGTAG, "LaunchFrameVoice: intents:" + collected.getNumMatches());

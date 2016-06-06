@@ -40,8 +40,7 @@ public class LaunchItemCall extends LaunchItem implements
         if (config.has("subitem"))
         {
             String iconurl = Json.getString(config, "icon");
-            String iconpath = "weblib|calls|" + iconurl;
-            icon.setImageResource(iconpath);
+            icon.setImageResource(iconurl);
 
             String subitem = Json.getString(config, "subitem");
 
