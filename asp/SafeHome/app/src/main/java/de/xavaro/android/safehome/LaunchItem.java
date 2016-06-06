@@ -6,13 +6,12 @@ import android.graphics.Color;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
-import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.view.Gravity;
 import android.view.View;
 import android.os.Handler;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

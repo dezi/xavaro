@@ -354,6 +354,11 @@ public class CommService extends Service
                 String privateKey = CryptUtils.RSAgetPrivateKey();
                 String passPhrase = CryptUtils.RSADecrypt(privateKey, encoPassPhrase);
 
+                if (CommonConfigs.debugGCM)
+                {
+                    Simple.makeAlertPost("\"" + passPhrase + "\"", type);
+                }
+
                 IdentityManager.put(remoteIdentity, "passPhrase", passPhrase);
 
                 Log.d(LOGTAG, "onMessageReceived: requestAESpassXChange"
@@ -630,6 +635,14 @@ public class CommService extends Service
             //
 
             JSONObject json = new JSONObject(new String(data, 4, data.length - 4));
+
+            if (CommonConfigs.debugGCM)
+            {
+                String pretty = Json.toPretty(json);
+                String title = LOGTAG + ":decryptPacket:";
+
+                Simple.makeAlertPost(pretty, title);
+            }
 
             //
             // Dispatch clear message to whom it might concern.

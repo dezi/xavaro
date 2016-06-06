@@ -23,6 +23,8 @@ public class GCMMessageService extends GcmListenerService
 {
     private static final String LOGTAG = GCMMessageService.class.getSimpleName();
 
+    private static final boolean verbose = true;
+
     @Override
     public void onCreate()
     {
@@ -67,6 +69,9 @@ public class GCMMessageService extends GcmListenerService
 
         String message = data.getString("message");
 
+        if (verbose) Log.d(LOGTAG, "======================>onMessageReceived: from:" + from);
+        if (verbose) Log.d(LOGTAG, "======================>onMessageReceived: message:" + message);
+
         if (from.startsWith("/topics/"))
         {
             //
@@ -89,6 +94,8 @@ public class GCMMessageService extends GcmListenerService
                 JSONObject jmess= new JSONObject(message);
                 String base64 = jmess.getString("base64");
                 byte[] rawdata = Base64.decode(base64, 0);
+
+                if (verbose) Log.d(LOGTAG, "======================>onMessageReceived: deliver:" + base64);
 
                 CommService.getInstance().onRawMessageReceived(rawdata);
             }
@@ -201,8 +208,6 @@ public class GCMMessageService extends GcmListenerService
         //
 
         JSONArray tokens = null;
-
-        Log.d(LOGTAG, "sendMessage");
 
         //
         // Try to obtain GCM token from our remote contacts.

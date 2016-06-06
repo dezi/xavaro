@@ -424,6 +424,21 @@ public class Simple
         Simple.adjustAlertDialog(dialog);
     }
 
+    public static void makeAlertPost(String text , String title)
+    {
+        final String cbtext = text;
+        final String cbtitle = title;
+
+        Simple.makePost(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                makeAlert(cbtext, cbtitle);
+            }
+        });
+    }
+
     public static void makeToast(String text)
     {
         final String cbtext = text;
@@ -1736,13 +1751,16 @@ public class Simple
     @Nullable
     public static Bitmap getBitmap(File file)
     {
-        try
+        if (file != null)
         {
-            return BitmapFactory.decodeFile(file.toString());
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
+            try
+            {
+                return BitmapFactory.decodeFile(file.toString());
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
         }
 
         return null;

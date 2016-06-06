@@ -383,13 +383,12 @@ public class HomeActivity extends AppCompatActivity implements
 
     public void addWorkerToBackStack(String title, ViewGroup view)
     {
-        workerScreen.getPayloadFrame().removeAllViews();
         workerScreen.getPayloadFrame().addView(view);
         workerScreen.setVisibility(View.VISIBLE);
         workerScreen.setTitle(title);
         workerScreen.bringToFront();
 
-        backStack.add(workerScreen);
+        if (! backStack.contains(workerScreen)) backStack.add(workerScreen);
 
         if (videoSurface != null) videoSurface.bringToFront();
     }
@@ -503,7 +502,7 @@ public class HomeActivity extends AppCompatActivity implements
 
                 if (! ((BackKeyClient) lastview).onBackKeyWanted())
                 {
-                    Log.d(LOGTAG, "==========================>onBackPressed: 1wanted=true");
+                    Log.d(LOGTAG, "==========================>onBackPressed: 1wanted=false");
 
                     if (! (lastview instanceof HomeWorker))
                     {

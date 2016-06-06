@@ -60,6 +60,7 @@ public class LaunchGroup extends FrameLayout implements
     protected FrameLayout arrowLeft;
     protected FrameLayout arrowRight;
 
+    protected String launchTitle;
     protected ArrayList<FrameLayout> launchPages;
     protected ArrayList<LaunchItem> launchItems;
 
@@ -71,20 +72,6 @@ public class LaunchGroup extends FrameLayout implements
     public LaunchGroup(Context context)
     {
         super(context);
-
-        myInit(context);
-    }
-
-    public LaunchGroup(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
-
-        myInit(context);
-    }
-
-    public LaunchGroup(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
 
         myInit(context);
     }
@@ -328,14 +315,15 @@ public class LaunchGroup extends FrameLayout implements
         // Adjust pages bullets.
         //
 
+        Log.d(LOGTAG, "adjustArrows:" + launchTitle);
+
         ViewParent parentview = getParent();
 
         while (parentview != null)
         {
             if (parentview instanceof HomeFrame)
             {
-                String label = (parent != null) ? (String) parent.label.getText() : null;
-
+                String label = (parent != null) ? (String) parent.label.getText() : launchTitle;
                 ((HomeFrame) parentview).setActivePage(launchPage, launchPages.size(), label);
 
                 break;
@@ -638,6 +626,13 @@ public class LaunchGroup extends FrameLayout implements
 
         this.parent = parent;
         this.config = config;
+    }
+
+    public void setTitle(String title)
+    {
+        launchTitle = title;
+
+        Log.d(LOGTAG, "setTitle:" + title);
     }
 
     public void activateLaunchItem(String type, String subtype)

@@ -135,9 +135,11 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
     public void checkPayloadFrame()
     {
-        if (payloadFrame.getChildCount() > 0)
+        int childs = payloadFrame.getChildCount();
+
+        if (childs > 0)
         {
-            Object view = payloadFrame.getChildAt(0);
+            Object view = payloadFrame.getChildAt(childs - 1);
 
             if (view instanceof LaunchGroup)
             {
@@ -164,8 +166,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         }
         else
         {
-            String newtitle = titleText + " – " + subtitle;
-            titleView.setText(newtitle);
+            titleView.setText(subtitle);
         }
 
         int dp16 = Simple.getDevicePixels(16);
@@ -466,21 +467,37 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
         if (getVisibility() == VISIBLE)
         {
-            View content = payloadFrame.getChildAt(0);
+            int childs = payloadFrame.getChildCount();
 
-            if (content instanceof BackKeyClient)
+            if (childs > 0)
             {
-                Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient:" + content);
+                View content = payloadFrame.getChildAt(childs - 1);
 
-                if (((BackKeyClient) content).onBackKeyWanted())
+                if (content instanceof BackKeyClient)
                 {
-                    Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient wanted");
+                    Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient:" + content);
+
+                    if (((BackKeyClient) content).onBackKeyWanted())
+                    {
+                        Log.d(LOGTAG, "onBackKeyWanted: BackKeyClient wanted");
+
+                        return true;
+                    }
+
+                    ((BackKeyClient) content).onBackKeyExecuted();
+                }
+
+                payloadFrame.removeView(content);
+
+                if (--childs > 0)
+                {
+                    checkPayloadFrame();
 
                     return true;
                 }
             }
 
-            if (isFullscreen() && ! onlyfullscreen)
+            if (isFullscreen() && !onlyfullscreen)
             {
                 onToogleFullscreen();
 
@@ -496,14 +513,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
     {
         Log.d(LOGTAG, "onBackKeyExecuted");
 
-        View content = payloadFrame.getChildAt(0);
-
-        if (content instanceof BackKeyClient)
-        {
-            ((BackKeyClient) content).onBackKeyExecuted();
-        }
-
-        payloadFrame.removeAllViews();
-        setVisibility(View.GONE);
+        int childs = payloadFrame.getChildCount();
+        if (childs == 0) setVisibility(View.GONE);
     }
 }

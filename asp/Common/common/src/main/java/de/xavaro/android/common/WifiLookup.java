@@ -137,7 +137,7 @@ public class WifiLookup
             {
                 try
                 {
-                    Log.d(LOGTAG, "waiting...");
+                    //Log.d(LOGTAG, "waiting...");
 
                     byte[] rxbuf = new byte[ 8192 ];
                     DatagramPacket packet = new DatagramPacket(rxbuf, rxbuf.length);
@@ -145,7 +145,7 @@ public class WifiLookup
 
                     String message = new String(packet.getData(), 0, packet.getLength());
 
-                    Log.d(LOGTAG, "received=" + message);
+                    //Log.d(LOGTAG, "received=" + message);
 
                     if (! message.startsWith("{")) continue;
                     JSONObject jmess = Json.fromString(message);

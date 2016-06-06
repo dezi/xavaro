@@ -128,20 +128,10 @@ public class LaunchItemSocial extends LaunchItemNotify
 
     private boolean launchDir()
     {
-        JSONArray launchItems = Json.getArray(config, "launchitems");
-
-        if (launchItems != null)
+        if (! launchLikes())
         {
-            LaunchGroup directory = new LaunchGroup(getContext());
-            directory.setConfig(null, launchItems);
-
-            String label = Json.getString(config, "label") + " – " + "Soziale Netzwerke";
-            ((HomeActivity) getContext()).addWorkerToBackStack(label, directory);
-
-            return true;
+            launchAny();
         }
-
-        launchAny();
 
         return true;
     }
@@ -152,10 +142,11 @@ public class LaunchItemSocial extends LaunchItemNotify
 
         if (launchItems != null)
         {
-            LaunchGroup directory = new LaunchGroup(getContext());
-            directory.setConfig(null, launchItems);
-
             String label = Json.getString(config, "label") + " – " + "Soziale Netzwerke";
+
+            LaunchGroup directory = new LaunchGroup(getContext());
+            directory.setTitle(label);
+            directory.setConfig(null, launchItems);
 
             ((HomeActivity) getContext()).addWorkerToBackStack(label, directory);
 
@@ -246,9 +237,10 @@ public class LaunchItemSocial extends LaunchItemNotify
         if (directory == null)
         {
             directory = new LaunchGroupSocial(context);
+            directory.setTitle(Json.getString(config, "label"));
             directory.setConfig(this, Json.getArray(config, "launchitems"));
         }
 
-        ((HomeActivity) context).addViewToBackStack(directory);
+        ((HomeActivity) context).addWorkerToBackStack(directory.launchTitle, directory);
     }
 }
