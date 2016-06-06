@@ -270,7 +270,14 @@ public class LaunchItem extends FrameLayout implements
         // Original font sizes based on 200 pixels height.
         //
 
-        float scale = (height - icon.getPaddingBottom()) / 200.0f;
+        float scale = height / 200.0f;
+
+        if (Json.equals(config, "label", "weitere"))
+        {
+            Log.d(LOGTAG, "setSize: 1 scale=" + scale
+                    + " height=" + height
+                    + " icon=" + icon.getPaddingBottom());
+        }
 
         layout.width = width;
         layout.height = height;
@@ -285,21 +292,22 @@ public class LaunchItem extends FrameLayout implements
         else
         {
             icon.setPadding(
-                    Simple.getDevicePixels(Math.round(18 * scale)),
-                    Simple.getDevicePixels(Math.round(0 * scale)),
-                    Simple.getDevicePixels(Math.round(18 * scale)),
-                    Simple.getDevicePixels(Math.round(36 * scale)));
+                    Math.round(18 * scale),
+                    Math.round(0 * scale),
+                    Math.round(18 * scale),
+                    Math.round(36 * scale));
         }
 
         oversize.width = layout.width / 4;
         oversize.height = layout.height / 4;
 
         overtext.setTextSize(Simple.getDeviceTextSize(24f * scale));
+
         overtext.setPadding(
-                Simple.getDevicePixels(Math.round(2 * scale)),
-                Simple.getDevicePixels(Math.round(0 * scale)),
-                Simple.getDevicePixels(Math.round(0 * scale)),
-                Simple.getDevicePixels(Math.round(4 * scale)));
+                Math.round(2 * scale),
+                Math.round(0 * scale),
+                Math.round(0 * scale),
+                Math.round(4 * scale));
 
         //
         // Nine patch background does not scale implicit
@@ -315,9 +323,23 @@ public class LaunchItem extends FrameLayout implements
         // Take care for notify element.
         //
 
-        notifyLayout.topMargin = Simple.getDevicePixels(Math.round(110 * scale));
+        notifyLayout.topMargin = Math.round(110 * scale);
+
         notifyText.setTextSize(Simple.getDeviceTextSize(18f * scale));
-        Simple.setPadding(notifyText, 8, 2, 8, 4);
+
+        notifyText.setPadding(
+                Math.round(8),
+                Math.round(2),
+                Math.round(8),
+                Math.round(4));
+
+        if (Json.equals(config, "label", "weitere"))
+        {
+            Log.d(LOGTAG, "setSize: scale=" + scale
+                    + " height=" + height
+                    + " top=" + notifyLayout.topMargin
+                    + " icon=" + icon.getPaddingBottom());
+        }
 
         //
         // Now fill in label text if present.

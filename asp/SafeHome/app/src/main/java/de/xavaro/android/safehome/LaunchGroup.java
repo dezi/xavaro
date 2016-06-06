@@ -504,8 +504,15 @@ public class LaunchGroup extends FrameLayout implements
 
             nextSlot++;
 
-            if (((nextSlot + 1) >= maxSlots) && (maxSlots > 4) && ((inx + 1) < allSlots))
+            if ((nextSlot >= maxSlots) && (maxSlots > 4) && ((inx + 1) < allSlots))
             {
+                Log.d(LOGTAG, "=================>positionLaunchItems:"
+                    + " inx=" + inx
+                    + " maxSlots=" + maxSlots
+                    + " allSlots=" + allSlots
+                    + " nextSlot=" + nextSlot
+                );
+
                 //
                 // Next icon on last position of page.
                 //

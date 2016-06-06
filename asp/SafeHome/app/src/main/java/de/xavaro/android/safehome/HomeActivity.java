@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.AppWorkerHandler;
+import de.xavaro.android.common.CryptUtils;
 import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
@@ -185,6 +187,25 @@ public class HomeActivity extends AppCompatActivity implements
 
         NotificationService.checkStatus();
         AccessibilityService.checkStatus();
+
+        //
+        // Test RSA encryption.
+        //
+
+        /*
+        String passPhrase = "seife";
+        String encoPassPhrase = CryptUtils.RSAEncrypt(CryptUtils.RSAgetPublicKey(), passPhrase);
+        String textPassPhrase = new String(Base64.decode(encoPassPhrase, 0));
+
+        Log.d(LOGTAG, "======crypt: enco:" + encoPassPhrase);
+        Log.d(LOGTAG, "======crypt: text:" + textPassPhrase);
+
+        String deco = CryptUtils.RSADecrypt(CryptUtils.RSAgetPrivateKey(), encoPassPhrase);
+        String base = CryptUtils.RSADecrypt(CryptUtils.RSAgetPrivateKey(), textPassPhrase);
+
+        Log.d(LOGTAG, "======crypt: deco:" + deco);
+        Log.d(LOGTAG, "======crypt: base:" + base);
+        */
     }
 
     @Override

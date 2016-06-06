@@ -76,7 +76,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
         titleView = new TextView(context);
         titleView.setTextSize(Simple.getDeviceTextSize(HomeActivity.titleSpace * 2 / 3));
-        titleView.setGravity(Gravity.START);
+        titleView.setGravity(Gravity.START | Gravity.BOTTOM);
         titleView.setTextColor(0xff888888);
         titleView.setPadding(ipad, 0, 0, ipad / 2);
         titleView.setVisibility(GONE);
@@ -194,7 +194,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
                     : R.drawable.bullet_white_32x32);
         }
 
-        pageBullets.setVisibility((max > 1) ? VISIBLE : GONE);
+        pageBullets.setVisibility(((max > 1) && isFullscreen()) ? VISIBLE : GONE);
     }
 
     public void setTitle(String title)
@@ -324,7 +324,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         {
             titleFrame.setBackgroundColor(Color.TRANSPARENT);
 
-            titleView.setGravity(Gravity.START);
+            titleView.setGravity(Gravity.START | Gravity.BOTTOM);
             titleView.setTextColor(0xff888888);
 
             titleClose.setVisibility(GONE);

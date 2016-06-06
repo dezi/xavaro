@@ -36,17 +36,24 @@ public class HomeSocial extends HomeFrame
 
     public void setConfig(JSONObject config)
     {
-        if (Simple.isTablet() && (webView == null))
+        if (Simple.isTablet())
         {
-            webView = new WebAppView(getContext());
-            webView.loadWebView("instaface", "main");
-
-            if (webView.social != null)
+            if (webView == null)
             {
-                webView.social.setNewsPostRunner(newsPostRunner);
-            }
+                webView = new WebAppView(getContext());
+                webView.loadWebView("instaface", "main");
 
-            payloadFrame.addView(webView);
+                if (webView.social != null)
+                {
+                    webView.social.setNewsPostRunner(newsPostRunner);
+                }
+
+                payloadFrame.addView(webView);
+            }
+        }
+        else
+        {
+            setVisibility(GONE);
         }
     }
 
