@@ -46,4 +46,16 @@ public class HomeLaunch extends HomeFrame
             layoutParams.bottomMargin = layoutNormal.bottomMargin;
         }
     }
+
+    @Override
+    public boolean onBackKeyWanted()
+    {
+        if (isFullscreen())
+        {
+            onToogleFullscreen();
+            return true;
+        }
+
+        return false;
+    }
 }
