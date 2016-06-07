@@ -8,7 +8,6 @@ import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
 import android.webkit.WebView;
 import android.os.Bundle;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 
 public class WebAppVoice implements RecognitionListener
 {
+    @SuppressWarnings("unused")
     private static final String LOGTAG = WebAppVoice.class.getSimpleName();
 
     private final WebView webview;
@@ -40,6 +40,7 @@ public class WebAppVoice implements RecognitionListener
     }
 
     @JavascriptInterface
+    @SuppressWarnings("unused")
     public String getCollectedIntents()
     {
         if (collected != null)
@@ -51,12 +52,14 @@ public class WebAppVoice implements RecognitionListener
     }
 
     @JavascriptInterface
+    @SuppressWarnings("unused")
     public boolean checkSpeechRecognizer()
     {
         return (recognizer != null);
     }
 
     @JavascriptInterface
+    @SuppressWarnings("unused")
     public boolean startSpeechRecognizer()
     {
         if (recognizer == null) return false;
@@ -67,6 +70,7 @@ public class WebAppVoice implements RecognitionListener
     }
 
     @JavascriptInterface
+    @SuppressWarnings("unused")
     public String evaluateCommand(String command)
     {
         if (collected != null)

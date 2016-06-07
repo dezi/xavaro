@@ -15,7 +15,7 @@
 
     "view": [ "zeige", "öffne", "lesen", "blättern", "anzeigen", "anschauen", "ansehen", "sehen" ],
 
-    "call": [ "anrufen", "telefonieren", "sprechen" ],
+    "call": [ "anrufen", "telefonieren", "sprechen", "rufen" ],
 
     "text": [ "schreiben", "chatten", "schicken" ],
 
@@ -65,8 +65,9 @@
       "type": "phone",
       "subtype": "text",
       "action": "text",
+      "keywords": [ "SMS" ],
       "response": "Ich öffne die SMS an %1$s",
-      "sample": "Ich möchte %1$s eine Nachricht schreiben"
+      "sample": "Ich möchte %1$s eine SMS schreiben"
     },
 
     "whatsapp.register": [

@@ -108,6 +108,12 @@ public class WebAppUtility
     }
 
     @JavascriptInterface
+    public boolean isTablet()
+    {
+        return Simple.isTablet();
+    }
+
+    @JavascriptInterface
     public String getDezify(String input)
     {
         return Simple.dezify(input);

@@ -243,11 +243,15 @@ public class WebAppRequest
         try
         {
             InputStream raw = Simple.getAnyContext().getResources().openRawResource(resourceid);
+            int size = raw.available();
 
-            byte[] ba = new byte[ 32 * 1024 ];
-            int xfer = raw.read(ba, 0, ba.length);
+            if (size < (64 * 1024))
+            {
+                byte[] ba = new byte[ size ];
+                int xfer = raw.read(ba, 0, size);
 
-            return "data:image/png;base64," + Base64.encodeToString(ba, 0, xfer, 0);
+                return "data:image/png;base64," + Base64.encodeToString(ba, 0, xfer, 0);
+            }
         }
         catch (Exception ex)
         {

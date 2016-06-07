@@ -32,9 +32,9 @@
 
     "intent": {
       "action": "view",
-      "keywords": [ "Kurzwahlverzeichnis" ],
-      "response": "Ich öffne das Kurzwahlverzeichnis.",
-      "sample": "Ich möchte das Kurzwahlverzeichnis sehen"
+      "keywords": [ "Kurzwahl Verzeichnis" ],
+      "response": "Ich öffne das Kurzwahl-Verzeichnis.",
+      "sample": "Öffne das Kurzwahl-Verzeichnis"
     },
 
     "pharmacie": {

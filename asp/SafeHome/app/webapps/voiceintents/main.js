@@ -1,6 +1,29 @@
-voiceintents.config =
+voiceintents.createConfig = function()
 {
-    "padding" : 1 == 0 ? 20 : 20
+    var vi = voiceintents;
+
+    vi.config = {};
+
+    if (WebAppUtility.isTablet())
+    {
+        vi.config.padding = 20;
+        vi.config.spacing =  4;
+        vi.config.bigtext = 24;
+        vi.config.stdtext = 20;
+        vi.config.keytext = 18;
+
+    }
+    else
+    {
+        vi.config.padding =  4;
+        vi.config.spacing =  0;
+        vi.config.bigtext = 16;
+        vi.config.stdtext = 14;
+        vi.config.keytext = 12;
+    }
+
+    vi.config.titleheight = 40;
+    vi.config.trialheight = 60;
 }
 
 voiceintents.createFrame = function()
@@ -10,29 +33,56 @@ voiceintents.createFrame = function()
     var vi = voiceintents;
 
     var pad = vi.config.padding;
+    var tithei = vi.config.titleheight;
+    var tryhei = vi.config.trialheight;
 
     vi.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, "topDiv", document.body);
-    WebLibSimple.setFontSpecs(vi.topDiv, 20, "bold", "#666666");
+    WebLibSimple.setFontSpecs(vi.topDiv, vi.config.stdtext, "bold", "#666666");
 
-    vi.titleDiv = WebLibSimple.createAnyHeight("center", pad, pad, pad, 30, "titleDiv" , vi.topDiv);
+    //
+    // Title bar.
+    //
+
+    vi.titleDiv = WebLibSimple.createDivHeight(pad, pad, pad, tithei, "titleDiv" , vi.topDiv);
     WebLibSimple.setBGColor(vi.titleDiv, "#888888");
-    WebLibSimple.setFontSpecs(vi.titleDiv, 24, "bold", "#ffffff");
+    WebLibSimple.setFontSpecs(vi.titleDiv, vi.config.bigtext, "bold", "#ffffff");
     vi.titleDiv.style.padding = "8px";
-    vi.titleDiv.style.marginBottom = "8px";
-    vi.titleDiv.innerHTML = "Auf diese Kommandos reagiert die Spracheingabe:"
 
-    vi.contDiv = WebLibSimple.createDiv(20, 80, 20 , 110, "contDiv", vi.topDiv);
-    vi.contDiv.style.overflow = "hidden";
+    vi.titabDiv = WebLibSimple.createAnyAppend("div", vi.titleDiv)
+    vi.titabDiv.style.display = "table";
+    vi.titabDiv.style.width   = "100%";
+    vi.titabDiv.style.height  = "100%";
 
-    vi.testDiv = WebLibSimple.createDivHeight(20, 20, 20, -60, "testDiv" , vi.topDiv);
+    vi.ticelDiv = WebLibSimple.createAnyAppend("div", vi.titabDiv)
+    vi.ticelDiv.style.display = "table-cell";
+    vi.ticelDiv.style.width   = "100%";
+    vi.ticelDiv.style.height  = "100%";
+    vi.ticelDiv.style.textAlign = "center";
+    vi.ticelDiv.style.verticalAlign = "middle";
+    vi.ticelDiv.innerHTML = "Auf diese Kommandos reagiert die Spracheingabe:"
+
+    //
+    // Bottom bar.
+    //
+
+    vi.testDiv = WebLibSimple.createDivHeight(pad, pad, pad, -tryhei, "testDiv" , vi.topDiv);
     WebLibSimple.setBGColor(vi.testDiv, "#888888");
-    WebLibSimple.setFontSpecs(vi.testDiv, 24, "bold", "#ffffff");
+    WebLibSimple.setFontSpecs(vi.testDiv, vi.config.bigtext, "bold", "#ffffff");
     vi.testDiv.style.padding = "8px";
-    vi.testDiv.style.marginTop = "8px";
 
-    vi.resultDiv = WebLibSimple.createDiv(16, 0, 80, 0, "testDiv" , vi.testDiv);
+    vi.padDiv = WebLibSimple.createDiv(16, 0, 80, 0, "padDiv", vi.testDiv);
+
+    vi.tableDiv = WebLibSimple.createAnyAppend("div", vi.padDiv)
+    vi.tableDiv.style.display = "table";
+    vi.tableDiv.style.width   = "100%";
+    vi.tableDiv.style.height  = "100%";
+
+    vi.resultDiv = WebLibSimple.createAnyAppend("div", vi.tableDiv);
+    vi.resultDiv.style.display = "table-cell";
+    vi.resultDiv.style.width   = "100%";
+    vi.resultDiv.style.height  = "100%";
+    vi.resultDiv.style.verticalAlign = "middle";
     vi.resultDiv.style.color = "#cccccc";
-    vi.resultDiv.style.lineHeight = "78px";
     vi.resultDiv.innerHTML = "Hier können sie es ausprobieren..."
 
     vi.divButton = WebLibSimple.createAnyAppend("div", vi.testDiv);
@@ -67,6 +117,16 @@ voiceintents.createFrame = function()
     vi.imgEar.style.width = "auto";
     vi.imgEar.style.height = "100%";
     vi.imgEar.src = "voice_ear_256x256.png";
+
+    //
+    // Content div.
+    //
+
+    var top = tithei + 2 * pad + 2 * 8;
+    var bot = tryhei + 2 * pad + 2 * 8;
+
+    vi.contDiv = WebLibSimple.createDiv(pad, top, pad , bot, "contDiv", vi.topDiv);
+    vi.contDiv.style.overflow = "hidden";
 
     vi.intents = JSON.parse(WebAppVoice.getCollectedIntents());
     vi.intents.sort(voiceintents.sortCompare);
@@ -211,8 +271,8 @@ voiceintents.createIntentData = function()
         divOuter.intent = intent;
 
         divOuter.divInner = WebLibSimple.createDiv(0, 0, 0, 0, "divInner", divOuter);
-        divOuter.divInner.style.marginTop = "4px";
-        divOuter.divInner.style.marginBottom = "4px";
+        divOuter.divInner.style.marginTop = vi.config.spacing + "px";
+        divOuter.divInner.style.marginBottom = vi.config.spacing + "px";
         divOuter.divInner.style.border = "1px solid grey";
         divOuter.divInner.style.backgroundColor = "#dddddd";
 
@@ -222,12 +282,12 @@ voiceintents.createIntentData = function()
         var imgIcon = WebLibSimple.createImgWidHei(0, 0, "auto", "100%", "imgIcon", divIcon);
         imgIcon.src = intent.icon ? intent.icon : WebAppRequest.loadResourceImage(intent.iconres);
 
-        var divSample = WebLibSimple.createDiv(64, 0, 0, null, "divSample", divOuter.divInner);
+        var divSample = WebLibSimple.createDiv(68, 0, 64, null, "divSample", divOuter.divInner);
         divSample.style.padding = "8px";
         divSample.innerHTML = intent.sample;
 
-        var divKeywords = WebLibSimple.createDiv(64, null, 0, 0, "divKeywords", divOuter.divInner);
-        WebLibSimple.setFontSpecs(divKeywords, 18, "normal", "#888888");
+        var divKeywords = WebLibSimple.createDiv(68, null, 64, 0, "divKeywords", divOuter.divInner);
+        WebLibSimple.setFontSpecs(divKeywords, vi.config.keytext, "normal", "#888888");
         divKeywords.style.padding = "8px";
         divKeywords.innerHTML = intent.keywords.join(", ");
 
@@ -361,9 +421,7 @@ WebAppVoice.onResults = function(results)
 
             for (var cnt = 0; cnt < vi.matches.length; cnt++)
             {
-                if ((vi.matches[ cnt ].type == intent.type) &&
-                    (vi.matches[ cnt ].subtype == intent.subtype) &&
-                    (vi.matches[ cnt ].subtypetag == intent.subtypetag))
+                if (vi.matches[ cnt ].identifier == intent.identifier)
                 {
                     ismatch = true;
                     break;
@@ -401,4 +459,5 @@ WebAppVoice.onResults = function(results)
    }
 }
 
+voiceintents.createConfig();
 voiceintents.createFrame();
