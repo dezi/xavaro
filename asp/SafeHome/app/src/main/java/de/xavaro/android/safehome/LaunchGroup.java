@@ -481,19 +481,6 @@ public class LaunchGroup extends FrameLayout implements
         {
             LaunchItem li = launchItems.get(inx);
 
-            /*
-            if ((nextSlot == 0) && (parent != null) && (maxSlots > 4))
-            {
-                LaunchItem liprev = getRecycledNextPrevItem("prev");
-                liprev.setSize(horzSize, vertSize);
-                liprev.setPosition(getXpos(nextSlot), getYpos(nextSlot));
-
-                lp.addView(liprev);
-
-                nextSlot++;
-            }
-            */
-
             if (li.getParent() != lp)
             {
                 Simple.removeFromParent(li);
@@ -504,7 +491,7 @@ public class LaunchGroup extends FrameLayout implements
 
             nextSlot++;
 
-            if ((nextSlot >= maxSlots) && (maxSlots > 4) && ((inx + 1) < allSlots))
+            if (((nextSlot + 1) == maxSlots) && (maxSlots > 4) && ((inx + 2) < allSlots))
             {
                 Log.d(LOGTAG, "=================>positionLaunchItems:"
                     + " inx=" + inx
