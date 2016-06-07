@@ -1,0 +1,31 @@
+{
+  "manifest": {
+
+    "label": "Game of Blocks",
+    "appname": "blockgame",
+    "appicon": "blockgame_512x512.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "request",
+      "utility"
+    ],
+
+    "weblibs": [
+      "touch",
+      "simple",
+      "strings",
+      "dialog"
+    ],
+
+    "preload": [],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": []
+  }
+}
