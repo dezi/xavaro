@@ -1,13 +1,20 @@
+voiceintents.config =
+{
+    "padding" : 1 == 0 ? 20 : 20
+}
+
 voiceintents.createFrame = function()
 {
     WebLibSimple.setBGColor(document.body, "#ffffffee");
 
     var vi = voiceintents;
 
+    var pad = vi.config.padding;
+
     vi.topDiv = WebLibSimple.createDiv(0, 0, 0, 0, "topDiv", document.body);
     WebLibSimple.setFontSpecs(vi.topDiv, 20, "bold", "#666666");
 
-    vi.titleDiv = WebLibSimple.createAnyHeight("center", 20, 20, 20, 30, "titleDiv" , vi.topDiv);
+    vi.titleDiv = WebLibSimple.createAnyHeight("center", pad, pad, pad, 30, "titleDiv" , vi.topDiv);
     WebLibSimple.setBGColor(vi.titleDiv, "#888888");
     WebLibSimple.setFontSpecs(vi.titleDiv, 24, "bold", "#ffffff");
     vi.titleDiv.style.padding = "8px";
