@@ -209,11 +209,13 @@ voiceintents.adjustScroll = function(firstMarked)
     var scrollheight = vi.listDiv.clientHeight;
     var offsettop = -vi.listDiv.offsetTop;
 
+    /*
     console.log("voiceintents.adjustScroll:"
         + displayheight + "=" + scrollheight
         + "="
         + offsettop + "=" + firstMarked
         );
+    */
 
     if (scrollheight < displayheight)
     {
@@ -421,7 +423,10 @@ WebAppVoice.onResults = function(results)
 
             for (var cnt = 0; cnt < vi.matches.length; cnt++)
             {
-                if (vi.matches[ cnt ].identifier == intent.identifier)
+                if ((vi.matches[ cnt ].type == intent.type) &&
+                    (vi.matches[ cnt ].subtype == intent.subtype) &&
+                    (vi.matches[ cnt ].subtypetag == intent.subtypetag) &&
+                    (vi.matches[ cnt ].identifier == intent.identifier))
                 {
                     ismatch = true;
                     break;
