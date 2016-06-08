@@ -1,75 +1,130 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-struct block {
-    char ccc;
+struct block
+{
+    int ccc;
     int len;
     int dir;
 };
 
-struct block *blocks;
+struct block blocks[ 256 ];
 
-void createGame() {
+int fitBlock(char *game, int ccc, int len, int dir, int pos)
+{
+    if (dir == 0)
+    {
+        int max = pos - (pos % 6) + 6;
 
-    blocks['#'] = {ccc: '#', len : 2, dir : 0};
+        for (int inx = 0; inx < len; inx++)
+        {
+            int gix = pos + inx;
 
-    var game = "_".repeat(36).split('');
+            if ((gix >= max) || (game[ gix ] != '_'))
+            {
+                return 0;
+            }
+        }
 
-    game[12] = '#';
-    game[13] = '#';
-}
+        for (int inx = 0; inx < len; inx++)
+        {
+            int gix = pos + inx;
 
-/*
+            game[ gix ] = ccc;
+        }
+    }
+    else
+    {
+        for (int inx = 0; inx < len; inx++)
+        {
+            int gix = pos + (inx * 6);
 
-//
-// Minimum number of free fields.
-//
+            if ((gix >= 36) || (game[ gix ] != '_'))
+            {
+                return 0;
+            }
+        }
 
-    var minf = 7 + (Math.floor(Math.random() * 70) % 7);
+        for (int inx = 0; inx < len; inx++)
+        {
+            int gix = pos + (inx * 6);
 
-//
-// Random position translate array.
-//
-
-    var
-    rpos = [];
-
-    for (var inx = 0; inx < 36; inx++) rpos[inx] = inx;
-
-    for (var inx = 0; inx < 36; inx++) {
-        var inx1 = Math.floor(Math.random() * 36);
-        var inx2 = Math.floor(Math.random() * 36);
-
-        var tmp = rpos[inx1];
-        rpos[inx1] = rpos[inx2];
-        rpos[inx2] = tmp;
+            game[ gix ] = ccc;
+        }
     }
 
-//
-// Start building game.
-//
+    return 1;
+}
 
-    var free = 36 - 2;
+void createGame()
+{
+    blocks[ '#' ].ccc = '#';
+    blocks[ '#' ].len = 2;
+    blocks[ '#' ].dir = 0;
 
-    for (var inx = 0; inx < 26; inx++) {
-        var block = {};
+    char game[ 37 ];
 
-        block.ccc = String.fromCharCode(97 + inx);
-        block.len = (Math.random() <= 0.2) ? 3 : 2;
-        block.dir = (Math.random() <= 0.5) ? 0 : 1
+    memset(game,   0, 37);
+    memset(game, '_', 36);
 
-        for (var pos = 0; pos < 36; pos++) {
-            if ((12 <= pos) && (pos <= 17) && (block.dir == 0)) {
-//
-// Do not put horizontal blocks in line 3.
-//
+    game[ 12 ] = '#';
+    game[ 13 ] = '#';
+
+    //
+    // Minimum number of free fields.
+    //
+
+    int minf = 7 + (random() % 7);
+
+    //
+    // Random position translate array.
+    //
+
+    int rpos[36];
+
+    for (int inx = 0; inx < 36; inx++) rpos[ inx ] = inx;
+
+    for (int inx = 0; inx < 36; inx++)
+    {
+        int inx1 = random() % 36;
+        int inx2 = random() % 36;
+
+        int tmp = rpos[ inx1 ];
+        rpos[ inx1 ] = rpos[ inx2 ];
+        rpos[ inx2 ] = tmp;
+    }
+
+    //
+    // Start building game.
+    //
+
+    int free = 36 - 2;
+
+    for (int inx = 0; inx < 26; inx++)
+    {
+        int ccc = 97 + inx;
+        int len = ((random() % 100) <= 20) ? 3 : 2;
+        int dir = ((random() % 100) <= 50) ? 0 : 1;
+
+        for (int pos = 0; pos < 36; pos++)
+        {
+            if ((12 <= pos) && (pos <= 17) && (dir == 0))
+            {
+                //
+                // Do not put horizontal blocks in line 3.
+                //
 
                 continue;
             }
 
-            if (blockgame.fitBlock(game, block, rpos[pos])) {
-                blocks[block.ccc] = block;
-                free -= block.len;
+            if (fitBlock(game, ccc, len, dir, rpos[ pos ]))
+            {
+                blocks[ ccc ].ccc = ccc;
+                blocks[ ccc ].len = len;
+                blocks[ ccc ].dir = dir;
+
+                free -= len;
 
                 break;
             }
@@ -78,6 +133,11 @@ void createGame() {
         if (free <= minf) break;
     }
 
+    printf("Game: %s\n", game);
+}
+
+
+/*
     blockgame.blocks = blocks;
     blockgame.knowns = {};
     blockgame.boards = [];
@@ -88,14 +148,11 @@ void createGame() {
 }
 */
 
-int main() {
+int main()
+{
     printf("Hello world\n");
 
-    blocks = malloc(sizeof(struct block *) * 256);
-
-    for (int inx = 0; inx < 256; inx++) {
-        blocks[inx] = malloc(sizeof(struct block));
-    }
+    createGame();
 
     return 0;
 }

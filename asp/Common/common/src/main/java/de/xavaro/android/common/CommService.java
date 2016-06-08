@@ -919,6 +919,8 @@ public class CommService extends Service
 
                     if (GCMMessageService.sendMessage(idrem, datagramPacket.getData()))
                     {
+                        Log.d(LOGTAG, "sendThread: GCM message:" + Json.toPretty(mc.msg));
+
                         if ((mc.enc == MessageClass.CRYPT_WITH_ACK) ||
                                 (mc.enc == MessageClass.CRYPT_RELIABLE))
                         {

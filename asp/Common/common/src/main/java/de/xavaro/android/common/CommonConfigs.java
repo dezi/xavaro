@@ -8,7 +8,7 @@ import android.content.Context;
 
 public class CommonConfigs
 {
-    public static final boolean debugGCM = true;
+    public static final boolean debugGCM = false;
 
     //region Global icons
 
