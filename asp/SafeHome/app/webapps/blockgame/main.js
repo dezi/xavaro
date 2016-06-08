@@ -1,14 +1,45 @@
 blockgame.createFrame = function()
 {
-    var xx = blockgame;
+    blockgame.topdiv = WebLibSimple.createAnyAppend("pre", document.body);
+    blockgame.topdiv.style.fontSize = "24px";
 
-    xx.topdiv = WebLibSimple.createAnyAppend("pre", document.body);
-    xx.topdiv.style.fontSize = "20px";
+    blockgame.tries = 0;
 }
 
 blockgame.printGame = function(gamekey, level)
 {
     blockgame.topdiv.innerHTML += gamekey + "=" + level + "\n";
+}
+
+blockgame.printFinalGame = function(gamekey, level)
+{
+    var text = "";
+
+    while (gamekey.length > 0)
+    {
+        text += gamekey.substring(0,6) + "\n";
+        gamekey = gamekey.substring(6);
+    }
+
+    blockgame.topdiv.innerHTML += "\n" + text + "\n" + "level=" + level + "\n";
+}
+
+blockgame.printGamePath = function(gamekey)
+{
+    var text = "";
+
+    while (gamekey)
+    {
+        var move = blockgame.knowns[ gamekey ];
+
+        text += "move: " + move.level + "=" + move.ccc + ":" + move.way + "\n";
+
+        if (move.from == 0) break;
+
+        gamekey = blockgame.boards[ move.from ];
+    }
+
+    blockgame.topdiv.innerHTML += "\n" + text + "\n";
 }
 
 blockgame.fitBlock = function(game, block, pos)
@@ -57,6 +88,75 @@ blockgame.fitBlock = function(game, block, pos)
     return true;
 }
 
+blockgame.testGame = function()
+{
+    var blocks = {};
+    var game = "_".repeat(36).split('');
+
+    blocks[ '#' ] = { ccc: '#', len : 2, dir : 0 };
+    game[ 15 ] = '#';
+    game[ 16 ] = '#';
+
+    blocks[ 'a' ] = { ccc: 'a', len : 3, dir : 1 };
+    game[  0 ] = 'a';
+    game[  6 ] = 'a';
+    game[ 12 ] = 'a';
+
+    blocks[ 'b' ] = { ccc: 'b', len : 2, dir : 0 };
+    game[  1 ] = 'b';
+    game[  2 ] = 'b';
+
+    blocks[ 'c' ] = { ccc: 'c', len : 2, dir : 1 };
+    game[  4 ] = 'c';
+    game[ 10 ] = 'c';
+
+    blocks[ 'd' ] = { ccc: 'd', len : 2, dir : 1 };
+    game[  7 ] = 'd';
+    game[ 13 ] = 'd';
+
+    blocks[ 'e' ] = { ccc: 'e', len : 2, dir : 1 };
+    game[  8 ] = 'e';
+    game[ 14 ] = 'e';
+
+    blocks[ 'f' ] = { ccc: 'f', len : 3, dir : 1 };
+    game[ 11 ] = 'f';
+    game[ 17 ] = 'f';
+    game[ 23 ] = 'f';
+
+    blocks[ 'g' ] = { ccc: 'g', len : 3, dir : 0 };
+    game[ 18 ] = 'g';
+    game[ 19 ] = 'g';
+    game[ 20 ] = 'g';
+
+    blocks[ 'h' ] = { ccc: 'h', len : 2, dir : 1 };
+    game[ 21 ] = 'h';
+    game[ 27 ] = 'h';
+
+    blocks[ 'i' ] = { ccc: 'i', len : 2, dir : 1 };
+    game[ 26 ] = 'i';
+    game[ 32 ] = 'i';
+
+    blocks[ 'j' ] = { ccc: 'j', len : 2, dir : 0 };
+    game[ 28 ] = 'j';
+    game[ 29 ] = 'j';
+
+    blocks[ 'k' ] = { ccc: 'k', len : 2, dir : 0 };
+    game[ 30 ] = 'k';
+    game[ 31 ] = 'k';
+
+    blocks[ 'l' ] = { ccc: 'l', len : 2, dir : 0 };
+    game[ 33 ] = 'l';
+    game[ 34 ] = 'l';
+
+    blockgame.blocks  = blocks;
+    blockgame.knowns  = {};
+    blockgame.boards  = [];
+    blockgame.solved  = false;
+    blockgame.evalinx = 0;
+
+    blockgame.storeGame(game, 0, 0);
+}
+
 blockgame.createGame = function()
 {
     var blocks = {};
@@ -65,8 +165,8 @@ blockgame.createGame = function()
 
     var game = "_".repeat(36).split('');
 
-    game[ 16 ] = '#';
-    game[ 17 ] = '#';
+    game[ 12 ] = '#';
+    game[ 13 ] = '#';
 
     //
     // Minimum number of free fields.
@@ -108,6 +208,15 @@ blockgame.createGame = function()
 
         for (var pos = 0; pos < 36; pos++)
         {
+            if ((12 <= pos) && (pos <= 17) && (block.dir == 0))
+            {
+                //
+                // Do not put horizontal blocks in line 3.
+                //
+
+                continue;
+            }
+
             if (blockgame.fitBlock(game, block, rpos[ pos ]))
             {
                 blocks[ block.ccc ] = block;
@@ -120,40 +229,154 @@ blockgame.createGame = function()
         if (free <= minf) break;
     }
 
-    blockgame.blocks = blocks;
+    blockgame.blocks  = blocks;
+    blockgame.knowns  = {};
+    blockgame.boards  = [];
+    blockgame.solved  = false;
+    blockgame.evalinx = 0;
 
-    blockgame.knowns = {};
-    blockgame.boards = [];
-
-    blockgame.storeGame(game, 0);
+    blockgame.storeGame(game, 0, 0);
 }
 
-blockgame.storeGame = function(game, level)
+blockgame.storeGame = function(game, from, level, ccc, way)
 {
+    if (blockgame.solved) return;
+
     var gamekey = game.join('');
 
     if (! blockgame.knowns[ gamekey ])
     {
-        blockgame.knowns[ gamekey ] = { ginx: blockgame.boards.length, level: level };
+        blockgame.knowns[ gamekey ] = { from: from, level: level, ccc: ccc, way: way };
         blockgame.boards.push(gamekey);
 
-        blockgame.printGame(gamekey, level)
+        //if ((blockgame.boards.length % 250) == 0) blockgame.printGame(gamekey, level)
+
+        blockgame.solved = (game[ 16 ] == '#') && (game[ 17 ] == '#');
+        blockgame.sollev = level;
+    }
+}
+
+blockgame.evaluateThousend = function()
+{
+    for (count = 0; blockgame.evalinx < blockgame.boards.length; count++)
+    {
+        blockgame.doallMoves(blockgame.evalinx++);
+
+        if (blockgame.solved) break;
+        if (count >= 100) break;
+    }
+
+    if (blockgame.solved || (blockgame.evalinx == blockgame.boards.length))
+    {
+        if (blockgame.solved)
+        {
+            if (blockgame.sollev >= 20)
+            {
+                blockgame.topdiv.innerHTML += "\n";
+
+                var gamekey = blockgame.boards[ 0 ];
+                var level = blockgame.knowns[ gamekey ].level;
+                blockgame.printFinalGame(gamekey, level);
+
+                var gamekey = blockgame.boards[ blockgame.boards.length - 1 ];
+                var level = blockgame.knowns[ gamekey ].level;
+                blockgame.printFinalGame(gamekey, level);
+
+                blockgame.topdiv.innerHTML += "solved...\n";
+
+                blockgame.printGamePath(gamekey);
+
+                return;
+            }
+        }
+
+        blockgame.topdiv.innerHTML = ++blockgame.tries + "=" + blockgame.boards.length;
+
+        blockgame.createGame();
+        setTimeout(blockgame.evaluateThousend, 0)
+    }
+    else
+    {
+        setTimeout(blockgame.evaluateThousend, 0)
     }
 }
 
 blockgame.evaluateGame = function()
 {
-    for (var ginx = 0; ginx < blockgame.boards.length; ginx++)
-    {
-        blockgame.doallMoves(ginx);
+    setTimeout(blockgame.evaluateThousend, 0)
+}
 
-        if (ginx > 1000) break;
+blockgame.moveLeft = function(game, from, level, pos, ccc, len, stp)
+{
+    if ((pos % 6) && (game[ pos - 1 ] == '_'))
+    {
+        game[ pos - 1 ] = ccc;
+        game[ pos - 1 + len ] = '_';
+
+        blockgame.storeGame(game, from, level, ccc, 'l' + stp);
+        if (blockgame.solved) return;
+
+        blockgame.moveLeft(game, from, level, pos - 1, ccc, len, stp + 1);
+
+        game[ pos - 1 ] = '_';
+        game[ pos - 1 + len ] = ccc;
     }
 }
 
-blockgame.doallMoves = function(ginx)
+blockgame.moveRight = function(game, from, level, pos, ccc, len, stp)
 {
-    var gamekey = blockgame.boards[ ginx ];
+    if ((((pos % 6) + len) < 6) && (game[ pos + len ] == '_'))
+    {
+        game[ pos ] = "_";
+        game[ pos + len ] = ccc;
+
+        blockgame.storeGame(game, from, level, ccc, 'r' + stp);
+        if (blockgame.solved) return;
+
+        blockgame.moveRight(game, from, level, pos + 1, ccc, len, stp + 1);
+
+        game[ pos ] = ccc;
+        game[ pos + len ] = '_';
+    }
+}
+
+blockgame.moveUp = function(game, from, level, pos, ccc, len, stp)
+{
+    if ((pos >= 6) && (game[ pos - 6 ] == '_'))
+    {
+        game[ pos - 6  ] = ccc;
+        game[ pos + 6 * (len - 1) ] = '_';
+
+        blockgame.storeGame(game, from, level, ccc, 'u' + stp);
+        if (blockgame.solved) return;
+
+        blockgame.moveUp(game, from, level, pos - 6, ccc, len, stp + 1);
+
+        game[ pos - 6  ] = '_';
+        game[ pos + 6 * (len - 1) ] = ccc;
+    }
+}
+
+blockgame.moveDown = function(game, from, level, pos, ccc, len, stp)
+{
+    if (((pos + (6 * len)) < 36) && (game[ pos + (6 * len) ] == '_'))
+    {
+        game[ pos ] = "_";
+        game[ pos + (6 * len) ] = ccc;
+
+        blockgame.storeGame(game, from, level, ccc, 'd' + stp);
+        if (blockgame.solved) return;
+
+        blockgame.moveDown(game, from, level, pos + 6, ccc, len, stp + 1);
+
+        game[ pos ] = ccc;
+        game[ pos + (6 * len) ] = "_";
+    }
+}
+
+blockgame.doallMoves = function(from)
+{
+    var gamekey = blockgame.boards[ from ];
     var level = blockgame.knowns[ gamekey ].level + 1;
     var game = gamekey.split('');
 
@@ -168,74 +391,28 @@ blockgame.doallMoves = function(ginx)
         have[ ccc ] = true;
 
         var block = blockgame.blocks[ ccc ];
+        var len = block.len;
 
         if (block.dir == 0)
         {
-            //
-            // Move left.
-            //
+            blockgame.moveLeft(game, from, level, pos, ccc, len, 1);
+            if (blockgame.solved) return;
 
-            if ((pos % 6) && (game[ pos - 1 ] == '_'))
-            {
-                game[ pos - 1 ] = ccc;
-                game[ pos - 1 + block.len ] = '_';
-
-                blockgame.storeGame(game, level);
-
-                game[ pos - 1 ] = '_';
-                game[ pos - 1 + block.len ] = ccc;
-            }
-
-            //
-            // Move right.
-            //
-
-            if ((((pos % 6) + block.len) < 6) && (game[ pos + block.len ] == '_'))
-            {
-                game[ pos ] = "_";
-                game[ pos + block.len ] = ccc;
-
-                blockgame.storeGame(game, level);
-
-                game[ pos ] = ccc;
-                game[ pos + block.len ] = '_';
-            }
+            blockgame.moveRight(game, from, level, pos, ccc, len, 1);
+            if (blockgame.solved) return;
         }
         else
         {
-            //
-            // Move up.
-            //
+            blockgame.moveUp(game, from, level, pos, ccc, len, 1);
+            if (blockgame.solved) return;
 
-            if ((pos >= 6) && (game[ pos - 6 ] == '_'))
-            {
-                game[ pos - 6  ] = ccc;
-                game[ pos + 6 * (block.len - 1) ] = '_';
-
-                blockgame.storeGame(game, level);
-
-                game[ pos - 6  ] = '_';
-                game[ pos + 6 * (block.len - 1) ] = ccc;
-            }
-
-             //
-             // Move down.
-             //
-
-             if (((pos + (6 * block.len)) < 36) && (game[ pos + (6 * block.len) ] == '_'))
-             {
-                 game[ pos ] = "_";
-                 game[ pos + (6 * block.len) ] = ccc;
-
-                 blockgame.storeGame(game, level);
-
-                 game[ pos ] = ccc;
-                 game[ pos + (6 * block.len) ] = "_";
-             }
+            blockgame.moveDown(game, from, level, pos, ccc, len, 1);
+            if (blockgame.solved) return;
        }
     }
 }
 
 blockgame.createFrame();
+//blockgame.testGame();
 blockgame.createGame();
 blockgame.evaluateGame();

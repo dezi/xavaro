@@ -149,8 +149,6 @@ public class HomeActivity extends AppCompatActivity implements
         topScreen.addView(socialScreen);
 
         workerScreen = new HomeWorker(this);
-        workerScreen.setFullscreen();
-        workerScreen.setVisibility(View.GONE);
         topScreen.addView(workerScreen);
 
         launchFrame = launchScreen.getPayloadFrame();
