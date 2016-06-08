@@ -466,6 +466,8 @@ public class ChatManager implements
 
     private void onSetMessageStatus(JSONObject message)
     {
+        Log.d(LOGTAG, "=====================onSetMessageStatus:" + Json.toPretty(message));
+
         String identity = getMessageIdentity(message);
         if (identity == null) return;
 
