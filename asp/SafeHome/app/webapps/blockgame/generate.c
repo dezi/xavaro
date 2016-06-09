@@ -83,30 +83,10 @@ int hashGame1(char *game)
 {
     unsigned int hash = 0;
 
-    for (int inx = 0; inx < 36; ++inx) hash = game[ inx ] + (hash << 6) + (hash << 16) - hash;
-
-    return hash % sizeof(hashes);
-}
-
-int hashGame2(char *game)
-{
-    unsigned int s1 = 1;
-    unsigned int s2 = 0;
-
-    for (int inx = 0; inx < 36; inx++)
+    for (int inx = 0; inx < 36; ++inx)
     {
-        s1 = (s1 + game[ inx ]) % 65521;
-        s2 = (s2 + s1) % 65521;
+        hash = game[ inx ] + (hash << 6) + (hash << 16) - hash;
     }
-
-    return ((s2 << 16) | s1) % sizeof(hashes);
-}
-
-int hashGame3(char *game)
-{
-    unsigned int hash = 0;
-
-    for (int inx = 0; inx < 36; ++inx) hash = 31 * hash + game[ inx ];
 
     return hash % sizeof(hashes);
 }
@@ -238,14 +218,16 @@ void createGame()
 {
     memset(hashes, 0, sizeof(hashes));
 
-    blocks[ '#' ].len = 2;
-    blocks[ '#' ].dir = 0;
-
     char game[ 36 ];
 
     memset(game, '_', 36);
 
-    int off = ((random() % 100) <= 80) ? 0 : ((random() % 100) <= 80) ? 1 : 2;
+    blocks[ '#' ].len = 2;
+    blocks[ '#' ].dir = 0;
+
+    int off = ((random() % 100) <= 25) ? 0 :
+              ((random() % 100) <= 33) ? 1 :
+              ((random() % 100) <= 50) ? 2 : 3;
 
     game[ 12 + off ] = '#';
     game[ 13 + off ] = '#';
@@ -445,10 +427,8 @@ void evaluateGame()
 
     if (solved && (sollev >= 20))
     {
-        //printf("Game: %36s\n", game);
-
-        printf("Moves=%05d act=%05d freesp=%02d level=%d\n",
-               movesact, movesinx, freesp, sollev);
+        printf("Moves=%05d act=%05d freesp=%02d %36s level=%d\n",
+               movesact, movesinx, freesp, moves[ 0 ].game, sollev);
     }
 }
 
