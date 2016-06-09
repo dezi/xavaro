@@ -22,6 +22,10 @@ blockgame.createFrame = function()
         "gamePanel", xx.centerDiv);
 
     WebLibSimple.setBGColor(xx.gamePanel, "#ffdddd");
+
+    xx.audio = WebLibSimple.createAnyAppend("audio", null);
+    xx.audio.src = "http://192.168.2.103/webapps/blockgame/sounds/finish_level_2.ogg";
+    xx.audio.preload = "auto";
 }
 
 blockgame.readLevel = function(level)
@@ -232,10 +236,22 @@ blockgame.onTouchEnd = function(event)
 
     xx.moveBlock(target.myblock);
     xx.solveGame(xx.game, xx.blocks);
-    xx.getHint();
+
+    if (! xx.getHint())
+    {
+        setTimeout(blockgame.playGameEnd, 10);
+    }
 
     event.preventDefault();
     return true;
+}
+
+blockgame.playGameEnd = function()
+{
+    blockgame.audio.load();
+    blockgame.audio.play();
+
+    setTimeout(blockgame.buildGame, 1000);
 }
 
 blockgame.moveBlock = function(block)
@@ -287,12 +303,18 @@ blockgame.getHint = function()
         if (ccc != nextmove.ccc) continue;
 
         block.blockcen.innerHTML = nextmove.way + " (" + movescnt + ")";
+
+        return true;
     }
+
+    return false;
 }
 
 blockgame.buildGame = function()
 {
     var xx = blockgame;
+
+    xx.gamePanel.innerHTML = null;
 
     //
     // Random select a game.
@@ -390,9 +412,6 @@ blockgame.buildGame = function()
 
     blockgame.solveGame(xx.game, xx.blocks);
     blockgame.getHint();
-
-    var audio = new Audio('/webapps/blockgame/sounds/finish_level_1.mp3');
-    audio.play();
 }
 
 blockgame.createFrame();

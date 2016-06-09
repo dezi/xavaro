@@ -28,6 +28,9 @@
       "strings.de-rDE.json"
     ],
 
-    "cachedefs": []
+    "cachedefs": [
+      { "interval": 24, "pattern": ".*.mp3" },
+      { "interval": 24, "pattern": ".*.ogg" }
+    ]
   }
 }
