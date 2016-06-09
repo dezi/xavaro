@@ -236,7 +236,7 @@ void createGame()
     // Minimum number of free fields.
     //
 
-    freesp = 6 + (random() % 4);
+    freesp = 6 + (random() % 10);
 
     //
     // Random position translate array.
@@ -425,8 +425,16 @@ void evaluateGame()
         if (solved) break;
     }
 
-    if (solved && (sollev >= 20))
+    if (solved && (sollev >= 14))
     {
+        char file[ 256 ];
+
+        snprintf(file, 128, "./games/level.%02d.txt", sollev);
+
+        FILE *fd = fopen(file, "a");
+        fprintf(fd,"%36s\n", moves[ 0 ].game);
+        fclose(fd);
+
         printf("Moves=%05d act=%05d freesp=%02d %36s level=%d\n",
                movesact, movesinx, freesp, moves[ 0 ].game, sollev);
     }

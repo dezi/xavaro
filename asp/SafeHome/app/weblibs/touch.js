@@ -84,10 +84,19 @@ WebLibTouch.onTouchStart = function(event)
             touch.scrollHorizontal = false;
         }
 
-        if (! (touch.scrollVertical || touch.scrollHorizontal))
+        if (! (touch.scrollVertical ||
+               touch.scrollHorizontal ||
+               touch.starget.onTouchStart ||
+               touch.starget.onTouchMove ||
+               touch.starget.onTouchEnd))
         {
             touch.starget = null;
         }
+    }
+
+    if (touch.starget && touch.starget.onTouchStart)
+    {
+        if (touch.starget.onTouchStart(event)) return;
     }
 
     event.preventDefault();
@@ -99,6 +108,11 @@ WebLibTouch.onTouchMove = function(event)
     var touchobj = event.changedTouches[ 0 ];
 
     if (! (touch.starget || touch.ctarget || touch.ltarget)) return;
+
+    if (touch.starget && touch.starget.onTouchMove)
+    {
+        if (touch.starget.onTouchMove(event)) return;
+    }
 
     touch.moves += 1;
 
@@ -184,6 +198,11 @@ WebLibTouch.onTouchEnd = function(event)
     var touchobj = event.changedTouches[ 0 ];
 
     if (! (touch.starget || touch.ctarget || touch.ltarget)) return;
+
+    if (touch.starget && touch.starget.onTouchEnd)
+    {
+        if (touch.starget.onTouchEnd(event)) return;
+    }
 
     WebLibTouch.computeOffsets(touchobj);
 

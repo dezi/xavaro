@@ -1,418 +1,359 @@
 blockgame.createFrame = function()
 {
-    blockgame.topdiv = WebLibSimple.createAnyAppend("pre", document.body);
-    blockgame.topdiv.style.fontSize = "24px";
+    var xx = blockgame;
 
-    blockgame.tries = 0;
+    xx.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
+    WebLibSimple.setBGColor(xx.topdiv, "#dddddd");
+    xx.topdiv.style.overflow = "hidden";
+
+    xx.centerDiv = WebLibSimple.createDivWidHei("50%", "50%", 1, 1, "centerDiv", xx.topdiv);
+
+    var wid = xx.topdiv.clientWidth;
+    var hei = xx.topdiv.clientHeight;
+
+    xx.gamesize  = Math.min(wid, hei) - 100;
+    xx.gamesize -= Math.floor(xx.gamesize % 6);
+    xx.fieldsize = Math.floor(xx.gamesize / 6);
+
+    xx.gamePanel = WebLibSimple.createDivWidHei(
+        -xx.gamesize / 2, -xx.gamesize / 2,
+        xx.gamesize, xx.gamesize,
+        "gamePanel", xx.centerDiv);
+
+    WebLibSimple.setBGColor(xx.gamePanel, "#ffdddd");
 }
 
-blockgame.printGame = function(gamekey, level)
+blockgame.readLevel = function(level)
 {
-    blockgame.topdiv.innerHTML += gamekey + "=" + level + "\n";
+    var xx = blockgame;
+
+    var lstring = ((level < 10) ? "0" : "") + level;
+    var url = "/games/level." + lstring + ".txt";
+    var leveldata = WebAppRequest.loadSync(url);
+
+    xx.games = leveldata.split("\n");
+
+    console.log("blockgame.readLevel: level=" + level + " games=" + xx.games.length);
+
+    xx.game = xx.games[ 0 ];
 }
 
-blockgame.printFinalGame = function(gamekey, level)
+blockgame.getTouchTarget = function(event)
 {
-    var text = "";
+    var touchobj = event.changedTouches[ 0 ];
+    var target = touchobj.target;
 
-    while (gamekey.length > 0)
+    while (target)
     {
-        text += gamekey.substring(0,6) + "\n";
-        gamekey = gamekey.substring(6);
+        if (target.myblock) return target;
+
+        target = target.parentElement;
     }
 
-    blockgame.topdiv.innerHTML += "\n" + text + "\n" + "level=" + level + "\n";
+    return null;
 }
 
-blockgame.printGamePath = function(gamekey)
+blockgame.onTouchStart = function(event)
 {
-    var text = "";
+    var xx = blockgame;
 
-    while (gamekey)
-    {
-        var move = blockgame.knowns[ gamekey ];
+    var target = xx.getTouchTarget(event);
+    if (! target) return false;
+    var touchobj = event.changedTouches[ 0 ];
 
-        text += "move: " + move.level + "=" + move.ccc + ":" + move.way + "\n";
+    xx.touch = {};
 
-        if (move.from == 0) break;
+    xx.touch.startX = touchobj.clientX;
+    xx.touch.startY = touchobj.clientY;
 
-        gamekey = blockgame.boards[ move.from ];
-    }
+    xx.touch.clientX = touchobj.clientX;
+    xx.touch.clientY = touchobj.clientY;
 
-    blockgame.topdiv.innerHTML += "\n" + text + "\n";
-}
+    var block = target.myblock;
 
-blockgame.fitBlock = function(game, block, pos)
-{
+    xx.touch.minX = block.left;
+    xx.touch.maxX = block.left;
+    xx.touch.minY = block.top;
+    xx.touch.maxY = block.top;
+
     if (block.dir == 0)
     {
-        var max = pos - (pos % 6) + 6;
+        var pos = block.pos;
 
-        for (var inx = 0; inx < block.len; inx++)
+        while (((pos % 6) > 0) && (xx.game[ pos - 1 ] == '_'))
         {
-            var gix = pos + inx;
-
-            if ((gix >= max) || (game[ gix ] != '_'))
-            {
-                return false;
-            }
+            xx.touch.minX -= xx.fieldsize;
+            pos--;
         }
 
-        for (var inx = 0; inx < block.len; inx++)
-        {
-            var gix = pos + inx;
+        var pos = block.pos;
+        var len = block.len;
 
-            game[ gix ] = block.ccc;
+        while ((((pos % 6) + len) < 6) && (xx.game[ pos + len ] == '_'))
+        {
+            xx.touch.maxX += xx.fieldsize;
+            pos++;
         }
     }
     else
     {
-        for (var inx = 0; inx < block.len; inx++)
-        {
-            var gix = pos + (inx * 6);
+        var pos = block.pos;
 
-            if ((gix >= 36) || (game[ gix ] != '_'))
-            {
-                return false;
-            }
+        while (((pos - 6) >= 0) && (xx.game[ pos - 6 ] == '_'))
+        {
+            xx.touch.minY -= xx.fieldsize;
+            pos -= 6;
         }
 
-        for (var inx = 0; inx < block.len; inx++)
-        {
-            var gix = pos + (inx * 6);
+        var pos = block.pos;
+        var len = (block.len - 1) * 6;
 
-            game[ gix ] = block.ccc;
+        while (((pos + len + 6 ) < 36) && (xx.game[ pos + len + 6 ] == '_'))
+        {
+            xx.touch.maxY += xx.fieldsize;
+            pos += 6;
         }
     }
 
+    event.preventDefault();
     return true;
 }
 
-blockgame.testGame = function()
+blockgame.onTouchMove = function(event)
 {
-    var blocks = {};
-    var game = "_".repeat(36).split('');
+    var xx = blockgame;
 
-    blocks[ '#' ] = { ccc: '#', len : 2, dir : 0 };
-    game[ 15 ] = '#';
-    game[ 16 ] = '#';
+    var target = xx.getTouchTarget(event);
+    if (! target) return false;
+    var touchobj = event.changedTouches[ 0 ];
 
-    blocks[ 'a' ] = { ccc: 'a', len : 3, dir : 1 };
-    game[  0 ] = 'a';
-    game[  6 ] = 'a';
-    game[ 12 ] = 'a';
+    xx.touch.clientX = touchobj.clientX;
+    xx.touch.clientY = touchobj.clientY;
 
-    blocks[ 'b' ] = { ccc: 'b', len : 2, dir : 0 };
-    game[  1 ] = 'b';
-    game[  2 ] = 'b';
+    xx.touch.newX = target.myblock.left + (xx.touch.clientX - xx.touch.startX);
+    xx.touch.newY = target.myblock.top  + (xx.touch.clientY - xx.touch.startY);
 
-    blocks[ 'c' ] = { ccc: 'c', len : 2, dir : 1 };
-    game[  4 ] = 'c';
-    game[ 10 ] = 'c';
-
-    blocks[ 'd' ] = { ccc: 'd', len : 2, dir : 1 };
-    game[  7 ] = 'd';
-    game[ 13 ] = 'd';
-
-    blocks[ 'e' ] = { ccc: 'e', len : 2, dir : 1 };
-    game[  8 ] = 'e';
-    game[ 14 ] = 'e';
-
-    blocks[ 'f' ] = { ccc: 'f', len : 3, dir : 1 };
-    game[ 11 ] = 'f';
-    game[ 17 ] = 'f';
-    game[ 23 ] = 'f';
-
-    blocks[ 'g' ] = { ccc: 'g', len : 3, dir : 0 };
-    game[ 18 ] = 'g';
-    game[ 19 ] = 'g';
-    game[ 20 ] = 'g';
-
-    blocks[ 'h' ] = { ccc: 'h', len : 2, dir : 1 };
-    game[ 21 ] = 'h';
-    game[ 27 ] = 'h';
-
-    blocks[ 'i' ] = { ccc: 'i', len : 2, dir : 1 };
-    game[ 26 ] = 'i';
-    game[ 32 ] = 'i';
-
-    blocks[ 'j' ] = { ccc: 'j', len : 2, dir : 0 };
-    game[ 28 ] = 'j';
-    game[ 29 ] = 'j';
-
-    blocks[ 'k' ] = { ccc: 'k', len : 2, dir : 0 };
-    game[ 30 ] = 'k';
-    game[ 31 ] = 'k';
-
-    blocks[ 'l' ] = { ccc: 'l', len : 2, dir : 0 };
-    game[ 33 ] = 'l';
-    game[ 34 ] = 'l';
-
-    blockgame.blocks  = blocks;
-    blockgame.knowns  = {};
-    blockgame.boards  = [];
-    blockgame.solved  = false;
-    blockgame.evalinx = 0;
-
-    blockgame.storeGame(game, 0, 0);
-}
-
-blockgame.createGame = function()
-{
-    var blocks = {};
-
-    blocks[ '#' ] = { ccc: '#', len : 2, dir : 0 };
-
-    var game = "_".repeat(36).split('');
-
-    game[ 12 ] = '#';
-    game[ 13 ] = '#';
-
-    //
-    // Minimum number of free fields.
-    //
-
-    var minf = 7 + (Math.floor(Math.random() * 70) % 7);
-
-    //
-    // Random position translate array.
-    //
-
-    var rpos = [];
-
-    for (var inx = 0; inx < 36; inx++) rpos[ inx ] = inx;
-
-    for (var inx = 0; inx < 36; inx++)
+    if (target.myblock.dir == 0)
     {
-        var inx1 = Math.floor(Math.random() * 36);
-        var inx2 = Math.floor(Math.random() * 36);
-
-        var tmp = rpos[ inx1 ];
-        rpos[ inx1 ] = rpos[ inx2 ];
-        rpos[ inx2 ] = tmp;
-    }
-
-    //
-    // Start building game.
-    //
-
-    var free = 36 - 2;
-
-    for (var inx = 0; inx < 26; inx++)
-    {
-        var block = {};
-
-        block.ccc = String.fromCharCode(97 + inx);
-        block.len = (Math.random() <= 0.2) ? 3 : 2;
-        block.dir = (Math.random() <= 0.5) ? 0 : 1
-
-        for (var pos = 0; pos < 36; pos++)
+        if (xx.touch.newX <= xx.touch.minX)
         {
-            if ((12 <= pos) && (pos <= 17) && (block.dir == 0))
-            {
-                //
-                // Do not put horizontal blocks in line 3.
-                //
+            xx.touch.newX = xx.touch.minX;
 
-                continue;
-            }
-
-            if (blockgame.fitBlock(game, block, rpos[ pos ]))
-            {
-                blocks[ block.ccc ] = block;
-                free -= block.len;
-
-                break;
-            }
+            if (xx.touch.newX != target.offsetLeft) WebAppUtility.makeClick();
         }
 
-        if (free <= minf) break;
-    }
-
-    blockgame.blocks  = blocks;
-    blockgame.knowns  = {};
-    blockgame.boards  = [];
-    blockgame.solved  = false;
-    blockgame.evalinx = 0;
-
-    blockgame.storeGame(game, 0, 0);
-}
-
-blockgame.storeGame = function(game, from, level, ccc, way)
-{
-    if (blockgame.solved) return;
-
-    var gamekey = game.join('');
-
-    if (! blockgame.knowns[ gamekey ])
-    {
-        blockgame.knowns[ gamekey ] = { from: from, level: level, ccc: ccc, way: way };
-        blockgame.boards.push(gamekey);
-
-        //if ((blockgame.boards.length % 250) == 0) blockgame.printGame(gamekey, level)
-
-        blockgame.solved = (game[ 16 ] == '#') && (game[ 17 ] == '#');
-        blockgame.sollev = level;
-    }
-}
-
-blockgame.evaluateThousend = function()
-{
-    for (count = 0; blockgame.evalinx < blockgame.boards.length; count++)
-    {
-        blockgame.doallMoves(blockgame.evalinx++);
-
-        if (blockgame.solved) break;
-        if (count >= 100) break;
-    }
-
-    if (blockgame.solved || (blockgame.evalinx == blockgame.boards.length))
-    {
-        if (blockgame.solved)
+        if (xx.touch.newX >= xx.touch.maxX)
         {
-            if (blockgame.sollev >= 20)
-            {
-                blockgame.topdiv.innerHTML += "\n";
+            xx.touch.newX = xx.touch.maxX;
 
-                var gamekey = blockgame.boards[ 0 ];
-                var level = blockgame.knowns[ gamekey ].level;
-                blockgame.printFinalGame(gamekey, level);
-
-                var gamekey = blockgame.boards[ blockgame.boards.length - 1 ];
-                var level = blockgame.knowns[ gamekey ].level;
-                blockgame.printFinalGame(gamekey, level);
-
-                blockgame.topdiv.innerHTML += "solved...\n";
-
-                blockgame.printGamePath(gamekey);
-
-                return;
-            }
+            if (xx.touch.newX != target.offsetLeft) WebAppUtility.makeClick();
         }
 
-        blockgame.topdiv.innerHTML = ++blockgame.tries + "=" + blockgame.boards.length;
-
-        blockgame.createGame();
-        setTimeout(blockgame.evaluateThousend, 0)
+        target.style.left = xx.touch.newX + "px";
     }
     else
     {
-        setTimeout(blockgame.evaluateThousend, 0)
+        if (xx.touch.newY <= xx.touch.minY)
+        {
+            xx.touch.newY = xx.touch.minY;
+            if (xx.touch.newY != target.offsetTop) WebAppUtility.makeClick();
+        }
+
+        if (xx.touch.newY >= xx.touch.maxY)
+        {
+            xx.touch.newY = xx.touch.maxY;
+            if (xx.touch.newY != target.offsetTop) WebAppUtility.makeClick();
+        }
+
+        target.style.top  = xx.touch.newY + "px";
     }
+
+    event.preventDefault();
+    return true;
 }
 
-blockgame.evaluateGame = function()
+blockgame.onTouchEnd = function(event)
 {
-    setTimeout(blockgame.evaluateThousend, 0)
-}
+    var xx = blockgame;
 
-blockgame.moveLeft = function(game, from, level, pos, ccc, len, stp)
-{
-    if ((pos % 6) && (game[ pos - 1 ] == '_'))
+    var target = xx.getTouchTarget(event);
+    if (! target) return false;
+    var touchobj = event.changedTouches[ 0 ];
+
+    if (target.myblock.dir == 0)
     {
-        game[ pos - 1 ] = ccc;
-        game[ pos - 1 + len ] = '_';
+        var restX = xx.touch.newX % xx.fieldsize;
 
-        blockgame.storeGame(game, from, level, ccc, 'l' + stp);
-        if (blockgame.solved) return;
+        if (restX)
+        {
+            if (restX > (xx.fieldsize >> 1))
+            {
+                xx.touch.newX += xx.fieldsize - restX;
+            }
+            else
+            {
+                xx.touch.newX -= restX;
+            }
 
-        blockgame.moveLeft(game, from, level, pos - 1, ccc, len, stp + 1);
+            target.style.left = xx.touch.newX + "px";
+            WebAppUtility.makeClick();
+        }
 
-        game[ pos - 1 ] = '_';
-        game[ pos - 1 + len ] = ccc;
+        target.myblock.left = xx.touch.newX;
     }
-}
-
-blockgame.moveRight = function(game, from, level, pos, ccc, len, stp)
-{
-    if ((((pos % 6) + len) < 6) && (game[ pos + len ] == '_'))
+    else
     {
-        game[ pos ] = "_";
-        game[ pos + len ] = ccc;
+        var restY = xx.touch.newY % xx.fieldsize;
 
-        blockgame.storeGame(game, from, level, ccc, 'r' + stp);
-        if (blockgame.solved) return;
+        if (restY)
+        {
+            if (restY > (xx.fieldsize >> 1))
+            {
+                xx.touch.newY += xx.fieldsize - restY;
+            }
+            else
+            {
+                xx.touch.newY -= restY;
+            }
 
-        blockgame.moveRight(game, from, level, pos + 1, ccc, len, stp + 1);
+            target.style.top = xx.touch.newY + "px";
+            WebAppUtility.makeClick();
+        }
 
-        game[ pos ] = ccc;
-        game[ pos + len ] = '_';
+        target.myblock.top = xx.touch.newY;
     }
+
+    var xpos = Math.floor(target.myblock.left / xx.fieldsize)
+    var ypos = Math.floor(target.myblock.top  / xx.fieldsize);
+
+    console.log("=======>>>>>>>> xpos=" + xpos);
+    console.log("=======>>>>>>>> ypos=" + ypos);
+
+    target.myblock.pos = (ypos * 6) + xpos;
+
+    xx.moveBlock(target.myblock);
+
+    event.preventDefault();
+    return true;
 }
 
-blockgame.moveUp = function(game, from, level, pos, ccc, len, stp)
+blockgame.moveBlock = function(block)
 {
-    if ((pos >= 6) && (game[ pos - 6 ] == '_'))
-    {
-        game[ pos - 6  ] = ccc;
-        game[ pos + 6 * (len - 1) ] = '_';
+    var xx = blockgame;
 
-        blockgame.storeGame(game, from, level, ccc, 'u' + stp);
-        if (blockgame.solved) return;
-
-        blockgame.moveUp(game, from, level, pos - 6, ccc, len, stp + 1);
-
-        game[ pos - 6  ] = '_';
-        game[ pos + 6 * (len - 1) ] = ccc;
-    }
-}
-
-blockgame.moveDown = function(game, from, level, pos, ccc, len, stp)
-{
-    if (((pos + (6 * len)) < 36) && (game[ pos + (6 * len) ] == '_'))
-    {
-        game[ pos ] = "_";
-        game[ pos + (6 * len) ] = ccc;
-
-        blockgame.storeGame(game, from, level, ccc, 'd' + stp);
-        if (blockgame.solved) return;
-
-        blockgame.moveDown(game, from, level, pos + 6, ccc, len, stp + 1);
-
-        game[ pos ] = ccc;
-        game[ pos + (6 * len) ] = "_";
-    }
-}
-
-blockgame.doallMoves = function(from)
-{
-    var gamekey = blockgame.boards[ from ];
-    var level = blockgame.knowns[ gamekey ].level + 1;
-    var game = gamekey.split('');
-
-    var have = {};
+    var game = xx.game.split('');
 
     for (var pos = 0; pos < 36; pos++)
     {
-        var ccc = game[ pos ];
+        if (game[ pos ] == block.ccc) game[ pos ] = '_';
+    }
 
-        if ((ccc == '_') || have[ ccc ]) continue;
+    var pos = block.pos;
+    var len = block.len;
 
-        have[ ccc ] = true;
+    if (block.dir == 0)
+    {
+        while (len-- > 0)
+        {
+            game[ pos ] = block.ccc;
+            pos += 1;
+        }
+    }
+    else
+    {
+        while (len-- > 0)
+        {
+            game[ pos ] = block.ccc;
+            pos += 6;
+        }
+    }
 
-        var block = blockgame.blocks[ ccc ];
-        var len = block.len;
+    xx.game = game.join('');
+}
+
+blockgame.buildGame = function()
+{
+    var xx = blockgame;
+
+    //
+    // Derive blocks from game.
+    //
+
+    console.log("blockgame.buildGame: game=" + xx.game);
+
+    xx.blocks = {};
+
+    for (var pos = 0; pos < 36; pos++)
+    {
+        var ccc = xx.game[ pos ];
+
+        if ((ccc == "_") || xx.blocks[ ccc ]) continue;
+
+        var block = {};
+
+        block.ccc = ccc;
+        block.pos = pos;
+        block.dir = (xx.game[ pos + 1 ] == ccc) ? 0 : 1;
 
         if (block.dir == 0)
         {
-            blockgame.moveLeft(game, from, level, pos, ccc, len, 1);
-            if (blockgame.solved) return;
-
-            blockgame.moveRight(game, from, level, pos, ccc, len, 1);
-            if (blockgame.solved) return;
+            block.len = (xx.game[ pos + 2 ] == ccc) ? 3 : 2;
         }
         else
         {
-            blockgame.moveUp(game, from, level, pos, ccc, len, 1);
-            if (blockgame.solved) return;
+            block.len = (xx.game[ pos + 12 ] == ccc) ? 3 : 2;
+        }
 
-            blockgame.moveDown(game, from, level, pos, ccc, len, 1);
-            if (blockgame.solved) return;
-       }
+        xx.blocks[ ccc ] = block;
     }
+
+    //console.log("blockgame.buildGame: " + JSON.stringify(xx.blocks));
+
+    //
+    // Draw all blocks.
+    //
+
+    for (var ccc in xx.blocks)
+    {
+        var block = xx.blocks[ ccc ];
+
+        console.log("blockgame.buildGame: " + JSON.stringify(block));
+
+        block.left = Math.floor(block.pos % 6) * xx.fieldsize;
+        block.top  = Math.floor(block.pos / 6) * xx.fieldsize;
+
+        block.wid = xx.fieldsize * ((block.dir == 0) ? block.len : 1) - 4;
+        block.hei = xx.fieldsize * ((block.dir == 1) ? block.len : 1) - 4;
+
+        block.blockdiv = WebLibSimple.createDivWidHei(
+            block.left, block.top,
+            block.wid, block.hei,
+            null, xx.gamePanel);
+
+        block.blockdiv.style.border = "2px solid grey";
+        block.blockdiv.style.borderRadius = "12px";
+
+        if (block.ccc == '#')
+        {
+            WebLibSimple.setBGColor(block.blockdiv, "#8888ff");
+        }
+        else
+        {
+            WebLibSimple.setBGColor(block.blockdiv, "#cccccc");
+        }
+
+        block.blockdiv.scrollBoth = true;
+
+        block.blockdiv.onTouchStart = blockgame.onTouchStart;
+        block.blockdiv.onTouchMove = blockgame.onTouchMove;
+        block.blockdiv.onTouchEnd = blockgame.onTouchEnd;
+
+        block.blockdiv.myblock = block;
+    }
+
+    blockgame.solveGame(xx.game, xx.blocks);
 }
 
 blockgame.createFrame();
-//blockgame.testGame();
-blockgame.createGame();
-blockgame.evaluateGame();
+blockgame.readLevel(41);
+blockgame.buildGame();
