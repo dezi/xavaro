@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.media.MediaPlayer;
 import android.webkit.JavascriptInterface;
 
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;

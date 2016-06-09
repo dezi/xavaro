@@ -32,11 +32,9 @@ blockgame.readLevel = function(level)
     var url = "/games/level." + lstring + ".txt";
     var leveldata = WebAppRequest.loadSync(url);
 
-    xx.games = leveldata.split("\n");
+    xx.games = leveldata.trim().split("\n");
 
     console.log("blockgame.readLevel: level=" + level + " games=" + xx.games.length);
-
-    xx.game = xx.games[ 0 ];
 }
 
 blockgame.getTouchTarget = function(event)
@@ -284,17 +282,24 @@ blockgame.getHint = function()
     for (var ccc in xx.blocks)
     {
         var block = xx.blocks[ ccc ];
-        block.blockdiv.innerHTML = "";
+        block.blockcen.innerHTML = "";
 
         if (ccc != nextmove.ccc) continue;
 
-        block.blockdiv.innerHTML = nextmove.way + " (" + movescnt + ")";
+        block.blockcen.innerHTML = nextmove.way + " (" + movescnt + ")";
     }
 }
 
 blockgame.buildGame = function()
 {
     var xx = blockgame;
+
+    //
+    // Random select a game.
+    //
+
+    var rnd = Math.floor(Math.random() * xx.games.length);
+    xx.game = xx.games[ rnd ];
 
     //
     // Derive blocks from game.
@@ -364,19 +369,34 @@ blockgame.buildGame = function()
         }
 
         block.blockdiv.scrollBoth = true;
-
         block.blockdiv.onTouchStart = blockgame.onTouchStart;
         block.blockdiv.onTouchMove = blockgame.onTouchMove;
         block.blockdiv.onTouchEnd = blockgame.onTouchEnd;
 
         block.blockdiv.myblock = block;
+
+        block.blocktab = WebLibSimple.createAnyAppend("div", block.blockdiv);
+        block.blocktab.style.display = "table";
+        block.blocktab.style.width   = "100%";
+        block.blocktab.style.height  = "100%";
+
+        block.blockcen = WebLibSimple.createAnyAppend("div", block.blocktab);
+        block.blockcen.style.display = "table-cell";
+        block.blockcen.style.width   = "100%";
+        block.blockcen.style.height  = "100%";
+        block.blockcen.style.verticalAlign = "middle";
+        block.blockcen.style.textAlign = "center";
     }
 
     blockgame.solveGame(xx.game, xx.blocks);
     blockgame.getHint();
+
+    var audio = new Audio('/webapps/blockgame/sounds/finish_level_1.mp3');
+    audio.play();
 }
 
 blockgame.createFrame();
 blockgame.readLevel(41);
 blockgame.readLevel(33);
+blockgame.readLevel(6);
 blockgame.buildGame();
