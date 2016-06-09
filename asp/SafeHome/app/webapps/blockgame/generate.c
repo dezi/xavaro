@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 struct block
 {
@@ -21,14 +22,16 @@ struct move
 
 struct block blocks[ 256 ];
 
-int movesmax = 10000;
+int movesmax = 20000;
 int movesact = 0;
-int moveseva = 0;
 
-struct move moves[ 10000 ];
+struct move moves[ 20000 ];
+
+char hashes[ 100000000 ];
 
 int solved = 0;
 int sollev = 0;
+int freesp = 0;
 
 int fitBlock(char *game, int ccc, int len, int dir, int pos)
 {
@@ -76,33 +79,165 @@ int fitBlock(char *game, int ccc, int len, int dir, int pos)
     return 1;
 }
 
+int hashGame1(char *game)
+{
+    unsigned int hash = 0;
+
+    for (int inx = 0; inx < 36; ++inx) hash = game[ inx ] + (hash << 6) + (hash << 16) - hash;
+
+    return hash % sizeof(hashes);
+}
+
+int hashGame2(char *game)
+{
+    unsigned int s1 = 1;
+    unsigned int s2 = 0;
+
+    for (int inx = 0; inx < 36; inx++)
+    {
+        s1 = (s1 + game[ inx ]) % 65521;
+        s2 = (s2 + s1) % 65521;
+    }
+
+    return ((s2 << 16) | s1) % sizeof(hashes);
+}
+
+int hashGame3(char *game)
+{
+    unsigned int hash = 0;
+
+    for (int inx = 0; inx < 36; ++inx) hash = 31 * hash + game[ inx ];
+
+    return hash % sizeof(hashes);
+}
+
 void storeGame(char *game, int from, int level, int ccc, int way, int steps)
 {
     if (solved) return;
 
-    int fund = 0;
+    int hash = hashGame1(game);
 
-    for (int inx = 0; inx < movesact; inx++)
+    if (hashes[ hash ]) return;
+
+    hashes[ hash ] = 1;
+
+    if (movesact < movesmax)
     {
-        if (strncmp(moves[ inx ].game, game, 36) == 0)
-        {
-            return;
-        }
+        memcpy(moves[ movesact ].game, game, 36);
+
+        moves[ movesact ].from  = from;
+        moves[ movesact ].level = level;
+        moves[ movesact ].ccc   = ccc;
+        moves[ movesact ].way   = way;
+        moves[ movesact ].steps = steps;
+
+        movesact++;
+
+        solved = (game[ 16 ] == '#') && (game[ 17 ] == '#');
+        sollev = level;
     }
+}
 
-    memcpy(moves[ movesact ].game, game, 36);
+void testGame()
+{
+    char game[ 36 ];
 
-    moves[ movesact ].from  = from;
-    moves[ movesact ].level = level;
-    moves[ movesact ].ccc   = ccc;
-    moves[ movesact ].way   = way;
-    moves[ movesact ].steps = steps;
+    memset(game, '_', 36);
 
-    movesact++;
+    freesp = 36;
+
+    blocks[ '#' ].len = 2;
+    blocks[ '#' ].dir = 0;
+    game[ 15 ] = '#';
+    game[ 16 ] = '#';
+    freesp -= 2;
+
+    blocks[ 'a' ].len = 3;
+    blocks[ 'a' ].dir = 1;
+    game[  0 ] = 'a';
+    game[  6 ] = 'a';
+    game[ 12 ] = 'a';
+    freesp -= 3;
+
+    blocks[ 'b' ].len = 2;
+    blocks[ 'b' ].dir = 0;
+    game[  1 ] = 'b';
+    game[  2 ] = 'b';
+    freesp -= 2;
+
+    blocks[ 'c' ].len = 2;
+    blocks[ 'c' ].dir = 1;
+    game[  4 ] = 'c';
+    game[ 10 ] = 'c';
+    freesp -= 2;
+
+    blocks[ 'd' ].len = 2;
+    blocks[ 'd' ].dir = 1;
+    game[  7 ] = 'd';
+    game[ 13 ] = 'd';
+    freesp -= 2;
+
+    blocks[ 'e' ].len = 2;
+    blocks[ 'e' ].dir = 1;
+    game[  8 ] = 'e';
+    game[ 14 ] = 'e';
+    freesp -= 2;
+
+    blocks[ 'f' ].len = 3;
+    blocks[ 'f' ].dir = 1;
+    game[ 11 ] = 'f';
+    game[ 17 ] = 'f';
+    game[ 23 ] = 'f';
+    freesp -= 3;
+
+    blocks[ 'g' ].len = 3;
+    blocks[ 'g' ].dir = 0;
+    game[ 18 ] = 'g';
+    game[ 19 ] = 'g';
+    game[ 20 ] = 'g';
+    freesp -= 3;
+
+    blocks[ 'h' ].len = 2;
+    blocks[ 'h' ].dir = 1;
+    game[ 21 ] = 'h';
+    game[ 27 ] = 'h';
+
+    blocks[ 'i' ].len = 2;
+    blocks[ 'i' ].dir = 1;
+    game[ 26 ] = 'i';
+    game[ 32 ] = 'i';
+    freesp -= 2;
+
+    blocks[ 'j' ].len = 2;
+    blocks[ 'j' ].dir = 0;
+    game[ 28 ] = 'j';
+    game[ 29 ] = 'j';
+    freesp -= 2;
+
+    blocks[ 'k' ].len = 2;
+    blocks[ 'k' ].dir = 0;
+    game[ 30 ] = 'k';
+    game[ 31 ] = 'k';
+    freesp -= 2;
+
+    blocks[ 'l' ].len = 2;
+    blocks[ 'l' ].dir = 0;
+    game[ 33 ] = 'l';
+    game[ 34 ] = 'l';
+    freesp -= 2;
+
+    movesact = 0;
+
+    solved = 0;
+    sollev = 0;
+
+    storeGame(game, 0, 0, 0, 0, 0);
 }
 
 void createGame()
 {
+    memset(hashes, 0, sizeof(hashes));
+
     blocks[ '#' ].len = 2;
     blocks[ '#' ].dir = 0;
 
@@ -110,20 +245,22 @@ void createGame()
 
     memset(game, '_', 36);
 
-    game[ 12 ] = '#';
-    game[ 13 ] = '#';
+    int off = ((random() % 100) <= 80) ? 0 : ((random() % 100) <= 80) ? 1 : 2;
+
+    game[ 12 + off ] = '#';
+    game[ 13 + off ] = '#';
 
     //
     // Minimum number of free fields.
     //
 
-    int minf = 7 + (random() % 7);
+    freesp = 6 + (random() % 4);
 
     //
     // Random position translate array.
     //
 
-    int rpos[36];
+    int rpos[ 36 ];
 
     for (int inx = 0; inx < 36; inx++) rpos[ inx ] = inx;
 
@@ -143,15 +280,19 @@ void createGame()
 
     int free = 36 - 2;
 
+    int next = 0;
+
     for (int inx = 0; inx < 26; inx++)
     {
-        int ccc = 97 + inx;
+        int ccc = 97 + next;
         int len = ((random() % 100) <= 20) ? 3 : 2;
         int dir = ((random() % 100) <= 50) ? 0 : 1;
 
         for (int pos = 0; pos < 36; pos++)
         {
-            if ((12 <= pos) && (pos <= 17) && (dir == 0))
+            int ppp = rpos[ pos ];
+
+            if ((dir == 0) && (12 <= ppp) && (ppp <= 17))
             {
                 //
                 // Do not put horizontal blocks in line 3.
@@ -160,25 +301,25 @@ void createGame()
                 continue;
             }
 
-            if (fitBlock(game, ccc, len, dir, rpos[ pos ]))
+            if (fitBlock(game, ccc, len, dir, ppp))
             {
                 blocks[ ccc ].len = len;
                 blocks[ ccc ].dir = dir;
 
                 free -= len;
+                next++;
 
                 break;
             }
         }
 
-        if (free <= minf) break;
+        if (free <= freesp) break;
     }
-
-    printf("Game: %36s\n", game);
 
     movesact = 0;
 
     solved = 0;
+    sollev = 0;
 
     storeGame(game, 0, 0, 0, 0, 0);
 }
@@ -293,22 +434,38 @@ void doallMoves(from)
 
 void evaluateGame()
 {
-    for (int moveinx = 0; moveinx < movesact; moveinx++)
+    int movesinx = 0;
+
+    while (movesinx < movesact)
     {
-        doallMoves(moveinx);
+        doallMoves(movesinx++);
 
         if (solved) break;
     }
 
-    printf("Fettig %d", movesact);
+    if (solved && (sollev >= 20))
+    {
+        //printf("Game: %36s\n", game);
+
+        printf("Moves=%05d act=%05d freesp=%02d level=%d\n",
+               movesact, movesinx, freesp, sollev);
+    }
 }
 
 int main()
 {
     printf("Block game generator.\n");
 
-    createGame();
+    srandom(time(NULL));
+
+    testGame();
     evaluateGame();
+
+    while (1)
+    {
+        createGame();
+        evaluateGame();
+    }
 
     return 0;
 }
