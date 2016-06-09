@@ -3,6 +3,7 @@ blockgame.createFrame = function()
     var xx = blockgame;
 
     xx.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
+    WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
     WebLibSimple.setBGColor(xx.topdiv, "#dddddd");
     xx.topdiv.style.overflow = "hidden";
 
@@ -232,6 +233,8 @@ blockgame.onTouchEnd = function(event)
     target.myblock.pos = (ypos * 6) + xpos;
 
     xx.moveBlock(target.myblock);
+    xx.solveGame(xx.game, xx.blocks);
+    xx.getHint();
 
     event.preventDefault();
     return true;
@@ -269,6 +272,24 @@ blockgame.moveBlock = function(block)
     }
 
     xx.game = game.join('');
+}
+
+blockgame.getHint = function()
+{
+    var xx = blockgame;
+
+    var movescnt = xx.solvepath.length;
+    var nextmove = xx.solvepath.shift();
+
+    for (var ccc in xx.blocks)
+    {
+        var block = xx.blocks[ ccc ];
+        block.blockdiv.innerHTML = "";
+
+        if (ccc != nextmove.ccc) continue;
+
+        block.blockdiv.innerHTML = nextmove.way + " (" + movescnt + ")";
+    }
 }
 
 blockgame.buildGame = function()
@@ -352,8 +373,10 @@ blockgame.buildGame = function()
     }
 
     blockgame.solveGame(xx.game, xx.blocks);
+    blockgame.getHint();
 }
 
 blockgame.createFrame();
 blockgame.readLevel(41);
+blockgame.readLevel(33);
 blockgame.buildGame();

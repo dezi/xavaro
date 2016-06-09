@@ -166,4 +166,7 @@ blockgame.solveGame = function(game, blocks)
 
         blockgame.printGamePath(gamekey);
     }
+
+    blockgame.knowns = null;
+    blockgame.boards = null;
 }
