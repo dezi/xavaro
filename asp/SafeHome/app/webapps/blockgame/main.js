@@ -298,16 +298,20 @@ blockgame.getHint = function()
     for (var ccc in xx.blocks)
     {
         var block = xx.blocks[ ccc ];
-        block.blockcen.innerHTML = "";
 
-        if (ccc != nextmove.ccc) continue;
-
-        block.blockcen.innerHTML = nextmove.way + " (" + movescnt + ")";
-
-        return true;
+        if (nextmove && (ccc == nextmove.ccc))
+        {
+            block.blockcen.innerHTML = nextmove.way + " (" + movescnt + ")";
+        }
+        else
+        {
+            block.blockcen.innerHTML = "";
+        }
     }
 
-    return false;
+    console.log("==================>>>>>>>>nexthint=" + JSON.stringify(nextmove));
+
+    return nextmove.ccc;
 }
 
 blockgame.buildGame = function()
