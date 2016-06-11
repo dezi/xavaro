@@ -94,7 +94,7 @@ blockgame.onButtonMinus = function(target, ctarget)
 
     WebAppUtility.makeClick();
 
-    xx.buttonTop2div.buttonCen.innerHTML = --xx.level;
+    if (xx.level > 2) xx.buttonTop2div.buttonCen.innerHTML = --xx.level;
 
     if (xx.newLevelTimeout) clearTimeout(xx.newLevelTimeout);
     xx.newLevelTimeout = setTimeout(xx.loadNewGameLevel, 1000);
@@ -106,7 +106,7 @@ blockgame.onButtonPlus = function(target, ctarget)
 
     WebAppUtility.makeClick();
 
-    xx.buttonTop2div.buttonCen.innerHTML = ++xx.level;
+    if (xx.level < 43) xx.buttonTop2div.buttonCen.innerHTML = ++xx.level;
 
     if (xx.newLevelTimeout) clearTimeout(xx.newLevelTimeout);
     xx.newLevelTimeout = setTimeout(xx.loadNewGameLevel, 1000);

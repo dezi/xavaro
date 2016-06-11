@@ -425,7 +425,7 @@ void evaluateGame()
         if (solved) break;
     }
 
-    if (solved && (sollev >= 17))
+    if (solved && (sollev > 1) && (sollev >= 23))
     {
         char file[ 256 ];
 
