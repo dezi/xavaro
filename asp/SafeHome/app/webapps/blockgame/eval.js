@@ -124,21 +124,24 @@ blockgame.printGamePath = function(gamekey)
 {
     blockgame.solvepath = [];
 
-    while (gamekey)
+    if (blockgame.boards.length > 1)
     {
-        var move = blockgame.knowns[ gamekey ];
+        while (gamekey)
+        {
+            var move = blockgame.knowns[ gamekey ];
 
-        blockgame.solvepath.unshift(move);
+            blockgame.solvepath.unshift(move);
 
-        if (move.from == 0) break;
+            gamekey = blockgame.boards[ move.from ];
 
-        gamekey = blockgame.boards[ move.from ];
-    }
+            if (move.from == 0) break;
+        }
 
-    for (var inx in blockgame.solvepath)
-    {
-        var move = blockgame.solvepath[ inx ];
-        console.log("move: " + move.level + "=" + move.ccc + ":" + move.way);
+        for (var inx in blockgame.solvepath)
+        {
+            var move = blockgame.solvepath[ inx ];
+            console.log("move: " + move.level + "=" + move.ccc + ":" + move.way);
+        }
     }
 }
 
@@ -152,17 +155,19 @@ blockgame.solveGame = function(game, blocks)
 
     blockgame.storeGame(game.split(''), 0, 0);
 
-    for (count = 0; blockgame.evalinx < blockgame.boards.length; count++)
+    if (! blockgame.solved)
     {
-        blockgame.doallMoves(blockgame.evalinx++);
+        for (count = 0; blockgame.evalinx < blockgame.boards.length; count++)
+        {
+            blockgame.doallMoves(blockgame.evalinx++);
 
-        if (blockgame.solved) break;
+            if (blockgame.solved) break;
+        }
     }
 
     if (blockgame.solved)
     {
         var gamekey = blockgame.boards[ blockgame.boards.length - 1 ];
-        var level = blockgame.knowns[ gamekey ].level;
 
         blockgame.printGamePath(gamekey);
     }

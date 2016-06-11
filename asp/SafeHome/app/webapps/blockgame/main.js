@@ -34,6 +34,7 @@ blockgame.createFrame = function()
     xx.buttonTop1div.onTouchClick = blockgame.onButtonMinus;
     xx.buttonTop3div.onTouchClick = blockgame.onButtonPlus;
     xx.buttonBot1div.onTouchClick = blockgame.onLoadNewGame;
+    xx.buttonBot3div.onTouchClick = blockgame.onHintPlayer;
 
     xx.audio = WebLibSimple.createAnyAppend("audio", null);
     xx.audio.src = "/webapps/blockgame/sounds/finish_level_2.wav";
@@ -86,6 +87,13 @@ blockgame.onLoadNewGame = function(target, ctarget)
     WebAppUtility.makeClick();
 
     blockgame.buildGame();
+}
+
+blockgame.onHintPlayer = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    blockgame.getHint(true);
 }
 
 blockgame.onButtonMinus = function(target, ctarget)
@@ -406,14 +414,7 @@ blockgame.onTouchEnd = function(event)
     xx.moveBlock(target.myblock);
     xx.clearHint();
 
-    if (xx.solvepath.length)
-    {
-        setTimeout(blockgame.solveAndHint, 10);
-    }
-    else
-    {
-        setTimeout(blockgame.playGameEnd, 10);
-    }
+    setTimeout(blockgame.solveAndHint, 10);
 
     event.preventDefault();
     return true;
@@ -424,15 +425,15 @@ blockgame.solveAndHint = function()
     var xx = blockgame;
 
     xx.solveGame(xx.game, xx.blocks);
-    xx.getHint();
-}
+    xx.getHint(false);
 
-blockgame.playGameEnd = function()
-{
-    blockgame.audio.play();
+    if (xx.solvepath.length == 0)
+    {
+        blockgame.audio.play();
 
-    setTimeout(blockgame.buildGame, 1000);
-    setTimeout(blockgame.audio.load, 5000);
+        setTimeout(blockgame.buildGame, 1000);
+        setTimeout(blockgame.audio.load, 5000);
+    }
 }
 
 blockgame.moveBlock = function(block)
@@ -480,24 +481,26 @@ blockgame.clearHint = function()
     }
 }
 
-blockgame.getHint = function()
+blockgame.getHint = function(display)
 {
     var xx = blockgame;
 
-    var movescnt = xx.solvepath.length;
-    var nextmove = xx.solvepath.shift();
-
-    for (var ccc in xx.blocks)
+    if (display)
     {
-        var block = xx.blocks[ ccc ];
+        var nextmove = xx.solvepath[ 0 ];
 
-        if (nextmove && (ccc == nextmove.ccc))
+        for (var ccc in xx.blocks)
         {
-            block.blockcen.innerHTML = nextmove.way + " (" + movescnt + ")";
+            var block = xx.blocks[ ccc ];
+
+            if (nextmove && (ccc == nextmove.ccc))
+            {
+                block.blockcen.innerHTML = nextmove.way;
+            }
         }
     }
 
-    xx.buttonBot2div.buttonCen.innerHTML = movescnt;
+    xx.buttonBot2div.buttonCen.innerHTML = xx.solvepath.length;
 }
 
 blockgame.buildGame = function()
@@ -601,9 +604,9 @@ blockgame.buildGame = function()
     }
 
     blockgame.solveGame(xx.game, xx.blocks);
-    blockgame.getHint();
+    blockgame.getHint(false);
 }
 
 blockgame.createFrame();
-blockgame.readLevel(14);
+blockgame.readLevel(2);
 blockgame.buildGame();
