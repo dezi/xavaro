@@ -414,7 +414,7 @@ blockgame.onTouchEnd = function(event)
     xx.moveBlock(target.myblock);
     xx.clearHint();
 
-    setTimeout(blockgame.solveAndHint, 10);
+    setTimeout(blockgame.solveAndHint, 0);
 
     event.preventDefault();
     return true;
@@ -432,7 +432,7 @@ blockgame.solveAndHint = function()
         blockgame.audio.play();
 
         setTimeout(blockgame.buildGame, 1000);
-        setTimeout(blockgame.audio.load, 5000);
+        setTimeout(blockgame.audio.load, 2000);
     }
 }
 

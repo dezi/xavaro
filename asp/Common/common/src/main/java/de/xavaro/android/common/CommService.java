@@ -354,7 +354,7 @@ public class CommService extends Service
                 String privateKey = CryptUtils.RSAgetPrivateKey();
                 String passPhrase = CryptUtils.RSADecrypt(privateKey, encoPassPhrase);
 
-                if (CommonConfigs.debugGCM)
+                if (Simple.getSharedPrefBoolean("developer.debug.gcmstuff"))
                 {
                     Simple.makeAlertPost("\"" + passPhrase + "\"", type);
                 }
@@ -636,7 +636,7 @@ public class CommService extends Service
 
             JSONObject json = new JSONObject(new String(data, 4, data.length - 4));
 
-            if (CommonConfigs.debugGCM)
+            if (Simple.getSharedPrefBoolean("developer.debug.gcmstuff"))
             {
                 String pretty = Json.toPretty(json);
                 String title = LOGTAG + ":decryptPacket:";

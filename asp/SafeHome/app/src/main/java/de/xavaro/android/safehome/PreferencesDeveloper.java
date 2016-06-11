@@ -67,6 +67,22 @@ public class PreferencesDeveloper
             NicedPreferences.NiceCheckboxPreference cp;
 
             //
+            // Debug switches.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Debug Schalter");
+            preferences.add(pc);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cp.setKey(keyprefix + ".debug.gcmstuff");
+            cp.setTitle("GCM Meldungen");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
+
+            //
             // Webapp server preferences.
             //
 
