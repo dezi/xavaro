@@ -6,11 +6,19 @@ sudoku.buildHints = function()
     xx.verthave = [];
     xx.cellhave = [];
 
+    xx.horzpositions = [];
+    xx.vertpositions = [];
+    xx.cellpositions = [];
+
     for (var inx = 0; inx < 9; inx++)
     {
         xx.horzhave[ inx ] = [];
         xx.verthave[ inx ] = [];
         xx.cellhave[ inx ] = [];
+
+        xx.horzpositions[ inx ] = [];
+        xx.vertpositions[ inx ] = [];
+        xx.cellpositions[ inx ] = [];
 
         for (var dig = 1; dig <= 9; dig++)
         {
@@ -27,6 +35,10 @@ sudoku.buildHints = function()
         xx.horzhave[ xx.horz[ pos ] ][ dig ] = true;
         xx.verthave[ xx.vert[ pos ] ][ dig ] = true;
         xx.cellhave[ xx.cell[ pos ] ][ dig ] = true;
+
+        xx.horzpositions[ xx.horz[ pos ] ].push(pos);
+        xx.vertpositions[ xx.vert[ pos ] ].push(pos);
+        xx.cellpositions[ xx.cell[ pos ] ].push(pos);
     }
 }
 
@@ -200,5 +212,7 @@ sudoku.generateGame = function()
 
             xx.game[ pos ] = olddig;
         }
+
+        if ((xx.level == 1) && (inx > 20)) break;
     }
 }

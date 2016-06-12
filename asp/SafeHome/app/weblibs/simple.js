@@ -305,7 +305,7 @@ WebLibSimple.setDefaultBGColor = function(elem)
 
 WebLibSimple.getRGBColor = function(color)
 {
-    if ((color.length == 9) && (color.charAt(0) == "#"))
+    if (color && (color.length == 9) && (color.charAt(0) == "#"))
     {
         //
         // Hex color with alpha like android.

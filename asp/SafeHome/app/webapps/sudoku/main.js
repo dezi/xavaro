@@ -3,6 +3,7 @@ sudoku.createFrame = function()
     var xx = sudoku;
 
     xx.level = 1;
+    xx.hintLevel = 0;
 
     xx.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
     WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
@@ -14,6 +15,10 @@ sudoku.createFrame = function()
     var wid = xx.topdiv.clientWidth;
     var hei = xx.topdiv.clientHeight;
 
+    //
+    // Game panel.
+    //
+
     xx.gamesize  = Math.min(wid, hei) - 100;
     xx.gamesize -= Math.floor(xx.gamesize % 9);
     xx.fieldsize = Math.floor(xx.gamesize / 9);
@@ -23,10 +28,71 @@ sudoku.createFrame = function()
         xx.gamesize, xx.gamesize,
         "gamePanel", xx.centerDiv);
 
-    WebLibSimple.setBGColor(xx.gamePanel, "#ffdddd");
+    WebLibSimple.setBGColor(xx.gamePanel, "#ffeeee");
+
+    //
+    // Digits enter panel.
+    //
+
+    xx.entersize  = Math.min(wid, hei) >> 1;
+    xx.entersize -= Math.floor(xx.entersize % 9);
+    xx.digitsize  = Math.floor(xx.entersize / 9);
+
+    xx.enterDimm = WebLibSimple.createDivWidHei(
+        -xx.gamesize / 2, -xx.gamesize / 2,
+        xx.gamesize, xx.gamesize,
+        "enterDimm", xx.centerDiv);
+
+    WebLibSimple.setBGColor(xx.enterDimm, "#88888888");
+    xx.enterDimm.style.display = "none";
+    xx.enterDimm.onTouchClick = xx.onTouchEnterCancel;
+
+    xx.enterPanel = WebLibSimple.createDivWidHei(
+        -xx.entersize / 2, -xx.entersize / 2,
+        xx.entersize, xx.entersize,
+        "enterPanel", xx.centerDiv);
+
+    WebLibSimple.setBGColor(xx.enterPanel, "#ffffff");
+    WebLibSimple.setFontSpecs(xx.enterPanel, 64, "bold");
+    xx.enterPanel.style.border = "8px solid grey";
+    xx.enterPanel.style.borderRadius = "16px";
+    xx.enterPanel.style.display = "none";
+
+    xx.enterTable = WebLibSimple.createAnyAppend("table", xx.enterPanel);
+    xx.enterTable.style.width  = "100%";
+    xx.enterTable.style.height = "100%";
+    xx.enterTable.cellPadding  = "0";
+    xx.enterTable.cellSpacing  = "0";
+    xx.enterTable.border = "0";
+
+    var digit = 1;
+
+    for (var row = 0; row < 3; row++)
+    {
+        var tableRow = WebLibSimple.createAnyAppend("tr", xx.enterTable);
+
+        for (var col = 0; col < 3; col++)
+        {
+            var tableData = WebLibSimple.createAnyAppend("td", tableRow);
+            tableData.style.width  = xx.digitsize + "px";
+            tableData.style.height = xx.digitsize + "px";
+            tableData.style.textAlign = "center";
+            tableData.style.verticalAlign = "middle";
+            tableData.innerHTML = digit;
+
+            tableData.onTouchClick = xx.onTouchEnterDigit;
+            tableData.digitValue = digit;
+
+            digit++;
+        }
+    }
+
+    //
+    // Buttons.
+    //
 
     xx.buttonTop1div = sudoku.createButton("–");
-    xx.buttonTop2div = sudoku.createButton(" ");
+    xx.buttonTop2div = sudoku.createButton(xx.level);
     xx.buttonTop3div = sudoku.createButton("+");
 
     xx.buttonBot1div = sudoku.createButton("!");
@@ -38,9 +104,64 @@ sudoku.createFrame = function()
     xx.buttonBot1div.onTouchClick = sudoku.onLoadNewGame;
     xx.buttonBot3div.onTouchClick = sudoku.onHintPlayer;
 
+    xx.audio = WebLibSimple.createAnyAppend("audio", null);
+    xx.audio.src = "/webapps/sudoku/sounds/finish_level_1.wav";
+    xx.audio.preload = "auto";
+
     xx.onWindowResize();
 
     addEventListener("resize", sudoku.onWindowResize);
+}
+
+sudoku.onTouchEnterDigit = function(target, ctarget)
+{
+    var xx = sudoku;
+
+    WebAppUtility.makeClick();
+
+    xx.game[ xx.enterPosition ] = target.digitValue;
+
+    xx.enterDimm.style.display = "none";
+    xx.enterPanel.style.display = "none";
+
+    xx.displayGame();
+
+    if (xx.hintLevel > 1)  xx.hintLevel = 1;
+
+    var solutions = xx.getNumberSolutions();
+    xx.gameCells[ xx.enterPosition ].style.color = (solutions == 1) ? "#000000" : "#ff0000";
+
+    xx.displayHints();
+
+    if (xx.issolved)
+    {
+        xx.audio.play();
+
+        setTimeout(xx.loadNewGame, 1000);
+        setTimeout(xx.audio.load, 2000);
+    }
+}
+
+sudoku.onTouchEnterField = function(target, ctarget)
+{
+    var xx = sudoku;
+
+    WebAppUtility.makeClick();
+
+    xx.enterDimm.style.display = "block";
+    xx.enterPanel.style.display = "block";
+
+    xx.enterPosition = target.gamePosition;
+}
+
+sudoku.onTouchEnterCancel = function(target, ctarget)
+{
+    var xx = sudoku;
+
+    WebAppUtility.makeClick();
+
+    xx.enterDimm.style.display = "none";
+    xx.enterPanel.style.display = "none";
 }
 
 sudoku.createButton = function(text)
@@ -88,6 +209,8 @@ sudoku.createPanel = function()
     xx.panelTable.cellSpacing  = "0";
     xx.panelTable.border = "0";
 
+    var pos = 0;
+
     for (var row = 0; row < 9; row++)
     {
         var tableRow = WebLibSimple.createAnyAppend("tr", xx.panelTable);
@@ -99,6 +222,9 @@ sudoku.createPanel = function()
             tableData.style.height = xx.fieldsize + "px";
             tableData.style.textAlign = "center";
             tableData.style.verticalAlign = "middle";
+            tableData.onTouchClick = xx.onTouchEnterField;
+            tableData.gamePosition = pos++;
+
             xx.gameCells.push(tableData);
 
             var solveTable = WebLibSimple.createAnyAppend("table", tableData);
@@ -165,15 +291,72 @@ sudoku.displayGame = function()
     }
 }
 
+sudoku.findSingle = function(positions)
+{
+    var xx = sudoku;
+
+    for (var dig = 1; dig <= 9; dig++)
+    {
+        var usable = [];
+
+        for (var inx = 0; inx < positions.length; inx++)
+        {
+            var pos = positions[ inx ];
+
+            if (xx.game[ pos ] > 0) continue;
+
+            if (xx.horzhave[ xx.horz[ pos ] ][ dig ] ||
+                xx.verthave[ xx.vert[ pos ] ][ dig ] ||
+                xx.cellhave[ xx.cell[ pos ] ][ dig ])
+            {
+                continue;
+            }
+
+            usable.push(pos);
+        }
+
+        if (usable.length == 1)
+        {
+            //
+            // One cell, horz or vert with only one choice.
+            //
+
+            for (var inx = 0; inx < positions.length; inx++)
+            {
+                var pos = positions[ inx ];
+                var gameCell = xx.gameCells[ pos ];
+                WebLibSimple.setBGColor(gameCell, "#ffccff");
+            }
+
+            var pos = usable[ 0 ];
+            var gameCell = xx.gameCells[ pos ];
+            WebLibSimple.setBGColor(gameCell, "#ff88ff");
+
+            return pos;
+        }
+    }
+
+    return -1;
+}
+
 sudoku.displayHints = function()
 {
     var xx = sudoku;
 
+    var onlyone = -1;
+
+    xx.issolved = true;
+
     for (var pos = 0; pos < 81; pos++)
     {
+        var gameCell = xx.gameCells[ pos ];
+        WebLibSimple.setBGColor(gameCell, null);
+
         if (xx.game[ pos ] > 0) continue;
 
-        var gameCell = xx.gameCells[ pos ];
+        xx.issolved = false;
+
+        var numvalid = 0;
 
         for (var dig = 1; dig <= 9; dig++)
         {
@@ -185,27 +368,77 @@ sudoku.displayHints = function()
             }
             else
             {
-                gameCell.hintCells[ dig - 1 ].innerHTML = dig;
+                gameCell.hintCells[ dig - 1 ].innerHTML = (xx.hintLevel > 0) ? dig : "&ensp;";
+                numvalid++;
             }
         }
+
+        if (numvalid == 1) onlyone = pos;
+    }
+
+    if (xx.hintLevel < 2) return;
+
+    //
+    // Give algorithmic hints.
+    //
+
+    if (onlyone >= 0)
+    {
+        //
+        // One field with only one choice.
+        //
+
+        var gameCell = xx.gameCells[ onlyone ];
+        WebLibSimple.setBGColor(gameCell, "#ff8888");
+
+        return;
+    }
+
+    for (var inx = 0; inx < 9; inx++)
+    {
+        var pos = xx.findSingle(xx.horzpositions[ inx ]);
+        if (pos >= 0) break;
+
+        var pos = xx.findSingle(xx.vertpositions[ inx ]);
+        if (pos >= 0) break;
+
+        var pos = xx.findSingle(xx.cellpositions[ inx ]);
+        if (pos >= 0) break;
     }
 }
 
-sudoku.loadNewGameLevel = function()
+sudoku.loadNewGame = function()
 {
-    sudoku.newLevelTimeout = null;
-    sudoku.buildGame();
+    var xx = sudoku;
+
+    xx.newLevelTimeout = null;
+
+    xx.hintLevel = 0;
+
+    for (var pos = 0; pos < 81; pos++)
+    {
+        xx.gameCells[ pos ].innerHTML = null;
+    }
+
+    setTimeout(xx.buildGame, 0);
 }
 
 sudoku.onLoadNewGame = function(target, ctarget)
 {
     WebAppUtility.makeClick();
-    sudoku.buildGame();
+
+    sudoku.loadNewGame();
 }
 
 sudoku.onHintPlayer = function(target, ctarget)
 {
     WebAppUtility.makeClick();
+
+    var xx = sudoku;
+
+    xx.hintLevel = (xx.hintLevel + 1) % 3;
+
+    xx.displayHints();
 }
 
 sudoku.onButtonMinus = function(target, ctarget)
@@ -217,7 +450,7 @@ sudoku.onButtonMinus = function(target, ctarget)
     if (xx.level > 1) xx.buttonTop2div.buttonCen.innerHTML = --xx.level;
 
     if (xx.newLevelTimeout) clearTimeout(xx.newLevelTimeout);
-    xx.newLevelTimeout = setTimeout(xx.loadNewGameLevel, 1000);
+    xx.newLevelTimeout = setTimeout(xx.loadNewGame, 1000);
 }
 
 sudoku.onButtonPlus = function(target, ctarget)
@@ -229,7 +462,7 @@ sudoku.onButtonPlus = function(target, ctarget)
     if (xx.level < 10) xx.buttonTop2div.buttonCen.innerHTML = ++xx.level;
 
     if (xx.newLevelTimeout) clearTimeout(xx.newLevelTimeout);
-    xx.newLevelTimeout = setTimeout(xx.loadNewGameLevel, 1000);
+    xx.newLevelTimeout = setTimeout(xx.loadNewGame, 1000);
 }
 
 sudoku.onWindowResize = function()
@@ -326,4 +559,5 @@ sudoku.buildGame = function()
 
 sudoku.createFrame();
 sudoku.createPanel();
-sudoku.buildGame();
+
+setTimeout(sudoku.buildGame, 0);
