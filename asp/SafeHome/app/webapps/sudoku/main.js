@@ -80,11 +80,13 @@ sudoku.createPanel = function()
     xx.gameCells = [];
 
     xx.panelTable = WebLibSimple.createAnyAppend("table", xx.gamePanel);
+    xx.panelTable.style.marginLeft = "2px";
+    xx.panelTable.style.marginTop  = "2px";
     xx.panelTable.style.width  = "100%";
     xx.panelTable.style.height = "100%";
     xx.panelTable.cellPadding  = "0";
     xx.panelTable.cellSpacing  = "0";
-    xx.panelTable.border = "1";
+    xx.panelTable.border = "0";
 
     for (var row = 0; row < 9; row++)
     {
@@ -93,8 +95,8 @@ sudoku.createPanel = function()
         for (var col = 0; col < 9; col++)
         {
             var tableData = WebLibSimple.createAnyAppend("td", tableRow);
-            tableData.style.width  = (xx.fieldsize - 0) + "px";
-            tableData.style.height = (xx.fieldsize - 2) + "px";
+            tableData.style.width  = xx.fieldsize + "px";
+            tableData.style.height = xx.fieldsize + "px";
             tableData.style.textAlign = "center";
             tableData.style.verticalAlign = "middle";
             xx.gameCells.push(tableData);
@@ -126,6 +128,21 @@ sudoku.createPanel = function()
                 }
             }
         }
+    }
+
+    //
+    // Make raster.
+    //
+    
+    for (var inx = 0; inx <= 9; inx++)
+    {
+        var wid = (inx % 3) ? 2 : 3;
+
+        var bar = WebLibSimple.createDivWidth(xx.fieldsize * inx, 0, wid, -wid, null, xx.gamePanel);
+        WebLibSimple.setBGColor(bar, "#0000ff");
+
+        var bar = WebLibSimple.createDivHeight(0, xx.fieldsize * inx, -wid, wid, null, xx.gamePanel);
+        WebLibSimple.setBGColor(bar, "#0000ff");
     }
 }
 
