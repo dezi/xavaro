@@ -133,7 +133,7 @@ sudoku.createPanel = function()
     //
     // Make raster.
     //
-    
+
     for (var inx = 0; inx <= 9; inx++)
     {
         var wid = (inx % 3) ? 2 : 3;
