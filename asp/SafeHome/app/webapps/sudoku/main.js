@@ -343,7 +343,8 @@ sudoku.displayHints = function()
 {
     var xx = sudoku;
 
-    var onlyone = -1;
+    xx.onlyone = -1;
+    xx.onlydig = -1;
 
     xx.issolved = true;
 
@@ -357,6 +358,7 @@ sudoku.displayHints = function()
         xx.issolved = false;
 
         var numvalid = 0;
+        var validdig = 0;
 
         for (var dig = 1; dig <= 9; dig++)
         {
@@ -369,11 +371,16 @@ sudoku.displayHints = function()
             else
             {
                 gameCell.hintCells[ dig - 1 ].innerHTML = (xx.hintLevel > 0) ? dig : "&ensp;";
+                validdig = dig;
                 numvalid++;
             }
         }
 
-        if (numvalid == 1) onlyone = pos;
+        if (numvalid == 1)
+        {
+            xx.onlyone = pos;
+            xx.onlydig = validdig;
+        }
     }
 
     if (xx.hintLevel < 2) return;
@@ -382,28 +389,53 @@ sudoku.displayHints = function()
     // Give algorithmic hints.
     //
 
-    if (onlyone >= 0)
+    if (xx.onlyone >= 0)
     {
         //
         // One field with only one choice.
         //
 
-        var gameCell = xx.gameCells[ onlyone ];
+        var gameCell = xx.gameCells[ xx.onlyone ];
         WebLibSimple.setBGColor(gameCell, "#ff8888");
+    }
+    else
+    {
+        for (var inx = 0; inx < 9; inx++)
+        {
+            var pos = xx.findSingle(xx.horzpositions[ inx ]);
+            if (pos >= 0) break;
 
-        return;
+            var pos = xx.findSingle(xx.vertpositions[ inx ]);
+            if (pos >= 0) break;
+
+            var pos = xx.findSingle(xx.cellpositions[ inx ]);
+            if (pos >= 0) break;
+        }
     }
 
-    for (var inx = 0; inx < 9; inx++)
+    if (xx.hintLevel < 3) return;
+
+    //
+    // Solve next digit.
+    //
+
+    xx.hintLevel = 1;
+
+    if (xx.onlyone >= 0)
     {
-        var pos = xx.findSingle(xx.horzpositions[ inx ]);
-        if (pos >= 0) break;
+        xx.game[ xx.onlyone ] = xx.onlydig;
+    }
 
-        var pos = xx.findSingle(xx.vertpositions[ inx ]);
-        if (pos >= 0) break;
+    xx.displayGame();
+    xx.buildHints();
+    xx.displayHints();
+    
+    if (xx.issolved)
+    {
+        xx.audio.play();
 
-        var pos = xx.findSingle(xx.cellpositions[ inx ]);
-        if (pos >= 0) break;
+        setTimeout(xx.loadNewGame, 1000);
+        setTimeout(xx.audio.load, 2000);
     }
 }
 
@@ -436,7 +468,7 @@ sudoku.onHintPlayer = function(target, ctarget)
 
     var xx = sudoku;
 
-    xx.hintLevel = (xx.hintLevel + 1) % 3;
+    xx.hintLevel = (xx.hintLevel + 1) % 4;
 
     xx.displayHints();
 }
@@ -459,7 +491,7 @@ sudoku.onButtonPlus = function(target, ctarget)
 
     WebAppUtility.makeClick();
 
-    if (xx.level < 10) xx.buttonTop2div.buttonCen.innerHTML = ++xx.level;
+    if (xx.level < 9) xx.buttonTop2div.buttonCen.innerHTML = ++xx.level;
 
     if (xx.newLevelTimeout) clearTimeout(xx.newLevelTimeout);
     xx.newLevelTimeout = setTimeout(xx.loadNewGame, 1000);

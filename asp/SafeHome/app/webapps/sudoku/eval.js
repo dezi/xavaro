@@ -213,6 +213,13 @@ sudoku.generateGame = function()
             xx.game[ pos ] = olddig;
         }
 
-        if ((xx.level == 1) && (inx > 20)) break;
+        if ((xx.level == 1) && (inx >  5)) break;
+        if ((xx.level == 2) && (inx > 10)) break;
+        if ((xx.level == 3) && (inx > 20)) break;
+        if ((xx.level == 4) && (inx > 25)) break;
+        if ((xx.level == 5) && (inx > 30)) break;
+        if ((xx.level == 6) && (inx > 40)) break;
+        if ((xx.level == 7) && (inx > 50)) break;
+        if ((xx.level == 8) && (inx > 60)) break;
     }
 }
