@@ -33,6 +33,10 @@ mahjong.createFrame = function()
     xx.buttonBot2div.onTouchClick = mahjong.onSolveStep;
     xx.buttonBot3div.onTouchClick = mahjong.onHintPlayer;
 
+    xx.audioInvalid = WebLibSimple.createAnyAppend("audio", null);
+    xx.audioInvalid.src = "/webapps/mahjong/sounds/invalid.wav";
+    xx.audioInvalid.preload = "auto";
+
     addEventListener("resize", mahjong.onWindowResize);
 }
 
@@ -253,6 +257,8 @@ mahjong.checkMove = function()
             xx.resetTiles.push(xx.selectedTile2);
 
             xx.resetSelect();
+
+
         }
 
         xx.selectedTile1 = null;
