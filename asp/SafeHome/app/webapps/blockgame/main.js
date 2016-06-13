@@ -24,7 +24,7 @@ blockgame.createFrame = function()
     WebLibSimple.setBGColor(xx.gamePanel, "#ffdddd");
 
     xx.audio = WebLibSimple.createAnyAppend("audio", null);
-    xx.audio.src = "/webapps/blockgame/sounds/finish_level_2.ogg";
+    xx.audio.src = "/webapps/blockgame/sounds/finish_level_2.wav";
     xx.audio.preload = "auto";
 }
 
@@ -251,7 +251,6 @@ blockgame.playGameEnd = function()
     blockgame.audio.play();
 
     setTimeout(blockgame.buildGame, 1000);
-    setTimeout(blockgame.audio.load, 5000);
 }
 
 blockgame.moveBlock = function(block)
