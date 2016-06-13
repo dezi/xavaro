@@ -80,9 +80,9 @@ mahjong.onWindowResize = function()
     xx.panelActWid = (wid - 100);
     xx.panelActHei = Math.floor(xx.panelRealHei * xx.panelActWid / xx.panelRealWid);
 
-    if (xx.panelActHei > (hei - 150))
+    if (xx.panelActHei > (hei - 200))
     {
-        xx.panelActHei = (hei - 150);
+        xx.panelActHei = (hei - 200);
         xx.panelActWid = Math.floor(xx.panelRealWid * xx.panelActHei / xx.panelRealHei);
     }
 
