@@ -96,12 +96,13 @@ sudoku.createFrame = function()
     xx.buttonTop3div = sudoku.createButton("+");
 
     xx.buttonBot1div = sudoku.createButton("!");
-    xx.buttonBot2div = sudoku.createButton(" ");
+    xx.buttonBot2div = sudoku.createButton("*");
     xx.buttonBot3div = sudoku.createButton("?");
 
     xx.buttonTop1div.onTouchClick = sudoku.onButtonMinus;
     xx.buttonTop3div.onTouchClick = sudoku.onButtonPlus;
     xx.buttonBot1div.onTouchClick = sudoku.onLoadNewGame;
+    xx.buttonBot2div.onTouchClick = sudoku.onSolveStep;
     xx.buttonBot3div.onTouchClick = sudoku.onHintPlayer;
 
     xx.audio = WebLibSimple.createAnyAppend("audio", null);
@@ -344,7 +345,7 @@ sudoku.findSingle = function(positions)
     return -1;
 }
 
-sudoku.displayHints = function()
+sudoku.displayHints = function(solvestep)
 {
     var xx = sudoku;
 
@@ -418,7 +419,7 @@ sudoku.displayHints = function()
         }
     }
 
-    if (xx.hintLevel < 3) return;
+    if (! solvestep) return;
 
     //
     // Solve next digit.
@@ -473,9 +474,16 @@ sudoku.onHintPlayer = function(target, ctarget)
 
     var xx = sudoku;
 
-    xx.hintLevel = (xx.hintLevel + 1) % 4;
+    xx.hintLevel = (xx.hintLevel + 1) % 3;
 
     xx.displayHints();
+}
+
+sudoku.onSolveStep = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    sudoku.displayHints(true);
 }
 
 sudoku.onButtonMinus = function(target, ctarget)
