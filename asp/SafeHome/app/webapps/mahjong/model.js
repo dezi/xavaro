@@ -33,6 +33,34 @@ mahjong.canBePairedWith = function(face1, face2)
            (isSeason1 && isSeason2);
 }
 
+mahjong.createPoolAddTiles = function(max)
+{
+    for (var inx = 0; inx < max; inx++)
+    {
+        mahjong.tilePool.push(mahjong.faces[ inx ]);
+    }
+}
+
+mahjong.createPool = function()
+{
+    var xx = mahjong;
+
+    xx.tilePool = [];
+
+    xx.createPoolAddTiles(42);
+    xx.createPoolAddTiles(34);
+    xx.createPoolAddTiles(34);
+    xx.createPoolAddTiles(34);
+}
+
+mahjong.getRandomTile = function()
+{
+    var xx = mahjong;
+
+    var rnd = Math.floor(Math.random() * xx.tilePool.length);
+    return xx.tilePool.slice(rnd, rnd + 1);
+}
+
 mahjong.createBoard = function()
 {
     var xx = mahjong;
@@ -53,6 +81,8 @@ mahjong.createBoard = function()
 
     console.log("mahjong.createBoard: numTiles=" + xx.numTiles);
 
+    xx.createPool();
+
     var dimensions = boardlines.shift().trim().split(",");
     if (dimensions.length != 3) return;
     xx.zSize = parseInt(dimensions[ 0 ]);
@@ -67,4 +97,67 @@ mahjong.createBoard = function()
     xx.panelRealHei = xx.ySize * xx.tileRealHei;
 
     console.log("mahjong.createBoard: wid=" + xx.panelRealWid + " hei=" + xx.panelRealHei);
+
+    xx.gamePanel.innerHTML = null;
+    xx.matrix = [];
+
+    for (var zinx = 0; zinx < xx.zSize; zinx++)
+    {
+        xx.matrix[ zinx ] = [];
+
+        for (var yinx = 0; yinx < xx.ySize; yinx++)
+        {
+            if (boardlines.length == 0)
+            {
+                alert("Lines missing in def.....");
+
+                return;
+            }
+
+            var line = boardlines.shift().trim();
+
+            while (boardlines.length && ! line.length)
+            {
+                line = boardlines.shift().trim();
+            }
+
+            xx.matrix[ zinx ][ yinx ] = [];
+
+            for (var xinx = 0; xinx < xx.xSize; xinx++)
+            {
+                var div = null;
+
+                if (line[ xinx ] == "1")
+                {
+                    div = WebLibSimple.createDivWidHei(0, 0, 0, 0, null, xx.gamePanel);
+
+                    div.tileName = xx.getRandomTile();
+                    div.tilePosition = { z: zinx, y: yinx, x: xinx };
+                    div.tileSelected = false;
+
+                    div.tileBack = WebLibSimple.createAnyAppend("img", div);
+                    div.tileBack.style.position = "absolute";
+                    div.tileBack.style.left     = "0px";
+                    div.tileBack.style.top      = "0px";
+                    div.tileBack.style.width    = "100%";
+                    div.tileBack.style.height   = "100%";
+                    div.tileBack.src = "tile_neutral_89x117.png";
+
+                    div.tileFace = WebLibSimple.createAnyAppend("img", div);
+                    div.tileFace.style.position = "absolute";
+                    div.tileFace.style.left     = "0px";
+                    div.tileFace.style.top      = "0px";
+                    div.tileFace.style.width    = "100%";
+                    div.tileFace.style.height   = "100%";
+                    div.tileFace.src = "tiles/classic/" + div.tileName + ".png";
+
+                    div.onTouchClick = mahjong.onTileClick;
+                }
+
+                xx.matrix[ zinx ][ yinx ][ xinx ] = div;
+            }
+        }
+    }
+
+    console.log("mahjong.createBoard: done...");
 }

@@ -8,11 +8,10 @@ mahjong.createFrame = function()
     WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
     WebLibSimple.setBGColor(xx.topdiv, "#dddddd");
     xx.topdiv.style.overflow = "hidden";
+    xx.topdiv.style.backgroundImage = "url('walls/wood.jpg')";;
 
     xx.centerDiv = WebLibSimple.createDivWidHei("50%", "50%", 1, 1, "centerDiv", xx.topdiv);
     xx.gamePanel = WebLibSimple.createDivWidHei(0, 0, 0, 0, "gamePanel", xx.centerDiv);
-
-    WebLibSimple.setBGColor(xx.gamePanel, "#ffeeee");
 
     //
     // Buttons.
@@ -74,6 +73,10 @@ mahjong.onWindowResize = function()
     var wid = xx.topdiv.clientWidth;
     var hei = xx.topdiv.clientHeight;
 
+    //
+    // Scale game panel to best fit.
+    //
+
     xx.panelActWid = (wid - 100);
     xx.panelActHei = Math.floor(xx.panelRealHei * xx.panelActWid / xx.panelRealWid);
 
@@ -87,6 +90,34 @@ mahjong.onWindowResize = function()
     xx.gamePanel.style.top    = -(xx.panelActHei >> 1) + "px";
     xx.gamePanel.style.width  = xx.panelActWid + "px";
     xx.gamePanel.style.height = xx.panelActHei + "px";
+
+    //
+    // Adjust tile sizes and positions.
+    //
+
+    xx.tileActWid = xx.panelActWid / (xx.xSize >> 1);
+    xx.tileActHei = xx.panelActHei / (xx.ySize >> 1);
+
+    for (var zinx = 0; zinx < xx.zSize; zinx++)
+    {
+        for (var yinx = 0; yinx < xx.ySize; yinx++)
+        {
+            for (var xinx = 0; xinx < xx.xSize; xinx++)
+            {
+                var div = xx.matrix[ zinx ][ yinx ][ xinx ];
+                if (! div) continue;
+
+                div.style.top    = (xx.tileActHei * yinx / 2) + "px";
+                div.style.left   = (xx.tileActWid * xinx / 2) + "px";
+                div.style.width  = xx.tileActWid + "px";
+                div.style.height = xx.tileActHei + "px";
+            }
+        }
+    }
+
+    //
+    // Adjust button positions.
+    //
 
     var spacehorz = (wid - xx.panelActWid) >> 1;
     var spacevert = (hei - xx.panelActHei) >> 1;
@@ -160,6 +191,22 @@ mahjong.onWindowResize = function()
         xx.buttonBot3div.style.top    = null;
         xx.buttonBot3div.style.right  = spacehorz + "px";
         xx.buttonBot3div.style.bottom = spacevert + "px";
+    }
+}
+
+mahjong.onTileClick = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    if (target.tileSelected)
+    {
+        target.tileBack.src = "tile_neutral_89x117.png";
+        target.tileSelected = false;
+    }
+    else
+    {
+        target.tileBack.src = "tile_selected_89x117.png";
+        target.tileSelected = true;
     }
 }
 
