@@ -298,6 +298,7 @@ sudoku.findSingle = function(positions)
     for (var dig = 1; dig <= 9; dig++)
     {
         var usable = [];
+        var usedig = -1;
 
         for (var inx = 0; inx < positions.length; inx++)
         {
@@ -313,6 +314,7 @@ sudoku.findSingle = function(positions)
             }
 
             usable.push(pos);
+            usedig = dig;
         }
 
         if (usable.length == 1)
@@ -331,6 +333,9 @@ sudoku.findSingle = function(positions)
             var pos = usable[ 0 ];
             var gameCell = xx.gameCells[ pos ];
             WebLibSimple.setBGColor(gameCell, "#ff88ff");
+
+            xx.onlyone = pos;
+            xx.onlydig = usedig;
 
             return pos;
         }
@@ -429,7 +434,7 @@ sudoku.displayHints = function()
     xx.displayGame();
     xx.buildHints();
     xx.displayHints();
-    
+
     if (xx.issolved)
     {
         xx.audio.play();
