@@ -327,6 +327,7 @@ mahjong.onLoadNewGame = function(target, ctarget)
 {
     WebAppUtility.makeClick();
 
+    mahjong.hintLevel = 0;
     mahjong.loadNewGame();
 }
 
