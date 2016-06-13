@@ -1,3 +1,5 @@
+mahjong.tilePackWid = 81;
+mahjong.tilePackHei = 110;
 mahjong.tileRealWid = 89;
 mahjong.tileRealHei = 118;
 
@@ -58,14 +60,16 @@ mahjong.getRandomTile = function()
     var xx = mahjong;
 
     var rnd = Math.floor(Math.random() * xx.tilePool.length);
-    return xx.tilePool.slice(rnd, rnd + 1);
+    var sub = xx.tilePool.slice(rnd, rnd + 1);
+
+    return sub[ 0 ];
 }
 
 mahjong.createBoard = function()
 {
     var xx = mahjong;
 
-    var url = "boards/" + xx.boards[ xx.boardIndex ] + ".txt";
+    var url = "boards/" + xx.boards[ xx.boardIndex - 1 ] + ".txt";
     var boarddata = WebAppRequest.loadSync(url);
     var boardlines = boarddata.trim().replace("\r","").split("\n");
     if (! boardlines.length) return;
@@ -93,8 +97,8 @@ mahjong.createBoard = function()
 
     console.log("mahjong.createBoard: z=" + xx.zSize + " y=" + xx.ySize + " x=" + xx.xSize);
 
-    xx.panelRealWid = xx.xSize * xx.tileRealWid;
-    xx.panelRealHei = xx.ySize * xx.tileRealHei;
+    xx.panelRealWid = xx.xSize * xx.tilePackWid;
+    xx.panelRealHei = xx.ySize * xx.tilePackHei;
 
     console.log("mahjong.createBoard: wid=" + xx.panelRealWid + " hei=" + xx.panelRealHei);
 
@@ -131,6 +135,7 @@ mahjong.createBoard = function()
                 {
                     div = WebLibSimple.createDivWidHei(0, 0, 0, 0, null, xx.gamePanel);
 
+                    div.tileKey = zinx + ":" + yinx + ":" + xinx;
                     div.tileName = xx.getRandomTile();
                     div.tilePosition = { z: zinx, y: yinx, x: xinx };
                     div.tileSelected = false;
@@ -159,5 +164,102 @@ mahjong.createBoard = function()
         }
     }
 
-    console.log("mahjong.createBoard: done...");
+    xx.selectedTile1 = null;
+    xx.selectedTile2 = null;
+
+    xx.computeBorder();
+}
+
+mahjong.computeBorder = function()
+{
+    var xx = mahjong;
+
+    xx.border = {};
+    xx.tilesLeft = 0;
+    xx.combinations = [];
+
+    for (var zinx = 0; zinx < xx.zSize; zinx++)
+    {
+        for (var yinx = 0; yinx < xx.ySize; yinx++)
+        {
+            for (var xinx = 0; xinx < xx.xSize; xinx++)
+            {
+                var div = xx.matrix[ zinx ][ yinx ][ xinx ];
+                if (! div) continue;
+
+                xx.tilesLeft++;
+
+                div.isBorder = xx.canTileBelongToBorder(xinx, yinx, zinx);
+
+                if (div.isBorder)
+                {
+                    if (xx.hintLevel > 0)
+                    {
+                        div.tileBack.src = "tile_border_89x117.png";
+                    }
+                    else
+                    {
+                        div.tileBack.src = "tile_neutral_89x117.png";
+                    }
+
+                    for (var key in xx.border)
+                    {
+                        var div1 = xx.border[ key ];
+
+                        if (xx.canBePairedWith(div.tileName, div1.tileName))
+                        {
+                            var combi = {};
+                            combi.tile1 = div;
+                            combi.tile2 = div1;
+
+                            xx.combinations.push(combi);
+                        }
+                    }
+
+                    xx.border[ div.tileKey ] = div;
+                }
+                else
+                {
+                    div.tileBack.src = "tile_neutral_89x117.png";
+                }
+            }
+        }
+    }
+
+    console.log("mahjong.computeBorder: tiles=" + xx.tilesLeft + " combinations=" + xx.combinations.length);
+}
+
+mahjong.canTileBelongToBorder = function(x, y, z)
+{
+    var xx = mahjong;
+
+    var zL = (z == xx.zSize - 1);
+    var x0 = (x == 0);
+    var xL = (x == xx.xSize - 1);
+    var y0 = (y == 0);
+    var yL = (y == xx.ySize - 1);
+    var x1 = (x < 2);
+    var xP = (x > xx.xSize - 3);
+
+    var matrix = xx.matrix;
+
+    if (zL || (matrix[ z + 1 ][ y ][ x ] == null
+            && (x0 || matrix[ z + 1 ][ y ][ x - 1 ] == null)
+            && (xL || matrix[ z + 1 ][ y ][ x + 1 ] == null)
+            && (y0 || matrix[ z + 1 ][ y - 1 ][ x ] == null)
+            && (yL || matrix[ z + 1 ][ y + 1 ][ x ] == null)
+            && (x0 || y0 || matrix[ z + 1 ][ y - 1 ][ x - 1 ] == null)
+            && (x0 || yL || matrix[ z + 1 ][ y + 1 ][ x - 1 ] == null)
+            && (xL || y0 || matrix[ z + 1 ][ y - 1 ][ x + 1 ] == null)
+            && (xL || yL || matrix[ z + 1 ][ y + 1 ][ x + 1 ] == null)))
+    {
+        return ((x1 || matrix[ z ][ y ][ x - 2 ] == null)
+                && (x1 || y0 || matrix[ z ][ y - 1 ][ x - 2 ] == null)
+                && (x1 || yL || matrix[ z ][ y + 1 ][ x - 2 ] == null))
+                || ((xP || matrix[ z ][ y ][ x + 2 ] == null)
+                && (xP || y0 || matrix[ z ][ y - 1 ][ x + 2 ] == null)
+                && (xP || yL || matrix[ z ][ y + 1 ][ x + 2 ] == null));
+    }
+
+    return false;
 }

@@ -3,6 +3,8 @@ mahjong.createFrame = function()
     var xx = mahjong;
 
     xx.boardIndex = 1;
+    xx.hintLevel  = 0;
+    xx.resetTiles = [];
 
     xx.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
     WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
@@ -22,16 +24,14 @@ mahjong.createFrame = function()
     xx.buttonTop3div = mahjong.createButton("+");
 
     xx.buttonBot1div = mahjong.createButton("!");
-    xx.buttonBot2div = mahjong.createButton("*");
+    xx.buttonBot2div = mahjong.createButton("=");
     xx.buttonBot3div = mahjong.createButton("?");
 
-    /*
     xx.buttonTop1div.onTouchClick = mahjong.onButtonMinus;
     xx.buttonTop3div.onTouchClick = mahjong.onButtonPlus;
     xx.buttonBot1div.onTouchClick = mahjong.onLoadNewGame;
     xx.buttonBot2div.onTouchClick = mahjong.onSolveStep;
     xx.buttonBot3div.onTouchClick = mahjong.onHintPlayer;
-    */
 
     addEventListener("resize", mahjong.onWindowResize);
 }
@@ -98,8 +98,17 @@ mahjong.onWindowResize = function()
     xx.tileActWid = xx.panelActWid / (xx.xSize >> 1);
     xx.tileActHei = xx.panelActHei / (xx.ySize >> 1);
 
+    xx.tileTotWid = xx.tileRealWid * xx.tileActWid / xx.tilePackWid;
+    xx.tileTotHei = xx.tileRealHei * xx.tileActHei / xx.tilePackHei;
+
+    xx.tileSkewWid = Math.floor(xx.tileTotWid - xx.tileActWid);
+    xx.tileSkewHei = Math.floor(xx.tileTotHei - xx.tileActHei);
+
     for (var zinx = 0; zinx < xx.zSize; zinx++)
     {
+        var skewWid = Math.floor(xx.tileSkewWid * zinx);
+        var skewHei = Math.floor(xx.tileSkewHei * zinx);
+
         for (var yinx = 0; yinx < xx.ySize; yinx++)
         {
             for (var xinx = 0; xinx < xx.xSize; xinx++)
@@ -107,10 +116,10 @@ mahjong.onWindowResize = function()
                 var div = xx.matrix[ zinx ][ yinx ][ xinx ];
                 if (! div) continue;
 
-                div.style.top    = (xx.tileActHei * yinx / 2) + "px";
-                div.style.left   = (xx.tileActWid * xinx / 2) + "px";
-                div.style.width  = xx.tileActWid + "px";
-                div.style.height = xx.tileActHei + "px";
+                div.style.left   = (Math.round(xx.tileActWid * xinx / 2) - skewWid) + "px";
+                div.style.top    = (Math.round(xx.tileActHei * yinx / 2) - skewHei) + "px";
+                div.style.width  = xx.tileTotWid + "px";
+                div.style.height = xx.tileTotHei + "px";
             }
         }
     }
@@ -194,20 +203,209 @@ mahjong.onWindowResize = function()
     }
 }
 
+mahjong.resetSelect = function()
+{
+    var xx = mahjong;
+
+    while (xx.resetTiles.length > 0)
+    {
+        var target = xx.resetTiles.shift();
+
+        if (target.isBorder && (xx.hintLevel > 0))
+        {
+            target.tileBack.src = "tile_border_89x117.png";
+        }
+        else
+        {
+            target.tileBack.src = "tile_neutral_89x117.png";
+        }
+
+        target.tileSelected = false;
+    }
+}
+
+mahjong.removeTile = function(tile)
+{
+    var xx = mahjong;
+
+    WebLibSimple.detachElement(tile);
+
+    var pos = tile.tilePosition;
+    xx.matrix[ pos.z ][ pos.y ][ pos.x ] = null;
+}
+
+mahjong.checkMove = function()
+{
+    var xx = mahjong;
+
+    if (xx.selectedTile1 && xx.selectedTile2)
+    {
+        if (xx.canBePairedWith(xx.selectedTile1.tileName, xx.selectedTile2.tileName))
+        {
+            xx.removeTile(xx.selectedTile1);
+            xx.removeTile(xx.selectedTile2);
+
+            xx.computeBorder();
+        }
+        else
+        {
+            xx.resetTiles.push(xx.selectedTile1);
+            xx.resetTiles.push(xx.selectedTile2);
+
+            xx.resetSelect();
+        }
+
+        xx.selectedTile1 = null;
+        xx.selectedTile2 = null;
+    }
+}
+
 mahjong.onTileClick = function(target, ctarget)
 {
     WebAppUtility.makeClick();
+
+    var xx = mahjong;
 
     if (target.tileSelected)
     {
         target.tileBack.src = "tile_neutral_89x117.png";
         target.tileSelected = false;
+
+        if (xx.selectedTile1 == target) xx.selectedTile1 = null;
+        if (xx.selectedTile2 == target) xx.selectedTile2 = null;
     }
     else
     {
+        if (xx.selectedTile1 && xx.selectedTile2)
+        {
+            //
+            // User clicked again before match evaluation.
+            //
+
+            return;
+        }
+
         target.tileBack.src = "tile_selected_89x117.png";
-        target.tileSelected = true;
+
+        if (xx.border[ target.tileKey ])
+        {
+            target.tileSelected = true;
+
+            if (xx.selectedTile1 == null)
+            {
+                xx.selectedTile1 = target;
+            }
+            else
+            {
+                xx.selectedTile2 = target;
+            }
+
+            if (xx.selectedTile1 && xx.selectedTile2)
+            {
+                setTimeout(xx.checkMove, 100);
+            }
+        }
+        else
+        {
+            xx.resetTiles.push(target);
+            setTimeout(xx.resetSelect, 250);
+        }
     }
+}
+
+mahjong.loadNewGame = function()
+{
+    var xx = mahjong;
+
+    xx.newLevelTimeout = null;
+
+    xx.createBoard();
+    xx.onWindowResize();
+}
+
+mahjong.onLoadNewGame = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    mahjong.loadNewGame();
+}
+
+mahjong.onHintPlayer = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    var xx = mahjong;
+
+    xx.hintLevel = (xx.hintLevel + 1) % 3;
+
+    xx.computeBorder();
+
+    if (xx.hintLevel < 2) return;
+    if (xx.combinations.length == 0) return;
+
+    var rnd = -1;
+    var lev = -1;
+
+    for (var inx = 0; inx < xx.combinations.length; inx++)
+    {
+        var combi = xx.combinations[ inx ];
+
+        if ((rnd < 0) || (combi.tile1.tilePosition.z > lev) || (combi.tile2.tilePosition.z > lev))
+        {
+            rnd = inx;
+            lev = Math.max(combi.tile1.tilePosition.z, combi.tile2.tilePosition.z);
+        }
+    }
+
+    if (xx.selectedTile1) xx.resetTiles.push(xx.selectedTile1);
+    if (xx.selectedTile2) xx.resetTiles.push(xx.selectedTile2);
+
+    xx.selectedTile1 = xx.combinations[ rnd ].tile1;
+    xx.selectedTile2 = xx.combinations[ rnd ].tile2;
+
+    xx.selectedTile1.tileBack.src = "tile_selected_89x117.png";
+    xx.selectedTile1.tileSelected = true;
+
+    xx.selectedTile2.tileBack.src = "tile_selected_89x117.png";
+    xx.selectedTile2.tileSelected = true;
+
+    xx.hintLevel--;
+}
+
+mahjong.onSolveStep = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    var xx = mahjong;
+
+    if (xx.selectedTile1 && xx.selectedTile2)
+    {
+        setTimeout(xx.checkMove, 100);
+    }
+}
+
+mahjong.onButtonMinus = function(target, ctarget)
+{
+    var xx = mahjong;
+
+    WebAppUtility.makeClick();
+
+    if (xx.boardIndex > 1) xx.buttonTop2div.buttonCen.innerHTML = --xx.boardIndex;
+
+    if (xx.newLevelTimeout) clearTimeout(xx.newLevelTimeout);
+    xx.newLevelTimeout = setTimeout(xx.loadNewGame, 1000);
+}
+
+mahjong.onButtonPlus = function(target, ctarget)
+{
+    var xx = mahjong;
+
+    WebAppUtility.makeClick();
+
+    if (xx.boardIndex < xx.boards.length) xx.buttonTop2div.buttonCen.innerHTML = ++xx.boardIndex;
+
+    if (xx.newLevelTimeout) clearTimeout(xx.newLevelTimeout);
+    xx.newLevelTimeout = setTimeout(xx.loadNewGame, 1000);
 }
 
 mahjong.createFrame();

@@ -96,7 +96,7 @@ sudoku.createFrame = function()
     xx.buttonTop3div = sudoku.createButton("+");
 
     xx.buttonBot1div = sudoku.createButton("!");
-    xx.buttonBot2div = sudoku.createButton("*");
+    xx.buttonBot2div = sudoku.createButton("=");
     xx.buttonBot3div = sudoku.createButton("?");
 
     xx.buttonTop1div.onTouchClick = sudoku.onButtonMinus;
