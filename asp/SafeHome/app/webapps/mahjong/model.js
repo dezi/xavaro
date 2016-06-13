@@ -59,8 +59,10 @@ mahjong.getRandomTile = function()
 {
     var xx = mahjong;
 
+    if (xx.tilePool.length == 0) return null;
+
     var rnd = Math.floor(Math.random() * xx.tilePool.length);
-    var sub = xx.tilePool.slice(rnd, rnd + 1);
+    var sub = xx.tilePool.splice(rnd, 1);
 
     return sub[ 0 ];
 }
@@ -133,30 +135,37 @@ mahjong.createBoard = function()
 
                 if (line[ xinx ] == "1")
                 {
-                    div = WebLibSimple.createDivWidHei(0, 0, 0, 0, null, xx.gamePanel);
+                    var name = xx.getRandomTile();
+                    console.log("==================xxxxxx====" + name);
 
-                    div.tileKey = zinx + ":" + yinx + ":" + xinx;
-                    div.tileName = xx.getRandomTile();
-                    div.tilePosition = { z: zinx, y: yinx, x: xinx };
-                    div.tileSelected = false;
+                    if (name != null)
+                    {
+                        div = WebLibSimple.createDivWidHei(0, 0, 0, 0, null, xx.gamePanel);
 
-                    div.tileBack = WebLibSimple.createAnyAppend("img", div);
-                    div.tileBack.style.position = "absolute";
-                    div.tileBack.style.left     = "0px";
-                    div.tileBack.style.top      = "0px";
-                    div.tileBack.style.width    = "100%";
-                    div.tileBack.style.height   = "100%";
-                    div.tileBack.src = "tile_neutral_89x117.png";
+                        div.tileName = name;
 
-                    div.tileFace = WebLibSimple.createAnyAppend("img", div);
-                    div.tileFace.style.position = "absolute";
-                    div.tileFace.style.left     = "0px";
-                    div.tileFace.style.top      = "0px";
-                    div.tileFace.style.width    = "100%";
-                    div.tileFace.style.height   = "100%";
-                    div.tileFace.src = "tiles/classic/" + div.tileName + ".png";
+                        div.tileKey = zinx + ":" + yinx + ":" + xinx;
+                        div.tilePosition = { z: zinx, y: yinx, x: xinx };
+                        div.tileSelected = false;
 
-                    div.onTouchClick = mahjong.onTileClick;
+                        div.tileBack = WebLibSimple.createAnyAppend("img", div);
+                        div.tileBack.style.position = "absolute";
+                        div.tileBack.style.left     = "0px";
+                        div.tileBack.style.top      = "0px";
+                        div.tileBack.style.width    = "100%";
+                        div.tileBack.style.height   = "100%";
+                        div.tileBack.src = "tile_neutral_89x117.png";
+
+                        div.tileFace = WebLibSimple.createAnyAppend("img", div);
+                        div.tileFace.style.position = "absolute";
+                        div.tileFace.style.left     = "0px";
+                        div.tileFace.style.top      = "0px";
+                        div.tileFace.style.width    = "100%";
+                        div.tileFace.style.height   = "100%";
+                        div.tileFace.src = "tiles/classic/" + div.tileName + ".png";
+
+                        div.onTouchClick = mahjong.onTileClick;
+                    }
                 }
 
                 xx.matrix[ zinx ][ yinx ][ xinx ] = div;

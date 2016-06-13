@@ -37,6 +37,14 @@ mahjong.createFrame = function()
     xx.audioInvalid.src = "/webapps/mahjong/sounds/invalid.wav";
     xx.audioInvalid.preload = "auto";
 
+    xx.audioTadaaa = WebLibSimple.createAnyAppend("audio", null);
+    xx.audioTadaaa.src = "/webapps/mahjong/sounds/tadaaa.wav";
+    xx.audioTadaaa.preload = "auto";
+
+    xx.audioNomoves = WebLibSimple.createAnyAppend("audio", null);
+    xx.audioNomoves.src = "/webapps/mahjong/sounds/nomoves.wav";
+    xx.audioNomoves.preload = "auto";
+
     addEventListener("resize", mahjong.onWindowResize);
 }
 
@@ -250,6 +258,26 @@ mahjong.checkMove = function()
             xx.removeTile(xx.selectedTile2);
 
             xx.computeBorder();
+
+            if (xx.combinations.length == 0)
+            {
+                //
+                // Game finished.
+                //
+
+                if (xx.tilesLeft == 0)
+                {
+                    xx.audioTadaaa.play();
+                    setTimeout(xx.audioTadaaa.load, 2000);
+                }
+                else
+                {
+                    xx.audioNomoves.play();
+                    setTimeout(xx.audioNomoves.load, 2000);
+                }
+
+                setTimeout(mahjong.loadNewGame, 2000);
+            }
         }
         else
         {
@@ -325,6 +353,7 @@ mahjong.loadNewGame = function()
     var xx = mahjong;
 
     xx.newLevelTimeout = null;
+    xx.hintLevel = 0;
 
     xx.createBoard();
     xx.onWindowResize();
@@ -334,7 +363,6 @@ mahjong.onLoadNewGame = function(target, ctarget)
 {
     WebAppUtility.makeClick();
 
-    mahjong.hintLevel = 0;
     mahjong.loadNewGame();
 }
 
