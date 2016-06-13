@@ -1,0 +1,33 @@
+{
+  "manifest": {
+
+    "label": "Mahjong",
+    "appname": "mahjong",
+    "appicon": "mahjong_600x600.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "request",
+      "utility"
+    ],
+
+    "weblibs": [
+      "touch",
+      "simple",
+      "strings",
+      "dialog"
+    ],
+
+    "preload": [
+      "model.js"
+    ],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": []
+  }
+}
