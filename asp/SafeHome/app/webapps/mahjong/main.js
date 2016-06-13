@@ -369,8 +369,6 @@ mahjong.onHintPlayer = function(target, ctarget)
 
     xx.selectedTile2.tileBack.src = "tile_selected_89x117.png";
     xx.selectedTile2.tileSelected = true;
-
-    xx.hintLevel--;
 }
 
 mahjong.onSolveStep = function(target, ctarget)
@@ -379,10 +377,14 @@ mahjong.onSolveStep = function(target, ctarget)
 
     var xx = mahjong;
 
+    if (xx.hintLevel < 2) return;
+
     if (xx.selectedTile1 && xx.selectedTile2)
     {
         setTimeout(xx.checkMove, 100);
     }
+
+    xx.hintLevel = 1;
 }
 
 mahjong.onButtonMinus = function(target, ctarget)
