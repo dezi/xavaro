@@ -2,8 +2,7 @@ mahjong.createFrame = function()
 {
     var xx = mahjong;
 
-    xx.level = 1;
-    xx.hintLevel = 0;
+    xx.boardIndex = 1;
 
     xx.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
     WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
@@ -11,22 +10,7 @@ mahjong.createFrame = function()
     xx.topdiv.style.overflow = "hidden";
 
     xx.centerDiv = WebLibSimple.createDivWidHei("50%", "50%", 1, 1, "centerDiv", xx.topdiv);
-
-    var wid = xx.topdiv.clientWidth;
-    var hei = xx.topdiv.clientHeight;
-
-    //
-    // Game panel.
-    //
-
-    xx.gamesize  = Math.min(wid, hei) - 100;
-    xx.gamesize -= Math.floor(xx.gamesize % 9);
-    xx.fieldsize = Math.floor(xx.gamesize / 9);
-
-    xx.gamePanel = WebLibSimple.createDivWidHei(
-        -xx.gamesize / 2, -xx.gamesize / 2,
-        xx.gamesize, xx.gamesize,
-        "gamePanel", xx.centerDiv);
+    xx.gamePanel = WebLibSimple.createDivWidHei(0, 0, 0, 0, "gamePanel", xx.centerDiv);
 
     WebLibSimple.setBGColor(xx.gamePanel, "#ffeeee");
 
@@ -35,7 +19,7 @@ mahjong.createFrame = function()
     //
 
     xx.buttonTop1div = mahjong.createButton("–");
-    xx.buttonTop2div = mahjong.createButton(xx.level);
+    xx.buttonTop2div = mahjong.createButton(xx.boardIndex);
     xx.buttonTop3div = mahjong.createButton("+");
 
     xx.buttonBot1div = mahjong.createButton("!");
@@ -49,8 +33,6 @@ mahjong.createFrame = function()
     xx.buttonBot2div.onTouchClick = mahjong.onSolveStep;
     xx.buttonBot3div.onTouchClick = mahjong.onHintPlayer;
     */
-
-    xx.onWindowResize();
 
     addEventListener("resize", mahjong.onWindowResize);
 }
@@ -92,8 +74,22 @@ mahjong.onWindowResize = function()
     var wid = xx.topdiv.clientWidth;
     var hei = xx.topdiv.clientHeight;
 
-    var spacehorz = (wid - xx.gamesize) >> 1;
-    var spacevert = (hei - xx.gamesize) >> 1;
+    xx.panelActWid = (wid - 100);
+    xx.panelActHei = Math.floor(xx.panelRealHei * xx.panelActWid / xx.panelRealWid);
+
+    if (xx.panelActHei > (hei - 150))
+    {
+        xx.panelActHei = (hei - 150);
+        xx.panelActWid = Math.floor(xx.panelRealWid * xx.panelActHei / xx.panelRealHei);
+    }
+
+    xx.gamePanel.style.left   = -(xx.panelActWid >> 1) + "px";
+    xx.gamePanel.style.top    = -(xx.panelActHei >> 1) + "px";
+    xx.gamePanel.style.width  = xx.panelActWid + "px";
+    xx.gamePanel.style.height = xx.panelActHei + "px";
+
+    var spacehorz = (wid - xx.panelActWid) >> 1;
+    var spacevert = (hei - xx.panelActHei) >> 1;
 
     if (spacehorz < spacevert)
     {
@@ -168,3 +164,5 @@ mahjong.onWindowResize = function()
 }
 
 mahjong.createFrame();
+mahjong.createBoard();
+mahjong.onWindowResize();
