@@ -67,7 +67,7 @@ public class GCMMessageService extends GcmListenerService
 
         String message = data.getString("message");
 
-        if (CommonConfigs.debugGCM)
+        if (Simple.getSharedPrefBoolean("developer.debug.gcmstuff"))
         {
             Log.d(LOGTAG, "======================>onMessageReceived: from:" + from);
             Log.d(LOGTAG, "======================>onMessageReceived: message:" + message);
@@ -96,7 +96,7 @@ public class GCMMessageService extends GcmListenerService
                 String base64 = jmess.getString("base64");
                 byte[] rawdata = Base64.decode(base64, 0);
 
-                if (CommonConfigs.debugGCM)
+                if (Simple.getSharedPrefBoolean("developer.debug.gcmstuff"))
                 {
                     Log.d(LOGTAG, "======================>onMessageReceived: deliver:" + base64);
                 }

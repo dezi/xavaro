@@ -2,20 +2,20 @@
   "SafeHome": {
 
     "latest": "0.8.012",
-    "latestdate": "2016-05-17T23:00:00Z",
+    "latestdate": "2016-06-10T23:00:00Z",
 
     "versions": {
 
       "0.8.012": {
 
-        "date": "2016-05-17T23:00:00Z",
+        "date": "2016-06-10T23:00:00Z",
 
         "notes": [
           {
-            "title": "Neues Design Teil 1.",
+            "title": "Zimmel-Debug.",
             "summary": [
-              "Umsetzung des neuen Designs Teil 2.",
-              "Notifications."
+              "Developer GCM Debug Switch.",
+              "Sonst auch alles neu und schön."
             ]
           }
         ]

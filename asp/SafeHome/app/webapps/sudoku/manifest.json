@@ -1,0 +1,33 @@
+{
+  "manifest": {
+
+    "label": "Sudoku",
+    "appname": "sudoku",
+    "appicon": "sudoku_512x512.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "request",
+      "utility"
+    ],
+
+    "weblibs": [
+      "touch",
+      "simple",
+      "strings",
+      "dialog"
+    ],
+
+    "preload": [
+      "eval.js"
+    ],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": []
+  }
+}
