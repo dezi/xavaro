@@ -258,7 +258,8 @@ mahjong.checkMove = function()
 
             xx.resetSelect();
 
-
+            xx.audioInvalid.play();
+            setTimeout(xx.audioInvalid.load, 2000);
         }
 
         xx.selectedTile1 = null;
