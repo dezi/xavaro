@@ -453,9 +453,6 @@ void evalgame()
     gkey[ 21 ] = '\n';
     gkey[ 22 ] = '\0';
 
-    FILE *fdhands = fopen("./pokerseven.hands.txt", "w");
-    FILE *fdscore = fopen("./pokerseven.score.txt", "w");
-
     for (c1 = 51; c1 >= 0; c1--)
     {
         deck[ c1 ] = 1;
@@ -532,15 +529,6 @@ void evalgame()
 
                                 total++;
 
-                                gkey[ 15 ] = wcvals[ 0 ] + ((wcvals[ 0 ] < 10) ? '0' : ('a' - 10));
-                                gkey[ 16 ] = wcvals[ 1 ] + ((wcvals[ 1 ] < 10) ? '0' : ('a' - 10));
-                                gkey[ 17 ] = wcvals[ 2 ] + ((wcvals[ 2 ] < 10) ? '0' : ('a' - 10));
-                                gkey[ 18 ] = wcvals[ 3 ] + ((wcvals[ 3 ] < 10) ? '0' : ('a' - 10));
-                                gkey[ 19 ] = wcvals[ 4 ] + ((wcvals[ 4 ] < 10) ? '0' : ('a' - 10));
-                                gkey[ 20 ] = wcvals[ 5 ] + ((wcvals[ 5 ] < 10) ? '0' : ('a' - 10));
-
-                                fputs(gkey +  0, fdhands);
-
                                 allsco[ wcvals2int() ]++;
 
                                 vals[ card2val[ c7 ] ]--;
@@ -593,6 +581,8 @@ void evalgame()
 
     int checksumm = 0;
 
+    FILE *fdscore = fopen("./scoretable.txt", "w");
+
     for (int inx = 0; inx < maxscores; inx++)
     {
         if (allsco[ inx ])
@@ -612,7 +602,6 @@ void evalgame()
         }
     }
 
-    fclose(fdhands);
     fclose(fdscore);
 
     printf("Wiki-Total %d total=%d check=%d\n", wikitotal, total, checksumm);
