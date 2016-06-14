@@ -30,58 +30,119 @@ int  scores[ 10 ];
 
 int c1, c2, c3, c4, c5, c6, c7;
 
+int wcvals[ 6 ];
+
+int getBestVal0()
+{
+    for (int inx = 51; inx >= 0; inx--)
+    {
+        if (deck[ inx ])
+        {
+            return card2val[ inx ];
+        }
+    }
+
+    printf("Something wrong getBestVal0...\n");
+    exit(1);
+}
+
+int getBestVal1(ex1)
+{
+    for (int inx = 51; inx >= 0; inx--)
+    {
+        if (deck[ inx ] && (card2val[ inx ] != ex1))
+        {
+            return card2val[ inx ];
+        }
+    }
+
+    printf("Something wrong getBestVal1...\n");
+    exit(1);
+}
+
+int getBestVal2(ex1, ex2)
+{
+    for (int inx = 51; inx >= 0; inx--)
+    {
+        if (deck[ inx ] && (card2val[ inx ] != ex1) && (card2val[ inx ] != ex2))
+        {
+            return card2val[ inx ];
+        }
+    }
+
+    printf("Something wrong getBestVal2...\n");
+    exit(1);
+}
+
+int getBestVal3(ex1, ex2, ex3)
+{
+    for (int inx = 51; inx >= 0; inx--)
+    {
+        if (deck[ inx ] && (card2val[ inx ] != ex1) &&
+                (card2val[ inx ] != ex2) && (card2val[ inx ] != ex3))
+        {
+            return card2val[ inx ];
+        }
+    }
+
+    printf("Something wrong getBestVal3...\n");
+    exit(1);
+}
+
+int getBestVal4(ex1, ex2, ex3, ex4)
+{
+    for (int inx = 51; inx >= 0; inx--)
+    {
+        if (deck[ inx ] &&
+                (card2val[ inx ] != ex1) && (card2val[ inx ] != ex2) &&
+                (card2val[ inx ] != ex3) && (card2val[ inx ] != ex4))
+        {
+            return card2val[ inx ];
+        }
+    }
+
+    printf("Something wrong getBestVal4...\n");
+    exit(1);
+}
+
 int scoreSeven()
 {
     //
     // Royal flush.
     //
 
-    if ((deck[ 51 ] && deck[ 47 ] && deck[ 43 ] && deck[ 39 ] && deck[ 35 ]) ||
-        (deck[ 50 ] && deck[ 46 ] && deck[ 42 ] && deck[ 38 ] && deck[ 34 ]) ||
-        (deck[ 49 ] && deck[ 45 ] && deck[ 41 ] && deck[ 37 ] && deck[ 33 ]) ||
-        (deck[ 48 ] && deck[ 44 ] && deck[ 40 ] && deck[ 36 ] && deck[ 32 ]))
+    for (int inx = 51; inx >= 48; inx--)
     {
-        return 9;
+        if (deck[ inx - 0 ] && deck[ inx - 4 ] && deck[ inx - 8 ] && deck[ inx - 12 ] && deck[ inx - 16 ])
+        {
+            wcvals[ 0 ] = 9;
+            wcvals[ 1 ] = card2val[ inx -  0 ];
+            wcvals[ 2 ] = card2val[ inx -  4 ];
+            wcvals[ 3 ] = card2val[ inx -  8 ];
+            wcvals[ 4 ] = card2val[ inx - 12 ];
+            wcvals[ 5 ] = card2val[ inx - 16 ];
+
+            return wcvals[ 0 ];
+        }
     }
 
     //
     // Straight flush.
     //
 
-    if ((deck[ 47 ] && deck[ 43 ] && deck[ 39 ] && deck[ 35 ] && deck[ 31 ]) ||
-        (deck[ 46 ] && deck[ 42 ] && deck[ 38 ] && deck[ 34 ] && deck[ 30 ]) ||
-        (deck[ 45 ] && deck[ 41 ] && deck[ 37 ] && deck[ 33 ] && deck[ 29 ]) ||
-        (deck[ 44 ] && deck[ 40 ] && deck[ 36 ] && deck[ 32 ] && deck[ 28 ]) ||
-        (deck[ 43 ] && deck[ 39 ] && deck[ 35 ] && deck[ 31 ] && deck[ 27 ]) ||
-        (deck[ 42 ] && deck[ 38 ] && deck[ 34 ] && deck[ 30 ] && deck[ 26 ]) ||
-        (deck[ 41 ] && deck[ 37 ] && deck[ 33 ] && deck[ 29 ] && deck[ 25 ]) ||
-        (deck[ 40 ] && deck[ 36 ] && deck[ 32 ] && deck[ 28 ] && deck[ 24 ]) ||
-        (deck[ 39 ] && deck[ 35 ] && deck[ 31 ] && deck[ 27 ] && deck[ 23 ]) ||
-        (deck[ 38 ] && deck[ 34 ] && deck[ 30 ] && deck[ 26 ] && deck[ 22 ]) ||
-        (deck[ 37 ] && deck[ 33 ] && deck[ 29 ] && deck[ 25 ] && deck[ 21 ]) ||
-        (deck[ 36 ] && deck[ 32 ] && deck[ 28 ] && deck[ 24 ] && deck[ 20 ]) ||
-        (deck[ 35 ] && deck[ 31 ] && deck[ 27 ] && deck[ 23 ] && deck[ 19 ]) ||
-        (deck[ 34 ] && deck[ 30 ] && deck[ 26 ] && deck[ 22 ] && deck[ 18 ]) ||
-        (deck[ 33 ] && deck[ 29 ] && deck[ 25 ] && deck[ 21 ] && deck[ 17 ]) ||
-        (deck[ 32 ] && deck[ 28 ] && deck[ 24 ] && deck[ 20 ] && deck[ 16 ]) ||
-        (deck[ 31 ] && deck[ 27 ] && deck[ 23 ] && deck[ 19 ] && deck[ 15 ]) ||
-        (deck[ 30 ] && deck[ 26 ] && deck[ 22 ] && deck[ 18 ] && deck[ 14 ]) ||
-        (deck[ 29 ] && deck[ 25 ] && deck[ 21 ] && deck[ 17 ] && deck[ 13 ]) ||
-        (deck[ 28 ] && deck[ 24 ] && deck[ 20 ] && deck[ 16 ] && deck[ 12 ]) ||
-        (deck[ 27 ] && deck[ 23 ] && deck[ 19 ] && deck[ 15 ] && deck[ 11 ]) ||
-        (deck[ 26 ] && deck[ 22 ] && deck[ 18 ] && deck[ 14 ] && deck[ 10 ]) ||
-        (deck[ 25 ] && deck[ 21 ] && deck[ 17 ] && deck[ 13 ] && deck[  9 ]) ||
-        (deck[ 24 ] && deck[ 20 ] && deck[ 16 ] && deck[ 12 ] && deck[  8 ]) ||
-        (deck[ 23 ] && deck[ 19 ] && deck[ 15 ] && deck[ 11 ] && deck[  7 ]) ||
-        (deck[ 22 ] && deck[ 18 ] && deck[ 14 ] && deck[ 10 ] && deck[  6 ]) ||
-        (deck[ 21 ] && deck[ 17 ] && deck[ 13 ] && deck[  9 ] && deck[  5 ]) ||
-        (deck[ 20 ] && deck[ 16 ] && deck[ 12 ] && deck[  8 ] && deck[  4 ]) ||
-        (deck[ 19 ] && deck[ 15 ] && deck[ 11 ] && deck[  7 ] && deck[  3 ]) ||
-        (deck[ 18 ] && deck[ 14 ] && deck[ 10 ] && deck[  6 ] && deck[  2 ]) ||
-        (deck[ 17 ] && deck[ 13 ] && deck[  9 ] && deck[  5 ] && deck[  1 ]) ||
-        (deck[ 16 ] && deck[ 12 ] && deck[  8 ] && deck[  4 ] && deck[  0 ]))
+    for (int inx = 47; inx >= 16; inx--)
     {
-        return 8;
+        if (deck[ inx ] && deck[ inx - 4 ] && deck[ inx - 8 ] && deck[ inx - 12 ] && deck[ inx - 16 ])
+        {
+            wcvals[ 0 ] = 8;
+            wcvals[ 1 ] = card2val[ inx -  0 ];
+            wcvals[ 2 ] = card2val[ inx -  4 ];
+            wcvals[ 3 ] = card2val[ inx -  8 ];
+            wcvals[ 4 ] = card2val[ inx - 12 ];
+            wcvals[ 5 ] = card2val[ inx - 16 ];
+
+            return wcvals[ 0 ];
+        }
     }
 
     //
@@ -138,42 +199,88 @@ int scoreSeven()
 
     if (fours == 1)
     {
-        return 7;
+        wcvals[ 0 ] = 7;
+        wcvals[ 1 ] = fourval1;
+        wcvals[ 2 ] = fourval1;
+        wcvals[ 3 ] = fourval1;
+        wcvals[ 4 ] = fourval1;
+        wcvals[ 5 ] = getBestVal1(fourval1);
+
+        return wcvals[ 0 ];
     }
 
     //
     // Full house.
     //
 
-    if ((threes == 2) || ((threes == 1) && (twos >= 1)))
+    if (threes == 2)
     {
-        return 6;
+        wcvals[ 0 ] = 6;
+        wcvals[ 1 ] = threeval1;
+        wcvals[ 2 ] = threeval1;
+        wcvals[ 3 ] = threeval1;
+        wcvals[ 4 ] = threeval2;
+        wcvals[ 5 ] = threeval2;
+
+        return wcvals[ 0 ];
+    }
+
+    if ((threes == 1) && (twos >= 1))
+    {
+        wcvals[ 0 ] = 6;
+        wcvals[ 1 ] = threeval1;
+        wcvals[ 2 ] = threeval1;
+        wcvals[ 3 ] = threeval1;
+        wcvals[ 4 ] = twoval1;
+        wcvals[ 5 ] = twoval1;
+
+        return wcvals[ 0 ];
     }
 
     //
     // Flush.
     //
 
-    if ((cols[ 0 ] >= 5) || (cols[ 1 ] >= 5) || (cols[ 2 ] >= 5) || (cols[ 3 ] >= 5))
+    for (int col = 0; col <= 3; col++)
     {
-        return 5;
+        if (cols[ col ] >= 5)
+        {
+            wcvals[ 0 ] = 5;
+
+            int cnt = 1;
+
+            for (int inx = 51; inx >= 0; inx--)
+            {
+                if (deck[ inx ] && ((inx % 4) == col))
+                {
+                    wcvals[ cnt++ ] = card2val[ inx ];
+
+                    if (cnt == 6) return wcvals[ 0 ];
+                }
+            }
+
+            printf("Something wrong Flush...\n");
+            exit(1);
+        }
     }
 
     //
     // Straight.
     //
 
-    if ((vals[ 12 ] && vals[ 11 ] && vals[ 10 ] && vals[  9 ] && vals[  8 ]) ||
-        (vals[ 11 ] && vals[ 10 ] && vals[  9 ] && vals[  8 ] && vals[  7 ]) ||
-        (vals[ 10 ] && vals[  9 ] && vals[  8 ] && vals[  7 ] && vals[  6 ]) ||
-        (vals[  9 ] && vals[  8 ] && vals[  7 ] && vals[  6 ] && vals[  5 ]) ||
-        (vals[  8 ] && vals[  7 ] && vals[  6 ] && vals[  5 ] && vals[  4 ]) ||
-        (vals[  7 ] && vals[  6 ] && vals[  5 ] && vals[  4 ] && vals[  3 ]) ||
-        (vals[  6 ] && vals[  5 ] && vals[  4 ] && vals[  3 ] && vals[  2 ]) ||
-        (vals[  5 ] && vals[  4 ] && vals[  3 ] && vals[  2 ] && vals[  1 ]) ||
-        (vals[  4 ] && vals[  3 ] && vals[  2 ] && vals[  1 ] && vals[  0 ]))
+    for (int inx = 12; inx >= 4; inx--)
     {
-        return 4;
+        if (vals[ inx - 0 ] && vals[ inx - 1 ] && vals[ inx - 2 ] && vals[ inx - 3 ] && vals[ inx - 4 ])
+        {
+            wcvals[ 0 ] = 4;
+            wcvals[ 1 ] = vals[ inx - 0 ];
+            wcvals[ 2 ] = vals[ inx - 1 ];
+            wcvals[ 3 ] = vals[ inx - 2 ];
+            wcvals[ 4 ] = vals[ inx - 3 ];
+            wcvals[ 5 ] = vals[ inx - 4 ];
+
+            return wcvals[ 0 ];
+        }
     }
 
     //
@@ -182,7 +289,14 @@ int scoreSeven()
 
     if (threes >= 1)
     {
-        return 3;
+        wcvals[ 0 ] = 3;
+        wcvals[ 1 ] = threeval1;
+        wcvals[ 2 ] = threeval1;
+        wcvals[ 3 ] = threeval1;
+        wcvals[ 4 ] = getBestVal1(threeval1);
+        wcvals[ 5 ] = getBestVal2(threeval1, wcvals[ 4 ]);
+
+        return wcvals[ 0 ];
     }
 
     //
@@ -191,7 +305,14 @@ int scoreSeven()
 
     if (twos >= 2)
     {
-        return 2;
+        wcvals[ 0 ] = 2;
+        wcvals[ 1 ] = twoval1;
+        wcvals[ 2 ] = twoval1;
+        wcvals[ 3 ] = twoval2;
+        wcvals[ 3 ] = twoval2;
+        wcvals[ 3 ] = getBestVal2(twoval1, twoval2);
+
+        return wcvals[ 0 ];
     }
 
     //
@@ -200,8 +321,22 @@ int scoreSeven()
 
     if (twos >= 1)
     {
-        return 1;
+        wcvals[ 0 ] = 1;
+        wcvals[ 1 ] = twoval1;
+        wcvals[ 2 ] = twoval1;
+        wcvals[ 3 ] = getBestVal1(twoval1);
+        wcvals[ 4 ] = getBestVal2(twoval1, wcvals[ 3 ]);
+        wcvals[ 5 ] = getBestVal3(twoval1, wcvals[ 3 ], wcvals[ 4 ]);
+
+        return wcvals[ 0 ];
     }
+
+    wcvals[ 0 ] = 0;
+    wcvals[ 1 ] = getBestVal0();
+    wcvals[ 2 ] = getBestVal1(wcvals[ 1 ]);
+    wcvals[ 3 ] = getBestVal2(wcvals[ 1 ], wcvals[ 2 ]);
+    wcvals[ 4 ] = getBestVal3(wcvals[ 1 ], wcvals[ 2 ], wcvals[ 3 ]);
+    wcvals[ 5 ] = getBestVal4(wcvals[ 1 ], wcvals[ 2 ], wcvals[ 3 ], wcvals[ 4 ]);
 
     return 0;
 }
