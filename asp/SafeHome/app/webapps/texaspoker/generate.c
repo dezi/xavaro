@@ -596,7 +596,9 @@ void evalgame()
             gkey[ 19 ] = wcvals[ 4 ] + ((wcvals[ 4 ] < 10) ? '0' : ('a' - 10));
             gkey[ 20 ] = wcvals[ 5 ] + ((wcvals[ 5 ] < 10) ? '0' : ('a' - 10));
 
-            fprintf(fdscore, "%s=%d\n", gkey + 15, allsco[ inx ]);
+            float wins = checksumm / (float) total;
+
+            fprintf(fdscore, "%s=%0.5f=%d\n", gkey + 15, wins, allsco[ inx ]);
 
             checksumm += allsco[ inx ];
         }

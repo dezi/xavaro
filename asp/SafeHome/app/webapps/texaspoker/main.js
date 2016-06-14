@@ -175,29 +175,20 @@ texaspoker.createGame = function()
     for (var inx = 0; inx < scoredata.length; inx++)
     {
         var parts = scoredata[ inx ].split("=");
-        if (parts.length != 2) continue;
+        if (parts.length != 3) continue;
 
-        var scoreval = parseInt(parts[ 1 ]);
+        var winpercent = parseFloat(parts[ 1 ]);
+        var scoreodds = parseInt(parts[ 2 ]);
 
-        xx.scoretable[ parts[ 0 ] ] = scoreval;
-        xx.totalodds += scoreval;
+        xx.scoretable[ parts[ 0 ] ] = { odd : scoreodds, win : winpercent };
+        xx.totalodds += scoreodds;
     }
 
     console.log("texaspoker.createGame: total=" + xx.totalodds);
 
-    var wingames = 0;
-    var logcnt = 0;
-
-    for (var scorekey in xx.scoretable)
+    if (xx.totalodds != 133784560)
     {
-        var thisodd = xx.scoretable[ scorekey ];
-        var thiswin = wingames / xx.totalodds;
-
-        xx.scoretable[ scorekey ] = { odd : thisodd, win : thiswin };
-
-        wingames += thisodd;
-
-        //if ((logcnt++ % 100) == 0) console.log(scorekey + "=" + thiswin);
+        alert("Datenbank stimmt nicht...")
     }
 
     //
@@ -232,7 +223,21 @@ texaspoker.createGame = function()
         4, // Four of a kind.
         5, // Straight flush.
         5, // Royal flush.
-    ]
+    ];
+
+    xx.winsuited =
+    [
+        false, // High card.
+        false, // Two of a kind.
+        false, // Two pairs.
+        false, // Three of a kind.
+        false, // Straight.
+        true,  // Flush.
+        false, // Full house.
+        false, // Four of a kind.
+        true,  // Straight flush.
+        true,  // Royal flush.
+    ];
 }
 
 texaspoker.dumpPreflopOdds = function()
@@ -256,28 +261,32 @@ texaspoker.dumpPreflopOdds = function()
                 // Relevant cards per win type.
                 //
 
-                var wincards = xx.wincards[ scorekey[ 0 ] ] + 1;
+                var wintype = scorekey[ 0 ];
+                if (wintype == 0) continue;
 
-                var match = 0;
+                var winsuited = xx.winsuited[ wintype ];
+                if (winsuited) continue;
 
-                for (var cnt = 1; cnt < wincards; cnt++)
+                var wincards = xx.wincards[ wintype ];
+                var winhand = scorekey.substring(1, wincards + 1);
+
+                var match = false;
+
+                if (hex1 == hex2)
                 {
-                    if (match == 0)
-                    {
-                        if (scorekey[ cnt ] == hex1) match++;
-                    }
-                    else
-                    {
-                        if (scorekey[ cnt ] == hex2)
-                        {
-                            wins += xx.scoretable[ scorekey ].win;
-                            hands++;
+                    match = (winhand.indexOf(hex1 + hex2) >= 0);
+                }
+                else
+                {
+                    match = (winhand.indexOf(hex1) >= 0) && (winhand.indexOf(hex2) >= 0);
+                }
 
-                            //console.log("texaspoker.dumpPreflopOdds: hands=" + hands + " " + scorekey + " " + xx.scoretable[ scorekey ].win);
+                if (match)
+                {
+                    wins += xx.scoretable[ scorekey ].win;
+                    hands++;
 
-                            break;
-                        }
-                    }
+                    //if (c2 == 2) console.log("texaspoker.dumpPreflopOdds: hands=" + hands + " " + scorekey + " " + xx.scoretable[ scorekey ].win);
                 }
             }
 
