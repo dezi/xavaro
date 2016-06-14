@@ -212,11 +212,11 @@ int scoreSeven()
     int twoval2 = -1;
     int twoval3 = -1;
 
-    for (int inx = 0; inx < 13; inx++)
+    for (int inx = 12; inx >= 0; inx--)
     {
         if (vals[ inx ] == 4)
         {
-            if (fourval1 < 0) fourval1 = inx;
+            if (fours == 0) fourval1 = inx;
 
             fours++;
         }
@@ -224,8 +224,8 @@ int scoreSeven()
         {
             if (vals[ inx ] == 3)
             {
-                if (threeval1 < 0) threeval1 = inx;
-                if (threeval2 < 0) threeval2 = inx;
+                if (threes == 0) threeval1 = inx;
+                if (threes == 1) threeval2 = inx;
 
                 threes++;
             }
@@ -233,9 +233,9 @@ int scoreSeven()
             {
                 if (vals[ inx ] == 2)
                 {
-                    if (twoval1 < 0) twoval1 = inx;
-                    if (twoval2 < 0) twoval2 = inx;
-                    if (twoval3 < 0) twoval3 = inx;
+                    if (twos == 0) twoval1 = inx;
+                    if (twos == 1) twoval2 = inx;
+                    if (twos == 2) twoval3 = inx;
 
                     twos++;
                 }
@@ -375,8 +375,8 @@ int scoreSeven()
         wcvals[ 1 ] = twoval1;
         wcvals[ 2 ] = twoval1;
         wcvals[ 3 ] = twoval2;
-        wcvals[ 3 ] = twoval2;
-        wcvals[ 3 ] = getBestVal2(twoval1, twoval2);
+        wcvals[ 4 ] = twoval2;
+        wcvals[ 5 ] = getBestVal2(twoval1, twoval2);
 
         return wcvals[ 0 ];
     }

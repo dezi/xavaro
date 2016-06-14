@@ -183,18 +183,116 @@ texaspoker.createGame = function()
         xx.totalodds += scoreval;
     }
 
+    console.log("texaspoker.createGame: total=" + xx.totalodds);
+
     var wingames = 0;
+    var logcnt = 0;
 
     for (var scorekey in xx.scoretable)
     {
         var thisodd = xx.scoretable[ scorekey ];
+        var thiswin = wingames / xx.totalodds;
 
-        xx.scoretable[ scorekey ] = wingames / xx.totalodds;
+        xx.scoretable[ scorekey ] = { odd : thisodd, win : thiswin };
 
         wingames += thisodd;
+
+        //if ((logcnt++ % 100) == 0) console.log(scorekey + "=" + thiswin);
+    }
+
+    //
+    // Initialize tables.
+    //
+
+    xx.card2val = [];
+    xx.card2col = [];
+
+    for (var inx = 0; inx < 52; inx++)
+    {
+        xx.card2val[ inx ] = inx / 4;
+        xx.card2col[ inx ] = inx % 4;
+    }
+
+    xx.vals2hex = [];
+
+    for (var inx = 0; inx < 13; inx++)
+    {
+        xx.vals2hex[ inx ] = String.fromCharCode(inx + (inx < 10 ? 48 : 87));
+    }
+
+    xx.wincards =
+    [
+        5, // High card.
+        2, // Two of a kind.
+        4, // Two pairs.
+        3, // Three of a kind.
+        5, // Straight.
+        5, // Flush.
+        5, // Full house.
+        4, // Four of a kind.
+        5, // Straight flush.
+        5, // Royal flush.
+    ]
+}
+
+texaspoker.dumpPreflopOdds = function()
+{
+    var xx = texaspoker;
+
+    for (var c1 = 12; c1 >= 0; c1--)
+    {
+        var hex1 = xx.vals2hex[ c1 ];
+
+        for (var c2 = c1; c2 >= 0; c2--)
+        {
+            var hex2 = xx.vals2hex[ c2 ];
+
+            var wins = 0;
+            var hands = 0;
+
+            for (var scorekey in xx.scoretable)
+            {
+                //
+                // Relevant cards per win type.
+                //
+
+                var wincards = xx.wincards[ scorekey[ 0 ] ] + 1;
+
+                var match = 0;
+
+                for (var cnt = 1; cnt < wincards; cnt++)
+                {
+                    if (match == 0)
+                    {
+                        if (scorekey[ cnt ] == hex1) match++;
+                    }
+                    else
+                    {
+                        if (scorekey[ cnt ] == hex2)
+                        {
+                            wins += xx.scoretable[ scorekey ].win;
+                            hands++;
+
+                            //console.log("texaspoker.dumpPreflopOdds: hands=" + hands + " " + scorekey + " " + xx.scoretable[ scorekey ].win);
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            wins /= hands;
+
+            console.log("texaspoker.dumpPreflopOdds: hand=" + hex1 + hex2 + " wins=" + wins);
+            //console.log("------------------------------------------------");
+        }
+
+        break;
     }
 }
 
 texaspoker.createFrame();
 texaspoker.createGame();
 texaspoker.onWindowResize();
+
+texaspoker.dumpPreflopOdds();
