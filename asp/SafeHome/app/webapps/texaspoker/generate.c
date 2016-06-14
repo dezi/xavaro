@@ -21,16 +21,16 @@
 
 char card2val[ 52 ];
 char card2col[ 52 ];
+char card2num[ 52 ][ 2 ];
 
 char deck  [ 52 ];
 char vals  [ 13 ];
 char cols  [  4 ];
+char gkey  [ 23 ]; // 01020304050607:9abcde\n\0
+
+char wcvals[  6 ];
 
 int  scores[ 10 ];
-
-int c1, c2, c3, c4, c5, c6, c7;
-
-int wcvals[ 6 ];
 
 int getBestVal0()
 {
@@ -331,6 +331,10 @@ int scoreSeven()
         return wcvals[ 0 ];
     }
 
+    //
+    // High card.
+    //
+
     wcvals[ 0 ] = 0;
     wcvals[ 1 ] = getBestVal0();
     wcvals[ 2 ] = getBestVal1(wcvals[ 1 ]);
@@ -347,6 +351,9 @@ void evalgame()
     {
         card2val[ inx ] = inx / 4;
         card2col[ inx ] = inx % 4;
+
+        card2num[ inx ][ 0 ] = '0' + inx / 10;
+        card2num[ inx ][ 1 ] = '0' + inx % 10;
     }
 
     for (int inx = 0; inx < 10; inx++)
@@ -372,12 +379,23 @@ void evalgame()
     int score = 0;
     int total = 0;
 
+    int c1, c2, c3, c4, c5, c6, c7;
+
+    gkey[ 14 ] = ':';
+    gkey[ 21 ] = '\n';
+    gkey[ 22 ] = '\0';
+
+    FILE *fd = fopen("./pokerseven.txt", "w");
+
     for (c1 = 51; c1 >= 0; c1--)
     {
         deck[ c1 ] = 1;
 
         vals[ card2val[ c1 ] ]++;
         cols[ card2col[ c1 ] ]++;
+
+        gkey[ 0 ] = card2num[ c1 ][ 0 ];
+        gkey[ 1 ] = card2num[ c1 ][ 1 ];
 
         for (c2 = c1 - 1; c2 >= 0; c2--)
         {
@@ -386,12 +404,18 @@ void evalgame()
             vals[ card2val[ c2 ] ]++;
             cols[ card2col[ c2 ] ]++;
 
+            gkey[ 2 ] = card2num[ c2 ][ 0 ];
+            gkey[ 3 ] = card2num[ c2 ][ 1 ];
+
             for (c3 = c2 - 1; c3 >= 0; c3--)
             {
                 deck[ c3 ] = 1;
 
                 vals[ card2val[ c3 ] ]++;
                 cols[ card2col[ c3 ] ]++;
+
+                gkey[ 4 ] = card2num[ c3 ][ 0 ];
+                gkey[ 5 ] = card2num[ c3 ][ 1 ];
 
                 for (c4 = c3 - 1; c4 >= 0; c4--)
                 {
@@ -400,12 +424,18 @@ void evalgame()
                     vals[ card2val[ c4 ] ]++;
                     cols[ card2col[ c4 ] ]++;
 
+                    gkey[ 6 ] = card2num[ c4 ][ 0 ];
+                    gkey[ 7 ] = card2num[ c4 ][ 1 ];
+
                     for (c5 = c4 - 1; c5 >= 0; c5--)
                     {
                         deck[ c5 ] = 1;
 
                         vals[ card2val[ c5 ] ]++;
                         cols[ card2col[ c5 ] ]++;
+
+                        gkey[ 8 ] = card2num[ c5 ][ 0 ];
+                        gkey[ 9 ] = card2num[ c5 ][ 1 ];
 
                         for (c6 = c5 - 1; c6 >= 0; c6--)
                         {
@@ -414,6 +444,9 @@ void evalgame()
                             vals[ card2val[ c6 ] ]++;
                             cols[ card2col[ c6 ] ]++;
 
+                            gkey[ 10 ] = card2num[ c6 ][ 0 ];
+                            gkey[ 11 ] = card2num[ c6 ][ 1 ];
+
                             for (c7 = c6 - 1; c7 >= 0; c7--)
                             {
                                 deck[ c7 ] = 1;
@@ -421,11 +454,25 @@ void evalgame()
                                 vals[ card2val[ c7 ] ]++;
                                 cols[ card2col[ c7 ] ]++;
 
+                                gkey[ 12 ] = card2num[ c7 ][ 0 ];
+                                gkey[ 13 ] = card2num[ c7 ][ 1 ];
+
                                 score = scoreSeven();
 
                                 scores[ score ]++;
 
                                 total++;
+
+                                gkey[ 15 ] = wcvals[ 0 ] + ((wcvals[ 0 ] < 10) ? '0' : ('a' - 10));
+                                gkey[ 16 ] = wcvals[ 1 ] + ((wcvals[ 1 ] < 10) ? '0' : ('a' - 10));
+                                gkey[ 17 ] = wcvals[ 2 ] + ((wcvals[ 2 ] < 10) ? '0' : ('a' - 10));
+                                gkey[ 18 ] = wcvals[ 3 ] + ((wcvals[ 3 ] < 10) ? '0' : ('a' - 10));
+                                gkey[ 19 ] = wcvals[ 4 ] + ((wcvals[ 4 ] < 10) ? '0' : ('a' - 10));
+                                gkey[ 20 ] = wcvals[ 5 ] + ((wcvals[ 5 ] < 10) ? '0' : ('a' - 10));
+
+                                fputs(gkey, fd);
+
+                                if ((total % 100000) == 0) printf("%s", gkey);
 
                                 vals[ card2val[ c7 ] ]--;
                                 cols[ card2col[ c7 ] ]--;
@@ -470,6 +517,8 @@ void evalgame()
 
         printf("%d...\n", total);
     }
+
+    fclose(fd);
 
     printf("%d\n", total);
 
