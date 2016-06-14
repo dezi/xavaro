@@ -167,7 +167,7 @@ texaspoker.createGame = function()
     var scoredata = WebAppRequest.loadSync("scoretable.txt");
     scoredata = scoredata.trim().split("\n");
 
-    console.log("blockgame.readLevel: hands=" + scoredata.length);
+    console.log("texaspoker.createGame: hands=" + scoredata.length);
 
     xx.totalodds = 0;
     xx.scoretable = {};

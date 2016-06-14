@@ -323,11 +323,11 @@ int scoreSeven()
         if (vals[ inx - 0 ] && vals[ inx - 1 ] && vals[ inx - 2 ] && vals[ inx - 3 ] && vals[ inx - 4 ])
         {
             wcvals[ 0 ] = 4;
-            wcvals[ 1 ] = vals[ inx - 0 ];
-            wcvals[ 2 ] = vals[ inx - 1 ];
-            wcvals[ 3 ] = vals[ inx - 2 ];
-            wcvals[ 4 ] = vals[ inx - 3 ];
-            wcvals[ 5 ] = vals[ inx - 4 ];
+            wcvals[ 1 ] = inx - 0;
+            wcvals[ 2 ] = inx - 1;
+            wcvals[ 3 ] = inx - 2;
+            wcvals[ 4 ] = inx - 3;
+            wcvals[ 5 ] = inx - 4;
 
             return wcvals[ 0 ];
         }
@@ -340,11 +340,11 @@ int scoreSeven()
     if (vals[ 3 ] && vals[ 2 ] && vals[ 1 ] && vals[ 0 ] && vals[ 12 ])
     {
         wcvals[ 0 ] = 4;
-        wcvals[ 1 ] = vals[  3 ];
-        wcvals[ 2 ] = vals[  2 ];
-        wcvals[ 3 ] = vals[  1 ];
-        wcvals[ 4 ] = vals[  0 ];
-        wcvals[ 5 ] = vals[ 12 ];
+        wcvals[ 1 ] = 3;
+        wcvals[ 2 ] = 2;
+        wcvals[ 3 ] = 1;
+        wcvals[ 4 ] = 0;
+        wcvals[ 5 ] = 12;
 
         return wcvals[ 0 ];
     }
