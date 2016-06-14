@@ -1,0 +1,32 @@
+{
+  "manifest": {
+
+    "label": "Poker",
+    "appname": "texaspoker",
+    "appicon": "texaspoker_600x600.png",
+    "preferences": false,
+    "events": false,
+
+    "permissions": [
+      "request",
+      "utility"
+    ],
+
+    "weblibs": [
+      "cards",
+      "touch",
+      "simple",
+      "strings",
+      "dialog"
+    ],
+
+    "preload": [],
+
+    "locale": [
+      "strings.json",
+      "strings.de-rDE.json"
+    ],
+
+    "cachedefs": []
+  }
+}
