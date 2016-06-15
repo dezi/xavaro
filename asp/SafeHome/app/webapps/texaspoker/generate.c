@@ -4,10 +4,10 @@
 #include <time.h>
 
 //
-// 12 = Ass
-// 11 = König
-// 10 = Dame
-//  9 = Bube
+// 12 = Ace
+// 11 = King
+// 10 = Queen
+//  9 = Jack
 //  8 = 10
 //  7 = 9
 //  6 = 8
@@ -26,13 +26,23 @@ char card2num[ 52 ][ 2 ];
 char deck  [ 52 ];
 char vals  [ 13 ];
 char cols  [  4 ];
-char gkey  [ 23 ]; // 01020304050607:9abcde\n\0
 
 char wcvals[  6 ];
 
 int  scores[ 10 ];
 int  allsco[ 13 * 13 * 13 * 13 * 13 * 13 ];
-int  wikitotal;
+
+int  wikitotal
+    = 4324
+    + 37260
+    + 224848
+    + 3473184
+    + 4047644
+    + 6180020
+    + 6461620
+    + 31433400
+    + 58627800
+    + 23294460;
 
 int getBestVal0()
 {
@@ -121,19 +131,23 @@ int wcvals2int()
     return intval;
 }
 
-void score2hex(int scoreval)
+int score2hex2(int scoreval)
 {
-    wcvals[ 5 ] = scoreval % 13;
+    int hexval = 0;
+
+    hexval |= (scoreval % 13) << (4 * 0);
     scoreval /= 13;
-    wcvals[ 4 ] = scoreval % 13;
+    hexval |= (scoreval % 13) << (4 * 1);
     scoreval /= 13;
-    wcvals[ 3 ] = scoreval % 13;
+    hexval |= (scoreval % 13) << (4 * 2);
     scoreval /= 13;
-    wcvals[ 2 ] = scoreval % 13;
+    hexval |= (scoreval % 13) << (4 * 3);
     scoreval /= 13;
-    wcvals[ 1 ] = scoreval % 13;
+    hexval |= (scoreval % 13) << (4 * 4);
     scoreval /= 13;
-    wcvals[ 0 ] = scoreval % 13;
+    hexval |= (scoreval % 13) << (4 * 5);
+
+    return hexval;
 }
 
 int scoreSeven()
@@ -449,19 +463,12 @@ void evalgame()
 
     int c1, c2, c3, c4, c5, c6, c7;
 
-    gkey[ 14 ] = ':';
-    gkey[ 21 ] = '\n';
-    gkey[ 22 ] = '\0';
-
     for (c1 = 51; c1 >= 0; c1--)
     {
         deck[ c1 ] = 1;
 
         vals[ card2val[ c1 ] ]++;
         cols[ card2col[ c1 ] ]++;
-
-        gkey[ 0 ] = card2num[ c1 ][ 0 ];
-        gkey[ 1 ] = card2num[ c1 ][ 1 ];
 
         for (c2 = c1 - 1; c2 >= 0; c2--)
         {
@@ -470,18 +477,12 @@ void evalgame()
             vals[ card2val[ c2 ] ]++;
             cols[ card2col[ c2 ] ]++;
 
-            gkey[ 2 ] = card2num[ c2 ][ 0 ];
-            gkey[ 3 ] = card2num[ c2 ][ 1 ];
-
             for (c3 = c2 - 1; c3 >= 0; c3--)
             {
                 deck[ c3 ] = 1;
 
                 vals[ card2val[ c3 ] ]++;
                 cols[ card2col[ c3 ] ]++;
-
-                gkey[ 4 ] = card2num[ c3 ][ 0 ];
-                gkey[ 5 ] = card2num[ c3 ][ 1 ];
 
                 for (c4 = c3 - 1; c4 >= 0; c4--)
                 {
@@ -490,18 +491,12 @@ void evalgame()
                     vals[ card2val[ c4 ] ]++;
                     cols[ card2col[ c4 ] ]++;
 
-                    gkey[ 6 ] = card2num[ c4 ][ 0 ];
-                    gkey[ 7 ] = card2num[ c4 ][ 1 ];
-
                     for (c5 = c4 - 1; c5 >= 0; c5--)
                     {
                         deck[ c5 ] = 1;
 
                         vals[ card2val[ c5 ] ]++;
                         cols[ card2col[ c5 ] ]++;
-
-                        gkey[ 8 ] = card2num[ c5 ][ 0 ];
-                        gkey[ 9 ] = card2num[ c5 ][ 1 ];
 
                         for (c6 = c5 - 1; c6 >= 0; c6--)
                         {
@@ -510,18 +505,12 @@ void evalgame()
                             vals[ card2val[ c6 ] ]++;
                             cols[ card2col[ c6 ] ]++;
 
-                            gkey[ 10 ] = card2num[ c6 ][ 0 ];
-                            gkey[ 11 ] = card2num[ c6 ][ 1 ];
-
                             for (c7 = c6 - 1; c7 >= 0; c7--)
                             {
                                 deck[ c7 ] = 1;
 
                                 vals[ card2val[ c7 ] ]++;
                                 cols[ card2col[ c7 ] ]++;
-
-                                gkey[ 12 ] = card2num[ c7 ][ 0 ];
-                                gkey[ 13 ] = card2num[ c7 ][ 1 ];
 
                                 score = scoreSeven();
 
@@ -577,8 +566,6 @@ void evalgame()
 
     int maxscores = sizeof(allsco) / sizeof(int);
 
-    gkey[ 21 ] = 0;
-
     int checksumm = 0;
 
     FILE *fdscore = fopen("./scoretable.txt", "w");
@@ -587,18 +574,10 @@ void evalgame()
     {
         if (allsco[ inx ])
         {
-            score2hex(inx);
-
-            gkey[ 15 ] = wcvals[ 0 ] + ((wcvals[ 0 ] < 10) ? '0' : ('a' - 10));
-            gkey[ 16 ] = wcvals[ 1 ] + ((wcvals[ 1 ] < 10) ? '0' : ('a' - 10));
-            gkey[ 17 ] = wcvals[ 2 ] + ((wcvals[ 2 ] < 10) ? '0' : ('a' - 10));
-            gkey[ 18 ] = wcvals[ 3 ] + ((wcvals[ 3 ] < 10) ? '0' : ('a' - 10));
-            gkey[ 19 ] = wcvals[ 4 ] + ((wcvals[ 4 ] < 10) ? '0' : ('a' - 10));
-            gkey[ 20 ] = wcvals[ 5 ] + ((wcvals[ 5 ] < 10) ? '0' : ('a' - 10));
-
+            int hexval = score2hex2(inx);
             float wins = checksumm / (float) total;
 
-            fprintf(fdscore, "%s=%0.5f=%d\n", gkey + 15, wins, allsco[ inx ]);
+            fprintf(fdscore, "%06x=%0.5f=%d\n", hexval, wins, allsco[ inx ]);
 
             checksumm += allsco[ inx ];
         }
@@ -619,19 +598,6 @@ void evalgame()
 int main()
 {
     printf("Texas poker generator.\n");
-
-    wikitotal
-            = 4324
-            + 37260
-            + 224848
-            + 3473184
-            + 4047644
-            + 6180020
-            + 6461620
-            + 31433400
-            + 58627800
-            + 23294460
-            ;
 
     printf("Wiki-Total %d.\n", wikitotal);
 
