@@ -82,38 +82,7 @@ int getBestVal2(ex1, ex2)
         }
     }
 
-    printf("Something wrong getBestVal2...\n");
-    exit(1);
-}
-
-int getBestVal3(ex1, ex2, ex3)
-{
-    for (int inx = 51; inx >= 0; inx--)
-    {
-        if (deck[ inx ] && (card2val[ inx ] != ex1) &&
-                (card2val[ inx ] != ex2) && (card2val[ inx ] != ex3))
-        {
-            return card2val[ inx ];
-        }
-    }
-
-    printf("Something wrong getBestVal3...\n");
-    exit(1);
-}
-
-int getBestVal4(ex1, ex2, ex3, ex4)
-{
-    for (int inx = 51; inx >= 0; inx--)
-    {
-        if (deck[ inx ] &&
-                (card2val[ inx ] != ex1) && (card2val[ inx ] != ex2) &&
-                (card2val[ inx ] != ex3) && (card2val[ inx ] != ex4))
-        {
-            return card2val[ inx ];
-        }
-    }
-
-    printf("Something wrong getBestVal4...\n");
+    printf("Something wrong getBestVal1...\n");
     exit(1);
 }
 
@@ -374,7 +343,7 @@ int scoreSeven()
         wcvals[ 2 ] = threeval1;
         wcvals[ 3 ] = threeval1;
         wcvals[ 4 ] = getBestVal1(threeval1);
-        wcvals[ 5 ] = getBestVal2(threeval1, wcvals[ 4 ]);
+        wcvals[ 5 ] = 0;
 
         return wcvals[ 0 ];
     }
@@ -405,8 +374,8 @@ int scoreSeven()
         wcvals[ 1 ] = twoval1;
         wcvals[ 2 ] = twoval1;
         wcvals[ 3 ] = getBestVal1(twoval1);
-        wcvals[ 4 ] = getBestVal2(twoval1, wcvals[ 3 ]);
-        wcvals[ 5 ] = getBestVal3(twoval1, wcvals[ 3 ], wcvals[ 4 ]);
+        wcvals[ 4 ] = 0;
+        wcvals[ 5 ] = 0;
 
         return wcvals[ 0 ];
     }
@@ -417,10 +386,10 @@ int scoreSeven()
 
     wcvals[ 0 ] = 0;
     wcvals[ 1 ] = getBestVal0();
-    wcvals[ 2 ] = getBestVal1(wcvals[ 1 ]);
-    wcvals[ 3 ] = getBestVal2(wcvals[ 1 ], wcvals[ 2 ]);
-    wcvals[ 4 ] = getBestVal3(wcvals[ 1 ], wcvals[ 2 ], wcvals[ 3 ]);
-    wcvals[ 5 ] = getBestVal4(wcvals[ 1 ], wcvals[ 2 ], wcvals[ 3 ], wcvals[ 4 ]);
+    wcvals[ 2 ] = 0;
+    wcvals[ 3 ] = 0;
+    wcvals[ 4 ] = 0;
+    wcvals[ 5 ] = 0;
 
     return 0;
 }
@@ -464,7 +433,7 @@ void evalhand()
     printf("Hallo=2\n");
 
     int a1, a2, b1, b2, c1, c2, c3, c4, c5;
-    int a1v, a2v, as, b1v, b2v, bs, akey, bkey, gkey, ascore, bscore;
+    int a1v, a2v, as, b1v, b2v, bs, akey, bkey, gkey, rkey, ascore, bscore;
     printf("Hallo=%d\n", akey);
 
     for (a1 = 51; a1 >= 0; a1--)
@@ -477,6 +446,8 @@ void evalhand()
             as  = (card2col[ a1 ] == card2col[ a2 ]);
 
             akey = (((a1v * 13) + a2v) << 1) + (as ? 1 : 0);
+
+            int count = 0;
 
             for (b1 = 51; b1 >= 0; b1--)
             {
@@ -494,158 +465,181 @@ void evalhand()
                     bkey = (((b1v * 13) + b2v) << 1) + (bs ? 1 : 0);
 
                     gkey = ((akey * 512) + bkey) << 2;
+                    rkey = ((bkey * 512) + akey) << 2;
 
                     if (allsco[ gkey ]) continue;
-                    allsco[ gkey ] = -1;
 
-                    for (c1 = 51; c1 >= 0; c1--)
+                    if (allsco[ rkey ])
                     {
-                        if ((c1 == a1) || (c1 == a2) || (c1 == b1) || (c1 == b2)) continue;
+                        allsco[ gkey + 1 ] = allsco[ rkey + 1 ];
+                        allsco[ gkey + 2 ] = allsco[ rkey + 3 ];
+                        allsco[ gkey + 3 ] = allsco[ rkey + 2 ];
+                    }
+                    else
+                    {
+                        allsco[ gkey ] = -1;
 
-                        deck[ c1 ] = 1;
-
-                        vals[ card2val[ c1 ] ]++;
-                        cols[ card2col[ c1 ] ]++;
-
-                        for (c2 = c1 - 1; c2 >= 0; c2--)
+                        for (c1 = 51; c1 >= 0; c1--)
                         {
-                            if ((c2 == a1) || (c2 == a2) || (c2 == b1) || (c2 == b2)) continue;
+                            if ((c1 == a1) || (c1 == a2) || (c1 == b1) || (c1 == b2)) continue;
 
-                            deck[ c2 ] = 1;
+                            deck[ c1 ] = 1;
 
-                            vals[ card2val[ c2 ] ]++;
-                            cols[ card2col[ c2 ] ]++;
+                            vals[ card2val[ c1 ]]++;
+                            cols[ card2col[ c1 ]]++;
 
-                            for (c3 = c2 - 1; c3 >= 0; c3--)
+                            for (c2 = c1 - 1; c2 >= 0; c2--)
                             {
-                                if ((c3 == a1) || (c3 == a2) || (c3 == b1) || (c3 == b2)) continue;
+                                if ((c2 == a1) || (c2 == a2) || (c2 == b1) || (c2 == b2)) continue;
 
-                                deck[ c3 ] = 1;
+                                deck[ c2 ] = 1;
 
-                                vals[ card2val[ c3 ] ]++;
-                                cols[ card2col[ c3 ] ]++;
+                                vals[ card2val[ c2 ]]++;
+                                cols[ card2col[ c2 ]]++;
 
-                                for (c4 = c3 - 1; c4 >= 0; c4--)
+                                for (c3 = c2 - 1; c3 >= 0; c3--)
                                 {
-                                    if ((c4 == a1) || (c4 == a2) || (c4 == b1) || (c4 == b2)) continue;
+                                    if ((c3 == a1) || (c3 == a2) ||
+                                        (c3 == b1) || (c3 == b2))
+                                        continue;
 
-                                    deck[ c4 ] = 1;
+                                    deck[ c3 ] = 1;
 
-                                    vals[ card2val[ c4 ] ]++;
-                                    cols[ card2col[ c4 ] ]++;
+                                    vals[ card2val[ c3 ]]++;
+                                    cols[ card2col[ c3 ]]++;
 
-                                    for (c5 = c4 - 1; c5 >= 0; c5--)
+                                    for (c4 = c3 - 1; c4 >= 0; c4--)
                                     {
-                                        if ((c5 == a1) || (c5 == a2) || (c5 == b1) || (c5 == b2)) continue;
+                                        if ((c4 == a1) || (c4 == a2) ||
+                                            (c4 == b1) || (c4 == b2))
+                                            continue;
 
-                                        deck[ c5 ] = 1;
+                                        deck[ c4 ] = 1;
 
-                                        vals[ card2val[ c5 ] ]++;
-                                        cols[ card2col[ c5 ] ]++;
+                                        vals[ card2val[ c4 ]]++;
+                                        cols[ card2col[ c4 ]]++;
 
-                                        deck[ a1 ] = 1;
-                                        vals[ card2val[ a1 ] ]++;
-                                        cols[ card2col[ a1 ] ]++;
-
-                                        deck[ a2 ] = 1;
-                                        vals[ card2val[ a2 ] ]++;
-                                        cols[ card2col[ a2 ] ]++;
-
-                                        ascore = scoreSeven();
-
-                                        vals[ card2val[ a1 ] ]--;
-                                        cols[ card2col[ a1 ] ]--;
-                                        deck[ a1 ] = 0;
-
-                                        vals[ card2val[ a2 ] ]--;
-                                        cols[ card2col[ a2 ] ]--;
-                                        deck[ a2 ] = 0;
-
-                                        deck[ b1 ] = 1;
-                                        vals[ card2val[ b1 ] ]++;
-                                        cols[ card2col[ b1 ] ]++;
-
-                                        deck[ b2 ] = 1;
-                                        vals[ card2val[ b2 ] ]++;
-                                        cols[ card2col[ b2 ] ]++;
-
-                                        bscore = scoreSeven();
-
-                                        vals[ card2val[ b1 ] ]--;
-                                        cols[ card2col[ b1 ] ]--;
-                                        deck[ b1 ] = 0;
-
-                                        vals[ card2val[ b2 ] ]--;
-                                        cols[ card2col[ b2 ] ]--;
-                                        deck[ b2 ] = 0;
-
-                                        //
-                                        // Sum up result.
-                                        //
-
-                                        if (ascore == bscore)
+                                        for (c5 = c4 - 1; c5 >= 0; c5--)
                                         {
+                                            if ((c5 == a1) || (c5 == a2) ||
+                                                (c5 == b1) || (c5 == b2))
+                                                continue;
+
+                                            deck[ c5 ] = 1;
+
+                                            vals[ card2val[ c5 ]]++;
+                                            cols[ card2col[ c5 ]]++;
+
+                                            count++;
+
+                                            deck[ a1 ] = 1;
+                                            vals[ card2val[ a1 ]]++;
+                                            cols[ card2col[ a1 ]]++;
+
+                                            deck[ a2 ] = 1;
+                                            vals[ card2val[ a2 ]]++;
+                                            cols[ card2col[ a2 ]]++;
+
+                                            scoreSeven();
+                                            ascore = wcvals2int();
+
+                                            vals[ card2val[ a1 ]]--;
+                                            cols[ card2col[ a1 ]]--;
+                                            deck[ a1 ] = 0;
+
+                                            vals[ card2val[ a2 ]]--;
+                                            cols[ card2col[ a2 ]]--;
+                                            deck[ a2 ] = 0;
+
+                                            deck[ b1 ] = 1;
+                                            vals[ card2val[ b1 ]]++;
+                                            cols[ card2col[ b1 ]]++;
+
+                                            deck[ b2 ] = 1;
+                                            vals[ card2val[ b2 ]]++;
+                                            cols[ card2col[ b2 ]]++;
+
+                                            scoreSeven();
+                                            bscore = wcvals2int();
+
+                                            vals[ card2val[ b1 ]]--;
+                                            cols[ card2col[ b1 ]]--;
+                                            deck[ b1 ] = 0;
+
+                                            vals[ card2val[ b2 ]]--;
+                                            cols[ card2col[ b2 ]]--;
+                                            deck[ b2 ] = 0;
+
                                             //
-                                            // Split.
+                                            // Sum up result.
                                             //
 
-                                            allsco[ gkey + 1 ]++;
-                                        }
-                                        else
-                                        {
-                                            if (ascore > bscore)
+                                            if (ascore == bscore)
                                             {
                                                 //
-                                                // Player a wins.
+                                                // Split.
                                                 //
 
-                                                allsco[ gkey + 2 ]++;
+                                                allsco[ gkey + 1 ]++;
                                             }
                                             else
                                             {
-                                                //
-                                                // Player b wins.
-                                                //
+                                                if (ascore > bscore)
+                                                {
+                                                    //
+                                                    // Player a wins.
+                                                    //
 
-                                                allsco[ gkey + 3 ]++;
+                                                    allsco[ gkey + 2 ]++;
+                                                }
+                                                else
+                                                {
+                                                    //
+                                                    // Player b wins.
+                                                    //
+
+                                                    allsco[ gkey + 3 ]++;
+                                                }
                                             }
+
+                                            vals[ card2val[ c5 ]]--;
+                                            cols[ card2col[ c5 ]]--;
+
+                                            deck[ c5 ] = 0;
                                         }
 
-                                        vals[ card2val[ c5 ] ]--;
-                                        cols[ card2col[ c5 ] ]--;
+                                        vals[ card2val[ c4 ]]--;
+                                        cols[ card2col[ c4 ]]--;
 
-                                        deck[ c5 ] = 0;
+                                        deck[ c4 ] = 0;
                                     }
 
-                                    vals[ card2val[ c4 ] ]--;
-                                    cols[ card2col[ c4 ] ]--;
+                                    vals[ card2val[ c3 ]]--;
+                                    cols[ card2col[ c3 ]]--;
 
-                                    deck[ c4 ] = 0;
+                                    deck[ c3 ] = 0;
                                 }
 
-                                vals[ card2val[ c3 ] ]--;
-                                cols[ card2col[ c3 ] ]--;
+                                vals[ card2val[ c2 ]]--;
+                                cols[ card2col[ c2 ]]--;
 
-                                deck[ c3 ] = 0;
+                                deck[ c2 ] = 0;
                             }
 
-                            vals[ card2val[ c2 ] ]--;
-                            cols[ card2col[ c2 ] ]--;
+                            vals[ card2val[ c1 ]]--;
+                            cols[ card2col[ c1 ]]--;
 
-                            deck[ c2 ] = 0;
+                            deck[ c1 ] = 0;
                         }
-
-                        vals[ card2val[ c1 ] ]--;
-                        cols[ card2col[ c1 ] ]--;
-
-                        deck[ c1 ] = 0;
                     }
 
-                    printf("%x%x(%d) - %x%x(%d) %10d %10d %10d\n",
-                           a1v, a2v, as, b1v, b2v, bs,
+                    printf("%x%x%c - %x%x%c %10d %10d %10d\n",
+                           a1v, a2v, (as ? 's' : ' '), b1v, b2v, (bs ? 's' : ' '),
                            allsco[ gkey + 1 ], allsco[ gkey + 2 ], allsco[ gkey + 3 ]);
                 }
             }
+
+            printf("%x%x%c - %d\n", a1v, a2v, (as ? 's' : ' '), count);
         }
     }
 
@@ -665,7 +659,7 @@ void evalhand()
 
             int hexval = score2hex2(inx >> 2);
 
-            printf("%06x=%d=%d=%d\n", hexval, awins, bwins, splits);
+            fprintf(fdhands,"%06x=%d=%d=%d\n", hexval, awins, bwins, splits);
         }
     }
 
@@ -822,7 +816,6 @@ int main()
 
     //evalgame();
 
-    printf("holo\n");
     evalhand();
 
     return 0;
