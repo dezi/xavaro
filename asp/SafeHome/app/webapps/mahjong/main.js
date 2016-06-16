@@ -53,7 +53,8 @@ mahjong.createButton = function(text)
     var buttonDiv;
     var buttonImg;
 
-    buttonDiv = WebLibSimple.createDivWidHei(null, null, 128, 128, null, mahjong.topdiv);
+    buttonDiv = WebLibSimple.createDivWidHei(null, null, 0, 0, null, mahjong.topdiv);
+    WebLibSimple.setFontSpecs(buttonDiv, 64, "bold");
 
     buttonImg = WebLibSimple.createAnyAppend("img", buttonDiv);
     buttonImg.style.width  = "100%";
@@ -64,7 +65,6 @@ mahjong.createButton = function(text)
     buttonTab.style.display = "table";
 
     buttonCen = WebLibSimple.createAnyAppend("div", buttonTab);
-    WebLibSimple.setFontSpecs(buttonCen, 64, "bold");
     buttonCen.style.display = "table-cell";
     buttonCen.style.width   = "100%";
     buttonCen.style.height  = "100%";
@@ -89,7 +89,7 @@ mahjong.onWindowResize = function()
     // Scale game panel to best fit.
     //
 
-    xx.panelActWid = (wid - 100);
+    xx.panelActWid = Math.floor(wid * 85 / 100);
     xx.panelActHei = Math.floor(xx.panelRealHei * xx.panelActWid / xx.panelRealWid);
 
     if (xx.panelActHei > (hei - 200))
@@ -142,6 +142,30 @@ mahjong.onWindowResize = function()
 
     var spacehorz = (wid - xx.panelActWid) >> 1;
     var spacevert = (hei - xx.panelActHei) >> 1;
+
+    var butsiz = Math.floor(Math.max(spacehorz, spacevert) * 60 / 100);
+    var fntsiz = Math.floor(butsiz * 75 / 100);
+
+    xx.buttonTop1div.style.width  = butsiz + "px";
+    xx.buttonTop1div.style.height = butsiz + "px";
+    xx.buttonTop2div.style.width  = butsiz + "px";
+    xx.buttonTop2div.style.height = butsiz + "px";
+    xx.buttonTop3div.style.width  = butsiz + "px";
+    xx.buttonTop3div.style.height = butsiz + "px";
+
+    xx.buttonBot1div.style.width  = butsiz + "px";
+    xx.buttonBot1div.style.height = butsiz + "px";
+    xx.buttonBot2div.style.width  = butsiz + "px";
+    xx.buttonBot2div.style.height = butsiz + "px";
+    xx.buttonBot3div.style.width  = butsiz + "px";
+    xx.buttonBot3div.style.height = butsiz + "px";
+
+    WebLibSimple.setFontSpecs(xx.buttonTop1div, fntsiz, "bold");
+    WebLibSimple.setFontSpecs(xx.buttonTop2div, fntsiz, "bold");
+    WebLibSimple.setFontSpecs(xx.buttonTop3div, fntsiz, "bold");
+    WebLibSimple.setFontSpecs(xx.buttonBot1div, fntsiz, "bold");
+    WebLibSimple.setFontSpecs(xx.buttonBot2div, fntsiz, "bold");
+    WebLibSimple.setFontSpecs(xx.buttonBot3div, fntsiz, "bold");
 
     if (spacehorz < spacevert)
     {
@@ -386,10 +410,10 @@ mahjong.onHintPlayer = function(target, ctarget)
     {
         var combi = xx.combinations[ inx ];
 
-        if ((rnd < 0) || (combi.tile1.tilePosition.z > lev) || (combi.tile2.tilePosition.z > lev))
+        if ((rnd < 0) || ((combi.tile1.tilePosition.z * combi.tile2.tilePosition.z) > lev))
         {
             rnd = inx;
-            lev = Math.max(combi.tile1.tilePosition.z, combi.tile2.tilePosition.z);
+            lev = combi.tile1.tilePosition.z * combi.tile2.tilePosition.z;
         }
     }
 

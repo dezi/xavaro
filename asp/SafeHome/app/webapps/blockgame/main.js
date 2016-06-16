@@ -12,7 +12,7 @@ blockgame.createFrame = function()
     var wid = xx.topdiv.clientWidth;
     var hei = xx.topdiv.clientHeight;
 
-    xx.gamesize  = Math.min(wid, hei) - 100;
+    xx.gamesize  = Math.floor(Math.min(wid, hei) * 85 / 100);
     xx.gamesize -= Math.floor(xx.gamesize % 6);
     xx.fieldsize = Math.floor(xx.gamesize / 6);
 
@@ -47,10 +47,17 @@ blockgame.createFrame = function()
 
 blockgame.createButton = function(text)
 {
+    var xx = blockgame;
+
+    var wid = xx.topdiv.clientWidth;
+    var hei = xx.topdiv.clientHeight;
+
+    var butsiz = Math.floor((Math.max(wid, hei) - xx.gamesize) * 75 / 200);
+
     var buttonDiv;
     var buttonImg;
 
-    buttonDiv = WebLibSimple.createDivWidHei(null, null, 128, 128, null, blockgame.topdiv);
+    buttonDiv = WebLibSimple.createDivWidHei(null, null, butsiz, butsiz, null, blockgame.topdiv);
 
     buttonImg = WebLibSimple.createAnyAppend("img", buttonDiv);
     buttonImg.style.width  = "100%";
@@ -61,7 +68,7 @@ blockgame.createButton = function(text)
     buttonTab.style.display = "table";
 
     buttonCen = WebLibSimple.createAnyAppend("div", buttonTab);
-    WebLibSimple.setFontSpecs(buttonCen, 64, "bold");
+    WebLibSimple.setFontSpecs(buttonCen, 60, "bold");
     buttonCen.style.display = "table-cell";
     buttonCen.style.width   = "100%";
     buttonCen.style.height  = "100%";

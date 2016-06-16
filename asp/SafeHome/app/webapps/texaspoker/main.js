@@ -16,7 +16,7 @@ texaspoker.createFrame = function()
     // Game panel.
     //
 
-    xx.gamesize  = Math.min(wid, hei) - 100;
+    xx.gamesize  = Math.floor(Math.min(wid, hei) * 85 / 100);
 
     xx.gamePanel = WebLibSimple.createDivWidHei(
         -xx.gamesize / 2, -xx.gamesize / 2,
@@ -30,7 +30,7 @@ texaspoker.createFrame = function()
     //
 
     xx.buttonTop1div = texaspoker.createButton("–");
-    xx.buttonTop2div = texaspoker.createButton("...");
+    xx.buttonTop2div = texaspoker.createButton("$");
     xx.buttonTop3div = texaspoker.createButton("+");
 
     xx.buttonBot1div = texaspoker.createButton("!");
@@ -50,10 +50,19 @@ texaspoker.createFrame = function()
 
 texaspoker.createButton = function(text)
 {
+    var xx = texaspoker;
+
+    var wid = xx.topdiv.clientWidth;
+    var hei = xx.topdiv.clientHeight;
+
+    var butsiz = Math.floor((Math.max(wid, hei) - xx.gamesize) * 75 / 200);
+    var fntsiz = Math.floor(butsiz * 70 / 100);
+
     var buttonDiv;
     var buttonImg;
 
-    buttonDiv = WebLibSimple.createDivWidHei(null, null, 128, 128, null, texaspoker.topdiv);
+    buttonDiv = WebLibSimple.createDivWidHei(null, null, butsiz, butsiz, null, texaspoker.topdiv);
+    WebLibSimple.setFontSpecs(buttonDiv, fntsiz, "bold");
 
     buttonImg = WebLibSimple.createAnyAppend("img", buttonDiv);
     buttonImg.style.width  = "100%";
@@ -64,7 +73,6 @@ texaspoker.createButton = function(text)
     buttonTab.style.display = "table";
 
     buttonCen = WebLibSimple.createAnyAppend("div", buttonTab);
-    WebLibSimple.setFontSpecs(buttonCen, 64, "bold");
     buttonCen.style.display = "table-cell";
     buttonCen.style.width   = "100%";
     buttonCen.style.height  = "100%";
@@ -164,10 +172,15 @@ texaspoker.createGame = function()
 {
     var xx = texaspoker;
 
-    var scoredata = WebAppRequest.loadSync("scoretable.txt");
-    scoredata = scoredata.trim().split("\n");
+    //
+    // Initialize global score lookup.
+    //
 
-    console.log("texaspoker.createGame: hands=" + scoredata.length);
+    var scoredata = WebAppRequest.loadSync("scoretable.txt");
+    scoredata = scoredata.split("\n");
+    if (scoredata[ scoredata.length - 1 ] == "") scoredata.pop();
+
+    console.log("texaspoker.createGame: scores=" + scoredata.length);
 
     xx.totalodds = 0;
     xx.scoretable = {};
@@ -189,6 +202,80 @@ texaspoker.createGame = function()
     if (xx.totalodds != 133784560)
     {
         alert("Datenbank stimmt nicht...")
+    }
+
+    //
+    // Initialize start hands.
+    //
+
+    var handsdata = WebAppRequest.loadSync("handstable.txt");
+    handsdata = handsdata.split("\n");
+    if (handsdata[ handsdata.length - 1 ] == "") handsdata.pop();
+
+    xx.totalhands = parseInt(handsdata.shift());
+    xx.starthands = {};
+    xx.starthand  = {};
+
+    console.log("texaspoker.createGame: totalhands=" + xx.totalhands);
+
+    for (var inx = 0; inx < handsdata.length; inx++)
+    {
+        var parts = handsdata[ inx ].split(",");
+        if (parts.length != 3) continue;
+
+        var hands = parts[ 0 ];
+        var win = parseInt(parts[ 1 ]);
+        var split = parseInt(parts[ 2 ]);
+        var loose = xx.totalhands - win - split;
+
+        xx.starthands[ hands ] = [ win, split ];
+
+        var handa = hands[ 0 ] + hands[ 1 ];
+        var handb;
+
+        if (hands[ 2 ] == "s")
+        {
+            handa = handa + hands[ 2 ];
+            handb = hands[ 3 ] + hands[ 4 ];
+
+            if (hands.length == 6) handb = handb + hands[ 5 ];
+        }
+        else
+        {
+            handb = hands[ 2 ] + hands[ 3 ];
+            if (hands.length == 5) handb = handb + hands[ 4 ];
+        }
+
+        if (! xx.starthand[ handa ]) xx.starthand[ handa ] = [ 0, 0, 0 ];
+        if (! xx.starthand[ handb ]) xx.starthand[ handb ] = [ 0, 0, 0 ];
+
+        xx.starthand[ handa ][ 0 ] += win;
+        xx.starthand[ handa ][ 1 ] += loose;
+        xx.starthand[ handa ][ 2 ] += split;
+
+        if (handa != handb)
+        {
+            xx.starthand[ handb ][ 0 ] += loose;
+            xx.starthand[ handb ][ 1 ] += win;
+            xx.starthand[ handb ][ 2 ] += split;
+        }
+    }
+
+    for (var hand in xx.starthand)
+    {
+        var wins   = xx.starthand[ hand ][ 0 ];
+        var looses = xx.starthand[ hand ][ 1 ];
+        var splits = xx.starthand[ hand ][ 2 ];
+
+        var strength = Math.floor(wins / (wins + looses + split) * 10000) / 100.0;
+
+        console.log("texaspoker.createGame:"
+            + " hand=" + hand
+            + " strength=" + strength
+            + " wins="   + wins
+            + " looses=" + looses
+            + " splits=" + splits
+            );
     }
 
     //
@@ -240,68 +327,6 @@ texaspoker.createGame = function()
     ];
 }
 
-texaspoker.dumpPreflopOdds = function()
-{
-    var xx = texaspoker;
-
-    for (var c1 = 12; c1 >= 0; c1--)
-    {
-        var hex1 = xx.vals2hex[ c1 ];
-
-        for (var c2 = c1; c2 >= 0; c2--)
-        {
-            var hex2 = xx.vals2hex[ c2 ];
-
-            var wins = 0;
-            var hands = 0;
-
-            for (var scorekey in xx.scoretable)
-            {
-                //
-                // Relevant cards per win type.
-                //
-
-                var wintype = scorekey[ 0 ];
-                if (wintype == 0) continue;
-
-                var winsuited = xx.winsuited[ wintype ];
-                if (winsuited) continue;
-
-                var wincards = xx.wincards[ wintype ];
-                var winhand = scorekey.substring(1, wincards + 1);
-
-                var match = false;
-
-                if (hex1 == hex2)
-                {
-                    match = (winhand.indexOf(hex1 + hex2) >= 0);
-                }
-                else
-                {
-                    match = (winhand.indexOf(hex1) >= 0) && (winhand.indexOf(hex2) >= 0);
-                }
-
-                if (match)
-                {
-                    wins += xx.scoretable[ scorekey ].win;
-                    hands++;
-
-                    //if (c2 == 2) console.log("texaspoker.dumpPreflopOdds: hands=" + hands + " " + scorekey + " " + xx.scoretable[ scorekey ].win);
-                }
-            }
-
-            wins /= hands;
-
-            console.log("texaspoker.dumpPreflopOdds: hand=" + hex1 + hex2 + " wins=" + wins);
-            //console.log("------------------------------------------------");
-        }
-
-        break;
-    }
-}
-
 texaspoker.createFrame();
 texaspoker.createGame();
 texaspoker.onWindowResize();
-
-texaspoker.dumpPreflopOdds();

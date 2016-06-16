@@ -6,7 +6,6 @@ sudoku.createFrame = function()
     xx.hintLevel = 0;
 
     xx.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
-    WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
     WebLibSimple.setBGColor(xx.topdiv, "#dddddd");
     xx.topdiv.style.overflow = "hidden";
 
@@ -19,9 +18,11 @@ sudoku.createFrame = function()
     // Game panel.
     //
 
-    xx.gamesize  = Math.min(wid, hei) - 100;
+    xx.gamesize  = Math.floor(Math.min(wid, hei) * 85 / 100);
     xx.gamesize -= Math.floor(xx.gamesize % 9);
     xx.fieldsize = Math.floor(xx.gamesize / 9);
+
+    WebLibSimple.setFontSpecs(xx.topdiv, xx.fieldsize, "bold");
 
     xx.gamePanel = WebLibSimple.createDivWidHei(
         -xx.gamesize / 2, -xx.gamesize / 2,
@@ -167,10 +168,19 @@ sudoku.onTouchEnterCancel = function(target, ctarget)
 
 sudoku.createButton = function(text)
 {
+    var xx = sudoku;
+
+    var wid = xx.topdiv.clientWidth;
+    var hei = xx.topdiv.clientHeight;
+
+    var butsiz = Math.floor((Math.max(wid, hei) - xx.gamesize) * 75 / 200);
+    var fntsiz = Math.floor(butsiz * 75 / 100);
+
     var buttonDiv;
     var buttonImg;
 
-    buttonDiv = WebLibSimple.createDivWidHei(null, null, 128, 128, null, sudoku.topdiv);
+    buttonDiv = WebLibSimple.createDivWidHei(null, null, butsiz, butsiz, null, sudoku.topdiv);
+    WebLibSimple.setFontSpecs(buttonDiv, fntsiz, "bold");
 
     buttonImg = WebLibSimple.createAnyAppend("img", buttonDiv);
     buttonImg.style.width  = "100%";
@@ -181,7 +191,6 @@ sudoku.createButton = function(text)
     buttonTab.style.display = "table";
 
     buttonCen = WebLibSimple.createAnyAppend("div", buttonTab);
-    WebLibSimple.setFontSpecs(buttonCen, 64, "bold");
     buttonCen.style.display = "table-cell";
     buttonCen.style.width   = "100%";
     buttonCen.style.height  = "100%";
@@ -204,17 +213,19 @@ sudoku.createPanel = function()
     xx.panelTable = WebLibSimple.createAnyAppend("table", xx.gamePanel);
     xx.panelTable.style.marginLeft = "2px";
     xx.panelTable.style.marginTop  = "2px";
-    xx.panelTable.style.width  = "100%";
-    xx.panelTable.style.height = "100%";
+    xx.panelTable.style.width  = xx.gamesize + "px";
+    xx.panelTable.style.height = xx.gamesize + "px";
     xx.panelTable.cellPadding  = "0";
     xx.panelTable.cellSpacing  = "0";
     xx.panelTable.border = "0";
+    xx.panelTable.style.backgroundColor = "#ff8888";
 
     var pos = 0;
 
     for (var row = 0; row < 9; row++)
     {
         var tableRow = WebLibSimple.createAnyAppend("tr", xx.panelTable);
+        tableRow.style.height = xx.fieldsize + "px";
 
         for (var col = 0; col < 9; col++)
         {
