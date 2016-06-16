@@ -94,12 +94,12 @@ texaspoker.createFrame = function()
 
     xx.computScore = texaspoker.createScore();
     xx.computScore.style.top  = (xx.fieldheight * 0.5) + "px";
-    xx.computScore.style.left = (xx.fieldwidth  * 4) + "px";
+    xx.computScore.style.left = (xx.fieldwidth  * 3) + "px";
     xx.computScore.innerHTML  = "--.-- %";
 
     xx.playerScore = texaspoker.createScore();
     xx.playerScore.style.top  = (xx.fieldheight * 2.5) + "px";
-    xx.playerScore.style.left = (xx.fieldwidth  * 4) + "px";
+    xx.playerScore.style.left = (xx.fieldwidth  * 3) + "px";
     xx.playerScore.innerHTML  = "--.-- %";
 
     addEventListener("resize", texaspoker.onWindowResize);

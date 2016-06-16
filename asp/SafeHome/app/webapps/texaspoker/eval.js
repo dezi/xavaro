@@ -1,3 +1,32 @@
+texaspoker.scorePlayer = function(p1, p2, f1, f2, f3, t, r)
+{
+    var deck = [];
+    var vals = [];
+    var cols = [];
+
+    for (var inx = 0; inx < 52; inx++) deck[ inx ] = 0;
+    for (var inx = 0; inx < 13; inx++) vals[ inx ] = 0;
+    for (var inx = 0; inx <  4; inx++) cols[ inx ] = 0;
+
+    texaspoker.addDeck(deck, vals, cols, p1);
+    texaspoker.addDeck(deck, vals, cols, p2);
+    texaspoker.addDeck(deck, vals, cols, f1);
+    texaspoker.addDeck(deck, vals, cols, f2);
+    texaspoker.addDeck(deck, vals, cols, f3);
+    texaspoker.addDeck(deck, vals, cols, t);
+    texaspoker.addDeck(deck, vals, cols, r);
+
+    return texaspoker.scoreSeven(deck, vals, cols);
+}
+
+texaspoker.addDeck = function(deck, vals, cols, card)
+{
+    deck[ card ] = true;
+
+    vals[ texaspoker.card2val[ card ] ]++;
+    cols[ texaspoker.card2col[ card ] ]++;
+}
+
 texaspoker.scoreSeven = function(deck, vals, cols)
 {
     var xx = texaspoker;
