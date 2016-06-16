@@ -428,13 +428,10 @@ void setup()
 
 void evalhand()
 {
-    printf("Hallo=1\n");
     memset(allsco, 0, sizeof(allsco));
-    printf("Hallo=2\n");
 
     int a1, a2, b1, b2, c1, c2, c3, c4, c5;
     int a1v, a2v, as, b1v, b2v, bs, akey, bkey, gkey, rkey, ascore, bscore;
-    printf("Hallo=%d\n", akey);
 
     for (a1 = 51; a1 >= 0; a1--)
     {
@@ -647,6 +644,8 @@ void evalhand()
 
     FILE *fdhands = fopen("./handstable.txt", "w");
 
+    fprintf(fdhands,"1712304\n");
+
     int awins, bwins, splits;
 
     for (int inx = 0; inx < maxscores; inx += 4)
@@ -673,9 +672,9 @@ void evalhand()
 
             gkey = ((akey * 512) + bkey) << 2;
 
-            fprintf(fdhands, "%x%x%c-%x%x%c,%d,%d,%d\n",
-                   a1v, a2v, (as ? 's' : 'u'), b1v, b2v, (bs ? 's' : 'u'),
-                   awins, bwins, splits);
+            fprintf(fdhands, "%x%x%s%x%x%s,%d,%d\n",
+                   a1v, a2v, (as ? "s" : ""), b1v, b2v, (bs ? "s" : ""),
+                   awins, splits);
         }
     }
 
