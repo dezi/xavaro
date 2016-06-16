@@ -20,7 +20,9 @@
       "dialog"
     ],
 
-    "preload": [],
+    "preload": [
+      "evals.js"
+    ],
 
     "locale": [
       "strings.json",
