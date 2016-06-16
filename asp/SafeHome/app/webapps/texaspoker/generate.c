@@ -659,7 +659,23 @@ void evalhand()
 
             int hexval = score2hex2(inx >> 2);
 
-            fprintf(fdhands,"%06x=%d=%d=%d\n", hexval, awins, bwins, splits);
+            akey = (inx >> 2) / 512;
+            bkey = (inx >> 2) % 512;
+
+            as = akey & 1;
+            bs = bkey & 1;
+
+            a1v = (akey >> 1) / 13;
+            a2v = (akey >> 1) % 13;
+
+            b1v = (bkey >> 1) / 13;
+            b2v = (bkey >> 1) % 13;
+
+            gkey = ((akey * 512) + bkey) << 2;
+
+            fprintf(fdhands, "%x%x%c-%x%x%c,%d,%d,%d\n",
+                   a1v, a2v, (as ? 's' : 'u'), b1v, b2v, (bs ? 's' : 'u'),
+                   awins, bwins, splits);
         }
     }
 
