@@ -71,7 +71,7 @@ WebLibCards.getCard = function()
 {
     var rnd = Math.floor(Math.random() * WebLibCards.playDeck.length);
 
-    return WebLibCards.playDeck.splice(rnd,1);
+    return WebLibCards.playDeck.splice(rnd,1)[ 0 ];
 }
 
 WebLibCards.getCardImageUrl = function(card)

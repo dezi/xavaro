@@ -94,12 +94,12 @@ texaspoker.createFrame = function()
 
     xx.computScore = texaspoker.createScore();
     xx.computScore.style.top  = (xx.fieldheight * 0.5) + "px";
-    xx.computScore.style.left = (xx.fieldwidth  * 3) + "px";
+    xx.computScore.style.left = (xx.fieldwidth  * 2.2) + "px";
     xx.computScore.innerHTML  = "--.-- %";
 
     xx.playerScore = texaspoker.createScore();
     xx.playerScore.style.top  = (xx.fieldheight * 2.5) + "px";
-    xx.playerScore.style.left = (xx.fieldwidth  * 3) + "px";
+    xx.playerScore.style.left = (xx.fieldwidth  * 2.2) + "px";
     xx.playerScore.innerHTML  = "--.-- %";
 
     addEventListener("resize", texaspoker.onWindowResize);
@@ -111,11 +111,11 @@ texaspoker.createScore = function()
 
     var scoreDiv = WebLibSimple.createAnyAppend("div", xx.gamePanel);
     scoreDiv.style.position = "absolute";
-    scoreDiv.style.width    = (xx.fieldwidth  * 3) + "px";
+    scoreDiv.style.width    = (xx.fieldwidth  * 4) + "px";
     scoreDiv.style.height   = (xx.fieldheight / 3) + "px";
     scoreDiv.style.color    = "#ffffff";
 
-    WebLibSimple.setFontSpecs(scoreDiv, (xx.fieldheight / 4), "bold");
+    WebLibSimple.setFontSpecs(scoreDiv, (xx.fieldheight / 5), "bold");
 
     return scoreDiv;
 }
@@ -425,6 +425,38 @@ texaspoker.createGame = function()
     ];
 }
 
+texaspoker.getHeadsUpPercent = function(hand1, hand2)
+{
+    var xx = texaspoker;
+
+    var wins = {};
+
+    if (hand1 > hand2)
+    {
+        var vals = xx.starthands[ hand1 + hand2 ];
+
+        wins.hand1 = vals[ 0 ];
+        wins.split = vals[ 1 ];
+        wins.hand2 = xx.totalhands - wins.hand1 - wins.split;
+    }
+    else
+    {
+        var vals = xx.starthands[ hand2 + hand1 ];
+
+        wins.hand2 = vals[ 0 ];
+        wins.split = vals[ 1 ];
+        wins.hand1 = xx.totalhands - wins.hand2 - wins.split;
+    }
+
+    wins.percent1 = wins.hand1 / (wins.hand1 + wins.split + wins.hand2);
+    wins.percent2 = wins.hand2 / (wins.hand1 + wins.split + wins.hand2);
+
+    wins.percent1 = Math.floor(wins.percent1 * 10000) / 100;
+    wins.percent2 = Math.floor(wins.percent2 * 10000) / 100;
+
+    return wins;
+}
+
 texaspoker.getHandPercent = function(hand)
 {
     var xx = texaspoker;
@@ -501,6 +533,14 @@ texaspoker.onHintPlayer = function(target, ctarget)
     var phand = xx.vals2hex[ p1 ] + xx.vals2hex[ p2 ] + (ps ? "s" : "");
 
     xx.playerScore.innerHTML = xx.getHandPercent(phand) + " %";
+
+    var headsup = texaspoker.getHeadsUpPercent(chand, phand);
+
+    console.log("=====================>:::::" + headsup.hand1 + " " + headsup.split + " " + headsup.hand2);
+    console.log("=====================>:::::" + headsup.percent1 + " " + headsup.percent2);
+
+    xx.computScore.innerHTML += " – " + headsup.percent1 + " %";
+    xx.playerScore.innerHTML += " – " + headsup.percent2 + " %";
 }
 
 texaspoker.createFrame();
