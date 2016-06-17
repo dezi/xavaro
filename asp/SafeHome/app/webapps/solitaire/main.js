@@ -81,19 +81,19 @@ solitaire.createFrame = function()
 
     xx.doneHeaps = [];
 
-    xx.doneHeaps[ 3 ] = solitaire.createCard();
+    xx.doneHeaps[ 3 ] = solitaire.createCard(true);
     xx.doneHeaps[ 3 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 3 ].style.left = (xx.fieldwidth  * 3) + "px";
 
-    xx.doneHeaps[ 2 ] = solitaire.createCard();
+    xx.doneHeaps[ 2 ] = solitaire.createCard(true);
     xx.doneHeaps[ 2 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 2 ].style.left = (xx.fieldwidth  * 4) + "px";
 
-    xx.doneHeaps[ 1 ] = solitaire.createCard();
+    xx.doneHeaps[ 1 ] = solitaire.createCard(true);
     xx.doneHeaps[ 1 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 1 ].style.left = (xx.fieldwidth  * 5) + "px";
 
-    xx.doneHeaps[ 0 ] = solitaire.createCard();
+    xx.doneHeaps[ 0 ] = solitaire.createCard(true);
     xx.doneHeaps[ 0 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 0 ].style.left = (xx.fieldwidth  * 6) + "px";
 
@@ -107,10 +107,36 @@ solitaire.createFrame = function()
     xx.doneHeaps[ 1 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 1 ].cardValue);
     xx.doneHeaps[ 0 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 0 ].cardValue);
 
+    xx.playHeaps = [];
+
+    for (var inx = 0; inx < 7; inx++)
+    {
+        xx.playHeaps[ inx ] = [];
+
+        var ph = xx.playHeaps[ inx ];
+
+        for (var cnt = 0; cnt <= inx; cnt++)
+        {
+            ph[ cnt ] = solitaire.createCard();
+            ph[ cnt ].style.top  = (xx.fieldheight * (1 + (0.2 * cnt))) + "px";
+            ph[ cnt ].style.left = (xx.fieldwidth  * inx) + "px";
+            ph[ cnt ].cardValue = WebLibCards.getCard();
+
+            if (cnt == inx)
+            {
+                ph[ cnt ].cardImg.src = WebLibCards.getCardImageUrl(ph[ cnt ].cardValue);
+            }
+            else
+            {
+                ph[ cnt ].cardImg.src = WebLibCards.getCardBacksideUrl();
+            }
+        }
+   }
+
     addEventListener("resize", solitaire.onWindowResize);
 }
 
-solitaire.createCard = function()
+solitaire.createCard = function(token)
 {
     var xx = solitaire;
 
@@ -129,9 +155,21 @@ solitaire.createCard = function()
     cardDiv.style.marginTop    = marginy + "px";
     cardDiv.style.marginBottom = marginy + "px";
 
+    cardDiv.backImg = WebLibSimple.createAnyAppend("img", cardDiv);
+    cardDiv.backImg.style.display  = token ? "none" : "block";
+    cardDiv.backImg.style.position = "absolute";
+    cardDiv.backImg.style.left     = "0px";
+    cardDiv.backImg.style.top      = "0px";
+    cardDiv.backImg.style.width    = "auto";
+    cardDiv.backImg.style.height   = "100%";
+    cardDiv.backImg.src = WebLibCards.getCardBackgroundUrl();
+
     cardDiv.cardImg = WebLibSimple.createAnyAppend("img", cardDiv);
-    cardDiv.cardImg.style.width  = "auto";
-    cardDiv.cardImg.style.height = "100%";
+    cardDiv.cardImg.style.position = "absolute";
+    cardDiv.cardImg.style.left     = "0px";
+    cardDiv.cardImg.style.top      = "0px";
+    cardDiv.cardImg.style.width    = "auto";
+    cardDiv.cardImg.style.height   = "100%";
 
     return cardDiv;
 }

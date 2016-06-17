@@ -83,3 +83,13 @@ WebLibCards.getCardBacksideUrl = function()
 {
     return "/weblibs/cards/backside_red_320x460.png";
 }
+
+WebLibCards.getCardBackgroundUrl = function(selected)
+{
+    if (selected)
+    {
+        return "/weblibs/cards/set1/0_background_green.png";
+    }
+
+    return "/weblibs/cards/set1/0_background_white.png";
+}
