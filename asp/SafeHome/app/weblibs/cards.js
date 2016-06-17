@@ -78,3 +78,8 @@ WebLibCards.getCardImageUrl = function(card)
 {
     return WebLibCards.cardPoker[ 51 - card ];
 }
+
+WebLibCards.getCardBacksideUrl = function()
+{
+    return "/weblibs/cards/backside_red_320x460.png";
+}

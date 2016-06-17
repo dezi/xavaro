@@ -1,6 +1,6 @@
-texaspoker.createFrame = function()
+solitaire.createFrame = function()
 {
-    var xx = texaspoker;
+    var xx = solitaire;
 
     xx.topdiv = WebLibSimple.createDiv(0, 0, 0, 0, "topdiv", document.body);
     WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
@@ -18,8 +18,8 @@ texaspoker.createFrame = function()
     //
 
     xx.gamesize    = Math.floor(Math.min(wid, hei) * 85 / 100);
-    xx.fieldwidth  = xx.gamesize / 6;
-    xx.fieldheight = xx.gamesize / 3;
+    xx.fieldwidth  = xx.gamesize / 7;
+    xx.fieldheight = xx.gamesize / 4;
 
     xx.gamePanel = WebLibSimple.createDivWidHei(
         -xx.gamesize / 2, -xx.gamesize / 2,
@@ -30,99 +30,89 @@ texaspoker.createFrame = function()
     // Buttons.
     //
 
-    xx.buttonTop1div = texaspoker.createButton("–");
-    xx.buttonTop2div = texaspoker.createButton("$");
-    xx.buttonTop3div = texaspoker.createButton("+");
+    xx.buttonTop1div = solitaire.createButton("–");
+    xx.buttonTop2div = solitaire.createButton("$");
+    xx.buttonTop3div = solitaire.createButton("+");
 
-    xx.buttonBot1div = texaspoker.createButton("!");
-    xx.buttonBot2div = texaspoker.createButton("=");
-    xx.buttonBot3div = texaspoker.createButton("?");
+    xx.buttonBot1div = solitaire.createButton("!");
+    xx.buttonBot2div = solitaire.createButton("=");
+    xx.buttonBot3div = solitaire.createButton("?");
 
     /*
-    xx.buttonTop1div.onTouchClick = texaspoker.onButtonMinus;
-    xx.buttonTop3div.onTouchClick = texaspoker.onButtonPlus;
-    xx.buttonBot1div.onTouchClick = texaspoker.onLoadNewGame;
-    xx.buttonBot2div.onTouchClick = texaspoker.onSolveStep;
-    xx.buttonBot3div.onTouchClick = texaspoker.onHintPlayer;
+    xx.buttonTop1div.onTouchClick = solitaire.onButtonMinus;
+    xx.buttonTop3div.onTouchClick = solitaire.onButtonPlus;
+    xx.buttonBot1div.onTouchClick = solitaire.onLoadNewGame;
+    xx.buttonBot2div.onTouchClick = solitaire.onSolveStep;
+    xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
     */
 
-    xx.buttonBot3div.onTouchClick = texaspoker.onHintPlayer;
+    xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
 
     //
     // Create cards.
     //
 
-    xx.computCard1 = texaspoker.createCard();
-    xx.computCard1.style.top  = (xx.fieldheight * 0) + "px";
-    xx.computCard1.style.left = (xx.fieldwidth  * 0) + "px";
+    xx.heapCard = solitaire.createCard();
+    xx.heapCard.style.top  = (xx.fieldheight * 0) + "px";
+    xx.heapCard.style.left = (xx.fieldwidth  * 0) + "px";
+    xx.heapCard.cardImg.src = WebLibCards.getCardBacksideUrl();
 
-    xx.computCard2 = texaspoker.createCard();
-    xx.computCard2.style.top  = (xx.fieldheight * 0) + "px";
-    xx.computCard2.style.left = (xx.fieldwidth  * 1) + "px";
+    WebLibCards.newDeck(52);
 
-    xx.playerCard1 = texaspoker.createCard();
-    xx.playerCard1.style.top  = (xx.fieldheight * 2) + "px";
-    xx.playerCard1.style.left = (xx.fieldwidth  * 0) + "px";
+    xx.openCards = [];
 
-    xx.playerCard2 = texaspoker.createCard();
-    xx.playerCard2.style.top  = (xx.fieldheight * 2) + "0px";
-    xx.playerCard2.style.left = (xx.fieldwidth  * 1) + "px";
+    xx.openCards[ 0 ] = solitaire.createCard();
+    xx.openCards[ 0 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.openCards[ 0 ].style.left = (xx.fieldwidth  * 1) + "px";
+    xx.openCards[ 0 ].cardValue = WebLibCards.getCard();
+    xx.openCards[ 0 ].cardImg.src = WebLibCards.getCardImageUrl(xx.openCards[ 0 ].cardValue);
 
-    xx.flopCard1 = texaspoker.createCard();
-    xx.flopCard1.style.top  = (xx.fieldheight * 1) + "px";
-    xx.flopCard1.style.left = (xx.fieldwidth  * 0) + "px";
+    xx.openCards[ 1 ] = solitaire.createCard();
+    xx.openCards[ 1 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.openCards[ 1 ].style.left = (xx.fieldwidth  * 1.3) + "px";
+    xx.openCards[ 1 ].cardValue = WebLibCards.getCard();
+    xx.openCards[ 1 ].cardImg.src = WebLibCards.getCardImageUrl(xx.openCards[ 1 ].cardValue);
 
-    xx.flopCard2 = texaspoker.createCard();
-    xx.flopCard2.style.top  = (xx.fieldheight * 1) + "px";
-    xx.flopCard2.style.left = (xx.fieldwidth  * 1) + "px";
+    xx.openCards[ 2 ] = solitaire.createCard();
+    xx.openCards[ 2 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.openCards[ 2 ].style.left = (xx.fieldwidth  * 1.6) + "px";
+    xx.openCards[ 2 ].cardValue = WebLibCards.getCard();
+    xx.openCards[ 2 ].cardImg.src = WebLibCards.getCardImageUrl(xx.openCards[ 2 ].cardValue);
 
-    xx.flopCard3 = texaspoker.createCard();
-    xx.flopCard3.style.top  = (xx.fieldheight * 1) + "px";
-    xx.flopCard3.style.left = (xx.fieldwidth  * 2) + "px";
+    xx.doneHeaps = [];
 
-    xx.turnCard = texaspoker.createCard();
-    xx.turnCard.style.top  = (xx.fieldheight * 1) + "px";
-    xx.turnCard.style.left = (xx.fieldwidth  * 3.5) + "px";
+    xx.doneHeaps[ 3 ] = solitaire.createCard();
+    xx.doneHeaps[ 3 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 3 ].style.left = (xx.fieldwidth  * 3) + "px";
 
-    xx.riverCard = texaspoker.createCard();
-    xx.riverCard.style.top  = (xx.fieldheight * 1) + "px";
-    xx.riverCard.style.left = (xx.fieldwidth  * 5) + "px";
+    xx.doneHeaps[ 2 ] = solitaire.createCard();
+    xx.doneHeaps[ 2 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 2 ].style.left = (xx.fieldwidth  * 4) + "px";
 
-    //
-    // Player score.
-    //
+    xx.doneHeaps[ 1 ] = solitaire.createCard();
+    xx.doneHeaps[ 1 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 1 ].style.left = (xx.fieldwidth  * 5) + "px";
 
-    xx.computScore = texaspoker.createScore();
-    xx.computScore.style.top  = (xx.fieldheight * 0.5) + "px";
-    xx.computScore.style.left = (xx.fieldwidth  * 2.2) + "px";
-    xx.computScore.innerHTML  = "--.-- %";
+    xx.doneHeaps[ 0 ] = solitaire.createCard();
+    xx.doneHeaps[ 0 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 0 ].style.left = (xx.fieldwidth  * 6) + "px";
 
-    xx.playerScore = texaspoker.createScore();
-    xx.playerScore.style.top  = (xx.fieldheight * 2.5) + "px";
-    xx.playerScore.style.left = (xx.fieldwidth  * 2.2) + "px";
-    xx.playerScore.innerHTML  = "--.-- %";
+    xx.doneHeaps[ 3 ].cardValue = 51;
+    xx.doneHeaps[ 2 ].cardValue = 50;
+    xx.doneHeaps[ 1 ].cardValue = 49;
+    xx.doneHeaps[ 0 ].cardValue = 48;
 
-    addEventListener("resize", texaspoker.onWindowResize);
+    xx.doneHeaps[ 3 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 3 ].cardValue);
+    xx.doneHeaps[ 2 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 2 ].cardValue);
+    xx.doneHeaps[ 1 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 1 ].cardValue);
+    xx.doneHeaps[ 0 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 0 ].cardValue);
+
+    addEventListener("resize", solitaire.onWindowResize);
 }
 
-texaspoker.createScore = function()
+solitaire.createCard = function()
 {
-    var xx = texaspoker;
-
-    var scoreDiv = WebLibSimple.createAnyAppend("div", xx.gamePanel);
-    scoreDiv.style.position = "absolute";
-    scoreDiv.style.width    = (xx.fieldwidth  * 4) + "px";
-    scoreDiv.style.height   = (xx.fieldheight / 3) + "px";
-    scoreDiv.style.color    = "#ffffff";
-
-    WebLibSimple.setFontSpecs(scoreDiv, (xx.fieldheight / 5), "bold");
-
-    return scoreDiv;
-}
-
-texaspoker.createCard = function()
-{
-    var xx = texaspoker;
+    var xx = solitaire;
 
     var marginx = Math.floor(xx.fieldwidth  * 0.1);
     var marginy = Math.floor(xx.fieldheight * 0.175);
@@ -146,9 +136,9 @@ texaspoker.createCard = function()
     return cardDiv;
 }
 
-texaspoker.createButton = function(text)
+solitaire.createButton = function(text)
 {
-    var xx = texaspoker;
+    var xx = solitaire;
 
     var wid = xx.topdiv.clientWidth;
     var hei = xx.topdiv.clientHeight;
@@ -159,7 +149,7 @@ texaspoker.createButton = function(text)
     var buttonDiv;
     var buttonImg;
 
-    buttonDiv = WebLibSimple.createDivWidHei(null, null, butsiz, butsiz, null, texaspoker.topdiv);
+    buttonDiv = WebLibSimple.createDivWidHei(null, null, butsiz, butsiz, null, solitaire.topdiv);
     WebLibSimple.setFontSpecs(buttonDiv, fntsiz, "bold");
 
     buttonImg = WebLibSimple.createAnyAppend("img", buttonDiv);
@@ -184,9 +174,9 @@ texaspoker.createButton = function(text)
     return buttonDiv;
 }
 
-texaspoker.onWindowResize = function()
+solitaire.onWindowResize = function()
 {
-    var xx = texaspoker;
+    var xx = solitaire;
 
     var wid = xx.topdiv.clientWidth;
     var hei = xx.topdiv.clientHeight;
@@ -266,284 +256,14 @@ texaspoker.onWindowResize = function()
     }
 }
 
-texaspoker.createGame = function()
-{
-    var xx = texaspoker;
-
-    //
-    // Initialize global score lookup.
-    //
-
-    var scoredata = WebAppRequest.loadSync("scoretable.txt");
-    scoredata = scoredata.split("\n");
-    if (scoredata[ scoredata.length - 1 ] == "") scoredata.pop();
-
-    console.log("texaspoker.createGame: scores=" + scoredata.length);
-
-    xx.totalodds = 0;
-    xx.scoretable = {};
-
-    for (var inx = 0; inx < scoredata.length; inx++)
-    {
-        var parts = scoredata[ inx ].split("=");
-        if (parts.length != 3) continue;
-
-        var winpercent = parseFloat(parts[ 1 ]);
-        var scoreodds = parseInt(parts[ 2 ]);
-
-        xx.scoretable[ parts[ 0 ] ] = { odd : scoreodds, win : winpercent };
-        xx.totalodds += scoreodds;
-    }
-
-    console.log("texaspoker.createGame: total=" + xx.totalodds);
-
-    if (xx.totalodds != 133784560)
-    {
-        alert("Datenbank stimmt nicht...")
-    }
-
-    //
-    // Initialize start hands.
-    //
-
-    var handsdata = WebAppRequest.loadSync("handstable.txt");
-    handsdata = handsdata.split("\n");
-    if (handsdata[ handsdata.length - 1 ] == "") handsdata.pop();
-
-    xx.totalhands = parseInt(handsdata.shift());
-    xx.starthands = {};
-    xx.starthand  = {};
-
-    console.log("texaspoker.createGame: totalhands=" + xx.totalhands);
-
-    for (var inx = 0; inx < handsdata.length; inx++)
-    {
-        var parts = handsdata[ inx ].split(",");
-        if (parts.length != 3) continue;
-
-        var hands = parts[ 0 ];
-        var win = parseInt(parts[ 1 ]);
-        var split = parseInt(parts[ 2 ]);
-        var loose = xx.totalhands - win - split;
-
-        xx.starthands[ hands ] = [ win, split ];
-
-        var handa = hands[ 0 ] + hands[ 1 ];
-        var handb;
-
-        if (hands[ 2 ] == "s")
-        {
-            handa = handa + hands[ 2 ];
-            handb = hands[ 3 ] + hands[ 4 ];
-
-            if (hands.length == 6) handb = handb + hands[ 5 ];
-        }
-        else
-        {
-            handb = hands[ 2 ] + hands[ 3 ];
-            if (hands.length == 5) handb = handb + hands[ 4 ];
-        }
-
-        if (! xx.starthand[ handa ]) xx.starthand[ handa ] = [ 0, 0, 0 ];
-        if (! xx.starthand[ handb ]) xx.starthand[ handb ] = [ 0, 0, 0 ];
-
-        xx.starthand[ handa ][ 0 ] += win;
-        xx.starthand[ handa ][ 1 ] += loose;
-        xx.starthand[ handa ][ 2 ] += split;
-
-        if (handa != handb)
-        {
-            xx.starthand[ handb ][ 0 ] += loose;
-            xx.starthand[ handb ][ 1 ] += win;
-            xx.starthand[ handb ][ 2 ] += split;
-        }
-    }
-
-    for (var hand in xx.starthand)
-    {
-        var wins   = xx.starthand[ hand ][ 0 ];
-        var looses = xx.starthand[ hand ][ 1 ];
-        var splits = xx.starthand[ hand ][ 2 ];
-
-        var strength = Math.floor(wins / (wins + looses + splits) * 10000) / 100.0;
-
-        console.log("texaspoker.createGame:"
-            + " hand=" + hand
-            + " strength=" + strength
-            + " wins="   + wins
-            + " looses=" + looses
-            + " splits=" + splits
-            );
-    }
-
-    //
-    // Initialize tables.
-    //
-
-    xx.card2val = [];
-    xx.card2col = [];
-
-    for (var inx = 0; inx < 52; inx++)
-    {
-        xx.card2val[ inx ] = inx >> 2;
-        xx.card2col[ inx ] = inx % 4;
-    }
-
-    xx.vals2hex = [];
-
-    for (var inx = 0; inx < 13; inx++)
-    {
-        xx.vals2hex[ inx ] = String.fromCharCode(inx + (inx < 10 ? 48 : 87));
-    }
-
-    xx.wincards =
-    [
-        5, // High card.
-        2, // Two of a kind.
-        4, // Two pairs.
-        3, // Three of a kind.
-        5, // Straight.
-        5, // Flush.
-        5, // Full house.
-        4, // Four of a kind.
-        5, // Straight flush.
-        5, // Royal flush.
-    ];
-
-    xx.winsuited =
-    [
-        false, // High card.
-        false, // Two of a kind.
-        false, // Two pairs.
-        false, // Three of a kind.
-        false, // Straight.
-        true,  // Flush.
-        false, // Full house.
-        false, // Four of a kind.
-        true,  // Straight flush.
-        true,  // Royal flush.
-    ];
-}
-
-texaspoker.getHeadsUpPercent = function(hand1, hand2)
-{
-    var xx = texaspoker;
-
-    var wins = {};
-
-    if (hand1 > hand2)
-    {
-        var vals = xx.starthands[ hand1 + hand2 ];
-
-        wins.hand1 = vals[ 0 ];
-        wins.split = vals[ 1 ];
-        wins.hand2 = xx.totalhands - wins.hand1 - wins.split;
-    }
-    else
-    {
-        var vals = xx.starthands[ hand2 + hand1 ];
-
-        wins.hand2 = vals[ 0 ];
-        wins.split = vals[ 1 ];
-        wins.hand1 = xx.totalhands - wins.hand2 - wins.split;
-    }
-
-    wins.percent1 = wins.hand1 / (wins.hand1 + wins.split + wins.hand2);
-    wins.percent2 = wins.hand2 / (wins.hand1 + wins.split + wins.hand2);
-
-    wins.percent1 = Math.floor(wins.percent1 * 10000) / 100;
-    wins.percent2 = Math.floor(wins.percent2 * 10000) / 100;
-
-    return wins;
-}
-
-texaspoker.getHandPercent = function(hand)
-{
-    var xx = texaspoker;
-
-    if (! xx.starthand[ hand ]) console.log("==========================>>>>hand=" + hand);
-
-    var wins   = xx.starthand[ hand ][ 0 ];
-    var looses = xx.starthand[ hand ][ 1 ];
-    var splits = xx.starthand[ hand ][ 2 ];
-
-    var strength = Math.floor(wins / (wins + looses + splits) * 10000) / 100.0;
-
-    return strength;
-}
-
-texaspoker.onHintPlayer = function(target, ctarget)
+solitaire.onHintPlayer = function(target, ctarget)
 {
     WebAppUtility.makeClick();
 
-    var xx = texaspoker;
+    var xx = solitaire;
 
     WebLibCards.newDeck(52);
-
-    xx.computCard1.cardValue = WebLibCards.getCard();
-    xx.computCard2.cardValue = WebLibCards.getCard();
-
-    if (xx.computCard2.cardValue > xx.computCard1.cardValue)
-    {
-        var tmp = xx.computCard2.cardValue;
-        xx.computCard2.cardValue = xx.computCard1.cardValue;
-        xx.computCard1.cardValue = tmp;
-    }
-
-    xx.computCard1.cardImg.src = WebLibCards.getCardImageUrl(xx.computCard1.cardValue);
-    xx.computCard2.cardImg.src = WebLibCards.getCardImageUrl(xx.computCard2.cardValue);
-
-    xx.playerCard1.cardValue = WebLibCards.getCard();
-    xx.playerCard2.cardValue = WebLibCards.getCard();
-
-    if (xx.playerCard2.cardValue > xx.playerCard1.cardValue)
-    {
-        var tmp = xx.playerCard2.cardValue;
-        xx.playerCard2.cardValue = xx.playerCard1.cardValue;
-        xx.playerCard1.cardValue = tmp;
-    }
-
-    xx.playerCard1.cardImg.src = WebLibCards.getCardImageUrl(xx.playerCard1.cardValue);
-    xx.playerCard2.cardImg.src = WebLibCards.getCardImageUrl(xx.playerCard2.cardValue);
-
-    xx.flopCard1.cardValue = WebLibCards.getCard();
-    xx.flopCard2.cardValue = WebLibCards.getCard();
-    xx.flopCard3.cardValue = WebLibCards.getCard();
-
-    xx.flopCard1.cardImg.src = WebLibCards.getCardImageUrl(xx.flopCard1.cardValue);
-    xx.flopCard2.cardImg.src = WebLibCards.getCardImageUrl(xx.flopCard2.cardValue);
-    xx.flopCard3.cardImg.src = WebLibCards.getCardImageUrl(xx.flopCard3.cardValue);
-
-    xx.turnCard.cardValue = WebLibCards.getCard();
-    xx.turnCard.cardImg.src = WebLibCards.getCardImageUrl(xx.turnCard.cardValue);
-
-    xx.riverCard.cardValue = WebLibCards.getCard();
-    xx.riverCard.cardImg.src = WebLibCards.getCardImageUrl(xx.riverCard.cardValue);
-
-    var c1 = xx.card2val[ xx.computCard1.cardValue ];
-    var c2 = xx.card2val[ xx.computCard2.cardValue ];
-    var cs = (xx.card2col[ xx.computCard1.cardValue ] == xx.card2col[ xx.computCard2.cardValue ]);
-    var chand = xx.vals2hex[ c1 ] + xx.vals2hex[ c2 ] + (cs ? "s" : "");
-
-    xx.computScore.innerHTML = xx.getHandPercent(chand) + " %";
-
-    var p1 = xx.card2val[ xx.playerCard1.cardValue ];
-    var p2 = xx.card2val[ xx.playerCard2.cardValue ];
-    var ps = (xx.card2col[ xx.playerCard1.cardValue ] == xx.card2col[ xx.playerCard2.cardValue ]);
-    var phand = xx.vals2hex[ p1 ] + xx.vals2hex[ p2 ] + (ps ? "s" : "");
-
-    xx.playerScore.innerHTML = xx.getHandPercent(phand) + " %";
-
-    var headsup = texaspoker.getHeadsUpPercent(chand, phand);
-
-    console.log("=====================>:::::" + headsup.hand1 + " " + headsup.split + " " + headsup.hand2);
-    console.log("=====================>:::::" + headsup.percent1 + " " + headsup.percent2);
-
-    xx.computScore.innerHTML += " – " + headsup.percent1 + " %";
-    xx.playerScore.innerHTML += " – " + headsup.percent2 + " %";
 }
 
-texaspoker.createFrame();
-texaspoker.createGame();
-texaspoker.onWindowResize();
-texaspoker.onHintPlayer();
+solitaire.createFrame();
+solitaire.onWindowResize();
