@@ -52,7 +52,7 @@ solitaire.createFrame = function()
     // Create cards.
     //
 
-    xx.heapCard = solitaire.createCard();
+    xx.heapCard = solitaire.createCard(0, true);
     xx.heapCard.style.top  = (xx.fieldheight * 0) + "px";
     xx.heapCard.style.left = (xx.fieldwidth  * 0) + "px";
     xx.heapCard.cardImg.src = WebLibCards.getCardBacksideUrl();
@@ -61,55 +61,39 @@ solitaire.createFrame = function()
 
     xx.openCards = [];
 
-    xx.openCards[ 0 ] = solitaire.createCard();
+    xx.openCards[ 0 ] = solitaire.createCard(WebLibCards.getCard(), false);
     xx.openCards[ 0 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.openCards[ 0 ].style.left = (xx.fieldwidth  * 1) + "px";
-    xx.openCards[ 0 ].cardValue = WebLibCards.getCard();
-    xx.openCards[ 0 ].cardImg.src = WebLibCards.getCardImageUrl(xx.openCards[ 0 ].cardValue);
 
-    xx.openCards[ 1 ] = solitaire.createCard();
+    xx.openCards[ 1 ] = solitaire.createCard(WebLibCards.getCard(), false);
     xx.openCards[ 1 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.openCards[ 1 ].style.left = (xx.fieldwidth  * 1.3) + "px";
-    xx.openCards[ 1 ].cardValue = WebLibCards.getCard();
-    xx.openCards[ 1 ].cardImg.src = WebLibCards.getCardImageUrl(xx.openCards[ 1 ].cardValue);
 
-    xx.openCards[ 2 ] = solitaire.createCard();
+    xx.openCards[ 2 ] = solitaire.createCard(WebLibCards.getCard(), false);
     xx.openCards[ 2 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.openCards[ 2 ].style.left = (xx.fieldwidth  * 1.6) + "px";
-    xx.openCards[ 2 ].cardValue = WebLibCards.getCard();
-    xx.openCards[ 2 ].cardImg.src = WebLibCards.getCardImageUrl(xx.openCards[ 2 ].cardValue);
 
     xx.doneHeaps = [];
 
-    xx.doneHeaps[ 3 ] = solitaire.createCard(true);
+    xx.doneHeaps[ 3 ] = solitaire.createCard(-51, false);
     xx.doneHeaps[ 3 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 3 ].style.left = (xx.fieldwidth  * 3) + "px";
 
-    xx.doneHeaps[ 2 ] = solitaire.createCard(true);
+    xx.doneHeaps[ 2 ] = solitaire.createCard(-50, false);
     xx.doneHeaps[ 2 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 2 ].style.left = (xx.fieldwidth  * 4) + "px";
 
-    xx.doneHeaps[ 1 ] = solitaire.createCard(true);
+    xx.doneHeaps[ 1 ] = solitaire.createCard(-49, false);
     xx.doneHeaps[ 1 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 1 ].style.left = (xx.fieldwidth  * 5) + "px";
 
-    xx.doneHeaps[ 0 ] = solitaire.createCard(true);
+    xx.doneHeaps[ 0 ] = solitaire.createCard(-48, false);
     xx.doneHeaps[ 0 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 0 ].style.left = (xx.fieldwidth  * 6) + "px";
 
-    xx.doneHeaps[ 3 ].cardValue = 51;
-    xx.doneHeaps[ 2 ].cardValue = 50;
-    xx.doneHeaps[ 1 ].cardValue = 49;
-    xx.doneHeaps[ 0 ].cardValue = 48;
-
-    xx.doneHeaps[ 3 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 3 ].cardValue);
-    xx.doneHeaps[ 2 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 2 ].cardValue);
-    xx.doneHeaps[ 1 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 1 ].cardValue);
-    xx.doneHeaps[ 0 ].cardImg.src = WebLibCards.getCardImageUrl(xx.doneHeaps[ 0 ].cardValue);
-
     xx.playHeaps = [];
 
-    for (var inx = 0; inx < 7; inx++)
+    for (var inx = 0; inx < 7; inx++)*
     {
         xx.playHeaps[ inx ] = [];
 
@@ -117,26 +101,16 @@ solitaire.createFrame = function()
 
         for (var cnt = 0; cnt <= inx; cnt++)
         {
-            ph[ cnt ] = solitaire.createCard();
+            ph[ cnt ] = solitaire.createCard(WebLibCards.getCard(), (cnt != inx));
             ph[ cnt ].style.top  = (xx.fieldheight * (1 + (0.2 * cnt))) + "px";
             ph[ cnt ].style.left = (xx.fieldwidth  * inx) + "px";
-            ph[ cnt ].cardValue = WebLibCards.getCard();
-
-            if (cnt == inx)
-            {
-                ph[ cnt ].cardImg.src = WebLibCards.getCardImageUrl(ph[ cnt ].cardValue);
-            }
-            else
-            {
-                ph[ cnt ].cardImg.src = WebLibCards.getCardBacksideUrl();
-            }
         }
    }
 
     addEventListener("resize", solitaire.onWindowResize);
 }
 
-solitaire.createCard = function(token)
+solitaire.createCard = function(card, back)
 {
     var xx = solitaire;
 
@@ -155,8 +129,10 @@ solitaire.createCard = function(token)
     cardDiv.style.marginTop    = marginy + "px";
     cardDiv.style.marginBottom = marginy + "px";
 
+    cardDiv.cardValue = Math.abs(card);
+
     cardDiv.backImg = WebLibSimple.createAnyAppend("img", cardDiv);
-    cardDiv.backImg.style.display  = token ? "none" : "block";
+    cardDiv.backImg.style.display  = (card < 0) ? "none" : "block";
     cardDiv.backImg.style.position = "absolute";
     cardDiv.backImg.style.left     = "0px";
     cardDiv.backImg.style.top      = "0px";
@@ -170,6 +146,9 @@ solitaire.createCard = function(token)
     cardDiv.cardImg.style.top      = "0px";
     cardDiv.cardImg.style.width    = "auto";
     cardDiv.cardImg.style.height   = "100%";
+    cardDiv.cardImg.src = back
+        ? WebLibCards.getCardBacksideUrl()
+        : WebLibCards.getCardImageUrl(cardDiv.cardValue);
 
     return cardDiv;
 }
