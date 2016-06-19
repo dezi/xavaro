@@ -17,7 +17,7 @@ solitaire.createFrame = function()
     // Game panel.
     //
 
-    xx.gamesize    = Math.floor(Math.min(wid, hei) * 85 / 100);
+    xx.gamesize    = Math.floor(Math.min(wid, hei) * 95 / 100);
     xx.fieldwidth  = xx.gamesize / 7;
     xx.fieldheight = xx.gamesize / 4;
 
@@ -41,59 +41,45 @@ solitaire.createFrame = function()
     /*
     xx.buttonTop1div.onTouchClick = solitaire.onButtonMinus;
     xx.buttonTop3div.onTouchClick = solitaire.onButtonPlus;
-    xx.buttonBot1div.onTouchClick = solitaire.onLoadNewGame;
     xx.buttonBot2div.onTouchClick = solitaire.onSolveStep;
     xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
     */
 
+    xx.buttonBot1div.onTouchClick = solitaire.onRedealOpen;
     xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
 
     //
     // Create cards.
     //
 
-    xx.heapCard = solitaire.createCard(0, true);
-    xx.heapCard.style.top  = (xx.fieldheight * 0) + "px";
-    xx.heapCard.style.left = (xx.fieldwidth  * 0) + "px";
-    xx.heapCard.cardImg.src = WebLibCards.getCardBacksideUrl();
-
     WebLibCards.newDeck(52);
-
-    xx.openCards = [];
-
-    xx.openCards[ 0 ] = solitaire.createCard(WebLibCards.getCard(), false);
-    xx.openCards[ 0 ].style.top  = (xx.fieldheight * 0) + "px";
-    xx.openCards[ 0 ].style.left = (xx.fieldwidth  * 1) + "px";
-
-    xx.openCards[ 1 ] = solitaire.createCard(WebLibCards.getCard(), false);
-    xx.openCards[ 1 ].style.top  = (xx.fieldheight * 0) + "px";
-    xx.openCards[ 1 ].style.left = (xx.fieldwidth  * 1.3) + "px";
-
-    xx.openCards[ 2 ] = solitaire.createCard(WebLibCards.getCard(), false);
-    xx.openCards[ 2 ].style.top  = (xx.fieldheight * 0) + "px";
-    xx.openCards[ 2 ].style.left = (xx.fieldwidth  * 1.6) + "px";
 
     xx.doneHeaps = [];
 
-    xx.doneHeaps[ 3 ] = solitaire.createCard(-51, false);
-    xx.doneHeaps[ 3 ].style.top  = (xx.fieldheight * 0) + "px";
-    xx.doneHeaps[ 3 ].style.left = (xx.fieldwidth  * 3) + "px";
+    xx.doneHeaps[ 0 ] = [];
+    xx.doneHeaps[ 1 ] = [];
+    xx.doneHeaps[ 2 ] = [];
+    xx.doneHeaps[ 3 ] = [];
 
-    xx.doneHeaps[ 2 ] = solitaire.createCard(-50, false);
-    xx.doneHeaps[ 2 ].style.top  = (xx.fieldheight * 0) + "px";
-    xx.doneHeaps[ 2 ].style.left = (xx.fieldwidth  * 4) + "px";
+    xx.doneHeaps[ 3 ][ 0 ] = solitaire.createCard(-51, false);
+    xx.doneHeaps[ 3 ][ 0 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 3 ][ 0 ].style.left = (xx.fieldwidth  * 3) + "px";
 
-    xx.doneHeaps[ 1 ] = solitaire.createCard(-49, false);
-    xx.doneHeaps[ 1 ].style.top  = (xx.fieldheight * 0) + "px";
-    xx.doneHeaps[ 1 ].style.left = (xx.fieldwidth  * 5) + "px";
+    xx.doneHeaps[ 2 ][ 0 ] = solitaire.createCard(-50, false);
+    xx.doneHeaps[ 2 ][ 0 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 2 ][ 0 ].style.left = (xx.fieldwidth  * 4) + "px";
 
-    xx.doneHeaps[ 0 ] = solitaire.createCard(-48, false);
-    xx.doneHeaps[ 0 ].style.top  = (xx.fieldheight * 0) + "px";
-    xx.doneHeaps[ 0 ].style.left = (xx.fieldwidth  * 6) + "px";
+    xx.doneHeaps[ 1 ][ 0 ] = solitaire.createCard(-49, false);
+    xx.doneHeaps[ 1 ][ 0 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 1 ][ 0 ].style.left = (xx.fieldwidth  * 5) + "px";
+
+    xx.doneHeaps[ 0 ][ 0 ] = solitaire.createCard(-48, false);
+    xx.doneHeaps[ 0 ][ 0 ].style.top  = (xx.fieldheight * 0) + "px";
+    xx.doneHeaps[ 0 ][ 0 ].style.left = (xx.fieldwidth  * 6) + "px";
 
     xx.playHeaps = [];
 
-    for (var inx = 0; inx < 7; inx++)*
+    for (var inx = 0; inx < 7; inx++)
     {
         xx.playHeaps[ inx ] = [];
 
@@ -107,7 +93,76 @@ solitaire.createFrame = function()
         }
    }
 
+    //
+    // Heap cards.
+    //
+
+    xx.heapCards = [];
+
+    while (WebLibCards.getCount())
+    {
+        var heapCard = solitaire.createCard(WebLibCards.getCard(), true);
+        heapCard.style.top  = (xx.fieldheight * 0) + "px";
+        heapCard.style.left = (xx.fieldwidth  * 0) + "px";
+
+        xx.heapCards.push(heapCard);
+    }
+
+    xx.openCards = [];
+
+    xx.redealTimeout = setTimeout(xx.dealOpen, 150);
+
     addEventListener("resize", solitaire.onWindowResize);
+}
+
+solitaire.removeOpen = function()
+{
+    var xx = solitaire;
+
+    xx.redealTimeout = null;
+
+    if (xx.openCards.length > 0)
+    {
+        var cardDiv = xx.openCards.pop();
+
+        cardDiv.style.top  = (xx.fieldheight * 0) + "px";
+        cardDiv.style.left = (xx.fieldwidth  * 0) + "px";
+
+        xx.showCard(cardDiv, false);
+
+        xx.heapCards.unshift(cardDiv);
+
+        if (xx.openCards.length > 0)
+        {
+            xx.redealTimeout = setTimeout(xx.removeOpen, 150);
+
+            return;
+        }
+    }
+
+    xx.redealTimeout = setTimeout(xx.dealOpen, 150);
+}
+
+solitaire.dealOpen = function()
+{
+    var xx = solitaire;
+
+    xx.redealTimeout = null;
+
+    if ((xx.openCards.length < 3) && (xx.heapCards.length > 0))
+    {
+        var cardDiv = xx.heapCards.pop();
+
+        cardDiv.style.top    = (xx.fieldheight * 0) + "px";
+        cardDiv.style.left   = (xx.fieldwidth  * (1 + (xx.openCards.length * 0.3))) + "px";
+        cardDiv.style.zIndex = "" + (xx.openCards.length + 1);
+
+        xx.showCard(cardDiv, true);
+
+        xx.openCards.push(cardDiv);
+
+        xx.redealTimeout = setTimeout(xx.dealOpen, 150);
+    }
 }
 
 solitaire.createCard = function(card, back)
@@ -130,15 +185,20 @@ solitaire.createCard = function(card, back)
     cardDiv.style.marginBottom = marginy + "px";
 
     cardDiv.cardValue = Math.abs(card);
+    cardDiv.isToken   = (card < 0);
+    cardDiv.isBack    = back;
+
+    cardDiv.onTouchClick = solitaire.onClickCard;
 
     cardDiv.backImg = WebLibSimple.createAnyAppend("img", cardDiv);
-    cardDiv.backImg.style.display  = (card < 0) ? "none" : "block";
     cardDiv.backImg.style.position = "absolute";
     cardDiv.backImg.style.left     = "0px";
     cardDiv.backImg.style.top      = "0px";
     cardDiv.backImg.style.width    = "auto";
     cardDiv.backImg.style.height   = "100%";
-    cardDiv.backImg.src = WebLibCards.getCardBackgroundUrl();
+    cardDiv.backImg.src = cardDiv.isToken
+        ? WebLibCards.getCardDimmUrl()
+        : WebLibCards.getCardBackgroundUrl(false);
 
     cardDiv.cardImg = WebLibSimple.createAnyAppend("img", cardDiv);
     cardDiv.cardImg.style.position = "absolute";
@@ -146,11 +206,92 @@ solitaire.createCard = function(card, back)
     cardDiv.cardImg.style.top      = "0px";
     cardDiv.cardImg.style.width    = "auto";
     cardDiv.cardImg.style.height   = "100%";
-    cardDiv.cardImg.src = back
-        ? WebLibCards.getCardBacksideUrl()
-        : WebLibCards.getCardImageUrl(cardDiv.cardValue);
+    cardDiv.cardImg.src = WebLibCards.getCardImageUrl(cardDiv.cardValue);
+
+    cardDiv.flipImg = WebLibSimple.createAnyAppend("img", cardDiv);
+    cardDiv.flipImg.style.display  = "none";
+    cardDiv.flipImg.style.position = "absolute";
+    cardDiv.flipImg.style.left     = "0px";
+    cardDiv.flipImg.style.top      = "0px";
+    cardDiv.flipImg.style.width    = "auto";
+    cardDiv.flipImg.style.height   = "100%";
+    cardDiv.flipImg.src = WebLibCards.getCardBacksideUrl();
+
+    if (cardDiv.isBack)
+    {
+        cardDiv.cardImg.style.display = "none";
+        cardDiv.flipImg.style.display = "block";
+    }
 
     return cardDiv;
+}
+
+solitaire.showCard = function(cardDiv, show)
+{
+    if (show)
+    {
+        cardDiv.cardImg.style.display = "block";
+        cardDiv.flipImg.style.display = "none";
+        cardDiv.isBack = false;
+    }
+    else
+    {
+        cardDiv.cardImg.style.display = "none";
+        cardDiv.flipImg.style.display = "block";
+        cardDiv.isBack = true;
+    }
+}
+
+solitaire.checkValidSelect = function(cardDiv, select)
+{
+    var xx = solitaire;
+
+    xx.checkTimeout = null;
+
+    //
+    // Check open cards heap.
+    //
+
+    for (var inx = 0; inx < xx.openCards.length - 1; inx++)
+    {
+        if (xx.openCards[ inx ].select)
+        {
+            xx.selectCard(xx.openCards[ inx ], false);
+        }
+    }
+}
+
+solitaire.selectCard = function(cardDiv, select)
+{
+    var xx = solitaire;
+
+    if (! cardDiv.isBack)
+    {
+        if (cardDiv.isToken && ! select)
+        {
+            cardDiv.backImg.src = WebLibCards.getCardDimmUrl();
+        }
+        else
+        {
+            cardDiv.backImg.src = WebLibCards.getCardBackgroundUrl(select);
+        }
+
+        cardDiv.select = select;
+
+        if (cardDiv.select)
+        {
+            if (xx.checkTimeout) removeTimeout(xx.checkTimeout);
+            xx.checkTimeout = setTimeout(xx.checkValidSelect, 500);
+        }
+    }
+}
+
+solitaire.toggleCard = function(cardDiv)
+{
+    if (! cardDiv.isBack)
+    {
+        solitaire.selectCard(cardDiv, ! cardDiv.select);
+    }
 }
 
 solitaire.createButton = function(text)
@@ -280,6 +421,38 @@ solitaire.onHintPlayer = function(target, ctarget)
     var xx = solitaire;
 
     WebLibCards.newDeck(52);
+}
+
+solitaire.onRedealOpen = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    var xx = solitaire;
+
+    if (! xx.redealTimeout) xx.removeOpen();
+}
+
+solitaire.onClickCard = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    var xx = solitaire;
+
+    //
+    // Check if heap card.
+    //
+
+    for (var inx = 0; inx < xx.heapCards.length; inx++)
+    {
+        if (target == xx.heapCards[ inx ])
+        {
+            if (! xx.redealTimeout) xx.removeOpen();
+
+            return;
+        }
+    }
+
+    xx.toggleCard(target);
 }
 
 solitaire.createFrame();

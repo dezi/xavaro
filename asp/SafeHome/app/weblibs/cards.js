@@ -74,6 +74,16 @@ WebLibCards.getCard = function()
     return WebLibCards.playDeck.splice(rnd,1)[ 0 ];
 }
 
+WebLibCards.putCard = function(card)
+{
+    return WebLibCards.playDeck.push(card);
+}
+
+WebLibCards.getCount = function()
+{
+    return WebLibCards.playDeck.length;
+}
+
 WebLibCards.getCardImageUrl = function(card)
 {
     return WebLibCards.cardPoker[ 51 - card ];
@@ -92,4 +102,9 @@ WebLibCards.getCardBackgroundUrl = function(selected)
     }
 
     return "/weblibs/cards/set1/0_background_white.png";
+}
+
+WebLibCards.getCardDimmUrl = function()
+{
+    return "/weblibs/cards/set1/0_background_dimm.png";
 }
