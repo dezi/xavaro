@@ -116,7 +116,7 @@ solitaire.createFrame = function()
 
     xx.openCards = [];
 
-    xx.redealTimeout = setTimeout(xx.dealOpen, 150);
+    xx.redealTimeout = setTimeout(xx.dealOpen, 100);
 
     addEventListener("resize", solitaire.onWindowResize);
 }
@@ -129,7 +129,7 @@ solitaire.removeOpen = function()
 
     if (xx.openCards.length > 0)
     {
-        var cardDiv = xx.openCards.pop();
+        var cardDiv = xx.openCards.shift();
 
         cardDiv.style.top  = (xx.fieldheight * 0) + "px";
         cardDiv.style.left = (xx.fieldwidth  * 0) + "px";
@@ -140,13 +140,13 @@ solitaire.removeOpen = function()
 
         if (xx.openCards.length > 0)
         {
-            xx.redealTimeout = setTimeout(xx.removeOpen, 150);
+            xx.redealTimeout = setTimeout(xx.removeOpen, 100);
 
             return;
         }
     }
 
-    xx.redealTimeout = setTimeout(xx.dealOpen, 150);
+    xx.redealTimeout = setTimeout(xx.dealOpen, 100);
 }
 
 solitaire.dealOpen = function()
@@ -167,7 +167,7 @@ solitaire.dealOpen = function()
 
         xx.openCards.push(cardDiv);
 
-        xx.redealTimeout = setTimeout(xx.dealOpen, 150);
+        xx.redealTimeout = setTimeout(xx.dealOpen, 100);
     }
 }
 
@@ -344,7 +344,7 @@ solitaire.selectCard = function(cardDiv, select)
         if (cardDiv.select)
         {
             if (xx.checkTimeout) clearTimeout(xx.checkTimeout);
-            xx.checkTimeout = setTimeout(xx.checkValidSelect, 500);
+            xx.checkTimeout = setTimeout(xx.executeMove, 250);
         }
     }
 }
@@ -508,6 +508,57 @@ solitaire.isDoneStack = function(card)
     return false;
 }
 
+solitaire.isOpenStack = function(card)
+{
+    var xx = solitaire;
+
+    for (var inx = 0; inx < xx.openCards.length; inx++)
+    {
+        if (xx.openCards[ inx ] == card)
+        {
+            return xx.openCards;
+        }
+    }
+
+    return false;
+}
+
+solitaire.isPlayStack = function(card)
+{
+    var xx = solitaire;
+
+    for (var inx = 0; inx < xx.playHeaps.length; inx++)
+    {
+        for (var cnt = 0; cnt < xx.playHeaps[ inx ].length; cnt++)
+        {
+            if (xx.playHeaps[ inx ][ cnt ] == card)
+            {
+                return xx.playHeaps[ inx ];
+            }
+        }
+    }
+
+    return false;
+}
+
+solitaire.getPlayStackIndex = function(card)
+{
+    var xx = solitaire;
+
+    for (var inx = 0; inx < xx.playHeaps.length; inx++)
+    {
+        for (var cnt = 0; cnt < xx.playHeaps[ inx ].length; cnt++)
+        {
+            if (xx.playHeaps[ inx ][ cnt ] == card)
+            {
+                return inx;
+            }
+        }
+    }
+
+    return -1;
+}
+
 solitaire.detachCard = function(card)
 {
     var xx = solitaire;
@@ -521,11 +572,14 @@ solitaire.detachCard = function(card)
 
     for (var inx = 0; inx < 7; inx++)
     {
-        if (xx.playHeaps[ inx ][ xx.playHeaps[ inx ].length - 1 ] == card)
+        for (var cnt = 0; cnt < xx.playHeaps[ inx ].length; cnt++)
         {
-            xx.playHeaps[ inx ].pop();
+            if (xx.playHeaps[ inx ][ cnt ] == card)
+            {
+                xx.playHeaps[ inx ].splice(cnt, 1);
 
-            return;
+                return;
+            }
         }
     }
 }
@@ -551,32 +605,188 @@ solitaire.checkMatch = function(card1, card2)
     var val2 = Math.floor(card2.cardValue / 4);
     var col2 = card2.cardValue % 4;
 
-    console.log("solitaire.checkMatch: card1=" + card1.cardValue + " " + val1 + ":" + col1);
-    console.log("solitaire.checkMatch: card2=" + card2.cardValue + " " + val2 + ":" + col2);
+    console.log("solitaire.checkMatch: card1=" + card1.cardValue + " " + val1 + ":" + col1 + ":" + card1.isToken);
+    console.log("solitaire.checkMatch: card2=" + card2.cardValue + " " + val2 + ":" + col2 + ":" + card2.isToken);
 
-    var typ1 = xx.isDoneStack(card1);
+    if (xx.isDoneStack(card2))
+    {
+        //
+        // Higher card is done stack.
+        //
 
-    if (typ1)
+        console.log("solitaire.checkMatch: exit1");
+
+        return false;
+    }
+
+    if (xx.isDoneStack(card1))
     {
         console.log("solitaire.checkMatch: doneStack");
+
+        if (col1 != col2) return false;
+
+        if (! (((val1 == 12) && (val2 ==  0)) ||
+               ((val1 == 12) && (val2 == 12)) ||
+               ((val1 + 1) == val2)))
+        {
+            //
+            // Cards do not match.
+            //
+
+            return false;
+        }
 
         xx.detachCard(card2);
 
         xx.doneHeaps[ col1 ].push(card2);
 
         card2.style.top  = (xx.fieldheight * 0) + "px";
-        card2.style.left = (xx.fieldwidth  * (3 + col1)) + "px";
+        card2.style.left = (xx.fieldwidth  * (6 - col1)) + "px";
 
         xx.doZindex(xx.doneHeaps[ col1 ]);
+
+        return true;
     }
 
-    return true;
+    var stack1 = xx.isOpenStack(card1);
+    var stack2 = xx.isPlayStack(card2);
+
+    if (stack1 && stack2)
+    {
+        console.log("solitaire.checkMatch: openStack => playStack");
+
+        if (((val1 + 1) == val2) && (((col1 < 2) && (col2 >= 2)) || ((col1 >= 2) && (col2 < 2))))
+        {
+            //
+            // Cards match.
+            //
+
+            xx.detachCard(card1);
+
+            stack2.push(card1);
+
+            var toppos = stack2.length - 2;
+
+            card1.style.top  = (xx.fieldheight * (1 + (0.2 * toppos))) + "px";
+            card1.style.left = (xx.fieldwidth * xx.getPlayStackIndex(card2)) + "px";
+
+            xx.doZindex(stack2);
+
+            return true;
+        }
+
+
+        return false;
+   }
+
+    var stack1 = xx.isPlayStack(card1);
+    var stack2 = xx.isOpenStack(card2);
+
+    if (stack1 && stack2)
+    {
+        if (card1.isToken && (val2 == 11))
+        {
+            //
+            // King matches open slot.
+            //
+
+            xx.detachCard(card2);
+
+            stack1.push(card2);
+
+            var toppos = stack1.length - 2;
+
+            card2.style.top  = (xx.fieldheight * (1 + (0.2 * toppos))) + "px";
+            card2.style.left = (xx.fieldwidth * xx.getPlayStackIndex(card1)) + "px";
+
+            xx.doZindex(stack1);
+
+            return true;
+        }
+    }
+
+    var stack1 = xx.isPlayStack(card1);
+    var stack2 = xx.isPlayStack(card2);
+
+    if (stack1 && stack2)
+    {
+        console.log("solitaire.checkMatch: playStack => playStack");
+
+        if ((stack1.length == 1) && card1.isToken)
+        {
+            //
+            // Stack 1 ist empty slot with token card so switch cards.
+            //
+
+            var tmp = card1;
+            card1 = card2;
+            card2 = tmp;
+
+            stack1 = xx.isPlayStack(card1);
+            stack2 = xx.isPlayStack(card2);
+
+            val2 = Math.floor(card2.cardValue / 4);
+            col2 = card2.cardValue % 4;
+        }
+
+        var moveStart = stack1.length;
+
+        for (var inx = stack1.length - 1; inx >= 0; inx--)
+        {
+            card1 = stack1[ inx ];
+
+            if (card1.isBack || card1.isToken) break;
+
+            val1 = Math.floor(card1.cardValue / 4);
+            col1 = card1.cardValue % 4;
+
+            if (((val1 + 1) == val2) && (((col1 < 2) && (col2 >= 2)) || ((col1 >= 2) && (col2 < 2))))
+            {
+                //
+                // Normal cards do match.
+                //
+
+                moveStart = inx;
+
+                break;
+            }
+
+            if (card2.isToken && (val1 == 11))
+            {
+                //
+                // King matches placeholder token card.
+                //
+
+                moveStart = inx;
+
+                break;
+            }
+        }
+
+        while (stack1.length > moveStart)
+        {
+            card1 = stack1[ moveStart ];
+
+            xx.detachCard(card1);
+
+            stack2.push(card1);
+
+            var toppos = stack2.length - 2;
+
+            card1.style.top  = (xx.fieldheight * (1 + (0.2 * toppos))) + "px";
+            card1.style.left = (xx.fieldwidth * xx.getPlayStackIndex(card2)) + "px";
+        }
+
+        xx.doZindex(stack2);
+
+        return true;
+    }
+
+    return false;
 }
 
-solitaire.onExecuteMove = function(target, ctarget)
+solitaire.executeMove = function()
 {
-    WebAppUtility.makeClick();
-
     var xx = solitaire;
 
     xx.checkValidSelect();
@@ -593,7 +803,9 @@ solitaire.onExecuteMove = function(target, ctarget)
     var lowcard;
     var higcard;
 
-    if ((selected[ 0 ].cardValue >= 48) || (selected[ 0 ].cardValue < selected[ 1 ].cardValue))
+    if ((selected[ 0 ].cardValue >= 48) ||
+        ((selected[ 0 ].cardValue < selected[ 1 ].cardValue) && (selected[ 1 ].cardValue < 48)) ||
+         selected[ 0 ].isToken)
     {
         lowcard = selected[ 0 ];
         higcard = selected[ 1 ];
@@ -606,9 +818,30 @@ solitaire.onExecuteMove = function(target, ctarget)
 
     if (xx.checkMatch(lowcard, higcard))
     {
+        //
+        // Flip last card on play stacks.
+        //
+
+        for (var inx = 0; inx < xx.playHeaps.length; inx++)
+        {
+            var lastCard = xx.playHeaps[ inx ][ xx.playHeaps[ inx ].length - 1 ];
+            var lastCard = xx.playHeaps[ inx ][ xx.playHeaps[ inx ].length - 1 ];
+
+            if (lastCard.isBack)
+            {
+                xx.showCard(lastCard, true);
+            }
+        }
     }
 
     xx.unselectAll();
+}
+
+solitaire.onExecuteMove = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    solitaire.executeMove();
 }
 
 solitaire.onClickCard = function(target, ctarget)
