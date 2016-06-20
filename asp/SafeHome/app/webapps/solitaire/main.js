@@ -46,6 +46,7 @@ solitaire.createFrame = function()
     */
 
     xx.buttonBot1div.onTouchClick = solitaire.onRedealOpen;
+    xx.buttonBot2div.onTouchClick = solitaire.onExecuteMove;
     xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
 
     //
@@ -54,6 +55,7 @@ solitaire.createFrame = function()
 
     WebLibCards.newDeck(52);
 
+    xx.allCards = [];
     xx.doneHeaps = [];
 
     xx.doneHeaps[ 0 ] = [];
@@ -85,11 +87,15 @@ solitaire.createFrame = function()
 
         var ph = xx.playHeaps[ inx ];
 
+        ph[ 0 ] = solitaire.createCard(-1, false);
+        ph[ 0 ].style.top  = (xx.fieldheight *   1) + "px";
+        ph[ 0 ].style.left = (xx.fieldwidth  * inx) + "px";
+
         for (var cnt = 0; cnt <= inx; cnt++)
         {
-            ph[ cnt ] = solitaire.createCard(WebLibCards.getCard(), (cnt != inx));
-            ph[ cnt ].style.top  = (xx.fieldheight * (1 + (0.2 * cnt))) + "px";
-            ph[ cnt ].style.left = (xx.fieldwidth  * inx) + "px";
+            ph[ cnt + 1 ] = solitaire.createCard(WebLibCards.getCard(), (cnt != inx));
+            ph[ cnt + 1 ].style.top  = (xx.fieldheight * (1 + (0.2 * cnt))) + "px";
+            ph[ cnt + 1 ].style.left = (xx.fieldwidth  * inx) + "px";
         }
    }
 
@@ -185,6 +191,7 @@ solitaire.createCard = function(card, back)
     cardDiv.style.marginBottom = marginy + "px";
 
     cardDiv.cardValue = Math.abs(card);
+    cardDiv.isBlank   = (card == -1);
     cardDiv.isToken   = (card < 0);
     cardDiv.isBack    = back;
 
@@ -223,6 +230,14 @@ solitaire.createCard = function(card, back)
         cardDiv.flipImg.style.display = "block";
     }
 
+    if (cardDiv.isBlank)
+    {
+        cardDiv.cardImg.style.display = "none";
+        cardDiv.flipImg.style.display = "none";
+    }
+
+    xx.allCards.push(cardDiv);
+
     return cardDiv;
 }
 
@@ -246,7 +261,11 @@ solitaire.checkValidSelect = function(cardDiv, select)
 {
     var xx = solitaire;
 
-    xx.checkTimeout = null;
+    if (xx.checkTimeout)
+    {
+        clearTimeout(xx.checkTimeout);
+        xx.checkTimeout = null;
+    }
 
     //
     // Check open cards heap.
@@ -261,12 +280,56 @@ solitaire.checkValidSelect = function(cardDiv, select)
     }
 }
 
+solitaire.unselectAll = function()
+{
+    var xx = solitaire;
+
+    for (var inx = 0; inx < xx.allCards.length; inx++)
+    {
+        if (xx.allCards[ inx ].select)
+        {
+            //
+            // Unselect previous selection.
+            //
+
+            xx.allCards[ inx ].backImg.src = xx.allCards[ inx ].isToken
+                ? WebLibCards.getCardDimmUrl()
+                : WebLibCards.getCardBackgroundUrl(false);
+
+            xx.allCards[ inx ].select = false;
+        }
+    }
+}
+
 solitaire.selectCard = function(cardDiv, select)
 {
     var xx = solitaire;
 
     if (! cardDiv.isBack)
     {
+        if (select)
+        {
+            //
+            // Check for more than two selected.
+            //
+
+            var numSelected = 0;
+
+            for (var inx = 0; inx < xx.allCards.length; inx++)
+            {
+                if (xx.allCards[ inx ].select) numSelected++;
+            }
+
+            if (numSelected >= 2)
+            {
+                xx.unselectAll();
+            }
+        }
+
+        //
+        // Perform selection on clicked card.
+        //
+
         if (cardDiv.isToken && ! select)
         {
             cardDiv.backImg.src = WebLibCards.getCardDimmUrl();
@@ -280,7 +343,7 @@ solitaire.selectCard = function(cardDiv, select)
 
         if (cardDiv.select)
         {
-            if (xx.checkTimeout) removeTimeout(xx.checkTimeout);
+            if (xx.checkTimeout) clearTimeout(xx.checkTimeout);
             xx.checkTimeout = setTimeout(xx.checkValidSelect, 500);
         }
     }
@@ -419,8 +482,6 @@ solitaire.onHintPlayer = function(target, ctarget)
     WebAppUtility.makeClick();
 
     var xx = solitaire;
-
-    WebLibCards.newDeck(52);
 }
 
 solitaire.onRedealOpen = function(target, ctarget)
@@ -430,6 +491,124 @@ solitaire.onRedealOpen = function(target, ctarget)
     var xx = solitaire;
 
     if (! xx.redealTimeout) xx.removeOpen();
+}
+
+solitaire.isDoneStack = function(card)
+{
+    var xx = solitaire;
+
+    for (var inx = 0; inx < 4; inx++)
+    {
+        if (xx.doneHeaps[ inx ][ xx.doneHeaps[ inx ].length - 1 ] == card)
+        {
+            return xx.doneHeaps[ inx ];
+        }
+    }
+
+    return false;
+}
+
+solitaire.detachCard = function(card)
+{
+    var xx = solitaire;
+
+    if (xx.openCards[ xx.openCards.length - 1 ] == card)
+    {
+        xx.openCards.pop();
+
+        return;
+    }
+
+    for (var inx = 0; inx < 7; inx++)
+    {
+        if (xx.playHeaps[ inx ][ xx.playHeaps[ inx ].length - 1 ] == card)
+        {
+            xx.playHeaps[ inx ].pop();
+
+            return;
+        }
+    }
+}
+
+solitaire.doZindex = function(cardStack)
+{
+    for (var inx = 0; inx < cardStack.length; inx++)
+    {
+        cardStack[ inx ].style.zIndex = "" + inx;
+    }
+}
+
+solitaire.checkMatch = function(card1, card2)
+{
+    var xx = solitaire;
+
+    //
+    // Card 1 is the lower card.
+    //
+
+    var val1 = Math.floor(card1.cardValue / 4);
+    var col1 = card1.cardValue % 4;
+    var val2 = Math.floor(card2.cardValue / 4);
+    var col2 = card2.cardValue % 4;
+
+    console.log("solitaire.checkMatch: card1=" + card1.cardValue + " " + val1 + ":" + col1);
+    console.log("solitaire.checkMatch: card2=" + card2.cardValue + " " + val2 + ":" + col2);
+
+    var typ1 = xx.isDoneStack(card1);
+
+    if (typ1)
+    {
+        console.log("solitaire.checkMatch: doneStack");
+
+        xx.detachCard(card2);
+
+        xx.doneHeaps[ col1 ].push(card2);
+
+        card2.style.top  = (xx.fieldheight * 0) + "px";
+        card2.style.left = (xx.fieldwidth  * (3 + col1)) + "px";
+
+        xx.doZindex(xx.doneHeaps[ col1 ]);
+    }
+
+    return true;
+}
+
+solitaire.onExecuteMove = function(target, ctarget)
+{
+    WebAppUtility.makeClick();
+
+    var xx = solitaire;
+
+    xx.checkValidSelect();
+
+    var selected = [];
+
+    for (var inx = 0; inx < xx.allCards.length; inx++)
+    {
+        if (xx.allCards[ inx ].select) selected.push(xx.allCards[ inx ]);
+    }
+
+    if (selected.length != 2) return;
+
+    var lowcard;
+    var higcard;
+
+    if ((selected[ 0 ].cardValue >= 48) || (selected[ 0 ].cardValue < selected[ 1 ].cardValue))
+    {
+        lowcard = selected[ 0 ];
+        higcard = selected[ 1 ];
+    }
+    else
+    {
+        lowcard = selected[ 1 ];
+        higcard = selected[ 0 ];
+    }
+
+    if (xx.checkMatch(lowcard, higcard))
+    {
+    }
+
+    xx.unselectAll();
 }
 
 solitaire.onClickCard = function(target, ctarget)
