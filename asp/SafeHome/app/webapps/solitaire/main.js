@@ -543,6 +543,22 @@ solitaire.onHintPlayer = function(target, ctarget)
 
     var xx = solitaire;
 
+    //
+    // Check number of selects.
+    //
+
+    var numSelected = 0;
+
+    for (var inx = 0; inx < xx.allCards.length; inx++)
+    {
+        if (xx.allCards[ inx ].select) numSelected++;
+    }
+
+    if (numSelected == 2)
+    {
+        xx.executeMove();
+    }
+
     xx.unselectAll();
 
     //
@@ -692,7 +708,7 @@ solitaire.onHintPlayer = function(target, ctarget)
 
             if (((val2 == 12) && (val1 ==  0) && ! card2.isToken) ||
                 ((val2 == 12) && (val1 == 12)) ||
-                ((val2 != 12) && ((val1 + 1) == val2)))
+                ((val2 != 12) && ((val1 - 1) == val2)))
             {
                 xx.selectCard(card1, true, true);
                 xx.selectCard(card2, true, true);
@@ -706,28 +722,31 @@ solitaire.onHintPlayer = function(target, ctarget)
     // Check for open stack to done move.
     //
 
-    var inx1 = xx.openCards.length - 1;
-    var card1 = xx.openCards[ inx1 ];
-    var val1 = Math.floor(card1.cardValue / 4);
-    var col1 = card1.cardValue % 4;
-
-    for (var inx2 = 0; inx2 < xx.doneHeaps.length; inx2++)
+    if (xx.openCards.length)
     {
-        var cnt2 = xx.doneHeaps[ inx2 ].length - 1;
-        var card2 = xx.doneHeaps[ inx2 ][ cnt2 ];
-        var val2 = Math.floor(card2.cardValue / 4);
-        var col2 = card2.cardValue % 4;
+        var inx1 = xx.openCards.length - 1;
+        var card1 = xx.openCards[ inx1 ];
+        var val1 = Math.floor(card1.cardValue / 4);
+        var col1 = card1.cardValue % 4;
 
-        if (col1 != col2) continue;
-
-        if (((val2 == 12) && (val1 ==  0) && ! card2.isToken) ||
-            ((val2 == 12) && (val1 == 12)) ||
-            ((val2 != 12) && ((val1 + 1) == val2)))
+        for (var inx2 = 0; inx2 < xx.doneHeaps.length; inx2++)
         {
-            xx.selectCard(card1, true, true);
-            xx.selectCard(card2, true, true);
+            var cnt2 = xx.doneHeaps[ inx2 ].length - 1;
+            var card2 = xx.doneHeaps[ inx2 ][ cnt2 ];
+            var val2 = Math.floor(card2.cardValue / 4);
+            var col2 = card2.cardValue % 4;
 
-            return;
+            if (col1 != col2) continue;
+
+            if (((val2 == 12) && (val1 ==  0) && ! card2.isToken) ||
+                ((val2 == 12) && (val1 == 12)) ||
+                ((val2 != 12) && ((val1 - 1) == val2)))
+            {
+                xx.selectCard(card1, true, true);
+                xx.selectCard(card2, true, true);
+
+                return;
+            }
         }
     }
 
@@ -735,29 +754,53 @@ solitaire.onHintPlayer = function(target, ctarget)
     // Check for open stack to play stack move.
     //
 
-    var inx1 = xx.openCards.length - 1;
-    var card1 = xx.openCards[ inx1 ];
-    var val1 = Math.floor(card1.cardValue / 4);
-    var col1 = card1.cardValue % 4;
-
-    for (var inx2 = 0; inx2 < xx.playHeaps.length; inx2++)
+    if (xx.openCards.length)
     {
-        var cnt2 = xx.playHeaps[ inx2 ].length - 1;
-        var card2 = xx.playHeaps[ inx2 ][ cnt2 ];
-        var val2 = Math.floor(card2.cardValue / 4);
-        var col2 = card2.cardValue % 4;
+        var inx1 = xx.openCards.length - 1;
+        var card1 = xx.openCards[ inx1 ];
+        var val1 = Math.floor(card1.cardValue / 4);
+        var col1 = card1.cardValue % 4;
 
-        if (! (((col1 < 2) && (col2 >= 2)) || ((col1 >= 2) && (col2 < 2)))) continue;
-
-        if (((val1 == 12) && (val2 ==  0)) ||
-            ((val1 == 12) && (val2 == 12)) ||
-            ((val1 + 1) == val2))
+        for (var inx2 = 0; inx2 < xx.playHeaps.length; inx2++)
         {
-            xx.selectCard(card1, true, true);
-            xx.selectCard(card2, true, true);
+            var cnt2 = xx.playHeaps[ inx2 ].length - 1;
+            var card2 = xx.playHeaps[ inx2 ][ cnt2 ];
+            var val2 = Math.floor(card2.cardValue / 4);
+            var col2 = card2.cardValue % 4;
 
-            return;
+            if ((cnt2 == 0) && (val1 == 11))
+            {
+                //
+                // King to empty play stack.
+                //
+
+                xx.selectCard(card1, true, true);
+                xx.selectCard(card2, true, true);
+
+                return;
+            }
+
+            if (! (((col1 < 2) && (col2 >= 2)) || ((col1 >= 2) && (col2 < 2)))) continue;
+
+            if (((val1 == 12) && (val2 ==  0)) ||
+                ((val1 == 12) && (val2 == 12)) ||
+                ((val1 + 1) == val2))
+            {
+                xx.selectCard(card1, true, true);
+                xx.selectCard(card2, true, true);
+
+                return;
+            }
         }
+    }
+    
+    //
+    // Redeal.
+    //
+
+    if (xx.allCards && xx.allCards.length)
+    {
+        xx.removeOpen();
     }
 }
 
