@@ -38,15 +38,7 @@ solitaire.createFrame = function()
     xx.buttonBot2div = solitaire.createButton("=");
     xx.buttonBot3div = solitaire.createButton("?");
 
-    /*
-    xx.buttonTop1div.onTouchClick = solitaire.onButtonMinus;
-    xx.buttonTop3div.onTouchClick = solitaire.onButtonPlus;
-    xx.buttonBot2div.onTouchClick = solitaire.onSolveStep;
-    xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
-    */
-
     xx.buttonTop3div.onTouchClick = solitaire.onNewGame;
-
     xx.buttonBot1div.onTouchClick = solitaire.onRedealOpen;
     xx.buttonBot2div.onTouchClick = solitaire.onExecuteMove;
     xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
@@ -69,16 +61,23 @@ solitaire.createGame = function()
     xx.gamePanel.innerHTML = null;
 
     xx.allCards  = [];
+    xx.dealCards = [];
     xx.doneHeaps = [];
     xx.playHeaps = [];
     xx.heapCards = [];
     xx.openCards = [];
+    xx.nextCards = [];
 
     //
     // Create cards.
     //
 
     WebLibCards.newDeck(52);
+
+    xx.heapToken = solitaire.createCard(-1, false);
+    xx.heapToken.style.top  = "0px";
+    xx.heapToken.style.left = "0px";
+    xx.allCards.pop();
 
     xx.doneHeaps[ 0 ] = [];
     xx.doneHeaps[ 1 ] = [];
@@ -101,6 +100,11 @@ solitaire.createGame = function()
     xx.doneHeaps[ 0 ][ 0 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 0 ][ 0 ].style.left = (xx.fieldwidth  * 6) + "px";
 
+    xx.dealCards.push(xx.doneHeaps[ 3 ][ 0 ]);
+    xx.dealCards.push(xx.doneHeaps[ 2 ][ 0 ]);
+    xx.dealCards.push(xx.doneHeaps[ 1 ][ 0 ]);
+    xx.dealCards.push(xx.doneHeaps[ 0 ][ 0 ]);
+
     for (var inx = 0; inx < 7; inx++)
     {
         xx.playHeaps[ inx ] = [];
@@ -116,6 +120,8 @@ solitaire.createGame = function()
             ph[ cnt + 1 ] = solitaire.createCard(WebLibCards.getCard(), (cnt != inx));
             ph[ cnt + 1 ].style.top  = (xx.fieldheight * (1 + (0.2 * cnt))) + "px";
             ph[ cnt + 1 ].style.left = (xx.fieldwidth  * inx) + "px";
+
+            xx.dealCards.push(ph[ cnt + 1 ]);
         }
    }
 
@@ -132,7 +138,31 @@ solitaire.createGame = function()
         xx.heapCards.push(heapCard);
     }
 
-    xx.redealTimeout = setTimeout(xx.dealOpen, 2000);
+    for (var inx = 0; inx < xx.dealCards.length; inx++)
+    {
+        xx.dealCards[ inx ].style.display = "none";
+    }
+
+    xx.displayTimeout = setTimeout(xx.displayGame, 100);
+}
+
+solitaire.displayGame = function()
+{
+    var xx = solitaire;
+
+    xx.displayTimeout = null;
+
+    if (xx.dealCards.length > 0)
+    {
+        var cardDiv = xx.dealCards.shift();
+        cardDiv.style.display = "block";
+
+        xx.displayTimeout = setTimeout(xx.displayGame, 100);
+    }
+    else
+    {
+        xx.redealTimeout = setTimeout(xx.dealOpen, 500);
+    }
 }
 
 solitaire.removeOpen = function()
@@ -145,12 +175,13 @@ solitaire.removeOpen = function()
     {
         var cardDiv = xx.openCards.shift();
 
-        cardDiv.style.top  = (xx.fieldheight * 0) + "px";
-        cardDiv.style.left = (xx.fieldwidth  * 0) + "px";
+        cardDiv.style.display = "none";
+        cardDiv.style.top     = (xx.fieldheight * 0) + "px";
+        cardDiv.style.left    = (xx.fieldwidth  * 0) + "px";
 
         xx.showCard(cardDiv, false);
 
-        xx.heapCards.unshift(cardDiv);
+        xx.nextCards.push(cardDiv);
 
         if (xx.openCards.length > 0)
         {
@@ -169,6 +200,17 @@ solitaire.dealOpen = function()
 
     xx.redealTimeout = null;
 
+    if ((xx.openCards.length == 0) && (xx.heapCards.length == 0))
+    {
+        while (xx.nextCards.length > 0)
+        {
+            var rnd = Math.floor(Math.random() * xx.nextCards.length);
+            var cardDiv = xx.nextCards.splice(rnd, 1)[ 0 ];
+            cardDiv.style.display = "block";
+            xx.heapCards.push(cardDiv);
+        }
+    }
+
     if ((xx.openCards.length < 3) && (xx.heapCards.length > 0))
     {
         var cardDiv = xx.heapCards.pop();
@@ -181,7 +223,12 @@ solitaire.dealOpen = function()
 
         xx.openCards.push(cardDiv);
 
-        xx.redealTimeout = setTimeout(xx.dealOpen, 100);
+        if ((xx.openCards.length < 3) && (xx.heapCards.length > 0))
+        {
+            xx.redealTimeout = setTimeout(xx.dealOpen, 100);
+        }
+
+        return;
     }
 }
 
@@ -230,8 +277,8 @@ solitaire.createCard = function(card, back)
     cardDiv.cardImg.src = WebLibCards.getCardImageUrl(cardDiv.cardValue);
 
     cardDiv.flipImg = WebLibSimple.createAnyAppend("img", cardDiv);
-    cardDiv.flipImg.style.display  = "none";
     cardDiv.flipImg.style.position = "absolute";
+    cardDiv.flipImg.style.display  = "none";
     cardDiv.flipImg.style.left     = "0px";
     cardDiv.flipImg.style.top      = "0px";
     cardDiv.flipImg.style.width    = "auto";
@@ -315,51 +362,50 @@ solitaire.unselectAll = function()
     }
 }
 
-solitaire.selectCard = function(cardDiv, select)
+solitaire.selectCard = function(cardDiv, select, noauto)
 {
     var xx = solitaire;
 
-    if (! cardDiv.isBack)
+    if (cardDiv.isBack) return;
+
+    if (select)
     {
-        if (select)
-        {
-            //
-            // Check for more than two selected.
-            //
-
-            var numSelected = 0;
-
-            for (var inx = 0; inx < xx.allCards.length; inx++)
-            {
-                if (xx.allCards[ inx ].select) numSelected++;
-            }
-
-            if (numSelected >= 2)
-            {
-                xx.unselectAll();
-            }
-        }
-
         //
-        // Perform selection on clicked card.
+        // Check for more than two selected.
         //
 
-        if (cardDiv.isToken && ! select)
+        var numSelected = 0;
+
+        for (var inx = 0; inx < xx.allCards.length; inx++)
         {
-            cardDiv.backImg.src = WebLibCards.getCardDimmUrl();
-        }
-        else
-        {
-            cardDiv.backImg.src = WebLibCards.getCardBackgroundUrl(select);
+            if (xx.allCards[ inx ].select) numSelected++;
         }
 
-        cardDiv.select = select;
-
-        if (cardDiv.select)
+        if (numSelected >= 2)
         {
-            if (xx.checkTimeout) clearTimeout(xx.checkTimeout);
-            xx.checkTimeout = setTimeout(xx.executeMove, 250);
+            xx.unselectAll();
         }
+    }
+
+    //
+    // Perform selection on clicked card.
+    //
+
+    if (cardDiv.isToken && ! select)
+    {
+        cardDiv.backImg.src = WebLibCards.getCardDimmUrl();
+    }
+    else
+    {
+        cardDiv.backImg.src = WebLibCards.getCardBackgroundUrl(select);
+    }
+
+    cardDiv.select = select;
+
+    if (cardDiv.select && ! noauto)
+    {
+        if (xx.checkTimeout) clearTimeout(xx.checkTimeout);
+        xx.checkTimeout = setTimeout(xx.executeMove, 250);
     }
 }
 
@@ -496,6 +542,223 @@ solitaire.onHintPlayer = function(target, ctarget)
     WebAppUtility.makeClick();
 
     var xx = solitaire;
+
+    xx.unselectAll();
+
+    //
+    // Check for play stack move.
+    //
+
+    for (var inx1 = 0; inx1 < xx.playHeaps.length; inx1++)
+    {
+        for (var cnt1 = 0; cnt1 < xx.playHeaps[ inx1 ].length; cnt1++)
+        {
+            var card1 = xx.playHeaps[ inx1 ][ cnt1 ];
+            var val1 = Math.floor(card1.cardValue / 4);
+            var col1 = card1.cardValue % 4;
+
+            if (card1.isBack || card1.isToken || (val1 == 12)) continue;
+
+            for (var inx2 = 0; inx2 < xx.playHeaps.length; inx2++)
+            {
+                if (inx1 == inx2) continue;
+
+                for (var cnt2 = 0; cnt2 < xx.playHeaps[ inx2 ].length; cnt2++)
+                {
+                    var card2 = xx.playHeaps[ inx2 ][ cnt2 ];
+                    var val2 = Math.floor(card2.cardValue / 4);
+                    var col2 = card2.cardValue % 4;
+
+                    if (card2.isBack || card2.isToken || (val2 == 12)) continue;
+
+                    if (! (((col1 < 2) && (col2 >= 2)) || ((col1 >= 2) && (col2 < 2)))) continue;
+                    if (! (((val1 + 1) == val2) || (val2 + 1) == val1)) continue;
+
+                    if (val1 > val2)
+                    {
+                        if ((cnt1 + 1) != xx.playHeaps[ inx1 ].length)
+                        {
+                            //
+                            // Invalid move.
+                            //
+
+                            continue;
+                        }
+
+                        if (! (xx.playHeaps[ inx2 ][ cnt2 - 1 ].isBack ||
+                               xx.playHeaps[ inx2 ][ cnt2 - 1 ].isToken))
+                        {
+                            //
+                            // Pointless move.
+                            //
+
+                            continue;
+                        }
+                    }
+
+                    if (val2 > val1)
+                    {
+                        if ((cnt2 + 1) != xx.playHeaps[ inx2 ].length)
+                        {
+                            //
+                            // Invalid move.
+                            //
+
+                            continue;
+                        }
+
+                        if (! (xx.playHeaps[ inx1 ][ cnt1 - 1 ].isBack ||
+                               xx.playHeaps[ inx1 ][ cnt1 - 1 ].isToken))
+                        {
+                            //
+                            // Pointless move.
+                            //
+
+                            continue;
+                        }
+                    }
+
+                    xx.selectCard(card1, true, true);
+                    xx.selectCard(card2, true, true);
+
+                    return;
+                }
+            }
+        }
+    }
+
+    //
+    // Check for king to free play stack move.
+    //
+
+    for (var inx1 = 0; inx1 < xx.playHeaps.length; inx1++)
+    {
+        for (var cnt1 = 0; cnt1 < xx.playHeaps[ inx1 ].length; cnt1++)
+        {
+            var card1 = xx.playHeaps[ inx1 ][ cnt1 ];
+            var val1 = Math.floor(card1.cardValue / 4);
+            var col1 = card1.cardValue % 4;
+
+            if (card1.isBack || card1.isToken) continue;
+            if (val1 != 11) continue;
+
+            if (cnt1 == 1)
+            {
+                //
+                // Pointless move.
+                //
+
+                continue;
+            }
+
+            for (var inx2 = 0; inx2 < xx.playHeaps.length; inx2++)
+            {
+                if (inx1 == inx2) continue;
+
+                if (xx.playHeaps[ inx2 ].length == 1)
+                {
+                    var card2 = xx.playHeaps[ inx2 ][ 0 ];
+
+                    xx.selectCard(card1, true, true);
+                    xx.selectCard(card2, true, true);
+
+                    return;
+                }
+            }
+        }
+    }
+
+    //
+    // Check for play stack to done move.
+    //
+
+    for (var inx1 = 0; inx1 < xx.playHeaps.length; inx1++)
+    {
+        var cnt1 = xx.playHeaps[ inx1 ].length - 1;
+        var card1 = xx.playHeaps[ inx1 ][ cnt1 ];
+        var val1 = Math.floor(card1.cardValue / 4);
+        var col1 = card1.cardValue % 4;
+
+        if (card1.isBack || card1.isToken) continue;
+
+        for (var inx2 = 0; inx2 < xx.doneHeaps.length; inx2++)
+        {
+            var cnt2 = xx.doneHeaps[ inx2 ].length - 1;
+            var card2 = xx.doneHeaps[ inx2 ][ cnt2 ];
+            var val2 = Math.floor(card2.cardValue / 4);
+            var col2 = card2.cardValue % 4;
+
+            if (col1 != col2) continue;
+
+            if (((val2 == 12) && (val1 ==  0) && ! card2.isToken) ||
+                ((val2 == 12) && (val1 == 12)) ||
+                ((val2 != 12) && ((val1 + 1) == val2)))
+            {
+                xx.selectCard(card1, true, true);
+                xx.selectCard(card2, true, true);
+
+                return;
+            }
+        }
+    }
+
+    //
+    // Check for open stack to done move.
+    //
+
+    var inx1 = xx.openCards.length - 1;
+    var card1 = xx.openCards[ inx1 ];
+    var val1 = Math.floor(card1.cardValue / 4);
+    var col1 = card1.cardValue % 4;
+
+    for (var inx2 = 0; inx2 < xx.doneHeaps.length; inx2++)
+    {
+        var cnt2 = xx.doneHeaps[ inx2 ].length - 1;
+        var card2 = xx.doneHeaps[ inx2 ][ cnt2 ];
+        var val2 = Math.floor(card2.cardValue / 4);
+        var col2 = card2.cardValue % 4;
+
+        if (col1 != col2) continue;
+
+        if (((val2 == 12) && (val1 ==  0) && ! card2.isToken) ||
+            ((val2 == 12) && (val1 == 12)) ||
+            ((val2 != 12) && ((val1 + 1) == val2)))
+        {
+            xx.selectCard(card1, true, true);
+            xx.selectCard(card2, true, true);
+
+            return;
+        }
+    }
+
+    //
+    // Check for open stack to play stack move.
+    //
+
+    var inx1 = xx.openCards.length - 1;
+    var card1 = xx.openCards[ inx1 ];
+    var val1 = Math.floor(card1.cardValue / 4);
+    var col1 = card1.cardValue % 4;
+
+    for (var inx2 = 0; inx2 < xx.playHeaps.length; inx2++)
+    {
+        var cnt2 = xx.playHeaps[ inx2 ].length - 1;
+        var card2 = xx.playHeaps[ inx2 ][ cnt2 ];
+        var val2 = Math.floor(card2.cardValue / 4);
+        var col2 = card2.cardValue % 4;
+
+        if (! (((col1 < 2) && (col2 >= 2)) || ((col1 >= 2) && (col2 < 2)))) continue;
+
+        if (((val1 == 12) && (val2 ==  0)) ||
+            ((val1 == 12) && (val2 == 12)) ||
+            ((val1 + 1) == val2))
+        {
+            xx.selectCard(card1, true, true);
+            xx.selectCard(card2, true, true);
+
+            return;
+        }
+    }
 }
 
 solitaire.onRedealOpen = function(target, ctarget)
@@ -504,7 +767,16 @@ solitaire.onRedealOpen = function(target, ctarget)
 
     var xx = solitaire;
 
-    if (! xx.redealTimeout) xx.removeOpen();
+    if (xx.redealTimeout || xx.displayTimeout) return;
+
+    if (xx.allCards && xx.allCards.length)
+    {
+        xx.removeOpen();
+    }
+    else
+    {
+        xx.createGame();
+    }
 }
 
 solitaire.isDoneStack = function(card)
@@ -869,21 +1141,41 @@ solitaire.onClickCard = function(target, ctarget)
 
     var xx = solitaire;
 
-    //
-    // Check if heap card.
-    //
+    if (xx.redealTimeout || xx.displayTimeout) return;
 
-    for (var inx = 0; inx < xx.heapCards.length; inx++)
+    if (xx.allCards && xx.allCards.length)
     {
-        if (target == xx.heapCards[ inx ])
+        if (target == xx.heapToken)
         {
-            if (! xx.redealTimeout) xx.removeOpen();
+            if (! xx.redealTimeout)
+            {
+                xx.redealNow = true;
+                xx.removeOpen();
+            }
 
             return;
         }
-    }
 
-    xx.toggleCard(target);
+        //
+        // Check if heap card.
+        //
+
+        for (var inx = 0; inx < xx.heapCards.length; inx++)
+        {
+            if (target == xx.heapCards[ inx ])
+            {
+                if (! xx.redealTimeout) xx.removeOpen();
+
+                return;
+            }
+        }
+
+        xx.toggleCard(target);
+    }
+    else
+    {
+        xx.createGame();
+    }
 }
 
 solitaire.createFrame();
