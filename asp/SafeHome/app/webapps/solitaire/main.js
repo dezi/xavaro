@@ -45,18 +45,40 @@ solitaire.createFrame = function()
     xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
     */
 
+    xx.buttonTop3div.onTouchClick = solitaire.onNewGame;
+
     xx.buttonBot1div.onTouchClick = solitaire.onRedealOpen;
     xx.buttonBot2div.onTouchClick = solitaire.onExecuteMove;
     xx.buttonBot3div.onTouchClick = solitaire.onHintPlayer;
+
+    //
+    // Create dummy display card stack.
+    //
+
+    var dummyStack = solitaire.createCard(0, true);
+    dummyStack.style.top  = (xx.fieldheight * 0) + "px";
+    dummyStack.style.left = (xx.fieldwidth  * 0) + "px";
+
+    addEventListener("resize", solitaire.onWindowResize);
+}
+
+solitaire.createGame = function()
+{
+    var xx = solitaire;
+
+    xx.gamePanel.innerHTML = null;
+
+    xx.allCards  = [];
+    xx.doneHeaps = [];
+    xx.playHeaps = [];
+    xx.heapCards = [];
+    xx.openCards = [];
 
     //
     // Create cards.
     //
 
     WebLibCards.newDeck(52);
-
-    xx.allCards = [];
-    xx.doneHeaps = [];
 
     xx.doneHeaps[ 0 ] = [];
     xx.doneHeaps[ 1 ] = [];
@@ -78,8 +100,6 @@ solitaire.createFrame = function()
     xx.doneHeaps[ 0 ][ 0 ] = solitaire.createCard(-48, false);
     xx.doneHeaps[ 0 ][ 0 ].style.top  = (xx.fieldheight * 0) + "px";
     xx.doneHeaps[ 0 ][ 0 ].style.left = (xx.fieldwidth  * 6) + "px";
-
-    xx.playHeaps = [];
 
     for (var inx = 0; inx < 7; inx++)
     {
@@ -103,8 +123,6 @@ solitaire.createFrame = function()
     // Heap cards.
     //
 
-    xx.heapCards = [];
-
     while (WebLibCards.getCount())
     {
         var heapCard = solitaire.createCard(WebLibCards.getCard(), true);
@@ -114,11 +132,7 @@ solitaire.createFrame = function()
         xx.heapCards.push(heapCard);
     }
 
-    xx.openCards = [];
-
-    xx.redealTimeout = setTimeout(xx.dealOpen, 100);
-
-    addEventListener("resize", solitaire.onWindowResize);
+    xx.redealTimeout = setTimeout(xx.dealOpen, 2000);
 }
 
 solitaire.removeOpen = function()
@@ -236,7 +250,7 @@ solitaire.createCard = function(card, back)
         cardDiv.flipImg.style.display = "none";
     }
 
-    xx.allCards.push(cardDiv);
+    if (xx.allCards) xx.allCards.push(cardDiv);
 
     return cardDiv;
 }
@@ -842,6 +856,11 @@ solitaire.onExecuteMove = function(target, ctarget)
     WebAppUtility.makeClick();
 
     solitaire.executeMove();
+}
+
+solitaire.onNewGame = function(target, ctarget)
+{
+    solitaire.createGame();
 }
 
 solitaire.onClickCard = function(target, ctarget)
