@@ -143,7 +143,7 @@ solitaire.createGame = function()
         xx.dealCards[ inx ].style.display = "none";
     }
 
-    xx.displayTimeout = setTimeout(xx.displayGame, 100);
+    xx.displayTimeout = setTimeout(xx.displayGame, 250);
 }
 
 solitaire.displayGame = function()
@@ -793,7 +793,7 @@ solitaire.onHintPlayer = function(target, ctarget)
             }
         }
     }
-    
+
     //
     // Redeal.
     //
@@ -1222,4 +1222,5 @@ solitaire.onClickCard = function(target, ctarget)
 }
 
 solitaire.createFrame();
+solitaire.createGame();
 solitaire.onWindowResize();
