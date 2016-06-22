@@ -543,6 +543,8 @@ solitaire.onHintPlayer = function(target, ctarget)
 
     var xx = solitaire;
 
+    if (xx.redealTimeout || xx.displayTimeout) return;
+
     //
     // Check number of selects.
     //

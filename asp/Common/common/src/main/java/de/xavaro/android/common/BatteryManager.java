@@ -125,7 +125,8 @@ public class BatteryManager
 
         Log.d(LOGTAG, "checkWarnings:" + percent + "% " + status + " " + plugged);
 
-        if (status == android.os.BatteryManager.BATTERY_STATUS_CHARGING)
+        if ((status == android.os.BatteryManager.BATTERY_STATUS_CHARGING) ||
+                (plugged == android.os.BatteryManager.BATTERY_PLUGGED_USB))
         {
             resetWarnings();
             return;
