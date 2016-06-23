@@ -139,9 +139,20 @@ texaspoker.createCard = function()
     cardDiv.style.marginTop    = marginy + "px";
     cardDiv.style.marginBottom = marginy + "px";
 
+    cardDiv.backImg = WebLibSimple.createAnyAppend("img", cardDiv);
+    cardDiv.backImg.style.position = "absolute";
+    cardDiv.backImg.style.left     = "0px";
+    cardDiv.backImg.style.top      = "0px";
+    cardDiv.backImg.style.width    = "auto";
+    cardDiv.backImg.style.height   = "100%";
+    cardDiv.backImg.src = WebLibCards.getCardBackgroundUrl(false);
+
     cardDiv.cardImg = WebLibSimple.createAnyAppend("img", cardDiv);
-    cardDiv.cardImg.style.width  = "auto";
-    cardDiv.cardImg.style.height = "100%";
+    cardDiv.cardImg.style.position = "absolute";
+    cardDiv.cardImg.style.left     = "0px";
+    cardDiv.cardImg.style.top      = "0px";
+    cardDiv.cardImg.style.width    = "auto";
+    cardDiv.cardImg.style.height   = "100%";
 
     return cardDiv;
 }

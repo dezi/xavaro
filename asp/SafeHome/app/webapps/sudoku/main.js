@@ -211,6 +211,7 @@ sudoku.createPanel = function()
     xx.gameCells = [];
 
     xx.panelTable = WebLibSimple.createAnyAppend("table", xx.gamePanel);
+    WebLibSimple.setFontSpecs(xx.panelTable, Math.floor(xx.fieldsize * 75 / 100), "bold");
     xx.panelTable.style.marginLeft = "2px";
     xx.panelTable.style.marginTop  = "2px";
     xx.panelTable.style.width  = xx.gamesize + "px";
@@ -218,7 +219,6 @@ sudoku.createPanel = function()
     xx.panelTable.cellPadding  = "0";
     xx.panelTable.cellSpacing  = "0";
     xx.panelTable.border = "0";
-    xx.panelTable.style.backgroundColor = "#ff8888";
 
     var pos = 0;
 
