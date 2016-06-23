@@ -93,7 +93,7 @@ public class BatteryManager
             String text1 = Simple.getTrans(R.string.battery_manager_assist_clear, owner);
             String text2 = Simple.getTrans(R.string.battery_manager_assist_level, percent);
 
-            AssistanceMessage.informAssistance(text1 + " " + text2);
+            AssistanceMessage.alertAssistance(text1 + " " + text2);
         }
 
         //
@@ -200,7 +200,7 @@ public class BatteryManager
                 String text1 = Simple.getTrans(R.string.battery_manager_assist_warn, owner);
                 String text2 = Simple.getTrans(R.string.battery_manager_assist_level, percent);
 
-                AssistanceMessage.informAssistance(text1 + " " + text2);
+                AssistanceMessage.alertAssistance(text1 + " " + text2);
 
                 Simple.setSharedPrefString("monitors.battery.lastassist", Simple.nowAsISO());
             }

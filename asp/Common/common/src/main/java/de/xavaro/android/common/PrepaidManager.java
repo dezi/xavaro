@@ -283,7 +283,7 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
             String text1 = Simple.getTrans(R.string.prepaid_manager_assist_clear, owner);
             String text2 = Simple.getTrans(R.string.prepaid_manager_assist_level, moneyval);
 
-            AssistanceMessage.informAssistance(text1 + " " + text2);
+            AssistanceMessage.alertAssistance(text1 + " " + text2);
         }
 
         //
@@ -379,7 +379,7 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
                 String text1 = Simple.getTrans(R.string.prepaid_manager_assist_warn, owner);
                 String text2 = Simple.getTrans(R.string.prepaid_manager_assist_level, moneyval);
 
-                AssistanceMessage.informAssistance(text1 + " " + text2);
+                AssistanceMessage.alertAssistance(text1 + " " + text2);
 
                 Simple.setSharedPrefString("monitors.prepaid.lastassist", Simple.nowAsISO());
             }

@@ -18,6 +18,12 @@ public class WebAppAssistance
     }
 
     @JavascriptInterface
+    public void alertAssistance(String text)
+    {
+        AssistanceMessage.alertAssistance(text);
+    }
+
+    @JavascriptInterface
     public void informAssistance(String text)
     {
         AssistanceMessage.informAssistance(text);

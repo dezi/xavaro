@@ -250,7 +250,7 @@ medicator.remindConfig = function(config)
                 var name = WebAppUtility.getOwnerName();
                 var text = WebLibStrings.getTrans("events.didnotyettake.pills", name);
 
-                WebAppAssistance.informAssistance(text);
+                WebAppAssistance.alertAssistance(text);
 
                 assistanceInformed = true;
             }
@@ -312,7 +312,7 @@ medicator.completeConfig = function(config)
             medicator.bloodpressurereminder = true;
         }
 
-        if ((config.mediform == "ZZG") && ! medicator.bloodglucosereminder)
+        if ((config.mediflat == "ZZG") && ! medicator.bloodglucosereminder)
         {
             tkey = "events.didnowtake.bloodglucose";
             medicator.bloodglucosereminder = true;
@@ -329,7 +329,7 @@ medicator.completeConfig = function(config)
             var name = WebAppUtility.getOwnerName();
             var text = WebLibStrings.getTrans(tkey, name);
 
-            WebAppAssistance.informAssistance(text);
+            WebAppAssistance.alertAssistance(text);
         }
     }
 

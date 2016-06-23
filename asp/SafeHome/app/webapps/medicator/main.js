@@ -119,6 +119,25 @@ medicator.updateHealthData = function(mediset)
     if (mediset.mediform == "ZZW") type = "scale";
 
     WebAppHealth.addRecord(type, JSON.stringify(record));
+
+    medicator.informAssistance(mediset);
+}
+
+medicator.informAssistance = function(mediset)
+{
+    var tkey = "events.didnowtake.pills";
+
+    if (mediset.mediform == "ZZB") tkey = "events.didnowtake.bloodpressure";
+    if (mediset.mediform == "ZZG") tkey = "events.didnowtake.bloodglucose";
+    if (mediset.mediform == "ZZW") tkey = "events.didnowtake.weight";
+
+    if (tkey)
+    {
+        var name = WebAppUtility.getOwnerName();
+        var text = WebLibStrings.getTrans(tkey, name);
+
+        WebAppAssistance.informAssistance(text);
+    }
 }
 
 medicator.onClickTaken = function(event)
@@ -496,7 +515,7 @@ medicator.onClickEventItem = function(target, ctarget, noclick)
                 var nicedate = WebLibSimple.getNiceDate(mediset.takendate)
                 takendateDiv.innerHTML = "Gemessen" + " " + nicedate;
             }
-       }
+        }
         else
         {
             dlconfig.title = "Medikamente einnehmen";
