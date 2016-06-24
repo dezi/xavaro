@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.media.projection.MediaProjectionManager;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 
@@ -19,6 +20,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.telephony.TelephonyManager;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -2742,14 +2744,29 @@ public class Simple
 
     //region System services.
 
+    public static void startActivityForResult(Intent intent, int requestCode)
+    {
+        actContext.startActivityForResult(intent, requestCode);
+    }
+
     public static Object getSystemService(String service)
     {
         return appContext.getSystemService(service);
     }
 
+    public static WindowManager getWindowManager()
+    {
+        return actContext.getWindowManager();
+    }
+
     public static NotificationManager getNotificationManager()
     {
         return (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    public static MediaProjectionManager getMediaProjectionManager()
+    {
+        return (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
     }
 
     public static InputMethodManager getInputMethodManager()
@@ -2776,5 +2793,6 @@ public class Simple
     {
         return getResources().getIdentifier(name, type, pack);
     }
+
     //endregion System services.
 }

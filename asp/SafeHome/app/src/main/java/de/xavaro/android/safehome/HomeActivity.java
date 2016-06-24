@@ -1,10 +1,10 @@
 package de.xavaro.android.safehome;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import de.xavaro.android.common.AppWorkerHandler;
-import de.xavaro.android.common.CryptUtils;
 import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.AppInfoHandler;
 import de.xavaro.android.common.BackKeyClient;
@@ -27,6 +26,7 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
 import de.xavaro.android.common.AccessibilityService;
+import de.xavaro.android.common.ScreenRecorder;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.Simple;
@@ -67,6 +67,7 @@ public class HomeActivity extends AppCompatActivity implements
 
     private LaunchGroupRoot launchGroup;
     private JSONObject launchConfig;
+    private ScreenRecorder screenRecorder;
 
     private boolean wasPaused = false;
     private boolean lostFocus = true;
@@ -186,29 +187,16 @@ public class HomeActivity extends AppCompatActivity implements
         NotificationService.checkStatus();
         AccessibilityService.checkStatus();
 
-        //
-        // Test RSA encryption.
-        //
-
-        /*
-        String passPhrase = "seife";
-        String encoPassPhrase = CryptUtils.RSAEncrypt(CryptUtils.RSAgetPublicKey(), passPhrase);
-        String textPassPhrase = new String(Base64.decode(encoPassPhrase, 0));
-
-        Log.d(LOGTAG, "======crypt: enco:" + encoPassPhrase);
-        Log.d(LOGTAG, "======crypt: text:" + textPassPhrase);
-
-        String deco = CryptUtils.RSADecrypt(CryptUtils.RSAgetPrivateKey(), encoPassPhrase);
-        String base = CryptUtils.RSADecrypt(CryptUtils.RSAgetPrivateKey(), textPassPhrase);
-
-        Log.d(LOGTAG, "======crypt: deco:" + deco);
-        Log.d(LOGTAG, "======crypt: base:" + base);
-        */
+        screenRecorder = new ScreenRecorder();
+        screenRecorder.create();
+        screenRecorder.onStartRecording();
     }
 
     @Override
     protected void onDestroy()
     {
+        if (screenRecorder != null) screenRecorder.onDestroy();
+
         super.onDestroy();
 
         Log.d(LOGTAG, "========================> onDestroy");
@@ -604,6 +592,8 @@ public class HomeActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         Log.d(LOGTAG,"onActivityResult: request:" + requestCode + " result:" + resultCode);
+
+        if (screenRecorder != null) screenRecorder.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
