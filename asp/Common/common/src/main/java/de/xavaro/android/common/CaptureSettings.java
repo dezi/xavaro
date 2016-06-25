@@ -3,12 +3,9 @@ package de.xavaro.android.common;
 import android.preference.PreferenceActivity;
 import android.view.MotionEvent;
 import android.os.Bundle;
-import android.util.Log;
 
 public class CaptureSettings extends PreferenceActivity
 {
-    private static final String LOGTAG = CaptureSettings.class.getSimpleName();
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
@@ -28,7 +25,7 @@ public class CaptureSettings extends PreferenceActivity
     @Override
     public boolean dispatchGenericMotionEvent (MotionEvent ev)
     {
-        Log.d(LOGTAG, "dispatchGenericMotionEvent: " + ev);
+        CaptureOverlay.getInstance().registerGenericMotionEvent(ev);
 
         return super.dispatchGenericMotionEvent(ev);
     }
@@ -36,7 +33,7 @@ public class CaptureSettings extends PreferenceActivity
     @Override
     public boolean dispatchTouchEvent (MotionEvent ev)
     {
-        Log.d(LOGTAG, "dispatchTouchEvent: " + ev);
+        CaptureOverlay.getInstance().registerTouchEvent(ev);
 
         return super.dispatchTouchEvent(ev);
     }

@@ -3,12 +3,9 @@ package de.xavaro.android.common;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.os.Bundle;
-import android.util.Log;
 
 public class CaptureActivity extends AppCompatActivity
 {
-    private static final String LOGTAG = CaptureActivity.class.getSimpleName();
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
@@ -28,7 +25,7 @@ public class CaptureActivity extends AppCompatActivity
     @Override
     public boolean dispatchGenericMotionEvent (MotionEvent ev)
     {
-        Log.d(LOGTAG, "dispatchGenericMotionEvent: " + ev);
+        CaptureOverlay.getInstance().registerGenericMotionEvent(ev);
 
         return super.dispatchGenericMotionEvent(ev);
     }
@@ -36,7 +33,7 @@ public class CaptureActivity extends AppCompatActivity
     @Override
     public boolean dispatchTouchEvent (MotionEvent ev)
     {
-        Log.d(LOGTAG, "dispatchTouchEvent: " + ev);
+        CaptureOverlay.getInstance().registerTouchEvent(ev);
 
         return super.dispatchTouchEvent(ev);
     }

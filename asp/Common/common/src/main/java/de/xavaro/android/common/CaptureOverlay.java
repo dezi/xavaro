@@ -1,7 +1,9 @@
 package de.xavaro.android.common;
 
 import android.graphics.PixelFormat;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.content.Context;
@@ -52,4 +54,15 @@ public class CaptureOverlay extends FrameLayout
             Simple.getWindowManager().removeView(this);
         }
     }
+
+    public void registerGenericMotionEvent (MotionEvent ev)
+    {
+        Log.d(LOGTAG, "registerGenericMotionEvent: " + ev);
+    }
+
+    public void registerTouchEvent (MotionEvent ev)
+    {
+        Log.d(LOGTAG, "registerTouchEvent: " + ev);
+    }
+
 }
