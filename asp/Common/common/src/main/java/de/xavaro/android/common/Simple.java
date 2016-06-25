@@ -2756,7 +2756,7 @@ public class Simple
 
     public static WindowManager getWindowManager()
     {
-        return actContext.getWindowManager();
+        return (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     }
 
     public static NotificationManager getNotificationManager()

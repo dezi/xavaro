@@ -186,9 +186,11 @@ public class HomeActivity extends CaptureActivity implements
         NotificationService.checkStatus();
         AccessibilityService.checkStatus();
 
+        /*
         screenRecorder = new CaptureRecorder();
         screenRecorder.create();
         screenRecorder.onStartRecording();
+        */
     }
 
     @Override
