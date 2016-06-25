@@ -15,15 +15,16 @@ import android.util.Log;
 
 import java.util.List;
 
+import de.xavaro.android.common.CaptureSettings;
 import de.xavaro.android.common.CommonStatic;
 import de.xavaro.android.common.ImageSmartView;
 import de.xavaro.android.common.Simple;
 
-public class SettingsActivity extends PreferenceActivity
+public class SettingsActivity extends CaptureSettings
 {
     private static final String LOGTAG = SettingsActivity.class.getSimpleName();
 
-    private static List<Header> headers;
+    private static List<PreferenceActivity.Header> headers;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)

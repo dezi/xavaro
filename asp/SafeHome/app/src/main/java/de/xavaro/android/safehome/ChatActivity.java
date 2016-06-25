@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
+import de.xavaro.android.common.CaptureActivity;
 import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.SimpleStorage;
 import de.xavaro.android.common.SocialFacebook;
@@ -44,7 +45,7 @@ import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.SystemIdentity;
 
 @SuppressWarnings("ResourceType")
-public class ChatActivity extends AppCompatActivity implements
+public class ChatActivity extends CaptureActivity implements
         View.OnSystemUiVisibilityChangeListener,
         ChatManager.ChatMessageCallback
 {

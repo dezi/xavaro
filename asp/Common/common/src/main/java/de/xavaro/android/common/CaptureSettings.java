@@ -1,13 +1,13 @@
 package de.xavaro.android.common;
 
-import android.support.v7.app.AppCompatActivity;
+import android.preference.PreferenceActivity;
 import android.view.MotionEvent;
 import android.os.Bundle;
 import android.util.Log;
 
-public class CaptureActivity extends AppCompatActivity
+public class CaptureSettings extends PreferenceActivity
 {
-    private static final String LOGTAG = CaptureActivity.class.getSimpleName();
+    private static final String LOGTAG = CaptureSettings.class.getSimpleName();
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState)

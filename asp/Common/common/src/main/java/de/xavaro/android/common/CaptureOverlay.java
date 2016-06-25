@@ -26,7 +26,7 @@ public class CaptureOverlay extends FrameLayout
     {
         super(context);
 
-        setBackgroundColor(0x88880000);
+        setBackgroundColor(0x22880000);
 
         overlayParam = new WindowManager.LayoutParams(
                 Simple.MP, Simple.MP,
