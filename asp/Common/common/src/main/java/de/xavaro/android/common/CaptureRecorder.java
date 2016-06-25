@@ -7,17 +7,19 @@ import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.content.Context;
 import android.content.Intent;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.SparseIntArray;
 import android.util.Log;
+import android.widget.FrameLayout;
 
 import java.io.IOException;
 
-public class ScreenRecorder
+public class CaptureRecorder
 {
-    private static final String LOGTAG = ScreenRecorder.class.getSimpleName();
+    private static final String LOGTAG = CaptureRecorder.class.getSimpleName();
 
     private static final int REQUEST_CODE = 1000;
     private MediaProjectionManager mProjectionManager;
@@ -27,6 +29,7 @@ public class ScreenRecorder
     private android.media.MediaRecorder mMediaRecorder;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private DisplayMetrics metrics;
+    private FrameLayout overlayView;
 
     static
     {
@@ -44,6 +47,56 @@ public class ScreenRecorder
         mMediaRecorder = new android.media.MediaRecorder();
 
         mProjectionManager = (MediaProjectionManager) Simple.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+
+        overlayView = new FrameLayout(Simple.getActContext())
+        {
+            @Override
+            public boolean onTouchEvent(MotionEvent event)
+            {
+                Log.d(LOGTAG, "touch me2");
+
+                //return super.onTouchEvent(event);
+
+                return false;
+            }
+
+            @Override
+            public boolean onGenericMotionEvent(MotionEvent event)
+            {
+                Log.d(LOGTAG, "touch me3");
+                return false;
+            }
+        };
+
+        /*
+        overlayView.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                Log.d(LOGTAG, "touch me1");
+                return false;
+            }
+        });
+        */
+
+        /*
+        WindowManager.LayoutParams overlayParam = new WindowManager.LayoutParams(
+                300, 300,
+                //WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                2003,
+                1064
+                //WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                //        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        //| WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                        //| WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+                ,
+                PixelFormat.TRANSLUCENT);
+
+        overlayParam.gravity = Gravity.LEFT | Gravity.TOP;
+        overlayView.setBackgroundColor(0x88880000);
+        Simple.getWindowManager().addView(overlayView, overlayParam);
+        */
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
