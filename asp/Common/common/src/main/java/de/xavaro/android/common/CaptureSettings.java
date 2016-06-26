@@ -25,16 +25,14 @@ public class CaptureSettings extends PreferenceActivity
     @Override
     public boolean dispatchGenericMotionEvent (MotionEvent ev)
     {
-        CaptureOverlay.getInstance().registerGenericMotionEvent(ev);
-
-        return super.dispatchGenericMotionEvent(ev);
+        return CaptureOverlay.getInstance().registerGenericMotionEvent(ev)
+                || super.dispatchGenericMotionEvent(ev);
     }
 
     @Override
     public boolean dispatchTouchEvent (MotionEvent ev)
     {
-        CaptureOverlay.getInstance().registerTouchEvent(ev);
-
-        return super.dispatchTouchEvent(ev);
+        return CaptureOverlay.getInstance().registerTouchEvent(ev)
+                || super.dispatchTouchEvent(ev);
     }
 }

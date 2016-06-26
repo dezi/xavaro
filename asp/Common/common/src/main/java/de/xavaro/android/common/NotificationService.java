@@ -441,14 +441,23 @@ public class NotificationService extends NotificationListenerService
             return;
         }
 
-        Set<String> keys = extras.keySet();
-
-        for (String key : keys)
+        try
         {
-            Object keyval = extras.get(key);
-            if (keyval == null) continue;
+            Set<String> keys = extras.keySet();
 
-            Log.d(LOGTAG, type + ": " + key + ":" + keyval.toString());
+            for (String key : keys)
+            {
+                Object keyval = extras.get(key);
+                if (keyval == null) continue;
+
+                Log.d(LOGTAG, type + ": " + key + ":" + keyval.toString());
+            }
+        }
+        catch (Exception ignore)
+        {
+            //
+            // Silently ignore.
+            //
         }
     }
 
