@@ -1,7 +1,11 @@
 package de.xavaro.android.common;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.graphics.PixelFormat;
 import android.view.InputDevice;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.view.MotionEvent;
@@ -53,6 +57,14 @@ public class CaptureOverlay extends FrameLayout
     private int markerScale;
     private int markerXoff;
     private int markerYoff;
+
+    private int maxX;
+    private int maxY;
+    private int orgX;
+    private int orgY;
+    private int lastX;
+    private int lastY;
+    private boolean isMove;
 
     private CaptureOverlay(Context context)
     {
@@ -154,44 +166,89 @@ public class CaptureOverlay extends FrameLayout
         }
     }
 
-    public boolean registerGenericMotionEvent (MotionEvent ev)
+    private final View.OnGenericMotionListener monitorGenericMotionListener = new View.OnGenericMotionListener()
     {
-        if (ev.getAction() == MotionEvent.ACTION_HOVER_MOVE)
+        @Override
+        public boolean onGenericMotion(View view, MotionEvent event)
         {
-            hideAll();
-
-            return true;
+            return registerGenericMotionEvent(event);
         }
+    };
 
-        if (ev.getAction() == MotionEvent.ACTION_HOVER_EXIT)
+    private final View.OnTouchListener monitorTouchListener = new View.OnTouchListener()
+    {
+        @Override
+        public boolean onTouch(View view, MotionEvent event)
         {
-            hideAll();
-
-            markerLayout.topMargin  = ((int) ev.getY()) - markerYoff;
-            markerLayout.leftMargin = ((int) ev.getX()) - markerXoff;
-
-            markerRed.setLayoutParams(markerLayout);
-            markerRed.setVisibility(VISIBLE);
-
-            return true;
+            return registerTouchEvent(event);
         }
+    };
 
+    private void monitorAllTouchesRecurse(View view)
+    {
+        view.setOnTouchListener(monitorTouchListener);
+
+        if (view instanceof ViewGroup)
+        {
+            ViewGroup vg = (ViewGroup) view;
+
+            int childcount = vg.getChildCount();
+
+            for (int inx = 0; inx < childcount; inx++)
+            {
+                monitorAllTouchesRecurse(vg.getChildAt(inx));
+            }
+        }
+    }
+
+    public void monitorAllTouches(Dialog dialog)
+    {
+        if ((dialog == null) || (dialog.getWindow() == null)) return;
+
+        dialog.getWindow().getDecorView().setOnGenericMotionListener(monitorGenericMotionListener);
+
+        monitorAllTouchesRecurse(dialog.getWindow().getDecorView());
+    }
+
+    public boolean registerGenericMotionEvent(MotionEvent ev)
+    {
         Log.d(LOGTAG, "registerGenericMotionEvent: " + ev);
 
         return false;
     }
 
-    public boolean registerTouchEvent (MotionEvent ev)
+    public boolean registerTouchEvent(MotionEvent ev)
     {
-        if ((ev.getDevice().getSources() & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE)
+        if ((ev.getDevice() != null) &&
+                ((ev.getDevice().getSources() & InputDevice.SOURCE_MOUSE)
+                        == InputDevice.SOURCE_MOUSE))
         {
+            if (ev.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                hideAll();
+
+                markerLayout.topMargin  = ((int) ev.getRawY()) - markerYoff;
+                markerLayout.leftMargin = ((int) ev.getRawX()) - markerXoff;
+
+                markerRed.setLayoutParams(markerLayout);
+                markerRed.setVisibility(VISIBLE);
+            }
+
             return true;
         }
 
-        if (ev.getAction() == MotionEvent.ACTION_MOVE)
+        int actX = (int) ev.getRawX();
+        int actY = (int) ev.getRawY();
+
+        if (ev.getAction() == MotionEvent.ACTION_DOWN)
         {
-            handLayoutMov.topMargin  = ((int) ev.getY()) - handYoff;
-            handLayoutMov.leftMargin = ((int) ev.getX()) - handXoff;
+            isMove = false;
+
+            orgX = maxX = lastX = actX;
+            orgY = maxY = lastY = actY;
+
+            handLayoutMov.topMargin  = actY - handYoff;
+            handLayoutMov.leftMargin = actX - handXoff;
 
             handTap.setLayoutParams(handLayoutMov);
             handTap.setVisibility(VISIBLE);
@@ -199,19 +256,78 @@ public class CaptureOverlay extends FrameLayout
             return false;
         }
 
+        if (ev.getAction() == MotionEvent.ACTION_MOVE)
+        {
+            hideAll();
+
+            ImageSmartView img = handTap;
+
+            int diffX = lastX - actX;
+            int diffY = lastY - actY;
+
+            if (! isMove)
+            {
+                isMove = (Math.abs(orgX - actX) > 10) || (Math.abs(orgY - actY) > 10);
+            }
+
+            if (isMove)
+            {
+                if (Math.abs(diffX) > Math.abs(diffY))
+                {
+                    if (lastX < actX)
+                    {
+                        img = handMoveRight;
+                    }
+                    else
+                    {
+                        img = handMoveLeft;
+                    }
+                }
+                else
+                {
+                    if (lastY < actY)
+                    {
+                        img = handMoveDown;
+                    }
+                    else
+                    {
+                        img = handMoveUp;
+                    }
+                }
+            }
+
+            handLayoutMov.topMargin  = actY - handYoff;
+            handLayoutMov.leftMargin = actX - handXoff;
+
+            img.setLayoutParams(handLayoutMov);
+            img.setVisibility(VISIBLE);
+
+            lastX = actX;
+            lastY = actY;
+
+            return false;
+        }
+
         if (ev.getAction() == MotionEvent.ACTION_UP)
         {
-            handTap.setVisibility(GONE);
+            if (isMove)
+            {
+                hideAll();
+            }
+            else
+            {
+                handTap.setVisibility(GONE);
 
-            handLayoutTap.topMargin  = ((int) ev.getY()) - handYtap;
-            handLayoutTap.leftMargin = ((int) ev.getX()) - handXtap;
+                handLayoutTap.topMargin = actY - handYtap;
+                handLayoutTap.leftMargin = actX - handXtap;
 
-            handTap1.setLayoutParams(handLayoutTap);
-            handTap1.setVisibility(VISIBLE);
+                handTap1.setLayoutParams(handLayoutTap);
+                handTap1.setVisibility(VISIBLE);
 
-            tapState = 1;
+                tapState = 1;
 
-            Simple.makePost(animateTap, tapDelay);
+                Simple.makePost(animateTap, tapDelay);
+            }
 
             return false;
         }
@@ -231,6 +347,7 @@ public class CaptureOverlay extends FrameLayout
         handMoveRight.setVisibility(GONE);
         handMoveUp.setVisibility(GONE);
         handMoveDown.setVisibility(GONE);
+        markerRed.setVisibility(GONE);
     }
 
     private final Runnable animateTap = new Runnable()
