@@ -130,6 +130,14 @@ public class NicedPreferences
         }
 
         @Override
+        protected void showDialog(Bundle state)
+        {
+            super.showDialog(state);
+
+            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+        }
+
+        @Override
         protected void onDialogClosed(boolean shouldSave)
         {
             if (shouldSave && changedValueCanBeNull != null)
@@ -261,6 +269,14 @@ public class NicedPreferences
             numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
             return numberPicker;
+        }
+
+        @Override
+        protected void showDialog(Bundle state)
+        {
+            super.showDialog(state);
+
+            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
         }
 
         @Override
@@ -407,6 +423,14 @@ public class NicedPreferences
             view.addView(numberPicker2);
 
             return view;
+        }
+
+        @Override
+        protected void showDialog(Bundle state)
+        {
+            super.showDialog(state);
+
+            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
         }
 
         @Override
@@ -886,7 +910,6 @@ public class NicedPreferences
             if (onClickRunner == null)
             {
                 super.showDialog(state);
-                Log.d(LOGTAG, "===============>" + getDialog());
 
                 CaptureOverlay.getInstance().monitorAllTouches(getDialog());
 
@@ -1145,6 +1168,8 @@ public class NicedPreferences
             if (onClickRunner == null)
             {
                 super.showDialog(state);
+
+                CaptureOverlay.getInstance().monitorAllTouches(getDialog());
 
                 View view = getDialog().getWindow().getDecorView();
                 View edit = view.findViewById(android.R.id.edit);
@@ -1796,6 +1821,8 @@ public class NicedPreferences
                     onSearchClick();
                 }
             });
+
+            CaptureOverlay.getInstance().monitorAllTouches(dialog);
         }
 
         public interface SearchCallback

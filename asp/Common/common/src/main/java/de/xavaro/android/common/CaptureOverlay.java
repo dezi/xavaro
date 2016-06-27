@@ -2,7 +2,9 @@ package de.xavaro.android.common;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.GradientDrawable;
 import android.view.InputDevice;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +42,7 @@ public class CaptureOverlay extends FrameLayout
     private ImageSmartView handMoveUp;
     private ImageSmartView handMoveDown;
     private ImageSmartView markerRed;
+    private FrameLayout frameRed;
 
     private FrameLayout.LayoutParams handLayoutMov;
     private int handSizeMov;
@@ -58,19 +61,20 @@ public class CaptureOverlay extends FrameLayout
     private int markerXoff;
     private int markerYoff;
 
-    private int maxX;
-    private int maxY;
+    private FrameLayout.LayoutParams frameLayout;
+
     private int orgX;
     private int orgY;
     private int lastX;
     private int lastY;
+
     private boolean isMove;
+    private boolean isHorz;
+    private boolean isVert;
 
     private CaptureOverlay(Context context)
     {
         super(context);
-
-        setBackgroundColor(0x22880000);
 
         overlayParam = new WindowManager.LayoutParams(
                 Simple.MP, Simple.MP,
@@ -148,6 +152,20 @@ public class CaptureOverlay extends FrameLayout
         markerRed.setImageResource(R.drawable.mark_red_640x400);
         markerRed.setVisibility(GONE);
         addView(markerRed);
+
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(16);
+        gd.setColor(Color.TRANSPARENT);
+        gd.setStroke(8, Color.RED);
+
+        frameLayout = new FrameLayout.LayoutParams(0, 0);
+
+        frameRed = new FrameLayout(getContext());
+        frameRed.setLayoutParams(frameLayout);
+        frameRed.setBackground(gd);
+        frameRed.setVisibility(GONE);
+
+        addView(frameRed);
     }
 
     public void attachToScreen()
@@ -164,6 +182,13 @@ public class CaptureOverlay extends FrameLayout
         {
             Simple.getWindowManager().removeView(this);
         }
+    }
+
+    private boolean isMouseEvent(MotionEvent event)
+    {
+        return ((event.getDevice() != null) &&
+                ((event.getDevice().getSources() & InputDevice.SOURCE_MOUSE)
+                        == InputDevice.SOURCE_MOUSE));
     }
 
     private final View.OnGenericMotionListener monitorGenericMotionListener = new View.OnGenericMotionListener()
@@ -205,9 +230,11 @@ public class CaptureOverlay extends FrameLayout
     {
         if ((dialog == null) || (dialog.getWindow() == null)) return;
 
-        dialog.getWindow().getDecorView().setOnGenericMotionListener(monitorGenericMotionListener);
+        View view = dialog.getWindow().getDecorView();
+        if (view == null) return;
 
-        monitorAllTouchesRecurse(dialog.getWindow().getDecorView());
+        view.setOnGenericMotionListener(monitorGenericMotionListener);
+        monitorAllTouchesRecurse(view);
     }
 
     public boolean registerGenericMotionEvent(MotionEvent ev)
@@ -219,117 +246,166 @@ public class CaptureOverlay extends FrameLayout
 
     public boolean registerTouchEvent(MotionEvent ev)
     {
-        if ((ev.getDevice() != null) &&
-                ((ev.getDevice().getSources() & InputDevice.SOURCE_MOUSE)
-                        == InputDevice.SOURCE_MOUSE))
-        {
-            if (ev.getAction() == MotionEvent.ACTION_DOWN)
-            {
-                hideAll();
-
-                markerLayout.topMargin  = ((int) ev.getRawY()) - markerYoff;
-                markerLayout.leftMargin = ((int) ev.getRawX()) - markerXoff;
-
-                markerRed.setLayoutParams(markerLayout);
-                markerRed.setVisibility(VISIBLE);
-            }
-
-            return true;
-        }
-
         int actX = (int) ev.getRawX();
         int actY = (int) ev.getRawY();
 
+        int diffX = lastX - actX;
+        int diffY = lastY - actY;
+
         if (ev.getAction() == MotionEvent.ACTION_DOWN)
         {
-            isMove = false;
+            isMove = isHorz = isVert = false;
 
-            orgX = maxX = lastX = actX;
-            orgY = maxY = lastY = actY;
-
-            handLayoutMov.topMargin  = actY - handYoff;
-            handLayoutMov.leftMargin = actX - handXoff;
-
-            handTap.setLayoutParams(handLayoutMov);
-            handTap.setVisibility(VISIBLE);
-
-            return false;
+            orgX = lastX = actX;
+            orgY = lastY = actY;
         }
 
         if (ev.getAction() == MotionEvent.ACTION_MOVE)
         {
-            hideAll();
-
-            ImageSmartView img = handTap;
-
-            int diffX = lastX - actX;
-            int diffY = lastY - actY;
-
             if (! isMove)
             {
-                isMove = (Math.abs(orgX - actX) > 10) || (Math.abs(orgY - actY) > 10);
+                isHorz = (Math.abs(orgX - actX) > 10);
+                isVert = (Math.abs(orgY - actY) > 10);
+                isMove = isHorz || isVert;
             }
 
-            if (isMove)
+            if ((Math.abs(diffX) < 10) && (Math.abs(diffY) < 10))
             {
-                if (Math.abs(diffX) > Math.abs(diffY))
+                //
+                // Move is to fine.
+                //
+
+                return false;
+            }
+        }
+
+        if (isMouseEvent(ev))
+        {
+            //
+            // Mouse event.
+            //
+
+            if (ev.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                hideAll();
+
+                orgX = lastX = actX;
+                orgY = lastY = actY;
+            }
+
+            if (ev.getAction() == MotionEvent.ACTION_MOVE)
+            {
+                if (isMove)
                 {
-                    if (lastX < actX)
+                    frameLayout.width = actX - orgX;
+                    frameLayout.height = actY - orgY;
+
+                    frameLayout.leftMargin = orgX;
+                    frameLayout.topMargin  = orgY;
+
+                    frameRed.setLayoutParams(frameLayout);
+                    frameRed.setVisibility(VISIBLE);
+                }
+            }
+
+            if (ev.getAction() == MotionEvent.ACTION_UP)
+            {
+                if (! isMove)
+                {
+                    markerLayout.leftMargin = actX - markerXoff;
+                    markerLayout.topMargin = actY - markerYoff;
+
+                    markerRed.setLayoutParams(markerLayout);
+                    markerRed.setVisibility(VISIBLE);
+                }
+            }
+
+            return true;
+        }
+        else
+        {
+            //
+            // Touch event.
+            //
+
+            if (ev.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                handLayoutMov.leftMargin = actX - handXoff;
+                handLayoutMov.topMargin = actY - handYoff;
+
+                handTap.setLayoutParams(handLayoutMov);
+                handTap.setVisibility(VISIBLE);
+
+                return false;
+            }
+
+            if (ev.getAction() == MotionEvent.ACTION_MOVE)
+            {
+                ImageSmartView img = handTap;
+
+                if (isMove)
+                {
+                    hideAll();
+
+                    if (Math.abs(diffX) > Math.abs(diffY))
                     {
-                        img = handMoveRight;
+                        if (lastX < actX)
+                        {
+                            img = handMoveRight;
+                        }
+                        else
+                        {
+                            img = handMoveLeft;
+                        }
                     }
                     else
                     {
-                        img = handMoveLeft;
+                        if (lastY < actY)
+                        {
+                            img = handMoveDown;
+                        }
+                        else
+                        {
+                            img = handMoveUp;
+                        }
                     }
+                }
+
+                handLayoutMov.leftMargin = isHorz ? (actX - handXoff) : orgX;
+                handLayoutMov.topMargin  = isVert ? (actY - handYoff) : orgY;
+
+                img.setLayoutParams(handLayoutMov);
+                img.setVisibility(VISIBLE);
+
+                lastX = actX;
+                lastY = actY;
+
+                return false;
+            }
+
+            if (ev.getAction() == MotionEvent.ACTION_UP)
+            {
+                if (isMove)
+                {
+                    hideAll();
                 }
                 else
                 {
-                    if (lastY < actY)
-                    {
-                        img = handMoveDown;
-                    }
-                    else
-                    {
-                        img = handMoveUp;
-                    }
+                    handTap.setVisibility(GONE);
+
+                    handLayoutTap.leftMargin = actX - handXtap;
+                    handLayoutTap.topMargin = actY - handYtap;
+
+                    handTap1.setLayoutParams(handLayoutTap);
+                    handTap1.setVisibility(VISIBLE);
+
+                    tapState = 1;
+
+                    Simple.makePost(animateTap, tapDelay);
                 }
+
+                return false;
             }
-
-            handLayoutMov.topMargin  = actY - handYoff;
-            handLayoutMov.leftMargin = actX - handXoff;
-
-            img.setLayoutParams(handLayoutMov);
-            img.setVisibility(VISIBLE);
-
-            lastX = actX;
-            lastY = actY;
-
-            return false;
-        }
-
-        if (ev.getAction() == MotionEvent.ACTION_UP)
-        {
-            if (isMove)
-            {
-                hideAll();
-            }
-            else
-            {
-                handTap.setVisibility(GONE);
-
-                handLayoutTap.topMargin = actY - handYtap;
-                handLayoutTap.leftMargin = actX - handXtap;
-
-                handTap1.setLayoutParams(handLayoutTap);
-                handTap1.setVisibility(VISIBLE);
-
-                tapState = 1;
-
-                Simple.makePost(animateTap, tapDelay);
-            }
-
-            return false;
         }
 
         Log.d(LOGTAG, "registerTouchEvent: " + ev);
@@ -343,11 +419,14 @@ public class CaptureOverlay extends FrameLayout
         handTap1.setVisibility(GONE);
         handTap2.setVisibility(GONE);
         handTap3.setVisibility(GONE);
+
         handMoveLeft.setVisibility(GONE);
         handMoveRight.setVisibility(GONE);
         handMoveUp.setVisibility(GONE);
         handMoveDown.setVisibility(GONE);
+
         markerRed.setVisibility(GONE);
+        frameRed.setVisibility(GONE);
     }
 
     private final Runnable animateTap = new Runnable()
@@ -357,6 +436,9 @@ public class CaptureOverlay extends FrameLayout
         {
             if (tapState == 1)
             {
+                frameRed.setVisibility(GONE);
+                markerRed.setVisibility(GONE);
+
                 handTap1.setVisibility(GONE);
 
                 handTap2.setLayoutParams(handLayoutTap);
