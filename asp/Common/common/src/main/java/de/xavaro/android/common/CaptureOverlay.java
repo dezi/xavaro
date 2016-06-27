@@ -267,6 +267,15 @@ public class CaptureOverlay extends FrameLayout
                 isHorz = (Math.abs(orgX - actX) > 10);
                 isVert = (Math.abs(orgY - actY) > 10);
                 isMove = isHorz || isVert;
+
+                if (isMove)
+                {
+                    //
+                    // Gesture is move. Try to cancel tap display.
+                    //
+
+                    Simple.removePost(showTap);
+                }
             }
 
             if ((Math.abs(diffX) < 10) && (Math.abs(diffY) < 10))
@@ -333,8 +342,7 @@ public class CaptureOverlay extends FrameLayout
                 handLayoutMov.leftMargin = actX - handXoff;
                 handLayoutMov.topMargin = actY - handYoff;
 
-                handTap.setLayoutParams(handLayoutMov);
-                handTap.setVisibility(VISIBLE);
+                Simple.makePost(showTap, 250);
 
                 return false;
             }
@@ -347,7 +355,7 @@ public class CaptureOverlay extends FrameLayout
                 {
                     hideAll();
 
-                    if (Math.abs(diffX) > Math.abs(diffY))
+                    if (isHorz)
                     {
                         if (lastX < actX)
                         {
@@ -358,7 +366,8 @@ public class CaptureOverlay extends FrameLayout
                             img = handMoveLeft;
                         }
                     }
-                    else
+
+                    if (isVert)
                     {
                         if (lastY < actY)
                         {
@@ -371,8 +380,9 @@ public class CaptureOverlay extends FrameLayout
                     }
                 }
 
-                handLayoutMov.leftMargin = isHorz ? (actX - handXoff) : orgX;
-                handLayoutMov.topMargin  = isVert ? (actY - handYoff) : orgY;
+
+                handLayoutMov.leftMargin = (isHorz ? actX : orgX) - handSizeMov / 2;
+                handLayoutMov.topMargin  = (isVert ? actY : orgY) - handSizeMov / 2;
 
                 img.setLayoutParams(handLayoutMov);
                 img.setVisibility(VISIBLE);
@@ -391,6 +401,7 @@ public class CaptureOverlay extends FrameLayout
                 }
                 else
                 {
+                    Simple.removePost(showTap);
                     handTap.setVisibility(GONE);
 
                     handLayoutTap.leftMargin = actX - handXtap;
@@ -428,6 +439,16 @@ public class CaptureOverlay extends FrameLayout
         markerRed.setVisibility(GONE);
         frameRed.setVisibility(GONE);
     }
+
+    private final Runnable showTap = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            handTap.setLayoutParams(handLayoutMov);
+            handTap.setVisibility(VISIBLE);
+        }
+    };
 
     private final Runnable animateTap = new Runnable()
     {
