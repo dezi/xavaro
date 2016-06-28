@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.os.Bundle;
@@ -12,14 +13,24 @@ public class CaptureActivity extends AppCompatActivity
         super.onPostCreate(savedInstanceState);
 
         CaptureOverlay.getInstance().attachToScreen();
+        CaptureRecorder.getInstance().onCreate();
     }
 
     @Override
     protected void onDestroy()
     {
+        CaptureRecorder.getInstance().onDestroy();
         CaptureOverlay.getInstance().detachFromScreen();
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        CaptureRecorder.getInstance().onActivityResult(requestCode, resultCode, data);
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

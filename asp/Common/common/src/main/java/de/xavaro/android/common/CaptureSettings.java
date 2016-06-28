@@ -1,6 +1,8 @@
 package de.xavaro.android.common;
 
+import android.content.Intent;
 import android.preference.PreferenceActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.os.Bundle;
 
@@ -12,14 +14,24 @@ public class CaptureSettings extends PreferenceActivity
         super.onPostCreate(savedInstanceState);
 
         CaptureOverlay.getInstance().attachToScreen();
+        CaptureRecorder.getInstance().onCreate();
     }
 
     @Override
     protected void onDestroy()
     {
+        CaptureRecorder.getInstance().onDestroy();
         CaptureOverlay.getInstance().detachFromScreen();
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        CaptureRecorder.getInstance().onActivityResult(requestCode, resultCode, data);
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

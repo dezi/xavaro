@@ -2176,6 +2176,13 @@ public class Simple
         return df.format(new Date(timeStamp));
     }
 
+    public static String getLocalTimeInternal(long timeStamp)
+    {
+        DateFormat df = new SimpleDateFormat("HH.mm.ss", Locale.getDefault());
+        df.setTimeZone(TimeZone.getDefault());
+        return df.format(new Date(timeStamp));
+    }
+
     public static String getLocalDate(long timeStamp)
     {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
@@ -2738,6 +2745,13 @@ public class Simple
     {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         return Math.min(displayMetrics.widthPixels, displayMetrics.heightPixels);
+    }
+
+    public static DisplayMetrics getMetrics()
+    {
+        DisplayMetrics metrics = new DisplayMetrics();
+        Simple.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics;
     }
 
     //endregion Display dimension methods.

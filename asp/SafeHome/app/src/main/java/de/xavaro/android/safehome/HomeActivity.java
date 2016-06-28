@@ -66,7 +66,6 @@ public class HomeActivity extends CaptureActivity implements
 
     private LaunchGroupRoot launchGroup;
     private JSONObject launchConfig;
-    private CaptureRecorder screenRecorder;
 
     private boolean wasPaused = false;
     private boolean lostFocus = true;
@@ -185,19 +184,11 @@ public class HomeActivity extends CaptureActivity implements
 
         NotificationService.checkStatus();
         AccessibilityService.checkStatus();
-
-        /*
-        screenRecorder = new CaptureRecorder();
-        screenRecorder.create();
-        screenRecorder.onStartRecording();
-        */
     }
 
     @Override
     protected void onDestroy()
     {
-        if (screenRecorder != null) screenRecorder.onDestroy();
-
         super.onDestroy();
 
         Log.d(LOGTAG, "========================> onDestroy");
@@ -594,7 +585,7 @@ public class HomeActivity extends CaptureActivity implements
     {
         Log.d(LOGTAG, "onActivityResult: request:" + requestCode + " result:" + resultCode);
 
-        if (screenRecorder != null) screenRecorder.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

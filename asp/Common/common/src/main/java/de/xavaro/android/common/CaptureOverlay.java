@@ -239,7 +239,7 @@ public class CaptureOverlay extends FrameLayout
 
     public boolean registerGenericMotionEvent(MotionEvent ev)
     {
-        Log.d(LOGTAG, "registerGenericMotionEvent: " + ev);
+        //Log.d(LOGTAG, "registerGenericMotionEvent: " + ev);
 
         return false;
     }
@@ -321,11 +321,21 @@ public class CaptureOverlay extends FrameLayout
             {
                 if (! isMove)
                 {
-                    markerLayout.leftMargin = actX - markerXoff;
-                    markerLayout.topMargin = actY - markerYoff;
+                    if ((actX == (Simple.getDeviceWidth() - 1)) &&
+                        (actY == (Simple.getDeviceHeight() - 1)))
+                    {
+                        CaptureRecorder.getInstance().toggleRecording();
+                    }
+                    else
+                    {
+                        markerLayout.leftMargin = actX - markerXoff;
+                        markerLayout.topMargin = actY - markerYoff;
 
-                    markerRed.setLayoutParams(markerLayout);
-                    markerRed.setVisibility(VISIBLE);
+                        markerRed.setLayoutParams(markerLayout);
+                        markerRed.setVisibility(VISIBLE);
+
+                        Log.d(LOGTAG, "registerTouchEvent: mouse up: " + actX + ":" + actY);
+                    }
                 }
             }
 
