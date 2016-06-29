@@ -83,6 +83,8 @@ tvscrape.onClickCancel = function(event)
 {
     WebLibSimple.detachElement(tvscrape.dimmer);
 
+    tvscrape.loadNextInfo(true);
+
     if (event) event.stopPropagation();
 }
 
@@ -92,7 +94,9 @@ tvscrape.onClickOk = function(event)
 
     if (! tvscrape.saveInfo())
     {
-        alert("Das war nix!!!")
+        alert("Das war nix!!!");
+
+        tvscrape.loadNextInfo(true);
     }
     else
     {
@@ -162,6 +166,8 @@ WebAppIntercept.onUserHrefClick = function(url)
         if (! tvscrape.saveInfo())
         {
             alert("Das war nix!!!")
+
+            tvscrape.loadNextInfo(true);
         }
         else
         {
@@ -402,34 +408,37 @@ tvscrape.loadChannelList = function()
     }
 }
 
-tvscrape.loadNextInfo = function()
+tvscrape.loadNextInfo = function(reload)
 {
-    if (tvscrape.infolist.length == 0)
+    if (! reload)
     {
-        tvscrape.iframe.style.display = "none";
-        tvscrape.selector.style.display = "block";
+        if (tvscrape.infolist.length == 0)
+        {
+            tvscrape.iframe.style.display = "none";
+            tvscrape.selector.style.display = "block";
 
-        return;
+            return;
+        }
+        else
+        {
+            tvscrape.iframe.style.display = "block";
+            tvscrape.selector.style.display = "none";
+        }
+
+        var info = tvscrape.infolist.shift();
+
+        tvscrape.info = {};
+        tvscrape.info.type = info.type;
+        tvscrape.info.name = info.t;
+        tvscrape.info.sender = info.s;
+        tvscrape.info.country = info.country;
+        tvscrape.info.issender = false;
+
+        tvscrape.counter.innerHTML = tvscrape.infolist.length;
+        tvscrape.title.innerHTML = tvscrape.info.sender + " (" + info.c + ")";
     }
-    else
-    {
-        tvscrape.iframe.style.display = "block";
-        tvscrape.selector.style.display = "none";
-    }
 
-    var info = tvscrape.infolist.shift();
-
-    tvscrape.info = {};
-    tvscrape.info.type = info.type;
-    tvscrape.info.name = info.t;
-    tvscrape.info.sender = info.s;
-    tvscrape.info.country = info.country;
-    tvscrape.info.issender = false;
-
-    tvscrape.counter.innerHTML = tvscrape.infolist.length;
-    tvscrape.title.innerHTML = tvscrape.info.sender + " (" + info.c + ")";
-
-    tvscrape.onClickTitle();
+    setTimeout(tvscrape.onClickTitle, 100);
 }
 
 tvscrape.saveInfo = function()

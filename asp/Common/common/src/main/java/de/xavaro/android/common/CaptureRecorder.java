@@ -3,19 +3,14 @@ package de.xavaro.android.common;
 import android.app.Activity;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
-import android.media.*;
-import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
-import android.content.Context;
+import android.media.MediaRecorder;
 import android.content.Intent;
-import android.view.MotionEvent;
 import android.view.Surface;
-import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.SparseIntArray;
 import android.util.Log;
-import android.widget.FrameLayout;
 
 import java.io.IOException;
 
@@ -160,8 +155,8 @@ public class CaptureRecorder
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setVideoEncodingBitRate(2048 * 1000);
-            mMediaRecorder.setVideoFrameRate(30);
             mMediaRecorder.setOrientationHint(orientation);
+            mMediaRecorder.setVideoFrameRate(30);
             mMediaRecorder.prepare();
         }
         catch (IOException ex)

@@ -144,7 +144,7 @@ public class WebAppLoader extends WebViewClient
                 }
             });
 
-            return null;
+            return denyLoad();
         }
 
         WebAppCache.WebAppCacheResponse wcr;
