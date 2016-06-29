@@ -64,7 +64,6 @@ tvscrape.onClickTitle = function(event)
 
         tvscrape.info.search += " " + sender;
         tvscrape.info.issender = true;
-
     }
 
     tvscrape.info.search = tvscrape.info.search.replace("_", " ");
@@ -410,7 +409,15 @@ tvscrape.loadChannelList = function()
 
 tvscrape.loadNextInfo = function(reload)
 {
-    if (! reload)
+    if (reload)
+    {
+        //
+        // Prevent toggling of sender tag in query.
+        //
+
+        tvscrape.info.issender = ! tvscrape.info.issender;
+    }
+    else
     {
         if (tvscrape.infolist.length == 0)
         {
