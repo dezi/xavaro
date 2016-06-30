@@ -87,15 +87,20 @@ tvscrape.onClickCancel = function(event)
     if (event) event.stopPropagation();
 }
 
+tvscrape.dasWarNix = function()
+{
+    alert("Das war nix!!!");
+}
+
 tvscrape.onClickOk = function(event)
 {
     WebLibSimple.detachElement(tvscrape.dimmer);
 
     if (! tvscrape.saveInfo())
     {
-        alert("Das war nix!!!");
-
         tvscrape.loadNextInfo(true);
+
+        setTimeout(tvscrape.dasWarNix, 10);
     }
     else
     {
@@ -164,9 +169,9 @@ WebAppIntercept.onUserHrefClick = function(url)
     {
         if (! tvscrape.saveInfo())
         {
-            alert("Das war nix!!!")
-
             tvscrape.loadNextInfo(true);
+
+            setTimeout(tvscrape.dasWarNix, 10);
         }
         else
         {
@@ -263,6 +268,8 @@ tvscrape.onChannelClick = function(channelspan)
     var channel = channelspan.channel;
     var channelpath = channel.type + "/" + channel.isocc + "/" + channel.name + ".json";
 
+    console.log("tvscrape.onChannelClick: start channel: " + channelpath);
+
     if (channelspan.channelcheck.checked)
     {
         for (var inx = 0; inx < tvscrape.infolist.length; inx++)
@@ -309,6 +316,8 @@ tvscrape.onChannelClick = function(channelspan)
     }
 
     tvscrape.counter.innerHTML = tvscrape.infolist.length;
+
+    console.log("tvscrape.onChannelClick: getan channel: " + channelpath);
 }
 
 tvscrape.sortChannelList = function(a, b)

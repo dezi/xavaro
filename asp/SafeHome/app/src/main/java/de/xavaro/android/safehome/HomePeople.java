@@ -355,6 +355,12 @@ public class HomePeople extends FrameLayout implements VoiceIntentResolver
             else
             {
                 String type = Json.getString(li, "type");
+                String subtype = Json.getString(li, "subtype");
+
+                if (Simple.equals(type, "xavaro") && Simple.equals(subtype, "padm"))
+                {
+                    continue;
+                }
 
                 if (Simple.equals(type, "contacts")
                         || Simple.equals(type, "phone")

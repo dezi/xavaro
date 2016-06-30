@@ -53,22 +53,16 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
                 icon.setImageResource(CommonConfigs.IconResPrepaid);
 
                 prepaidDateView = new TextView(getContext());
-                prepaidDateView.setLayoutParams(Simple.layoutParamsMW());
-                prepaidDateView.setPadding(0, 16, 0, 0);
-                prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f));
-                prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-                prepaidDateView.setTextColor(Color.WHITE);
+                prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL);
                 prepaidDateView.setTypeface(null, Typeface.BOLD);
+                prepaidDateView.setTextColor(Color.WHITE);
 
                 addView(prepaidDateView);
 
                 prepaidMoneyView = new TextView(getContext());
-                prepaidMoneyView.setLayoutParams(Simple.layoutParamsMM());
-                prepaidMoneyView.setPadding(0, 20, 0, icon.getPaddingBottom() + 36);
-                prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f));
-                prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-                prepaidMoneyView.setTextColor(Color.WHITE);
+                prepaidMoneyView.setGravity(Gravity.CENTER_HORIZONTAL);
                 prepaidMoneyView.setTypeface(null, Typeface.BOLD);
+                prepaidMoneyView.setTextColor(Color.WHITE);
 
                 addView(prepaidMoneyView);
             }
@@ -121,6 +115,27 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
         if (targetIcon == overicon) overlay.setVisibility(VISIBLE);
 
         Simple.makePost(onNotification);
+    }
+
+    @Override
+    public void setSize(int width, int height)
+    {
+        super.setSize(width, height);
+
+        if (Json.equals(config, "subtype", "padm"))
+        {
+            //
+            // Original font sizes based on 200 pixels height.
+            //
+
+            float scale = height / 200.0f;
+
+            prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f * scale));
+            prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f * scale));
+
+            prepaidDateView.setPadding(0, Math.round(28 * scale), 0, 0);
+            prepaidMoneyView.setPadding(0, Math.round(56 * scale), 0, 0);
+        }
     }
 
     private void checkPrepaidBalance()
