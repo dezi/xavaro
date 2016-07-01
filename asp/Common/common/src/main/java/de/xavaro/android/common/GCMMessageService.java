@@ -139,28 +139,15 @@ public class GCMMessageService extends GcmListenerService
             jData.put("message", message);
             jData.put("guid", UUID.randomUUID().toString());
 
-            JSONObject jSub = new JSONObject();
-            jSub.put("a", "1");
-            jSub.put("b", "2");
-            jData.put("myjson", jSub);
-
-            JSONObject jAPS = new JSONObject();
-            jAPS.put("alert", "zickezacke");
-
-            //jData.put("aps", "zickezacke");
-
             JSONObject jGcmData = new JSONObject();
             jGcmData.put("data", jData);
 
             JSONObject noti = new JSONObject();
-            //noti.put("title", "Schnullerbacke");
-            //noti.put("sound", "1.wav");
-            noti.put("badge", "7");
-            //noti.put("body", "ich bin der bodey");
+            noti.put("sound", "1.wav");
+            jGcmData.put("notification", noti);
 
             jGcmData.put("priority", "high");
             jGcmData.put("content_available", true);
-            //jGcmData.put("notification", noti);
 
             if (tokens != null)
             {
@@ -268,8 +255,12 @@ public class GCMMessageService extends GcmListenerService
             // IOS compliance flags.
             //
 
+            JSONObject noti = new JSONObject();
+            noti.put("sound", "1.wav");
+
             jGcmData.put("priority", "high");
             jGcmData.put("content_available", true);
+            jGcmData.put("notification", noti);
 
             //
             // GCM only sends via post api.

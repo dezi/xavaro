@@ -41,6 +41,11 @@ public class LaunchItemNotify extends LaunchItem
         String type = Json.getString(config, "type");
         String subtype = Json.getString(config, "subtype");
 
+        if (Simple.equals(type, "xavaro") && Simple.equals(subtype, "padm"))
+        {
+            return null;
+        }
+
         if (Simple.equals(type, "phone"))
         {
             if (Simple.equals(subtype, "text")) typetag = "smsmms";

@@ -195,6 +195,8 @@ public class ChatManager implements
                 {
                     String cashcode = Json.getString(message, "cashcode");
                     PrepaidManager.makeRequest(this, true, message, cashcode);
+
+                    return;
                 }
 
                 if (Simple.equals(type, "sendOnlineStatus"))
