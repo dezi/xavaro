@@ -1,34 +1,18 @@
 // javascript:(function(){document.getElementsByTagName('head')[0].appendChild(document.createElement('script')).src='http://192.168.2.103/weblibs/test.js?'+Math.random();}());
+// javascript:(function(){document.getElementsByTagName('head')[0].appendChild(document.createElement('script')).src='http://192.168.1.150/weblibs/test.js?'+Math.random();}());
 
-function df(obfu)
+function df(o)
 {
-    var text = "";
+    var t="";
 
-    for (var fnz = 0; fnz < obfu.length; fnz++)
+    for (var f=0;f<o.length;f++)
     {
-        var c = obfu.charAt(fnz);
+        var c=o.charAt(f);
 
-        if (c == "±")
-        {
-            text += "&";
-        }
-        else
-        if (c == "´")
-        {
-            text += ";";
-        }
-        else
-        if (c == " ")
-        {
-            text += " ";
-        }
-        else
-        {
-            text += String.fromCharCode(obfu.charCodeAt(fnz) - 1);
-        }
+        t+=c=="±"?"&":c=="´"?";":c==" "?" ":String.fromCharCode(o.charCodeAt(f)-1);
     }
 
-    return text.replace("&amp;", "&");
+    return t.replace("&amp;","&");
 }
 
 function lp(elem)
@@ -47,18 +31,14 @@ function lp(elem)
 
         if (child.className == "obfuscated")
         {
-            for (var cnt = 0; cnt < child.childNodes.length; cnt++)
+            var n=child.childNodes;
+
+            for (var cnt = 0; cnt < n.length; cnt++)
             {
-                if (child.childNodes[ cnt ].nodeName === "#text")
-                {
-                    child.childNodes[ cnt ].nodeValue = df(child.childNodes[ cnt ].nodeValue);
-                }
+                var z=n[ cnt ];
 
-                if (child.childNodes[ cnt ].nodeName === "B")
-                {
-                    child.childNodes[ cnt ].innerHTML = df(child.childNodes[ cnt ].innerHTML);
-                }
-
+                if (z.nodeName=="#text") z.nodeValue = df(z.nodeValue);
+                if (z.nodeName=="B"||z.nodeName=="I") z.innerHTML = df(z.innerHTML);
             }
         }
     }
