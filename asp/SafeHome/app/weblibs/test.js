@@ -1,5 +1,9 @@
-// javascript:(function(){document.getElementsByTagName('head')[0].appendChild(document.createElement('script')).src='http://192.168.2.103/weblibs/test.js?'+Math.random();}());
+//
+// Laterpay defuscator.
+//
 // javascript:(function(){document.getElementsByTagName('head')[0].appendChild(document.createElement('script')).src='http://192.168.1.150/weblibs/test.js?'+Math.random();}());
+
+// Defuscate text string.
 
 function df(o)
 {
@@ -9,11 +13,15 @@ function df(o)
     {
         var c=o.charAt(f);
 
+        // Subtract 1 from UTF-8 character code with a few exceptions.
+
         t+=c=="±"?"&":c=="´"?";":c==" "?" ":String.fromCharCode(o.charCodeAt(f)-1);
     }
 
     return t.replace("&amp;","&");
 }
+
+// Recurse DOM HTML elements.
 
 function lp(elem)
 {
@@ -23,11 +31,20 @@ function lp(elem)
 
         lp(child);
 
+        // Identify Laterpay popup and blur.
+
         if (child.className && child.className.indexOf && child.className.indexOf("filter-blur") >= 0)
         {
+            // Remove blur css style.
+
             child.className = null;
+
+            // Delete popup.
+
             child.nextSibling.innerHTML = null;
         }
+
+        // Defuscate a paragraph
 
         if (child.className == "obfuscated")
         {
