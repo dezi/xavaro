@@ -33,15 +33,11 @@ function lp(elem)
 
         // Identify Laterpay popup and blur.
 
-        if (child.className && child.className.indexOf && child.className.indexOf("filter-blur") >= 0)
+        if (child.className && child.className.indexOf && child.className.indexOf("laterpay-under-overlay") >= 0)
         {
             // Remove blur css style.
 
-            child.className = null;
-
-            // Delete popup.
-
-            child.nextSibling.innerHTML = null;
+            child.nextSibling.className = null;
         }
 
         // Defuscate a paragraph

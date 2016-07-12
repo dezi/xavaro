@@ -638,6 +638,8 @@ public abstract class BlueTooth extends BroadcastReceiver
                         + " => "
                         + currentGatt.getDevice().getBondState());
 
+                Log.d(LOGTAG,"onServicesDiscovered ===================================:" + currentPrimary);
+
                 if (currentPrimary != null) gattHandler.postDelayed(runEnableAndSync, 0);
             }
         }

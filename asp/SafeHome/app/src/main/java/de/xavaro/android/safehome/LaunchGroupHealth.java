@@ -36,6 +36,18 @@ public class LaunchGroupHealth extends LaunchGroup
             Json.put(Simple.sharedPrefEquals("health.bpm.icon", "home") ? home : adir, entry);
         }
 
+        if (Simple.getSharedPrefBoolean("health.oxy.enable"))
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "subtype", "oxy");
+            Json.put(entry, "label", "Blutsauerstoff");
+            Json.put(entry, "order", 1000);
+
+            Json.put(Simple.sharedPrefEquals("health.oxy.icon", "home") ? home : adir, entry);
+        }
+
         if (Simple.getSharedPrefBoolean("health.scale.enable"))
         {
             JSONObject entry = new JSONObject();
@@ -122,6 +134,22 @@ public class LaunchGroupHealth extends LaunchGroup
             if (HealthBPM.getInstance().isConfigured())
             {
                 HealthBPM.getInstance().setBlueTooth(null);
+            }
+        }
+
+        if (getDevice("oxy") != null)
+        {
+            if (! HealthOxy.getInstance().isConfigured())
+            {
+                HealthOxy.getInstance().setBlueTooth(
+                        new BlueToothOxy(context, getDevice("oxy")));
+            }
+        }
+        else
+        {
+            if (HealthOxy.getInstance().isConfigured())
+            {
+                HealthOxy.getInstance().setBlueTooth(null);
             }
         }
 

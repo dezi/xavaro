@@ -247,6 +247,44 @@ public class PreferencesHealth
 
     //endregion Health Units preferences
 
+    //region Health Oxy preferences
+
+    public static class HealthOxyFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Blutsauerstoff";
+            header.iconRes = GlobalConfigs.IconResHealthOxy;
+            header.fragment = HealthOxyFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthOxyFragment()
+        {
+            super();
+
+            isOxy = true;
+
+            iconres = GlobalConfigs.IconResHealthOxy;
+            keyprefix = "health.oxy";
+            masterenable = "Puls-Oxymeter freischalten";
+            devicetitle = "Puls-Oxymeter";
+            devicesearch = "Puls-Oxymeter werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+        }
+    }
+
+    //endregion Health Oxy preferences
+
     //region Health BPM preferences
 
     public static class HealthBPMFragment extends BlueToothFragment
@@ -638,6 +676,7 @@ public class PreferencesHealth
         protected String devicesearch;
 
         protected boolean isBPM;
+        protected boolean isOxy;
         protected boolean isScale;
         protected boolean isSensor;
         protected boolean isGlucose;
@@ -804,6 +843,7 @@ public class PreferencesHealth
                     public void onClick(View view)
                     {
                         if (isBPM) new BlueToothBPM(context).discover(self);
+                        if (isOxy) new BlueToothOxy(context).discover(self);
                         if (isScale) new BlueToothScale(context).discover(self);
                         if (isSensor) new BlueToothSensor(context).discover(self);
                         if (isGlucose) new BlueToothGlucose(context).discover(self);
