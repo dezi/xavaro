@@ -18,12 +18,8 @@ import de.xavaro.android.common.Simple;
 // Health data record format:
 //
 //  dts => ISO timestamp
-//  sys => Systolic blood pressure
-//  dia => Diastolic blood pressure
-//  map => Mean arterial blood pressure
+//  sat => Oxygene saturation
 //  pls => Pulse
-//  usr => User id
-//  flg => Device flags
 //
 
 public class BlueToothOxy extends BlueTooth
@@ -43,12 +39,13 @@ public class BlueToothOxy extends BlueTooth
     @Override
     protected boolean isCompatibleService(BluetoothGattService service)
     {
-        return service.getUuid().toString().contains("ba11f08c-5f14-0b0d");
+        return service.getUuid().toString().startsWith("ba11f08c-5f14-0b0d");
     }
 
     @Override
     protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
+        //noinspection SimplifiableIfStatement
         if (currentPrimary != null)
         {
             //
@@ -74,6 +71,10 @@ public class BlueToothOxy extends BlueTooth
     @Override
     protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
     {
+        //
+        // Stupid device wants all notifiers enabled, otherwise does not respond.
+        //
+
         if (characteristic.getUuid().toString().equals("0000cd02-0000-1000-8000-00805f9b34fb"))
         {
             c2 = characteristic;
@@ -90,11 +91,11 @@ public class BlueToothOxy extends BlueTooth
     @Override
     protected void enableDevice()
     {
-        //super.enableDevice();
-
         if (currentPrimary != null) gattSchedule.add(new GattAction(currentPrimary));
+
         if (c2 != null) gattSchedule.add(new GattAction(c2));
         if (c3 != null) gattSchedule.add(new GattAction(c3));
+
         if (currentSecondary != null) gattSchedule.add(new GattAction(currentSecondary));
     }
 
@@ -104,7 +105,7 @@ public class BlueToothOxy extends BlueTooth
         BlueTooth.GattAction ga;
 
         //
-        // Set stupid password to device.
+        // Send stupid password to device.
         //
 
         ga = new BlueTooth.GattAction();
@@ -168,7 +169,7 @@ public class BlueToothOxy extends BlueTooth
         }
     }
 
-    public byte[] getPassword()
+    private byte[] getPassword()
     {
         Log.d(LOGTAG, "getPassword");
 
@@ -180,14 +181,15 @@ public class BlueToothOxy extends BlueTooth
         data[ 3 ] = (byte) 177;
         data[ 4 ] = (byte) 0;
         data[ 5 ] = (byte) 0;
-        data[ 6 ] = (byte) 181;
+        data[ 6 ] = (byte) 0;
 
         calcChecksum(data);
 
         return data;
     }
 
-    public byte[] getReadRealtime()
+    @SuppressWarnings("unused")
+    private byte[] getReadRealtime()
     {
         Log.d(LOGTAG, "getReadRealtime");
 
@@ -213,8 +215,6 @@ public class BlueToothOxy extends BlueTooth
         {
             cs += data[ inx ];
         }
-
-        Log.d(LOGTAG, "calcChecksum:" + data[ data.length - 1 ] + "==" + cs);
 
         data[ data.length - 1 ] = cs;
     }
