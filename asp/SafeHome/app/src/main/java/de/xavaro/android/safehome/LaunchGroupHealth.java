@@ -209,6 +209,11 @@ public class LaunchGroupHealth extends LaunchGroup
             HealthBPM.subscribe(subscriber);
         }
 
+        if (subtype.equals("oxy") && (HealthOxy.getInstance() != null))
+        {
+            HealthOxy.subscribe(subscriber);
+        }
+
         if (subtype.equals("scale") && (HealthScale.getInstance() != null))
         {
             HealthScale.subscribe(subscriber);

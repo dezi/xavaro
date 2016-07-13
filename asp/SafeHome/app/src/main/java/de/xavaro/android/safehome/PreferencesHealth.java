@@ -280,6 +280,79 @@ public class PreferencesHealth
         public void registerAll(Context context)
         {
             super.registerAll(context);
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceCheckboxPreference cb;
+            NicedPreferences.NiceNumberPreference dp;
+            NicedPreferences.NiceSwitchPreference sp;
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Warnungen");
+            preferences.add(pc);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".alert.enable");
+            sp.setTitle("Aktivieren");
+            sp.setEnabled(enabled);
+
+            sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    for (Preference pref : preferences)
+                    {
+                        if (pref.getKey() == null) continue;
+                        if (pref.getKey().equals(keyprefix + ".alert.enable")) continue;
+                        if (! pref.getKey().startsWith(keyprefix + ".alert.")) continue;
+
+                        pref.setEnabled((boolean) newValue);
+                    }
+
+                    return true;
+                }
+            });
+
+            preferences.add(sp);
+
+            dp = new NicedPreferences.NiceNumberPreference(context);
+
+            dp.setKey(keyprefix + ".alert.lowsat");
+            dp.setMinMaxValue(40, 95, 1);
+            dp.setDefaultValue(90);
+            dp.setTitle("Zu niedriger Sauerstoff");
+            dp.setEnabled(enabled);
+
+            preferences.add(dp);
+
+            dp = new NicedPreferences.NiceNumberPreference(context);
+
+            dp.setKey(keyprefix + ".alert.highpls");
+            dp.setMinMaxValue(90, 140, 1);
+            dp.setDefaultValue(90);
+            dp.setTitle("Zu hoher Puls");
+            dp.setEnabled(enabled);
+
+            preferences.add(dp);
+
+            dp = new NicedPreferences.NiceNumberPreference(context);
+
+            dp.setKey(keyprefix + ".alert.lowpls");
+            dp.setMinMaxValue(30, 80, 1);
+            dp.setDefaultValue(60);
+            dp.setTitle("Zu niedriger Puls");
+            dp.setEnabled(enabled);
+
+            preferences.add(dp);
+
+            cb = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cb.setKey(keyprefix + ".alert.alertgroup");
+            cb.setTitle("Assistenz informieren");
+            cb.setEnabled(enabled);
+
+            preferences.add(cb);
         }
     }
 

@@ -138,7 +138,7 @@ public class BlueToothOxy extends BlueTooth
         {
             JSONObject oxydata = new JSONObject();
 
-            Json.put(oxydata, "type", "OXYMeasurement");
+            Json.put(oxydata, "type", "OxyMeasurement");
 
             float sat = rd[ 3 ];
             float pls = rd[ 4 ];

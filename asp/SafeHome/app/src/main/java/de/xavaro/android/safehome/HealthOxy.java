@@ -50,29 +50,24 @@ public class HealthOxy extends HealthBase
             String date = Json.getString(lastRecord, "dts");
             if (date == null) return;
 
-            /*
-            int systolic = Json.getInt(lastRecord, "sys");
-            int diastolic = Json.getInt(lastRecord, "dia");
+            int saturation = Json.getInt(lastRecord, "sat");
             int pulse = Json.getInt(lastRecord, "pls");
 
             if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
             {
-                lastSys = systolic;
-                lastDia = diastolic;
+                lastSat = saturation;
                 lastPls = pulse;
                 lastDts = date;
 
                 handler.removeCallbacks(messageSpeaker);
                 handler.postDelayed(messageSpeaker, 500);
             }
-            */
         }
     }
 
     JSONObject lastRecord;
     String lastDts;
-    int lastSys;
-    int lastDia;
+    int lastSat;
     int lastPls;
 
     private void informAssistance(int resid)
@@ -87,16 +82,16 @@ public class HealthOxy extends HealthBase
         }
 
         if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return;
-        if (! Simple.getSharedPrefBoolean("health.bpm.alert.alertgroup")) return;
+        if (! Simple.getSharedPrefBoolean("health.oxy.alert.alertgroup")) return;
 
         String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
         if (groupIdentity == null) return;
 
         String name = Simple.getOwnerName();
-        String bval = lastSys + ":" + lastDia;
+        String bval = "" + lastSat;
         String puls = "" + lastPls;
 
-        String text = Simple.getTrans(R.string.healt_bpm_alert, name, bval, puls)
+        String text = Simple.getTrans(R.string.healt_oxy_alert, name, bval, puls)
                 + " " + Simple.getTrans(resid);
 
         JSONObject assistMessage = new JSONObject();
@@ -113,32 +108,25 @@ public class HealthOxy extends HealthBase
     {
         if (lastRecord == null) return;
         String type = Json.getString(lastRecord, "type");
-        if (!Simple.equals(type, "BPMMeasurement")) return;
+        if (! Simple.equals(type, "OxyMeasurement")) return;
 
-        String sm = Simple.getTrans(R.string.healt_bpm_spoken, lastSys, lastDia, lastPls);
-        String am = Simple.getTrans(R.string.healt_bpm_activity, lastSys, lastDia, lastPls);
+        String sm = Simple.getTrans(R.string.healt_oxy_spoken, lastSat, lastPls);
+        String am = Simple.getTrans(R.string.healt_oxy_activity, lastSat, lastPls);
 
         Speak.speak(sm);
         ActivityManager.recordActivity(am);
 
-        if (!Simple.getSharedPrefBoolean("health.bpm.alert.enable")) return;
+        if (!Simple.getSharedPrefBoolean("health.oxy.alert.enable")) return;
 
         try
         {
-            String low = Simple.getSharedPrefString("health.bpm.alert.lowbp");
+            int low = Simple.getSharedPrefInt("health.oxy.alert.lowsat");
 
-            if (low != null)
+            if (low <= lastSat)
             {
-                String[] lp = low.split(":");
-
-                if ((lp.length == 2) &&
-                        ((Integer.parseInt(lp[ 0 ]) >= lastSys) ||
-                                (Integer.parseInt(lp[ 1 ]) >= lastDia)))
-                {
-                    Speak.speak(Simple.getTrans(R.string.healt_bpm_lowpb));
-                    ActivityManager.recordAlert(R.string.healt_bpm_lowpb);
-                    informAssistance(R.string.healt_bpm_lowpb);
-                }
+                Speak.speak(Simple.getTrans(R.string.healt_oxy_lowsat));
+                ActivityManager.recordAlert(R.string.healt_oxy_lowsat);
+                informAssistance(R.string.healt_oxy_lowsat);
             }
         }
         catch (Exception ex)
@@ -148,20 +136,29 @@ public class HealthOxy extends HealthBase
 
         try
         {
-            String high = Simple.getSharedPrefString("health.bpm.alert.highbp");
+            int low = Simple.getSharedPrefInt("health.oxy.alert.lowpls");
 
-            if (high != null)
+            if (low >= lastPls)
             {
-                String[] hp = high.split(":");
+                Speak.speak(Simple.getTrans(R.string.healt_oxy_highpls));
+                ActivityManager.recordAlert(R.string.healt_oxy_highpls);
+                informAssistance(R.string.healt_oxy_highpls);
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
 
-                if ((hp.length == 2) &&
-                        ((Integer.parseInt(hp[ 0 ]) >= lastSys) ||
-                                (Integer.parseInt(hp[ 1 ]) >= lastDia)))
-                {
-                    Speak.speak(Simple.getTrans(R.string.healt_bpm_highbp));
-                    ActivityManager.recordAlert(R.string.healt_bpm_highbp);
-                    informAssistance(R.string.healt_bpm_highbp);
-                }
+        try
+        {
+            int high = Simple.getSharedPrefInt("health.oxy.alert.highpls");
+
+            if (high <= lastPls)
+            {
+                Speak.speak(Simple.getTrans(R.string.healt_oxy_lowpls));
+                ActivityManager.recordAlert(R.string.healt_oxy_lowpls);
+                informAssistance(R.string.healt_oxy_lowpls);
             }
         }
         catch (Exception ex)
