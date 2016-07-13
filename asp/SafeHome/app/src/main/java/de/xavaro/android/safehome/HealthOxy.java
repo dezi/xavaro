@@ -122,7 +122,7 @@ public class HealthOxy extends HealthBase
         {
             int low = Simple.getSharedPrefInt("health.oxy.alert.lowsat");
 
-            if (low <= lastSat)
+            if (low >= lastSat)
             {
                 Speak.speak(Simple.getTrans(R.string.healt_oxy_lowsat));
                 ActivityManager.recordAlert(R.string.healt_oxy_lowsat);
