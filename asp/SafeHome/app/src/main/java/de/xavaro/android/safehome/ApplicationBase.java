@@ -1,9 +1,15 @@
 package de.xavaro.android.safehome;
 
 import android.app.Application;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Location;
 import android.os.StrictMode;
 import android.util.Log;
+
+import java.io.File;
+import java.util.List;
 
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Simple;
@@ -23,6 +29,25 @@ public class ApplicationBase extends Application
         Log.d(LOGTAG, "onCreate");
 
         super.onCreate();
+
+        /*
+        final PackageManager pm = getPackageManager();
+
+        List<ApplicationInfo> packages =  pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        for (ApplicationInfo packageInfo : packages)
+        {
+            if (packageInfo.packageName.equals("com.nianticlabs.pokemongo"))
+            {
+                Log.d(LOGTAG, "Installed package :" + packageInfo.packageName);
+                Log.d(LOGTAG, "Apk file path:" + packageInfo.sourceDir);
+
+                Simple.fileCopy(new File(packageInfo.sourceDir),
+                        new File(Simple.getMediaPath("download"),
+                                "com.nianticlabs.pokemongo.apk"));
+            }
+        }
+        */
 
         //
         // Make application context available.
