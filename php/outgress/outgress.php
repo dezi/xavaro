@@ -2,20 +2,28 @@
 
 include "../include/json.php";
 
-function closedatabase()
+function getSSLPage($url) 
 {
-	if (isset($GLOBALS[ "hspots" ])) dba_close($GLOBALS[ "hspots" ]);
+	$handle = popen("curl -s '$url'", "r");
 	
-	echo "Closed...\n";
+	$read = "";
+	
+	while ($chunk = fread($handle, 8192))
+	{
+		$read .= $chunk;
+	}	
+
+	pclose($handle);
+	return $read;
 }
 
 function dumpdat()
 {
 	$hspotsfile = "./points.hash";
 	
-	for ($lon = 2; $lon < 180; $lon++)
+	for ($lon = -180; $lon < 180; $lon++)
 	{
-		for ($lat = 50; $lat < 90; $lat++)
+		for ($lat = -90; $lat < 90; $lat++)
 		{
 			$donefile = "./done/$lon-$lat.done";
 			if (file_exists($donefile)) continue;
@@ -29,7 +37,13 @@ function dumpdat()
 			
 			echo "Url=$url\n";
 			
-			$cont = file_get_contents($url);
+			//
+			// file_get_contents does not always work on OSX with HTTPS...
+			//
+			
+			$cont = getSSLPage($url);
+			if ($cont === false) continue;
+			
 			$json = json_decdat($cont);
 			$points = $json[ "points" ];
 			
@@ -55,10 +69,23 @@ function dumpdat()
 	}
 }
 
-//pcntl_signal(SIGTERM, "closedatabase");
-//pcntl_signal(SIGHUP,  "closedatabase");
-//pcntl_signal(SIGUSR1, "closedatabase");
+function details()
+{
+	$hspotsfile = "./points.hash";
 
-dumpdat();
+	$hspots = dba_open($hspotsfile, "r", "ndbm");
+	
+	for($key = dba_firstkey($hspots); $key != false; $key = dba_nextkey($hspots)) 
+	{
+        $val = dba_fetch($key, $hspots);
+        
+        echo "$key => $val\n";
+    }
+    
+	dba_close($hspots);
+}
+
+//dumpdat();
+details();
 
 ?>
