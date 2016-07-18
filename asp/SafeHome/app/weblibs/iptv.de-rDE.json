@@ -441,7 +441,7 @@
         "label": "RTL II",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/728562115859066880/KJzEZyvO_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/752433961561886720/ExwAyEFs_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl2.html",
         "aliase": [ "tv/de/RTL 2 Deutschland", "tv/de/RTL 2 Deutschland HD" ]
       },
@@ -721,14 +721,14 @@
 
     "label": "ATV",
     "url": "http://www.atv.at/",
-    "icon": "http://pbs.twimg.com/profile_images/488581242359541760/Rei25M59_400x400.jpeg",
+    "icon": "http://pbs.twimg.com/profile_images/748484632522391552/wJemk0gY_400x400.jpg",
 
     "channels": [
       {
         "label": "ATV",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/488581242359541760/Rei25M59_400x400.jpeg",
+        "icon": "http://pbs.twimg.com/profile_images/748484632522391552/wJemk0gY_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/atv.html",
         "aliase": [ "tv/de/ATV", "tv/de/ATV HD" ]
       }

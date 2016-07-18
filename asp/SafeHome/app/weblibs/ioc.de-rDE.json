@@ -188,6 +188,22 @@
       "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
     },
 
+    "www.svz.de": {
+      "url": "http://www.svz.de/",
+      "icon": "http://pbs.twimg.com/profile_images/552730002907602944/JYMEi5tI_400x400.jpeg",
+
+      "label": "Schweriner Volkszeitung",
+      "default": false,
+      "region": "de.mv",
+
+      "intent": {
+        "action" : "view",
+        "keywords": [ "SVZ", "Schweriner Volkszeitung" ],
+        "response": "Ich öffne die Schweriner Volkszeitung",
+        "sample": "Ich möchte die SVZ lesen"
+      }
+    },
+
     "t.haz.de": {
       "url": "http://t.haz.de/",
       "icon": "http://pbs.twimg.com/profile_images/603240721072726016/PyXJlsR9_400x400.png",
@@ -292,7 +308,7 @@
 
     "m.nationalgeographic.de": {
       "url": "http://m.nationalgeographic.de/",
-      "icon": "http://pbs.twimg.com/profile_images/705249451816853504/y1Er7BhQ_400x400.jpg",
+      "icon": "http://pbs.twimg.com/profile_images/743924912855879680/yWJHj3fW_400x400.jpg",
       "label": "National Geo",
       "default": true,
 
@@ -306,7 +322,7 @@
 
     "www.bento.de": {
       "url": "http://www.bento.de/",
-      "icon": "http://pbs.twimg.com/profile_images/652103303103385600/e_TKuZ3q_400x400.jpg",
+      "icon": "http://pbs.twimg.com/profile_images/751132148518838272/AIJS1WLZ_400x400.jpg",
       "label": "bento",
       "default": true,
 
@@ -500,7 +516,7 @@
 
     "de.m.xhamster.com": {
       "url": "http://de.m.xhamster.com/",
-      "icon": "http://pbs.twimg.com/profile_images/733205748331614208/CqOSVwyS_400x400.jpg",
+      "icon": "http://pbs.twimg.com/profile_images/750232279214133248/_EUpgpnb_400x400.jpg",
       "label": "xHamster",
       "default": true,
 
