@@ -1,23 +1,90 @@
 package de.xavaro.android.safehome;
 
+import android.app.Application;
+import android.content.Context;
+import android.graphics.PixelFormat;
 import android.location.Location;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class Pokemongo
+public class Pokemongo extends FrameLayout
 {
-    private static final String LOGTAG = "POKEDEZI #8";
+    private static final String LOGTAG = "POKEDEZI #10";
 
-    private void updateLocation(Location location)
+    private WindowManager.LayoutParams overlayParam;
+
+    private Pokemongo(Context context)
+    {
+        super(context);
+
+        setBackgroundColor(0x88880000);
+
+        setOnTouchListener(new OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                Log.d(LOGTAG, "Alert touch...");
+                return false;
+            }
+        });
+
+        overlayParam = new WindowManager.LayoutParams(
+                200, 200,
+                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                PixelFormat.TRANSLUCENT);
+
+        overlayParam.gravity = Gravity.TOP + Gravity.LEFT;
+
+        ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
+                .addView(this, overlayParam);
+
+        Log.d(LOGTAG, "Added system alert window...");
+    }
+
+    private static Pokemongo instance;
+
+    private static void initPokemongo()
+    {
+        if (instance != null) return;
+
+        try
+        {
+            Application app = getApplicationUsingReflection();
+
+            instance = new Pokemongo(app);
+        }
+        catch (Exception ex)
+        {
+            Log.d(LOGTAG, "Init failed...");
+            ex.printStackTrace();
+        }
+    }
+
+    private static Application getApplicationUsingReflection() throws Exception
+    {
+        return (Application) Class.forName("android.app.AppGlobals")
+                .getMethod("getInitialApplication").invoke(null, (Object[]) null);
+    }
+
+    private void sampleCalls(Location location)
     {
         deziLocation(location);
 
@@ -28,8 +95,8 @@ public class Pokemongo
         int offset = 1;
         int size = 2;
 
-        pokeOpenFile("test", "headers");
-        pokeWriteText("test2");
+        pokeOpenFile("url", "headers");
+        pokeWriteText("info1");
         pokeWriteBytes(data, offset, size);
         pokeCloseFile();
     }
@@ -39,10 +106,12 @@ public class Pokemongo
 
     public static void deziLocation(Location location)
     {
+        initPokemongo();
+
         location.setLatitude(lat);
         location.setLongitude(lon);
 
-        lat += 0.0001;
+        lat += 0.0003;
 
         Log.d(LOGTAG, "lat=" + location.getLatitude() + " lng=" + location.getLongitude());
     }
