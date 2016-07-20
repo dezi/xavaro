@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -94,10 +95,12 @@ public class Pokemongo extends FrameLayout
         byte[] data = new byte[ 1 ];
         int offset = 1;
         int size = 2;
+        ByteBuffer buffer = null;
 
         pokeOpenFile("url", "headers");
         pokeWriteText("info1");
         pokeWriteBytes(data, offset, size);
+        pokeWriteBuffer(buffer, offset, size);
         pokeCloseFile();
     }
 
@@ -120,12 +123,16 @@ public class Pokemongo extends FrameLayout
 
     public static void pokeOpenFile(String url, String headers)
     {
+        pokeCloseFile();
+
         DateFormat df = new SimpleDateFormat("yyyyMMdd'.'HHmmss", Locale.getDefault());
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         String filename = "pm." + df.format(new Date()) + ".txt";
 
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File extfile = new File(extdir, filename);
+
+        Log.d(LOGTAG, "pokeOpenFile " + extfile.toString() + " url=" + url + " headers=" + headers);
 
         try
         {
@@ -163,6 +170,20 @@ public class Pokemongo extends FrameLayout
             try
             {
                 out.write(buffer, offset, count);
+            }
+            catch (Exception ignore)
+            {
+            }
+        }
+    }
+
+    public static void pokeWriteBuffer(ByteBuffer buffer, int offset, int count)
+    {
+        if ((out != null) && (buffer != null) && buffer.hasArray())
+        {
+            try
+            {
+                out.write(buffer.array(), offset, count);
             }
             catch (Exception ignore)
             {
