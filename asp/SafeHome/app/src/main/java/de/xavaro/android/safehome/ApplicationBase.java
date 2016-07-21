@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.File;
 import java.util.List;
 
+import de.xavaro.android.common.ProtoBufferDecode;
 import de.xavaro.android.common.SocialFacebook;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SocialGoogleplus;
@@ -48,6 +49,8 @@ public class ApplicationBase extends Application
             }
         }
         */
+
+        ProtoBufferDecode.testDat();
 
         //
         // Make application context available.

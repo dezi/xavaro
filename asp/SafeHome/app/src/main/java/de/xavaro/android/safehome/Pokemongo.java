@@ -139,9 +139,9 @@ public class Pokemongo extends FrameLayout
             out = new FileOutputStream(extfile);
 
             out.write(url.getBytes());
-            out.write("\r".getBytes());
+            out.write("\n".getBytes());
             out.write(headers.getBytes());
-            out.write("\r".getBytes());
+            out.write("\n------------------------------\n".getBytes());
         }
         catch (Exception ignore)
         {
@@ -183,6 +183,7 @@ public class Pokemongo extends FrameLayout
         {
             try
             {
+                out.write("\n------------------------------\n".getBytes());
                 out.write(buffer.array(), offset, count);
             }
             catch (Exception ignore)
