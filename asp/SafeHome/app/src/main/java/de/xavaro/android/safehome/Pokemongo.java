@@ -32,7 +32,7 @@ import de.xavaro.android.common.Simple;
 
 public class Pokemongo extends FrameLayout
 {
-    private static final String LOGTAG = "POKEDEZI #10";
+    private static final String LOGTAG = "POKEDEZI #11";
 
     private WindowManager.LayoutParams overlayParam;
 
@@ -122,7 +122,7 @@ public class Pokemongo extends FrameLayout
         location.setLatitude(lat);
         location.setLongitude(lon);
 
-        lat += 0.0003;
+        //lat += 0.0003;
 
         Log.d(LOGTAG, "lat=" + location.getLatitude() + " lng=" + location.getLongitude());
     }
@@ -132,6 +132,8 @@ public class Pokemongo extends FrameLayout
     public static void pokeOpenFile(String url, String headers)
     {
         pokeCloseFile();
+
+        if (! url.contains("pgorelease.nianticlabs.com")) return;
 
         DateFormat df = new SimpleDateFormat("yyyyMMdd'.'HHmmss", Locale.getDefault());
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -149,7 +151,7 @@ public class Pokemongo extends FrameLayout
             out.write(url.getBytes());
             out.write("\n".getBytes());
             out.write(headers.getBytes());
-            out.write("\n------------------------------\n".getBytes());
+            out.write("\n--\n".getBytes());
         }
         catch (Exception ignore)
         {
@@ -177,6 +179,8 @@ public class Pokemongo extends FrameLayout
         {
             try
             {
+                Log.d(LOGTAG, "pokeWriteBytes: offset=" + offset + " len=" + count);
+
                 out.write(buffer, offset, count);
             }
             catch (Exception ignore)
@@ -191,7 +195,7 @@ public class Pokemongo extends FrameLayout
         {
             try
             {
-                out.write("\n------------------------------\n".getBytes());
+                out.write("\n--\n".getBytes());
                 out.write(buffer.array(), offset, count);
             }
             catch (Exception ignore)
@@ -224,19 +228,19 @@ public class Pokemongo extends FrameLayout
     public static void testDat()
     {
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extfile = new File(extdir, "pm.20160721.061112.txt");
+        File extfile = new File(extdir, "pm.20160721.144623.txt");
 
         byte[] data = Simple.readBinaryFile(extfile);
         Log.d(LOGTAG, "testDat: size=" + data.length);
 
-        byte[] match = "\n------------------------------\n".getBytes();
+        byte[] match = "\n--\n".getBytes();
 
         int von = -1;
         int bis = -1;
 
         for (int inx = 4; inx < data.length; inx++)
         {
-            if ((data[ inx - 3 ] == (int) '-') && (data[ inx - 2 ] == (int) '-') && (data[ inx - 1 ] == (int) '\n'))
+            if ((data[ inx - 4 ] == (int) '\n') && (data[ inx - 3 ] == (int) '-') && (data[ inx - 2 ] == (int) '-') && (data[ inx - 1 ] == (int) '\n'))
             {
                 if (von < 0)
                 {
@@ -246,23 +250,23 @@ public class Pokemongo extends FrameLayout
                 {
                     if (bis < 0)
                     {
-                        bis = inx - 32;
+                        bis = inx - 4;
                     }
                 }
             }
         }
 
-        ProtoBufferDecode decode = new ProtoBufferDecode(data, von, bis - von);
+        Log.d(LOGTAG, "testDat: post=" + (bis - von));
+        ProtoBufferDecode decode = new ProtoBufferDecode(data, von, bis);
         JSONObject protos = PokemonProto.getProtos();
         decode.setProtos(protos);
         JSONObject json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
 
-        tuneUp(json);
-
+        //tuneUp(json);
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
 
         /*
-        decode = new ProtoBufferDecode(data, bis + 32, data.length - (bis + 32));
+        decode = new ProtoBufferDecode(data, bis + 4, data.length);
         protos = PokemonProto.getProtos();
         decode.setProtos(protos);
         json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
@@ -274,42 +278,48 @@ public class Pokemongo extends FrameLayout
     {
         try
         {
+            json.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
+
             JSONObject request = json.getJSONObject("requests@.POGOProtos.Networking.Requests.Request");
             String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
-            JSONArray reqbytes = request.getJSONArray("request_message@bytes");
-            byte[] reqdata = new byte[ reqbytes.length() ];
 
-            for (int inx = 0; inx < reqbytes.length(); inx++)
+            if (request.has("request_message@bytes"))
             {
-                reqdata[ inx ] = (byte) reqbytes.getInt(inx);
-            }
+                JSONArray reqbytes = request.getJSONArray("request_message@bytes");
+                byte[] reqdata = new byte[ reqbytes.length() ];
 
-            String messagename = "";
-            boolean nextUp = true;
-
-            for (int inx = 0; inx < reqtype.length(); inx++)
-            {
-                if (reqtype.charAt(inx) == '@') break;
-
-                if (reqtype.charAt(inx) == '_')
+                for (int inx = 0; inx < reqbytes.length(); inx++)
                 {
-                    nextUp = true;
-                    continue;
+                    reqdata[ inx ] = (byte) reqbytes.getInt(inx);
                 }
 
-                messagename += nextUp ? reqtype.charAt(inx) : Character.toLowerCase(reqtype.charAt(inx));
-                nextUp = false;
+                String messagename = "";
+                boolean nextUp = true;
+
+                for (int inx = 0; inx < reqtype.length(); inx++)
+                {
+                    if (reqtype.charAt(inx) == '@') break;
+
+                    if (reqtype.charAt(inx) == '_')
+                    {
+                        nextUp = true;
+                        continue;
+                    }
+
+                    messagename += nextUp ? reqtype.charAt(inx) : Character.toLowerCase(reqtype.charAt(inx));
+                    nextUp = false;
+                }
+
+                messagename = ".POGOProtos.Networking.Requests.Messages." + messagename + "Message";
+
+                Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
+
+                ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
+                decode.setProtos(PokemonProto.getProtos());
+
+                JSONObject tune = decode.decode(messagename);
+                request.put("request_message@bytes", tune);
             }
-
-            messagename = ".POGOProtos.Networking.Requests.Messages." + messagename + "Message";
-
-            Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
-
-            ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
-            decode.setProtos(PokemonProto.getProtos());
-
-            JSONObject tune = decode.decode(messagename);
-            request.put("request_message@bytes", tune);
         }
         catch (Exception ex)
         {

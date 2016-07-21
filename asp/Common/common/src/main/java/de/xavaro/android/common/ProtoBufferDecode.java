@@ -23,7 +23,6 @@ public class ProtoBufferDecode
     private byte[] buffer;
     private int offset;
     private int length;
-    private int position;
 
     private JSONObject protos;
 
@@ -34,7 +33,6 @@ public class ProtoBufferDecode
             this.buffer = buffer;
             this.length = buffer.length;
             this.offset = 0;
-            this.position = 0;
         }
     }
 
@@ -45,7 +43,6 @@ public class ProtoBufferDecode
             this.buffer = buffer;
             this.length = length;
             this.offset = offset;
-            this.position = offset;
         }
     }
 
@@ -121,9 +118,9 @@ public class ProtoBufferDecode
 
     private int getNextByte()
     {
-        if ((buffer != null) && (position < (offset + length)))
+        if ((buffer != null) && (offset < length))
         {
-            return buffer[ position++ ] & 0xff;
+            return buffer[ offset++ ] & 0xff;
         }
 
         return -1;
@@ -131,7 +128,7 @@ public class ProtoBufferDecode
 
     private byte[] getNextBytes(int size)
     {
-        size = Math.min(size, (offset + length) - position);
+        size = Math.min(size, length - offset);
 
         byte[] bytes = new byte[ size ];
 
@@ -169,10 +166,22 @@ public class ProtoBufferDecode
         String name;
         String type;
 
-        while ((next = getNextByte()) >= 0)
+        Log.d(LOGTAG, "buffer=" + Simple.getHexBytesToString(buffer, offset, 32));
+
+        while (true)
         {
+            Log.d(LOGTAG, "decode next "
+                    + buffer[ offset ] + " "
+                    + buffer[ offset + 1 ] + " "
+                    + buffer[ offset + 2 ] + " "
+                    + buffer[ offset + 3 ] + " ");
+            Log.d(LOGTAG, "decode pos=" + offset + " len=" + length);
+
+            next = getNextByte();
+            if (next < 0) break;
+
             idid = next >> 3;
-            wire = next & 0x03;
+            wire = next & 0x07;
 
             type = getProtoType(current, idid);
             name = getProtoName(current, idid) + "@" + type;
@@ -214,9 +223,19 @@ public class ProtoBufferDecode
                 // Bytes
                 //
 
+                Log.d(LOGTAG, "decode wire "
+                        + buffer[ offset - 1 ] + " "
+                        + buffer[ offset ] + " "
+                        + buffer[ offset + 1 ] + " "
+                        + buffer[ offset + 2 ] + " "
+                        + buffer[ offset + 3 ] + " ");
+
                 int seqlen = (int) decodeVarint();
+                Log.d(LOGTAG, "decode wire=2 len=" + seqlen);
+
                 byte[] seqbytes = getNextBytes(seqlen);
 
+                /*
                 if (protos.has(type))
                 {
                     ProtoBufferDecode pbdecode = new ProtoBufferDecode(seqbytes);
@@ -249,9 +268,10 @@ public class ProtoBufferDecode
                             continue;
                         }
                     }
-
-                    put(json, name, seqbytes);
                 }
+                */
+
+                put(json, name, seqbytes);
 
                 continue;
             }
@@ -288,7 +308,7 @@ public class ProtoBufferDecode
             {
                 float floatval;
 
-                while (dp.position < dp.length)
+                while (dp.offset < dp.length)
                 {
                     floatval = dp.decodeFloat();
                     valarray.put((double) floatval);
@@ -299,7 +319,7 @@ public class ProtoBufferDecode
             {
                 double doubleval;
 
-                while (dp.position < dp.length)
+                while (dp.offset < dp.length)
                 {
                     doubleval = dp.decodeDouble();
                     valarray.put(doubleval);
@@ -312,11 +332,11 @@ public class ProtoBufferDecode
             {
                 long varint;
 
-                while (dp.position < dp.length)
+                while (dp.offset < dp.length)
                 {
                     varint = dp.decodeVarint();
 
-                    Log.d(LOGTAG, "decodePacked: type=" + type + " pos=" + dp.position + " len=" + dp.length + " varint=" + varint);
+                    Log.d(LOGTAG, "decodePacked: type=" + type + " pos=" + dp.offset + " len=" + dp.length + " varint=" + varint);
 
                     valarray.put(varint);
                 }
@@ -365,10 +385,14 @@ public class ProtoBufferDecode
 
         if (value != null)
         {
+            /*
             for (byte aValue : value)
             {
                 arraybytes.put(aValue & 0xff);
             }
+            */
+
+            arraybytes.put("Array => " + value.length);
         }
 
         put(json, name, arraybytes);
@@ -378,7 +402,27 @@ public class ProtoBufferDecode
     {
         try
         {
-            json.put(name, value);
+            if (json.has(name))
+            {
+                JSONArray array;
+
+                if (json.get(name) instanceof JSONArray)
+                {
+                    array = (JSONArray) json.get(name);
+                }
+                else
+                {
+                    array = new JSONArray();
+                    array.put(json.get(name));
+                    json.put(name, array);
+                }
+
+                array.put(value);
+            }
+            else
+            {
+                json.put(name, value);
+            }
         }
         catch (Exception ignore)
         {
