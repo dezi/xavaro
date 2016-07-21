@@ -207,6 +207,8 @@ public class ProtoBufferDecode
             for (byte aValue : value)
             {
                 arraybytes.put(aValue & 0xff);
+
+                break;
             }
         }
 
