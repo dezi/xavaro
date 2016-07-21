@@ -1,0 +1,2736 @@
+message POGOProtos.Data.AssetDigestEntry
+{
+	string asset_id = 1;
+	string bundle_name = 2;
+	int64 version = 3;
+	uint32 checksum = 4;
+	int32 size = 5;
+	bytes key = 6;
+}
+
+message POGOProtos.Data.Battle.BattleAction
+{
+	.POGOProtos.Data.Battle.BattleActionType Type = 1;
+	int64 action_start_ms = 2;
+	int32 duration_ms = 3;
+	int32 energy_delta = 5;
+	int32 attacker_index = 6;
+	int32 target_index = 7;
+	uint64 active_pokemon_id = 8;
+	.POGOProtos.Data.Battle.BattleParticipant player_joined = 9;
+	.POGOProtos.Data.Battle.BattleResults battle_results = 10;
+	int64 damage_windows_start_timestamp_mss = 11;
+	int64 damage_windows_end_timestamp_mss = 12;
+	.POGOProtos.Data.Battle.BattleParticipant player_left = 13;
+	uint64 target_pokemon_id = 14;
+}
+
+enum POGOProtos.Data.Battle.BattleActionType
+{
+	ACTION_UNSET = 0;
+	ACTION_ATTACK = 1;
+	ACTION_DODGE = 2;
+	ACTION_SPECIAL_ATTACK = 3;
+	ACTION_SWAP_POKEMON = 4;
+	ACTION_FAINT = 5;
+	ACTION_PLAYER_JOIN = 6;
+	ACTION_PLAYER_QUIT = 7;
+	ACTION_VICTORY = 8;
+	ACTION_DEFEAT = 9;
+	ACTION_TIMED_OUT = 10;
+}
+
+message POGOProtos.Data.Battle.BattleLog
+{
+	.POGOProtos.Data.Battle.BattleState state = 1;
+	.POGOProtos.Data.Battle.BattleType battle_type = 2;
+	int64 server_ms = 3;
+	repeated .POGOProtos.Data.Battle.BattleAction battle_actions = 4;
+	int64 battle_start_timestamp_ms = 5;
+	int64 battle_end_timestamp_ms = 6;
+}
+
+message POGOProtos.Data.Battle.BattleParticipant
+{
+	.POGOProtos.Data.Battle.BattlePokemonInfo active_pokemon = 1;
+	.POGOProtos.Data.Player.PlayerPublicProfile trainer_public_profile = 2;
+	repeated .POGOProtos.Data.Battle.BattlePokemonInfo reverse_pokemon = 3;
+	repeated .POGOProtos.Data.Battle.BattlePokemonInfo defeated_pokemon = 4;
+}
+
+message POGOProtos.Data.Battle.BattlePokemonInfo
+{
+	.POGOProtos.Data.PokemonData pokemon_data = 1;
+	int32 current_health = 2;
+	int32 current_energy = 3;
+}
+
+message POGOProtos.Data.Battle.BattleResults
+{
+	.POGOProtos.Data.Gym.GymState gym_state = 1;
+	repeated .POGOProtos.Data.Battle.BattleParticipant attackers = 2;
+	repeated int32 player_experience_awarded = 3;
+	int64 next_defender_pokemon_id = 4;
+	int32 gym_points_delta = 5;
+}
+
+enum POGOProtos.Data.Battle.BattleState
+{
+	STATE_UNSET = 0;
+	ACTIVE = 1;
+	VICTORY = 2;
+	DEFEATED = 3;
+	TIMED_OUT = 4;
+}
+
+enum POGOProtos.Data.Battle.BattleType
+{
+	BATTLE_TYPE_UNSET = 0;
+	NORMAL = 1;
+	TRAINING = 2;
+}
+
+message POGOProtos.Data.Capture.CaptureAward
+{
+	repeated .POGOProtos.Enums.ActivityType activity_type = 1;
+	repeated int32 xp = 2;
+	repeated int32 candy = 3;
+	repeated int32 stardust = 4;
+}
+
+message POGOProtos.Data.Capture.CaptureProbability
+{
+	repeated .POGOProtos.Inventory.ItemId pokeball_type = 1;
+	repeated float capture_probability = 2;
+	double reticle_difficulty_scale = 12;
+}
+
+message POGOProtos.Data.DownloadUrlEntry
+{
+	string asset_id = 1;
+	string url = 2;
+	int32 size = 3;
+	uint32 checksum = 4;
+}
+
+message POGOProtos.Data.Gym.GymMembership
+{
+	.POGOProtos.Data.PokemonData pokemon_data = 1;
+	.POGOProtos.Data.Player.PlayerPublicProfile trainer_public_profile = 2;
+}
+
+message POGOProtos.Data.Gym.GymState
+{
+	.POGOProtos.Map.Fort.FortData fort_data = 1;
+	repeated .POGOProtos.Data.Gym.GymMembership memberships = 2;
+}
+
+message POGOProtos.Data.Player.ContactSettings
+{
+	bool send_marketing_emails = 1;
+	bool send_push_notifications = 2;
+}
+
+message POGOProtos.Data.Player.Currency
+{
+	string name = 1;
+	int32 amount = 2;
+}
+
+message POGOProtos.Data.Player.DailyBonus
+{
+	int64 next_collected_timestamp_ms = 1;
+	int64 next_defender_bonus_collect_timestamp_ms = 2;
+}
+
+message POGOProtos.Data.Player.EquippedBadge
+{
+	.POGOProtos.Enums.BadgeType badge_type = 1;
+	int32 level = 2;
+	int64 next_equip_change_allowed_timestamp_ms = 3;
+}
+
+message POGOProtos.Data.Player.PlayerAvatar
+{
+	int32 skin = 2;
+	int32 hair = 3;
+	int32 shirt = 4;
+	int32 pants = 5;
+	int32 hat = 6;
+	int32 shoes = 7;
+	.POGOProtos.Enums.Gender gender = 8;
+	int32 eyes = 9;
+	int32 backpack = 10;
+}
+
+message POGOProtos.Data.Player.PlayerCamera
+{
+	bool is_default_camera = 1;
+}
+
+message POGOProtos.Data.Player.PlayerCurrency
+{
+	int32 gems = 1;
+}
+
+message POGOProtos.Data.Player.PlayerPublicProfile
+{
+	string name = 1;
+	int32 level = 2;
+	.POGOProtos.Data.Player.PlayerAvatar avatar = 3;
+}
+
+message POGOProtos.Data.Player.PlayerStats
+{
+	int32 level = 1;
+	int64 experience = 2;
+	int64 prev_level_xp = 3;
+	int64 next_level_xp = 4;
+	float km_walked = 5;
+	int32 pokemons_encountered = 6;
+	int32 unique_pokedex_entries = 7;
+	int32 pokemons_captured = 8;
+	int32 evolutions = 9;
+	int32 poke_stop_visits = 10;
+	int32 pokeballs_thrown = 11;
+	int32 eggs_hatched = 12;
+	int32 big_magikarp_caught = 13;
+	int32 battle_attack_won = 14;
+	int32 battle_attack_total = 15;
+	int32 battle_defended_won = 16;
+	int32 battle_training_won = 17;
+	int32 battle_training_total = 18;
+	int32 prestige_raised_total = 19;
+	int32 prestige_dropped_total = 20;
+	int32 pokemon_deployed = 21;
+	bytes pokemon_caught_by_type = 22; // TODO: repeated PokemonType ??
+	int32 small_rattata_caught = 23;
+}
+
+message POGOProtos.Data.PlayerBadge
+{
+	.POGOProtos.Enums.BadgeType badge_type = 1;
+	int32 rank = 2;
+	int32 start_value = 3;
+	int32 end_value = 4;
+	double current_value = 5;
+}
+
+message POGOProtos.Data.PlayerData
+{
+	int64 creation_timestamp_ms  = 1;
+	string username = 2;
+	int32 team = 5;
+	repeated .POGOProtos.Enums.TutorialState tutorial_state = 7;
+	.POGOProtos.Data.Player.PlayerAvatar avatar = 8;
+	int32 max_pokemon_storage = 9;
+	int32 max_item_storage = 10;
+	.POGOProtos.Data.Player.DailyBonus daily_bonus = 11;
+	.POGOProtos.Data.Player.EquippedBadge equipped_badge = 12;
+	.POGOProtos.Data.Player.ContactSettings contact_settings = 13;
+	repeated .POGOProtos.Data.Player.Currency currencies = 14;
+}
+
+message POGOProtos.Data.PokedexEntry
+{
+  int32 pokedex_entry_number = 1;
+  int32 times_encountered = 2;
+  int32 times_captured = 3;
+  int32 evolution_stone_pieces = 4;
+  int32 evolution_stones = 5;
+}
+
+message POGOProtos.Data.PokemonData
+{
+	fixed64 id = 1;
+	.POGOProtos.Enums.PokemonId pokemon_id = 2;
+	int32 cp = 3;
+	int32 stamina = 4;
+	int32 stamina_max = 5;
+	.POGOProtos.Enums.PokemonMove move_1 = 6;
+	.POGOProtos.Enums.PokemonMove move_2 = 7;
+	int32 deployed_fort_id = 8;
+	string owner_name = 9;
+	bool is_egg = 10;
+	double egg_km_walked_target = 11;
+	double egg_km_walked_start = 12;
+	int32 origin = 14;
+	float height_m = 15;
+	float weight_kg = 16;
+	int32 individual_attack = 17;
+	int32 individual_defense = 18;
+	int32 individual_stamina = 19;
+	float cp_multiplier = 20;
+	int32 pokeball = 21;
+	uint64 captured_cell_id = 22;
+	int32 battles_attacked = 23;
+	int32 battles_defended = 24;
+	string egg_incubator_id = 25;
+	uint64 creation_time_ms = 26;
+	int32 num_upgrades = 27;
+	int32 additional_cp_multiplier = 28;
+	int32 favorite = 29;
+	string nickname = 30;
+	int32 from_fort = 31;
+}
+
+enum POGOProtos.Enums.ActivityType
+{
+	ACTIVITY_UNKNOWN = 0;
+	ACTIVITY_CATCH_POKEMON = 1;
+	ACTIVITY_CATCH_LEGEND_POKEMON = 2;
+	ACTIVITY_FLEE_POKEMON = 3;
+	ACTIVITY_DEFEAT_FORT = 4;
+	ACTIVITY_EVOLVE_POKEMON = 5;
+	ACTIVITY_HATCH_EGG = 6;
+	ACTIVITY_WALK_KM = 7;
+	ACTIVITY_POKEDEX_ENTRY_NEW = 8;
+	ACTIVITY_CATCH_FIRST_THROW = 9;
+	ACTIVITY_CATCH_NICE_THROW = 10;
+	ACTIVITY_CATCH_GREAT_THROW = 11;
+	ACTIVITY_CATCH_EXCELLENT_THROW = 12;
+	ACTIVITY_CATCH_CURVEBALL = 13;
+	ACTIVITY_CATCH_FIRST_CATCH_OF_DAY = 14;
+	ACTIVITY_CATCH_MILESTONE = 15;
+	ACTIVITY_TRAIN_POKEMON = 16;
+	ACTIVITY_SEARCH_FORT = 17;
+	ACTIVITY_RELEASE_POKEMON = 18;
+	ACTIVITY_HATCH_EGG_SMALL_BONUS = 19;
+	ACTIVITY_HATCH_EGG_MEDIUM_BONUS = 20;
+	ACTIVITY_HATCH_EGG_LARGE_BONUS = 21;
+	ACTIVITY_DEFEAT_GYM_DEFENDER = 22;
+	ACTIVITY_DEFEAT_GYM_LEADER = 23;
+}
+
+enum POGOProtos.Enums.BadgeType
+{
+	BADGE_UNSET = 0;
+	BADGE_TRAVEL_KM = 1;
+	BADGE_POKEDEX_ENTRIES = 2;
+	BADGE_CAPTURE_TOTAL = 3;
+	BADGE_DEFEATED_FORT = 4;
+	BADGE_EVOLVED_TOTAL = 5;
+	BADGE_HATCHED_TOTAL = 6;
+	BADGE_ENCOUNTERED_TOTAL = 7;
+	BADGE_POKESTOPS_VISITED = 8;
+	BADGE_UNIQUE_POKESTOPS = 9;
+	BADGE_POKEBALL_THROWN = 10;
+	BADGE_BIG_MAGIKARP = 11;
+	BADGE_DEPLOYED_TOTAL = 12;
+	BADGE_BATTLE_ATTACK_WON = 13;
+	BADGE_BATTLE_TRAINING_WON = 14;
+	BADGE_BATTLE_DEFEND_WON = 15;
+	BADGE_PRESTIGE_RAISED = 16;
+	BADGE_PRESTIGE_DROPPED = 17;
+	BADGE_TYPE_NORMAL = 18;
+	BADGE_TYPE_FIGHTING = 19;
+	BADGE_TYPE_FLYING = 20;
+	BADGE_TYPE_POISON = 21;
+	BADGE_TYPE_GROUND = 22;
+	BADGE_TYPE_ROCK = 23;
+	BADGE_TYPE_BUG = 24;
+	BADGE_TYPE_GHOST = 25;
+	BADGE_TYPE_STEEL = 26;
+	BADGE_TYPE_FIRE = 27;
+	BADGE_TYPE_WATER = 28;
+	BADGE_TYPE_GRASS = 29;
+	BADGE_TYPE_ELECTRIC = 30;
+	BADGE_TYPE_PSYCHIC = 31;
+	BADGE_TYPE_ICE = 32;
+	BADGE_TYPE_DRAGON = 33;
+	BADGE_TYPE_DARK = 34;
+	BADGE_TYPE_FAIRY = 35;
+	BADGE_SMALL_RATTATA = 36;
+	BADGE_PIKACHU = 37;
+}
+
+enum POGOProtos.Enums.CameraInterpolation
+{
+	CAM_INTERP_CUT = 0;
+	CAM_INTERP_LINEAR = 1;
+	CAM_INTERP_SMOOTH = 2;
+	CAM_INTERP_SMOOTH_ROT_LINEAR_MOVE = 3;
+	CAM_INTERP_DEPENDS = 4;
+}
+
+enum POGOProtos.Enums.CameraTarget
+{
+	CAM_TARGET_ATTACKER = 0;
+	CAM_TARGET_ATTACKER_EDGE = 1;
+	CAM_TARGET_ATTACKER_GROUND = 2;
+	CAM_TARGET_DEFENDER = 3;
+	CAM_TARGET_DEFENDER_EDGE = 4;
+	CAM_TARGET_DEFENDER_GROUND = 5;
+	CAM_TARGET_ATTACKER_DEFENDER = 6;
+	CAM_TARGET_ATTACKER_DEFENDER_EDGE = 7;
+	CAM_TARGET_DEFENDER_ATTACKER = 8;
+	CAM_TARGET_DEFENDER_ATTACKER_EDGE = 9;
+	CAM_TARGET_ATTACKER_DEFENDER_MIRROR = 11;
+	CAM_TARGET_SHOULDER_ATTACKER_DEFENDER = 12;
+	CAM_TARGET_SHOULDER_ATTACKER_DEFENDER_MIRROR = 13;
+	CAM_TARGET_ATTACKER_DEFENDER_WORLD = 14;
+}
+
+enum POGOProtos.Enums.Gender
+{
+	MALE = 0;
+	FEMALE = 1;
+}
+
+enum POGOProtos.Enums.HoloIapItemCategory
+{
+	IAP_CATEGORY_NONE = 0;
+	IAP_CATEGORY_BUNDLE = 1;
+	IAP_CATEGORY_ITEMS = 2;
+	IAP_CATEGORY_UPGRADES = 3;
+	IAP_CATEGORY_POKECOINS = 4;
+}
+
+enum POGOProtos.Enums.ItemCategory
+{
+	ITEM_CATEGORY_NONE = 0;
+	ITEM_CATEGORY_POKEBALL = 1;
+	ITEM_CATEGORY_FOOD = 2;
+	ITEM_CATEGORY_MEDICINE = 3;
+	ITEM_CATEGORY_BOOST = 4;
+	ITEM_CATEGORY_UTILITES = 5;
+	ITEM_CATEGORY_CAMERA = 6;
+	ITEM_CATEGORY_DISK = 7;
+	ITEM_CATEGORY_INCUBATOR = 8;
+	ITEM_CATEGORY_INCENSE = 9;
+	ITEM_CATEGORY_XP_BOOST = 10;
+	ITEM_CATEGORY_INVENTORY_UPGRADE = 11;
+}
+
+enum POGOProtos.Enums.ItemEffect
+{
+	ITEM_EFFECT_NONE = 0;
+	ITEM_EFFECT_CAP_NO_FLEE = 1000;
+	ITEM_EFFECT_CAP_NO_MOVEMENT = 1002;
+	ITEM_EFFECT_CAP_NO_THREAT = 1003;
+	ITEM_EFFECT_CAP_TARGET_MAX = 1004;
+	ITEM_EFFECT_CAP_TARGET_SLOW = 1005;
+	ITEM_EFFECT_CAP_CHANCE_NIGHT = 1006;
+	ITEM_EFFECT_CAP_CHANCE_TRAINER = 1007;
+	ITEM_EFFECT_CAP_CHANCE_FIRST_THROW = 1008;
+	ITEM_EFFECT_CAP_CHANCE_LEGEND = 1009;
+	ITEM_EFFECT_CAP_CHANCE_HEAVY = 1010;
+	ITEM_EFFECT_CAP_CHANCE_REPEAT = 1011;
+	ITEM_EFFECT_CAP_CHANCE_MULTI_THROW = 1012;
+	ITEM_EFFECT_CAP_CHANCE_ALWAYS = 1013;
+	ITEM_EFFECT_CAP_CHANCE_SINGLE_THROW = 1014;
+}
+
+enum POGOProtos.Enums.Platform
+{
+	UNSET = 0;
+	IOS = 1;
+	ANDROID = 2;
+	OSX = 3;
+	WINDOWS = 4;
+}
+
+enum POGOProtos.Enums.PokemonClass
+{
+	NORMAL = 0;
+	LEGENDARY = 1;
+	MYTHIC = 2;
+}
+
+enum POGOProtos.Enums.PokemonFamilyId
+{
+	FAMILY_UNSET = 0;
+	FAMILY_BULBASAUR = 1;
+	FAMILY_CHARMANDER = 4;
+	FAMILY_SQUIRTLE = 7;
+	FAMILY_CATERPIE = 10;
+	FAMILY_WEEDLE = 13;
+	FAMILY_PIDGEY = 16;
+	FAMILY_RATTATA = 19;
+	FAMILY_SPEAROW = 21;
+	FAMILY_EKANS = 23;
+	FAMILY_PIKACHU = 25;
+	FAMILY_SANDSHREW = 27;
+	FAMILY_NIDORAN_FEMALE = 29;
+	FAMILY_NIDORAN_MALE = 32;
+	FAMILY_CLEFAIRY = 35;
+	FAMILY_VULPIX = 37;
+	FAMILY_JIGGLYPUFF = 39;
+	FAMILY_ZUBAT = 41;
+	FAMILY_ODDISH = 43;
+	FAMILY_PARAS = 46;
+	FAMILY_VENONAT = 48;
+	FAMILY_DIGLETT = 50;
+	FAMILY_MEOWTH = 52;
+	FAMILY_PSYDUCK = 54;
+	FAMILY_MANKEY = 56;
+	FAMILY_GROWLITHE = 58;
+	FAMILY_POLIWAG = 60;
+	FAMILY_ABRA = 63;
+	FAMILY_MACHOP = 66;
+	FAMILY_BELLSPROUT = 69;
+	FAMILY_TENTACOOL = 72;
+	FAMILY_GEODUDE = 74;
+	FAMILY_PONYTA = 77;
+	FAMILY_SLOWPOKE = 79;
+	FAMILY_MAGNEMITE = 81;
+	FAMILY_FARFETCHD = 83;
+	FAMILY_DODUO = 84;
+	FAMILY_SEEL = 86;
+	FAMILY_GRIMER = 88;
+	FAMILY_SHELLDER = 90;
+	FAMILY_GASTLY = 92;
+	FAMILY_ONIX = 95;
+	FAMILY_DROWZEE = 96;
+	FAMILY_HYPNO = 97;
+	FAMILY_KRABBY = 98;
+	FAMILY_VOLTORB = 100;
+	FAMILY_EXEGGCUTE = 102;
+	FAMILY_CUBONE = 104;
+	FAMILY_HITMONLEE = 106;
+	FAMILY_HITMONCHAN = 107;
+	FAMILY_LICKITUNG = 108;
+	FAMILY_KOFFING = 109;
+	FAMILY_RHYHORN = 111;
+	FAMILY_CHANSEY = 113;
+	FAMILY_TANGELA = 114;
+	FAMILY_KANGASKHAN = 115;
+	FAMILY_HORSEA = 116;
+	FAMILY_GOLDEEN = 118;
+	FAMILY_STARYU = 120;
+	FAMILY_MR_MIME = 122;
+	FAMILY_SCYTHER = 123;
+	FAMILY_JYNX = 124;
+	FAMILY_ELECTABUZZ = 125;
+	FAMILY_MAGMAR = 126;
+	FAMILY_PINSIR = 127;
+	FAMILY_TAUROS = 128;
+	FAMILY_MAGIKARP = 129;
+	FAMILY_LAPRAS = 131;
+	FAMILY_DITTO = 132;
+	FAMILY_EEVEE = 133;
+	FAMILY_PORYGON = 137;
+	FAMILY_OMANYTE = 138;
+	FAMILY_KABUTO = 140;
+	FAMILY_AERODACTYL = 142;
+	FAMILY_SNORLAX = 143;
+	FAMILY_ARTICUNO = 144;
+	FAMILY_ZAPDOS = 145;
+	FAMILY_MOLTRES = 146;
+	FAMILY_DRATINI = 147;
+	FAMILY_MEWTWO = 150;
+	FAMILY_MEW = 151;
+}
+
+enum POGOProtos.Enums.PokemonId
+{
+	MISSINGNO = 0;
+	BULBASAUR = 1;
+	IVYSAUR = 2;
+	VENUSAUR = 3;
+	CHARMANDER = 4;
+	CHARMELEON = 5;
+	CHARIZARD = 6;
+	SQUIRTLE = 7;
+	WARTORTLE = 8;
+	BLASTOISE = 9;
+	CATERPIE = 10;
+	METAPOD = 11;
+	BUTTERFREE = 12;
+	WEEDLE = 13;
+	KAKUNA = 14;
+	BEEDRILL = 15;
+	PIDGEY = 16;
+	PIDGEOTTO = 17;
+	PIDGEOT = 18;
+	RATTATA = 19;
+	RATICATE = 20;
+	SPEAROW = 21;
+	FEAROW = 22;
+	EKANS = 23;
+	ARBOK = 24;
+	PIKACHU = 25;
+	RAICHU = 26;
+	SANDSHREW = 27;
+	SANDSLASH = 28;
+	NIDORAN_FEMALE = 29;
+	NIDORINA = 30;
+	NIDOQUEEN = 31;
+	NIDORAN_MALE = 32;
+	NIDORINO = 33;
+	NIDOKING = 34;
+	CLEFAIRY = 35;
+	CLEFABLE = 36;
+	VULPIX = 37;
+	NINETALES = 38;
+	JIGGLYPUFF = 39;
+	WIGGLYTUFF = 40;
+	ZUBAT = 41;
+	GOLBAT = 42;
+	ODDISH = 43;
+	GLOOM = 44;
+	VILEPLUME = 45;
+	PARAS = 46;
+	PARASECT = 47;
+	VENONAT = 48;
+	VENOMOTH = 49;
+	DIGLETT = 50;
+	DUGTRIO = 51;
+	MEOWTH = 52;
+	PERSIAN = 53;
+	PSYDUCK = 54;
+	GOLDUCK = 55;
+	MANKEY = 56;
+	PRIMEAPE = 57;
+	GROWLITHE = 58;
+	ARCANINE = 59;
+	POLIWAG = 60;
+	POLIWHIRL = 61;
+	POLIWRATH = 62;
+	ABRA = 63;
+	KADABRA = 64;
+	ALAKAZAM = 65;
+	MACHOP = 66;
+	MACHOKE = 67;
+	MACHAMP = 68;
+	BELLSPROUT = 69;
+	WEEPINBELL = 70;
+	VICTREEBEL = 71;
+	TENTACOOL = 72;
+	TENTACRUEL = 73;
+	GEODUDE = 74;
+	GRAVELER = 75;
+	GOLEM = 76;
+	PONYTA = 77;
+	RAPIDASH = 78;
+	SLOWPOKE = 79;
+	SLOWBRO = 80;
+	MAGNEMITE = 81;
+	MAGNETON = 82;
+	FARFETCHD = 83;
+	DODUO = 84;
+	DODRIO = 85;
+	SEEL = 86;
+	DEWGONG = 87;
+	GRIMER = 88;
+	MUK = 89;
+	SHELLDER = 90;
+	CLOYSTER = 91;
+	GASTLY = 92;
+	HAUNTER = 93;
+	GENGAR = 94;
+	ONIX = 95;
+	DROWZEE = 96;
+	HYPNO = 97;
+	KRABBY = 98;
+	KINGLER = 99;
+	VOLTORB = 100;
+	ELECTRODE = 101;
+	EXEGGCUTE = 102;
+	EXEGGUTOR = 103;
+	CUBONE = 104;
+	MAROWAK = 105;
+	HITMONLEE = 106;
+	HITMONCHAN = 107;
+	LICKITUNG = 108;
+	KOFFING = 109;
+	WEEZING = 110;
+	RHYHORN = 111;
+	RHYDON = 112;
+	CHANSEY = 113;
+	TANGELA = 114;
+	KANGASKHAN = 115;
+	HORSEA = 116;
+	SEADRA = 117;
+	GOLDEEN = 118;
+	SEAKING = 119;
+	STARYU = 120;
+	STARMIE = 121;
+	MR_MIME = 122;
+	SCYTHER = 123;
+	JYNX = 124;
+	ELECTABUZZ = 125;
+	MAGMAR = 126;
+	PINSIR = 127;
+	TAUROS = 128;
+	MAGIKARP = 129;
+	GYARADOS = 130;
+	LAPRAS = 131;
+	DITTO = 132;
+	EEVEE = 133;
+	VAPOREON = 134;
+	JOLTEON = 135;
+	FLAREON = 136;
+	PORYGON = 137;
+	OMANYTE = 138;
+	OMASTAR = 139;
+	KABUTO = 140;
+	KABUTOPS = 141;
+	AERODACTYL = 142;
+	SNORLAX = 143;
+	ARTICUNO = 144;
+	ZAPDOS = 145;
+	MOLTRES = 146;
+	DRATINI = 147;
+	DRAGONAIR = 148;
+	DRAGONITE = 149;
+	MEWTWO = 150;
+	MEW = 151;
+}
+
+enum POGOProtos.Enums.PokemonMove
+{
+	MOVE_UNSET = 0;
+	THUNDER_SHOCK = 1;
+	QUICK_ATTACK = 2;
+	SCRATCH = 3;
+	EMBER = 4;
+	VINE_WHIP = 5;
+	TACKLE = 6;
+	RAZOR_LEAF = 7;
+	TAKE_DOWN = 8;
+	WATER_GUN = 9;
+	BITE = 10;
+	POUND = 11;
+	DOUBLE_SLAP = 12;
+	WRAP = 13;
+	HYPER_BEAM = 14;
+	LICK = 15;
+	DARK_PULSE = 16;
+	SMOG = 17;
+	SLUDGE = 18;
+	METAL_CLAW = 19;
+	VICE_GRIP = 20;
+	FLAME_WHEEL = 21;
+	MEGAHORN = 22;
+	WING_ATTACK = 23;
+	FLAMETHROWER = 24;
+	SUCKER_PUNCH = 25;
+	DIG = 26;
+	LOW_KICK = 27;
+	CROSS_CHOP = 28;
+	PSYCHO_CUT = 29;
+	PSYBEAM = 30;
+	EARTHQUAKE = 31;
+	STONE_EDGE = 32;
+	ICE_PUNCH = 33;
+	HEART_STAMP = 34;
+	DISCHARGE = 35;
+	FLASH_CANNON = 36;
+	PECK = 37;
+	DRILL_PECK = 38;
+	ICE_BEAM = 39;
+	BLIZZARD = 40;
+	AIR_SLASH = 41;
+	HEAT_WAVE = 42;
+	TWINEEDLE = 43;
+	POISON_JAB = 44;
+	AERIAL_ACE = 45;
+	DRILL_RUN = 46;
+	PETAL_BLIZZARD = 47;
+	MEGA_DRAIN = 48;
+	BUG_BUZZ = 49;
+	POISON_FANG = 50;
+	NIGHT_SLASH = 51;
+	SLASH = 52;
+	BUBBLE_BEAM = 53;
+	SUBMISSION = 54;
+	KARATE_CHOP = 55;
+	LOW_SWEEP = 56;
+	AQUA_JET = 57;
+	AQUA_TAIL = 58;
+	SEED_BOMB = 59;
+	PSYSHOCK = 60;
+	ROCK_THROW = 61;
+	ANCIENT_POWER = 62;
+	ROCK_TOMB = 63;
+	ROCK_SLIDE = 64;
+	POWER_GEM = 65;
+	SHADOW_SNEAK = 66;
+	SHADOW_PUNCH = 67;
+	SHADOW_CLAW = 68;
+	OMINOUS_WIND = 69;
+	SHADOW_BALL = 70;
+	BULLET_PUNCH = 71;
+	MAGNET_BOMB = 72;
+	STEEL_WING = 73;
+	IRON_HEAD = 74;
+	PARABOLIC_CHARGE = 75;
+	SPARK = 76;
+	THUNDER_PUNCH = 77;
+	THUNDER = 78;
+	THUNDERBOLT = 79;
+	TWISTER = 80;
+	DRAGON_BREATH = 81;
+	DRAGON_PULSE = 82;
+	DRAGON_CLAW = 83;
+	DISARMING_VOICE = 84;
+	DRAINING_KISS = 85;
+	DAZZLING_GLEAM = 86;
+	MOONBLAST = 87;
+	PLAY_ROUGH = 88;
+	CROSS_POISON = 89;
+	SLUDGE_BOMB = 90;
+	SLUDGE_WAVE = 91;
+	GUNK_SHOT = 92;
+	MUD_SHOT = 93;
+	BONE_CLUB = 94;
+	BULLDOZE = 95;
+	MUD_BOMB = 96;
+	FURY_CUTTER = 97;
+	BUG_BITE = 98;
+	SIGNAL_BEAM = 99;
+	X_SCISSOR = 100;
+	FLAME_CHARGE = 101;
+	FLAME_BURST = 102;
+	FIRE_BLAST = 103;
+	BRINE = 104;
+	WATER_PULSE = 105;
+	SCALD = 106;
+	HYDRO_PUMP = 107;
+	PSYCHIC = 108;
+	PSYSTRIKE = 109;
+	ICE_SHARD = 110;
+	ICY_WIND = 111;
+	FROST_BREATH = 112;
+	ABSORB = 113;
+	GIGA_DRAIN = 114;
+	FIRE_PUNCH = 115;
+	SOLAR_BEAM = 116;
+	LEAF_BLADE = 117;
+	POWER_WHIP = 118;
+	SPLASH = 119;
+	ACID = 120;
+	AIR_CUTTER = 121;
+	HURRICANE = 122;
+	BRICK_BREAK = 123;
+	CUT = 124;
+	SWIFT = 125;
+	HORN_ATTACK = 126;
+	STOMP = 127;
+	HEADBUTT = 128;
+	HYPER_FANG = 129;
+	SLAM = 130;
+	BODY_SLAM = 131;
+	REST = 132;
+	STRUGGLE = 133;
+	SCALD_BLASTOISE = 134;
+	HYDRO_PUMP_BLASTOISE = 135;
+	WRAP_GREEN = 136;
+	WRAP_PINK = 137;
+	FURY_CUTTER_FAST = 200;
+	BUG_BITE_FAST = 201;
+	BITE_FAST = 202;
+	SUCKER_PUNCH_FAST = 203;
+	DRAGON_BREATH_FAST = 204;
+	THUNDER_SHOCK_FAST = 205;
+	SPARK_FAST = 206;
+	LOW_KICK_FAST = 207;
+	KARATE_CHOP_FAST = 208;
+	EMBER_FAST = 209;
+	WING_ATTACK_FAST = 210;
+	PECK_FAST = 211;
+	LICK_FAST = 212;
+	SHADOW_CLAW_FAST = 213;
+	VINE_WHIP_FAST = 214;
+	RAZOR_LEAF_FAST = 215;
+	MUD_SHOT_FAST = 216;
+	ICE_SHARD_FAST = 217;
+	FROST_BREATH_FAST = 218;
+	QUICK_ATTACK_FAST = 219;
+	SCRATCH_FAST = 220;
+	TACKLE_FAST = 221;
+	POUND_FAST = 222;
+	CUT_FAST = 223;
+	POISON_JAB_FAST = 224;
+	ACID_FAST = 225;
+	PSYCHO_CUT_FAST = 226;
+	ROCK_THROW_FAST = 227;
+	METAL_CLAW_FAST = 228;
+	BULLET_PUNCH_FAST = 229;
+	WATER_GUN_FAST = 230;
+	SPLASH_FAST = 231;
+	WATER_GUN_FAST_BLASTOISE = 232;
+	MUD_SLAP_FAST = 233;
+	ZEN_HEADBUTT_FAST = 234;
+	CONFUSION_FAST = 235;
+	POISON_STING_FAST = 236;
+	BUBBLE_FAST = 237;
+	FEINT_ATTACK_FAST = 238;
+	STEEL_WING_FAST = 239;
+	FIRE_FANG_FAST = 240;
+	ROCK_SMASH_FAST = 241;
+}
+
+enum POGOProtos.Enums.PokemonMovementType
+{
+	MOVEMENT_STATIC = 0;
+	MOVEMENT_JUMP = 1;
+	MOVEMENT_VERTICAL = 2;
+	MOVEMENT_PSYCHIC = 3;
+	MOVEMENT_ELECTRIC = 4;
+	MOVEMENT_FLYING = 5;
+	MOVEMENT_HOVERING = 6;
+}
+
+enum POGOProtos.Enums.PokemonType
+{
+	POKEMON_TYPE_NONE = 0;
+	POKEMON_TYPE_NORMAL = 1;
+	POKEMON_TYPE_FIGHTING = 2;
+	POKEMON_TYPE_FLYING = 3;
+	POKEMON_TYPE_POISON = 4;
+	POKEMON_TYPE_GROUND = 5;
+	POKEMON_TYPE_ROCK = 6;
+	POKEMON_TYPE_BUG = 7;
+	POKEMON_TYPE_GHOST = 8;
+	POKEMON_TYPE_STEEL = 9;
+	POKEMON_TYPE_FIRE = 10;
+	POKEMON_TYPE_WATER = 11;
+	POKEMON_TYPE_GRASS = 12;
+	POKEMON_TYPE_ELECTRIC = 13;
+	POKEMON_TYPE_PSYCHIC = 14;
+	POKEMON_TYPE_ICE = 15;
+	POKEMON_TYPE_DRAGON = 16;
+	POKEMON_TYPE_DARK = 17;
+	POKEMON_TYPE_FAIRY = 18;
+}
+
+enum POGOProtos.Enums.TeamColor
+{
+	NEUTRAL = 0;
+	BLUE = 1;
+	RED = 2;
+	YELLOW = 3;
+}
+
+enum POGOProtos.Enums.TutorialState
+{
+	LEGAL_SCREEN = 0;
+	AVATAR_SELECTION = 1;
+	ACCOUNT_CREATION = 2;
+	POKEMON_CAPTURE = 3;
+	NAME_SELECTION = 4;
+	POKEMON_BERRY = 5;
+	USE_ITEM = 6;
+	FIRST_TIME_EXPERIENCE_COMPLETE = 7;
+	POKESTOP_TUTORIAL = 8;
+	GYM_TUTORIAL = 9;
+}
+
+message POGOProtos.Inventory.AppliedItem
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.ItemType item_type = 2;
+	int64 expire_ms = 3;
+	int64 applied_ms = 4;
+}
+
+message POGOProtos.Inventory.AppliedItems
+{
+	repeated .POGOProtos.Inventory.AppliedItem item = 4;
+}
+
+message POGOProtos.Inventory.EggIncubator
+{
+	string id = 1;
+	.POGOProtos.Inventory.ItemId item_id = 2;
+	.POGOProtos.Inventory.EggIncubatorType incubator_type = 3;
+	int32 uses_remaining = 4;
+	uint64 pokemon_id = 5; // TODO: Check if is PokemonType
+	double start_km_walked = 6;
+	double target_km_walked = 7;
+}
+
+message POGOProtos.Inventory.EggIncubators
+{
+	.POGOProtos.Inventory.EggIncubator egg_incubator = 1;
+}
+
+enum POGOProtos.Inventory.EggIncubatorType
+{
+	INCUBATOR_UNSET = 0;
+	INCUBATOR_DISTANCE = 1;
+}
+
+message POGOProtos.Inventory.InventoryDelta
+{
+	int64 original_timestamp_ms = 1;
+	int64 new_timestamp_ms = 2;
+	repeated .POGOProtos.Inventory.InventoryItem inventory_items = 3;
+}
+
+message POGOProtos.Inventory.InventoryItem
+{
+	int64 modified_timestamp_ms = 1;
+	int64 deleted_item_key = 2;
+	.POGOProtos.Inventory.InventoryItemData inventory_item_data = 3;
+}
+
+message POGOProtos.Inventory.InventoryItemData
+{
+	.POGOProtos.Data.PokemonData pokemon_data = 1;
+	.POGOProtos.Inventory.Item item = 2;
+	.POGOProtos.Data.PokedexEntry pokedex_entry = 3;
+	.POGOProtos.Data.Player.PlayerStats player_stats = 4;
+	.POGOProtos.Data.Player.PlayerCurrency player_currency = 5;
+	.POGOProtos.Data.Player.PlayerCamera player_camera = 6;
+	.POGOProtos.Inventory.InventoryUpgrades inventory_upgrades = 7;
+	.POGOProtos.Inventory.AppliedItems applied_items = 8;
+	.POGOProtos.Inventory.EggIncubators egg_incubators = 9;
+	.POGOProtos.Inventory.PokemonFamily pokemon_family = 10;
+}
+
+message POGOProtos.Inventory.InventoryUpgrade
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.InventoryUpgradeType upgrade_type = 2;
+	int32 additional_storage = 3;
+}
+
+message POGOProtos.Inventory.InventoryUpgrades
+{
+	repeated InventoryUpgrade inventory_upgrades = 1;
+}
+
+enum POGOProtos.Inventory.InventoryUpgradeType
+{
+	UPGRADE_UNSET = 0;
+	INCREASE_ITEM_STORAGE = 1;
+	INCREASE_POKEMON_STORAGE = 2;
+}
+
+message POGOProtos.Inventory.Item
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	int32 count = 2;
+	bool unseen = 3;
+}
+
+message POGOProtos.Inventory.ItemAward
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	int32 item_count = 2;
+}
+
+enum POGOProtos.Inventory.ItemId
+{
+	ITEM_UNKNOWN = 0;
+	ITEM_POKE_BALL = 1;
+	ITEM_GREAT_BALL = 2;
+	ITEM_ULTRA_BALL = 3;
+	ITEM_MASTER_BALL = 4;
+	ITEM_POTION = 101;
+	ITEM_SUPER_POTION = 102;
+	ITEM_HYPER_POTION = 103;
+	ITEM_MAX_POTION = 104;
+	ITEM_REVIVE = 201;
+	ITEM_MAX_REVIVE = 202;
+	ITEM_LUCKY_EGG = 301;
+	ITEM_INCENSE_ORDINARY = 401;
+	ITEM_INCENSE_SPICY = 402;
+	ITEM_INCENSE_COOL = 403;
+	ITEM_INCENSE_FLORAL = 404;
+	ITEM_TROY_DISK = 501;
+	ITEM_X_ATTACK = 602;
+	ITEM_X_DEFENSE = 603;
+	ITEM_X_MIRACLE = 604;
+	ITEM_RAZZ_BERRY = 701;
+	ITEM_BLUK_BERRY = 702;
+	ITEM_NANAB_BERRY = 703;
+	ITEM_WEPAR_BERRY = 704;
+	ITEM_PINAP_BERRY = 705;
+	ITEM_SPECIAL_CAMERA = 801;
+	ITEM_INCUBATOR_BASIC_UNLIMITED = 901;
+	ITEM_INCUBATOR_BASIC = 902;
+	ITEM_POKEMON_STORAGE_UPGRADE = 1001;
+	ITEM_ITEM_STORAGE_UPGRADE = 1002;
+}
+
+enum POGOProtos.Inventory.ItemType
+{
+	ITEM_TYPE_NONE = 0;
+	ITEM_TYPE_POKEBALL = 1;
+	ITEM_TYPE_POTION = 2;
+	ITEM_TYPE_REVIVE = 3;
+	ITEM_TYPE_MAP = 4;
+	ITEM_TYPE_BATTLE = 5;
+	ITEM_TYPE_FOOD = 6;
+	ITEM_TYPE_CAMERA = 7;
+	ITEM_TYPE_DISK = 8;
+	ITEM_TYPE_INCUBATOR = 9;
+	ITEM_TYPE_INCENSE = 10;
+	ITEM_TYPE_XP_BOOST = 11;
+	ITEM_TYPE_INVENTORY_UPGRADE = 12;
+}
+
+message POGOProtos.Inventory.PokemonFamily
+{
+	.POGOProtos.Enums.PokemonFamilyId family_id = 1;
+	int32 candy = 2;
+}
+
+message POGOProtos.Map.Fort.FortData
+{
+	string id = 1;
+	int64 last_modified_timestamp_ms = 2;
+	double latitude = 3;
+	double longitude = 4;
+	bool enabled = 8;
+	.POGOProtos.Map.Fort.FortType type = 9;
+
+	//// Fields related to gyms only
+
+	// Team that owns the gym
+	.POGOProtos.Enums.TeamColor owned_by_team = 5;
+
+	// Highest CP Pokemon at the gym
+	.POGOProtos.Enums.PokemonId guard_pokemon_id = 6;
+	int32 guard_pokemon_cp = 7;
+
+	// Prestigate / experience of the gym
+	int64 gym_points = 10;
+
+	// Whether someone is battling at the gym currently
+	bool is_in_battle = 11;
+
+	//// Fields related to pokestops only
+
+	// Timestamp when the pokestop can be activated again to get items / xp
+	int64 cooldown_complete_timestamp_ms = 14;
+
+	.POGOProtos.Map.Fort.FortSponsor sponsor = 15;
+	.POGOProtos.Map.Fort.FortRenderingType rendering_type = 16;
+
+	// Might represent the type of item applied to the pokestop, right now only lures can be applied
+	bytes active_fort_modifier = 12;
+	.POGOProtos.Map.Fort.FortLureInfo lure_info = 13;
+}
+
+message POGOProtos.Map.Fort.FortLureInfo
+{
+	string fort_id = 1;
+	double unknown2 = 2;
+	.POGOProtos.Enums.PokemonId active_pokemon_id = 3;
+	int64 lure_expires_timestamp_ms = 4;
+}
+
+message POGOProtos.Map.Fort.FortModifier
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	int64 expiration_timestamp_ms = 2;
+	string deployer_player_codename = 3;
+}
+
+enum POGOProtos.Map.Fort.FortRenderingType
+{
+	DEFAULT = 0;
+	INTERNAL_TEST = 1;
+}
+
+enum POGOProtos.Map.Fort.FortSponsor
+{
+	UNSET_SPONSOR = 0;
+	MCDONALDS = 1;
+	POKEMON_STORE = 2;
+}
+
+message POGOProtos.Map.Fort.FortSummary
+{
+	int32 fort_summary_id = 1;
+	int32 last_modified_timestamp_ms = 2;
+	int32 latitude = 3;
+	int32 longitude = 4;
+}
+
+enum POGOProtos.Map.Fort.FortType
+{
+	GYM = 0;
+	CHECKPOINT = 1;
+}
+
+// A cell is a geographical "zone" containing objects like pokemon, gyms, and pokestops.
+message POGOProtos.Map.MapCell
+{
+	// S2 geographic area that the cell covers (http://s2map.com/) (https://code.google.com/archive/p/s2-geometry-library/)
+	uint64 s2_cell_id = 1;
+	int64 current_timestamp_ms = 2;
+	repeated .POGOProtos.Map.Fort.FortData forts = 3;
+	repeated .POGOProtos.Map.SpawnPoint spawn_points = 4;
+	repeated string deleted_objects = 6;
+	bool is_truncated_list = 7;
+	repeated .POGOProtos.Map.Fort.FortSummary fort_summaries = 8;
+	repeated .POGOProtos.Map.SpawnPoint decimated_spawn_points = 9;
+
+	// Pokemon within 2 steps or less.
+	repeated .POGOProtos.Map.Pokemon.WildPokemon wild_pokemons = 5;
+	// Pokemon within 1 step or none.
+	repeated .POGOProtos.Map.Pokemon.MapPokemon catchable_pokemons = 10;
+	// Pokemon farther away than 2 steps, but still in the area.
+	repeated .POGOProtos.Map.Pokemon.NearbyPokemon nearby_pokemons = 11;
+}
+
+enum POGOProtos.Map.MapObjectsStatus
+{
+	UNSET_STATUS = 0;
+	SUCCESS = 1;
+	LOCATION_UNSET = 2;
+}
+
+message POGOProtos.Map.Pokemon.MapPokemon
+{
+	string spawn_point_id = 1;
+	fixed64 encounter_id = 2;
+	.POGOProtos.Enums.PokemonId pokemon_id = 3;
+	// After this timestamp, the pokemon will be gone.
+	int64 expiration_timestamp_ms = 4;
+	double latitude = 5;
+	double longitude = 6;
+}
+
+message POGOProtos.Map.Pokemon.NearbyPokemon
+{
+	.POGOProtos.Enums.PokemonId pokemon_id = 1;
+	float distance_in_meters = 2;
+	fixed64 encounter_id = 3;
+}
+
+message POGOProtos.Map.Pokemon.WildPokemon
+{
+	fixed64 encounter_id = 1;
+	int64 last_modified_timestamp_ms = 2;
+	double latitude = 3;
+	double longitude = 4;
+	string spawn_point_id = 5;
+	.POGOProtos.Data.PokemonData pokemon_data = 7;
+	int32 time_till_hidden_ms = 11;
+}
+
+message POGOProtos.Map.SpawnPoint
+{
+	double latitude = 2;
+	double longitude = 3;
+}
+
+message POGOProtos.Networking.Envelopes.AuthTicket
+{
+	bytes start = 1;
+	uint64 expire_timestamp_ms = 2;
+	bytes end = 3;
+}
+
+message POGOProtos.Networking.Envelopes.RequestEnvelope
+{
+	int32 status_code = 1;
+
+	uint64 request_id = 3;
+	repeated .POGOProtos.Networking.Requests.Request requests = 4;
+
+	.POGOProtos.Networking.Envelopes.Unknown6 unknown6 = 6;
+	double latitude = 7;
+	double longitude = 8;
+	double altitude = 9;
+	AuthInfo auth_info = 10;
+	.POGOProtos.Networking.Envelopes.AuthTicket auth_ticket = 11;
+	int64 unknown12 = 12;
+
+	message AuthInfo
+	{
+		string provider = 1;
+		JWT token = 2;
+
+		message JWT
+		{
+			string contents = 1;
+			int32 unknown2  = 2;
+		}
+	}
+}
+
+message POGOProtos.Networking.Envelopes.ResponseEnvelope
+{
+	int32 status_code = 1;
+	uint64 request_id = 2;
+	string api_url = 3;
+
+	.POGOProtos.Networking.Envelopes.Unknown6Response unknown6 = 6;
+	.POGOProtos.Networking.Envelopes.AuthTicket auth_ticket = 7;
+
+	repeated bytes returns = 100;
+	string error = 101;
+
+	message Unknown7
+	{
+		bytes unknown71 = 1;
+		int64 unknown72 = 2;
+		bytes unknown73 = 3;
+	}
+}
+
+message POGOProtos.Networking.Envelopes.Unknown6
+{
+	int32 unknown1 = 1; //6
+	Unknown2 unknown2 = 2;
+
+	message Unknown2
+	{
+		bytes unknown1 = 1;
+	}
+}
+
+message POGOProtos.Networking.Envelopes.Unknown6Response
+{
+	int32 unknown1 = 1; //6
+	Unknown2 unknown2 = 2;
+
+	message Unknown2
+	{
+		uint64 unknown1 = 1;
+	}
+}
+
+message POGOProtos.Networking.Requests.Messages.AddFortModifierMessage
+{
+	.POGOProtos.Inventory.ItemId modifier_type = 1;
+	string fort_id = 2;
+	double player_latitude = 3;
+	double player_longitude = 4;
+}
+
+message POGOProtos.Networking.Requests.Messages.AttackGymMessage
+{
+	string gym_id = 1;
+	string battle_id = 2;
+	repeated .POGOProtos.Data.Battle.BattleAction attack_actions = 3;
+	.POGOProtos.Data.Battle.BattleAction last_retrieved_actions = 4;
+	double player_latitude = 5;
+	double player_longitude = 6;
+}
+
+message POGOProtos.Networking.Requests.Messages.CatchPokemonMessage
+{
+	fixed64 encounter_id = 1;
+	int32 pokeball = 2;
+	double normalized_reticle_size = 3;
+	string spawn_point_guid = 4;
+	bool hit_pokemon = 5;
+	double spin_modifier = 6;
+	double normalized_hit_position = 7;
+}
+
+message POGOProtos.Networking.Requests.Messages.CheckAwardedBadgesMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.CheckCodenameAvailableMessage
+{
+	string codename = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.ClaimCodenameMessage
+{
+	string codename = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.CollectDailyBonusMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.CollectDailyDefenderBonusMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.DiskEncounterMessage
+{
+	fixed64 encounter_id = 1;
+	string fort_id = 2;
+	double player_latitude = 3;
+	double player_longitude = 4;
+}
+
+message POGOProtos.Networking.Requests.Messages.DownloadItemTemplatesMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.DownloadRemoteConfigVersionMessage
+{
+	.POGOProtos.Enums.Platform platform = 1;
+	string device_manufacturer = 2;
+	string device_model = 3;
+	string locale = 4;
+	uint32 app_version = 5;
+}
+
+message POGOProtos.Networking.Requests.Messages.DownloadSettingsMessage
+{
+	string hash = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.EchoMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.EncounterMessage
+{
+	fixed64 encounter_id = 1;
+	string spawn_point_id = 2;
+	double player_latitude = 3;
+	double player_longitude = 4;
+}
+
+message POGOProtos.Networking.Requests.Messages.EncounterTutorialCompleteMessage
+{
+	.POGOProtos.Enums.PokemonId pokemon_id = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.EquipBadgeMessage
+{
+	.POGOProtos.Enums.BadgeType badge_type = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.EvolvePokemonMessage
+{
+	fixed64 pokemon_id = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessage
+{
+	string fort_id = 1;
+	uint64 pokemon_id = 2;
+	double player_latitude = 3;
+	double player_longitude = 4;
+}
+
+message POGOProtos.Networking.Requests.Messages.FortDetailsMessage
+{
+	string fort_id = 1;
+	double latitude = 2;
+	double longitude = 3;
+}
+
+message POGOProtos.Networking.Requests.Messages.FortRecallPokemonMessage
+{
+	string fort_id = 1;
+	uint64 pokemon_id = 2;
+	double player_latitude = 3;
+	double player_longitude = 4;
+}
+
+message POGOProtos.Networking.Requests.Messages.FortSearchMessage
+{
+	string fort_id = 1;
+	double player_latitude = 2;
+	double player_longitude = 3;
+	double fort_latitude = 4;
+	double fort_longitude = 5;
+}
+
+message POGOProtos.Networking.Requests.Messages.GetAssetDigestMessage
+{
+	.POGOProtos.Enums.Platform platform = 1;
+	string device_manufacturer = 2;
+	string device_model = 3;
+	string locale = 4;
+	uint32 app_version = 5;
+}
+
+// UNTESTED
+message POGOProtos.Networking.Requests.Messages.GetDownloadUrlsMessage
+{
+	repeated string asset_id = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.GetGymDetailsMessage
+{
+	string gym_id = 1;
+	double player_latitude = 2;
+	double player_longitude = 3;
+	double gym_latitude = 4;
+	double gym_longitude = 5;
+}
+
+message POGOProtos.Networking.Requests.Messages.GetHatchedEggsMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.GetIncensePokemonMessage
+{
+	double player_latitude = 1;
+	double player_longitude = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.GetInventoryMessage
+{
+	int64 last_timestamp_ms = 1;
+	int32 item_been_seen = 2; // TODO: Find out what this is.
+}
+
+message POGOProtos.Networking.Requests.Messages.GetMapObjectsMessage
+{
+	repeated uint64 cell_id = 1 [packed=true];
+	repeated int64 since_timestamp_ms = 2 [packed=true];
+	double latitude = 3;
+	double longitude = 4;
+}
+
+message POGOProtos.Networking.Requests.Messages.GetPlayerMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.GetPlayerProfileMessage
+{
+	string player_name = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.GetSuggestedCodenamesMessage
+{
+	// No message needed.
+}
+
+message POGOProtos.Networking.Requests.Messages.IncenseEncounterMessage
+{
+	int64 encounter_id = 1;
+	string encounter_location = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.LevelUpRewardsMessage
+{
+	int32 level = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessage
+{
+	repeated .POGOProtos.Enums.TutorialState tutorials_completed = 1;
+	bool send_marketing_emails = 2;
+	bool send_push_notifications = 3;
+}
+
+message POGOProtos.Networking.Requests.Messages.NicknamePokemonMessage
+{
+	uint64 pokemon_id = 1;
+	string nickname = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.PlayerUpdateMessage
+{
+	double latitude = 1;
+	double longitude = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessage
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	int32 count = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.ReleasePokemonMessage
+{
+	fixed64 pokemon_id = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.SetAvatarMessage
+{
+	.POGOProtos.Data.Player.PlayerAvatar player_avatar = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.SetContactSettingsMessage
+{
+	.POGOProtos.Data.Player.ContactSettings contact_settings = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessage
+{
+	uint64 pokemon_id = 1;
+	bool is_favorite = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.SetPlayerTeamMessage
+{
+	.POGOProtos.Enums.TeamColor team = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.StartGymBattleMessage
+{
+	string gym_id = 1;
+	repeated fixed64 attacking_pokemon_ids = 2;
+	uint64 defending_pokemon_id = 3;
+	double player_latitude = 4;
+	double player_longitude = 5;
+}
+
+message POGOProtos.Networking.Requests.Messages.UpgradePokemonMessage
+{
+	uint64 pokemon_id = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.UseIncenseMessage
+{
+	.POGOProtos.Inventory.ItemId incense_type = 1;
+}
+
+message POGOProtos.Networking.Requests.Messages.UseItemCaptureMessage
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	fixed64 encounter_id = 2;
+	string spawn_point_guid = 3;
+}
+
+message POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessage
+{
+	string item_id = 1;
+	uint64 pokemon_id = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.UseItemGymMessage
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	string gym_id = 2;
+	double player_latitude = 3;
+	double player_longitude = 4;
+}
+
+message POGOProtos.Networking.Requests.Messages.UseItemPotionMessage
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	uint64 pokemon_id = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.UseItemReviveMessage
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	uint64 pokemon_id = 2;
+}
+
+message POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessage
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+}
+
+message POGOProtos.Networking.Requests.Request
+{
+	.POGOProtos.Networking.Requests.RequestType request_type = 1;
+	bytes request_message = 2;
+}
+
+// R = Response
+// M = Message
+
+enum POGOProtos.Networking.Requests.RequestType
+{
+	METHOD_UNSET = 0;					 // No implementation required
+	PLAYER_UPDATE = 1;					// Implemented [R & M]
+	GET_PLAYER = 2;					   // Implemented [R & M]
+	GET_INVENTORY = 4;					// Implemented [R & M]
+	DOWNLOAD_SETTINGS = 5;				// Implemented [R & M]
+	DOWNLOAD_ITEM_TEMPLATES = 6;		  // Implemented [R & M]
+	DOWNLOAD_REMOTE_CONFIG_VERSION = 7;   // Implemented [R & M]
+	FORT_SEARCH = 101;					// Implemented [R & M]
+	ENCOUNTER = 102;					  // Implemented [R & M]
+	CATCH_POKEMON = 103;				  // Implemented [R & M]
+	FORT_DETAILS = 104;				   // Implemented [R & M]
+	ITEM_USE = 105;					   // Can't find this one
+	GET_MAP_OBJECTS = 106;				// Implemented [R & M]
+	FORT_DEPLOY_POKEMON = 110;			// Implemented [R & M]
+	FORT_RECALL_POKEMON = 111;			// Implemented [R & M]
+	RELEASE_POKEMON = 112;				// Implemented [R & M]
+	USE_ITEM_POTION = 113;				// Implemented [R & M]
+	USE_ITEM_CAPTURE = 114;			   // Implemented [R & M]
+	USE_ITEM_FLEE = 115;				  // Can't find this one
+	USE_ITEM_REVIVE = 116;				// Implemented [R & M]
+	TRADE_SEARCH = 117;				   // Not yet implemented in the game
+	TRADE_OFFER = 118;					// Not yet implemented in the game
+	TRADE_RESPONSE = 119;				 // Not yet implemented in the game
+	TRADE_RESULT = 120;				   // Not yet implemented in the game
+	GET_PLAYER_PROFILE = 121;			 // Implemented [R & M]
+	GET_ITEM_PACK = 122;				  // Can't find this one
+	BUY_ITEM_PACK = 123;				  // Can't find this one
+	BUY_GEM_PACK = 124;				   // Can't find this one
+	EVOLVE_POKEMON = 125;				 // Implemented [R & M]
+	GET_HATCHED_EGGS = 126;			   // Implemented [R & M]
+	ENCOUNTER_TUTORIAL_COMPLETE = 127;	// Implemented [R & M]
+	LEVEL_UP_REWARDS = 128;			   // Implemented [R & M]
+	CHECK_AWARDED_BADGES = 129;		   // Implemented [R & M]
+	USE_ITEM_GYM = 133;				   // Implemented [R & M]
+	GET_GYM_DETAILS = 134;				// Implemented [R & M]
+	START_GYM_BATTLE = 135;			   // Implemented [R & M]
+	ATTACK_GYM = 136;					 // Implemented [R & M]
+	RECYCLE_INVENTORY_ITEM = 137;		 // Implemented [R & M]
+	COLLECT_DAILY_BONUS = 138;			// Implemented [R & M]
+	USE_ITEM_XP_BOOST = 139;			  // Implemented [R & M]
+	USE_ITEM_EGG_INCUBATOR = 140;		 // Implemented [R & M]
+	USE_INCENSE = 141;					// Implemented [R & M]
+	GET_INCENSE_POKEMON = 142;			// Implemented [R & M]
+	INCENSE_ENCOUNTER = 143;			  // Implemented [R & M]
+	ADD_FORT_MODIFIER = 144;			  // Implemented [R & M]
+	DISK_ENCOUNTER = 145;				 // Implemented [R & M]
+	COLLECT_DAILY_DEFENDER_BONUS = 146;   // Implemented [R & M]
+	UPGRADE_POKEMON = 147;				// Implemented [R & M]
+	SET_FAVORITE_POKEMON = 148;		   // Implemented [R & M]
+	NICKNAME_POKEMON = 149;			   // Implemented [R & M]
+	EQUIP_BADGE = 150;					// Implemented [R & M]
+	SET_CONTACT_SETTINGS = 151;		   // Implemented [R & M]
+	GET_ASSET_DIGEST = 300;			   // Implemented [R & M]
+	GET_DOWNLOAD_URLS = 301;			  // Implemented [R & M]
+	GET_SUGGESTED_CODENAMES = 401;		// Implemented [R & M]
+	CHECK_CODENAME_AVAILABLE = 402;	   // Implemented [R & M] TEST RESPONSE
+	CLAIM_CODENAME = 403;				 // Implemented [R & M] TEST RESPONSE
+	SET_AVATAR = 404;					 // Implemented [R & M]
+	SET_PLAYER_TEAM = 405;				// Implemented [R & M]
+	MARK_TUTORIAL_COMPLETE = 406;		 // Implemented [R & M]
+	LOAD_SPAWN_POINTS = 500;			  // Can't find this one
+	ECHO = 666;						   // Implemented [R & M]
+	DEBUG_UPDATE_INVENTORY = 700;
+	DEBUG_DELETE_PLAYER = 701;
+	SFIDA_REGISTRATION = 800;			 // Not yet released.
+	SFIDA_ACTION_LOG = 801;			   // Not yet released.
+	SFIDA_CERTIFICATION = 802;			// Not yet released.
+	SFIDA_UPDATE = 803;				   // Not yet released.
+	SFIDA_ACTION = 804;				   // Not yet released.
+	SFIDA_DOWSER = 805;				   // Not yet released.
+	SFIDA_CAPTURE = 806;				  // Not yet released.
+}
+
+message POGOProtos.Networking.Responses.AddFortModifierResponse
+{
+	// Initialized by assist.py
+}
+
+message POGOProtos.Networking.Responses.AttackGymResponse
+{
+	.POGOProtos.Networking.Responses.AttackGymResponse.Result result = 1;
+	.POGOProtos.Data.Battle.BattleLog battle_log = 2;
+	string battle_id = 3;
+	.POGOProtos.Data.Battle.BattlePokemonInfo active_defender = 4;
+	.POGOProtos.Data.Battle.BattlePokemonInfo active_attacker = 5;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_INVALID_ATTACK_ACTIONS = 2;
+		ERROR_NOT_IN_RANGE = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.CatchPokemonResponse
+{
+	.POGOProtos.Networking.Responses.CatchPokemonResponse.CatchStatus status = 1;
+	double miss_percent = 2;
+	uint64 captured_pokemon_id = 3;
+	.POGOProtos.Data.Capture.CaptureAward capture_award = 4;
+
+	enum CatchStatus
+	{
+		CATCH_ERROR = 0;
+		CATCH_SUCCESS = 1;
+		CATCH_ESCAPE = 2;
+		CATCH_FLEE = 3;
+		CATCH_MISSED = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.CheckAwardedBadgesResponse
+{
+	bool success = 1;
+	repeated .POGOProtos.Enums.BadgeType awarded_badges = 2;
+	repeated int32 awarded_badge_levels = 3;
+}
+
+// TODO: Might be incorrect, please test.
+message POGOProtos.Networking.Responses.CheckCodenameAvailableResponse
+{
+	string codename = 1;
+	string user_message = 2;
+	bool is_assignable = 3;
+	.POGOProtos.Networking.Responses.CheckCodenameAvailableResponse.Status status = 4;
+
+	enum Status
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		CODENAME_NOT_AVAILABLE = 2;
+		CODENAME_NOT_VALID = 3;
+		CURRENT_OWNER = 4;
+		CODENAME_CHANGE_NOT_ALLOWED = 5;
+	}
+}
+
+// TODO: Might be incorrect, please test.
+message POGOProtos.Networking.Responses.ClaimCodenameResponse
+{
+	string codename = 1;
+	string user_message = 2;
+	bool is_assignable = 3;
+	.POGOProtos.Networking.Responses.ClaimCodenameResponse.Status status = 4;
+
+	enum Status
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		CODENAME_NOT_AVAILABLE = 2;
+		CODENAME_NOT_VALID = 3;
+		CURRENT_OWNER = 4;
+		CODENAME_CHANGE_NOT_ALLOWED = 5;
+	}
+}
+
+message POGOProtos.Networking.Responses.CollectDailyBonusResponse
+{
+	.POGOProtos.Networking.Responses.CollectDailyBonusResponse.Result result = 1;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		FAILURE = 2;
+		TOO_SOON = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.CollectDailyDefenderBonusResponse
+{
+	.POGOProtos.Networking.Responses.CollectDailyDefenderBonusResponse.Result result = 1;
+	repeated string currency_type = 2;
+	repeated int32 currency_awarded = 3;
+	int32 defenders_count = 4;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		FAILURE = 2;
+		TOO_SOON = 3;
+		NO_DEFENDERS = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.DiskEncounterResponse
+{
+	Result result = 1;
+	.POGOProtos.Data.PokemonData pokemon_data = 2;
+	.POGOProtos.Data.Capture.CaptureProbability capture_probability = 3;
+
+	enum Result
+	{
+		UNKNOWN = 0;
+		SUCCESS = 1;
+		NOT_AVAILABLE = 2;
+		NOT_IN_RANGE = 3;
+		ENCOUNTER_ALREADY_FINISHED = 4;
+		POKEMON_INVENTORY_FULL = 5;
+	}
+}
+
+message POGOProtos.Networking.Responses.DownloadItemTemplatesResponse
+{
+	bool success = 1;
+	repeated .POGOProtos.Networking.Responses.DownloadItemTemplatesResponse.ItemTemplate item_templates = 2;
+	uint64 timestamp_ms = 3;
+
+	message ItemTemplate
+	{
+		string template_id = 1;
+		.POGOProtos.Settings.Master.PokemonSettings pokemon_settings = 2;
+		.POGOProtos.Settings.Master.ItemSettings item_settings = 3;
+		.POGOProtos.Settings.Master.MoveSettings move_settings = 4;
+		.POGOProtos.Settings.Master.MoveSequenceSettings move_sequence_settings = 5;
+		.POGOProtos.Settings.Master.TypeEffectiveSettings type_effective = 8;
+		.POGOProtos.Settings.Master.BadgeSettings badge_settings = 10; 
+		.POGOProtos.Settings.Master.CameraSettings camera = 11;
+		.POGOProtos.Settings.Master.PlayerLevelSettings player_level = 12;
+		.POGOProtos.Settings.Master.GymLevelSettings gym_level = 13;
+		.POGOProtos.Settings.Master.GymBattleSettings battle_settings = 14;
+		.POGOProtos.Settings.Master.EncounterSettings encounter_settings = 15;
+		.POGOProtos.Settings.Master.IapItemDisplay iap_item_display = 16;
+		.POGOProtos.Settings.Master.IapSettings iap_settings = 17;
+		.POGOProtos.Settings.Master.PokemonUpgradeSettings pokemon_upgrades = 18;
+		.POGOProtos.Settings.Master.EquippedBadgeSettings equipped_badges = 19;
+	}
+}
+
+message POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponse
+{
+	.POGOProtos.Networking.Responses.DownloadRemoteConfigVersionResponse.Result result = 1;
+	uint64 item_templates_timestamp_ms = 2; // Latest available?
+	uint64 asset_digest_timestamp_ms = 3;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+	}
+}
+
+message POGOProtos.Networking.Responses.DownloadSettingsResponse
+{
+	string error = 1;
+	string hash = 2;
+	.POGOProtos.Settings.GlobalSettings settings = 3;
+}
+
+message POGOProtos.Networking.Responses.EchoResponse
+{
+	string context = 1;
+}
+
+message POGOProtos.Networking.Responses.EncounterResponse
+{
+	.POGOProtos.Map.Pokemon.WildPokemon wild_pokemon = 1;
+	Background background = 2;
+	Status status = 3;
+	.POGOProtos.Data.Capture.CaptureProbability capture_probability = 4;
+
+	enum Background
+	{
+		PARK = 0;
+		DESERT = 1;
+	}
+
+	enum Status
+	{
+		ENCOUNTER_ERROR = 0;
+		ENCOUNTER_SUCCESS = 1;
+		ENCOUNTER_NOT_FOUND = 2;
+		ENCOUNTER_CLOSED = 3;
+		ENCOUNTER_POKEMON_FLED = 4;
+		ENCOUNTER_NOT_IN_RANGE = 5;
+		ENCOUNTER_ALREADY_HAPPENED = 6;
+		POKEMON_INVENTORY_FULL = 7;
+	}
+}
+
+message POGOProtos.Networking.Responses.EncounterTutorialCompleteResponse
+{
+	.POGOProtos.Networking.Responses.EncounterTutorialCompleteResponse.Result result = 1;
+	.POGOProtos.Data.PokemonData pokemon_data = 2;
+	.POGOProtos.Data.Capture.CaptureAward capture_award = 3;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_INVALID_POKEMON = 2;
+	}
+}
+
+message POGOProtos.Networking.Responses.EquipBadgeResponse
+{
+	.POGOProtos.Networking.Responses.EquipBadgeResponse.Result result = 1;
+	.POGOProtos.Data.Player.EquippedBadge equipped = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		COOLDOWN_ACTIVE = 2;
+		NOT_QUALIFIED = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.EvolvePokemonResponse
+{
+	.POGOProtos.Networking.Responses.EvolvePokemonResponse.Result result = 1;
+	.POGOProtos.Data.PokemonData evolved_pokemon_data = 2;
+	int32 experience_awarded = 3;
+	int32 candy_awarded = 4;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		FAILED_POKEMON_MISSING = 2;
+		FAILED_INSUFFICIENT_RESOURCES = 3;
+		FAILED_POKEMON_CANNOT_EVOLVE = 4;
+		FAILED_POKEMON_IS_DEPLOYED = 5;
+	}
+}
+
+message POGOProtos.Networking.Responses.FortDeployPokemonResponse
+{
+	.POGOProtos.Networking.Responses.FortDeployPokemonResponse.Result result = 1;
+	.POGOProtos.Networking.Responses.FortDetailsResponse fort_details = 2;
+	.POGOProtos.Data.PokemonData pokemon_data = 3;
+	.POGOProtos.Data.Gym.GymState gym_state = 4;
+
+	enum Result
+	{
+		NO_RESULT_SET = 0;
+		SUCCESS = 1;
+		ERROR_ALREADY_HAS_POKEMON_ON_FORT = 2;
+		ERROR_OPPOSING_TEAM_OWNS_FORT = 3;
+		ERROR_FORT_IS_FULL = 4;
+		ERROR_NOT_IN_RANGE = 5;
+		ERROR_PLAYER_HAS_NO_TEAM = 6;
+		ERROR_POKEMON_NOT_FULL_HP = 7;
+		ERROR_PLAYER_BELOW_MINIMUM_LEVEL = 8;
+	}
+}
+
+message POGOProtos.Networking.Responses.FortDetailsResponse
+{
+	string fort_id = 1;
+	.POGOProtos.Enums.TeamColor team_color = 2;
+	.POGOProtos.Data.PokemonData pokemon_data = 3;
+	string name = 4;
+	repeated string image_urls = 5;
+	int32 fp = 6;
+	int32 stamina = 7;
+	int32 max_stamina = 8;
+	.POGOProtos.Map.Fort.FortType type = 9;
+	double latitude = 10;
+	double longitude = 11;
+	string description = 12;
+	repeated .POGOProtos.Map.Fort.FortModifier modifiers = 13;
+}
+
+message POGOProtos.Networking.Responses.FortRecallPokemonResponse
+{
+	.POGOProtos.Networking.Responses.FortRecallPokemonResponse.Result result = 1;
+	.POGOProtos.Networking.Responses.FortDetailsResponse fort_details = 2;
+
+	enum Result
+	{
+		NO_RESULT_SET = 0;
+		SUCCESS = 1;
+		ERROR_NOT_IN_RANGE = 2;
+		ERROR_POKEMON_NOT_ON_FORT = 3;
+		ERROR_NO_PLAYER = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.FortSearchResponse
+{
+	.POGOProtos.Networking.Responses.FortSearchResponse.Result result = 1;
+	repeated .POGOProtos.Inventory.ItemAward items_awarded = 2;
+	int32 gems_awarded = 3;
+	.POGOProtos.Data.PokemonData pokemon_data_egg = 4;
+	int32 experience_awarded = 5;
+	int64 cooldown_complete_timestamp_ms = 6;
+	int32 chain_hack_sequence_number = 7;
+
+	enum Result
+	{
+		NO_RESULT_SET = 0;
+		SUCCESS = 1;
+		OUT_OF_RANGE = 2;
+		IN_COOLDOWN_PERIOD = 3;
+		INVENTORY_FULL = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.GetAssetDigestResponse
+{
+	repeated .POGOProtos.Data.AssetDigestEntry digest = 1;
+	uint64 timestamp_ms = 2;
+}
+
+// UNTESTED
+message POGOProtos.Networking.Responses.GetDownloadUrlsResponse
+{
+	repeated .POGOProtos.Data.DownloadUrlEntry download_urls = 1;
+}
+
+message POGOProtos.Networking.Responses.GetGymDetailsResponse
+{
+	.POGOProtos.Data.Gym.GymState gym_state = 1;
+	string name = 2;
+	repeated string urls = 3;
+	POGOProtos.Networking.Responses.GetGymDetailsResponse.Result result = 4;
+	string description = 5;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_NOT_IN_RANGE = 2;
+	}
+}
+
+message POGOProtos.Networking.Responses.GetHatchedEggsResponse
+{
+	bool success = 1;
+	repeated uint64 pokemon_id = 2 [packed=true];
+	repeated int32 experience_awarded = 3;
+	repeated int32 candy_awarded = 4;
+	repeated int32 stardust_awarded = 5;
+}
+
+message POGOProtos.Networking.Responses.GetIncensePokemonResponse
+{
+	.POGOProtos.Networking.Responses.GetIncensePokemonResponse.Result result = 1;
+	int32 pokemon_type_id = 2; // TODO: PokemonType.proto or PokemonId.proto
+	double latitude = 3;
+	double longitude = 4;
+	string encounter_location = 5;
+	uint64 encounter_id = 6;
+	int64 disappear_timestamp_ms = 7;
+
+	enum Result
+	{
+		INCENSE_ENCOUNTER_UNKNOWN = 0;
+		INCENSE_ENCOUNTER_AVAILABLE = 1;
+		INCENSE_ENCOUNTER_NOT_AVAILABLE = 2;
+	}
+}
+
+message POGOProtos.Networking.Responses.GetInventoryResponse
+{
+	bool success = 1;
+	.POGOProtos.Inventory.InventoryDelta inventory_delta = 2;
+}
+
+message POGOProtos.Networking.Responses.GetMapObjectsResponse
+{
+	repeated .POGOProtos.Map.MapCell map_cells = 1;
+	.POGOProtos.Map.MapObjectsStatus status = 2;
+}
+
+message POGOProtos.Networking.Responses.GetPlayerProfileResponse
+{
+	.POGOProtos.Networking.Responses.GetPlayerProfileResponse.Result result = 1;
+	int64 start_time = 2;
+	repeated .POGOProtos.Data.PlayerBadge badges = 3;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+	}
+}
+
+message POGOProtos.Networking.Responses.GetPlayerResponse
+{
+	bool success = 1;
+	.POGOProtos.Data.PlayerData player_data = 2;
+}
+
+message POGOProtos.Networking.Responses.GetSuggestedCodenamesResponse
+{
+	repeated string codenames = 1;
+	bool success = 2;
+}
+
+message POGOProtos.Networking.Responses.IncenseEncounterResponse
+{
+	.POGOProtos.Networking.Responses.IncenseEncounterResponse.Result result = 1;
+	.POGOProtos.Data.PokemonData pokemon_data = 2;
+	.POGOProtos.Data.Capture.CaptureProbability capture_probability = 3;
+
+	enum Result
+	{
+		INCENSE_ENCOUNTER_UNKNOWN = 0;
+		INCENSE_ENCOUNTER_SUCCESS = 1;
+		INCENSE_ENCOUNTER_NOT_AVAILABLE = 2;
+		POKEMON_INVENTORY_FULL = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.LevelUpRewardsResponse
+{
+	.POGOProtos.Networking.Responses.LevelUpRewardsResponse.Result result = 1;
+	repeated .POGOProtos.Inventory.ItemAward items_awarded = 2;
+	repeated .POGOProtos.Inventory.ItemId items_unlocked = 4;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		AWARDED_ALREADY = 2;
+	}
+}
+
+message POGOProtos.Networking.Responses.MarkTutorialCompleteResponse
+{
+	bool success = 1;
+	.POGOProtos.Data.PlayerData player_data = 2;
+}
+
+message POGOProtos.Networking.Responses.NicknamePokemonResponse
+{
+	.POGOProtos.Networking.Responses.NicknamePokemonResponse.Result result = 1;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_INVALID_NICKNAME = 2;
+		ERROR_POKEMON_NOT_FOUND = 3;
+		ERROR_POKEMON_IS_EGG = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.PlayerUpdateResponse
+{
+	repeated .POGOProtos.Map.Pokemon.WildPokemon wild_pokemons = 1;
+	repeated .POGOProtos.Map.Fort.FortData forts = 2;
+	int32 forts_nearby = 3;
+}
+
+message POGOProtos.Networking.Responses.RecycleInventoryItemResponse
+{
+	.POGOProtos.Networking.Responses.RecycleInventoryItemResponse.Result result = 1;
+	int32 new_count = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_NOT_ENOUGH_COPIES = 2;
+		ERROR_CANNOT_RECYCLE_INCUBATORS = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.ReleasePokemonResponse
+{
+	.POGOProtos.Networking.Responses.ReleasePokemonResponse.Result result = 1;
+	int32 candy_awarded = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		POKEMON_DEPLOYED = 2;
+		FAILED = 3;
+		ERROR_POKEMON_IS_EGG = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.SetAvatarResponse
+{
+	.POGOProtos.Networking.Responses.SetAvatarResponse.Status status = 1;
+	.POGOProtos.Data.PlayerData player_data = 2;
+
+	enum Status
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		AVATAR_ALREADY_SET = 2;
+		FAILURE = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.SetContactSettingsResponse
+{
+	.POGOProtos.Networking.Responses.SetContactSettingsResponse.Status status = 1;
+	.POGOProtos.Data.PlayerData player_data = 2;
+
+	enum Status
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		FAILURE = 2;
+	}
+}
+
+message POGOProtos.Networking.Responses.SetFavoritePokemonResponse
+{
+	.POGOProtos.Networking.Responses.SetFavoritePokemonResponse.Result result = 1;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_POKEMON_NOT_FOUND = 2;
+		ERROR_POKEMON_IS_EGG = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.SetPlayerTeamResponse
+{
+	.POGOProtos.Networking.Responses.SetPlayerTeamResponse.Status status = 1;
+	.POGOProtos.Data.PlayerData player_data = 2;
+
+	enum Status
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		TEAM_ALREADY_SET = 2;
+		FAILURE = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.StartGymBattleResponse
+{
+	.POGOProtos.Networking.Responses.StartGymBattleResponse.Result result = 1;
+	int64 battle_start_timestamp_ms = 2;
+	int64 battle_end_timestamp_ms = 3;
+	string battle_id = 4;
+	.POGOProtos.Data.Battle.BattleParticipant defender = 5;
+	.POGOProtos.Data.Battle.BattleLog battle_log = 6;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_GYM_NOT_FOUND = 2;
+		ERROR_GYM_NEUTRAL = 3;
+		ERROR_GYM_WRONG_TEAM = 4;
+		ERROR_GYM_EMPTY = 5;
+		ERROR_INVALID_DEFENDER = 6;
+		ERROR_TRAINING_INVALID_ATTACKER_COUNT = 7;
+		ERROR_ALL_POKEMON_FAINTED = 8;
+		ERROR_TOO_MANY_BATTLES = 9;
+		ERROR_TOO_MANY_PLAYERS = 10;
+		ERROR_GYM_BATTLE_LOCKOUT = 11;
+		ERROR_PLAYER_BELOW_MINIMUM_LEVEL = 12;
+		ERROR_NOT_IN_RANGE = 13;
+	}
+}
+
+message POGOProtos.Networking.Responses.UpgradePokemonResponse
+{
+	.POGOProtos.Networking.Responses.UpgradePokemonResponse.Result result = 1;
+	.POGOProtos.Data.PokemonData upgraded_pokemon = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_POKEMON_NOT_FOUND = 2;
+		ERROR_INSUFFICIENT_RESOURCES = 3;
+		ERROR_UPGRADE_NOT_AVAILABLE = 4;
+		ERROR_POKEMON_IS_DEPLOYED = 5;
+	}
+}
+
+message POGOProtos.Networking.Responses.UseIncenseResponse
+{
+	.POGOProtos.Networking.Responses.UseIncenseResponse.Result result = 1;
+	.POGOProtos.Inventory.AppliedItem applied_incense = 2;
+
+	enum Result
+	{
+		UNKNOWN = 0;
+		SUCCESS = 1;
+		INCENSE_ALREADY_ACTIVE = 2;
+		NONE_IN_INVENTORY = 3;
+		LOCATION_UNSET = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.UseItemCaptureResponse
+{
+	bool success = 1;
+	double item_capture_mult = 2;
+	double item_flee_mult = 3;
+	bool stop_movement = 4;
+	bool stop_attack = 5;
+	bool target_max = 6;
+	bool target_slow = 7;
+}
+
+message POGOProtos.Networking.Responses.UseItemEggIncubatorResponse
+{
+	.POGOProtos.Networking.Responses.UseItemEggIncubatorResponse.Result result = 1;
+	.POGOProtos.Inventory.EggIncubator egg_incubator = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_INCUBATOR_NOT_FOUND = 2;
+		ERROR_POKEMON_EGG_NOT_FOUND = 3;
+		ERROR_POKEMON_ID_NOT_EGG = 4;
+		ERROR_INCUBATOR_ALREADY_IN_USE = 5;
+		ERROR_POKEMON_ALREADY_INCUBATING = 6;
+		ERROR_INCUBATOR_NO_USES_REMAINING = 7;
+	}
+}
+
+message POGOProtos.Networking.Responses.UseItemGymResponse
+{
+	POGOProtos.Networking.Responses.UseItemGymResponse.Result result = 1;
+	int64 updated_gp = 2; // Gym Points (?)
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_CANNOT_USE = 2;
+		ERROR_NOT_IN_RANGE = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.UseItemPotionResponse
+{
+	.POGOProtos.Networking.Responses.UseItemPotionResponse.Result result = 1;
+	int32 stamina = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_NO_POKEMON = 2;
+		ERROR_CANNOT_USE = 3;
+		ERROR_DEPLOYED_TO_FORT = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.UseItemReviveResponse
+{
+	.POGOProtos.Networking.Responses.UseItemReviveResponse.Result result = 1;
+	int32 stamina = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_NO_POKEMON = 2;
+		ERROR_CANNOT_USE = 3;
+		ERROR_DEPLOYED_TO_FORT = 4;
+	}
+}
+
+message POGOProtos.Networking.Responses.UseItemXpBoostResponse
+{
+	.POGOProtos.Networking.Responses.UseItemXpBoostResponse.Result result = 1;
+	.POGOProtos.Inventory.AppliedItems applied_items = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+		ERROR_INVALID_ITEM_TYPE = 2;
+		ERROR_XP_BOOST_ALREADY_ACTIVE = 3;
+		ERROR_NO_ITEMS_REMAINING = 4;
+		ERROR_LOCATION_UNSET = 5;
+	}
+}
+
+message POGOProtos.Settings.DownloadSettingsAction
+{
+	string hash = 1;
+}
+
+message POGOProtos.Settings.FortSettings
+{
+	double interaction_range_meters = 1;
+	int32 max_total_deployed_pokemon = 2;
+	int32 max_player_deployed_pokemon = 3;
+	double deploy_stamina_multiplier = 4;
+	double deploy_attack_multiplier = 5;
+	double far_interaction_range_meters = 6;
+}
+
+message POGOProtos.Settings.GlobalSettings
+{
+	.POGOProtos.Settings.FortSettings fort_settings = 2;
+	.POGOProtos.Settings.MapSettings map_settings = 3;
+	.POGOProtos.Settings.LevelSettings level_settings = 4;
+	.POGOProtos.Settings.InventorySettings inventory_settings = 5;
+	string minimum_client_version = 6;
+}
+
+message POGOProtos.Settings.InventorySettings
+{
+	int32 max_pokemon = 1;
+	int32 max_bag_items = 2;
+	int32 base_pokemon = 3;
+	int32 base_bag_items = 4;
+	int32 base_eggs = 5;
+}
+
+message POGOProtos.Settings.LevelSettings
+{
+	double trainer_cp_modifier = 2;
+	double trainer_difficulty_modifier = 3;
+}
+
+message POGOProtos.Settings.MapSettings
+{
+	double pokemon_visible_range = 1;
+	double poke_nav_range_meters = 2;
+	double encounter_range_meters = 3;
+	float get_map_objects_min_refresh_seconds = 4;
+	float get_map_objects_max_refresh_seconds = 5;
+	float get_map_objects_min_distance_meters = 6;
+	string google_maps_api_key = 7;
+}
+
+message POGOProtos.Settings.Master.BadgeSettings
+{
+	.POGOProtos.Enums.BadgeType badge_type = 1;
+	int32 badge_rank = 2;
+	repeated int32 targets = 3;
+}
+
+message POGOProtos.Settings.Master.CameraSettings
+{
+	string next_camera = 1;
+	repeated .POGOProtos.Enums.CameraInterpolation interpolation = 2;
+	repeated .POGOProtos.Enums.CameraTarget target_type = 3;
+	repeated float ease_in_speed = 4;
+	repeated float east_out_speed = 5;
+	repeated float duration_seconds = 6;
+	repeated float wait_seconds = 7;
+	repeated float transition_seconds = 8;
+	repeated float angle_degree = 9;
+	repeated float angle_offset_degree = 10;
+	repeated float pitch_degree = 11;
+	repeated float pitch_offset_degree = 12;
+	repeated float roll_degree = 13;
+	repeated float distance_meters = 14;
+	repeated float height_percent = 15;
+	repeated float vert_ctr_ratio = 16;
+}
+
+message POGOProtos.Settings.Master.EncounterSettings
+{
+	float spin_bonus_threshold = 1;
+	float excellent_throw_threshold = 2;
+	float great_throw_threshold = 3;
+	float nice_throw_threshold = 4;
+	int32 milestone_threshold = 5;
+}
+
+message POGOProtos.Settings.Master.EquippedBadgeSettings
+{
+	int64 equip_badge_cooldown_ms = 1;
+	repeated float catch_probability_bonus = 2;
+	repeated float flee_probability_bonus = 3;
+}
+
+message POGOProtos.Settings.Master.GymBattleSettings
+{
+	float energy_per_sec = 1;
+	float dodge_energy_cost = 2;
+	float retarget_seconds = 3;
+	float enemy_attack_interval = 4;
+	float attack_server_interval = 5;
+	float round_duration_seconds = 6;
+	float bonus_time_per_ally_seconds = 7;
+	int32 maximum_attackers_per_battle = 8;
+	float same_type_attack_bonus_multiplier = 9;
+	int32 maximum_energy = 10;
+	float energy_delta_per_health_lost = 11;
+	int32 dodge_duration_ms = 12;
+	int32 minimum_player_level = 13;
+	int32 swap_duration_ms = 14;
+}
+
+message POGOProtos.Settings.Master.GymLevelSettings
+{
+	repeated int32 required_experience = 1;
+	repeated int32 leader_slots = 2;
+	repeated int32 trainer_slots = 3;
+	repeated int32 search_roll_bonus = 4;
+}
+
+message POGOProtos.Settings.Master.IapItemDisplay
+{
+	string sku = 1;
+	.POGOProtos.Enums.HoloIapItemCategory category = 2;
+	int32 sort_order = 3;
+	repeated .POGOProtos.Inventory.ItemId item_ids = 4;
+	repeated int32 counts = 5;
+}
+
+message POGOProtos.Settings.Master.IapSettings
+{
+	int32 daily_bonus_coins = 1;
+	repeated int32 daily_defender_bonus_per_pokemon = 2;
+	int32 daily_defender_bonus_max_defenders = 3;
+	repeated string daily_defender_bonus_currency = 4;
+	int64 min_time_between_claims_ms = 5;
+	bool daily_bonus_enabled = 6;
+	bool daily_defender_bonus_enabled = 7;
+}
+
+message POGOProtos.Settings.Master.Item.BattleAttributes
+{
+	float sta_percent = 1;
+}
+
+message POGOProtos.Settings.Master.Item.EggIncubatorAttributes
+{
+  .POGOProtos.Inventory.EggIncubatorType incubator_type = 1;
+  int32 uses = 2;
+  float distance_multiplier = 3;
+}
+
+message POGOProtos.Settings.Master.Item.ExperienceBoostAttributes
+{
+	float xp_multiplier = 1;
+	int32 boost_duration_ms = 2;
+}
+
+message POGOProtos.Settings.Master.Item.FoodAttributes
+{
+	repeated POGOProtos.Enums.ItemEffect item_effect = 1;
+	repeated float item_effect_percent = 2;
+	float growth_percent = 3;
+}
+
+message POGOProtos.Settings.Master.Item.FortModifierAttributes
+{
+	int32 modifier_lifetime_seconds = 1;
+	int32 troy_disk_num_pokemon_spawned = 2;
+}
+
+message POGOProtos.Settings.Master.Item.IncenseAttributes
+{
+	int32 incense_lifetime_seconds = 1;
+	repeated .POGOProtos.Enums.PokemonType pokemon_type = 2;
+	float pokemon_incense_type_probability = 3;
+	int32 standing_time_between_encounters_seconds = 4;
+	int32 moving_time_between_encounter_seconds = 5;
+	int32 distance_required_for_shorter_interval_meters = 6;
+	int32 pokemon_attracted_length_sec = 7;
+}
+
+message POGOProtos.Settings.Master.Item.InventoryUpgradeAttributes
+{
+	int32 additional_storage = 1;
+	.POGOProtos.Inventory.InventoryUpgradeType upgrade_type = 2;
+}
+
+message POGOProtos.Settings.Master.Item.PokeballAttributes
+{
+	.POGOProtos.Enums.ItemEffect item_effect = 1;
+	float capture_multi = 2;
+	float capture_multi_effect = 3;
+	float item_effect_mod = 4;
+}
+
+message POGOProtos.Settings.Master.Item.PotionAttributes
+{
+	float sta_percent = 1;
+	int32 sta_amount = 2;
+}
+
+message POGOProtos.Settings.Master.Item.ReviveAttributes
+{
+	float sta_percent = 1;
+}
+
+message POGOProtos.Settings.Master.ItemSettings
+{
+	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.ItemType item_type = 2;
+	.POGOProtos.Enums.ItemCategory category = 3;
+	float drop_freq = 4;
+	int32 drop_trainer_level = 5;
+
+	// One of the below attributes will be set in the response, the others will be null.
+
+	.POGOProtos.Settings.Master.Item.PokeballAttributes pokeball = 6;
+	.POGOProtos.Settings.Master.Item.PotionAttributes potion = 7;
+	.POGOProtos.Settings.Master.Item.ReviveAttributes revive = 8;
+	.POGOProtos.Settings.Master.Item.BattleAttributes battle = 9;
+	.POGOProtos.Settings.Master.Item.FoodAttributes food = 10;
+	.POGOProtos.Settings.Master.Item.InventoryUpgradeAttributes inventory_upgrade = 11;
+	.POGOProtos.Settings.Master.Item.ExperienceBoostAttributes xp_boost = 12;
+	.POGOProtos.Settings.Master.Item.IncenseAttributes incense = 13;
+	.POGOProtos.Settings.Master.Item.EggIncubatorAttributes egg_incubator = 14;
+	.POGOProtos.Settings.Master.Item.FortModifierAttributes fort_modifier = 15;
+}
+
+message POGOProtos.Settings.Master.MoveSequenceSettings
+{
+	repeated string sequence = 1;
+}
+
+message POGOProtos.Settings.Master.MoveSettings
+{
+	.POGOProtos.Enums.PokemonMovementType movement_id = 1;
+	int32 animation_id = 2;
+	.POGOProtos.Enums.PokemonType pokemon_type = 3;
+	float power = 4;
+	float accuracy_chance = 5;
+	float critical_chance = 6;
+	float heal_scalar = 7;
+	float stamina_loss_scalar = 8;
+	int32 trainer_level_min = 9;
+	int32 trainer_level_max = 10;
+	string vfx_name = 11;
+	int32 duration_ms = 12;
+	int32 damage_window_start_ms = 13;
+	int32 damage_window_end_ms = 14;
+	int32 energy_delta = 15;
+}
+
+message POGOProtos.Settings.Master.PlayerLevelSettings
+{
+	repeated int32 rank_num = 1;
+	repeated int32 required_experience = 2;
+	repeated float cp_multiplier = 3;
+	int32 max_egg_player_level = 4;
+	int32 max_encounter_player_level = 5;
+}
+
+message POGOProtos.Settings.Master.Pokemon.CameraAttributes
+{
+	float disk_radius_m = 1;
+	float cylinder_radius_m = 2;
+	float cylinder_height_m = 3;
+	float cylinder_ground_m = 4;
+	float shoulder_mode_scale = 5;
+}
+
+message POGOProtos.Settings.Master.Pokemon.EncounterAttributes
+{
+	float base_capture_rate = 1;
+	float base_flee_rate = 2;
+	float collision_radius_m = 3;
+	float collision_height_m = 4;
+	float collision_head_radius_m = 5;
+	.POGOProtos.Enums.PokemonMovementType movement_type = 6;
+	float movement_timer_s = 7;
+	float jump_time_s = 8;
+	float attack_timer_s = 9;
+}
+
+message POGOProtos.Settings.Master.Pokemon.StatsAttributes
+{
+	int32 base_stamina = 1;
+	int32 base_attack = 2;
+	int32 base_defense = 3;
+	int32 dodge_energy_delta = 8;
+}
+
+message POGOProtos.Settings.Master.PokemonSettings
+{
+	.POGOProtos.Enums.PokemonId pokemon_id = 1;
+	float model_scale = 3;
+	.POGOProtos.Enums.PokemonType type = 4;
+	.POGOProtos.Enums.PokemonType type_2 = 5;
+	.POGOProtos.Settings.Master.Pokemon.CameraAttributes camera = 6;
+	.POGOProtos.Settings.Master.Pokemon.EncounterAttributes encounter = 7;
+	.POGOProtos.Settings.Master.Pokemon.StatsAttributes stats = 8;
+	repeated .POGOProtos.Enums.PokemonMove quick_moves = 9;
+	repeated .POGOProtos.Enums.PokemonMove cinematic_moves = 10;
+	repeated float animation_time = 11;
+	repeated .POGOProtos.Enums.PokemonId evolution_ids = 12;
+	int32 evolution_pips = 13;
+	.POGOProtos.Enums.PokemonClass class = 14;
+	float pokedex_height_m = 15;
+	float pokedex_weight_kg = 16;
+	.POGOProtos.Enums.PokemonId parent_pokemon_id = 17;
+	float height_std_dev = 18;
+	float weight_std_dev = 19;
+	float km_distance_to_hatch = 20;
+	.POGOProtos.Enums.PokemonFamilyId family_id = 21;
+	int32 candy_to_evolve = 22;
+}
+
+message POGOProtos.Settings.Master.PokemonUpgradeSettings
+{
+	int32 upgrades_per_level = 1;
+	int32 allowed_levels_above_player = 2;
+	repeated int32 candy_cost = 3;
+	repeated int32 stardust_cost = 4;
+}
+
+message POGOProtos.Settings.Master.TypeEffectiveSettings
+{
+	repeated float attack_scalar = 1;
+	.POGOProtos.Enums.PokemonType attack_type = 2;
+}
+

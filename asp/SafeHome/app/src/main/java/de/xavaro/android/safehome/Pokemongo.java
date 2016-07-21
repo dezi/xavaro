@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
@@ -21,6 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import de.xavaro.android.common.Json;
+import de.xavaro.android.common.PokemonProto;
+import de.xavaro.android.common.ProtoBufferDecode;
+import de.xavaro.android.common.Simple;
 
 public class Pokemongo extends FrameLayout
 {
@@ -211,5 +219,101 @@ public class Pokemongo extends FrameLayout
     public static void logDat(String text)
     {
         Log.d(LOGTAG, "text=" + text);
+    }
+
+    public static void testDat()
+    {
+        File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File extfile = new File(extdir, "pm.20160721.061112.txt");
+
+        byte[] data = Simple.readBinaryFile(extfile);
+        Log.d(LOGTAG, "testDat: size=" + data.length);
+
+        byte[] match = "\n------------------------------\n".getBytes();
+
+        int von = -1;
+        int bis = -1;
+
+        for (int inx = 4; inx < data.length; inx++)
+        {
+            if ((data[ inx - 3 ] == (int) '-') && (data[ inx - 2 ] == (int) '-') && (data[ inx - 1 ] == (int) '\n'))
+            {
+                if (von < 0)
+                {
+                    von = inx;
+                }
+                else
+                {
+                    if (bis < 0)
+                    {
+                        bis = inx - 32;
+                    }
+                }
+            }
+        }
+
+        ProtoBufferDecode decode = new ProtoBufferDecode(data, von, bis - von);
+        JSONObject protos = PokemonProto.getProtos();
+        decode.setProtos(protos);
+        JSONObject json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
+
+        tuneUp(json);
+
+        Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
+
+        /*
+        decode = new ProtoBufferDecode(data, bis + 32, data.length - (bis + 32));
+        protos = PokemonProto.getProtos();
+        decode.setProtos(protos);
+        json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
+        Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
+        */
+    }
+
+    private static void tuneUp(JSONObject json)
+    {
+        try
+        {
+            JSONObject request = json.getJSONObject("requests@.POGOProtos.Networking.Requests.Request");
+            String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+            JSONArray reqbytes = request.getJSONArray("request_message@bytes");
+            byte[] reqdata = new byte[ reqbytes.length() ];
+
+            for (int inx = 0; inx < reqbytes.length(); inx++)
+            {
+                reqdata[ inx ] = (byte) reqbytes.getInt(inx);
+            }
+
+            String messagename = "";
+            boolean nextUp = true;
+
+            for (int inx = 0; inx < reqtype.length(); inx++)
+            {
+                if (reqtype.charAt(inx) == '@') break;
+
+                if (reqtype.charAt(inx) == '_')
+                {
+                    nextUp = true;
+                    continue;
+                }
+
+                messagename += nextUp ? reqtype.charAt(inx) : Character.toLowerCase(reqtype.charAt(inx));
+                nextUp = false;
+            }
+
+            messagename = ".POGOProtos.Networking.Requests.Messages." + messagename + "Message";
+
+            Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
+
+            ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
+            decode.setProtos(PokemonProto.getProtos());
+
+            JSONObject tune = decode.decode(messagename);
+            request.put("request_message@bytes", tune);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 }

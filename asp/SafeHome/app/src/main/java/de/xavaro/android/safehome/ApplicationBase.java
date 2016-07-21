@@ -50,7 +50,7 @@ public class ApplicationBase extends Application
         }
         */
 
-        ProtoBufferDecode.testDat();
+        Pokemongo.testDat();
 
         //
         // Make application context available.

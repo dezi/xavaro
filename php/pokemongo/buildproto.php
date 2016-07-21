@@ -4,17 +4,20 @@ include "../include/json.php";
 
 $GLOBALS[ "types" ] = array();
 
-$GLOBALS[ "types" ][ "bool"    ] = true;
+$GLOBALS[ "types" ][ "bytes"   ] = true;
 $GLOBALS[ "types" ][ "string"  ] = true;
-$GLOBALS[ "types" ][ "fixed64" ] = true;
-$GLOBALS[ "types" ][ "fixed32" ] = true;
-$GLOBALS[ "types" ][ "double"  ] = true;
+
 $GLOBALS[ "types" ][ "float"   ] = true;
+$GLOBALS[ "types" ][ "double"  ] = true;
+$GLOBALS[ "types" ][ "fixed32" ] = true;
+$GLOBALS[ "types" ][ "fixed64" ] = true;
+
 $GLOBALS[ "types" ][ "int32"   ] = true;
 $GLOBALS[ "types" ][ "int64"   ] = true;
+
+$GLOBALS[ "types" ][ "bool"    ] = true;
 $GLOBALS[ "types" ][ "uint32"  ] = true;
 $GLOBALS[ "types" ][ "uint64"  ] = true;
-$GLOBALS[ "types" ][ "bytes"   ] = true;
 
 function recurse($fd, $dir)
 {
@@ -297,6 +300,46 @@ function checkLinks()
 	file_put_contents("./pogo_protos_refs.json", json_encdat($links) . "\n");
 }
 
+function buildjava()
+{
+	$java = "";
+	
+	$java .= "package de.xavaro.android.common;\n";
+	$java .= "\n";
+	$java .= "import org.json.JSONObject;\n";
+	$java .= "\n";
+	$java .= "public class PokemonProto\n";
+	$java .= "{\n";
+	$java .= "\tpublic static JSONObject getProtos()\n";
+	$java .= "\t{\n";
+	$java .= "\t\tJSONObject json = new JSONObject();\n";
+	$java .= "\n";
+	$java .= "\t\ttry\n";
+	$java .= "\t\t{\n";
+
+	foreach ($GLOBALS[ "data" ] as $path => $data)
+	{
+		$json = json_encode($data, JSON_UNESCAPED_SLASHES +  JSON_UNESCAPED_UNICODE);
+		$json = str_replace("\"", "'", $json);
+
+		if ($json == "[]") $json = "{}";
+		
+		$java .= "\t\t\tjson.put(\"$path\",new JSONObject(\"$json\"));\n";
+	}
+	
+	$java .= "\t\t}\n";
+	$java .= "\t\tcatch (Exception ex)\n";
+	$java .= "\t\t{\n";
+	$java .= "\t\t\tex.printStackTrace();\n";
+	$java .= "\t\t}\n";
+	$java .= "\n";
+	$java .= "\t\treturn json;\n";
+	$java .= "\t}\n";
+	$java .= "}\n";
+
+	file_put_contents("./PokemonProto.java", $java . "\n");
+}
+
 $fd = fopen("./pogo_protos.proto","w");
 recurse($fd, "./POGOProtos");
 fclose($fd);
@@ -306,6 +349,9 @@ $data = parse("./pogo_protos.proto");
 file_put_contents("./pogo_protos.json", json_encdat($data) . "\n");
 
 checkLinks();
+
+buildjava();
+
 
 
 
