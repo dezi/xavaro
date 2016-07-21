@@ -1,5 +1,21 @@
 <?php
 
+include "../include/json.php";
+
+$GLOBALS[ "types" ] = array();
+
+$GLOBALS[ "types" ][ "bool"    ] = true;
+$GLOBALS[ "types" ][ "string"  ] = true;
+$GLOBALS[ "types" ][ "fixed64" ] = true;
+$GLOBALS[ "types" ][ "fixed32" ] = true;
+$GLOBALS[ "types" ][ "double"  ] = true;
+$GLOBALS[ "types" ][ "float"   ] = true;
+$GLOBALS[ "types" ][ "int32"   ] = true;
+$GLOBALS[ "types" ][ "int64"   ] = true;
+$GLOBALS[ "types" ][ "uint32"  ] = true;
+$GLOBALS[ "types" ][ "uint64"  ] = true;
+$GLOBALS[ "types" ][ "bytes"   ] = true;
+
 function recurse($fd, $dir)
 {
 	$dfd = opendir($dir);
@@ -106,11 +122,211 @@ function recurse($fd, $dir)
 	}
 }
 
-$fd = fopen("./POGOProtos.proto","w");
+function parse($protofile)
+{
+	$content = file_get_contents($protofile);
+	
+	$GLOBALS[ "lines" ] = explode("\n", $content);
+	$GLOBALS[ "lipos" ] = 0;
+	
+	$GLOBALS[ "data" ] = array();
 
+ 	parseItems("", "M");
+ 	
+	return $GLOBALS[ "data" ];
+}
+
+function parseItems($prefix, $toptype)
+{
+	$data = array();
+	
+	$type = null;
+	$path = null;
+	
+	while ($GLOBALS[ "lipos" ] < count($GLOBALS[ "lines" ]))
+	{
+		$line = trim($GLOBALS[ "lines" ][ $GLOBALS[ "lipos" ]++ ]);
+		
+		if (trim($line) == "") continue;
+		if (substr(trim($line), 0, 2) == "//") continue;
+			
+		if (substr($line, 0, 8) == "message ")
+		{
+			$type = "M";
+			$path = $prefix . "." . trim(substr($line, 8));
+			//echo "$type=$path\n";
+			continue;
+		}
+		
+		if (substr($line, 0, 5) == "enum ")
+		{
+			$type = "E";
+			$path = $prefix . "." . trim(substr($line, 5));
+			//echo "$type=$path\n"; 
+			continue;
+		}
+		
+		if ($line == "{")
+		{
+			$subdata = parseItems($path, $type);
+			
+			$GLOBALS[ "data" ][ $path ] = $subdata;
+			
+			continue;
+		}
+		
+		if ($line == "}")
+		{
+			return $data;	
+			continue;
+		}
+		
+		if ($toptype == "E")
+		{
+			$parts = explode(";", $line);
+			$line = $parts[ 0 ];
+			$parts = explode("=", $line);
+			
+			$data[ trim($parts[ 0 ]) ] = intval(trim($parts[ 1 ]), 10);
+			
+			continue;
+		}
+		
+		if ($toptype == "M")
+		{
+			$item = array();
+			
+			$packed = false;
+			$repeated = false;
+			
+			if (substr($line, 0, 9) == "repeated ")
+			{
+				$repeated = true;
+				$line = trim(substr($line, 9));
+			}
+			
+			if (substr($line, -15) == " [packed=true];")
+			{
+				$packed = true;
+				$line = trim(substr($line, 0, -15)) . ";";
+			}
+			
+			$parts = explode(";", $line);
+			$line = $parts[ 0 ];
+			$parts = explode("=", $line);
+			
+			if (count($parts) != 2)
+			{
+				echo "==========>$line<<<\n";
+				continue;
+			}
+			
+			$idid = intval(trim($parts[ 1 ]), 10);
+			$parts = explode(" ", trim($parts[ 0 ]));
+			$ttyp = trim($parts[ 0 ]);
+			$name = trim($parts[ 1 ]);
+			
+			//
+			// Check type....
+			//
+			
+			if ((substr($ttyp, 0, 1) != ".") && ! isset($GLOBALS[ "types" ][ $ttyp ]))
+			{
+				if (substr($ttyp, 0, 11) == "POGOProtos.")
+				{
+					$ttyp = "." . $ttyp;
+				}
+				else
+				{
+					//
+					// Fixed glitch in original repo.
+					//
+					
+					if ($ttyp == "InventoryUpgrade")
+					{
+						$ttyp = ".POGOProtos.Inventory.InventoryUpgrade";
+					}
+					else
+					{
+						$ttyp = $prefix . "." . $ttyp;
+					}
+					
+					echo "$ttyp=>$line\n";
+				}
+			}
+			
+			$item[ "id" ] = $idid;
+			$item[ "type" ] = $ttyp;
+			
+			if ($packed) $item[ "packed" ] = true;
+			if ($repeated) $item[ "repeated" ] = true;
+			
+			$data[ $name ] = $item;
+			
+			continue;
+		}
+	}
+	
+	return $data;
+}
+
+function checkLinks()
+{
+	$links = array();
+	
+	foreach ($GLOBALS[ "data" ] as $path => $data)
+	{
+		$links[ $path ] = 0;
+	}
+	
+	foreach ($GLOBALS[ "data" ] as $path => $data)
+	{
+		foreach ($data as $name => $value)
+		{
+			if (is_array($value) && isset($value[ "type" ]))
+			{
+				$ref = $value[ "type" ];
+				
+				if (! isset($links[ $ref ])) $links[ $ref ] = 0;
+				
+				$links[ $ref ]++;
+			}
+		}
+	}
+	
+	file_put_contents("./pogo_protos_refs.json", json_encdat($links) . "\n");
+}
+
+$fd = fopen("./pogo_protos.proto","w");
 recurse($fd, "./POGOProtos");
-
 fclose($fd);
+
+$data = parse("./pogo_protos.proto");
+
+file_put_contents("./pogo_protos.json", json_encdat($data) . "\n");
+
+checkLinks();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ?>
