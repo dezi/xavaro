@@ -106,7 +106,6 @@ public class Pokemongo extends FrameLayout
         ByteBuffer buffer = null;
 
         pokeOpenFile("url", "headers");
-        pokeWriteText("info1");
         pokeWriteBytes(data, offset, size);
         pokeWriteBuffer(buffer, offset, size);
         pokeCloseFile();
@@ -131,7 +130,7 @@ public class Pokemongo extends FrameLayout
 
     public static void pokeOpenFile(String url, String headers)
     {
-        pokeCloseFile();
+        Log.d(LOGTAG, "pokeOpenFile url=" + url + " headers=" + headers);
 
         if (! url.contains("pgorelease.nianticlabs.com")) return;
 
@@ -142,7 +141,7 @@ public class Pokemongo extends FrameLayout
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File extfile = new File(extdir, filename);
 
-        Log.d(LOGTAG, "pokeOpenFile " + extfile.toString() + " url=" + url + " headers=" + headers);
+        Log.d(LOGTAG, "pokeOpenFile url=" + url + " headers=" + headers + " file=" + extfile.toString());
 
         try
         {
@@ -159,22 +158,10 @@ public class Pokemongo extends FrameLayout
         }
     }
 
-    public static void pokeWriteText(String text)
-    {
-        if (out != null)
-        {
-            try
-            {
-                out.write(text.getBytes());
-            }
-            catch (Exception ignore)
-            {
-            }
-        }
-    }
-
     public static void pokeWriteBytes(byte[] buffer, int offset, int count)
     {
+        Log.d(LOGTAG, "pokeWriteBytes: offset=" + offset + " len=" + count + " out=" + out);
+
         if (out != null)
         {
             try
@@ -191,6 +178,8 @@ public class Pokemongo extends FrameLayout
 
     public static void pokeWriteBuffer(ByteBuffer buffer, int offset, int count)
     {
+        Log.d(LOGTAG, "pokeWriteBuffer: offset=" + offset + " len=" + count + " out=" + out);
+
         if ((out != null) && (buffer != null) && buffer.hasArray())
         {
             try
@@ -206,6 +195,8 @@ public class Pokemongo extends FrameLayout
 
     public static void pokeCloseFile()
     {
+        Log.d(LOGTAG, "pokeCloseFile: out=" + out);
+
         if (out != null)
         {
             try
