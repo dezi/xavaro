@@ -223,7 +223,7 @@ public class Pokemongo extends FrameLayout
     public static void testDat()
     {
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extfile = new File(extdir, "pm.20160721.144623.txt");
+        File extfile = new File(extdir, "pm.20160722.084953.txt");
 
         byte[] data = Simple.readBinaryFile(extfile);
         Log.d(LOGTAG, "testDat: size=" + data.length);
@@ -257,7 +257,7 @@ public class Pokemongo extends FrameLayout
         decode.setProtos(protos);
         JSONObject json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
 
-        //tuneUp(json);
+        tuneUp(json);
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
 
         /*
@@ -274,6 +274,7 @@ public class Pokemongo extends FrameLayout
         try
         {
             json.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
+            json.remove("unknown12@int64");
 
             JSONObject request = json.getJSONObject("requests@.POGOProtos.Networking.Requests.Request");
             String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");

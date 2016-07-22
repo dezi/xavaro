@@ -357,13 +357,14 @@ public class ProtoBufferDecode
     private long decodeVarint()
     {
         long result = 0;
-
+        int shift = 0;
         int next;
 
         while ((next = getNextByte()) >= 0)
         {
-            result = (result << 7) | (next & 0x7f);
+            result |= (next & 0x7f) << shift;
             if ((next & 0x80) == 0) break;
+            shift += 7;
         }
 
         return result;
@@ -385,14 +386,12 @@ public class ProtoBufferDecode
 
         if (value != null)
         {
-            /*
             for (byte aValue : value)
             {
                 arraybytes.put(aValue & 0xff);
             }
-            */
 
-            arraybytes.put("Array => " + value.length);
+            //arraybytes.put("Array => " + value.length);
         }
 
         put(json, name, arraybytes);
