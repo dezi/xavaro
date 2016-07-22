@@ -22,7 +22,9 @@ import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 import de.xavaro.android.common.Json;
@@ -126,18 +128,13 @@ public class Pokemongo extends FrameLayout
         Log.d(LOGTAG, "lat=" + location.getLatitude() + " lng=" + location.getLongitude());
     }
 
-    private static OutputStream out;
+    private static final Map<Integer, OutputStream> outputs = new HashMap<>();
 
     public static void pokeOpenFile(String url)
     {
-        if (out != null)
-        {
-            Log.d(LOGTAG, "pokeOpenFile was open!!!!!!!!!!!");
+        int urlhash = System.identityHashCode(url);
 
-            pokeCloseFile(url);
-        }
-
-        Log.d(LOGTAG, "pokeOpenFile url=" + url + " hash=" + System.identityHashCode(url));
+        Log.d(LOGTAG, "pokeOpenFile url=" + url + " hash=" + urlhash);
 
         if (! url.contains("pgorelease.nianticlabs.com")) return;
 
@@ -148,30 +145,42 @@ public class Pokemongo extends FrameLayout
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File extfile = new File(extdir, filename);
 
+        if (extfile.exists())
+        {
+            Log.d(LOGTAG, "pokeOpenFile toofast... url=" + url + " hash=" + urlhash);
+
+            return;
+        }
+
         Log.d(LOGTAG, "pokeOpenFile url=" + url + " file=" + extfile.toString());
 
         try
         {
-            out = new FileOutputStream(extfile);
+            OutputStream out = new FileOutputStream(extfile);
 
             out.write(url.getBytes());
             out.write("\n--\n".getBytes());
+
+            outputs.put(urlhash, out);
         }
         catch (Exception ignore)
         {
-            out = null;
         }
     }
 
     public static void pokeWriteBytes(String url, byte[] buffer, int offset, int count)
     {
-        Log.d(LOGTAG, "pokeWriteBytes: offset=" + offset + " len=" + count + " out=" + out + " hash=" + System.identityHashCode(url));
+        int urlhash = System.identityHashCode(url);
+
+        Log.d(LOGTAG, "pokeWriteBytes: offset=" + offset + " len=" + count + " hash=" + urlhash);
+
+        OutputStream out = outputs.get(urlhash);
 
         if (out != null)
         {
             try
             {
-                Log.d(LOGTAG, "pokeWriteBytes: offset=" + offset + " len=" + count);
+                Log.d(LOGTAG, "pokeWriteBytes: found... offset=" + offset + " len=" + count);
 
                 out.write(buffer, offset, count);
             }
@@ -183,12 +192,18 @@ public class Pokemongo extends FrameLayout
 
     public static void pokeWriteBuffer(String url, ByteBuffer buffer, int offset, int count)
     {
-        Log.d(LOGTAG, "pokeWriteBuffer: offset=" + offset + " len=" + count + " out=" + out + " hash=" + System.identityHashCode(url));
+        int urlhash = System.identityHashCode(url);
+
+        Log.d(LOGTAG, "pokeWriteBuffer: offset=" + offset + " len=" + count + " hash=" + urlhash);
+
+        OutputStream out = outputs.get(urlhash);
 
         if (out != null)
         {
             try
             {
+                Log.d(LOGTAG, "pokeWriteBuffer: found... offset=" + offset + " len=" + count);
+
                 out.write("\n--\n".getBytes());
 
                 if ((buffer != null) && buffer.hasArray())
@@ -204,13 +219,21 @@ public class Pokemongo extends FrameLayout
 
     public static void pokeCloseFile(String url)
     {
-        Log.d(LOGTAG, "pokeCloseFile: out=" + out + " hash=" + System.identityHashCode(url));
+        int urlhash = System.identityHashCode(url);
+
+        Log.d(LOGTAG, "pokeCloseFile: hash=" + urlhash);
+
+        OutputStream out = outputs.get(urlhash);
 
         if (out != null)
         {
             try
             {
+                Log.d(LOGTAG, "pokeCloseFile: closed... out=" + out + " hash=" + urlhash);
+
                 out.close();
+
+                outputs.remove(urlhash);
             }
             catch (Exception ignore)
             {
@@ -223,7 +246,7 @@ public class Pokemongo extends FrameLayout
     public static void testDat()
     {
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extfile = new File(extdir, "pm.20160722.084953.txt");
+        File extfile = new File(extdir, "pm.20160722.104901.txt");
 
         byte[] data = Simple.readBinaryFile(extfile);
         Log.d(LOGTAG, "testDat: size=" + data.length);
@@ -260,13 +283,11 @@ public class Pokemongo extends FrameLayout
         tuneUp(json);
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
 
-        /*
         decode = new ProtoBufferDecode(data, bis + 4, data.length);
         protos = PokemonProto.getProtos();
         decode.setProtos(protos);
         json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
-        */
     }
 
     private static void tuneUp(JSONObject json)
@@ -276,6 +297,7 @@ public class Pokemongo extends FrameLayout
             json.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
             json.remove("unknown12@int64");
 
+            /*
             JSONObject request = json.getJSONObject("requests@.POGOProtos.Networking.Requests.Request");
             String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
 
@@ -316,6 +338,7 @@ public class Pokemongo extends FrameLayout
                 JSONObject tune = decode.decode(messagename);
                 request.put("request_message@bytes", tune);
             }
+            */
         }
         catch (Exception ex)
         {

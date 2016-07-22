@@ -166,15 +166,11 @@ public class ProtoBufferDecode
         String name;
         String type;
 
-        Log.d(LOGTAG, "buffer=" + Simple.getHexBytesToString(buffer, offset, 32));
+        boolean packed;
+        boolean repeat;
 
         while (true)
         {
-            Log.d(LOGTAG, "decode next "
-                    + buffer[ offset ] + " "
-                    + buffer[ offset + 1 ] + " "
-                    + buffer[ offset + 2 ] + " "
-                    + buffer[ offset + 3 ] + " ");
             Log.d(LOGTAG, "decode pos=" + offset + " len=" + length);
 
             next = getNextByte();
@@ -185,6 +181,8 @@ public class ProtoBufferDecode
 
             type = getProtoType(current, idid);
             name = getProtoName(current, idid) + "@" + type;
+            packed = getProtoPacked(current, idid);
+            repeat = getProtoRepeat(current, idid);
 
             if (wire == 0)
             {
@@ -196,11 +194,11 @@ public class ProtoBufferDecode
 
                 if (protos.has(type))
                 {
-                    put(json, name, getProtoEnum(type, varint));
+                    put(json, name, getProtoEnum(type, varint), repeat);
                 }
                 else
                 {
-                    put(json, name, varint);
+                    put(json, name, varint, repeat);
                 }
 
                 continue;
@@ -212,7 +210,7 @@ public class ProtoBufferDecode
                 // Double
                 //
 
-                put(json, name, decodeDouble());
+                put(json, name, decodeDouble(), repeat);
 
                 continue;
             }
@@ -223,38 +221,34 @@ public class ProtoBufferDecode
                 // Bytes
                 //
 
-                Log.d(LOGTAG, "decode wire "
-                        + buffer[ offset - 1 ] + " "
-                        + buffer[ offset ] + " "
-                        + buffer[ offset + 1 ] + " "
-                        + buffer[ offset + 2 ] + " "
-                        + buffer[ offset + 3 ] + " ");
-
                 int seqlen = (int) decodeVarint();
                 Log.d(LOGTAG, "decode wire=2 len=" + seqlen);
 
                 byte[] seqbytes = getNextBytes(seqlen);
 
-                /*
                 if (protos.has(type))
                 {
+                    Log.d(LOGTAG, "decode: known type=" + type);
+
                     ProtoBufferDecode pbdecode = new ProtoBufferDecode(seqbytes);
                     pbdecode.setProtos(protos);
 
                     JSONObject seqjson = pbdecode.decode(type);
-                    put(json, name, seqjson);
+                    put(json, name, seqjson, repeat);
+
+                    continue;
                 }
                 else
                 {
                     if ((type != null) && type.equals("string"))
                     {
-                        put(json, name, new String(seqbytes));
+                        put(json, name, new String(seqbytes), repeat);
                         continue;
                     }
 
                     if ((type != null) && type.equals("bytes"))
                     {
-                        put(json, name, seqbytes);
+                        put(json, name, seqbytes, repeat);
                         continue;
                     }
 
@@ -264,14 +258,15 @@ public class ProtoBufferDecode
 
                         if (packedvals != null)
                         {
-                            put(json, name, packedvals);
+                            put(json, name, packedvals, repeat);
                             continue;
                         }
                     }
                 }
-                */
 
-                put(json, name, seqbytes);
+                Log.d(LOGTAG, "decode: unknown type=" + type);
+
+                put(json, name, seqbytes, repeat);
 
                 continue;
             }
@@ -282,7 +277,7 @@ public class ProtoBufferDecode
                 // Float
                 //
 
-                put(json, name, decodeFloat());
+                put(json, name, decodeFloat(), repeat);
 
                 continue;
             }
@@ -380,7 +375,7 @@ public class ProtoBufferDecode
         return ByteBuffer.wrap(getNextBytes(4)).order(ByteOrder.LITTLE_ENDIAN).getFloat();
     }
 
-    private void put(JSONObject json, String name, byte[] value)
+    private void put(JSONObject json, String name, byte[] value, boolean repeat)
     {
         JSONArray arraybytes = new JSONArray();
 
@@ -390,29 +385,26 @@ public class ProtoBufferDecode
             {
                 arraybytes.put(aValue & 0xff);
             }
-
-            //arraybytes.put("Array => " + value.length);
         }
 
-        put(json, name, arraybytes);
+        put(json, name, arraybytes, repeat);
     }
 
-    private void put(JSONObject json, String name, Object value)
+    private void put(JSONObject json, String name, Object value, boolean repeat)
     {
         try
         {
-            if (json.has(name))
+            if (repeat)
             {
                 JSONArray array;
 
-                if (json.get(name) instanceof JSONArray)
+                if (json.has(name))
                 {
                     array = (JSONArray) json.get(name);
                 }
                 else
                 {
                     array = new JSONArray();
-                    array.put(json.get(name));
                     json.put(name, array);
                 }
 
@@ -454,6 +446,19 @@ public class ProtoBufferDecode
     }
 
     @Nullable
+    private boolean getBoolean(JSONObject json, String name)
+    {
+        try
+        {
+            return json.getBoolean(name);
+        }
+        catch (Exception ignore)
+        {
+            return false;
+        }
+    }
+
+    @Nullable
     private JSONObject getJSONObject(JSONObject json, String name)
     {
         try
@@ -476,8 +481,10 @@ public class ProtoBufferDecode
             JSONObject item = getJSONObject(current, name);
             if (item == null) continue;
 
-            int itemid = getInt(item, "id");
-            if (itemid == idid) return name;
+            if (idid == getInt(item, "id"))
+            {
+                return name;
+            }
         }
 
         return "" + idid;
@@ -493,11 +500,51 @@ public class ProtoBufferDecode
             JSONObject item = getJSONObject(current, name);
             if (item == null) continue;
 
-            int itemid = getInt(item, "id");
-            if (itemid == idid) return getString(item, "type");
+            if (idid == getInt(item, "id"))
+            {
+                return getString(item, "type");
+            }
         }
 
         return "unknown";
+    }
+
+    private boolean getProtoRepeat(JSONObject current, int idid)
+    {
+        Iterator<String> keysIterator = current.keys();
+
+        while (keysIterator.hasNext())
+        {
+            String name = keysIterator.next();
+            JSONObject item = getJSONObject(current, name);
+            if (item == null) continue;
+
+            if (idid == getInt(item, "id"))
+            {
+                return getBoolean(item, "repeated");
+            }
+        }
+
+        return false;
+    }
+
+    private boolean getProtoPacked(JSONObject current, int idid)
+    {
+        Iterator<String> keysIterator = current.keys();
+
+        while (keysIterator.hasNext())
+        {
+            String name = keysIterator.next();
+            JSONObject item = getJSONObject(current, name);
+            if (item == null) continue;
+
+            if (idid == getInt(item, "id"))
+            {
+                return getBoolean(item, "packed");
+            }
+        }
+
+        return false;
     }
 
     private Object getProtoEnum(String enumtype, long value)
