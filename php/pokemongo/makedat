@@ -4,4 +4,4 @@ mkdir -p ./com.nianticlabs.pokemongo/smali/de/xavaro/android/safehome
 cp ./app-debug/smali/de/xavaro/android/safehome/Pokemongo.smali ./com.nianticlabs.pokemongo/smali/de/xavaro/android/safehome 
 cp ./app-debug/smali/de/xavaro/android/safehome/Pokemongo\$1.smali ./com.nianticlabs.pokemongo/smali/de/xavaro/android/safehome 
 apktool b -o pokemongo.apk com.nianticlabs.pokemongo
-jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -storepass hallo5 -keystore my-release-key.store pokemongo.apk apk-key
+jarsigner -sigalg SHA1withRSA -digestalg SHA1 -storepass hallo5 -keystore my-release-key.store pokemongo.apk apk-key
