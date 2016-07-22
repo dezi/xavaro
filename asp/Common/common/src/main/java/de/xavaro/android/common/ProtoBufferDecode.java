@@ -234,6 +234,7 @@ public class ProtoBufferDecode
 
                 byte[] seqbytes = getNextBytes(seqlen);
 
+                /*
                 if (protos.has(type))
                 {
                     ProtoBufferDecode pbdecode = new ProtoBufferDecode(seqbytes);
@@ -271,8 +272,10 @@ public class ProtoBufferDecode
                 }
 
                 Log.d(LOGTAG, "decode: unknown type=" + type);
+                */
 
-                put(json, name, seqbytes, repeat);
+                String hex = Simple.getHexBytesToString(seqbytes);
+                put(json, name, hex, repeat);
 
                 continue;
             }

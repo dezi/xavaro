@@ -280,8 +280,10 @@ public class Pokemongo extends FrameLayout
         JSONObject protos = PokemonProto.getProtos();
         JSONObject json;
 
-        /*
         Log.d(LOGTAG, "testDat: post=" + (bis - von));
+        Log.d(LOGTAG, "testDat: post=" + Simple.getHexBytesToString(data, von, 16));
+
+        /*
         decode = new ProtoBufferDecode(data, von, bis);
         decode.setProtos(protos);
         json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
@@ -290,8 +292,10 @@ public class Pokemongo extends FrameLayout
         */
 
         bis += 4;
+        bis += 4;
 
         Log.d(LOGTAG, "testDat: read=" + (data.length - bis));
+        Log.d(LOGTAG, "testDat: read=" + Simple.getHexBytesToString(data, bis, 16));
         decode = new ProtoBufferDecode(data, bis, data.length);
         decode.setProtos(protos);
         json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
