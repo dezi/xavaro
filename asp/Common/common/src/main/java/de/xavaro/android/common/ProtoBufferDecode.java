@@ -200,11 +200,9 @@ public class ProtoBufferDecode
         boolean packed;
         boolean repeat;
 
-        while (true)
+        while (offset < length)
         {
-            next = getNextByte();
-            if (next < 0) break;
-            nhex[ 0 ] = (byte) next;
+            next = (int) decodeVarint();
 
             idid = next >> 3;
             wire = next & 0x07;
@@ -421,6 +419,13 @@ public class ProtoBufferDecode
 
     private void put(JSONObject json, String name, byte[] value, boolean repeat)
     {
+        if (name.equals("returns@bytes"))
+        {
+            put(json, name, getHexBytesToString(value, 0, Math.min(value.length, 10)), repeat);
+
+            return;
+        }
+
         JSONArray arraybytes = new JSONArray();
 
         if (value != null)

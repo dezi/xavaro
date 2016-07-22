@@ -260,7 +260,7 @@ public class Pokemongo extends FrameLayout
     public static void testDat()
     {
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extfile = new File(extdir, "pm.20160722.182146.txt");
+        File extfile = new File(extdir, "pm.20160722.181847.txt");
 
         byte[] data = Simple.readBinaryFile(extfile);
         Log.d(LOGTAG, "testDat: size=" + data.length);
@@ -307,7 +307,6 @@ public class Pokemongo extends FrameLayout
         Log.d(LOGTAG, "testDat: read=" + getHexBytesToString(data, bis, 64));
         decode = new ProtoBufferDecode(data, bis, data.length);
         decode.setProtos(protos);
-        decode.setFlat(true);
         json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
     }
