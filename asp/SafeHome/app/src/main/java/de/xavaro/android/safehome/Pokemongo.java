@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.support.annotation.Nullable;
+
 import android.app.Application;
 import android.content.Context;
 import android.graphics.PixelFormat;
@@ -246,7 +248,7 @@ public class Pokemongo extends FrameLayout
     public static void testDat()
     {
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extfile = new File(extdir, "pm.20160722.104901.txt");
+        File extfile = new File(extdir, "pm.20160722.132741.txt");
 
         byte[] data = Simple.readBinaryFile(extfile);
         Log.d(LOGTAG, "testDat: size=" + data.length);
@@ -274,71 +276,105 @@ public class Pokemongo extends FrameLayout
             }
         }
 
-        Log.d(LOGTAG, "testDat: post=" + (bis - von));
-        ProtoBufferDecode decode = new ProtoBufferDecode(data, von, bis);
+        ProtoBufferDecode decode;
         JSONObject protos = PokemonProto.getProtos();
+        JSONObject json;
+
+        /*
+        Log.d(LOGTAG, "testDat: post=" + (bis - von));
+        decode = new ProtoBufferDecode(data, von, bis);
         decode.setProtos(protos);
-        JSONObject json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
-
-        tuneUp(json);
+        json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
+        tuneRequest(json);
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
+        */
 
-        decode = new ProtoBufferDecode(data, bis + 4, data.length);
-        protos = PokemonProto.getProtos();
+        bis += 4;
+
+        Log.d(LOGTAG, "testDat: read=" + (data.length - bis));
+        decode = new ProtoBufferDecode(data, bis, data.length);
         decode.setProtos(protos);
         json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
     }
 
-    private static void tuneUp(JSONObject json)
+    @Nullable
+    public static String decodeRequest(byte[] request)
+    {
+        ProtoBufferDecode decode = new ProtoBufferDecode(request);
+        JSONObject protos = PokemonProto.getProtos();
+        decode.setProtos(protos);
+        JSONObject json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
+        tuneRequest(json);
+
+        if (json != null)
+        {
+            try
+            {
+                return json.toString(2);
+            }
+            catch (Exception ignored)
+            {
+            }
+        }
+
+        return null;
+    }
+
+    public static void tuneRequest(JSONObject json)
     {
         try
         {
+            json.remove("auth_ticket@.POGOProtos.Networking.Envelopes.AuthTicket");
             json.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
             json.remove("unknown12@int64");
 
-            /*
-            JSONObject request = json.getJSONObject("requests@.POGOProtos.Networking.Requests.Request");
-            String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+            JSONArray requests = json.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
 
-            if (request.has("request_message@bytes"))
+            for (int rinx = 0; rinx < requests.length(); rinx++)
             {
-                JSONArray reqbytes = request.getJSONArray("request_message@bytes");
-                byte[] reqdata = new byte[ reqbytes.length() ];
+                JSONObject request = requests.getJSONObject(rinx);
 
-                for (int inx = 0; inx < reqbytes.length(); inx++)
+                String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+
+                if (request.has("request_message@bytes"))
                 {
-                    reqdata[ inx ] = (byte) reqbytes.getInt(inx);
-                }
+                    JSONArray reqbytes = request.getJSONArray("request_message@bytes");
+                    byte[] reqdata = new byte[ reqbytes.length() ];
 
-                String messagename = "";
-                boolean nextUp = true;
-
-                for (int inx = 0; inx < reqtype.length(); inx++)
-                {
-                    if (reqtype.charAt(inx) == '@') break;
-
-                    if (reqtype.charAt(inx) == '_')
+                    for (int inx = 0; inx < reqbytes.length(); inx++)
                     {
-                        nextUp = true;
-                        continue;
+                        reqdata[ inx ] = (byte) reqbytes.getInt(inx);
                     }
 
-                    messagename += nextUp ? reqtype.charAt(inx) : Character.toLowerCase(reqtype.charAt(inx));
-                    nextUp = false;
+                    String messagename = "";
+                    boolean nextUp = true;
+
+                    for (int inx = 0; inx < reqtype.length(); inx++)
+                    {
+                        if (reqtype.charAt(inx) == '@') break;
+
+                        if (reqtype.charAt(inx) == '_')
+                        {
+                            nextUp = true;
+                            continue;
+                        }
+
+                        messagename += nextUp ? reqtype.charAt(inx) : Character.toLowerCase(reqtype.charAt(inx));
+                        nextUp = false;
+                    }
+
+                    messagename = ".POGOProtos.Networking.Requests.Messages." + messagename + "Message";
+
+                    Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
+
+                    ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
+                    decode.setProtos(PokemonProto.getProtos());
+
+                    JSONObject tune = decode.decode(messagename);
+                    request.put("request_message@bytes", tune);
                 }
-
-                messagename = ".POGOProtos.Networking.Requests.Messages." + messagename + "Message";
-
-                Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
-
-                ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
-                decode.setProtos(PokemonProto.getProtos());
-
-                JSONObject tune = decode.decode(messagename);
-                request.put("request_message@bytes", tune);
             }
-            */
         }
         catch (Exception ex)
         {

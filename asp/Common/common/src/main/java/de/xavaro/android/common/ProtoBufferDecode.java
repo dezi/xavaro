@@ -171,8 +171,6 @@ public class ProtoBufferDecode
 
         while (true)
         {
-            Log.d(LOGTAG, "decode pos=" + offset + " len=" + length);
-
             next = getNextByte();
             if (next < 0) break;
 
@@ -183,6 +181,16 @@ public class ProtoBufferDecode
             name = getProtoName(current, idid) + "@" + type;
             packed = getProtoPacked(current, idid);
             repeat = getProtoRepeat(current, idid);
+
+            Log.d(LOGTAG, "decode"
+                    + " pos=" + (offset - 1)
+                    + " len=" + length
+                    + " idid=" + idid
+                    + " wire=" + wire
+                    + " name=" + name
+                    + " pck=" + packed
+                    + " rpt=" + repeat
+                );
 
             if (wire == 0)
             {
@@ -228,8 +236,6 @@ public class ProtoBufferDecode
 
                 if (protos.has(type))
                 {
-                    Log.d(LOGTAG, "decode: known type=" + type);
-
                     ProtoBufferDecode pbdecode = new ProtoBufferDecode(seqbytes);
                     pbdecode.setProtos(protos);
 
@@ -286,6 +292,8 @@ public class ProtoBufferDecode
 
             break;
         }
+
+        Log.d(LOGTAG, "decode: done decoding...");
 
         return json;
     }
@@ -352,8 +360,8 @@ public class ProtoBufferDecode
     private long decodeVarint()
     {
         long result = 0;
+        long next;
         int shift = 0;
-        int next;
 
         while ((next = getNextByte()) >= 0)
         {
