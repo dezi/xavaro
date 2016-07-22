@@ -109,6 +109,7 @@ public class Pokemongo extends FrameLayout
         ByteBuffer buffer = null;
         String url = "url";
 
+        pokeWriteText(url);
         pokeOpenFile(url);
         pokeWriteBytes(url, data, offset, size);
         pokeWriteBuffer(url, buffer, offset, size);
@@ -170,6 +171,11 @@ public class Pokemongo extends FrameLayout
         }
     }
 
+    public static void pokeWriteText(String text)
+    {
+        Log.d(LOGTAG, "pokeWriteText: text=" + text);
+    }
+
     public static void pokeWriteBytes(String url, byte[] buffer, int offset, int count)
     {
         int urlhash = System.identityHashCode(url);
@@ -196,7 +202,13 @@ public class Pokemongo extends FrameLayout
     {
         int urlhash = System.identityHashCode(url);
 
+
         Log.d(LOGTAG, "pokeWriteBuffer: offset=" + offset + " len=" + count + " hash=" + urlhash);
+
+        if ((buffer != null) && buffer.hasArray())
+        {
+            Log.d(LOGTAG, "pokeWriteBuffer: remain=" + buffer.remaining() + " buffoff=" + buffer.arrayOffset() + " buffsiz=" + buffer.array().length);
+        }
 
         OutputStream out = outputs.get(urlhash);
 
@@ -210,7 +222,7 @@ public class Pokemongo extends FrameLayout
 
                 if ((buffer != null) && buffer.hasArray())
                 {
-                    out.write(buffer.array(), offset, count);
+                    out.write(buffer.array(), buffer.arrayOffset() + offset, count);
                 }
             }
             catch (Exception ignore)
@@ -248,7 +260,7 @@ public class Pokemongo extends FrameLayout
     public static void testDat()
     {
         File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extfile = new File(extdir, "pm.20160722.132741.txt");
+        File extfile = new File(extdir, "pm.20160722.182146.txt");
 
         byte[] data = Simple.readBinaryFile(extfile);
         Log.d(LOGTAG, "testDat: size=" + data.length);
@@ -281,25 +293,40 @@ public class Pokemongo extends FrameLayout
         JSONObject json;
 
         Log.d(LOGTAG, "testDat: post=" + (bis - von));
-        Log.d(LOGTAG, "testDat: post=" + Simple.getHexBytesToString(data, von, 16));
+        Log.d(LOGTAG, "testDat: post=" + getHexBytesToString(data, von, 64));
 
-        /*
         decode = new ProtoBufferDecode(data, von, bis);
         decode.setProtos(protos);
         json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
         tuneRequest(json);
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
-        */
 
-        bis += 4;
         bis += 4;
 
         Log.d(LOGTAG, "testDat: read=" + (data.length - bis));
-        Log.d(LOGTAG, "testDat: read=" + Simple.getHexBytesToString(data, bis, 16));
+        Log.d(LOGTAG, "testDat: read=" + getHexBytesToString(data, bis, 64));
         decode = new ProtoBufferDecode(data, bis, data.length);
         decode.setProtos(protos);
+        decode.setFlat(true);
         json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
         Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
+    }
+
+    public static String getHexBytesToString(byte[] bytes, int offset, int length)
+    {
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[ length * 3 ];
+
+        for (int inx = offset; inx < (length + offset); inx++)
+        {
+            //noinspection PointlessArithmeticExpression
+            hexChars[ ((inx - offset) * 3) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
+            //noinspection PointlessBitwiseExpression
+            hexChars[ ((inx - offset) * 3) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
+            hexChars[ ((inx - offset) * 3) + 2 ] = ' ';
+        }
+
+        return String.valueOf(hexChars);
     }
 
     @Nullable

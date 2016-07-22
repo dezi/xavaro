@@ -25,6 +25,7 @@ public class ProtoBufferDecode
     private int length;
 
     private JSONObject protos;
+    private boolean flat;
 
     public ProtoBufferDecode(byte[] buffer)
     {
@@ -63,6 +64,11 @@ public class ProtoBufferDecode
     public void setProtos(JSONObject protos)
     {
         this.protos = protos;
+    }
+
+    public void setFlat(boolean flat)
+    {
+        this.flat = flat;
     }
 
     private static Application getApplicationUsingReflection() throws Exception
@@ -143,6 +149,28 @@ public class ProtoBufferDecode
         return bytes;
     }
 
+    public static String getHexBytesToString(byte[] bytes)
+    {
+        return getHexBytesToString(bytes, 0, bytes.length);
+    }
+
+    public static String getHexBytesToString(byte[] bytes, int offset, int length)
+    {
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[ length * 3 ];
+
+        for (int inx = offset; inx < (length + offset); inx++)
+        {
+            //noinspection PointlessArithmeticExpression
+            hexChars[ ((inx - offset) * 3) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
+            //noinspection PointlessBitwiseExpression
+            hexChars[ ((inx - offset) * 3) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
+            hexChars[ ((inx - offset) * 3) + 2 ] = ' ';
+        }
+
+        return String.valueOf(hexChars);
+    }
+
     @Nullable
     public JSONObject decode(String message)
     {
@@ -157,6 +185,8 @@ public class ProtoBufferDecode
 
         Log.d(LOGTAG, "decode: start decoding...");
 
+        if (flat) Log.d(LOGTAG, "decode: " + getHexBytesToString(buffer, offset, length - offset));
+
         JSONObject json = new JSONObject();
 
         int next;
@@ -165,6 +195,7 @@ public class ProtoBufferDecode
 
         String name;
         String type;
+        byte[] nhex = new byte[ 1 ];
 
         boolean packed;
         boolean repeat;
@@ -173,6 +204,7 @@ public class ProtoBufferDecode
         {
             next = getNextByte();
             if (next < 0) break;
+            nhex[ 0 ] = (byte) next;
 
             idid = next >> 3;
             wire = next & 0x07;
@@ -184,7 +216,7 @@ public class ProtoBufferDecode
 
             Log.d(LOGTAG, "decode"
                     + " pos=" + (offset - 1)
-                    + " len=" + length
+                    + " next=" + getHexBytesToString(nhex)
                     + " idid=" + idid
                     + " wire=" + wire
                     + " name=" + name
@@ -234,47 +266,48 @@ public class ProtoBufferDecode
 
                 byte[] seqbytes = getNextBytes(seqlen);
 
-                /*
-                if (protos.has(type))
+                if (! flat)
                 {
-                    ProtoBufferDecode pbdecode = new ProtoBufferDecode(seqbytes);
-                    pbdecode.setProtos(protos);
-
-                    JSONObject seqjson = pbdecode.decode(type);
-                    put(json, name, seqjson, repeat);
-
-                    continue;
-                }
-                else
-                {
-                    if ((type != null) && type.equals("string"))
+                    if (protos.has(type))
                     {
-                        put(json, name, new String(seqbytes), repeat);
+                        ProtoBufferDecode pbdecode = new ProtoBufferDecode(seqbytes);
+                        pbdecode.setProtos(protos);
+
+                        JSONObject seqjson = pbdecode.decode(type);
+                        put(json, name, seqjson, repeat);
+
                         continue;
                     }
-
-                    if ((type != null) && type.equals("bytes"))
+                    else
                     {
-                        put(json, name, seqbytes, repeat);
-                        continue;
-                    }
-
-                    if (type != null)
-                    {
-                        JSONArray packedvals = decodePacked(type, seqbytes);
-
-                        if (packedvals != null)
+                        if ((type != null) && type.equals("string"))
                         {
-                            put(json, name, packedvals, repeat);
+                            put(json, name, new String(seqbytes), repeat);
                             continue;
                         }
+
+                        if ((type != null) && type.equals("bytes"))
+                        {
+                            put(json, name, seqbytes, repeat);
+                            continue;
+                        }
+
+                        if (type != null)
+                        {
+                            JSONArray packedvals = decodePacked(type, seqbytes);
+
+                            if (packedvals != null)
+                            {
+                                put(json, name, packedvals, repeat);
+                                continue;
+                            }
+                        }
                     }
+
+                    Log.d(LOGTAG, "decode: unknown type=" + type);
                 }
 
-                Log.d(LOGTAG, "decode: unknown type=" + type);
-                */
-
-                String hex = Simple.getHexBytesToString(seqbytes);
+                String hex = getHexBytesToString(seqbytes);
                 put(json, name, hex, repeat);
 
                 continue;
