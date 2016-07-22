@@ -270,6 +270,7 @@
 
     move-object/from16 v0, p3
 
+    invoke-static {v0}, Lde/xavaro/android/safehome/Pokemongo;->pokeOpenFile(Ljava/lang/String;)V
     invoke-direct {v2, v0}, Ljava/net/URL;-><init>(Ljava/lang/String;)V
 
     invoke-virtual {v2}, Ljava/net/URL;->openConnection()Ljava/net/URLConnection;
@@ -365,6 +366,8 @@
 
     move/from16 v1, p8
 
+    move-object/from16 v5, p3
+    invoke-static {v5, v2, v3, v1}, Lde/xavaro/android/safehome/Pokemongo;->pokeWriteBytes(Ljava/lang/String;[BII)V
     invoke-virtual {v0, v2, v3, v1}, Ljava/io/OutputStream;->write([BII)V
     :try_end_2
     .catchall {:try_start_2 .. :try_end_2} :catchall_1
@@ -418,8 +421,11 @@
     .local v6, "buffer":Ljava/nio/ByteBuffer;
     const/4 v7, 0x0
 
-    move-wide/from16 v2, p0
+    move-object/from16 v2, p3
+    invoke-static {v2, v6, v7, v8}, Lde/xavaro/android/safehome/Pokemongo;->pokeWriteBuffer(Ljava/lang/String;Ljava/nio/ByteBuffer;II)V
+    invoke-static {v2}, Lde/xavaro/android/safehome/Pokemongo;->pokeCloseFile(Ljava/lang/String;)V
 
+    move-wide/from16 v2, p0
     invoke-static/range {v2 .. v8}, Lcom/nianticlabs/nia/network/NiaNet;->nativeCallback(JILjava/lang/String;Ljava/nio/ByteBuffer;II)V
 
     goto/16 :goto_1
@@ -496,7 +502,9 @@
     move-object/from16 v0, v21
 
     move-object/from16 v1, v17
-
+    
+    move-object/from16 v3, p3
+    invoke-static {v3, v1, v2, v9}, Lde/xavaro/android/safehome/Pokemongo;->pokeWriteBytes(Ljava/lang/String;[BII)V
     invoke-virtual {v0, v1, v2, v9}, Ljava/io/OutputStream;->write([BII)V
     :try_end_5
     .catchall {:try_start_5 .. :try_end_5} :catchall_1
@@ -588,8 +596,11 @@
     move-wide/from16 v10, p0
 
     move v12, v4
-
+    
     move-object v13, v5
+    
+    move-object/from16 v2, p3
+    invoke-static {v2}, Lde/xavaro/android/safehome/Pokemongo;->pokeCloseFile(Ljava/lang/String;)V
 
     invoke-static/range {v10 .. v16}, Lcom/nianticlabs/nia/network/NiaNet;->nativeCallback(JILjava/lang/String;Ljava/nio/ByteBuffer;II)V
 
