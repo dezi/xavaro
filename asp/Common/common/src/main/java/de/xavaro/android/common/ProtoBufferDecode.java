@@ -421,7 +421,7 @@ public class ProtoBufferDecode
     {
         if (name.equals("returns@bytes"))
         {
-            put(json, name, getHexBytesToString(value, 0, Math.min(value.length, 10)), repeat);
+            put(json, name, getHexBytesToString(value), repeat);
 
             return;
         }

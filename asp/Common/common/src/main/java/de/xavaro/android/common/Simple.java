@@ -1477,6 +1477,8 @@ public class Simple
     {
         if (hexstring == null) return null;
 
+        hexstring = hexstring.replace(" ", "");
+
         byte[] bytes = new byte[ hexstring.length() >> 1 ];
 
         for (int inx = 0; inx < hexstring.length(); inx += 2)

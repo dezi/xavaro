@@ -290,25 +290,28 @@ public class Pokemongo extends FrameLayout
 
         ProtoBufferDecode decode;
         JSONObject protos = PokemonProto.getProtos();
-        JSONObject json;
+        JSONObject reqenvelope;
+        JSONObject resenvelope;
 
         Log.d(LOGTAG, "testDat: post=" + (bis - von));
         Log.d(LOGTAG, "testDat: post=" + getHexBytesToString(data, von, 64));
 
         decode = new ProtoBufferDecode(data, von, bis);
         decode.setProtos(protos);
-        json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
-        tuneRequest(json);
-        Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
+        reqenvelope = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
+        assembleRequest(reqenvelope);
+        Log.d(LOGTAG,"testDat: " + Json.toPretty(reqenvelope));
 
         bis += 4;
 
         Log.d(LOGTAG, "testDat: read=" + (data.length - bis));
         Log.d(LOGTAG, "testDat: read=" + getHexBytesToString(data, bis, 64));
+
         decode = new ProtoBufferDecode(data, bis, data.length);
         decode.setProtos(protos);
-        json = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
-        Log.d(LOGTAG,"testDat: " + Json.toPretty(json));
+        resenvelope = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
+        assembleResponse(reqenvelope,resenvelope);
+        Log.d(LOGTAG,"testDat: " + Json.toPretty(resenvelope));
     }
 
     public static String getHexBytesToString(byte[] bytes, int offset, int length)
@@ -335,7 +338,7 @@ public class Pokemongo extends FrameLayout
         JSONObject protos = PokemonProto.getProtos();
         decode.setProtos(protos);
         JSONObject json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
-        tuneRequest(json);
+        assembleRequest(json);
 
         if (json != null)
         {
@@ -351,21 +354,22 @@ public class Pokemongo extends FrameLayout
         return null;
     }
 
-    public static void tuneRequest(JSONObject json)
+    public static void assembleRequest(JSONObject reqenvelop)
     {
         try
         {
-            json.remove("auth_ticket@.POGOProtos.Networking.Envelopes.AuthTicket");
-            json.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
-            json.remove("unknown12@int64");
+            reqenvelop.remove("auth_ticket@.POGOProtos.Networking.Envelopes.AuthTicket");
+            reqenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
+            reqenvelop.remove("unknown12@int64");
 
-            JSONArray requests = json.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
+            JSONArray requests = reqenvelop.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
 
             for (int rinx = 0; rinx < requests.length(); rinx++)
             {
                 JSONObject request = requests.getJSONObject(rinx);
 
                 String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+                String messagename = ".POGOProtos.Networking.Requests.Messages." + CamelName(reqtype) + "Message";
 
                 if (request.has("request_message@bytes"))
                 {
@@ -377,32 +381,15 @@ public class Pokemongo extends FrameLayout
                         reqdata[ inx ] = (byte) reqbytes.getInt(inx);
                     }
 
-                    String messagename = "";
-                    boolean nextUp = true;
-
-                    for (int inx = 0; inx < reqtype.length(); inx++)
-                    {
-                        if (reqtype.charAt(inx) == '@') break;
-
-                        if (reqtype.charAt(inx) == '_')
-                        {
-                            nextUp = true;
-                            continue;
-                        }
-
-                        messagename += nextUp ? reqtype.charAt(inx) : Character.toLowerCase(reqtype.charAt(inx));
-                        nextUp = false;
-                    }
-
-                    messagename = ".POGOProtos.Networking.Requests.Messages." + messagename + "Message";
-
                     Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
 
                     ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
                     decode.setProtos(PokemonProto.getProtos());
 
                     JSONObject tune = decode.decode(messagename);
-                    request.put("request_message@bytes", tune);
+
+                    request.remove("request_message@bytes");
+                    request.put(messagename, tune);
                 }
             }
         }
@@ -410,5 +397,75 @@ public class Pokemongo extends FrameLayout
         {
             ex.printStackTrace();
         }
+    }
+
+    public static void assembleResponse(JSONObject reqenvelop, JSONObject resenvelop)
+    {
+        try
+        {
+            resenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6Response");
+
+            JSONArray requests = reqenvelop.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
+            JSONArray reponses = resenvelop.getJSONArray("returns@bytes");
+
+            JSONArray decoded = new JSONArray();
+
+            for (int rinx = 0; rinx < requests.length(); rinx++)
+            {
+                JSONObject request = requests.getJSONObject(rinx);
+
+                String restype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+                String messagename = ".POGOProtos.Networking.Responses." + CamelName(restype) + "Response";
+
+                if (rinx <= reponses.length())
+                {
+                    String hexbytes = reponses.getString(rinx);
+                    byte[] resdata = Simple.getHexStringToBytes(hexbytes);
+
+                    Log.d(LOGTAG, "tuneUp restype=" + restype + " messagename=" + messagename);
+
+                    ProtoBufferDecode decode = new ProtoBufferDecode(resdata);
+                    decode.setProtos(PokemonProto.getProtos());
+
+                    JSONObject tune = decode.decode(messagename);
+
+                    JSONObject resmessage = new JSONObject();
+
+                    resmessage.put("type", messagename);
+                    resmessage.put("data", tune);
+
+                    decoded.put(resmessage);
+                }
+            }
+
+            resenvelop.remove("returns@bytes");
+            resenvelop.put("returns@array", decoded);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    private static String CamelName(String uppercase)
+    {
+        String camelname = "";
+        boolean nextUp = true;
+
+        for (int inx = 0; inx < uppercase.length(); inx++)
+        {
+            if (uppercase.charAt(inx) == '@') break;
+
+            if (uppercase.charAt(inx) == '_')
+            {
+                nextUp = true;
+                continue;
+            }
+
+            camelname += nextUp ? uppercase.charAt(inx) : Character.toLowerCase(uppercase.charAt(inx));
+            nextUp = false;
+        }
+
+        return camelname;
     }
 }
