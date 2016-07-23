@@ -154,12 +154,12 @@ public class Pokemongo extends FrameLayout
         pokeCloseFile(url);
     }
 
-    private static double lat = 0;
-    private static double lon = 0;
+    //private static double lat = 0;
+    //private static double lon = 0;
 
     // Hamburg => 53.544107, 9.985271
-    //private static double lat = 53.544107;
-    //private static double lon = 9.985271;
+    private static double lat = 53.544107;
+    private static double lon = 9.985271;
 
     private static double latMove = 0;
     private static double lonMove = 0;
