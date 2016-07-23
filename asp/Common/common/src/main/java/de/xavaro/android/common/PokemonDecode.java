@@ -113,7 +113,7 @@ public class PokemonDecode
                     String hexbytes = reponses.getString(rinx);
                     byte[] resdata = getHexStringToBytes(hexbytes);
 
-                    Log.d(LOGTAG, "tuneUp restype=" + restype + " messagename=" + messagename);
+                    Log.d("POKEDEZI", "tuneUp restype=" + restype + " messagename=" + messagename);
 
                     ProtoBufferDecode decode = new ProtoBufferDecode(resdata);
                     decode.setProtos(PokemonProto.getProtos());

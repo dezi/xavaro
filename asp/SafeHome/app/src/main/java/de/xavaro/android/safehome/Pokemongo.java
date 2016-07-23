@@ -94,11 +94,14 @@ public class Pokemongo extends FrameLayout
             else
             {
                 latMove = -relY / 100000.0;
-                lonMove = relX / 100000.0;
+                lonMove =  relX / 100000.0;
             }
 
             Log.d(LOGTAG, "Alert touch down: relX=" + relX + " relY=" + relY);
-            Log.d(LOGTAG, "Alert touch down: latMove=" + latMove + " lonMove=" + lonMove);
+
+            Log.d(LOGTAG, "Alert touch down:"
+                    + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
+                    + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove));
         }
 
         return false;
@@ -110,8 +113,8 @@ public class Pokemongo extends FrameLayout
     {
         if (instance != null) return;
 
-        lat = location.getLatitude();
-        lon = location.getLongitude();
+        if (lat == 0) lat = location.getLatitude();
+        if (lon == 0) lon = location.getLongitude();
 
         try
         {
@@ -153,8 +156,13 @@ public class Pokemongo extends FrameLayout
 
     private static double lat = 0;
     private static double lon = 0;
+
+    // Hamburg => 53.544107, 9.985271
+    //private static double lat = 53.544107;
+    //private static double lon = 9.985271;
+
     private static double latMove = 0;
-    private static double lonMove = 0.001;
+    private static double lonMove = 0;
 
     public static void deziLocation(Location location)
     {
@@ -169,8 +177,8 @@ public class Pokemongo extends FrameLayout
         Log.d(LOGTAG, "deziLocation:"
                 + " lat=" + location.getLatitude()
                 + " lon=" + location.getLongitude()
-                + " latMove=" + String.format("%0.6f", latMove)
-                + " lonMove=" + String.format("%0.6f", lonMove)
+                + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
+                + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove)
         );
     }
 
@@ -332,19 +340,20 @@ public class Pokemongo extends FrameLayout
             {
                 JSONObject returnobj = returns.getJSONObject(inx);
                 String type = returnobj.getString("type");
-                if (! type.equals(".POGOProtos.Networking.Responses.FortDetailsResponse")) continue;
+                if (type.equals(".POGOProtos.Networking.Responses.FortDetailsResponse"))
+                {
+                    JSONObject data = returnobj.getJSONObject("data");
 
-                JSONObject data = returnobj.getJSONObject("data");
+                    double latloc = data.getDouble("latitude@double");
+                    double lonloc = data.getDouble("longitude@double");
 
-                double latloc = data.getDouble("latitude@double");
-                double lonloc = data.getDouble("longitude@double");
+                    Log.d(LOGTAG, "Fort encountered: lat=" + latloc + " lon=" + lonloc);
 
-                Log.d(LOGTAG, "Fort encountered: lat=" + latloc + " lon=" + lonloc);
-
-                lat = latloc;
-                lon = lonloc;
-                latMove = 0;
-                lonMove = 0;
+                    lat = latloc;
+                    lon = lonloc;
+                    latMove = 0;
+                    lonMove = 0;
+                }
             }
         }
         catch (Exception ex)
