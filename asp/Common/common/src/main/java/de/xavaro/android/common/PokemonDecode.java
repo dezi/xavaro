@@ -18,7 +18,7 @@ public class PokemonDecode
     }
 
     @Nullable
-    public JSONObject decode(byte[] requestBytes, byte[] responseBytes)
+    public JSONObject decode(String url, byte[] requestBytes, byte[] responseBytes)
     {
         try
         {
@@ -38,6 +38,7 @@ public class PokemonDecode
 
             JSONObject result = new JSONObject();
 
+            result.put("apiurl", url);
             result.put("request", reqenvelope);
             result.put("response", resenvelope);
 
@@ -68,13 +69,8 @@ public class PokemonDecode
 
                 if (request.has("request_message@bytes"))
                 {
-                    JSONArray reqbytes = request.getJSONArray("request_message@bytes");
-                    byte[] reqdata = new byte[ reqbytes.length() ];
-
-                    for (int inx = 0; inx < reqbytes.length(); inx++)
-                    {
-                        reqdata[ inx ] = (byte) reqbytes.getInt(inx);
-                    }
+                    String hexbytes = request.getString("request_message@bytes");
+                    byte[] reqdata = getHexStringToBytes(hexbytes);
 
                     Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
 

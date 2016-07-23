@@ -92,8 +92,10 @@ public class ProtoBufferDecode
 
     public static String getHexBytesToString(byte[] bytes, int offset, int length)
     {
+        if (length == 0) return "";
+
         char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[ length * 3 ];
+        char[] hexChars = new char[ (length * 3) - 1 ];
 
         for (int inx = offset; inx < (length + offset); inx++)
         {
@@ -101,6 +103,8 @@ public class ProtoBufferDecode
             hexChars[ ((inx - offset) * 3) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
             //noinspection PointlessBitwiseExpression
             hexChars[ ((inx - offset) * 3) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
+
+            if (inx + 1 >= (length + offset)) break;
             hexChars[ ((inx - offset) * 3) + 2 ] = ' ';
         }
 
@@ -119,9 +123,9 @@ public class ProtoBufferDecode
             return null;
         }
 
-        Log.d(LOGTAG, "decode: start decoding...");
+        if (debug) Log.d(LOGTAG, "decode: start decoding...");
 
-        if (flat) Log.d(LOGTAG, "decode: " + getHexBytesToString(buffer, offset, length - offset));
+        if (debug && flat) Log.d(LOGTAG, "decode: " + getHexBytesToString(buffer, offset, length - offset));
 
         JSONObject json = new JSONObject();
 
@@ -131,7 +135,6 @@ public class ProtoBufferDecode
 
         String name;
         String type;
-        byte[] nhex = new byte[ 1 ];
 
         boolean packed;
         boolean repeat;
@@ -148,15 +151,17 @@ public class ProtoBufferDecode
             packed = getProtoPacked(current, idid);
             repeat = getProtoRepeat(current, idid);
 
-            Log.d(LOGTAG, "decode"
-                    + " pos=" + (offset - 1)
-                    + " next=" + getHexBytesToString(nhex)
-                    + " idid=" + idid
-                    + " wire=" + wire
-                    + " name=" + name
-                    + " pck=" + packed
-                    + " rpt=" + repeat
+            if (debug)
+            {
+                Log.d(LOGTAG, "decode"
+                        + " pos=" + (offset - 1)
+                        + " idid=" + idid
+                        + " wire=" + wire
+                        + " name=" + name
+                        + " pck=" + packed
+                        + " rpt=" + repeat
                 );
+            }
 
             if (wire == 0)
             {
@@ -196,7 +201,8 @@ public class ProtoBufferDecode
                 //
 
                 int seqlen = (int) decodeVarint();
-                Log.d(LOGTAG, "decode wire=2 len=" + seqlen);
+
+                if (debug) Log.d(LOGTAG, "decode wire=2 len=" + seqlen);
 
                 byte[] seqbytes = getNextBytes(seqlen);
 
@@ -263,7 +269,7 @@ public class ProtoBufferDecode
             break;
         }
 
-        Log.d(LOGTAG, "decode: done decoding...");
+        if (debug) Log.d(LOGTAG, "decode: done decoding...");
 
         return json;
     }
@@ -309,13 +315,13 @@ public class ProtoBufferDecode
                 {
                     varint = dp.decodeVarint();
 
-                    Log.d(LOGTAG, "decodePacked: type=" + type + " pos=" + dp.offset + " len=" + dp.length + " varint=" + varint);
+                    if (debug) Log.d(LOGTAG, "decodePacked: type=" + type + " pos=" + dp.offset + " len=" + dp.length + " varint=" + varint);
 
                     valarray.put(varint);
                 }
             }
 
-            Log.d(LOGTAG, "decodePacked: valarray=" + valarray.length());
+            if (debug) Log.d(LOGTAG, "decodePacked: valarray=" + valarray.length());
 
             return valarray;
         }
@@ -355,6 +361,9 @@ public class ProtoBufferDecode
 
     private void put(JSONObject json, String name, byte[] value, boolean repeat)
     {
+        put(json, name, getHexBytesToString(value), repeat);
+
+        /*
         if (name.equals("returns@bytes"))
         {
             put(json, name, getHexBytesToString(value), repeat);
@@ -373,6 +382,7 @@ public class ProtoBufferDecode
         }
 
         put(json, name, arraybytes, repeat);
+        */
     }
 
     private void put(JSONObject json, String name, Object value, boolean repeat)

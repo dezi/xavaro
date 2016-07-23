@@ -3,7 +3,7 @@ apktool d -f app-debug.apk
 mkdir -p ./com.nianticlabs.pokemongo/smali/de/xavaro/android/safehome
 mkdir -p ./com.nianticlabs.pokemongo/smali/de/xavaro/android/common
 cp ./app-debug/smali/de/xavaro/android/safehome/Pokemongo* ./com.nianticlabs.pokemongo/smali/de/xavaro/android/safehome 
-cp ./app-debug/smali/de/xavaro/android/common/PokemonProto* ./com.nianticlabs.pokemongo/smali/de/xavaro/android/common 
+cp ./app-debug/smali/de/xavaro/android/common/Pokemon* ./com.nianticlabs.pokemongo/smali/de/xavaro/android/common 
 cp ./app-debug/smali/de/xavaro/android/common/ProtoBuffer* ./com.nianticlabs.pokemongo/smali/de/xavaro/android/common 
 apktool b -o pokemongo.apk com.nianticlabs.pokemongo
 jarsigner -sigalg SHA1withRSA -digestalg SHA1 -storepass hallo5 -keystore my-release-key.store pokemongo.apk apk-key
