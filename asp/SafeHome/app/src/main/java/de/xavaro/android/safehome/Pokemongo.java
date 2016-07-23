@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.PokemonDecode;
 import de.xavaro.android.common.PokemonProto;
 import de.xavaro.android.common.ProtoBufferDecode;
 import de.xavaro.android.common.Simple;
@@ -288,184 +289,20 @@ public class Pokemongo extends FrameLayout
             }
         }
 
-        ProtoBufferDecode decode;
-        JSONObject protos = PokemonProto.getProtos();
-        JSONObject reqenvelope;
-        JSONObject resenvelope;
+        byte[] request = new byte[ bis - von ];
 
-        Log.d(LOGTAG, "testDat: post=" + (bis - von));
-        Log.d(LOGTAG, "testDat: post=" + getHexBytesToString(data, von, 64));
-
-        decode = new ProtoBufferDecode(data, von, bis);
-        decode.setProtos(protos);
-        reqenvelope = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
-        assembleRequest(reqenvelope);
-        Log.d(LOGTAG,"testDat: " + Json.toPretty(reqenvelope));
+        System.arraycopy(data, von, request, 0, bis - von);
 
         bis += 4;
 
-        Log.d(LOGTAG, "testDat: read=" + (data.length - bis));
-        Log.d(LOGTAG, "testDat: read=" + getHexBytesToString(data, bis, 64));
+        byte[] response = new byte[ data.length - bis ];
 
-        decode = new ProtoBufferDecode(data, bis, data.length);
-        decode.setProtos(protos);
-        resenvelope = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
-        assembleResponse(reqenvelope,resenvelope);
-        Log.d(LOGTAG,"testDat: " + Json.toPretty(resenvelope));
-    }
+        System.arraycopy(data, bis, response, 0, data.length - bis);
 
-    public static String getHexBytesToString(byte[] bytes, int offset, int length)
-    {
-        char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[ length * 3 ];
+        PokemonDecode pd = new PokemonDecode();
 
-        for (int inx = offset; inx < (length + offset); inx++)
-        {
-            //noinspection PointlessArithmeticExpression
-            hexChars[ ((inx - offset) * 3) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
-            //noinspection PointlessBitwiseExpression
-            hexChars[ ((inx - offset) * 3) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
-            hexChars[ ((inx - offset) * 3) + 2 ] = ' ';
-        }
+        JSONObject result = pd.decode(request, response);
 
-        return String.valueOf(hexChars);
-    }
-
-    @Nullable
-    public static String decodeRequest(byte[] request)
-    {
-        ProtoBufferDecode decode = new ProtoBufferDecode(request);
-        JSONObject protos = PokemonProto.getProtos();
-        decode.setProtos(protos);
-        JSONObject json = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
-        assembleRequest(json);
-
-        if (json != null)
-        {
-            try
-            {
-                return json.toString(2);
-            }
-            catch (Exception ignored)
-            {
-            }
-        }
-
-        return null;
-    }
-
-    public static void assembleRequest(JSONObject reqenvelop)
-    {
-        try
-        {
-            reqenvelop.remove("auth_ticket@.POGOProtos.Networking.Envelopes.AuthTicket");
-            reqenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
-            reqenvelop.remove("unknown12@int64");
-
-            JSONArray requests = reqenvelop.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
-
-            for (int rinx = 0; rinx < requests.length(); rinx++)
-            {
-                JSONObject request = requests.getJSONObject(rinx);
-
-                String reqtype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
-                String messagename = ".POGOProtos.Networking.Requests.Messages." + CamelName(reqtype) + "Message";
-
-                if (request.has("request_message@bytes"))
-                {
-                    JSONArray reqbytes = request.getJSONArray("request_message@bytes");
-                    byte[] reqdata = new byte[ reqbytes.length() ];
-
-                    for (int inx = 0; inx < reqbytes.length(); inx++)
-                    {
-                        reqdata[ inx ] = (byte) reqbytes.getInt(inx);
-                    }
-
-                    Log.d(LOGTAG, "tuneUp reqtype=" + reqtype + " messagename=" + messagename);
-
-                    ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
-                    decode.setProtos(PokemonProto.getProtos());
-
-                    JSONObject tune = decode.decode(messagename);
-
-                    request.remove("request_message@bytes");
-                    request.put(messagename, tune);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    public static void assembleResponse(JSONObject reqenvelop, JSONObject resenvelop)
-    {
-        try
-        {
-            resenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6Response");
-
-            JSONArray requests = reqenvelop.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
-            JSONArray reponses = resenvelop.getJSONArray("returns@bytes");
-
-            JSONArray decoded = new JSONArray();
-
-            for (int rinx = 0; rinx < requests.length(); rinx++)
-            {
-                JSONObject request = requests.getJSONObject(rinx);
-
-                String restype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
-                String messagename = ".POGOProtos.Networking.Responses." + CamelName(restype) + "Response";
-
-                if (rinx <= reponses.length())
-                {
-                    String hexbytes = reponses.getString(rinx);
-                    byte[] resdata = Simple.getHexStringToBytes(hexbytes);
-
-                    Log.d(LOGTAG, "tuneUp restype=" + restype + " messagename=" + messagename);
-
-                    ProtoBufferDecode decode = new ProtoBufferDecode(resdata);
-                    decode.setProtos(PokemonProto.getProtos());
-
-                    JSONObject tune = decode.decode(messagename);
-
-                    JSONObject resmessage = new JSONObject();
-
-                    resmessage.put("type", messagename);
-                    resmessage.put("data", tune);
-
-                    decoded.put(resmessage);
-                }
-            }
-
-            resenvelop.remove("returns@bytes");
-            resenvelop.put("returns@array", decoded);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    private static String CamelName(String uppercase)
-    {
-        String camelname = "";
-        boolean nextUp = true;
-
-        for (int inx = 0; inx < uppercase.length(); inx++)
-        {
-            if (uppercase.charAt(inx) == '@') break;
-
-            if (uppercase.charAt(inx) == '_')
-            {
-                nextUp = true;
-                continue;
-            }
-
-            camelname += nextUp ? uppercase.charAt(inx) : Character.toLowerCase(uppercase.charAt(inx));
-            nextUp = false;
-        }
-
-        return camelname;
+        Log.d(LOGTAG,"testDat: " + Json.toPretty(result));
     }
 }

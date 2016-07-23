@@ -1,8 +1,8 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
 import android.media.projection.MediaProjectionManager;
 import android.os.StrictMode;
-import android.support.annotation.Nullable;
 
 import android.app.Activity;
 import android.app.AlertDialog;

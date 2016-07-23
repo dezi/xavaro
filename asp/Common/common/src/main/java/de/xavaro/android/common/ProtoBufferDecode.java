@@ -2,16 +2,11 @@ package de.xavaro.android.common;
 
 import android.support.annotation.Nullable;
 
-import android.app.Application;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Iterator;
@@ -25,6 +20,7 @@ public class ProtoBufferDecode
     private int length;
 
     private JSONObject protos;
+    private boolean debug;
     private boolean flat;
 
     public ProtoBufferDecode(byte[] buffer)
@@ -47,20 +43,6 @@ public class ProtoBufferDecode
         }
     }
 
-    public void loadProtos(int resid)
-    {
-        protos = readRawTextResourceJSON(resid);
-
-        if (protos == null)
-        {
-            Log.d(LOGTAG, "loadProtos: failed.");
-        }
-        else
-        {
-            Log.d(LOGTAG, "loadProtos: success.");
-        }
-    }
-
     public void setProtos(JSONObject protos)
     {
         this.protos = protos;
@@ -71,55 +53,9 @@ public class ProtoBufferDecode
         this.flat = flat;
     }
 
-    private static Application getApplicationUsingReflection() throws Exception
+    public void setDebug(boolean debug)
     {
-        return (Application) Class.forName("android.app.AppGlobals")
-                .getMethod("getInitialApplication").invoke(null, (Object[]) null);
-    }
-
-    private String readRawTextResource(int resId)
-    {
-        try
-        {
-            Application appcontext = getApplicationUsingReflection();
-
-            InputStream inputStream = appcontext.getResources().openRawResource(resId);
-
-            InputStreamReader inputreader = new InputStreamReader(inputStream);
-            BufferedReader buffreader = new BufferedReader(inputreader);
-            StringBuilder text = new StringBuilder();
-            String line;
-
-            while ((line = buffreader.readLine()) != null)
-            {
-                text.append(line);
-                text.append('\n');
-            }
-
-            return text.toString();
-        }
-        catch (Exception ignore)
-        {
-        }
-
-        return null;
-    }
-
-    private JSONObject readRawTextResourceJSON(int resId)
-    {
-        String json = readRawTextResource(resId);
-        if (json == null) return null;
-
-        try
-        {
-            return new JSONObject(json);
-        }
-        catch (JSONException ex)
-        {
-            ex.printStackTrace();
-        }
-
-        return null;
+        this.debug = debug;
     }
 
     private int getNextByte()
