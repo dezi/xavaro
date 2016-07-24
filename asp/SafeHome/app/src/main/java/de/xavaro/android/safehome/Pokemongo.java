@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,7 +32,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import de.xavaro.android.common.Json;
-import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.PokemonDecode;
 
@@ -41,12 +41,25 @@ public class Pokemongo extends FrameLayout
 
     private WindowManager.LayoutParams overlayParam;
 
+    private final FrameLayout[] buttons = new FrameLayout[ 9 ];
+
+    private final int[] buttonsX = new int[]{ -1, 0, 1, -1, 0, 1, -1,  0,  1 };
+    private final int[] buttonsY = new int[]{  1, 1, 1,  0, 0, 0, -1, -1, -1 };
+
+    private final static int xsize = 240;
+    private final static int ysize = 180;
+
+    private final static int buttsize = 60;
+    private final static int buttpad = buttsize / 10;
+    private final static int buttnetto = buttsize - buttpad * 2;
+
     private Pokemongo(Context context)
     {
         super(context);
 
         setBackgroundColor(0x88880000);
 
+        /*
         setOnTouchListener(new OnTouchListener()
         {
             @Override
@@ -55,12 +68,13 @@ public class Pokemongo extends FrameLayout
                 return onTouchCommandWindow(view, event);
             }
         });
+        */
 
         overlayParam = new WindowManager.LayoutParams(
                 xsize, ysize,
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                        | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+//                      | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
 
@@ -69,11 +83,103 @@ public class Pokemongo extends FrameLayout
         ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
                 .addView(this, overlayParam);
 
+        for (int inx = 0; inx < 9; inx++)
+        {
+            buttons[ inx ] = new FrameLayout(context);
+
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(buttnetto, buttnetto);
+            lp.gravity = Gravity.TOP + Gravity.LEFT;
+
+            lp.topMargin = ((inx / 3) * buttsize) + buttpad;
+            lp.leftMargin = ((inx % 3) * buttsize) + buttpad;
+
+            buttons[ inx ].setLayoutParams(lp);
+            buttons[ inx ].setBackgroundColor(0x8800ff00);
+
+            final int buttinx = inx;
+
+            buttons[ inx ].setOnClickListener(new OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    onClickJoystickButton(buttinx);
+                }
+            });
+
+            addView(buttons[ inx ]);
+        }
+
+        spanLocationButton(context);
+
         Log.d(LOGTAG, "Added system alert window...");
     }
 
-    private final static int xsize = 200;
-    private final static int ysize = 200;
+    private void spanLocationButton(Context context)
+    {
+        FrameLayout button = new FrameLayout(context);
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(buttnetto, buttnetto);
+        lp.gravity = Gravity.TOP + Gravity.LEFT;
+
+        lp.topMargin = buttpad;
+        lp.leftMargin = (3 * buttsize) + buttpad;
+
+        button.setLayoutParams(lp);
+        button.setBackgroundColor(0x880000ff);
+
+        button.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onClickSpawnpointButton();
+            }
+        });
+
+        addView(button);
+    }
+
+    private void onClickSpawnpointButton()
+    {
+        Log.d(LOGTAG, "onClickSpawnpointButton:");
+
+        if (pokeposen.size() > 0)
+        {
+            try
+            {
+                String pokeposstr = pokeposen.remove(0);
+                JSONObject pokepos = new JSONObject(pokeposstr);
+
+                double plat = pokepos.getDouble("lat");
+                double plon = pokepos.getDouble("lon");
+
+                Log.d(LOGTAG, "onClickSpawnpointButton lat=" + plat + " lon=" + plon);
+
+                latMove = 0;
+                lonMove = 0;
+                lat = plat;
+                lon = plon;
+            }
+            catch (Exception ignore)
+            {
+            }
+        }
+    }
+
+    private void onClickJoystickButton(int buttinx)
+    {
+        if (buttonsX[ buttinx ] == 0) lonMove = 0;
+        if (buttonsY[ buttinx ] == 0) latMove = 0;
+
+        lonMove += buttonsX[ buttinx ] / 10000.0;
+        latMove += buttonsY[ buttinx ] / 10000.0;
+
+        Log.d(LOGTAG, "Alert butt touch:"
+                + " buttinx=" + buttinx
+                + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
+                + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove));
+    }
 
     private static boolean onTouchCommandWindow(View view, MotionEvent ev)
     {
@@ -187,6 +293,7 @@ public class Pokemongo extends FrameLayout
     private static final Map<Integer, OutputStream> outputs = new HashMap<>();
     private static final Map<Integer, byte[]> postdata = new HashMap<>();
     private static final ArrayList<File> logfiles = new ArrayList<>();
+    private static final ArrayList<String> pokeposen = new ArrayList<>();
 
     public static void pokeOpenFile(String url)
     {
@@ -308,6 +415,7 @@ public class Pokemongo extends FrameLayout
                         out.write(jres.replace("\\/", "/").getBytes());
 
                         saveRecords(result);
+                        evalMapDetails(result);
                         evalGymDetails(result);
                         evalFortDetails(result);
                     }
@@ -431,6 +539,91 @@ public class Pokemongo extends FrameLayout
         }
 
         return false;
+    }
+
+    private static void addPokepos(String tag, JSONObject poke)
+    {
+        try
+        {
+            double plat = poke.getDouble("latitude@double");
+            double plon = poke.getDouble("longitude@double");
+
+            JSONObject pokepos = new JSONObject();
+            pokepos.put("lat", plat);
+            pokepos.put("lon", plon);
+
+            String pokeposstr = pokepos.toString();
+
+            Log.d(LOGTAG, "addPokepos: tag=" + tag + " chk=" + pokeposstr);
+
+            if (! pokeposen.contains(pokeposstr))
+            {
+                Log.d(LOGTAG, "addPokepos: tag=" + tag + " add=" + pokeposstr);
+
+                latMove = 0;
+                lonMove = 0;
+
+                lat = plat;
+                lon = plon;
+
+                pokeposen.add(pokeposstr);
+            }
+        }
+        catch (Exception ignore)
+        {
+        }
+    }
+
+    private static void evalMapDetails(JSONObject json)
+    {
+        try
+        {
+            JSONObject response = json.getJSONObject("response");
+            JSONArray returns = response.getJSONArray("returns@array");
+
+            for (int inx = 0; inx < returns.length(); inx++)
+            {
+                JSONObject returnobj = returns.getJSONObject(inx);
+                String type = returnobj.getString("type");
+
+                if (type.equals(".POGOProtos.Networking.Responses.GetMapObjectsResponse"))
+                {
+                    JSONObject data = returnobj.getJSONObject("data");
+                    JSONArray mapcells = data.getJSONArray("map_cells@.POGOProtos.Map.MapCell");
+
+                    for (int minx = 0; minx < mapcells.length(); minx++)
+                    {
+                        JSONObject mapcell = mapcells.getJSONObject(minx);
+
+                        if (mapcell.has("wild_pokemons@.POGOProtos.Map.Pokemon.WildPokemon"))
+                        {
+                            JSONArray wilds = mapcell.getJSONArray("wild_pokemons@.POGOProtos.Map.Pokemon.WildPokemon");
+
+                            for (int winx = 0; winx < wilds.length(); winx++)
+                            {
+                                JSONObject wild = wilds.getJSONObject(winx);
+                                addPokepos("wild", wild);
+                            }
+                        }
+
+                        if (mapcell.has("catchable_pokemons@.POGOProtos.Map.Pokemon.MapPokemon"))
+                        {
+                            JSONArray wilds = mapcell.getJSONArray("catchable_pokemons@.POGOProtos.Map.Pokemon.MapPokemon");
+
+                            for (int winx = 0; winx < wilds.length(); winx++)
+                            {
+                                JSONObject wild = wilds.getJSONObject(winx);
+                                addPokepos("map", wild);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 
     private static void evalGymDetails(JSONObject json)
