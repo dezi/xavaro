@@ -186,10 +186,17 @@ public class ProtoBufferDecode
             if (wire == 1)
             {
                 //
-                // Double
+                // Fixed 64 bit
                 //
 
-                put(json, name, decodeDouble(), repeat);
+                if (type.equals("double"))
+                {
+                    put(json, name, decodeDouble(), repeat);
+                }
+                else
+                {
+                    put(json, name, decodeFixed64(), repeat);
+                }
 
                 continue;
             }
@@ -256,10 +263,18 @@ public class ProtoBufferDecode
             if (wire == 5)
             {
                 //
-                // Float
+                // Fixed 32 bit
                 //
 
-                put(json, name, decodeFloat(), repeat);
+                if (type.equals("float"))
+                {
+                    put(json, name, decodeFloat(), repeat);
+                }
+                else
+                {
+                    put(json, name, decodeFixed32(), repeat);
+
+                }
 
                 continue;
             }
@@ -354,9 +369,19 @@ public class ProtoBufferDecode
         return ByteBuffer.wrap(getNextBytes(8)).order(ByteOrder.LITTLE_ENDIAN).getDouble();
     }
 
+    private long decodeFixed64()
+    {
+        return ByteBuffer.wrap(getNextBytes(8)).order(ByteOrder.LITTLE_ENDIAN).getLong();
+    }
+
     private float decodeFloat()
     {
         return ByteBuffer.wrap(getNextBytes(4)).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+    }
+
+    private long decodeFixed32()
+    {
+        return ByteBuffer.wrap(getNextBytes(4)).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     private void put(JSONObject json, String name, byte[] value, boolean repeat)

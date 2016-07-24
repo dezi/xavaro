@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.PokemonDecode;
 
@@ -94,7 +96,7 @@ public class Pokemongo extends FrameLayout
             else
             {
                 latMove = -relY / 100000.0;
-                lonMove =  relX / 100000.0;
+                lonMove = relX / 100000.0;
             }
 
             Log.d(LOGTAG, "Alert touch down: relX=" + relX + " relY=" + relY);
@@ -184,6 +186,7 @@ public class Pokemongo extends FrameLayout
 
     private static final Map<Integer, OutputStream> outputs = new HashMap<>();
     private static final Map<Integer, byte[]> postdata = new HashMap<>();
+    private static final ArrayList<File> logfiles = new ArrayList<>();
 
     public static void pokeOpenFile(String url)
     {
@@ -191,13 +194,21 @@ public class Pokemongo extends FrameLayout
 
         Log.d(LOGTAG, "pokeOpenFile url=" + url + " hash=" + urlhash);
 
-        if (! url.contains("pgorelease.nianticlabs.com")) return;
+        if (!url.contains("pgorelease.nianticlabs.com")) return;
+
+        while (logfiles.size() > 10)
+        {
+            File tobedel = logfiles.remove(0);
+            tobedel.delete();
+        }
 
         DateFormat df = new SimpleDateFormat("yyyyMMdd'.'HHmmss", Locale.getDefault());
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         String filename = "pm." + df.format(new Date()) + ".json";
 
-        File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File extstore = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File extdir = new File(extstore, "pm");
+        if (!extdir.exists()) extdir.mkdirs();
         File extfile = new File(extdir, filename);
 
         if (extfile.exists())
@@ -218,6 +229,8 @@ public class Pokemongo extends FrameLayout
 
             outputs.put(urlhash, out);
             postdata.put(urlhash, new byte[ 0 ]);
+
+            logfiles.add(extfile);
         }
         catch (Exception ignore)
         {
@@ -292,8 +305,10 @@ public class Pokemongo extends FrameLayout
                         String jres = result.toString(2);
 
                         //out.write("\n--\n".getBytes());
-                        out.write(jres.replace("\\/","/").getBytes());
+                        out.write(jres.replace("\\/", "/").getBytes());
 
+                        saveRecords(result);
+                        evalGymDetails(result);
                         evalFortDetails(result);
                     }
                 }
@@ -329,6 +344,132 @@ public class Pokemongo extends FrameLayout
         }
     }
 
+    private static void saveRecords(JSONObject json)
+    {
+        File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        try
+        {
+            JSONObject rpcrequest = json.getJSONObject("request");
+            JSONArray requests = rpcrequest.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
+
+            for (int rinx = 0; rinx < requests.length(); rinx++)
+            {
+                JSONObject request = requests.getJSONObject(rinx);
+
+                String restype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+
+                String file = "pm.Requests." + CamelName(restype) + "Response.json";
+                File extfile = new File(extdir, file);
+
+                OutputStream out = new FileOutputStream(extfile);
+                out.write(request.toString(2).replace("\\/", "/").getBytes());
+                out.close();
+            }
+
+            JSONObject response = json.getJSONObject("response");
+            JSONArray returns = response.getJSONArray("returns@array");
+
+            for (int inx = 0; inx < returns.length(); inx++)
+            {
+                JSONObject returnobj = returns.getJSONObject(inx);
+                String type = returnobj.getString("type");
+                JSONObject data = returnobj.getJSONObject("data");
+
+                String[] parts = type.split("\\.");
+                if (parts.length < 3) continue;
+                String file = "pm." + parts[ parts.length - 2 ] + "." + parts[ parts.length - 1 ] + ".json";
+                File extfile = new File(extdir, file);
+
+                OutputStream out = new FileOutputStream(extfile);
+                out.write(data.toString(2).replace("\\/", "/").getBytes());
+                out.close();
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    private static String CamelName(String uppercase)
+    {
+        String camelname = "";
+        boolean nextUp = true;
+
+        for (int inx = 0; inx < uppercase.length(); inx++)
+        {
+            if (uppercase.charAt(inx) == '@') break;
+
+            if (uppercase.charAt(inx) == '_')
+            {
+                nextUp = true;
+                continue;
+            }
+
+            camelname += nextUp ? uppercase.charAt(inx) : Character.toLowerCase(uppercase.charAt(inx));
+            nextUp = false;
+        }
+
+        return camelname;
+    }
+
+    public static boolean putFileBytes(File file, byte[] bytes)
+    {
+        if (bytes == null) return false;
+
+        try
+        {
+            OutputStream out = new FileOutputStream(file);
+            out.write(bytes);
+            out.close();
+
+            return true;
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return false;
+    }
+
+    private static void evalGymDetails(JSONObject json)
+    {
+        try
+        {
+            JSONObject response = json.getJSONObject("response");
+            JSONArray returns = response.getJSONArray("returns@array");
+
+            for (int inx = 0; inx < returns.length(); inx++)
+            {
+                JSONObject returnobj = returns.getJSONObject(inx);
+                String type = returnobj.getString("type");
+
+                if (type.equals(".POGOProtos.Networking.Responses.GetGymDetailsResponse"))
+                {
+                    JSONObject data = returnobj.getJSONObject("data");
+
+                    JSONObject gymstate = data.getJSONObject("gym_state@.POGOProtos.Data.Gym.GymState");
+                    JSONObject fortdata = gymstate.getJSONObject("fort_data@.POGOProtos.Map.Fort.FortData");
+
+                    double latloc = fortdata.getDouble("latitude@double");
+                    double lonloc = fortdata.getDouble("longitude@double");
+
+                    Log.d(LOGTAG, "Gym encountered: lat=" + latloc + " lon=" + lonloc);
+
+                    lat = latloc;
+                    lon = lonloc;
+                    latMove = 0;
+                    lonMove = 0;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
     private static void evalFortDetails(JSONObject json)
     {
         try
@@ -340,6 +481,7 @@ public class Pokemongo extends FrameLayout
             {
                 JSONObject returnobj = returns.getJSONObject(inx);
                 String type = returnobj.getString("type");
+
                 if (type.equals(".POGOProtos.Networking.Responses.FortDetailsResponse"))
                 {
                     JSONObject data = returnobj.getJSONObject("data");
