@@ -3,9 +3,6 @@ package de.xavaro.android.common;
 import android.support.annotation.Nullable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
-
-import java.io.ByteArrayOutputStream;
 
 public class PokemonImage
 {
@@ -74,118 +71,6 @@ public class PokemonImage
         }
 
         return null;
-    }
-
-    private static class ASCII85Decode
-    {
-        public ASCII85Decode(String asci85)
-        {
-            asci85 = asci85.replace("z", "!!!!!").replace("y", "+<VdL/");
-
-            pad = 5 - (asci85.length() % 5);
-            String padstr = "";
-            while (pad++ > 0) padstr += "u";
-
-            len = buf.length;
-        }
-
-        private byte[] buf;
-        private int len;
-        private int off;
-        private int pad;
-
-        private int nextChar()
-        {
-            if (off < len) return buf[ off++ ] & 0xff;
-
-            return -1;
-        }
-
-        private boolean decode5(ByteArrayOutputStream baos)
-        {
-            int[] five = new int[ 5 ];
-            int i;
-
-            for (i = 0; i < 5; i++)
-            {
-                five[ i ] = nextChar();
-                if (five[ i ] < 0) break;
-
-                if (five[ i ] == '~')
-                {
-                    if (nextChar() == '>')
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        Log.d(LOGTAG, "Bad character in ASCII85Decode: not ~>");
-                        return false;
-                    }
-                }
-                else
-                    if (five[ i ] >= '!' && five[ i ] <= 'u')
-                    {
-                        five[ i ] -= '!';
-                    }
-                    else
-                        if (five[ i ] == 'z')
-                        {
-                            if (i == 0)
-                            {
-                                five[ i ] = 0;
-                                i = 4;
-                            }
-                            else
-                            {
-                                Log.d(LOGTAG, "Inappropriate 'z' in ASCII85Decode");
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            Log.d(LOGTAG, "Bad character in ASCII85Decode: " + five[ i ]
-                                    + " (" + (char) five[ i ] + ")");
-                        }
-            }
-            if (i > 0)
-            {
-                i -= 1;
-            }
-
-            int value
-                    = five[ 0 ] * 85 * 85 * 85 * 85
-                    + five[ 1 ] * 85 * 85 * 85
-                    + five[ 2 ] * 85 * 85
-                    + five[ 3 ] * 85
-                    + five[ 4 ];
-
-            for (int j = 0; j < i; j++)
-            {
-                int shift = 8 * (3 - j);
-                baos.write((byte) ((value >> shift) & 0xff));
-            }
-
-            return (i == 4);
-        }
-
-        public byte[] decode()
-        {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            while (true) if (!decode5(baos)) break;
-
-            return baos.toByteArray();
-        }
-
-        public byte[] decode(byte[] buffer)
-        {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-
-
-            return baos.toByteArray();
-        }
     }
 
     @Nullable
