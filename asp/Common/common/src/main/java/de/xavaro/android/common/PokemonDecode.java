@@ -108,7 +108,7 @@ public class PokemonDecode
                 String restype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
                 String messagename = ".POGOProtos.Networking.Responses." + CamelName(restype) + "Response";
 
-                if (rinx <= reponses.length())
+                if (rinx < reponses.length())
                 {
                     String hexbytes = reponses.getString(rinx);
                     byte[] resdata = getHexStringToBytes(hexbytes);

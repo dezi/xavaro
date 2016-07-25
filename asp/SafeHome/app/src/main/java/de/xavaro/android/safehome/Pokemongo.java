@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.PokemonImage;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.PokemonDecode;
 
@@ -42,6 +44,7 @@ public class Pokemongo extends FrameLayout
 
     private final static FrameLayout[] buttons = new FrameLayout[ 9 ];
     private final static FrameLayout[] spawns = new FrameLayout[ 18 ];
+    private final static ImageView[] pimages = new ImageView[ 18 ];
 
     private final static int[] buttonsX = new int[]{ -1, 0, 1, -1, 0, 1, -1,  0,  1 };
     private final static int[] buttonsY = new int[]{  1, 1, 1,  0, 0, 0, -1, -1, -1 };
@@ -116,13 +119,17 @@ public class Pokemongo extends FrameLayout
             spawns[ inx ].setOnClickListener(new OnClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(View view)
                 {
                     onClickSpawnsButton(buttinx);
                 }
             });
 
             addView(spawns[ inx ]);
+
+            pimages[ inx ] = new ImageView(context);
+            pimages[ inx ].setImageBitmap(PokemonImage.getPokemonImage(inx + 1));
+            spawns[ inx ].addView(pimages[ inx ]);
         }
 
         Log.d(LOGTAG, "Added system alert window...");
