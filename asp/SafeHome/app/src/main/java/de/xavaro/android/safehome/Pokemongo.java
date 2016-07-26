@@ -354,8 +354,8 @@ public class Pokemongo extends FrameLayout
     //private static double lon = 0;
 
     // Hamburg => 53.544107, 9.985271
-    private static double lat = 53.544107 + Math.random();
-    private static double lon = 9.985271 + Math.random();
+    private static double lat = 53.55 + ((Math.random() - 0.5) / 25.0);
+    private static double lon = 10.00 + ((Math.random() - 0.5) / 25.0);
 
     private static double latMove = 0;
     private static double lonMove = 0;
