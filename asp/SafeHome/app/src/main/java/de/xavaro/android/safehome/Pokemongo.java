@@ -1,29 +1,25 @@
 package de.xavaro.android.safehome;
 
-import android.graphics.Typeface;
-import android.support.annotation.Nullable;
 
 import android.app.Application;
 import android.content.Context;
-import android.graphics.PixelFormat;
 import android.location.Location;
-import android.os.Environment;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
+import android.graphics.Typeface;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.graphics.Bitmap;
 import android.widget.TextView;
+import android.os.Environment;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,6 +30,9 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.File;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.PokemonImage;
@@ -44,91 +43,138 @@ public class Pokemongo extends FrameLayout
 {
     private static final String LOGTAG = "POKEDEZI";
 
+    private static final int numPokemons = 151;
+
     private WindowManager.LayoutParams overlayParam;
 
-    private final static FrameLayout[] buttons = new FrameLayout[ 9 ];
-    private final static TextView[] btexts = new TextView[ 9 ];
+    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "SHOP"};
 
-    private final static FrameLayout[] spawns = new FrameLayout[ 18 ];
-    private final static ImageView[] pimages = new ImageView[ 18 ];
-    private final static JSONObject[] locsJson = new JSONObject[ 18 ];
+    private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
+    private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
+    private final static String[] cmdTexts = new String[]{"HIDE", "SHOP", "HUNT"};
 
-    private final static String[] buttonsTexts = new String []
-            {
-                    "NW", "N", "NE",
-                    "W", "STOP", "E",
-                    "SW", "S", "SE"
-            };
+    private final static FrameLayout[] dirButtons = new FrameLayout[ 9 ];
+    private final static TextView[] dirButtonTextViews = new TextView[ 9 ];
+    private final static String[] dirTexts = new String[]{"NW", "N", "NE", "W", "STOP", "E", "SW", "S", "SE"};
+    private final static int[] dirMoveX = new int[]{-1, 0, 1, -1, 0, 1, -1, 0, 1};
+    private final static int[] dirMoveY = new int[]{1, 1, 1, 0, 0, 0, -1, -1, -1};
 
-    private final static int[] buttonsX = new int[]{ -1, 0, 1, -1, 0, 1, -1,  0,  1 };
-    private final static int[] buttonsY = new int[]{  1, 1, 1,  0, 0, 0, -1, -1, -1 };
+    private final static FrameLayout[] spawns = new FrameLayout[ 27 ];
+    private final static ImageView[] pimages = new ImageView[ 27 ];
+    private final static JSONObject[] locsJson = new JSONObject[ 27 ];
 
-    private final static int buttsize = 80;
-    private final static int buttpad = 8;
+    private final static int buttsize = 56;
+    private final static int buttpad = 4;
     private final static int buttnetto = buttsize - buttpad * 2;
 
-    private final static int xsize = buttsize * ((buttons.length + spawns.length) / 3);
+    private final static int xsize = buttsize * ((cmdButtons.length + dirButtons.length + spawns.length) / 3);
     private final static int ysize = buttsize * 3;
 
     private final static JSONObject pokeLocs = new JSONObject();
+    private final static JSONObject pokeLocsDead = new JSONObject();
+
+    private static FrameLayout pokeDir;
+    private static FrameLayout[] pokeDirFrames;
+    private static ImageView[] pokeDirImages;
+    private static boolean[] pokeDirEnabled;
+    private static boolean[] pokeDirHunting;
+    private static int pokeDirCols;
+    private static int pokeDirRows;
+
+    private static JSONObject poke2spawn = new JSONObject();
 
     private Pokemongo(Context context)
     {
         super(context);
 
-        setBackgroundColor(0x88880000);
-
         overlayParam = new WindowManager.LayoutParams(
                 xsize, ysize,
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT);
 
         overlayParam.gravity = Gravity.TOP + Gravity.CENTER_HORIZONTAL;
 
-        ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
+        ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
                 .addView(this, overlayParam);
 
-        for (int inx = 0; inx < 9; inx++)
+        for (int inx = 0; inx < cmdButtons.length; inx++)
         {
-            buttons[ inx ] = new FrameLayout(context);
+            cmdButtons[ inx ] = new FrameLayout(context);
 
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(buttnetto, buttnetto);
             lp.gravity = Gravity.TOP + Gravity.LEFT;
 
-            lp.topMargin = ((inx / (buttons.length / 3)) * buttsize) + buttpad;
-            lp.leftMargin = ((inx % (buttons.length / 3)) * buttsize) + buttpad;
+            lp.topMargin = ((inx / (cmdButtons.length / 3)) * buttsize) + buttpad;
+            lp.leftMargin = ((inx % (cmdButtons.length / 3)) * buttsize) + buttpad;
 
-            buttons[ inx ].setLayoutParams(lp);
+            cmdButtons[ inx ].setLayoutParams(lp);
 
             final int buttinx = inx;
 
-            buttons[ inx ].setOnClickListener(new OnClickListener()
+            cmdButtons[ inx ].setOnClickListener(new OnClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(View view)
+                {
+                    onClickCommandButton(buttinx);
+                }
+            });
+
+            addView(cmdButtons[ inx ]);
+
+            cmdButtonTextViews[ inx ] = new TextView(context);
+
+            cmdButtonTextViews[ inx ].setText(cmdTexts[ inx ]);
+            cmdButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
+            cmdButtonTextViews[ inx ].setBackgroundColor(0x88000088);
+            cmdButtonTextViews[ inx ].setTextSize(buttnetto / 3.0f);
+            cmdButtonTextViews[ inx ].setGravity(Gravity.CENTER_HORIZONTAL + Gravity.CENTER_VERTICAL);
+
+            cmdButtons[ inx ].addView(cmdButtonTextViews[ inx ]);
+        }
+
+        for (int inx = 0; inx < 9; inx++)
+        {
+            dirButtons[ inx ] = new FrameLayout(context);
+
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(buttnetto, buttnetto);
+            lp.gravity = Gravity.TOP + Gravity.LEFT;
+
+            lp.topMargin = ((inx / (dirButtons.length / 3)) * buttsize) + buttpad;
+            lp.leftMargin = ((cmdButtons.length / 3) * buttsize) + ((inx % (dirButtons.length / 3)) * buttsize) + buttpad;
+
+            dirButtons[ inx ].setLayoutParams(lp);
+
+            final int buttinx = inx;
+
+            dirButtons[ inx ].setOnClickListener(new OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
                 {
                     onClickJoystickButton(buttinx);
                 }
             });
 
-            addView(buttons[ inx ]);
+            addView(dirButtons[ inx ]);
 
-            btexts[ inx ] = new TextView(context);
-            btexts[ inx ].setTypeface(null, Typeface.NORMAL);
-            btexts[ inx ].setBackgroundColor(0x8800ff00);
-            btexts[ inx ].setText(buttonsTexts[ inx ]);
-            btexts[ inx ].setTextSize(buttnetto / 3.0f);
-            btexts[ inx ].setGravity(Gravity.CENTER_HORIZONTAL + Gravity.CENTER_VERTICAL);
+            dirButtonTextViews[ inx ] = new TextView(context);
+
+            dirButtonTextViews[ inx ].setText(dirTexts[ inx ]);
+            dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
+            dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
+            dirButtonTextViews[ inx ].setTextSize(buttnetto / 3.0f);
+            dirButtonTextViews[ inx ].setGravity(Gravity.CENTER_HORIZONTAL + Gravity.CENTER_VERTICAL);
 
             if (inx == 4)
             {
-                btexts[ inx ].setTypeface(null, Typeface.BOLD);
-                btexts[ inx ].setBackgroundColor(0xff00ff00);
+                dirButtonTextViews[ inx ].setTypeface(null, Typeface.BOLD);
+                dirButtonTextViews[ inx ].setBackgroundColor(0xff008800);
             }
 
-            buttons[ inx ].addView(btexts[ inx ]);
+            dirButtons[ inx ].addView(dirButtonTextViews[ inx ]);
         }
 
         for (int inx = 0; inx < spawns.length; inx++)
@@ -139,7 +185,7 @@ public class Pokemongo extends FrameLayout
             lp.gravity = Gravity.TOP + Gravity.LEFT;
 
             lp.topMargin = ((inx / (spawns.length / 3)) * buttsize) + buttpad;
-            lp.leftMargin = ((buttons.length / 3) * buttsize) + ((inx % (spawns.length / 3)) * buttsize) + buttpad;
+            lp.leftMargin = (((cmdButtons.length + dirButtons.length) / 3) * buttsize) + ((inx % (spawns.length / 3)) * buttsize) + buttpad;
 
             spawns[ inx ].setLayoutParams(lp);
 
@@ -162,24 +208,207 @@ public class Pokemongo extends FrameLayout
             spawns[ inx ].addView(pimages[ inx ]);
         }
 
+        createPokemonDir();
+
         Log.d(LOGTAG, "Added system alert window...");
+    }
+
+    private void createPokemonDir()
+    {
+        pokeDirEnabled = new boolean[ numPokemons ];
+        pokeDirHunting = new boolean[ numPokemons ];
+
+        loadPokeHuntSettings();
+
+        pokeDir = new FrameLayout(getContext());
+        pokeDir.setBackgroundColor(0xffffffff);
+        pokeDir.setVisibility(GONE);
+
+        pokeDirFrames = new FrameLayout[ numPokemons ];
+        pokeDirImages = new ImageView[ numPokemons ];
+
+        pokeDirCols = (cmdButtons.length + dirButtons.length + spawns.length) / 3;
+        pokeDirRows = (numPokemons / pokeDirCols) + (((numPokemons % pokeDirCols) > 0) ? 1 : 0);
+
+        int width = pokeDirCols * buttsize;
+        int height = pokeDirRows * buttsize;
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(width, height);
+        lp.topMargin = (3 * buttsize) + buttpad;
+
+        pokeDir.setLayoutParams(lp);
+        this.addView(pokeDir);
+
+        for (int inx = 0; inx < numPokemons; inx++)
+        {
+            lp = new FrameLayout.LayoutParams(buttnetto, buttnetto);
+            lp.topMargin = ((inx / pokeDirCols) * buttsize) + buttpad;
+            lp.leftMargin = ((inx % pokeDirCols) * buttsize) + buttpad;
+
+            pokeDirFrames[ inx ] = new FrameLayout(getContext());
+            pokeDirFrames[ inx ].setLayoutParams(lp);
+
+            pokeDir.addView(pokeDirFrames[ inx ]);
+
+            pokeDirImages[ inx ] = new ImageView(getContext());
+            pokeDirImages[ inx ].setBackgroundColor(0xffffffff);
+            pokeDirImages[ inx ].setImageBitmap(PokemonImage.getPokemonImage(inx + 1));
+
+            final int buttinx = inx;
+
+            pokeDirImages[ inx ].setOnClickListener(new OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    onClickHuntPokemonButton(buttinx);
+                }
+            });
+
+            pokeDirFrames[ inx ].addView(pokeDirImages[ inx ]);
+        }
+    }
+
+    private static void buildPokeHuntSpawns()
+    {
+        synchronized (huntPointsTodo)
+        {
+            try
+            {
+                huntPointsTodo.clear();
+
+                Iterator<String> pokeIterator = poke2spawn.keys();
+
+                while (pokeIterator.hasNext())
+                {
+                    String pokeId = pokeIterator.next();
+
+                    String[] parts = pokeId.split("@");
+                    if (parts.length != 2) continue;
+
+                    int pokeNum = Integer.parseInt(parts[ 1 ], 10);
+
+                    if (!pokeDirHunting[ pokeNum - 1 ]) continue;
+
+                    JSONArray spawns = poke2spawn.getJSONArray(pokeId);
+
+                    for (int inx = 0; inx < spawns.length(); inx++)
+                    {
+                        huntPointsTodo.add(spawns.getJSONObject(inx));
+                    }
+                }
+
+                //
+                // Shuffle list.
+                //
+
+                for (int inx = 0; inx < huntPointsTodo.size(); inx++)
+                {
+                    int shuffle = (int) (Math.random() * huntPointsTodo.size());
+
+                    huntPointsTodo.add(huntPointsTodo.remove(shuffle));
+                }
+
+                Log.d(LOGTAG, "buildPokeHuntSpawns: size=" + huntPointsTodo.size());
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
+    }
+
+    private static void enablePokemonDirEntry(int pokeNum)
+    {
+        if ((pokeNum <= 0) || (pokeNum > numPokemons)) return;
+
+        if (pokeDirHunting[ pokeNum - 1 ])
+        {
+            pokeDirImages[ pokeNum - 1 ].setBackgroundColor(0xffffcccc);
+        }
+        else
+        {
+            pokeDirImages[ pokeNum - 1 ].setBackgroundColor(0xcccccccc);
+        }
+
+        pokeDirEnabled[ pokeNum - 1 ] = true;
+    }
+
+    private void onClickHuntPokemonButton(int buttinx)
+    {
+        if (! pokeDirEnabled[ buttinx ]) return;
+
+        if (pokeDirHunting[ buttinx ])
+        {
+            pokeDirImages[ buttinx ].setBackgroundColor(0xcccccccc);
+            pokeDirHunting[ buttinx ] = false;
+        }
+        else
+        {
+            pokeDirImages[ buttinx ].setBackgroundColor(0xffffcccc);
+            pokeDirHunting[ buttinx ] = true;
+        }
+
+        savePokeHuntSettings();
+    }
+
+    private void onClickCommandButton(int buttinx)
+    {
+        if (buttinx == 0)
+        {
+            if (overlayParam.width == xsize)
+            {
+                overlayParam.width = buttsize;
+                overlayParam.height = buttsize;
+                overlayParam.gravity = Gravity.TOP + Gravity.LEFT;
+                cmdButtonTextViews[ 0 ].setText("SHOW");
+            }
+            else
+            {
+                overlayParam.width = xsize;
+                overlayParam.height = ysize;
+                overlayParam.gravity = Gravity.TOP + Gravity.CENTER_HORIZONTAL;
+                cmdButtonTextViews[ 0 ].setText("HIDE");
+            }
+        }
+
+        if (buttinx == 2)
+        {
+            if (isShowhunt)
+            {
+                overlayParam.height = ysize;
+                pokeDir.setVisibility(GONE);
+                isShowhunt = false;
+            }
+            else
+            {
+                overlayParam.height = ysize + (pokeDirRows * buttsize) + buttpad;
+                pokeDir.setVisibility(VISIBLE);
+                isShowhunt = true;
+            }
+        }
+
+        ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                .removeView(this);
+
+        ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                .addView(this, overlayParam);
     }
 
     private void onClickSpawnsButton(int buttinx)
     {
-        JSONObject seekLoc = locsJson[ buttinx ];
-        if (seekLoc == null) return;
+        JSONObject gotoLoc = locsJson[ buttinx ];
+        if (gotoLoc == null) return;
 
         synchronized (pokeLocs)
         {
             try
             {
-                JSONObject locs = seekLoc.getJSONObject("loc");
+                JSONObject locs = gotoLoc.getJSONObject("loc");
 
                 Iterator<String> locsIterator = locs.keys();
 
                 String gotostr = null;
-                int valid = 0;
 
                 while (locsIterator.hasNext())
                 {
@@ -190,21 +419,19 @@ public class Pokemongo extends FrameLayout
                         gotostr = latlonstr;
                         locs.remove(latlonstr);
                     }
-                    else
-                    {
-                        valid++;
-                    }
-                }
-
-                if (valid == 0)
-                {
-                    pimages[ buttinx ].setBackgroundColor(0xcccccccc);
                 }
 
                 if (gotostr != null)
                 {
-                    isSeeking = true;
-                    seekLocation = gotostr;
+                    pimages[ buttinx ].setBackgroundColor(0xcccccccc);
+
+                    long expires = new Date().getTime() + 60 * 1000;
+                    pokeLocsDead.put(gotostr, expires);
+
+                    spotLocation = gotostr;
+                    isSpotting = true;
+
+                    setCommand(0);
                 }
             }
             catch (Exception ignore)
@@ -214,32 +441,37 @@ public class Pokemongo extends FrameLayout
         }
     }
 
-    private static boolean isHunting;
-    private static boolean isSeeking;
+    private static int commandMode;
 
-    private static String seekLocation;
+    private static boolean isSpotting;
+    private static boolean isShowhunt;
+
+    private static String spotLocation;
 
     private void onClickJoystickButton(int buttinx)
     {
         if (buttinx == 4)
         {
-            if ((latMove == 0) && (lonMove == 0))
+            commandMode = ++commandMode % commandModeTexts.length;
+            dirButtonTextViews[ 4 ].setText(commandModeTexts[ commandMode ]);
+
+            if (commandMode == 2)
             {
-                isHunting = !isHunting;
+                synchronized (huntPointsTodo)
+                {
+                    huntPointsTodo.clear();
+                }
             }
+
+            latMove = 0;
+            lonMove = 0;
         }
-        else
-        {
-            isHunting = false;
-        }
 
-        btexts[ 4 ].setText(isHunting ? "HUNT" : "STOP");
+        if (dirMoveY[ buttinx ] == 0) latMove = 0;
+        if (dirMoveX[ buttinx ] == 0) lonMove = 0;
 
-        if (buttonsY[ buttinx ] == 0) latMove = 0;
-        if (buttonsX[ buttinx ] == 0) lonMove = 0;
-
-        latMove += buttonsY[ buttinx ] / 10000.0;
-        lonMove += buttonsX[ buttinx ] / 10000.0;
+        latMove += dirMoveY[ buttinx ] / 10000.0;
+        lonMove += dirMoveX[ buttinx ] / 10000.0;
 
         if (Math.abs(latMove) < 0.00000001) latMove = 0;
         if (Math.abs(lonMove) < 0.00000001) lonMove = 0;
@@ -254,55 +486,21 @@ public class Pokemongo extends FrameLayout
                 + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
                 + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove));
 
-        for (int inx = 0; inx < btexts.length; inx++)
+        for (int inx = 0; inx < dirButtonTextViews.length; inx++)
         {
             if (inx == buttinx)
             {
-                btexts[ inx ].setTypeface(null, Typeface.BOLD);
-                btexts[ inx ].setBackgroundColor(0xff00ff00);
+                dirButtonTextViews[ inx ].setTypeface(null, Typeface.BOLD);
+                dirButtonTextViews[ inx ].setBackgroundColor(0xff008800);
             }
             else
             {
-                btexts[ inx ].setText(buttonsTexts[ inx ]);
-                btexts[ inx ].setTypeface(null, Typeface.NORMAL);
-                btexts[ inx ].setBackgroundColor(0x8800ff00);
+                dirButtonTextViews[ inx ].setText(dirTexts[ inx ]);
+                dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
+                dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
             }
         }
 
-    }
-
-    private static boolean onTouchCommandWindow(View view, MotionEvent ev)
-    {
-        int actX = (int) ev.getX();
-        int actY = (int) ev.getY();
-
-        int relX = actX - (xsize / 2);
-        int relY = actY - (ysize / 2);
-
-        if (ev.getAction() == MotionEvent.ACTION_DOWN)
-        {
-
-            // 100 => 0.01 ? 10000
-
-            if ((Math.abs(relX) < 30) && (Math.abs(relY) < 30))
-            {
-                latMove = 0;
-                lonMove = 0;
-            }
-            else
-            {
-                latMove = -relY / 100000.0;
-                lonMove = relX / 100000.0;
-            }
-
-            Log.d(LOGTAG, "Alert touch down: relX=" + relX + " relY=" + relY);
-
-            Log.d(LOGTAG, "Alert touch down:"
-                    + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
-                    + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove));
-        }
-
-        return false;
     }
 
     private static Pokemongo instance;
@@ -325,6 +523,8 @@ public class Pokemongo extends FrameLayout
             Log.d(LOGTAG, "Init failed...");
             ex.printStackTrace();
         }
+
+        loadPokeSpawnMap();
     }
 
     private static Application getApplicationUsingReflection() throws Exception
@@ -354,12 +554,49 @@ public class Pokemongo extends FrameLayout
     //private static double lon = 0;
 
     // Hamburg => 53.544107, 9.985271
-    private static double lat = 53.55 + ((Math.random() - 0.5) / 25.0);
-    private static double lon = 10.00 + ((Math.random() - 0.5) / 25.0);
+    private static double lat = 53.55 + ((Math.random() - 0.5) / 50.0);
+    private static double lon = 10.00 + ((Math.random() - 0.5) / 50.0);
 
     private static double latMove = 0;
     private static double lonMove = 0;
     private static long spawnCount = 0;
+
+    private static void setCommand(int command)
+    {
+        commandMode = command;
+
+        for (int inx = 0; inx < dirButtonTextViews.length; inx++)
+        {
+            if (inx == 4)
+            {
+                dirButtonTextViews[ inx ].setText(commandModeTexts[ command ]);
+                dirButtonTextViews[ inx ].setTypeface(null, Typeface.BOLD);
+                dirButtonTextViews[ inx ].setBackgroundColor(0xff008800);
+            }
+            else
+            {
+                dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
+                dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
+            }
+        }
+    }
+
+    private static void clearFinalJSON(JSONObject json)
+    {
+        try
+        {
+            Iterator<String> keysIterator = json.keys();
+
+            while (keysIterator.hasNext())
+            {
+                json.remove(keysIterator.next());
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
 
     public static void deziLocation(Location location)
     {
@@ -367,29 +604,13 @@ public class Pokemongo extends FrameLayout
 
         setupSpawns();
 
-        if (isSeeking)
+        if (isSpotting)
         {
-            isHunting = false;
-            isSeeking = false;
-
-            for (int inx = 0; inx < btexts.length; inx++)
-            {
-                if (inx == 4)
-                {
-                    btexts[ inx ].setText("STOP");
-                    btexts[ inx ].setTypeface(null, Typeface.BOLD);
-                    btexts[ inx ].setBackgroundColor(0xff00ff00);
-                }
-                else
-                {
-                    btexts[ inx ].setTypeface(null, Typeface.NORMAL);
-                    btexts[ inx ].setBackgroundColor(0x8800ff00);
-                }
-            }
+            isSpotting = false;
 
             try
             {
-                JSONObject latlon = new JSONObject(seekLocation);
+                JSONObject latlon = new JSONObject(spotLocation);
 
                 latMove = 0;
                 lonMove = 0;
@@ -407,7 +628,7 @@ public class Pokemongo extends FrameLayout
             }
         }
 
-        if (isHunting)
+        if (commandMode == 1)
         {
             if ((spawnCount++ % 2) == 0)
             {
@@ -434,6 +655,44 @@ public class Pokemongo extends FrameLayout
             }
         }
 
+        if (commandMode == 2)
+        {
+            if (huntPointsTodo.size() == 0)
+            {
+                clearFinalJSON(pokeLocs);
+                clearFinalJSON(pokeLocsDead);
+
+                setupSpawns();
+
+                buildPokeHuntSpawns();
+            }
+
+            if ((spawnCount++ % 2) == 0)
+            {
+                synchronized (huntPointsTodo)
+                {
+                    if (huntPointsTodo.size() > 0)
+                    {
+                        try
+                        {
+                            JSONObject huntPoint = huntPointsTodo.remove(0);
+                            huntPointsTodo.add(huntPoint);
+
+                            lat = huntPoint.getDouble("lat");
+                            lon = huntPoint.getDouble("lon");
+
+                            Log.d(LOGTAG, "deziLocation: hunt"
+                                    + " lat=" + location.getLatitude()
+                                    + " lon=" + location.getLongitude());
+                        }
+                        catch (Exception ignore)
+                        {
+                        }
+                    }
+                }
+            }
+        }
+
         location.setLatitude(lat);
         location.setLongitude(lon);
 
@@ -453,6 +712,7 @@ public class Pokemongo extends FrameLayout
     private static final ArrayList<File> logfiles = new ArrayList<>();
     private static final ArrayList<String> pokeposen = new ArrayList<>();
 
+    private static final ArrayList<JSONObject> huntPointsTodo = new ArrayList<>();
     private static final ArrayList<String> spawnPointsTodo = new ArrayList<>();
     private static final ArrayList<String> spawnPointsSeen = new ArrayList<>();
 
@@ -706,15 +966,152 @@ public class Pokemongo extends FrameLayout
         return false;
     }
 
-    private static void addPokepos(String tag, JSONObject poke)
+    private static void loadPokeHuntSettings()
     {
         try
         {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            if (extpoke.exists())
+            {
+                File extfile = new File(extpoke, "Settings.PokeHunt.json");
+
+                FileInputStream input = new FileInputStream(extfile);
+                int size = (int) input.getChannel().size();
+                byte[] content = new byte[ size ];
+                int xfer = input.read(content);
+                input.close();
+
+                if (size == xfer)
+                {
+                    JSONArray hunts = new JSONArray(new String(content));
+
+                    for (int inx = 0; inx < hunts.length(); inx++)
+                    {
+                        pokeDirHunting[ inx ] = hunts.getBoolean(inx);
+                    }
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void savePokeHuntSettings()
+    {
+        try
+        {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            if (extpoke.exists() || extpoke.mkdir())
+            {
+                JSONArray hunts = new JSONArray();
+
+                for (boolean hunt : pokeDirHunting)
+                {
+                    hunts.put(hunt);
+                }
+
+                File extfile = new File(extpoke, "Settings.PokeHunt.json");
+
+                OutputStream out = new FileOutputStream(extfile);
+                out.write(hunts.toString(2).replace("\\/", "/").getBytes());
+                out.close();
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void loadPokeSpawnMap()
+    {
+        try
+        {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            Log.d(LOGTAG, "loadPokeSpawnMap: dir=" + extpoke.toString());
+
+            if (extpoke.exists())
+            {
+                File extspawn = new File(extpoke, "Harvest.SpawnMap.json");
+
+                Log.d(LOGTAG, "loadPokeSpawnMap: fil=" + extspawn.toString());
+
+                FileInputStream input = new FileInputStream(extspawn);
+                int size = (int) input.getChannel().size();
+                byte[] content = new byte[ size ];
+                int xfer = input.read(content);
+                input.close();
+
+                if (size == xfer)
+                {
+                    poke2spawn = new JSONObject(new String(content));
+
+                    Iterator<String> keysIterator = poke2spawn.keys();
+
+                    while (keysIterator.hasNext())
+                    {
+                        String pokeId = keysIterator.next();
+
+                        String[] parts = pokeId.split("@");
+                        if (parts.length != 2) continue;
+
+                        int pokeNum = Integer.parseInt(parts[ 1 ], 10);
+                        enablePokemonDirEntry(pokeNum);
+                    }
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+
+        if (poke2spawn == null) poke2spawn = new JSONObject();
+    }
+
+    private static void savePokeSpawnMap()
+    {
+        try
+        {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            Log.d(LOGTAG, "savePokeSpawnMap: dir=" + extpoke.toString());
+
+            if (extpoke.exists() || extpoke.mkdir())
+            {
+                File extspawn = new File(extpoke, "Harvest.SpawnMap.json");
+
+                Log.d(LOGTAG, "savePokeSpawnMap: fil=" + extspawn.toString());
+
+                OutputStream out = new FileOutputStream(extspawn);
+                out.write(poke2spawn.toString(2).replace("\\/", "/").getBytes());
+                out.close();
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void addPokeSpawnMap(JSONObject poke)
+    {
+        try
+        {
+            String spid = poke.getString("spawn_point_id@string");
             double plat = poke.getDouble("latitude@double");
             double plon = poke.getDouble("longitude@double");
 
             String pokeId = null;
-            long tthidden = -1;
 
             if (poke.has("pokemon_id@.POGOProtos.Enums.PokemonId"))
             {
@@ -728,6 +1125,72 @@ public class Pokemongo extends FrameLayout
             }
 
             if (pokeId == null) return;
+
+            if (! poke2spawn.has(pokeId)) poke2spawn.put(pokeId, new JSONArray());
+            JSONArray spawns = poke2spawn.getJSONArray(pokeId);
+
+            if (spawns.length() > 25) return;
+
+            for (int inx = 0; inx < spawns.length(); inx++)
+            {
+                JSONObject spoint = spawns.getJSONObject(inx);
+
+                if (spid.equals(spoint.getString("sid")))
+                {
+                    //
+                    // Point is known.
+                    //
+
+                    return;
+                }
+            }
+
+            JSONObject spoint = new JSONObject();
+            spoint.put("sid", spid);
+            spoint.put("lat", plat);
+            spoint.put("lon", plon);
+
+            spawns.put(spoint);
+
+            savePokeSpawnMap();
+
+            String[] parts = pokeId.split("@");
+            if (parts.length != 2) return;
+
+            int pokeNum = Integer.parseInt(parts[ 1 ], 10);
+            enablePokemonDirEntry(pokeNum);
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void addPokepos(String tag, JSONObject poke)
+    {
+        try
+        {
+            addPokeSpawnMap(poke);
+
+            double plat = poke.getDouble("latitude@double");
+            double plon = poke.getDouble("longitude@double");
+
+            String pokeId = null;
+
+            if (poke.has("pokemon_id@.POGOProtos.Enums.PokemonId"))
+            {
+                pokeId = poke.getString("pokemon_id@.POGOProtos.Enums.PokemonId");
+            }
+
+            if (poke.has("pokemon_data@.POGOProtos.Data.PokemonData"))
+            {
+                JSONObject pokedata = poke.getJSONObject("pokemon_data@.POGOProtos.Data.PokemonData");
+                pokeId = pokedata.getString("pokemon_id@.POGOProtos.Enums.PokemonId");
+            }
+
+            if (pokeId == null) return;
+
+            long tthidden = -1;
 
             if (poke.has("time_till_hidden_ms@int32"))
             {
@@ -757,19 +1220,32 @@ public class Pokemongo extends FrameLayout
             if (parts.length != 2) return;
             int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
 
+            if ((commandMode == 2) && ! pokeDirHunting[ pokeOrd - 1 ])
+            {
+                //
+                // Check if already known. If not, we accept new
+                // pokemons positions anyway.
+                //
+
+                if (pokeDirEnabled[ pokeOrd - 1 ]) return;
+            }
+
             synchronized (pokeLocs)
             {
-                if (!pokeLocs.has(pokeId)) pokeLocs.put(pokeId, new JSONObject());
-                JSONObject pokeLoc = pokeLocs.getJSONObject(pokeId);
+                if (! pokeLocsDead.has(pokeposstr))
+                {
+                    if (!pokeLocs.has(pokeId)) pokeLocs.put(pokeId, new JSONObject());
+                    JSONObject pokeLoc = pokeLocs.getJSONObject(pokeId);
 
-                pokeLoc.put("pid", pokeId);
-                pokeLoc.put("ord", pokeOrd);
+                    pokeLoc.put("pid", pokeId);
+                    pokeLoc.put("ord", pokeOrd);
 
-                if (!pokeLoc.has("loc")) pokeLoc.put("loc", new JSONObject());
-                JSONObject loc = pokeLoc.getJSONObject("loc");
+                    if (!pokeLoc.has("loc")) pokeLoc.put("loc", new JSONObject());
+                    JSONObject loc = pokeLoc.getJSONObject("loc");
 
-                long expires = new Date().getTime() + tthidden;
-                loc.put(pokeposstr, expires);
+                    long expires = new Date().getTime() + tthidden;
+                    loc.put(pokeposstr, expires);
+                }
             }
 
             Log.d(LOGTAG, "addPokepos: tag=" + tag + " id=" + pokeId + " tth=" + (tthidden / 1000) + " chk=" + pokeposstr);
@@ -780,7 +1256,7 @@ public class Pokemongo extends FrameLayout
         }
     }
 
-    private static void registerSpawn(String tag, JSONObject spawn)
+    private static void registerSpawn(JSONObject spawn)
     {
         try
         {
@@ -796,8 +1272,6 @@ public class Pokemongo extends FrameLayout
             if ((! spawnPointsTodo.contains(spawnposstr))
                     && (! spawnPointsSeen.contains(spawnposstr)))
             {
-                //Log.d(LOGTAG, "registerSpawn: add=" + spawnposstr);
-
                 spawnPointsTodo.add(spawnposstr);
             }
         }
@@ -827,6 +1301,8 @@ public class Pokemongo extends FrameLayout
                     {
                         JSONObject mapcell = mapcells.getJSONObject(minx);
 
+                        boolean haveSpawn = false;
+
                         if (mapcell.has("spawn_points@.POGOProtos.Map.SpawnPoint"))
                         {
                             JSONArray spawns = mapcell.getJSONArray("spawn_points@.POGOProtos.Map.SpawnPoint");
@@ -834,25 +1310,24 @@ public class Pokemongo extends FrameLayout
                             for (int sinx = 0; sinx < spawns.length(); sinx++)
                             {
                                 JSONObject spawn = spawns.getJSONObject(sinx);
-                                registerSpawn("n", spawn);
-
+                                registerSpawn(spawn);
+                                haveSpawn = true;
                                 break;
                             }
                         }
 
-                        if (mapcell.has("decimated_spawn_points@.POGOProtos.Map.SpawnPoint"))
+                        if ((! haveSpawn) && mapcell.has("decimated_spawn_points@.POGOProtos.Map.SpawnPoint"))
                         {
                             JSONArray spawns = mapcell.getJSONArray("decimated_spawn_points@.POGOProtos.Map.SpawnPoint");
 
                             for (int sinx = 0; sinx < spawns.length(); sinx++)
                             {
                                 JSONObject spawn = spawns.getJSONObject(sinx);
-                                registerSpawn("d", spawn);
+                                registerSpawn(spawn);
 
                                 break;
                             }
                         }
-
 
                         if (mapcell.has("wild_pokemons@.POGOProtos.Map.Pokemon.WildPokemon"))
                         {
@@ -890,6 +1365,37 @@ public class Pokemongo extends FrameLayout
     {
         synchronized (pokeLocs)
         {
+            //
+            // Remove expired dead spawns.
+            //
+
+            Log.d(LOGTAG, "setupSpawns: Remove dead spawns.");
+
+            try
+            {
+                long now = new Date().getTime();
+
+                Iterator<String> keysIterator = pokeLocsDead.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String latlonstr = keysIterator.next();
+
+                    long expiration = pokeLocsDead.getLong(latlonstr);
+
+                    if (expiration < now)
+                    {
+                        pokeLocsDead.remove(latlonstr);
+
+                        Log.d(LOGTAG, "setupSpawns: dead spawns pos=" + latlonstr);
+                    }
+                }
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+
             //
             // Remove expired spawns.
             //
@@ -937,8 +1443,6 @@ public class Pokemongo extends FrameLayout
                         Log.d(LOGTAG, "setupSpawns: expired all id=" + pokeId);
                     }
                 }
-
-                Log.d(LOGTAG, "setupSpawns: Remove expired spawns done.");
             }
             catch (Exception ignore)
             {
@@ -946,14 +1450,14 @@ public class Pokemongo extends FrameLayout
             }
 
             //
-            // Setup spawn buttons.
+            // Setup spawn dirButtons.
             //
 
             Log.d(LOGTAG, "setupSpawns: Setup spawn buttons.");
 
             try
             {
-                Log.d(LOGTAG, "setupSpawns: " + pokeLocs.toString(2));
+                //Log.d(LOGTAG, "setupSpawns: " + pokeLocs.toString(2));
 
                 int spawninx = 0;
 
@@ -970,12 +1474,13 @@ public class Pokemongo extends FrameLayout
 
                     Bitmap bitmap = PokemonImage.getPokemonImage(pokeOrd);
 
-                    pimages[ spawninx ].setImageBitmap(bitmap);
-                    pimages[ spawninx ].setBackgroundColor(0xffffffff);
+                    if (locsJson[ spawninx ] != pokeLoc)
+                    {
+                        locsJson[ spawninx ] = pokeLoc;
 
-                    locsJson[ spawninx ] = pokeLoc;
-
-                    Log.d(LOGTAG, "setupSpawns: ord=" + pokeOrd + " spawninx=" + spawninx + " bitmap=" + bitmap);
+                        pimages[ spawninx ].setImageBitmap(bitmap);
+                        pimages[ spawninx ].setBackgroundColor(0xffffffff);
+                    }
 
                     spawninx++;
                 }
@@ -989,8 +1494,6 @@ public class Pokemongo extends FrameLayout
 
                     spawninx++;
                 }
-
-                Log.d(LOGTAG, "setupSpawns: Setup spawn buttons done.");
             }
             catch (Exception ignore)
             {
@@ -1027,6 +1530,8 @@ public class Pokemongo extends FrameLayout
                     lon = lonloc;
                     latMove = 0;
                     lonMove = 0;
+
+                    setCommand(0);
                 }
             }
         }
@@ -1061,6 +1566,8 @@ public class Pokemongo extends FrameLayout
                     lon = lonloc;
                     latMove = 0;
                     lonMove = 0;
+
+                    setCommand(0);
                 }
             }
         }
