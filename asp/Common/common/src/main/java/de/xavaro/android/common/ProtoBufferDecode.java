@@ -22,6 +22,7 @@ public class ProtoBufferDecode
     private JSONObject protos;
     private boolean debug;
     private boolean flat;
+    private boolean offs;
 
     public ProtoBufferDecode(byte[] buffer)
     {
@@ -51,6 +52,11 @@ public class ProtoBufferDecode
     public void setFlat(boolean flat)
     {
         this.flat = flat;
+    }
+
+    public void setOffs(boolean offs)
+    {
+        this.offs = offs;
     }
 
     public void setDebug(boolean debug)
@@ -114,6 +120,9 @@ public class ProtoBufferDecode
     @Nullable
     public JSONObject decode(String message)
     {
+        setDebug(message.equals(".POGOProtos.Networking.Responses.EncounterResponse") ||
+                 message.equals(".POGOProtos.Data.Capture.CaptureProbability"));
+
         JSONObject current = getJSONObject(protos, message);
 
         if (current == null)
@@ -125,7 +134,7 @@ public class ProtoBufferDecode
 
         if (debug) Log.d(LOGTAG, "decode: start decoding...");
 
-        if (debug && flat) Log.d(LOGTAG, "decode: " + getHexBytesToString(buffer, offset, length - offset));
+        if (debug) Log.d(LOGTAG, "decode: " + getHexBytesToString(buffer, offset, length - offset));
 
         JSONObject json = new JSONObject();
 
@@ -189,6 +198,8 @@ public class ProtoBufferDecode
                 // Fixed 64 bit
                 //
 
+                if (offs) put(json, name + "@", offset, repeat);
+
                 if (type.equals("double"))
                 {
                     put(json, name, decodeDouble(), repeat);
@@ -207,6 +218,8 @@ public class ProtoBufferDecode
                 // Bytes
                 //
 
+                if (offs) put(json, name + "@", offset, repeat);
+
                 int seqlen = (int) decodeVarint();
 
                 if (debug) Log.d(LOGTAG, "decode wire=2 len=" + seqlen);
@@ -215,10 +228,11 @@ public class ProtoBufferDecode
 
                 if (! flat)
                 {
-                    if (protos.has(type))
+                    if (protos.has(type) && ! isProtoEnum(type))
                     {
                         ProtoBufferDecode pbdecode = new ProtoBufferDecode(seqbytes);
                         pbdecode.setProtos(protos);
+                        pbdecode.setOffs(offs);
 
                         JSONObject seqjson = pbdecode.decode(type);
                         put(json, name, seqjson, repeat);
@@ -265,6 +279,8 @@ public class ProtoBufferDecode
                 //
                 // Fixed 32 bit
                 //
+
+                if (offs) put(json, name + "@", offset, repeat);
 
                 if (type.equals("float"))
                 {
@@ -333,6 +349,20 @@ public class ProtoBufferDecode
                     if (debug) Log.d(LOGTAG, "decodePacked: type=" + type + " pos=" + dp.offset + " len=" + dp.length + " varint=" + varint);
 
                     valarray.put(varint);
+                }
+            }
+
+            if (isProtoEnum(type))
+            {
+                long varint;
+
+                while (dp.offset < dp.length)
+                {
+                    varint = dp.decodeVarint();
+
+                    if (debug) Log.d(LOGTAG, "decodePacked: type=" + type + " pos=" + dp.offset + " len=" + dp.length + " enum=" + varint);
+
+                    valarray.put(getProtoEnum(type,varint));
                 }
             }
 
@@ -565,6 +595,30 @@ public class ProtoBufferDecode
         }
 
         return false;
+    }
+
+    private boolean isProtoEnum(String enumtype)
+    {
+        JSONObject enumobj = getJSONObject(protos, enumtype);
+        if (enumobj == null) return false;
+
+        Iterator<String> keysIterator = enumobj.keys();
+
+        if (keysIterator.hasNext())
+        {
+            String name = keysIterator.next();
+
+            try
+            {
+                enumobj.getInt(name);
+            }
+            catch (Exception ignore)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private Object getProtoEnum(String enumtype, long value)

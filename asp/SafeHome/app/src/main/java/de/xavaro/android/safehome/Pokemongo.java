@@ -51,6 +51,7 @@ public class Pokemongo extends FrameLayout
 
     private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
     private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
+    private final static ImageView[] cmdButtonImageViews = new ImageView[ 3 ];
     private final static String[] cmdTexts = new String[]{"HIDE", "SHOP", "HUNT"};
 
     private final static FrameLayout[] dirButtons = new FrameLayout[ 9 ];
@@ -133,6 +134,9 @@ public class Pokemongo extends FrameLayout
             cmdButtonTextViews[ inx ].setGravity(Gravity.CENTER_HORIZONTAL + Gravity.CENTER_VERTICAL);
 
             cmdButtons[ inx ].addView(cmdButtonTextViews[ inx ]);
+
+            cmdButtonImageViews[ inx ] = new ImageView(context);
+            cmdButtons[ inx ].addView(cmdButtonImageViews[ inx ]);
         }
 
         for (int inx = 0; inx < 9; inx++)
@@ -397,42 +401,31 @@ public class Pokemongo extends FrameLayout
 
     private void onClickSpawnsButton(int buttinx)
     {
-        JSONObject gotoLoc = locsJson[ buttinx ];
-        if (gotoLoc == null) return;
-
         synchronized (pokeLocs)
         {
             try
             {
+                JSONObject gotoLoc = locsJson[ buttinx ];
+                if (gotoLoc == null) return;
+
                 JSONObject locs = gotoLoc.getJSONObject("loc");
 
+                Log.d(LOGTAG, "onClickSpawnsButton: " + locs.toString(2));
+
                 Iterator<String> locsIterator = locs.keys();
+                if (! locsIterator.hasNext()) return;
 
-                String gotostr = null;
+                String latlonstr = locsIterator.next();
+                locs.remove(latlonstr);
 
-                while (locsIterator.hasNext())
-                {
-                    String latlonstr = locsIterator.next();
+                pimages[ buttinx ].setBackgroundColor(0xcccccccc);
 
-                    if (gotostr == null)
-                    {
-                        gotostr = latlonstr;
-                        locs.remove(latlonstr);
-                    }
-                }
+                long expires = new Date().getTime() + 60 * 1000;
+                pokeLocsDead.put(latlonstr, expires);
 
-                if (gotostr != null)
-                {
-                    pimages[ buttinx ].setBackgroundColor(0xcccccccc);
-
-                    long expires = new Date().getTime() + 60 * 1000;
-                    pokeLocsDead.put(gotostr, expires);
-
-                    spotLocation = gotostr;
-                    isSpotting = true;
-
-                    setCommand(0);
-                }
+                spotLocation = latlonstr;
+                suspendTime = new Date().getTime() + 15 * 1000;
+                isSpotting = true;
             }
             catch (Exception ignore)
             {
@@ -442,6 +435,7 @@ public class Pokemongo extends FrameLayout
     }
 
     private static int commandMode;
+    private static long suspendTime;
 
     private static boolean isSpotting;
     private static boolean isShowhunt;
@@ -550,16 +544,17 @@ public class Pokemongo extends FrameLayout
         pokeCloseFile(url);
     }
 
-    //private static double lat = 0;
-    //private static double lon = 0;
+    //
+    // Hamburg => 53.55, 10.00
+    //
 
-    // Hamburg => 53.544107, 9.985271
     private static double lat = 53.55 + ((Math.random() - 0.5) / 50.0);
     private static double lon = 10.00 + ((Math.random() - 0.5) / 50.0);
 
+    private static long spawnCount = 0;
+
     private static double latMove = 0;
     private static double lonMove = 0;
-    private static long spawnCount = 0;
 
     private static void setCommand(int command)
     {
@@ -606,8 +601,6 @@ public class Pokemongo extends FrameLayout
 
         if (isSpotting)
         {
-            isSpotting = false;
-
             try
             {
                 JSONObject latlon = new JSONObject(spotLocation);
@@ -626,60 +619,68 @@ public class Pokemongo extends FrameLayout
             {
                 ignore.printStackTrace();
             }
+
+            isSpotting = false;
         }
 
-        if (commandMode == 1)
+        if (suspendTime < new Date().getTime())
         {
-            if ((spawnCount++ % 2) == 0)
+            if (commandMode == 1)
             {
-                if (spawnPointsTodo.size() > 0)
+                if ((spawnCount++ % 2) == 0)
                 {
-                    try
+                    if (spawnPointsTodo.size() > 0)
                     {
-                        String spanposstr = spawnPointsTodo.remove(0);
-                        spawnPointsSeen.add(spanposstr);
+                        try
+                        {
+                            String spanposstr = spawnPointsTodo.remove(0);
+                            spawnPointsSeen.add(spanposstr);
 
-                        JSONObject spanpos = new JSONObject(spanposstr);
+                            JSONObject spanpos = new JSONObject(spanposstr);
 
-                        lat = spanpos.getDouble("lat");
-                        lon = spanpos.getDouble("lon");
+                            lat = spanpos.getDouble("lat");
+                            lon = spanpos.getDouble("lon");
 
-                        Log.d(LOGTAG, "deziLocation: spawn"
-                                + " lat=" + location.getLatitude()
-                                + " lon=" + location.getLongitude());
-                    }
-                    catch (Exception ignore)
-                    {
+                            Log.d(LOGTAG, "deziLocation: spawn"
+                                    + " lat=" + location.getLatitude()
+                                    + " lon=" + location.getLongitude());
+                        }
+                        catch (Exception ignore)
+                        {
+                        }
                     }
                 }
             }
-        }
 
-        if (commandMode == 2)
-        {
-            if (huntPointsTodo.size() == 0)
+            if (commandMode == 2)
             {
-                clearFinalJSON(pokeLocs);
-                clearFinalJSON(pokeLocsDead);
+                if (huntPointsTodo.size() == 0)
+                {
+                    synchronized (pokeLocs)
+                    {
+                        clearFinalJSON(pokeLocs);
+                        clearFinalJSON(pokeLocsDead);
+                    }
 
-                setupSpawns();
+                    setupSpawns();
 
-                buildPokeHuntSpawns();
-            }
+                    buildPokeHuntSpawns();
+                }
 
-            if ((spawnCount++ % 2) == 0)
-            {
-                synchronized (huntPointsTodo)
+                if ((spawnCount++ % 2) == 0)
                 {
                     if (huntPointsTodo.size() > 0)
                     {
                         try
                         {
-                            JSONObject huntPoint = huntPointsTodo.remove(0);
-                            huntPointsTodo.add(huntPoint);
+                            synchronized (huntPointsTodo)
+                            {
+                                JSONObject huntPoint = huntPointsTodo.remove(0);
+                                huntPointsTodo.add(huntPoint);
 
-                            lat = huntPoint.getDouble("lat");
-                            lon = huntPoint.getDouble("lon");
+                                lat = huntPoint.getDouble("lat");
+                                lon = huntPoint.getDouble("lon");
+                            }
 
                             Log.d(LOGTAG, "deziLocation: hunt"
                                     + " lat=" + location.getLatitude()
@@ -691,13 +692,13 @@ public class Pokemongo extends FrameLayout
                     }
                 }
             }
+
+            lat += latMove;
+            lon += lonMove;
         }
 
         location.setLatitude(lat);
         location.setLongitude(lon);
-
-        lat += latMove;
-        lon += lonMove;
 
         Log.d(LOGTAG, "deziLocation:"
                 + " lat=" + location.getLatitude()
@@ -892,8 +893,12 @@ public class Pokemongo extends FrameLayout
 
                 String restype = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
 
+                Log.d(LOGTAG, "saveRecords: req type=" + restype);
+
                 String file = "pm.Requests." + CamelName(restype) + "Response.json";
                 File extfile = new File(extdir, file);
+
+                Log.d(LOGTAG, "saveRecords: req name=" + extfile.toString());
 
                 OutputStream out = new FileOutputStream(extfile);
                 out.write(request.toString(2).replace("\\/", "/").getBytes());
@@ -909,10 +914,14 @@ public class Pokemongo extends FrameLayout
                 String type = returnobj.getString("type");
                 JSONObject data = returnobj.getJSONObject("data");
 
+                Log.d(LOGTAG, "saveRecords: res type=" + type);
+
                 String[] parts = type.split("\\.");
                 if (parts.length < 3) continue;
                 String file = "pm." + parts[ parts.length - 2 ] + "." + parts[ parts.length - 1 ] + ".json";
                 File extfile = new File(extdir, file);
+
+                Log.d(LOGTAG, "saveRecords: res name=" + extfile.toString());
 
                 OutputStream out = new FileOutputStream(extfile);
                 out.write(data.toString(2).replace("\\/", "/").getBytes());
@@ -1369,8 +1378,6 @@ public class Pokemongo extends FrameLayout
             // Remove expired dead spawns.
             //
 
-            Log.d(LOGTAG, "setupSpawns: Remove dead spawns.");
-
             try
             {
                 long now = new Date().getTime();
@@ -1380,15 +1387,8 @@ public class Pokemongo extends FrameLayout
                 while (keysIterator.hasNext())
                 {
                     String latlonstr = keysIterator.next();
-
                     long expiration = pokeLocsDead.getLong(latlonstr);
-
-                    if (expiration < now)
-                    {
-                        pokeLocsDead.remove(latlonstr);
-
-                        Log.d(LOGTAG, "setupSpawns: dead spawns pos=" + latlonstr);
-                    }
+                    if (expiration < now)pokeLocsDead.remove(latlonstr);
                 }
             }
             catch (Exception ignore)
@@ -1399,8 +1399,6 @@ public class Pokemongo extends FrameLayout
             //
             // Remove expired spawns.
             //
-
-            Log.d(LOGTAG, "setupSpawns: Remove expired spawns.");
 
             try
             {
@@ -1427,8 +1425,6 @@ public class Pokemongo extends FrameLayout
                         if (expiration < now)
                         {
                             locs.remove(latlonstr);
-
-                            Log.d(LOGTAG, "setupSpawns: expired loc id=" + pokeId);
                         }
                         else
                         {
@@ -1436,12 +1432,7 @@ public class Pokemongo extends FrameLayout
                         }
                     }
 
-                    if (valid == 0)
-                    {
-                        pokeLocs.remove(pokeId);
-
-                        Log.d(LOGTAG, "setupSpawns: expired all id=" + pokeId);
-                    }
+                    if (valid == 0) pokeLocs.remove(pokeId);
                 }
             }
             catch (Exception ignore)
@@ -1452,8 +1443,6 @@ public class Pokemongo extends FrameLayout
             //
             // Setup spawn dirButtons.
             //
-
-            Log.d(LOGTAG, "setupSpawns: Setup spawn buttons.");
 
             try
             {
@@ -1479,18 +1468,19 @@ public class Pokemongo extends FrameLayout
                         locsJson[ spawninx ] = pokeLoc;
 
                         pimages[ spawninx ].setImageBitmap(bitmap);
-                        pimages[ spawninx ].setBackgroundColor(0xffffffff);
                     }
+
+                    pimages[ spawninx ].setBackgroundColor(0xffffffff);
 
                     spawninx++;
                 }
 
                 while (spawninx < spawns.length)
                 {
+                    locsJson[ spawninx ] = null;
+
                     pimages[ spawninx ].setImageBitmap(null);
                     pimages[ spawninx ].setBackgroundColor(0xffffffff);
-
-                    locsJson[ spawninx ] = null;
 
                     spawninx++;
                 }

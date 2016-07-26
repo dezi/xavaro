@@ -26,12 +26,14 @@ public class PokemonDecode
 
             decode = new ProtoBufferDecode(requestBytes);
             decode.setProtos(protos);
+            decode.setOffs(true);
             JSONObject reqenvelope = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
             assembleRequest(reqenvelope);
             //Log.d(LOGTAG, "decode: " + Json.toPretty(reqenvelope));
 
             decode = new ProtoBufferDecode(responseBytes);
             decode.setProtos(protos);
+            decode.setOffs(true);
             JSONObject resenvelope = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
             assembleResponse(reqenvelope, resenvelope);
             //Log.d(LOGTAG, "decode: " + Json.toPretty(resenvelope));
@@ -113,10 +115,11 @@ public class PokemonDecode
                     String hexbytes = reponses.getString(rinx);
                     byte[] resdata = getHexStringToBytes(hexbytes);
 
-                    Log.d("POKEDEZI", "tuneUp restype=" + restype + " messagename=" + messagename);
+                    Log.d(LOGTAG, "tuneUp restype=" + restype + " messagename=" + messagename);
 
                     ProtoBufferDecode decode = new ProtoBufferDecode(resdata);
                     decode.setProtos(PokemonProto.getProtos());
+                    decode.setOffs(true);
 
                     JSONObject tune = decode.decode(messagename);
 
