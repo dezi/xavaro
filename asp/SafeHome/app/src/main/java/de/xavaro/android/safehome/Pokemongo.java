@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -620,9 +621,7 @@ public class Pokemongo extends FrameLayout
                 lat = latlon.getDouble("lat");
                 lon = latlon.getDouble("lon");
 
-                Log.d(LOGTAG, "deziLocation: seeking:"
-                        + " lat=" + location.getLatitude()
-                        + " lon=" + location.getLongitude());
+                Log.d(LOGTAG, "deziLocation: seeking:" + " lat=" + lat + " lon=" + lon);
             }
             catch (Exception ignore)
             {
@@ -650,9 +649,7 @@ public class Pokemongo extends FrameLayout
                             lat = spanpos.getDouble("lat");
                             lon = spanpos.getDouble("lon");
 
-                            Log.d(LOGTAG, "deziLocation: spawn"
-                                    + " lat=" + location.getLatitude()
-                                    + " lon=" + location.getLongitude());
+                            Log.d(LOGTAG, "deziLocation: spawn" + " lat=" + lat + " lon=" + lon);
                         }
                         catch (Exception ignore)
                         {
@@ -691,9 +688,7 @@ public class Pokemongo extends FrameLayout
                                 lon = huntPoint.getDouble("lon");
                             }
 
-                            Log.d(LOGTAG, "deziLocation: hunt"
-                                    + " lat=" + location.getLatitude()
-                                    + " lon=" + location.getLongitude());
+                            Log.d(LOGTAG, "deziLocation: hunt" + " lat=" + lat + " lon=" + lon);
                         }
                         catch (Exception ignore)
                         {
@@ -715,6 +710,8 @@ public class Pokemongo extends FrameLayout
                 + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
                 + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove)
         );
+
+        makeToast();
     }
 
     private static final Map<Integer, OutputStream> outputs = new HashMap<>();
@@ -727,7 +724,8 @@ public class Pokemongo extends FrameLayout
     private static final ArrayList<String> spawnPointsSeen = new ArrayList<>();
 
     // http://www.pokemon.com/de/api/pokedex/kalos
-    // http://www.pokemon.com/us/api/pokedex/kalos
+    // http://www.pok
+    // emon.com/us/api/pokedex/kalos
     // http://assets.pokemon.com/assets/cms2/img/pokedex/full/010.png
 
     public static void pokeOpenFile(String url)
@@ -844,10 +842,12 @@ public class Pokemongo extends FrameLayout
 
                     if (result != null)
                     {
+                        /*
                         pd.patch(url, result, response);
 
                         buffer.clear();
                         buffer.put(response, 0, response.length);
+                        */
 
                         String jres = result.toString(2);
 
@@ -1697,6 +1697,8 @@ public class Pokemongo extends FrameLayout
                     fortId = fortData.getString("fort_id@string");
                     fortLat = fortData.getDouble("fort_latitude@double");
                     fortLon = fortData.getDouble("fort_longitude@double");
+
+                    Log.d(LOGTAG, "evalFortDetails: fortid=" + fortId + " lat=" + fortLat + " lon=" + fortLon);
                 }
             }
 
@@ -1715,7 +1717,7 @@ public class Pokemongo extends FrameLayout
                     double latloc = data.getDouble("latitude@double");
                     double lonloc = data.getDouble("longitude@double");
 
-                    Log.d(LOGTAG, "Fort encountered: lat=" + latloc + " lon=" + lonloc);
+                    Log.d(LOGTAG, "evalFortDetails: encountered: lat=" + latloc + " lon=" + lonloc);
 
                     lat = latloc;
                     lon = lonloc;
@@ -1731,8 +1733,12 @@ public class Pokemongo extends FrameLayout
 
                         int fortScore = getFortScore(data);
 
+                        Log.d(LOGTAG, "evalFortDetails: searched: fortid=" + fortId + " lat=" + fortLat + " lon=" + fortLon + " score=" + fortScore);
+
                         if (fortScore > 0)
                         {
+                            cleanFortData(data);
+
                             data.put("mongopoke_fortid", fortId);
                             data.put("mongopoke_lat", fortLat);
                             data.put("mongopoke_lon", fortLon);
@@ -1755,7 +1761,7 @@ public class Pokemongo extends FrameLayout
                             {
                                 knownForts.put(data);
 
-                                sortInteger(knownForts, "mongopoke_score", true);
+                                knownForts = sortInteger(knownForts, "mongopoke_score", true);
 
                                 while (knownForts.length() > 1000)
                                 {
@@ -1771,6 +1777,19 @@ public class Pokemongo extends FrameLayout
         }
         catch (Exception ignore)
         {
+        }
+    }
+
+    private static void cleanFortData(JSONObject fort)
+    {
+        if (fort.has("result@.POGOProtos.Networking.Responses.FortSearchResponse.Result"))
+        {
+            fort.remove("result@.POGOProtos.Networking.Responses.FortSearchResponse.Result");
+        }
+
+        if (fort.has("items_awarded@.POGOProtos.Inventory.ItemAward@"))
+        {
+            fort.remove("items_awarded@.POGOProtos.Inventory.ItemAward@");
         }
     }
 
@@ -1798,6 +1817,15 @@ public class Pokemongo extends FrameLayout
                 if (size == xfer)
                 {
                     knownForts = new JSONArray(new String(content));
+
+                    for (int inx = 0; inx < knownForts.length(); inx++)
+                    {
+                        JSONObject data = knownForts.getJSONObject(inx);
+
+                        cleanFortData(data);
+
+                        data.put("mongopoke_score", getFortScore(data));
+                    }
                 }
             }
         }
@@ -1844,9 +1872,9 @@ public class Pokemongo extends FrameLayout
             itemScore.put("ITEM_UNKNOWN", 0);
 
             itemScore.put("ITEM_POKE_BALL", 0);
-            itemScore.put("ITEM_GREAT_BALL", 10);
-            itemScore.put("ITEM_ULTRA_BALL", 100);
-            itemScore.put("ITEM_MASTER_BALL", 1000);
+            itemScore.put("ITEM_GREAT_BALL", 100);
+            itemScore.put("ITEM_ULTRA_BALL", 1000);
+            itemScore.put("ITEM_MASTER_BALL", 10000);
 
             itemScore.put("ITEM_POTION", 0);
             itemScore.put("ITEM_SUPER_POTION", 10);
@@ -1904,7 +1932,7 @@ public class Pokemongo extends FrameLayout
                 {
                     JSONObject item = items.getJSONObject(inx);
 
-                    String itemString = item.getString("item_id@POGOProtos.Inventory.ItemId");
+                    String itemString = item.getString("item_id@.POGOProtos.Inventory.ItemId");
                     int itemCount = item.getInt("item_count@int32");
 
                     score += getItemScore(itemString) * itemCount;
@@ -1962,6 +1990,46 @@ public class Pokemongo extends FrameLayout
         Collections.sort(jsonValues, new comparedat());
 
         return new JSONArray(jsonValues);
+    }
+
+    private static final ArrayList<String> toastMessages = new ArrayList<>();
+
+    private static void addToast(String message)
+    {
+        try
+        {
+            synchronized (toastMessages)
+            {
+                toastMessages.add(message);
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void makeToast()
+    {
+        try
+        {
+            String message;
+
+            synchronized (toastMessages)
+            {
+                if (toastMessages.size() == 0) return;
+                message = toastMessages.remove(0);
+            }
+
+            Toast toast = Toast.makeText(application, message, Toast.LENGTH_LONG);
+            TextView view = (TextView) toast.getView().findViewById(android.R.id.message);
+            if (view != null) view.setGravity(Gravity.CENTER);
+            toast.show();
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
     }
 
     //endregion Utility methods.
