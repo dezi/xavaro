@@ -6,6 +6,9 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 public class PokemonDecode
 {
     private static final String LOGTAG = PokemonDecode.class.getSimpleName();
@@ -15,6 +18,56 @@ public class PokemonDecode
     public PokemonDecode()
     {
         if (protos == null) protos = PokemonProto.getProtos();
+    }
+
+    public void patch(String url, JSONObject result, byte[] responseBytes)
+    {
+        try
+        {
+            JSONObject reponseEnv = result.getJSONObject("response");
+
+            JSONArray reponseArr = reponseEnv.getJSONArray("returns@array");
+            JSONArray reponseOff= reponseEnv.getJSONArray("returns@array@");
+
+            for (int inx = 0; inx < reponseArr.length(); inx++)
+            {
+                JSONObject response = reponseArr.getJSONObject(inx);
+                int offset = reponseOff.getInt(inx);
+                String type = response.getString("type");
+                JSONObject data = response.getJSONObject("data");
+
+                Log.d(LOGTAG, "patch: type=" + type + " offset=" + offset);
+
+                if (type.equals(".POGOProtos.Networking.Responses.EncounterResponse"))
+                {
+                    offset += data.getInt("capture_probability@.POGOProtos.Data.Capture.CaptureProbability@");
+                    data = data.getJSONObject("capture_probability@.POGOProtos.Data.Capture.CaptureProbability");
+
+                    JSONArray pvals = data.getJSONArray("capture_probability@float");
+                    JSONArray poffs = data.getJSONArray("capture_probability@float@");
+
+                    pvals = pvals.getJSONArray(0);
+
+                    for (int pinx = 0; pinx < pvals.length(); pinx++)
+                    {
+                        double probaval = pvals.getDouble(pinx);
+                        int probaoff = offset + poffs.getInt(0) + pinx * 4;
+                        byte[] fval = new byte[ 4 ];
+
+                        System.arraycopy(responseBytes, probaoff, fval, 0, 4);
+                        float bfloat = ByteBuffer.wrap(fval).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                        byte[] nfloat = ByteBuffer.wrap(fval).order(ByteOrder.LITTLE_ENDIAN).putFloat(1.0f).array();
+                        System.arraycopy(nfloat, 0, responseBytes, probaoff, 4);
+
+                        Log.d(LOGTAG, "patch: CaptureProbability=" + probaval + " off=" + probaoff + " bfloat=" + bfloat);
+                    }
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
     }
 
     @Nullable
@@ -134,6 +187,13 @@ public class PokemonDecode
 
             resenvelop.remove("returns@bytes");
             resenvelop.put("returns@array", decoded);
+
+            if (resenvelop.has("returns@bytes@"))
+            {
+                Object indexes = resenvelop.get("returns@bytes@");
+                resenvelop.remove("returns@bytes@");
+                resenvelop.put("returns@array@",indexes);
+            }
         }
         catch (Exception ex)
         {

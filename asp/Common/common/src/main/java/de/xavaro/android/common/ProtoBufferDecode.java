@@ -120,9 +120,6 @@ public class ProtoBufferDecode
     @Nullable
     public JSONObject decode(String message)
     {
-        setDebug(message.equals(".POGOProtos.Networking.Responses.EncounterResponse") ||
-                 message.equals(".POGOProtos.Data.Capture.CaptureProbability"));
-
         JSONObject current = getJSONObject(protos, message);
 
         if (current == null)
@@ -218,11 +215,11 @@ public class ProtoBufferDecode
                 // Bytes
                 //
 
-                if (offs) put(json, name + "@", offset, repeat);
-
                 int seqlen = (int) decodeVarint();
 
                 if (debug) Log.d(LOGTAG, "decode wire=2 len=" + seqlen);
+
+                if (offs) put(json, name + "@", offset, repeat);
 
                 byte[] seqbytes = getNextBytes(seqlen);
 

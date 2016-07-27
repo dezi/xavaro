@@ -424,7 +424,7 @@ public class Pokemongo extends FrameLayout
                 pokeLocsDead.put(latlonstr, expires);
 
                 spotLocation = latlonstr;
-                suspendTime = new Date().getTime() + 15 * 1000;
+                suspendTime = new Date().getTime() + 20 * 1000;
                 isSpotting = true;
             }
             catch (Exception ignore)
@@ -830,8 +830,10 @@ public class Pokemongo extends FrameLayout
                     //out.write(response);
 
                     PokemonDecode pd = new PokemonDecode();
-
                     JSONObject result = pd.decode(url, request, response);
+                    pd.patch(url, result, response);
+
+                    System.arraycopy(response, 0, buffer.array(), buffer.arrayOffset() + offset, count);
 
                     if (result != null)
                     {
