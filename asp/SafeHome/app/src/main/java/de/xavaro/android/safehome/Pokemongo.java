@@ -4,6 +4,7 @@ package de.xavaro.android.safehome;
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -24,11 +25,16 @@ import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
@@ -340,7 +346,7 @@ public class Pokemongo extends FrameLayout
 
     private void onClickHuntPokemonButton(int buttinx)
     {
-        if (! pokeDirEnabled[ buttinx ]) return;
+        if (!pokeDirEnabled[ buttinx ]) return;
 
         if (pokeDirHunting[ buttinx ])
         {
@@ -413,7 +419,7 @@ public class Pokemongo extends FrameLayout
                 Log.d(LOGTAG, "onClickSpawnsButton: " + locs.toString(2));
 
                 Iterator<String> locsIterator = locs.keys();
-                if (! locsIterator.hasNext()) return;
+                if (!locsIterator.hasNext()) return;
 
                 String latlonstr = locsIterator.next();
                 locs.remove(latlonstr);
@@ -558,6 +564,9 @@ public class Pokemongo extends FrameLayout
 
     private static void setCommand(int command)
     {
+        latMove = 0;
+        lonMove = 0;
+
         commandMode = command;
 
         for (int inx = 0; inx < dirButtonTextViews.length; inx++)
@@ -741,9 +750,9 @@ public class Pokemongo extends FrameLayout
 
         File extdir = Environment.getExternalStorageDirectory();
         File extpoke = new File(extdir, "Mongopoke");
-        if (! (extpoke.exists() || extpoke.mkdir())) return;
+        if (!(extpoke.exists() || extpoke.mkdir())) return;
         File extsubdir = new File(extpoke, "Requests");
-        if (! (extsubdir.exists() || extsubdir.mkdir())) return;
+        if (!(extsubdir.exists() || extsubdir.mkdir())) return;
 
         File extfile = new File(extsubdir, filename);
 
@@ -830,21 +839,18 @@ public class Pokemongo extends FrameLayout
                     byte[] response = new byte[ count ];
                     System.arraycopy(buffer.array(), buffer.arrayOffset() + offset, response, 0, count);
 
-                    //out.write(response);
-
                     PokemonDecode pd = new PokemonDecode();
                     JSONObject result = pd.decode(url, request, response);
-                    pd.patch(url, result, response);
-
-                    buffer.clear();
-                    buffer.put(response, 0, response.length);
-                    //System.arraycopy(response, 0, buffer.array(), buffer.arrayOffset() + offset, count);
 
                     if (result != null)
                     {
+                        pd.patch(url, result, response);
+
+                        buffer.clear();
+                        buffer.put(response, 0, response.length);
+
                         String jres = result.toString(2);
 
-                        //out.write("\n--\n".getBytes());
                         out.write(jres.replace("\\/", "/").getBytes());
 
                         saveRecords(result);
@@ -891,7 +897,7 @@ public class Pokemongo extends FrameLayout
         File extpoke = new File(extdir, "Mongopoke");
         File extsamples = new File(extpoke, "Samples");
 
-        if (! (extsamples.exists() || extsamples.mkdirs())) return;
+        if (!(extsamples.exists() || extsamples.mkdirs())) return;
 
         try
         {
@@ -1142,7 +1148,7 @@ public class Pokemongo extends FrameLayout
 
             if (pokeId == null) return;
 
-            if (! poke2spawn.has(pokeId)) poke2spawn.put(pokeId, new JSONArray());
+            if (!poke2spawn.has(pokeId)) poke2spawn.put(pokeId, new JSONArray());
             JSONArray spawns = poke2spawn.getJSONArray(pokeId);
 
             if (spawns.length() > 25) return;
@@ -1236,7 +1242,7 @@ public class Pokemongo extends FrameLayout
             if (parts.length != 2) return;
             int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
 
-            if ((commandMode == 2) && ! pokeDirHunting[ pokeOrd - 1 ])
+            if ((commandMode == 2) && !pokeDirHunting[ pokeOrd - 1 ])
             {
                 //
                 // Check if already known. If not, we accept new
@@ -1248,7 +1254,7 @@ public class Pokemongo extends FrameLayout
 
             synchronized (pokeLocs)
             {
-                if (! pokeLocsDead.has(pokeposstr))
+                if (!pokeLocsDead.has(pokeposstr))
                 {
                     if (!pokeLocs.has(pokeId)) pokeLocs.put(pokeId, new JSONObject());
                     JSONObject pokeLoc = pokeLocs.getJSONObject(pokeId);
@@ -1285,8 +1291,8 @@ public class Pokemongo extends FrameLayout
 
             String spawnposstr = spawnpos.toString();
 
-            if ((! spawnPointsTodo.contains(spawnposstr))
-                    && (! spawnPointsSeen.contains(spawnposstr)))
+            if ((!spawnPointsTodo.contains(spawnposstr))
+                    && (!spawnPointsSeen.contains(spawnposstr)))
             {
                 spawnPointsTodo.add(spawnposstr);
             }
@@ -1332,7 +1338,7 @@ public class Pokemongo extends FrameLayout
                             }
                         }
 
-                        if ((! haveSpawn) && mapcell.has("decimated_spawn_points@.POGOProtos.Map.SpawnPoint"))
+                        if ((!haveSpawn) && mapcell.has("decimated_spawn_points@.POGOProtos.Map.SpawnPoint"))
                         {
                             JSONArray spawns = mapcell.getJSONArray("decimated_spawn_points@.POGOProtos.Map.SpawnPoint");
 
@@ -1395,7 +1401,7 @@ public class Pokemongo extends FrameLayout
                 {
                     String latlonstr = keysIterator.next();
                     long expiration = pokeLocsDead.getLong(latlonstr);
-                    if (expiration < now)pokeLocsDead.remove(latlonstr);
+                    if (expiration < now) pokeLocsDead.remove(latlonstr);
                 }
             }
             catch (Exception ignore)
@@ -1525,44 +1531,6 @@ public class Pokemongo extends FrameLayout
 
                     lat = latloc;
                     lon = lonloc;
-                    latMove = 0;
-                    lonMove = 0;
-
-                    setCommand(0);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-
-        }
-    }
-
-    private static void evalFortDetails(JSONObject json)
-    {
-        try
-        {
-            JSONObject response = json.getJSONObject("response");
-            JSONArray returns = response.getJSONArray("returns@array");
-
-            for (int inx = 0; inx < returns.length(); inx++)
-            {
-                JSONObject returnobj = returns.getJSONObject(inx);
-                String type = returnobj.getString("type");
-
-                if (type.equals(".POGOProtos.Networking.Responses.FortDetailsResponse"))
-                {
-                    JSONObject data = returnobj.getJSONObject("data");
-
-                    double latloc = data.getDouble("latitude@double");
-                    double lonloc = data.getDouble("longitude@double");
-
-                    Log.d(LOGTAG, "Fort encountered: lat=" + latloc + " lon=" + lonloc);
-
-                    lat = latloc;
-                    lon = lonloc;
-                    latMove = 0;
-                    lonMove = 0;
 
                     setCommand(0);
                 }
@@ -1625,6 +1593,295 @@ public class Pokemongo extends FrameLayout
 
         JSONObject result = pd.decode("test", request, response);
 
-        Log.d(LOGTAG,"testDat: " + Json.toPretty(result));
+        Log.d(LOGTAG, "testDat: " + Json.toPretty(result));
     }
+
+    //region Fort methods.
+
+    private static JSONArray knownForts;
+    private static Map<String, Integer> itemScore;
+
+    private static void evalFortDetails(JSONObject json)
+    {
+        try
+        {
+            String fortId = null;
+            double fortLat = 0;
+            double fortLon = 0;
+
+            JSONObject requestEnv = json.getJSONObject("request");
+            JSONArray requests = requestEnv.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
+
+            for (int rinx = 0; rinx < requests.length(); rinx++)
+            {
+                JSONObject request = requests.getJSONObject(rinx);
+
+                String reqType = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+                String reqName = ".POGOProtos.Networking.Requests.Messages." + CamelName(reqType) + "Message";
+
+                if (reqType.equals("FORT_SEARCH@101") && request.has(reqName))
+                {
+                    JSONObject fortData = request.getJSONObject(reqName);
+
+                    fortId = fortData.getString("fort_id@string");
+                    fortLat = fortData.getDouble("fort_latitude@double");
+                    fortLon = fortData.getDouble("fort_longitude@double");
+                }
+            }
+
+            JSONObject responseEnv = json.getJSONObject("response");
+            JSONArray returns = responseEnv.getJSONArray("returns@array");
+
+            for (int inx = 0; inx < returns.length(); inx++)
+            {
+                JSONObject returnobj = returns.getJSONObject(inx);
+                String type = returnobj.getString("type");
+
+                if (type.equals(".POGOProtos.Networking.Responses.FortDetailsResponse"))
+                {
+                    JSONObject data = returnobj.getJSONObject("data");
+
+                    double latloc = data.getDouble("latitude@double");
+                    double lonloc = data.getDouble("longitude@double");
+
+                    Log.d(LOGTAG, "Fort encountered: lat=" + latloc + " lon=" + lonloc);
+
+                    lat = latloc;
+                    lon = lonloc;
+
+                    setCommand(0);
+                }
+
+                if (type.equals(".POGOProtos.Networking.Responses.FortSearchResponse"))
+                {
+                    if (fortId != null)
+                    {
+                        JSONObject data = returnobj.getJSONObject("data");
+
+                        int score = getFortScore(data);
+
+                        data.put("mongopoke_fortid", fortId);
+                        data.put("mongopoke_lat", fortLat);
+                        data.put("mongopoke_lon", fortLon);
+                        data.put("mongopoke_score", score);
+
+                        if (knownForts == null) loadKnownForts();
+
+                        boolean isdup = false;
+
+                        for (int finx = 0; finx < knownForts.length(); finx++)
+                        {
+                            if (knownForts.getJSONObject(finx).getString("mongopoke_fortid").equals(fortId))
+                            {
+                                isdup = true;
+                                break;
+                            }
+                        }
+
+                        if (!isdup)
+                        {
+                            knownForts.put(data);
+                            sortInteger(knownForts, "mongopoke_score", true);
+                            saveKnownForts();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+        }
+    }
+
+    private static void loadKnownForts()
+    {
+        try
+        {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            Log.d(LOGTAG, "loadKnownForts: dir=" + extpoke.toString());
+
+            if (extpoke.exists())
+            {
+                File extfile = new File(extpoke, "Harvest.KnownForts.json");
+
+                Log.d(LOGTAG, "loadKnownForts: fil=" + extfile.toString());
+
+                FileInputStream input = new FileInputStream(extfile);
+                int size = (int) input.getChannel().size();
+                byte[] content = new byte[ size ];
+                int xfer = input.read(content);
+                input.close();
+
+                if (size == xfer)
+                {
+                    knownForts = new JSONArray(new String(content));
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+
+        if (knownForts == null) knownForts = new JSONArray();
+    }
+
+    private static void saveKnownForts()
+    {
+        try
+        {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            Log.d(LOGTAG, "saveKnownForts: dir=" + extpoke.toString());
+
+            if (extpoke.exists() || extpoke.mkdir())
+            {
+                File extfile = new File(extpoke, "Harvest.KnownForts.json");
+
+                Log.d(LOGTAG, "saveKnownForts: fil=" + extfile.toString());
+
+                OutputStream out = new FileOutputStream(extfile);
+                out.write(knownForts.toString(2).replace("\\/", "/").getBytes());
+                out.close();
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static int getItemScore(String itemString)
+    {
+        if (itemScore == null)
+        {
+            itemScore = new HashMap<>();
+
+            itemScore.put("ITEM_UNKNOWN", 0);
+
+            itemScore.put("ITEM_POKE_BALL", 0);
+            itemScore.put("ITEM_GREAT_BALL", 10);
+            itemScore.put("ITEM_ULTRA_BALL", 100);
+            itemScore.put("ITEM_MASTER_BALL", 1000);
+
+            itemScore.put("ITEM_POTION", 0);
+            itemScore.put("ITEM_SUPER_POTION", 10);
+            itemScore.put("ITEM_HYPER_POTION", 100);
+            itemScore.put("ITEM_MAX_POTION", 1000);
+
+            itemScore.put("ITEM_REVIVE", 0);
+            itemScore.put("ITEM_MAX_REVIVE", 100);
+
+            itemScore.put("ITEM_LUCKY_EGG", 2000);
+
+            itemScore.put("ITEM_INCENSE_ORDINARY", 100);
+            itemScore.put("ITEM_INCENSE_SPICY", 1000);
+            itemScore.put("ITEM_INCENSE_COOL", 1000);
+            itemScore.put("ITEM_INCENSE_FLORAL", 1000);
+
+            itemScore.put("ITEM_TROY_DISK", 10000);
+
+            itemScore.put("ITEM_X_ATTACK", 10000);
+            itemScore.put("ITEM_X_DEFENSE", 10000);
+            itemScore.put("ITEM_X_MIRACLE", 10000);
+
+            itemScore.put("ITEM_RAZZ_BERRY", 100);
+            itemScore.put("ITEM_BLUK_BERRY", 10000);
+            itemScore.put("ITEM_NANAB_BERRY", 10000);
+            itemScore.put("ITEM_WEPAR_BERRY", 10000);
+            itemScore.put("ITEM_PINAP_BERRY", 10000);
+
+            itemScore.put("ITEM_SPECIAL_CAMERA", 10000);
+
+            itemScore.put("ITEM_INCUBATOR_BASIC_UNLIMITED", 10000);
+            itemScore.put("ITEM_INCUBATOR_BASIC", 10000);
+
+            itemScore.put("ITEM_POKEMON_STORAGE_UPGRADE", 100000);
+            itemScore.put("ITEM_ITEM_STORAGE_UPGRADE", 100000);
+        }
+
+        String[] parts = itemString.split("@");
+        if (parts.length == 2) itemString = parts[ 0 ];
+
+        return itemScore.containsKey(itemString) ? itemScore.get(itemString) : 0;
+    }
+
+    private static int getFortScore(JSONObject fortData)
+    {
+        int score = 0;
+
+        try
+        {
+            if (fortData.has("items_awarded@.POGOProtos.Inventory.ItemAward"))
+            {
+                JSONArray items = fortData.getJSONArray("items_awarded@.POGOProtos.Inventory.ItemAward");
+
+                for (int inx = 0; inx < items.length(); inx++)
+                {
+                    JSONObject item = items.getJSONObject(inx);
+
+                    String itemString = item.getString("item_id@POGOProtos.Inventory.ItemId");
+                    int itemCount = item.getInt("item_count@int32");
+
+                    score += getItemScore(itemString) * itemCount;
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+
+        return score;
+    }
+
+    //endregion Fort methods.
+
+    //region Utility methods.
+
+    public static JSONArray sortInteger(JSONArray array, String field, boolean descending)
+    {
+        final String sort = field;
+        final boolean desc = descending;
+
+        class comparedat implements Comparator<JSONObject>
+        {
+            public int compare(JSONObject a, JSONObject b)
+            {
+                try
+                {
+                    int aval = desc ? b.getInt(sort) : a.getInt(sort);
+                    int bval = desc ? a.getInt(sort) : b.getInt(sort);
+
+                    return aval - bval;
+                }
+                catch (Exception ignore)
+                {
+                    return 0;
+                }
+            }
+        }
+
+        List<JSONObject> jsonValues = new ArrayList<>();
+
+        for (int inx = 0; inx < array.length(); inx++)
+        {
+            try
+            {
+                jsonValues.add(array.getJSONObject(inx));
+            }
+            catch (Exception ignore)
+            {
+            }
+        }
+
+        Collections.sort(jsonValues, new comparedat());
+
+        return new JSONArray(jsonValues);
+    }
+
+    //endregion Utility methods.
 }

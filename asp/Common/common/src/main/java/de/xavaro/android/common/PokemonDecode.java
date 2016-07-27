@@ -85,27 +85,28 @@ public class PokemonDecode
             decode.setOffs(true);
             JSONObject reqenvelope = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
             assembleRequest(reqenvelope);
-            //Log.d(LOGTAG, "decode: " + Json.toPretty(reqenvelope));
 
             decode = new ProtoBufferDecode(responseBytes);
             decode.setProtos(protos);
             decode.setOffs(true);
             JSONObject resenvelope = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
-            assembleResponse(reqenvelope, resenvelope);
-            //Log.d(LOGTAG, "decode: " + Json.toPretty(resenvelope));
 
-            JSONObject result = new JSONObject();
+            if (assembleResponse(reqenvelope, resenvelope))
+            {
+                JSONObject result = new JSONObject();
 
-            result.put("apiurl", url);
-            result.put("request", reqenvelope);
-            result.put("response", resenvelope);
+                result.put("apiurl", url);
+                result.put("request", reqenvelope);
+                result.put("response", resenvelope);
 
-            return result;
+                return result;
+            }
         }
-        catch (Exception ex)
+        catch (Exception ignore)
         {
-            return null;
         }
+
+        return null;
     }
 
     private void assembleRequest(JSONObject reqenvelop)
@@ -149,13 +150,16 @@ public class PokemonDecode
         }
     }
 
-    private void assembleResponse(JSONObject reqenvelop, JSONObject resenvelop)
+    private boolean assembleResponse(JSONObject reqenvelop, JSONObject resenvelop)
     {
         try
         {
             resenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6Response");
 
             JSONArray requests = reqenvelop.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
+
+            if (! resenvelop.has("returns@bytes")) return false;
+
             JSONArray reponses = resenvelop.getJSONArray("returns@bytes");
 
             JSONArray decoded = new JSONArray();
@@ -198,11 +202,15 @@ public class PokemonDecode
                 resenvelop.remove("returns@bytes@");
                 resenvelop.put("returns@array@",indexes);
             }
+
+            return true;
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
         }
+
+        return false;
     }
 
     private String CamelName(String uppercase)
