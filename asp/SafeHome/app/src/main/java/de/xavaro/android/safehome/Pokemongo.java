@@ -737,12 +737,15 @@ public class Pokemongo extends FrameLayout
 
         DateFormat df = new SimpleDateFormat("yyyyMMdd'.'HHmmss", Locale.getDefault());
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String filename = "pm." + df.format(new Date()) + ".json";
+        String filename = "Request." + df.format(new Date()) + ".json";
 
-        File extstore = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extdir = new File(extstore, "pm");
-        if (!extdir.exists()) extdir.mkdirs();
-        File extfile = new File(extdir, filename);
+        File extdir = Environment.getExternalStorageDirectory();
+        File extpoke = new File(extdir, "Mongopoke");
+        if (! (extpoke.exists() || extpoke.mkdir())) return;
+        File extsubdir = new File(extpoke, "Requests");
+        if (! (extsubdir.exists() || extsubdir.mkdir())) return;
+
+        File extfile = new File(extsubdir, filename);
 
         if (extfile.exists())
         {
@@ -833,7 +836,9 @@ public class Pokemongo extends FrameLayout
                     JSONObject result = pd.decode(url, request, response);
                     pd.patch(url, result, response);
 
-                    System.arraycopy(response, 0, buffer.array(), buffer.arrayOffset() + offset, count);
+                    buffer.clear();
+                    buffer.put(response, 0, response.length);
+                    //System.arraycopy(response, 0, buffer.array(), buffer.arrayOffset() + offset, count);
 
                     if (result != null)
                     {
@@ -882,7 +887,11 @@ public class Pokemongo extends FrameLayout
 
     private static void saveRecords(JSONObject json)
     {
-        File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File extdir = Environment.getExternalStorageDirectory();
+        File extpoke = new File(extdir, "Mongopoke");
+        File extsamples = new File(extpoke, "Samples");
+
+        if (! (extsamples.exists() || extsamples.mkdirs())) return;
 
         try
         {
@@ -897,10 +906,8 @@ public class Pokemongo extends FrameLayout
 
                 Log.d(LOGTAG, "saveRecords: req type=" + restype);
 
-                String file = "pm.Requests." + CamelName(restype) + "Response.json";
-                File extfile = new File(extdir, file);
-
-                Log.d(LOGTAG, "saveRecords: req name=" + extfile.toString());
+                String file = "Samples.Requests." + CamelName(restype) + "Response.json";
+                File extfile = new File(extsamples, file);
 
                 OutputStream out = new FileOutputStream(extfile);
                 out.write(request.toString(2).replace("\\/", "/").getBytes());
@@ -920,10 +927,8 @@ public class Pokemongo extends FrameLayout
 
                 String[] parts = type.split("\\.");
                 if (parts.length < 3) continue;
-                String file = "pm." + parts[ parts.length - 2 ] + "." + parts[ parts.length - 1 ] + ".json";
-                File extfile = new File(extdir, file);
-
-                Log.d(LOGTAG, "saveRecords: res name=" + extfile.toString());
+                String file = "Samples." + parts[ parts.length - 2 ] + "." + parts[ parts.length - 1 ] + ".json";
+                File extfile = new File(extsamples, file);
 
                 OutputStream out = new FileOutputStream(extfile);
                 out.write(data.toString(2).replace("\\/", "/").getBytes());

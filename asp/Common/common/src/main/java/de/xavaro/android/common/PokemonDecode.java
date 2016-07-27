@@ -112,7 +112,8 @@ public class PokemonDecode
     {
         try
         {
-            reqenvelop.remove("auth_ticket@.POGOProtos.Networking.Envelopes.AuthTicket");
+            //reqenvelop.remove("auth_ticket@.POGOProtos.Networking.Envelopes.AuthTicket");
+
             reqenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
             reqenvelop.remove("unknown12@int64");
 
