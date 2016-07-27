@@ -52,14 +52,16 @@ public class PokemonDecode
                     {
                         double probaval = pvals.getDouble(pinx);
                         int probaoff = offset + poffs.getInt(0) + pinx * 4;
+
                         byte[] fval = new byte[ 4 ];
+                        byte[] nval = new byte[ 4 ];
 
                         System.arraycopy(responseBytes, probaoff, fval, 0, 4);
                         float bfloat = ByteBuffer.wrap(fval).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                        byte[] nval = ByteBuffer.wrap(fval).order(ByteOrder.LITTLE_ENDIAN).putFloat(1.0f).array();
+                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putFloat(100.0f);
                         System.arraycopy(nval, 0, responseBytes, probaoff, 4);
 
-                        Log.d(LOGTAG, "patch: CaptureProbability=" + getHexBytesToString(fval) + " nval=" + getHexBytesToString(nval));
+                        Log.d(LOGTAG, "patch: CaptureProbability=fval=" + getHexBytesToString(fval) + " nval=" + getHexBytesToString(nval));
                         Log.d(LOGTAG, "patch: CaptureProbability=" + probaval + " off=" + probaoff + " bfloat=" + bfloat);
                     }
                 }
