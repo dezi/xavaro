@@ -56,9 +56,10 @@ public class PokemonDecode
 
                         System.arraycopy(responseBytes, probaoff, fval, 0, 4);
                         float bfloat = ByteBuffer.wrap(fval).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                        byte[] nfloat = ByteBuffer.wrap(fval).order(ByteOrder.LITTLE_ENDIAN).putFloat(1.0f).array();
-                        System.arraycopy(nfloat, 0, responseBytes, probaoff, 4);
+                        byte[] nval = ByteBuffer.wrap(fval).order(ByteOrder.LITTLE_ENDIAN).putFloat(1.0f).array();
+                        System.arraycopy(nval, 0, responseBytes, probaoff, 4);
 
+                        Log.d(LOGTAG, "patch: CaptureProbability=" + getHexBytesToString(fval) + " nval=" + getHexBytesToString(nval));
                         Log.d(LOGTAG, "patch: CaptureProbability=" + probaval + " off=" + probaoff + " bfloat=" + bfloat);
                     }
                 }
@@ -221,6 +222,32 @@ public class PokemonDecode
         }
 
         return camelname;
+    }
+
+    public static String getHexBytesToString(byte[] bytes)
+    {
+        return getHexBytesToString(bytes, 0, bytes.length);
+    }
+
+    public static String getHexBytesToString(byte[] bytes, int offset, int length)
+    {
+        if (length == 0) return "";
+
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[ (length * 3) - 1 ];
+
+        for (int inx = offset; inx < (length + offset); inx++)
+        {
+            //noinspection PointlessArithmeticExpression
+            hexChars[ ((inx - offset) * 3) + 0 ] = hexArray[ (bytes[ inx ] >> 4) & 0x0f ];
+            //noinspection PointlessBitwiseExpression
+            hexChars[ ((inx - offset) * 3) + 1 ] = hexArray[ (bytes[ inx ] >> 0) & 0x0f ];
+
+            if (inx + 1 >= (length + offset)) break;
+            hexChars[ ((inx - offset) * 3) + 2 ] = ' ';
+        }
+
+        return String.valueOf(hexChars);
     }
 
     @Nullable
