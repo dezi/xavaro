@@ -1600,6 +1600,48 @@ public class Pokemongo extends FrameLayout
 
     private static JSONArray knownForts;
     private static Map<String, Integer> itemScore;
+    private static String lastFort;
+
+    private static void gotoNextFort(boolean reset)
+    {
+        try
+        {
+            if (reset) lastFort = null;
+
+            if (knownForts == null) loadKnownForts();
+
+            int nextFort = -1;
+
+            for (int inx = 0; inx < knownForts.length(); inx++)
+            {
+                if (lastFort == null)
+                {
+                    nextFort = inx;
+                    break;
+                }
+
+                JSONObject fort = knownForts.getJSONObject(inx);
+
+                if (lastFort.equals(fort.getString("mongopoke_fortid")))
+                {
+                    nextFort = ((inx + 1) < knownForts.length()) ? inx + 1 : 0;
+                    break;
+                }
+            }
+
+            if (nextFort >= 0)
+            {
+                JSONObject fort = knownForts.getJSONObject(nextFort);
+
+                lat = fort.getDouble("mongopoke_lat");
+                lon = fort.getDouble("mongopoke_lon");
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
 
     private static void evalFortDetails(JSONObject json)
     {
@@ -1658,31 +1700,41 @@ public class Pokemongo extends FrameLayout
                     {
                         JSONObject data = returnobj.getJSONObject("data");
 
-                        int score = getFortScore(data);
+                        int fortScore = getFortScore(data);
 
-                        data.put("mongopoke_fortid", fortId);
-                        data.put("mongopoke_lat", fortLat);
-                        data.put("mongopoke_lon", fortLon);
-                        data.put("mongopoke_score", score);
-
-                        if (knownForts == null) loadKnownForts();
-
-                        boolean isdup = false;
-
-                        for (int finx = 0; finx < knownForts.length(); finx++)
+                        if (fortScore > 0)
                         {
-                            if (knownForts.getJSONObject(finx).getString("mongopoke_fortid").equals(fortId))
+                            data.put("mongopoke_fortid", fortId);
+                            data.put("mongopoke_lat", fortLat);
+                            data.put("mongopoke_lon", fortLon);
+                            data.put("mongopoke_score", fortScore);
+
+                            if (knownForts == null) loadKnownForts();
+
+                            boolean isdup = false;
+
+                            for (int finx = 0; finx < knownForts.length(); finx++)
                             {
-                                isdup = true;
-                                break;
+                                if (knownForts.getJSONObject(finx).getString("mongopoke_fortid").equals(fortId))
+                                {
+                                    isdup = true;
+                                    break;
+                                }
                             }
-                        }
 
-                        if (!isdup)
-                        {
-                            knownForts.put(data);
-                            sortInteger(knownForts, "mongopoke_score", true);
-                            saveKnownForts();
+                            if (!isdup)
+                            {
+                                knownForts.put(data);
+
+                                sortInteger(knownForts, "mongopoke_score", true);
+
+                                while (knownForts.length() > 1000)
+                                {
+                                    knownForts.remove(knownForts.length() - 1);
+                                }
+
+                                saveKnownForts();
+                            }
                         }
                     }
                 }
