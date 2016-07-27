@@ -8,6 +8,8 @@ import android.location.Location;
 import android.os.StrictMode;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.List;
 
@@ -50,7 +52,7 @@ public class ApplicationBase extends Application
         }
         */
 
-        Pokemongo.testDat();
+        Pokemongo.testEncode();
 
         //
         // Make application context available.

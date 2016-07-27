@@ -1,10 +1,10 @@
 package de.xavaro.android.safehome;
 
+import android.support.annotation.NonNull;
 
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
-import android.support.annotation.NonNull;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -34,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
@@ -42,6 +40,8 @@ import java.io.File;
 
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.PokemonImage;
+import de.xavaro.android.common.PokemonProto;
+import de.xavaro.android.common.ProtoBufferEncode;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.PokemonDecode;
 
@@ -1541,6 +1541,35 @@ public class Pokemongo extends FrameLayout
 
         }
     }
+
+    public static void testEncode()
+    {
+        try
+        {
+            String text = "{\n" +
+                    "  \"request_type@.POGOProtos.Networking.Requests.RequestType\": \"ENCOUNTER@102\",\n" +
+                    "  \"request_message@bytes@\": 3,\n" +
+                    "  \".POGOProtos.Networking.Requests.Messages.EncounterMessage\": {\n" +
+                    "    \"encounter_id@fixed64\": -2372265606374053763,\n" +
+                    "    \"spawn_point_id@string\": \"47b18f1ab11\",\n" +
+                    "    \"player_latitude@double\": 53.54851531982422,\n" +
+                    "    \"player_longitude@double\": 9.985169410705566\n" +
+                    "  }\n" +
+                    "}";
+
+            ProtoBufferEncode encode = new ProtoBufferEncode();
+            encode.setProtos(PokemonProto.getProtos());
+
+            JSONObject result = encode.encodeJSON(new JSONObject(text), ".POGOProtos.Networking.Requests.Request");
+            Log.d(LOGTAG, "testEncode: " + result.toString(2));
+
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
 
     public static void testDat()
     {
