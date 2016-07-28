@@ -1,7 +1,5 @@
 package de.xavaro.android.safehome;
 
-import android.support.annotation.NonNull;
-
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
@@ -39,11 +37,9 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.File;
 
-import de.xavaro.android.common.Json;
+import de.xavaro.android.common.ProtoBufferEncode;
 import de.xavaro.android.common.PokemonImage;
 import de.xavaro.android.common.PokemonProto;
-import de.xavaro.android.common.ProtoBufferEncode;
-import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.PokemonDecode;
 
 public class Pokemongo extends FrameLayout
@@ -538,11 +534,11 @@ public class Pokemongo extends FrameLayout
     {
         deziLocation(location);
 
-        byte[] data = new byte[ 1 ];
+        String url = "url";
         int offset = 1;
         int size = 2;
-        ByteBuffer buffer = null;
-        String url = "url";
+        byte[] data = new byte[ 1 ];
+        ByteBuffer buffer = ByteBuffer.wrap(data);
 
         pokeWriteText(url);
         pokeOpenFile(url);
@@ -557,8 +553,6 @@ public class Pokemongo extends FrameLayout
 
     private static double lat = 53.55 + ((Math.random() - 0.5) / 50.0);
     private static double lon = 10.00 + ((Math.random() - 0.5) / 50.0);
-
-    private static long spawnCount = 0;
 
     private static double latMove = 0;
     private static double lonMove = 0;
@@ -588,23 +582,6 @@ public class Pokemongo extends FrameLayout
                 dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
                 dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
             }
-        }
-    }
-
-    private static void clearFinalJSON(JSONObject json)
-    {
-        try
-        {
-            Iterator<String> keysIterator = json.keys();
-
-            while (keysIterator.hasNext())
-            {
-                json.remove(keysIterator.next());
-            }
-        }
-        catch (Exception ignore)
-        {
-            ignore.printStackTrace();
         }
     }
 
@@ -2058,9 +2035,27 @@ public class Pokemongo extends FrameLayout
         }
         catch (Exception ignore)
         {
+            ignore.printStackTrace();
         }
 
         return false;
+    }
+
+    private static void clearFinalJSON(JSONObject json)
+    {
+        try
+        {
+            Iterator<String> keysIterator = json.keys();
+
+            while (keysIterator.hasNext())
+            {
+                json.remove(keysIterator.next());
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
     }
 
     //endregion Utility methods.
