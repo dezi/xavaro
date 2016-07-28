@@ -789,8 +789,6 @@ public class Pokemongo extends FrameLayout
     {
         int urlhash = System.identityHashCode(url);
 
-        //Log.d(LOGTAG, "pokeWriteBytes: offset=" + offset + " len=" + count + " hash=" + urlhash);
-
         OutputStream out = outputs.get(urlhash);
         byte[] request = postdata.get(urlhash);
 
@@ -798,16 +796,35 @@ public class Pokemongo extends FrameLayout
         {
             try
             {
-                //Log.d(LOGTAG, "pokeWriteBytes: found... offset=" + offset + " len=" + count);
+                Log.d(LOGTAG, "pokeWriteBytes: found... offset=" + offset + " len=" + count + " hash=" + urlhash);
 
                 //out.write(buffer, offset, count);
 
-                byte[] newdata = new byte[ request.length + (count - offset) ];
+                boolean initial = (request.length == 0);
 
+                byte[] newdata = new byte[ request.length + (count - offset) ];
                 System.arraycopy(request, 0, newdata, 0, request.length);
                 System.arraycopy(buffer, offset, newdata, request.length, count - offset);
 
+                if (initial && (newdata.length < 32765))
+                {
+                    PokemonDecode dc = new PokemonDecode();
+                    JSONObject requestEnv = dc.decodeRequest(newdata);
+                    ArrayList<String> messages = dc.patchRequest(requestEnv, newdata);
+
+                    System.arraycopy(newdata, request.length, buffer, offset, count - offset);
+
+                    if (messages != null)
+                    {
+                        while (messages.size() > 0)
+                        {
+                            addToast(messages.remove(0));
+                        }
+                    }
+                }
+
                 postdata.put(urlhash, newdata);
+
             }
             catch (Exception ignore)
             {
@@ -857,6 +874,7 @@ public class Pokemongo extends FrameLayout
                         evalMapDetails(result);
                         evalGymDetails(result);
                         evalFortDetails(result);
+                        evalItemCapture(result);
                     }
                 }
             }
@@ -1502,6 +1520,53 @@ public class Pokemongo extends FrameLayout
             {
                 ignore.printStackTrace();
             }
+        }
+    }
+
+    private static void evalItemCapture(JSONObject json)
+    {
+        try
+        {
+            JSONObject response = json.getJSONObject("response");
+            JSONArray returns = response.getJSONArray("returns@array");
+
+            for (int inx = 0; inx < returns.length(); inx++)
+            {
+                JSONObject returnobj = returns.getJSONObject(inx);
+                String type = returnobj.getString("type");
+
+                if (type.equals(".POGOProtos.Networking.Responses.UseItemCaptureResponse"))
+                {
+                    JSONObject data = returnobj.getJSONObject("data");
+
+                    Log.d(LOGTAG, "evalItemCapture: json=" + data.toString(2));
+
+                    String text = "";
+
+                    if (data.has("item_capture_mult@double"))
+                    {
+                        double mult = data.getDouble("item_capture_mult@double");
+
+                        text += " Capture x " + mult;
+                    }
+
+                    if (data.has("item_flee_mult@double"))
+                    {
+                        double mult = data.getDouble("item_flee_mult@double");
+
+                        text += " Flee x " + mult;
+                    }
+
+                    text = text.trim();
+
+                    if (text.isEmpty()) text = "No effect";
+
+                    addToast(text);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
         }
     }
 

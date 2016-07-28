@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 
 public class PokemonDecode
 {
@@ -18,6 +19,104 @@ public class PokemonDecode
     public PokemonDecode()
     {
         if (protos == null) protos = PokemonProto.getProtos();
+    }
+
+    public ArrayList<String> patchRequest(JSONObject result, byte[] requestBytes)
+    {
+        try
+        {
+            if (! result.has("requests@.POGOProtos.Networking.Requests.Request")) return null;
+
+            ArrayList<String> messages = new ArrayList<>();
+
+            JSONArray requestsArr = result.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
+            JSONArray requestsOff = result.getJSONArray("requests@.POGOProtos.Networking.Requests.Request@");
+
+            for (int rinx = 0; rinx < requestsArr.length(); rinx++)
+            {
+                JSONObject request = requestsArr.getJSONObject(rinx);
+                int offset = requestsOff.getInt(rinx);
+
+                String reqType = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
+                String reqName = ".POGOProtos.Networking.Requests.Messages." + CamelName(reqType) + "Message";
+
+                if (reqType.equals("CATCH_POKEMON@103") && request.has(reqName))
+                {
+                    offset += request.getInt("request_message@bytes@");
+                    JSONObject data = request.getJSONObject(reqName);
+
+                    Log.d(LOGTAG, "patchRequest: CATCH_POKEMON=" + data.toString(2));
+
+                    if (data.has("normalized_reticle_size@double"))
+                    {
+                        double orgval = data.getDouble("normalized_reticle_size@double");
+                        int orgoff = offset + data.getInt("normalized_reticle_size@double@");
+
+                        byte[] dval = new byte[ 8 ];
+                        byte[] nval = new byte[ 8 ];
+
+                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(1.985);
+                        System.arraycopy(nval, 0, requestBytes, orgoff, nval.length);
+
+                        System.arraycopy(requestBytes, orgoff, dval, 0, dval.length);
+                        double binval = ByteBuffer.wrap(dval).order(ByteOrder.LITTLE_ENDIAN).getDouble();
+
+                        Log.d(LOGTAG, "patchRequest: normalized_reticle_size=" + orgval + " off=" + orgoff + " binval=" + binval);
+                    }
+
+                    if (data.has("spin_modifier@double"))
+                    {
+                        double orgval = data.getDouble("spin_modifier@double");
+                        int orgoff = offset + data.getInt("spin_modifier@double@");
+
+                        byte[] dval = new byte[ 8 ];
+                        byte[] nval = new byte[ 8 ];
+
+                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.986);
+                        System.arraycopy(nval, 0, requestBytes, orgoff, nval.length);
+
+                        System.arraycopy(requestBytes, orgoff, dval, 0, dval.length);
+                        double binval = ByteBuffer.wrap(dval).order(ByteOrder.LITTLE_ENDIAN).getDouble();
+
+                        Log.d(LOGTAG, "patchRequest: spin_modifier=" + orgval + " off=" + orgoff + " binval=" + binval);
+                    }
+
+                    if (data.has("normalized_hit_position@double"))
+                    {
+                        double orgval = data.getDouble("normalized_hit_position@double");
+                        int orgoff = offset + data.getInt("normalized_hit_position@double@");
+
+                        byte[] dval = new byte[ 8 ];
+                        byte[] nval = new byte[ 8 ];
+
+                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(1.0);
+                        System.arraycopy(nval, 0, requestBytes, orgoff, nval.length);
+
+                        System.arraycopy(requestBytes, orgoff, dval, 0, dval.length);
+                        double binval = ByteBuffer.wrap(dval).order(ByteOrder.LITTLE_ENDIAN).getDouble();
+
+                        Log.d(LOGTAG, "patchRequest: normalized_hit_position=" + orgval + " off=" + orgoff + " binval=" + binval);
+                    }
+
+                    if (data.has("hit_pokemon@bool"))
+                    {
+                        messages.add("Patched Curveball");
+                    }
+                    else
+                    {
+                        messages.add("Missed");
+                    }
+                }
+            }
+
+            return messages;
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+
+            return null;
+        }
     }
 
     public void patch(String url, JSONObject result, byte[] responseBytes)
@@ -70,6 +169,29 @@ public class PokemonDecode
         catch (Exception ignore)
         {
             ignore.printStackTrace();
+        }
+    }
+
+    @Nullable
+    public JSONObject decodeRequest(byte[] requestBytes)
+    {
+        try
+        {
+            ProtoBufferDecode decode;
+
+            decode = new ProtoBufferDecode(requestBytes);
+            decode.setProtos(protos);
+            decode.setOffs(true);
+            JSONObject reqenvelope = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
+            assembleRequest(reqenvelope);
+
+            return reqenvelope;
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+
+            return null;
         }
     }
 
@@ -136,6 +258,7 @@ public class PokemonDecode
 
                     ProtoBufferDecode decode = new ProtoBufferDecode(reqdata);
                     decode.setProtos(PokemonProto.getProtos());
+                    decode.setOffs(true);
 
                     JSONObject tune = decode.decode(messagename);
 
