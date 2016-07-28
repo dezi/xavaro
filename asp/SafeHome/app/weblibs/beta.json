@@ -1,10 +1,24 @@
 {
   "SafeHome": {
 
-    "latest": "0.8.012",
-    "latestdate": "2016-06-10T23:00:00Z",
+    "latest": "0.8.013",
+    "latestdate": "2016-07-27T23:00:00Z",
 
     "versions": {
+
+      "0.8.013": {
+
+        "date": "2016-07-27T23:00:00Z",
+
+        "notes": [
+          {
+            "title": "Neue Version.",
+            "summary": [
+              "Neue Version."
+            ]
+          }
+        ]
+      },
 
       "0.8.012": {
 

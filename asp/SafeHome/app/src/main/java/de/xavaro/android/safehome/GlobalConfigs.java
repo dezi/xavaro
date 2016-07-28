@@ -12,9 +12,9 @@ public class GlobalConfigs
 
     // @formatter:off
     public static final boolean  BetaFlag        = true;
-    public static final String   BetaVersion     = "0.8.012";
-    public static final String   BetaVersionDate = "2016-05-15T23:00:00Z";
-    public static final String   BetaExpiration  = "2016-06-21T23:00:00Z";
+    public static final String   BetaVersion     = "0.8.013";
+    public static final String   BetaVersionDate = "2016-07-27T23:00:00Z";
+    public static final String   BetaExpiration  = "2016-09-21T23:00:00Z";
     // @formatter:on
 
     //endregion

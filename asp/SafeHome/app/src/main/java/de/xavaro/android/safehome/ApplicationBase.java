@@ -52,7 +52,7 @@ public class ApplicationBase extends Application
         }
         */
 
-        Pokemongo.testEncode();
+        //Pokemongo.testEncode();
 
         //
         // Make application context available.
