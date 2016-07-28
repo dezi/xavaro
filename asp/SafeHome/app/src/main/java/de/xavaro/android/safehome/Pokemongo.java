@@ -431,7 +431,6 @@ public class Pokemongo extends FrameLayout
                 pokeLocsDead.put(latlonstr, expires);
 
                 spotLocation = latlonstr;
-                suspendTime = new Date().getTime() + 20 * 1000;
                 isSpotting = true;
             }
             catch (Exception ignore)
@@ -453,10 +452,9 @@ public class Pokemongo extends FrameLayout
     {
         if (buttinx == 4)
         {
-            commandMode = ++commandMode % commandModeTexts.length;
-            dirButtonTextViews[ 4 ].setText(commandModeTexts[ commandMode ]);
+            setCommand(++commandMode % commandModeTexts.length);
 
-            if (commandMode == 2)
+            if (commandMode == COMMAND_HUNT)
             {
                 synchronized (huntPointsTodo)
                 {
@@ -464,8 +462,10 @@ public class Pokemongo extends FrameLayout
                 }
             }
 
-            latMove = 0;
-            lonMove = 0;
+            if (commandMode == COMMAND_SHOP)
+            {
+                nextFort = 0;
+            }
         }
 
         if (dirMoveY[ buttinx ] == 0) latMove = 0;
@@ -563,6 +563,11 @@ public class Pokemongo extends FrameLayout
     private static double latMove = 0;
     private static double lonMove = 0;
 
+    private static final int COMMAND_STOP = 0;
+    private static final int COMMAND_SEEK = 1;
+    private static final int COMMAND_HUNT = 2;
+    private static final int COMMAND_SHOP = 3;
+
     private static void setCommand(int command)
     {
         latMove = 0;
@@ -607,21 +612,21 @@ public class Pokemongo extends FrameLayout
     {
         initPokemongo(location);
 
-        setupSpawns();
-
         if (isSpotting)
         {
             try
             {
-                JSONObject latlon = new JSONObject(spotLocation);
-
                 latMove = 0;
                 lonMove = 0;
+
+                JSONObject latlon = new JSONObject(spotLocation);
 
                 lat = latlon.getDouble("lat");
                 lon = latlon.getDouble("lon");
 
-                Log.d(LOGTAG, "deziLocation: seeking:" + " lat=" + lat + " lon=" + lon);
+                Log.d(LOGTAG, "deziLocation: wait lat=" + lat + " lon=" + lon);
+
+                suspendTime = new Date().getTime() + 20 * 1000;
             }
             catch (Exception ignore)
             {
@@ -633,73 +638,80 @@ public class Pokemongo extends FrameLayout
 
         if (suspendTime < new Date().getTime())
         {
-            if (commandMode == 1)
+            if (commandMode == COMMAND_SEEK)
             {
-                if ((spawnCount++ % 2) == 0)
+                try
                 {
                     if (spawnPointsTodo.size() > 0)
                     {
-                        try
+                        synchronized (spawnPointsTodo)
                         {
-                            String spanposstr = spawnPointsTodo.remove(0);
+                            int rnd = (int) Math.floor(Math.random() * spawnPointsTodo.size());
+                            String spanposstr = spawnPointsTodo.remove(rnd);
                             spawnPointsSeen.add(spanposstr);
 
                             JSONObject spanpos = new JSONObject(spanposstr);
 
                             lat = spanpos.getDouble("lat");
                             lon = spanpos.getDouble("lon");
+                        }
 
-                            Log.d(LOGTAG, "deziLocation: spawn" + " lat=" + lat + " lon=" + lon);
-                        }
-                        catch (Exception ignore)
-                        {
-                        }
+                        Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
+
+                        suspendTime = new Date().getTime() + 5 * 1000;
                     }
+                }
+                catch (Exception ignore)
+                {
                 }
             }
 
-            if (commandMode == 2)
+            if (commandMode == COMMAND_HUNT)
             {
                 if (huntPointsTodo.size() == 0)
                 {
-                    synchronized (pokeLocs)
-                    {
-                        clearFinalJSON(pokeLocs);
-                        clearFinalJSON(pokeLocsDead);
-                    }
-
-                    setupSpawns();
+                    clearSpawns();
 
                     buildPokeHuntSpawns();
                 }
 
-                if ((spawnCount++ % 2) == 0)
+                if (huntPointsTodo.size() > 0)
                 {
-                    if (huntPointsTodo.size() > 0)
+                    try
                     {
-                        try
+                        synchronized (huntPointsTodo)
                         {
-                            synchronized (huntPointsTodo)
-                            {
-                                JSONObject huntPoint = huntPointsTodo.remove(0);
-                                huntPointsTodo.add(huntPoint);
+                            JSONObject huntPoint = huntPointsTodo.remove(0);
+                            huntPointsTodo.add(huntPoint);
 
-                                lat = huntPoint.getDouble("lat");
-                                lon = huntPoint.getDouble("lon");
-                            }
+                            lat = huntPoint.getDouble("lat");
+                            lon = huntPoint.getDouble("lon");
+                        }
 
-                            Log.d(LOGTAG, "deziLocation: hunt" + " lat=" + lat + " lon=" + lon);
-                        }
-                        catch (Exception ignore)
-                        {
-                        }
+                        Log.d(LOGTAG, "deziLocation: hunt lat=" + lat + " lon=" + lon);
+
+                        suspendTime = new Date().getTime() + 5 * 1000;
+                    }
+                    catch (Exception ignore)
+                    {
                     }
                 }
+            }
+
+            if (commandMode == COMMAND_SHOP)
+            {
+                gotoNextFort();
+
+                Log.d(LOGTAG, "deziLocation: shop lat=" + lat + " lon=" + lon);
+
+                suspendTime = new Date().getTime() + 5 * 1000;
             }
 
             lat += latMove;
             lon += lonMove;
         }
+
+        setupSpawns();
 
         location.setLatitude(lat);
         location.setLongitude(lon);
@@ -987,25 +999,6 @@ public class Pokemongo extends FrameLayout
         return camelname;
     }
 
-    public static boolean putFileBytes(File file, byte[] bytes)
-    {
-        if (bytes == null) return false;
-
-        try
-        {
-            OutputStream out = new FileOutputStream(file);
-            out.write(bytes);
-            out.close();
-
-            return true;
-        }
-        catch (Exception ignore)
-        {
-        }
-
-        return false;
-    }
-
     private static void loadPokeHuntSettings()
     {
         try
@@ -1260,7 +1253,7 @@ public class Pokemongo extends FrameLayout
             if (parts.length != 2) return;
             int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
 
-            if ((commandMode == 2) && !pokeDirHunting[ pokeOrd - 1 ])
+            if ((commandMode == COMMAND_HUNT) && !pokeDirHunting[ pokeOrd - 1 ])
             {
                 //
                 // Check if already known. If not, we accept new
@@ -1309,10 +1302,18 @@ public class Pokemongo extends FrameLayout
 
             String spawnposstr = spawnpos.toString();
 
-            if ((!spawnPointsTodo.contains(spawnposstr))
-                    && (!spawnPointsSeen.contains(spawnposstr)))
+            synchronized (spawnPointsTodo)
             {
-                spawnPointsTodo.add(spawnposstr);
+                if ((!spawnPointsTodo.contains(spawnposstr))
+                        && (!spawnPointsSeen.contains(spawnposstr)))
+                {
+                    spawnPointsTodo.add(spawnposstr);
+
+                    while (spawnPointsTodo.size() > 10)
+                    {
+                        spawnPointsTodo.remove(0);
+                    }
+                }
             }
         }
         catch (Exception ignore)
@@ -1347,12 +1348,11 @@ public class Pokemongo extends FrameLayout
                         {
                             JSONArray spawns = mapcell.getJSONArray("spawn_points@.POGOProtos.Map.SpawnPoint");
 
-                            for (int sinx = 0; sinx < spawns.length(); sinx++)
+                            if (spawns.length() > 0)
                             {
-                                JSONObject spawn = spawns.getJSONObject(sinx);
+                                JSONObject spawn = spawns.getJSONObject(0);
                                 registerSpawn(spawn);
                                 haveSpawn = true;
-                                break;
                             }
                         }
 
@@ -1360,12 +1360,10 @@ public class Pokemongo extends FrameLayout
                         {
                             JSONArray spawns = mapcell.getJSONArray("decimated_spawn_points@.POGOProtos.Map.SpawnPoint");
 
-                            for (int sinx = 0; sinx < spawns.length(); sinx++)
+                            if (spawns.length() > 0)
                             {
-                                JSONObject spawn = spawns.getJSONObject(sinx);
+                                JSONObject spawn = spawns.getJSONObject(0);
                                 registerSpawn(spawn);
-
-                                break;
                             }
                         }
 
@@ -1398,6 +1396,15 @@ public class Pokemongo extends FrameLayout
         catch (Exception ignore)
         {
             ignore.printStackTrace();
+        }
+    }
+
+    public static void clearSpawns()
+    {
+        synchronized (pokeLocs)
+        {
+            clearFinalJSON(pokeLocs);
+            clearFinalJSON(pokeLocsDead);
         }
     }
 
@@ -1597,7 +1604,7 @@ public class Pokemongo extends FrameLayout
                     lat = latloc;
                     lon = lonloc;
 
-                    setCommand(0);
+                    setCommand(COMMAND_STOP);
                 }
             }
         }
@@ -1635,100 +1642,28 @@ public class Pokemongo extends FrameLayout
         }
     }
 
-
-    public static void testDat()
-    {
-        File extdir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File extfile = new File(extdir, "pm.20160723.082357.json");
-
-        byte[] data = Simple.readBinaryFile(extfile);
-        Log.d(LOGTAG, "testDat: size=" + data.length);
-
-        int von = -1;
-        int bis = -1;
-        int eof = -1;
-
-        for (int inx = 4; inx < data.length; inx++)
-        {
-            if ((data[ inx - 4 ] == (int) '\n') && (data[ inx - 3 ] == (int) '-') && (data[ inx - 2 ] == (int) '-') && (data[ inx - 1 ] == (int) '\n'))
-            {
-                if (von < 0)
-                {
-                    von = inx;
-                }
-                else
-                {
-                    if (bis < 0)
-                    {
-                        bis = inx - 4;
-                    }
-                    else
-                    {
-                        if (eof < 0)
-                        {
-                            eof = inx - 4;
-                        }
-                    }
-                }
-            }
-        }
-
-        byte[] request = new byte[ bis - von ];
-
-        System.arraycopy(data, von, request, 0, bis - von);
-
-        bis += 4;
-
-        byte[] response = new byte[ eof - bis ];
-
-        System.arraycopy(data, bis, response, 0, eof - bis);
-
-        PokemonDecode pd = new PokemonDecode();
-
-        JSONObject result = pd.decode("test", request, response);
-
-        Log.d(LOGTAG, "testDat: " + Json.toPretty(result));
-    }
-
     //region Fort methods.
 
     private static JSONArray knownForts;
     private static Map<String, Integer> itemScore;
-    private static String lastFort;
+    private static int nextFort;
 
-    private static void gotoNextFort(boolean reset)
+    private static void gotoNextFort()
     {
         try
         {
-            if (reset) lastFort = null;
+            loadKnownForts();
 
-            if (knownForts == null) loadKnownForts();
+            if (nextFort >= knownForts.length()) nextFort = 0;
 
-            int nextFort = -1;
-
-            for (int inx = 0; inx < knownForts.length(); inx++)
-            {
-                if (lastFort == null)
-                {
-                    nextFort = inx;
-                    break;
-                }
-
-                JSONObject fort = knownForts.getJSONObject(inx);
-
-                if (lastFort.equals(fort.getString("mongopoke_fortid")))
-                {
-                    nextFort = ((inx + 1) < knownForts.length()) ? inx + 1 : 0;
-                    break;
-                }
-            }
-
-            if (nextFort >= 0)
+            if (nextFort < knownForts.length())
             {
                 JSONObject fort = knownForts.getJSONObject(nextFort);
 
                 lat = fort.getDouble("mongopoke_lat");
                 lon = fort.getDouble("mongopoke_lon");
+
+                nextFort++;
             }
         }
         catch (Exception ignore)
@@ -1787,7 +1722,7 @@ public class Pokemongo extends FrameLayout
                     lat = latloc;
                     lon = lonloc;
 
-                    setCommand(0);
+                    setCommand(COMMAND_STOP);
                 }
 
                 if (type.equals(".POGOProtos.Networking.Responses.FortSearchResponse"))
@@ -1800,29 +1735,33 @@ public class Pokemongo extends FrameLayout
 
                         Log.d(LOGTAG, "evalFortDetails: searched: fortid=" + fortId + " lat=" + fortLat + " lon=" + fortLon + " score=" + fortScore);
 
-                        if (fortScore > 0)
+                        cleanFortData(data);
+
+                        data.put("mongopoke_fortid", fortId);
+                        data.put("mongopoke_lat", fortLat);
+                        data.put("mongopoke_lon", fortLon);
+                        data.put("mongopoke_score", fortScore);
+
+                        loadKnownForts();
+
+                        boolean isdup = false;
+
+                        for (int finx = 0; finx < knownForts.length(); finx++)
                         {
-                            cleanFortData(data);
-
-                            data.put("mongopoke_fortid", fortId);
-                            data.put("mongopoke_lat", fortLat);
-                            data.put("mongopoke_lon", fortLon);
-                            data.put("mongopoke_score", fortScore);
-
-                            if (knownForts == null) loadKnownForts();
-
-                            boolean isdup = false;
-
-                            for (int finx = 0; finx < knownForts.length(); finx++)
+                            if (knownForts.getJSONObject(finx).getString("mongopoke_fortid").equals(fortId))
                             {
-                                if (knownForts.getJSONObject(finx).getString("mongopoke_fortid").equals(fortId))
-                                {
-                                    isdup = true;
-                                    break;
-                                }
+                                isdup = true;
+                                break;
                             }
+                        }
 
-                            if (!isdup)
+                        if (isdup)
+                        {
+                            addToast("Known PokeStop");
+                        }
+                        else
+                        {
+                            if (fortScore > 0)
                             {
                                 knownForts.put(data);
 
@@ -1834,6 +1773,12 @@ public class Pokemongo extends FrameLayout
                                 }
 
                                 saveKnownForts();
+
+                                addToast("Good PokeStop");
+                            }
+                            else
+                            {
+                                addToast("Bogus PokeStop");
                             }
                         }
                     }
@@ -1860,6 +1805,8 @@ public class Pokemongo extends FrameLayout
 
     private static void loadKnownForts()
     {
+        if (knownForts != null) return;
+
         try
         {
             File extdir = Environment.getExternalStorageDirectory();
@@ -2095,6 +2042,25 @@ public class Pokemongo extends FrameLayout
         {
             ignore.printStackTrace();
         }
+    }
+
+    public static boolean putFileBytes(File file, byte[] bytes)
+    {
+        if (bytes == null) return false;
+
+        try
+        {
+            OutputStream out = new FileOutputStream(file);
+            out.write(bytes);
+            out.close();
+
+            return true;
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return false;
     }
 
     //endregion Utility methods.
