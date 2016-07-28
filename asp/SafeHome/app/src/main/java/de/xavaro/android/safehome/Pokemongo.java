@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
@@ -87,6 +88,7 @@ public class Pokemongo extends FrameLayout
 
     private static JSONObject poke2spawn = new JSONObject();
 
+    @SuppressLint("RtlHardcoded")
     private Pokemongo(Context context)
     {
         super(context);
@@ -359,6 +361,7 @@ public class Pokemongo extends FrameLayout
         savePokeHuntSettings();
     }
 
+    @SuppressLint("RtlHardcoded")
     private void onClickCommandButton(int buttinx)
     {
         if (buttinx == 0)
@@ -706,7 +709,6 @@ public class Pokemongo extends FrameLayout
     private static final Map<Integer, OutputStream> outputs = new HashMap<>();
     private static final Map<Integer, byte[]> postdata = new HashMap<>();
     private static final ArrayList<File> logfiles = new ArrayList<>();
-    private static final ArrayList<String> pokeposen = new ArrayList<>();
 
     private static final ArrayList<JSONObject> huntPointsTodo = new ArrayList<>();
     private static final ArrayList<String> spawnPointsTodo = new ArrayList<>();
@@ -1549,7 +1551,7 @@ public class Pokemongo extends FrameLayout
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception ignore)
         {
         }
     }
@@ -1585,9 +1587,8 @@ public class Pokemongo extends FrameLayout
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception ignore)
         {
-
         }
     }
 
@@ -1610,7 +1611,7 @@ public class Pokemongo extends FrameLayout
             encode.setProtos(PokemonProto.getProtos());
 
             JSONObject result = encode.encodeJSON(new JSONObject(text), ".POGOProtos.Networking.Requests.Request");
-            Log.d(LOGTAG, "testEncode: " + result.toString(2));
+            Log.d(LOGTAG, "testEncode: " + ((result == null) ? "Fail" : result.toString(2)));
 
         }
         catch (Exception ignore)
