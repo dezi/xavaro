@@ -1599,7 +1599,7 @@ public class Pokemongo extends FrameLayout
             String text = "{\n" +
                     "  \"request_type@.POGOProtos.Networking.Requests.RequestType\": \"ENCOUNTER@102\",\n" +
                     "  \"request_message@bytes@\": 3,\n" +
-                    "  \".POGOProtos.Networking.Requests.Messages.EncounterMessage\": {\n" +
+                    "  \"request_message@.POGOProtos.Networking.Requests.Messages.EncounterMessage\": {\n" +
                     "    \"encounter_id@fixed64\": -2372265606374053763,\n" +
                     "    \"spawn_point_id@string\": \"47b18f1ab11\",\n" +
                     "    \"player_latitude@double\": 53.54851531982422,\n" +
