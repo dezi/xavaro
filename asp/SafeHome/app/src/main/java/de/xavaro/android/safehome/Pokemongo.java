@@ -51,7 +51,7 @@ public class Pokemongo extends FrameLayout
 
     private WindowManager.LayoutParams overlayParam;
 
-    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "SHOP"};
+    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "WAIT"};
 
     private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
     private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
@@ -442,6 +442,8 @@ public class Pokemongo extends FrameLayout
     private static int commandMode;
     private static long suspendTime;
 
+    private static boolean isWalking;
+    private static boolean isWaiting;
     private static boolean isSpotting;
     private static boolean isShowhunt;
 
@@ -451,19 +453,21 @@ public class Pokemongo extends FrameLayout
     {
         if (buttinx == 4)
         {
-            setCommand(++commandMode % commandModeTexts.length);
-
-            if (commandMode == COMMAND_HUNT)
+            if (! (isWaiting || isWalking))
             {
-                synchronized (huntPointsTodo)
-                {
-                    huntPointsTodo.clear();
-                }
+                setCommand(++commandMode % 3);
             }
 
-            if (commandMode == COMMAND_SHOP)
+            if (isWaiting)
             {
-                nextFort = 0;
+                isWaiting = false;
+                setCommand(commandMode);
+            }
+
+            if (isWalking)
+            {
+                isWalking = false;
+                setCommand(commandMode);
             }
         }
 
@@ -501,6 +505,10 @@ public class Pokemongo extends FrameLayout
             }
         }
 
+        if (! ((latMove == 0) && (lonMove == 0)))
+        {
+            isWalking = true;
+        }
     }
 
     private static Pokemongo instance;
@@ -554,8 +562,8 @@ public class Pokemongo extends FrameLayout
     // Hamburg => 53.55, 10.00
     //
 
-    private static double lat = 53.55 + ((Math.random() - 0.5) / 50.0);
-    private static double lon = 10.00 + ((Math.random() - 0.5) / 50.0);
+    private static double lat = 53.55 + ((Math.random() - 0.5) / 30.0);
+    private static double lon = 10.00 + ((Math.random() - 0.5) / 30.0);
 
     private static double latMove = 0;
     private static double lonMove = 0;
@@ -563,7 +571,7 @@ public class Pokemongo extends FrameLayout
     private static final int COMMAND_STOP = 0;
     private static final int COMMAND_SEEK = 1;
     private static final int COMMAND_HUNT = 2;
-    private static final int COMMAND_SHOP = 3;
+    private static final int COMMAND_WAIT = 3;
 
     private static void setCommand(int command)
     {
@@ -588,17 +596,28 @@ public class Pokemongo extends FrameLayout
         }
     }
 
+    private static void setWaiting()
+    {
+        isWaiting = true;
+
+        dirButtonTextViews[ 4 ].setText(commandModeTexts[ COMMAND_WAIT ]);
+        dirButtonTextViews[ 4 ].setTypeface(null, Typeface.BOLD);
+        dirButtonTextViews[ 4 ].setBackgroundColor(0xff008800);
+    }
+
+    private static double latJitter;
+    private static double lonJitter;
+
     public static void deziLocation(Location location)
     {
         initPokemongo(location);
 
         if (isSpotting)
         {
+            isSpotting = false;
+
             try
             {
-                latMove = 0;
-                lonMove = 0;
-
                 JSONObject latlon = new JSONObject(spotLocation);
 
                 lat = latlon.getDouble("lat");
@@ -613,32 +632,43 @@ public class Pokemongo extends FrameLayout
                 ignore.printStackTrace();
             }
 
-            isSpotting = false;
+            setWaiting();
         }
 
-        if (suspendTime < new Date().getTime())
+        if (! isWaiting)
         {
             if (commandMode == COMMAND_SEEK)
             {
                 try
                 {
-                    if (spawnPointsTodo.size() > 0)
+                    if (suspendTime < new Date().getTime())
                     {
-                        synchronized (spawnPointsTodo)
+                        if (spawnPointsTodo.size() > 0)
                         {
-                            int rnd = (int) Math.floor(Math.random() * spawnPointsTodo.size());
-                            String spanposstr = spawnPointsTodo.remove(rnd);
-                            spawnPointsSeen.add(spanposstr);
+                            synchronized (spawnPointsTodo)
+                            {
+                                int rnd = (int) Math.floor(Math.random() * spawnPointsTodo.size());
+                                String spanposstr = spawnPointsTodo.remove(rnd);
+                                spawnPointsSeen.add(spanposstr);
 
-                            JSONObject spanpos = new JSONObject(spanposstr);
+                                JSONObject spanpos = new JSONObject(spanposstr);
 
-                            lat = spanpos.getDouble("lat");
-                            lon = spanpos.getDouble("lon");
+                                lat = spanpos.getDouble("lat");
+                                lon = spanpos.getDouble("lon");
+                            }
+
+                            Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
+
+                            suspendTime = new Date().getTime() + 8 * 1000;
+
+                            latJitter += (Math.random() - 0.5) / 10000.0;
+                            lonJitter += (Math.random() - 0.5) / 10000.0;
                         }
-
-                        Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
-
-                        suspendTime = new Date().getTime() + 5 * 1000;
+                    }
+                    else
+                    {
+                        lat += latJitter;
+                        lon += lonJitter;
                     }
                 }
                 catch (Exception ignore)
@@ -648,47 +678,49 @@ public class Pokemongo extends FrameLayout
 
             if (commandMode == COMMAND_HUNT)
             {
-                if (huntPointsTodo.size() == 0)
+                if (suspendTime < new Date().getTime())
                 {
-                    clearSpawns();
-
-                    buildPokeHuntSpawns();
-                }
-
-                if (huntPointsTodo.size() > 0)
-                {
-                    try
+                    if (huntPointsTodo.size() == 0)
                     {
-                        synchronized (huntPointsTodo)
+                        buildPokeHuntSpawns();
+                    }
+
+                    if (huntPointsTodo.size() > 0)
+                    {
+                        try
                         {
-                            JSONObject huntPoint = huntPointsTodo.remove(0);
-                            huntPointsTodo.add(huntPoint);
+                            synchronized (huntPointsTodo)
+                            {
+                                JSONObject huntPoint = huntPointsTodo.remove(0);
 
-                            lat = huntPoint.getDouble("lat");
-                            lon = huntPoint.getDouble("lon");
+                                lat = huntPoint.getDouble("lat");
+                                lon = huntPoint.getDouble("lon");
+                            }
+
+                            Log.d(LOGTAG, "deziLocation: hunt lat=" + lat + " lon=" + lon);
+
+                            suspendTime = new Date().getTime() + 8 * 1000;
+
+                            latJitter += (Math.random() - 0.5) / 10000.0;
+                            lonJitter += (Math.random() - 0.5) / 10000.0;
                         }
-
-                        Log.d(LOGTAG, "deziLocation: hunt lat=" + lat + " lon=" + lon);
-
-                        suspendTime = new Date().getTime() + 5 * 1000;
+                        catch (Exception ignore)
+                        {
+                        }
                     }
-                    catch (Exception ignore)
-                    {
-                    }
+                }
+                else
+                {
+                    lat += latJitter;
+                    lon += lonJitter;
                 }
             }
 
-            if (commandMode == COMMAND_SHOP)
+            if (! isWaiting)
             {
-                gotoNextFort();
-
-                Log.d(LOGTAG, "deziLocation: shop lat=" + lat + " lon=" + lon);
-
-                suspendTime = new Date().getTime() + 5 * 1000;
+                lat += latMove;
+                lon += lonMove;
             }
-
-            lat += latMove;
-            lon += lonMove;
         }
 
         setupSpawns();
@@ -1171,6 +1203,8 @@ public class Pokemongo extends FrameLayout
 
             int pokeNum = Integer.parseInt(parts[ 1 ], 10);
             enablePokemonDirEntry(pokeNum);
+
+            addToast("New Spawn " + pokeId);
         }
         catch (Exception ignore)
         {
@@ -1520,12 +1554,55 @@ public class Pokemongo extends FrameLayout
             {
                 JSONObject returnobj = returns.getJSONObject(inx);
                 String type = returnobj.getString("type");
+                JSONObject data = returnobj.getJSONObject("data");
+
+                if (type.equals(".POGOProtos.Networking.Responses.EncounterResponse"))
+                {
+                    Log.d(LOGTAG, "evalItemCapture: encounter json=" + data.toString(2));
+
+                    data = data.getJSONObject("capture_probability@.POGOProtos.Data.Capture.CaptureProbability");
+
+                    String text = "";
+
+                    if (data.has("pokeball_type@.POGOProtos.Inventory.ItemId") && data.has("capture_probability@float"))
+                    {
+                        JSONArray items = data.getJSONArray("pokeball_type@.POGOProtos.Inventory.ItemId");
+                        if (items.get(0) instanceof JSONArray) items = items.getJSONArray(0);
+
+                        JSONArray probas = data.getJSONArray("capture_probability@float");
+                        if (probas.get(0) instanceof JSONArray) probas = probas.getJSONArray(0);
+
+                        if (items.length() == probas.length())
+                        {
+                            for (int cnt = 0; cnt < items.length(); cnt++)
+                            {
+                                String item = items.getString(cnt);
+                                double proba = probas.getDouble(cnt);
+
+                                if (item.equals("ITEM_POKE_BALL@1")) item = "Normal Ball";
+                                if (item.equals("ITEM_GREAT_BALL@2")) item = "Great Ball";
+                                if (item.equals("ITEM_ULTRA_BALL@3")) item = "Ultra Ball";
+                                if (item.equals("ITEM_MASTER_BALL@4")) item = "Master Ball";
+
+                                text += item + " = " + proba + "\n";
+                            }
+                        }
+                    }
+
+                    text = text.trim();
+
+                    if (text.isEmpty()) text = "No Encounter Data";
+
+                    Log.d(LOGTAG, "evalItemCapture: encounter text=" + text);
+
+                    addToast(text);
+
+                    setWaiting();
+                }
 
                 if (type.equals(".POGOProtos.Networking.Responses.UseItemCaptureResponse"))
                 {
-                    JSONObject data = returnobj.getJSONObject("data");
-
-                    Log.d(LOGTAG, "evalItemCapture: json=" + data.toString(2));
+                    Log.d(LOGTAG, "evalItemCapture: capture json=" + data.toString(2));
 
                     String text = "";
 
@@ -1547,12 +1624,15 @@ public class Pokemongo extends FrameLayout
 
                     if (text.isEmpty()) text = "No effect";
 
+                    Log.d(LOGTAG, "evalItemCapture: capture text=" + text);
+
                     addToast(text);
                 }
             }
         }
         catch (Exception ignore)
         {
+            ignore.printStackTrace();
         }
     }
 

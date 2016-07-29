@@ -72,7 +72,7 @@ public class PokemonDecode
                         byte[] dval = new byte[ 8 ];
                         byte[] nval = new byte[ 8 ];
 
-                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.986);
+                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.999999);
                         System.arraycopy(nval, 0, requestBytes, orgoff, nval.length);
 
                         System.arraycopy(requestBytes, orgoff, dval, 0, dval.length);
@@ -100,7 +100,7 @@ public class PokemonDecode
 
                     if (data.has("hit_pokemon@bool"))
                     {
-                        messages.add("Patched Curveball");
+                        messages.add("Curveball");
                     }
                     else
                     {
