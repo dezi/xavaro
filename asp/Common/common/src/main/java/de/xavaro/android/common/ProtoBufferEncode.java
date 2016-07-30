@@ -5,6 +5,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Iterator;
 
 public class ProtoBufferEncode
@@ -50,6 +52,7 @@ public class ProtoBufferEncode
                     continue;
                 }
 
+                int idid = desc.getInt("id");
                 String type = (parts.length == 2) ? parts[ 1 ] : desc.getString("type");
                 String dest = name + "@" + desc.getInt("id");
 
@@ -64,8 +67,8 @@ public class ProtoBufferEncode
                         Log.d(LOGTAG, "encode: enum name=" + name);
 
                         int enumint = getProtoEnumValue(name, json.get(key));
-
-                        result.put(dest, getHexBytesToString(encodeVarint(enumint)));
+                        byte[] bytes = encodeVarint(enumint);
+                        result.put(dest, getHexBytesToString(encodeSection(idid, 0, bytes)));
                     }
                     else
                     {
@@ -75,15 +78,23 @@ public class ProtoBufferEncode
 
                         Log.d(LOGTAG, "encode: mess name=" + name + " type=" + type);
 
-                        JSONObject subjson = json.getJSONObject(name);
+                        JSONObject subjson = json.getJSONObject(key);
                         result.put(dest, encodeJSON(subjson, type));
                     }
                 }
                 else
                 {
-                    Log.d(LOGTAG, "encode: valu name=" + name + " type=" + type);
+                    int mode = getModeFromType(type);
 
-                    result.put(dest, encodeScalar(type, json.get(key)));
+                    Log.d(LOGTAG, "encode: valu name=" + name + " type=" + type + "mode=" + mode);
+
+                    byte[] bytes = (mode == 0)
+                            ? encodeVarint(json.getLong(key))
+                            : (mode == 2)
+                            ? encodeVector(mode, json.get(key))
+                            : encodeScalar(mode, json.get(key));
+
+                    result.put(dest, getHexBytesToString(encodeSection(idid, mode, bytes)));
                 }
             }
 
@@ -97,10 +108,98 @@ public class ProtoBufferEncode
         }
     }
 
-    private byte[] encodeScalar(String type, Object value)
+    private byte[] encodeVector(int mode, Object value)
     {
+        byte[] data = new byte[ 0 ];
 
-        return null;
+        if (value instanceof String)
+        {
+            data = ((String) value).getBytes();
+        }
+
+        if (value instanceof byte[])
+        {
+            data = (byte[]) value;
+        }
+
+        return data;
+    }
+
+    private byte[] encodeScalar(int mode, Object value)
+    {
+        byte[] data = new byte[ (mode == 1) ? 8 : 4 ];
+
+        if (value instanceof Double)
+        {
+            if (mode == 1)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putDouble((double) value);
+            }
+
+            if (mode == 5)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putFloat((float) (double) value);
+            }
+        }
+
+        if (value instanceof Long)
+        {
+            if (mode == 1)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putLong((long) value);
+            }
+
+            if (mode == 5)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putLong((int) (long) value);
+            }
+        }
+
+        if (value instanceof Float)
+        {
+            if (mode == 1)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putDouble((double) (float) value);
+            }
+
+            if (mode == 5)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putFloat((float) value);
+            }
+        }
+
+        if (value instanceof Integer)
+        {
+            if (mode == 1)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putLong((long) (int) value);
+            }
+
+            if (mode == 5)
+            {
+                ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).putInt((int) value);
+            }
+        }
+
+        return data;
+    }
+
+    private byte[] encodeSection(long idid, int mode, byte[] section)
+    {
+        byte[] id = encodeId(idid, mode);
+
+        byte[] result = new byte[ id.length + section.length ];
+
+        System.arraycopy(id, 0, result, 0, id.length);
+        System.arraycopy(section, 0, result, id.length, section.length);
+
+        return result;
+    }
+
+    private byte[] encodeId(long idid, int mode)
+    {
+        long value = (idid << 3) | mode;
+        return encodeVarint(value);
     }
 
     private byte[] encodeVarint(long value)
@@ -160,12 +259,21 @@ public class ProtoBufferEncode
         }
     }
 
+    private int getModeFromType(String type)
+    {
+        if (type.equals("string") || type.equals("bytes")) return 2;
+        if (type.equals("float") || type.equals("fixed32") || type.equals("sfixed32")) return 5;
+        if (type.equals("double") || type.equals("fixed64") || type.equals("sfixed64")) return 1;
+
+        return 0;
+    }
+
     @Nullable
-    private JSONObject getProtoDescriptor(String enumtype, String name)
+    private JSONObject getProtoDescriptor(String messageName, String name)
     {
         try
         {
-            JSONObject message = protos.getJSONObject(name);
+            JSONObject message = protos.getJSONObject(messageName);
             return message.getJSONObject(name);
         }
         catch (Exception ignore)

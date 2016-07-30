@@ -303,7 +303,9 @@ public class Pokemongo extends FrameLayout
 
                     for (int inx = 0; inx < spawns.length(); inx++)
                     {
-                        huntPointsTodo.add(spawns.getJSONObject(inx));
+                        JSONObject clone = new JSONObject(spawns.getJSONObject(inx).toString());
+                        clone.put("pid", pokeId);
+                        huntPointsTodo.add(clone);
                     }
                 }
 
@@ -699,15 +701,30 @@ public class Pokemongo extends FrameLayout
                         {
                             try
                             {
+                                String pid = null;
+
                                 synchronized (huntPointsTodo)
                                 {
                                     JSONObject huntPoint = huntPointsTodo.remove(0);
 
+                                    pid = huntPoint.getString("pid");
                                     lat = huntPoint.getDouble("lat");
                                     lon = huntPoint.getDouble("lon");
                                 }
 
-                                Log.d(LOGTAG, "deziLocation: hunt lat=" + lat + " lon=" + lon);
+                                if (pid != null)
+                                {
+                                    String[] parts = pid.split("@");
+
+                                    if (parts.length == 2)
+                                    {
+                                        int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
+                                        Bitmap bm = PokemonImage.getPokemonImage(pokeOrd);
+                                        pimages[ pimages.length - 1 ].setImageBitmap(bm);
+                                    }
+                                }
+
+                                Log.d(LOGTAG, "deziLocation: hunt lat=" + lat + " lon=" + lon + " pid=" + pid);
 
                                 suspendTime = new Date().getTime() + 10 * 1000;
 
@@ -1636,6 +1653,34 @@ public class Pokemongo extends FrameLayout
 
                     addToast(text);
                 }
+
+                if (type.equals(".POGOProtos.Networking.Responses.CatchPokemonResponse"))
+                {
+                    Log.d(LOGTAG, "evalItemCapture: catch json=" + data.toString(2));
+
+                    if (data.has("status@.POGOProtos.Networking.Responses.CatchPokemonResponse.CatchStatus"))
+                    {
+                        String status = data.getString("status@.POGOProtos.Networking.Responses.CatchPokemonResponse.CatchStatus");
+
+                        //
+                        // CATCH_ERROR = 0;
+                        // CATCH_SUCCESS = 1;
+                        // CATCH_ESCAPE = 2;
+                        // CATCH_FLEE = 3;
+                        // CATCH_MISSED = 4;
+                        //
+
+                        if (status.equals("CATCH_ERROR@0")
+                                || status.equals("CATCH_SUCCESS@1")
+                                || status.equals("CATCH_ESCAPE@2")
+                                || status.equals("CATCH_FLEE@3"))
+                        {
+                            isWaiting = false;
+                            setCommand(commandMode);
+                        }
+                    }
+
+                }
             }
         }
         catch (Exception ignore)
@@ -1697,6 +1742,8 @@ public class Pokemongo extends FrameLayout
 
             ProtoBufferEncode encode = new ProtoBufferEncode();
             encode.setProtos(PokemonProto.getProtos());
+
+            Log.d(LOGTAG, "testEncode: " + text);
 
             JSONObject result = encode.encodeJSON(new JSONObject(text), ".POGOProtos.Networking.Requests.Request");
             Log.d(LOGTAG, "testEncode: " + ((result == null) ? "Fail" : result.toString(2)));
