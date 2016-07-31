@@ -3,7 +3,10 @@ package de.xavaro.android.safehome;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -51,7 +54,7 @@ public class Pokemongo extends FrameLayout
 
     private WindowManager.LayoutParams overlayParam;
 
-    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "WAIT"};
+    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "WAIT", "DONE", "SPOT"};
 
     private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
     private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
@@ -286,6 +289,7 @@ public class Pokemongo extends FrameLayout
             {
                 huntPointsTodo.clear();
 
+                ArrayList<JSONObject> prep = new ArrayList<>();
                 Iterator<String> pokeIterator = poke2spawn.keys();
 
                 while (pokeIterator.hasNext())
@@ -305,7 +309,9 @@ public class Pokemongo extends FrameLayout
                     {
                         JSONObject clone = new JSONObject(spawns.getJSONObject(inx).toString());
                         clone.put("pid", pokeId);
-                        huntPointsTodo.add(clone);
+                        prep.add(clone);
+
+                        if ((inx >= 8) && ! pokeId.equals("PIKACHU@25")) break;
                     }
                 }
 
@@ -313,11 +319,20 @@ public class Pokemongo extends FrameLayout
                 // Shuffle list.
                 //
 
+                while (prep.size() > 0)
+                {
+                    int shuffle = (int) (Math.random() * prep.size());
+
+                    Log.d(LOGTAG, "buildPokeHuntSpawns shuffle=" + shuffle);
+
+                    huntPointsTodo.add(prep.remove(shuffle));
+                }
+
                 for (int inx = 0; inx < huntPointsTodo.size(); inx++)
                 {
-                    int shuffle = (int) (Math.random() * huntPointsTodo.size());
+                    JSONObject item = huntPointsTodo.get(inx);
 
-                    huntPointsTodo.add(huntPointsTodo.remove(shuffle));
+                    Log.d(LOGTAG,"buildPokeHuntSpawns list pid=" + item.getString("pid"));
                 }
 
                 Log.d(LOGTAG, "buildPokeHuntSpawns: size=" + huntPointsTodo.size());
@@ -424,20 +439,18 @@ public class Pokemongo extends FrameLayout
                 if (!locsIterator.hasNext()) return;
 
                 String latlonstr = locsIterator.next();
-                locs.remove(latlonstr);
 
                 pimages[ buttinx ].setBackgroundColor(0xcccccccc);
 
-                long expires = new Date().getTime() + 60 * 1000;
-                pokeLocsDead.put(latlonstr, expires);
+                //long expires = new Date().getTime() + 60 * 1000;
+                //pokeLocsDead.put(latlonstr, expires);
 
                 JSONObject latlon = new JSONObject(latlonstr);
 
                 latSpot = latlon.getDouble("lat");
                 lonSpot = latlon.getDouble("lon");
 
-                latJitter = ((Math.random() - 0.5) / 10000.0) * 50;
-                lonJitter = ((Math.random() - 0.5) / 10000.0) * 50;
+                setCommand(COMMAND_SPOT);
 
                 isSpotting = true;
             }
@@ -465,7 +478,14 @@ public class Pokemongo extends FrameLayout
         {
             if (! (isWaiting || isWalking))
             {
-                setCommand(++commandMode % 3);
+                if (commandMode > COMMAND_HUNT)
+                {
+                    setCommand(COMMAND_STOP);
+                }
+                else
+                {
+                    setCommand(++commandMode % 3);
+                }
             }
 
             if (isWaiting)
@@ -572,23 +592,30 @@ public class Pokemongo extends FrameLayout
     // Hamburg => 53.55, 10.00
     //
 
-    private static double lat = 53.55 + ((Math.random() - 0.5) / 30.0);
-    private static double lon = 10.00 + ((Math.random() - 0.5) / 30.0);
+    private static double lat = 53.55 + ((Math.random() - 0.5) / 10.0);
+    private static double lon = 10.00 + ((Math.random() - 0.5) / 10.0);
 
     private static double latMove = 0;
     private static double lonMove = 0;
+
+    private static double latMin = +1000;
+    private static double latMax = -1000;
+    private static double lonMin = +1000;
+    private static double lonMax = -1000;
 
     private static final int COMMAND_STOP = 0;
     private static final int COMMAND_SEEK = 1;
     private static final int COMMAND_HUNT = 2;
     private static final int COMMAND_WAIT = 3;
+    private static final int COMMAND_DONE = 4;
+    private static final int COMMAND_SPOT = 5;
 
     private static void setCommand(int command)
     {
         latMove = 0;
         lonMove = 0;
 
-        commandMode = command;
+        if (command <= COMMAND_HUNT) commandMode = command;
 
         for (int inx = 0; inx < dirButtonTextViews.length; inx++)
         {
@@ -628,15 +655,20 @@ public class Pokemongo extends FrameLayout
 
         if (isSpotting)
         {
-            lat = latSpot + latJitter;
-            lon = lonSpot + lonJitter;
+            double latDist = (latSpot - lat) / 2.0;
+            double lonDist = (lonSpot - lon) / 2.0;
 
-            latJitter /= 2.0;
-            lonJitter /= 2.0;
+            if (latDist > +0.001) latDist = +0.001;
+            if (lonDist > +0.001) lonDist = +0.001;
+            if (latDist < -0.001) latDist = -0.001;
+            if (lonDist < -0.001) lonDist = -0.001;
+
+            lat += latDist;
+            lon += lonDist;
 
             Log.d(LOGTAG, "deziLocation: spot lat=" + lat + " lon=" + lon);
 
-            if ((Math.abs(latJitter) < 0.00001) && (Math.abs(lonJitter) < 0.00001))
+            if ((Math.abs(latDist) < 0.00001) && (Math.abs(lonDist) < 0.00001))
             {
                 suspendTime = new Date().getTime() + 20 * 1000;
 
@@ -659,8 +691,7 @@ public class Pokemongo extends FrameLayout
                             {
                                 synchronized (spawnPointsTodo)
                                 {
-                                    int rnd = (int) Math.floor(Math.random() * spawnPointsTodo.size());
-                                    String spanposstr = spawnPointsTodo.remove(rnd);
+                                    String spanposstr = spawnPointsTodo.remove(spawnPointsTodo.size() - 1);
                                     spawnPointsSeen.add(spanposstr);
 
                                     JSONObject spanpos = new JSONObject(spanposstr);
@@ -671,10 +702,14 @@ public class Pokemongo extends FrameLayout
 
                                 Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
 
-                                suspendTime = new Date().getTime() + 10 * 1000;
+                                suspendTime = new Date().getTime() + 5 * 1000;
 
                                 latJitter = (Math.random() - 0.5) / 10000.0;
                                 lonJitter = (Math.random() - 0.5) / 10000.0;
+                            }
+                            else
+                            {
+                                setCommand(COMMAND_DONE);
                             }
                         }
                         else
@@ -702,14 +737,19 @@ public class Pokemongo extends FrameLayout
                             try
                             {
                                 String pid = null;
+                                Bitmap bm = null;
+                                int ord = 0;
 
                                 synchronized (huntPointsTodo)
                                 {
-                                    JSONObject huntPoint = huntPointsTodo.remove(0);
+                                    JSONObject huntPoint = getNearestPoint(huntPointsTodo);
 
-                                    pid = huntPoint.getString("pid");
-                                    lat = huntPoint.getDouble("lat");
-                                    lon = huntPoint.getDouble("lon");
+                                    if (huntPoint != null)
+                                    {
+                                        pid = huntPoint.getString("pid");
+                                        lat = huntPoint.getDouble("lat");
+                                        lon = huntPoint.getDouble("lon");
+                                    }
                                 }
 
                                 if (pid != null)
@@ -718,15 +758,19 @@ public class Pokemongo extends FrameLayout
 
                                     if (parts.length == 2)
                                     {
-                                        int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
-                                        Bitmap bm = PokemonImage.getPokemonImage(pokeOrd);
-                                        pimages[ pimages.length - 1 ].setImageBitmap(bm);
+                                        ord = Integer.parseInt(parts[ 1 ], 10);
+                                        bm = PokemonImage.getPokemonImage(ord);
+
+                                        setImageBitmapRecycle(pimages[ pimages.length - 1 ], bm);
                                     }
                                 }
 
-                                Log.d(LOGTAG, "deziLocation: hunt lat=" + lat + " lon=" + lon + " pid=" + pid);
+                                Log.d(LOGTAG, "deziLocation: hunt"
+                                        + " lat=" + lat + " lon=" + lon
+                                        + " pid=" + pid + " ord=" + ord
+                                        + " bm=" + bm);
 
-                                suspendTime = new Date().getTime() + 10 * 1000;
+                                suspendTime = new Date().getTime() + 5 * 1000;
 
                                 latJitter = (Math.random() - 0.5) / 10000.0;
                                 lonJitter = (Math.random() - 0.5) / 10000.0;
@@ -761,6 +805,42 @@ public class Pokemongo extends FrameLayout
         );
 
         makeToast();
+    }
+
+    @Nullable
+    private static JSONObject getNearestPoint(ArrayList<JSONObject> spanLocations)
+    {
+        try
+        {
+            int bestInx = -1;
+            double bestDist = 0.0;
+
+            for (int inx = 0; inx < spanLocations.size(); inx++)
+            {
+                JSONObject spanLocation = spanLocations.get(inx);
+
+                double distLat = lat - spanLocation.getDouble("lat");
+                double distLon = lon - spanLocation.getDouble("lon");
+
+                double dist = Math.sqrt(distLat * distLat + distLon * distLon);
+
+                if ((bestInx < 0) || (dist < bestDist))
+                {
+                    bestInx = inx;
+                    bestDist = dist;
+                }
+            }
+
+            Log.d(LOGTAG, "getNearestPoint: inx=" + bestInx);
+
+            return (bestInx >= 0) ? spanLocations.remove(bestInx) : null;
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+
+            return null;
+        }
     }
 
     private static final Map<Integer, OutputStream> outputs = new HashMap<>();
@@ -1134,8 +1214,37 @@ public class Pokemongo extends FrameLayout
 
                         int pokeNum = Integer.parseInt(parts[ 1 ], 10);
                         enablePokemonDirEntry(pokeNum);
+
+                        JSONArray pokeSpwans = poke2spawn.getJSONArray(pokeId);
+
+                        for (int inx = 0; inx < pokeSpwans.length(); inx++)
+                        {
+                            JSONObject pokeSpwan = pokeSpwans.getJSONObject(inx);
+
+                            double slat = pokeSpwan.getDouble("lat");
+                            double slon = pokeSpwan.getDouble("lon");
+
+                            if (slat < latMin) latMin = slat;
+                            if (slat > latMax) latMax = slat;
+                            if (slon < lonMin) lonMin = slon;
+                            if (slon > lonMax) lonMax = slon;
+
+                            if (pokeId.equals("PIKACHU@25"))
+                            {
+                                JSONObject clone = new JSONObject(pokeSpwan.toString());
+                                clone.put("pid", pokeId);
+                                huntPointsTodo.add(clone);
+                            }
+                        }
                     }
                 }
+
+                Log.d(LOGTAG, "loadPokeSpawnMap:"
+                        + " latMin=" + latMin + " latMax=" + latMax
+                        + " lonMin=" + lonMin + " lonMax=" + lonMax);
+
+                lat = (Math.random() < 0.5) ? latMin : latMax;
+                lon = (Math.random() < 0.5) ? lonMin : lonMax;
             }
         }
         catch (Exception ignore)
@@ -1446,6 +1555,57 @@ public class Pokemongo extends FrameLayout
         }
     }
 
+    public static void clearSpawnPoint(double latPos, double lonPos)
+    {
+        synchronized (pokeLocs)
+        {
+            try
+            {
+                Log.d(LOGTAG, "clearSpawnPoint lat=" + latPos + " lon=" + lonPos);
+
+                JSONObject latlon = new JSONObject();
+                latlon.put("lat", latPos);
+                latlon.put("lon", lonPos);
+                String latlonStr = latlon.toString();
+
+                Iterator<String> keysIterator = pokeLocs.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String pokeId = keysIterator.next();
+
+                    JSONObject pokeLoc = pokeLocs.getJSONObject(pokeId);
+                    JSONObject locs = pokeLoc.getJSONObject("loc");
+
+                    Iterator<String> locsIterator = locs.keys();
+
+                    int valid = 0;
+
+                    while (locsIterator.hasNext())
+                    {
+                        if (latlonStr.equals(locsIterator.next()))
+                        {
+                            locs.remove(latlonStr);
+
+                            Log.d(LOGTAG, "clearSpawnPoint pid=" + pokeId);
+                        }
+                        else
+                        {
+                            valid++;
+                        }
+                    }
+
+                    if (valid == 0) pokeLocs.remove(pokeId);
+                }
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
+
+    }
+
     public static void setupSpawns()
     {
         synchronized (pokeLocs)
@@ -1535,13 +1695,13 @@ public class Pokemongo extends FrameLayout
                     String pokeId = keysIterator.next();
 
                     JSONObject pokeLoc = pokeLocs.getJSONObject(pokeId);
-                    int pokeOrd = pokeLoc.getInt("ord");
-
-                    Bitmap bitmap = PokemonImage.getPokemonImage(pokeOrd);
 
                     if (locsJson[ spawninx ] != pokeLoc)
                     {
                         locsJson[ spawninx ] = pokeLoc;
+
+                        int pokeOrd = pokeLoc.getInt("ord");
+                        Bitmap bitmap = PokemonImage.getPokemonImage(pokeOrd);
 
                         pimages[ spawninx ].setImageBitmap(bitmap);
                     }
@@ -1551,7 +1711,11 @@ public class Pokemongo extends FrameLayout
                     spawninx++;
                 }
 
-                while (spawninx < spawns.length)
+                //
+                // Pfusch hier...
+                //
+
+                while (spawninx < spawns.length - 1)
                 {
                     locsJson[ spawninx ] = null;
 
@@ -1567,6 +1731,9 @@ public class Pokemongo extends FrameLayout
             }
         }
     }
+
+    private static double latEncounter;
+    private static double lonEncounter;
 
     private static void evalItemCapture(JSONObject json)
     {
@@ -1584,6 +1751,12 @@ public class Pokemongo extends FrameLayout
                 if (type.equals(".POGOProtos.Networking.Responses.EncounterResponse"))
                 {
                     Log.d(LOGTAG, "evalItemCapture: encounter json=" + data.toString(2));
+
+                    JSONObject wildPoke = data.getJSONObject("wild_pokemon@.POGOProtos.Map.Pokemon.WildPokemon");
+                    latEncounter = wildPoke.getDouble("latitude@double");
+                    lonEncounter = wildPoke.getDouble("longitude@double");
+
+                    Log.d(LOGTAG, "evalItemCapture: encounter lat=" + latEncounter + " lon=" + lonEncounter);
 
                     data = data.getJSONObject("capture_probability@.POGOProtos.Data.Capture.CaptureProbability");
 
@@ -1670,13 +1843,18 @@ public class Pokemongo extends FrameLayout
                         // CATCH_MISSED = 4;
                         //
 
+                        Log.d(LOGTAG, "evalItemCapture catch=" + status);
+
                         if (status.equals("CATCH_ERROR@0")
                                 || status.equals("CATCH_SUCCESS@1")
-                                || status.equals("CATCH_ESCAPE@2")
                                 || status.equals("CATCH_FLEE@3"))
                         {
                             isWaiting = false;
-                            setCommand(commandMode);
+                            suspendTime = new Date().getTime() + 7 * 1000;
+
+                            clearSpawnPoint(latEncounter, lonEncounter);
+
+                            addToast(status.equals("CATCH_SUCCESS@1") ? "GOT!" : "NIX!");
                         }
                     }
 
@@ -2146,7 +2324,7 @@ public class Pokemongo extends FrameLayout
                 message = toastMessages.remove(0);
             }
 
-            Toast toast = Toast.makeText(application, message, Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(application, message, Toast.LENGTH_SHORT);
             TextView view = (TextView) toast.getView().findViewById(android.R.id.message);
             if (view != null) view.setGravity(Gravity.CENTER);
             toast.show();
@@ -2192,6 +2370,18 @@ public class Pokemongo extends FrameLayout
         {
             ignore.printStackTrace();
         }
+    }
+
+    private static void setImageBitmapRecycle(ImageView imageView, Bitmap bitmap)
+    {
+        Drawable drawable = imageView.getDrawable();
+
+        if ((drawable != null) && (drawable instanceof BitmapDrawable))
+        {
+            ((BitmapDrawable) drawable).getBitmap().recycle();
+        }
+
+        imageView.setImageBitmap(bitmap);
     }
 
     //endregion Utility methods.
