@@ -775,9 +775,11 @@ public class Pokemongo extends FrameLayout
                                     if (parts.length == 2)
                                     {
                                         ord = Integer.parseInt(parts[ 1 ], 10);
-                                        bm = PokemonImage.getPokemonImage(ord);
 
-                                        setImageBitmapRecycle(pimages[ pimages.length - 1 ], bm);
+                                        //bm = PokemonImage.getPokemonImage(ord);
+                                        //setImageBitmapRecycle(pimages[ pimages.length - 1 ], bm);
+
+                                        pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord ].getDrawable());
                                     }
                                 }
 
@@ -1452,7 +1454,7 @@ public class Pokemongo extends FrameLayout
                     long expires = new Date().getTime() + tthidden;
                     loc.put(pokeposstr, expires);
 
-                    if (((commandMode == COMMAND_HUNT) || (commandMode == COMMAND_SEEK)) && !isSpotting)
+                    if ((commandMode == COMMAND_HUNT) && !isSpotting)
                     {
                         //
                         // Goto pokemon spot.
@@ -1717,9 +1719,11 @@ public class Pokemongo extends FrameLayout
                         locsJson[ spawninx ] = pokeLoc;
 
                         int pokeOrd = pokeLoc.getInt("ord");
-                        Bitmap bitmap = PokemonImage.getPokemonImage(pokeOrd);
 
-                        pimages[ spawninx ].setImageBitmap(bitmap);
+                        //Bitmap bitmap = PokemonImage.getPokemonImage(pokeOrd);
+                        //pimages[ spawninx ].setImageBitmap(bitmap);
+
+                        pimages[ spawninx ].setImageDrawable(pokeDirImages[ pokeOrd ].getDrawable());
                     }
 
                     pimages[ spawninx ].setBackgroundColor(0xffffffff);
@@ -1735,7 +1739,7 @@ public class Pokemongo extends FrameLayout
                 {
                     locsJson[ spawninx ] = null;
 
-                    pimages[ spawninx ].setImageBitmap(null);
+                    pimages[ spawninx ].setImageDrawable(null);
                     pimages[ spawninx ].setBackgroundColor(0xffffffff);
 
                     spawninx++;
