@@ -41,6 +41,7 @@ import java.util.TimeZone;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.File;
+import java.util.concurrent.ExecutionException;
 
 import de.xavaro.android.common.ProtoBufferEncode;
 import de.xavaro.android.common.PokemonImage;
@@ -295,6 +296,49 @@ public class Pokemongo extends FrameLayout
 
             pokeDirFrames[ inx ].addView(pokeDirCounts[ inx ]);
         }
+
+        updatePokemonDir();
+    }
+
+    private static void updatePokemonDir()
+    {
+        if (! isUpdatedir) return;
+
+        try
+        {
+            Iterator<String> keysIterator = poke2spawn.keys();
+
+            while (keysIterator.hasNext())
+            {
+                String pokeId = keysIterator.next();
+
+                String[] parts = pokeId.split("@");
+                if (parts.length != 2) continue;
+
+                int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
+                JSONArray pokeSpwans = poke2spawn.getJSONArray(pokeId);
+                String count = "" + pokeSpwans.length();
+
+                pokeDirEnabled[ pokeOrd - 1 ] = true;
+
+                if (pokeDirHunting[ pokeOrd - 1 ])
+                {
+                    pokeDirImages[ pokeOrd - 1 ].setBackgroundColor(0xffffcccc);
+                }
+                else
+                {
+                    pokeDirImages[ pokeOrd - 1 ].setBackgroundColor(0xcccccccc);
+                }
+
+                pokeDirCounts[ pokeOrd - 1 ].setText(count);
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+
+        isUpdatedir = false;
     }
 
     private static void buildPokeHuntSpawns()
@@ -361,35 +405,6 @@ public class Pokemongo extends FrameLayout
                 ignore.printStackTrace();
             }
         }
-    }
-
-    private static void enablePokemonDirEntry(int pokeNum, int plus)
-    {
-        if ((pokeNum <= 0) || (pokeNum > numPokemons)) return;
-
-        if (pokeDirHunting[ pokeNum - 1 ])
-        {
-            pokeDirImages[ pokeNum - 1 ].setBackgroundColor(0xffffcccc);
-        }
-        else
-        {
-            pokeDirImages[ pokeNum - 1 ].setBackgroundColor(0xcccccccc);
-        }
-
-        pokeDirEnabled[ pokeNum - 1 ] = true;
-
-        String oldCount = (String) pokeDirCounts[ pokeNum - 1 ].getText();
-
-        if ((oldCount == null) || oldCount.isEmpty())
-        {
-            oldCount = "" + plus;
-        }
-        else
-        {
-            oldCount = "" + (Integer.parseInt(oldCount,10) + plus);
-        }
-
-        pokeDirCounts[ pokeNum - 1 ].setText(oldCount);
     }
 
     private void onClickHuntPokemonButton(int buttinx)
@@ -472,13 +487,14 @@ public class Pokemongo extends FrameLayout
 
                 String latlonstr = locsIterator.next();
                 JSONObject latlon = new JSONObject(latlonstr);
+                long expires = locs.getLong(latlonstr);
 
                 //
                 // Reorder to back.
                 //
 
                 locs.remove(latlonstr);
-                locs.put(latlonstr, latlon);
+                locs.put(latlonstr, expires);
 
                 pimages[ buttinx ].setBackgroundColor(0xcccccccc);
 
@@ -505,6 +521,7 @@ public class Pokemongo extends FrameLayout
     private static boolean isHolding;
     private static boolean isSpotting;
     private static boolean isShowhunt;
+    private static boolean isUpdatedir;
 
     private void onClickJoystickButton(int buttinx)
     {
@@ -648,17 +665,17 @@ public class Pokemongo extends FrameLayout
     // Berlin => 52.511389, 13.411379
     //
 
-    //private static String region = "de.Berlin";
-    //private static double latRegion = 52.51;
-    //private static double lonRegion = 13.41;
+    private static String region = "de.Berlin";
+    private static double latRegion = 52.51;
+    private static double lonRegion = 13.41;
 
     //
     // Trittau => 53.612295, 10.393479
     //
 
-    private static String region = "de.Trittau";
-    private static double latRegion = 53.61;
-    private static double lonRegion = 10.39;
+    //private static String region = "de.Trittau";
+    //private static double latRegion = 53.61;
+    //private static double lonRegion = 10.39;
 
     private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
     private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
@@ -728,233 +745,262 @@ public class Pokemongo extends FrameLayout
 
     public static void deziLocation(Location location)
     {
-        initPokemongo(location);
-
-        meterPerDegree();
-
-        if ((suspendTime > 0) && (suspendTime < new Date().getTime()))
+        try
         {
-            isWaiting = false;
-        }
+            initPokemongo(location);
 
-        setCommandText(isHolding ? COMMAND_HOLD : isWaiting ? COMMAND_WAIT : isSpotting ? COMMAND_SPOT : commandMode);
+            meterPerDegree();
 
-        if (isMoving && ! isHolding)
-        {
-            if ((Math.abs(lat - latTogo) > 0.00001) || (Math.abs(lon - lonTogo) > 0.00001))
+            //updatePokemonDir();
+
+            if ((suspendTime > 0) && (suspendTime < new Date().getTime()))
             {
-                double latDist = (latTogo - lat) / 2.0;
-                double lonDist = (lonTogo - lon) / 2.0;
+                isWaiting = false;
+            }
 
-                if (latDist > +0.001) latDist = +0.001;
-                if (lonDist > +0.001) lonDist = +0.001;
-                if (latDist < -0.001) latDist = -0.001;
-                if (lonDist < -0.001) lonDist = -0.001;
+            setCommandText(isHolding ? COMMAND_HOLD : isWaiting ? COMMAND_WAIT : isSpotting ? COMMAND_SPOT : commandMode);
 
-                lat += latDist;
-                lon += lonDist;
+            if (isMoving && !isHolding)
+            {
+                if ((Math.abs(lat - latTogo) > 0.00001) || (Math.abs(lon - lonTogo) > 0.00001))
+                {
+                    double latDist = (latTogo - lat) / 2.0;
+                    double lonDist = (lonTogo - lon) / 2.0;
 
-                Log.d(LOGTAG, "deziLocation: goto lat=" + lat + " lon=" + lon);
-                Log.d(LOGTAG, "deziLocation: dist lat=" + latTogo + " lon=" + lonTogo);
+                    if (latDist > +0.001) latDist = +0.001;
+                    if (lonDist > +0.001) lonDist = +0.001;
+                    if (latDist < -0.001) latDist = -0.001;
+                    if (lonDist < -0.001) lonDist = -0.001;
+
+                    lat += latDist;
+                    lon += lonDist;
+
+                    Log.d(LOGTAG, "deziLocation: goto lat=" + lat + " lon=" + lon);
+                    Log.d(LOGTAG, "deziLocation: dist lat=" + latTogo + " lon=" + lonTogo);
+                }
+                else
+                {
+                    isMoving = false;
+                }
+            }
+
+            if (isSpotting && !isHolding)
+            {
+                if (!isMoving)
+                {
+                    suspendTime = new Date().getTime() + 10 * 1000;
+
+                    isWaiting = true;
+                    isSpotting = false;
+
+                    setCommandText(COMMAND_WAIT);
+                }
             }
             else
             {
-                isMoving = false;
-            }
-        }
-
-        if (isSpotting && ! isHolding)
-        {
-            if (! isMoving)
-            {
-                suspendTime = new Date().getTime() + 10 * 1000;
-
-                isWaiting = true;
-                isSpotting = false;
-
-                setCommandText(COMMAND_WAIT);
-            }
-        }
-        else
-        {
-            if ((!isWaiting) && (!isMoving) && (! isHolding))
-            {
-                if (commandMode == COMMAND_SEEK)
+                if ((!isWaiting) && (!isMoving) && (!isHolding))
                 {
-                    try
+                    if (commandMode == COMMAND_SEEK)
+                    {
+                        try
+                        {
+                            if (suspendTime < new Date().getTime())
+                            {
+                                if (spawnPointsTodo.size() > 0)
+                                {
+                                    synchronized (spawnPointsTodo)
+                                    {
+                                        String spanposstr = spawnPointsTodo.remove(spawnPointsTodo.size() - 1);
+                                        spawnPointsSeen.add(spanposstr);
+
+                                        JSONObject spanpos = new JSONObject(spanposstr);
+
+                                        lat = spanpos.getDouble("lat");
+                                        lon = spanpos.getDouble("lon");
+                                    }
+
+                                    Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
+
+                                    suspendTime = new Date().getTime() + 5 * 1000;
+                                }
+                                else
+                                {
+                                    setCommand(COMMAND_DONE);
+                                }
+                            }
+                        }
+                        catch (Exception ignore)
+                        {
+                        }
+                    }
+
+                    if (commandMode == COMMAND_HUNT)
                     {
                         if (suspendTime < new Date().getTime())
                         {
-                            if (spawnPointsTodo.size() > 0)
+                            if (huntPointsTodo.size() == 0)
                             {
-                                synchronized (spawnPointsTodo)
+                                buildPokeHuntSpawns();
+                            }
+
+                            if (huntPointsTodo.size() > 0)
+                            {
+                                try
                                 {
-                                    String spanposstr = spawnPointsTodo.remove(spawnPointsTodo.size() - 1);
-                                    spawnPointsSeen.add(spanposstr);
+                                    String pid = null;
+                                    int ord = 0;
 
-                                    JSONObject spanpos = new JSONObject(spanposstr);
+                                    synchronized (huntPointsTodo)
+                                    {
+                                        JSONObject huntPoint = getNearestPoint(huntPointsTodo);
 
-                                    lat = spanpos.getDouble("lat");
-                                    lon = spanpos.getDouble("lon");
+                                        if (huntPoint != null)
+                                        {
+                                            pid = huntPoint.getString("pid");
+
+                                            latTogo = huntPoint.getDouble("lat");
+                                            lonTogo = huntPoint.getDouble("lon");
+                                            isMoving = true;
+                                        }
+                                    }
+
+                                    if (pid != null)
+                                    {
+                                        String[] parts = pid.split("@");
+
+                                        if (parts.length == 2)
+                                        {
+                                            ord = Integer.parseInt(parts[ 1 ], 10);
+
+                                            //bm = PokemonImage.getPokemonImage(ord);
+                                            //setImageBitmapRecycle(pimages[ pimages.length - 1 ], bm);
+
+                                            pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord - 1 ].getDrawable());
+                                        }
+                                    }
+
+                                    Log.d(LOGTAG, "deziLocation: hunt"
+                                            + " lat=" + lat + " lon=" + lon
+                                            + " pid=" + pid + " ord=" + ord);
+
+                                    suspendTime = new Date().getTime() + 5 * 1000;
+                                }
+                                catch (Exception ignore)
+                                {
+                                }
+                            }
+                        }
+                    }
+
+                    if (commandMode == COMMAND_SPIN)
+                    {
+                        try
+                        {
+                            if (suspendTime < new Date().getTime())
+                            {
+                                if (spinPointsTodo.size() == 0)
+                                {
+                                    lat = latRegion;
+                                    lon = lonRegion;
+
+                                    double deltax = meterLon * 250;
+                                    double deltay = meterLat * 250;
+
+                                    double[] latOrg = new double[]{latRegion, latRegion, latRegion, latRegion};
+                                    double[] lonOrg = new double[]{lonRegion, lonRegion, lonRegion, lonRegion};
+
+                                    for (int inx = 0; inx < 100; inx++)
+                                    {
+                                        if ((inx % 4) == 0)
+                                        {
+                                            latOrg[ 0 ] -= deltay;
+                                            lonOrg[ 0 ] -= deltax;
+                                        }
+                                        ;
+                                        if ((inx % 4) == 1)
+                                        {
+                                            latOrg[ 1 ] -= deltay;
+                                            lonOrg[ 1 ] += deltax;
+                                        }
+                                        ;
+                                        if ((inx % 4) == 2)
+                                        {
+                                            latOrg[ 2 ] += deltay;
+                                            lonOrg[ 2 ] += deltax;
+                                        }
+                                        ;
+                                        if ((inx % 4) == 3)
+                                        {
+                                            latOrg[ 3 ] += deltay;
+                                            lonOrg[ 3 ] -= deltax;
+                                        }
+                                        ;
+
+                                        JSONObject spinpos = new JSONObject();
+
+                                        spinpos.put("lat", latOrg[ inx % 4 ]);
+                                        spinpos.put("lon", lonOrg[ inx % 4 ]);
+
+                                        spinPointsTodo.add(spinpos.toString());
+                                    }
+
+                                    if (region.equals("de.Köln"))
+                                    {
+                                        for (int inx = 0; inx < 20; inx++) spinPointsTodo.remove(0);
+                                    }
                                 }
 
-                                Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
-
-                                suspendTime = new Date().getTime() + 5 * 1000;
-                            }
-                            else
-                            {
-                                setCommand(COMMAND_DONE);
-                            }
-                        }
-                    }
-                    catch (Exception ignore)
-                    {
-                    }
-                }
-
-                if (commandMode == COMMAND_HUNT)
-                {
-                    if (suspendTime < new Date().getTime())
-                    {
-                        if (huntPointsTodo.size() == 0)
-                        {
-                            buildPokeHuntSpawns();
-                        }
-
-                        if (huntPointsTodo.size() > 0)
-                        {
-                            try
-                            {
-                                String pid = null;
-                                int ord = 0;
-
-                                synchronized (huntPointsTodo)
+                                if (spinPointsTodo.size() > 0)
                                 {
-                                    JSONObject huntPoint = getNearestPoint(huntPointsTodo);
-
-                                    if (huntPoint != null)
+                                    synchronized (spinPointsTodo)
                                     {
-                                        pid = huntPoint.getString("pid");
+                                        String spinposstr = spinPointsTodo.remove(0);
 
-                                        latTogo = huntPoint.getDouble("lat");
-                                        lonTogo = huntPoint.getDouble("lon");
+                                        JSONObject spinpos = new JSONObject(spinposstr);
+
+                                        latTogo = spinpos.getDouble("lat");
+                                        lonTogo = spinpos.getDouble("lon");
                                         isMoving = true;
                                     }
-                                }
 
-                                if (pid != null)
+                                    Log.d(LOGTAG, "deziLocation: spin lat=" + lat + " lon=" + lon);
+
+                                    suspendTime = 0;
+                                }
+                                else
                                 {
-                                    String[] parts = pid.split("@");
-
-                                    if (parts.length == 2)
-                                    {
-                                        ord = Integer.parseInt(parts[ 1 ], 10);
-
-                                        //bm = PokemonImage.getPokemonImage(ord);
-                                        //setImageBitmapRecycle(pimages[ pimages.length - 1 ], bm);
-
-                                        pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord - 1 ].getDrawable());
-                                    }
+                                    setCommand(COMMAND_DONE);
                                 }
-
-                                Log.d(LOGTAG, "deziLocation: hunt"
-                                        + " lat=" + lat + " lon=" + lon
-                                        + " pid=" + pid + " ord=" + ord);
-
-                                suspendTime = new Date().getTime() + 5 * 1000;
-                            }
-                            catch (Exception ignore)
-                            {
                             }
                         }
-                    }
-                }
-
-                if (commandMode == COMMAND_SPIN)
-                {
-                    try
-                    {
-                        if (suspendTime < new Date().getTime())
+                        catch (Exception ignore)
                         {
-                            if (spinPointsTodo.size() == 0)
-                            {
-                                lat = latRegion;
-                                lon = lonRegion;
-
-                                double deltax = meterLon * 250;
-                                double deltay = meterLat * 250;
-
-                                double[] latOrg = new double[]{ latRegion, latRegion, latRegion, latRegion };
-                                double[] lonOrg = new double[]{ lonRegion, lonRegion, lonRegion, lonRegion };
-
-                                for (int inx = 0; inx < 100; inx++)
-                                {
-                                    if ((inx % 4) == 0) { latOrg[ 0 ] -= deltay; lonOrg[ 0 ] -= deltax; };
-                                    if ((inx % 4) == 1) { latOrg[ 1 ] -= deltay; lonOrg[ 1 ] += deltax; };
-                                    if ((inx % 4) == 2) { latOrg[ 2 ] += deltay; lonOrg[ 2 ] += deltax; };
-                                    if ((inx % 4) == 3) { latOrg[ 3 ] += deltay; lonOrg[ 3 ] -= deltax; };
-
-                                    JSONObject spinpos = new JSONObject();
-
-                                    spinpos.put("lat", latOrg[ inx % 4 ]);
-                                    spinpos.put("lon", lonOrg[ inx % 4 ]);
-
-                                    spinPointsTodo.add(spinpos.toString());
-                                }
-
-                                if (region.equals("de.Köln"))
-                                {
-                                    for (int inx = 0; inx < 20; inx++) spinPointsTodo.remove(0);
-                                }
-                            }
-
-                            if (spinPointsTodo.size() > 0)
-                            {
-                                synchronized (spinPointsTodo)
-                                {
-                                    String spinposstr = spinPointsTodo.remove(0);
-
-                                    JSONObject spinpos = new JSONObject(spinposstr);
-
-                                    latTogo = spinpos.getDouble("lat");
-                                    lonTogo = spinpos.getDouble("lon");
-                                    isMoving = true;
-                                }
-
-                                Log.d(LOGTAG, "deziLocation: spin lat=" + lat + " lon=" + lon);
-
-                                suspendTime = 0;
-                            }
-                            else
-                            {
-                                setCommand(COMMAND_DONE);
-                            }
                         }
                     }
-                    catch (Exception ignore)
-                    {
-                    }
+
+                    lat += latMove;
+                    lon += lonMove;
                 }
-
-                lat += latMove;
-                lon += lonMove;
             }
+
+            setupSpawns();
+
+            location.setLatitude(lat);
+            location.setLongitude(lon);
+
+            Log.d(LOGTAG, "deziLocation:"
+                    + " lat=" + location.getLatitude()
+                    + " lon=" + location.getLongitude()
+                    + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
+                    + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove)
+            );
+
+            makeToast();
         }
-
-        setupSpawns();
-
-        location.setLatitude(lat);
-        location.setLongitude(lon);
-
-        Log.d(LOGTAG, "deziLocation:"
-                + " lat=" + location.getLatitude()
-                + " lon=" + location.getLongitude()
-                + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
-                + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove)
-        );
-
-        makeToast();
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
     }
 
     @Nullable
@@ -1376,7 +1422,7 @@ public class Pokemongo extends FrameLayout
                         int pokeNum = Integer.parseInt(parts[ 1 ], 10);
                         JSONArray pokeSpwans = poke2spawn.getJSONArray(pokeId);
 
-                        enablePokemonDirEntry(pokeNum, pokeSpwans.length());
+                        while (pokeSpwans.length() > 25) pokeSpwans.remove(0);
 
                         for (int inx = 0; inx < pokeSpwans.length(); inx++)
                         {
@@ -1467,7 +1513,7 @@ public class Pokemongo extends FrameLayout
             if (!poke2spawn.has(pokeId)) poke2spawn.put(pokeId, new JSONArray());
             JSONArray spawns = poke2spawn.getJSONArray(pokeId);
 
-            if (spawns.length() > 25) return;
+            if (spawns.length() >= 25) return;
 
             for (int inx = 0; inx < spawns.length(); inx++)
             {
@@ -1492,11 +1538,7 @@ public class Pokemongo extends FrameLayout
 
             savePokeSpawnMap();
 
-            String[] parts = pokeId.split("@");
-            if (parts.length != 2) return;
-
-            int pokeNum = Integer.parseInt(parts[ 1 ], 10);
-            enablePokemonDirEntry(pokeNum, 1);
+            isUpdatedir = true;
 
             addToast("New Spawn " + pokeId);
         }
@@ -1725,14 +1767,6 @@ public class Pokemongo extends FrameLayout
         }
     }
 
-    public static void clearSpawns()
-    {
-        synchronized (pokeLocs)
-        {
-            clearFinalJSON(pokeLocs);
-        }
-    }
-
     public static void clearSpawnPoint(double latPos, double lonPos)
     {
         synchronized (pokeLocs)
@@ -1747,6 +1781,7 @@ public class Pokemongo extends FrameLayout
                 String latlonStr = latlon.toString();
 
                 Iterator<String> keysIterator = pokeLocs.keys();
+                ArrayList<String> removePokes = new ArrayList<>();
 
                 while (keysIterator.hasNext())
                 {
@@ -1756,6 +1791,7 @@ public class Pokemongo extends FrameLayout
                     JSONObject locs = pokeLoc.getJSONObject("loc");
 
                     Iterator<String> locsIterator = locs.keys();
+                    ArrayList<String> removeLocs = new ArrayList<>();
 
                     int valid = 0;
 
@@ -1763,7 +1799,7 @@ public class Pokemongo extends FrameLayout
                     {
                         if (latlonStr.equals(locsIterator.next()))
                         {
-                            locs.remove(latlonStr);
+                            removeLocs.add(latlonStr);
 
                             Log.d(LOGTAG, "clearSpawnPoint pid=" + pokeId);
                         }
@@ -1773,8 +1809,12 @@ public class Pokemongo extends FrameLayout
                         }
                     }
 
-                    if (valid == 0) pokeLocs.remove(pokeId);
+                    while (removeLocs.size() > 0) locs.remove(removeLocs.get(0));
+
+                    if (valid == 0) removePokes.add(pokeId);
                 }
+
+                while (removePokes.size() > 0) pokeLocs.remove(removePokes.get(0));
             }
             catch (Exception ignore)
             {
@@ -1797,6 +1837,7 @@ public class Pokemongo extends FrameLayout
                 long now = new Date().getTime();
 
                 Iterator<String> keysIterator = pokeLocs.keys();
+                ArrayList<String> removePokes = new ArrayList<>();
 
                 while (keysIterator.hasNext())
                 {
@@ -1806,6 +1847,7 @@ public class Pokemongo extends FrameLayout
                     JSONObject locs = pokeLoc.getJSONObject("loc");
 
                     Iterator<String> locsIterator = locs.keys();
+                    ArrayList<String> removeLocs = new ArrayList<>();
 
                     int valid = 0;
 
@@ -1816,7 +1858,7 @@ public class Pokemongo extends FrameLayout
 
                         if (expiration < now)
                         {
-                            locs.remove(latlonstr);
+                            removeLocs.add(latlonstr);
                         }
                         else
                         {
@@ -1824,8 +1866,12 @@ public class Pokemongo extends FrameLayout
                         }
                     }
 
-                    if (valid == 0) pokeLocs.remove(pokeId);
+                    while (removeLocs.size() > 0) locs.remove(removeLocs.get(0));
+
+                    if (valid == 0) removePokes.add(pokeId);
                 }
+
+                while (removePokes.size() > 0) pokeLocs.remove(removePokes.get(0));
             }
             catch (Exception ignore)
             {
@@ -2173,6 +2219,7 @@ public class Pokemongo extends FrameLayout
 
                 if (type.equals(".POGOProtos.Networking.Responses.FortSearchResponse"))
                 {
+                    /*
                     if (fortId != null)
                     {
                         JSONObject data = returnobj.getJSONObject("data");
@@ -2218,6 +2265,7 @@ public class Pokemongo extends FrameLayout
                             }
                         }
                     }
+                    */
 
                     isWaiting = false;
                     suspendTime = 0;
@@ -2516,35 +2564,6 @@ public class Pokemongo extends FrameLayout
         }
 
         return false;
-    }
-
-    private static void clearFinalJSON(JSONObject json)
-    {
-        try
-        {
-            Iterator<String> keysIterator = json.keys();
-
-            while (keysIterator.hasNext())
-            {
-                json.remove(keysIterator.next());
-            }
-        }
-        catch (Exception ignore)
-        {
-            ignore.printStackTrace();
-        }
-    }
-
-    private static void setImageBitmapRecycle(ImageView imageView, Bitmap bitmap)
-    {
-        Drawable drawable = imageView.getDrawable();
-
-        if ((drawable != null) && (drawable instanceof BitmapDrawable))
-        {
-            ((BitmapDrawable) drawable).getBitmap().recycle();
-        }
-
-        imageView.setImageBitmap(bitmap);
     }
 
     //endregion Utility methods.
