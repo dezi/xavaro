@@ -483,7 +483,7 @@ public class Pokemongo extends FrameLayout
     {
         if (buttinx == 4)
         {
-            if (! (isWaiting || isWalking))
+            if (! (isWaiting || isHolding || isWalking))
             {
                 if (commandMode > COMMAND_HUNT)
                 {
@@ -504,6 +504,12 @@ public class Pokemongo extends FrameLayout
             if (isWalking)
             {
                 isWalking = false;
+                setCommand(commandMode);
+            }
+
+            if (isHolding)
+            {
+                isHolding = false;
                 setCommand(commandMode);
             }
         }
@@ -599,8 +605,17 @@ public class Pokemongo extends FrameLayout
     // Hamburg => 53.55, 10.00
     //
 
-    private static double lat = 53.55 + ((Math.random() - 0.5) / 20.0);
-    private static double lon = 10.00 + ((Math.random() - 0.5) / 20.0);
+    //private static String region = "de.Hamburg";
+    //private static double lat = 53.55 + ((Math.random() - 0.5) / 20.0);
+    //private static double lon = 10.00 + ((Math.random() - 0.5) / 20.0);
+
+    //
+    // Köln => 50.946695, 6.971266
+    //
+
+    private static String region = "de.Köln";
+    private static double lat = 50.94 + ((Math.random() - 0.5) / 40.0);
+    private static double lon =  6.97 + ((Math.random() - 0.5) / 40.0);
 
     private static double latMove = 0;
     private static double lonMove = 0;
@@ -751,7 +766,6 @@ public class Pokemongo extends FrameLayout
                             try
                             {
                                 String pid = null;
-                                Bitmap bm = null;
                                 int ord = 0;
 
                                 synchronized (huntPointsTodo)
@@ -779,14 +793,13 @@ public class Pokemongo extends FrameLayout
                                         //bm = PokemonImage.getPokemonImage(ord);
                                         //setImageBitmapRecycle(pimages[ pimages.length - 1 ], bm);
 
-                                        pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord ].getDrawable());
+                                        pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord - 1 ].getDrawable());
                                     }
                                 }
 
                                 Log.d(LOGTAG, "deziLocation: hunt"
                                         + " lat=" + lat + " lon=" + lon
-                                        + " pid=" + pid + " ord=" + ord
-                                        + " bm=" + bm);
+                                        + " pid=" + pid + " ord=" + ord);
 
                                 suspendTime = new Date().getTime() + 5 * 1000;
                             }
@@ -1209,7 +1222,7 @@ public class Pokemongo extends FrameLayout
 
             if (extpoke.exists())
             {
-                File extspawn = new File(extpoke, "Harvest.SpawnMap.json");
+                File extspawn = new File(extpoke, "Harvest.SpawnMap." + region + ".json");
 
                 Log.d(LOGTAG, "loadPokeSpawnMap: fil=" + extspawn.toString());
 
@@ -1288,7 +1301,7 @@ public class Pokemongo extends FrameLayout
 
             if (extpoke.exists() || extpoke.mkdir())
             {
-                File extspawn = new File(extpoke, "Harvest.SpawnMap.json");
+                File extspawn = new File(extpoke, "Harvest.SpawnMap." + region + ".json");
 
                 Log.d(LOGTAG, "savePokeSpawnMap: fil=" + extspawn.toString());
 
@@ -1497,7 +1510,7 @@ public class Pokemongo extends FrameLayout
                 {
                     spawnPointsTodo.add(spawnposstr);
 
-                    while (spawnPointsTodo.size() > 10)
+                    while (spawnPointsTodo.size() > 20)
                     {
                         spawnPointsTodo.remove(0);
                     }
@@ -1723,7 +1736,7 @@ public class Pokemongo extends FrameLayout
                         //Bitmap bitmap = PokemonImage.getPokemonImage(pokeOrd);
                         //pimages[ spawninx ].setImageBitmap(bitmap);
 
-                        pimages[ spawninx ].setImageDrawable(pokeDirImages[ pokeOrd ].getDrawable());
+                        pimages[ spawninx ].setImageDrawable(pokeDirImages[ pokeOrd - 1 ].getDrawable());
                     }
 
                     pimages[ spawninx ].setBackgroundColor(0xffffffff);
@@ -2126,7 +2139,7 @@ public class Pokemongo extends FrameLayout
 
             if (extpoke.exists())
             {
-                File extfile = new File(extpoke, "Harvest.KnownForts.json");
+                File extfile = new File(extpoke, "Harvest.KnownForts." + region + ".json");
 
                 Log.d(LOGTAG, "loadKnownForts: fil=" + extfile.toString());
 
@@ -2170,7 +2183,7 @@ public class Pokemongo extends FrameLayout
 
             if (extpoke.exists() || extpoke.mkdir())
             {
-                File extfile = new File(extpoke, "Harvest.KnownForts.json");
+                File extfile = new File(extpoke, "Harvest.KnownForts." + region + ".json");
 
                 Log.d(LOGTAG, "saveKnownForts: fil=" + extfile.toString());
 
