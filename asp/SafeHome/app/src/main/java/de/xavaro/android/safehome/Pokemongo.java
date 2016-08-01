@@ -298,7 +298,6 @@ public class Pokemongo extends FrameLayout
         }
 
         isUpdatedir = true;
-        updatePokemonDir();
     }
 
     private static void updatePokemonDir()
@@ -746,15 +745,14 @@ public class Pokemongo extends FrameLayout
 
     public static void deziLocation(Location location)
     {
-        Log.d(LOGTAG, "pupsekacke in...");
+        //Log.d(LOGTAG, "pupsekacke in...");
 
         try
         {
             initPokemongo(location);
 
             meterPerDegree();
-
-            //updatePokemonDir();
+            updatePokemonDir();
 
             if ((suspendTime > 0) && (suspendTime < new Date().getTime()))
             {
@@ -1005,7 +1003,7 @@ public class Pokemongo extends FrameLayout
             ignore.printStackTrace();
         }
 
-        Log.d(LOGTAG, "pupsekacke out...");
+        //Log.d(LOGTAG, "pupsekacke out...");
     }
 
     @Nullable
@@ -1814,12 +1812,12 @@ public class Pokemongo extends FrameLayout
                         }
                     }
 
-                    while (removeLocs.size() > 0) locs.remove(removeLocs.get(0));
+                    while (removeLocs.size() > 0) locs.remove(removeLocs.remove(0));
 
                     if (valid == 0) removePokes.add(pokeId);
                 }
 
-                while (removePokes.size() > 0) pokeLocs.remove(removePokes.get(0));
+                while (removePokes.size() > 0) pokeLocs.remove(removePokes.remove(0));
             }
             catch (Exception ignore)
             {
@@ -1871,12 +1869,12 @@ public class Pokemongo extends FrameLayout
                         }
                     }
 
-                    while (removeLocs.size() > 0) locs.remove(removeLocs.get(0));
+                    while (removeLocs.size() > 0) locs.remove(removeLocs.remove(0));
 
                     if (valid == 0) removePokes.add(pokeId);
                 }
 
-                while (removePokes.size() > 0) pokeLocs.remove(removePokes.get(0));
+                while (removePokes.size() > 0) pokeLocs.remove(removePokes.remove(0));
             }
             catch (Exception ignore)
             {
