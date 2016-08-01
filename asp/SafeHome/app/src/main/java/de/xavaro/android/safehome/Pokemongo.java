@@ -1,14 +1,15 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.Nullable;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
@@ -54,7 +55,7 @@ public class Pokemongo extends FrameLayout
 
     private WindowManager.LayoutParams overlayParam;
 
-    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "WAIT", "DONE", "SPOT", "HOLD"};
+    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "SPIN", "HUNT", "WAIT", "DONE", "SPOT", "HOLD"};
 
     private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
     private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
@@ -83,6 +84,7 @@ public class Pokemongo extends FrameLayout
     private static FrameLayout pokeDir;
     private static FrameLayout[] pokeDirFrames;
     private static ImageView[] pokeDirImages;
+    private static TextView[] pokeDirCounts;
     private static boolean[] pokeDirEnabled;
     private static boolean[] pokeDirHunting;
     private static int pokeDirCols;
@@ -237,6 +239,7 @@ public class Pokemongo extends FrameLayout
 
         pokeDirFrames = new FrameLayout[ numPokemons ];
         pokeDirImages = new ImageView[ numPokemons ];
+        pokeDirCounts = new TextView[ numPokemons ];
 
         pokeDirCols = (cmdButtons.length + dirButtons.length + spawns.length) / 3;
         pokeDirRows = (numPokemons / pokeDirCols) + (((numPokemons % pokeDirCols) > 0) ? 1 : 0);
@@ -277,6 +280,20 @@ public class Pokemongo extends FrameLayout
             });
 
             pokeDirFrames[ inx ].addView(pokeDirImages[ inx ]);
+
+            lp = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+
+            pokeDirCounts[ inx ] = new TextView(getContext());
+            pokeDirCounts[ inx ].setTypeface(null, Typeface.BOLD);
+            pokeDirCounts[ inx ].setTextSize(buttnetto / 3.0f);
+            pokeDirCounts[ inx ].setTextColor(0xffff0000);
+            pokeDirCounts[ inx ].setPadding(0, 0, 2, 0);
+            pokeDirCounts[ inx ].setLayoutParams(lp);
+
+            pokeDirFrames[ inx ].addView(pokeDirCounts[ inx ]);
         }
     }
 
@@ -346,7 +363,7 @@ public class Pokemongo extends FrameLayout
         }
     }
 
-    private static void enablePokemonDirEntry(int pokeNum)
+    private static void enablePokemonDirEntry(int pokeNum, int plus)
     {
         if ((pokeNum <= 0) || (pokeNum > numPokemons)) return;
 
@@ -360,6 +377,19 @@ public class Pokemongo extends FrameLayout
         }
 
         pokeDirEnabled[ pokeNum - 1 ] = true;
+
+        String oldCount = (String) pokeDirCounts[ pokeNum - 1 ].getText();
+
+        if ((oldCount == null) || oldCount.isEmpty())
+        {
+            oldCount = "" + plus;
+        }
+        else
+        {
+            oldCount = "" + (Integer.parseInt(oldCount,10) + plus);
+        }
+
+        pokeDirCounts[ pokeNum - 1 ].setText(oldCount);
     }
 
     private void onClickHuntPokemonButton(int buttinx)
@@ -476,9 +506,6 @@ public class Pokemongo extends FrameLayout
     private static boolean isSpotting;
     private static boolean isShowhunt;
 
-    private static double latSpot;
-    private static double lonSpot;
-
     private void onClickJoystickButton(int buttinx)
     {
         if (buttinx == 4)
@@ -491,7 +518,7 @@ public class Pokemongo extends FrameLayout
                 }
                 else
                 {
-                    setCommand(++commandMode % 3);
+                    setCommand(++commandMode % (COMMAND_HUNT + 1));
                 }
             }
 
@@ -606,16 +633,35 @@ public class Pokemongo extends FrameLayout
     //
 
     //private static String region = "de.Hamburg";
-    //private static double lat = 53.55 + ((Math.random() - 0.5) / 20.0);
-    //private static double lon = 10.00 + ((Math.random() - 0.5) / 20.0);
+    //private static double latRegion = 53.55;
+    //private static double lonRegion = 10.00;
 
     //
     // Köln => 50.946695, 6.971266
     //
 
-    private static String region = "de.Köln";
-    private static double lat = 50.94 + ((Math.random() - 0.5) / 40.0);
-    private static double lon =  6.97 + ((Math.random() - 0.5) / 40.0);
+    //private static String region = "de.Köln";
+    //private static double latRegion = 50.94;
+    //private static double lonRegion =  6.97;
+
+    //
+    // Berlin => 52.511389, 13.411379
+    //
+
+    //private static String region = "de.Berlin";
+    //private static double latRegion = 52.51;
+    //private static double lonRegion = 13.41;
+
+    //
+    // Trittau => 53.612295, 10.393479
+    //
+
+    private static String region = "de.Trittau";
+    private static double latRegion = 53.61;
+    private static double lonRegion = 10.39;
+
+    private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
+    private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
 
     private static double latMove = 0;
     private static double lonMove = 0;
@@ -627,11 +673,12 @@ public class Pokemongo extends FrameLayout
 
     private static final int COMMAND_STOP = 0;
     private static final int COMMAND_SEEK = 1;
-    private static final int COMMAND_HUNT = 2;
-    private static final int COMMAND_WAIT = 3;
-    private static final int COMMAND_DONE = 4;
-    private static final int COMMAND_SPOT = 5;
-    private static final int COMMAND_HOLD = 6;
+    private static final int COMMAND_SPIN = 2;
+    private static final int COMMAND_HUNT = 3;
+    private static final int COMMAND_WAIT = 4;
+    private static final int COMMAND_DONE = 5;
+    private static final int COMMAND_SPOT = 6;
+    private static final int COMMAND_HOLD = 7;
 
     private static void setCommand(int command)
     {
@@ -654,6 +701,18 @@ public class Pokemongo extends FrameLayout
                 dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
             }
         }
+
+        if (commandMode == COMMAND_STOP)
+        {
+            isMoving = false;
+            isWaiting = false;
+            isWalking = false;
+            isHolding = false;
+            isSpotting = false;
+
+            latTogo = lat;
+            lonTogo = lon;
+        }
     }
 
     private static void setCommandText(int command)
@@ -671,12 +730,14 @@ public class Pokemongo extends FrameLayout
     {
         initPokemongo(location);
 
+        meterPerDegree();
+
         if ((suspendTime > 0) && (suspendTime < new Date().getTime()))
         {
             isWaiting = false;
         }
 
-        setCommandText(isSpotting ? COMMAND_SPOT : isWaiting ? COMMAND_WAIT : isHolding ? COMMAND_HOLD : commandMode);
+        setCommandText(isHolding ? COMMAND_HOLD : isWaiting ? COMMAND_WAIT : isSpotting ? COMMAND_SPOT : commandMode);
 
         if (isMoving && ! isHolding)
         {
@@ -810,6 +871,72 @@ public class Pokemongo extends FrameLayout
                     }
                 }
 
+                if (commandMode == COMMAND_SPIN)
+                {
+                    try
+                    {
+                        if (suspendTime < new Date().getTime())
+                        {
+                            if (spinPointsTodo.size() == 0)
+                            {
+                                lat = latRegion;
+                                lon = lonRegion;
+
+                                double deltax = meterLon * 250;
+                                double deltay = meterLat * 250;
+
+                                double[] latOrg = new double[]{ latRegion, latRegion, latRegion, latRegion };
+                                double[] lonOrg = new double[]{ lonRegion, lonRegion, lonRegion, lonRegion };
+
+                                for (int inx = 0; inx < 100; inx++)
+                                {
+                                    if ((inx % 4) == 0) { latOrg[ 0 ] -= deltay; lonOrg[ 0 ] -= deltax; };
+                                    if ((inx % 4) == 1) { latOrg[ 1 ] -= deltay; lonOrg[ 1 ] += deltax; };
+                                    if ((inx % 4) == 2) { latOrg[ 2 ] += deltay; lonOrg[ 2 ] += deltax; };
+                                    if ((inx % 4) == 3) { latOrg[ 3 ] += deltay; lonOrg[ 3 ] -= deltax; };
+
+                                    JSONObject spinpos = new JSONObject();
+
+                                    spinpos.put("lat", latOrg[ inx % 4 ]);
+                                    spinpos.put("lon", lonOrg[ inx % 4 ]);
+
+                                    spinPointsTodo.add(spinpos.toString());
+                                }
+
+                                if (region.equals("de.Köln"))
+                                {
+                                    for (int inx = 0; inx < 20; inx++) spinPointsTodo.remove(0);
+                                }
+                            }
+
+                            if (spinPointsTodo.size() > 0)
+                            {
+                                synchronized (spinPointsTodo)
+                                {
+                                    String spinposstr = spinPointsTodo.remove(0);
+
+                                    JSONObject spinpos = new JSONObject(spinposstr);
+
+                                    latTogo = spinpos.getDouble("lat");
+                                    lonTogo = spinpos.getDouble("lon");
+                                    isMoving = true;
+                                }
+
+                                Log.d(LOGTAG, "deziLocation: spin lat=" + lat + " lon=" + lon);
+
+                                suspendTime = 0;
+                            }
+                            else
+                            {
+                                setCommand(COMMAND_DONE);
+                            }
+                        }
+                    }
+                    catch (Exception ignore)
+                    {
+                    }
+                }
+
                 lat += latMove;
                 lon += lonMove;
             }
@@ -881,6 +1008,7 @@ public class Pokemongo extends FrameLayout
     private static final ArrayList<File> logfiles = new ArrayList<>();
 
     private static final ArrayList<JSONObject> huntPointsTodo = new ArrayList<>();
+    private static final ArrayList<String> spinPointsTodo = new ArrayList<>();
     private static final ArrayList<String> spawnPointsTodo = new ArrayList<>();
     private static final ArrayList<String> spawnPointsSeen = new ArrayList<>();
 
@@ -1246,9 +1374,9 @@ public class Pokemongo extends FrameLayout
                         if (parts.length != 2) continue;
 
                         int pokeNum = Integer.parseInt(parts[ 1 ], 10);
-                        enablePokemonDirEntry(pokeNum);
-
                         JSONArray pokeSpwans = poke2spawn.getJSONArray(pokeId);
+
+                        enablePokemonDirEntry(pokeNum, pokeSpwans.length());
 
                         for (int inx = 0; inx < pokeSpwans.length(); inx++)
                         {
@@ -1277,9 +1405,6 @@ public class Pokemongo extends FrameLayout
                 Log.d(LOGTAG, "loadPokeSpawnMap:"
                         + " latMin=" + latMin + " latMax=" + latMax
                         + " lonMin=" + lonMin + " lonMax=" + lonMax);
-
-                lat = (Math.random() < 0.5) ? latMin : latMax;
-                lon = (Math.random() < 0.5) ? lonMin : lonMax;
             }
         }
         catch (Exception ignore)
@@ -1371,7 +1496,7 @@ public class Pokemongo extends FrameLayout
             if (parts.length != 2) return;
 
             int pokeNum = Integer.parseInt(parts[ 1 ], 10);
-            enablePokemonDirEntry(pokeNum);
+            enablePokemonDirEntry(pokeNum, 1);
 
             addToast("New Spawn " + pokeId);
         }
@@ -1733,9 +1858,6 @@ public class Pokemongo extends FrameLayout
 
                         int pokeOrd = pokeLoc.getInt("ord");
 
-                        //Bitmap bitmap = PokemonImage.getPokemonImage(pokeOrd);
-                        //pimages[ spawninx ].setImageBitmap(bitmap);
-
                         pimages[ spawninx ].setImageDrawable(pokeDirImages[ pokeOrd - 1 ].getDrawable());
                     }
 
@@ -2045,7 +2167,8 @@ public class Pokemongo extends FrameLayout
                     lat = latloc;
                     lon = lonloc;
 
-                    setCommand(COMMAND_STOP);
+                    isWaiting = true;
+                    suspendTime = new Date().getTime() + 10 * 1000;
                 }
 
                 if (type.equals(".POGOProtos.Networking.Responses.FortSearchResponse"))
@@ -2078,11 +2201,7 @@ public class Pokemongo extends FrameLayout
                             }
                         }
 
-                        if (isdup)
-                        {
-                            addToast("Known PokeStop");
-                        }
-                        else
+                        if (! isdup)
                         {
                             if (fortScore > 0)
                             {
@@ -2096,15 +2215,12 @@ public class Pokemongo extends FrameLayout
                                 }
 
                                 saveKnownForts();
-
-                                addToast("Good PokeStop");
-                            }
-                            else
-                            {
-                                addToast("Bogus PokeStop");
                             }
                         }
                     }
+
+                    isWaiting = false;
+                    suspendTime = 0;
                 }
             }
         }
@@ -2280,6 +2396,21 @@ public class Pokemongo extends FrameLayout
         }
 
         return score;
+    }
+
+    private static double meterLat;
+    private static double meterLon;
+
+    private static void meterPerDegree()
+    {
+        double mLan = 111132.954 - 559.822 * Math.cos(2 * lat) + 1.175 * Math.cos(4 * lat);
+        double mLon = 111132.954 * Math.cos(lat);
+
+        meterLat = 1.0 / mLan;
+        meterLon = 1.0 / mLon;
+
+        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " mLat=" + mLan + " mLon=" + mLon);
+        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " meterLat=" + meterLat + " meterLon=" + meterLon);
     }
 
     //endregion Fort methods.
