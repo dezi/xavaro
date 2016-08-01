@@ -297,6 +297,7 @@ public class Pokemongo extends FrameLayout
             pokeDirFrames[ inx ].addView(pokeDirCounts[ inx ]);
         }
 
+        isUpdatedir = true;
         updatePokemonDir();
     }
 
@@ -745,6 +746,8 @@ public class Pokemongo extends FrameLayout
 
     public static void deziLocation(Location location)
     {
+        Log.d(LOGTAG, "pupsekacke in...");
+
         try
         {
             initPokemongo(location);
@@ -1001,6 +1004,8 @@ public class Pokemongo extends FrameLayout
         {
             ignore.printStackTrace();
         }
+
+        Log.d(LOGTAG, "pupsekacke out...");
     }
 
     @Nullable
@@ -2135,64 +2140,10 @@ public class Pokemongo extends FrameLayout
 
     //region Fort methods.
 
-    private static JSONArray knownForts;
-    private static Map<String, Integer> itemScore;
-    private static int nextFort;
-
-    private static void gotoNextFort()
-    {
-        try
-        {
-            loadKnownForts();
-
-            if (nextFort >= knownForts.length()) nextFort = 0;
-
-            if (nextFort < knownForts.length())
-            {
-                JSONObject fort = knownForts.getJSONObject(nextFort);
-
-                lat = fort.getDouble("mongopoke_lat");
-                lon = fort.getDouble("mongopoke_lon");
-
-                nextFort++;
-            }
-        }
-        catch (Exception ignore)
-        {
-            ignore.printStackTrace();
-        }
-    }
-
     private static void evalFortDetails(JSONObject json)
     {
         try
         {
-            String fortId = null;
-            double fortLat = 0;
-            double fortLon = 0;
-
-            JSONObject requestEnv = json.getJSONObject("request");
-            JSONArray requests = requestEnv.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
-
-            for (int rinx = 0; rinx < requests.length(); rinx++)
-            {
-                JSONObject request = requests.getJSONObject(rinx);
-
-                String reqType = request.getString("request_type@.POGOProtos.Networking.Requests.RequestType");
-                String reqName = ".POGOProtos.Networking.Requests.Messages." + CamelName(reqType) + "Message";
-
-                if (reqType.equals("FORT_SEARCH@101") && request.has(reqName))
-                {
-                    JSONObject fortData = request.getJSONObject(reqName);
-
-                    fortId = fortData.getString("fort_id@string");
-                    fortLat = fortData.getDouble("fort_latitude@double");
-                    fortLon = fortData.getDouble("fort_longitude@double");
-
-                    Log.d(LOGTAG, "evalFortDetails: fortid=" + fortId + " lat=" + fortLat + " lon=" + fortLon);
-                }
-            }
-
             JSONObject responseEnv = json.getJSONObject("response");
             JSONArray returns = responseEnv.getJSONArray("returns@array");
 
@@ -2219,54 +2170,6 @@ public class Pokemongo extends FrameLayout
 
                 if (type.equals(".POGOProtos.Networking.Responses.FortSearchResponse"))
                 {
-                    /*
-                    if (fortId != null)
-                    {
-                        JSONObject data = returnobj.getJSONObject("data");
-
-                        int fortScore = getFortScore(data);
-
-                        Log.d(LOGTAG, "evalFortDetails: searched: fortid=" + fortId + " lat=" + fortLat + " lon=" + fortLon + " score=" + fortScore);
-
-                        cleanFortData(data);
-
-                        data.put("mongopoke_fortid", fortId);
-                        data.put("mongopoke_lat", fortLat);
-                        data.put("mongopoke_lon", fortLon);
-                        data.put("mongopoke_score", fortScore);
-
-                        loadKnownForts();
-
-                        boolean isdup = false;
-
-                        for (int finx = 0; finx < knownForts.length(); finx++)
-                        {
-                            if (knownForts.getJSONObject(finx).getString("mongopoke_fortid").equals(fortId))
-                            {
-                                isdup = true;
-                                break;
-                            }
-                        }
-
-                        if (! isdup)
-                        {
-                            if (fortScore > 0)
-                            {
-                                knownForts.put(data);
-
-                                knownForts = sortInteger(knownForts, "mongopoke_score", true);
-
-                                while (knownForts.length() > 1000)
-                                {
-                                    knownForts.remove(knownForts.length() - 1);
-                                }
-
-                                saveKnownForts();
-                            }
-                        }
-                    }
-                    */
-
                     isWaiting = false;
                     suspendTime = 0;
                 }
@@ -2274,176 +2177,8 @@ public class Pokemongo extends FrameLayout
         }
         catch (Exception ignore)
         {
-        }
-    }
-
-    private static void cleanFortData(JSONObject fort)
-    {
-        if (fort.has("result@.POGOProtos.Networking.Responses.FortSearchResponse.Result"))
-        {
-            fort.remove("result@.POGOProtos.Networking.Responses.FortSearchResponse.Result");
-        }
-
-        if (fort.has("items_awarded@.POGOProtos.Inventory.ItemAward@"))
-        {
-            fort.remove("items_awarded@.POGOProtos.Inventory.ItemAward@");
-        }
-    }
-
-    private static void loadKnownForts()
-    {
-        if (knownForts != null) return;
-
-        try
-        {
-            File extdir = Environment.getExternalStorageDirectory();
-            File extpoke = new File(extdir, "Mongopoke");
-
-            Log.d(LOGTAG, "loadKnownForts: dir=" + extpoke.toString());
-
-            if (extpoke.exists())
-            {
-                File extfile = new File(extpoke, "Harvest.KnownForts." + region + ".json");
-
-                Log.d(LOGTAG, "loadKnownForts: fil=" + extfile.toString());
-
-                FileInputStream input = new FileInputStream(extfile);
-                int size = (int) input.getChannel().size();
-                byte[] content = new byte[ size ];
-                int xfer = input.read(content);
-                input.close();
-
-                if (size == xfer)
-                {
-                    knownForts = new JSONArray(new String(content));
-
-                    for (int inx = 0; inx < knownForts.length(); inx++)
-                    {
-                        JSONObject data = knownForts.getJSONObject(inx);
-
-                        cleanFortData(data);
-
-                        data.put("mongopoke_score", getFortScore(data));
-                    }
-                }
-            }
-        }
-        catch (Exception ignore)
-        {
             ignore.printStackTrace();
         }
-
-        if (knownForts == null) knownForts = new JSONArray();
-    }
-
-    private static void saveKnownForts()
-    {
-        try
-        {
-            File extdir = Environment.getExternalStorageDirectory();
-            File extpoke = new File(extdir, "Mongopoke");
-
-            Log.d(LOGTAG, "saveKnownForts: dir=" + extpoke.toString());
-
-            if (extpoke.exists() || extpoke.mkdir())
-            {
-                File extfile = new File(extpoke, "Harvest.KnownForts." + region + ".json");
-
-                Log.d(LOGTAG, "saveKnownForts: fil=" + extfile.toString());
-
-                OutputStream out = new FileOutputStream(extfile);
-                out.write(knownForts.toString(2).replace("\\/", "/").getBytes());
-                out.close();
-            }
-        }
-        catch (Exception ignore)
-        {
-            ignore.printStackTrace();
-        }
-    }
-
-    private static int getItemScore(String itemString)
-    {
-        if (itemScore == null)
-        {
-            itemScore = new HashMap<>();
-
-            itemScore.put("ITEM_UNKNOWN", 0);
-
-            itemScore.put("ITEM_POKE_BALL", 0);
-            itemScore.put("ITEM_GREAT_BALL", 100);
-            itemScore.put("ITEM_ULTRA_BALL", 1000);
-            itemScore.put("ITEM_MASTER_BALL", 10000);
-
-            itemScore.put("ITEM_POTION", 0);
-            itemScore.put("ITEM_SUPER_POTION", 10);
-            itemScore.put("ITEM_HYPER_POTION", 100);
-            itemScore.put("ITEM_MAX_POTION", 1000);
-
-            itemScore.put("ITEM_REVIVE", 0);
-            itemScore.put("ITEM_MAX_REVIVE", 100);
-
-            itemScore.put("ITEM_LUCKY_EGG", 2000);
-
-            itemScore.put("ITEM_INCENSE_ORDINARY", 100);
-            itemScore.put("ITEM_INCENSE_SPICY", 1000);
-            itemScore.put("ITEM_INCENSE_COOL", 1000);
-            itemScore.put("ITEM_INCENSE_FLORAL", 1000);
-
-            itemScore.put("ITEM_TROY_DISK", 10000);
-
-            itemScore.put("ITEM_X_ATTACK", 10000);
-            itemScore.put("ITEM_X_DEFENSE", 10000);
-            itemScore.put("ITEM_X_MIRACLE", 10000);
-
-            itemScore.put("ITEM_RAZZ_BERRY", 100);
-            itemScore.put("ITEM_BLUK_BERRY", 10000);
-            itemScore.put("ITEM_NANAB_BERRY", 10000);
-            itemScore.put("ITEM_WEPAR_BERRY", 10000);
-            itemScore.put("ITEM_PINAP_BERRY", 10000);
-
-            itemScore.put("ITEM_SPECIAL_CAMERA", 10000);
-
-            itemScore.put("ITEM_INCUBATOR_BASIC_UNLIMITED", 10000);
-            itemScore.put("ITEM_INCUBATOR_BASIC", 10000);
-
-            itemScore.put("ITEM_POKEMON_STORAGE_UPGRADE", 100000);
-            itemScore.put("ITEM_ITEM_STORAGE_UPGRADE", 100000);
-        }
-
-        String[] parts = itemString.split("@");
-        if (parts.length == 2) itemString = parts[ 0 ];
-
-        return itemScore.containsKey(itemString) ? itemScore.get(itemString) : 0;
-    }
-
-    private static int getFortScore(JSONObject fortData)
-    {
-        int score = 0;
-
-        try
-        {
-            if (fortData.has("items_awarded@.POGOProtos.Inventory.ItemAward"))
-            {
-                JSONArray items = fortData.getJSONArray("items_awarded@.POGOProtos.Inventory.ItemAward");
-
-                for (int inx = 0; inx < items.length(); inx++)
-                {
-                    JSONObject item = items.getJSONObject(inx);
-
-                    String itemString = item.getString("item_id@.POGOProtos.Inventory.ItemId");
-                    int itemCount = item.getInt("item_count@int32");
-
-                    score += getItemScore(itemString) * itemCount;
-                }
-            }
-        }
-        catch (Exception ignore)
-        {
-            ignore.printStackTrace();
-        }
-
-        return score;
     }
 
     private static double meterLat;
