@@ -4,14 +4,11 @@ import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 import android.app.Application;
 import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.widget.FrameLayout;
@@ -24,10 +21,8 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.FileInputStream;
-import java.nio.ByteBuffer;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,10 +33,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.nio.ByteBuffer;
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 import de.xavaro.android.common.ProtoBufferEncode;
 import de.xavaro.android.common.PokemonImage;
@@ -71,6 +67,7 @@ public class Pokemongo extends FrameLayout
 
     private final static FrameLayout[] spawns = new FrameLayout[ 27 ];
     private final static ImageView[] pimages = new ImageView[ 27 ];
+    private final static TextView[] timages = new TextView[ 27 ];
     private final static JSONObject[] locsJson = new JSONObject[ 27 ];
 
     private final static int buttsize = 56;
@@ -220,6 +217,21 @@ public class Pokemongo extends FrameLayout
             pimages[ inx ].setBackgroundColor(0xffffffff);
 
             spawns[ inx ].addView(pimages[ inx ]);
+
+            lp = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+
+            timages[ inx ] = new TextView(getContext());
+            timages[ inx ].setTypeface(null, Typeface.BOLD);
+            timages[ inx ].setTextSize(buttnetto / 3.0f);
+            timages[ inx ].setTextColor(0xffff0000);
+            timages[ inx ].setPadding(0, 0, 2, 0);
+            timages[ inx ].setLayoutParams(lp);
+
+            spawns[ inx ].addView(timages[ inx ]);
+
         }
 
         createPokemonDir();
@@ -865,6 +877,9 @@ public class Pokemongo extends FrameLayout
                                         }
                                     }
 
+                                    String counttext = "" + huntPointsTodo.size();
+                                    timages[ pimages.length - 1 ].setText(counttext);
+
                                     if (pid != null)
                                     {
                                         String[] parts = pid.split("@");
@@ -872,9 +887,6 @@ public class Pokemongo extends FrameLayout
                                         if (parts.length == 2)
                                         {
                                             ord = Integer.parseInt(parts[ 1 ], 10);
-
-                                            //bm = PokemonImage.getPokemonImage(ord);
-                                            //setImageBitmapRecycle(pimages[ pimages.length - 1 ], bm);
 
                                             pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord - 1 ].getDrawable());
                                         }
@@ -1023,7 +1035,7 @@ public class Pokemongo extends FrameLayout
 
                 double dist = Math.sqrt(distLat * distLat + distLon * distLon);
 
-                if (dist < 0.0001)
+                if (dist < 0.0005)
                 {
                     //
                     // Span location is almost the same as actual.
@@ -1599,6 +1611,8 @@ public class Pokemongo extends FrameLayout
             if (tthidden < 0)
             {
                 Log.d(LOGTAG, "addPokepos: bad expiration: tag=" + tag + " id=" + pokeId + " tth=" + tthidden);
+
+                tthidden = 120 * 1000;
             }
 
             String[] parts = pokeId.split("@");
@@ -1900,6 +1914,10 @@ public class Pokemongo extends FrameLayout
                     String pokeId = keysIterator.next();
 
                     JSONObject pokeLoc = pokeLocs.getJSONObject(pokeId);
+                    int count = countJSONObjects(pokeLoc.getJSONObject("loc"));
+
+                    String counttext = "" + count;
+                    timages[ spawninx ].setText(counttext);
 
                     if (locsJson[ spawninx ] != pokeLoc)
                     {
@@ -1925,6 +1943,7 @@ public class Pokemongo extends FrameLayout
 
                     pimages[ spawninx ].setImageDrawable(null);
                     pimages[ spawninx ].setBackgroundColor(0xffffffff);
+                    timages[ spawninx ].setText(null);
 
                     spawninx++;
                 }
@@ -2297,6 +2316,21 @@ public class Pokemongo extends FrameLayout
         }
 
         return false;
+    }
+
+    private static int countJSONObjects(JSONObject json)
+    {
+        int count = 0;
+
+        Iterator<String> keysIterator = json.keys();
+
+        while (keysIterator.hasNext())
+        {
+            keysIterator.next();
+            count++;
+        }
+
+        return count;
     }
 
     //endregion Utility methods.
