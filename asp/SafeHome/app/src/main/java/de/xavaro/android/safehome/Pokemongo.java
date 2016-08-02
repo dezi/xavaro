@@ -1639,6 +1639,8 @@ public class Pokemongo extends FrameLayout
                 tthidden = 120 * 1000;
             }
 
+            Log.d(LOGTAG, "addPokepos: see tag=" + tag + " id=" + pokeId + " tth=" + (tthidden / 1000) + " chk=" + pokeposstr);
+
             String[] parts = pokeId.split("@");
             if (parts.length != 2) return;
             int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
@@ -1690,7 +1692,7 @@ public class Pokemongo extends FrameLayout
                 }
             }
 
-            Log.d(LOGTAG, "addPokepos: tag=" + tag + " id=" + pokeId + " tth=" + (tthidden / 1000) + " chk=" + pokeposstr);
+            Log.d(LOGTAG, "addPokepos: add tag=" + tag + " id=" + pokeId + " tth=" + (tthidden / 1000) + " chk=" + pokeposstr);
         }
         catch (Exception ignore)
         {
