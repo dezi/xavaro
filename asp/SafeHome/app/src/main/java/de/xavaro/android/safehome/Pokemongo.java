@@ -895,9 +895,14 @@ public class Pokemongo extends FrameLayout
                                         {
                                             pid = huntPoint.getString("pid");
 
-                                            latTogo = huntPoint.getDouble("lat");
-                                            lonTogo = huntPoint.getDouble("lon");
-                                            isMoving = true;
+                                            //latTogo = huntPoint.getDouble("lat");
+                                            //lonTogo = huntPoint.getDouble("lon");
+                                            //isMoving = true;
+
+                                            lat = huntPoint.getDouble("lat");
+                                            lon = huntPoint.getDouble("lon");
+
+                                            suspendTime = new Date().getTime() + 5 * 1000;
                                         }
                                     }
 
@@ -1059,7 +1064,7 @@ public class Pokemongo extends FrameLayout
 
                 double dist = Math.sqrt(distLat * distLat + distLon * distLon);
 
-                if (dist < 0.0005)
+                if (dist < 0.001)
                 {
                     //
                     // Span location is almost the same as actual.
@@ -1233,15 +1238,7 @@ public class Pokemongo extends FrameLayout
 
                     if (result != null)
                     {
-                        /*
-                        pd.patch(url, result, response);
-
-                        buffer.clear();
-                        buffer.put(response, 0, response.length);
-                        */
-
                         String jres = result.toString(2);
-
                         out.write(jres.replace("\\/", "/").getBytes());
 
                         saveRecords(result);
@@ -1337,28 +1334,6 @@ public class Pokemongo extends FrameLayout
         {
             ex.printStackTrace();
         }
-    }
-
-    private static String CamelName(String uppercase)
-    {
-        String camelname = "";
-        boolean nextUp = true;
-
-        for (int inx = 0; inx < uppercase.length(); inx++)
-        {
-            if (uppercase.charAt(inx) == '@') break;
-
-            if (uppercase.charAt(inx) == '_')
-            {
-                nextUp = true;
-                continue;
-            }
-
-            camelname += nextUp ? uppercase.charAt(inx) : Character.toLowerCase(uppercase.charAt(inx));
-            nextUp = false;
-        }
-
-        return camelname;
     }
 
     private static void loadPokeHuntSettings()
@@ -1639,8 +1614,6 @@ public class Pokemongo extends FrameLayout
                 tthidden = 120 * 1000;
             }
 
-            Log.d(LOGTAG, "addPokepos: see tag=" + tag + " id=" + pokeId + " tth=" + (tthidden / 1000) + " chk=" + pokeposstr);
-
             String[] parts = pokeId.split("@");
             if (parts.length != 2) return;
             int pokeOrd = Integer.parseInt(parts[ 1 ], 10);
@@ -1658,7 +1631,12 @@ public class Pokemongo extends FrameLayout
                     savePokeHuntSettings();
                 }
 
-                if (! pokeDirHunting[ pokeOrd - 1 ]) return;
+                if (! pokeDirHunting[ pokeOrd - 1 ])
+                {
+                    Log.d(LOGTAG, "addPokepos: see tag=" + tag + " id=" + pokeId + " tth=" + (tthidden / 1000) + " chk=" + pokeposstr);
+
+                    return;
+                }
             }
 
             synchronized (pokeLocs)
@@ -2224,21 +2202,6 @@ public class Pokemongo extends FrameLayout
         }
     }
 
-    private static double meterLat;
-    private static double meterLon;
-
-    private static void meterPerDegree()
-    {
-        double mLan = 111132.954 - 559.822 * Math.cos(2 * lat) + 1.175 * Math.cos(4 * lat);
-        double mLon = 111132.954 * Math.cos(lat);
-
-        meterLat = 1.0 / mLan;
-        meterLon = 1.0 / mLon;
-
-        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " mLat=" + mLan + " mLon=" + mLon);
-        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " meterLat=" + meterLat + " meterLon=" + meterLon);
-    }
-
     //endregion Fort methods.
 
     //region Utility methods.
@@ -2357,6 +2320,43 @@ public class Pokemongo extends FrameLayout
         }
 
         return count;
+    }
+
+    private static String CamelName(String uppercase)
+    {
+        String camelname = "";
+        boolean nextUp = true;
+
+        for (int inx = 0; inx < uppercase.length(); inx++)
+        {
+            if (uppercase.charAt(inx) == '@') break;
+
+            if (uppercase.charAt(inx) == '_')
+            {
+                nextUp = true;
+                continue;
+            }
+
+            camelname += nextUp ? uppercase.charAt(inx) : Character.toLowerCase(uppercase.charAt(inx));
+            nextUp = false;
+        }
+
+        return camelname;
+    }
+
+    private static double meterLat;
+    private static double meterLon;
+
+    private static void meterPerDegree()
+    {
+        double mLan = 111132.954 - 559.822 * Math.cos(2 * lat) + 1.175 * Math.cos(4 * lat);
+        double mLon = 111132.954 * Math.cos(lat);
+
+        meterLat = 1.0 / mLan;
+        meterLon = 1.0 / mLon;
+
+        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " mLat=" + mLan + " mLon=" + mLon);
+        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " meterLat=" + meterLat + " meterLon=" + meterLon);
     }
 
     //endregion Utility methods.
