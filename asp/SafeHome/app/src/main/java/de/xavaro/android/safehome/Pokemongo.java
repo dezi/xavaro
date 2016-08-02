@@ -658,6 +658,14 @@ public class Pokemongo extends FrameLayout
     }
 
     //
+    // Trittau => 53.612295, 10.393479
+    //
+
+    //private static String region = "de.Trittau";
+    //private static double latRegion = 53.61;
+    //private static double lonRegion = 10.39;
+
+    //
     // Hamburg => 53.55, 10.00
     //
 
@@ -682,12 +690,28 @@ public class Pokemongo extends FrameLayout
     private static double lonRegion = 13.41;
 
     //
-    // Trittau => 53.612295, 10.393479
+    // Tokyo => 35.652442, 139.757809
     //
 
-    //private static String region = "de.Trittau";
-    //private static double latRegion = 53.61;
-    //private static double lonRegion = 10.39;
+    //private static String region = "jp.Tokyo";
+    //private static double latRegion =  35.65;
+    //private static double lonRegion = 139.75;
+
+    //
+    // New York => 40.705161, -74.013142
+    //
+
+    //private static String region = "us.NewYork";
+    //private static double latRegion =  40.70;
+    //private static double lonRegion = -74.01;
+
+    //
+    // Sydney => -33.862769, 151.067699
+    //
+
+    //private static String region = "au.Sydney";
+    //private static double latRegion = -33.862769;
+    //private static double lonRegion = 151.067699;
 
     private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
     private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
