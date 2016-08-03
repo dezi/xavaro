@@ -48,11 +48,11 @@ public class Pokemongo extends FrameLayout
 
     private static final int numPokemons = 151;
     private static final int freeMetersperSecond = 30;
-    private static final int softBanSecondsPerKilometer = 60;
+    private static final int softBanSecondsPerKilometer = 50;
 
     private WindowManager.LayoutParams overlayParam;
 
-    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "SPIN", "HUNT", "WAIT", "DONE", "SPOT", "HOLD"};
+    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "WAIT", "DONE", "SPOT", "HOLD"};
 
     private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
     private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
@@ -197,7 +197,7 @@ public class Pokemongo extends FrameLayout
             dirButtonInfo[ inx ] = new TextView(getContext());
             dirButtonInfo[ inx ].setTypeface(null, Typeface.BOLD);
             dirButtonInfo[ inx ].setTextSize(buttnetto / 3.0f);
-            dirButtonInfo[ inx ].setTextColor(0xffff0000);
+            dirButtonInfo[ inx ].setTextColor(0xffffffff);
             dirButtonInfo[ inx ].setPadding(0, 0, 2, 0);
             dirButtonInfo[ inx ].setLayoutParams(lp);
 
@@ -739,12 +739,11 @@ public class Pokemongo extends FrameLayout
 
     private static final int COMMAND_STOP = 0;
     private static final int COMMAND_SEEK = 1;
-    private static final int COMMAND_SPIN = 2;
-    private static final int COMMAND_HUNT = 3;
-    private static final int COMMAND_WAIT = 4;
-    private static final int COMMAND_DONE = 5;
-    private static final int COMMAND_SPOT = 6;
-    private static final int COMMAND_HOLD = 7;
+    private static final int COMMAND_HUNT = 2;
+    private static final int COMMAND_WAIT = 3;
+    private static final int COMMAND_DONE = 4;
+    private static final int COMMAND_SPOT = 5;
+    private static final int COMMAND_HOLD = 6;
 
     private static void setCommand(int command)
     {
@@ -836,7 +835,7 @@ public class Pokemongo extends FrameLayout
             {
                 if (!isMoving)
                 {
-                    suspendTime = new Date().getTime() + 15 * 1000;
+                    suspendTime = new Date().getTime() + 18 * 1000;
 
                     isWaiting = true;
                     isSpotting = false;
@@ -945,92 +944,6 @@ public class Pokemongo extends FrameLayout
                         }
                     }
 
-                    if (commandMode == COMMAND_SPIN)
-                    {
-                        try
-                        {
-                            if (suspendTime < new Date().getTime())
-                            {
-                                if (spinPointsTodo.size() == 0)
-                                {
-                                    lat = latRegion;
-                                    lon = lonRegion;
-
-                                    double deltax = meterLon * 250;
-                                    double deltay = meterLat * 250;
-
-                                    double[] latOrg = new double[]{latRegion, latRegion, latRegion, latRegion};
-                                    double[] lonOrg = new double[]{lonRegion, lonRegion, lonRegion, lonRegion};
-
-                                    for (int inx = 0; inx < 100; inx++)
-                                    {
-                                        if ((inx % 4) == 0)
-                                        {
-                                            latOrg[ 0 ] -= deltay;
-                                            lonOrg[ 0 ] -= deltax;
-                                        }
-                                        ;
-                                        if ((inx % 4) == 1)
-                                        {
-                                            latOrg[ 1 ] -= deltay;
-                                            lonOrg[ 1 ] += deltax;
-                                        }
-                                        ;
-                                        if ((inx % 4) == 2)
-                                        {
-                                            latOrg[ 2 ] += deltay;
-                                            lonOrg[ 2 ] += deltax;
-                                        }
-                                        ;
-                                        if ((inx % 4) == 3)
-                                        {
-                                            latOrg[ 3 ] += deltay;
-                                            lonOrg[ 3 ] -= deltax;
-                                        }
-                                        ;
-
-                                        JSONObject spinpos = new JSONObject();
-
-                                        spinpos.put("lat", latOrg[ inx % 4 ]);
-                                        spinpos.put("lon", lonOrg[ inx % 4 ]);
-
-                                        spinPointsTodo.add(spinpos.toString());
-                                    }
-
-                                    if (region.equals("de.Köln"))
-                                    {
-                                        for (int inx = 0; inx < 20; inx++) spinPointsTodo.remove(0);
-                                    }
-                                }
-
-                                if (spinPointsTodo.size() > 0)
-                                {
-                                    synchronized (spinPointsTodo)
-                                    {
-                                        String spinposstr = spinPointsTodo.remove(0);
-
-                                        JSONObject spinpos = new JSONObject(spinposstr);
-
-                                        latTogo = spinpos.getDouble("lat");
-                                        lonTogo = spinpos.getDouble("lon");
-                                        isMoving = true;
-                                    }
-
-                                    Log.d(LOGTAG, "deziLocation: spin lat=" + lat + " lon=" + lon);
-
-                                    suspendTime = 0;
-                                }
-                                else
-                                {
-                                    setCommand(COMMAND_DONE);
-                                }
-                            }
-                        }
-                        catch (Exception ignore)
-                        {
-                        }
-                    }
-
                     lat += latMove;
                     lon += lonMove;
                 }
@@ -1101,7 +1014,6 @@ public class Pokemongo extends FrameLayout
     private static final ArrayList<File> logfiles = new ArrayList<>();
 
     private static final ArrayList<JSONObject> huntPointsTodo = new ArrayList<>();
-    private static final ArrayList<String> spinPointsTodo = new ArrayList<>();
     private static final ArrayList<String> spawnPointsTodo = new ArrayList<>();
     private static final ArrayList<String> spawnPointsSeen = new ArrayList<>();
 
@@ -2431,8 +2343,17 @@ public class Pokemongo extends FrameLayout
 
         savePosition();
 
-        String btext = "" + ((bannedSeconds > 0) ? bannedSeconds : "");
-        dirButtonInfo[ 4 ].setText(btext);
+        if (bannedSeconds > 0)
+        {
+            String btext = "" + bannedSeconds;
+            dirButtonInfo[ 4 ].setText(btext);
+            dirButtonTextViews[ 4 ].setBackgroundColor(0xffff0000);
+        }
+        else
+        {
+            dirButtonInfo[ 4 ].setText(null);
+            dirButtonTextViews[ 4 ].setBackgroundColor(0x88008800);
+        }
     }
 
     private static void meterPerDegree()
