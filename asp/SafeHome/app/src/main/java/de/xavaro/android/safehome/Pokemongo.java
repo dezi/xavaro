@@ -706,17 +706,17 @@ public class Pokemongo extends FrameLayout
     // Tokyo => 35.652442, 139.757809
     //
 
-    //private static String region = "jp.Tokyo";
-    //private static double latRegion =  35.65;
-    //private static double lonRegion = 139.75;
+    private static String region = "jp.Tokyo";
+    private static double latRegion =  35.65;
+    private static double lonRegion = 139.75;
 
     //
     // New York => 40.705161, -74.013142
     //
 
-    private static String region = "us.NewYork";
-    private static double latRegion =  40.70;
-    private static double lonRegion = -74.01;
+    //private static String region = "us.NewYork";
+    //private static double latRegion =  40.70;
+    //private static double lonRegion = -74.01;
 
     //
     // Sydney => -33.862769, 151.067699
@@ -1106,8 +1106,8 @@ public class Pokemongo extends FrameLayout
                 {
                     PokemonDecode dc = new PokemonDecode();
                     JSONObject requestEnv = dc.decodeRequest(newdata);
-                    ArrayList<String> messages = dc.patchRequest(requestEnv, newdata);
 
+                    ArrayList<String> messages = dc.patchRequest(requestEnv, newdata);
                     System.arraycopy(newdata, request.length, buffer, offset, count - offset);
 
                     if (messages != null)
@@ -1158,7 +1158,7 @@ public class Pokemongo extends FrameLayout
                         String jres = result.toString(2);
                         out.write(jres.replace("\\/", "/").getBytes());
 
-                        //saveRecords(result);
+                        saveRecords(result);
 
                         evalMapDetails(result);
                         evalGymDetails(result);
@@ -2001,7 +2001,6 @@ public class Pokemongo extends FrameLayout
                             addToast(status.equals("CATCH_SUCCESS@1") ? "GOT!" : "NIX!");
                         }
                     }
-
                 }
             }
         }
@@ -2328,6 +2327,7 @@ public class Pokemongo extends FrameLayout
 
         long bannedSeconds = (lastBan - now) / 1000;
         if (bannedSeconds < 0) bannedSeconds = 0;
+        if (bannedSeconds > 7200) bannedSeconds = 7200;
 
         location.setLatitude(lat);
         location.setLongitude(lon);

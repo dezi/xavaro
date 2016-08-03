@@ -47,6 +47,7 @@ public class PokemonDecode
 
                     Log.d(LOGTAG, "patchRequest: CATCH_POKEMON=" + data.toString(2));
 
+                    /*
                     if (data.has("normalized_reticle_size@double"))
                     {
                         double orgval = data.getDouble("normalized_reticle_size@double");
@@ -55,7 +56,7 @@ public class PokemonDecode
                         byte[] dval = new byte[ 8 ];
                         byte[] nval = new byte[ 8 ];
 
-                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(1.985);
+                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.5);
                         System.arraycopy(nval, 0, requestBytes, orgoff, nval.length);
 
                         System.arraycopy(requestBytes, orgoff, dval, 0, dval.length);
@@ -72,7 +73,7 @@ public class PokemonDecode
                         byte[] dval = new byte[ 8 ];
                         byte[] nval = new byte[ 8 ];
 
-                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.999999);
+                        ByteBuffer.wrap(nval).order(ByteOrder.LITTLE_ENDIAN).putDouble(1.0);
                         System.arraycopy(nval, 0, requestBytes, orgoff, nval.length);
 
                         System.arraycopy(requestBytes, orgoff, dval, 0, dval.length);
@@ -97,10 +98,11 @@ public class PokemonDecode
 
                         Log.d(LOGTAG, "patchRequest: normalized_hit_position=" + orgval + " off=" + orgoff + " binval=" + binval);
                     }
+                    */
 
                     if (data.has("hit_pokemon@bool"))
                     {
-                        messages.add("Curveball");
+                        messages.add("Hit");
                     }
                     else
                     {
