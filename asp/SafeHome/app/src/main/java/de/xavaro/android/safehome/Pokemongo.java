@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
+
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
@@ -24,12 +25,9 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -49,6 +47,8 @@ public class Pokemongo extends FrameLayout
     private static final String LOGTAG = "POKEDEZI";
 
     private static final int numPokemons = 151;
+    private static final int freeMetersperSecond = 30;
+    private static final int softBanSecondsPerKilometer = 60;
 
     private WindowManager.LayoutParams overlayParam;
 
@@ -61,6 +61,7 @@ public class Pokemongo extends FrameLayout
 
     private final static FrameLayout[] dirButtons = new FrameLayout[ 9 ];
     private final static TextView[] dirButtonTextViews = new TextView[ 9 ];
+    private final static TextView[] dirButtonInfo = new TextView[ 9 ];
     private final static String[] dirTexts = new String[]{"NW", "N", "NE", "W", "STOP", "E", "SW", "S", "SE"};
     private final static int[] dirMoveX = new int[]{-1, 0, 1, -1, 0, 1, -1, 0, 1};
     private final static int[] dirMoveY = new int[]{1, 1, 1, 0, 0, 0, -1, -1, -1};
@@ -186,6 +187,21 @@ public class Pokemongo extends FrameLayout
             }
 
             dirButtons[ inx ].addView(dirButtonTextViews[ inx ]);
+
+            lp = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            lp.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+
+            dirButtonInfo[ inx ] = new TextView(getContext());
+            dirButtonInfo[ inx ].setTypeface(null, Typeface.BOLD);
+            dirButtonInfo[ inx ].setTextSize(buttnetto / 3.0f);
+            dirButtonInfo[ inx ].setTextColor(0xffff0000);
+            dirButtonInfo[ inx ].setPadding(0, 0, 2, 0);
+            dirButtonInfo[ inx ].setLayoutParams(lp);
+
+            dirButtons[ inx ].addView(dirButtonInfo[ inx ]);
         }
 
         for (int inx = 0; inx < spawns.length; inx++)
@@ -510,6 +526,7 @@ public class Pokemongo extends FrameLayout
 
                 pimages[ buttinx ].setBackgroundColor(0xcccccccc);
 
+                setCommand(COMMAND_STOP);
                 setCommand(COMMAND_SPOT);
 
                 latTogo = latlon.getDouble("lat");
@@ -620,6 +637,8 @@ public class Pokemongo extends FrameLayout
         if (lat == 0) lat = location.getLatitude();
         if (lon == 0) lon = location.getLongitude();
 
+        loadPosition();
+
         try
         {
             application = getApplicationUsingReflection();
@@ -632,12 +651,6 @@ public class Pokemongo extends FrameLayout
         }
 
         loadPokeSpawnMap();
-    }
-
-    private static Application getApplicationUsingReflection() throws Exception
-    {
-        return (Application) Class.forName("android.app.AppGlobals")
-                .getMethod("getInitialApplication").invoke(null, (Object[]) null);
     }
 
     private void sampleCalls(Location location)
@@ -786,8 +799,6 @@ public class Pokemongo extends FrameLayout
         try
         {
             initPokemongo(location);
-
-            meterPerDegree();
             updatePokemonDir();
 
             if ((suspendTime > 0) && (suspendTime < new Date().getTime()))
@@ -1025,17 +1036,9 @@ public class Pokemongo extends FrameLayout
                 }
             }
 
+            setPosition(location);
+
             setupSpawns();
-
-            location.setLatitude(lat);
-            location.setLongitude(lon);
-
-            Log.d(LOGTAG, "deziLocation:"
-                    + " lat=" + location.getLatitude()
-                    + " lon=" + location.getLongitude()
-                    + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
-                    + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove)
-            );
 
             makeToast();
         }
@@ -2206,45 +2209,10 @@ public class Pokemongo extends FrameLayout
 
     //region Utility methods.
 
-    public static JSONArray sortInteger(JSONArray array, String field, boolean descending)
+    private static Application getApplicationUsingReflection() throws Exception
     {
-        final String sort = field;
-        final boolean desc = descending;
-
-        class comparedat implements Comparator<JSONObject>
-        {
-            public int compare(JSONObject a, JSONObject b)
-            {
-                try
-                {
-                    int aval = desc ? b.getInt(sort) : a.getInt(sort);
-                    int bval = desc ? a.getInt(sort) : b.getInt(sort);
-
-                    return aval - bval;
-                }
-                catch (Exception ignore)
-                {
-                    return 0;
-                }
-            }
-        }
-
-        List<JSONObject> jsonValues = new ArrayList<>();
-
-        for (int inx = 0; inx < array.length(); inx++)
-        {
-            try
-            {
-                jsonValues.add(array.getJSONObject(inx));
-            }
-            catch (Exception ignore)
-            {
-            }
-        }
-
-        Collections.sort(jsonValues, new comparedat());
-
-        return new JSONArray(jsonValues);
+        return (Application) Class.forName("android.app.AppGlobals")
+                .getMethod("getInitialApplication").invoke(null, (Object[]) null);
     }
 
     private static final ArrayList<String> toastMessages = new ArrayList<>();
@@ -2344,8 +2312,128 @@ public class Pokemongo extends FrameLayout
         return camelname;
     }
 
+    //endregion Utility methods.
+
+    //region Timing methods.
+
     private static double meterLat;
     private static double meterLon;
+
+    private static long lastTim;
+    private static long lastBan;
+
+    private static double lastLat;
+    private static double lastLon;
+
+    private static void loadPosition()
+    {
+        try
+        {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            if (extpoke.exists())
+            {
+                File extfile = new File(extpoke, "Settings.Position.json");
+
+                FileInputStream input = new FileInputStream(extfile);
+                int size = (int) input.getChannel().size();
+                byte[] content = new byte[ size ];
+                int xfer = input.read(content);
+                input.close();
+
+                if (size == xfer)
+                {
+                    JSONObject position = new JSONObject(new String(content));
+
+                    lastTim = position.getLong("tim");
+                    lastBan = position.getLong("ban");
+                    lastLat = position.getDouble("lat");
+                    lastLon = position.getDouble("lon");
+
+                    lat = lastLat;
+                    lon = lastLon;
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void savePosition()
+    {
+        try
+        {
+            File extdir = Environment.getExternalStorageDirectory();
+            File extpoke = new File(extdir, "Mongopoke");
+
+            if (extpoke.exists() || extpoke.mkdir())
+            {
+                JSONObject position = new JSONObject();
+
+                position.put("tim", lastTim);
+                position.put("ban", lastBan);
+                position.put("lat", lastLat);
+                position.put("lon", lastLon);
+
+                File extfile = new File(extpoke, "Settings.Position.json");
+
+                OutputStream out = new FileOutputStream(extfile);
+                out.write(position.toString(2).replace("\\/", "/").getBytes());
+                out.close();
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void setPosition(Location location)
+    {
+        meterPerDegree();
+
+        long now = new Date().getTime();
+        long use = (now - lastTim);
+
+        double xMeter = (lastLat - lat) / meterLat;
+        double yMeter = (lastLon - lon) / meterLon;
+
+        double freeMeter = freeMetersperSecond * (use / 1000.0);
+        double doneMeter = Math.sqrt(xMeter * xMeter + yMeter * yMeter);
+        double banSeconds = ((doneMeter - freeMeter) / 1000.0) * softBanSecondsPerKilometer;
+
+        if (banSeconds > 0)
+        {
+            long nextSoftBan = now + (int) (banSeconds * 1000.0);
+            if (nextSoftBan > lastBan) lastBan = nextSoftBan;
+        }
+
+        long bannedSeconds = (lastBan - now) / 1000;
+        if (bannedSeconds < 0) bannedSeconds = 0;
+
+        location.setLatitude(lat);
+        location.setLongitude(lon);
+
+        Log.d(LOGTAG, "setPosition:"
+                + " lat=" + location.getLatitude()
+                + " lon=" + location.getLongitude()
+                + " mps=" + ((int) (doneMeter / (use / 1000.0)))
+                + " dst=" + ((int) doneMeter)
+                + " ban=" + bannedSeconds
+        );
+
+        lastLat = lat;
+        lastLon = lon;
+        lastTim = now;
+
+        savePosition();
+
+        String btext = "" + ((bannedSeconds > 0) ? bannedSeconds : "");
+        dirButtonInfo[ 4 ].setText(btext);
+    }
 
     private static void meterPerDegree()
     {
@@ -2356,5 +2444,5 @@ public class Pokemongo extends FrameLayout
         meterLon = 1.0 / mLon;
     }
 
-    //endregion Utility methods.
+    //endregion Timing methods.
 }
