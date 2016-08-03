@@ -198,6 +198,10 @@ public class PokemonDecode
     @Nullable
     public JSONObject decode(String url, byte[] requestBytes, byte[] responseBytes)
     {
+        JSONObject reqenvelope = null;
+        JSONObject resenvelope = null;
+        boolean fucked = false;
+
         try
         {
             ProtoBufferDecode decode;
@@ -205,13 +209,13 @@ public class PokemonDecode
             decode = new ProtoBufferDecode(requestBytes);
             decode.setProtos(protos);
             decode.setOffs(true);
-            JSONObject reqenvelope = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
+            reqenvelope = decode.decode(".POGOProtos.Networking.Envelopes.RequestEnvelope");
             assembleRequest(reqenvelope);
 
             decode = new ProtoBufferDecode(responseBytes);
             decode.setProtos(protos);
             decode.setOffs(true);
-            JSONObject resenvelope = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
+            resenvelope = decode.decode(".POGOProtos.Networking.Envelopes.ResponseEnvelope");
 
             if (assembleResponse(reqenvelope, resenvelope))
             {
@@ -226,9 +230,22 @@ public class PokemonDecode
         }
         catch (Exception ignore)
         {
+            fucked = true;
         }
 
-        return null;
+        if (fucked)
+        {
+            try
+            {
+                if (reqenvelope != null) Log.d(LOGTAG, "fuckdat req=" + reqenvelope.toString(2));
+                if (resenvelope != null) Log.d(LOGTAG, "fuckdat res=" + resenvelope.toString(2));
+            }
+            catch (Exception ignore)
+            {
+            }
+        }
+
+        return reqenvelope;
     }
 
     private void assembleRequest(JSONObject reqenvelop)

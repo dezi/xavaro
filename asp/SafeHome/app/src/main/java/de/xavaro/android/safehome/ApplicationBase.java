@@ -33,7 +33,6 @@ public class ApplicationBase extends Application
 
         super.onCreate();
 
-        /*
         final PackageManager pm = getPackageManager();
 
         List<ApplicationInfo> packages =  pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -50,9 +49,8 @@ public class ApplicationBase extends Application
                                 "com.nianticlabs.pokemongo.apk"));
             }
         }
-        */
 
-        Pokemongo.testEncode();
+        //Pokemongo.testEncode();
         System.exit(1);
 
         //

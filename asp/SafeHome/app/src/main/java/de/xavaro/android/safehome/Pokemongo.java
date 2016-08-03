@@ -958,6 +958,8 @@ public class Pokemongo extends FrameLayout
             ignore.printStackTrace();
         }
 
+        System.gc();
+
         Log.d(LOGTAG, "pupsekacke out...");
     }
 
@@ -1081,6 +1083,8 @@ public class Pokemongo extends FrameLayout
     {
         int urlhash = System.identityHashCode(url);
 
+        Log.d(LOGTAG, "pokeWriteBytes: offset=" + offset + " len=" + count + " hash=" + urlhash);
+
         OutputStream out = outputs.get(urlhash);
         byte[] request = postdata.get(urlhash);
 
@@ -1128,7 +1132,7 @@ public class Pokemongo extends FrameLayout
     {
         int urlhash = System.identityHashCode(url);
 
-        //Log.d(LOGTAG, "pokeWriteBuffer: offset=" + offset + " len=" + count + " hash=" + urlhash);
+        Log.d(LOGTAG, "pokeWriteBuffer: offset=" + offset + " len=" + count + " hash=" + urlhash);
 
         OutputStream out = outputs.get(urlhash);
         byte[] request = postdata.get(urlhash);
@@ -1154,7 +1158,8 @@ public class Pokemongo extends FrameLayout
                         String jres = result.toString(2);
                         out.write(jres.replace("\\/", "/").getBytes());
 
-                        saveRecords(result);
+                        //saveRecords(result);
+
                         evalMapDetails(result);
                         evalGymDetails(result);
                         evalFortDetails(result);
