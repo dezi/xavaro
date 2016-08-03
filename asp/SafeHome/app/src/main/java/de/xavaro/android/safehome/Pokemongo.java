@@ -793,7 +793,7 @@ public class Pokemongo extends FrameLayout
 
     public static void deziLocation(Location location)
     {
-        //Log.d(LOGTAG, "pupsekacke in...");
+        Log.d(LOGTAG, "pupsekacke in...");
 
         try
         {
@@ -911,8 +911,6 @@ public class Pokemongo extends FrameLayout
 
                                             //lat = huntPoint.getDouble("lat");
                                             //lon = huntPoint.getDouble("lon");
-
-                                            //suspendTime = new Date().getTime() + 5 * 1000;
                                         }
                                     }
 
@@ -960,7 +958,7 @@ public class Pokemongo extends FrameLayout
             ignore.printStackTrace();
         }
 
-        //Log.d(LOGTAG, "pupsekacke out...");
+        Log.d(LOGTAG, "pupsekacke out...");
     }
 
     @Nullable
