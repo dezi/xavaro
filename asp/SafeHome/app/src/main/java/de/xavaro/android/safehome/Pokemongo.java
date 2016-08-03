@@ -685,9 +685,9 @@ public class Pokemongo extends FrameLayout
     // Berlin => 52.511389, 13.411379
     //
 
-    private static String region = "de.Berlin";
-    private static double latRegion = 52.51;
-    private static double lonRegion = 13.41;
+    //private static String region = "de.Berlin";
+    //private static double latRegion = 52.51;
+    //private static double lonRegion = 13.41;
 
     //
     // Tokyo => 35.652442, 139.757809
@@ -701,9 +701,9 @@ public class Pokemongo extends FrameLayout
     // New York => 40.705161, -74.013142
     //
 
-    //private static String region = "us.NewYork";
-    //private static double latRegion =  40.70;
-    //private static double lonRegion = -74.01;
+    private static String region = "us.NewYork";
+    private static double latRegion =  40.70;
+    private static double lonRegion = -74.01;
 
     //
     // Sydney => -33.862769, 151.067699
@@ -799,15 +799,15 @@ public class Pokemongo extends FrameLayout
 
             if (isMoving && !isHolding)
             {
-                if ((Math.abs(lat - latTogo) > 0.00001) || (Math.abs(lon - lonTogo) > 0.00001))
+                if ((Math.abs(lat - latTogo) > 0.0001) || (Math.abs(lon - lonTogo) > 0.0001))
                 {
                     double latDist = (latTogo - lat) / 2.0;
                     double lonDist = (lonTogo - lon) / 2.0;
 
-                    if (latDist > +0.001) latDist = +0.001;
-                    if (lonDist > +0.001) lonDist = +0.001;
-                    if (latDist < -0.001) latDist = -0.001;
-                    if (lonDist < -0.001) lonDist = -0.001;
+                    if (latDist > +0.0015) latDist = +0.0015;
+                    if (lonDist > +0.0015) lonDist = +0.0015;
+                    if (latDist < -0.0015) latDist = -0.0015;
+                    if (lonDist < -0.0015) lonDist = -0.0015;
 
                     lat += latDist;
                     lon += lonDist;
@@ -825,7 +825,7 @@ public class Pokemongo extends FrameLayout
             {
                 if (!isMoving)
                 {
-                    suspendTime = new Date().getTime() + 10 * 1000;
+                    suspendTime = new Date().getTime() + 15 * 1000;
 
                     isWaiting = true;
                     isSpotting = false;
@@ -895,14 +895,14 @@ public class Pokemongo extends FrameLayout
                                         {
                                             pid = huntPoint.getString("pid");
 
-                                            //latTogo = huntPoint.getDouble("lat");
-                                            //lonTogo = huntPoint.getDouble("lon");
-                                            //isMoving = true;
+                                            latTogo = huntPoint.getDouble("lat");
+                                            lonTogo = huntPoint.getDouble("lon");
+                                            isMoving = true;
 
-                                            lat = huntPoint.getDouble("lat");
-                                            lon = huntPoint.getDouble("lon");
+                                            //lat = huntPoint.getDouble("lat");
+                                            //lon = huntPoint.getDouble("lon");
 
-                                            suspendTime = new Date().getTime() + 5 * 1000;
+                                            //suspendTime = new Date().getTime() + 5 * 1000;
                                         }
                                     }
 
@@ -1698,7 +1698,7 @@ public class Pokemongo extends FrameLayout
                 {
                     spawnPointsTodo.add(spawnposstr);
 
-                    while (spawnPointsTodo.size() > 20)
+                    while (spawnPointsTodo.size() > 1000)
                     {
                         spawnPointsTodo.remove(0);
                     }
@@ -2354,9 +2354,6 @@ public class Pokemongo extends FrameLayout
 
         meterLat = 1.0 / mLan;
         meterLon = 1.0 / mLon;
-
-        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " mLat=" + mLan + " mLon=" + mLon);
-        //Log.d(LOGTAG, "meterPerDegree: lat=" + lat + " meterLat=" + meterLat + " meterLon=" + meterLon);
     }
 
     //endregion Utility methods.
