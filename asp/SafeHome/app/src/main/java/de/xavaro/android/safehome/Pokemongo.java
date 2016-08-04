@@ -828,6 +828,11 @@ public class Pokemongo extends FrameLayout
                 else
                 {
                     isMoving = false;
+
+                    if (commandMode == COMMAND_HUNT)
+                    {
+                        suspendTime = new Date().getTime() + 15 * 1000;
+                    }
                 }
             }
 
