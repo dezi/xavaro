@@ -256,8 +256,8 @@ public class PokemonDecode
         {
             //reqenvelop.remove("auth_ticket@.POGOProtos.Networking.Envelopes.AuthTicket");
 
-            reqenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
-            reqenvelop.remove("unknown12@int64");
+            //reqenvelop.remove("unknown6@.POGOProtos.Networking.Envelopes.Unknown6");
+            //reqenvelop.remove("unknown12@int64");
 
             JSONArray requests = reqenvelop.getJSONArray("requests@.POGOProtos.Networking.Requests.Request");
 
