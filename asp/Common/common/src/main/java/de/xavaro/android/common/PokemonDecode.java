@@ -25,7 +25,7 @@ public class PokemonDecode
     {
         try
         {
-            if (! result.has("requests@.POGOProtos.Networking.Requests.Request")) return null;
+            if (!result.has("requests@.POGOProtos.Networking.Requests.Request")) return null;
 
             ArrayList<String> messages = new ArrayList<>();
 
@@ -111,6 +111,26 @@ public class PokemonDecode
                         messages.add("Missed");
                     }
                 }
+            }
+
+            if (result.has("unknown12@int64") && result.has("unknown12@int64@"))
+            {
+                int u12value = result.getInt("unknown12@int64");
+                int u12offset = result.getInt("unknown12@int64@");
+
+                byte[] u12bytes = new byte[ requestBytes.length - u12offset ];
+
+                System.arraycopy(requestBytes, u12offset, u12bytes, 0, u12bytes.length);
+                Log.d(LOGTAG, "patchRequest: u12=" + u12value + " u12bytes=" + getHexBytesToString(u12bytes));
+
+                //if (u12value > 0) u12bytes[ 0 ] = (byte) 0xbe;
+                System.arraycopy(u12bytes, 0, requestBytes, u12offset, u12bytes.length);
+
+                messages.add("unknown12 = " + u12value);
+            }
+            else
+            {
+                Log.d(LOGTAG, "patchRequest: u12=missing");
             }
 
             return messages;

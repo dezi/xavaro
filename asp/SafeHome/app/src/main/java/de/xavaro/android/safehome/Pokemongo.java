@@ -777,6 +777,8 @@ public class Pokemongo extends FrameLayout
             isHolding = false;
             isSpotting = false;
 
+            suspendTime = 0;
+
             latTogo = lat;
             lonTogo = lon;
         }
