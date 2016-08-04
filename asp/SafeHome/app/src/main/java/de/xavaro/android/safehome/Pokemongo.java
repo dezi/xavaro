@@ -1,12 +1,14 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
+import android.media.AudioManager;
 import android.support.annotation.Nullable;
 
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
 import android.view.Gravity;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -910,12 +912,14 @@ public class Pokemongo extends FrameLayout
                                         {
                                             pid = huntPoint.getString("pid");
 
-                                            latTogo = huntPoint.getDouble("lat");
-                                            lonTogo = huntPoint.getDouble("lon");
-                                            isMoving = true;
+                                            //latTogo = huntPoint.getDouble("lat");
+                                            //lonTogo = huntPoint.getDouble("lon");
+                                            //isMoving = true;
 
-                                            //lat = huntPoint.getDouble("lat");
-                                            //lon = huntPoint.getDouble("lon");
+                                            lat = huntPoint.getDouble("lat");
+                                            lon = huntPoint.getDouble("lon");
+
+                                            setCommand(COMMAND_STOP);
                                         }
                                     }
 
@@ -1559,6 +1563,18 @@ public class Pokemongo extends FrameLayout
                     Log.d(LOGTAG, "addPokepos: see tag=" + tag + " id=" + pokeId + " tth=" + (tthidden / 1000) + " chk=" + pokeposstr);
 
                     return;
+                }
+            }
+
+            if (commandMode == COMMAND_SEEK)
+            {
+                if (pokeDirHunting[ pokeOrd - 1 ])
+                {
+                    isWaiting = true;
+                    suspendTime = new Date().getTime() + 120 * 1000;
+
+                    AudioManager am = (AudioManager) application.getSystemService(Context.AUDIO_SERVICE);
+                    am.playSoundEffect(SoundEffectConstants.CLICK);
                 }
             }
 

@@ -175,6 +175,8 @@ public class ProtoBufferDecode
                 // Varint
                 //
 
+                if (offs) put(json, name + "@", offset, repeat);
+
                 long varint = decodeVarint();
 
                 if (protos.has(type))

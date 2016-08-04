@@ -64,7 +64,9 @@ public class PokemonDecode
 
                         Log.d(LOGTAG, "patchRequest: normalized_reticle_size=" + orgval + " off=" + orgoff + " binval=" + binval);
                     }
+                    */
 
+                    /*
                     if (data.has("spin_modifier@double"))
                     {
                         double orgval = data.getDouble("spin_modifier@double");
