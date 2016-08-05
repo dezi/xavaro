@@ -33,6 +33,7 @@ public class ApplicationBase extends Application
 
         super.onCreate();
 
+        /*
         final PackageManager pm = getPackageManager();
 
         List<ApplicationInfo> packages =  pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -52,6 +53,7 @@ public class ApplicationBase extends Application
 
         //Pokemongo.testEncode();
         System.exit(1);
+        */
 
         //
         // Make application context available.

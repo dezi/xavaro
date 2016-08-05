@@ -1,9 +1,8 @@
 package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
-import android.media.AudioManager;
 import android.support.annotation.Nullable;
-
+import android.media.AudioManager;
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
@@ -54,19 +53,20 @@ public class Pokemongo extends FrameLayout
 
     private WindowManager.LayoutParams overlayParam;
 
-    private final static String[] commandModeTexts = new String[]{"STOP", "SEEK", "HUNT", "WAIT", "DONE", "SPOT", "HOLD"};
+    private final static String[] commandModeTexts = new String[]{ "STOP", "SEEK", "HUNT", "WAIT", "SPOT", "HOLD", "WALK" };
 
     private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
     private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
     private final static ImageView[] cmdButtonImageViews = new ImageView[ 3 ];
-    private final static String[] cmdTexts = new String[]{"HIDE", "SHOP", "HUNT"};
+    private final static String[] cmdTexts = new String[]{ "HIDE", "SHOP", "HUNT" };
 
     private final static FrameLayout[] dirButtons = new FrameLayout[ 9 ];
     private final static TextView[] dirButtonTextViews = new TextView[ 9 ];
-    private final static TextView[] dirButtonInfo = new TextView[ 9 ];
-    private final static String[] dirTexts = new String[]{"NW", "N", "NE", "W", "STOP", "E", "SW", "S", "SE"};
-    private final static int[] dirMoveX = new int[]{-1, 0, 1, -1, 0, 1, -1, 0, 1};
-    private final static int[] dirMoveY = new int[]{1, 1, 1, 0, 0, 0, -1, -1, -1};
+    private final static TextView[] dirButtonInfoViews = new TextView[ 9 ];
+    private final static String[] dirTexts = new String[]{ "NW", "N", "NE", "W", "STOP", "E", "SW", "S", "SE" };
+    private final static int[] dirMoveX = new int[]{ -1, 0, 1, -1, 0, 1, -1, 0, 1 };
+    private final static int[] dirMoveY = new int[]{ 1, 1, 1, 0, 0, 0, -1, -1, -1 };
+    private final static int[] dirNextDir = new int[]{ 7, 8, 3, 2, 4, 6, 5, 0, 1 };
 
     private final static FrameLayout[] spawns = new FrameLayout[ 27 ];
     private final static ImageView[] pimages = new ImageView[ 27 ];
@@ -196,14 +196,14 @@ public class Pokemongo extends FrameLayout
 
             lp.gravity = Gravity.BOTTOM | Gravity.RIGHT;
 
-            dirButtonInfo[ inx ] = new TextView(getContext());
-            dirButtonInfo[ inx ].setTypeface(null, Typeface.BOLD);
-            dirButtonInfo[ inx ].setTextSize(buttnetto / 3.0f);
-            dirButtonInfo[ inx ].setTextColor(0xffffffff);
-            dirButtonInfo[ inx ].setPadding(0, 0, 2, 0);
-            dirButtonInfo[ inx ].setLayoutParams(lp);
+            dirButtonInfoViews[ inx ] = new TextView(getContext());
+            dirButtonInfoViews[ inx ].setTypeface(null, Typeface.BOLD);
+            dirButtonInfoViews[ inx ].setTextSize(buttnetto / 3.0f);
+            dirButtonInfoViews[ inx ].setTextColor(0xffffffff);
+            dirButtonInfoViews[ inx ].setPadding(0, 0, 2, 0);
+            dirButtonInfoViews[ inx ].setLayoutParams(lp);
 
-            dirButtons[ inx ].addView(dirButtonInfo[ inx ]);
+            dirButtons[ inx ].addView(dirButtonInfoViews[ inx ]);
         }
 
         for (int inx = 0; inx < spawns.length; inx++)
@@ -528,9 +528,6 @@ public class Pokemongo extends FrameLayout
 
                 pimages[ buttinx ].setBackgroundColor(0xcccccccc);
 
-                setCommand(COMMAND_STOP);
-                setCommand(COMMAND_SPOT);
-
                 latTogo = latlon.getDouble("lat");
                 lonTogo = latlon.getDouble("lon");
 
@@ -548,85 +545,151 @@ public class Pokemongo extends FrameLayout
     private static long suspendTime;
 
     private static boolean isWalking;
-    private static boolean isWaiting;
     private static boolean isHolding;
+    private static boolean isWaiting;
     private static boolean isSpotting;
     private static boolean isShowhunt;
     private static boolean isUpdatedir;
+
+    private static void updateCommandStatus()
+    {
+        //
+        // Derive walking button from walking parameters.
+        //
+
+        int currentButton = 4;
+        int currentSpeed = (int) Math.round(Math.max(latWalk / (meterLat * 4), lonWalk / (meterLon * 4)));
+
+        int dirX = (lonWalk < 0) ? -1 : (lonWalk > 0) ? 1 : 0;
+        int dirY = (latWalk < 0) ? -1 : (latWalk > 0) ? 1 : 0;
+
+        for (int inx = 0; inx < dirMoveX.length; inx++)
+        {
+            if ((dirX == dirMoveX[ inx ]) && (dirY == dirMoveY[ inx ]))
+            {
+                currentButton = inx;
+                break;
+            }
+        }
+
+        if (currentButton != 4) isWalking = true;
+
+        //
+        // Higlight corresponding button.
+        //
+
+        for (int inx = 0; inx < dirButtonTextViews.length; inx++)
+        {
+            if (inx == currentButton)
+            {
+                dirButtonTextViews[ inx ].setTypeface(null, Typeface.BOLD);
+                dirButtonTextViews[ inx ].setBackgroundColor(0xff008800);
+
+                if (inx == 4)
+                {
+                    if (lastSec > 0)
+                    {
+                        String btext = "" + lastSec;
+                        dirButtonInfoViews[ inx ].setText(btext);
+                        dirButtonTextViews[ inx ].setBackgroundColor(0xffff0000);
+                    }
+                    else
+                    {
+                        dirButtonInfoViews[ inx ].setText(null);
+                        dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
+                    }
+
+                }
+                else
+                {
+                    String speed = "x" + currentSpeed;
+                    dirButtonInfoViews[ inx ].setText(speed);
+                }
+            }
+            else
+            {
+                dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
+                dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
+                dirButtonInfoViews[ inx ].setText(null);
+            }
+        }
+
+        int cmd = commandMode;
+
+        if (isSpotting) cmd = COMMAND_SPOT;
+        if (isWalking) cmd = COMMAND_WALK;
+        if (isWaiting) cmd = COMMAND_WAIT;
+        if (isHolding) cmd = COMMAND_HOLD;
+
+        if ((cmd != commandMode) && (lastSec <= 0))
+        {
+            dirButtonTextViews[ 4 ].setBackgroundColor(0xffcccc00);
+        }
+
+        dirButtonTextViews[ 4 ].setText(commandModeTexts[ cmd ]);
+    }
 
     private void onClickJoystickButton(int buttinx)
     {
         if (buttinx == 4)
         {
-            if (! (isWaiting || isHolding || isWalking))
-            {
-                if (commandMode > COMMAND_HUNT)
-                {
-                    setCommand(COMMAND_STOP);
-                }
-                else
-                {
-                    setCommand(++commandMode % (COMMAND_HUNT + 1));
-                }
-            }
-
-            if (isWaiting)
-            {
-                isWaiting = false;
-                setCommand(commandMode);
-            }
-
-            if (isWalking)
-            {
-                isWalking = false;
-                setCommand(commandMode);
-            }
-
-            if (isHolding)
-            {
-                isHolding = false;
-                setCommand(commandMode);
-            }
+            onClickMiddleButton();
         }
-
-        if (dirMoveY[ buttinx ] == 0) latMove = 0;
-        if (dirMoveX[ buttinx ] == 0) lonMove = 0;
-
-        latMove += dirMoveY[ buttinx ] / 10000.0;
-        lonMove += dirMoveX[ buttinx ] / 10000.0;
-
-        if (Math.abs(latMove) < 0.00000001) latMove = 0;
-        if (Math.abs(lonMove) < 0.00000001) lonMove = 0;
-
-        if ((latMove == 0) && (lonMove == 0))
+        else
         {
-            buttinx = 4;
+            onClickDirectionButton(buttinx);
         }
 
-        Log.d(LOGTAG, "Alert butt touch:"
+        updateCommandStatus();
+    }
+
+    private void onClickMiddleButton()
+    {
+        latWalk = 0.0;
+        lonWalk = 0.0;
+        latTogo = lat;
+        lonTogo = lon;
+
+        suspendTime = 0;
+
+        if (isHolding || isWaiting || isSpotting || isWalking)
+        {
+            isHolding = false;
+            isWaiting = false;
+            isWalking = false;
+            isSpotting = false;
+
+            commandMode = COMMAND_STOP;
+        }
+        else
+        {
+            commandMode = ++commandMode % (COMMAND_HUNT + 1);
+        }
+    }
+
+    private void onClickDirectionButton(int buttinx)
+    {
+        if (dirMoveY[ buttinx ] == 0) latWalk = 0;
+        if (dirMoveX[ buttinx ] == 0) lonWalk = 0;
+
+        lonWalk += dirMoveX[ buttinx ] * meterLon * 4;
+        latWalk += dirMoveY[ buttinx ] * meterLat * 4;
+
+        if (Math.abs(latWalk) < 0.00000001) latWalk = 0;
+        if (Math.abs(lonWalk) < 0.00000001) lonWalk = 0;
+
+        isMoving = false;
+        isWaiting = false;
+        isHolding = false;
+        isWalking = false;
+        isSpotting = false;
+
+        suspendTime = 0;
+
+        Log.d(LOGTAG, "onClickDirectionButton:"
                 + " buttinx=" + buttinx
-                + " latMove=" + String.format(Locale.ROOT, "%.6f", latMove)
-                + " lonMove=" + String.format(Locale.ROOT, "%.6f", lonMove));
-
-        for (int inx = 0; inx < dirButtonTextViews.length; inx++)
-        {
-            if (inx == buttinx)
-            {
-                dirButtonTextViews[ inx ].setTypeface(null, Typeface.BOLD);
-                dirButtonTextViews[ inx ].setBackgroundColor(0xff008800);
-            }
-            else
-            {
-                dirButtonTextViews[ inx ].setText(dirTexts[ inx ]);
-                dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
-                dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
-            }
-        }
-
-        if (! ((latMove == 0) && (lonMove == 0)))
-        {
-            isWalking = true;
-        }
+                + " latWalk=" + String.format(Locale.ROOT, "%.6f", latWalk)
+                + " lonWalk=" + String.format(Locale.ROOT, "%.6f", lonWalk));
     }
 
     private static Pokemongo instance;
@@ -731,8 +794,8 @@ public class Pokemongo extends FrameLayout
     private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
     private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
 
-    private static double latMove = 0;
-    private static double lonMove = 0;
+    private static double latWalk = 0;
+    private static double lonWalk = 0;
 
     private static double latMin = +1000;
     private static double latMax = -1000;
@@ -742,54 +805,11 @@ public class Pokemongo extends FrameLayout
     private static final int COMMAND_STOP = 0;
     private static final int COMMAND_SEEK = 1;
     private static final int COMMAND_HUNT = 2;
+
     private static final int COMMAND_WAIT = 3;
-    private static final int COMMAND_DONE = 4;
-    private static final int COMMAND_SPOT = 5;
-    private static final int COMMAND_HOLD = 6;
-
-    private static void setCommand(int command)
-    {
-        latMove = 0;
-        lonMove = 0;
-
-        if (command <= COMMAND_HUNT) commandMode = command;
-
-        for (int inx = 0; inx < dirButtonTextViews.length; inx++)
-        {
-            if (inx == 4)
-            {
-                dirButtonTextViews[ inx ].setText(commandModeTexts[ command ]);
-                dirButtonTextViews[ inx ].setTypeface(null, Typeface.BOLD);
-                dirButtonTextViews[ inx ].setBackgroundColor(0xff008800);
-            }
-            else
-            {
-                dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
-                dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
-            }
-        }
-
-        if (commandMode == COMMAND_STOP)
-        {
-            isMoving = false;
-            isWaiting = false;
-            isWalking = false;
-            isHolding = false;
-            isSpotting = false;
-
-            suspendTime = 0;
-
-            latTogo = lat;
-            lonTogo = lon;
-        }
-    }
-
-    private static void setCommandText(int command)
-    {
-        dirButtonTextViews[ 4 ].setText(commandModeTexts[ command ]);
-        dirButtonTextViews[ 4 ].setTypeface(null, Typeface.BOLD);
-        dirButtonTextViews[ 4 ].setBackgroundColor(0xff008800);
-    }
+    private static final int COMMAND_SPOT = 4;
+    private static final int COMMAND_HOLD = 5;
+    private static final int COMMAND_WALK = 6;
 
     private static boolean isMoving;
     private static double latTogo = lat;
@@ -802,159 +822,72 @@ public class Pokemongo extends FrameLayout
         try
         {
             initPokemongo(location);
+
             updatePokemonDir();
 
-            if ((suspendTime > 0) && (suspendTime < new Date().getTime()))
+            isWaiting = (suspendTime >= new Date().getTime());
+
+            updateCommandStatus();
+
+            if (! (isHolding || isWaiting))
             {
-                isWaiting = false;
-            }
-
-            setCommandText(isHolding ? COMMAND_HOLD : isWaiting ? COMMAND_WAIT : isSpotting ? COMMAND_SPOT : commandMode);
-
-            if (isMoving && !isHolding)
-            {
-                if ((Math.abs(lat - latTogo) > 0.0001) || (Math.abs(lon - lonTogo) > 0.0001))
+                if (isMoving)
                 {
-                    double latDist = (latTogo - lat) / 2.0;
-                    double lonDist = (lonTogo - lon) / 2.0;
-
-                    if (latDist > +0.0015) latDist = +0.0015;
-                    if (lonDist > +0.0015) lonDist = +0.0015;
-                    if (latDist < -0.0015) latDist = -0.0015;
-                    if (lonDist < -0.0015) lonDist = -0.0015;
-
-                    lat += latDist;
-                    lon += lonDist;
-
-                    Log.d(LOGTAG, "deziLocation: goto lat=" + lat + " lon=" + lon);
-                    Log.d(LOGTAG, "deziLocation: dist lat=" + latTogo + " lon=" + lonTogo);
-                }
-                else
-                {
-                    isMoving = false;
-
-                    if (commandMode == COMMAND_HUNT)
+                    if ((Math.abs(lat - latTogo) > 0.0001) || (Math.abs(lon - lonTogo) > 0.0001))
                     {
-                        suspendTime = new Date().getTime() + 15 * 1000;
+                        double latDist = (latTogo - lat) / 2.0;
+                        double lonDist = (lonTogo - lon) / 2.0;
+
+                        if (latDist > +0.0015) latDist = +0.0015;
+                        if (lonDist > +0.0015) lonDist = +0.0015;
+                        if (latDist < -0.0015) latDist = -0.0015;
+                        if (lonDist < -0.0015) lonDist = -0.0015;
+
+                        lat += latDist;
+                        lon += lonDist;
+
+                        Log.d(LOGTAG, "deziLocation: goto lat=" + lat + " lon=" + lon);
+                        Log.d(LOGTAG, "deziLocation: dist lat=" + latTogo + " lon=" + lonTogo);
                     }
-                }
-            }
-
-            if (isSpotting && !isHolding)
-            {
-                if (!isMoving)
-                {
-                    suspendTime = new Date().getTime() + 18 * 1000;
-
-                    isWaiting = true;
-                    isSpotting = false;
-
-                    setCommandText(COMMAND_WAIT);
-                }
-            }
-            else
-            {
-                if ((!isWaiting) && (!isMoving) && (!isHolding))
-                {
-                    if (commandMode == COMMAND_SEEK)
+                    else
                     {
-                        try
+                        isMoving = false;
+
+                        if (commandMode == COMMAND_SEEK)
                         {
-                            if (suspendTime < new Date().getTime())
-                            {
-                                if (spawnPointsTodo.size() > 0)
-                                {
-                                    synchronized (spawnPointsTodo)
-                                    {
-                                        String spanposstr = spawnPointsTodo.remove(spawnPointsTodo.size() - 1);
-                                        spawnPointsSeen.add(spanposstr);
-
-                                        JSONObject spanpos = new JSONObject(spanposstr);
-
-                                        lat = spanpos.getDouble("lat");
-                                        lon = spanpos.getDouble("lon");
-                                    }
-
-                                    Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
-
-                                    suspendTime = new Date().getTime() + 2 * 1000;
-                                }
-                                else
-                                {
-                                    setCommand(COMMAND_DONE);
-                                }
-                            }
+                            suspendTime = new Date().getTime() + 2 * 1000;
                         }
-                        catch (Exception ignore)
+
+                        if (commandMode == COMMAND_HUNT)
                         {
+                            suspendTime = new Date().getTime() + 15 * 1000;
                         }
                     }
+                }
 
-                    if (commandMode == COMMAND_HUNT)
+                if (isSpotting)
+                {
+                    if (!isMoving)
                     {
-                        if (suspendTime < new Date().getTime())
-                        {
-                            if (huntPointsTodo.size() == 0)
-                            {
-                                buildPokeHuntSpawns();
-                            }
+                        isSpotting = false;
 
-                            if (huntPointsTodo.size() > 0)
-                            {
-                                try
-                                {
-                                    String pid = null;
-                                    int ord = 0;
-
-                                    synchronized (huntPointsTodo)
-                                    {
-                                        JSONObject huntPoint = getNearestPoint(huntPointsTodo);
-
-                                        if (huntPoint != null)
-                                        {
-                                            pid = huntPoint.getString("pid");
-
-                                            //latTogo = huntPoint.getDouble("lat");
-                                            //lonTogo = huntPoint.getDouble("lon");
-                                            //isMoving = true;
-
-                                            lat = huntPoint.getDouble("lat");
-                                            lon = huntPoint.getDouble("lon");
-
-                                            suspendTime = new Date().getTime() + 2 * 1000;
-
-                                            //setCommand(COMMAND_STOP);
-                                        }
-                                    }
-
-                                    String counttext = "" + huntPointsTodo.size();
-                                    timages[ pimages.length - 1 ].setText(counttext);
-
-                                    if (pid != null)
-                                    {
-                                        String[] parts = pid.split("@");
-
-                                        if (parts.length == 2)
-                                        {
-                                            ord = Integer.parseInt(parts[ 1 ], 10);
-
-                                            pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord - 1 ].getDrawable());
-                                        }
-                                    }
-
-                                    Log.d(LOGTAG, "deziLocation: hunt"
-                                            + " lat=" + lat + " lon=" + lon
-                                            + " pid=" + pid + " ord=" + ord);
-                                }
-                                catch (Exception ignore)
-                                {
-                                }
-                            }
-                        }
+                        suspendTime = new Date().getTime() + 18 * 1000;
                     }
+                }
 
-                    lat += latMove;
-                    lon += lonMove;
+                if (isWalking)
+                {
+                    lat += latWalk;
+                    lon += lonWalk;
+
+                    if ((lat < latMin) || (lat > latMax)) latWalk = -latWalk;
+                    if ((lon < lonMin) || (lon > lonMax)) lonWalk = -lonWalk;
+                }
+
+                if (! (isHolding || isWaiting || isMoving || isSpotting || isWalking))
+                {
+                    if (commandMode == COMMAND_SEEK) doSeekCommand();
+                    if (commandMode == COMMAND_HUNT) doHuntCommand();
                 }
             }
 
@@ -972,6 +905,97 @@ public class Pokemongo extends FrameLayout
         System.gc();
 
         Log.d(LOGTAG, "pupsekacke out...");
+    }
+
+    private static void doSeekCommand()
+    {
+        try
+        {
+            if (spawnPointsTodo.size() > 0)
+            {
+                synchronized (spawnPointsTodo)
+                {
+                    String spanposstr = spawnPointsTodo.remove(spawnPointsTodo.size() - 1);
+                    spawnPointsSeen.add(spanposstr);
+
+                    JSONObject spanpos = new JSONObject(spanposstr);
+
+                    lat = spanpos.getDouble("lat");
+                    lon = spanpos.getDouble("lon");
+
+                    suspendTime = new Date().getTime() + 2 * 1000;
+                }
+
+                Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
+            }
+            else
+            {
+                synchronized (spawnPointsTodo)
+                {
+                    spawnPointsSeen.clear();
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
+    private static void doHuntCommand()
+    {
+        if (huntPointsTodo.size() == 0) buildPokeHuntSpawns();
+
+        if (huntPointsTodo.size() > 0)
+        {
+            try
+            {
+                String pid = null;
+                int ord = 0;
+
+                synchronized (huntPointsTodo)
+                {
+                    JSONObject huntPoint = getNearestPoint(huntPointsTodo);
+
+                    if (huntPoint != null)
+                    {
+                        pid = huntPoint.getString("pid");
+
+                        //latTogo = huntPoint.getDouble("lat");
+                        //lonTogo = huntPoint.getDouble("lon");
+                        //isMoving = true;
+
+                        lat = huntPoint.getDouble("lat");
+                        lon = huntPoint.getDouble("lon");
+
+                        suspendTime = new Date().getTime() + 2 * 1000;
+                    }
+                }
+
+                String counttext = "" + huntPointsTodo.size();
+                timages[ pimages.length - 1 ].setText(counttext);
+
+                if (pid != null)
+                {
+                    String[] parts = pid.split("@");
+
+                    if (parts.length == 2)
+                    {
+                        ord = Integer.parseInt(parts[ 1 ], 10);
+
+                        pimages[ pimages.length - 1 ].setImageDrawable(pokeDirImages[ ord - 1 ].getDrawable());
+                    }
+                }
+
+                Log.d(LOGTAG, "deziLocation: hunt"
+                        + " lat=" + lat + " lon=" + lon
+                        + " pid=" + pid + " ord=" + ord);
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
     }
 
     @Nullable
@@ -1572,11 +1596,10 @@ public class Pokemongo extends FrameLayout
             {
                 if (pokeDirHunting[ pokeOrd - 1 ])
                 {
-                    isWaiting = true;
-                    suspendTime = new Date().getTime() + 120 * 1000;
-
                     AudioManager am = (AudioManager) application.getSystemService(Context.AUDIO_SERVICE);
                     am.playSoundEffect(SoundEffectConstants.CLICK);
+
+                    suspendTime = new Date().getTime() + 120 * 1000;
                 }
             }
 
@@ -1623,19 +1646,18 @@ public class Pokemongo extends FrameLayout
     {
         try
         {
-            double plat = spawn.getDouble("latitude@double");
-            double plon = spawn.getDouble("longitude@double");
+            double spawnLat = spawn.getDouble("latitude@double");
+            double spawnLon = spawn.getDouble("longitude@double");
 
             JSONObject spawnpos = new JSONObject();
-            spawnpos.put("lat", plat);
-            spawnpos.put("lon", plon);
+            spawnpos.put("lat", spawnLat);
+            spawnpos.put("lon", spawnLon);
 
             String spawnposstr = spawnpos.toString();
 
             synchronized (spawnPointsTodo)
             {
-                if ((!spawnPointsTodo.contains(spawnposstr))
-                        && (!spawnPointsSeen.contains(spawnposstr)))
+                if (! (spawnPointsTodo.contains(spawnposstr) || spawnPointsSeen.contains(spawnposstr)))
                 {
                     spawnPointsTodo.add(spawnposstr);
 
@@ -1648,6 +1670,7 @@ public class Pokemongo extends FrameLayout
         }
         catch (Exception ignore)
         {
+            ignore.printStackTrace();
         }
     }
 
@@ -2058,7 +2081,7 @@ public class Pokemongo extends FrameLayout
                     lat = latloc;
                     lon = lonloc;
 
-                    setCommand(COMMAND_STOP);
+                    isHolding = true;
                 }
             }
         }
@@ -2123,14 +2146,12 @@ public class Pokemongo extends FrameLayout
                     lat = latloc;
                     lon = lonloc;
 
-                    isWaiting = true;
-                    suspendTime = new Date().getTime() + 10 * 1000;
+                    isHolding = true;
                 }
 
                 if (type.equals(".POGOProtos.Networking.Responses.FortSearchResponse"))
                 {
-                    isWaiting = false;
-                    suspendTime = 0;
+                    isHolding = false;
                 }
             }
         }
@@ -2256,6 +2277,7 @@ public class Pokemongo extends FrameLayout
 
     private static long lastTim;
     private static long lastBan;
+    private static long lastSec;
 
     private static double lastLat;
     private static double lastLon;
@@ -2346,9 +2368,9 @@ public class Pokemongo extends FrameLayout
             if (nextSoftBan > lastBan) lastBan = nextSoftBan;
         }
 
-        long bannedSeconds = (lastBan - now) / 1000;
-        if (bannedSeconds < 0) bannedSeconds = 0;
-        if (bannedSeconds > 7200) bannedSeconds = 7200;
+        lastSec = (lastBan - now) / 1000;
+        if (lastSec < 0) lastSec = 0;
+        if (lastSec > 7200) lastSec = 7200;
 
         location.setLatitude(lat);
         location.setLongitude(lon);
@@ -2358,7 +2380,7 @@ public class Pokemongo extends FrameLayout
                 + " lon=" + location.getLongitude()
                 + " mps=" + ((int) (doneMeter / (use / 1000.0)))
                 + " dst=" + ((int) doneMeter)
-                + " ban=" + bannedSeconds
+                + " ban=" + lastSec
         );
 
         lastLat = lat;
@@ -2366,18 +2388,6 @@ public class Pokemongo extends FrameLayout
         lastTim = now;
 
         savePosition();
-
-        if (bannedSeconds > 0)
-        {
-            String btext = "" + bannedSeconds;
-            dirButtonInfo[ 4 ].setText(btext);
-            dirButtonTextViews[ 4 ].setBackgroundColor(0xffff0000);
-        }
-        else
-        {
-            dirButtonInfo[ 4 ].setText(null);
-            dirButtonTextViews[ 4 ].setBackgroundColor(0x88008800);
-        }
     }
 
     private static void meterPerDegree()
@@ -2385,8 +2395,8 @@ public class Pokemongo extends FrameLayout
         double mLan = 111132.954 - 559.822 * Math.cos(2 * lat) + 1.175 * Math.cos(4 * lat);
         double mLon = 111132.954 * Math.cos(lat);
 
-        meterLat = 1.0 / mLan;
-        meterLon = 1.0 / mLon;
+        meterLat = 1.0 / Math.abs(mLan);
+        meterLon = 1.0 / Math.abs(mLon);
     }
 
     //endregion Timing methods.
