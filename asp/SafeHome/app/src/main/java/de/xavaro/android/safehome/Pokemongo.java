@@ -558,7 +558,10 @@ public class Pokemongo extends FrameLayout
         //
 
         int currentButton = 4;
-        int currentSpeed = (int) Math.round(Math.max(latWalk / (meterLat * 4), lonWalk / (meterLon * 4)));
+
+        int currentSpeed = (int) Math.round(Math.max(
+                Math.abs(latWalk / (meterLat * 4)),
+                Math.abs(lonWalk / (meterLon * 4))));
 
         int dirX = (lonWalk < 0) ? -1 : (lonWalk > 0) ? 1 : 0;
         int dirY = (latWalk < 0) ? -1 : (latWalk > 0) ? 1 : 0;
