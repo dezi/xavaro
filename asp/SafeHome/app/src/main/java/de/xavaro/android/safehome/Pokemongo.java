@@ -834,6 +834,12 @@ public class Pokemongo extends FrameLayout
 
             if (! (isHolding || isWaiting))
             {
+                if (! (isMoving || isWalking || isSpotting))
+                {
+                    if (commandMode == COMMAND_SEEK) doSeekCommand();
+                    if (commandMode == COMMAND_HUNT) doHuntCommand();
+                }
+
                 if (isMoving)
                 {
                     if ((Math.abs(lat - latTogo) > 0.0001) || (Math.abs(lon - lonTogo) > 0.0001))
@@ -868,16 +874,6 @@ public class Pokemongo extends FrameLayout
                     }
                 }
 
-                if (isSpotting)
-                {
-                    if (!isMoving)
-                    {
-                        isSpotting = false;
-
-                        suspendTime = new Date().getTime() + 18 * 1000;
-                    }
-                }
-
                 if (isWalking)
                 {
                     lat += latWalk;
@@ -887,10 +883,14 @@ public class Pokemongo extends FrameLayout
                     if ((lon < lonMin) || (lon > lonMax)) lonWalk = -lonWalk;
                 }
 
-                if (! (isHolding || isWaiting || isMoving || isSpotting || isWalking))
+                if (isSpotting)
                 {
-                    if (commandMode == COMMAND_SEEK) doSeekCommand();
-                    if (commandMode == COMMAND_HUNT) doHuntCommand();
+                    if (!isMoving)
+                    {
+                        isSpotting = false;
+
+                        suspendTime = new Date().getTime() + 18 * 1000;
+                    }
                 }
             }
 
@@ -1631,8 +1631,8 @@ public class Pokemongo extends FrameLayout
                         latTogo = plat;
                         lonTogo = plon;
 
-                        isSpotting = true;
                         isMoving = true;
+                        isSpotting = true;
                     }
                 }
             }
