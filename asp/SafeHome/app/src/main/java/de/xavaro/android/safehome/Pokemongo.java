@@ -708,9 +708,9 @@ public class Pokemongo extends FrameLayout
     // Tokyo => 35.652442, 139.757809
     //
 
-    private static String region = "jp.Tokyo";
-    private static double latRegion =  35.65;
-    private static double lonRegion = 139.75;
+    //private static String region = "jp.Tokyo";
+    //private static double latRegion =  35.65;
+    //private static double lonRegion = 139.75;
 
     //
     // New York => 40.705161, -74.013142
@@ -721,12 +721,12 @@ public class Pokemongo extends FrameLayout
     //private static double lonRegion = -74.01;
 
     //
-    // Sydney => -33.862769, 151.067699
+    // Sydney => -33.872806, 151.207502
     //
 
-    //private static String region = "au.Sydney";
-    //private static double latRegion = -33.862769;
-    //private static double lonRegion = 151.067699;
+    private static String region = "au.Sydney";
+    private static double latRegion = -33.87;
+    private static double lonRegion = 151.20;
 
     private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
     private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
@@ -877,7 +877,7 @@ public class Pokemongo extends FrameLayout
 
                                     Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
 
-                                    suspendTime = new Date().getTime() + 5 * 1000;
+                                    suspendTime = new Date().getTime() + 2 * 1000;
                                 }
                                 else
                                 {
@@ -921,7 +921,9 @@ public class Pokemongo extends FrameLayout
                                             lat = huntPoint.getDouble("lat");
                                             lon = huntPoint.getDouble("lon");
 
-                                            setCommand(COMMAND_STOP);
+                                            suspendTime = new Date().getTime() + 2 * 1000;
+
+                                            //setCommand(COMMAND_STOP);
                                         }
                                     }
 
@@ -943,8 +945,6 @@ public class Pokemongo extends FrameLayout
                                     Log.d(LOGTAG, "deziLocation: hunt"
                                             + " lat=" + lat + " lon=" + lon
                                             + " pid=" + pid + " ord=" + ord);
-
-                                    suspendTime = new Date().getTime() + 5 * 1000;
                                 }
                                 catch (Exception ignore)
                                 {
@@ -1878,11 +1878,9 @@ public class Pokemongo extends FrameLayout
                     spawninx++;
                 }
 
-                //
-                // Pfusch hier...
-                //
+                int max = spawns.length - ((commandMode == COMMAND_HUNT) ? 1 : 0);
 
-                while (spawninx < spawns.length - 1)
+                while (spawninx < max)
                 {
                     locsJson[ spawninx ] = null;
 

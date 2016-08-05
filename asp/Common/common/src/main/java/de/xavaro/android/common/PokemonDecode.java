@@ -113,6 +113,7 @@ public class PokemonDecode
                 }
             }
 
+            /*
             if (result.has("unknown12@int64") && result.has("unknown12@int64@"))
             {
                 int u12value = result.getInt("unknown12@int64");
@@ -126,12 +127,13 @@ public class PokemonDecode
                 //if (u12value > 0) u12bytes[ 0 ] = (byte) 0xbe;
                 System.arraycopy(u12bytes, 0, requestBytes, u12offset, u12bytes.length);
 
-                messages.add("unknown12 = " + u12value);
+                //messages.add("unknown12 = " + u12value);
             }
             else
             {
                 Log.d(LOGTAG, "patchRequest: u12=missing");
             }
+            */
 
             return messages;
         }
