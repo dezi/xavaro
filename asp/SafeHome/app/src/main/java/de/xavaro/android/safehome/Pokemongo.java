@@ -439,8 +439,6 @@ public class Pokemongo extends FrameLayout
 
     private void onClickHuntPokemonButton(int buttinx)
     {
-        if (!pokeDirEnabled[ buttinx ]) return;
-
         if (pokeDirHunting[ buttinx ])
         {
             pokeDirImages[ buttinx ].setBackgroundColor(0xcccccccc);
@@ -531,6 +529,7 @@ public class Pokemongo extends FrameLayout
                 latTogo = latlon.getDouble("lat");
                 lonTogo = latlon.getDouble("lon");
 
+                commandMode = COMMAND_STOP;
                 isSpotting = true;
                 isMoving = true;
             }
@@ -972,7 +971,7 @@ public class Pokemongo extends FrameLayout
                         lat = huntPoint.getDouble("lat");
                         lon = huntPoint.getDouble("lon");
 
-                        suspendTime = new Date().getTime() + 2 * 1000;
+                        suspendTime = new Date().getTime() + 5 * 1000;
                     }
                 }
 
@@ -1637,6 +1636,7 @@ public class Pokemongo extends FrameLayout
                         isMoving = true;
                         isSpotting = true;
 
+                        commandMode = COMMAND_STOP;
                         suspendTime = 0;
                     }
                 }

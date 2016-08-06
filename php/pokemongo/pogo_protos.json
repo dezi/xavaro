@@ -19,7 +19,7 @@
     "checksum":
     {
       "id":4,
-      "type":"uint32"
+      "type":"fixed32"
     },
     "size":
     {
@@ -67,7 +67,7 @@
     "active_pokemon_id":
     {
       "id":8,
-      "type":"uint64"
+      "type":"fixed64"
     },
     "player_joined":
     {
@@ -97,7 +97,7 @@
     "target_pokemon_id":
     {
       "id":14,
-      "type":"uint64"
+      "type":"fixed64"
     }
   },
   ".POGOProtos.Data.Battle.BattleActionType":
@@ -241,24 +241,28 @@
     {
       "id":1,
       "type":".POGOProtos.Enums.ActivityType",
+      "packed":true,
       "repeated":true
     },
     "xp":
     {
       "id":2,
       "type":"int32",
+      "packed":true,
       "repeated":true
     },
     "candy":
     {
       "id":3,
       "type":"int32",
+      "packed":true,
       "repeated":true
     },
     "stardust":
     {
       "id":4,
       "type":"int32",
+      "packed":true,
       "repeated":true
     }
   },
@@ -267,13 +271,15 @@
     "pokeball_type":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId",
+      "type":".POGOProtos.Inventory.Item.ItemId",
+      "packed":true,
       "repeated":true
     },
     "capture_probability":
     {
       "id":2,
       "type":"float",
+      "packed":true,
       "repeated":true
     },
     "reticle_difficulty_scale":
@@ -302,7 +308,7 @@
     "checksum":
     {
       "id":4,
-      "type":"uint32"
+      "type":"fixed32"
     }
   },
   ".POGOProtos.Data.Gym.GymMembership":
@@ -330,6 +336,81 @@
       "id":2,
       "type":".POGOProtos.Data.Gym.GymMembership",
       "repeated":true
+    }
+  },
+  "":
+  [
+    
+  ],
+  ".POGOProtos.Data.Logs.ActionLogEntry":
+  {
+    "timestamp_ms":
+    {
+      "id":1,
+      "type":"int64"
+    },
+    "sfida":
+    {
+      "id":2,
+      "type":"bool"
+    }
+  },
+  ".POGOProtos.Data.Logs.CatchPokemonLogEntry.Result":
+  {
+    "UNSET":0,
+    "POKEMON_CAPTURED":1,
+    "POKEMON_FLED":2
+  },
+  ".POGOProtos.Data.Logs.CatchPokemonLogEntry":
+  {
+    "result":
+    {
+      "id":1,
+      "type":".POGOProtos.Data.Logs.CatchPokemonLogEntry.Result"
+    },
+    "pokemon_id":
+    {
+      "id":2,
+      "type":".POGOProtos.Enums.PokemonId"
+    },
+    "combat_points":
+    {
+      "id":3,
+      "type":"int32"
+    },
+    "pokemon_data_id":
+    {
+      "id":4,
+      "type":"uint64"
+    }
+  },
+  ".POGOProtos.Data.Logs.FortSearchLogEntry.Result":
+  {
+    "UNSET":0,
+    "SUCCESS":1
+  },
+  ".POGOProtos.Data.Logs.FortSearchLogEntry":
+  {
+    "result":
+    {
+      "id":1,
+      "type":".POGOProtos.Data.Logs.FortSearchLogEntry.Result"
+    },
+    "fort_id":
+    {
+      "id":2,
+      "type":"string"
+    },
+    "items":
+    {
+      "id":3,
+      "type":".POGOProtos.Inventory.Item.ItemData",
+      "repeated":true
+    },
+    "eggs":
+    {
+      "id":4,
+      "type":"int32"
     }
   },
   ".POGOProtos.Data.Player.ContactSettings":
@@ -632,12 +713,13 @@
     "team":
     {
       "id":5,
-      "type":"int32"
+      "type":".POGOProtos.Enums.TeamColor"
     },
     "tutorial_state":
     {
       "id":7,
       "type":".POGOProtos.Enums.TutorialState",
+      "packed":true,
       "repeated":true
     },
     "avatar":
@@ -679,10 +761,10 @@
   },
   ".POGOProtos.Data.PokedexEntry":
   {
-    "pokedex_entry_number":
+    "pokemon_id":
     {
       "id":1,
-      "type":"int32"
+      "type":".POGOProtos.Enums.PokemonId"
     },
     "times_encountered":
     {
@@ -745,7 +827,7 @@
     "deployed_fort_id":
     {
       "id":8,
-      "type":"int32"
+      "type":"string"
     },
     "owner_name":
     {
@@ -805,7 +887,7 @@
     "pokeball":
     {
       "id":21,
-      "type":"int32"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "captured_cell_id":
     {
@@ -840,7 +922,7 @@
     "additional_cp_multiplier":
     {
       "id":28,
-      "type":"int32"
+      "type":"float"
     },
     "favorite":
     {
@@ -1004,12 +1086,6 @@
     "ANDROID":2,
     "OSX":3,
     "WINDOWS":4
-  },
-  ".POGOProtos.Enums.PokemonClass":
-  {
-    "NORMAL":0,
-    "LEGENDARY":1,
-    "MYTHIC":2
   },
   ".POGOProtos.Enums.PokemonFamilyId":
   {
@@ -1443,6 +1519,12 @@
     "MOVEMENT_FLYING":5,
     "MOVEMENT_HOVERING":6
   },
+  ".POGOProtos.Enums.PokemonRarity":
+  {
+    "NORMAL":0,
+    "LEGENDARY":1,
+    "MYTHIC":2
+  },
   ".POGOProtos.Enums.PokemonType":
   {
     "POKEMON_TYPE_NONE":0,
@@ -1490,12 +1572,12 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "item_type":
     {
       "id":2,
-      "type":".POGOProtos.Inventory.ItemType"
+      "type":".POGOProtos.Inventory.Item.ItemType"
     },
     "expire_ms":
     {
@@ -1517,6 +1599,19 @@
       "repeated":true
     }
   },
+  ".POGOProtos.Inventory.Candy":
+  {
+    "family_id":
+    {
+      "id":1,
+      "type":".POGOProtos.Enums.PokemonFamilyId"
+    },
+    "candy":
+    {
+      "id":2,
+      "type":"int32"
+    }
+  },
   ".POGOProtos.Inventory.EggIncubator":
   {
     "id":
@@ -1527,7 +1622,7 @@
     "item_id":
     {
       "id":2,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "incubator_type":
     {
@@ -1560,7 +1655,8 @@
     "egg_incubator":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.EggIncubator"
+      "type":".POGOProtos.Inventory.EggIncubator",
+      "repeated":true
     }
   },
   ".POGOProtos.Inventory.EggIncubatorType":
@@ -1587,6 +1683,14 @@
       "repeated":true
     }
   },
+  ".POGOProtos.Inventory.InventoryItem.DeletedItem":
+  {
+    "pokemon_id":
+    {
+      "id":1,
+      "type":"fixed64"
+    }
+  },
   ".POGOProtos.Inventory.InventoryItem":
   {
     "modified_timestamp_ms":
@@ -1594,10 +1698,10 @@
       "id":1,
       "type":"int64"
     },
-    "deleted_item_key":
+    "deleted_item":
     {
       "id":2,
-      "type":"int64"
+      "type":".POGOProtos.Inventory.InventoryItem.DeletedItem"
     },
     "inventory_item_data":
     {
@@ -1615,7 +1719,7 @@
     "item":
     {
       "id":2,
-      "type":".POGOProtos.Inventory.Item"
+      "type":".POGOProtos.Inventory.Item.ItemData"
     },
     "pokedex_entry":
     {
@@ -1652,10 +1756,10 @@
       "id":9,
       "type":".POGOProtos.Inventory.EggIncubators"
     },
-    "pokemon_family":
+    "candy":
     {
       "id":10,
-      "type":".POGOProtos.Inventory.PokemonFamily"
+      "type":".POGOProtos.Inventory.Candy"
     }
   },
   ".POGOProtos.Inventory.InventoryUpgrade":
@@ -1663,7 +1767,7 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "upgrade_type":
     {
@@ -1691,12 +1795,25 @@
     "INCREASE_ITEM_STORAGE":1,
     "INCREASE_POKEMON_STORAGE":2
   },
-  ".POGOProtos.Inventory.Item":
+  ".POGOProtos.Inventory.Item.ItemAward":
   {
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
+    },
+    "item_count":
+    {
+      "id":2,
+      "type":"int32"
+    }
+  },
+  ".POGOProtos.Inventory.Item.ItemData":
+  {
+    "item_id":
+    {
+      "id":1,
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "count":
     {
@@ -1709,20 +1826,7 @@
       "type":"bool"
     }
   },
-  ".POGOProtos.Inventory.ItemAward":
-  {
-    "item_id":
-    {
-      "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
-    },
-    "item_count":
-    {
-      "id":2,
-      "type":"int32"
-    }
-  },
-  ".POGOProtos.Inventory.ItemId":
+  ".POGOProtos.Inventory.Item.ItemId":
   {
     "ITEM_UNKNOWN":0,
     "ITEM_POKE_BALL":1,
@@ -1755,7 +1859,7 @@
     "ITEM_POKEMON_STORAGE_UPGRADE":1001,
     "ITEM_ITEM_STORAGE_UPGRADE":1002
   },
-  ".POGOProtos.Inventory.ItemType":
+  ".POGOProtos.Inventory.Item.ItemType":
   {
     "ITEM_TYPE_NONE":0,
     "ITEM_TYPE_POKEBALL":1,
@@ -1770,19 +1874,6 @@
     "ITEM_TYPE_INCENSE":10,
     "ITEM_TYPE_XP_BOOST":11,
     "ITEM_TYPE_INVENTORY_UPGRADE":12
-  },
-  ".POGOProtos.Inventory.PokemonFamily":
-  {
-    "family_id":
-    {
-      "id":1,
-      "type":".POGOProtos.Enums.PokemonFamilyId"
-    },
-    "candy":
-    {
-      "id":2,
-      "type":"int32"
-    }
   },
   ".POGOProtos.Map.Fort.FortData":
   {
@@ -1874,10 +1965,10 @@
       "id":1,
       "type":"string"
     },
-    "unknown2":
+    "encounter_id":
     {
       "id":2,
-      "type":"double"
+      "type":"fixed64"
     },
     "active_pokemon_id":
     {
@@ -1895,7 +1986,7 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "expiration_timestamp_ms":
     {
@@ -1924,22 +2015,22 @@
     "fort_summary_id":
     {
       "id":1,
-      "type":"int32"
+      "type":"string"
     },
     "last_modified_timestamp_ms":
     {
       "id":2,
-      "type":"int32"
+      "type":"int64"
     },
     "latitude":
     {
       "id":3,
-      "type":"int32"
+      "type":"double"
     },
     "longitude":
     {
       "id":4,
-      "type":"int32"
+      "type":"double"
     }
   },
   ".POGOProtos.Map.Fort.FortType":
@@ -2183,10 +2274,11 @@
       "type":".POGOProtos.Networking.Requests.Request",
       "repeated":true
     },
-    "unknown6":
+    "signature":
     {
       "id":6,
-      "type":".POGOProtos.Networking.Envelopes.Unknown6"
+      "type":".POGOProtos.Networking.Envelopes.Signature",
+      "repeated":true
     },
     "latitude":
     {
@@ -2257,7 +2349,8 @@
     "unknown6":
     {
       "id":6,
-      "type":".POGOProtos.Networking.Envelopes.Unknown6Response"
+      "type":".POGOProtos.Networking.Envelopes.Unknown6Response",
+      "repeated":true
     },
     "auth_ticket":
     {
@@ -2276,6 +2369,334 @@
       "type":"string"
     }
   },
+  ".POGOProtos.Networking.Envelopes.Signature.LocationFix":
+  {
+    "provider":
+    {
+      "id":1,
+      "type":"string"
+    },
+    "timestamp_since_start":
+    {
+      "id":2,
+      "type":"uint64"
+    },
+    "latitude":
+    {
+      "id":13,
+      "type":"float"
+    },
+    "longitude":
+    {
+      "id":14,
+      "type":"float"
+    },
+    "unk20":
+    {
+      "id":20,
+      "type":"float"
+    },
+    "altitude":
+    {
+      "id":21,
+      "type":"float"
+    },
+    "unk22":
+    {
+      "id":22,
+      "type":"float"
+    },
+    "unk26":
+    {
+      "id":26,
+      "type":"uint64"
+    },
+    "unk28":
+    {
+      "id":28,
+      "type":"uint64"
+    }
+  },
+  ".POGOProtos.Networking.Envelopes.Signature.Unknown5":
+  {
+    "unk1":
+    {
+      "id":1,
+      "type":"uint64"
+    },
+    "unk2":
+    {
+      "id":2,
+      "type":"bytes"
+    },
+    "unk3":
+    {
+      "id":3,
+      "type":"fixed32",
+      "repeated":true
+    },
+    "unk4":
+    {
+      "id":4,
+      "type":"fixed32",
+      "repeated":true
+    },
+    "unk5":
+    {
+      "id":5,
+      "type":"fixed32",
+      "repeated":true
+    },
+    "unk6":
+    {
+      "id":6,
+      "type":"bytes"
+    },
+    "unk7":
+    {
+      "id":7,
+      "type":"bytes"
+    },
+    "unk8":
+    {
+      "id":8,
+      "type":"bytes"
+    }
+  },
+  ".POGOProtos.Networking.Envelopes.Signature.SensorInfo":
+  {
+    "timestamp_snapshot":
+    {
+      "id":1,
+      "type":"uint64"
+    },
+    "magnetometer_x":
+    {
+      "id":3,
+      "type":"double"
+    },
+    "magnetometer_y":
+    {
+      "id":4,
+      "type":"double"
+    },
+    "magnetometer_z":
+    {
+      "id":5,
+      "type":"double"
+    },
+    "angle_normalized_x":
+    {
+      "id":6,
+      "type":"double"
+    },
+    "angle_normalized_y":
+    {
+      "id":7,
+      "type":"double"
+    },
+    "angle_normalized_z":
+    {
+      "id":8,
+      "type":"double"
+    },
+    "accel_raw_x":
+    {
+      "id":10,
+      "type":"double"
+    },
+    "accel_raw_y":
+    {
+      "id":11,
+      "type":"double"
+    },
+    "accel_raw_z":
+    {
+      "id":12,
+      "type":"double"
+    },
+    "gyroscope_raw_x":
+    {
+      "id":13,
+      "type":"double"
+    },
+    "gyroscope_raw_y":
+    {
+      "id":14,
+      "type":"double"
+    },
+    "gyroscope_raw_z":
+    {
+      "id":15,
+      "type":"double"
+    },
+    "accel_normalized_x":
+    {
+      "id":16,
+      "type":"double"
+    },
+    "accel_normalized_y":
+    {
+      "id":17,
+      "type":"double"
+    },
+    "accel_normalized_z":
+    {
+      "id":18,
+      "type":"double"
+    },
+    "accelerometer_axes":
+    {
+      "id":19,
+      "type":"uint64"
+    }
+  },
+  ".POGOProtos.Networking.Envelopes.Signature.DeviceInfo":
+  {
+    "device_id":
+    {
+      "id":1,
+      "type":"string"
+    },
+    "android_board_name":
+    {
+      "id":2,
+      "type":"string"
+    },
+    "android_bootloader":
+    {
+      "id":3,
+      "type":"string"
+    },
+    "device_brand":
+    {
+      "id":4,
+      "type":"string"
+    },
+    "device_model":
+    {
+      "id":5,
+      "type":"string"
+    },
+    "device_model_identifier":
+    {
+      "id":6,
+      "type":"string"
+    },
+    "device_model_boot":
+    {
+      "id":7,
+      "type":"string"
+    },
+    "hardware_manufacturer":
+    {
+      "id":8,
+      "type":"string"
+    },
+    "hardware_model":
+    {
+      "id":9,
+      "type":"string"
+    },
+    "firmware_brand":
+    {
+      "id":10,
+      "type":"string"
+    },
+    "firmware_tags":
+    {
+      "id":12,
+      "type":"string"
+    },
+    "firmware_type":
+    {
+      "id":13,
+      "type":"string"
+    },
+    "firmware_fingerprint":
+    {
+      "id":14,
+      "type":"string"
+    }
+  },
+  ".POGOProtos.Networking.Envelopes.Signature.Unknown9":
+  {
+    "unk3":
+    {
+      "id":3,
+      "type":"uint64"
+    },
+    "unk5":
+    {
+      "id":5,
+      "type":"uint64"
+    },
+    "unk6":
+    {
+      "id":6,
+      "type":"uint64"
+    }
+  },
+  ".POGOProtos.Networking.Envelopes.Signature":
+  {
+    "timestamp_since_start":
+    {
+      "id":2,
+      "type":"uint64"
+    },
+    "location_fix":
+    {
+      "id":4,
+      "type":".POGOProtos.Networking.Envelopes.Signature.LocationFix",
+      "repeated":true
+    },
+    "unk5":
+    {
+      "id":5,
+      "type":".POGOProtos.Networking.Envelopes.Signature.Unknown5"
+    },
+    "sensor_info":
+    {
+      "id":7,
+      "type":".POGOProtos.Networking.Envelopes.Signature.SensorInfo"
+    },
+    "device_info":
+    {
+      "id":8,
+      "type":".POGOProtos.Networking.Envelopes.Signature.DeviceInfo"
+    },
+    "unk9":
+    {
+      "id":9,
+      "type":".POGOProtos.Networking.Envelopes.Signature.Unknown9"
+    },
+    "location_hash1":
+    {
+      "id":10,
+      "type":"uint32"
+    },
+    "location_hash2":
+    {
+      "id":20,
+      "type":"uint32"
+    },
+    "unk22":
+    {
+      "id":22,
+      "type":"bytes"
+    },
+    "timestamp":
+    {
+      "id":23,
+      "type":"uint64"
+    },
+    "request_hash":
+    {
+      "id":24,
+      "type":"uint64",
+      "repeated":true
+    }
+  },
   ".POGOProtos.Networking.Envelopes.Unknown6.Unknown2":
   {
     "unknown1":
@@ -2286,7 +2707,7 @@
   },
   ".POGOProtos.Networking.Envelopes.Unknown6":
   {
-    "unknown1":
+    "request_type":
     {
       "id":1,
       "type":"int32"
@@ -2297,17 +2718,86 @@
       "type":".POGOProtos.Networking.Envelopes.Unknown6.Unknown2"
     }
   },
+  ".POGOProtos.Networking.Envelopes.Unknown6Response.Unknown2.StoreItem.Tag":
+  {
+    "key":
+    {
+      "id":1,
+      "type":"string"
+    },
+    "value":
+    {
+      "id":2,
+      "type":"string"
+    }
+  },
+  ".POGOProtos.Networking.Envelopes.Unknown6Response.Unknown2.StoreItem":
+  {
+    "item_id":
+    {
+      "id":1,
+      "type":"string"
+    },
+    "is_iap":
+    {
+      "id":2,
+      "type":"bool"
+    },
+    "currency_to_buy":
+    {
+      "id":3,
+      "type":".POGOProtos.Data.Player.Currency"
+    },
+    "yields_currency":
+    {
+      "id":4,
+      "type":".POGOProtos.Data.Player.Currency"
+    },
+    "yields_item":
+    {
+      "id":5,
+      "type":".POGOProtos.Inventory.Item.ItemData"
+    },
+    "tags":
+    {
+      "id":6,
+      "type":".POGOProtos.Networking.Envelopes.Unknown6Response.Unknown2.StoreItem.Tag",
+      "repeated":true
+    },
+    "unknown7":
+    {
+      "id":7,
+      "type":"int32"
+    }
+  },
   ".POGOProtos.Networking.Envelopes.Unknown6Response.Unknown2":
   {
     "unknown1":
     {
       "id":1,
       "type":"uint64"
+    },
+    "items":
+    {
+      "id":2,
+      "type":".POGOProtos.Networking.Envelopes.Unknown6Response.Unknown2.StoreItem",
+      "repeated":true
+    },
+    "player_currencies":
+    {
+      "id":3,
+      "type":".POGOProtos.Data.Player.Currency",
+      "repeated":true
+    },
+    "unknown4":
+    {
+      "id":4,
+      "type":"string"
     }
   },
   ".POGOProtos.Networking.Envelopes.Unknown6Response":
   {
-    "unknown1":
+    "response_type":
     {
       "id":1,
       "type":"int32"
@@ -2323,7 +2813,7 @@
     "modifier_type":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "fort_id":
     {
@@ -2385,14 +2875,14 @@
     "pokeball":
     {
       "id":2,
-      "type":"int32"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "normalized_reticle_size":
     {
       "id":3,
       "type":"double"
     },
-    "spawn_point_guid":
+    "spawn_point_id":
     {
       "id":4,
       "type":"string"
@@ -2446,7 +2936,7 @@
     "encounter_id":
     {
       "id":1,
-      "type":"fixed64"
+      "type":"uint64"
     },
     "fort_id":
     {
@@ -2565,7 +3055,7 @@
     "pokemon_id":
     {
       "id":2,
-      "type":"uint64"
+      "type":"fixed64"
     },
     "player_latitude":
     {
@@ -2606,7 +3096,7 @@
     "pokemon_id":
     {
       "id":2,
-      "type":"uint64"
+      "type":"fixed64"
     },
     "player_latitude":
     {
@@ -2770,9 +3260,13 @@
     }
   },
   ".POGOProtos.Networking.Requests.Messages.GetPlayerMessage":
-  [
-    
-  ],
+  {
+    "app_version":
+    {
+      "id":1,
+      "type":"string"
+    }
+  },
   ".POGOProtos.Networking.Requests.Messages.GetPlayerProfileMessage":
   {
     "player_name":
@@ -2790,7 +3284,7 @@
     "encounter_id":
     {
       "id":1,
-      "type":"int64"
+      "type":"uint64"
     },
     "encounter_location":
     {
@@ -2830,7 +3324,7 @@
     "pokemon_id":
     {
       "id":1,
-      "type":"uint64"
+      "type":"fixed64"
     },
     "nickname":
     {
@@ -2856,7 +3350,7 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "count":
     {
@@ -2893,7 +3387,7 @@
     "pokemon_id":
     {
       "id":1,
-      "type":"uint64"
+      "type":"int64"
     },
     "is_favorite":
     {
@@ -2909,6 +3403,10 @@
       "type":".POGOProtos.Enums.TeamColor"
     }
   },
+  ".POGOProtos.Networking.Requests.Messages.SfidaActionLogMessage":
+  [
+    
+  ],
   ".POGOProtos.Networking.Requests.Messages.StartGymBattleMessage":
   {
     "gym_id":
@@ -2925,7 +3423,7 @@
     "defending_pokemon_id":
     {
       "id":3,
-      "type":"uint64"
+      "type":"fixed64"
     },
     "player_latitude":
     {
@@ -2943,7 +3441,7 @@
     "pokemon_id":
     {
       "id":1,
-      "type":"uint64"
+      "type":"fixed64"
     }
   },
   ".POGOProtos.Networking.Requests.Messages.UseIncenseMessage":
@@ -2951,7 +3449,7 @@
     "incense_type":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     }
   },
   ".POGOProtos.Networking.Requests.Messages.UseItemCaptureMessage":
@@ -2959,14 +3457,14 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "encounter_id":
     {
       "id":2,
       "type":"fixed64"
     },
-    "spawn_point_guid":
+    "spawn_point_id":
     {
       "id":3,
       "type":"string"
@@ -2990,7 +3488,7 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "gym_id":
     {
@@ -3013,12 +3511,12 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "pokemon_id":
     {
       "id":2,
-      "type":"uint64"
+      "type":"fixed64"
     }
   },
   ".POGOProtos.Networking.Requests.Messages.UseItemReviveMessage":
@@ -3026,12 +3524,12 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "pokemon_id":
     {
       "id":2,
-      "type":"uint64"
+      "type":"fixed64"
     }
   },
   ".POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessage":
@@ -3039,7 +3537,7 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     }
   },
   ".POGOProtos.Networking.Requests.Request":
@@ -3191,7 +3689,7 @@
     "captured_pokemon_id":
     {
       "id":3,
-      "type":"uint64"
+      "type":"fixed64"
     },
     "capture_award":
     {
@@ -3768,7 +4266,7 @@
     "items_awarded":
     {
       "id":2,
-      "type":".POGOProtos.Inventory.ItemAward",
+      "type":".POGOProtos.Inventory.Item.ItemAward",
       "repeated":true
     },
     "gems_awarded":
@@ -3865,7 +4363,7 @@
     "pokemon_id":
     {
       "id":2,
-      "type":"uint64",
+      "type":"fixed64",
       "packed":true,
       "repeated":true
     },
@@ -3901,10 +4399,10 @@
       "id":1,
       "type":".POGOProtos.Networking.Responses.GetIncensePokemonResponse.Result"
     },
-    "pokemon_type_id":
+    "pokemon_id":
     {
       "id":2,
-      "type":"int32"
+      "type":".POGOProtos.Enums.PokemonId"
     },
     "latitude":
     {
@@ -3924,7 +4422,7 @@
     "encounter_id":
     {
       "id":6,
-      "type":"uint64"
+      "type":"fixed64"
     },
     "disappear_timestamp_ms":
     {
@@ -4051,13 +4549,13 @@
     "items_awarded":
     {
       "id":2,
-      "type":".POGOProtos.Inventory.ItemAward",
+      "type":".POGOProtos.Inventory.Item.ItemAward",
       "repeated":true
     },
     "items_unlocked":
     {
       "id":4,
-      "type":".POGOProtos.Inventory.ItemId",
+      "type":".POGOProtos.Inventory.Item.ItemId",
       "repeated":true
     }
   },
@@ -4223,6 +4721,25 @@
     {
       "id":2,
       "type":".POGOProtos.Data.PlayerData"
+    }
+  },
+  ".POGOProtos.Networking.Responses.SfidaActionLogResponse.Result":
+  {
+    "UNSET":0,
+    "SUCCESS":1
+  },
+  ".POGOProtos.Networking.Responses.SfidaActionLogResponse":
+  {
+    "result":
+    {
+      "id":1,
+      "type":".POGOProtos.Networking.Responses.SfidaActionLogResponse.Result"
+    },
+    "log_entries":
+    {
+      "id":2,
+      "type":".POGOProtos.Data.Logs.ActionLogEntry",
+      "repeated":true
     }
   },
   ".POGOProtos.Networking.Responses.StartGymBattleResponse.Result":
@@ -4897,7 +5414,7 @@
     "item_ids":
     {
       "id":4,
-      "type":".POGOProtos.Inventory.ItemId",
+      "type":".POGOProtos.Inventory.Item.ItemId",
       "repeated":true
     },
     "counts":
@@ -5120,12 +5637,12 @@
     "item_id":
     {
       "id":1,
-      "type":".POGOProtos.Inventory.ItemId"
+      "type":".POGOProtos.Inventory.Item.ItemId"
     },
     "item_type":
     {
       "id":2,
-      "type":".POGOProtos.Inventory.ItemType"
+      "type":".POGOProtos.Inventory.Item.ItemType"
     },
     "category":
     {
@@ -5207,7 +5724,7 @@
     "movement_id":
     {
       "id":1,
-      "type":".POGOProtos.Enums.PokemonMovementType"
+      "type":".POGOProtos.Enums.PokemonMove"
     },
     "animation_id":
     {
@@ -5476,10 +5993,10 @@
       "id":13,
       "type":"int32"
     },
-    "class":
+    "rarity":
     {
       "id":14,
-      "type":".POGOProtos.Enums.PokemonClass"
+      "type":".POGOProtos.Enums.PokemonRarity"
     },
     "pokedex_height_m":
     {

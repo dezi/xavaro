@@ -3,7 +3,7 @@ message POGOProtos.Data.AssetDigestEntry
 	string asset_id = 1;
 	string bundle_name = 2;
 	int64 version = 3;
-	uint32 checksum = 4;
+	fixed32 checksum = 4;
 	int32 size = 5;
 	bytes key = 6;
 }
@@ -16,13 +16,13 @@ message POGOProtos.Data.Battle.BattleAction
 	int32 energy_delta = 5;
 	int32 attacker_index = 6;
 	int32 target_index = 7;
-	uint64 active_pokemon_id = 8;
+	fixed64 active_pokemon_id = 8;
 	.POGOProtos.Data.Battle.BattleParticipant player_joined = 9;
 	.POGOProtos.Data.Battle.BattleResults battle_results = 10;
 	int64 damage_windows_start_timestamp_mss = 11;
 	int64 damage_windows_end_timestamp_mss = 12;
 	.POGOProtos.Data.Battle.BattleParticipant player_left = 13;
-	uint64 target_pokemon_id = 14;
+	fixed64 target_pokemon_id = 14;
 }
 
 enum POGOProtos.Data.Battle.BattleActionType
@@ -92,16 +92,16 @@ enum POGOProtos.Data.Battle.BattleType
 
 message POGOProtos.Data.Capture.CaptureAward
 {
-	repeated .POGOProtos.Enums.ActivityType activity_type = 1;
-	repeated int32 xp = 2;
-	repeated int32 candy = 3;
-	repeated int32 stardust = 4;
+	repeated .POGOProtos.Enums.ActivityType activity_type = 1  [packed=true];
+	repeated int32 xp = 2  [packed=true];
+	repeated int32 candy = 3  [packed=true];
+	repeated int32 stardust = 4  [packed=true];
 }
 
 message POGOProtos.Data.Capture.CaptureProbability
 {
-	repeated .POGOProtos.Inventory.ItemId pokeball_type = 1;
-	repeated float capture_probability = 2;
+	repeated .POGOProtos.Inventory.Item.ItemId pokeball_type = 1 [packed=true];
+	repeated float capture_probability = 2 [packed=true];
 	double reticle_difficulty_scale = 12;
 }
 
@@ -110,7 +110,7 @@ message POGOProtos.Data.DownloadUrlEntry
 	string asset_id = 1;
 	string url = 2;
 	int32 size = 3;
-	uint32 checksum = 4;
+	fixed32 checksum = 4;
 }
 
 message POGOProtos.Data.Gym.GymMembership
@@ -123,6 +123,47 @@ message POGOProtos.Data.Gym.GymState
 {
 	.POGOProtos.Map.Fort.FortData fort_data = 1;
 	repeated .POGOProtos.Data.Gym.GymMembership memberships = 2;
+}
+
+message POGOProtos.Data.Logs.ActionLogEntry
+{
+	int64 timestamp_ms = 1;
+	bool sfida = 2;
+
+	oneof Action
+	{
+		.POGOProtos.Data.Logs.CatchPokemonLogEntry catch_pokemon = 3;
+		.POGOProtos.Data.Logs.FortSearchLogEntry fort_search = 4;
+	}
+}
+
+message POGOProtos.Data.Logs.CatchPokemonLogEntry
+{
+	.POGOProtos.Data.Logs.CatchPokemonLogEntry.Result result = 1;
+	.POGOProtos.Enums.PokemonId pokemon_id = 2;
+	int32 combat_points = 3;
+	uint64 pokemon_data_id = 4;
+
+	enum Result
+	{
+		UNSET = 0;
+		POKEMON_CAPTURED = 1;
+		POKEMON_FLED = 2;
+	}
+}
+
+message POGOProtos.Data.Logs.FortSearchLogEntry
+{
+	.POGOProtos.Data.Logs.FortSearchLogEntry.Result result = 1;
+	string fort_id = 2;
+	repeated .POGOProtos.Inventory.Item.ItemData items = 3;
+	int32 eggs = 4;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
+	}
 }
 
 message POGOProtos.Data.Player.ContactSettings
@@ -220,8 +261,8 @@ message POGOProtos.Data.PlayerData
 {
 	int64 creation_timestamp_ms  = 1;
 	string username = 2;
-	int32 team = 5;
-	repeated .POGOProtos.Enums.TutorialState tutorial_state = 7;
+	.POGOProtos.Enums.TeamColor team = 5;
+	repeated .POGOProtos.Enums.TutorialState tutorial_state = 7 [packed=true];
 	.POGOProtos.Data.Player.PlayerAvatar avatar = 8;
 	int32 max_pokemon_storage = 9;
 	int32 max_item_storage = 10;
@@ -233,11 +274,11 @@ message POGOProtos.Data.PlayerData
 
 message POGOProtos.Data.PokedexEntry
 {
-  int32 pokedex_entry_number = 1;
-  int32 times_encountered = 2;
-  int32 times_captured = 3;
-  int32 evolution_stone_pieces = 4;
-  int32 evolution_stones = 5;
+	.POGOProtos.Enums.PokemonId pokemon_id = 1;
+	int32 times_encountered = 2;
+	int32 times_captured = 3;
+	int32 evolution_stone_pieces = 4;
+	int32 evolution_stones = 5;
 }
 
 message POGOProtos.Data.PokemonData
@@ -249,7 +290,7 @@ message POGOProtos.Data.PokemonData
 	int32 stamina_max = 5;
 	.POGOProtos.Enums.PokemonMove move_1 = 6;
 	.POGOProtos.Enums.PokemonMove move_2 = 7;
-	int32 deployed_fort_id = 8;
+	string deployed_fort_id = 8;
 	string owner_name = 9;
 	bool is_egg = 10;
 	double egg_km_walked_target = 11;
@@ -261,14 +302,14 @@ message POGOProtos.Data.PokemonData
 	int32 individual_defense = 18;
 	int32 individual_stamina = 19;
 	float cp_multiplier = 20;
-	int32 pokeball = 21;
+	.POGOProtos.Inventory.Item.ItemId pokeball = 21;
 	uint64 captured_cell_id = 22;
 	int32 battles_attacked = 23;
 	int32 battles_defended = 24;
 	string egg_incubator_id = 25;
 	uint64 creation_time_ms = 26;
 	int32 num_upgrades = 27;
-	int32 additional_cp_multiplier = 28;
+	float additional_cp_multiplier = 28;
 	int32 favorite = 29;
 	string nickname = 30;
 	int32 from_fort = 31;
@@ -428,13 +469,6 @@ enum POGOProtos.Enums.Platform
 	ANDROID = 2;
 	OSX = 3;
 	WINDOWS = 4;
-}
-
-enum POGOProtos.Enums.PokemonClass
-{
-	NORMAL = 0;
-	LEGENDARY = 1;
-	MYTHIC = 2;
 }
 
 enum POGOProtos.Enums.PokemonFamilyId
@@ -873,6 +907,13 @@ enum POGOProtos.Enums.PokemonMovementType
 	MOVEMENT_HOVERING = 6;
 }
 
+enum POGOProtos.Enums.PokemonRarity
+{
+	NORMAL = 0;
+	LEGENDARY = 1;
+	MYTHIC = 2;
+}
+
 enum POGOProtos.Enums.PokemonType
 {
 	POKEMON_TYPE_NONE = 0;
@@ -920,8 +961,8 @@ enum POGOProtos.Enums.TutorialState
 
 message POGOProtos.Inventory.AppliedItem
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
-	.POGOProtos.Inventory.ItemType item_type = 2;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemType item_type = 2;
 	int64 expire_ms = 3;
 	int64 applied_ms = 4;
 }
@@ -931,10 +972,16 @@ message POGOProtos.Inventory.AppliedItems
 	repeated .POGOProtos.Inventory.AppliedItem item = 4;
 }
 
+message POGOProtos.Inventory.Candy
+{
+	.POGOProtos.Enums.PokemonFamilyId family_id = 1;
+	int32 candy = 2;
+}
+
 message POGOProtos.Inventory.EggIncubator
 {
 	string id = 1;
-	.POGOProtos.Inventory.ItemId item_id = 2;
+	.POGOProtos.Inventory.Item.ItemId item_id = 2;
 	.POGOProtos.Inventory.EggIncubatorType incubator_type = 3;
 	int32 uses_remaining = 4;
 	uint64 pokemon_id = 5; // TODO: Check if is PokemonType
@@ -944,7 +991,7 @@ message POGOProtos.Inventory.EggIncubator
 
 message POGOProtos.Inventory.EggIncubators
 {
-	.POGOProtos.Inventory.EggIncubator egg_incubator = 1;
+	repeated .POGOProtos.Inventory.EggIncubator egg_incubator = 1;
 }
 
 enum POGOProtos.Inventory.EggIncubatorType
@@ -963,14 +1010,19 @@ message POGOProtos.Inventory.InventoryDelta
 message POGOProtos.Inventory.InventoryItem
 {
 	int64 modified_timestamp_ms = 1;
-	int64 deleted_item_key = 2;
+	DeletedItem deleted_item = 2;
 	.POGOProtos.Inventory.InventoryItemData inventory_item_data = 3;
+
+	message DeletedItem
+	{
+		fixed64 pokemon_id = 1;
+	}
 }
 
 message POGOProtos.Inventory.InventoryItemData
 {
 	.POGOProtos.Data.PokemonData pokemon_data = 1;
-	.POGOProtos.Inventory.Item item = 2;
+	.POGOProtos.Inventory.Item.ItemData item = 2;
 	.POGOProtos.Data.PokedexEntry pokedex_entry = 3;
 	.POGOProtos.Data.Player.PlayerStats player_stats = 4;
 	.POGOProtos.Data.Player.PlayerCurrency player_currency = 5;
@@ -978,12 +1030,12 @@ message POGOProtos.Inventory.InventoryItemData
 	.POGOProtos.Inventory.InventoryUpgrades inventory_upgrades = 7;
 	.POGOProtos.Inventory.AppliedItems applied_items = 8;
 	.POGOProtos.Inventory.EggIncubators egg_incubators = 9;
-	.POGOProtos.Inventory.PokemonFamily pokemon_family = 10;
+	.POGOProtos.Inventory.Candy candy = 10;
 }
 
 message POGOProtos.Inventory.InventoryUpgrade
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
 	.POGOProtos.Inventory.InventoryUpgradeType upgrade_type = 2;
 	int32 additional_storage = 3;
 }
@@ -1000,20 +1052,20 @@ enum POGOProtos.Inventory.InventoryUpgradeType
 	INCREASE_POKEMON_STORAGE = 2;
 }
 
-message POGOProtos.Inventory.Item
+message POGOProtos.Inventory.Item.ItemAward
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
+	int32 item_count = 2;
+}
+
+message POGOProtos.Inventory.Item.ItemData
+{
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
 	int32 count = 2;
 	bool unseen = 3;
 }
 
-message POGOProtos.Inventory.ItemAward
-{
-	.POGOProtos.Inventory.ItemId item_id = 1;
-	int32 item_count = 2;
-}
-
-enum POGOProtos.Inventory.ItemId
+enum POGOProtos.Inventory.Item.ItemId
 {
 	ITEM_UNKNOWN = 0;
 	ITEM_POKE_BALL = 1;
@@ -1047,7 +1099,7 @@ enum POGOProtos.Inventory.ItemId
 	ITEM_ITEM_STORAGE_UPGRADE = 1002;
 }
 
-enum POGOProtos.Inventory.ItemType
+enum POGOProtos.Inventory.Item.ItemType
 {
 	ITEM_TYPE_NONE = 0;
 	ITEM_TYPE_POKEBALL = 1;
@@ -1062,12 +1114,6 @@ enum POGOProtos.Inventory.ItemType
 	ITEM_TYPE_INCENSE = 10;
 	ITEM_TYPE_XP_BOOST = 11;
 	ITEM_TYPE_INVENTORY_UPGRADE = 12;
-}
-
-message POGOProtos.Inventory.PokemonFamily
-{
-	.POGOProtos.Enums.PokemonFamilyId family_id = 1;
-	int32 candy = 2;
 }
 
 message POGOProtos.Map.Fort.FortData
@@ -1110,14 +1156,14 @@ message POGOProtos.Map.Fort.FortData
 message POGOProtos.Map.Fort.FortLureInfo
 {
 	string fort_id = 1;
-	double unknown2 = 2;
+	fixed64 encounter_id = 2; 
 	.POGOProtos.Enums.PokemonId active_pokemon_id = 3;
 	int64 lure_expires_timestamp_ms = 4;
 }
 
 message POGOProtos.Map.Fort.FortModifier
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
 	int64 expiration_timestamp_ms = 2;
 	string deployer_player_codename = 3;
 }
@@ -1137,10 +1183,10 @@ enum POGOProtos.Map.Fort.FortSponsor
 
 message POGOProtos.Map.Fort.FortSummary
 {
-	int32 fort_summary_id = 1;
-	int32 last_modified_timestamp_ms = 2;
-	int32 latitude = 3;
-	int32 longitude = 4;
+	string fort_summary_id = 1;
+	int64 last_modified_timestamp_ms = 2;
+	double latitude = 3;
+	double longitude = 4;
 }
 
 enum POGOProtos.Map.Fort.FortType
@@ -1226,7 +1272,7 @@ message POGOProtos.Networking.Envelopes.RequestEnvelope
 	uint64 request_id = 3;
 	repeated .POGOProtos.Networking.Requests.Request requests = 4;
 
-	.POGOProtos.Networking.Envelopes.Unknown6 unknown6 = 6;
+	repeated .POGOProtos.Networking.Envelopes.Signature signature = 6;
 	double latitude = 7;
 	double longitude = 8;
 	double altitude = 9;
@@ -1253,16 +1299,117 @@ message POGOProtos.Networking.Envelopes.ResponseEnvelope
 	uint64 request_id = 2;
 	string api_url = 3;
 
-	.POGOProtos.Networking.Envelopes.Unknown6Response unknown6 = 6;
+	repeated .POGOProtos.Networking.Envelopes.Unknown6Response unknown6 = 6;
 	.POGOProtos.Networking.Envelopes.AuthTicket auth_ticket = 7;
 
 	repeated bytes returns = 100;
 	string error = 101;
+
+	message Unknown7
+	{
+		bytes unknown71 = 1;
+		int64 unknown72 = 2;
+		bytes unknown73 = 3;
+	}
+}
+
+message POGOProtos.Networking.Envelopes.Signature
+{
+
+	message LocationFix
+	{
+		string provider = 1; // "network", "gps", "fused", possibly others
+		uint64 timestamp_since_start = 2; // in ms
+		float latitude = 13;
+		float longitude = 14;
+		float unk20 = 20; // iOS only, possibly horizontal accuracy? (range seems to be -1 to +1)
+		float altitude = 21;
+		float unk22 = 22; // iOS only, possibly vertical accuracy? (range seems to be ~10-12)
+		uint64 unk26 = 26; // Usually 3 (possibly GPS status: 1 = no fix, 2 = acquiring/inaccurate, 3 = fix acquired)
+						   // On iOS there are some LocationFixes with unk26=1 and everything else empty
+		uint64 unk28 = 28; // Always 1 (if there is data at all)
+	}
+
+	message Unknown5
+	{
+		uint64 unk1 = 1;
+		bytes unk2 = 2;
+		repeated fixed32 unk3 = 3;
+		repeated fixed32 unk4 = 4;
+		repeated fixed32 unk5 = 5;
+		bytes unk6 = 6;
+		bytes unk7 = 7;
+		bytes unk8 = 8;
+	}
+
+	message SensorInfo
+	{
+		uint64 timestamp_snapshot = 1; // in ms
+		double magnetometer_x = 3;
+		double magnetometer_y = 4;
+		double magnetometer_z = 5;
+		double angle_normalized_x = 6;
+		double angle_normalized_y = 7;
+		double angle_normalized_z = 8;
+		double accel_raw_x = 10;
+		double accel_raw_y = 11;
+		double accel_raw_z = 12;
+		double gyroscope_raw_x = 13;
+		double gyroscope_raw_y = 14;
+		double gyroscope_raw_z = 15;
+		double accel_normalized_x = 16;
+		double accel_normalized_y = 17;
+		double accel_normalized_z = 18;
+		uint64 accelerometer_axes = 19; // Always 3
+	}
+
+	message DeviceInfo
+	{
+		string device_id = 1; // Hex string
+		string android_board_name = 2;
+		string android_bootloader = 3;
+		string device_brand = 4; // On Android: product.brand
+		string device_model = 5; // On Android: product.device
+		string device_model_identifier = 6; // Android only, build.display.id
+		string device_model_boot = 7;  // On Android: boot.hardware
+		string hardware_manufacturer = 8; // On Android: product.manufacturer
+		string hardware_model = 9;  // On Android: product.model
+		string firmware_brand = 10; // On Android: product.name, on iOS: "iPhone OS"
+		string firmware_tags = 12; // Android only, build.tags
+		string firmware_type = 13; // On Android: build.type, on iOS instead: iOS version
+		string firmware_fingerprint = 14; // Android only, build.fingerprint
+	}
+
+	// Apparently iOS only
+	message Unknown9
+	{
+		// all of these had 1 as their value
+		uint64 unk3 = 3;
+		uint64 unk5 = 5;
+		uint64 unk6 = 6;
+	}
+
+	uint64 timestamp_since_start = 2; // in ms
+	repeated LocationFix location_fix = 4;
+	Unknown5 unk5 = 5;
+	SensorInfo sensor_info = 7;
+	DeviceInfo device_info = 8;
+	Unknown9 unk9 = 9;
+	uint32 location_hash1 = 10; // Location1 hashed based on the auth_token - xxHash32
+	uint32 location_hash2 = 20; // Location2 hashed based on the auth_token - xxHash32
+	bytes unk22 = 22; // possibly replay check. Generation unknown but pointed to by 0001B8614
+	uint64 timestamp = 23; // epoch timestamp in ms
+	repeated uint64 request_hash = 24; // hashes of each request message in a hashArray - xxhash64
+
+	// Addresses for the corresponding hash functions:
+	//	xxHash32			  00054D28
+	//	xxhash64			  000546C8 - Feeds into 00053D40
+
 }
 
 message POGOProtos.Networking.Envelopes.Unknown6
 {
-	int32 unknown1 = 1; //6
+	int32 request_type = 1; // 5 for IAPs, 6 is unknown still
 	Unknown2 unknown2 = 2;
 
 	message Unknown2
@@ -1273,18 +1420,38 @@ message POGOProtos.Networking.Envelopes.Unknown6
 
 message POGOProtos.Networking.Envelopes.Unknown6Response
 {
-	int32 unknown1 = 1; //6
-	Unknown2 unknown2 = 2;
+	int32 response_type = 1; // Still don't know what 6 is, but 5 lists items available via IAPs. 
+	Unknown2 unknown2 = 2; // Response data
 
 	message Unknown2
 	{
-		uint64 unknown1 = 1;
+		uint64 unknown1 = 1; // Maybe status? It's always 1 (success), so it's probably that.
+		repeated StoreItem items = 2; // Items to show in the shop
+		repeated .POGOProtos.Data.Player.Currency player_currencies = 3; // currencies that player has at the moment
+		string unknown4 = 4; // Some base64 encoded stuff...
+		
+		message StoreItem
+		{
+			string item_id = 1; // Internal ID (probably for Google Play/App Store) example: "pgorelease.incenseordinary.1"
+			bool is_iap = 2; // If true, this item is bought with real currency (USD, etc.) through the Play/App Store instead of Pokecoins
+			.POGOProtos.Data.Player.Currency currency_to_buy = 3; // This defines how much the item costs (with the exception of items that cost real money like Pokecoins, that's defined in the respective store)
+			.POGOProtos.Data.Player.Currency yields_currency = 4; // When bought, this IAP will yield this much currency
+			.POGOProtos.Inventory.Item.ItemData yields_item = 5; // The item and count of such item that this IAP will yield
+			repeated Tag tags = 6; // Stuff like SORT:12, CATEGORY:ITEMS
+			int32 unknown7 = 7; // Possibly something to toggle visibility in the store/purchasibility?
+			
+			message Tag
+		{
+				string key = 1;
+				string value = 2;
+			}
+		}
 	}
 }
 
 message POGOProtos.Networking.Requests.Messages.AddFortModifierMessage
 {
-	.POGOProtos.Inventory.ItemId modifier_type = 1;
+	.POGOProtos.Inventory.Item.ItemId modifier_type = 1;
 	string fort_id = 2;
 	double player_latitude = 3;
 	double player_longitude = 4;
@@ -1303,9 +1470,9 @@ message POGOProtos.Networking.Requests.Messages.AttackGymMessage
 message POGOProtos.Networking.Requests.Messages.CatchPokemonMessage
 {
 	fixed64 encounter_id = 1;
-	int32 pokeball = 2;
+	.POGOProtos.Inventory.Item.ItemId pokeball = 2;
 	double normalized_reticle_size = 3;
-	string spawn_point_guid = 4;
+	string spawn_point_id = 4;
 	bool hit_pokemon = 5;
 	double spin_modifier = 6;
 	double normalized_hit_position = 7;
@@ -1338,7 +1505,7 @@ message POGOProtos.Networking.Requests.Messages.CollectDailyDefenderBonusMessage
 
 message POGOProtos.Networking.Requests.Messages.DiskEncounterMessage
 {
-	fixed64 encounter_id = 1;
+	uint64 encounter_id = 1;
 	string fort_id = 2;
 	double player_latitude = 3;
 	double player_longitude = 4;
@@ -1394,7 +1561,7 @@ message POGOProtos.Networking.Requests.Messages.EvolvePokemonMessage
 message POGOProtos.Networking.Requests.Messages.FortDeployPokemonMessage
 {
 	string fort_id = 1;
-	uint64 pokemon_id = 2;
+	fixed64 pokemon_id = 2;
 	double player_latitude = 3;
 	double player_longitude = 4;
 }
@@ -1409,7 +1576,7 @@ message POGOProtos.Networking.Requests.Messages.FortDetailsMessage
 message POGOProtos.Networking.Requests.Messages.FortRecallPokemonMessage
 {
 	string fort_id = 1;
-	uint64 pokemon_id = 2;
+	fixed64 pokemon_id = 2;
 	double player_latitude = 3;
 	double player_longitude = 4;
 }
@@ -1474,7 +1641,8 @@ message POGOProtos.Networking.Requests.Messages.GetMapObjectsMessage
 
 message POGOProtos.Networking.Requests.Messages.GetPlayerMessage
 {
-	// No message needed.
+	// Human readable app version, e.g. "0.31.1"
+	string app_version = 1;
 }
 
 message POGOProtos.Networking.Requests.Messages.GetPlayerProfileMessage
@@ -1489,7 +1657,7 @@ message POGOProtos.Networking.Requests.Messages.GetSuggestedCodenamesMessage
 
 message POGOProtos.Networking.Requests.Messages.IncenseEncounterMessage
 {
-	int64 encounter_id = 1;
+	uint64 encounter_id = 1;
 	string encounter_location = 2;
 }
 
@@ -1507,7 +1675,7 @@ message POGOProtos.Networking.Requests.Messages.MarkTutorialCompleteMessage
 
 message POGOProtos.Networking.Requests.Messages.NicknamePokemonMessage
 {
-	uint64 pokemon_id = 1;
+	fixed64 pokemon_id = 1;
 	string nickname = 2;
 }
 
@@ -1519,7 +1687,7 @@ message POGOProtos.Networking.Requests.Messages.PlayerUpdateMessage
 
 message POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessage
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
 	int32 count = 2;
 }
 
@@ -1540,7 +1708,7 @@ message POGOProtos.Networking.Requests.Messages.SetContactSettingsMessage
 
 message POGOProtos.Networking.Requests.Messages.SetFavoritePokemonMessage
 {
-	uint64 pokemon_id = 1;
+	int64 pokemon_id = 1; // Do not change https://github.com/AeonLucid/POGOProtos/pull/126
 	bool is_favorite = 2;
 }
 
@@ -1549,30 +1717,35 @@ message POGOProtos.Networking.Requests.Messages.SetPlayerTeamMessage
 	.POGOProtos.Enums.TeamColor team = 1;
 }
 
+message POGOProtos.Networking.Requests.Messages.SfidaActionLogMessage
+{
+	// No message needed.
+}
+
 message POGOProtos.Networking.Requests.Messages.StartGymBattleMessage
 {
 	string gym_id = 1;
 	repeated fixed64 attacking_pokemon_ids = 2;
-	uint64 defending_pokemon_id = 3;
+	fixed64 defending_pokemon_id = 3; // needs to be fixed64, tested by Grover
 	double player_latitude = 4;
 	double player_longitude = 5;
 }
 
 message POGOProtos.Networking.Requests.Messages.UpgradePokemonMessage
 {
-	uint64 pokemon_id = 1;
+	fixed64 pokemon_id = 1;
 }
 
 message POGOProtos.Networking.Requests.Messages.UseIncenseMessage
 {
-	.POGOProtos.Inventory.ItemId incense_type = 1;
+	.POGOProtos.Inventory.Item.ItemId incense_type = 1;
 }
 
 message POGOProtos.Networking.Requests.Messages.UseItemCaptureMessage
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
 	fixed64 encounter_id = 2;
-	string spawn_point_guid = 3;
+	string spawn_point_id = 3;
 }
 
 message POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessage
@@ -1583,7 +1756,7 @@ message POGOProtos.Networking.Requests.Messages.UseItemEggIncubatorMessage
 
 message POGOProtos.Networking.Requests.Messages.UseItemGymMessage
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
 	string gym_id = 2;
 	double player_latitude = 3;
 	double player_longitude = 4;
@@ -1591,19 +1764,19 @@ message POGOProtos.Networking.Requests.Messages.UseItemGymMessage
 
 message POGOProtos.Networking.Requests.Messages.UseItemPotionMessage
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
-	uint64 pokemon_id = 2;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
+	fixed64 pokemon_id = 2;
 }
 
 message POGOProtos.Networking.Requests.Messages.UseItemReviveMessage
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
-	uint64 pokemon_id = 2;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
+	fixed64 pokemon_id = 2;
 }
 
 message POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessage
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
 }
 
 message POGOProtos.Networking.Requests.Request
@@ -1682,7 +1855,7 @@ enum POGOProtos.Networking.Requests.RequestType
 	DEBUG_UPDATE_INVENTORY = 700;
 	DEBUG_DELETE_PLAYER = 701;
 	SFIDA_REGISTRATION = 800;			 // Not yet released.
-	SFIDA_ACTION_LOG = 801;			   // Not yet released.
+	SFIDA_ACTION_LOG = 801;			   // Implemented [R & M]
 	SFIDA_CERTIFICATION = 802;			// Not yet released.
 	SFIDA_UPDATE = 803;				   // Not yet released.
 	SFIDA_ACTION = 804;				   // Not yet released.
@@ -1716,7 +1889,7 @@ message POGOProtos.Networking.Responses.CatchPokemonResponse
 {
 	.POGOProtos.Networking.Responses.CatchPokemonResponse.CatchStatus status = 1;
 	double miss_percent = 2;
-	uint64 captured_pokemon_id = 3;
+	fixed64 captured_pokemon_id = 3;
 	.POGOProtos.Data.Capture.CaptureAward capture_award = 4;
 
 	enum CatchStatus
@@ -2001,7 +2174,7 @@ message POGOProtos.Networking.Responses.FortRecallPokemonResponse
 message POGOProtos.Networking.Responses.FortSearchResponse
 {
 	.POGOProtos.Networking.Responses.FortSearchResponse.Result result = 1;
-	repeated .POGOProtos.Inventory.ItemAward items_awarded = 2;
+	repeated .POGOProtos.Inventory.Item.ItemAward items_awarded = 2;
 	int32 gems_awarded = 3;
 	.POGOProtos.Data.PokemonData pokemon_data_egg = 4;
 	int32 experience_awarded = 5;
@@ -2049,7 +2222,7 @@ message POGOProtos.Networking.Responses.GetGymDetailsResponse
 message POGOProtos.Networking.Responses.GetHatchedEggsResponse
 {
 	bool success = 1;
-	repeated uint64 pokemon_id = 2 [packed=true];
+	repeated fixed64 pokemon_id = 2 [packed=true];
 	repeated int32 experience_awarded = 3;
 	repeated int32 candy_awarded = 4;
 	repeated int32 stardust_awarded = 5;
@@ -2058,11 +2231,11 @@ message POGOProtos.Networking.Responses.GetHatchedEggsResponse
 message POGOProtos.Networking.Responses.GetIncensePokemonResponse
 {
 	.POGOProtos.Networking.Responses.GetIncensePokemonResponse.Result result = 1;
-	int32 pokemon_type_id = 2; // TODO: PokemonType.proto or PokemonId.proto
+	.POGOProtos.Enums.PokemonId pokemon_id = 2;
 	double latitude = 3;
 	double longitude = 4;
 	string encounter_location = 5;
-	uint64 encounter_id = 6;
+	fixed64 encounter_id = 6;
 	int64 disappear_timestamp_ms = 7;
 
 	enum Result
@@ -2128,8 +2301,8 @@ message POGOProtos.Networking.Responses.IncenseEncounterResponse
 message POGOProtos.Networking.Responses.LevelUpRewardsResponse
 {
 	.POGOProtos.Networking.Responses.LevelUpRewardsResponse.Result result = 1;
-	repeated .POGOProtos.Inventory.ItemAward items_awarded = 2;
-	repeated .POGOProtos.Inventory.ItemId items_unlocked = 4;
+	repeated .POGOProtos.Inventory.Item.ItemAward items_awarded = 2;
+	repeated .POGOProtos.Inventory.Item.ItemId items_unlocked = 4;
 
 	enum Result
 	{
@@ -2246,6 +2419,18 @@ message POGOProtos.Networking.Responses.SetPlayerTeamResponse
 		SUCCESS = 1;
 		TEAM_ALREADY_SET = 2;
 		FAILURE = 3;
+	}
+}
+
+message POGOProtos.Networking.Responses.SfidaActionLogResponse
+{
+	.POGOProtos.Networking.Responses.SfidaActionLogResponse.Result result = 1;
+	repeated .POGOProtos.Data.Logs.ActionLogEntry log_entries = 2;
+
+	enum Result
+	{
+		UNSET = 0;
+		SUCCESS = 1;
 	}
 }
 
@@ -2521,7 +2706,7 @@ message POGOProtos.Settings.Master.IapItemDisplay
 	string sku = 1;
 	.POGOProtos.Enums.HoloIapItemCategory category = 2;
 	int32 sort_order = 3;
-	repeated .POGOProtos.Inventory.ItemId item_ids = 4;
+	repeated .POGOProtos.Inventory.Item.ItemId item_ids = 4;
 	repeated int32 counts = 5;
 }
 
@@ -2605,8 +2790,8 @@ message POGOProtos.Settings.Master.Item.ReviveAttributes
 
 message POGOProtos.Settings.Master.ItemSettings
 {
-	.POGOProtos.Inventory.ItemId item_id = 1;
-	.POGOProtos.Inventory.ItemType item_type = 2;
+	.POGOProtos.Inventory.Item.ItemId item_id = 1;
+	.POGOProtos.Inventory.Item.ItemType item_type = 2;
 	.POGOProtos.Enums.ItemCategory category = 3;
 	float drop_freq = 4;
 	int32 drop_trainer_level = 5;
@@ -2632,7 +2817,7 @@ message POGOProtos.Settings.Master.MoveSequenceSettings
 
 message POGOProtos.Settings.Master.MoveSettings
 {
-	.POGOProtos.Enums.PokemonMovementType movement_id = 1;
+	.POGOProtos.Enums.PokemonMove movement_id = 1;
 	int32 animation_id = 2;
 	.POGOProtos.Enums.PokemonType pokemon_type = 3;
 	float power = 4;
@@ -2702,7 +2887,7 @@ message POGOProtos.Settings.Master.PokemonSettings
 	repeated float animation_time = 11;
 	repeated .POGOProtos.Enums.PokemonId evolution_ids = 12;
 	int32 evolution_pips = 13;
-	.POGOProtos.Enums.PokemonClass class = 14;
+	.POGOProtos.Enums.PokemonRarity rarity = 14;
 	float pokedex_height_m = 15;
 	float pokedex_weight_kg = 16;
 	.POGOProtos.Enums.PokemonId parent_pokemon_id = 17;
