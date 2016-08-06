@@ -2274,10 +2274,10 @@
       "type":".POGOProtos.Networking.Requests.Request",
       "repeated":true
     },
-    "signature":
+    "unknown6":
     {
       "id":6,
-      "type":".POGOProtos.Networking.Envelopes.Signature",
+      "type":".POGOProtos.Networking.Envelopes.Unknown6",
       "repeated":true
     },
     "latitude":
@@ -2699,7 +2699,7 @@
   },
   ".POGOProtos.Networking.Envelopes.Unknown6.Unknown2":
   {
-    "unknown1":
+    ".POGOProtos.Networking.Envelopes.Signature":
     {
       "id":1,
       "type":"bytes"

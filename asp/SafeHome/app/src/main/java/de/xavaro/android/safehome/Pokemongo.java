@@ -967,14 +967,14 @@ public class Pokemongo extends FrameLayout
                     {
                         pid = huntPoint.getString("pid");
 
-                        //latTogo = huntPoint.getDouble("lat");
-                        //lonTogo = huntPoint.getDouble("lon");
-                        //isMoving = true;
+                        latTogo = huntPoint.getDouble("lat");
+                        lonTogo = huntPoint.getDouble("lon");
+                        isMoving = true;
 
-                        lat = huntPoint.getDouble("lat");
-                        lon = huntPoint.getDouble("lon");
+                        //lat = huntPoint.getDouble("lat");
+                        //lon = huntPoint.getDouble("lon");
 
-                        suspendTime = new Date().getTime() + 5 * 1000;
+                        //suspendTime = new Date().getTime() + 5 * 1000;
                     }
                 }
 
