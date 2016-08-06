@@ -548,6 +548,7 @@ public class Pokemongo extends FrameLayout
     private static boolean isHolding;
     private static boolean isWaiting;
     private static boolean isSpotting;
+    private static boolean isImportant;
     private static boolean isShowhunt;
     private static boolean isUpdatedir;
 
@@ -889,7 +890,7 @@ public class Pokemongo extends FrameLayout
                     {
                         isSpotting = false;
 
-                        suspendTime = new Date().getTime() + 18 * 1000;
+                        suspendTime = new Date().getTime() + (isImportant ? 120 : 18) * 1000;
                     }
                 }
             }
@@ -1595,6 +1596,8 @@ public class Pokemongo extends FrameLayout
                 }
             }
 
+            isImportant = false;
+
             if (commandMode == COMMAND_SEEK)
             {
                 if (pokeDirHunting[ pokeOrd - 1 ])
@@ -1602,7 +1605,7 @@ public class Pokemongo extends FrameLayout
                     AudioManager am = (AudioManager) application.getSystemService(Context.AUDIO_SERVICE);
                     am.playSoundEffect(SoundEffectConstants.CLICK);
 
-                    suspendTime = new Date().getTime() + 120 * 1000;
+                    isImportant = true;
                 }
             }
 
@@ -1622,7 +1625,7 @@ public class Pokemongo extends FrameLayout
                     long expires = new Date().getTime() + tthidden;
                     loc.put(pokeposstr, expires);
 
-                    if ((commandMode == COMMAND_HUNT) && !isSpotting)
+                    if (isImportant || ((commandMode == COMMAND_HUNT) && !isSpotting))
                     {
                         //
                         // Goto pokemon spot.
@@ -1633,6 +1636,8 @@ public class Pokemongo extends FrameLayout
 
                         isMoving = true;
                         isSpotting = true;
+
+                        suspendTime = 0;
                     }
                 }
             }
