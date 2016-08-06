@@ -530,6 +530,9 @@ public class Pokemongo extends FrameLayout
                 lonTogo = latlon.getDouble("lon");
 
                 commandMode = COMMAND_STOP;
+                suspendTime = 0;
+
+                isHolding = false;
                 isSpotting = true;
                 isMoving = true;
             }
@@ -1959,9 +1962,9 @@ public class Pokemongo extends FrameLayout
 
                     String text = "";
 
-                    if (data.has("pokeball_type@.POGOProtos.Inventory.ItemId") && data.has("capture_probability@float"))
+                    if (data.has("pokeball_type@.POGOProtos.Inventory.Item.ItemId") && data.has("capture_probability@float"))
                     {
-                        JSONArray items = data.getJSONArray("pokeball_type@.POGOProtos.Inventory.ItemId");
+                        JSONArray items = data.getJSONArray("pokeball_type@.POGOProtos.Inventory.Item.ItemId");
                         if (items.get(0) instanceof JSONArray) items = items.getJSONArray(0);
 
                         JSONArray probas = data.getJSONArray("capture_probability@float");
