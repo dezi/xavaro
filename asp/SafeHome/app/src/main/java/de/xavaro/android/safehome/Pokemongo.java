@@ -1,5 +1,10 @@
 package de.xavaro.android.safehome;
 
+//
+// \(result \+ ([0-9]+)\)
+// result[ $1 ]
+//
+
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 
@@ -837,17 +842,17 @@ public class Pokemongo extends FrameLayout
     // New York => 40.705161, -74.013142
     //
 
-    private static String region = "us.NewYork";
-    private static double latRegion =  40.70;
-    private static double lonRegion = -74.01;
+    //private static String region = "us.NewYork";
+    //private static double latRegion =  40.70;
+    //private static double lonRegion = -74.01;
 
     //
     // Sydney => -33.872806, 151.207502
     //
 
-    //private static String region = "au.Sydney";
-    //private static double latRegion = -33.87;
-    //private static double lonRegion = 151.20;
+    private static String region = "au.Sydney";
+    private static double latRegion = -33.87;
+    private static double lonRegion = 151.20;
 
     private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
     private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
