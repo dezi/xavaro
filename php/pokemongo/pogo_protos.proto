@@ -1414,7 +1414,7 @@ message POGOProtos.Networking.Envelopes.Unknown6
 
 	message Unknown2
 	{
-		.POGOProtos.Networking.Envelopes.Signature signature = 1;
+		bytes signature = 1;
 	}
 }
 

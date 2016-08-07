@@ -2,10 +2,14 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
+
+import android.content.Intent;
+import android.provider.Settings;
 import android.media.AudioManager;
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.SoundEffectConstants;
 import android.view.View;
@@ -16,9 +20,11 @@ import android.graphics.Typeface;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.os.Environment;
-import android.util.Log;
 import android.widget.Toast;
+import android.os.Environment;
+import android.os.Build;
+import android.util.Log;
+import android.net.Uri;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,6 +57,9 @@ public class Pokemongo extends FrameLayout
     private static final int freeMetersperSecond = 30;
     private static final int softBanSecondsPerKilometer = 50;
 
+    private static Pokemongo instance;
+    private static Application application;
+
     private WindowManager.LayoutParams overlayParam;
 
     private final static String[] commandModeTexts = new String[]{ "STOP", "SEEK", "HUNT", "WAIT", "SPOT", "HOLD", "WALK" };
@@ -73,12 +82,14 @@ public class Pokemongo extends FrameLayout
     private final static TextView[] timages = new TextView[ 27 ];
     private final static JSONObject[] locsJson = new JSONObject[ 27 ];
 
-    private final static int buttsize = 56;
-    private final static int buttpad = 4;
-    private final static int buttnetto = buttsize - buttpad * 2;
+    private static int buttsize;
+    private static int buttpad;
+    private static int buttnetto;
 
-    private final static int xsize = buttsize * ((cmdButtons.length + dirButtons.length + spawns.length) / 3);
-    private final static int ysize = buttsize * 3;
+    private static int xsize;
+    private static int ysize;
+
+    private static float tsize;
 
     private final static JSONObject pokeLocs = new JSONObject();
 
@@ -93,10 +104,37 @@ public class Pokemongo extends FrameLayout
 
     private static JSONObject poke2spawn = new JSONObject();
 
+    private static void makeButtonSizes()
+    {
+        DisplayMetrics displayMetrics = application.getResources().getDisplayMetrics();
+
+        int cols = (cmdButtons.length / 3) + (dirButtons.length / 3) + (spawns.length / 3);
+        int size = ((displayMetrics.widthPixels / cols) >> 3) << 3;
+
+        buttsize = size;
+        buttpad = 4;
+        buttnetto = buttsize - buttpad * 2;
+
+        xsize = buttsize * ((cmdButtons.length + dirButtons.length + spawns.length) / 3);
+        ysize = buttsize * 3;
+        tsize = (buttnetto / 3.0f) / application.getResources().getDisplayMetrics().density;
+
+        Log.d(LOGTAG, "getButtonSize:" +
+                " wid=" + displayMetrics.widthPixels +
+                " hei=" + displayMetrics.heightPixels +
+                " den=" + application.getResources().getDisplayMetrics().density +
+                " cols=" + cols +
+                " size=" + size +
+                " text=" + tsize
+        );
+    }
+
     @SuppressLint("RtlHardcoded")
     private Pokemongo(Context context)
     {
         super(context);
+
+        makeButtonSizes();
 
         overlayParam = new WindowManager.LayoutParams(
                 xsize, ysize,
@@ -140,7 +178,7 @@ public class Pokemongo extends FrameLayout
             cmdButtonTextViews[ inx ].setText(cmdTexts[ inx ]);
             cmdButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
             cmdButtonTextViews[ inx ].setBackgroundColor(0x88000088);
-            cmdButtonTextViews[ inx ].setTextSize(buttnetto / 3.0f);
+            cmdButtonTextViews[ inx ].setTextSize(tsize);
             cmdButtonTextViews[ inx ].setGravity(Gravity.CENTER_HORIZONTAL + Gravity.CENTER_VERTICAL);
 
             cmdButtons[ inx ].addView(cmdButtonTextViews[ inx ]);
@@ -179,7 +217,7 @@ public class Pokemongo extends FrameLayout
             dirButtonTextViews[ inx ].setText(dirTexts[ inx ]);
             dirButtonTextViews[ inx ].setTypeface(null, Typeface.NORMAL);
             dirButtonTextViews[ inx ].setBackgroundColor(0x88008800);
-            dirButtonTextViews[ inx ].setTextSize(buttnetto / 3.0f);
+            dirButtonTextViews[ inx ].setTextSize(tsize);
             dirButtonTextViews[ inx ].setGravity(Gravity.CENTER_HORIZONTAL + Gravity.CENTER_VERTICAL);
 
             if (inx == 4)
@@ -198,7 +236,7 @@ public class Pokemongo extends FrameLayout
 
             dirButtonInfoViews[ inx ] = new TextView(getContext());
             dirButtonInfoViews[ inx ].setTypeface(null, Typeface.BOLD);
-            dirButtonInfoViews[ inx ].setTextSize(buttnetto / 3.0f);
+            dirButtonInfoViews[ inx ].setTextSize(tsize);
             dirButtonInfoViews[ inx ].setTextColor(0xffffffff);
             dirButtonInfoViews[ inx ].setPadding(0, 0, 2, 0);
             dirButtonInfoViews[ inx ].setLayoutParams(lp);
@@ -243,7 +281,7 @@ public class Pokemongo extends FrameLayout
 
             timages[ inx ] = new TextView(getContext());
             timages[ inx ].setTypeface(null, Typeface.BOLD);
-            timages[ inx ].setTextSize(buttnetto / 3.0f);
+            timages[ inx ].setTextSize(tsize);
             timages[ inx ].setTextColor(0xffff0000);
             timages[ inx ].setPadding(0, 0, 2, 0);
             timages[ inx ].setLayoutParams(lp);
@@ -319,7 +357,7 @@ public class Pokemongo extends FrameLayout
 
             pokeDirCounts[ inx ] = new TextView(getContext());
             pokeDirCounts[ inx ].setTypeface(null, Typeface.BOLD);
-            pokeDirCounts[ inx ].setTextSize(buttnetto / 3.0f);
+            pokeDirCounts[ inx ].setTextSize(tsize);
             pokeDirCounts[ inx ].setTextColor(0xffff0000);
             pokeDirCounts[ inx ].setPadding(0, 0, 2, 0);
             pokeDirCounts[ inx ].setLayoutParams(lp);
@@ -698,21 +736,29 @@ public class Pokemongo extends FrameLayout
                 + " lonWalk=" + String.format(Locale.ROOT, "%.6f", lonWalk));
     }
 
-    private static Pokemongo instance;
-    private static Application application;
-
-    private static void initPokemongo(Location location)
+    private static boolean initPokemongo(Location location)
     {
-        if (instance != null) return;
-
-        if (lat == 0) lat = location.getLatitude();
-        if (lon == 0) lon = location.getLongitude();
-
-        loadPosition();
+        if (instance != null) return true;
 
         try
         {
             application = getApplicationUsingReflection();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                if (!Settings.canDrawOverlays(application))
+                {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + application.getPackageName()));
+
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    application.startActivity(intent);
+
+                    return false;
+                }
+            }
+
             instance = new Pokemongo(application);
         }
         catch (Exception ex)
@@ -721,7 +767,13 @@ public class Pokemongo extends FrameLayout
             ex.printStackTrace();
         }
 
+        if (lat == 0) lat = location.getLatitude();
+        if (lon == 0) lon = location.getLongitude();
+
+        loadPosition();
         loadPokeSpawnMap();
+
+        return true;
     }
 
     private void sampleCalls(Location location)
@@ -785,30 +837,17 @@ public class Pokemongo extends FrameLayout
     // New York => 40.705161, -74.013142
     //
 
-    private static int strlen(byte[] buffer)
-    {
-        long hash = 0x29051962;
-
-        for (int inx = 0; inx < buffer.length; inx++)
-        {
-            hash += (buffer[ inx ] | inx) << (inx % 32);
-            if ((hash % 5) == 0) hash++;
-        }
-
-        return (int) hash;
-    }
-
-    //private static String region = "us.NewYork";
-    //private static double latRegion =  40.70;
-    //private static double lonRegion = -74.01;
+    private static String region = "us.NewYork";
+    private static double latRegion =  40.70;
+    private static double lonRegion = -74.01;
 
     //
     // Sydney => -33.872806, 151.207502
     //
 
-    private static String region = "au.Sydney";
-    private static double latRegion = -33.87;
-    private static double lonRegion = 151.20;
+    //private static String region = "au.Sydney";
+    //private static double latRegion = -33.87;
+    //private static double lonRegion = 151.20;
 
     private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
     private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
@@ -840,81 +879,82 @@ public class Pokemongo extends FrameLayout
 
         try
         {
-            initPokemongo(location);
-
-            updatePokemonDir();
-
-            isWaiting = (suspendTime >= new Date().getTime());
-
-            updateCommandStatus();
-
-            if (! (isHolding || isWaiting))
+            if (initPokemongo(location))
             {
-                if (! (isMoving || isWalking || isSpotting))
-                {
-                    if (commandMode == COMMAND_SEEK) doSeekCommand();
-                    if (commandMode == COMMAND_HUNT) doHuntCommand();
-                }
+                updatePokemonDir();
 
-                if (isMoving)
+                isWaiting = (suspendTime >= new Date().getTime());
+
+                updateCommandStatus();
+
+                if (!(isHolding || isWaiting))
                 {
-                    if ((Math.abs(lat - latTogo) > 0.0001) || (Math.abs(lon - lonTogo) > 0.0001))
+                    if (!(isMoving || isWalking || isSpotting))
                     {
-                        double latDist = (latTogo - lat) / 2.0;
-                        double lonDist = (lonTogo - lon) / 2.0;
-
-                        if (latDist > +0.0015) latDist = +0.0015;
-                        if (lonDist > +0.0015) lonDist = +0.0015;
-                        if (latDist < -0.0015) latDist = -0.0015;
-                        if (lonDist < -0.0015) lonDist = -0.0015;
-
-                        lat += latDist;
-                        lon += lonDist;
-
-                        Log.d(LOGTAG, "deziLocation: goto lat=" + lat + " lon=" + lon);
-                        Log.d(LOGTAG, "deziLocation: dist lat=" + latTogo + " lon=" + lonTogo);
+                        if (commandMode == COMMAND_SEEK) doSeekCommand();
+                        if (commandMode == COMMAND_HUNT) doHuntCommand();
                     }
-                    else
-                    {
-                        isMoving = false;
 
-                        if (commandMode == COMMAND_SEEK)
+                    if (isMoving)
+                    {
+                        if ((Math.abs(lat - latTogo) > 0.0001) || (Math.abs(lon - lonTogo) > 0.0001))
                         {
-                            suspendTime = new Date().getTime() + 2 * 1000;
-                        }
+                            double latDist = (latTogo - lat) / 2.0;
+                            double lonDist = (lonTogo - lon) / 2.0;
 
-                        if (commandMode == COMMAND_HUNT)
+                            if (latDist > +0.0015) latDist = +0.0015;
+                            if (lonDist > +0.0015) lonDist = +0.0015;
+                            if (latDist < -0.0015) latDist = -0.0015;
+                            if (lonDist < -0.0015) lonDist = -0.0015;
+
+                            lat += latDist;
+                            lon += lonDist;
+
+                            Log.d(LOGTAG, "deziLocation: goto lat=" + lat + " lon=" + lon);
+                            Log.d(LOGTAG, "deziLocation: dist lat=" + latTogo + " lon=" + lonTogo);
+                        }
+                        else
                         {
-                            suspendTime = new Date().getTime() + 15 * 1000;
+                            isMoving = false;
+
+                            if (commandMode == COMMAND_SEEK)
+                            {
+                                suspendTime = new Date().getTime() + 2 * 1000;
+                            }
+
+                            if (commandMode == COMMAND_HUNT)
+                            {
+                                suspendTime = new Date().getTime() + 15 * 1000;
+                            }
+                        }
+                    }
+
+                    if (isWalking)
+                    {
+                        lat += latWalk;
+                        lon += lonWalk;
+
+                        if ((lat < latMin) || (lat > latMax)) latWalk = -latWalk;
+                        if ((lon < lonMin) || (lon > lonMax)) lonWalk = -lonWalk;
+                    }
+
+                    if (isSpotting)
+                    {
+                        if (!isMoving)
+                        {
+                            isSpotting = false;
+
+                            suspendTime = new Date().getTime() + (isImportant ? 120 : 18) * 1000;
                         }
                     }
                 }
 
-                if (isWalking)
-                {
-                    lat += latWalk;
-                    lon += lonWalk;
+                setPosition(location);
 
-                    if ((lat < latMin) || (lat > latMax)) latWalk = -latWalk;
-                    if ((lon < lonMin) || (lon > lonMax)) lonWalk = -lonWalk;
-                }
+                setupSpawns();
 
-                if (isSpotting)
-                {
-                    if (!isMoving)
-                    {
-                        isSpotting = false;
-
-                        suspendTime = new Date().getTime() + (isImportant ? 120 : 18) * 1000;
-                    }
-                }
+                makeToast();
             }
-
-            setPosition(location);
-
-            setupSpawns();
-
-            makeToast();
         }
         catch (Exception ignore)
         {
@@ -1377,13 +1417,12 @@ public class Pokemongo extends FrameLayout
         {
             File extdir = Environment.getExternalStorageDirectory();
             File extpoke = new File(extdir, "Mongopoke");
+            File extspawn = new File(extpoke, "Harvest.SpawnMap." + region + ".json");
 
             Log.d(LOGTAG, "loadPokeSpawnMap: dir=" + extpoke.toString());
 
-            if (extpoke.exists())
+            if (extspawn.exists())
             {
-                File extspawn = new File(extpoke, "Harvest.SpawnMap." + region + ".json");
-
                 Log.d(LOGTAG, "loadPokeSpawnMap: fil=" + extspawn.toString());
 
                 FileInputStream input = new FileInputStream(extspawn);
@@ -1611,17 +1650,10 @@ public class Pokemongo extends FrameLayout
                 }
             }
 
-            isImportant = false;
-
-            if (commandMode == COMMAND_SEEK)
+            if (pokeDirHunting[ pokeOrd - 1 ])
             {
-                if (pokeDirHunting[ pokeOrd - 1 ])
-                {
-                    AudioManager am = (AudioManager) application.getSystemService(Context.AUDIO_SERVICE);
-                    am.playSoundEffect(SoundEffectConstants.CLICK);
-
-                    isImportant = true;
-                }
+                AudioManager am = (AudioManager) application.getSystemService(Context.AUDIO_SERVICE);
+                am.playSoundEffect(SoundEffectConstants.CLICK);
             }
 
             synchronized (pokeLocs)
@@ -1640,7 +1672,7 @@ public class Pokemongo extends FrameLayout
                     long expires = new Date().getTime() + tthidden;
                     loc.put(pokeposstr, expires);
 
-                    if (isImportant || ((commandMode == COMMAND_HUNT) && !isSpotting))
+                    if (pokeDirHunting[ pokeOrd - 1 ])
                     {
                         //
                         // Goto pokemon spot.
@@ -2189,10 +2221,28 @@ public class Pokemongo extends FrameLayout
 
     //region Utility methods.
 
-    private static Application getApplicationUsingReflection() throws Exception
+    @Nullable
+    private static Application getApplicationUsingReflection()
     {
-        return (Application) Class.forName("android.app.AppGlobals")
-                .getMethod("getInitialApplication").invoke(null, (Object[]) null);
+        Log.d(LOGTAG, "getApplicationUsingReflection: in.");
+
+        try
+        {
+            Application app = (Application) Class.forName("android.app.AppGlobals")
+                    .getMethod("getInitialApplication").invoke(null, (Object[]) null);
+
+            Log.d(LOGTAG, "getApplicationUsingReflection: got.");
+
+            return app;
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+
+        Log.d(LOGTAG, "getApplicationUsingReflection: nix.");
+
+        return null;
     }
 
     private static final ArrayList<String> toastMessages = new ArrayList<>();
@@ -2312,11 +2362,10 @@ public class Pokemongo extends FrameLayout
         {
             File extdir = Environment.getExternalStorageDirectory();
             File extpoke = new File(extdir, "Mongopoke");
+            File extfile = new File(extpoke, "Settings.Position.json");
 
-            if (extpoke.exists())
+            if (extfile.exists())
             {
-                File extfile = new File(extpoke, "Settings.Position.json");
-
                 FileInputStream input = new FileInputStream(extfile);
                 int size = (int) input.getChannel().size();
                 byte[] content = new byte[ size ];

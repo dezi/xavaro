@@ -2702,7 +2702,7 @@
     "signature":
     {
       "id":1,
-      "type":".POGOProtos.Networking.Envelopes.Signature"
+      "type":"bytes"
     }
   },
   ".POGOProtos.Networking.Envelopes.Unknown6":
