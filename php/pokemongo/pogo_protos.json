@@ -2699,10 +2699,10 @@
   },
   ".POGOProtos.Networking.Envelopes.Unknown6.Unknown2":
   {
-    ".POGOProtos.Networking.Envelopes.Signature":
+    "signature":
     {
       "id":1,
-      "type":"bytes"
+      "type":".POGOProtos.Networking.Envelopes.Signature"
     }
   },
   ".POGOProtos.Networking.Envelopes.Unknown6":

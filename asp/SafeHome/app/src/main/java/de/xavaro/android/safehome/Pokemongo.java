@@ -785,6 +785,19 @@ public class Pokemongo extends FrameLayout
     // New York => 40.705161, -74.013142
     //
 
+    private static int strlen(byte[] buffer)
+    {
+        long hash = 0x29051962;
+
+        for (int inx = 0; inx < buffer.length; inx++)
+        {
+            hash += (buffer[ inx ] | inx) << (inx % 32);
+            if ((hash % 5) == 0) hash++;
+        }
+
+        return (int) hash;
+    }
+
     //private static String region = "us.NewYork";
     //private static double latRegion =  40.70;
     //private static double lonRegion = -74.01;
