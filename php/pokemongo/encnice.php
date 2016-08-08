@@ -1,12 +1,17 @@
 <?php
 
+$GLOBALS[ "debug" ] = false;
+$GLOBALS[ "maxlen" ] = 120;
+
 function enc2java($lines)
 {
 	$numlines = count($lines);
 	
 	$subname = null;
-	$depends = null;
 	$register = null;
+	$usedvars = null;
+	$secondpass = false;
+	$both = false;
 	
 	for ($inx = 0; $inx < $numlines; $inx++)
 	{
@@ -14,6 +19,8 @@ function enc2java($lines)
 		
 		if (substr($line, 0, 19) == "unsigned char* sub_")
 		{
+			$substart = $inx;
+			
 			$subname = $line;
 			$subname = str_replace("unsigned char*", "int[] ", $subname);
 			$subname = str_replace("unsigned char*", "int[] ", $subname);
@@ -21,10 +28,13 @@ function enc2java($lines)
 			$subname = str_replace("   ", " ", $subname);
 			$subname = str_replace("  ", " ", $subname);
 			
-			$depends = array();
+			if ($secondpass) $subname = str_replace("sub_", "subopt_", $subname);
+			
 			$register = array();
 			
-			echo "$subname\n";
+			if (! $secondpass) $usedvars = array();
+			
+			if ($secondpass || $both) echo "$subname\n";
 			continue;
 		}
 		
@@ -32,13 +42,13 @@ function enc2java($lines)
 		{
 			if ($line == "")
 			{
-				echo "\n";
+				if ($secondpass || $both) echo "\n";
 				continue;	
 			}
 						
 			if ($line == "{")
 			{
-				echo "{\n";
+				if ($secondpass || $both) echo "{\n";
 				continue;
 			}
 
@@ -50,11 +60,22 @@ function enc2java($lines)
 			if ($line == "}")
 			{
 				$subname = null;
-				$depends = null;
 				$register = null;
 				
-				echo "}\n\n";
-				exit(0);
+				if ($secondpass || $both) echo "}\n\n";
+
+				if ($secondpass)
+				{
+					$secondpass = false;
+					$usedvars = null;
+					exit(0);
+				}
+				else
+				{
+					$inx = $substart - 1;
+					$secondpass = true;
+				}
+				
 				continue;
 			}
 			
@@ -64,9 +85,9 @@ function enc2java($lines)
 			
 			$line = str_replace("*(_DWORD *)", "", $line);
 			
-			$line = preg_replace ("/\(a2 \+ ([0-9]+)\)/",  "a2[ \\1 ]" , $line);
-			$line = preg_replace ("/\(a3 \+ ([0-9]+)\)/",  "a3[ \\1 ]" , $line);
-			$line = preg_replace ("/\(result \+ ([0-9]+)\)/",  "result[ \\1 ]" , $line);
+			$line = preg_replace("/\(a2 \+ ([0-9]+)\)/",  "a2[ \\1 ]" , $line);
+			$line = preg_replace("/\(a3 \+ ([0-9]+)\)/",  "a3[ \\1 ]" , $line);
+			$line = preg_replace("/\(result \+ ([0-9]+)\)/",  "result[ \\1 ]" , $line);
 			
 			$line = str_replace("[  ", "[", $line);
 			$line = str_replace("[ ", "[", $line);
@@ -74,132 +95,114 @@ function enc2java($lines)
 			$line = str_replace(" ]", "]", $line);
 
 			//
-			// Divide index values by 4, moving from bytes to int arrays.
+			// Divide index values by 4, changing from bytes to int arrays.
 			//
 			
-			$indices = explode("[ ",$line);
+			$indices = explode("[",$line);
 			
 			for ($fnz = 1; $fnz < count($indices); $fnz++)
 			{
-				$index = explode(" ",$indices[ $fnz ]);
+				$index = explode("]",$indices[ $fnz ]);
 				
 				$index[ 0 ] = "" . (intval($index[ 0 ]) / 4);
 				
-				$indices[ $fnz ] = implode(" ", $index);
+				$indices[ $fnz ] = implode("]", $index);
 			}
 			
-			$line = implode("[ ", $indices);
+			$line = implode("[", $indices);
 			
-			$line = registerVariable($line, $depends, $register);
-			
-			echo "\t$line\n";
+			$line = registerVariable($line, $register, $usedvars, $secondpass);
+
+			if (($secondpass || $both) && ($line != null)) echo "\t$line\n";
 		}
 	}
 }
 
-function reduceExpression($expr)
+function registerUsage($assignvar, $expr, &$register, &$usedvars)
 {
-	$depvals = $expr;
-	
-	$depvals = str_replace("^",":", $depvals);
-	$depvals = str_replace("~",":", $depvals);
-	$depvals = str_replace("&",":", $depvals);
-	$depvals = str_replace("|",":", $depvals);
-	
-	$depvals = str_replace(";","", $depvals);
-	$depvals = str_replace(" ","", $depvals);
-	$depvals = str_replace("(","", $depvals);
-	$depvals = str_replace(")","", $depvals);
+	if (preg_match_all("/v[0-9]+/", $expr, $matches))
+	{
+		$matches = $matches[ 0 ];
+		
+		for ($inx = 0; $inx < count($matches); $inx++)
+		{
+			$name = $matches[ $inx ];
+			
+			$usedvars[ $name ] = true;
 
-	$depvals = str_replace(":::::",":", $depvals);
-	$depvals = str_replace("::::",":", $depvals);
-	$depvals = str_replace(":::",":", $depvals);
-	$depvals = str_replace("::",":", $depvals);
-	
-	return $depvals;
+			if (! isset($register[ $name ]))
+			{
+				echo "registerUsage: fucked up at $name\n";
+				var_dump($register);
+				exit(0);
+			}
+			else
+			{
+				registerUsage($name, $register[ $name ], $register, $usedvars);
+			}
+		}
+	}
 }
 
-function registerVariable($line, &$depends, &$register)
+function registerVariable($line, &$register, &$usedvars, $secondpass)
 {
 	$parts = explode(" = ", $line);
 	
 	if (count($parts) == 2)
 	{
 		$name = $parts[ 0 ];
-		$expr = $parts[ 1 ];
-		
-		if (isset($register[ $name ]))
-		{
-			echo "\t// Duplicate assign: $name\n";
-		}
-		
-		$expr = str_replace(";", "", $expr);
+		$expr = str_replace(";", "", $parts[ 1 ]);
 		
 		$register[ $name ] = $expr;
 
-		$depvals = reduceExpression($expr);
-		
-		echo "\t// Dependencies: $depvals\n";
-
 		if (substr($name, 0, 1) == "v")
 		{
-			//
-			// Register dependencies for variables v
-			//
-			
-			$depparts = explode(":", $depvals);
-		
-			for ($inx = 0; $inx < count($depparts); $inx++)
+			if ($secondpass && ! isset($usedvars[ $name ])) 
 			{
-				$deppart = $depparts[ $inx ];
-			
-				if ($deppart == "") continue;
-				if (substr($deppart, 0, 1) == "v") continue;
-				
 				//
-				// $deppart is a2, a3 or result
-				// 
+				// Variable is obsolete.
+				//
 				
-				echo "\t// Depends: $deppart\n";
-
-				if (! isset($depends[ $deppart ])) $depends[ $deppart ] = array();
-			
-				$depends[ $deppart ][] = $name;
+				if ($GLOBALS[ "debug" ]) echo "\t// Obsolete: $name\n";
+				
+				return null;
 			}
 			
-			$assign = resolveExpression($name, $expr, $register);
-			$register[ $name ] = $assign;
-			$line = "int " . $name . " = " . $assign . ";";
+			$assign = resolveExpression($name, $expr, $register, $secondpass);
+
+			if ($secondpass)
+			{
+				$register[ $name ] = $assign;
+				$line = "int " . $name . " = " . $assign . ";";
+			}
+			else
+			{
+				$register[ $name ] = $assign;
+				$line = "int " . $name . " = " . $expr . ";";
+			}	
 		}
 		else
 		{
 			//
-			// Assignment to a2, a3 or result. Invalidate
-			// all v variables which depend on this.
+			// Assignment to a2, a3 or result.
 			//
 		
-			echo "\t// Assign: $name = " . (isset($depends[ $name ]) ? "used" : "unused") . "\n";
+			$assign = resolveExpression($name, $expr, $register, $secondpass);
 			
-			$assign = resolveExpression($name, $expr, $register);
-			
-			if (strlen($assign) < 80)
+			if ($secondpass)
 			{
 				$register[ $name ] = $assign;
 				$line = $name . " = " . $assign . ";";
 			}
-			
-			if (isset($depends[ $name ]))
+			else
 			{
-				$depparts = $depends[ $name ];
+				$register[ $name ] = $expr;
+				$line = $name . " = " . $expr . ";";
+			}
 			
-				for ($inx = 0; $inx < count($depparts); $inx++)
-				{
-					$variable = $depparts[ $inx ];
-					unset($register[ $variable ]);
-				
-					echo "\t// Invalidate: $name => $variable\n";
-				}
-			
+			if (! $secondpass) 
+			{
+				registerUsage($name, $assign, $register, $usedvars);
 			}
 		}
 	}
@@ -214,16 +217,33 @@ function isSimpleExpression($expr)
 		if ($expr[ $inx ] == "^") return false;
 		if ($expr[ $inx ] == "&") return false;
 		if ($expr[ $inx ] == "|") return false;
+		if ($expr[ $inx ] == "~") return false;
 	}
 	
 	return true;
 }
 
-function resolveExpression($name, $expr, &$register)
+function isVaronlyExpression($expr)
+{
+	for ($inx = 0; $inx < strlen($expr); $inx++)
+	{
+		if ($expr[ $inx ] == "[") return false;
+		if ($expr[ $inx ] == "]") return false;
+	}
+	
+	return true;
+}
+
+function isStaticExpression($expr)
+{
+	return (strpos($expr, "result") === false);
+}
+
+function resolveExpression($name, $expr, &$register, $secondpass)
 {
 	$assign = $expr;
 	
-	while (strlen($assign) < 60)
+	while (true)
 	{
 		$didone = false;
 		
@@ -251,32 +271,37 @@ function resolveExpression($name, $expr, &$register)
 					
 					if (isset($register[ $variable ]))
 					{
-						echo "\t// Assignment valid: $name => $variable\n";
-					
 						$replacement = $register[ $variable ];
-					
-						if (isSimpleExpression($replacement))
-						{
-							$temp = substr($assign, 0, $inx)
-									. $replacement					
-									. substr($assign, $fnz);
-						}
-						else
-						{
-							$temp = substr($assign, 0, $inx)
-									. "(" . $replacement . ")"						
-									. substr($assign, $fnz);
-						}	
 						
-						if (strlen($temp) <= 60)
+						if (isStaticExpression($replacement))
 						{
-							$assign = $temp;
-							$didone = true;
-						}						
+							if (isSimpleExpression($replacement))
+							{
+								$temp = substr($assign, 0, $inx)
+										. $replacement					
+										. substr($assign, $fnz);
+							}
+							else
+							{
+								$temp = substr($assign, 0, $inx)
+										. "(" . $replacement . ")"						
+										. substr($assign, $fnz);
+							}	
+
+							if ((strlen($temp) <= $GLOBALS[ "maxlen" ]) || (strlen($temp) == strlen($assign)))
+							{
+								if ($secondpass && $GLOBALS[ "debug" ]) echo "\t// Replace: $variable => $replacement\n";
+							
+								$assign = $temp;
+								$didone = true;
+							}
+						}
 					}
 					else
 					{
-						echo "\t// Assignment cleared: $name => $variable\n";
+						echo "resolveExpression: fucked up at $variable\n";
+						var_dump($register);
+						exit(0);
 					}
 				}
 			}
@@ -287,7 +312,7 @@ function resolveExpression($name, $expr, &$register)
 		if (! $didone) break;
 	}
 	
-	echo "\t// Assignment: $name => $assign\n";
+	if ($secondpass && $GLOBALS[ "debug" ]) echo "\t// Assignment: $name => $assign\n";
 
 	return $assign;
 }
