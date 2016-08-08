@@ -42,6 +42,11 @@ function enc2java($lines)
 				continue;
 			}
 
+			if (substr($line, 0, 4) == "int ")
+			{
+				continue;
+			}
+
 			if ($line == "}")
 			{
 				$subname = null;
@@ -91,6 +96,28 @@ function enc2java($lines)
 	}
 }
 
+function reduceExpression($expr)
+{
+	$depvals = $expr;
+	
+	$depvals = str_replace("^",":", $depvals);
+	$depvals = str_replace("~",":", $depvals);
+	$depvals = str_replace("&",":", $depvals);
+	$depvals = str_replace("|",":", $depvals);
+	
+	$depvals = str_replace(";","", $depvals);
+	$depvals = str_replace(" ","", $depvals);
+	$depvals = str_replace("(","", $depvals);
+	$depvals = str_replace(")","", $depvals);
+
+	$depvals = str_replace(":::::",":", $depvals);
+	$depvals = str_replace("::::",":", $depvals);
+	$depvals = str_replace(":::",":", $depvals);
+	$depvals = str_replace("::",":", $depvals);
+	
+	return $depvals;
+}
+
 function registerVariable($line, &$depends, &$register)
 {
 	$parts = explode(" = ", $line);
@@ -104,25 +131,12 @@ function registerVariable($line, &$depends, &$register)
 		{
 			echo "\t// Duplicate assign: $name\n";
 		}
-				
+		
+		$expr = str_replace(";", "", $expr);
+		
 		$register[ $name ] = $expr;
 
-		$depvals = $expr;
-		
-		$depvals = str_replace("^",":", $depvals);
-		$depvals = str_replace("~",":", $depvals);
-		$depvals = str_replace("&",":", $depvals);
-		$depvals = str_replace("|",":", $depvals);
-		
-		$depvals = str_replace(";","", $depvals);
-		$depvals = str_replace(" ","", $depvals);
-		$depvals = str_replace("(","", $depvals);
-		$depvals = str_replace(")","", $depvals);
-
-		$depvals = str_replace(":::::",":", $depvals);
-		$depvals = str_replace("::::",":", $depvals);
-		$depvals = str_replace(":::",":", $depvals);
-		$depvals = str_replace("::",":", $depvals);
+		$depvals = reduceExpression($expr);
 		
 		echo "\t// Dependencies: $depvals\n";
 
@@ -151,6 +165,10 @@ function registerVariable($line, &$depends, &$register)
 			
 				$depends[ $deppart ][] = $name;
 			}
+			
+			$assign = resolveExpression($name, $expr, $register);
+			
+			$line = "int " . $line;
 		}
 		else
 		{
@@ -163,11 +181,15 @@ function registerVariable($line, &$depends, &$register)
 
 			if (isset($depends[ $name ]))
 			{
+				$assign = resolveExpression($name, $expr, $register);
+				
 				$depparts = $depends[ $name ];
 				
 				for ($inx = 0; $inx < count($depparts); $inx++)
 				{
 					$variable = $depparts[ $inx ];
+					unset($register[ $variable ]);
+					
 					echo "\t// Invalidate: $name => $variable\n";
 				}
 			}
@@ -175,6 +197,64 @@ function registerVariable($line, &$depends, &$register)
 	}
 	
 	return $line;
+}
+
+function resolveExpression($name, $expr, &$register)
+{
+	$assign = $expr;
+	
+	while (true)
+	{
+		$didone = false;
+		
+		for ($inx = 0; $inx < strlen($assign); $inx++)
+		{
+			if ($assign[ $inx ] == "v")
+			{
+				$dest = "";
+				
+				for ($fnz = $inx + 1; $fnz < strlen($assign); $fnz++)
+				{
+					if (("0" <= $assign[ $fnz ]) && ($assign[ $fnz ] <= "9"))
+					{
+						$dest .= $assign[ $fnz ];
+					}
+					else
+					{
+						if (strlen($dest) > 0)
+						{
+							$variable = "v" . $dest;
+							
+							if (isset($register[ $variable ]))
+							{
+								echo "\t// Assignment valid: $name => $variable\n";
+							
+								$replacement = $register[ $variable ];
+							
+								$assign = substr($assign, 0, $inx)
+										. "(" . $replacement . ")"						
+										. substr($assign, $fnz);
+							}
+							else
+							{
+								echo "\t// Assignment cleared: $name => $variable\n";
+							}
+						}
+						
+						break;
+					}
+				}
+			}
+			
+			if ($didone) break;
+		}
+		
+		if (! $didone) break;
+	}
+	
+	echo "\t// Assignment: $name => $assign\n";
+
+	return $assign;
 }
 
 enc2java(file("./pgoencrypt/src/encrypt.c"));
