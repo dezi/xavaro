@@ -54,6 +54,7 @@ function enc2java($lines)
 				$register = null;
 				
 				echo "}\n\n";
+				exit(0);
 				continue;
 			}
 			
@@ -167,8 +168,8 @@ function registerVariable($line, &$depends, &$register)
 			}
 			
 			$assign = resolveExpression($name, $expr, $register);
-			
-			$line = "int " . $line;
+			$register[ $name ] = $assign;
+			$line = "int " . $name . " = " . $assign . ";";
 		}
 		else
 		{
@@ -178,20 +179,27 @@ function registerVariable($line, &$depends, &$register)
 			//
 		
 			echo "\t// Assign: $name = " . (isset($depends[ $name ]) ? "used" : "unused") . "\n";
-
+			
+			$assign = resolveExpression($name, $expr, $register);
+			
+			if (strlen($assign) < 80)
+			{
+				$register[ $name ] = $assign;
+				$line = $name . " = " . $assign . ";";
+			}
+			
 			if (isset($depends[ $name ]))
 			{
-				$assign = resolveExpression($name, $expr, $register);
-				
 				$depparts = $depends[ $name ];
-				
+			
 				for ($inx = 0; $inx < count($depparts); $inx++)
 				{
 					$variable = $depparts[ $inx ];
 					unset($register[ $variable ]);
-					
+				
 					echo "\t// Invalidate: $name => $variable\n";
 				}
+			
 			}
 		}
 	}
@@ -199,11 +207,23 @@ function registerVariable($line, &$depends, &$register)
 	return $line;
 }
 
+function isSimpleExpression($expr)
+{
+	for ($inx = 0; $inx < strlen($expr); $inx++)
+	{
+		if ($expr[ $inx ] == "^") return false;
+		if ($expr[ $inx ] == "&") return false;
+		if ($expr[ $inx ] == "|") return false;
+	}
+	
+	return true;
+}
+
 function resolveExpression($name, $expr, &$register)
 {
 	$assign = $expr;
 	
-	while (true)
+	while (strlen($assign) < 60)
 	{
 		$didone = false;
 		
@@ -220,28 +240,43 @@ function resolveExpression($name, $expr, &$register)
 						$dest .= $assign[ $fnz ];
 					}
 					else
-					{
-						if (strlen($dest) > 0)
-						{
-							$variable = "v" . $dest;
-							
-							if (isset($register[ $variable ]))
-							{
-								echo "\t// Assignment valid: $name => $variable\n";
-							
-								$replacement = $register[ $variable ];
-							
-								$assign = substr($assign, 0, $inx)
-										. "(" . $replacement . ")"						
-										. substr($assign, $fnz);
-							}
-							else
-							{
-								echo "\t// Assignment cleared: $name => $variable\n";
-							}
-						}
-						
+					{	
 						break;
+					}
+				}
+				
+				if (strlen($dest) > 0)
+				{
+					$variable = "v" . $dest;
+					
+					if (isset($register[ $variable ]))
+					{
+						echo "\t// Assignment valid: $name => $variable\n";
+					
+						$replacement = $register[ $variable ];
+					
+						if (isSimpleExpression($replacement))
+						{
+							$temp = substr($assign, 0, $inx)
+									. $replacement					
+									. substr($assign, $fnz);
+						}
+						else
+						{
+							$temp = substr($assign, 0, $inx)
+									. "(" . $replacement . ")"						
+									. substr($assign, $fnz);
+						}	
+						
+						if (strlen($temp) <= 60)
+						{
+							$assign = $temp;
+							$didone = true;
+						}						
+					}
+					else
+					{
+						echo "\t// Assignment cleared: $name => $variable\n";
 					}
 				}
 			}
