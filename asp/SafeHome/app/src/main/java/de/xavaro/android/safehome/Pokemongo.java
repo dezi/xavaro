@@ -62,6 +62,7 @@ public class Pokemongo extends FrameLayout
     private static final int softBanSecondsPerKilometer = 50;
     private static final String mapskey = "AIzaSyDF9rkP8lhcddBtvH9gVFzjnNo13WtmJIM";
     private static final String pokeimgurl = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/";
+    private static final int pokeimgsize = 64;
 
     private static Pokemongo instance;
     private static Application application;
@@ -342,8 +343,8 @@ public class Pokemongo extends FrameLayout
         {
             if (pokemonsOnMapInitialized)
             {
-                String setPosition = "playerpos.setPosition(new google.maps.LatLng("
-                        + lat + "," + lon + "));";
+                String latlon = lat + "," + lon;
+                String setPosition = "playerpos.setPosition(new google.maps.LatLng(" + latlon + "));";
 
                 pokeMapView.evaluateJavascript(setPosition, null);
             }
@@ -408,19 +409,23 @@ public class Pokemongo extends FrameLayout
                                 String nums = "" + pokeNum;
                                 while (nums.length() < 3) nums = "0" + nums;
                                 String icon = pokeimgurl + nums + ".png";
+                                String size = pokeimgsize + "," + pokeimgsize;
+                                String cent = (pokeimgsize / 2) + "," + (pokeimgsize / 2);
 
                                 String setIcon = "var icon = {"
                                         + "url: '" + icon + "',"
-                                        + "scaledSize: new google.maps.Size(32,32),"
-                                        + "anchor: new google.maps.Point(16,16)"
-                                        + "};";
+                                        + "scaledSize: new google.maps.Size(" + size + "),"
+                                        + "anchor: new google.maps.Point(" + cent + ")"
+                                        + "};"
+                                        ;
 
                                 Log.d(LOGTAG, "showPokemonsPositions: icon=" + setIcon);
 
                                 String setMarker = "var poke" + pokemonVarCount + " = "
                                         + "new google.maps.Marker({"
-                                        + "position: {lat: " + lat + ", lng: " + lon + "}, map: map,"
-                                        + "icon: icon });";
+                                        + "position: {lat: " + lat + ", lng: " + lon + "}, "
+                                        + "map: map, zIndex: 50, icon: icon });"
+                                        ;
 
                                 Log.d(LOGTAG, "showPokemonsPositions: marker=" + setMarker);
 
@@ -487,6 +492,11 @@ public class Pokemongo extends FrameLayout
                         Log.d(LOGTAG, "onPageFinished");
 
                         pokemonsOnMapInitialized = true;
+
+                        String latlon = lat + "," + lon;
+                        String centerMap = "map.setCenter(new google.maps.LatLng(" + latlon + "));";
+                        pokeMapView.evaluateJavascript(centerMap, null);
+
                         mainHandler.post(showPokemonsPositions);
                     }
                 });
@@ -506,7 +516,7 @@ public class Pokemongo extends FrameLayout
                         + "map = new google.maps.Map(document.getElementById('map'), "
                         + "{ center: {lat: " + lat + ", lng: " + lon + "}, zoom: 12 });"
                         + "playerpos = new google.maps.Marker({"
-                        + "position: {lat: " + lat + ", lng: " + lon + "}, map: map });"
+                        + "position: {lat: " + lat + ", lng: " + lon + "}, map: map, zIndex:99 });"
                         + "}"
                         + "</script>"
                         + "<script src=\"https://maps.googleapis.com/maps/api/js"
