@@ -1,10 +1,5 @@
 package de.xavaro.android.safehome;
 
-//
-// \(result \+ ([0-9]+)\)
-// result[ $1 ]
-//
-
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 
@@ -22,12 +17,16 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Environment;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.net.Uri;
 
@@ -61,18 +60,21 @@ public class Pokemongo extends FrameLayout
     private static final int numPokemons = 151;
     private static final int freeMetersperSecond = 30;
     private static final int softBanSecondsPerKilometer = 50;
+    private static final String mapskey = "AIzaSyDF9rkP8lhcddBtvH9gVFzjnNo13WtmJIM";
+    private static final String pokeimgurl = "https://assets.pokemon.com/assets/cms2/img/pokedex/detail/";
 
     private static Pokemongo instance;
     private static Application application;
 
-    private WindowManager.LayoutParams overlayParam;
+    private static WindowManager.LayoutParams overlayParam;
+    private static WindowManager.LayoutParams mapviewParam;
 
     private final static String[] commandModeTexts = new String[]{ "STOP", "SEEK", "HUNT", "WAIT", "SPOT", "HOLD", "WALK" };
 
     private final static FrameLayout[] cmdButtons = new FrameLayout[ 3 ];
     private final static TextView[] cmdButtonTextViews = new TextView[ 3 ];
     private final static ImageView[] cmdButtonImageViews = new ImageView[ 3 ];
-    private final static String[] cmdTexts = new String[]{ "HIDE", "SHOP", "HUNT" };
+    private final static String[] cmdTexts = new String[]{ "HIDE", "MAPS", "HUNT" };
 
     private final static FrameLayout[] dirButtons = new FrameLayout[ 9 ];
     private final static TextView[] dirButtonTextViews = new TextView[ 9 ];
@@ -106,6 +108,9 @@ public class Pokemongo extends FrameLayout
     private static boolean[] pokeDirHunting;
     private static int pokeDirCols;
     private static int pokeDirRows;
+
+    private static FrameLayout pokeMap;
+    private static WebView pokeMapView;
 
     private static JSONObject poke2spawn = new JSONObject();
 
@@ -296,9 +301,227 @@ public class Pokemongo extends FrameLayout
         }
 
         createPokemonDir();
+        createPokemonMap();
 
         Log.d(LOGTAG, "Added system alert window...");
     }
+
+    private void createPokemonMap()
+    {
+        mainHandler.post(makeWebView);
+    }
+
+    private static final Runnable showMaps = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "showMaps");
+
+            ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE))
+                    .addView(pokeMap, mapviewParam);
+        }
+    };
+
+    private static final Runnable hideMaps = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "showMaps");
+
+            ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE))
+                    .removeView(pokeMap);
+        }
+    };
+
+    private static final Runnable showPlayerPosition = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (pokemonsOnMapInitialized)
+            {
+                String setPosition = "playerpos.setPosition(new google.maps.LatLng("
+                        + lat + "," + lon + "));";
+
+                pokeMapView.evaluateJavascript(setPosition, null);
+            }
+        }
+    };
+
+    private static Map<String, Integer> pokemonsOnMap = new HashMap<>();
+    private static boolean pokemonsOnMapInitialized;
+    private static int pokemonVarCount;
+
+    private static final Runnable showPokemonsPositions = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Log.d(LOGTAG, "showPokemonsPositions: run");
+
+            if (!pokemonsOnMapInitialized) return;
+
+            try
+            {
+                Log.d(LOGTAG, "showPokemonsPositions: work");
+
+                Iterator<String> pokeIterator = poke2spawn.keys();
+                while (pokeIterator.hasNext())
+                {
+                    String pokeId = pokeIterator.next();
+
+                    String[] parts = pokeId.split("@");
+                    if (parts.length != 2) continue;
+
+                    int pokeNum = Integer.parseInt(parts[ 1 ], 10);
+
+                    JSONArray spawns = poke2spawn.getJSONArray(pokeId);
+
+                    for (int inx = 0; inx < spawns.length(); inx++)
+                    {
+                        JSONObject spawn = spawns.getJSONObject(inx);
+
+                        double lat = spawn.getDouble("lat");
+                        double lon = spawn.getDouble("lon");
+
+                        String spawnkey = pokeId + "|" + lat + "|" + lon;
+
+                        if (pokemonsOnMap.containsKey(spawnkey))
+                        {
+                            if (! pokeDirHunting[ pokeNum - 1])
+                            {
+                                String pokevar = "poke" + pokemonsOnMap.get(spawnkey);
+                                String removeMarker = pokevar + ".setMap(null); " + pokevar + " = null;";
+
+                                Log.d(LOGTAG, "showPokemonsPositions: remove=" + removeMarker);
+                                pokeMapView.evaluateJavascript(removeMarker, null);
+
+                                pokemonsOnMap.remove(spawnkey);
+                            }
+                        }
+                        else
+                        {
+                            if (pokeDirHunting[ pokeNum - 1])
+                            {
+                                String nums = "" + pokeNum;
+                                while (nums.length() < 3) nums = "0" + nums;
+                                String icon = pokeimgurl + nums + ".png";
+
+                                String setIcon = "var icon = {"
+                                        + "url: '" + icon + "',"
+                                        + "scaledSize: new google.maps.Size(32,32),"
+                                        + "anchor: new google.maps.Point(16,16)"
+                                        + "};";
+
+                                Log.d(LOGTAG, "showPokemonsPositions: icon=" + setIcon);
+
+                                String setMarker = "var poke" + pokemonVarCount + " = "
+                                        + "new google.maps.Marker({"
+                                        + "position: {lat: " + lat + ", lng: " + lon + "}, map: map,"
+                                        + "icon: icon });";
+
+                                Log.d(LOGTAG, "showPokemonsPositions: marker=" + setMarker);
+
+                                pokeMapView.evaluateJavascript(setIcon + setMarker, null);
+
+                                pokemonsOnMap.put(spawnkey, pokemonVarCount);
+                                pokemonVarCount += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
+    };
+
+    private static final Runnable makeWebView = new Runnable()
+    {
+        @Override
+        @SuppressLint("SetJavaScriptEnabled")
+        public void run()
+        {
+            Log.d(LOGTAG, "makeWebView");
+
+            try
+            {
+                pokeMap = new FrameLayout(application);
+                pokeMap.setBackgroundColor(0xffffffff);
+
+                int width = pokeDirCols * buttsize;
+                int height = pokeDirRows * buttsize;
+
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(width, height);
+                pokeMap.setLayoutParams(lp);
+
+                mapviewParam = new WindowManager.LayoutParams(
+                        width, height,
+                        WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                        PixelFormat.TRANSLUCENT);
+
+                mapviewParam.gravity = Gravity.TOP + Gravity.CENTER_HORIZONTAL;
+                mapviewParam.y = (3 * buttsize) + buttpad;
+
+                pokeMapView = new WebView(application);
+
+                pokeMapView.getSettings().setJavaScriptEnabled(true);
+                pokeMapView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+                pokeMapView.getSettings().setSupportMultipleWindows(true);
+                pokeMapView.getSettings().setSupportZoom(false);
+                pokeMapView.getSettings().setAppCacheEnabled(false);
+
+                pokeMapView.setWebViewClient(new WebViewClient()
+                {
+                    @Override
+                    public void onPageFinished(WebView view, String url)
+                    {
+                        super.onPageFinished(pokeMapView, url);
+
+                        Log.d(LOGTAG, "onPageFinished");
+
+                        pokemonsOnMapInitialized = true;
+                        mainHandler.post(showPokemonsPositions);
+                    }
+                });
+
+                pokeMap.addView(pokeMapView);
+
+                String maphtml = "<!DOCTYPE html>"
+                        + "<html><head>"
+                        + "<meta name=\"viewport\" content=\"initial-scale=1.0\">"
+                        + "<meta charset=\"utf-8\">"
+                        + "<style> html, body {height:100%;margin:0;padding:0;} #map {height:100%;} </style>"
+                        + "</head><body>"
+                        + "<div id=\"map\"></div>"
+                        + "<script>"
+                        + "var map; var playerpos; function initMap()"
+                        + "{"
+                        + "map = new google.maps.Map(document.getElementById('map'), "
+                        + "{ center: {lat: " + lat + ", lng: " + lon + "}, zoom: 12 });"
+                        + "playerpos = new google.maps.Marker({"
+                        + "position: {lat: " + lat + ", lng: " + lon + "}, map: map });"
+                        + "}"
+                        + "</script>"
+                        + "<script src=\"https://maps.googleapis.com/maps/api/js"
+                        + "?key=AIzaSyDzgfXaWd2CV-sF3I7_iEVyaNOuaiauIoU&callback=initMap\" async defer>"
+                        + "</script>"
+                        + "</body></html>";
+
+                pokeMapView.loadDataWithBaseURL("https://maps-generator.com/", maphtml, "text/html", "utf-8", null);
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
+    };
 
     private void createPokemonDir()
     {
@@ -484,7 +707,15 @@ public class Pokemongo extends FrameLayout
     {
         if (pokeDirHunting[ buttinx ])
         {
-            pokeDirImages[ buttinx ].setBackgroundColor(0xcccccccc);
+            if (pokeDirEnabled[ buttinx ])
+            {
+                pokeDirImages[ buttinx ].setBackgroundColor(0xcccccccc);
+            }
+            else
+            {
+                pokeDirImages[ buttinx ].setBackgroundColor(0xffffffff);
+            }
+
             pokeDirHunting[ buttinx ] = false;
         }
         else
@@ -494,11 +725,15 @@ public class Pokemongo extends FrameLayout
         }
 
         savePokeHuntSettings();
+
+        mainHandler.post(showPokemonsPositions);
     }
 
     @SuppressLint("RtlHardcoded")
     private void onClickCommandButton(int buttinx)
     {
+        boolean updateMain = false;
+
         if (buttinx == 0)
         {
             if (overlayParam.width == xsize)
@@ -515,29 +750,50 @@ public class Pokemongo extends FrameLayout
                 overlayParam.gravity = Gravity.TOP + Gravity.CENTER_HORIZONTAL;
                 cmdButtonTextViews[ 0 ].setText("HIDE");
             }
+
+            updateMain = true;
+        }
+
+        if (buttinx == 1)
+        {
+            if (isShowMap)
+            {
+                mainHandler.post(hideMaps);
+                isShowMap = false;
+            }
+            else
+            {
+                mainHandler.post(showMaps);
+                isShowMap = true;
+            }
         }
 
         if (buttinx == 2)
         {
-            if (isShowhunt)
+            if (isShowDir)
             {
                 overlayParam.height = ysize;
                 pokeDir.setVisibility(GONE);
-                isShowhunt = false;
+                isShowDir = false;
             }
             else
             {
                 overlayParam.height = ysize + (pokeDirRows * buttsize) + buttpad;
                 pokeDir.setVisibility(VISIBLE);
-                isShowhunt = true;
+                isShowDir = true;
             }
+
+            updateMain = true;
         }
 
-        ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
-                .removeView(this);
+        if (updateMain)
+        {
+            ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                    .removeView(this);
 
-        ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
-                .addView(this, overlayParam);
+            ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
+                    .addView(this, overlayParam);
+        }
     }
 
     private void onClickSpawnsButton(int buttinx)
@@ -593,8 +849,8 @@ public class Pokemongo extends FrameLayout
     private static boolean isHolding;
     private static boolean isWaiting;
     private static boolean isSpotting;
-    private static boolean isImportant;
-    private static boolean isShowhunt;
+    private static boolean isShowMap;
+    private static boolean isShowDir;
     private static boolean isUpdatedir;
 
     private static void updateCommandStatus()
@@ -741,6 +997,8 @@ public class Pokemongo extends FrameLayout
                 + " lonWalk=" + String.format(Locale.ROOT, "%.6f", lonWalk));
     }
 
+    private static Handler mainHandler;
+
     private static boolean initPokemongo(Location location)
     {
         if (instance != null) return true;
@@ -748,6 +1006,8 @@ public class Pokemongo extends FrameLayout
         try
         {
             application = getApplicationUsingReflection();
+
+            mainHandler = new Handler(Looper.getMainLooper());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
@@ -892,6 +1152,8 @@ public class Pokemongo extends FrameLayout
 
                 updateCommandStatus();
 
+                mainHandler.post(showPlayerPosition);
+
                 if (!(isHolding || isWaiting))
                 {
                     if (!(isMoving || isWalking || isSpotting))
@@ -949,7 +1211,7 @@ public class Pokemongo extends FrameLayout
                         {
                             isSpotting = false;
 
-                            suspendTime = new Date().getTime() + (isImportant ? 120 : 18) * 1000;
+                            suspendTime = new Date().getTime() + (18 * 1000);
                         }
                     }
                 }
@@ -1259,6 +1521,7 @@ public class Pokemongo extends FrameLayout
 
                         saveRecords(result);
 
+                        evalSettings(result);
                         evalMapDetails(result);
                         evalGymDetails(result);
                         evalFortDetails(result);
@@ -1735,6 +1998,40 @@ public class Pokemongo extends FrameLayout
         }
     }
 
+    private static void evalSettings(JSONObject json)
+    {
+        try
+        {
+            JSONObject response = json.getJSONObject("response");
+            JSONArray returns = response.getJSONArray("returns@array");
+
+            for (int inx = 0; inx < returns.length(); inx++)
+            {
+                JSONObject returnobj = returns.getJSONObject(inx);
+                String type = returnobj.getString("type");
+
+                if (type.equals(".POGOProtos.Networking.Responses.DownloadSettingsResponse"))
+                {
+                    Log.d(LOGTAG, "evalSettings: settings...");
+
+                    JSONObject data = returnobj.getJSONObject("data");
+
+                    if (data.has("map_settings@.POGOProtos.Settings.MapSettings"))
+                    {
+                        JSONObject mapSettings = data.getJSONObject("map_settings@.POGOProtos.Settings.MapSettings");
+
+                        String apikey = mapSettings.getString("google_maps_api_key@string");
+                        Log.d(LOGTAG, "evalSettings: mapskey=" + apikey);
+                    }
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
+
     private static void evalMapDetails(JSONObject json)
     {
         try
@@ -1805,7 +2102,6 @@ public class Pokemongo extends FrameLayout
                     }
                 }
             }
-
         }
         catch (Exception ignore)
         {
