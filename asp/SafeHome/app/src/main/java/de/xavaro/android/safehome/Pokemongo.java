@@ -1271,6 +1271,8 @@ public class Pokemongo extends FrameLayout
                             //
 
                             spawnPointsTodo.remove(inx--);
+                            spawnPointsSeen.add(spanposstr);
+
                             continue;
                         }
 
@@ -2048,7 +2050,7 @@ public class Pokemongo extends FrameLayout
                 {
                     spawnPointsTodo.add(spawnposstr);
 
-                    while (spawnPointsTodo.size() > 100)
+                    while (spawnPointsTodo.size() > 500)
                     {
                         spawnPointsTodo.remove(0);
                     }
