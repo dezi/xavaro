@@ -1243,15 +1243,68 @@ public class Pokemongo extends FrameLayout
         Log.d(LOGTAG, "pupsekacke out...");
     }
 
+    private static String getNearestSpawn()
+    {
+        try
+        {
+            synchronized (spawnPointsTodo)
+            {
+                if (spawnPointsTodo.size() > 0)
+                {
+                    int bestInx = -1;
+                    double bestDist = 0.0;
+
+                    for (int inx = 0; inx < spawnPointsTodo.size(); inx++)
+                    {
+                        String spanposstr = spawnPointsTodo.get(inx);
+                        JSONObject spanLocation = new JSONObject(spanposstr);
+
+                        double distLat = lat - spanLocation.getDouble("lat");
+                        double distLon = lon - spanLocation.getDouble("lon");
+
+                        double dist = Math.sqrt(distLat * distLat + distLon * distLon);
+
+                        if (dist < 0.001)
+                        {
+                            //
+                            // Span location is almost the same as actual.
+                            //
+
+                            spawnPointsTodo.remove(inx--);
+                            continue;
+                        }
+
+                        if ((bestInx < 0) || (dist < bestDist))
+                        {
+                            bestInx = inx;
+                            bestDist = dist;
+                        }
+                    }
+
+                    Log.d(LOGTAG, "getNearestSpawn: inx=" + bestInx);
+
+                    return spawnPointsTodo.remove(bestInx);
+                }
+            }
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+
+        return null;
+    }
+
     private static void doSeekCommand()
     {
         try
         {
             if (spawnPointsTodo.size() > 0)
             {
-                synchronized (spawnPointsTodo)
+                String spanposstr = getNearestSpawn();
+
+                if (spanposstr != null)
                 {
-                    String spanposstr = spawnPointsTodo.remove(spawnPointsTodo.size() - 1);
                     spawnPointsSeen.add(spanposstr);
 
                     JSONObject spanpos = new JSONObject(spanposstr);
@@ -1260,16 +1313,16 @@ public class Pokemongo extends FrameLayout
                     lon = spanpos.getDouble("lon");
 
                     suspendTime = new Date().getTime() + 2 * 1000;
-                }
 
-                Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
-            }
-            else
-            {
-                synchronized (spawnPointsTodo)
-                {
-                    spawnPointsSeen.clear();
+                    Log.d(LOGTAG, "deziLocation: seek lat=" + lat + " lon=" + lon);
+
+                    return;
                 }
+            }
+
+            synchronized (spawnPointsTodo)
+            {
+                spawnPointsSeen.clear();
             }
         }
         catch (Exception ignore)
@@ -1995,7 +2048,7 @@ public class Pokemongo extends FrameLayout
                 {
                     spawnPointsTodo.add(spawnposstr);
 
-                    while (spawnPointsTodo.size() > 1000)
+                    while (spawnPointsTodo.size() > 100)
                     {
                         spawnPointsTodo.remove(0);
                     }
