@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
+import android.webkit.JavascriptInterface;
 
 import android.content.Intent;
 import android.provider.Settings;
@@ -484,6 +485,8 @@ public class Pokemongo extends FrameLayout
                 pokeMapView.getSettings().setSupportZoom(false);
                 pokeMapView.getSettings().setAppCacheEnabled(false);
 
+                pokeMapView.addJavascriptInterface(instance, "Mongopoke");
+
                 pokeMapView.setWebViewClient(new WebViewClient()
                 {
                     @Override
@@ -524,7 +527,8 @@ public class Pokemongo extends FrameLayout
                         + "}"
                         + "function pokeClick(pokeMarker)"
                         + "{"
-                        + "console.log('markerclick: ' + pokeMarker.getPosition())"
+                        + "console.log('markerclick: ' + pokeMarker.getPosition());"
+                        + "Mongopoke.markerClick(JSON.stringify(pokeMarker.getPosition()));"
                         + "}"
                         + "</script>"
                         + "<script src=\"https://maps.googleapis.com/maps/api/js"
@@ -2847,4 +2851,29 @@ public class Pokemongo extends FrameLayout
     }
 
     //endregion Timing methods.
+
+    @JavascriptInterface
+    public void markerClick(String json)
+    {
+        Log.d(LOGTAG, "markerclick: in app: " + json);
+
+        try
+        {
+            JSONObject latlon = new JSONObject(json);
+
+            latTogo = latlon.getDouble("lat");
+            lonTogo = latlon.getDouble("lng");
+
+            commandMode = COMMAND_STOP;
+            suspendTime = 0;
+
+            isHolding = false;
+            isSpotting = true;
+            isMoving = true;
+        }
+        catch (Exception ignore)
+        {
+            ignore.printStackTrace();
+        }
+    }
 }
