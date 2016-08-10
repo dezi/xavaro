@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto" package="com.nianticlabs.pokemongo" platformBuildVersionCode="23" platformBuildVersionName="6.0-2704002">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:installLocation="auto" package="com.nianticlabs.pokemongo" platformBuildVersionCode="24" platformBuildVersionName="N">
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true" android:xlargeScreens="true"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
@@ -18,6 +18,16 @@
         </activity>
         <activity android:name="com.google.nianticproject.platform.AccountsActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Black.NoTitleBar"/>
         <service android:name="com.upsight.android.analytics.internal.DispatcherService"/>
+        <receiver android:name="com.upsight.android.analytics.internal.dispatcher.schema.NetworkChangeBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:exported="true" android:name="com.upsight.android.analytics.internal.referrer.InstallReferrerReceiver">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
+            </intent-filter>
+        </receiver>
         <meta-data android:name="com.upsight.extension.analytics" android:value="com.upsight.android.UpsightAnalyticsExtension"/>
         <meta-data android:name="com.upsight.core" android:value="com.upsight.android.internal.CoreComponentFactory"/>
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
@@ -26,7 +36,10 @@
         <service android:name="com.upsight.android.googlepushservices.internal.PushClickIntentService"/>
         <meta-data android:name="com.upsight.extension.googlepushservices" android:value="com.upsight.android.UpsightGooglePushServicesExtension"/>
         <meta-data android:name="com.upsight.extension.managedvariables" android:value="com.upsight.android.UpsightManagedVariablesExtension"/>
+        <activity android:name="com.upsight.android.marketing.internal.billboard.BillboardManagementActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <meta-data android:name="com.upsight.extension.marketing" android:value="com.upsight.android.UpsightMarketingExtension"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize" android:hardwareAccelerated="true" android:name="com.upsight.mediation.ads.adapters.MRaidActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" android:windowSoftInputMode="adjustResize"/>
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:name="com.upsight.mediation.vast.activity.VASTActivity" android:screenOrientation="sensorLandscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
         <activity android:name="com.nianticlabs.nia.account.AccountsActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Black.NoTitleBar"/>
         <activity android:exported="false" android:name="com.nianticlabs.nia.iap.PurchaseActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <service android:exported="false" android:name="com.nianticlabs.nia.useractivity.ActivityRecognitionService"/>
@@ -43,6 +56,7 @@
         <activity android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:name="com.google.android.gms.ads.AdActivity" android:theme="@android:style/Theme.Translucent"/>
         <activity android:name="com.google.android.gms.ads.purchase.InAppPurchaseActivity" android:theme="@style/Theme.IAPTheme"/>
         <meta-data android:name="com.upsight.session_callbacks" android:value="com.upsight.android.unity.UnitySessionCallbacks"/>
+        <meta-data android:name="com.upsight.notification_builder_factory" android:value="com.upsight.android.unity.UnityPushNotificationBuilderFactory"/>
         <receiver android:name="com.upsight.android.googlepushservices.internal.PushBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
@@ -50,16 +64,16 @@
             </intent-filter>
         </receiver>
         <provider android:authorities="com.nianticlabs.pokemongo.upsight" android:enabled="true" android:exported="false" android:name="com.upsight.android.internal.persistence.ContentProvider"/>
-        <meta-data android:name="com.upsight.sdk_plugin" android:value="4.0.7"/>
+        <meta-data android:name="com.upsight.sdk_plugin" android:value="unity:4.2.2"/>
         <meta-data android:name="com.upsight.app_token" android:value="a9cc12f87adc420baf964f187672ecb4"/>
         <meta-data android:name="com.upsight.public_key" android:value="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyYKX0nb1ezY2KLkAl0tuWn2AZ0PfS2NF2BSM0T2OLCJM/H8Siyz1+OTvDWo1w+psbz6ugjTOaBGtkTRI1uikGcu32mhW2I4c9XUUkx1AYlC3wwiqnWZMvMKthp1yaKzrTsqhZzwJ6DvgZHUf1IPIkoxXoGmfyYNRI3QcpW5Uwa1dsZr5YeG8fwC53hyukOutt6PRqwDXQCsyCd/PawjUJZT6oxDFYYZ8a/11OIstlS4jXnQQ+k/f5HV5b8+ITiKhqXuNVsByPZqSIwi5T8pwJan7Rk8OCVImSkgUmWLcmlPcoL1UaF+vMZXZYhk1hM765IUw++7Dw2qvKVi4yl+giwIDAQAB"/>
         <meta-data android:name="com.upsight.gcm" android:value="com.nianticlabs.pokemongo.848232511240"/>
-        <meta-data android:name="com.upsight.user_attribute.player_level" android:value="0"/>
-        <meta-data android:name="com.upsight.user_attribute.player_xp" android:value="0"/>
-        <meta-data android:name="com.upsight.user_attribute.player_avatar" android:value="0"/>
-        <meta-data android:name="com.upsight.user_attribute.pokemon_count" android:value="0"/>
-        <meta-data android:name="com.upsight.user_attribute.item_count" android:value="0"/>
-        <meta-data android:name="com.upsight.user_attribute.pokecoin" android:value="0"/>
+        <meta-data android:name="com.upsight.user_attribute.integer.player_level" android:value="0"/>
+        <meta-data android:name="com.upsight.user_attribute.integer.player_xp" android:value="0"/>
+        <meta-data android:name="com.upsight.user_attribute.integer.player_avatar" android:value="0"/>
+        <meta-data android:name="com.upsight.user_attribute.integer.pokemon_count" android:value="0"/>
+        <meta-data android:name="com.upsight.user_attribute.integer.item_count" android:value="0"/>
+        <meta-data android:name="com.upsight.user_attribute.integer.pokecoin" android:value="0"/>
     </application>
     <uses-feature android:glEsVersion="0x20000"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

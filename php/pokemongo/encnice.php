@@ -11,7 +11,7 @@ function enc2java($lines)
 	$register = null;
 	$usedvars = null;
 	$secondpass = false;
-	$both = false;
+	$both = true;
 	
 	for ($inx = 0; $inx < $numlines; $inx++)
 	{

@@ -51,9 +51,10 @@ public class ApplicationBase extends Application
             }
         }
 
-        //Pokemongo.testEncode();
         System.exit(1);
         */
+
+        //Pokemongo.testEncode();
 
         //
         // Make application context available.
