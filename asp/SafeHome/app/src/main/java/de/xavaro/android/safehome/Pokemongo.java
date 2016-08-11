@@ -394,48 +394,14 @@ public class Pokemongo extends FrameLayout
                         {
                             if (! pokeDirHunting[ pokeNum - 1])
                             {
-                                String pokevar = "poke" + pokemonsOnMap.get(spawnkey);
-                                String removeMarker = pokevar + ".setMap(null); " + pokevar + " = null;";
-
-                                Log.d(LOGTAG, "showPokemonsPositions: remove=" + removeMarker);
-                                pokeMapView.evaluateJavascript(removeMarker, null);
-
-                                pokemonsOnMap.remove(spawnkey);
+                                removeMarker(spawnkey);
                             }
                         }
                         else
                         {
                             if (pokeDirHunting[ pokeNum - 1])
                             {
-                                String nums = "" + pokeNum;
-                                while (nums.length() < 3) nums = "0" + nums;
-                                String icon = pokeimgurl + nums + ".png";
-                                String size = pokeimgsize + "," + pokeimgsize;
-                                String cent = (pokeimgsize / 2) + "," + (pokeimgsize / 2);
-
-                                String setIcon = "var icon = {"
-                                        + "url: '" + icon + "',"
-                                        + "scaledSize: new google.maps.Size(" + size + "),"
-                                        + "anchor: new google.maps.Point(" + cent + ")"
-                                        + "};"
-                                        ;
-
-                                Log.d(LOGTAG, "showPokemonsPositions: icon=" + setIcon);
-
-                                String setMarker = "var poke" + pokemonVarCount + " = "
-                                        + "new google.maps.Marker({"
-                                        + "position: {lat:" + lat + ", lng:" + lon + "}, "
-                                        + "map:map, zIndex:50, icon:icon });"
-                                        + "poke" + pokemonVarCount + ".addListener('click',"
-                                        + "function() { pokeClick(poke" + pokemonVarCount + ")});"
-                                        ;
-
-                                Log.d(LOGTAG, "showPokemonsPositions: marker=" + setMarker);
-
-                                pokeMapView.evaluateJavascript(setIcon + setMarker, null);
-
-                                pokemonsOnMap.put(spawnkey, pokemonVarCount);
-                                pokemonVarCount += 1;
+                                placeMarker(spawnkey, pokeNum, lat, lon, 0);
                             }
                         }
                     }
@@ -447,6 +413,98 @@ public class Pokemongo extends FrameLayout
             }
         }
     };
+
+    private static final Runnable updateMarkers = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            try
+            {
+                Iterator<String> keysIterator = pokeLocs.keys();
+
+                while (keysIterator.hasNext())
+                {
+                    String pokeId = keysIterator.next();
+                    String[] parts = pokeId.split("@");
+                    if (parts.length != 2) continue;
+
+                    int pokeNum = Integer.parseInt(parts[ 1 ], 10);
+
+                    JSONObject pokeLoc = pokeLocs.getJSONObject(pokeId);
+                    JSONObject locs = pokeLoc.getJSONObject("loc");
+
+                    Iterator<String> locsIterator = locs.keys();
+
+                    while (locsIterator.hasNext())
+                    {
+                        String latlonstr = locsIterator.next();
+                        Log.d(LOGTAG, "debugme:" + latlonstr);
+
+                        JSONObject latlon = new JSONObject(latlonstr);
+                        double plat = latlon.getDouble("lat");
+                        double plon = latlon.getDouble("lon");
+
+                        String spawnkey = pokeId + "|" + plat + "|" + plon;
+
+                        placeMarker(spawnkey, pokeNum, plat, plon, 0);
+                    }
+                }
+            }
+            catch (Exception ignore)
+            {
+                ignore.printStackTrace();
+            }
+        }
+    };
+
+    private static void placeMarker(String spawnkey, int pokeNum, double lat, double lon, int timeout)
+    {
+        if (! pokemonsOnMap.containsKey(spawnkey))
+        {
+            String nums = "" + pokeNum;
+            while (nums.length() < 3) nums = "0" + nums;
+            String icon = pokeimgurl + nums + ".png";
+            String size = pokeimgsize + "," + pokeimgsize;
+            String cent = (pokeimgsize / 2) + "," + (pokeimgsize / 2);
+
+            String setIcon = "var icon = {"
+                    + "url: '" + icon + "',"
+                    + "scaledSize: new google.maps.Size(" + size + "),"
+                    + "anchor: new google.maps.Point(" + cent + ")"
+                    + "};";
+
+            Log.d(LOGTAG, "showPokemonsPositions: icon=" + setIcon);
+
+            String setMarker = "var poke" + pokemonVarCount + " = "
+                    + "new google.maps.Marker({"
+                    + "position: {lat:" + lat + ", lng:" + lon + "}, "
+                    + "map:map, zIndex:50, icon:icon });"
+                    + "poke" + pokemonVarCount + ".addListener('click',"
+                    + "function() { pokeClick(poke" + pokemonVarCount + ")});";
+
+            Log.d(LOGTAG, "showPokemonsPositions: marker=" + setMarker);
+
+            pokeMapView.evaluateJavascript(setIcon + setMarker, null);
+
+            pokemonsOnMap.put(spawnkey, pokemonVarCount);
+            pokemonVarCount += 1;
+        }
+    }
+
+    private static void removeMarker(String spawnkey)
+    {
+        if (pokemonsOnMap.containsKey(spawnkey))
+        {
+            String pokevar = "poke" + pokemonsOnMap.get(spawnkey);
+            String removeMarker = pokevar + ".setMap(null); " + pokevar + " = null;";
+
+            Log.d(LOGTAG, "showPokemonsPositions: remove=" + removeMarker);
+            pokeMapView.evaluateJavascript(removeMarker, null);
+
+            pokemonsOnMap.remove(spawnkey);
+        }
+    }
 
     private static final Runnable makeWebView = new Runnable()
     {
@@ -1908,7 +1966,7 @@ public class Pokemongo extends FrameLayout
 
             savePokeSpawnMap();
 
-            isUpdatedir = true;
+            //isUpdatedir = true;
 
             addToast("New Spawn " + pokeId);
         }
@@ -2278,6 +2336,21 @@ public class Pokemongo extends FrameLayout
                         if (expiration < now)
                         {
                             removeLocs.add(latlonstr);
+
+                            JSONObject latlon = new JSONObject(latlonstr);
+                            double plat = latlon.getDouble("lat");
+                            double plon = latlon.getDouble("lon");
+
+                            final String spawnkey = pokeId + "|" + plat + "|" + plon;
+
+                            mainHandler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    removeMarker(spawnkey);
+                                }
+                            });
                         }
                         else
                         {
@@ -2353,6 +2426,8 @@ public class Pokemongo extends FrameLayout
                 ignore.printStackTrace();
             }
         }
+
+        mainHandler.post(updateMarkers);
     }
 
     private static double latEncounter;
