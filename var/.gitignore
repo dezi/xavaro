@@ -4,6 +4,7 @@ epginfo
 pgminfo
 owmdata
 prodata
+mtkdata
 shares
 *.json.gz
 epginfo.json
