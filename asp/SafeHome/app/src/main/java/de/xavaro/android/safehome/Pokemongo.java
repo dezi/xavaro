@@ -1150,9 +1150,9 @@ public class Pokemongo extends FrameLayout
     // Hamburg => 53.55, 10.00
     //
 
-    //private static String region = "de.Hamburg";
-    //private static double latRegion = 53.55;
-    //private static double lonRegion = 10.00;
+    private static String region = "de.Hamburg";
+    private static double latRegion = 53.55;
+    private static double lonRegion = 10.00;
 
     //
     // Köln => 50.946695, 6.971266
@@ -1190,9 +1190,9 @@ public class Pokemongo extends FrameLayout
     // Sydney => -33.872806, 151.207502
     //
 
-    private static String region = "au.Sydney";
-    private static double latRegion = -33.87;
-    private static double lonRegion = 151.20;
+    //private static String region = "au.Sydney";
+    //private static double latRegion = -33.87;
+    //private static double lonRegion = 151.20;
 
     private static double lat = latRegion; // + ((Math.random() - 0.5) / 50.0);
     private static double lon = lonRegion; // + ((Math.random() - 0.5) / 50.0);
