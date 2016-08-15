@@ -2,9 +2,11 @@
 
 include("../include/json.php");
 
-$GLOBALS[ "bootstrapurl" ] = "http://zdfmediathk.sourceforge.net/akt.xml";
-$GLOBALS[ "mtkdirectory" ] = "../../var/mtkdata/tv/de";
-
+$GLOBALS[ "bootstrapurl"    ] = "http://zdfmediathk.sourceforge.net/akt.xml";
+$GLOBALS[ "configfile"      ] = "./mtkprepare.de.json";
+$GLOBALS[ "mtkdirectory"    ] = "../../var/mtkdata/tv/de";
+$GLOBALS[ "minimumduration" ] = "001000";
+ 
 //
 //  0 => Sender
 //  1 => Thema 
@@ -27,6 +29,17 @@ $GLOBALS[ "mtkdirectory" ] = "../../var/mtkdata/tv/de";
 // 18 => Geo 
 // 19 => neu
 //
+
+function readConfig()
+{
+	$GLOBALS[ "config" ] = json_decdat(file_get_contents($GLOBALS[ "configfile" ]));
+	
+	if (! $GLOBALS[ "config" ])
+	{
+		error_log("Cannot read config: " . $GLOBALS[ "configfile" ]);
+		exit(1);
+	}
+}
 
 function prepareDate(&$entry)
 {
@@ -66,46 +79,174 @@ function prepareDuration(&$entry)
 	return str_replace(":", "", $entry[ 5 ]);
 }
 
+function checkSpecialVersion(&$entry)
+{
+	$version = "N";
+	
+	$title = $entry[ 2 ];
+	
+	if (strpos($title, "Hörfassung: ") !== false)
+	{
+		$title = trim(str_replace("Hörfassung: ", " ", $title));
+		$version = "H";
+	}
+	
+	if (strpos($title, "- Hörfassung") !== false)
+	{
+		$title = trim(str_replace("- Hörfassung", " ", $title));
+		$version = "H";
+	}
+	
+	if (strpos($title, "(Hörfassung)") !== false)
+	{
+		$title = trim(str_replace("(Hörfassung)", " ", $title));
+		$version = "H";
+	}
+	
+	if (strpos($title, "(Hörfassung)") !== false)
+	{
+		$title = trim(str_replace("(Hörfassung)", " ", $title));
+		$version = "H";
+	}
+	
+	if (strpos($title, "(mit Audiodeskription)") !== false)
+	{
+		$title = trim(str_replace("(mit Audiodeskription)", " ", $title));
+		$version = "H";
+	}
+
+	if (strpos($title, "(mit Audiodeskription, ") !== false)
+	{
+		$title = trim(str_replace("(mit Audiodeskription, ", "(", $title));
+		$version = "H";
+	}
+
+	if (strpos($title, " mit Gebärdensprache") !== false)
+	{
+		$title = trim(str_replace(" mit Gebärdensprache", " ", $title));
+		$version = "G";
+	}
+	
+	if (strpos($title, " Gebärden") !== false)
+	{
+		$title = trim(str_replace(" Gebärden", " ", $title));
+		$version = "G";
+	}
+	
+	if (strpos($title, " - AD") !== false)
+	{
+		$title = trim(str_replace(" - AD", " ", $title));
+		$version = "H";
+	}
+	
+	if (strpos($title, " (AD)") !== false)
+	{
+		$title = trim(str_replace(" (AD)", " ", $title));
+		$version = "H";
+	}
+	
+	$title = str_replace("  ", " ", $title);
+	$title = str_replace("  ", " ", $title);
+
+	$entry[ 2 ] = $title;
+
+	return $version;
+}
+
 function prepareTitle($show, &$entry)
 {
-	$showlen = strlen($show);
+	$shownames = array();
+	$shownames[] = $show;
+	
+	if (isset($GLOBALS[ "config" ][ "shows" ][ $show ][ "synonyms" ]))
+	{
+		foreach($GLOBALS[ "config" ][ "shows" ][ $show ][ "synonyms" ] as $index => $altname)
+		{
+			$shownames[] = $altname;
+		}
+	}
 	
 	$title = prepareString($entry, 2);
 	
-	if (substr($title, 0, $showlen + 3) == "$show - ")
+	foreach ($shownames as $index => $showname)
 	{
-		$title = substr($title, $showlen + 3);
-	}
+		$showlen = strlen($showname);
+	
+		if ((substr($title, 0, 1) == "\"") && (substr($title, -1) == "\""))
+		{
+			$title = trim(substr($title, 1, -1));
+		}
+	
+		if (substr($title, 0, $showlen + 2) == "\"$showname\"")
+		{
+			$title = trim(str_replace("\"$showname\"", "$showname", $title));
+		}
+	
+		if (substr($title, 0, $showlen + 3) == "$showname - ")
+		{
+			$title = trim(substr($title, $showlen + 3));
+		}
 
-	if (substr($title, 0, $showlen + 2) == "$show: ")
-	{
-		$title = substr($title, $showlen + 2);
+		if (substr($title, 0, $showlen + 2) == "$showname: ")
+		{
+			$title = trim(substr($title, $showlen + 2));
+		}
+	
+		if (substr($title, 0, $showlen + 4) == "$showname vom")
+		{
+			$title = "";
+		}
+	
+		if (substr($title, 0, $showlen + 3) == "$showname am")
+		{
+			$title = "";
+		}
+		
+		if (substr($title, 0, $showlen + 1) == "$showname ")
+		{
+			$title = trim(substr($title, $showlen + 1));
+		}
+
+		if ($title == $showname)
+		{
+			$title = "";
+		}
+	
+		if ((substr($title, 0, 1) == "\"") && (substr($title, -1) == "\""))
+		{
+			$title = trim(substr($title, 1, -1));
+		}
 	}
 	
-	if (substr($title, 0, $showlen + 1) == "$show ")
-	{
-		$title = substr($title, $showlen + 1);
-	}
-
 	return $title;
 }
 
 function prepareString(&$entry, $inx)
 {
 	$item = $entry[ $inx ];
+	
 	$item = str_replace(" ...", "...", $item);
+	
+	$item = str_replace("“", "\"", $item);
+	$item = str_replace("„", "\"", $item);
+	
 	$item = str_replace("|", "/", $item);
 	$item = str_replace("–", "-", $item);
+	
 	$item = str_replace("\r", " ", $item);
 	$item = str_replace("\n", " ", $item);
+	
 	$item = str_replace("   ", " ", $item);
 	$item = str_replace("  ", " ", $item);
 	
 	return $item;
 }
 
-function writeEntries($outputfd, &$entrylines)
+function writeEntries($outputfd, $show, &$entrylines)
 {
+	fwrite($outputfd, "  \"$show\":\n");
+	fwrite($outputfd, "  [\n");
+
 	rsort($entrylines, SORT_STRING);
 	
 	$lastdate = "";
@@ -116,13 +257,18 @@ function writeEntries($outputfd, &$entrylines)
 		
 		$parts = explode("|", $line);
 		
+		if ($parts[ 1 ] < $GLOBALS[ "minimumduration" ]) continue;
+		
 		if ($lastdate != $parts[ 0 ])
 		{
 			$lastdate = $parts[ 0 ];
 		}
 		else
 		{
-			$line = str_replace("|*|", "|-|", $line);
+			if ($parts[ 3 ] == "N")
+			{
+				$line = str_replace("|*|", "|-|", $line);
+			}
 		}
 		
 		fwrite($outputfd, "    \"" . $line . "\"");
@@ -131,6 +277,8 @@ function writeEntries($outputfd, &$entrylines)
 		
 		fwrite($outputfd, "\n");
 	}
+	
+	fwrite($outputfd, "  ]\n");
 }
 
 function activateIfModified($outputfile)
@@ -223,9 +371,7 @@ function prepareList()
 		{
 			if ($show != "") 
 			{
-				writeEntries($outputfd, $entrylines);
-				
-				fwrite($outputfd, "  ]\n");
+				writeEntries($outputfd, $show, $entrylines);
 			}
 			
 			if ($channel != "") 
@@ -258,18 +404,12 @@ function prepareList()
 			{
 				error_log("$channel $show => $ecount");
 		
-				writeEntries($outputfd, $entrylines);
-				
-				fwrite($outputfd, "  ]");
+				writeEntries($outputfd, $show, $entrylines);
 			}
 			
 			$show = $temp;
 			$showlc = $templc;
-			
-			if ($scount > 0) fwrite($outputfd, ",\n");
-			fwrite($outputfd, "  \"$show\":\n");
-			fwrite($outputfd, "  [\n");
-		
+					
 			$scount++;
 			$ecount = 0;
 			$entrylines = array();
@@ -277,6 +417,7 @@ function prepareList()
 
 		$entryline = prepareDate($entry) . "|" 
 				   . prepareDuration($entry) . "|" 
+				   . checkSpecialVersion($entry) . "|"
 				   . "*|" 
 				   . prepareTitle($show, $entry) . "|" 
 				   . prepareString($entry, 7) .  "|"
@@ -299,9 +440,7 @@ function prepareList()
 	{
 		error_log("$channel $show => $ecount");
 
-		writeEntries($outputfd, $entrylines);
-		
-		fwrite($outputfd, "  ]\n");
+		writeEntries($outputfd, $show, $entrylines);
 	}
 	
 	if ($channel != "") 
@@ -353,7 +492,8 @@ function getLatestList()
 	}
 }
 
-getLatestList();
+readConfig();
+//getLatestList();
 prepareList();
 
 ?>
