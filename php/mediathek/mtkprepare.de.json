@@ -1,0 +1,28 @@
+{
+	"channels" :
+	{
+	},
+	
+	"shows" :
+	{
+		"ZDF heute journal" :
+		{
+			"synonyms" : [ "heute journal" ]
+		},
+		
+		"ZDF heute in europa" :
+		{
+			"synonyms" : [ "heute in Europa", "heute - in Europa" ]
+		},
+		
+		"ZDF heute journal - ganze Sendungen" :
+		{
+			"skip" : true
+		},
+		
+		"ZDF heute in europa - ganze Sendungen" :
+		{
+			"skip" : true
+		}
+	}
+}
