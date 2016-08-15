@@ -7,31 +7,11 @@
 			{
 				"3sat" : { "rename" : "Diverses" },
 				"3satbuchzeit" : { "synonyms" : [ "Buchzeit" ] },
-				"Ab 18!" : {},
-				"Aus anderer Sicht" : {},
 				"auslandsjournal extra" : { "synonyms" : [ "auslandsjournal-extra", "auslandsjournal" ] },
 				"Bauerfeind" : { "rename" : "Bauerfeind assistiert", "synonyms" : [ "Bauerfeind assistiert...", "Bauerfeind assistiert", "Bauerfeind assisiert" ] },
-				"Berg und Geist" : {},
-				"Besonders normal" : {},
-				"Close up" : {},
-				"Film" : {},
-				"Hessenreporter" : {},
-				"hitec" : {},
-				"Kabarett / Comedy" : {},
-				"Kulturpalast" : {},
-				"Kulturzeit" : {},
-				"Mädchengeschichten" : {},
-				"makro" : {},
-				"Museumscheck" : {},
-				"Musik" : {},
 				"nano" : { "synonyms" : [ "nano spezial" ] },
 				"Peter Voß fragt" : { "synonyms" : [ "Peter Voß im Gespräch mit" ] },
-				"Philosophie" : {},
- 				"Pixelmacher" : {},
-				"SCHWEIZWEIT" : {},
-				"scobel" : { "synonyms" : [ "scobel-Sendung", "Scobel" ] },
-				"Vis-a-vis" : {},
-				"Wissenschaftsdoku" : {}
+				"scobel" : { "synonyms" : [ "scobel-Sendung", "Scobel" ] }
 			}
 		},
 
@@ -128,7 +108,18 @@
 				"unicato" : { "minlength" : "004000" },
 				"Unser Land" : { "minlength" : "002500" },
 				"Visite" : { "minlength" : "004000" },
-				"WESTART Jazzline" : { "synonyms" : [ "Jazzline" ] }
+				"WESTART Jazzline" : { "synonyms" : [ "Jazzline" ] },
+				"WESTART Magazin" : { "synonyms" : [ "West ART Magazin", "West ART" ] },
+				"WESTART Talk" : { "synonyms" : [ "West ART Talk" ] },
+				"Wir in Bayern" : { "minlength" : "004000", "synonyms" : [ "Lust auf Heimat" ] },
+				"Wuhladko" : { "synonyms" : [ "Wuhladko - Das Magazin in sorbischer Sprache" ] },
+				"Zapp" : { "minlength" : "002500", "synonyms" : [ "Zapp - Das Medienmagazin" ] },
+				"zibb" : { "minlength" : "005000" },
+				"Zimmer frei!" : { "synonyms" : [ "Zimmer frei" ] },
+				"Zur Sache Baden-Württemberg!" : { "minlength" : "003500", "synonyms" : [ "Zur Sache Baden-Württemberg" ] },
+				"zur Sache Rheinland-Pfalz!" : { "rename" : "Zur Sache Rheinland-Pfalz!" },
+				"Zur Sache Rheinland-Pfalz!" : { "minlength" : "003500", "synonyms" : [ "zur Sache Rheinland-Pfalz", "ZUR SACHE! Rheinland-Pfalz" ] },
+				"Zwischen Spessart und Karwendel" : { "minlength" : "004000" }
 
 
 			}

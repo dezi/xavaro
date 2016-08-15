@@ -300,6 +300,8 @@ function prepareTitle($channel, $show, &$entry)
 	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
 	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.$/ui", "", $title));
 	
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+./ui", "", $title));
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+:/ui", "", $title));
 	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
 	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+$/ui", "", $title));
 	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+:/ui", "", $title));
@@ -327,6 +329,15 @@ function prepareTitle($channel, $show, &$entry)
 	
 	$title = trim(preg_replace("/^[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9] -/ui", "", $title));
 	$title = trim(preg_replace("/^[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9] /ui", "", $title));
+	$title = trim(preg_replace("/ [0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9]$/ui", "", $title));
+	
+	$title = trim(preg_replace("/^Montag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^Dienstag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^Mittwoch,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^Donnerstag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^Freitag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^Samstag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^Sonntag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
 
 	//
 	// Change episode stuff.
@@ -369,6 +380,7 @@ function prepareTitle($channel, $show, &$entry)
 	$title = trim(preg_replace("/^sendung$/ui", "", $title));
 	$title = trim(preg_replace("/^die sendung$/ui", "", $title));
 	$title = trim(preg_replace("/^Mediathek$/ui", "", $title));
+	$title = trim(preg_replace("/^Alle Beiträge:/ui", "", $title));
 	
 	//
 	// Remove fully quoted titles quotes once again.
