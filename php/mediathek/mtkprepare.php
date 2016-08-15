@@ -79,9 +79,14 @@ function prepareDuration(&$entry)
 	return str_replace(":", "", $entry[ 5 ]);
 }
 
-function checkSpecialVersion(&$entry)
+function checkSpecialVersion($channel, $show, &$entry)
 {
 	$version = "N";
+	
+	if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "special" ]))
+	{
+		$version = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "special" ];
+	}
 	
 	$title = $entry[ 2 ];
 	
@@ -109,6 +114,42 @@ function checkSpecialVersion(&$entry)
 		$version = "H";
 	}
 	
+	if (strpos($title, "die Sendung in Gebärdensprache") !== false)
+	{
+		$title = trim(str_replace("die Sendung in Gebärdensprache", " ", $title));
+		$version = "G";
+	}
+
+	if (strpos($title, "mit Gebärdenübersetzung") !== false)
+	{
+		$title = trim(str_replace("mit Gebärdenübersetzung", " ", $title));
+		$version = "G";
+	}
+
+	if (strpos($title, "(Mit Gebärdensprache)") !== false)
+	{
+		$title = trim(str_replace("(Mit Gebärdensprache)", " ", $title));
+		$version = "G";
+	}
+
+	if (strpos($title, "(mit Gebärdensprache)") !== false)
+	{
+		$title = trim(str_replace("(mit Gebärdensprache)", " ", $title));
+		$version = "G";
+	}
+
+	if (strpos($title, " - mit Audiodeskription)") !== false)
+	{
+		$title = trim(str_replace(" - mit Audiodeskription)", ")", $title));
+		$version = "H";
+	}
+
+	if (strpos($title, ", mit Audiodeskription)") !== false)
+	{
+		$title = trim(str_replace(", mit Audiodeskription)", ")", $title));
+		$version = "H";
+	}
+
 	if (strpos($title, "(mit Audiodeskription)") !== false)
 	{
 		$title = trim(str_replace("(mit Audiodeskription)", " ", $title));
@@ -121,9 +162,21 @@ function checkSpecialVersion(&$entry)
 		$version = "H";
 	}
 
+	if (strpos($title, " - Gebärdensprache") !== false)
+	{
+		$title = trim(str_replace(" - Gebärdensprache", " ", $title));
+		$version = "G";
+	}
+	
 	if (strpos($title, " mit Gebärdensprache") !== false)
 	{
 		$title = trim(str_replace(" mit Gebärdensprache", " ", $title));
+		$version = "G";
+	}
+	
+	if (strpos($title, " Gebärdensprache") !== false)
+	{
+		$title = trim(str_replace(" Gebärdensprache", " ", $title));
 		$version = "G";
 	}
 	
@@ -153,71 +206,188 @@ function checkSpecialVersion(&$entry)
 	return $version;
 }
 
-function prepareTitle($show, &$entry)
+function sortByStringLength($a, $b)
+{
+  	if (strlen($a) == strlen($b)) return 0;
+  	return (strlen($a) > strlen($b) ? -1 : 1);
+}
+
+function prepareTitle($channel, $show, &$entry)
 {
 	$shownames = array();
 	$shownames[] = $show;
 	
-	if (isset($GLOBALS[ "config" ][ "shows" ][ $show ][ "synonyms" ]))
+	if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "synonyms" ]))
 	{
-		foreach($GLOBALS[ "config" ][ "shows" ][ $show ][ "synonyms" ] as $index => $altname)
+		$synonyms = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "synonyms" ];
+		
+		foreach($synonyms as $index => $altname)
 		{
 			$shownames[] = $altname;
 		}
+		
+		usort($shownames, "sortByStringLength");
 	}
 	
 	$title = prepareString($entry, 2);
 	
-	foreach ($shownames as $index => $showname)
+	//
+	// Replace single quotes.
+	//
+	
+	$title = trim(preg_replace("/^'/", "\"", $title));
+	$title = trim(preg_replace("/'$/", "\"", $title));
+	$title = trim(preg_replace("/ '/", " \"", $title));
+	$title = trim(preg_replace("/' /", "\" ", $title));
+
+	//
+	// Remove fully quoted titles quotes.
+	//
+	
+	if ((substr($title, 0, 1) == "\"") && (substr($title, -1) == "\""))
 	{
-		$showlen = strlen($showname);
-	
-		if ((substr($title, 0, 1) == "\"") && (substr($title, -1) == "\""))
-		{
-			$title = trim(substr($title, 1, -1));
-		}
-	
-		if (substr($title, 0, $showlen + 2) == "\"$showname\"")
-		{
-			$title = trim(str_replace("\"$showname\"", "$showname", $title));
-		}
-	
-		if (substr($title, 0, $showlen + 3) == "$showname - ")
-		{
-			$title = trim(substr($title, $showlen + 3));
-		}
-
-		if (substr($title, 0, $showlen + 2) == "$showname: ")
-		{
-			$title = trim(substr($title, $showlen + 2));
-		}
-	
-		if (substr($title, 0, $showlen + 4) == "$showname vom")
-		{
-			$title = "";
-		}
-	
-		if (substr($title, 0, $showlen + 3) == "$showname am")
-		{
-			$title = "";
-		}
-		
-		if (substr($title, 0, $showlen + 1) == "$showname ")
-		{
-			$title = trim(substr($title, $showlen + 1));
-		}
-
-		if ($title == $showname)
-		{
-			$title = "";
-		}
-	
-		if ((substr($title, 0, 1) == "\"") && (substr($title, -1) == "\""))
-		{
-			$title = trim(substr($title, 1, -1));
-		}
+		$title = trim(substr($title, 1, -1));
 	}
 	
+	//
+	// Remove repeatations of show name.
+	//
+	
+	foreach ($shownames as $index => $showname)
+	{
+		$title = trim(preg_replace("/\"$showname\"/ui", $showname, $title));
+		
+		$title = trim(preg_replace("/" . $showname . "[ ]*[\\?\\-\\:]+/ui", "", $title));
+		$title = trim(preg_replace("/" . $showname . " (vom|am)/ui", "", $title));
+		$title = trim(preg_replace("/" . $showname . "[ ]+/ui", "", $title));
+		$title = trim(preg_replace("/^" . $showname . "$/ui", "", $title));
+		$title = trim(preg_replace("/^" . $showname . "\\(/ui", "(", $title));
+	}
+	
+	//
+	// Remove restrictions.
+	//
+	
+	$title = trim(preg_replace("/\\(Video tgl. ab 20 Uhr\\)/ui", "", $title));
+	$title = trim(preg_replace("/\\(Video tgl. ab 22 Uhr\\)/ui", "", $title));
+	$title = trim(preg_replace("/\\(FSK 12, ab 20 Uhr abrufbar\\)/ui", "", $title));
+	$title = trim(preg_replace("/\\(ab 20 Uhr abrufbar\\)/ui", "", $title));
+
+	//
+	// Remove fully quoted titles quotes once more.
+	//
+	
+	if ((substr($title, 0, 1) == "\"") && (substr($title, -1) == "\""))
+	{
+		$title = trim(substr($title, 1, -1));
+	}
+	
+	//
+	// Remove bogus date spezifications.
+	//
+	
+	$title = trim(preg_replace("/^[0-9]+\\.[0-9]+\\.$/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/\\([0-9]+\\.[0-9]+\\.[0-9]+\\)/ui", "", $title));
+	
+	$title = trim(preg_replace("/^[0-9]+\\.[0-9]+\\.[0-9]+ [0-9]+\\:[0-9]+$/ui", "", $title));
+	
+	$title = trim(preg_replace("/Die ganze Sendung/ui", "Die Sendung", $title));
+	$title = trim(preg_replace("/Die ganz Sendung/ui", "Die Sendung", $title));
+
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+ -/ui", "", $title));
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.$/ui", "", $title));
+	
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+$/ui", "", $title));
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+:/ui", "", $title));
+	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ -/ui", "", $title));
+
+	$title = trim(preg_replace("/Die Sendung am [0-9]+\\. [\\p{L}]+$/ui", "", $title));
+
+	$title = trim(preg_replace("/Sendung vom [\\p{L}]+, [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+	
+	$title = trim(preg_replace("/Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+ -/ui", "", $title));
+	$title = trim(preg_replace("/Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	
+	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+$/ui", "", $title));
+	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+:/ui", "", $title));
+	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+ -/ui", "", $title));
+
+	$title = trim(preg_replace("/(vom|von) [0-9]+\\.[0-9]+\\.[0-9]+ -/ui", "", $title));
+	$title = trim(preg_replace("/(vom|von) [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	
+	$title = trim(preg_replace("/(vom|von) [0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/(vom|von) [0-9]+\\. [\\p{L}]+$/ui", "", $title));
+	$title = trim(preg_replace("/(vom|von) [0-9]+\\. [\\p{L}]+:/ui", "", $title));
+	$title = trim(preg_replace("/(vom|von) [0-9]+\\. [\\p{L}]+ -/ui", "", $title));
+	
+	$title = trim(preg_replace("/^[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9] -/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9] /ui", "", $title));
+
+	//
+	// Change episode stuff.
+	//
+	
+	$title = trim(preg_replace("/Folge ([0-9]+) -/ui", "($1) ", $title));
+	$title = trim(preg_replace("/Folge ([0-9]+):/ui", "($1) ", $title));
+	$title = trim(preg_replace("/Folge ([0-9]+) /ui", "($1) ", $title));
+	$title = trim(preg_replace("/Folge ([0-9]+)$/ui", "($1) ", $title));
+	$title = trim(preg_replace("/\\(Folge ([0-9]+)\\)$/ui", "($1) ", $title));
+	
+	$title = trim(preg_replace("/\\(([0-9]+)\\/[0-9]+\\)/ui", "($1) ", $title));
+	$title = trim(preg_replace("/\\(([0-9]+)\\) - /ui", "($1) ", $title));
+	
+	$title = trim(preg_replace("/^(.*?) (\\([0-9]+\\))$/ui", "$2 $1", $title));
+
+	//
+	// Remove copyright stuff.
+	//
+	
+	$title = trim(preg_replace("/© [ a-zA-Z0-9\\.\\,\\-\\/\\(\\)\\_\\&\\p{L}]+$/u", "", $title));
+	
+	//
+	// Remove small junk at start.
+	//
+	
+	$title = trim(preg_replace("/^- /u", "", $title));
+	$title = trim(preg_replace("/^\\/ /u", "", $title));
+	//
+	// Remove redundant entries.
+	//
+	
+	$title = trim(preg_replace("/^Sendung [0-9]+:[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/^Die Nachrichten in voller Länge$/ui", "", $title));
+	$title = trim(preg_replace("/^Die komplette Sendung$/ui", "", $title));
+	$title = trim(preg_replace("/^Die ganze Sendung$/ui", "", $title));
+	$title = trim(preg_replace("/ - ganze sendung$/ui", "", $title));
+	$title = trim(preg_replace("/^Die ganze Folge$/ui", "", $title));
+	$title = trim(preg_replace("/^ganze sendung$/ui", "", $title));
+	$title = trim(preg_replace("/^sendung$/ui", "", $title));
+	$title = trim(preg_replace("/^die sendung$/ui", "", $title));
+	$title = trim(preg_replace("/^Mediathek$/ui", "", $title));
+	
+	//
+	// Remove fully quoted titles quotes once again.
+	//
+	
+	if ((substr($title, 0, 1) == "\"") && (substr($title, -1) == "\""))
+	{
+		$title = trim(substr($title, 1, -1));
+	}
+	
+	//
+	// Convert first char to upper case.
+	//
+	
+	$title = mb_convert_case(mb_substr($title, 0, 1), MB_CASE_UPPER) . mb_substr($title, 1);
+		
+	$title = str_replace("   ", " ", $title);
+	$title = str_replace("  ", " ", $title);
+
 	return $title;
 }
 
@@ -239,11 +409,64 @@ function prepareString(&$entry, $inx)
 	$item = str_replace("   ", " ", $item);
 	$item = str_replace("  ", " ", $item);
 	
-	return $item;
+	return trim($item);
 }
 
-function writeEntries($outputfd, $show, &$entrylines)
+function writeEntries($outputfd, $channel, $show, &$entrylines)
 {
+	if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "skip" ]))
+	{
+		if ($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "skip" ])
+		{
+			//
+			// Skip show.
+			//
+			
+			return;
+		}
+	}
+	
+	$minlength = $GLOBALS[ "minimumduration" ];
+	
+	if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "minlength" ]))
+	{
+		//
+		// Override minimum length.
+		//
+
+		$minlength = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "minlength" ];
+	}
+
+	//
+	// Preflight entries.
+	//
+	
+	$numentries = 0;
+	
+	for ($inx = 0; $inx < count($entrylines); $inx++)
+	{
+		$line = $entrylines[ $inx ];
+		
+		$parts = explode("|", $line);
+		
+		if ($parts[ 1 ] < $minlength) continue;
+		
+		$numentries++;
+	}
+	
+	if ($numentries == 0)
+	{
+		//
+		// Skip empty shows.
+		//
+		
+		return;
+	}
+
+	//
+	// Dump show.
+	//
+	
 	fwrite($outputfd, "  \"$show\":\n");
 	fwrite($outputfd, "  [\n");
 
@@ -257,7 +480,7 @@ function writeEntries($outputfd, $show, &$entrylines)
 		
 		$parts = explode("|", $line);
 		
-		if ($parts[ 1 ] < $GLOBALS[ "minimumduration" ]) continue;
+		if ($parts[ 1 ] < $minlength) continue;
 		
 		if ($lastdate != $parts[ 0 ])
 		{
@@ -308,7 +531,7 @@ function activateIfModified($outputfile)
 
 function prepareList()
 {
-	$filexy = $GLOBALS[ "mtkdirectory" ] . "/rawdata.xy";
+	$filexy = $GLOBALS[ "mtkdirectory" ] . "/rawdata.xz";
 
 	$pfd = popen("xzcat < $filexy", "r");
 	
@@ -328,6 +551,18 @@ function prepareList()
 		
 		if (substr($line, 0, 7) != "\"X\" : [") continue;
 		
+		//
+		// Strip off global character junk.
+		//
+		
+		$line = str_replace("  ", " - ", $line);
+		$line = str_replace("…", "...", $line);
+		$line = str_replace(" ", " ", $line);
+
+		//
+		// Decode line into parts.
+		//
+		
 		if (substr($line, -1) == ",")
 		{
 			$entry = json_decdat(substr($line, 6, -1));
@@ -338,7 +573,7 @@ function prepareList()
 		}
 		
 		//
-		// Strip ORF junk.
+		// Strip off ORF junk.
 		//
 			
 		if (substr($entry[ 1 ], 0, 5) == "AD | ")
@@ -351,27 +586,11 @@ function prepareList()
 			$entry[ 2 ] = substr($entry[ 2 ], 5);
 		}
 		
-		$temp = $entry[ 1 ];
-		$temp = str_replace("   ", " ", $temp);
-		$temp = str_replace("  ", " ", $temp);
-		$temp = str_replace("–", "-", $temp);
-		$temp = trim($temp);
-		
-		if (substr($temp, -10) == "Livestream") continue;
-		
-		$templc = mb_convert_case($temp, MB_CASE_LOWER);
-		$templc = str_replace("!", " ", $templc);
-		$templc = str_replace(".", " ", $templc);
-		$templc = str_replace("-", " ", $templc);
-		$templc = str_replace("   ", " ", $templc);
-		$templc = str_replace("  ", " ", $templc);
-		$templc = trim($templc);
-
 		if (($entry[ 0 ] != "") && ($entry[ 0 ] != $channel))
 		{
 			if ($show != "") 
 			{
-				writeEntries($outputfd, $show, $entrylines);
+				writeEntries($outputfd, $channel, $show, $entrylines);
 			}
 			
 			if ($channel != "") 
@@ -398,13 +617,44 @@ function prepareList()
 			fwrite($outputfd, "{\n");
 		}
 		
+		//
+		// Rename shows upfront.
+		//
+		
+		if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $entry[ 1 ] ][ "rename" ]))
+		{
+			//
+			// Rename show.
+			//
+
+			echo "Rename===>>>>> " . $entry[ 1 ] . "\n";
+			
+			$entry[ 1 ] = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $entry[ 1 ] ][ "rename" ];
+		}
+
+		$temp = $entry[ 1 ];
+		$temp = str_replace("   ", " ", $temp);
+		$temp = str_replace("  ", " ", $temp);
+		$temp = str_replace("–", "-", $temp);
+		$temp = trim($temp);
+		
+		if (substr($temp, -10) == "Livestream") continue;
+		
+		$templc = mb_convert_case($temp, MB_CASE_LOWER);
+		$templc = str_replace("!", " ", $templc);
+		$templc = str_replace(".", " ", $templc);
+		$templc = str_replace("-", " ", $templc);
+		$templc = str_replace("   ", " ", $templc);
+		$templc = str_replace("  ", " ", $templc);
+		$templc = trim($templc);
+		
 		if (($templc != "") && ($templc != $showlc))
 		{
 			if ($show != "") 
 			{
 				error_log("$channel $show => $ecount");
 		
-				writeEntries($outputfd, $show, $entrylines);
+				writeEntries($outputfd, $channel, $show, $entrylines);
 			}
 			
 			$show = $temp;
@@ -417,9 +667,9 @@ function prepareList()
 
 		$entryline = prepareDate($entry) . "|" 
 				   . prepareDuration($entry) . "|" 
-				   . checkSpecialVersion($entry) . "|"
+				   . checkSpecialVersion($channel, $show, $entry) . "|"
 				   . "*|" 
-				   . prepareTitle($show, $entry) . "|" 
+				   . prepareTitle($channel, $show, $entry) . "|" 
 				   . prepareString($entry, 7) .  "|"
 				   . prepareString($entry, 8) .  "|"
 				   . prepareString($entry, 9)
@@ -440,7 +690,7 @@ function prepareList()
 	{
 		error_log("$channel $show => $ecount");
 
-		writeEntries($outputfd, $show, $entrylines);
+		writeEntries($outputfd, $channel, $show, $entrylines);
 	}
 	
 	if ($channel != "") 
@@ -481,7 +731,7 @@ function getLatestList()
 	foreach ($matches[ 0 ] as $index => $serverurl)
 	{
 		$listxy = file_get_contents($serverurl);
-		$filexy = $GLOBALS[ "mtkdirectory" ] . "/rawdata.xy";
+		$filexy = $GLOBALS[ "mtkdirectory" ] . "/rawdata.xz";
 		
 		if (file_put_contents($filexy, $listxy))
 		{

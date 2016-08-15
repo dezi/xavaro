@@ -1,28 +1,148 @@
 {
 	"channels" :
 	{
-	},
-	
-	"shows" :
-	{
-		"ZDF heute journal" :
+		"3Sat" :
 		{
-			"synonyms" : [ "heute journal" ]
+			"shows" :
+			{
+				"3sat" : { "rename" : "Diverses" },
+				"3satbuchzeit" : { "synonyms" : [ "Buchzeit" ] },
+				"Ab 18!" : {},
+				"Aus anderer Sicht" : {},
+				"auslandsjournal extra" : { "synonyms" : [ "auslandsjournal-extra", "auslandsjournal" ] },
+				"Bauerfeind" : { "rename" : "Bauerfeind assistiert", "synonyms" : [ "Bauerfeind assistiert...", "Bauerfeind assistiert", "Bauerfeind assisiert" ] },
+				"Berg und Geist" : {},
+				"Besonders normal" : {},
+				"Close up" : {},
+				"Film" : {},
+				"Hessenreporter" : {},
+				"hitec" : {},
+				"Kabarett / Comedy" : {},
+				"Kulturpalast" : {},
+				"Kulturzeit" : {},
+				"Mädchengeschichten" : {},
+				"makro" : {},
+				"Museumscheck" : {},
+				"Musik" : {},
+				"nano" : { "synonyms" : [ "nano spezial" ] },
+				"Peter Voß fragt" : { "synonyms" : [ "Peter Voß im Gespräch mit" ] },
+				"Philosophie" : {},
+ 				"Pixelmacher" : {},
+				"SCHWEIZWEIT" : {},
+				"scobel" : { "synonyms" : [ "scobel-Sendung", "Scobel" ] },
+				"Vis-a-vis" : {},
+				"Wissenschaftsdoku" : {}
+			}
 		},
-		
-		"ZDF heute in europa" :
+
+		"ARD" :
 		{
-			"synonyms" : [ "heute in Europa", "heute - in Europa" ]
+			"shows" :
+			{
+				"alle wetter!" : { "synonyms" : [ "alle wetter" ] },
+				"ARD Themenwoche 2014" : { "skip" : true },
+				"ARD Themenwoche 2015" : { "skip" : true },
+				"Arena am Samstag" : { "synonyms" : [ "sportarena, Samstag", "sportarena", "arena am samstag extra" ] },
+				"artour" : { "synonyms" : [ "Artour" ] },
+				"Außenseiter Spitzenreiter" : { "synonyms" : [ "Außenseiter-Spitzenreiter" ] },
+				"Berlinale-Studio" : { "synonyms" : [ "Berlinale Studio" ] },
+				"buten un binnen Regionalmagazin" : { "rename" : "buten un binnen" },
+				"defacto" : { "minlength" : "002500" },
+				"Der Komödienstadel" : { "minlength" : "010000" },
+				"Die Ernährungs-Docs" : { "minlength" : "004000" },
+				"Die Sendung mit der Maus vom 14.08.2016" : { "skip" : true },
+				"Die Sendung mit der Maus vom 14.08.2016 (mit Gebärdensprache)" : { "skip" : true },
+				"Die unwahrscheinlichen Ereignisse im Leben von..." : { "synonyms" : [ "Die unwahrscheinlichen Ereignisse im Leben von" ] },
+				"Donnerwetter" : { "synonyms" : [ "Donnerwetter!" ] },
+				"Echo 2015" : { "skip" : true },
+				"Echo 2016" : { "skip" : true },
+				"Einfach. Gut. Bachmeier" : { "synonyms" : [ "Kochen mit Hans Jörg Bachmeier" ] },
+				"Elefant, Tiger & Co." : { "synonyms" : [ "Elefant, Tiger und Co.", "Elefant, Tiger und Co. - Geschichten aus dem Leipziger Zoo" ] },
+				"Exakt" : { "minlength" : "002000" },
+				"FAKT" : { "minlength" : "002500" },
+				"Fakt ist!" : { "synonyms" : [ "Fakt ist...!" ] },
+				"Frankenschau aktuell" : { "synonyms" : [ "Das Wichtigste aus Franken", "Live vor Ort und Reportagen aus Franken" ] },
+				"frauTV" : { "rename" : "frau tv" },
+				"frau tv" : { "synonyms" : [ "FrauTV" ] },
+				"Gefällt mir" : { "synonyms" : [ "Gefällt mir!" ] },
+				"Giraffe, Erdmännchen & Co." : { "synonyms" : [ "Giraffe, Erdmännchen und Co." ] },
+				"Hirschhausens Quiz des Menschen (WDR)" : { "rename" : "Hirschhausens Quiz des Menschen" },
+				"Inas Nacht" : { "synonyms" : [ "Ina Müller im Talk" ] },
+				"kinokino" : { "synonyms" : [ "Das Filmmagazin im BR Fernsehen", "Das Filmmagazin des Bayerischen Fernsehens" ] },
+				"Kopfball" : { "minlength" : "002500" },
+				"Krause kommt" : { "synonyms" : [ "Krause kommt!", "Pierre M. Krause bei" ] },
+				"Kunst & Krempel" : { "minlength" : "002500", "synonyms" : [ "Familienschätze unter der Lupe" ] },
+				"Lieb & Teuer" : { "minlength" : "002500", "synonyms" : [ "Lieb und Teuer" ] },
+				"Lokalzeitgeschichten" : { "synonyms" : [ "Lokalzeit Geschichten", "Lokalzeit-Geschichten" ] },
+				"Lokalzeit OWL" : { "synonyms" : [ "Lokalzeit aus OWL" ] },
+				"Luzyca" : {  "synonyms" : [ "Łužyca" ] },
+				"Mach dich ran" : { "synonyms" : [ "Mach dich ran!" ] },
+				"Mach mal" : { "synonyms" : [ "Mach mal...!" ] },
+				"mag's" : { "minlength" : "004000", "synonyms" : [ "Mag?s spezial", "mag?s" ] },
+				"Märchen" : { "minlength" : "004000" },
+				"Märchenfilm im Ersten" : { "rename" : "Märchen" },
+				"Märchen im rbb" : { "rename" : "Märchen" },
+				"Markt" : { "minlength" : "004000" },
+				"MARKTCHECK" : { "minlength" : "004000" },
+				"Mein Nachmittag" : { "minlength" : "004000" },
+				"MENSCH LEUTE Baden-Württemberg" : { "rename" : "MENSCH LEUTE" },
+				"Monitor" : { "minlength" : "002800" },
+				"Monitor (WDR)" : { "rename" : "Monitor" },
+				"Morgenmagazin" : { "minlength" : "010000" },
+				"natürlich!" : { "synonyms" : [ "natürlich" ] },
+				"NDR Talk Show" : { "minlength" : "010000" },
+				"NDR Talk Show classics" : { "minlength" : "003000" },
+				"Nordtour" : { "minlength" : "004000" },
+				"Olaf verbessert die Welt!" : { "synonyms" : [ "Olaf verbessert die Welt" ] },
+				"Panorama" : { "minlength" : "002500" },
+				"Panorama 3" : { "minlength" : "002500" },
+				"Plusminus" : { "minlength" : "002500" },
+				"PULS" : { "minlength" : "002900" },
+				"puzzle" : { "minlength" : "002500" },
+				"rbb PRAXIS" : { "minlength" : "004000" },
+				"RebellComedy" : { "synonyms" : [ "Rebell Comedy" ] },
+				"reisen" : { "minlength" : "004000" },
+				"Reportage/Dokumentation im Ersten" : { "rename" : "Reportage / Dokumentation" },
+				"Reportage & Dokumentation" : { "rename" : "Reportage / Dokumentation" },
+				"REPORT MAINZ" : { "minlength" : "002500" },
+				"REPORT MÜNCHEN" : { "minlength" : "002500" },
+				"Schwaben & Altbayern" : { "minlength" : "003500" },
+				"Sehen statt Hören" : { "minlength" : "002500", "special" : "G" },
+				"Spätschicht" : { "synonyms" : [ "Spätschicht - Die Comedy Bühne" ] },
+				"Sport-Arena" : { "synonyms" : [ "Sportarena", "Sportarena," ] },
+				"Stadt - Land - Quiz" : { "synonyms" : [ "Stadt-Land-Quiz", "Stadt Land Quiz" ] },
+				"Stadtspaziergänge" : { "synonyms" : [ "Die BR-Korrespondenten unterwegs" ] },
+				"tagesschau" : { "synonyms" : [ "tagesschau," ] },
+				"tagesschau mit Gebärdensprache" : { "synonyms" : [ "tagesschau ," ] },
+				"Tatort" : { "minlength" : "010000" },
+				"Tierärztin Dr. Mertens" : { "synonyms" : [ "Tierärtin Dr. Mertens" ] },
+				"Tiere bis unters Dach (41)" : { "skip" : true },
+				"Tiere bis unters Dach (42)" : { "skip" : true },
+				"Tiere bis unters Dach (43)" : { "skip" : true },
+				"Tiere bis unters Dach (44)" : { "skip" : true },
+				"Tiere suchen ein Zuhause" : { "minlength" : "005000" },
+				"Tigerentenclub" : { "rename" : "Tigerenten Club" },
+				"ttt - titel, thesen, temperamente" : { "synonyms" : [ "ttt - titel thesen temperamente", "ttt - extra", "ttt extra", "ttt-extra", "\"ttt\"-Spezial" ] },
+				"ttt - titel thesen temperamente" : { "rename" : "ttt - titel, thesen, temperamente" },
+				"Umschau" : { "minlength" : "002000", "synonyms" : [ "Umschau: MDR-Magazin" ] },
+				"unicato" : { "minlength" : "004000" },
+				"Unser Land" : { "minlength" : "002500" },
+				"Visite" : { "minlength" : "004000" },
+				"WESTART Jazzline" : { "synonyms" : [ "Jazzline" ] }
+
+
+			}
 		},
-		
-		"ZDF heute journal - ganze Sendungen" :
+				
+		"ZDF" :
 		{
-			"skip" : true
-		},
-		
-		"ZDF heute in europa - ganze Sendungen" :
-		{
-			"skip" : true
+			"shows" :
+			{
+				"ZDF heute journal" : { "synonyms" : [ "heute journal" ] },
+				"ZDF heute in europa" : { "synonyms" : [ "heute in Europa", "heute - in Europa" ] },
+				"ZDF heute journal - ganze Sendungen" : { "skip" : true },
+				"ZDF heute in europa - ganze Sendungen" : { "skip" : true }
+			}
 		}
 	}
 }
