@@ -739,12 +739,16 @@ function prepareList()
 		// Strip off global character junk.
 		//
 		
-		/*
-		if (strpos($line, "…") !== false)
+		$line = str_replace("\xc2\xa0",     " ",   $line); // Non breaking space.
+		$line = str_replace("\xe2\x80\x9c", "\"",  $line); // Double quote top.
+		$line = str_replace("\xe2\x80\x9e", "\"",  $line); // Double quote bottom.
+		$line = str_replace("\xe2\x80\xa6", "...", $line); // Triple period.
+
+		if (strpos($line, "„") !== false)
 		{
 			echo "$line\n";
 			
-			for ($inx = strpos($line, "…"); $inx < strlen($line); $inx++)
+			for ($inx = strpos($line, "„"); $inx < strlen($line); $inx++)
 			{
 				echo ord($line[ $inx ]) . " ";
 			} 
@@ -752,12 +756,7 @@ function prepareList()
 			echo "\n";
 			exit(1);
 		}
-		*/
 		
-		$line = str_replace("\xc2\xa0",     " ",   $line); // Non breaking space.
-		$line = str_replace("\xe2\x80\x9c", "\"",  $line); // Double quote top.
-		$line = str_replace("\xe2\x80\x9e", "\"",  $line); // Double quote bottom.
-		$line = str_replace("\xe2\x80\xa6", "...", $line); // Triple period.
 
 		//
 		// Decode line into parts.
@@ -771,6 +770,12 @@ function prepareList()
 		{
 			$entry = json_decdat(substr($line, 6));
 		}
+		
+		//
+		// Remove quotes from show name.
+		//
+		
+		$entry[ 1 ] = str_replace("\"", "", $entry[ 1 ]);
 		
 		//
 		// Strip off ORF junk.
