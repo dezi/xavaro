@@ -499,11 +499,6 @@ function prepareString(&$entry, $inx)
 {
 	$item = $entry[ $inx ];
 	
-	$item = str_replace(" ...", "...", $item);
-	
-	$item = str_replace("|", "/", $item);
-	$item = str_replace("–", "-", $item);
-	
 	$item = str_replace("\r", " ", $item);
 	$item = str_replace("\n", " ", $item);
 	
@@ -513,7 +508,26 @@ function prepareString(&$entry, $inx)
 	return trim($item);
 }
 
-function writeEntries($outputfd, $channel, $show, &$entrylines)
+function writeChannel($channel, &$data)
+{
+	ksort($data);
+
+	$newdata = array();
+	
+	foreach ($data as $show => $entries)
+	{
+		$newentries = checkEntries($channel, $show, $entries);
+		if ($newentries && count($newentries)) $newdata[ $show ] = $newentries;
+	}
+	
+	$outputfile = $GLOBALS[ "mtkdirectory" ] . "/$channel.tmp.json";
+	
+	file_put_contents($outputfile, json_encdat($newdata));
+	
+	activateIfModified($outputfile);
+}
+
+function checkEntries($channel, $show, &$entrylines)
 {
 	if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "skip" ]))
 	{
@@ -523,7 +537,7 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 			// Skip show.
 			//
 			
-			return;
+			return null;
 		}
 	}
 	
@@ -560,71 +574,13 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		$skipvideourls = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "skipvideourls" ];
 	}
 
-	//
-	// Preflight entries.
-	//
-	
-	$numentries = 0;
-	
-	for ($inx = 0; $inx < count($entrylines); $inx++)
-	{
-		$line = $entrylines[ $inx ];
-		
-		$parts = explode("|", $line);
-		
-		if ($parts[ 1 ] < $minlength) continue;
-		
-		$skip = false;
-		
-		if ($cleantags)
-		{
-			foreach ($cleantags as $index => $clean)
-			{
-				if (strpos($parts[ 4 ], $clean) !== false)
-				{
-					$skip = true;
-					break;
-				}
-			} 
-		}
-		
-		if ($skipvideourls)
-		{
-			foreach ($skipvideourls as $index => $skipurl)
-			{
-				if (strpos($parts[ 6 ], $skipurl) !== false)
-				{
-					$skip = true;
-					break;
-				}
-			} 
-		}
-		
-		if ($skip) continue;
-		
-		$numentries++;
-	}
-	
-	if ($numentries == 0)
-	{
-		//
-		// Skip empty shows.
-		//
-		
-		return;
-	}
-
-	//
-	// Dump show.
-	//
-	
-	fwrite($outputfd, "  \"$show\":\n");
-	fwrite($outputfd, "  [\n");
-
 	rsort($entrylines, SORT_STRING);
 	
+	$newentries = array();
+
 	$lastdate = "";
 	$lasttype = "";
+	$lastline = "";
 	
 	for ($inx = 0; $inx < count($entrylines); $inx++)
 	{
@@ -661,6 +617,9 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		}
 		
 		if ($skip) continue;
+		if ($lastline == $line) continue;
+		
+		$lastline = $line;
 
 		if ($lastdate != $parts[ 0 ])
 		{
@@ -683,14 +642,10 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		
 		$GLOBALS[ "videourllist" ][ $parts[ 6 ] ] = true;
 		
-		fwrite($outputfd, "    \"" . $line . "\"");
-		
-		if (($inx + 1) < count($entrylines)) fwrite($outputfd, ",");
-		
-		fwrite($outputfd, "\n");
+		$newentries[] = $line;
 	}
 	
-	fwrite($outputfd, "  ]\n");
+	return $newentries;
 }
 
 function activateIfModified($outputfile)
@@ -728,7 +683,7 @@ function prepareList()
 	$scount = 0;
 	$ecount = 0;
 	$tcount = 0;
-
+	
 	while (($line = fgets($pfd)) !== false)
 	{
 		$line = trim($line);
@@ -738,12 +693,16 @@ function prepareList()
 		//
 		// Strip off global character junk.
 		//
-		
+
+		$line = str_replace("–", "-", $line);
+		$line = str_replace("|", ":", $line);
+
 		$line = str_replace("\xc2\xa0",     " ",   $line); // Non breaking space.
 		$line = str_replace("\xe2\x80\x9c", "\"",  $line); // Double quote top.
 		$line = str_replace("\xe2\x80\x9e", "\"",  $line); // Double quote bottom.
 		$line = str_replace("\xe2\x80\xa6", "...", $line); // Triple period.
-
+		
+		/*
 		if (strpos($line, "„") !== false)
 		{
 			echo "$line\n";
@@ -756,8 +715,8 @@ function prepareList()
 			echo "\n";
 			exit(1);
 		}
+		*/
 		
-
 		//
 		// Decode line into parts.
 		//
@@ -793,33 +752,16 @@ function prepareList()
 		
 		if (($entry[ 0 ] != "") && ($entry[ 0 ] != $channel))
 		{
-			if ($show != "") 
-			{
-				writeEntries($outputfd, $channel, $show, $entrylines);
-			}
-			
-			if ($channel != "") 
-			{
-				error_log("$channel => $scount => $tcount");
-				
-				fwrite($outputfd, "}\n");
-				fclose($outputfd);
-				
-				activateIfModified($outputfile);
-			}
+			if ($channel != "") writeChannel($channel, $data);
 			
 			$channel = $entry[ 0 ];
+			$data = array();
 			$show = "";
 			
 			$ccount = 0;
 			$scount = 0;
 			$ecount = 0;
 			$tcount = 0;
-			
-			$outputfile = $GLOBALS[ "mtkdirectory" ] . "/$channel.tmp.json";
-			
-			$outputfd = fopen($outputfile, "w");
-			fwrite($outputfd, "{\n");
 		}
 		
 		//
@@ -832,43 +774,14 @@ function prepareList()
 			// Rename show.
 			//
 
-			echo "Rename===>>>>> " . $entry[ 1 ] . "\n";
+			$finalshow = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $entry[ 1 ] ][ "rename" ];
 			
-			$entry[ 1 ] = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $entry[ 1 ] ][ "rename" ];
+			echo "Rename===>>>>> " . $entry[ 1 ] . " => " . $finalshow . "\n";
+			
+			$entry[ 1 ] = $finalshow;
 		}
 
-		$temp = $entry[ 1 ];
-		$temp = str_replace("   ", " ", $temp);
-		$temp = str_replace("  ", " ", $temp);
-		$temp = str_replace("–", "-", $temp);
-		$temp = trim($temp);
-		
-		if (substr($temp, -10) == "Livestream") continue;
-		
-		$templc = mb_convert_case($temp, MB_CASE_LOWER);
-		$templc = str_replace("!", " ", $templc);
-		$templc = str_replace(".", " ", $templc);
-		$templc = str_replace("-", " ", $templc);
-		$templc = str_replace("   ", " ", $templc);
-		$templc = str_replace("  ", " ", $templc);
-		$templc = trim($templc);
-		
-		if (($templc != "") && ($templc != $showlc))
-		{
-			if ($show != "") 
-			{
-				error_log("$channel $show => $ecount");
-		
-				writeEntries($outputfd, $channel, $show, $entrylines);
-			}
-			
-			$show = $temp;
-			$showlc = $templc;
-					
-			$scount++;
-			$ecount = 0;
-			$entrylines = array();
-		}
+		if ($entry[ 1 ] != "") $show = $entry[ 1 ];
 
 		$entryline = prepareDate($entry) . "|" 
 				   . prepareDuration($entry) . "|" 
@@ -880,33 +793,12 @@ function prepareList()
 				   . prepareString($entry, 9)
 				   ;
 				   
-		$entryline = str_replace("\\", "/", $entryline);  
-		$entryline = str_replace("\"", "\\\"", $entryline);
-		
-		$entrylines[] = $entryline;
-		
-		$ecount++;
-		$ccount++;
-		$tcount++;
+		$data[ $show ][] = $entryline;
+
 		$lines++;
 	}
 	
-	if ($show != "") 
-	{
-		error_log("$channel $show => $ecount");
-
-		writeEntries($outputfd, $channel, $show, $entrylines);
-	}
-	
-	if ($channel != "") 
-	{
-		error_log("$channel => $scount => $tcount");
-		
-		fwrite($outputfd, "}\n");
-		fclose($outputfd);
-		
-		activateIfModified($outputfile);
-	}
+	if ($channel != "") writeChannel($channel, $data);
 	
 	pclose($pfd);
 	
@@ -935,6 +827,8 @@ function getLatestList()
 
 	foreach ($matches[ 0 ] as $index => $serverurl)
 	{
+		if ($index < 1) continue;
+		
 		$listxy = file_get_contents($serverurl);
 		$filexy = $GLOBALS[ "mtkdirectory" ] . "/rawdata.xz";
 		
@@ -945,6 +839,8 @@ function getLatestList()
 			break;
 		}
 	}
+	
+	system("xzcat $filexy > xxx.json");
 }
 
 readConfig();

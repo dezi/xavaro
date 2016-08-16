@@ -124,6 +124,75 @@
 			}
 		},
 		
+		"WDR" :
+		{
+			"shows" :
+			{
+				"2 durch Deutschland" : { "skip" : true },
+				"Am Limit (22/28)" : { "rename" : "Am Limit" },
+				"Archiv Westart Magazin - WEST ART Magazin" : { "rename" : "WESTART Magazin" },
+				"Ausgerechnet Brille" : { "skip" : true },
+				"Das tapfere Schneiderlein" : { "skip" : true },
+				"Der Haushaltscheck - Haushaltscheck" : { "rename" : "Der Haushaltscheck" },
+				"Der Vorkoster" : { "minlength" : "004000" },
+				"Die ARD Themenwoche Heimat im WDR" : { "skip" : true },
+				"Die unwahrscheinlichen Ereignisse im Leben von - DuEiLv" : { "rename" : "Die unwahrscheinlichen Ereignisse im Leben von" },
+				"Die unwahrscheinlichen Ereignisse im Leben von ... Wigald Boning" : { "rename" : "Die unwahrscheinlichen Ereignisse im Leben von" },
+				"HIER UND HEUTE" : { "rename" : "hier und heute" },
+				"Markt - markt" : { "rename" : "Markt" },
+				"NightWash" : { "rename" : "Nightwash" },
+				"Nightwash" : { "synonyms" : [ "Comedy aus dem Waschsalon" ] },
+				"Quarks & Caspers" : { "rename" : "Quarks & Co" },
+				"Quarks & Co - Quarks & Co" : { "rename" : "Quarks & Co" },
+				"Sport inside - sport inside" : { "rename" : "Sport inside" },
+				"Tag 7 - tag 7" : { "rename" : "Tag 7" },
+				"WESTART Jazzline" : { "synonyms" : [ "Jazzline" ] },
+				"WESTART Magazin" : { "synonyms" : [ "West ART Magazin", "West ART" ] },
+				"West ART Magazin" : { "rename" : "WESTART Magazin" },
+				"Westart Talk - WEST ART Talk" : { "rename" : "WESTART Talk" },
+				"Westart live" : { "rename" : "WESTART live" },
+				"Wiwaldi Show" : { "rename" : "Die Wiwaldi Show" },
+				"Wunderschön!" : { "rename" : "Wunderschön" },
+				"Wunderschön! Amsterdam" : { "skip" : true },
+				"Zeiglers wunderbare Welt des Fußballs - Zeigler" : { "rename" : "Zeiglers wunderbare Welt des Fußballs" },
+				"cosmo tv" : { "rename" : "Cosmo TV" },
+				"frauTV - frau TV" : { "rename" : "frauTV" },
+				"markt" : { "rename" : "Markt" },
+				"sport inside" : { "rename" : "Sport inside" },
+				"tag 7" : { "rename" : "Tag 7" },
+
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				"xxxx" : { "synonyms" : [ "xxxx" ] },
+				
+				"xxxx" : { "minlength" : "002000" },
+				"xxxx" : { "minlength" : "002000" },
+				"xxxx" : { "minlength" : "002000" },
+				"xxxx" : { "minlength" : "002000" },
+				"xxxx" : { "minlength" : "002000" },
+				"xxxx" : { "minlength" : "002000" },
+				"xxxx" : { "minlength" : "002000" },
+
+				"xxxx" : { "rename" : "xxxx" },
+				
+				"xxxx" : { "skip" : true },
+				"xxxx" : { "skip" : true },
+				"xxxx" : { "skip" : true },
+
+				"Maintower Kriminalreport" : { "synonyms" : [ "Kriminalreport Hessen" ] }
+			}
+		},
+
 		"HR" :
 		{
 			"shows" :
