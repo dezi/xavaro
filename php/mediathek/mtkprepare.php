@@ -501,9 +501,6 @@ function prepareString(&$entry, $inx)
 	
 	$item = str_replace(" ...", "...", $item);
 	
-	$item = str_replace("“", "\"", $item);
-	$item = str_replace("„", "\"", $item);
-	
 	$item = str_replace("|", "/", $item);
 	$item = str_replace("–", "-", $item);
 	
@@ -742,9 +739,25 @@ function prepareList()
 		// Strip off global character junk.
 		//
 		
-		$line = str_replace("  ", " - ", $line);
-		$line = str_replace("…", "...", $line);
-		$line = str_replace(" ", " ", $line);
+		/*
+		if (strpos($line, "…") !== false)
+		{
+			echo "$line\n";
+			
+			for ($inx = strpos($line, "…"); $inx < strlen($line); $inx++)
+			{
+				echo ord($line[ $inx ]) . " ";
+			} 
+			
+			echo "\n";
+			exit(1);
+		}
+		*/
+		
+		$line = str_replace("\xc2\xa0",     " ",   $line); // Non breaking space.
+		$line = str_replace("\xe2\x80\x9c", "\"",  $line); // Double quote top.
+		$line = str_replace("\xe2\x80\x9e", "\"",  $line); // Double quote bottom.
+		$line = str_replace("\xe2\x80\xa6", "...", $line); // Triple period.
 
 		//
 		// Decode line into parts.

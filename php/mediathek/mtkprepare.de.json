@@ -9,6 +9,7 @@
 				"3satbuchzeit" : { "synonyms" : [ "Buchzeit" ] },
 				"auslandsjournal extra" : { "synonyms" : [ "auslandsjournal-extra", "auslandsjournal" ] },
 				"Bauerfeind" : { "rename" : "Bauerfeind assistiert", "synonyms" : [ "Bauerfeind assistiert...", "Bauerfeind assistiert", "Bauerfeind assisiert" ] },
+				"Close up" : { "synonyms" : [ "Das Kinomagazin" ] },
 				"nano" : { "synonyms" : [ "nano spezial" ] },
 				"Peter Voß fragt" : { "synonyms" : [ "Peter Voß im Gespräch mit" ] },
 				"scobel" : { "synonyms" : [ "scobel-Sendung" ] }
@@ -134,10 +135,7 @@
 				"lecker (h)essen" : { "rename" : "leckeres hessen" },
 				"leckeres hessen (3)" : { "rename" : "leckeres hessen" },
 				"leckeres hessen" : { "synonyms" : [ "lecker (h)essen", "Lecker hessen" ] },
-				"Maintower Kriminalreport" : { "synonyms" : [ "Kriminalreport Hessen" ] },
-				"alle wetter" : { "synonyms" : [ "alle wetter!" ] },
-				"alle wetter" : { "synonyms" : [ "alle wetter!" ] },
-				"alle wetter" : { "synonyms" : [ "alle wetter!" ] }
+				"Maintower Kriminalreport" : { "synonyms" : [ "Kriminalreport Hessen" ] }
 			}
 		},
 
@@ -166,7 +164,15 @@
 												"DW Wirtschaft - Europa & Afrika", "DW Wirtschaft - Amerika", "DW Wirtschaft - Asien",
 												"DW Wirtschaft - Europa", "Wirtschaft Kompakt - Nachrichten", "Wirtschaft - Nachrichten" ] }
 			}
-		},	
+		},
+		
+		"KiKA" :
+		{
+			"shows" :
+			{
+				"Zoés Zauberschrank" : { "skip" : true }
+			}
+		},
 		
 		"BR" :
 		{
