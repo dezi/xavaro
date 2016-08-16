@@ -122,6 +122,73 @@
 				"Zwischen Spessart und Karwendel" : { "minlength" : "004000" }
 			}
 		},
+		
+		"HR" :
+		{
+			"shows" :
+			{
+				"alle wetter" : { "synonyms" : [ "alle wetter!" ] },
+				"giraffe, erdmännchen & co" : { "minlength" : "004000", "synonyms" : [ "Giraffe, Erdmännchen & Co.", "Giraffe, Erdmännchen und Co." ] },
+				"hessenquiz" : { "synonyms" : [ "Das große ganze Sendung", "Das große Hessenquiz", "Hessen-Dingsda" ] },
+				"hessenschau kompakt - Spätausgabe" : { "synonyms" : [ "hessenschau kompakt" ] },
+				"lecker (h)essen" : { "rename" : "leckeres hessen" },
+				"leckeres hessen (3)" : { "rename" : "leckeres hessen" },
+				"leckeres hessen" : { "synonyms" : [ "lecker (h)essen", "Lecker hessen" ] },
+				"Maintower Kriminalreport" : { "synonyms" : [ "Kriminalreport Hessen" ] },
+				"alle wetter" : { "synonyms" : [ "alle wetter!" ] },
+				"alle wetter" : { "synonyms" : [ "alle wetter!" ] },
+				"alle wetter" : { "synonyms" : [ "alle wetter!" ] }
+			}
+		},
+
+		"DW" :
+		{
+			"shows" :
+			{
+				"Check-in" : { "synonyms" : [ "Check-in - Das Reisemagazin" ] },
+				"Der Tag" : { "synonyms" : [ "Der Tag - Nachrichten und Hintergrund", "Ausgabe" ] },
+				"Euromaxx" : { "synonyms" : [ "Euromaxx - Leben und Kultur in Europa", "Euromaxx - Highlights der Woche" ] },
+				"Fit & gesund" : { "synonyms" : [ "Fit & gesund - Das Gesundheitsmagazin" ] },
+				"Fokus Europa" : { "synonyms" : [ "Fokus Europa - Länder, Menschen, Schicksale" ] },
+				"Glaubenssachen" : { "synonyms" : [ "Glaubenssachen - Die Kirchensendung" ] },
+				"Global 3000" : { "synonyms" : [ "Global 3000 - Das Globalisierungsmagazin" ] },
+				"Hin & weg" : { "synonyms" : [ "Hin & weg - Das Reisemagazin" ] },
+				"Kino" : { "synonyms" : [ "Kino - Das Filmmagazin" ] },
+				"Kultur.21" : { "synonyms" : [ "Kultur.21 - Das Kulturmagazin" ] },
+				"Made in Germany" : { "synonyms" : [ "Made in Germany - Das Wirtschaftsmagazin" ] },
+				"Motor mobil" : { "synonyms" : [ "Motor mobil - Das Automagazin" ] },
+				"Projekt Zukunft" : { "synonyms" : [ "Projekt Zukunft - Das Wissenschaftsmagazin" ] },
+				"Shift" : { "synonyms" : [ "Shift - Leben in der digitalen Welt" ] },	
+				"World Stories" : { "synonyms" : [ "World Stories - Reportagen der Woche" ] },
+
+				"Wirtschaft" : { "synonyms" : [ "DW", "DW Wirtschaft", "DW Wirtschaft #", 
+												"DW Wirtschaft - Europa & Amerika", "DW Wirtschaft - Europa & Asien",
+												"DW Wirtschaft - Europa & Afrika", "DW Wirtschaft - Amerika", "DW Wirtschaft - Asien",
+												"DW Wirtschaft - Europa", "Wirtschaft Kompakt - Nachrichten", "Wirtschaft - Nachrichten" ] }
+			}
+		},	
+		
+		"BR" :
+		{
+			"shows" :
+			{
+				"Lógos" : { "synonyms" : [ "Alpha-Lógos" ] },
+				"mehr/wert" : { "synonyms" : [ "Das Magazin für Wirtschaft und Soziales", "Mehrwert" ] },
+				"quer mit Christoph Süß" : { "synonyms" : [ "Quer kompett", "Quer komplett", "Quer" ] },
+				"report München" : { "minlength" : "002000" },
+				"Rundschau 16.00 / 18.30" : { "synonyms" : [ "Rundschau" ] },
+				"Rundschau Magazin" : { "synonyms" : [ "Rundschau-Magazin" ] },
+				"Sehen statt Hören" : { "minlength" : "002500", "special" : "G" },
+				"Sonntags-Stammtisch" : { "synonyms" : [ "Der Sonntags-Stammtisch" ] },
+				"Stadtspaziergänge" : { "synonyms" : [ "Die BR-Korrespondenten unterwegs" ] },
+				"Unter 4 Augen" : { "synonyms" : [ "Unter vier Augen" ] },
+				"Uschis VIP-Gärten" : { "synonyms" : [ "Uschis VIP Gärten" ] },
+				"Vereinsheim Schwabing" : { "synonyms" : [ "best of", "best-of" ] },
+				"Werner Heisenberg und die Frage nach der Wirklichkeit" : { "synonyms" : [ "Werner Heisenberg" ] },
+				"Wir in Bayern" : { "minlength" : "003500" },
+				"Zwischen Spessart und Karwendel" : { "minlength" : "003500" }
+			}
+		},
 				
 		"ZDF" :
 		{
@@ -162,13 +229,12 @@
 				"WISO plus" : { "minlength" : "002500" },
 				"ZDFarabic" : { "skip" : true },
 				"ZDF heute" : { "synonyms" : [ "ZDF-heute" ] },
-				"ZDFspezial" : { "synonyms" : [ "ZDF spezial" ] },
-				"ZDF SPORTreportage" : { "synonyms" : [ "SPORTreportage", "Die SPORTreportage" ] },
-
 				"ZDF heute journal" : { "synonyms" : [ "heute journal" ] },
 				"ZDF heute in europa" : { "synonyms" : [ "heute in Europa", "heute - in Europa" ] },
 				"ZDF heute journal - ganze Sendungen" : { "skip" : true },
-				"ZDF heute in europa - ganze Sendungen" : { "skip" : true }
+				"ZDF heute in europa - ganze Sendungen" : { "skip" : true },
+				"ZDFspezial" : { "synonyms" : [ "ZDF spezial" ] },
+				"ZDF SPORTreportage" : { "synonyms" : [ "SPORTreportage", "Die SPORTreportage" ] }
 			}
 		}
 	}

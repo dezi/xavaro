@@ -6,7 +6,8 @@ $GLOBALS[ "bootstrapurl"    ] = "http://zdfmediathk.sourceforge.net/akt.xml";
 $GLOBALS[ "configfile"      ] = "./mtkprepare.de.json";
 $GLOBALS[ "mtkdirectory"    ] = "../../var/mtkdata/tv/de";
 $GLOBALS[ "minimumduration" ] = "001000";
- 
+$GLOBALS[ "videourllist"    ] = array();
+
 //
 //  0 => Sender
 //  1 => Thema 
@@ -240,19 +241,19 @@ function prepareInfos($channel, $show, &$entry)
 	// Strip bogues lead ins.
 	//
 	
+	$infos = findAtStart($infos, "Die ganze Sendung mit diesen Themen:");
+	$infos = findAtStart($infos, "Die Gerichte in dieser Folge:");
+	$infos = findAtStart($infos, "Das Thema dieser Sendung:");
+	$infos = findAtStart($infos, "Das Thema dieser Folge:");
 	$infos = findAtStart($infos, "Die Themen der Sendung:");
-	$infos = findAtStart($infos, "Themen der Sendung:");
 	$infos = findAtStart($infos, "Mit folgenden Themen:");
+	$infos = findAtStart($infos, "Themen der Sendung:");
+	$infos = findAtStart($infos, "Mit diesen Themen:");
 	$infos = findAtStart($infos, "Mit den Themen:");
+	$infos = findAtStart($infos, "Mit denThemen:");
 	$infos = findAtStart($infos, "Unsere Themen:");
 	$infos = findAtStart($infos, "Die Themen:");
-	$infos = findAtStart($infos, "Mit diesen Themen:");
-	$infos = findAtStart($infos, "Mit denThemen:");
-	$infos = findAtStart($infos, "Themen:");
-	$infos = findAtStart($infos, "Themen:");
-	$infos = findAtStart($infos, "Themen:");
-	$infos = findAtStart($infos, "Themen:");
-	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Top-Thema:");
 	$infos = findAtStart($infos, "Themen:");
 	$infos = findAtStart($infos, "Themen:");
 	$infos = findAtStart($infos, "Themen:");
@@ -314,8 +315,11 @@ function prepareTitle($channel, $show, &$entry)
 	
 	foreach ($shownames as $index => $showname)
 	{
-		$title = trim(preg_replace("/\"$showname\"/ui", $showname, $title));
+		$showname = str_replace("/", "\\/", $showname);
+		$showname = str_replace("(", "\\(", $showname);
+		$showname = str_replace(")", "\\)", $showname);
 		
+		$title = trim(preg_replace("/\"" . $showname . "\"/ui", $showname, $title));
 		$title = trim(preg_replace("/" . $showname . "[ ]*[\\?\\-\\:]+/ui", "", $title));
 		$title = trim(preg_replace("/" . $showname . " (vom|am)/ui", "", $title));
 		$title = trim(preg_replace("/" . $showname . "[ ]+/ui", "", $title));
@@ -365,6 +369,8 @@ function prepareTitle($channel, $show, &$entry)
 	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\.[0-9]+\\.[0-9]+:/ui", "", $title));
 	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\.[0-9]+\\.[0-9]+ /ui", "", $title));
 	
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\.[0-9]+\\.$/ui", "", $title));
+
 	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ [0-9]+ -/ui", "", $title));
 	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
 	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ [0-9]+:/ui", "", $title));
@@ -375,14 +381,13 @@ function prepareTitle($channel, $show, &$entry)
 	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+:/ui", "", $title));
 	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ /ui", "", $title));
 
-	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9] -/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9]$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9]:/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9] /ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,|\\/) *[0-9]+(\\.|\\,|\\/) *[0-9][0-9][0-9][0-9] -/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,|\\/) *[0-9]+(\\.|\\,|\\/) *[0-9][0-9][0-9][0-9]$/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,|\\/) *[0-9]+(\\.|\\,|\\/) *[0-9][0-9][0-9][0-9]:/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,|\\/) *[0-9]+(\\.|\\,|\\/) *[0-9][0-9][0-9][0-9] /ui", "", $title));
 	
-	$title = trim(preg_replace("/ [0-9][0-9](\\.|\\,)[0-9][0-9](\\.|\\,)[0-9][0-9][0-9][0-9]$/ui", "", $title));
-	$title = trim(preg_replace("/ [0-9][0-9](\\.|\\,) [\\p{L}]+ [0-9][0-9][0-9][0-9]$/ui", "", $title));
-	
+	$title = trim(preg_replace("/\\([0-9]+(\\.|\\,|\\/) *[0-9]+(\\.|\\,|\\/) *[0-9][0-9][0-9][0-9]\\)/ui", "", $title));
+
 	$title = trim(preg_replace("/^Montag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
 	$title = trim(preg_replace("/^Dienstag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
 	$title = trim(preg_replace("/^Mittwoch,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
@@ -390,6 +395,9 @@ function prepareTitle($channel, $show, &$entry)
 	$title = trim(preg_replace("/^Freitag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
 	$title = trim(preg_replace("/^Samstag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
 	$title = trim(preg_replace("/^Sonntag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+
+	$title = trim(preg_replace("/ [0-9][0-9](\\.|\\,)[0-9][0-9](\\.|\\,)[0-9][0-9][0-9][0-9]$/ui", "", $title));
+	$title = trim(preg_replace("/ [0-9][0-9](\\.|\\,) [\\p{L}]+ [0-9][0-9][0-9][0-9]$/ui", "", $title));
 		
 	$title = trim(preg_replace("/^[0-9]+\\.* *Januar [0-9][0-9][0-9][0-9]:*/ui", "", $title));
 	$title = trim(preg_replace("/^[0-9]+\\.* *Februar [0-9][0-9][0-9][0-9]:*/ui", "", $title));
@@ -670,6 +678,14 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 			}
 		}
 		
+		if (isset($GLOBALS[ "videourllist" ][ $parts[ 6 ] ]))
+		{
+			$line = str_replace("|*|", "|+|", $line);
+			$line = str_replace("|-|", "|+|", $line);
+		}
+		
+		$GLOBALS[ "videourllist" ][ $parts[ 6 ] ] = true;
+		
 		fwrite($outputfd, "    \"" . $line . "\"");
 		
 		if (($inx + 1) < count($entrylines)) fwrite($outputfd, ",");
@@ -687,17 +703,12 @@ function activateIfModified($outputfile)
 	$finalmd5 = file_exists($finalfile) ? md5_file($finalfile) : "";
 	$outputmd5 = md5_file($outputfile);
 	
-	error_log("MD5=$finalmd5:$finalfile");
-	error_log("MD5=$outputmd5:$outputfile");
-	
 	if ($finalmd5 == $outputmd5)
 	{
 		unlink($outputfile);
 	}
 	else
 	{
-		error_log("GZIP=$outputfile");
-		
 		system("gzip < \"$outputfile\" > \"$outputfile.gz\"");
 		
 		rename($outputfile, $finalfile);
