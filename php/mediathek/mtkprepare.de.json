@@ -120,8 +120,6 @@
 				"zur Sache Rheinland-Pfalz!" : { "rename" : "Zur Sache Rheinland-Pfalz!" },
 				"Zur Sache Rheinland-Pfalz!" : { "minlength" : "003500", "synonyms" : [ "zur Sache Rheinland-Pfalz", "ZUR SACHE! Rheinland-Pfalz" ] },
 				"Zwischen Spessart und Karwendel" : { "minlength" : "004000" }
-
-
 			}
 		},
 				
@@ -129,6 +127,25 @@
 		{
 			"shows" :
 			{
+				"37 Grad" : { "minlength" : "004000" },
+				"Alle Sendungen von hallo deutschland" : { "skip" : true },
+				"aspekte" : { "minlength" : "004000" },
+				"Augstein und Blome" : { "synonyms" : [ "Augstein & Blome" ] },
+				"auslandsjournal extra" : { "synonyms" : [ "auslandsjournal", "Auslandsjournal-extra" ] },
+				"auslandsjournal extra - ganze Sendungen" : { "skip" : true },
+				"BLOCKBUSTAZ - ZDFneo" : { "rename" : "BLOCKBUSTAZ" },
+				"Der Haustier-Check" : { "synonyms" : [ "Der Haustier-Check.", "Der Haustier-Check," ] },
+				"Deutschland von oben (ZDFneo)" : { "rename" : "Deutschland von oben" },
+				"Die Küchenschlacht" : { "synonyms" : [ "Küchenschlacht" ] },
+				"Dietrich Grönemeyer - Leben ist mehr!" : { "synonyms" : [ "\"Leben ist mehr!\"", "Leben ist mehr!" ] },
+				"Eichwald, MdB" : { "synonyms" : [ "Eichwald MdB" ] },
+				"Ein Fall für zwei" : { "minlength" : "005000" },
+				"Frontal 21" : { "minlength" : "003000", "synonyms" : [ "Frontal21" ] },
+				"God´s Cloud" : { "synonyms" : [ "God's Cloud" ] },
+				"heute - in Deutschland" : { "synonyms" : [ "ZDF heute in Deutschland" ] },
+				"heuteplus" : { "synonyms" : [ "heute\\+" ], "clean" : [ "Stream" ] },
+				"heute plus" : { "rename" : "heuteplus" },
+
 				"ZDF heute journal" : { "synonyms" : [ "heute journal" ] },
 				"ZDF heute in europa" : { "synonyms" : [ "heute in Europa", "heute - in Europa" ] },
 				"ZDF heute journal - ganze Sendungen" : { "skip" : true },
