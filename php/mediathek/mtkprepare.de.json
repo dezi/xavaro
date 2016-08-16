@@ -11,7 +11,7 @@
 				"Bauerfeind" : { "rename" : "Bauerfeind assistiert", "synonyms" : [ "Bauerfeind assistiert...", "Bauerfeind assistiert", "Bauerfeind assisiert" ] },
 				"nano" : { "synonyms" : [ "nano spezial" ] },
 				"Peter Voß fragt" : { "synonyms" : [ "Peter Voß im Gespräch mit" ] },
-				"scobel" : { "synonyms" : [ "scobel-Sendung", "Scobel" ] }
+				"scobel" : { "synonyms" : [ "scobel-Sendung" ] }
 			}
 		},
 
@@ -125,6 +125,8 @@
 				
 		"ZDF" :
 		{
+			"skipvideourls" : [ "http://nrodl.zdf.de/none/zdf/14/01/140106_fsk12_2256k_p14v11.mp4" ],
+			
 			"shows" :
 			{
 				"37 Grad" : { "minlength" : "004000" },
@@ -145,6 +147,23 @@
 				"heute - in Deutschland" : { "synonyms" : [ "ZDF heute in Deutschland" ] },
 				"heuteplus" : { "synonyms" : [ "heute\\+" ], "clean" : [ "Stream" ] },
 				"heute plus" : { "rename" : "heuteplus" },
+				"kaputt und ... zugenäht!" : { "synonyms" : [ "kaputt und... zugenäht!" ] },
+				"Kommissarin Lund - Das Verbrechen III" : { "synonyms" : [ "Kommissarin Lund: Das Verbrechen III" ] },
+				"Länderspiegel" : { "minlength" : "002000" },
+				"Markus Lanz" : { "minlength" : "004000" },
+				"NEO MAGAZIN ROYALE mit Jan Böhmermann" : { "minlength" : "002500", "synonyms" : [ "NEO MAGAZIN ROYALE" ] },
+				"planet e" : { "synonyms" : [ "planet e." ] },
+				"Schulz & Böhmermann - ZDFneo" : { "synonyms" : [ "Schulz & Böhmermann" ] },
+				"scobel" : { "synonyms" : [ "scobel-Sendung" ] },
+				"Standpunkte" : { "synonyms" : [ "ZDF Standpunkte", "ZDF-Standpunkte" ] },
+				"Volle Kanne" : { "skip" : true },
+				"Volle Kanne - Service täglich" : { "minlength" : "002000" },
+				"WISO" : { "minlength" : "002500" },
+				"WISO plus" : { "minlength" : "002500" },
+				"ZDFarabic" : { "skip" : true },
+				"ZDF heute" : { "synonyms" : [ "ZDF-heute" ] },
+				"ZDFspezial" : { "synonyms" : [ "ZDF spezial" ] },
+				"ZDF SPORTreportage" : { "synonyms" : [ "SPORTreportage", "Die SPORTreportage" ] },
 
 				"ZDF heute journal" : { "synonyms" : [ "heute journal" ] },
 				"ZDF heute in europa" : { "synonyms" : [ "heute in Europa", "heute - in Europa" ] },
@@ -154,3 +173,25 @@
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

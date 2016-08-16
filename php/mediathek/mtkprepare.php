@@ -212,6 +212,65 @@ function sortByStringLength($a, $b)
   	return (strlen($a) > strlen($b) ? -1 : 1);
 }
 
+function findAtStart($haystack, $needle, $replace = null)
+{
+	if (substr($haystack, 0, strlen($needle)) == $needle)
+	{
+		if ($replace)
+		{
+			$haystack = trim($replace . substr($haystack, strlen($needle)));
+		}
+		else
+		{
+			$haystack = trim(substr($haystack, strlen($needle)));
+		}
+	}
+	
+	$haystack = str_replace("   ", " ", $haystack);
+	$haystack = str_replace("  ", " ", $haystack);
+	
+	return $haystack;
+}
+
+function prepareInfos($channel, $show, &$entry)
+{
+	$infos = prepareString($entry, 7);
+	
+	//
+	// Strip bogues lead ins.
+	//
+	
+	$infos = findAtStart($infos, "Die Themen der Sendung:");
+	$infos = findAtStart($infos, "Themen der Sendung:");
+	$infos = findAtStart($infos, "Mit folgenden Themen:");
+	$infos = findAtStart($infos, "Mit den Themen:");
+	$infos = findAtStart($infos, "Unsere Themen:");
+	$infos = findAtStart($infos, "Die Themen:");
+	$infos = findAtStart($infos, "Mit diesen Themen:");
+	$infos = findAtStart($infos, "Mit denThemen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Themen:");
+	$infos = findAtStart($infos, "Zu Gast sind", "Gäste:");
+
+	//
+	// Convert first char to upper case.
+	//
+	
+	$infos = mb_convert_case(mb_substr($infos, 0, 1), MB_CASE_UPPER) . mb_substr($infos, 1);
+		
+	$infos = str_replace("   ", " ", $infos);
+	$infos = str_replace("  ", " ", $infos);
+
+	return $infos;
+
+}
+
 function prepareTitle($channel, $show, &$entry)
 {
 	$shownames = array();
@@ -285,7 +344,7 @@ function prepareTitle($channel, $show, &$entry)
 	//
 	// Remove bogus date spezifications.
 	//
-	
+		
 	$title = trim(preg_replace("/^[0-9]+\\.[0-9]+\\.$/ui", "", $title));
 	$title = trim(preg_replace("/^[0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
 	$title = trim(preg_replace("/^[0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
@@ -294,103 +353,78 @@ function prepareTitle($channel, $show, &$entry)
 	
 	$title = trim(preg_replace("/^[0-9]+\\.[0-9]+\\.[0-9]+ [0-9]+\\:[0-9]+$/ui", "", $title));
 	
-	$title = trim(preg_replace("/Die ganze Sendung/ui", "Die Sendung", $title));
-	$title = trim(preg_replace("/Die ganz Sendung/ui", "Die Sendung", $title));
-
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+ -/ui", "", $title));
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\.[0-9]+\\.$/ui", "", $title));
-	
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+./ui", "", $title));
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+:/ui", "", $title));
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+$/ui", "", $title));
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+:/ui", "", $title));
-	$title = trim(preg_replace("/Die Sendung vom [0-9]+\\. [\\p{L}]+ -/ui", "", $title));
-
-	$title = trim(preg_replace("/Die Sendung am [0-9]+\\. [\\p{L}]+$/ui", "", $title));
-
-	$title = trim(preg_replace("/Sendung vom [\\p{L}]+, [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
-	
-	$title = trim(preg_replace("/Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+ -/ui", "", $title));
-	$title = trim(preg_replace("/Sendung vom [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	
-	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+ [0-9]+ /ui", "", $title));
-	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+$/ui", "", $title));
-	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+:/ui", "", $title));
-	$title = trim(preg_replace("/Sendung vom [0-9]+\\. [\\p{L}]+ -/ui", "", $title));
-
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\. *[\\p{L}]+ [0-9]+ -/ui", "", $title));
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\.[0-9]+\\.[0-9]+ -/ui", "", $title));
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\. *[\\p{L}]+ [0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\. *[\\p{L}]+ [0-9]+ /ui", "", $title));
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\. *[\\p{L}]+$/ui", "", $title));
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\. *[\\p{L}]+:/ui", "", $title));
-	$title = trim(preg_replace("/(vom|von) [0-9]+\\. *[\\p{L}]+ -/ui", "", $title));
-	
-	$title = trim(preg_replace("/^[0-9][0-9](\\.|\\,)[0-9][0-9](\\.|\\,)[0-9][0-9][0-9][0-9] -/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9][0-9](\\.|\\,)[0-9][0-9](\\.|\\,)[0-9][0-9][0-9][0-9] /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9][0-9](\\.|\\,)[0-9][0-9](\\.|\\,)[0-9][0-9][0-9][0-9]$/ui", "", $title));
-	$title = trim(preg_replace("/ [0-9][0-9](\\.|\\,)[0-9][0-9](\\.|\\,)[0-9][0-9][0-9][0-9]$/ui", "", $title));
-	
-	$title = trim(preg_replace("/^Montag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/^Dienstag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/^Mittwoch,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/^Donnerstag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/^Freitag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/^Samstag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
-	$title = trim(preg_replace("/^Sonntag,* [0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/Die ganze Sendung/ui", "Sendung", $title));
+	$title = trim(preg_replace("/Die ganz Sendung/ui", "Sendung", $title));
+	$title = trim(preg_replace("/Die Sendung/ui", "Sendung", $title));
+	$title = trim(preg_replace("/Sendung (vom|von|am)/ui", "Sendung", $title));
 		
-	$title = trim(preg_replace("/^[0-9]+\\. *Januar [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Februar [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *März [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *April [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Mai [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Juni [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Juli [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *August [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Ausgust [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *September [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Oktober [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *November [0-9][0-9][0-9][0-9]/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Dezember [0-9][0-9][0-9][0-9]/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) [\\p{L}]+, *[0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
 
-	$title = trim(preg_replace("/^[0-9]+\\. *Januar$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Februar$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *März$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *April$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Mai$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Juni$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Juli$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *August$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Ausgust$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *September$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Oktober$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *November$/ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Dezember$/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\.[0-9]+\\.[0-9]+ -/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\.[0-9]+\\.[0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\.[0-9]+\\.[0-9]+:/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\.[0-9]+\\.[0-9]+ /ui", "", $title));
+	
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ [0-9]+ -/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ [0-9]+$/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ [0-9]+:/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ [0-9]+ /ui", "", $title));
+	
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ -/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+$/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+:/ui", "", $title));
+	$title = trim(preg_replace("/(Sendung|vom|von|am) *[0-9]+\\. [\\p{L}]+ /ui", "", $title));
 
-	$title = trim(preg_replace("/^[0-9]+\\. *Januar - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Februar - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *März - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *April - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Mai - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Juni - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Juli - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *August - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Ausgust - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *September - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Oktober - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *November - /ui", "", $title));
-	$title = trim(preg_replace("/^[0-9]+\\. *Dezember - /ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9] -/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9]$/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9]:/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+(\\.|\\,) *[0-9]+(\\.|\\,) *[0-9][0-9][0-9][0-9] /ui", "", $title));
+	
+	$title = trim(preg_replace("/ [0-9][0-9](\\.|\\,)[0-9][0-9](\\.|\\,)[0-9][0-9][0-9][0-9]$/ui", "", $title));
+	$title = trim(preg_replace("/ [0-9][0-9](\\.|\\,) [\\p{L}]+ [0-9][0-9][0-9][0-9]$/ui", "", $title));
+	
+	$title = trim(preg_replace("/^Montag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+	$title = trim(preg_replace("/^Dienstag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+	$title = trim(preg_replace("/^Mittwoch,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+	$title = trim(preg_replace("/^Donnerstag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+	$title = trim(preg_replace("/^Freitag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+	$title = trim(preg_replace("/^Samstag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+	$title = trim(preg_replace("/^Sonntag,* [0-9]+\\.[0-9]+\\.[0-9]+/ui", "", $title));
+		
+	$title = trim(preg_replace("/^[0-9]+\\.* *Januar [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *Februar [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *März [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *April [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *Mai [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *Juni [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *Juli [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *August [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *Ausgust [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *September [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *Oktober [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *November [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\.* *Dezember [0-9][0-9][0-9][0-9]:*/ui", "", $title));
+
+	$title = trim(preg_replace("/^[0-9]+\\. *Januar(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *Februar(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *März(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *April(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *Mai(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *Juni(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *Juli(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *August(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *Ausgust(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *September(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *Oktober(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *November(:| -)*/ui", "", $title));
+	$title = trim(preg_replace("/^[0-9]+\\. *Dezember(:| -)*/ui", "", $title));
 
 	//
 	// Change episode stuff.
 	//
 	
 	$title = trim(preg_replace("/Folge ([0-9]+) -/ui", "($1) ", $title));
+	$title = trim(preg_replace("/Folge ([0-9]+)-/ui", "($1) ", $title));
 	$title = trim(preg_replace("/Folge ([0-9]+):/ui", "($1) ", $title));
 	$title = trim(preg_replace("/Folge ([0-9]+) /ui", "($1) ", $title));
 	$title = trim(preg_replace("/Folge ([0-9]+)$/ui", "($1) ", $title));
@@ -399,7 +433,7 @@ function prepareTitle($channel, $show, &$entry)
 	$title = trim(preg_replace("/\\(([0-9]+)\\/[0-9]+\\)/ui", "($1) ", $title));
 	$title = trim(preg_replace("/\\(([0-9]+)\\) - /ui", "($1) ", $title));
 	
-	$title = trim(preg_replace("/^(.*?) (\\([0-9]+\\))$/ui", "$2 $1", $title));
+	$title = trim(preg_replace("/^(\\([0-9]+\\)) (.*?)$/ui", "$2 $1", $title));
 
 	//
 	// Remove copyright stuff.
@@ -499,7 +533,7 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		$minlength = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "minlength" ];
 	}
 	
-	$cleans = null;
+	$cleantags = null;
 	
 	if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "clean" ]))
 	{
@@ -507,7 +541,18 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		// Match array with entries to clean.
 		//
 
-		$cleans = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "clean" ];
+		$cleantags = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "shows" ][ $show ][ "clean" ];
+	}
+
+	$skipvideourls = null;
+	
+	if (isset($GLOBALS[ "config" ][ "channels" ][ $channel ][ "skipvideourls" ]))
+	{
+		//
+		// Match array with entries to clean.
+		//
+
+		$skipvideourls = $GLOBALS[ "config" ][ "channels" ][ $channel ][ "skipvideourls" ];
 	}
 
 	//
@@ -526,11 +571,23 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		
 		$skip = false;
 		
-		if ($cleans)
+		if ($cleantags)
 		{
-			foreach ($cleans as $index => $clean)
+			foreach ($cleantags as $index => $clean)
 			{
 				if (strpos($parts[ 4 ], $clean) !== false)
+				{
+					$skip = true;
+					break;
+				}
+			} 
+		}
+		
+		if ($skipvideourls)
+		{
+			foreach ($skipvideourls as $index => $skipurl)
+			{
+				if (strpos($parts[ 6 ], $skipurl) !== false)
 				{
 					$skip = true;
 					break;
@@ -562,6 +619,7 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 	rsort($entrylines, SORT_STRING);
 	
 	$lastdate = "";
+	$lasttype = "";
 	
 	for ($inx = 0; $inx < count($entrylines); $inx++)
 	{
@@ -573,11 +631,23 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		
 		$skip = false;
 		
-		if ($cleans)
+		if ($cleantags)
 		{
-			foreach ($cleans as $index => $clean)
+			foreach ($cleantags as $index => $clean)
 			{
 				if (strpos($parts[ 4 ], $clean) !== false)
+				{
+					$skip = true;
+					break;
+				}
+			} 
+		}
+		
+		if ($skipvideourls)
+		{
+			foreach ($skipvideourls as $index => $skipurl)
+			{
+				if (strpos($parts[ 6 ], $skipurl) !== false)
 				{
 					$skip = true;
 					break;
@@ -590,10 +660,11 @@ function writeEntries($outputfd, $channel, $show, &$entrylines)
 		if ($lastdate != $parts[ 0 ])
 		{
 			$lastdate = $parts[ 0 ];
+			$lasttype = $parts[ 2 ];
 		}
 		else
 		{
-			if ($parts[ 3 ] == "N")
+			if ($parts[ 2 ] == $lasttype)
 			{
 				$line = str_replace("|*|", "|-|", $line);
 			}
@@ -775,7 +846,7 @@ function prepareList()
 				   . checkSpecialVersion($channel, $show, $entry) . "|"
 				   . "*|" 
 				   . prepareTitle($channel, $show, $entry) . "|" 
-				   . prepareString($entry, 7) .  "|"
+				   . prepareInfos($channel, $show, $entry) .  "|"
 				   . prepareString($entry, 8) .  "|"
 				   . prepareString($entry, 9)
 				   ;
