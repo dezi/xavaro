@@ -472,7 +472,9 @@ function prepareTitle($channel, $show, &$entry)
 	$title = trim(preg_replace("/^die sendung$/ui", "", $title));
 	$title = trim(preg_replace("/^Mediathek$/ui", "", $title));
 	$title = trim(preg_replace("/^Alle Beiträge:/ui", "", $title));
+	$title = trim(preg_replace("/^Ganze Sedung/ui", "", $title));
 	$title = trim(preg_replace("/^TV$/ui", "", $title));
+	$title = trim(preg_replace("/^\\.\\.\\. /ui", "", $title));
 	
 	//
 	// Remove fully quoted titles quotes once again.
@@ -639,10 +641,13 @@ function checkEntries($channel, $show, &$entrylines)
 			$line = str_replace("|*|", "|+|", $line);
 			$line = str_replace("|-|", "|+|", $line);
 		}
-		
+				
 		$GLOBALS[ "videourllist" ][ $parts[ 6 ] ] = true;
-		
-		$newentries[] = $line;
+
+		if (substr($parts[ 6 ], -5) != ".m3u8")
+		{
+			$newentries[] = $line;
+		}
 	}
 	
 	return $newentries;
@@ -697,17 +702,18 @@ function prepareList()
 		$line = str_replace("–", "-", $line);
 		$line = str_replace("|", ":", $line);
 
+		$line = str_replace("\xc2\x96",     "-",   $line); // Junk separator.
 		$line = str_replace("\xc2\xa0",     " ",   $line); // Non breaking space.
 		$line = str_replace("\xe2\x80\x9c", "\"",  $line); // Double quote top.
 		$line = str_replace("\xe2\x80\x9e", "\"",  $line); // Double quote bottom.
 		$line = str_replace("\xe2\x80\xa6", "...", $line); // Triple period.
 		
 		/*
-		if (strpos($line, "„") !== false)
+		if (strpos($line, "  ") !== false)
 		{
 			echo "$line\n";
 			
-			for ($inx = strpos($line, "„"); $inx < strlen($line); $inx++)
+			for ($inx = strpos($line, "  "); $inx < strlen($line); $inx++)
 			{
 				echo ord($line[ $inx ]) . " ";
 			} 

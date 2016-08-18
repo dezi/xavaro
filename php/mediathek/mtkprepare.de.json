@@ -20,6 +20,7 @@
 		{
 			"shows" :
 			{
+				"7 Tage" : { "synonyms" : [ "7 Tage..." ] },
 				"alle wetter!" : { "synonyms" : [ "alle wetter" ] },
 				"ARD Themenwoche 2014" : { "skip" : true },
 				"ARD Themenwoche 2015" : { "skip" : true },
