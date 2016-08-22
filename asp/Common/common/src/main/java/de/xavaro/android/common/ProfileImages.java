@@ -36,15 +36,20 @@ public class ProfileImages
     @Nullable
     private static String getOwnerProfileImageUrl()
     {
-        Cursor items = Simple.getAnyContext().getContentResolver().query(
-                ContactsContract.Profile.CONTENT_URI,
-                null, null, null, null);
+        String photoUrl = null;
 
-        if ((items == null) || ! items.moveToNext()) return null;
+        if (Simple.checkReadContactsPermission())
+        {
+            Cursor items = Simple.getAnyContext().getContentResolver().query(
+                    ContactsContract.Profile.CONTENT_URI,
+                    null, null, null, null);
 
-        int photoCol = items.getColumnIndex(ContactsContract.Profile.PHOTO_URI);
-        String photoUrl = items.getString(photoCol);
-        items.close();
+            if ((items == null) || !items.moveToNext()) return null;
+
+            int photoCol = items.getColumnIndex(ContactsContract.Profile.PHOTO_URI);
+            photoUrl = items.getString(photoCol);
+            items.close();
+        }
 
         return photoUrl;
     }

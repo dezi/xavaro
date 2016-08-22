@@ -32,25 +32,28 @@ public class Owner
     @Nullable
     private static String getOwnerName()
     {
-        Cursor items = Simple.getAnyContext().getContentResolver().query(
-                ContactsContract.Profile.CONTENT_RAW_CONTACTS_URI,
-                null, null, null, null);
-
-        if ((items == null) || ! items.moveToNext()) return null;
-
         String name = null;
 
-        try
+        if (Simple.checkReadContactsPermission())
         {
-            int nameCol = items.getColumnIndex("display_name_alt");
-            name = items.getString(nameCol);
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+            Cursor items = Simple.getAnyContext().getContentResolver().query(
+                    ContactsContract.Profile.CONTENT_RAW_CONTACTS_URI,
+                    null, null, null, null);
 
-        items.close();
+            if ((items == null) || !items.moveToNext()) return null;
+
+            try
+            {
+                int nameCol = items.getColumnIndex("display_name_alt");
+                name = items.getString(nameCol);
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
+
+            items.close();
+        }
 
         return name;
     }

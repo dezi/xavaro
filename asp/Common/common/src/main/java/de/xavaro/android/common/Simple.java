@@ -2618,6 +2618,31 @@ public class Simple
         return connection;
     }
 
+    @Nullable
+    public static View findViewByName(View view, String name)
+    {
+        if (view.getId() > 0)
+        {
+            String viewName = getResources().getResourceEntryName(view.getId());
+
+            if ((viewName != null) && viewName.equals(name)) return view;
+        }
+
+        if (view instanceof ViewGroup)
+        {
+            for (int inx = 0; inx < ((ViewGroup) view).getChildCount(); ++inx)
+            {
+                View nextChild = ((ViewGroup) view).getChildAt(inx);
+
+                View result = findViewByName(nextChild, name);
+
+                if (result != null) return result;
+            }
+        }
+
+        return null;
+    }
+
     //region Display dimension methods.
 
     public static void setFontScale()

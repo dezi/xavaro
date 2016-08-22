@@ -435,23 +435,15 @@ public class PreferenceFragments
             for (Preference pref : preferences) root.addPreference(pref);
         }
 
-        @SuppressWarnings("ResourceType")
         protected void rebuildHeader()
         {
-            //
-            // Android internal IDs.
-            //
-
-            final int breadcrumb_section = 0x1020342;
-            final int left_icon = 0x1020032;
-
             View view = getActivity().getWindow().getDecorView();
             if (view == null) return;
 
-            view = view.findViewById(breadcrumb_section);
+            view = Simple.findViewByName(view, "breadcrumb_section");
             if (view == null) return;
 
-            view = view.findViewById(left_icon);
+            view = Simple.findViewByName(view, "left_icon");
             if ((view == null) || ! (view instanceof ImageView)) return;
             ImageView icon = (ImageView) view;
 
