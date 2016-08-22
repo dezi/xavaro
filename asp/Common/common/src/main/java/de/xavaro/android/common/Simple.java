@@ -1,5 +1,7 @@
 package de.xavaro.android.common;
 
+import android.Manifest;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.media.projection.MediaProjectionManager;
 import android.os.StrictMode;
@@ -2808,6 +2810,17 @@ public class Simple
     public static int getIdentifier(String name, String type, String pack)
     {
         return getResources().getIdentifier(name, type, pack);
+    }
+
+    public static boolean checkReadContactsPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            return (appContext.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                    == PackageManager.PERMISSION_GRANTED);
+        }
+
+        return true;
     }
 
     //endregion System services.

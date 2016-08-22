@@ -46,16 +46,26 @@ public class WebAppCache
 
     private static void removeDirectories(File dir)
     {
-        File[] list = dir.listFiles();
-
-        for (File item : list)
+        try
         {
-            if (item.isDirectory()) removeDirectories(item);
-
-            if (! item.delete())
+            if (dir.exists())
             {
-                Log.d(LOGTAG, "removeDirectories: failed:" + item);
+                File[] list = dir.listFiles();
+
+                for (File item : list)
+                {
+                    if (item.isDirectory()) removeDirectories(item);
+
+                    if (!item.delete())
+                    {
+                        Log.d(LOGTAG, "removeDirectories: failed:" + item);
+                    }
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
         }
     }
 
@@ -74,7 +84,7 @@ public class WebAppCache
 
     public static void nukeWebAppCache()
     {
-        File file = new File(Simple.getCacheDir(), "webappcache");
+        File file = new File(Simple.getExternalCacheDir(), "webappcache");
         removeDirectories(file);
 
         freeMemory.run();
@@ -144,7 +154,7 @@ public class WebAppCache
             return new WebAppCacheResponse(null, null, null, false);
         }
 
-        File cachedir = new File(Simple.getCacheDir(), "webappcache/" + webappname);
+        File cachedir = new File(Simple.getExternalCacheDir(), "webappcache/" + webappname);
 
         if (! cachedir.exists())
         {
@@ -722,7 +732,7 @@ public class WebAppCache
                 // Process unused list.
                 //
 
-                File cachedir = new File(Simple.getCacheDir(), "webappcache/" + webappname);
+                File cachedir = new File(Simple.getExternalCacheDir(), "webappcache/" + webappname);
 
                 for (String url : unusedUrls)
                 {

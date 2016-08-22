@@ -850,7 +850,7 @@ function getLatestList()
 }
 
 readConfig();
-//getLatestList();
+getLatestList();
 prepareList();
 
 ?>

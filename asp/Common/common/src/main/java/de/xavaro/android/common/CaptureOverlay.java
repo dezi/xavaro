@@ -2,9 +2,13 @@ package de.xavaro.android.common;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.InputDevice;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +26,25 @@ public class CaptureOverlay extends FrameLayout
 
     public static CaptureOverlay getInstance()
     {
-        if (instance == null) instance = new CaptureOverlay(Simple.getAppContext());
+        if (instance == null)
+        {
+            instance = new CaptureOverlay(Simple.getAppContext());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                if (!Settings.canDrawOverlays(Simple.getAppContext()))
+                {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + Simple.getAppContext().getPackageName()));
+
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    Simple.getAppContext().startActivity(intent);
+
+                    instance = null;
+                }
+            }
+        }
 
         return instance;
     }

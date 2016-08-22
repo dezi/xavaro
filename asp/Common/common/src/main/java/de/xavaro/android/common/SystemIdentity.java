@@ -1,12 +1,15 @@
 package de.xavaro.android.common;
 
+import android.Manifest;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -14,6 +17,7 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -183,51 +187,54 @@ public class SystemIdentity
 
         try
         {
-            ContentResolver cr = context.getContentResolver();
-            Uri uri = ContactsContract.RawContacts.CONTENT_URI;
-            String selection = ContactsContract.RawContacts.ACCOUNT_TYPE + " = ?";
-            String[] selectionArguments = { context.getPackageName() };
-            cursor = cr.query(uri, null, selection, selectionArguments, null);
-
-            if (cursor != null)
+            if (Simple.checkReadContactsPermission())
             {
-                while (cursor.moveToNext())
-                {
-                    String rawi = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts._ID));
-                    String gone = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.DELETED));
-                    String uuid = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.SOURCE_ID));
+                ContentResolver cr = context.getContentResolver();
+                Uri uri = ContactsContract.RawContacts.CONTENT_URI;
+                String selection = ContactsContract.RawContacts.ACCOUNT_TYPE + " = ?";
+                String[] selectionArguments = {context.getPackageName()};
+                cursor = cr.query(uri, null, selection, selectionArguments, null);
 
-                    if ((uuid == null) || ! uuid.contains(":"))
+                if (cursor != null)
+                {
+                    while (cursor.moveToNext())
                     {
-                        //
-                        // Bogus contact w/o UUID.
-                        //
+                        String rawi = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts._ID));
+                        String gone = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.DELETED));
+                        String uuid = cursor.getString(cursor.getColumnIndex(ContactsContract.RawContacts.SOURCE_ID));
+
+                        if ((uuid == null) || !uuid.contains(":"))
+                        {
+                            //
+                            // Bogus contact w/o UUID.
+                            //
+
+                            if (gone.equals("0"))
+                            {
+                                Uri delete = Uri.withAppendedPath(ContactsContract.RawContacts.CONTENT_URI, rawi);
+                                cr.delete(delete, null, null);
+                                Log.d(LOGTAG, "retrieveFromContacts: delete=" + delete.toString());
+                            }
+
+                            continue;
+                        }
 
                         if (gone.equals("0"))
                         {
-                            Uri delete = Uri.withAppendedPath(ContactsContract.RawContacts.CONTENT_URI, rawi);
-                            cr.delete(delete, null, null);
-                            Log.d(LOGTAG, "retrieveFromContacts: delete=" + delete.toString());
+                            //
+                            // First class valid UUID.
+                            //
+
+                            foundInContact = uuid;
                         }
+                        else
+                        {
+                            //
+                            // Deleted account UUID. Accept if nothing else present.
+                            //
 
-                        continue;
-                    }
-
-                    if (gone.equals("0"))
-                    {
-                        //
-                        // First class valid UUID.
-                        //
-
-                        foundInContact = uuid;
-                    }
-                    else
-                    {
-                        //
-                        // Deleted account UUID. Accept if nothing else present.
-                        //
-
-                        if (foundInContact == null) foundInContact = uuid;
+                            if (foundInContact == null) foundInContact = uuid;
+                        }
                     }
                 }
             }
@@ -244,6 +251,8 @@ public class SystemIdentity
 
     private static void storeIntoContact(Context context)
     {
+        if (! Simple.checkReadContactsPermission()) return;
+
         ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
 
         String idvalue = "";
@@ -301,14 +310,17 @@ public class SystemIdentity
 
         try
         {
-            byte[] content = new byte[ 4096 ];
+            if (new File(filename).exists())
+            {
+                byte[] content = new byte[ 4096 ];
 
-            inputStream = context.openFileInput(filename);
-            int xfer = inputStream.read(content);
-            inputStream.close();
+                inputStream = context.openFileInput(filename);
+                int xfer = inputStream.read(content);
+                inputStream.close();
 
-            JSONObject ident = new JSONObject(new String(content,0,xfer));
-            foundInStorage = ident.getString("identity");
+                JSONObject ident = new JSONObject(new String(content, 0, xfer));
+                foundInStorage = ident.getString("identity");
+            }
         }
         catch (Exception ex)
         {
