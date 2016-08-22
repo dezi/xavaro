@@ -296,19 +296,19 @@ public class SettingsActivity extends CaptureSettings
 
                 flview = new LinearLayout(context);
                 flview.setLayoutParams(new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, 56));
+                        ViewGroup.LayoutParams.MATCH_PARENT, Simple.DP(56)));
 
                 if (headerType == HEADER_TYPE_NORMAL)
                 {
                     holder.icon = new ImageSmartView(context);
-                    holder.icon.setPadding(24, 12, 0, 12);
+                    Simple.setPadding(holder.icon, 24, 12, 0, 12);
                     flview.addView(holder.icon, new LinearLayout.LayoutParams(
-                            56, ViewGroup.LayoutParams.MATCH_PARENT));
+                            Simple.DP(56), ViewGroup.LayoutParams.MATCH_PARENT));
                 }
 
                 holder.title = new TextView(context);
                 holder.title.setGravity(Gravity.CENTER_VERTICAL);
-                holder.title.setPadding(16, 0, 0, 0);
+                Simple.setPadding(holder.title, 16, 0, 0, 0);
 
                 flview.addView(holder.title, new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -317,14 +317,14 @@ public class SettingsActivity extends CaptureSettings
 
                 if (headerType == HEADER_TYPE_NORMAL)
                 {
-                    holder.title.setTextSize(17f);
+                    Simple.setTextSize(holder.title, 17f);
                     holder.title.setTextColor(0xff000000);
                 }
 
                 if (headerType == HEADER_TYPE_CATEGORY)
                 {
-                    holder.title.setTextSize(16f);
-                    holder.title.setPadding(32, 0, 0, 0);
+                    Simple.setTextSize(holder.title, 16f);
+                    Simple.setPadding(holder.title, 32, 0, 0, 0);
                     flview.setBackgroundColor(0xcccccccc);
                 }
 

@@ -1512,7 +1512,8 @@ public class NicedPreferences
             LinearLayout newlayout = new LinearLayout(getContext());
             newlayout.setLayoutParams(Simple.layoutParamsMW());
             newlayout.setOrientation(LinearLayout.HORIZONTAL);
-            newlayout.setPadding(12, 0, 0, 0);
+
+            Simple.setPadding(newlayout, 12, 0, 0, 0);
 
             while (((ViewGroup) view).getChildCount() > 0)
             {
@@ -1527,7 +1528,7 @@ public class NicedPreferences
             //
 
             ((LinearLayout) view).setOrientation(LinearLayout.VERTICAL);
-            view.setPadding(0, 4, 0, 4);
+            Simple.setPadding(view, 0, 4, 0, 4);
 
             //
             // Step three: remove summary from horizontal layout and add
@@ -1540,12 +1541,12 @@ public class NicedPreferences
             {
                 LinearLayout icon_frame = (LinearLayout) icon.getParent();
                 icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
-                icon_frame.setPadding(0, 0, 0, 0);
+                Simple.setPadding(icon_frame, 0, 0, 0, 0);
             }
 
             TextView summary = (TextView) view.findViewById(android.R.id.summary);
-            summary.setPadding(16, 0, 16, 0);
             summary.setMaxLines(50);
+            Simple.setPadding(summary, 16, 0, 16, 0);
 
             ((ViewGroup) view).addView(Simple.removeFromParent(summary));
 
@@ -1557,7 +1558,7 @@ public class NicedPreferences
             view.setBackgroundColor(0xcccccccc);
 
             TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setTextSize(Simple.getDeviceTextSize(textSize));
+            title.setTextSize(textSize);
 
             //
             // Add an action icon.
@@ -1570,8 +1571,6 @@ public class NicedPreferences
 
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
-
-            //StaticUtils.dumpViewsChildren(view);
         }
 
         @Override

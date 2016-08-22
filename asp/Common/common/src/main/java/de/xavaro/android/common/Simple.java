@@ -680,9 +680,29 @@ public class Simple
         return (pixels * getDensityDPI()) / 160;
     }
 
+    public static int DP(int pixels)
+    {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+    }
+
+    public static float DP(float pixels)
+    {
+        return (float) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+    }
+
     public static float getDeviceTextSize(float textsize)
     {
         return textsize / getDensity();
+    }
+
+    public static void setTextSize(View view, float textsize)
+    {
+        if (view instanceof TextView)
+        {
+            float newsize = textsize * getResources().getDisplayMetrics().density;
+            Log.d(LOGTAG, "setTextSize: textsize=" + textsize + "=" + getDeviceTextSize(textsize) + "=" + newsize);
+            ((TextView) view).setTextSize(textsize);
+        }
     }
 
     public static void setPadding(View view, int left, int top, int right, int bottom)
