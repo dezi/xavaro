@@ -273,6 +273,29 @@
     <string name="pref_basic_permissions_contacts_read">Kontakte lesen</string>
     <string name="pref_basic_permissions_contacts_write">Kontakte ändern</string>
 
+    <string name="pref_basic_permissions_phone">Telefon</string>
+    <string name="pref_basic_permissions_phone_summary">todo</string>
+    <string name="pref_basic_permissions_phone_call">Anrufe auslösen</string>
+    <string name="pref_basic_permissions_phone_read">Status lesen</string>
+
+    <string name="pref_basic_permissions_storage">Speicherkarte</string>
+    <string name="pref_basic_permissions_storage_summary">todo</string>
+    <string name="pref_basic_permissions_storage_read">Speicherkarte lesen</string>
+    <string name="pref_basic_permissions_storage_write">Speicherkarte schreiben</string>
+
+    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
+    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
+    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
+    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
+
+    <string name="pref_basic_permissions_record_audio">Mikrofon</string>
+    <string name="pref_basic_permissions_record_audio_summary">todo</string>
+    <string name="pref_basic_permissions_record_audio_allow">Aufnahmen tätigen</string>
+
+    <string name="pref_basic_permissions_system_alert">Display Overlay</string>
+    <string name="pref_basic_permissions_system_alert_summary">todo</string>
+    <string name="pref_basic_permissions_system_alert_window">Display Overlay anzeigen</string>
+
     <string-array name="pref_basic_permissions_status_vals">
         <item>Nicht gewährt</item>
         <item>Zulassen</item>

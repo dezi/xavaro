@@ -274,9 +274,28 @@
     <string name="pref_basic_permissions_contacts_read">Read Contacts</string>
     <string name="pref_basic_permissions_contacts_write">Modify Contacts</string>
 
-    <string name="pref_basic_permissions_system_alert">Alarmfenster</string>
+    <string name="pref_basic_permissions_phone">Telephone</string>
+    <string name="pref_basic_permissions_phone_summary">todo</string>
+    <string name="pref_basic_permissions_phone_call">Make Calls</string>
+    <string name="pref_basic_permissions_phone_read">Read Status</string>
+
+    <string name="pref_basic_permissions_storage">External Storage</string>
+    <string name="pref_basic_permissions_storage_summary">todo</string>
+    <string name="pref_basic_permissions_storage_read">Read External Storage</string>
+    <string name="pref_basic_permissions_storage_write">Write External Storage</string>
+
+    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
+    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
+    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
+    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
+
+    <string name="pref_basic_permissions_record_audio">Microphone</string>
+    <string name="pref_basic_permissions_record_audio_summary">todo</string>
+    <string name="pref_basic_permissions_record_audio_allow">Allow Recording</string>
+
+    <string name="pref_basic_permissions_system_alert">Display Overlay</string>
     <string name="pref_basic_permissions_system_alert_summary">todo</string>
-    <string name="pref_basic_permissions_system_alert_window">Alarmfenster anzeigen</string>
+    <string name="pref_basic_permissions_system_alert_window">Display Overlay Window</string>
 
     <string-array name="pref_basic_permissions_status_keys">
         <item>deny</item>

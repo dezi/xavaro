@@ -33,12 +33,14 @@ public class CaptureOverlay extends FrameLayout
             {
                 if (!Settings.canDrawOverlays(Simple.getAppContext()))
                 {
+                    /*
                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:" + Simple.getAppContext().getPackageName()));
 
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                     Simple.getAppContext().startActivity(intent);
+                    */
 
                     instance = null;
                 }
@@ -193,7 +195,7 @@ public class CaptureOverlay extends FrameLayout
     {
         if (isAttached++ == 0)
         {
-            Simple.getWindowManager().addView(this, overlayParam);
+            //Simple.getWindowManager().addView(this, overlayParam);
         }
     }
 
@@ -201,7 +203,7 @@ public class CaptureOverlay extends FrameLayout
     {
         if (--isAttached == 0)
         {
-            Simple.getWindowManager().removeView(this);
+            //Simple.getWindowManager().removeView(this);
         }
     }
 

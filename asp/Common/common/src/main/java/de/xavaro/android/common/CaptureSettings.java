@@ -13,15 +13,29 @@ public class CaptureSettings extends PreferenceActivity
     {
         super.onPostCreate(savedInstanceState);
 
-        CaptureOverlay.getInstance().attachToScreen();
-        CaptureRecorder.getInstance().onCreate();
+        if (CaptureOverlay.getInstance() != null)
+        {
+            CaptureOverlay.getInstance().attachToScreen();
+        }
+
+        if (CaptureRecorder.getInstance() != null)
+        {
+            CaptureRecorder.getInstance().onCreate();
+        }
     }
 
     @Override
     protected void onDestroy()
     {
-        CaptureRecorder.getInstance().onDestroy();
-        CaptureOverlay.getInstance().detachFromScreen();
+        if (CaptureRecorder.getInstance() != null)
+        {
+            CaptureRecorder.getInstance().onDestroy();
+        }
+
+        if (CaptureOverlay.getInstance() != null)
+        {
+            CaptureOverlay.getInstance().detachFromScreen();
+        }
 
         super.onDestroy();
     }
@@ -29,7 +43,10 @@ public class CaptureSettings extends PreferenceActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        CaptureRecorder.getInstance().onActivityResult(requestCode, resultCode, data);
+        if (CaptureRecorder.getInstance() != null)
+        {
+            CaptureRecorder.getInstance().onActivityResult(requestCode, resultCode, data);
+        }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -37,14 +54,24 @@ public class CaptureSettings extends PreferenceActivity
     @Override
     public boolean dispatchGenericMotionEvent (MotionEvent ev)
     {
-        return CaptureOverlay.getInstance().registerGenericMotionEvent(ev)
-                || super.dispatchGenericMotionEvent(ev);
+        if (CaptureOverlay.getInstance() != null)
+        {
+            return CaptureOverlay.getInstance().registerGenericMotionEvent(ev)
+                    || super.dispatchGenericMotionEvent(ev);
+        }
+
+        return super.dispatchGenericMotionEvent(ev);
     }
 
     @Override
     public boolean dispatchTouchEvent (MotionEvent ev)
     {
-        return CaptureOverlay.getInstance().registerTouchEvent(ev)
-                || super.dispatchTouchEvent(ev);
+        if (CaptureOverlay.getInstance() != null)
+        {
+            return CaptureOverlay.getInstance().registerTouchEvent(ev)
+                    || super.dispatchTouchEvent(ev);
+        }
+
+        return super.dispatchTouchEvent(ev);
     }
 }
