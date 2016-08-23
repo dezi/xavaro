@@ -271,7 +271,7 @@
     <string name="pref_basic_permissions_contacts">Kontakte</string>
     <string name="pref_basic_permissions_contacts_summary">todo</string>
     <string name="pref_basic_permissions_contacts_read">Kontakte lesen</string>
-    <string name="pref_basic_permissions_contacts_write">Kontakte schreiben</string>
+    <string name="pref_basic_permissions_contacts_write">Kontakte ändern</string>
 
     <string-array name="pref_basic_permissions_status_vals">
         <item>Nicht gewährt</item>
