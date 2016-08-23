@@ -69,12 +69,6 @@ public class ApplicationBase extends Application
         Simple.setThreadPolicy();
 
         //
-        // Ignore users system setting regarding font scaling.
-        //
-
-        Simple.setFontScale();
-
-        //
         // Set common cookie store between webkit and java.net
         //
 
@@ -87,29 +81,10 @@ public class ApplicationBase extends Application
         WebAppCache.checkWebAppCache();
     }
 
-    public final Runnable setFontScale = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            //
-            // On LG phone some application fucks with the font scale setting.
-            // This leads to unreadable system dialogs. We set it to default
-            // value if screwed up.
-            //
-
-            Simple.setFontScale();
-        }
-    };
-
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
         super.onConfigurationChanged(newConfig);
-
-        Log.d(LOGTAG, "onConfigurationChanged: font SCALE=" + newConfig.fontScale);
-
-        Simple.makePost(setFontScale);
     }
 
     @Override

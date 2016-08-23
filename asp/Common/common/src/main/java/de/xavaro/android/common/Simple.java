@@ -692,7 +692,7 @@ public class Simple
 
     public static float getDeviceTextSize(float textsize)
     {
-        return textsize / getDensity();
+        return textsize / (getDensity() * getFontScale());
     }
 
     public static void setTextSize(View view, float textsize)
@@ -2667,19 +2667,28 @@ public class Simple
 
     public static void setFontScale()
     {
-        if (getResources().getConfiguration().fontScale > 1.0f)
+        float fontScale = getResources().getConfiguration().fontScale;
+
+        if (fontScale > 1.0f)
         {
-            Settings.System.putFloat(getContentResolver(), Settings.System.FONT_SCALE, 1.0f);
+            Log.d(LOGTAG, "setFontScale: fontScale=" + fontScale);
 
-            Configuration configuration = getResources().getConfiguration();
-            configuration.fontScale = 1.0f;
+            try
+            {
+                Settings.System.putFloat(getContentResolver(), Settings.System.FONT_SCALE, 1.0f);
 
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            metrics.scaledDensity = configuration.fontScale * metrics.density;
+                Configuration configuration = getResources().getConfiguration();
+                configuration.fontScale = 1.0f;
 
-            getResources().updateConfiguration(configuration, metrics);
+                DisplayMetrics metrics = getResources().getDisplayMetrics();
+                metrics.scaledDensity = configuration.fontScale * metrics.density;
 
-            Log.d(LOGTAG, "setFontScale: adjusted.");
+                getResources().updateConfiguration(configuration, metrics);
+            }
+            catch (Exception ex)
+            {
+                OopsService.log(LOGTAG, ex);
+            }
         }
     }
 
@@ -2718,6 +2727,11 @@ public class Simple
     public static float getDensity()
     {
         return getResources().getDisplayMetrics().density;
+    }
+
+    public static float getFontScale()
+    {
+        return getResources().getConfiguration().fontScale;
     }
 
     public static float getPreferredTitleSize()

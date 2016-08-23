@@ -96,6 +96,7 @@ public class SettingsActivity extends CaptureSettings
 
         target.add(category);
 
+        target.add(PreferencesBasicsPermissions.getHeader());
         target.add(PreferencesBasicsOwner.getHeader());
         target.add(PreferencesBasicsCommunity.getHeader());
         target.add(PreferencesBasicsAssistance.getHeader());

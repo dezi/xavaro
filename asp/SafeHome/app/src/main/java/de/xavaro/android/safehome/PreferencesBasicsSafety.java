@@ -280,7 +280,6 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         @Override
         public void run()
         {
-            Simple.setFontScale();
             DefaultApps.setDefaultHome();
         }
     };
@@ -290,7 +289,6 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         @Override
         public void run()
         {
-            Simple.setFontScale();
             DefaultApps.setDefaultAssist();
         }
     };

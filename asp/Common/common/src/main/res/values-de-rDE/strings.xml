@@ -265,6 +265,20 @@
     <string name="pref_basic_safety_assistance_button">Assistenz</string>
     <string name="pref_basic_safety_menu_button">Menü</string>
 
+    <string name="pref_basic_permissions">Berechtigungen</string>
+    <string name="pref_basic_permissions_summary">todo</string>
+
+    <string name="pref_basic_permissions_contacts">Kontakte</string>
+    <string name="pref_basic_permissions_contacts_summary">todo</string>
+    <string name="pref_basic_permissions_contacts_read">Kontakte lesen</string>
+    <string name="pref_basic_permissions_contacts_write">Kontakte schreiben</string>
+
+    <string-array name="pref_basic_permissions_status_vals">
+        <item>Nicht gewährt</item>
+        <item>Zulassen</item>
+    </string-array>
+
+
     <string name="pref_basic_owner">Anwender</string>
     <string name="pref_basic_owner_summary">
         Diese persönlichen Daten werden nur mit den Bezugspersonen geteilt.
