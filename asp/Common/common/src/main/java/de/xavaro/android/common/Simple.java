@@ -692,16 +692,14 @@ public class Simple
 
     public static float getDeviceTextSize(float textsize)
     {
-        return textsize / (getDensity() * getFontScale());
+        return textsize / getFontScale();
     }
 
     public static void setTextSize(View view, float textsize)
     {
         if (view instanceof TextView)
         {
-            float newsize = textsize * getResources().getDisplayMetrics().density;
-            Log.d(LOGTAG, "setTextSize: textsize=" + textsize + "=" + getDeviceTextSize(textsize) + "=" + newsize);
-            ((TextView) view).setTextSize(textsize);
+            ((TextView) view).setTextSize(getDeviceTextSize(textsize));
         }
     }
 
@@ -2746,7 +2744,7 @@ public class Simple
 
     public static float getPreferredTextSize()
     {
-        return getDeviceTextSize(22f);
+        return getDeviceTextSize(18f);
     }
 
     public static int getActionBarHeight()

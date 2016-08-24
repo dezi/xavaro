@@ -1,15 +1,19 @@
 package de.xavaro.android.safehome;
 
+import android.content.Intent;
+import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.provider.Settings;
 import android.util.Log;
 
 import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.NotificationService;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.NicedPreferences;
+import de.xavaro.android.common.ProcessManager;
 import de.xavaro.android.common.Simple;
 
 public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentStub
@@ -280,7 +284,16 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         @Override
         public void run()
         {
-            DefaultApps.setDefaultHome();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                Intent intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ProcessManager.launchIntent(intent);
+            }
+            else
+            {
+                DefaultApps.setDefaultHome();
+            }
         }
     };
 
@@ -289,7 +302,16 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         @Override
         public void run()
         {
-            DefaultApps.setDefaultAssist();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ProcessManager.launchIntent(intent);
+            }
+            else
+            {
+                DefaultApps.setDefaultAssist();
+            }
         }
     };
 

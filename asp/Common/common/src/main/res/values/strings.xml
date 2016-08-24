@@ -211,6 +211,7 @@
 
     <string name="pref_basic_safety_notifications_service">Notifications</string>
     <string name="pref_basic_safety_notifications_enable">Functionalty requested</string>
+    <string name="pref_basic_safety_notifications_activate">Activate / Deactivate</string>
     <string name="pref_basic_safety_notifications_summary">todo</string>
     <string name="pref_basic_safety_notifications_unavailable">
         There are no Notification Services on this device.
@@ -230,6 +231,7 @@
 
     <string name="pref_basic_safety_accessibility_service">Accessibility</string>
     <string name="pref_basic_safety_accessibility_enable">Functionalty requested</string>
+    <string name="pref_basic_safety_accessibility_activate">Activate / Deactivate</string>
     <string name="pref_basic_safety_accessibility_summary">todo</string>
     <string name="pref_basic_safety_accessibility_unavailable">
         There are no Accessibility Services on this device.
@@ -291,7 +293,7 @@
 
     <string name="pref_basic_permissions_system_alert">Display Overlay</string>
     <string name="pref_basic_permissions_system_alert_summary">todo</string>
-    <string name="pref_basic_permissions_system_alert_window">Display Overlay Window</string>
+    <string name="pref_basic_permissions_system_alert_window">Overlay Window</string>
 
     <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
     <string name="pref_basic_permissions_bluetooth_summary">todo</string>

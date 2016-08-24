@@ -425,8 +425,6 @@ public class PreferenceFragments
         {
             super.onCreate(savedInstanceState);
 
-            rebuildHeader();
-
             root = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(root);
 
@@ -435,12 +433,42 @@ public class PreferenceFragments
             for (Preference pref : preferences) root.addPreference(pref);
         }
 
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState)
+        {
+            super.onViewCreated(view, savedInstanceState);
+
+            rebuildHeader();
+        }
+
         protected void rebuildHeader()
         {
-            View view = getActivity().getWindow().getDecorView();
+            View baseview = getActivity().getWindow().getDecorView();
+            if (baseview == null) return;
+
+            StaticUtils.dumpViewsChildren(baseview);
+
+            View view;
+
+            //
+            // Adjust padding in frame and list.
+            //
+
+            view = Simple.findViewByName(baseview, "prefs_frame");
             if (view == null) return;
 
-            view = Simple.findViewByName(view, "breadcrumb_section");
+            view.setPadding(8, 8, 8, 4);
+
+            view = Simple.findViewByName(view, "list");
+            if (view == null) return;
+
+            view.setPadding(0, 0, 0, 0);
+
+            //
+            // Adjust title stuff.
+            //
+
+            view = Simple.findViewByName(baseview, "breadcrumb_section");
             if (view == null) return;
 
             view = Simple.findViewByName(view, "left_icon");
@@ -498,7 +526,7 @@ public class PreferenceFragments
 
                 ImageView info = new ImageView(Simple.getActContext());
                 info.setImageResource(android.R.drawable.ic_menu_info_details);
-                info.setPadding(8, 8, 7, 8);
+                info.setPadding(8, 8, 8, 8);
 
                 infoframe.addView(info, Simple.layoutParamsWM(Gravity.END));
             }
@@ -515,7 +543,7 @@ public class PreferenceFragments
 
             view = (View) view.getParent();
             view.setLayoutParams(new LinearLayout.LayoutParams(Simple.MP, Simple.WC));
-            view.setPadding(8, 4, 8, 4);
+            view.setPadding(0, 0, 0, 8);
 
             if (view instanceof LinearLayout)
             {
@@ -540,8 +568,6 @@ public class PreferenceFragments
                 if (summaryres != 0) summaryView.setText(summaryres);
                 summaryView.setVisibility(View.GONE);
             }
-
-            view = (View) view.getParent();
         }
     }
 

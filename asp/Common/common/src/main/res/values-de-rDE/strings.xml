@@ -175,7 +175,7 @@
 
     <string name="pref_basic_safety_notifications_service">Benachrichtigungen</string>
     <string name="pref_basic_safety_notifications_enable">Funktion erwünscht</string>
-    <string name="pref_basic_safety_notifications_activate">Funktion aktivieren</string>
+    <string name="pref_basic_safety_notifications_activate">Aktivieren / Deaktivieren</string>
     <string name="pref_basic_safety_notifications_summary">
         Benachrichtigungen werden von vielen Apps benutzt, um den Anwender auf
         irgend etwas hinzuweisen oder ihn zu informieren.
@@ -203,7 +203,7 @@
 
     <string name="pref_basic_safety_accessibility_service">Eingabehilfe</string>
     <string name="pref_basic_safety_accessibility_enable">Funktion erwünscht</string>
-    <string name="pref_basic_safety_accessibility_activate">Funktion aktivieren</string>
+    <string name="pref_basic_safety_accessibility_activate">Aktivieren / Deaktivieren</string>
     <string name="pref_basic_safety_accessibility_summary">
         Die Eingabehilfe ist eigentlich dafür vorgesehen, behinderten Menschen den
         Inhalt von Popup-Fenstern vorzulesen. Sie ist nicht auf allen Android
@@ -290,7 +290,7 @@
 
     <string name="pref_basic_permissions_system_alert">Display Overlay</string>
     <string name="pref_basic_permissions_system_alert_summary">todo</string>
-    <string name="pref_basic_permissions_system_alert_window">Display Overlay anzeigen</string>
+    <string name="pref_basic_permissions_system_alert_window">Overlay anzeigen</string>
 
     <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
     <string name="pref_basic_permissions_bluetooth_summary">todo</string>

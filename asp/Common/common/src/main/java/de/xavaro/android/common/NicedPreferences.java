@@ -939,69 +939,7 @@ public class NicedPreferences
         {
             super.onBindView(view);
 
-            //
-            // Re-arrange completely shitty checkbox layout.
-            // The summary must be last item in layout. Icon,
-            // title and checkbox need to be in on layout.
-            //
-            // Step one: move all items into new horizontal linear layout.
-            //
-
-            LinearLayout newlayout = new LinearLayout(getContext());
-            newlayout.setOrientation(LinearLayout.HORIZONTAL);
-            newlayout.setLayoutParams(new ViewGroup.LayoutParams(Simple.MP, Simple.WC));
-            newlayout.setPadding(0, 0, 16, 0);
-
-            ViewGroup vg = (ViewGroup) view;
-
-            while (vg.getChildCount() > 0)
-            {
-                newlayout.addView(Simple.removeFromParent(vg.getChildAt(0)));
-            }
-
-            vg.addView(newlayout);
-
-            //
-            // Step two: fuck top level layout to be vertical match parent.
-            // Also add a little bit of fucking padding at left, top and bottom.
-            //
-
-            ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            Simple.setPadding(vg, 16, 8, 0, 8);
-
-            //
-            // Step three: Fuck linear layout of icon to be square and nice.
-            //
-
-            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
-
-            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
-            {
-                LinearLayout icon_frame = (LinearLayout) icon.getParent();
-                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
-                icon_frame.setPadding(0, 0, 0, 0);
-
-                icon_frame.setOnLongClickListener(this);
-            }
-
-            //
-            // Step four: remove summary from horizontal layout and add
-            // to top layout now beeing vertical.
-            //
-
-            TextView summary = (TextView) view.findViewById(android.R.id.summary);
-            vg.addView(Simple.removeFromParent(summary));
-
-            //
-            // Step five: do not forget to fuck stupid max lines on summary.
-            //
-
-            summary.setMaxLines(50);
-            summary.setPadding(0, 0, 12, 0);
-
-            //
-            // Fucked into shape. Now add choice display.
-            //
+            LinearLayout newlayout = FuckIntoShape(getContext(), view);
 
             if (current == null)
             {
@@ -1013,7 +951,7 @@ public class NicedPreferences
                         ? CommonConfigs.PreferenceTextDisabledColor
                         : CommonConfigs.PreferenceTextEnabledColor);
 
-                current.setText(getDisplayValue(getPersistedString("")));
+                current.setText(getDisplayValue(getValue()));
             }
 
             if (current.getParent() != null)
@@ -1391,6 +1329,71 @@ public class NicedPreferences
         }
     }
 
+    public static LinearLayout FuckIntoShape(Context context, View view)
+    {
+        //
+        // Re-arrange completely shitty checkbox layout.
+        // The summary must be last item in layout. Icon,
+        // title and checkbox need to be in one layout.
+        //
+
+        //
+        // Step one: move all items into new horizontal linear layout.
+        //
+
+        LinearLayout newlayout = new LinearLayout(context);
+        newlayout.setOrientation(LinearLayout.HORIZONTAL);
+        newlayout.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        ViewGroup vg = (ViewGroup) view;
+
+        while (vg.getChildCount() > 0)
+        {
+            newlayout.addView(Simple.removeFromParent(vg.getChildAt(0)));
+        }
+
+        vg.addView(newlayout);
+
+        //
+        // Step two: fuck top level layout to be vertical match parent.
+        //
+
+        ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
+
+        ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
+
+        if ((icon != null) && (icon.getParent() instanceof LinearLayout))
+        {
+            LinearLayout icon_frame = (LinearLayout) icon.getParent();
+            icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
+            icon_frame.setPadding(0, 0, 0, 0);
+        }
+
+        //
+        // Step three: remove summary from horizontal layout and add
+        // to top layout now beeing vertical.
+        //
+
+        TextView summary = (TextView) view.findViewById(android.R.id.summary);
+
+        vg.addView(Simple.removeFromParent(summary));
+
+        //
+        // Step four: do not forget to fuck stupid max lines on summary.
+        //
+
+        summary.setMaxLines(50);
+        summary.setPadding(0, 0, 16, 16);
+
+        //
+        // Fucked into shape.
+        //
+
+        return newlayout;
+    }
+
     public static class NiceCheckboxPreference extends CheckBoxPreference
     {
         public NiceCheckboxPreference(Context context)
@@ -1403,64 +1406,7 @@ public class NicedPreferences
         {
             super.onBindView(view);
 
-            //
-            // Re-arrange completely shitty checkbox layout.
-            // The summary must be last item in layout. Icon,
-            // title and checkbox need to be in on layout.
-            //
-            // Step one: move all items into new horizontal linear layout.
-            //
-
-            LinearLayout newlayout = new LinearLayout(getContext());
-            newlayout.setOrientation(LinearLayout.HORIZONTAL);
-            newlayout.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            ViewGroup vg = (ViewGroup) view;
-
-            while (vg.getChildCount() > 0)
-            {
-                newlayout.addView(Simple.removeFromParent(vg.getChildAt(0)));
-            }
-
-            vg.addView(newlayout);
-
-            //
-            // Step two: fuck top level layout to be vertical match parent.
-            // Also add a little bit of fucking padding at left, top and bottom.
-            //
-
-            ((LinearLayout) vg).setOrientation(LinearLayout.VERTICAL);
-            Simple.setPadding(vg, 14, 8, 10, 8);
-
-            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
-
-            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
-            {
-                LinearLayout icon_frame = (LinearLayout) icon.getParent();
-                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
-                icon_frame.setPadding(0, 0, 0, 0);
-            }
-
-            //
-            // Step three: remove summary from horizontal layout and add
-            // to top layout now beeing vertical.
-            //
-
-            TextView summary = (TextView) view.findViewById(android.R.id.summary);
-
-            vg.addView(Simple.removeFromParent(summary));
-
-            //
-            // Step four: do not forget to fuck stupid max lines on summary.
-            //
-
-            summary.setMaxLines(50);
-
-            //
-            // Fucked into shape.
-            //
+            FuckIntoShape(getContext(), view);
         }
     }
 
@@ -1469,8 +1415,6 @@ public class NicedPreferences
         public NiceSeparatorPreference(Context context)
         {
             super(context);
-
-            textSize = 20f;
         }
     }
 
@@ -1483,7 +1427,6 @@ public class NicedPreferences
             super(context);
         }
 
-        protected float textSize = 24f;
         protected Runnable onClickRunner;
         protected Runnable onLongClickRunner;
         protected ImageView actionIcon;
@@ -1503,62 +1446,13 @@ public class NicedPreferences
         {
             super.onBindView(view);
 
-            //
-            // Re-arrange completely preference layout.
-            //
-            // Step one: move all items into new horizontal linear layout.
-            //
-
-            LinearLayout newlayout = new LinearLayout(getContext());
-            newlayout.setLayoutParams(Simple.layoutParamsMW());
-            newlayout.setOrientation(LinearLayout.HORIZONTAL);
-
-            Simple.setPadding(newlayout, 12, 0, 0, 0);
-
-            while (((ViewGroup) view).getChildCount() > 0)
-            {
-                newlayout.addView(Simple.removeFromParent(((ViewGroup) view).getChildAt(0)));
-            }
-
-            ((ViewGroup) view).addView(newlayout);
+            LinearLayout newlayout = FuckIntoShape(getContext(), view);
 
             //
-            // Step two: fuck top level layout to be vertical match parent.
-            // Also add a little bit of fucking padding at bottom.
-            //
-
-            ((LinearLayout) view).setOrientation(LinearLayout.VERTICAL);
-            Simple.setPadding(view, 0, 4, 0, 4);
-
-            //
-            // Step three: remove summary from horizontal layout and add
-            // to top layout now beeing vertical.
-            //
-
-            ImageView icon = (ImageView) view.findViewById(android.R.id.icon);
-
-            if ((icon != null) && (icon.getParent() instanceof LinearLayout))
-            {
-                LinearLayout icon_frame = (LinearLayout) icon.getParent();
-                icon_frame.setLayoutParams(new LinearLayout.LayoutParams(Simple.WC, Simple.MP));
-                Simple.setPadding(icon_frame, 0, 0, 0, 0);
-            }
-
-            TextView summary = (TextView) view.findViewById(android.R.id.summary);
-            summary.setMaxLines(50);
-            Simple.setPadding(summary, 16, 0, 16, 0);
-
-            ((ViewGroup) view).addView(Simple.removeFromParent(summary));
-
-            //
-            // Step four set category dependant values. Change color, add a space view
-            // and adjust text size and color.
+            // Grey background.
             //
 
             view.setBackgroundColor(0xcccccccc);
-
-            TextView title = (TextView) view.findViewById(android.R.id.title);
-            title.setTextSize(textSize);
 
             //
             // Add an action icon.
@@ -1567,7 +1461,7 @@ public class NicedPreferences
             actionIcon = new ImageView(getContext());
             actionIcon.setLayoutParams(Simple.layoutParamsXX(Simple.WC, Simple.MP));
             actionIcon.setPadding(10, 16, 10, 10);
-            ((LinearLayout) ((ViewGroup) view).getChildAt(0)).addView(actionIcon);
+            newlayout.addView(actionIcon);
 
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
