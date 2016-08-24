@@ -72,13 +72,14 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
 
         titleFrame = new FrameLayout(context);
         titleFrame.setLayoutParams(titleLayout);
+
         addView(titleFrame);
 
         titleView = new TextView(context);
-        titleView.setTextSize(Simple.getDeviceTextSize(HomeActivity.titleSpace * 2 / 3));
-        titleView.setGravity(Gravity.START | Gravity.BOTTOM);
+        titleView.setTextSize(Simple.getDeviceTextSize(Simple.getNormalPixels(HomeActivity.titleSpace * 2 / 3)));
+        titleView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         titleView.setTextColor(0xff888888);
-        titleView.setPadding(ipad, 0, 0, ipad / 2);
+        titleView.setPadding(ipad, 0, 0, 0);
         titleView.setVisibility(GONE);
         titleFrame.addView(titleView);
 
@@ -115,7 +116,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
         if (Simple.isTablet())
         {
             innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
-            innerFrame.setPadding(8, 8, 8, 8);
+            Simple.setPadding(innerFrame, 8, 8, 8, 8);
         }
 
         addView(innerFrame);
@@ -441,7 +442,7 @@ public abstract class HomeFrame extends FrameLayout implements BackKeyClient
                 if (Simple.isTablet())
                 {
                     innerFrame.setBackground(Simple.getRoundedBorders(16, 0xffffffff, 0xffcccccc));
-                    innerFrame.setPadding(8, 8, 8, 8);
+                    Simple.setPadding(innerFrame, 8, 8, 8, 8);
                 }
 
                 fullscreen = false;

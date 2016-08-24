@@ -78,15 +78,15 @@ public class LaunchItemToday extends LaunchItem
         // Original font sizes based on 200 pixels height.
         //
 
-        float scale = (height - icon.getPaddingBottom()) / 200.0f;
+        float scale = Simple.getNormalPixels(height - icon.getPaddingBottom()) / 200.0f;
 
         wdayView.setTextSize(Simple.getDeviceTextSize(28f * scale));
         timeView.setTextSize(Simple.getDeviceTextSize(56f * scale));
         dateView.setTextSize(Simple.getDeviceTextSize(24f * scale));
 
-        wdayView.setPadding(0, Math.round( 20 * scale), 0, 0);
-        timeView.setPadding(0, Math.round( 50 * scale), 0, 0);
-        dateView.setPadding(0, Math.round(120 * scale), 0, 0);
+        Simple.setPadding(wdayView, 0, Math.round( 20 * scale), 0, 0);
+        Simple.setPadding(timeView, 0, Math.round( 50 * scale), 0, 0);
+        Simple.setPadding(dateView, 0, Math.round(120 * scale), 0, 0);
     }
 
     @Override

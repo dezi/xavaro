@@ -128,13 +128,13 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
             // Original font sizes based on 200 pixels height.
             //
 
-            float scale = (height - icon.getPaddingBottom()) / 200.0f;
+            float scale = Simple.getNormalPixels(height - icon.getPaddingBottom()) / 200.0f;
 
-            prepaidDateView.setTextSize(Simple.getDeviceTextSize(22f * scale));
+            prepaidDateView.setTextSize(Simple.getDeviceTextSize(28f * scale));
             prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f * scale));
 
-            prepaidDateView.setPadding(0, Math.round(20 * scale), 0, 0);
-            prepaidMoneyView.setPadding(0, Math.round(50 * scale), 0, 0);
+            Simple.setPadding(prepaidDateView, 0, Math.round(20 * scale), 0, 0);
+            Simple.setPadding(prepaidMoneyView, 0, Math.round(56 * scale), 0, 0);
         }
     }
 

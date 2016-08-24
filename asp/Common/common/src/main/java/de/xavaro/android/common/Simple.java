@@ -381,7 +381,7 @@ public class Simple
     public static void makeRoundedCorners(View view, boolean solid)
     {
         GradientDrawable shape = new GradientDrawable();
-        shape.setCornerRadius(4);
+        shape.setCornerRadius(Simple.getDevicePixels(4));
 
         if (solid)
         {
@@ -392,8 +392,8 @@ public class Simple
             shape.setStroke(2, CommonConfigs.PreferenceTextButtonColor);
         }
 
-        view.setPadding(12, 10, 10, 12);
         view.setBackground(shape);
+        Simple.setPadding(view, 12, 10, 10, 12);
     }
 
     public static void makeStandardButton(View view, boolean preferred)
@@ -668,7 +668,7 @@ public class Simple
     public static GradientDrawable getRoundedBorders(int radius, int color, int stroke)
     {
         GradientDrawable gd = new GradientDrawable();
-        gd.setCornerRadius(radius);
+        gd.setCornerRadius(Simple.getDevicePixels(radius));
         gd.setColor(color);
         gd.setStroke(2, stroke);
 
@@ -680,9 +680,19 @@ public class Simple
         return (pixels * getDensityDPI()) / 160;
     }
 
+    public static int getNormalPixels(int pixels)
+    {
+        return (pixels * 160) / getDensityDPI();
+    }
+
     public static int DP(int pixels)
     {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+        return getDevicePixels(pixels);
+    }
+
+    public static int NP(int pixels)
+    {
+        return getNormalPixels(pixels);
     }
 
     public static float DP(float pixels)

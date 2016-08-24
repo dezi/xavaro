@@ -123,8 +123,8 @@ public class HomeActivity extends CaptureActivity implements
         titleSpace = Simple.getDevicePixels(40);
         notifySize = 0;
 
-        launchWid = CommonStatic.LaunchItemSize * 2 + 32;
-        launchHei = CommonStatic.LaunchItemSize * 2 + 32 + HomeActivity.titleSpace;
+        launchWid = CommonStatic.LaunchItemSize * 2 + Simple.DP(32);
+        launchHei = CommonStatic.LaunchItemSize * 2 + Simple.DP(32) + HomeActivity.titleSpace;
 
         //
         // Build views.

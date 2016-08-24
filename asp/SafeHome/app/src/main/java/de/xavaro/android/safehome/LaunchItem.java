@@ -270,14 +270,7 @@ public class LaunchItem extends FrameLayout implements
         // Original font sizes based on 200 pixels height.
         //
 
-        float scale = height / 200.0f;
-
-        if (Json.equals(config, "label", "weitere"))
-        {
-            Log.d(LOGTAG, "setSize: 1 scale=" + scale
-                    + " height=" + height
-                    + " icon=" + icon.getPaddingBottom());
-        }
+        float scale = Simple.getNormalPixels(height) / 200.0f;
 
         layout.width = width;
         layout.height = height;
@@ -291,7 +284,7 @@ public class LaunchItem extends FrameLayout implements
         }
         else
         {
-            icon.setPadding(
+            Simple.setPadding(icon,
                     Math.round(18 * scale),
                     Math.round(0 * scale),
                     Math.round(18 * scale),
@@ -333,14 +326,6 @@ public class LaunchItem extends FrameLayout implements
                 Math.round(8),
                 Math.round(4));
 
-        if (Json.equals(config, "label", "weitere"))
-        {
-            Log.d(LOGTAG, "setSize: scale=" + scale
-                    + " height=" + height
-                    + " top=" + notifyLayout.topMargin
-                    + " icon=" + icon.getPaddingBottom());
-        }
-
         //
         // Now fill in label text if present.
         //
@@ -370,7 +355,7 @@ public class LaunchItem extends FrameLayout implements
         // Set reasonable size of text according to height.
         //
 
-        textsize = layout.height / 9;
+        textsize = Simple.getNormalPixels(layout.height) / 9;
         label.setTextSize(Simple.getDeviceTextSize(textsize));
 
         //

@@ -58,10 +58,10 @@ public class HomeNotify extends HomeFrame
         layoutParams.height = HomeActivity.notifySize - 16;
         layoutParams.gravity = Gravity.TOP;
 
-        layoutParams.leftMargin = 8;
-        layoutParams.topMargin = 8;
-        layoutParams.rightMargin = Simple.isPortrait() ? 8 : HomeActivity.peopleSize;
-        layoutParams.bottomMargin = 8;
+        layoutParams.leftMargin = Simple.DP(8);
+        layoutParams.topMargin = Simple.DP(8);
+        layoutParams.rightMargin = Simple.isPortrait() ? Simple.DP(8) : HomeActivity.peopleSize;
+        layoutParams.bottomMargin = Simple.DP(8);
 
         layoutNormal = new LayoutParams(layoutParams);
 
@@ -171,8 +171,8 @@ public class HomeNotify extends HomeFrame
     @Override
     protected void onChangeOrientation()
     {
-        layoutNormal.height = HomeActivity.notifySize - 16;
-        layoutNormal.rightMargin = Simple.isPortrait() ? 8 : HomeActivity.peopleSize;
+        layoutNormal.height = HomeActivity.notifySize - Simple.DP(16);
+        layoutNormal.rightMargin = Simple.isPortrait() ? Simple.DP(8) : HomeActivity.peopleSize;
 
         if (! fullscreen)
         {
