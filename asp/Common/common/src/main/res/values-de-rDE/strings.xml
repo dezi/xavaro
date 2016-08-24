@@ -268,25 +268,21 @@
     <string name="pref_basic_permissions">Berechtigungen</string>
     <string name="pref_basic_permissions_summary">todo</string>
 
-    <string name="pref_basic_permissions_contacts">Kontakte</string>
+    <string name="pref_basic_permissions_contacts">Profil und Kontakte</string>
     <string name="pref_basic_permissions_contacts_summary">todo</string>
+    <string name="pref_basic_permissions_contacts_profread">Profil lesen</string>
     <string name="pref_basic_permissions_contacts_read">Kontakte lesen</string>
     <string name="pref_basic_permissions_contacts_write">Kontakte ändern</string>
 
     <string name="pref_basic_permissions_phone">Telefon</string>
     <string name="pref_basic_permissions_phone_summary">todo</string>
-    <string name="pref_basic_permissions_phone_call">Anrufe auslösen</string>
     <string name="pref_basic_permissions_phone_read">Status lesen</string>
+    <string name="pref_basic_permissions_phone_call">Anrufe auslösen</string>
 
     <string name="pref_basic_permissions_storage">Speicherkarte</string>
     <string name="pref_basic_permissions_storage_summary">todo</string>
     <string name="pref_basic_permissions_storage_read">Speicherkarte lesen</string>
     <string name="pref_basic_permissions_storage_write">Speicherkarte schreiben</string>
-
-    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
-    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
-    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
-    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
 
     <string name="pref_basic_permissions_record_audio">Mikrofon</string>
     <string name="pref_basic_permissions_record_audio_summary">todo</string>
@@ -295,6 +291,24 @@
     <string name="pref_basic_permissions_system_alert">Display Overlay</string>
     <string name="pref_basic_permissions_system_alert_summary">todo</string>
     <string name="pref_basic_permissions_system_alert_window">Display Overlay anzeigen</string>
+
+    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
+    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
+    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
+    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
+
+    <string name="pref_basic_permissions_network">Netzwerk</string>
+    <string name="pref_basic_permissions_network_summary">todo</string>
+    <string name="pref_basic_permissions_network_internet">Internet Zugriff</string>
+    <string name="pref_basic_permissions_network_state">Netzwerk Status</string>
+    <string name="pref_basic_permissions_network_wifistate">WLAN Status</string>
+    <string name="pref_basic_permissions_network_gcmreceive">Google Cloud Messages</string>
+
+    <string name="pref_basic_permissions_other">Sonstiges</string>
+    <string name="pref_basic_permissions_other_summary">todo</string>
+    <string name="pref_basic_permissions_other_vibrate">Vibrationsalarm</string>
+    <string name="pref_basic_permissions_other_wakelock">Ruhemodus sperren</string>
+    <string name="pref_basic_permissions_other_receiveboot">Automatisch starten</string>
 
     <string-array name="pref_basic_permissions_status_vals">
         <item>Nicht gewährt</item>

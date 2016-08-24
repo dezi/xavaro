@@ -42,6 +42,7 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         summaryres = R.string.pref_basic_permissions_summary;
     }
 
+    public NicedPreferences.NiceListPreference PrefContactsProfRead;
     public NicedPreferences.NiceListPreference PrefContactsRead;
     public NicedPreferences.NiceListPreference PrefContactsWrite;
     public NicedPreferences.NiceListPreference PrefPhoneCall;
@@ -53,6 +54,15 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
 
     public NicedPreferences.NiceListPreference PrefBluetoothRead;
     public NicedPreferences.NiceListPreference PrefBluetoothAdmin;
+
+    public NicedPreferences.NiceListPreference PrefNetworkInternet;
+    public NicedPreferences.NiceListPreference PrefNetworkState;
+    public NicedPreferences.NiceListPreference PrefNetworkWifiState;
+    public NicedPreferences.NiceListPreference PrefNetworkGCM;
+
+    public NicedPreferences.NiceListPreference PrefOtherVibrate;
+    public NicedPreferences.NiceListPreference PrefOtherWakelock;
+    public NicedPreferences.NiceListPreference PrefOtherReceiveBoot;
 
     public void registerAll(Context context)
     {
@@ -74,6 +84,25 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         ip.setTitle(R.string.pref_basic_permissions_contacts);
         ip.setSummary(R.string.pref_basic_permissions_contacts_summary);
         preferences.add(ip);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".contacts.profread");
+        lp.setTitle(R.string.pref_basic_permissions_contacts_profread);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission("android.permission.READ_PROFILE");
+            }
+        });
+
+        preferences.add(lp);
+        PrefContactsProfRead = lp;
 
         lp = new NicedPreferences.NiceListPreference(context);
 
@@ -124,25 +153,6 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
 
         lp = new NicedPreferences.NiceListPreference(context);
 
-        lp.setKey(permprefix + ".phone.call");
-        lp.setTitle(R.string.pref_basic_permissions_phone_call);
-        lp.setEntries(permStatusText);
-        lp.setEntryValues(permStatusKeys);
-
-        lp.setOnclick(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                requestPermission(Manifest.permission.CALL_PHONE);
-            }
-        });
-
-        preferences.add(lp);
-        PrefPhoneCall = lp;
-
-        lp = new NicedPreferences.NiceListPreference(context);
-
         lp.setKey(permprefix + ".phone.read");
         lp.setTitle(R.string.pref_basic_permissions_phone_read);
         lp.setEntries(permStatusText);
@@ -159,6 +169,26 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
 
         preferences.add(lp);
         PrefPhoneRead = lp;
+
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".phone.call");
+        lp.setTitle(R.string.pref_basic_permissions_phone_call);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.CALL_PHONE);
+            }
+        });
+
+        preferences.add(lp);
+        PrefPhoneCall = lp;
 
         //
         // Storage permissions.
@@ -311,6 +341,157 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         PrefBluetoothAdmin = lp;
 
         //
+        // Network permissions.
+        //
+
+        ip = new NicedPreferences.NiceInfoPreference(context);
+        ip.setTitle(R.string.pref_basic_permissions_network);
+        ip.setSummary(R.string.pref_basic_permissions_network_summary);
+        preferences.add(ip);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".network.internet");
+        lp.setTitle(R.string.pref_basic_permissions_network_internet);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.INTERNET);
+            }
+        });
+
+        preferences.add(lp);
+        PrefNetworkInternet = lp;
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".network.state");
+        lp.setTitle(R.string.pref_basic_permissions_network_state);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.ACCESS_NETWORK_STATE);
+            }
+        });
+
+        preferences.add(lp);
+        PrefNetworkState = lp;
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".network.wifistate");
+        lp.setTitle(R.string.pref_basic_permissions_network_wifistate);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.ACCESS_NETWORK_STATE);
+            }
+        });
+
+        preferences.add(lp);
+        PrefNetworkWifiState = lp;
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".network.gcmreceive");
+        lp.setTitle(R.string.pref_basic_permissions_network_gcmreceive);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission("com.google.android.c2dm.permission.RECEIVE");
+            }
+        });
+
+        preferences.add(lp);
+        PrefNetworkGCM = lp;
+
+        //
+        // Miscelanous permissions.
+        //
+
+        ip = new NicedPreferences.NiceInfoPreference(context);
+        ip.setTitle(R.string.pref_basic_permissions_other);
+        ip.setSummary(R.string.pref_basic_permissions_other_summary);
+        preferences.add(ip);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".other.vibrate");
+        lp.setTitle(R.string.pref_basic_permissions_other_vibrate);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.VIBRATE);
+            }
+        });
+
+        preferences.add(lp);
+        PrefOtherVibrate = lp;
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".other.wakelock");
+        lp.setTitle(R.string.pref_basic_permissions_other_wakelock);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.WAKE_LOCK);
+            }
+        });
+
+        preferences.add(lp);
+        PrefOtherWakelock = lp;
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".other.receiveboot");
+        lp.setTitle(R.string.pref_basic_permissions_other_receiveboot);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.RECEIVE_BOOT_COMPLETED);
+            }
+        });
+
+        preferences.add(lp);
+        PrefOtherReceiveBoot = lp;
+
+        //
         // Run preferences monitor.
         //
 
@@ -322,6 +503,11 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         if (checkPermission(permission).equals("grant")) return;
 
         Log.d(LOGTAG, "requestPermission: " + permission);
+
+        //
+        // Execute request delayed to get rid
+        // of overlay before calling settings.
+        //
 
         if (CaptureOverlay.getInstance() != null)
         {
@@ -344,9 +530,13 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         }
 
         //
-        // Execute request delayed to get rid
-        // of overlay before calling settings.
+        // Workaround for bug in Android permission system.
         //
+
+        if (permission.equals("android.permission.READ_PROFILE"))
+        {
+            permission = Manifest.permission.READ_CONTACTS;
+        }
 
         final String cbpermission = permission;
 
@@ -370,9 +560,29 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
             }
         }
 
-        int res = ContextCompat.checkSelfPermission(Simple.getActContext(), permission);
+        //
+        // Bug in Android:
+        //
+        // When "android.permission.READ_PROFILE" is granted in manifest, the
+        // check permission method returns true. This is not correct, unless
+        // the user has granted access to the contacts permissions.
+        //
 
-        return  (res == PackageManager.PERMISSION_GRANTED) ? "grant" : "deny";
+        if (permission.equals("android.permission.READ_PROFILE"))
+        {
+            int res1 = ContextCompat.checkSelfPermission(Simple.getActContext(), permission);
+            int res2 = ContextCompat.checkSelfPermission(Simple.getActContext(), Manifest.permission.READ_CONTACTS);
+
+            boolean ok = ((res1 == PackageManager.PERMISSION_GRANTED) && (res2 == PackageManager.PERMISSION_GRANTED));
+            return ok ? "grant" : "deny";
+        }
+
+        //
+        // Check normal permission.
+        //
+
+        int res = ContextCompat.checkSelfPermission(Simple.getActContext(), permission);
+        return (res == PackageManager.PERMISSION_GRANTED) ? "grant" : "deny";
     }
 
     @Override
@@ -388,11 +598,12 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         @Override
         public void run()
         {
+            PrefContactsProfRead.setValue(checkPermission("android.permission.READ_PROFILE"));
             PrefContactsRead.setValue(checkPermission(Manifest.permission.READ_CONTACTS));
             PrefContactsWrite.setValue(checkPermission(Manifest.permission.WRITE_CONTACTS));
 
-            PrefPhoneCall.setValue(checkPermission(Manifest.permission.CALL_PHONE));
             PrefPhoneRead.setValue(checkPermission(Manifest.permission.READ_PHONE_STATE));
+            PrefPhoneCall.setValue(checkPermission(Manifest.permission.CALL_PHONE));
 
             PrefStorageRead.setValue(checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE));
             PrefStorageWrite.setValue(checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE));
@@ -404,7 +615,16 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
             PrefBluetoothRead.setValue(checkPermission(Manifest.permission.BLUETOOTH));
             PrefBluetoothAdmin.setValue(checkPermission(Manifest.permission.BLUETOOTH_ADMIN));
 
-            Simple.makePost(checkStatus, 1 * 1000);
+            PrefNetworkInternet.setValue(checkPermission(Manifest.permission.INTERNET));
+            PrefNetworkState.setValue(checkPermission(Manifest.permission.ACCESS_NETWORK_STATE));
+            PrefNetworkWifiState.setValue(checkPermission(Manifest.permission.ACCESS_WIFI_STATE));
+            PrefNetworkGCM.setValue(checkPermission("com.google.android.c2dm.permission.RECEIVE"));
+
+            PrefOtherVibrate.setValue(checkPermission(Manifest.permission.VIBRATE));
+            PrefOtherWakelock.setValue(checkPermission(Manifest.permission.WAKE_LOCK));
+            PrefOtherReceiveBoot.setValue(checkPermission(Manifest.permission.RECEIVE_BOOT_COMPLETED));
+
+            Simple.makePost(checkStatus, 1000);
         }
     };
 
