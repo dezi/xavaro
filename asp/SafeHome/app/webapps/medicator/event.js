@@ -32,6 +32,7 @@ medicator.getNextEvents = function()
         medicator.weightreminder = false;
         medicator.bloodglucosereminder = false;
         medicator.bloodpressurereminder = false;
+        medicator.bloodoxyreminder = false;
 
         for (var inx = 0; inx < events.length; inx++)
         {
@@ -186,6 +187,26 @@ medicator.remindConfig = function(config)
         medicator.bloodpressurereminder = true;
     }
 
+    if ((config.mediflat == "ZZO") && ! medicator.bloodoxyreminder)
+    {
+        var notify = {};
+
+        notify.key         = "medicator.take.bloodoxy";
+        notify.title       = WebLibStrings.getTrans("events.take.bloodoxy");
+        notify.icon        = "health_oxy_440x440.png";
+        notify.importance  = medicator.getImportance(config);
+        notify.followText  = WebLibStrings.getTrans("events.take.bloodoxy.follow");
+        notify.declineText = WebLibStrings.getTrans("events.take.bloodoxy.decline");
+        notify.speakOnce   = (newtime < nowtime);
+
+        notify.followJavaCall  = "medicator.onTakeBloodOxy(true);"
+        notify.declineJavaCall = "medicator.onTakeBloodOxy(false);"
+
+        WebAppNotify.addNotification(JSON.stringify(notify));
+
+        medicator.bloodoxyreminder = true;
+    }
+
     if ((config.mediform == "ZZG") && ! medicator.bloodglucosereminder)
     {
         var notify = {};
@@ -310,6 +331,12 @@ medicator.completeConfig = function(config)
         {
             tkey = "events.didnowtake.bloodpressure";
             medicator.bloodpressurereminder = true;
+        }
+
+        if ((config.mediflat == "ZZO") && ! medicator.bloodoxyreminder)
+        {
+            tkey = "events.didnowtake.bloodoxy";
+            medicator.bloodoxyreminder = true;
         }
 
         if ((config.mediflat == "ZZG") && ! medicator.bloodglucosereminder)

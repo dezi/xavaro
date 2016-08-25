@@ -67,6 +67,30 @@ public class PreferencesDeveloper
             NicedPreferences.NiceCheckboxPreference cp;
 
             //
+            // Display switches.
+            //
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Display Schalter");
+            preferences.add(pc);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cp.setKey(keyprefix + ".display.betaversion");
+            cp.setTitle("Beta Version Icon");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cp.setKey(keyprefix + ".display.browsericons");
+            cp.setTitle("Browser Icons");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
+
+            //
             // Debug switches.
             //
 

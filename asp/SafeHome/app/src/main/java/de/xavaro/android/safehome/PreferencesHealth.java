@@ -40,6 +40,11 @@ public class PreferencesHealth
 
             return header;
         }
+
+        public HealthMedicatorFragment()
+        {
+            super();
+        }
     }
 
     //endregion Health medicator preferences
@@ -328,20 +333,20 @@ public class PreferencesHealth
 
             dp = new NicedPreferences.NiceNumberPreference(context);
 
-            dp.setKey(keyprefix + ".alert.highpls");
-            dp.setMinMaxValue(90, 140, 1);
-            dp.setDefaultValue(90);
-            dp.setTitle("Zu hoher Puls");
+            dp.setKey(keyprefix + ".alert.lowpls");
+            dp.setMinMaxValue(30, 80, 1);
+            dp.setDefaultValue(60);
+            dp.setTitle("Zu niedriger Puls");
             dp.setEnabled(enabled);
 
             preferences.add(dp);
 
             dp = new NicedPreferences.NiceNumberPreference(context);
 
-            dp.setKey(keyprefix + ".alert.lowpls");
-            dp.setMinMaxValue(30, 80, 1);
-            dp.setDefaultValue(60);
-            dp.setTitle("Zu niedriger Puls");
+            dp.setKey(keyprefix + ".alert.highpls");
+            dp.setMinMaxValue(90, 140, 1);
+            dp.setDefaultValue(90);
+            dp.setTitle("Zu hoher Puls");
             dp.setEnabled(enabled);
 
             preferences.add(dp);
@@ -775,6 +780,24 @@ public class PreferencesHealth
             NicedPreferences.NiceListPreference lp;
 
             //
+            // Icon location preference.
+            //
+
+            String[] keys =  Simple.getTransArray(R.array.pref_health_where_keys);
+            String[] vals =  Simple.getTransArray(R.array.pref_health_where_vals);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".icon");
+            lp.setEntries(vals);
+            lp.setEntryValues(keys);
+            lp.setDefaultValue("home");
+            lp.setTitle("Anzeigen");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
+
+            //
             // Bluetooth device selection preference
             //
 
@@ -811,24 +834,6 @@ public class PreferencesHealth
             devicePref.setOnclick(discoverDialog);
 
             preferences.add(devicePref);
-
-            //
-            // Icon location preference.
-            //
-
-            String[] keys =  Simple.getTransArray(R.array.pref_health_where_keys);
-            String[] vals =  Simple.getTransArray(R.array.pref_health_where_vals);
-
-            lp = new NicedPreferences.NiceListPreference(context);
-
-            lp.setKey(keyprefix + ".icon");
-            lp.setEntries(vals);
-            lp.setEntryValues(keys);
-            lp.setDefaultValue("home");
-            lp.setTitle("Anzeigen");
-            lp.setEnabled(enabled);
-
-            preferences.add(lp);
         }
 
         private final Handler handler = new Handler();

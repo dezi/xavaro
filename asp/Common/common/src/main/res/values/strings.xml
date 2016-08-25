@@ -99,11 +99,13 @@
     </string-array>
 
     <string-array name="pref_health_where_keys">
+        <item>none</item>
         <item>home</item>
         <item>folder</item>
     </string-array>
 
     <string-array name="pref_health_where_vals">
+        <item>No Display</item>
         <item>Home-Screen</item>
         <item>Vital-Folder</item>
     </string-array>
@@ -133,7 +135,7 @@
     </string-array>
 
     <string-array name="pref_webapps_where_keys">
-        <item>inact</item>
+        <item>none</item>
         <item>home</item>
         <item>folder</item>
     </string-array>
@@ -287,6 +289,16 @@
     <string name="pref_basic_permissions_storage_read">Read External Storage</string>
     <string name="pref_basic_permissions_storage_write">Write External Storage</string>
 
+    <string name="pref_basic_permissions_location">Location</string>
+    <string name="pref_basic_permissions_location_summary">todo</string>
+    <string name="pref_basic_permissions_location_coarse">Access approximate location</string>
+    <string name="pref_basic_permissions_location_fine">Access precise location</string>
+
+    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
+    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
+    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
+    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
+
     <string name="pref_basic_permissions_record_audio">Microphone</string>
     <string name="pref_basic_permissions_record_audio_summary">todo</string>
     <string name="pref_basic_permissions_record_audio_allow">Allow Recording</string>
@@ -294,11 +306,6 @@
     <string name="pref_basic_permissions_system_alert">Display Overlay</string>
     <string name="pref_basic_permissions_system_alert_summary">todo</string>
     <string name="pref_basic_permissions_system_alert_window">Overlay Window</string>
-
-    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
-    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
-    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
-    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
 
     <string name="pref_basic_permissions_network">Network</string>
     <string name="pref_basic_permissions_network_summary">todo</string>
@@ -600,18 +607,18 @@
 
     <string name="today_label">Logbook</string>
 
-    <string name="healt_bpm_spoken">The last reading resulted in a blood pressure of %1$d to %2$d The pulse was %3$d</string>
-    <string name="healt_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
-    <string name="healt_bpm_lowpb">The blood pressure is alarming high.</string>
-    <string name="healt_bpm_highbp">The blood pressure is alarming low.</string>
-    <string name="healt_bpm_activity">You have a blood pressure of %1$d to %2$d. The pulse is %3$d.</string>
+    <string name="health_bpm_spoken">The last reading resulted in a blood pressure of %1$d to %2$d The pulse was %3$d</string>
+    <string name="health_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
+    <string name="health_bpm_lowpb">The blood pressure is alarming high.</string>
+    <string name="health_bpm_highbp">The blood pressure is alarming low.</string>
+    <string name="health_bpm_activity">You have a blood pressure of %1$d to %2$d. The pulse is %3$d.</string>
 
-    <string name="healt_oxy_spoken">The last reading resulted in a blood oxygene saturation of %1$d percent. The pulse was %2$d</string>
-    <string name="healt_oxy_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
-    <string name="healt_oxy_lowsat">The blood oxygene saturation is alarming low.</string>
-    <string name="healt_oxy_highpls">The pulse is alarming high.</string>
-    <string name="healt_oxy_lowpls">The pulse is alarming low.</string>
-    <string name="healt_oxy_activity">You have a blood oxygene saturation of %1$d %%. The pulse is %2$d.</string>
+    <string name="health_oxy_spoken">The last reading resulted in a blood oxygene saturation of %1$d percent. The pulse was %2$d</string>
+    <string name="health_oxy_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
+    <string name="health_oxy_lowsat">The blood oxygene saturation is alarming low.</string>
+    <string name="health_oxy_highpls">The pulse is alarming high.</string>
+    <string name="health_oxy_lowpls">The pulse is alarming low.</string>
+    <string name="health_oxy_activity">You have a blood oxygene saturation of %1$d %%. The pulse is %2$d.</string>
 
     <string-array name="phone_labels_keys">
         <item>1</item>

@@ -33,7 +33,8 @@ public class LaunchGroupHealth extends LaunchGroup
             Json.put(entry, "label", "Blutdruck");
             Json.put(entry, "order", 1000);
 
-            Json.put(Simple.sharedPrefEquals("health.bpm.icon", "home") ? home : adir, entry);
+            if (Simple.sharedPrefEquals("health.bpm.icon", "home")) Json.put(home, entry);
+            if (Simple.sharedPrefEquals("health.bpm.icon", "folder")) Json.put(adir, entry);
         }
 
         if (Simple.getSharedPrefBoolean("health.oxy.enable"))
@@ -45,7 +46,8 @@ public class LaunchGroupHealth extends LaunchGroup
             Json.put(entry, "label", "Blutsauerstoff");
             Json.put(entry, "order", 1000);
 
-            Json.put(Simple.sharedPrefEquals("health.oxy.icon", "home") ? home : adir, entry);
+            if (Simple.sharedPrefEquals("health.oxy.icon", "home")) Json.put(home, entry);
+            if (Simple.sharedPrefEquals("health.oxy.icon", "folder")) Json.put(adir, entry);
         }
 
         if (Simple.getSharedPrefBoolean("health.scale.enable"))
@@ -57,7 +59,8 @@ public class LaunchGroupHealth extends LaunchGroup
             Json.put(entry, "label", "Gewicht");
             Json.put(entry, "order", 1010);
 
-            Json.put(Simple.sharedPrefEquals("health.scale.icon", "home") ? home : adir, entry);
+            if (Simple.sharedPrefEquals("health.scale.icon", "home")) Json.put(home, entry);
+            if (Simple.sharedPrefEquals("health.scale.icon", "folder")) Json.put(adir, entry);
         }
 
         if (Simple.getSharedPrefBoolean("health.sensor.enable"))
@@ -69,7 +72,8 @@ public class LaunchGroupHealth extends LaunchGroup
             Json.put(entry, "label", "Aktivität");
             Json.put(entry, "order", 1020);
 
-            Json.put(Simple.sharedPrefEquals("health.sensor.icon", "home") ? home : adir, entry);
+            if (Simple.sharedPrefEquals("health.sensor.icon", "home")) Json.put(home, entry);
+            if (Simple.sharedPrefEquals("health.sensor.icon", "folder")) Json.put(adir, entry);
         }
 
         if (Simple.getSharedPrefBoolean("health.glucose.enable"))
@@ -81,7 +85,8 @@ public class LaunchGroupHealth extends LaunchGroup
             Json.put(entry, "label", "Blutzucker");
             Json.put(entry, "order", 1030);
 
-            Json.put(Simple.sharedPrefEquals("health.glucose.icon", "home") ? home : adir, entry);
+            if (Simple.sharedPrefEquals("health.glucose.icon", "home")) Json.put(home, entry);
+            if (Simple.sharedPrefEquals("health.glucose.icon", "folder")) Json.put(adir, entry);
         }
 
         if (adir.length() > 0)

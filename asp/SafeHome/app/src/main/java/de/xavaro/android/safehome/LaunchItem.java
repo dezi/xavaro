@@ -154,7 +154,7 @@ public class LaunchItem extends FrameLayout implements
         addView(icon);
 
         label = new TextView(context);
-        label.setLayoutParams(Simple.layoutParamsWW(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
+        label.setLayoutParams(Simple.layoutParamsMW(Gravity.BOTTOM));
         label.setGravity(Gravity.CENTER_HORIZONTAL);
         label.setTypeface(label.getTypeface(), Typeface.BOLD);
         addView(label);
@@ -309,7 +309,7 @@ public class LaunchItem extends FrameLayout implements
         // value if dimensions are known.
         //
 
-        padding = layout.width / 20;
+        padding = layout.width / 24;
         setPadding(padding, padding, padding, padding);
 
         //
@@ -381,9 +381,9 @@ public class LaunchItem extends FrameLayout implements
             // layout. Make it a little bit smaller.
             //
 
-            textsize = layout.height / 10;
+            textsize = Simple.getNormalPixels(layout.height) / 11;
             label.setTextSize(Simple.getDeviceTextSize(textsize));
-            label.setLineSpacing(-3 * Simple.getDensity(), 1);
+            //label.setLineSpacing(1.0f, 0.0f);
 
             //
             // This might lead to a shitty breaking

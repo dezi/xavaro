@@ -62,7 +62,7 @@ public class WebAppUtility
     @JavascriptInterface
     public int getLaunchItemSize()
     {
-        return CommonStatic.LaunchItemSize;
+        return Simple.getNormalPixels(CommonStatic.LaunchItemSize);
     }
 
     @JavascriptInterface

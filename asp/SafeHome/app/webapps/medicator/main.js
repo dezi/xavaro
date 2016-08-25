@@ -17,6 +17,11 @@ medicator.onTakeBloodPressure = function(doit)
     medicator.onTakeThat(doit, "ZZB");
 }
 
+medicator.onTakeBloodOxygen = function(doit)
+{
+    medicator.onTakeThat(doit, "ZZO");
+}
+
 medicator.onTakeBloodGlucose = function(doit)
 {
     medicator.onTakeThat(doit, "ZZG");
@@ -75,11 +80,12 @@ medicator.updateMedisetEvent = function(mediset)
         // Measurement data.
         //
 
-        if (mediset.puls     ) event.puls      = mediset.puls;
-        if (mediset.weight   ) event.weight    = mediset.weight;
-        if (mediset.glucose  ) event.glucose   = mediset.glucose;
-        if (mediset.systolic ) event.systolic  = mediset.systolic;
-        if (mediset.diastolic) event.diastolic = mediset.diastolic;
+        if (mediset.puls      ) event.puls       = mediset.puls;
+        if (mediset.weight    ) event.weight     = mediset.weight;
+        if (mediset.glucose   ) event.glucose    = mediset.glucose;
+        if (mediset.systolic  ) event.systolic   = mediset.systolic;
+        if (mediset.diastolic ) event.diastolic  = mediset.diastolic;
+        if (mediset.saturation) event.saturation = mediset.saturation;
 
         WebAppEvents.updateComingEvent(JSON.stringify(event));
     }
@@ -106,15 +112,17 @@ medicator.updateHealthData = function(mediset)
     // Measurement data.
     //
 
-    if (mediset.puls     ) record.pls = mediset.puls;
-    if (mediset.weight   ) record.wei = mediset.weight;
-    if (mediset.glucose  ) record.bgv = mediset.glucose;
-    if (mediset.systolic ) record.sys = mediset.systolic;
-    if (mediset.diastolic) record.dia = mediset.diastolic;
+    if (mediset.puls      ) record.pls = mediset.puls;
+    if (mediset.weight    ) record.wei = mediset.weight;
+    if (mediset.glucose   ) record.bgv = mediset.glucose;
+    if (mediset.systolic  ) record.sys = mediset.systolic;
+    if (mediset.diastolic ) record.dia = mediset.diastolic;
+    if (mediset.saturation) record.sat = mediset.saturation;
 
     var type = "medication";
 
     if (mediset.mediform == "ZZB") type = "bpm";
+    if (mediset.mediform == "ZZO") type = "oxy";
     if (mediset.mediform == "ZZG") type = "glucose";
     if (mediset.mediform == "ZZW") type = "scale";
 
@@ -128,6 +136,7 @@ medicator.informAssistance = function(mediset)
     var tkey = "events.didnowtake.pills";
 
     if (mediset.mediform == "ZZB") tkey = "events.didnowtake.bloodpressure";
+    if (mediset.mediform == "ZZO") tkey = "events.didnowtake.bloodoxygen";
     if (mediset.mediform == "ZZG") tkey = "events.didnowtake.bloodglucose";
     if (mediset.mediform == "ZZW") tkey = "events.didnowtake.weight";
 
@@ -281,6 +290,7 @@ medicator.onClickMeasured = function(target)
     if (whatSpan.glucose) config.medisets[ 0 ].glucose = whatSpan.glucose;
     if (whatSpan.systolic) config.medisets[ 0 ].systolic = whatSpan.systolic;
     if (whatSpan.diastolic) config.medisets[ 0 ].diastolic = whatSpan.diastolic;
+    if (whatSpan.saturation) config.medisets[ 0 ].saturation = whatSpan.saturation;
 
     medicator.updateHealthData(config.medisets[ 0 ]);
     medicator.updateMedisetEvent(config.medisets[ 0 ]);
@@ -293,9 +303,10 @@ medicator.onClickMeasured = function(target)
     var mediform = config.medisets[ 0 ].mediform;
     var meditext = null;
 
-    if (mediform.startsWith("ZZW")) meditext = "activity.took.weight";
-    if (mediform.startsWith("ZZG")) meditext = "activity.took.bloodglucose";
     if (mediform.startsWith("ZZB")) meditext = "activity.took.bloodpressure";
+    if (mediform.startsWith("ZZO")) meditext = "activity.took.bloodoxygen";
+    if (mediform.startsWith("ZZG")) meditext = "activity.took.bloodglucose";
+    if (mediform.startsWith("ZZW")) meditext = "activity.took.weight";
 
     if (meditext != null) WebAppActivity.recordActivity(WebLibStrings.getTrans(meditext));
 
@@ -306,6 +317,7 @@ medicator.onClickMeasured = function(target)
     var notify = {};
 
     if (mediform.startsWith("ZZB")) notify.key = "medicator.take.bloodpressure";
+    if (mediform.startsWith("ZZO")) notify.key = "medicator.take.bloodoxygen";
     if (mediform.startsWith("ZZG")) notify.key = "medicator.take.bloodglucose";
     if (mediform.startsWith("ZZW")) notify.key = "medicator.take.weight";
 
@@ -387,6 +399,22 @@ medicator.onBloodPressureKeypress = function(event)
     whatSpan.pulsEdit.style.color = (whatSpan.puls > 260) ? "#ff0000" : "#444444";
 
     var okok = (whatSpan.systolic <= 260) && (whatSpan.diastolic <= 260) && (whatSpan.puls <= 260);
+
+    WebLibDialog.setOkButtonEnable(okok);
+}
+
+medicator.onBloodOxygenKeypress = function(event)
+{
+    var whatSpan = WebLibSimple.findTarget(event.target, "whatSpan");
+    if (! whatSpan) return;
+
+    whatSpan.saturation = parseInt(whatSpan.saturationEdit.value);
+    whatSpan.saturationEdit.style.color = (whatSpan.saturation > 100) ? "#ff0000" : "#444444";
+
+    whatSpan.puls = parseInt(whatSpan.pulsEdit.value);
+    whatSpan.pulsEdit.style.color = (whatSpan.puls > 260) ? "#ff0000" : "#444444";
+
+    var okok = (whatSpan.saturation <= 260) && (whatSpan.puls <= 260);
 
     WebLibDialog.setOkButtonEnable(okok);
 }
@@ -487,6 +515,17 @@ medicator.onClickEventItem = function(target, ctarget, noclick)
 
                 whatSpan.pulsEdit = medicator.createNumberInput(whatSpan, mediset.puls, "Puls");
                 whatSpan.pulsEdit.onkeyup = medicator.onBloodPressureKeypress;
+            }
+
+            if (mediset.mediform == "ZZO")
+            {
+                dlconfig.title = "Blutsauerstoff messen";
+
+                whatSpan.saturationEdit = medicator.createNumberInput(whatSpan, mediset.systolic, "Sättigung", true);
+                whatSpan.saturationEdit.onkeyup = medicator.onBloodOxygenKeypress;
+
+                whatSpan.pulsEdit = medicator.createNumberInput(whatSpan, mediset.puls, "Puls");
+                whatSpan.pulsEdit.onkeyup = medicator.onBloodOxygenKeypress;
             }
 
             if (mediset.mediform == "ZZG")
@@ -660,6 +699,7 @@ medicator.getItemIcon = function(event)
     var icon = "health_frame_490x490.png";
 
     if (mediform == "ZZB") icon = "health_bpm_256x256.png";
+    if (mediform == "ZZO") icon = "health_oxy_440x440.png";
     if (mediform == "ZZG") icon = "health_glucose_512x512.png";
     if (mediform == "ZZW") icon = "health_scale_280x280.png";
 
@@ -748,11 +788,12 @@ medicator.createEvents = function()
                 mediset.taken = true;
                 mediset.takendate = event.takendate;
 
-                mediset.puls      = event.puls;
-                mediset.weight    = event.weight;
-                mediset.glucose   = event.glucose;
-                mediset.systolic  = event.systolic;
-                mediset.diastolic = event.diastolic;
+                mediset.puls       = event.puls;
+                mediset.weight     = event.weight;
+                mediset.glucose    = event.glucose;
+                mediset.systolic   = event.systolic;
+                mediset.diastolic  = event.diastolic;
+                mediset.saturation = event.saturation;
             }
 
             config.medisets.push(mediset);

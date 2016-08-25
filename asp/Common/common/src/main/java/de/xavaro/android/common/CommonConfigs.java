@@ -40,12 +40,12 @@ public class CommonConfigs
     //
 
     // @formatter:off
-    public static boolean likeGooglePlus = true;
+    public static boolean likeGooglePlus = false;
     public static boolean likeWhatsApp   = false;
-    public static boolean likeFacebook   = true;
-    public static boolean likeTwitter    = true;
+    public static boolean likeFacebook   = false;
+    public static boolean likeTwitter    = false;
     public static boolean likeSkype      = false;
-    public static boolean likeEmail      = true;
+    public static boolean likeEmail      = false;
     // @formatter:on
 
     public static void weLikeThis(String packagename)

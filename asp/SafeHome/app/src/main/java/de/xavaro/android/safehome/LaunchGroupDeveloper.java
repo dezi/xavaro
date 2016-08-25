@@ -23,7 +23,8 @@ public class LaunchGroupDeveloper extends LaunchGroup
         JSONArray adir = new JSONArray();
         JSONObject entry;
 
-        if (Simple.getSharedPrefBoolean("developer.enable"))
+        if (Simple.getSharedPrefBoolean("developer.enable")
+                && Simple.getSharedPrefBoolean("developer.display.browsericons"))
         {
             entry = new JSONObject();
 

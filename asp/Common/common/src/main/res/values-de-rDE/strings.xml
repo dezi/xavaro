@@ -117,6 +117,7 @@
     </string-array>
 
     <string-array name="pref_health_where_vals">
+        <item>Nicht anzeigen</item>
         <item>Home-Bildschirm</item>
         <item>Vital-Ordner</item>
     </string-array>
@@ -128,7 +129,7 @@
     </string-array>
 
     <string-array name="pref_webapps_where_vals">
-        <item>Inaktiv</item>
+        <item>Nicht anzeigen</item>
         <item>Home-Screen</item>
         <item>Webapp-Ordner</item>
     </string-array>
@@ -284,6 +285,16 @@
     <string name="pref_basic_permissions_storage_read">Speicherkarte lesen</string>
     <string name="pref_basic_permissions_storage_write">Speicherkarte schreiben</string>
 
+    <string name="pref_basic_permissions_location">Standort</string>
+    <string name="pref_basic_permissions_location_summary">todo</string>
+    <string name="pref_basic_permissions_location_coarse">Ungefähren Ort lesen</string>
+    <string name="pref_basic_permissions_location_fine">Präzisen Ort lesen</string>
+
+    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
+    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
+    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
+    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
+
     <string name="pref_basic_permissions_record_audio">Mikrofon</string>
     <string name="pref_basic_permissions_record_audio_summary">todo</string>
     <string name="pref_basic_permissions_record_audio_allow">Aufnahmen tätigen</string>
@@ -291,11 +302,6 @@
     <string name="pref_basic_permissions_system_alert">Display Overlay</string>
     <string name="pref_basic_permissions_system_alert_summary">todo</string>
     <string name="pref_basic_permissions_system_alert_window">Overlay anzeigen</string>
-
-    <string name="pref_basic_permissions_bluetooth">Bluetooth</string>
-    <string name="pref_basic_permissions_bluetooth_summary">todo</string>
-    <string name="pref_basic_permissions_bluetooth_read">Bluetooth lesen</string>
-    <string name="pref_basic_permissions_bluetooth_admin">Bluetooth verbinden</string>
 
     <string name="pref_basic_permissions_network">Netzwerk</string>
     <string name="pref_basic_permissions_network_summary">todo</string>
@@ -781,20 +787,20 @@
 
     <string name="today_label">Logbuch</string>
 
-    <string name="healt_bpm_spoken">Die letzte Messung ergab einen Blutdruck von %1$d zu %2$d Der Puls beträgt %3$d</string>
-    <string name="healt_bpm_alert">%1$s hat einen Blutdruck von %2$s bei einem Puls von %3$s.</string>
-    <string name="healt_bpm_lowpb">Der Blutdruck ist bedenklich niedrig.</string>
-    <string name="healt_bpm_highbp">Der Blutdruck ist bedenklich hoch.</string>
-    <string name="healt_bpm_activity">Sie haben einen Blutdruck von %1$d zu %2$d. Ihr Puls ist %3$d.</string>
-    <string name="healt_bpm_activity_du">Du hast einen Blutdruck von %1$d zu %2$d. Dein Puls ist %3$d.</string>
+    <string name="health_bpm_spoken">Die letzte Messung ergab einen Blutdruck von %1$d zu %2$d Der Puls beträgt %3$d</string>
+    <string name="health_bpm_alert">%1$s hat einen Blutdruck von %2$s bei einem Puls von %3$s.</string>
+    <string name="health_bpm_lowpb">Der Blutdruck ist bedenklich niedrig.</string>
+    <string name="health_bpm_highbp">Der Blutdruck ist bedenklich hoch.</string>
+    <string name="health_bpm_activity">Sie haben einen Blutdruck von %1$d zu %2$d. Ihr Puls ist %3$d.</string>
+    <string name="health_bpm_activity_du">Du hast einen Blutdruck von %1$d zu %2$d. Dein Puls ist %3$d.</string>
 
-    <string name="healt_oxy_spoken">Die letzte Messung ergab eine Sauerstoff-Sättigung von %1$d Prozent. Der Puls beträgt %2$d</string>
-    <string name="healt_oxy_alert">%1$s hat eine Sauerstoff-Sättigung von %2$s Prozent bei einem Puls von %3$s</string>
-    <string name="healt_oxy_lowsat">Die Sauerstoff-Sättigung ist bedenklich niedrig.</string>
-    <string name="healt_oxy_lowpls">Der Puls ist bedenklich niedrig.</string>
-    <string name="healt_oxy_highpls">Der Puls ist bedenklich hoch.</string>
-    <string name="healt_oxy_activity">Sie haben eine Sauerstoff-Sättigung von %1$d %%. Ihr Puls ist %2$d.</string>
-    <string name="healt_oxy_activity_du">Du hast eine Sauerstoff-Sättigung von %1$d %%. Dein Puls ist %2$d.</string>
+    <string name="health_oxy_spoken">Die letzte Messung ergab eine Sauerstoff-Sättigung von %1$d Prozent. Der Puls beträgt %2$d</string>
+    <string name="health_oxy_alert">%1$s hat eine Sauerstoff-Sättigung von %2$s Prozent bei einem Puls von %3$s</string>
+    <string name="health_oxy_lowsat">Die Sauerstoff-Sättigung ist bedenklich niedrig.</string>
+    <string name="health_oxy_lowpls">Der Puls ist bedenklich niedrig.</string>
+    <string name="health_oxy_highpls">Der Puls ist bedenklich hoch.</string>
+    <string name="health_oxy_activity">Sie haben eine Sauerstoff-Sättigung von %1$d %%. Ihr Puls ist %2$d.</string>
+    <string name="health_oxy_activity_du">Du hast eine Sauerstoff-Sättigung von %1$d %%. Dein Puls ist %2$d.</string>
 
     <string-array name="phone_labels_vals">
         <item>Zuhause</item>

@@ -94,7 +94,7 @@ public class HealthBPM extends HealthBase
         String bval = lastSys + ":" + lastDia;
         String puls = "" + lastPls;
 
-        String text = Simple.getTrans(R.string.healt_bpm_alert, name, bval, puls)
+        String text = Simple.getTrans(R.string.health_bpm_alert, name, bval, puls)
                 + " " + Simple.getTrans(resid);
 
         JSONObject assistMessage = new JSONObject();
@@ -113,8 +113,8 @@ public class HealthBPM extends HealthBase
         String type = Json.getString(lastRecord, "type");
         if (!Simple.equals(type, "BPMMeasurement")) return;
 
-        String sm = Simple.getTrans(R.string.healt_bpm_spoken, lastSys, lastDia, lastPls);
-        String am = Simple.getTrans(R.string.healt_bpm_activity, lastSys, lastDia, lastPls);
+        String sm = Simple.getTrans(R.string.health_bpm_spoken, lastSys, lastDia, lastPls);
+        String am = Simple.getTrans(R.string.health_bpm_activity, lastSys, lastDia, lastPls);
 
         Speak.speak(sm);
         ActivityManager.recordActivity(am);
@@ -133,9 +133,9 @@ public class HealthBPM extends HealthBase
                         ((Integer.parseInt(lp[ 0 ]) >= lastSys) ||
                                 (Integer.parseInt(lp[ 1 ]) >= lastDia)))
                 {
-                    Speak.speak(Simple.getTrans(R.string.healt_bpm_lowpb));
-                    ActivityManager.recordAlert(R.string.healt_bpm_lowpb);
-                    informAssistance(R.string.healt_bpm_lowpb);
+                    Speak.speak(Simple.getTrans(R.string.health_bpm_lowpb));
+                    ActivityManager.recordAlert(R.string.health_bpm_lowpb);
+                    informAssistance(R.string.health_bpm_lowpb);
                 }
             }
         }
@@ -156,9 +156,9 @@ public class HealthBPM extends HealthBase
                         ((Integer.parseInt(hp[ 0 ]) >= lastSys) ||
                                 (Integer.parseInt(hp[ 1 ]) >= lastDia)))
                 {
-                    Speak.speak(Simple.getTrans(R.string.healt_bpm_highbp));
-                    ActivityManager.recordAlert(R.string.healt_bpm_highbp);
-                    informAssistance(R.string.healt_bpm_highbp);
+                    Speak.speak(Simple.getTrans(R.string.health_bpm_highbp));
+                    ActivityManager.recordAlert(R.string.health_bpm_highbp);
+                    informAssistance(R.string.health_bpm_highbp);
                 }
             }
         }

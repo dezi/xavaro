@@ -170,8 +170,8 @@
       }
     },
 
-    "mobil.mopo.de": {
-      "url": "http://mobil.mopo.de/",
+    "www.mopo.de": {
+      "url": "http://www.mopo.de/",
       "icon": "http://pbs.twimg.com/profile_images/700585031912153090/LPBp5cA4_400x400.png",
 
       "label": "MOPO",
@@ -185,7 +185,7 @@
         "sample": "Ich möchte die MOPO lesen"
       },
 
-      "subdomains": [ "jobs.mopo.de", "alster.mopo.de" ]
+      "subdomains": [ "jobs.mopo.de", "alster.mopo.de", "mobil.mopo.de" ]
     },
 
     "www.svz.de": {

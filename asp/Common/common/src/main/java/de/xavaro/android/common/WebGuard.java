@@ -247,109 +247,115 @@ public class WebGuard extends WebViewClient
         // Do more cherry picking here.
         //
 
-        if (follow.getScheme().equals("mailto") && CommonConfigs.likeEmail)
+        if (follow.getScheme() != null)
         {
-            //
-            // We like Email.
-            //
-
-            try
+            if (follow.getScheme().equals("mailto") && CommonConfigs.likeEmail)
             {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(follow);
-                context.startActivity(intent);
-            }
-            catch (Exception ignore)
-            {
-            }
+                //
+                // We like Email.
+                //
 
-            return true;
-        }
-
-        if (follow.getScheme().equals("whatsapp") && CommonConfigs.likeWhatsApp)
-        {
-            //
-            // We love WhatsApp.
-            //
-
-            try
-            {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(follow);
-                intent.setPackage(CommonConfigs.packageWhatsApp);
-                context.startActivity(intent);
-            }
-            catch (Exception ignore)
-            {
-            }
-
-            return true;
-        }
-
-        if (follow.getHost().endsWith("twitter.com") && CommonConfigs.likeTwitter)
-        {
-            //
-            // We like Twitter.
-            //
-
-            try
-            {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(follow);
-                intent.setPackage(CommonConfigs.packageTwitter);
-                context.startActivity(intent);
-
-                return true;
-            }
-            catch (Exception ignore)
-            {
-                ignore.printStackTrace();
-            }
-        }
-
-        if (follow.getHost().equals("plus.google.com") && CommonConfigs.likeGooglePlus)
-        {
-            //
-            // We hate GooglePlus.
-            //
-
-            try
-            {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(follow);
-                intent.setPackage(CommonConfigs.packageGooglePlus);
-                context.startActivity(intent);
-
-                return true;
-            }
-            catch (Exception ignore)
-            {
-                ignore.printStackTrace();
-            }
-        }
-
-        if (follow.getHost().endsWith(".facebook.com") && CommonConfigs.likeFacebook)
-        {
-            //
-            // We hate Facebook.
-            //
-
-            try
-            {
-                if (follow.getQueryParameter("u") != null)
+                try
                 {
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setType("text/plain");
-                    intent.putExtra("android.intent.extra.TEXT", follow.getQueryParameter("u"));
-                    intent.setPackage(CommonConfigs.packageFacebook);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(follow);
+                    context.startActivity(intent);
+                }
+                catch (Exception ignore)
+                {
+                }
+
+                return true;
+            }
+
+            if (follow.getScheme().equals("whatsapp") && CommonConfigs.likeWhatsApp)
+            {
+                //
+                // We love WhatsApp.
+                //
+
+                try
+                {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(follow);
+                    intent.setPackage(CommonConfigs.packageWhatsApp);
+                    context.startActivity(intent);
+                }
+                catch (Exception ignore)
+                {
+                }
+
+                return true;
+            }
+        }
+
+        if (follow.getHost() != null)
+        {
+            if (follow.getHost().endsWith("twitter.com") && CommonConfigs.likeTwitter)
+            {
+                //
+                // We like Twitter.
+                //
+
+                try
+                {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(follow);
+                    intent.setPackage(CommonConfigs.packageTwitter);
                     context.startActivity(intent);
 
                     return true;
                 }
+                catch (Exception ignore)
+                {
+                    ignore.printStackTrace();
+                }
             }
-            catch (Exception ignore)
+
+            if (follow.getHost().equals("plus.google.com") && CommonConfigs.likeGooglePlus)
             {
-                ignore.printStackTrace();
+                //
+                // We hate GooglePlus.
+                //
+
+                try
+                {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(follow);
+                    intent.setPackage(CommonConfigs.packageGooglePlus);
+                    context.startActivity(intent);
+
+                    return true;
+                }
+                catch (Exception ignore)
+                {
+                    ignore.printStackTrace();
+                }
+            }
+
+            if (follow.getHost().endsWith(".facebook.com") && CommonConfigs.likeFacebook)
+            {
+                //
+                // We hate Facebook.
+                //
+
+                try
+                {
+                    if (follow.getQueryParameter("u") != null)
+                    {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.putExtra("android.intent.extra.TEXT", follow.getQueryParameter("u"));
+                        intent.setPackage(CommonConfigs.packageFacebook);
+                        context.startActivity(intent);
+
+                        return true;
+                    }
+                }
+                catch (Exception ignore)
+                {
+                    ignore.printStackTrace();
+                }
             }
         }
 

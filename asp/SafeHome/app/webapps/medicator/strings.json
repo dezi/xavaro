@@ -21,6 +21,15 @@
 
     {
       "action" : "take",
+      "keywords": [ "blood oxygen"  ],
+      "response": "You can enter Your values now",
+      "sample": "I would like to take my blood oxygen now",
+      "icon": "/webapps/medicator/health_oxy_440x440.png",
+      "tag": "ZZO"
+    },
+
+    {
+      "action" : "take",
       "keywords": [ "blood sugar" ],
       "response": "You can enter Your value now",
       "sample": "I would like to take my blood sugar now",
@@ -57,26 +66,30 @@
   "events.take.weight.follow" : "Weigh now",
   "events.take.bloodglucose.follow" : "Measure now",
   "events.take.bloodpressure.follow" : "Measure now",
+  "events.take.bloodoxygen.follow" : "Measure now",
 
   "events.take.pills.decline" : "Not taken",
   "events.take.weight.decline" : "Not weighed",
   "events.take.bloodglucose.decline" : "Not measured",
-  "events.take.bloodpressure.decline" : "Not measured",
+  "events.take.bloodoxygen.decline" : "Not measured",
 
   "events.didnotyettake.pills" : "%1$s did not yet take his medication.",
   "events.didnotyettake.weight" : "%1$s did not yet take his weight.",
   "events.didnotyettake.bloodglucose" : "%1$s did not yet measured his blood sugar.",
   "events.didnotyettake.bloodpressure" : "%1$s did not yet measured his blood pressure.",
+  "events.didnotyettake.bloodoxygen" : "%1$s did not yet measured his blood oxygen.",
 
   "events.didnowtake.pills" : "%1$s did just take his medication.",
   "events.didnowtake.weight" : "%1$s did just take his weight.",
   "events.didnowtake.bloodglucose" : "%1$s did just measure his blood sugar.",
   "events.didnowtake.bloodpressure" : "%1$s did just measure his blood pressure.",
+  "events.didnowtake.bloodoxygen" : "%1$s did just measure his blood oxygen.",
 
   "activity.took.pills" : "You took Your medication.",
   "activity.took.weight" : "You took Your weight.",
   "activity.took.bloodglucose" : "You measured Your blood sugar.",
   "activity.took.bloodpressure" : "You measured Your blood pressure.",
+  "activity.took.bloodoxygen" : "You measured Your blood oxygen.",
 
   "EOL" : true
 }

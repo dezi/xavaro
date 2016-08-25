@@ -91,7 +91,7 @@ public class HealthOxy extends HealthBase
         String bval = "" + lastSat;
         String puls = "" + lastPls;
 
-        String text = Simple.getTrans(R.string.healt_oxy_alert, name, bval, puls)
+        String text = Simple.getTrans(R.string.health_oxy_alert, name, bval, puls)
                 + " " + Simple.getTrans(resid);
 
         JSONObject assistMessage = new JSONObject();
@@ -110,8 +110,8 @@ public class HealthOxy extends HealthBase
         String type = Json.getString(lastRecord, "type");
         if (! Simple.equals(type, "OxyMeasurement")) return;
 
-        String sm = Simple.getTrans(R.string.healt_oxy_spoken, lastSat, lastPls);
-        String am = Simple.getTrans(R.string.healt_oxy_activity, lastSat, lastPls);
+        String sm = Simple.getTrans(R.string.health_oxy_spoken, lastSat, lastPls);
+        String am = Simple.getTrans(R.string.health_oxy_activity, lastSat, lastPls);
 
         Speak.speak(sm);
         ActivityManager.recordActivity(am);
@@ -124,9 +124,9 @@ public class HealthOxy extends HealthBase
 
             if (low >= lastSat)
             {
-                Speak.speak(Simple.getTrans(R.string.healt_oxy_lowsat));
-                ActivityManager.recordAlert(R.string.healt_oxy_lowsat);
-                informAssistance(R.string.healt_oxy_lowsat);
+                Speak.speak(Simple.getTrans(R.string.health_oxy_lowsat));
+                ActivityManager.recordAlert(R.string.health_oxy_lowsat);
+                informAssistance(R.string.health_oxy_lowsat);
             }
         }
         catch (Exception ex)
@@ -140,9 +140,9 @@ public class HealthOxy extends HealthBase
 
             if (low >= lastPls)
             {
-                Speak.speak(Simple.getTrans(R.string.healt_oxy_highpls));
-                ActivityManager.recordAlert(R.string.healt_oxy_highpls);
-                informAssistance(R.string.healt_oxy_highpls);
+                Speak.speak(Simple.getTrans(R.string.health_oxy_lowpls));
+                ActivityManager.recordAlert(R.string.health_oxy_lowpls);
+                informAssistance(R.string.health_oxy_lowpls);
             }
         }
         catch (Exception ex)
@@ -156,9 +156,9 @@ public class HealthOxy extends HealthBase
 
             if (high <= lastPls)
             {
-                Speak.speak(Simple.getTrans(R.string.healt_oxy_lowpls));
-                ActivityManager.recordAlert(R.string.healt_oxy_lowpls);
-                informAssistance(R.string.healt_oxy_lowpls);
+                Speak.speak(Simple.getTrans(R.string.health_oxy_highpls));
+                ActivityManager.recordAlert(R.string.health_oxy_highpls);
+                informAssistance(R.string.health_oxy_highpls);
             }
         }
         catch (Exception ex)

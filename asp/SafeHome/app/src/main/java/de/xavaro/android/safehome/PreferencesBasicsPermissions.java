@@ -45,15 +45,21 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
     public NicedPreferences.NiceListPreference PrefContactsProfRead;
     public NicedPreferences.NiceListPreference PrefContactsRead;
     public NicedPreferences.NiceListPreference PrefContactsWrite;
+
     public NicedPreferences.NiceListPreference PrefPhoneCall;
     public NicedPreferences.NiceListPreference PrefPhoneRead;
+
     public NicedPreferences.NiceListPreference PrefStorageRead;
     public NicedPreferences.NiceListPreference PrefStorageWrite;
-    public NicedPreferences.NiceListPreference PrefRecordAudio;
-    public NicedPreferences.NiceListPreference PrefSystemAlertWindow;
+
+    public NicedPreferences.NiceListPreference PrefLocationCoarse;
+    public NicedPreferences.NiceListPreference PrefLocationFine;
 
     public NicedPreferences.NiceListPreference PrefBluetoothRead;
     public NicedPreferences.NiceListPreference PrefBluetoothAdmin;
+
+    public NicedPreferences.NiceListPreference PrefRecordAudio;
+    public NicedPreferences.NiceListPreference PrefSystemAlertWindow;
 
     public NicedPreferences.NiceListPreference PrefNetworkInternet;
     public NicedPreferences.NiceListPreference PrefNetworkState;
@@ -238,6 +244,100 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         PrefStorageWrite = lp;
 
         //
+        // Location permissions.
+        //
+
+        ip = new NicedPreferences.NiceInfoPreference(context);
+        ip.setTitle(R.string.pref_basic_permissions_location);
+        ip.setSummary(R.string.pref_basic_permissions_location_summary);
+        preferences.add(ip);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".location.coarse");
+        lp.setTitle(R.string.pref_basic_permissions_location_coarse);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission. ACCESS_COARSE_LOCATION );
+            }
+        });
+
+        preferences.add(lp);
+        PrefLocationCoarse = lp;
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".location.fine");
+        lp.setTitle(R.string.pref_basic_permissions_location_fine);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+            }
+        });
+
+        preferences.add(lp);
+        PrefLocationFine = lp;
+
+        //
+        // Bluetooth permissions.
+        //
+
+        ip = new NicedPreferences.NiceInfoPreference(context);
+        ip.setTitle(R.string.pref_basic_permissions_bluetooth);
+        ip.setSummary(R.string.pref_basic_permissions_bluetooth_summary);
+        preferences.add(ip);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".bluetooth.read");
+        lp.setTitle(R.string.pref_basic_permissions_bluetooth_read);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.BLUETOOTH);
+            }
+        });
+
+        preferences.add(lp);
+        PrefBluetoothRead = lp;
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(permprefix + ".bluetooth.admin");
+        lp.setTitle(R.string.pref_basic_permissions_bluetooth_admin);
+        lp.setEntries(permStatusText);
+        lp.setEntryValues(permStatusKeys);
+
+        lp.setOnclick(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                requestPermission(Manifest.permission.BLUETOOTH_ADMIN);
+            }
+        });
+
+        preferences.add(lp);
+        PrefBluetoothAdmin = lp;
+
+        //
         // Microphone permissions.
         //
 
@@ -292,53 +392,6 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
 
         preferences.add(lp);
         PrefSystemAlertWindow = lp;
-
-        //
-        // Bluetooth permissions.
-        //
-
-        ip = new NicedPreferences.NiceInfoPreference(context);
-        ip.setTitle(R.string.pref_basic_permissions_bluetooth);
-        ip.setSummary(R.string.pref_basic_permissions_bluetooth_summary);
-        preferences.add(ip);
-
-        lp = new NicedPreferences.NiceListPreference(context);
-
-        lp.setKey(permprefix + ".bluetooth.read");
-        lp.setTitle(R.string.pref_basic_permissions_bluetooth_read);
-        lp.setEntries(permStatusText);
-        lp.setEntryValues(permStatusKeys);
-
-        lp.setOnclick(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                requestPermission(Manifest.permission.BLUETOOTH);
-            }
-        });
-
-        preferences.add(lp);
-        PrefBluetoothRead = lp;
-
-        lp = new NicedPreferences.NiceListPreference(context);
-
-        lp.setKey(permprefix + ".bluetooth.admin");
-        lp.setTitle(R.string.pref_basic_permissions_bluetooth_admin);
-        lp.setEntries(permStatusText);
-        lp.setEntryValues(permStatusKeys);
-
-        lp.setOnclick(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                requestPermission(Manifest.permission.BLUETOOTH_ADMIN);
-            }
-        });
-
-        preferences.add(lp);
-        PrefBluetoothAdmin = lp;
 
         //
         // Network permissions.
@@ -530,12 +583,18 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         }
 
         //
-        // Workaround for bug in Android permission system.
+        // Workarounds for bugs in Android permission system.
         //
 
         if (permission.equals("android.permission.READ_PROFILE"))
         {
             permission = Manifest.permission.READ_CONTACTS;
+        }
+
+        if (permission.equals(Manifest.permission.BLUETOOTH) ||
+                permission.equals(Manifest.permission.BLUETOOTH_ADMIN))
+        {
+            permission = Manifest.permission.ACCESS_COARSE_LOCATION;
         }
 
         final String cbpermission = permission;
@@ -567,11 +626,24 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         // check permission method returns true. This is not correct, unless
         // the user has granted access to the contacts permissions.
         //
+        // Same bullshit for "BLUETOOTH_ADMIN". This does not work w/o accessing
+        // fine or coarse locations granted.
+        //
 
         if (permission.equals("android.permission.READ_PROFILE"))
         {
             int res1 = ContextCompat.checkSelfPermission(Simple.getActContext(), permission);
             int res2 = ContextCompat.checkSelfPermission(Simple.getActContext(), Manifest.permission.READ_CONTACTS);
+
+            boolean ok = ((res1 == PackageManager.PERMISSION_GRANTED) && (res2 == PackageManager.PERMISSION_GRANTED));
+            return ok ? "grant" : "deny";
+        }
+
+        if (permission.equals(Manifest.permission.BLUETOOTH) ||
+                permission.equals(Manifest.permission.BLUETOOTH_ADMIN))
+        {
+            int res1 = ContextCompat.checkSelfPermission(Simple.getActContext(), permission);
+            int res2 = ContextCompat.checkSelfPermission(Simple.getActContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
 
             boolean ok = ((res1 == PackageManager.PERMISSION_GRANTED) && (res2 == PackageManager.PERMISSION_GRANTED));
             return ok ? "grant" : "deny";
@@ -608,12 +680,15 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
             PrefStorageRead.setValue(checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE));
             PrefStorageWrite.setValue(checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE));
 
-            PrefRecordAudio.setValue(checkPermission(Manifest.permission.RECORD_AUDIO));
-
-            PrefSystemAlertWindow.setValue(checkPermission(Manifest.permission.SYSTEM_ALERT_WINDOW));
+            PrefLocationCoarse.setValue(checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION));
+            PrefLocationFine.setValue(checkPermission(Manifest.permission.ACCESS_FINE_LOCATION));
 
             PrefBluetoothRead.setValue(checkPermission(Manifest.permission.BLUETOOTH));
             PrefBluetoothAdmin.setValue(checkPermission(Manifest.permission.BLUETOOTH_ADMIN));
+
+            PrefRecordAudio.setValue(checkPermission(Manifest.permission.RECORD_AUDIO));
+
+            PrefSystemAlertWindow.setValue(checkPermission(Manifest.permission.SYSTEM_ALERT_WINDOW));
 
             PrefNetworkInternet.setValue(checkPermission(Manifest.permission.INTERNET));
             PrefNetworkState.setValue(checkPermission(Manifest.permission.ACCESS_NETWORK_STATE));

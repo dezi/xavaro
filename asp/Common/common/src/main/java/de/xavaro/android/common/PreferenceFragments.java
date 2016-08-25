@@ -446,8 +446,6 @@ public class PreferenceFragments
             View baseview = getActivity().getWindow().getDecorView();
             if (baseview == null) return;
 
-            StaticUtils.dumpViewsChildren(baseview);
-
             View view;
 
             //

@@ -33,7 +33,7 @@ public class PreferencesWebApps
 {
     //region Webapps preferences
 
-    public static class WebappFragment extends PreferenceFragments.BasicFragmentStub
+    public static class WebappFragment extends PreferenceFragments.EnableFragmentStub
     {
         private static final String LOGTAG = WebappFragment.class.getSimpleName();
 
@@ -81,6 +81,7 @@ public class PreferencesWebApps
             webappname = getArguments().getString("webappname");
             webappkeyprefix = keyprefix + ".pref." + webappname + ".";
             icondraw = WebApp.getAppIcon(webappname);
+            masterenable = WebApp.getLabel(webappname) + " " + "freischalten";
 
             super.onCreate(savedInstanceState);
         }
@@ -100,8 +101,8 @@ public class PreferencesWebApps
             lp.setKey(keyprefix + ".mode." + webappname);
             lp.setEntries(vals);
             lp.setEntryValues(keys);
-            lp.setDefaultValue("inact");
-            lp.setTitle("Aktiviert");
+            lp.setDefaultValue("none");
+            lp.setTitle("Anzeige");
 
             lp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
             {
@@ -120,6 +121,7 @@ public class PreferencesWebApps
             onEnableStateChanged(Simple.getSharedPrefString(lp.getKey()));
 
             preferences.add(lp);
+            activekeys.add(lp.getKey());
 
             if ((webprefs == null) && WebApp.hasPreferences(webappname))
             {
@@ -367,9 +369,10 @@ public class PreferencesWebApps
                 ArrayList<Preference> newprefs = new ArrayList<>();
 
                 //
-                // Migrate first enable preference.
+                // Migrate first enable and display preference.
                 //
 
+                newprefs.add(preferences.remove(0));
                 newprefs.add(preferences.remove(0));
 
                 //

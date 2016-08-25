@@ -25,7 +25,8 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifySer
     {
         JSONArray launchitems = new JSONArray();
 
-        if (GlobalConfigs.BetaFlag)
+        //noinspection PointlessBooleanExpression
+        if (GlobalConfigs.BetaFlag && Simple.getSharedPrefBoolean("developer.display.betaversion"))
         {
             JSONObject launchitem = new JSONObject();
 
@@ -48,7 +49,6 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifySer
         Simple.makePost(checkBeta);
     }
 
-    private String latestVersion;
     private boolean isNewVersion;
 
     private final Runnable checkBeta = new Runnable()
@@ -66,7 +66,7 @@ public class LaunchItemBeta extends LaunchItem implements NotifyIntent.NotifySer
 
                 if (betaapp != null)
                 {
-                    latestVersion = Json.getString(betaapp, "latest");
+                    String latestVersion = Json.getString(betaapp, "latest");
 
                     if ((latestVersion != null) && (latestVersion.compareTo(GlobalConfigs.BetaVersion) > 0))
                     {
