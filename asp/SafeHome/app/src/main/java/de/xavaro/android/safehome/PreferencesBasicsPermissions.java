@@ -196,6 +196,11 @@ public class PreferencesBasicsPermissions extends PreferenceFragments.BasicFragm
         preferences.add(lp);
         PrefPhoneCall = lp;
 
+        Log.d(LOGTAG, "=============perm====acc=" + checkPermission(Manifest.permission.BIND_ACCESSIBILITY_SERVICE));
+        Log.d(LOGTAG, "=============perm====not=" + checkPermission(Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE));
+
+        requestPermission(Manifest.permission.BIND_ACCESSIBILITY_SERVICE);
+
         //
         // Storage permissions.
         //

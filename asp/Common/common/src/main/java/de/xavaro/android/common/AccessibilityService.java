@@ -1,8 +1,8 @@
 package de.xavaro.android.common;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.provider.Settings;
 import android.view.accessibility.AccessibilityEvent;
+import android.provider.Settings;
 import android.content.Intent;
 import android.util.Log;
 
