@@ -13,14 +13,32 @@ blockgame.createFrame = function()
     var wid = xx.topdiv.clientWidth;
     var hei = xx.topdiv.clientHeight;
 
-    xx.gamesize  = Math.floor(Math.min(wid, hei) * 85 / 100);
-    xx.gamesize -= Math.floor(xx.gamesize % 6);
-    xx.fieldsize = Math.floor(xx.gamesize / 6);
+    xx.areasize  = Math.floor(Math.min(wid, hei) * 85 / 100);
+    xx.areaPanel = WebLibSimple.createDivWidHei(
+        -xx.areasize / 2, -xx.areasize / 2,
+        xx.areasize, xx.areasize,
+        "areaPanel", xx.centerDiv);
+
+    xx.areaPanel.style.backgroundImage = "url('walls/brick-blue.jpg')";
+
+    xx.gamesize   = xx.areasize - 40;
+    xx.gamesize  -= Math.floor(xx.gamesize % 6);
+
+    xx.bordersize = Math.floor((xx.areasize - xx.gamesize) / 2);
+    xx.fieldsize  = Math.floor(xx.gamesize / 6);
+
+    xx.exitDiv = WebLibSimple.createDivWidHei(
+        xx.bordersize + (6 * xx.fieldsize),
+        xx.bordersize + (2 * xx.fieldsize),
+        xx.bordersize, xx.fieldsize,
+        "exitDiv", xx.areaPanel);
+
+    WebLibSimple.setBGColor(xx.exitDiv, "#ffffff");
 
     xx.gamePanel = WebLibSimple.createDivWidHei(
-        -xx.gamesize / 2, -xx.gamesize / 2,
+        xx.bordersize, xx.bordersize,
         xx.gamesize, xx.gamesize,
-        "gamePanel", xx.centerDiv);
+        "gamePanel", xx.areaPanel);
 
     xx.gamePanel.style.backgroundImage = "url('walls/green-wool.jpg')";
 
@@ -282,6 +300,11 @@ blockgame.onTouchStart = function(event)
             xx.touch.maxX += xx.fieldsize;
             pos++;
         }
+
+        if ((((pos % 6) + len) == 6) && (13 <= block.pos) && (block.pos <= 18))
+        {
+            xx.touch.maxX += xx.fieldsize * 3;
+        }
     }
     else
     {
@@ -413,6 +436,15 @@ blockgame.onTouchEnd = function(event)
 
     var xpos = Math.floor(target.myblock.left / xx.fieldsize)
     var ypos = Math.floor(target.myblock.top  / xx.fieldsize);
+
+    if ((xpos + target.myblock.len) >= 6)
+    {
+        //
+        // Blue block in exit.
+        //
+        
+        xpos = 6 - target.myblock.len;
+    }
 
     console.log("=======>>>>>>>> xpos=" + xpos);
     console.log("=======>>>>>>>> ypos=" + ypos);
