@@ -34,6 +34,11 @@ medicator.onTakeWeight = function(doit)
 
 medicator.onTakeThat = function(doit, mediform)
 {
+    var now = new Date().getTime()
+
+    var bestForm = null;
+    var bestDiff = 0;
+
     for (var formkey in medicator.configs)
     {
         var config = medicator.configs[ formkey ];
@@ -49,10 +54,20 @@ medicator.onTakeThat = function(doit, mediform)
 
         if (confmediform != mediform) continue;
 
-        var lauchitem = medicator.lauchis[ formkey ];
-        medicator.onClickEventItem(lauchitem, null, true);
+        var targetDate = new Date(config.medisets[ 0 ].date).getTime();
+        var targetDiff = Math.abs(now - targetDate);
 
-        break;
+        if ((bestForm == null) || ((targetDiff + (30 * 60 * 1000)) < bestDiff))
+        {
+            bestForm = formkey;
+            bestDiff = targetDiff;
+        }
+    }
+
+    if (bestForm)
+    {
+        var lauchitem = medicator.lauchis[ bestForm ];
+        medicator.onClickEventItem(lauchitem, null, true);
     }
 }
 
@@ -521,7 +536,7 @@ medicator.onClickEventItem = function(target, ctarget, noclick)
             {
                 dlconfig.title = "Blutsauerstoff messen";
 
-                whatSpan.saturationEdit = medicator.createNumberInput(whatSpan, mediset.systolic, "Sättigung", true);
+                whatSpan.saturationEdit = medicator.createNumberInput(whatSpan, mediset.saturation, "Sättigung", true);
                 whatSpan.saturationEdit.onkeyup = medicator.onBloodOxygenKeypress;
 
                 whatSpan.pulsEdit = medicator.createNumberInput(whatSpan, mediset.puls, "Puls");
@@ -639,12 +654,16 @@ medicator.computePillPositions = function(launchitem)
 
 medicator.updateEvents = function()
 {
+    medicator.comingEvents = JSON.parse(WebAppEvents.getComingEvents());
+
     var now = new Date().getTime();
 
     for (var formkey in medicator.configs)
     {
         var config = medicator.configs[ formkey ];
         var date = new Date(config.date).getTime();
+
+        console.log("medicator.updateEvents:" + JSON.stringify(config));
 
         var overicon = null;
 
@@ -676,7 +695,7 @@ medicator.updateEvents = function()
         WebLibSimple.setImageSource(overimg, overicon)
     }
 
-    setTimeout(medicator.updateEvents, 30000);
+    setTimeout(medicator.updateEvents, 10000);
 }
 
 medicator.getItemLabel = function(event)

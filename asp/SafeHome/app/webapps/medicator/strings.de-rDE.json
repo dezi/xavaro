@@ -56,6 +56,8 @@
   "events.take.pills.du" : "Du musst noch Deine Medikamente einnehmen.",
   "events.take.weight" : "Sie müssen sich noch wiegen.",
   "events.take.weight.du" : "Du musst Dich noch wiegen.",
+  "events.take.bloodoxygen" : "Sie müssen noch Ihre Sauerstoffsättigung messen.",
+  "events.take.bloodoxygen.du" : "Du musst noch Deine Sauerstoffsättigung messen.",
   "events.take.bloodglucose" : "Sie müssen noch Ihren Blutzucker messen.",
   "events.take.bloodglucose.du" : "Du musst noch Deinen Blutzucker messen.",
   "events.take.bloodpressure" : "Sie müssen noch Ihren Blutdruck messen.",
@@ -63,21 +65,25 @@
 
   "events.take.pills.follow" : "Jetzt nehmen",
   "events.take.weight.follow" : "Jetzt wiegen",
+  "events.take.bloodoxygen.follow" : "Jetzt messen",
   "events.take.bloodglucose.follow" : "Jetzt messen",
   "events.take.bloodpressure.follow" : "Jetzt messen",
 
   "events.take.pills.decline" : "Nicht genommen",
   "events.take.weight.decline" : "Nicht gewogen",
+  "events.take.bloodoxygen.decline" : "Nicht gemessen",
   "events.take.bloodglucose.decline" : "Nicht gemessen",
   "events.take.bloodpressure.decline" : "Nicht gemessen",
 
   "events.didnotyettake.pills" : "%1$s hat seine Medikamente noch nicht genommen.",
   "events.didnotyettake.weight" : "%1$s hat sich noch nicht gewogen.",
+  "events.didnotyettake.bloodoxygen" : "%1$s hat noch nicht die Sauerstoffsättigung gemessen.",
   "events.didnotyettake.bloodglucose" : "%1$s hat noch nicht den Blutzucker gemessen.",
   "events.didnotyettake.bloodpressure" : "%1$s hat noch nicht den Blutdruck gemessen.",
 
   "events.didnowtake.pills" : "%1$s hat seine Medikamente jetzt gerade genommen.",
   "events.didnowtake.weight" : "%1$s hat sich jetzt gerade gewogen.",
+  "events.didnowtake.bloodoxygen" : "%1$s hat jetzt gerade die Sauerstoffsättigung gemessen.",
   "events.didnowtake.bloodglucose" : "%1$s hat jetzt gerade den Blutzucker gemessen.",
   "events.didnowtake.bloodpressure" : "%1$s hat jetzt gerade den Blutdruck gemessen.",
 
@@ -85,6 +91,8 @@
   "activity.took.pills.du" : "Du hast deine Medikamente genommen.",
   "activity.took.weight" : "Sie haben sich gewogen.",
   "activity.took.weight.du" : "Du hast dich gewogen.",
+  "activity.took.bloodoxygen" : "Sie haben ihre Sauerstoffsättigung gemessen.",
+  "activity.took.bloodoxygen.du" : "Du hast deine Sauerstoffsättigung gemessen.",
   "activity.took.bloodglucose" : "Sie haben ihren Blutzucker gemessen.",
   "activity.took.bloodglucose.du" : "Du hast deinen Blutzucker gemessen.",
   "activity.took.bloodpressure" : "Sie haben ihren Blutdruck gemessen.",

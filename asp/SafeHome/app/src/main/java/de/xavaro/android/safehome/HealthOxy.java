@@ -2,10 +2,12 @@ package de.xavaro.android.safehome;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.ChatManager;
+import de.xavaro.android.common.EventManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
@@ -104,6 +106,37 @@ public class HealthOxy extends HealthBase
         Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
     }
 
+    private void evaluteEvents()
+    {
+        JSONArray events = EventManager.getComingEvents("webapps.medicator");
+        if (events == null) return;
+
+        for (int inx = 0; inx < events.length(); inx++)
+        {
+            JSONObject event = Json.getObject(events, inx);
+
+            if ((event == null) || Json.getBoolean(event, "completed")) continue;
+
+            String medication = Json.getString(event, "medication");
+            if ((medication == null) || ! medication.endsWith(",ZZO")) continue;
+
+            //
+            // Event is suitable.
+            //
+
+            Json.put(event, "taken", true);
+            Json.put(event, "takendate", lastDts);
+            Json.put(event, "saturation", lastSat);
+            Json.put(event, "puls", lastPls);
+
+            EventManager.updateComingEvent("webapps.medicator", event);
+
+            Log.d(LOGTAG, "evaluteEvents: " + event.toString());
+
+            break;
+        }
+    }
+
     private void evaluateMessage()
     {
         if (lastRecord == null) return;
@@ -115,6 +148,8 @@ public class HealthOxy extends HealthBase
 
         Speak.speak(sm);
         ActivityManager.recordActivity(am);
+
+        evaluteEvents();
 
         if (!Simple.getSharedPrefBoolean("health.oxy.alert.enable")) return;
 

@@ -93,7 +93,7 @@ medicator.getNextEvents = function()
         }
     }
 
-    medicator.getNextEventsTimer = setTimeout(medicator.getNextEvents,  10 * 1000);
+    medicator.getNextEventsTimer = setTimeout(medicator.getNextEvents, 10 * 1000);
 
     if (! medicator.requestUnloadTimer)
     {
@@ -191,16 +191,16 @@ medicator.remindConfig = function(config)
     {
         var notify = {};
 
-        notify.key         = "medicator.take.bloodoxy";
-        notify.title       = WebLibStrings.getTrans("events.take.bloodoxy");
+        notify.key         = "medicator.take.bloodoxygen";
+        notify.title       = WebLibStrings.getTrans("events.take.bloodoxygen");
         notify.icon        = "health_oxy_440x440.png";
         notify.importance  = medicator.getImportance(config);
-        notify.followText  = WebLibStrings.getTrans("events.take.bloodoxy.follow");
-        notify.declineText = WebLibStrings.getTrans("events.take.bloodoxy.decline");
+        notify.followText  = WebLibStrings.getTrans("events.take.bloodoxygen.follow");
+        notify.declineText = WebLibStrings.getTrans("events.take.bloodoxygen.decline");
         notify.speakOnce   = (newtime < nowtime);
 
-        notify.followJavaCall  = "medicator.onTakeBloodOxy(true);"
-        notify.declineJavaCall = "medicator.onTakeBloodOxy(false);"
+        notify.followJavaCall  = "medicator.onTakeBloodOxygen(true);"
+        notify.declineJavaCall = "medicator.onTakeBloodOxygen(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
 

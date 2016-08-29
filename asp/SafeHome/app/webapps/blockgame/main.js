@@ -442,7 +442,7 @@ blockgame.onTouchEnd = function(event)
         //
         // Blue block in exit.
         //
-        
+
         xpos = 6 - target.myblock.len;
     }
 
