@@ -91,6 +91,8 @@ public class LaunchItemBattery extends LaunchItem implements NotifyIntent.Notify
             icon.setImageResource(resid);
             lastresname = resname;
         }
+
+        setLabelText(Json.getString(config, "label") + " " + percent + "%");
     }
 
     private final Runnable updateBatteryPost = new Runnable()

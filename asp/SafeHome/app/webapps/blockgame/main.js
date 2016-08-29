@@ -6,6 +6,7 @@ blockgame.createFrame = function()
     WebLibSimple.setFontSpecs(xx.topdiv, 32, "bold");
     WebLibSimple.setBGColor(xx.topdiv, "#dddddd");
     xx.topdiv.style.overflow = "hidden";
+    xx.topdiv.style.backgroundImage = "url('walls/wood-seamless.jpg')";
 
     xx.centerDiv = WebLibSimple.createDivWidHei("50%", "50%", 1, 1, "centerDiv", xx.topdiv);
 
@@ -21,7 +22,7 @@ blockgame.createFrame = function()
         xx.gamesize, xx.gamesize,
         "gamePanel", xx.centerDiv);
 
-    WebLibSimple.setBGColor(xx.gamePanel, "#ffdddd");
+    xx.gamePanel.style.backgroundImage = "url('walls/green-wool.jpg')";
 
     xx.buttonTop1div = blockgame.createButton("–");
     xx.buttonTop2div = blockgame.createButton(" ");
@@ -584,10 +585,12 @@ blockgame.buildGame = function()
         if (block.ccc == '#')
         {
             WebLibSimple.setBGColor(block.blockdiv, "#8888ff");
+            block.blockdiv.style.backgroundImage = "url('walls/brick-blue.jpg')";
         }
         else
         {
             WebLibSimple.setBGColor(block.blockdiv, "#cccccc");
+            block.blockdiv.style.backgroundImage = "url('walls/brick-grey.jpg')";
         }
 
         block.blockdiv.scrollBoth = true;
