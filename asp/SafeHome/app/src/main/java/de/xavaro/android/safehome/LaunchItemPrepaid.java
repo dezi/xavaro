@@ -28,17 +28,15 @@ public class LaunchItemPrepaid extends LaunchItem implements
 
         String mode = Simple.getSharedPrefString("monitors.prepaid.mode");
 
-        if (Simple.equals(mode, "home"))
-        {
-            JSONObject launchitem = new JSONObject();
+        JSONObject launchitem = new JSONObject();
 
-            Json.put(launchitem, "type", "prepaid");
-            Json.put(launchitem, "label", "Prepaid SIM");
-            Json.put(launchitem, "notify", "only");
-            Json.put(launchitem, "order", 100);
+        Json.put(launchitem, "type", "prepaid");
+        Json.put(launchitem, "label", "Prepaid SIM");
+        Json.put(launchitem, "order", 100);
 
-            Json.put(launchitems, launchitem);
-        }
+        if (! Simple.equals(mode, "home")) Json.put(launchitem, "notify", "only");
+
+        Json.put(launchitems, launchitem);
 
         return launchitems;
     }
@@ -55,6 +53,8 @@ public class LaunchItemPrepaid extends LaunchItem implements
     @Override
     protected void setConfig()
     {
+        icon.setImageResource(R.drawable.prepaid_600x600);
+
         prepaidDateView = new TextView(getContext());
         prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL);
         prepaidDateView.setTypeface(null, Typeface.BOLD);

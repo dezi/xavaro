@@ -22,17 +22,15 @@ public class LaunchItemBattery extends LaunchItem implements NotifyIntent.Notify
 
         String mode = Simple.getSharedPrefString("monitors.battery.mode");
 
-        if (Simple.equals(mode, "home"))
-        {
-            JSONObject launchitem = new JSONObject();
+        JSONObject launchitem = new JSONObject();
 
-            Json.put(launchitem, "type", "battery");
-            Json.put(launchitem, "label", "Batterie");
-            Json.put(launchitem, "notify", "only");
-            Json.put(launchitem, "order", 100);
+        Json.put(launchitem, "type", "battery");
+        Json.put(launchitem, "label", "Batterie");
+        Json.put(launchitem, "order", 100);
 
-            Json.put(launchitems, launchitem);
-        }
+        if (! Simple.equals(mode, "home")) Json.put(launchitem, "notify", "only");
+
+        Json.put(launchitems, launchitem);
 
         return launchitems;
     }

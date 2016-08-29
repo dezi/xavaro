@@ -52,6 +52,8 @@ public class LaunchItem extends FrameLayout implements
         if (Simple.equals(type, "today"       )) item = new LaunchItemToday(context);
         if (Simple.equals(type, "voice"       )) item = new LaunchItemVoice(context);
         if (Simple.equals(type, "battery"     )) item = new LaunchItemBattery(context);
+        if (Simple.equals(type, "prepaid"     )) item = new LaunchItemPrepaid(context);
+
         if (Simple.equals(type, "health"      )) item = new LaunchItemHealth(context);
         if (Simple.equals(type, "alertcall"   )) item = new LaunchItemAlertcall(context);
         if (Simple.equals(type, "calls"       )) item = new LaunchItemCall(context);
