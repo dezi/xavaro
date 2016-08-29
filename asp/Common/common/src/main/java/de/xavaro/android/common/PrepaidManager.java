@@ -50,15 +50,15 @@ public class PrepaidManager implements AccessibilityService.MessageServiceCallba
 
         if (cashcode == null)
         {
-            phonenumber = Simple.getSharedPrefString("calls.monitors.phonenumber:prepaid");
+            phonenumber = Simple.getSharedPrefString("monitors.prepaid.balance");
             if (phonenumber == null) return false;
         }
         else
         {
-            phonenumber = Simple.getSharedPrefString("calls.monitors.prepaidload:prepaid");
+            phonenumber = Simple.getSharedPrefString("monitors.prepaid.charge");
             if (phonenumber == null) return false;
 
-            phonenumber += cashcode + "#";
+            phonenumber = phonenumber.replace("*#", "*" + cashcode + "#");
         }
 
         this.balanceCallback = callback;

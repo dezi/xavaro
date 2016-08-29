@@ -93,8 +93,8 @@ public class LaunchGroupRoot extends LaunchGroup
         configs.add(LaunchItemBeta.getConfig());
         configs.add(LaunchItemToday.getConfig());
         configs.add(LaunchItemBattery.getConfig());
+        configs.add(LaunchItemPrepaid.getConfig());
 
-        configs.add(LaunchGroupCalls.getConfig("calls","monitors"));
         configs.add(LaunchGroupCalls.getConfig("calls","important"));
 
         configs.add(LaunchGroupHealth.getConfig());

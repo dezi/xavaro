@@ -439,6 +439,17 @@
     <string name="pref_basic_monitoring_repeat">Intervall</string>
     <string name="pref_basic_monitoring_record">Verlauf aufzeichnen</string>
 
+    <string-array name="pref_basic_monitoring_where_vals">
+        <item>Inaktiv</item>
+        <item>Home</item>
+    </string-array>
+
+    <string name="pref_basic_monitoring_prepaid">Prepaid SIM</string>
+    <string name="pref_basic_monitoring_prepaid_summary">todo</string>
+    <string name="pref_basic_monitoring_prepaid_where">Icon anzeigen</string>
+    <string name="pref_basic_monitoring_prepaid_balance">Guthaben Abrufcode</string>
+    <string name="pref_basic_monitoring_prepaid_charge">Guthaben Aufladecode</string>
+
     <string name="pref_basic_monitoring_prepaid_auto">Automatisch abfragen</string>
     <string name="pref_basic_monitoring_prepaid_call">Nach jedem Vorgang abfragen</string>
 
@@ -461,15 +472,11 @@
     <string name="pref_basic_monitoring_battery_summary">todo</string>
     <string name="pref_basic_monitoring_battery_where">Icon anzeigen</string>
 
-    <string-array name="pref_basic_monitoring_battery_where_vals">
-        <item>Inaktiv</item>
-        <item>Home</item>
-    </string-array>
-
     <string-array name="pref_basic_monitoring_battery_warn_vals">
         <item>Aus</item>
         <item>96%</item>
         <item>95%</item>
+        <item>75%</item>
         <item>50%</item>
         <item>40%</item>
         <item>30%</item>

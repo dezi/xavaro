@@ -50,7 +50,7 @@ public class LaunchItemCommXavaro extends LaunchItemComm implements
         {
             if (Json.equals(config, "subtype", "padm"))
             {
-                icon.setImageResource(CommonConfigs.IconResPrepaid);
+                icon.setImageResource(CommonConfigs.IconResPrepaidAssist);
 
                 prepaidDateView = new TextView(getContext());
                 prepaidDateView.setGravity(Gravity.CENTER_HORIZONTAL);

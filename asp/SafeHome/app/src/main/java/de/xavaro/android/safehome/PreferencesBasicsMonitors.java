@@ -5,11 +5,12 @@ import android.preference.PreferenceActivity;
 
 import de.xavaro.android.common.AccessibilityService;
 import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NicedPreferences;
 import de.xavaro.android.common.PreferenceFragments;
 import de.xavaro.android.common.Simple;
 
-public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmentStub
+public class PreferencesBasicsMonitors extends PreferenceFragments.EnableFragmentStub
 {
     public static PreferenceActivity.Header getHeader()
     {
@@ -27,15 +28,9 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
     {
         super();
 
-        type = "calls";
-        subtype = "monitors";
-        iscalls = true;
         iconres = CommonConfigs.IconResMonitoring;
         summaryres = R.string.pref_basic_monitoring_summary;
-        keyprefix = type + "." + subtype;
         masterenable = Simple.getTrans(R.string.pref_basic_monitoring_enable);
-        residKeys = R.array.pref_where_keys;
-        residVals = R.array.pref_where_vals;
     }
 
     @Override
@@ -46,12 +41,64 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
         NicedPreferences.NiceCategoryPreference cp;
         NicedPreferences.NiceSwitchPreference sp;
         NicedPreferences.NiceListPreference lp;
+        NicedPreferences.NiceEditTextPreference ep;
+
+        CharSequence[] wherePrefText = Simple.getTransArray(R.array.pref_basic_monitoring_where_vals);
+        CharSequence[] wherePrefKeys = Simple.getTransArray(R.array.pref_basic_monitoring_where_keys);
 
         //
         // Prepaid status monitoring.
         //
 
         String prepaidprefix = "monitors.prepaid";
+
+        cp = new NicedPreferences.NiceInfoPreference(context);
+        cp.setIcon(CommonConfigs.IconResPrepaid);
+        cp.setTitle(R.string.pref_basic_monitoring_prepaid);
+        cp.setSummary(R.string.pref_basic_monitoring_prepaid_summary);
+        cp.setEnabled(enabled);
+        preferences.add(cp);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(prepaidprefix + ".mode");
+        lp.setTitle(R.string.pref_basic_monitoring_prepaid_where);
+        lp.setEntries(wherePrefText);
+        lp.setEntryValues(wherePrefKeys);
+        lp.setDefaultValue("inact");
+        lp.setEnabled(enabled);
+
+        preferences.add(lp);
+
+        ep = new NicedPreferences.NiceEditTextPreference(context);
+
+        ep.setKey(prepaidprefix + ".balance");
+        ep.setTitle(R.string.pref_basic_monitoring_prepaid_balance);
+        ep.setIsPhonenumber();
+        ep.setEnabled(enabled);
+        ep.setDefaultValue("*100#");
+
+        if (Simple.getSharedPrefString(ep.getKey()) == null)
+        {
+            Simple.setSharedPrefString(ep.getKey(),"*100#");
+        }
+
+        preferences.add(ep);
+
+        ep = new NicedPreferences.NiceEditTextPreference(context);
+
+        ep.setKey(prepaidprefix + ".charge");
+        ep.setTitle(R.string.pref_basic_monitoring_prepaid_charge);
+        ep.setIsPhonenumber();
+        ep.setEnabled(enabled);
+        ep.setDefaultValue("*101*#");
+
+        if (Simple.getSharedPrefString(ep.getKey()) == null)
+        {
+            Simple.setSharedPrefString(ep.getKey(),"*101*#");
+        }
+
+        preferences.add(ep);
 
         CharSequence[] preWarnText = Simple.getTransArray(R.array.pref_basic_monitoring_prepaid_warn_vals);
         CharSequence[] preWarnKeys = Simple.getTransArray(R.array.pref_basic_monitoring_prepaid_warn_keys);
@@ -138,9 +185,6 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
 
         String batteryprefix = "monitors.battery";
 
-        CharSequence[] battPrefText = Simple.getTransArray(R.array.pref_basic_monitoring_battery_where_vals);
-        CharSequence[] battPrefKeys = Simple.getTransArray(R.array.pref_basic_monitoring_battery_where_keys);
-
         CharSequence[] battWarnText = Simple.getTransArray(R.array.pref_basic_monitoring_battery_warn_vals);
         CharSequence[] battWarnKeys = Simple.getTransArray(R.array.pref_basic_monitoring_battery_warn_keys);
 
@@ -158,8 +202,8 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.WeblibFragmen
 
         lp.setKey(batteryprefix + ".mode");
         lp.setTitle(R.string.pref_basic_monitoring_battery_where);
-        lp.setEntries(battPrefText);
-        lp.setEntryValues(battPrefKeys);
+        lp.setEntries(wherePrefText);
+        lp.setEntryValues(wherePrefKeys);
         lp.setDefaultValue("inact");
         lp.setEnabled(enabled);
 

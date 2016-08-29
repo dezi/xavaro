@@ -379,6 +379,22 @@
     <string name="pref_basic_monitoring_repeat">Interval</string>
     <string name="pref_basic_monitoring_record">Record progress</string>
 
+    <string-array name="pref_basic_monitoring_where_keys">
+        <item>inact</item>
+        <item>home</item>
+    </string-array>
+
+    <string-array name="pref_basic_monitoring_where_vals">
+        <item>Inactive</item>
+        <item>Home</item>
+    </string-array>
+
+    <string name="pref_basic_monitoring_prepaid">Pre Paid SIM</string>
+    <string name="pref_basic_monitoring_prepaid_summary">todo</string>
+    <string name="pref_basic_monitoring_prepaid_where">Icon</string>
+    <string name="pref_basic_monitoring_prepaid_balance">Balance dial code</string>
+    <string name="pref_basic_monitoring_prepaid_charge">Charge dial code</string>
+
     <string name="pref_basic_monitoring_prepaid_auto">Automatic request</string>
     <string name="pref_basic_monitoring_prepaid_call">Request after call</string>
 
@@ -415,16 +431,6 @@
     <string name="pref_basic_monitoring_battery">Battery</string>
     <string name="pref_basic_monitoring_battery_summary">todo</string>
     <string name="pref_basic_monitoring_battery_where">Icon</string>
-
-    <string-array name="pref_basic_monitoring_battery_where_keys">
-        <item>inact</item>
-        <item>home</item>
-    </string-array>
-
-    <string-array name="pref_basic_monitoring_battery_where_vals">
-        <item>Inactive</item>
-        <item>Home</item>
-    </string-array>
 
     <string-array name="pref_basic_monitoring_battery_warn_keys">
         <item>never</item>
