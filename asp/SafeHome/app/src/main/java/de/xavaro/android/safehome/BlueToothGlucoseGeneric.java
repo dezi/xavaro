@@ -6,6 +6,10 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevice
@@ -45,6 +49,7 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
 
     public void syncSequence()
     {
+        /*
         BlueTooth.GattAction ga;
 
         //
@@ -58,8 +63,9 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
         ga.characteristic = parent.currentControl;
 
         parent.gattSchedule.add(ga);
+        */
 
-        parent.fireNext(false);
+        parent.fireNext(true);
     }
 
     public void sendCommand(JSONObject command)
@@ -69,7 +75,34 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
-        Log.d(LOGTAG, "parseResponse: " + rd[ 0 ]);
+        Log.d(LOGTAG, "parseResponse: " + getMaskString(rd[ 0 ]));
+
+        int offset = 0;
+
+        JSONObject bpmdata = new JSONObject();
+
+        Json.put(bpmdata, "type", "GlucoseRecord");
+
+        int sequence = rd[ ++offset ] + (rd[ ++offset  ] << 8);
+
+        Log.d(LOGTAG, "parseResponse: seq=" + sequence);
+
+        if ((rd[ 0 ] & 0x01) >= 1)
+        {
+            int year = rd[ ++offset ] + (rd[ ++offset ] << 8);
+            int month = rd[ ++offset ];
+            int day = rd[ ++offset ];
+            int hour = rd[ ++offset ];
+            int minute = rd[ ++offset ];
+            int second = rd[ ++offset ];
+
+            Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+            long utc = calendar.getTimeInMillis();
+            Json.put(bpmdata, "dts", Simple.timeStampAsISO(utc));
+
+            Log.d(LOGTAG,"parseResponse result=" + hour + "::" + Simple.timeStampAsISO(utc));
+        }
+
     }
 
     public byte[] getNumberOfRecords()
@@ -95,4 +128,19 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
 
         return data;
     }
+
+    private String getMaskString(int mask)
+    {
+        String pstr = "";
+
+        if ((mask & 0x01) >= 1) pstr += "TIME ";
+        if ((mask & 0x02) >= 1) pstr += "SAMPLE ";
+        if ((mask & 0x04) == 0) pstr += "kg/L ";
+        if ((mask & 0x04) >= 1) pstr += "mol/L ";
+        if ((mask & 0x08) >= 1) pstr += "STATUS ";
+        if ((mask & 0x10) >= 1) pstr += "CONTEXT ";
+
+        return pstr.trim();
+    }
+
 }
