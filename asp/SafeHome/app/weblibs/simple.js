@@ -300,7 +300,7 @@ WebLibSimple.createSpanPadded = function(left, top, right, bottom, id, parent)
 
 WebLibSimple.setDefaultBGColor = function(elem)
 {
-    WebLibSimple.setBGColor(elem, "#ffffffee");
+    WebLibSimple.setBGColor(elem, "#ffffffff");
 }
 
 WebLibSimple.getRGBColor = function(color)

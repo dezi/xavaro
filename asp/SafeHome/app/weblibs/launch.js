@@ -67,14 +67,22 @@ WebLibLaunch.onResize = function()
     wl.horzItems = Math.floor(wl.realWidth  / wl.horzSize);
     wl.vertItems = Math.floor(wl.realHeight / wl.vertSize);
 
-    wl.horzSpace = Math.floor((wl.realWidth  - (wl.horzItems * wl.horzSize)) / (wl.horzItems + 1));
-    wl.vertSpace = Math.floor((wl.realHeight - (wl.vertItems * wl.vertSize)) / wl.vertItems);
+    while (true)
+    {
+        wl.horzSpace = Math.floor((wl.realWidth  - (wl.horzItems * wl.horzSize)) / (wl.horzItems + 1));
+        wl.vertSpace = Math.floor((wl.realHeight - (wl.vertItems * wl.vertSize)) / wl.vertItems);
 
-    wl.horzStart = Math.floor(((wl.realWidth  - (wl.horzItems * wl.horzSize)) % (wl.horzItems + 1)) / 2);
-    wl.vertStart = Math.floor(((wl.realHeight - (wl.vertItems * wl.vertSize)) % wl.vertItems) / 2);
+        wl.horzStart = Math.floor(((wl.realWidth  - (wl.horzItems * wl.horzSize)) % (wl.horzItems + 1)) / 2);
+        wl.vertStart = Math.floor(((wl.realHeight - (wl.vertItems * wl.vertSize)) % wl.vertItems) / 2);
 
-    wl.horzStart += wl.horzSpace;
-    wl.vertStart += wl.vertSpace / 2;
+        wl.horzStart += wl.horzSpace;
+        wl.vertStart += wl.vertSpace / 2;
+
+        if ((wl.horzSpace >= 4) && (wl.vertSpace >= 4)) break;
+
+        if (wl.horzSpace < 6) wl.horzItems--;
+        if (wl.vertSpace < 6) wl.vertItems--;
+   }
 
     console.log("Resize: " + orientation
         + "=" + wl.realWidth + "/" + wl.realHeight
@@ -181,11 +189,15 @@ WebLibLaunch.createLaunchItemInternal = function(config)
     wl.launchItems.push(li);
     li.config = config;
 
-    var url = "url('/weblibs/launch/shadow_black_400x400.png')";
-    if (config.frame) url = "url('/weblibs/launch/shadow_" + config.frame + "_400x400.png')";
+    WebLibSimple.setBGColor(li, "#ffffee");
+	li.style.border = "1px solid #cccccc";
+	li.style.borderRadius = "16px";
 
-    li.style.backgroundSize = WebLibSimple.addPixel(wl.horzSize);
-    li.style.backgroundImage = url;
+    //var url = "url('/weblibs/launch/shadow_black_400x400.png')";
+    //if (config.frame) url = "url('/weblibs/launch/shadow_" + config.frame + "_400x400.png')";
+
+    //li.style.backgroundSize = WebLibSimple.addPixel(wl.horzSize);
+    //li.style.backgroundImage = url;
 
     li.divElem = WebLibSimple.createDiv(0, 0, 0, 0, "divElem", li);
     li.divElem.style.margin = WebLibSimple.addPixel(18);

@@ -214,7 +214,7 @@ medicator.remindConfig = function(config)
         medicator.bloodoxyreminder = true;
     }
 
-    if ((config.mediform == "ZZG") && ! medicator.bloodglucosereminder)
+    if ((config.mediflat == "ZZG") && ! medicator.bloodglucosereminder)
     {
         var notify = {};
 
@@ -393,7 +393,7 @@ medicator.completeConfig = function(config)
     if (config.mediflat == "AAA") notify.key = "medicator.take.pills";
     if (config.mediflat == "ZZB") notify.key = "medicator.take.bloodpressure";
     if (config.mediflat == "ZZO") notify.key = "medicator.take.bloodoxygen";
-    if (config.mediform == "ZZG") notify.key = "medicator.take.bloodglucose";
+    if (config.mediflat == "ZZG") notify.key = "medicator.take.bloodglucose";
     if (config.mediflat == "ZZW") notify.key = "medicator.take.weight";
 
     WebAppNotify.removeNotification(JSON.stringify(notify));

@@ -119,7 +119,7 @@ public class HealthOxy extends HealthBase
         {
             JSONObject event = Json.getObject(events, inx);
 
-            if ((event == null) || Json.getBoolean(event, "completed")) continue;
+            if ((event == null) || Json.getBoolean(event, "taken")) continue;
 
             String date = Json.getString(event, "date");
             String medication = Json.getString(event, "medication");

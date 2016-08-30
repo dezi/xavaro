@@ -318,7 +318,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     protected void fireNext(boolean delayed)
     {
-        fireNext(delayed ? 300 : 0);
+        fireNext(delayed ? 300 : 100);
     }
 
     protected void fireNext(int delay)

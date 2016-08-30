@@ -67,7 +67,7 @@ public class BlueToothBPM extends BlueTooth
     @Override
     protected void enableDevice()
     {
-        super.enableDevice();
+        gattSchedule.add(new GattAction(currentPrimary));
     }
 
     @Override
@@ -128,6 +128,8 @@ public class BlueToothBPM extends BlueTooth
         {
             Json.put(bpmdata, "flg", unsignedByteToInt(rd[ ++offset ]));
         }
+
+        Log.d(LOGTAG,"parseResponse final=" + isfinal + " json=" + bpmdata.toString());
 
         if (isfinal)
         {

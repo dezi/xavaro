@@ -2,11 +2,15 @@ package de.xavaro.android.safehome;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.ChatManager;
+import de.xavaro.android.common.CommonConfigs;
+import de.xavaro.android.common.EventManager;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotifyManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
@@ -107,6 +111,49 @@ public class HealthBPM extends HealthBase
         Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
     }
 
+    private void evaluateEvents()
+    {
+        JSONArray events = EventManager.getComingEvents("webapps.medicator");
+        if (events == null) return;
+
+        long now = Simple.nowAsTimeStamp();
+
+        for (int inx = 0; inx < events.length(); inx++)
+        {
+            JSONObject event = Json.getObject(events, inx);
+
+            if ((event == null) || Json.getBoolean(event, "taken")) continue;
+
+            String date = Json.getString(event, "date");
+            String medication = Json.getString(event, "medication");
+
+            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZB")) continue;
+
+            long dts = Simple.getTimeStamp(date);
+
+            if (Math.abs(now - dts) > 2 * 3600 * 1000) continue;
+
+            //
+            // Event is suitable.
+            //
+
+            Json.put(event, "taken", true);
+            Json.put(event, "takendate", lastDts);
+            Json.put(event, "diastolic", lastDia);
+            Json.put(event, "systolic", lastSys);
+            Json.put(event, "puls", lastPls);
+
+            EventManager.updateComingEvent("webapps.medicator", event);
+
+            Log.d(LOGTAG, "evaluateEvents: updated=" + event.toString());
+
+            break;
+        }
+
+        NotifyManager.removeNotification("medicator.take.bloodoxygen");
+        Simple.makePost(CommonConfigs.UpdateNotifications);
+    }
+
     private void evaluateMessage()
     {
         if (lastRecord == null) return;
@@ -118,6 +165,8 @@ public class HealthBPM extends HealthBase
 
         Speak.speak(sm);
         ActivityManager.recordActivity(am);
+
+        evaluateEvents();
 
         if (!Simple.getSharedPrefBoolean("health.bpm.alert.enable")) return;
 
@@ -153,8 +202,8 @@ public class HealthBPM extends HealthBase
                 String[] hp = high.split(":");
 
                 if ((hp.length == 2) &&
-                        ((Integer.parseInt(hp[ 0 ]) >= lastSys) ||
-                                (Integer.parseInt(hp[ 1 ]) >= lastDia)))
+                        ((Integer.parseInt(hp[ 0 ]) <= lastSys) ||
+                                (Integer.parseInt(hp[ 1 ]) <= lastDia)))
                 {
                     Speak.speak(Simple.getTrans(R.string.health_bpm_highbp));
                     ActivityManager.recordAlert(R.string.health_bpm_highbp);

@@ -66,8 +66,43 @@ medicator.onTakeThat = function(doit, mediform)
 
     if (bestForm)
     {
-        var lauchitem = medicator.lauchis[ bestForm ];
-        medicator.onClickEventItem(lauchitem, null, true);
+        if (doit)
+        {
+            var lauchitem = medicator.lauchis[ bestForm ];
+            medicator.onClickEventItem(lauchitem, null, true);
+        }
+        else
+        {
+            //
+            // User declined medication.
+            //
+
+            console.log("medicator.onTakeThat: declined=" + mediform);
+
+            var config = medicator.configs[ bestForm ];
+
+            for (var inx = 0; inx < config.medisets.length; inx++)
+            {
+                medicator.updateMedisetEvent(config.medisets[ inx ]);
+            }
+
+            //
+            // Remove notification.
+            //
+
+            var notify = {};
+
+            if (mediform == "AAA") notify.key = "medicator.take.pills";
+            if (mediform == "ZZB") notify.key = "medicator.take.bloodpressure";
+            if (mediform == "ZZO") notify.key = "medicator.take.bloodoxygen";
+            if (mediform == "ZZG") notify.key = "medicator.take.bloodglucose";
+            if (mediform == "ZZW") notify.key = "medicator.take.weight";
+
+            console.log("medicator.onTakeThat: remove=" + notify.key);
+
+            WebAppNotify.removeNotification(JSON.stringify(notify));
+            WebAppNotify.updateNotificationDisplay();
+        }
     }
 }
 
@@ -82,6 +117,8 @@ medicator.updateMedisetEvent = function(mediset)
 
         if (! (event.date && (event.date == eventdate))) continue;
         if (! (event.medication && (event.medication == medication))) continue;
+
+        event.completed = true;
 
         //
         // Taken data.
@@ -101,6 +138,8 @@ medicator.updateMedisetEvent = function(mediset)
         if (mediset.systolic  ) event.systolic   = mediset.systolic;
         if (mediset.diastolic ) event.diastolic  = mediset.diastolic;
         if (mediset.saturation) event.saturation = mediset.saturation;
+
+        console.log("medicator.updateMedisetEvent: event=" + JSON.stringify(event));
 
         WebAppEvents.updateComingEvent(JSON.stringify(event));
     }
