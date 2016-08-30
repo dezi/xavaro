@@ -59,6 +59,8 @@ public class LaunchItemWebApp extends LaunchItem
             {
                 Simple.removeFromParent(webappView);
                 webappView.destroy();
+
+                Log.d(LOGTAG, "onBackKeyExecuted: webview destroyed.");
             }
 
             Simple.removeFromParent(webappFrame);

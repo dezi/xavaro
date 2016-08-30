@@ -34,6 +34,12 @@ public class CommonConfigs
 
     //endregion Global icons
 
+    //region UI-Thread runnables
+
+    public static Runnable UpdateNotifications;
+
+    //endregion UI-Thread runnables
+
     //region Standard apps
 
     //

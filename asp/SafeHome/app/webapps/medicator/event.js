@@ -163,6 +163,7 @@ medicator.remindConfig = function(config)
         notify.declineJavaCall = "medicator.onTakePills(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppNotify.updateNotificationDisplay();
 
         medicator.pillsreminder = true;
     }
@@ -183,6 +184,7 @@ medicator.remindConfig = function(config)
         notify.declineJavaCall = "medicator.onTakeBloodPressure(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppNotify.updateNotificationDisplay();
 
         medicator.bloodpressurereminder = true;
     }
@@ -203,6 +205,7 @@ medicator.remindConfig = function(config)
         notify.declineJavaCall = "medicator.onTakeBloodOxygen(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppNotify.updateNotificationDisplay();
 
         medicator.bloodoxyreminder = true;
     }
@@ -223,6 +226,7 @@ medicator.remindConfig = function(config)
         notify.declineJavaCall = "medicator.onTakeBloodGlucose(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppNotify.updateNotificationDisplay();
 
         medicator.bloodglucosereminder = true;
     }
@@ -243,6 +247,7 @@ medicator.remindConfig = function(config)
         notify.declineJavaCall = "medicator.onTakeWeight(false);"
 
         WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppNotify.updateNotificationDisplay();
 
         medicator.weightreminder = true;
     }
@@ -374,6 +379,21 @@ medicator.completeConfig = function(config)
 
         console.log("completed=" + JSON.stringify(event));
     }
+
+    //
+    // Remove notification.
+    //
+
+    var notify = {};
+
+    if (config.mediflat == "AAA") notify.key = "medicator.take.pills";
+    if (config.mediflat == "ZZB") notify.key = "medicator.take.bloodpressure";
+    if (config.mediflat == "ZZO") notify.key = "medicator.take.bloodoxygen";
+    if (config.mediform == "ZZG") notify.key = "medicator.take.bloodglucose";
+    if (config.mediflat == "ZZW") notify.key = "medicator.take.weight";
+
+    WebAppNotify.removeNotification(JSON.stringify(notify));
+    WebAppNotify.updateNotificationDisplay();
 }
 
 medicator.getNextEvents();

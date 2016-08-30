@@ -285,6 +285,7 @@ medicator.onClickTaken = function(event)
     notify.key = "medicator.take.pills";
 
     WebAppNotify.removeNotification(JSON.stringify(notify));
+    WebAppNotify.updateNotificationDisplay();
 
     return true;
 }
@@ -336,7 +337,11 @@ medicator.onClickMeasured = function(target)
     if (mediform.startsWith("ZZG")) notify.key = "medicator.take.bloodglucose";
     if (mediform.startsWith("ZZW")) notify.key = "medicator.take.weight";
 
-    if (notify.key) WebAppNotify.removeNotification(JSON.stringify(notify));
+    if (notify.key)
+    {
+        WebAppNotify.removeNotification(JSON.stringify(notify));
+        WebAppNotify.updateNotificationDisplay();
+    }
 
     return true;
 }
@@ -654,7 +659,43 @@ medicator.computePillPositions = function(launchitem)
 
 medicator.updateEvents = function()
 {
+    //
+    // Re-read actual events.
+    //
+
     medicator.comingEvents = JSON.parse(WebAppEvents.getComingEvents());
+
+    //
+    // Update measurement result values from bluetooth devices.
+    //
+
+    for (var inx in medicator.comingEvents)
+    {
+        var event = medicator.comingEvents[ inx ];
+
+        if (! event.taken) continue;
+
+        var medication = event.medication.substring(0,event.medication.length - 4);
+        var mediform = event.medication.substring(event.medication.length - 3);
+
+        if (! mediform.startsWith("ZZ")) continue;
+
+        var formkey = event.date + ":" + (mediform.startsWith("ZZ") ? mediform : "AAA");
+        if (! medicator.configs[ formkey ]) continue;
+
+        var config = medicator.configs[ formkey ];
+
+        config.taken = true;
+        config.medisets[ 0 ].taken = true;
+        config.medisets[ 0 ].takendate = event.takendate;
+
+        config.medisets[ 0 ].puls       = event.puls;
+        config.medisets[ 0 ].weight     = event.weight;
+        config.medisets[ 0 ].glucose    = event.glucose;
+        config.medisets[ 0 ].systolic   = event.systolic;
+        config.medisets[ 0 ].diastolic  = event.diastolic;
+        config.medisets[ 0 ].saturation = event.saturation;
+    }
 
     var now = new Date().getTime();
 
@@ -727,6 +768,9 @@ medicator.getItemIcon = function(event)
 
 medicator.createEvents = function()
 {
+    if (! medicator.configs) medicator.configs = {};
+    if (! medicator.lauchis) medicator.lauchis = {};
+
     medicator.comingEvents = JSON.parse(WebAppEvents.getComingEvents());
 
     var today = WebLibSimple.getTodayDate().getTime();
@@ -735,8 +779,8 @@ medicator.createEvents = function()
     today = new Date(today).toISOString();
     midni = new Date(midni).toISOString();
 
-    var configs = medicator.configs = {};
-    var lauchis = medicator.lauchis = {};
+    var configs = medicator.configs;
+    var lauchis = medicator.lauchis;
 
     for (var inx in medicator.comingEvents)
     {

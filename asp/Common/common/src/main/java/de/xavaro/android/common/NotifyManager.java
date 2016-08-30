@@ -29,17 +29,22 @@ public class NotifyManager
     {
         if (intent == null) return;
 
-        if (intent.key != null)
+        removeNotification(intent.key);
+
+        if (pendingIntents.contains(intent)) pendingIntents.remove(intent);
+    }
+
+    public static void removeNotification(String intentKey)
+    {
+        if (intentKey != null)
         {
             for (int inx = 0; inx < pendingIntents.size(); inx++)
             {
                 NotifyIntent old = pendingIntents.get(inx);
 
-                if (Simple.equals(intent.key, old.key)) pendingIntents.remove(inx--);
+                if (Simple.equals(intentKey, old.key)) pendingIntents.remove(inx--);
             }
         }
-
-        if (pendingIntents.contains(intent)) pendingIntents.remove(intent);
     }
 
     public static ArrayList<NotifyIntent> getPendingIntents()

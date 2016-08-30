@@ -71,13 +71,21 @@ public class PreferencesDeveloper
             //
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
-            pc.setTitle("Display Schalter");
+            pc.setTitle("Funktionen");
             preferences.add(pc);
 
             cp = new NicedPreferences.NiceCheckboxPreference(context);
 
+            cp.setKey(keyprefix + ".demomode.takepills");
+            cp.setTitle("Pillen nach Oxy-Messung");
+            cp.setEnabled(enabled);
+
+            preferences.add(cp);
+
+            cp = new NicedPreferences.NiceCheckboxPreference(context);
+
             cp.setKey(keyprefix + ".display.betaversion");
-            cp.setTitle("Beta Version Icon");
+            cp.setTitle("Beta Version Icon anzeigen");
             cp.setEnabled(enabled);
 
             preferences.add(cp);
@@ -85,7 +93,7 @@ public class PreferencesDeveloper
             cp = new NicedPreferences.NiceCheckboxPreference(context);
 
             cp.setKey(keyprefix + ".display.browsericons");
-            cp.setTitle("Browser Icons");
+            cp.setTitle("Browser Icons anzeigen");
             cp.setEnabled(enabled);
 
             preferences.add(cp);

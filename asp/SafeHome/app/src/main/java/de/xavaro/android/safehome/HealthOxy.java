@@ -7,8 +7,10 @@ import org.json.JSONObject;
 
 import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.ChatManager;
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.EventManager;
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.NotifyManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
@@ -106,10 +108,12 @@ public class HealthOxy extends HealthBase
         Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
     }
 
-    private void evaluteEvents()
+    private void evaluateEvents()
     {
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
+
+        long now = Simple.nowAsTimeStamp();
 
         for (int inx = 0; inx < events.length(); inx++)
         {
@@ -117,9 +121,15 @@ public class HealthOxy extends HealthBase
 
             if ((event == null) || Json.getBoolean(event, "completed")) continue;
 
+            String date = Json.getString(event, "date");
             String medication = Json.getString(event, "medication");
-            if ((medication == null) || ! medication.endsWith(",ZZO")) continue;
 
+            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZO")) continue;
+
+            long dts = Simple.getTimeStamp(date);
+
+            if (Math.abs(now - dts) > 2 * 3600 * 1000) continue;
+            
             //
             // Event is suitable.
             //
@@ -131,9 +141,46 @@ public class HealthOxy extends HealthBase
 
             EventManager.updateComingEvent("webapps.medicator", event);
 
-            Log.d(LOGTAG, "evaluteEvents: " + event.toString());
+            Log.d(LOGTAG, "evaluateEvents: updated=" + event.toString());
 
             break;
+        }
+
+        NotifyManager.removeNotification("medicator.take.bloodoxygen");
+        Simple.makePost(CommonConfigs.UpdateNotifications);
+
+        //
+        // Check for demo mode take pills after
+        // oxygen measurement as the trigger.
+        //
+
+        if (Simple.getSharedPrefBoolean("developer.demomode.takepills"))
+        {
+            for (int inx = 0; inx < events.length(); inx++)
+            {
+                JSONObject event = Json.getObject(events, inx);
+                if (event == null) continue;
+
+                String date = Json.getString(event, "date");
+                String medication = Json.getString(event, "medication");
+
+                if ((date == null) || (medication == null)) continue;
+                String mediform = medication.substring(medication.length() - 3, medication.length());
+                if (mediform.startsWith("ZZ")) continue;
+
+                long dts = Simple.getTimeStamp(date);
+
+                if ((dts < now) || (Math.abs(now - dts) > 24 * 3600 * 1000)) continue;
+
+                Json.put(event, "date", Simple.timeStampAsISO(now + 5 * 60 * 1000));
+                Json.put(event, "taken", false);
+                Json.put(event, "completed", false);
+                Json.put(event, "reminded", 0);
+
+                EventManager.updateComingEvent("webapps.medicator", event);
+
+                Log.d(LOGTAG, "evaluateEvents: faked=" + event.toString());
+            }
         }
     }
 
@@ -149,7 +196,7 @@ public class HealthOxy extends HealthBase
         Speak.speak(sm);
         ActivityManager.recordActivity(am);
 
-        evaluteEvents();
+        evaluateEvents();
 
         if (!Simple.getSharedPrefBoolean("health.oxy.alert.enable")) return;
 

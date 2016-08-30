@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NotifyIntent;
 import de.xavaro.android.common.NotifyManager;
@@ -109,6 +110,15 @@ public class HomeNotify extends HomeFrame
         event2Frame = new HomeEvent(context, false);
         contentFrame.addView(event2Frame);
         slots.add(event2Frame);
+
+        CommonConfigs.UpdateNotifications = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                manageNotifications();
+            }
+        };
     }
 
     public void setConfig(JSONObject config)

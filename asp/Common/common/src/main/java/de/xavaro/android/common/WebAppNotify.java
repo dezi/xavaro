@@ -140,4 +140,10 @@ public class WebAppNotify
 
         NotifyManager.removeNotification(notification);
     }
+
+    @JavascriptInterface
+    public void updateNotificationDisplay()
+    {
+        Simple.makePost(CommonConfigs.UpdateNotifications);
+    }
 }

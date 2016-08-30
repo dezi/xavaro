@@ -86,8 +86,7 @@ public class EventManager
             {
                 JSONObject oldevent = Json.getObject(events, inx);
 
-                if (Json.equals(oldevent, "date", event) &&
-                        Json.equals(oldevent, "uuid", event))
+                if (Json.equals(oldevent, "uuid", event))
                 {
                     //
                     // Integrate all values from event into old event,
@@ -393,7 +392,7 @@ public class EventManager
                     continue;
                 }
 
-                if ((timestamp < now) && ! event.has("completed"))
+                if ((timestamp < now) && ! Json.getBoolean(event, "completed"))
                 {
                     Json.put(evgfiring, event);
                     dirty = true;
