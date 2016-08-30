@@ -1,5 +1,6 @@
 medicator.remindMaximum = 3;
 medicator.remindIntervall = 600;
+medicator.remindOutdated = 2 * 3600;
 
 medicator.getNextEvents = function()
 {
@@ -65,12 +66,15 @@ medicator.getNextEvents = function()
             configs[ formkey ].events.push(event);
         }
 
+        var nowtime = new Date().getTime();
+
         for (var formkey in configs)
         {
             var config = configs[ formkey ];
 
             console.log("config=" + JSON.stringify(config));
 
+            var outdated = ((nowtime - new Date(config.date).getTime()) / 1000) > medicator.remindOutdated;
             var alltaken = true;
             var ondemand = true;
 
@@ -82,7 +86,7 @@ medicator.getNextEvents = function()
                 ondemand = ondemand && event.ondemand;
             }
 
-            if (alltaken || ondemand)
+            if (alltaken || ondemand || outdated)
             {
                 medicator.completeConfig(config);
 

@@ -98,7 +98,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
             BluetoothDevice device = bta.getRemoteDevice(macAddress);
 
-            if (isSpecialBonding()) unpairDevice(device);
+            //if (isSpecialBonding()) unpairDevice(device);
 
             currentGatt = device.connectGatt(Simple.getAppContext(), true, gattCallback);
         }
@@ -545,7 +545,16 @@ public abstract class BlueTooth extends BroadcastReceiver
                         + "=" + currentGatt.getDevice().getName()
                         + "=" + currentGatt.getDevice().getBondState());
 
-                gattHandler.postDelayed(runDiscoverServices, 100);
+                if (isSpecialBonding() && (currentGatt.getDevice().getBondState() != BluetoothDevice.BOND_BONDED))
+                {
+                    Log.d(LOGTAG, "onConnectionStateChange==================== bonding!!!!!!!!!!!");
+
+                    pairDevice(currentGatt.getDevice());
+                }
+                else
+                {
+                    gattHandler.postDelayed(runDiscoverServices, 100);
+                }
             }
 
             if (newState == BluetoothProfile.STATE_DISCONNECTED)
