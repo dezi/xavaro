@@ -631,7 +631,7 @@
     <string name="health_glucose_spoken">The last reading resulted in a glucose value of %1$d</string>
     <string name="health_glucose_alert">%1$s has a glucose value of %2$s</string>
     <string name="health_glucose_lowglucose">The glucose value is alarming low.</string>
-    <string name="health_glucose_higglucose">The glucose value is alarming high.</string>
+    <string name="health_glucose_highglucose">The glucose value is alarming high.</string>
     <string name="health_glucose_activity">You have a glucose value of %1$d.</string>
 
     <string-array name="phone_labels_keys">

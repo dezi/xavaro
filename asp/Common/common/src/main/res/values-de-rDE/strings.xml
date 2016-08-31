@@ -814,7 +814,7 @@
     <string name="health_glucose_spoken">Die letzte Messung ergab einen Blutzuckerwert von %1$d</string>
     <string name="health_glucose_alert">%1$s hat einen Blutzuckerwert von %2$s</string>
     <string name="health_glucose_lowglucose">Der Blutzuckerwert ist bedenklich niedrig.</string>
-    <string name="health_glucose_higglucose">Der Blutzuckerwert ist bedenklich hoch.</string>
+    <string name="health_glucose_highglucose">Der Blutzuckerwert ist bedenklich hoch.</string>
     <string name="health_glucose_activity">Sie haben einen Blutzuckerwert von %1$d.</string>
     <string name="health_glucose_activity_du">Du hast einen Blutzuckerwert von %1$d.</string>
 

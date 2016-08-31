@@ -749,13 +749,68 @@ public class PreferencesHealth
         {
             super.registerAll(context);
 
-            /*
             NicedPreferences.NiceCategoryPreference pc;
-            NicedPreferences.NiceEditTextPreference ep;
-            NicedPreferences.NiceListPreference lp;
-            NicedPreferences.NiceDatePreference dp;
+            NicedPreferences.NiceCheckboxPreference cb;
             NicedPreferences.NiceNumberPreference np;
-            */
+            NicedPreferences.NiceSwitchPreference sp;
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Warnungen");
+            preferences.add(pc);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".alert.enable");
+            sp.setTitle("Aktivieren");
+            sp.setEnabled(enabled);
+
+            sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    for (Preference pref : preferences)
+                    {
+                        if (pref.getKey() == null) continue;
+                        if (pref.getKey().equals(keyprefix + ".alert.enable")) continue;
+                        if (! pref.getKey().startsWith(keyprefix + ".alert.")) continue;
+
+                        pref.setEnabled((boolean) newValue);
+                    }
+
+                    return true;
+                }
+            });
+
+            preferences.add(sp);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.lowglucose");
+            np.setMinMaxValue(30, 80, 1);
+            np.setDefaultValue(60);
+            np.setTitle("Zu niedriger Blutzucker");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.highglucose");
+            np.setMinMaxValue(100, 240, 1);
+            np.setDefaultValue(180);
+            np.setTitle("Zu hoher Blutzucker");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            cb = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cb.setKey(keyprefix + ".alert.alertgroup");
+            cb.setTitle("Assistenz informieren");
+            cb.setEnabled(enabled);
+
+            preferences.add(cb);
         }
     }
 

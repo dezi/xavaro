@@ -61,21 +61,19 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
 
     public void syncSequence()
     {
-        /*
         BlueTooth.GattAction ga;
 
         //
-        // Read number of records.
+        // Get all records.
         //
 
         ga = new BlueTooth.GattAction();
 
         ga.mode = BlueTooth.GattAction.MODE_WRITE;
-        ga.data = getNumberOfRecords();
+        ga.data = getAllRecords();
         ga.characteristic = parent.currentControl;
 
         parent.gattSchedule.add(ga);
-        */
 
         parent.fireNext(true);
     }
@@ -88,96 +86,104 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
     {
         Log.d(LOGTAG, "parseResponse: " + characteristic.getUuid().toString());
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
-        Log.d(LOGTAG, "parseResponse: " + getMaskString(rd[ 0 ]));
 
-        if (! isCompatiblePrimary(characteristic)) return;
-        if (rd.length <= 4) return;
-
-        int offset = 0;
-
-        int mask = rd[ offset++ ] & 0xff;
-        int sequence = (rd[ offset++ ] & 0xff) + ((rd[ offset++ ] & 0xff) << 8);
-
-        Log.d(LOGTAG, "parseResponse: seq=" + sequence);
-
-        int year = (rd[ offset++ ] & 0xff) + ((rd[ offset++ ] & 0xff) << 8);
-        int month = rd[ offset++ ] & 0xff;
-        int day = rd[ offset++ ] & 0xff;
-        int hour = rd[ offset++ ] & 0xff;
-        int minute = rd[ offset++ ] & 0xff;
-        int second = rd[ offset++ ] & 0xff;
-        int minoff = 0;
-
-        if ((mask & 0x01) >= 1)
+        if (isCompatiblePrimary(characteristic))
         {
-            minoff = (rd[ offset++ ] & 0xff) + ((rd[ offset++ ] & 0xff) << 8);
+            if (rd.length <= 4) return;
+
+            Log.d(LOGTAG, "parseResponse: " + getMaskString(rd[ 0 ]));
+
+            int offset = 0;
+
+            int mask = rd[ offset++ ] & 0xff;
+            int sequence = (rd[ offset++ ] & 0xff) + ((rd[ offset++ ] & 0xff) << 8);
+
+            Log.d(LOGTAG, "parseResponse: seq=" + sequence);
+
+            int year = (rd[ offset++ ] & 0xff) + ((rd[ offset++ ] & 0xff) << 8);
+            int month = rd[ offset++ ] & 0xff;
+            int day = rd[ offset++ ] & 0xff;
+            int hour = rd[ offset++ ] & 0xff;
+            int minute = rd[ offset++ ] & 0xff;
+            int second = rd[ offset++ ] & 0xff;
+            int minoff = 0;
+
+            if ((mask & 0x01) >= 1)
+            {
+                minoff = (rd[ offset++ ] & 0xff) + ((rd[ offset++ ] & 0xff) << 8);
+            }
+
+            Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+            long utc = calendar.getTimeInMillis() + (minoff * 60 * 1000);
+
+            Log.d(LOGTAG, "parseResponse: hour=" + hour + " minoff=" + minoff + "=>" + Simple.timeStampAsISO(utc));
+
+            float glucose = 0.0f;
+            int datatype = 0;
+            int location = 0;
+
+            String unit = ((mask & 0x04) == 0) ? "mg/DL" : "mol/L";
+
+            if ((mask & 0x02) >= 1)
+            {
+                glucose = bytesToFloat(rd[ offset++ ], rd[ offset++ ]);
+                glucose = glucose * (((mask & 0x04) == 0) ? 100000.0f : 1.0f);
+
+                datatype = rd[ offset++ ] & 0xff;
+                location = datatype & 0x0f;
+                datatype = (datatype & 0xf0) >> 4;
+            }
+
+            Log.d(LOGTAG, "parseResponse: glucose=" + glucose + " unit=" + unit);
+            Log.d(LOGTAG, "parseResponse: datatype=" + datatype + " location=" + location);
+
+            int status = 0;
+
+            if ((mask & 0x08) >= 1)
+            {
+                status = ((rd[ offset++ ] & 0xff) << 8) + (rd[ offset++ ] & 0xff);
+                Log.d(LOGTAG, "parseResponse: status=" + status);
+            }
+
+            Log.d(LOGTAG, "parseResponse: size=" + rd.length + " used=" + offset);
+
+            //
+            // Announce last record to user interface.
+            //
+
+            JSONObject result = new JSONObject();
+
+            Json.put(result, "type", "GlucoseRecord");
+
+            Json.put(result, "dts", Simple.timeStampAsISO(utc));
+            Json.put(result, "bgv", glucose);
+            Json.put(result, "unt", unit);
+            Json.put(result, "dty", datatype);
+            Json.put(result, "loc", location);
+            Json.put(result, "sst", status);
+            Json.put(result, "dev", parent.deviceName);
+
+            if (parent.dataCallback != null)
+            {
+                JSONObject data = new JSONObject();
+                Json.put(data, "glucose", result);
+
+                parent.dataCallback.onBluetoothReceivedData(parent.deviceName, data);
+            }
+
+            //
+            // Store data.
+            //
+
+            JSONObject record = Json.clone(result);
+            record.remove("type");
+            HealthData.addRecord("glucose", record);
         }
 
-        Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-        long utc = calendar.getTimeInMillis() + (minoff * 60 * 1000);
-
-        Log.d(LOGTAG, "parseResponse: hour=" + hour + " minoff=" + minoff + "=>" + Simple.timeStampAsISO(utc));
-
-        float glucose = 0.0f;
-        int datatype = 0;
-        int location = 0;
-
-        String unit = ((mask & 0x04) == 0) ? "mg/DL" : "mol/L";
-
-        if ((mask & 0x02) >= 1)
+        if (isCompatibleControl(characteristic))
         {
-            glucose = bytesToFloat(rd[ offset++ ], rd[ offset++ ]);
-            glucose = glucose * (((mask & 0x04) == 0) ? 100000.0f : 1.0f);
 
-            datatype = rd[ offset++ ] & 0xff;
-            location = datatype & 0x0f;
-            datatype = (datatype & 0xf0) >> 4;
         }
-
-        Log.d(LOGTAG, "parseResponse: glucose=" + glucose + " unit=" + unit);
-        Log.d(LOGTAG, "parseResponse: datatype=" + datatype + " location=" + location);
-
-        int status = 0;
-
-        if ((mask & 0x08) >= 1)
-        {
-            status = ((rd[ offset++ ] & 0xff) << 8) + (rd[ offset++ ] & 0xff);
-            Log.d(LOGTAG, "parseResponse: status=" + status);
-        }
-
-        Log.d(LOGTAG, "parseResponse: size=" + rd.length + " used=" + offset);
-
-        //
-        // Announce last record to user interface.
-        //
-
-        JSONObject result = new JSONObject();
-
-        Json.put(result, "type", "GlucoseRecord");
-
-        Json.put(result, "dts", Simple.timeStampAsISO(utc));
-        Json.put(result, "bgv", glucose);
-        Json.put(result, "unt", unit);
-        Json.put(result, "dty", datatype);
-        Json.put(result, "loc", location);
-        Json.put(result, "sst", status);
-        Json.put(result, "dev", parent.deviceName);
-
-        if (parent.dataCallback != null)
-        {
-            JSONObject data = new JSONObject();
-            Json.put(data, "glucose", result);
-
-            parent.dataCallback.onBluetoothReceivedData(parent.deviceName, data);
-        }
-
-        //
-        // Store data.
-        //
-
-        JSONObject record = Json.clone(result);
-        record.remove("type");
-        HealthData.addRecord("glucose", record);
     }
 
     public byte[] getNumberOfRecords()

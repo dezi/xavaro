@@ -169,9 +169,9 @@ public class HealthGlucose extends HealthBase
 
             if (low >= bgv)
             {
-                Speak.speak(Simple.getTrans(R.string.health_bpm_lowpls));
-                ActivityManager.recordAlert(R.string.health_bpm_lowpls);
-                informAssistance(R.string.health_bpm_lowpls);
+                Speak.speak(Simple.getTrans(R.string.health_glucose_lowglucose));
+                ActivityManager.recordAlert(R.string.health_glucose_lowglucose);
+                informAssistance(R.string.health_glucose_lowglucose);
             }
         }
         catch (Exception ex)
@@ -181,13 +181,13 @@ public class HealthGlucose extends HealthBase
 
         try
         {
-            int high = Simple.getSharedPrefInt("health.glucose.alert.lowglucose");
+            int high = Simple.getSharedPrefInt("health.glucose.alert.highglucose");
 
             if (high <= bgv)
             {
-                Speak.speak(Simple.getTrans(R.string.health_bpm_highpls));
-                ActivityManager.recordAlert(R.string.health_bpm_highpls);
-                informAssistance(R.string.health_bpm_highpls);
+                Speak.speak(Simple.getTrans(R.string.health_glucose_highglucose));
+                ActivityManager.recordAlert(R.string.health_glucose_highglucose);
+                informAssistance(R.string.health_glucose_highglucose);
             }
         }
         catch (Exception ex)
@@ -202,35 +202,6 @@ public class HealthGlucose extends HealthBase
         public void run()
         {
             evaluateMessage();
-        }
-    };
-
-    private Runnable messageSpeakerOld = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            if (lastRecord == null) return;
-
-            String type = Json.getString(lastRecord, "type");
-
-            if (Simple.equals(type, "GlucoseRecord"))
-            {
-                int ngv = Json.getInt(lastRecord, "ngv");
-                int csv = Json.getInt(lastRecord, "csv");
-                int bgv = Json.getInt(lastRecord, "bgv");
-
-                String speak = "Die letzte Messung ergab einen Blutzuckerwert von " + bgv;
-
-                if (csv != 0)
-                    speak = "Die letzte Messung wurde mit Kontrollflüssigkeit durchgeführt";
-
-                if (ngv != 0) speak = "Die letzte Messung war fehlerhaft";
-
-                Speak.speak(speak);
-            }
-
-            lastRecord = null;
         }
     };
 }
