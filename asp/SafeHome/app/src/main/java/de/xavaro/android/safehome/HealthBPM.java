@@ -150,7 +150,7 @@ public class HealthBPM extends HealthBase
             break;
         }
 
-        NotifyManager.removeNotification("medicator.take.bloodoxygen");
+        NotifyManager.removeNotification("medicator.take.bloodpressure");
         Simple.makePost(CommonConfigs.UpdateNotifications);
     }
 

@@ -104,7 +104,6 @@ public class HealthGlucose extends HealthBase
 
     private void evaluateEvents()
     {
-        /*
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
 
@@ -119,7 +118,7 @@ public class HealthGlucose extends HealthBase
             String date = Json.getString(event, "date");
             String medication = Json.getString(event, "medication");
 
-            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZB")) continue;
+            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZG")) continue;
 
             long dts = Simple.getTimeStamp(date);
 
@@ -129,11 +128,11 @@ public class HealthGlucose extends HealthBase
             // Event is suitable.
             //
 
+            int bgv = (int) Math.round(Json.getDouble(lastRecord, "bgv"));
+
             Json.put(event, "taken", true);
             Json.put(event, "takendate", lastDts);
-            Json.put(event, "diastolic", lastDia);
-            Json.put(event, "systolic", lastSys);
-            Json.put(event, "puls", lastPls);
+            Json.put(event, "glucose", bgv);
 
             EventManager.updateComingEvent("webapps.medicator", event);
 
@@ -142,9 +141,8 @@ public class HealthGlucose extends HealthBase
             break;
         }
 
-        NotifyManager.removeNotification("medicator.take.bloodoxygen");
+        NotifyManager.removeNotification("medicator.take.bloodglucose");
         Simple.makePost(CommonConfigs.UpdateNotifications);
-        */
     }
 
     private void evaluateMessage()
