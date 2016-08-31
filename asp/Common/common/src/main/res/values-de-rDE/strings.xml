@@ -798,6 +798,8 @@
     <string name="health_bpm_alert">%1$s hat einen Blutdruck von %2$s bei einem Puls von %3$s.</string>
     <string name="health_bpm_lowpb">Der Blutdruck ist bedenklich niedrig.</string>
     <string name="health_bpm_highbp">Der Blutdruck ist bedenklich hoch.</string>
+    <string name="health_bpm_lowpls">Der Puls ist bedenklich niedrig.</string>
+    <string name="health_bpm_highpls">Der Puls ist bedenklich hoch.</string>
     <string name="health_bpm_activity">Sie haben einen Blutdruck von %1$d zu %2$d. Ihr Puls ist %3$d.</string>
     <string name="health_bpm_activity_du">Du hast einen Blutdruck von %1$d zu %2$d. Dein Puls ist %3$d.</string>
 
@@ -808,6 +810,13 @@
     <string name="health_oxy_highpls">Der Puls ist bedenklich hoch.</string>
     <string name="health_oxy_activity">Sie haben eine Sauerstoff-Sättigung von %1$d %%. Ihr Puls ist %2$d.</string>
     <string name="health_oxy_activity_du">Du hast eine Sauerstoff-Sättigung von %1$d %%. Dein Puls ist %2$d.</string>
+
+    <string name="health_glucose_spoken">Die letzte Messung ergab einen Blutzuckerwert von %1$d</string>
+    <string name="health_glucose_alert">%1$s hat einen Blutzuckerwert von %2$s</string>
+    <string name="health_glucose_lowglucose">Der Blutzuckerwert ist bedenklich niedrig.</string>
+    <string name="health_glucose_higglucose">Der Blutzuckerwert ist bedenklich hoch.</string>
+    <string name="health_glucose_activity">Sie haben einen Blutzuckerwert von %1$d.</string>
+    <string name="health_glucose_activity_du">Du hast einen Blutzuckerwert von %1$d.</string>
 
     <string-array name="phone_labels_vals">
         <item>Zuhause</item>

@@ -617,6 +617,8 @@
     <string name="health_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
     <string name="health_bpm_lowpb">The blood pressure is alarming low.</string>
     <string name="health_bpm_highbp">The blood pressure is alarming high.</string>
+    <string name="health_bpm_lowpls">The pulse is alarming low.</string>
+    <string name="health_bpm_highpls">The pulse is alarming high.</string>
     <string name="health_bpm_activity">You have a blood pressure of %1$d to %2$d. The pulse is %3$d.</string>
 
     <string name="health_oxy_spoken">The last reading resulted in a blood oxygene saturation of %1$d percent. The pulse was %2$d</string>
@@ -625,6 +627,12 @@
     <string name="health_oxy_lowpls">The pulse is alarming low.</string>
     <string name="health_oxy_highpls">The pulse is alarming high.</string>
     <string name="health_oxy_activity">You have a blood oxygene saturation of %1$d %%. The pulse is %2$d.</string>
+
+    <string name="health_glucose_spoken">The last reading resulted in a glucose value of %1$d</string>
+    <string name="health_glucose_alert">%1$s has a glucose value of %2$s</string>
+    <string name="health_glucose_lowglucose">The glucose value is alarming low.</string>
+    <string name="health_glucose_higglucose">The glucose value is alarming high.</string>
+    <string name="health_glucose_activity">You have a glucose value of %1$d.</string>
 
     <string-array name="phone_labels_keys">
         <item>1</item>

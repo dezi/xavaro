@@ -215,6 +215,38 @@ public class HealthBPM extends HealthBase
         {
             OopsService.log(LOGTAG, ex);
         }
+
+        try
+        {
+            int low = Simple.getSharedPrefInt("health.bpm.alert.lowpls");
+
+            if (low >= lastPls)
+            {
+                Speak.speak(Simple.getTrans(R.string.health_bpm_lowpls));
+                ActivityManager.recordAlert(R.string.health_bpm_lowpls);
+                informAssistance(R.string.health_bpm_lowpls);
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        try
+        {
+            int high = Simple.getSharedPrefInt("health.bpm.alert.highpls");
+
+            if (high <= lastPls)
+            {
+                Speak.speak(Simple.getTrans(R.string.health_bpm_highpls));
+                ActivityManager.recordAlert(R.string.health_bpm_highpls);
+                informAssistance(R.string.health_bpm_highpls);
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
     }
 
     private Runnable messageSpeaker = new Runnable()

@@ -288,7 +288,7 @@ public class PreferencesHealth
 
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceCheckboxPreference cb;
-            NicedPreferences.NiceNumberPreference dp;
+            NicedPreferences.NiceNumberPreference np;
             NicedPreferences.NiceSwitchPreference sp;
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
@@ -321,35 +321,35 @@ public class PreferencesHealth
 
             preferences.add(sp);
 
-            dp = new NicedPreferences.NiceNumberPreference(context);
+            np = new NicedPreferences.NiceNumberPreference(context);
 
-            dp.setKey(keyprefix + ".alert.lowsat");
-            dp.setMinMaxValue(40, 95, 1);
-            dp.setDefaultValue(90);
-            dp.setTitle("Zu niedriger Sauerstoff");
-            dp.setEnabled(enabled);
+            np.setKey(keyprefix + ".alert.lowsat");
+            np.setMinMaxValue(40, 95, 1);
+            np.setDefaultValue(90);
+            np.setTitle("Zu niedriger Sauerstoff");
+            np.setEnabled(enabled);
 
-            preferences.add(dp);
+            preferences.add(np);
 
-            dp = new NicedPreferences.NiceNumberPreference(context);
+            np = new NicedPreferences.NiceNumberPreference(context);
 
-            dp.setKey(keyprefix + ".alert.lowpls");
-            dp.setMinMaxValue(30, 80, 1);
-            dp.setDefaultValue(60);
-            dp.setTitle("Zu niedriger Puls");
-            dp.setEnabled(enabled);
+            np.setKey(keyprefix + ".alert.lowpls");
+            np.setMinMaxValue(30, 80, 1);
+            np.setDefaultValue(60);
+            np.setTitle("Zu niedriger Puls");
+            np.setEnabled(enabled);
 
-            preferences.add(dp);
+            preferences.add(np);
 
-            dp = new NicedPreferences.NiceNumberPreference(context);
+            np = new NicedPreferences.NiceNumberPreference(context);
 
-            dp.setKey(keyprefix + ".alert.highpls");
-            dp.setMinMaxValue(90, 140, 1);
-            dp.setDefaultValue(90);
-            dp.setTitle("Zu hoher Puls");
-            dp.setEnabled(enabled);
+            np.setKey(keyprefix + ".alert.highpls");
+            np.setMinMaxValue(90, 140, 1);
+            np.setDefaultValue(90);
+            np.setTitle("Zu hoher Puls");
+            np.setEnabled(enabled);
 
-            preferences.add(dp);
+            preferences.add(np);
 
             cb = new NicedPreferences.NiceCheckboxPreference(context);
 
@@ -401,6 +401,7 @@ public class PreferencesHealth
             NicedPreferences.NiceListPreference lp;
             NicedPreferences.NiceCheckboxPreference cb;
             NicedPreferences.NiceDualpickPreference dp;
+            NicedPreferences.NiceNumberPreference np;
             NicedPreferences.NiceSwitchPreference sp;
 
             //
@@ -509,6 +510,26 @@ public class PreferencesHealth
             dp.setEnabled(enabled);
 
             preferences.add(dp);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.lowpls");
+            np.setMinMaxValue(30, 80, 1);
+            np.setDefaultValue(60);
+            np.setTitle("Zu niedriger Puls");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.highpls");
+            np.setMinMaxValue(90, 140, 1);
+            np.setDefaultValue(90);
+            np.setTitle("Zu hoher Puls");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
 
             cb = new NicedPreferences.NiceCheckboxPreference(context);
 

@@ -319,8 +319,9 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
         Json.put(result, "dts", utciso);
         Json.put(result, "bgv", bgValue);
-        Json.put(result, "ngv", pl[  9 ]);
+        Json.put(result, "ngv", pl[ 9 ]);
         Json.put(result, "csv", pl[ 6 ]);
+        Json.put(result, "dev", parent.deviceName);
 
         if (parent.dataCallback != null)
         {
