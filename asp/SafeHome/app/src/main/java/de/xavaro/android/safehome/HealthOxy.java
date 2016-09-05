@@ -170,7 +170,7 @@ public class HealthOxy extends HealthBase
 
                 long dts = Simple.getTimeStamp(date);
 
-                if ((dts < now) || (Math.abs(now - dts) > 24 * 3600 * 1000)) continue;
+                if (Math.abs(now - dts) > 24 * 3600 * 1000) continue;
 
                 Json.put(event, "date", Simple.timeStampAsISO(now + 5 * 60 * 1000));
                 Json.put(event, "taken", false);
