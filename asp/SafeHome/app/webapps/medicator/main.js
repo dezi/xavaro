@@ -706,45 +706,48 @@ medicator.insertDialogValues = function(event)
     if (! (medicator.currentDialog && medicator.currentDialog.whatSpan)) return;
 
     var whatSpan = medicator.currentDialog.whatSpan;
-    var haveData = false;
+    var haveType = false;
 
     if (whatSpan.pulsEdit && event.puls)
     {
+        //
+        // Puls does not identify type.
+        //
+
         whatSpan.pulsEdit.value = event.puls;
-        haveData = true;
     }
 
     if (whatSpan.weightEdit && event.weight)
     {
         whatSpan.weightEdit.value = event.weight;
-        haveData = true;
+        haveType = true;
     }
 
     if (whatSpan.glucoseEdit && event.glucose)
     {
         whatSpan.glucoseEdit.value = event.glucose;
-        haveData = true;
+        haveType = true;
     }
 
     if (whatSpan.systolicEdit && event.systolic)
     {
         whatSpan.systolicEdit.value = event.systolic;
-        haveData = true;
+        haveType = true;
     }
 
     if (whatSpan.diastolicEdit && event.diastolic)
     {
         whatSpan.diastolicEdit.value = event.diastolic;
-        haveData = true;
+        haveType = true;
     }
 
     if (whatSpan.saturationEdit && event.saturation)
     {
         whatSpan.saturationEdit.value = event.saturation;
-        haveData = true;
+        haveType = true;
     }
 
-    if (haveData)
+    if (haveType)
     {
         whatSpan.bluetooth = true;
         WebLibDialog.setOkButtonEnable(true);
