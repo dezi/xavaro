@@ -334,53 +334,58 @@ medicator.onClickMeasured = function(target)
     var config = medicator.currentConfig
     if (! (config && config.medisets)) return;
 
-    config.taken = true;
-    config.medisets[ 0 ].taken = true;
-    config.medisets[ 0 ].takendate = new Date().toISOString();
-
     var whatSpan = medicator.currentDialog.whatSpan;
 
-    if (whatSpan.puls) config.medisets[ 0 ].puls = whatSpan.puls;
-    if (whatSpan.weight) config.medisets[ 0 ].weight = whatSpan.weight;
-    if (whatSpan.glucose) config.medisets[ 0 ].glucose = whatSpan.glucose;
-    if (whatSpan.systolic) config.medisets[ 0 ].systolic = whatSpan.systolic;
-    if (whatSpan.diastolic) config.medisets[ 0 ].diastolic = whatSpan.diastolic;
-    if (whatSpan.saturation) config.medisets[ 0 ].saturation = whatSpan.saturation;
-
-    medicator.updateHealthData(config.medisets[ 0 ]);
-    medicator.updateMedisetEvent(config.medisets[ 0 ]);
-
-    var formkey = config.formkey;
-    var launchitem = medicator.lauchis[ formkey ];
-    var overicon = WebLibLaunch.getOverIconImgElem(launchitem);
-    overicon.src = "indicator_ok_480x480.png";
-
-    var mediform = config.medisets[ 0 ].mediform;
-    var meditext = null;
-
-    if (mediform.startsWith("ZZB")) meditext = "activity.took.bloodpressure";
-    if (mediform.startsWith("ZZO")) meditext = "activity.took.bloodoxygen";
-    if (mediform.startsWith("ZZG")) meditext = "activity.took.bloodglucose";
-    if (mediform.startsWith("ZZW")) meditext = "activity.took.weight";
-
-    if (meditext != null) WebAppActivity.recordActivity(WebLibStrings.getTrans(meditext));
-
-    //
-    // Remove any pending notification.
-    //
-
-    var notify = {};
-
-    if (mediform.startsWith("ZZB")) notify.key = "medicator.take.bloodpressure";
-    if (mediform.startsWith("ZZO")) notify.key = "medicator.take.bloodoxygen";
-    if (mediform.startsWith("ZZG")) notify.key = "medicator.take.bloodglucose";
-    if (mediform.startsWith("ZZW")) notify.key = "medicator.take.weight";
-
-    if (notify.key)
+    if (! whatSpan.bluetooth)
     {
-        WebAppNotify.removeNotification(JSON.stringify(notify));
-        WebAppNotify.updateNotificationDisplay();
+        config.taken = true;
+        config.medisets[ 0 ].taken = true;
+        config.medisets[ 0 ].takendate = new Date().toISOString();
+
+        if (whatSpan.puls) config.medisets[ 0 ].puls = whatSpan.puls;
+        if (whatSpan.weight) config.medisets[ 0 ].weight = whatSpan.weight;
+        if (whatSpan.glucose) config.medisets[ 0 ].glucose = whatSpan.glucose;
+        if (whatSpan.systolic) config.medisets[ 0 ].systolic = whatSpan.systolic;
+        if (whatSpan.diastolic) config.medisets[ 0 ].diastolic = whatSpan.diastolic;
+        if (whatSpan.saturation) config.medisets[ 0 ].saturation = whatSpan.saturation;
+
+        medicator.updateHealthData(config.medisets[ 0 ]);
+        medicator.updateMedisetEvent(config.medisets[ 0 ]);
+
+        var formkey = config.formkey;
+        var launchitem = medicator.lauchis[ formkey ];
+        var overicon = WebLibLaunch.getOverIconImgElem(launchitem);
+        overicon.src = "indicator_ok_480x480.png";
+
+        var mediform = config.medisets[ 0 ].mediform;
+        var meditext = null;
+
+        if (mediform.startsWith("ZZB")) meditext = "activity.took.bloodpressure";
+        if (mediform.startsWith("ZZO")) meditext = "activity.took.bloodoxygen";
+        if (mediform.startsWith("ZZG")) meditext = "activity.took.bloodglucose";
+        if (mediform.startsWith("ZZW")) meditext = "activity.took.weight";
+
+        if (meditext != null) WebAppActivity.recordActivity(WebLibStrings.getTrans(meditext));
+
+        //
+        // Remove any pending notification.
+        //
+
+        var notify = {};
+
+        if (mediform.startsWith("ZZB")) notify.key = "medicator.take.bloodpressure";
+        if (mediform.startsWith("ZZO")) notify.key = "medicator.take.bloodoxygen";
+        if (mediform.startsWith("ZZG")) notify.key = "medicator.take.bloodglucose";
+        if (mediform.startsWith("ZZW")) notify.key = "medicator.take.weight";
+
+        if (notify.key)
+        {
+            WebAppNotify.removeNotification(JSON.stringify(notify));
+            WebAppNotify.updateNotificationDisplay();
+        }
     }
+
+    medicator.currentDialog = null;
 
     return true;
 }
@@ -696,6 +701,56 @@ medicator.computePillPositions = function(launchitem)
     }
 }
 
+medicator.insertDialogValues = function(event)
+{
+    if (! (medicator.currentDialog && medicator.currentDialog.whatSpan)) return;
+
+    var whatSpan = medicator.currentDialog.whatSpan;
+    var haveData = false;
+
+    if (whatSpan.pulsEdit && event.puls)
+    {
+        whatSpan.pulsEdit.value = event.puls;
+        haveData = true;
+    }
+
+    if (whatSpan.weightEdit && event.weight)
+    {
+        whatSpan.weightEdit.value = event.weight;
+        haveData = true;
+    }
+
+    if (whatSpan.glucoseEdit && event.glucose)
+    {
+        whatSpan.glucoseEdit.value = event.glucose;
+        haveData = true;
+    }
+
+    if (whatSpan.systolicEdit && event.systolic)
+    {
+        whatSpan.systolicEdit.value = event.systolic;
+        haveData = true;
+    }
+
+    if (whatSpan.diastolicEdit && event.diastolic)
+    {
+        whatSpan.diastolicEdit.value = event.diastolic;
+        haveData = true;
+    }
+
+    if (whatSpan.saturationEdit && event.saturation)
+    {
+        whatSpan.saturationEdit.value = event.saturation;
+        haveData = true;
+    }
+
+    if (haveData)
+    {
+        whatSpan.bluetooth = true;
+        WebLibDialog.setOkButtonEnable(true);
+    }
+}
+
 medicator.updateEvents = function()
 {
     //
@@ -734,6 +789,8 @@ medicator.updateEvents = function()
         config.medisets[ 0 ].systolic   = event.systolic;
         config.medisets[ 0 ].diastolic  = event.diastolic;
         config.medisets[ 0 ].saturation = event.saturation;
+
+        medicator.insertDialogValues(event);
     }
 
     var now = new Date().getTime();
@@ -775,6 +832,7 @@ medicator.updateEvents = function()
         WebLibSimple.setImageSource(overimg, overicon)
     }
 
+    var millis = (medicator.currentDialog && medicator.currentDialog.whatSpan) ? 1000 : 10000;
     setTimeout(medicator.updateEvents, 10000);
 }
 
