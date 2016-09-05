@@ -781,6 +781,7 @@ medicator.updateEvents = function()
         if (! medicator.configs[ formkey ]) continue;
 
         var config = medicator.configs[ formkey ];
+        if (config.taken) continue;
 
         config.taken = true;
         config.medisets[ 0 ].taken = true;
