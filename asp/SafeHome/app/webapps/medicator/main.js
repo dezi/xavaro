@@ -133,6 +133,7 @@ medicator.updateMedisetEvent = function(mediset)
         //
 
         if (mediset.puls      ) event.puls       = mediset.puls;
+        if (mediset.meal      ) event.meal       = mediset.meal;
         if (mediset.weight    ) event.weight     = mediset.weight;
         if (mediset.glucose   ) event.glucose    = mediset.glucose;
         if (mediset.systolic  ) event.systolic   = mediset.systolic;
@@ -167,6 +168,7 @@ medicator.updateHealthData = function(mediset)
     //
 
     if (mediset.puls      ) record.pls = mediset.puls;
+    if (mediset.meal      ) record.mea = mediset.meal;
     if (mediset.weight    ) record.wei = mediset.weight;
     if (mediset.glucose   ) record.bgv = mediset.glucose;
     if (mediset.systolic  ) record.sys = mediset.systolic;
@@ -343,6 +345,7 @@ medicator.onClickMeasured = function(target)
         config.medisets[ 0 ].takendate = new Date().toISOString();
 
         if (whatSpan.puls) config.medisets[ 0 ].puls = whatSpan.puls;
+        if (whatSpan.meal) config.medisets[ 0 ].meal = whatSpan.meal;
         if (whatSpan.weight) config.medisets[ 0 ].weight = whatSpan.weight;
         if (whatSpan.glucose) config.medisets[ 0 ].glucose = whatSpan.glucose;
         if (whatSpan.systolic) config.medisets[ 0 ].systolic = whatSpan.systolic;
@@ -493,7 +496,10 @@ medicator.onBloodGlucoseKeypress = function(event)
     whatSpan.glucose = parseInt(whatSpan.glucoseEdit.value);
     whatSpan.glucoseEdit.style.color = (whatSpan.glucose > 260) ? "#ff0000" : "#444444";
 
-    var okok = (whatSpan.glucose <= 260);
+    whatSpan.meal = whatSpan.mealSelect.value;
+    whatSpan.mealSelect.style.color = (whatSpan.meal == "0:undefined") ? "#ff0000" : "#444444";
+
+    var okok = ((whatSpan.glucose <= 260) && (whatSpan.meal != "0:undefined"));
 
     WebLibDialog.setOkButtonEnable(okok);
 }
@@ -534,6 +540,32 @@ medicator.createNumberInput = function(parent, value, title, focus)
     titleSpan.innerHTML = title;
 
     return numberInput;
+}
+
+medicator.createSelectInput = function(parent, value, title, langtag, focus)
+{
+    var inputDiv = WebLibSimple.createAnyAppend("div", parent);
+    inputDiv.style.padding = WebLibSimple.addPixel(8);
+
+    var selectInput = WebLibSimple.createAnyAppend("select", inputDiv);
+    WebLibSimple.setFontSpecs(selectInput, 28, "bold", "#444444");
+    selectInput.style.textAlign = "center";
+
+    var keys = WebLibStrings.getTrans(langtag + ".keys");
+    var vals = WebLibStrings.getTrans(langtag + ".vals");
+
+    for (var inx = 0; inx < keys.length; inx++)
+    {
+        var option = document.createElement("option");
+        option.text  = vals[ inx ];
+        option.value = keys[ inx ];
+
+        selectInput.add(option);
+    }
+
+    selectInput.value = value;
+
+    return selectInput;
 }
 
 medicator.onClickEventItem = function(target, ctarget, noclick)
@@ -596,9 +628,13 @@ medicator.onClickEventItem = function(target, ctarget, noclick)
             {
                 dlconfig.title = "Blutzucker messen";
 
+                whatSpan.mealSelect = medicator.createSelectInput(whatSpan, mediset.meal, "Markierung", "glucose.meal", true);
+                whatSpan.mealSelect.onchange = medicator.onBloodGlucoseKeypress;
+                whatSpan.mealSelect.style.color = (whatSpan.mealSelect.value == "0:undefined") ? "#ff0000" : "#444444";
+
                 whatSpan.glucoseEdit = medicator.createNumberInput(whatSpan, mediset.glucose, "Glucosewert", true);
                 whatSpan.glucoseEdit.onkeyup = medicator.onBloodGlucoseKeypress;
-            }
+           }
 
             if (mediset.mediform == "ZZW")
             {
@@ -717,6 +753,12 @@ medicator.insertDialogValues = function(event)
         whatSpan.pulsEdit.value = event.puls;
     }
 
+    if (whatSpan.mealSelect && event.meal)
+    {
+        whatSpan.mealSelect.value = event.meal;
+        haveType = true;
+    }
+
     if (whatSpan.weightEdit && event.weight)
     {
         whatSpan.weightEdit.value = event.weight;
@@ -788,6 +830,7 @@ medicator.updateEvents = function()
         config.medisets[ 0 ].takendate = event.takendate;
 
         config.medisets[ 0 ].puls       = event.puls;
+        config.medisets[ 0 ].meal       = event.meal;
         config.medisets[ 0 ].weight     = event.weight;
         config.medisets[ 0 ].glucose    = event.glucose;
         config.medisets[ 0 ].systolic   = event.systolic;
@@ -953,6 +996,7 @@ medicator.createEvents = function()
                 mediset.takendate = event.takendate;
 
                 mediset.puls       = event.puls;
+                mediset.meal       = event.meal;
                 mediset.weight     = event.weight;
                 mediset.glucose    = event.glucose;
                 mediset.systolic   = event.systolic;

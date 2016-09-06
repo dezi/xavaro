@@ -98,5 +98,7 @@
   "activity.took.bloodpressure" : "Sie haben ihren Blutdruck gemessen.",
   "activity.took.bloodpressure.du" : "Du hast deinen Blutdruck gemessen.",
 
+  "glucose.meal.vals" : [   "Nicht festgelegt", "Vor der Mahlzeit", "Nach der Mahlzeit", "Nüchtern",   "Zwischendurch",   "Schlafenzeit" ],
+
   "EOL" : true
 }

@@ -93,5 +93,8 @@
   "activity.took.bloodglucose" : "You measured Your blood sugar.",
   "activity.took.bloodpressure" : "You measured Your blood pressure.",
 
+  "glucose.meal.keys" : [ "0:undefined",  "1:before",    "2:after",    "3:fasting", "4:casual", "5:bedtime" ],
+  "glucose.meal.vals" : [ "Undetermined", "Before Meal", "After Meal", "Fasting",   "Casual",   "Bedtime"   ],
+
   "EOL" : true
 }

@@ -20,7 +20,7 @@ WebLibTouch.onTouchStart = function(event)
 
     while (target)
     {
-        if (target.nodeName == "INPUT")
+        if ((target.nodeName == "INPUT") || (target.nodeName == "SELECT"))
         {
             //
             // Input element. Return to default behaviour.
