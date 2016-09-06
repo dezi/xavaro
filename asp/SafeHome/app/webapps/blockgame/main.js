@@ -437,7 +437,7 @@ blockgame.onTouchEnd = function(event)
     var xpos = Math.floor(target.myblock.left / xx.fieldsize)
     var ypos = Math.floor(target.myblock.top  / xx.fieldsize);
 
-    if ((xpos + target.myblock.len) >= 6)
+    if ((target.myblock.dir == 0) && (xpos + target.myblock.len) >= 6)
     {
         //
         // Blue block in exit.
