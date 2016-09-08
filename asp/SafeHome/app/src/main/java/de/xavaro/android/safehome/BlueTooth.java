@@ -569,6 +569,8 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "onServicesDiscovered=" + (currentGatt == gatt));
 
+            boolean isCompatible = false;
+
             List<BluetoothGattService> gattServices = gatt.getServices();
 
             for (BluetoothGattService service : gattServices)
@@ -605,6 +607,7 @@ public abstract class BlueTooth extends BroadcastReceiver
                     {
                         currentPrimary = characteristic;
                         Log.d(LOGTAG, "Found primary=" + deviceName + " " + uuid);
+                        isCompatible = true;
                     }
 
                     if (isCompatibleSecondary(characteristic))
@@ -623,7 +626,7 @@ public abstract class BlueTooth extends BroadcastReceiver
 
             if (isDiscovering)
             {
-                if ((discoverCallback != null) && (currentPrimary != null))
+                if ((discoverCallback != null) && isCompatible)
                 {
                     Log.d(LOGTAG,"onServicesDiscovered Found=" + deviceName);
 

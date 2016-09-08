@@ -4,12 +4,12 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.json.JSONObject;
 
 import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Json;
@@ -24,35 +24,35 @@ import de.xavaro.android.common.Simple;
 //  loc => Sample location
 //
 
-public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
+public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevice
 {
-    private static final String LOGTAG = BlueToothThermoGeneric.class.getSimpleName();
+    private static final String LOGTAG = BlueToothThermoMedisana.class.getSimpleName();
 
     private final BlueTooth parent;
 
-    public BlueToothThermoGeneric(BlueTooth parent)
+    public BlueToothThermoMedisana(BlueTooth parent)
     {
         this.parent = parent;
     }
 
     public boolean isCompatibleService(BluetoothGattService service)
     {
-        return service.getUuid().toString().equals("00001809-0000-1000-8000-00805f9b34fb");
+        return service.getUuid().toString().equals("a72435c3-d797-44ed-a625-cf29d84aa64c");
     }
 
     public boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
-        return characteristic.getUuid().toString().equals("00002a1c-0000-1000-8000-00805f9b34fb");
+        return characteristic.getUuid().toString().equals("5869cf77-a8ea-47d8-a239-cd2100fa30a1");
     }
 
     public boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
     {
-        return false;
+        return characteristic.getUuid().toString().equals("db765158-8854-48aa-a228-add88374eae9");
     }
 
     public boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
     {
-        return false;
+        return characteristic.getUuid().toString().equals("e9a2825d-6aab-438a-ac95-a914a36036e6");
     }
 
     public void enableDevice()
@@ -61,6 +61,20 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
 
     public void syncSequence()
     {
+        BlueTooth.GattAction ga;
+
+        //
+        // Get all records.
+        //
+
+        ga = new BlueTooth.GattAction();
+
+        ga.mode = BlueTooth.GattAction.MODE_WRITE;
+        ga.data = getAllRecords();
+        ga.characteristic = parent.currentControl;
+
+        parent.gattSchedule.add(ga);
+
         parent.fireNext(true);
     }
 
@@ -75,6 +89,7 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
         Log.d(LOGTAG, "parseResponse: " + characteristic.getUuid().toString());
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
 
+        /*
         if (isCompatiblePrimary(characteristic))
         {
             Log.d(LOGTAG, "parseResponse: " + getMaskPrimaryString(rd[ 0 ]));
@@ -144,6 +159,7 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
             record.remove("type");
             HealthData.addRecord("thermo", record);
         }
+        */
     }
 
     private String getMaskPrimaryString(int mask)
@@ -156,6 +172,20 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
         if ((mask & 0x04) != 0) pstr += "TYPE ";
 
         return pstr.trim();
+    }
+
+    public byte[] getAllRecords()
+    {
+        Log.d(LOGTAG, "getAllRecords");
+
+        byte[] data = new byte[ 4 ];
+
+        data[ 0 ] = 0x00;
+        data[ 1 ] = 0x08;
+        data[ 2 ] = 0x00;
+        data[ 3 ] = 0x01;
+
+        return data;
     }
 
     private int unsignedByteToInt(byte b)

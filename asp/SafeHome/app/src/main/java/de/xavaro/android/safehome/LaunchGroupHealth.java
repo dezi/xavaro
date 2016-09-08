@@ -124,11 +124,11 @@ public class LaunchGroupHealth extends LaunchGroup
     {
         if (Simple.getSharedPrefBoolean("health." + subtype + ".enable"))
         {
-            String bpmDevice = Simple.getSharedPrefString("health." + subtype + ".device");
+            String bluetoothDevice = Simple.getSharedPrefString("health." + subtype + ".device");
 
-            if ((bpmDevice != null) && ! bpmDevice.equals("unknown"))
+            if ((bluetoothDevice != null) && ! bluetoothDevice.equals("unknown"))
             {
-                return bpmDevice;
+                return bluetoothDevice;
             }
         }
 
@@ -192,7 +192,7 @@ public class LaunchGroupHealth extends LaunchGroup
             if (! HealthThermo.getInstance().isConfigured())
             {
                 HealthThermo.getInstance().setBlueTooth(
-                        new BlueToothScale(context, getDevice("thermo")));
+                        new BlueToothThermo(context, getDevice("thermo")));
             }
         }
         else
