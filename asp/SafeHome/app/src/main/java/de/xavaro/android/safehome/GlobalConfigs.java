@@ -87,6 +87,7 @@ public class GlobalConfigs
     public static final int IconResHealthOxy          = R.drawable.health_oxy_440x440;
     public static final int IconResHealthScale        = R.drawable.health_scale_280x280;
     public static final int IconResHealthSensor       = R.drawable.health_sensor_256x256;
+    public static final int IconResHealthThermo       = R.drawable.health_thermo_512x512;
     public static final int IconResHealthGlucose      = R.drawable.health_glucose_512x512;
     public static final int IconResBlueTooth          = R.drawable.bluetooth_256x256;
     public static final int IconResAppsDiscounter     = R.drawable.discounter_512x512;

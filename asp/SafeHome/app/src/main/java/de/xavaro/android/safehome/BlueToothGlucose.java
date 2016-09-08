@@ -62,10 +62,7 @@ public class BlueToothGlucose extends BlueTooth
     @Override
     protected boolean isSpecialBonding()
     {
-        if (deviceName.equals("Accu-Chek")) return true;
-        if (deviceName.equals("MediTouch 2 BT")) return true;
-
-        return false;
+        return deviceName.equals("Accu-Chek") || deviceName.equals("MediTouch 2 BT");
     }
 
     @Override

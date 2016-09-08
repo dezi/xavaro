@@ -252,6 +252,107 @@ public class PreferencesHealth
 
     //endregion Health Units preferences
 
+    //region Health Thermo preferences
+
+    public static class HealthThermoFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "Temperatur";
+            header.iconRes = GlobalConfigs.IconResHealthThermo;
+            header.fragment = HealthThermoFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthThermoFragment()
+        {
+            super();
+
+            isThermo = true;
+
+            iconres = GlobalConfigs.IconResHealthThermo;
+            keyprefix = "health.thermo";
+            masterenable = "Thermometer freischalten";
+            devicetitle = "Thermometer";
+            devicesearch = "Thermometer werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceCheckboxPreference cb;
+            NicedPreferences.NiceNumberPreference np;
+            NicedPreferences.NiceSwitchPreference sp;
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Warnungen");
+            preferences.add(pc);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".alert.enable");
+            sp.setTitle("Aktivieren");
+            sp.setEnabled(enabled);
+
+            sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    for (Preference pref : preferences)
+                    {
+                        if (pref.getKey() == null) continue;
+                        if (pref.getKey().equals(keyprefix + ".alert.enable")) continue;
+                        if (! pref.getKey().startsWith(keyprefix + ".alert.")) continue;
+
+                        pref.setEnabled((boolean) newValue);
+                    }
+
+                    return true;
+                }
+            });
+
+            preferences.add(sp);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.lowtherm");
+            np.setMinMaxValue(30, 37, 1);
+            np.setDefaultValue(36);
+            np.setTitle("Zu niedrige Temperatur");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.hightherm");
+            np.setMinMaxValue(37, 40, 1);
+            np.setDefaultValue(38);
+            np.setTitle("Zu hohe Temperatur");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            cb = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cb.setKey(keyprefix + ".alert.alertgroup");
+            cb.setTitle("Assistenz informieren");
+            cb.setEnabled(enabled);
+
+            preferences.add(cb);
+        }
+    }
+
+    //endregion Health Thermo preferences
+
     //region Health Oxy preferences
 
     public static class HealthOxyFragment extends BlueToothFragment
@@ -832,6 +933,7 @@ public class PreferencesHealth
         protected boolean isBPM;
         protected boolean isOxy;
         protected boolean isScale;
+        protected boolean isThermo;
         protected boolean isSensor;
         protected boolean isGlucose;
 
@@ -999,6 +1101,7 @@ public class PreferencesHealth
                         if (isBPM) new BlueToothBPM(context).discover(self);
                         if (isOxy) new BlueToothOxy(context).discover(self);
                         if (isScale) new BlueToothScale(context).discover(self);
+                        if (isThermo) new BlueToothThermo(context).discover(self);
                         if (isSensor) new BlueToothSensor(context).discover(self);
                         if (isGlucose) new BlueToothGlucose(context).discover(self);
                     }

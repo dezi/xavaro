@@ -63,6 +63,19 @@ public class LaunchGroupHealth extends LaunchGroup
             if (Simple.sharedPrefEquals("health.scale.icon", "folder")) Json.put(adir, entry);
         }
 
+        if (Simple.getSharedPrefBoolean("health.thermo.enable"))
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "subtype", "thermo");
+            Json.put(entry, "label", "Temperatur");
+            Json.put(entry, "order", 1000);
+
+            if (Simple.sharedPrefEquals("health.thermo.icon", "home")) Json.put(home, entry);
+            if (Simple.sharedPrefEquals("health.thermo.icon", "folder")) Json.put(adir, entry);
+        }
+
         if (Simple.getSharedPrefBoolean("health.sensor.enable"))
         {
             JSONObject entry = new JSONObject();
@@ -174,6 +187,22 @@ public class LaunchGroupHealth extends LaunchGroup
             }
         }
 
+        if (getDevice("thermo") != null)
+        {
+            if (! HealthThermo.getInstance().isConfigured())
+            {
+                HealthThermo.getInstance().setBlueTooth(
+                        new BlueToothScale(context, getDevice("thermo")));
+            }
+        }
+        else
+        {
+            if (HealthThermo.getInstance().isConfigured())
+            {
+                HealthThermo.getInstance().setBlueTooth(null);
+            }
+        }
+
         if (getDevice("sensor") != null)
         {
             if (! HealthSensor.getInstance().isConfigured())
@@ -222,6 +251,11 @@ public class LaunchGroupHealth extends LaunchGroup
         if (subtype.equals("scale") && (HealthScale.getInstance() != null))
         {
             HealthScale.subscribe(subscriber);
+        }
+
+        if (subtype.equals("thermo") && (HealthThermo.getInstance() != null))
+        {
+            HealthThermo.subscribe(subscriber);
         }
 
         if (subtype.equals("sensor") && (HealthSensor.getInstance() != null))
