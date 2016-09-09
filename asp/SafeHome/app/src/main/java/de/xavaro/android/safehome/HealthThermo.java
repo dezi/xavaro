@@ -54,7 +54,7 @@ public class HealthThermo extends HealthBase
             String date = Json.getString(lastRecord, "dts");
             if (date == null) return;
 
-            int temperature = Json.getInt(lastRecord, "tmp");
+            double temperature = Json.getDouble(lastRecord, "tmp");
 
             if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
             {
@@ -69,7 +69,7 @@ public class HealthThermo extends HealthBase
 
     JSONObject lastRecord;
     String lastDts;
-    int lastTmp;
+    double lastTmp;
 
     private void informAssistance(int resid)
     {
@@ -91,7 +91,7 @@ public class HealthThermo extends HealthBase
         String name = Simple.getOwnerName();
         String bval = "" + lastTmp;
 
-        String text = Simple.getTrans(R.string.health_oxy_alert, name, bval)
+        String text = Simple.getTrans(R.string.health_thermo_alert, name, bval)
                 + " " + Simple.getTrans(resid);
 
         JSONObject assistMessage = new JSONObject();
@@ -151,8 +151,8 @@ public class HealthThermo extends HealthBase
         String type = Json.getString(lastRecord, "type");
         if (! Simple.equals(type, "ThermoMeasurement")) return;
 
-        String sm = Simple.getTrans(R.string.health_oxy_spoken, lastTmp);
-        String am = Simple.getTrans(R.string.health_oxy_activity, lastTmp);
+        String sm = Simple.getTrans(R.string.health_thermo_spoken, lastTmp);
+        String am = Simple.getTrans(R.string.health_thermo_activity, lastTmp);
 
         Speak.speak(sm);
         ActivityManager.recordActivity(am);
@@ -163,13 +163,14 @@ public class HealthThermo extends HealthBase
 
         try
         {
-            int low = Simple.getSharedPrefInt("health.thermo.alert.lowtemp");
+            String lowstr = Simple.getSharedPrefString("health.thermo.alert.lowtemp");
+            Double low = Simple.parseDouble(lowstr);
 
             if (low >= lastTmp)
             {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_lowpls));
-                ActivityManager.recordAlert(R.string.health_oxy_lowpls);
-                informAssistance(R.string.health_oxy_lowpls);
+                Speak.speak(Simple.getTrans(R.string.health_thermo_lowtemp));
+                ActivityManager.recordAlert(R.string.health_thermo_lowtemp);
+                informAssistance(R.string.health_thermo_lowtemp);
             }
         }
         catch (Exception ex)
@@ -179,13 +180,14 @@ public class HealthThermo extends HealthBase
 
         try
         {
-            int high = Simple.getSharedPrefInt("health.thermo.alert.hightemp");
+            String highstr = Simple.getSharedPrefString("health.thermo.alert.hightemp");
+            Double high = Simple.parseDouble(highstr);
 
             if (high <= lastTmp)
             {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_highpls));
-                ActivityManager.recordAlert(R.string.health_oxy_highpls);
-                informAssistance(R.string.health_oxy_highpls);
+                Speak.speak(Simple.getTrans(R.string.health_thermo_hightemp));
+                ActivityManager.recordAlert(R.string.health_thermo_hightemp);
+                informAssistance(R.string.health_thermo_hightemp);
             }
         }
         catch (Exception ex)

@@ -278,11 +278,24 @@ public class Simple
 
     //region All purpose simple methods
 
-    public static int parseNumber(String restag)
+    public static int parseNumber(String str)
     {
         try
         {
-            return Integer.parseInt(restag);
+            return Integer.parseInt(str);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return 0;
+    }
+
+    public static double parseDouble(String str)
+    {
+        try
+        {
+            return Double.parseDouble(str);
         }
         catch (Exception ignore)
         {

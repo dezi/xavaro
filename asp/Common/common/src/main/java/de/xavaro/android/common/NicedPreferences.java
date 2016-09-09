@@ -334,6 +334,8 @@ public class NicedPreferences
         private String[] stepValues1;
         private String[] stepValues2;
 
+        private String separator = ":";
+
         public NiceDualpickPreference(Context context)
         {
             super(context);
@@ -354,6 +356,11 @@ public class NicedPreferences
             minValue2 = min;
             maxValue2 = max;
             stepValue2 = step;
+        }
+
+        public void setSeparator(String separator)
+        {
+            this.separator = separator;
         }
 
         @Override
@@ -442,14 +449,14 @@ public class NicedPreferences
 
                 if ((stepValues1 == null) || (stepValues2 == null))
                 {
-                    newvalue = numberPicker1.getValue() + ":" + numberPicker2.getValue();
+                    newvalue = numberPicker1.getValue() + separator + numberPicker2.getValue();
                 }
                 else
                 {
                     String val1 = stepValues1[ numberPicker1.getValue() ];
                     String val2 = stepValues2[ numberPicker2.getValue() ];
 
-                    newvalue = val1 + ":" + val2;
+                    newvalue = val1 + separator + val2;
                 }
 
                 setValue(newvalue);
@@ -472,7 +479,7 @@ public class NicedPreferences
 
             try
             {
-                String[] parts = value.split(":");
+                String[] parts = value.split(separator);
 
                 if (parts.length == 2)
                 {

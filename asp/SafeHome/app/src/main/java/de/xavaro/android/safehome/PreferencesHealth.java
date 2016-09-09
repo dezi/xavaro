@@ -1,18 +1,17 @@
 package de.xavaro.android.safehome;
 
-import android.app.AlertDialog;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Bundle;
-import android.os.Handler;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.util.Log;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.app.AlertDialog;
+import android.view.View;
+import android.os.Handler;
+import android.os.Bundle;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -288,7 +287,7 @@ public class PreferencesHealth
 
             NicedPreferences.NiceCategoryPreference pc;
             NicedPreferences.NiceCheckboxPreference cb;
-            NicedPreferences.NiceNumberPreference np;
+            NicedPreferences.NiceDualpickPreference dp;
             NicedPreferences.NiceSwitchPreference sp;
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
@@ -321,25 +320,43 @@ public class PreferencesHealth
 
             preferences.add(sp);
 
-            np = new NicedPreferences.NiceNumberPreference(context);
+            //
+            // Legacy removes.
+            //
 
-            np.setKey(keyprefix + ".alert.lowtherm");
-            np.setMinMaxValue(30, 37, 1);
-            np.setDefaultValue(36);
-            np.setTitle("Zu niedrige Temperatur");
-            np.setEnabled(enabled);
+            if (Simple.getSharedPrefString(keyprefix + ".alert.lowtherm") == null)
+            {
+                Simple.removeSharedPref(keyprefix + ".alert.lowtherm");
+            }
 
-            preferences.add(np);
+            if (Simple.getSharedPrefString(keyprefix + ".alert.hightherm") == null)
+            {
+                Simple.removeSharedPref(keyprefix + ".alert.hightherm");
+            }
 
-            np = new NicedPreferences.NiceNumberPreference(context);
+            dp = new NicedPreferences.NiceDualpickPreference(context);
 
-            np.setKey(keyprefix + ".alert.hightherm");
-            np.setMinMaxValue(37, 40, 1);
-            np.setDefaultValue(38);
-            np.setTitle("Zu hohe Temperatur");
-            np.setEnabled(enabled);
+            dp.setKey(keyprefix + ".alert.lowtherm");
+            dp.setMinMaxValue1(35, 37, 1);
+            dp.setMinMaxValue2(0, 9, 1);
+            dp.setSeparator(".");
+            dp.setDefaultValue("36.5");
+            dp.setTitle("Zu niedrige Temperatur");
+            dp.setEnabled(enabled);
 
-            preferences.add(np);
+            preferences.add(dp);
+
+            dp = new NicedPreferences.NiceDualpickPreference(context);
+
+            dp.setKey(keyprefix + ".alert.hightherm");
+            dp.setMinMaxValue1(37, 40, 1);
+            dp.setMinMaxValue2(0, 9, 1);
+            dp.setSeparator(".");
+            dp.setDefaultValue("38.0");
+            dp.setTitle("Zu hohe Temperatur");
+            dp.setEnabled(enabled);
+
+            preferences.add(dp);
 
             cb = new NicedPreferences.NiceCheckboxPreference(context);
 
