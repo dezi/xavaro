@@ -96,11 +96,14 @@ public abstract class BlueTooth extends BroadcastReceiver
         {
             Log.d(LOGTAG, "connect: device=" + deviceName + " => " + macAddress);
 
-            BluetoothDevice device = bta.getRemoteDevice(macAddress);
-
-            //if (isSpecialBonding()) unpairDevice(device);
-
-            currentGatt = device.connectGatt(Simple.getAppContext(), true, gattCallback);
+            try
+            {
+                BluetoothDevice device = bta.getRemoteDevice(macAddress);
+                currentGatt = device.connectGatt(Simple.getAppContext(), true, gattCallback);
+            }
+            catch (Exception ignore)
+            {
+            }
         }
     };
 
