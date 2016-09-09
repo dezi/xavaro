@@ -110,8 +110,6 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
     {
     }
 
-    private final Map<Integer, JSONObject> lastResults = new HashMap<>();
-
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + characteristic.getUuid().toString());
