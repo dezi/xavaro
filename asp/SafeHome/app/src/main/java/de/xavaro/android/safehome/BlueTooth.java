@@ -225,8 +225,8 @@ public abstract class BlueTooth extends BroadcastReceiver
             if (((device.getType() == BluetoothDevice.DEVICE_TYPE_LE) ||
                     (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
             {
-                deviceName = device.getName();
-                macAddress = device.getAddress();
+                //deviceName = device.getName();
+                //macAddress = device.getAddress();
 
                 Log.d(LOGTAG, "onReceive: connectGatt=" + device.getName());
                 device.connectGatt(context, true, gattCallback);
@@ -628,9 +628,11 @@ public abstract class BlueTooth extends BroadcastReceiver
             {
                 if ((discoverCallback != null) && isCompatible)
                 {
-                    Log.d(LOGTAG,"onServicesDiscovered Found=" + deviceName);
+                    Log.d(LOGTAG,"onServicesDiscovered Found=" + gatt.getDevice().getName());
 
-                    discoverCallback.onDeviceDiscovered(gatt.getDevice());
+                    discoverCallback.onDeviceDiscovered(
+                            getDeviceName(gatt.getDevice()),
+                            gatt.getDevice().getAddress());
                 }
 
                 if (--discoverBGJobs == 0) finishDiscovery();
@@ -717,10 +719,15 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     //region Derived class abstract stuff
 
+    protected String getDeviceName(BluetoothDevice device)
+    {
+        return device.getName();
+    }
+
     protected abstract boolean isCompatibleService(BluetoothGattService service);
+    protected abstract boolean isCompatibleControl(BluetoothGattCharacteristic characteristic);
     protected abstract boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic);
     protected abstract boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
-    protected abstract boolean isCompatibleControl(BluetoothGattCharacteristic characteristic);
 
     protected boolean isSpecialBonding()
     {
@@ -805,7 +812,7 @@ public abstract class BlueTooth extends BroadcastReceiver
     public interface BlueToothDiscoverCallback
     {
         void onDiscoverStarted();
-        void onDeviceDiscovered(BluetoothDevice device);
+        void onDeviceDiscovered(String name, String macaddress);
         void onDiscoverFinished();
     }
 
@@ -835,9 +842,9 @@ public abstract class BlueTooth extends BroadcastReceiver
     public interface BlueToothPhysicalDevice
     {
         boolean isCompatibleService(BluetoothGattService service);
+        boolean isCompatibleControl(BluetoothGattCharacteristic characteristic);
         boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic);
         boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic);
-        boolean isCompatibleControl(BluetoothGattCharacteristic characteristic);
 
         void enableDevice();
         void syncSequence();

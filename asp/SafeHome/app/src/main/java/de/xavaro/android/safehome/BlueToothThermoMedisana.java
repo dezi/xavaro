@@ -21,7 +21,6 @@ import de.xavaro.android.common.Simple;
 //  dts => ISO timestamp
 //  tmp => Temperatur value
 //  unt => Temperature unit
-//  loc => Sample location
 //
 
 public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevice
@@ -29,6 +28,12 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
     private static final String LOGTAG = BlueToothThermoMedisana.class.getSimpleName();
 
     private final BlueTooth parent;
+
+    private BluetoothGattCharacteristic dateTimeChara;
+
+    private BluetoothGattCharacteristic unknown1;
+    private BluetoothGattCharacteristic unknown2;
+    private BluetoothGattCharacteristic unknown3;
 
     public BlueToothThermoMedisana(BlueTooth parent)
     {
@@ -42,6 +47,13 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
 
     public boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
+        String uuid = characteristic.getUuid().toString();
+
+        if (uuid.equals("874a9717-352e-11e2-89b6-7fb28bc8d12d")) dateTimeChara = characteristic;
+        if (uuid.equals("e7d6818f-8610-11e2-8412-7bc9455e1a3a")) unknown1 = characteristic;
+        if (uuid.equals("bf7a1506-dcf2-410a-b4b2-8829eb93d423")) unknown2 = characteristic;
+        if (uuid.equals("29a59c78-ccc0-11e2-b493-14cf921ae45d")) unknown3 = characteristic;
+
         return characteristic.getUuid().toString().equals("5869cf77-a8ea-47d8-a239-cd2100fa30a1");
     }
 
@@ -64,11 +76,27 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
         BlueTooth.GattAction ga;
 
         //
-        // Get all records.
+        // Adjust date and time.
         //
 
         ga = new BlueTooth.GattAction();
+        ga.mode = BlueTooth.GattAction.MODE_WRITE;
+        ga.data = getCurrentTime();
+        ga.characteristic = dateTimeChara;
 
+        parent.gattSchedule.add(ga);
+
+        ga = new BlueTooth.GattAction();
+        ga.mode = BlueTooth.GattAction.MODE_READ;
+        ga.characteristic = dateTimeChara;
+
+        parent.gattSchedule.add(ga);
+
+        //
+        // Request ongoing measuerement.
+        //
+
+        ga = new BlueTooth.GattAction();
         ga.mode = BlueTooth.GattAction.MODE_WRITE;
         ga.data = getAllRecords();
         ga.characteristic = parent.currentControl;
@@ -89,45 +117,42 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
         Log.d(LOGTAG, "parseResponse: " + characteristic.getUuid().toString());
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
 
-        /*
+        if (characteristic.getUuid().toString().equals(dateTimeChara.getUuid().toString()))
+        {
+            long timestamp = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0) & 0xffffffffL;
+
+            Log.d(LOGTAG, "parseResponse:"
+                    + " timestamp=" + timestamp
+                    + " utc=" + Simple.timeStampAsISO(timestamp * 1000L)
+            );
+        }
+
         if (isCompatiblePrimary(characteristic))
         {
-            Log.d(LOGTAG, "parseResponse: " + getMaskPrimaryString(rd[ 0 ]));
+            int intValu1 = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32,  0);
+            int intValu2 = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8,   4);
+            int intValu3 = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16,  5);
+            int intValu4 = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16,  7);
+            int intValu5 = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16,  9);
+            int checksum = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 11);
 
-            int offset = 0;
+            Log.d(LOGTAG, "parseResponse:"
+                    + " iv1=" + intValu1
+                    + " iv2=" + intValu2
+                    + " iv3=" + intValu3
+                    + " iv4=" + intValu4
+                    + " iv5=" + intValu5
+                    + " chk=" + checksum
+            );
 
-            final int mask = rd[ offset++ ] & 0xff;
+            long utc  = (intValu1 & 0xffffffffL) * 1000L;
+            double temperature = intValu3 / 1000.0;
+            String unit = "C";
 
-            String unit = ((mask & 0x01) == 0) ? "C" : "F";
-            float temperature = bytesToFloat(rd[ offset++ ], rd[ offset++ ], rd[ offset++ ], rd[ offset++ ]);
-            int location = 0;
-
-            Calendar calendar = new GregorianCalendar();
-
-            if ((mask & 0x02) != 0)
-            {
-                int year = (rd[ offset++ ] & 0xff) + ((rd[ offset++ ] & 0xff) << 8);
-                int month = rd[ offset++ ] & 0xff;
-                int day = rd[ offset++ ] & 0xff;
-                int hour = rd[ offset++ ] & 0xff;
-                int minute = rd[ offset++ ] & 0xff;
-                int second = rd[ offset++ ] & 0xff;
-
-                calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-            }
-
-            if ((mask & 0x04) != 0)
-            {
-                location = rd[ offset++ ] & 0xff;
-            }
-
-            long utc = calendar.getTimeInMillis();
-            Log.d(LOGTAG, "parseResponse: dts=" + Simple.timeStampAsISO(utc));
-
-            Log.d(LOGTAG, "parseResponse: temperature=" + temperature + " unit=" + unit);
-            Log.d(LOGTAG, "parseResponse: location=" + location);
-
-            Log.d(LOGTAG, "parseResponse: size=" + rd.length + " used=" + offset);
+            Log.d(LOGTAG, "parseResponse:"
+                    + " dts=" + Simple.timeStampAsISO(utc)
+                    + " tmp=" + temperature
+            );
 
             //
             // Announce last record to user interface.
@@ -140,9 +165,9 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
             Json.put(result, "dts", Simple.timeStampAsISO(utc));
             Json.put(result, "tmp", temperature);
             Json.put(result, "unt", unit);
-            Json.put(result, "loc", location);
             Json.put(result, "dev", parent.deviceName);
 
+            /*
             if (parent.dataCallback != null)
             {
                 JSONObject data = new JSONObject();
@@ -150,6 +175,7 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
 
                 parent.dataCallback.onBluetoothReceivedData(parent.deviceName, data);
             }
+            */
 
             //
             // Store data.
@@ -159,56 +185,38 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
             record.remove("type");
             HealthData.addRecord("thermo", record);
         }
-        */
-    }
-
-    private String getMaskPrimaryString(int mask)
-    {
-        String pstr = "";
-
-        if ((mask & 0x01) == 0) pstr += "Celsius ";
-        if ((mask & 0x01) != 0) pstr += "Fahrenheit ";
-        if ((mask & 0x02) != 0) pstr += "TIME ";
-        if ((mask & 0x04) != 0) pstr += "TYPE ";
-
-        return pstr.trim();
     }
 
     public byte[] getAllRecords()
     {
         Log.d(LOGTAG, "getAllRecords");
 
-        byte[] data = new byte[ 4 ];
+        byte[] data = new byte[ 7 ];
 
-        data[ 0 ] = 0x00;
-        data[ 1 ] = 0x08;
-        data[ 2 ] = 0x00;
-        data[ 3 ] = 0x01;
+        data[ 0 ] = (byte) 0xff;
+        data[ 1 ] = (byte) 0xff;
+        data[ 2 ] = (byte) 0x00;
+        data[ 3 ] = (byte) 0x00;
+        data[ 4 ] = (byte) 0x00;
+        data[ 5 ] = (byte) 0x00;
+        data[ 6 ] = (byte) 0x00;
 
         return data;
     }
 
-    private int unsignedByteToInt(byte b)
+    public byte[] getCurrentTime()
     {
-        return b & 0xff;
-    }
+        Log.d(LOGTAG, "getCurrentTime");
 
-    private int unsignedToSigned(int unsigned, int size)
-    {
-        if ((unsigned & (1 << size - 1)) != 0)
-        {
-            unsigned = -1 * ((1 << size - 1) - (unsigned & ((1 << size - 1) - 1)));
-        }
+        long now = Simple.nowAsTimeStamp() / 1000L;
 
-        return unsigned;
-    }
+        byte[] data = new byte[ 4 ];
 
-    private float bytesToFloat(byte b0, byte b1, byte b2, byte b3)
-    {
-        int mantissa = unsignedToSigned(unsignedByteToInt(b0)
-                + (unsignedByteToInt(b1) << 8)
-                + (unsignedByteToInt(b2) << 16), 24);
+        data[ 0 ] = (byte) (now & 0xff);
+        data[ 1 ] = (byte) ((now >> 8) & 0xff);
+        data[ 2 ] = (byte) ((now >> 16) & 0xff);
+        data[ 3 ] = (byte) ((now >> 24) & 0xff);
 
-        return (float) (mantissa * Math.pow(10, b3));
+        return data;
     }
 }

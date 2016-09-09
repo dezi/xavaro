@@ -1143,12 +1143,12 @@ public class PreferencesHealth
             handler.post(runner);
         }
 
-        public void onDeviceDiscovered(BluetoothDevice device)
+        public void onDeviceDiscovered(String name, String macaddress)
         {
-            Log.d(LOGTAG, "onDeviceDiscovered: " + device.getName());
+            Log.d(LOGTAG, "onDeviceDiscovered: " + name);
 
-            String newEntry = device.getName();
-            String newValue = device.getName() + " => " + device.getAddress();
+            String newEntry = name + "";
+            String newValue = name + " => " + macaddress;
 
             if (! recentText.contains(newEntry))
             {

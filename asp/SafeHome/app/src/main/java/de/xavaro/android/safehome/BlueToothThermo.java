@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
@@ -20,13 +21,26 @@ public class BlueToothThermo extends BlueTooth
     public BlueToothThermo(Context context)
     {
         super(context);
-
-        Log.d(LOGTAG, "=============================================thermo");
     }
 
     public BlueToothThermo(Context context, String deviceTag)
     {
         super(context, deviceTag);
+    }
+
+    @Override
+    protected String getDeviceName(BluetoothDevice device)
+    {
+        if (isMedisana)
+        {
+            //
+            // Medisana TM 735 returns null as device name.
+            //
+
+            return "TM 735";
+        }
+
+        return device.getName();
     }
 
     @Override
@@ -73,7 +87,7 @@ public class BlueToothThermo extends BlueTooth
     {
         super.enableDevice();
 
-        if (isGeneric) genericDevice.enableDevice();
+        if (isGeneric)genericDevice.enableDevice();
         if (isMedisana) medisanaDevice.enableDevice();
     }
 

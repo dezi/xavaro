@@ -10,16 +10,19 @@ public class Defucker
 
     public static void Sample()
     {
-
         BluetoothGattDescriptor desc = null;
         BluetoothGattCharacteristic chara = null;
 
-        DumpDescriptor(desc);
-        DumpCharacteristic(chara);
+        WriteDescriptor(desc);
+        WriteCharacteristic(chara);
+        ChangedCharacteristic(chara);
+        ReadCharacteristic(chara);
     }
 
     public static String getHexBytesToString(byte[] bytes)
     {
+        if (bytes == null) return "..null..";
+
         int offset = 0;
         int length = bytes.length;
 
@@ -37,16 +40,28 @@ public class Defucker
         return String.valueOf(hexChars);
     }
 
-    public static void DumpDescriptor(BluetoothGattDescriptor desc)
+    public static void WriteDescriptor(BluetoothGattDescriptor desc)
     {
-        Log.d(LOGTAG, "DumpDescriptor desc=" + desc.getUuid().toString());
-        Log.d(LOGTAG, "DumpDescriptor char=" + desc.getCharacteristic().getUuid().toString());
-        Log.d(LOGTAG, "DumpDescriptor vals=" + getHexBytesToString(desc.getValue()));
+        Log.d(LOGTAG, "WriteDescriptor desc=" + desc.getUuid().toString());
+        Log.d(LOGTAG, "WriteDescriptor char=" + desc.getCharacteristic().getUuid().toString());
+        Log.d(LOGTAG, "WriteDescriptor vals=" + getHexBytesToString(desc.getValue()));
     }
 
-    public static void DumpCharacteristic(BluetoothGattCharacteristic chara)
+    public static void WriteCharacteristic(BluetoothGattCharacteristic chara)
     {
-        Log.d(LOGTAG, "DumpCharacteristic char=" + chara.getUuid().toString());
-        Log.d(LOGTAG, "DumpCharacteristic vals=" + getHexBytesToString(chara.getValue()));
+        Log.d(LOGTAG, "WriteCharacteristic char=" + chara.getUuid().toString());
+        Log.d(LOGTAG, "WriteCharacteristic vals=" + getHexBytesToString(chara.getValue()));
+    }
+
+    public static void ReadCharacteristic(BluetoothGattCharacteristic chara)
+    {
+        Log.d(LOGTAG, "ReadCharacteristic char=" + chara.getUuid().toString());
+        Log.d(LOGTAG, "ReadCharacteristic vals=" + getHexBytesToString(chara.getValue()));
+    }
+
+    public static void ChangedCharacteristic(BluetoothGattCharacteristic chara)
+    {
+        Log.d(LOGTAG, "ChangedCharacteristic char=" + chara.getUuid().toString());
+        Log.d(LOGTAG, "ChangedCharacteristic vals=" + getHexBytesToString(chara.getValue()));
     }
 }
