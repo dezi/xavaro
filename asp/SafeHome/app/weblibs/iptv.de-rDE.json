@@ -103,13 +103,13 @@
 
     "label": "arte",
     "url": "http://www.arte.tv/",
-    "icon": "http://pbs.twimg.com/profile_images/666906868929929216/LVNSvBVx_400x400.png",
+    "icon": "http://pbs.twimg.com/profile_images/755318292156383232/UqOCW0VU_400x400.jpg",
 
     "channels": [
       {
         "label": "arte",
         "default": true,
-        "icon": "http://pbs.twimg.com/profile_images/666906868929929216/LVNSvBVx_400x400.png",
+        "icon": "http://pbs.twimg.com/profile_images/755318292156383232/UqOCW0VU_400x400.jpg",
         "videourl": "http://delive.artestras.cshls.lldns.net/artestras/contrib/delive.m3u8",
         "aliase": [ "tv/de/ARTE Deutsch", "tv/de/ARTE Deutsch HD" ]
       }
@@ -359,13 +359,13 @@
 
     "label": "N24",
     "url": "http://www.n24.de/",
-    "icon": "http://pbs.twimg.com/profile_images/2455474765/oo5ltd4p48q2xo3svj04_400x400.png",
+    "icon": "http://pbs.twimg.com/profile_images/774162842056470529/7odvlsuU_400x400.jpg",
 
     "channels": [
       {
         "label": "N24",
         "default": true,
-        "icon": "http://pbs.twimg.com/profile_images/2455474765/oo5ltd4p48q2xo3svj04_400x400.png",
+        "icon": "http://pbs.twimg.com/profile_images/774162842056470529/7odvlsuU_400x400.jpg",
         "videourl": "http://n24-live.hls.adaptive.level3.net/hls-live/n24-pssimn24live/_definst_/live.m3u8",
         "aliase": [ "tv/de/N24", "tv/de/N24 HD" ]
       }
@@ -392,27 +392,27 @@
 
     "label": "QVC",
     "url": "http://www.qvc.de/",
-    "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
 
     "channels": [
       {
         "label": "QVC",
         "default": false,
-        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
         "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi5/3/prog_index.m3u8",
         "aliase": [ "tv/de/QVC Deutschland", "tv/de/QVC Deutschland HD" ]
       },
       {
         "label": "QVC Plus",
         "default": false,
-        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
         "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi6/3/prog_index.m3u8",
         "aliase": [ "tv/de/QVC Plus Deutschland", "tv/de/QVC Plus Deutschland HD" ]
       },
       {
         "label": "QVC Beauty",
         "default": false,
-        "icon": "https://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/597747166900195328/yTnMRrbC_400x400.jpg",
         "videourl": "http://llnw.live.qvc.simplestream.com/hera/remote/qvcde_primary_sdi7/3/prog_index.m3u8",
         "aliase": [ "tv/de/QVC Beauty & Style", "tv/de/QVC Beauty & Style HD" ]
       }
@@ -441,7 +441,7 @@
         "label": "RTL II",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/752433961561886720/ExwAyEFs_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/768725097171517440/Rhw4GwFq_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl2.html",
         "aliase": [ "tv/de/RTL 2 Deutschland", "tv/de/RTL 2 Deutschland HD" ]
       },
@@ -461,7 +461,7 @@
         "label": "RTL NITRO",
         "default": false,
         "develop": true,
-        "icon": "https://pbs.twimg.com/profile_images/2530896718/rn3do2g6wuxc8kekdasv_400x400.jpeg",
+        "icon": "http://pbs.twimg.com/profile_images/2530896718/rn3do2g6wuxc8kekdasv_400x400.jpeg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtlnitro.html",
         "aliase": [ "tv/de/RTL Nitro Deutschland", "tv/de/RTL Nitro Deutschland HD" ]
       },
@@ -510,7 +510,7 @@
         "label": "PRO7",
         "default": false,
         "develop": true,
-        "icon": "http://upload.wikimedia.org/wikipedia/bar/thumb/2/2e/Pro7-Logo.svg/600px-Pro7-Logo.svg.png",
+        "icon": "http://pbs.twimg.com/profile_images/741164987712983040/w3TLX9_e_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7.html",
         "aliase": [ "tv/de/Pro Sieben Deutschland", "tv/de/Pro Sieben Deutschland HD" ]
       },
@@ -520,7 +520,7 @@
         "label": "PRO7 MAXX",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/666190926814035968/mV8kbFLP_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/755664623165173761/3iss_A2Y_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7_maxx.html",
         "aliase": [ "tv/de/Pro Sieben Maxx Deutschland", "tv/de/Pro Sieben Maxx Deutschland HD" ]
       },
@@ -551,14 +551,14 @@
 
     "label": "DMAX",
     "url": "http://www.dmax.de/",
-    "icon": "http://pbs.twimg.com/profile_images/378800000663840950/655679388e2fef54aac94a66ebaf1ea4_400x400.jpeg",
+    "icon": "http://pbs.twimg.com/profile_images/772698472336199680/qtH2kt_S_400x400.jpg",
 
     "channels": [
       {
         "label": "DMAX",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/378800000663840950/655679388e2fef54aac94a66ebaf1ea4_400x400.jpeg",
+        "icon": "http://pbs.twimg.com/profile_images/772698472336199680/qtH2kt_S_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/dmax.html",
         "aliase": [ "tv/de/DMAX Deutschland", "tv/de/DMAX Deutschland HD" ]
       }
