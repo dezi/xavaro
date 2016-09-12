@@ -106,7 +106,7 @@ public class LaunchItemPrepaid extends LaunchItem implements
 
         float scale = Simple.getNormalPixels(height - icon.getPaddingBottom()) / 200.0f;
 
-        prepaidDateView.setTextSize(Simple.getDeviceTextSize(28f * scale));
+        prepaidDateView.setTextSize(Simple.getDeviceTextSize(24f * scale));
         prepaidMoneyView.setTextSize(Simple.getDeviceTextSize(40f * scale));
 
         Simple.setPadding(prepaidDateView, 0, Math.round(20 * scale), 0, 0);
