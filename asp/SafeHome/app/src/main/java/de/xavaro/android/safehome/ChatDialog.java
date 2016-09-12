@@ -70,8 +70,12 @@ public class ChatDialog extends ScrollView
     private final static int ID_USER = 4;
     private final static int ID_THUMBS = 5;
 
+    private float textSize;
+
     private void initialize()
     {
+        textSize = Simple.getDeviceTextSize(Simple.isTablet() ? 30f: 22f);
+
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(Simple.MP, Simple.MP);
         lp.setMargins(0, 16, 0, 16);
 
@@ -123,7 +127,7 @@ public class ChatDialog extends ScrollView
         dateView.setLayoutParams(Simple.layoutParamsWW());
         dateView.setBackgroundResource(R.drawable.balloon_date);
         dateView.setPadding(10, 5, 10, 0);
-        dateView.setTextSize(Simple.getDeviceTextSize(30f));
+        dateView.setTextSize(Simple.getDeviceTextSize(textSize));
         dateView.setText(lastDate);
 
         lastDiv.addView(dateView);
@@ -271,7 +275,7 @@ public class ChatDialog extends ScrollView
         textView.setLayoutParams(Simple.layoutParamsWW(Gravity.START));
         textView.setId(ID_TEXT);
         textView.setPadding(12, 0, 12, 0);
-        textView.setTextSize(Simple.getDeviceTextSize(30f));
+        textView.setTextSize(Simple.getDeviceTextSize(textSize));
         textView.setText(message);
 
         lastTextLayout.addView(textView);
@@ -356,7 +360,7 @@ public class ChatDialog extends ScrollView
         textView.setLayoutParams(Simple.layoutParamsWW());
         textView.setId(ID_TEXT);
         textView.setPadding(12, 0, 24, 0);
-        textView.setTextSize(Simple.getDeviceTextSize(30f));
+        textView.setTextSize(Simple.getDeviceTextSize(textSize));
         textView.setText(message);
         lastTextLayout.addView(textView);
 

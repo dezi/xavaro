@@ -825,6 +825,8 @@ medicator.updateEvents = function()
         var config = medicator.configs[ formkey ];
         if (config.taken) continue;
 
+        console.log("medicator.updateEvents: event=" + JSON.stringify(event));
+
         config.taken = true;
         config.medisets[ 0 ].taken = true;
         config.medisets[ 0 ].takendate = event.takendate;
@@ -847,7 +849,7 @@ medicator.updateEvents = function()
         var config = medicator.configs[ formkey ];
         var date = new Date(config.date).getTime();
 
-        console.log("medicator.updateEvents:" + JSON.stringify(config));
+        console.log("medicator.updateEvents: config=" + JSON.stringify(config));
 
         var overicon = null;
 
@@ -874,13 +876,16 @@ medicator.updateEvents = function()
             }
         }
 
-        var launchitem = medicator.lauchis[ formkey ];
-        var overimg = WebLibLaunch.getOverIconImgElem(launchitem);
-        WebLibSimple.setImageSource(overimg, overicon)
+        if (overicon)
+        {
+            var launchitem = medicator.lauchis[ formkey ];
+            var overimg = WebLibLaunch.getOverIconImgElem(launchitem);
+            WebLibSimple.setImageSource(overimg, overicon)
+        }
     }
 
     var millis = (medicator.currentDialog && medicator.currentDialog.whatSpan) ? 1000 : 10000;
-    setTimeout(medicator.updateEvents, 10000);
+    setTimeout(medicator.updateEvents, millis);
 }
 
 medicator.getItemLabel = function(event)
