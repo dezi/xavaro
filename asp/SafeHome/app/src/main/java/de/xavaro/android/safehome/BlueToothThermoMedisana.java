@@ -6,11 +6,6 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-
 import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -31,10 +26,6 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
 
     private BluetoothGattCharacteristic dateTimeChara;
 
-    private BluetoothGattCharacteristic unknown1;
-    private BluetoothGattCharacteristic unknown2;
-    private BluetoothGattCharacteristic unknown3;
-
     public BlueToothThermoMedisana(BlueTooth parent)
     {
         this.parent = parent;
@@ -50,9 +41,10 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
         String uuid = characteristic.getUuid().toString();
 
         if (uuid.equals("874a9717-352e-11e2-89b6-7fb28bc8d12d")) dateTimeChara = characteristic;
-        if (uuid.equals("e7d6818f-8610-11e2-8412-7bc9455e1a3a")) unknown1 = characteristic;
-        if (uuid.equals("bf7a1506-dcf2-410a-b4b2-8829eb93d423")) unknown2 = characteristic;
-        if (uuid.equals("29a59c78-ccc0-11e2-b493-14cf921ae45d")) unknown3 = characteristic;
+
+        //if (uuid.equals("e7d6818f-8610-11e2-8412-7bc9455e1a3a")) unknown1 = characteristic;
+        //if (uuid.equals("bf7a1506-dcf2-410a-b4b2-8829eb93d423")) unknown2 = characteristic;
+        //if (uuid.equals("29a59c78-ccc0-11e2-b493-14cf921ae45d")) unknown3 = characteristic;
 
         return characteristic.getUuid().toString().equals("5869cf77-a8ea-47d8-a239-cd2100fa30a1");
     }
@@ -98,7 +90,7 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
 
         ga = new BlueTooth.GattAction();
         ga.mode = BlueTooth.GattAction.MODE_WRITE;
-        ga.data = getAllRecords();
+        ga.data = getOnlineData();
         ga.characteristic = parent.currentControl;
 
         parent.gattSchedule.add(ga);
@@ -185,9 +177,9 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
         }
     }
 
-    public byte[] getAllRecords()
+    public byte[] getOnlineData()
     {
-        Log.d(LOGTAG, "getAllRecords");
+        Log.d(LOGTAG, "getOnlineData");
 
         byte[] data = new byte[ 7 ];
 
