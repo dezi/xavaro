@@ -126,10 +126,16 @@ public class HealthOxy extends HealthBase
 
             if ((date == null) || (medication == null) || ! medication.endsWith(",ZZO")) continue;
 
-            long dts = Simple.getTimeStamp(date);
+            //
+            // Check event and measurement dates.
+            //
 
+            long dts = Simple.getTimeStamp(date);
             if (Math.abs(now - dts) > 2 * 3600 * 1000) continue;
-            
+
+            long mts = Simple.getTimeStamp(lastDts);
+            if (Math.abs(dts - mts) > 2 * 3600 * 1000) continue;
+
             //
             // Event is suitable.
             //
