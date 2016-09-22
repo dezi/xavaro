@@ -1,9 +1,12 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Locale;
 
 import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
@@ -49,7 +52,7 @@ public class HealthThermo extends HealthBase
 
         String type = Json.getString(lastRecord, "type");
 
-        if (Simple.equals(type, "ThermoMeasurement"))
+        if (Simple.equals(type, "ThermoRecord"))
         {
             String date = Json.getString(lastRecord, "dts");
             if (date == null) return;
@@ -58,7 +61,7 @@ public class HealthThermo extends HealthBase
 
             if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
             {
-                lastTmp = temperature;
+                lastTmp = Math.round(temperature * 10.0) / 10.0;
                 lastDts = date;
 
                 handler.removeCallbacks(messageSpeaker);
@@ -89,7 +92,7 @@ public class HealthThermo extends HealthBase
         if (groupIdentity == null) return;
 
         String name = Simple.getOwnerName();
-        String bval = "" + lastTmp;
+        String bval = String.format(Locale.getDefault(), "%.1f", lastTmp);
 
         String text = Simple.getTrans(R.string.health_thermo_alert, name, bval)
                 + " " + Simple.getTrans(resid);
@@ -120,7 +123,7 @@ public class HealthThermo extends HealthBase
             String date = Json.getString(event, "date");
             String medication = Json.getString(event, "medication");
 
-            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZO")) continue;
+            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZT")) continue;
 
             //
             // Check event and measurement dates.
@@ -147,7 +150,7 @@ public class HealthThermo extends HealthBase
             break;
         }
 
-        NotifyManager.removeNotification("medicator.take.bloodoxygen");
+        NotifyManager.removeNotification("medicator.take.temperature");
         Simple.makePost(CommonConfigs.UpdateNotifications);
     }
 
@@ -155,10 +158,12 @@ public class HealthThermo extends HealthBase
     {
         if (lastRecord == null) return;
         String type = Json.getString(lastRecord, "type");
-        if (! Simple.equals(type, "ThermoMeasurement")) return;
+        if (! Simple.equals(type, "ThermoRecord")) return;
 
-        String sm = Simple.getTrans(R.string.health_thermo_spoken, lastTmp);
-        String am = Simple.getTrans(R.string.health_thermo_activity, lastTmp);
+        String bval = String.format(Locale.getDefault(), "%.1f", lastTmp);
+
+        String sm = Simple.getTrans(R.string.health_thermo_spoken, bval);
+        String am = Simple.getTrans(R.string.health_thermo_activity, bval);
 
         Speak.speak(sm);
         ActivityOldManager.recordActivity(am);

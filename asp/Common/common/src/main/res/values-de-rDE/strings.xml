@@ -818,12 +818,12 @@
     <string name="health_glucose_activity">Sie haben einen Blutzuckerwert von %1$d.</string>
     <string name="health_glucose_activity_du">Du hast einen Blutzuckerwert von %1$d.</string>
 
-    <string name="health_thermo_spoken">Die letzte Messung ergab einen Temperatur von %1$d Grad Celsius.</string>
+    <string name="health_thermo_spoken">Die letzte Messung ergab eine Temperatur von %1$s Grad Celsius.</string>
     <string name="health_thermo_alert">%1$s hat eine Temperatur %2$s Grad Celsius.</string>
     <string name="health_thermo_lowtemp">Die Temperatur ist bedenklich niedrig.</string>
     <string name="health_thermo_hightemp">Die Temperatur ist bedenklich hoch.</string>
-    <string name="health_thermo_activity">Sie haben eine Temperatur von %1$d Grad Celsius.</string>
-    <string name="health_thermo_activity_du">Du hast eine Temperatur von %1$d Grad Celsius.</string>
+    <string name="health_thermo_activity">Sie haben eine Temperatur von %1$s Grad Celsius.</string>
+    <string name="health_thermo_activity_du">Du hast eine Temperatur von %1$s Grad Celsius.</string>
 
     <string-array name="phone_labels_vals">
         <item>Zuhause</item>

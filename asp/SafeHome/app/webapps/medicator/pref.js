@@ -41,6 +41,12 @@ medicator.buildAllPreferences = function()
     medicator.prefs.push(pref);
 
     var pref = {};
+    pref.key = "activity.temp";
+    pref.type = "switch";
+    pref.title = "Temperatur messen";
+    medicator.prefs.push(pref);
+
+    var pref = {};
     pref.key = "activity.weight";
     pref.type = "switch";
     pref.title = "Wiegen";
@@ -79,6 +85,15 @@ medicator.buildAllPreferences = function()
 
     for (var key in medicator.currentprefs)
     {
+        if (key.startsWith("medication.enable.") && key.endsWith("ZZT"))
+        {
+            var medication = key.substring(18);
+            medicator.buildMedication(medication);
+        }
+    }
+
+    for (var key in medicator.currentprefs)
+    {
         if (key.startsWith("medication.enable.") && key.endsWith("ZZW"))
         {
             var medication = key.substring(18);
@@ -93,7 +108,11 @@ medicator.buildAllPreferences = function()
     for (var key in medicator.currentprefs)
     {
         if (key.startsWith("medication.enable.") &&
-            ! (key.endsWith("ZZB") || key.endsWith("ZZO") || key.endsWith("ZZG") || key.endsWith("ZZW")))
+            ! (key.endsWith("ZZB") ||
+               key.endsWith("ZZO") ||
+               key.endsWith("ZZG") ||
+               key.endsWith("ZZT") ||
+               key.endsWith("ZZW")))
         {
             var medication = key.substring(18);
             medicator.buildMedication(medication);
@@ -147,7 +166,11 @@ medicator.getActivityText = function(medication, which)
 
     var key = "medication.mode.pills.keys";
 
-    if ((mediform == "ZZB") || (mediform == "ZZO") || (mediform == "ZZG") || (mediform == "ZZW"))
+    if ((mediform == "ZZB") ||
+        (mediform == "ZZO") ||
+        (mediform == "ZZG") ||
+        (mediform == "ZZT") ||
+        (mediform == "ZZW"))
     {
         key = "medication.mode.measure.keys";
     }
@@ -175,7 +198,15 @@ medicator.buildTimePref = function(medication, whichtime, enabled)
 medicator.buildDosisPref = function(medication, whichtime, whichdose, enabled)
 {
     var mediform = medication.substring(medication.length - 3);
-    if ((mediform == "ZZB") || (mediform == "ZZO") || (mediform == "ZZG") || (mediform == "ZZW")) return;
+
+    if ((mediform == "ZZB") ||
+        (mediform == "ZZO") ||
+        (mediform == "ZZG") ||
+        (mediform == "ZZT") ||
+        (mediform == "ZZW"))
+    {
+        return;
+    }
 
     var dosetext = (whichdose == "ondemandmax") ? "tägliche Höchstdosis" : "Dosis";
 
@@ -209,7 +240,14 @@ medicator.buildMedication = function(medication)
     var dlang = medicator.form[ dkurz ];
     var htype = "delete";
 
-    if ((dkurz == "ZZB") || (dkurz == "ZZO") || (dkurz == "ZZG") || (dkurz == "ZZW")) htype = "category";
+    if ((dkurz == "ZZB") ||
+        (dkurz == "ZZO") ||
+        (dkurz == "ZZG") ||
+        (dkurz == "ZZT") ||
+        (dkurz == "ZZW"))
+    {
+        htype = "category";
+    }
 
     //
     // Medication category header. The header will not store
@@ -451,6 +489,7 @@ WebAppPrefBuilder.onPreferenceChanged = function(prefkey)
         if (prefkey == "activity.bloodpressure") medication = "Blutdruck messen,ZZB"
         if (prefkey == "activity.bloodoxygen") medication = "Blutsauerstoff messen,ZZO"
         if (prefkey == "activity.glucose") medication = "Blutzucker messen,ZZG"
+        if (prefkey == "activity.temp") medication = "Temperatur messen,ZZT"
         if (prefkey == "activity.weight") medication = "Wiegen,ZZW"
 
         if (medication)

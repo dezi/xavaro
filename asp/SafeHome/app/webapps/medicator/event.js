@@ -235,6 +235,27 @@ medicator.remindConfig = function(config)
         medicator.bloodglucosereminder = true;
     }
 
+    if ((config.mediflat == "ZZT") && ! medicator.temperaturereminder)
+    {
+        var notify = {};
+
+        notify.key         = "medicator.take.temperature";
+        notify.title       = WebLibStrings.getTrans("events.take.temperature");
+        notify.icon        = "health_thermo_512x512.png";
+        notify.importance  = medicator.getImportance(config);
+        notify.followText  = WebLibStrings.getTrans("events.take.temperature.follow");
+        notify.declineText = WebLibStrings.getTrans("events.take.temperature.decline");
+        notify.speakOnce   = (newtime < nowtime);
+
+        notify.followJavaCall  = "medicator.onTakeTemperature(true);"
+        notify.declineJavaCall = "medicator.onTakeTemperature(false);"
+
+        WebAppNotify.addNotification(JSON.stringify(notify));
+        WebAppNotify.updateNotificationDisplay();
+
+        medicator.temperaturereminder = true;
+    }
+
     if ((config.mediflat == "ZZW") && ! medicator.weightreminder)
     {
         var notify = {};
@@ -354,6 +375,12 @@ medicator.completeConfig = function(config)
             medicator.bloodglucosereminder = true;
         }
 
+        if ((config.mediflat == "ZZT") && ! medicator.temperaturereminder)
+        {
+            tkey = "events.didnowtake.temperature";
+            medicator.temperaturereminder = true;
+        }
+
         if ((config.mediflat == "ZZW") && ! medicator.weightreminder)
         {
             tkey = "events.didnowtake.weight";
@@ -394,6 +421,7 @@ medicator.completeConfig = function(config)
     if (config.mediflat == "ZZB") notify.key = "medicator.take.bloodpressure";
     if (config.mediflat == "ZZO") notify.key = "medicator.take.bloodoxygen";
     if (config.mediflat == "ZZG") notify.key = "medicator.take.bloodglucose";
+    if (config.mediflat == "ZZT") notify.key = "medicator.take.temperature";
     if (config.mediflat == "ZZW") notify.key = "medicator.take.weight";
 
     WebAppNotify.removeNotification(JSON.stringify(notify));

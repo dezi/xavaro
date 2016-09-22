@@ -39,6 +39,15 @@
 
     {
       "action" : "take",
+      "keywords": [ "temperature" ],
+      "response": "You can enter Your value now",
+      "sample": "I would like to take my temperature now",
+      "icon": "/webapps/medicator/health_thermo_512x512.png",
+      "tag": "ZZT"
+    },
+
+    {
+      "action" : "take",
       "keywords": [ "weigh" ],
       "response": "You can enter Your weight now",
       "sample": "I would like to weigh myself",
@@ -59,36 +68,42 @@
 
   "events.take.pills" : "You have to take Your medication.",
   "events.take.weight" : "You have to weigh yourself.",
+  "events.take.temperature" : "You have to measure Your temperature.",
   "events.take.bloodoxygen" : "You have to measure Your blood oxygen.",
   "events.take.bloodglucose" : "You have to measure Your blood sugar.",
   "events.take.bloodpressure" : "You have to measure Your blood pressure.",
 
   "events.take.pills.follow" : "Take now",
   "events.take.weight.follow" : "Weigh now",
+  "events.take.temperature.follow" : "Measure now",
   "events.take.bloodoxygen.follow" : "Measure now",
   "events.take.bloodglucose.follow" : "Measure now",
   "events.take.bloodpressure.follow" : "Measure now",
 
   "events.take.pills.decline" : "Not taken",
   "events.take.weight.decline" : "Not weighed",
+  "events.take.temperature.decline" : "Not measured",
   "events.take.bloodoxygen.decline" : "Not measured",
   "events.take.bloodglucose.decline" : "Not measured",
   "events.take.bloodpressure.decline" : "Not measured",
 
   "events.didnotyettake.pills" : "%1$s did not yet take his medication.",
   "events.didnotyettake.weight" : "%1$s did not yet take his weight.",
+  "events.didnotyettake.temperature" : "%1$s did not yet measured his temperature.",
   "events.didnotyettake.bloodglucose" : "%1$s did not yet measured his blood sugar.",
   "events.didnotyettake.bloodpressure" : "%1$s did not yet measured his blood pressure.",
   "events.didnotyettake.bloodoxygen" : "%1$s did not yet measured his blood oxygen.",
 
   "events.didnowtake.pills" : "%1$s did just take his medication.",
   "events.didnowtake.weight" : "%1$s did just take his weight.",
+  "events.didnowtake.temperature" : "%1$s did just measure his temperature.",
   "events.didnowtake.bloodoxygen" : "%1$s did just measure his blood oxygen.",
   "events.didnowtake.bloodglucose" : "%1$s did just measure his blood sugar.",
   "events.didnowtake.bloodpressure" : "%1$s did just measure his blood pressure.",
 
   "activity.took.pills" : "You took Your medication.",
   "activity.took.weight" : "You took Your weight.",
+  "activity.took.temperature" : "You measured Your temperature.",
   "activity.took.bloodoxygen" : "You measured Your blood oxygen.",
   "activity.took.bloodglucose" : "You measured Your blood sugar.",
   "activity.took.bloodpressure" : "You measured Your blood pressure.",
