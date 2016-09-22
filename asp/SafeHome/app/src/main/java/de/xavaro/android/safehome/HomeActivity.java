@@ -25,7 +25,6 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.GCMRegistrationService;
 import de.xavaro.android.common.MediaSurface;
 import de.xavaro.android.common.AccessibilityService;
-import de.xavaro.android.common.CaptureRecorder;
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.VoiceIntentResolver;
 import de.xavaro.android.common.Simple;
@@ -539,6 +538,8 @@ public class HomeActivity extends CaptureActivity implements
             return;
         }
 
+        Log.d(LOGTAG, "==========================>onBackPressed: 1a");
+        if (workerScreen.onBackKeyWanted()) return;
         Log.d(LOGTAG, "==========================>onBackPressed: 2");
         if (socialScreen.onBackKeyWanted()) return;
         Log.d(LOGTAG, "==========================>onBackPressed: 3");
