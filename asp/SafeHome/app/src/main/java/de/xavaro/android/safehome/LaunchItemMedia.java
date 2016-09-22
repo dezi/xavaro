@@ -14,7 +14,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Map;
 
-import de.xavaro.android.common.ActivityManager;
+import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommSender;
 import de.xavaro.android.common.Json;
@@ -287,7 +287,7 @@ public abstract class LaunchItemMedia extends LaunchItemProxyPlayer
             String am = Simple.getTrans(R.string.launch_media_image_simple_yousend, rmsg);
 
             Speak.speak(sm);
-            ActivityManager.recordActivity(am, mediaitem);
+            ActivityOldManager.recordActivity(am, mediaitem);
         }
     }
 }

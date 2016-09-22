@@ -3,10 +3,9 @@ package de.xavaro.android.safehome;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.xavaro.android.common.ActivityManager;
+import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.EventManager;
@@ -163,7 +162,7 @@ public class HealthGlucose extends HealthBase
         String am = Simple.getTrans(R.string.health_glucose_activity, bgv);
 
         Speak.speak(sm);
-        ActivityManager.recordActivity(am);
+        ActivityOldManager.recordActivity(am);
 
         evaluateEvents();
 
@@ -176,7 +175,7 @@ public class HealthGlucose extends HealthBase
             if (low >= bgv)
             {
                 Speak.speak(Simple.getTrans(R.string.health_glucose_lowglucose));
-                ActivityManager.recordAlert(R.string.health_glucose_lowglucose);
+                ActivityOldManager.recordAlert(R.string.health_glucose_lowglucose);
                 informAssistance(R.string.health_glucose_lowglucose);
             }
         }
@@ -192,7 +191,7 @@ public class HealthGlucose extends HealthBase
             if (high <= bgv)
             {
                 Speak.speak(Simple.getTrans(R.string.health_glucose_highglucose));
-                ActivityManager.recordAlert(R.string.health_glucose_highglucose);
+                ActivityOldManager.recordAlert(R.string.health_glucose_highglucose);
                 informAssistance(R.string.health_glucose_highglucose);
             }
         }

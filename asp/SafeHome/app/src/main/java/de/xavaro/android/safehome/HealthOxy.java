@@ -5,7 +5,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.xavaro.android.common.ActivityManager;
+import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.EventManager;
@@ -200,7 +200,7 @@ public class HealthOxy extends HealthBase
         String am = Simple.getTrans(R.string.health_oxy_activity, lastSat, lastPls);
 
         Speak.speak(sm);
-        ActivityManager.recordActivity(am);
+        ActivityOldManager.recordActivity(am);
 
         evaluateEvents();
 
@@ -213,7 +213,7 @@ public class HealthOxy extends HealthBase
             if (low >= lastSat)
             {
                 Speak.speak(Simple.getTrans(R.string.health_oxy_lowsat));
-                ActivityManager.recordAlert(R.string.health_oxy_lowsat);
+                ActivityOldManager.recordAlert(R.string.health_oxy_lowsat);
                 informAssistance(R.string.health_oxy_lowsat);
             }
         }
@@ -229,7 +229,7 @@ public class HealthOxy extends HealthBase
             if (low >= lastPls)
             {
                 Speak.speak(Simple.getTrans(R.string.health_oxy_lowpls));
-                ActivityManager.recordAlert(R.string.health_oxy_lowpls);
+                ActivityOldManager.recordAlert(R.string.health_oxy_lowpls);
                 informAssistance(R.string.health_oxy_lowpls);
             }
         }
@@ -245,7 +245,7 @@ public class HealthOxy extends HealthBase
             if (high <= lastPls)
             {
                 Speak.speak(Simple.getTrans(R.string.health_oxy_highpls));
-                ActivityManager.recordAlert(R.string.health_oxy_highpls);
+                ActivityOldManager.recordAlert(R.string.health_oxy_highpls);
                 informAssistance(R.string.health_oxy_highpls);
             }
         }

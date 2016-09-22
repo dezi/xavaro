@@ -715,7 +715,7 @@ public class CommSender
         JSONObject actmess = new JSONObject();
         Json.put(actmess, "message", message);
         Json.put(actmess, "mediapath", mediapath);
-        ActivityManager.onIncomingMessage(actmess);
+        ActivityOldManager.onIncomingMessage(actmess);
 
         NotificationCompat.Builder nb = new NotificationCompat.Builder(Simple.getAnyContext());
 

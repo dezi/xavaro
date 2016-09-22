@@ -5,7 +5,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.xavaro.android.common.ActivityManager;
+import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.EventManager;
@@ -161,7 +161,7 @@ public class HealthThermo extends HealthBase
         String am = Simple.getTrans(R.string.health_thermo_activity, lastTmp);
 
         Speak.speak(sm);
-        ActivityManager.recordActivity(am);
+        ActivityOldManager.recordActivity(am);
 
         evaluateEvents();
 
@@ -175,7 +175,7 @@ public class HealthThermo extends HealthBase
             if (low >= lastTmp)
             {
                 Speak.speak(Simple.getTrans(R.string.health_thermo_lowtemp));
-                ActivityManager.recordAlert(R.string.health_thermo_lowtemp);
+                ActivityOldManager.recordAlert(R.string.health_thermo_lowtemp);
                 informAssistance(R.string.health_thermo_lowtemp);
             }
         }
@@ -192,7 +192,7 @@ public class HealthThermo extends HealthBase
             if (high <= lastTmp)
             {
                 Speak.speak(Simple.getTrans(R.string.health_thermo_hightemp));
-                ActivityManager.recordAlert(R.string.health_thermo_hightemp);
+                ActivityOldManager.recordAlert(R.string.health_thermo_hightemp);
                 informAssistance(R.string.health_thermo_hightemp);
             }
         }

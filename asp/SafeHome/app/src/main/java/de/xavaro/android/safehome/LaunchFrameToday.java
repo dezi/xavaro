@@ -1,7 +1,6 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
@@ -10,12 +9,12 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
-import de.xavaro.android.common.ActivityManager;
+import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 public class LaunchFrameToday extends LaunchFrame
-        implements ActivityManager.ActivityMessageCallback
+        implements ActivityOldManager.ActivityMessageCallback
 {
     private static final String LOGTAG = LaunchFrameToday.class.getSimpleName();
 
@@ -41,7 +40,7 @@ public class LaunchFrameToday extends LaunchFrame
 
         topscreen.addView(scrollview);
 
-        ActivityManager.subscribe(this);
+        ActivityOldManager.subscribe(this);
     }
 
     public void onProtocollMessages(JSONObject protocoll)

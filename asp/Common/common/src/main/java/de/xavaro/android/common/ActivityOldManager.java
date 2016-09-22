@@ -10,17 +10,17 @@ import java.io.File;
 import java.util.Iterator;
 
 @SuppressWarnings("unused")
-public class ActivityManager
+public class ActivityOldManager
 {
-    private static final String LOGTAG = ActivityManager.class.getSimpleName();
+    private static final String LOGTAG = ActivityOldManager.class.getSimpleName();
 
     //region Static singleton methods.
 
-    private static ActivityManager instance;
+    private static ActivityOldManager instance;
 
-    public static ActivityManager getInstance()
+    public static ActivityOldManager getInstance()
     {
-        if (instance == null) instance = new ActivityManager();
+        if (instance == null) instance = new ActivityOldManager();
 
         return instance;
     }

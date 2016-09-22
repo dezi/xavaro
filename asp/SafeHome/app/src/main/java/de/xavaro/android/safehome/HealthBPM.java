@@ -5,7 +5,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.xavaro.android.common.ActivityManager;
+import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.EventManager;
@@ -170,7 +170,7 @@ public class HealthBPM extends HealthBase
         String am = Simple.getTrans(R.string.health_bpm_activity, lastSys, lastDia, lastPls);
 
         Speak.speak(sm);
-        ActivityManager.recordActivity(am);
+        ActivityOldManager.recordActivity(am);
 
         evaluateEvents();
 
@@ -189,7 +189,7 @@ public class HealthBPM extends HealthBase
                                 (Integer.parseInt(lp[ 1 ]) >= lastDia)))
                 {
                     Speak.speak(Simple.getTrans(R.string.health_bpm_lowpb));
-                    ActivityManager.recordAlert(R.string.health_bpm_lowpb);
+                    ActivityOldManager.recordAlert(R.string.health_bpm_lowpb);
                     informAssistance(R.string.health_bpm_lowpb);
                 }
             }
@@ -212,7 +212,7 @@ public class HealthBPM extends HealthBase
                                 (Integer.parseInt(hp[ 1 ]) <= lastDia)))
                 {
                     Speak.speak(Simple.getTrans(R.string.health_bpm_highbp));
-                    ActivityManager.recordAlert(R.string.health_bpm_highbp);
+                    ActivityOldManager.recordAlert(R.string.health_bpm_highbp);
                     informAssistance(R.string.health_bpm_highbp);
                 }
             }
@@ -229,7 +229,7 @@ public class HealthBPM extends HealthBase
             if (low >= lastPls)
             {
                 Speak.speak(Simple.getTrans(R.string.health_bpm_lowpls));
-                ActivityManager.recordAlert(R.string.health_bpm_lowpls);
+                ActivityOldManager.recordAlert(R.string.health_bpm_lowpls);
                 informAssistance(R.string.health_bpm_lowpls);
             }
         }
@@ -245,7 +245,7 @@ public class HealthBPM extends HealthBase
             if (high <= lastPls)
             {
                 Speak.speak(Simple.getTrans(R.string.health_bpm_highpls));
-                ActivityManager.recordAlert(R.string.health_bpm_highpls);
+                ActivityOldManager.recordAlert(R.string.health_bpm_highpls);
                 informAssistance(R.string.health_bpm_highpls);
             }
         }

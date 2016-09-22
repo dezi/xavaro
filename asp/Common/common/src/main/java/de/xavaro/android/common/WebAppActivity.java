@@ -10,7 +10,7 @@ public class WebAppActivity
     @JavascriptInterface
     public String recordActivity(String message)
     {
-        String uuid = ActivityManager.recordActivity(message);
+        String uuid = ActivityOldManager.recordActivity(message);
 
         return (uuid != null) ? uuid : "";
     }
