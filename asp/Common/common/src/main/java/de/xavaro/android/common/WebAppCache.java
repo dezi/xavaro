@@ -156,10 +156,18 @@ public class WebAppCache
 
         File cachedir = new File(Simple.getExternalCacheDir(), "webappcache/" + webappname);
 
+        Log.d(LOGTAG, "getCacheFile:======================" + cachedir);
+
         if (! cachedir.exists())
         {
-            //noinspection ResultOfMethodCallIgnored
-            cachedir.mkdirs();
+            if (cachedir.mkdirs())
+            {
+                Log.d(LOGTAG,"getCacheFile: created=" + cachedir);
+            }
+            else
+            {
+                Log.d(LOGTAG,"getCacheFile: failed=" + cachedir);
+            }
         }
 
         byte[] content = null;
