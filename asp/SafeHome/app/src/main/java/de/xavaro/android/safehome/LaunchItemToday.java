@@ -20,13 +20,21 @@ public class LaunchItemToday extends LaunchItem
     {
         JSONArray launchitems = new JSONArray();
 
-        JSONObject launchitem = new JSONObject();
+        if (Simple.getSharedPrefBoolean("monitors.enable"))
+        {
+            String mode = Simple.getSharedPrefString("monitors.today.mode");
 
-        Json.put(launchitem, "type", "today");
-        Json.put(launchitem, "label", Simple.getTrans(R.string.today_label));
-        Json.put(launchitem, "order", 100);
+            JSONObject launchitem = new JSONObject();
 
-        Json.put(launchitems, launchitem);
+            Json.put(launchitem, "type", "today");
+            Json.put(launchitem, "label", Simple.getTrans(R.string.today_label));
+            Json.put(launchitem, "order", 100);
+
+            if (Simple.equals(mode, "home"))
+            {
+                Json.put(launchitems, launchitem);
+            }
+        }
 
         return launchitems;
     }

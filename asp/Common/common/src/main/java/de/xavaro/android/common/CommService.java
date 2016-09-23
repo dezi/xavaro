@@ -162,7 +162,6 @@ public class CommService extends Service
     // Worker background thread.
     //
 
-    private String identity;
     private Thread workerSend;
     private Thread workerRecv;
 
@@ -176,7 +175,6 @@ public class CommService extends Service
         Log.d(LOGTAG, "onCreate: running with " + getApplicationContext().getPackageName());
 
         instance = this;
-        identity = SystemIdentity.getIdentity();
 
         ChatManager.initialize();
     }
@@ -755,8 +753,8 @@ public class CommService extends Service
             StaticUtils.sleep(sleeptime);
 
             //checkPing();
+            //CommSender.commTick();
 
-            CommSender.commTick();
             WebAppCache.commTick();
             EventManager.commTick();
             BatteryManager.commTick();
@@ -786,7 +784,7 @@ public class CommService extends Service
             // Add own identity to message and prepare.
             //
 
-            Simple.JSONput(mc.msg, "identity", identity);
+            Simple.JSONput(mc.msg, "identity", SystemIdentity.getIdentity());
             Simple.JSONput(mc.msg, "date", Simple.nowAsISO());
 
             String body = "JSON" + Simple.JSONdefuck(mc.msg.toString());
@@ -812,7 +810,7 @@ public class CommService extends Service
             if ((mc.enc == MessageClass.NONE) && mc.msg.has("type")
                     && Simple.equals(Simple.JSONgetString(mc.msg, "type"), "ping"))
             {
-                ident = identity;
+                ident = SystemIdentity.getIdentity();
 
                 byte[] ping = new byte[ 4 + 16 ];
 
@@ -829,7 +827,7 @@ public class CommService extends Service
 
             if ((mc.enc == MessageClass.CLIENT_ACK) && mc.msg.has("uuid"))
             {
-                ident = identity;
+                ident = SystemIdentity.getIdentity();
                 uuid = Simple.JSONgetString(mc.msg, "uuid");
 
                 byte[] acme = new byte[ 4 + 16 + 16 ];
@@ -846,7 +844,7 @@ public class CommService extends Service
                 // Encrypt message.
                 //
 
-                ident = identity;
+                ident = SystemIdentity.getIdentity();
                 idrem = Simple.JSONgetString(mc.msg, "idremote");
                 byte[] encrypted = CryptUtils.AESencrypt(idrem, body);
 
@@ -873,7 +871,7 @@ public class CommService extends Service
 
                 String mtype = (mc.enc == MessageClass.CRYPT_WITH_ACK) ? "CACK" : "CARL";
 
-                ident = identity;
+                ident = SystemIdentity.getIdentity();
                 idrem = Simple.JSONgetString(mc.msg, "idremote");
                 ackid = Simple.JSONgetString(mc.msg, "uuid");
 

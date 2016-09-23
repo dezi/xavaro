@@ -389,6 +389,10 @@
         <item>Home</item>
     </string-array>
 
+    <string name="pref_basic_monitoring_today">Logbook and Date</string>
+    <string name="pref_basic_monitoring_today_summary">todo</string>
+    <string name="pref_basic_monitoring_today_where">Icon</string>
+
     <string name="pref_basic_monitoring_prepaid">Pre Paid SIM</string>
     <string name="pref_basic_monitoring_prepaid_summary">todo</string>
     <string name="pref_basic_monitoring_prepaid_where">Icon</string>

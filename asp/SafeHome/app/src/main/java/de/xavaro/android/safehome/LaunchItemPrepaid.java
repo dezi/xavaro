@@ -26,17 +26,35 @@ public class LaunchItemPrepaid extends LaunchItem implements
     {
         JSONArray launchitems = new JSONArray();
 
-        String mode = Simple.getSharedPrefString("monitors.prepaid.mode");
+        if (Simple.getSharedPrefBoolean("monitors.enable"))
+        {
+            String mode = Simple.getSharedPrefString("monitors.prepaid.mode");
 
-        JSONObject launchitem = new JSONObject();
+            JSONObject launchitem = new JSONObject();
 
-        Json.put(launchitem, "type", "prepaid");
-        Json.put(launchitem, "label", "Prepaid SIM");
-        Json.put(launchitem, "order", 100);
+            Json.put(launchitem, "type", "prepaid");
+            Json.put(launchitem, "label", "Prepaid SIM");
+            Json.put(launchitem, "order", 100);
 
-        if (! Simple.equals(mode, "home")) Json.put(launchitem, "notify", "only");
+            if (Simple.equals(mode, "home"))
+            {
+                Json.put(launchitems, launchitem);
+            }
+            else
+            {
+                String rem = Simple.getSharedPrefString("monitors.prepaid.remind");
+                String wrn = Simple.getSharedPrefString("monitors.prepaid.warn");
+                String ass = Simple.getSharedPrefString("monitors.prepaid.assistance");
 
-        Json.put(launchitems, launchitem);
+                if (((rem != null) && ! rem.equals("never")) ||
+                        ((wrn != null) && ! wrn.equals("never")) ||
+                        ((ass != null) && ! ass.equals("never")))
+                {
+                    Json.put(launchitem, "notify", "only");
+                    Json.put(launchitems, launchitem);
+                }
+            }
+        }
 
         return launchitems;
     }

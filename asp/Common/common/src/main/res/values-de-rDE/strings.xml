@@ -444,6 +444,10 @@
         <item>Home</item>
     </string-array>
 
+    <string name="pref_basic_monitoring_today">Logbuch und Datum</string>
+    <string name="pref_basic_monitoring_today_summary">todo</string>
+    <string name="pref_basic_monitoring_today_where">Icon</string>
+
     <string name="pref_basic_monitoring_prepaid">Prepaid SIM</string>
     <string name="pref_basic_monitoring_prepaid_summary">todo</string>
     <string name="pref_basic_monitoring_prepaid_where">Icon anzeigen</string>

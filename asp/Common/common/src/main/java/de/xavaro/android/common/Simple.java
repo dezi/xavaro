@@ -311,12 +311,14 @@ public class Simple
 
     public static boolean equals(String str1, String str2)
     {
-        return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equals(str2);
+        return ((str1 == null) && (str2 == null))
+                || ((str1 != null) && (str2 != null) && str1.equals(str2));
     }
 
     public static boolean equalsIgnoreCase(String str1, String str2)
     {
-        return (str1 == null) && (str2 == null) || (str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2);
+        return ((str1 == null) && (str2 == null))
+                || ((str1 != null) && (str2 != null) && str1.equalsIgnoreCase(str2));
     }
 
     public static boolean startsWith(String str1, String str2)
@@ -1250,8 +1252,11 @@ public class Simple
     {
         try
         {
-            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            return tm.getLine1Number();
+            if (checkReadPhoneStatusPermission())
+            {
+                TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                return tm.getLine1Number();
+            }
         }
         catch (Exception ex)
         {
@@ -1265,8 +1270,11 @@ public class Simple
     {
         try
         {
-            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            return tm.getSimState() == TelephonyManager.SIM_STATE_READY;
+            if (checkReadPhoneStatusPermission())
+            {
+                TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                return tm.getSimState() == TelephonyManager.SIM_STATE_READY;
+            }
         }
         catch (Exception ex)
         {
@@ -2892,11 +2900,33 @@ public class Simple
         return getResources().getIdentifier(name, type, pack);
     }
 
+    public static boolean checkReadPhoneStatusPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            return (appContext.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+                    == PackageManager.PERMISSION_GRANTED);
+        }
+
+        return true;
+    }
+
     public static boolean checkReadContactsPermission()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             return (appContext.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                    == PackageManager.PERMISSION_GRANTED);
+        }
+
+        return true;
+    }
+
+    public static boolean checkWriteContactsPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            return (appContext.checkSelfPermission(Manifest.permission.WRITE_CONTACTS)
                     == PackageManager.PERMISSION_GRANTED);
         }
 

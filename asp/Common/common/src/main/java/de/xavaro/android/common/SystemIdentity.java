@@ -49,6 +49,15 @@ public class SystemIdentity
 
     public static String getIdentity()
     {
+        try
+        {
+            double vvv = 8 / 0;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
         if (identity == null) initialize();
 
         return identity;
@@ -269,7 +278,7 @@ public class SystemIdentity
 
     private static void storeIntoContact(Context context)
     {
-        if (! Simple.checkReadContactsPermission()) return;
+        if (! Simple.checkWriteContactsPermission()) return;
 
         ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
 

@@ -918,7 +918,10 @@ public class NicedPreferences
             {
                 super.showDialog(state);
 
-                CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+                if (CaptureOverlay.getInstance() != null)
+                {
+                    CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+                }
 
                 return;
             }

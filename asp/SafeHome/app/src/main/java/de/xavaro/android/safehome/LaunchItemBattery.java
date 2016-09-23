@@ -20,17 +20,35 @@ public class LaunchItemBattery extends LaunchItem implements NotifyIntent.Notify
     {
         JSONArray launchitems = new JSONArray();
 
-        String mode = Simple.getSharedPrefString("monitors.battery.mode");
+        if (Simple.getSharedPrefBoolean("monitors.enable"))
+        {
+            String mode = Simple.getSharedPrefString("monitors.battery.mode");
 
-        JSONObject launchitem = new JSONObject();
+            JSONObject launchitem = new JSONObject();
 
-        Json.put(launchitem, "type", "battery");
-        Json.put(launchitem, "label", "Batterie");
-        Json.put(launchitem, "order", 100);
+            Json.put(launchitem, "type", "battery");
+            Json.put(launchitem, "label", "Batterie");
+            Json.put(launchitem, "order", 100);
 
-        if (! Simple.equals(mode, "home")) Json.put(launchitem, "notify", "only");
+            if (Simple.equals(mode, "home"))
+            {
+                Json.put(launchitems, launchitem);
+            }
+            else
+            {
+                String rem = Simple.getSharedPrefString("monitors.battery.remind");
+                String wrn = Simple.getSharedPrefString("monitors.battery.warn");
+                String ass = Simple.getSharedPrefString("monitors.battery.assistance");
 
-        Json.put(launchitems, launchitem);
+                if (((rem != null) && !rem.equals("never")) ||
+                        ((wrn != null) && !wrn.equals("never")) ||
+                        ((ass != null) && !ass.equals("never")))
+                {
+                    Json.put(launchitem, "notify", "only");
+                    Json.put(launchitems, launchitem);
+                }
+            }
+        }
 
         return launchitems;
     }

@@ -28,6 +28,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.EnableFragmen
     {
         super();
 
+        keyprefix = "monitors";
         iconres = CommonConfigs.IconResMonitoring;
         summaryres = R.string.pref_basic_monitoring_summary;
         masterenable = Simple.getTrans(R.string.pref_basic_monitoring_enable);
@@ -47,10 +48,34 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.EnableFragmen
         CharSequence[] wherePrefKeys = Simple.getTransArray(R.array.pref_basic_monitoring_where_keys);
 
         //
+        // Activities status monitoring.
+        //
+
+        String todayprefix = keyprefix + ".today";
+
+        cp = new NicedPreferences.NiceInfoPreference(context);
+        cp.setIcon(GlobalConfigs.IconResToday);
+        cp.setTitle(R.string.pref_basic_monitoring_today);
+        cp.setSummary(R.string.pref_basic_monitoring_today_summary);
+        cp.setEnabled(enabled);
+        preferences.add(cp);
+
+        lp = new NicedPreferences.NiceListPreference(context);
+
+        lp.setKey(todayprefix + ".mode");
+        lp.setTitle(R.string.pref_basic_monitoring_today_where);
+        lp.setEntries(wherePrefText);
+        lp.setEntryValues(wherePrefKeys);
+        lp.setDefaultValue("inact");
+        lp.setEnabled(enabled);
+
+        preferences.add(lp);
+
+        //
         // Prepaid status monitoring.
         //
 
-        String prepaidprefix = "monitors.prepaid";
+        String prepaidprefix = keyprefix + ".prepaid";
 
         cp = new NicedPreferences.NiceInfoPreference(context);
         cp.setIcon(CommonConfigs.IconResPrepaid);
@@ -183,7 +208,7 @@ public class PreferencesBasicsMonitors extends PreferenceFragments.EnableFragmen
         // Battery status monitoring.
         //
 
-        String batteryprefix = "monitors.battery";
+        String batteryprefix = keyprefix + ".battery";
 
         CharSequence[] battWarnText = Simple.getTransArray(R.array.pref_basic_monitoring_battery_warn_vals);
         CharSequence[] battWarnKeys = Simple.getTransArray(R.array.pref_basic_monitoring_battery_warn_keys);
