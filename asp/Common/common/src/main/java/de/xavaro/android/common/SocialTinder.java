@@ -321,6 +321,8 @@ public class SocialTinder extends Social implements Social.SocialInterface
 
     public void commTick()
     {
+        if (! isEnabled()) return;
+
         long now = Simple.nowAsTimeStamp();
 
         if (nextAction == 0)

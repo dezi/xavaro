@@ -1,5 +1,6 @@
 package de.xavaro.android.common;
 
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.annotation.SuppressLint;
 
@@ -82,7 +83,7 @@ public abstract class Social
 
         cachedir = new File(Simple.getExternalCacheDir(), platform);
 
-        if ((! cachedir.exists()) && cachedir.mkdirs())
+        if (isEnabled() && (! cachedir.exists()) && cachedir.mkdirs())
         {
             Log.d(LOGTAG, "Constructor: created cache:" + cachedir);
         }
@@ -435,7 +436,10 @@ public abstract class Social
             Log.d(LOGTAG, "clearCookies: nachher=" + cookiestring);
         }
 
-        cookieManager.removeAllCookies(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        {
+            cookieManager.removeAllCookies(null);
+        }
     }
 
     protected JSONObject getQuery(String querystr)
@@ -1181,6 +1185,8 @@ public abstract class Social
 
     public void commTick()
     {
+        if (! isEnabled()) return;
+
         long now = Simple.nowAsTimeStamp();
 
         if (nextAction == 0)

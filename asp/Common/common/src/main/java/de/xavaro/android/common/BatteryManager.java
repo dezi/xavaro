@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.io.File;
+import java.util.Locale;
 
 public class BatteryManager
 {
@@ -156,8 +157,7 @@ public class BatteryManager
         // Some warnings might be due.
         //
 
-        if ((percent <= remindval) && (percent > warnval)
-                && (plugged != android.os.BatteryManager.BATTERY_PLUGGED_USB))
+        if ((percent <= remindval) && (percent > warnval))
         {
             lastMessage = Simple.getTrans(R.string.battery_manager_remind);
             lastImportance = NotifyIntent.REMINDER;
@@ -258,7 +258,7 @@ public class BatteryManager
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        String filename = String.format("battery.%04d.%02d.%02d.json", year, month, day);
+        String filename = String.format(Locale.ROOT, "battery.%04d.%02d.%02d.json", year, month, day);
         File statusfile = Simple.getIdentityFile(filename);
         String content = Simple.getFileContent(statusfile);
         JSONArray values = (content != null) ? Json.fromStringArray(content) : new JSONArray();
