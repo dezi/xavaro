@@ -65,6 +65,8 @@ public class SystemIdentity
         retrieveFromCookies(context);
         retrieveFromContact(context);
 
+        String usedIdentity = null;
+
         try
         {
             if ((foundInPrefers != null) && (identity == null))
@@ -72,6 +74,8 @@ public class SystemIdentity
                 appsname = foundInPrefers.split(":")[ 0 ];
                 identity = foundInPrefers.split(":")[ 1 ];
                 randomiz = foundInPrefers.split(":")[ 2 ];
+
+                usedIdentity = foundInPrefers;
             }
         }
         catch (Exception ignore)
@@ -82,9 +86,11 @@ public class SystemIdentity
         {
             if ((foundInStorage != null) && (identity == null))
             {
-                appsname = foundInContact.split(":")[ 0 ];
-                identity = foundInContact.split(":")[ 1 ];
-                randomiz = foundInContact.split(":")[ 2 ];
+                appsname = foundInStorage.split(":")[ 0 ];
+                identity = foundInStorage.split(":")[ 1 ];
+                randomiz = foundInStorage.split(":")[ 2 ];
+
+                usedIdentity = foundInStorage;
             }
         }
         catch (Exception ignore)
@@ -98,6 +104,8 @@ public class SystemIdentity
                 appsname = foundInCookies.split(":")[ 0 ];
                 identity = foundInCookies.split(":")[ 1 ];
                 randomiz = foundInCookies.split(":")[ 2 ];
+
+                usedIdentity = foundInCookies;
             }
         }
         catch (Exception ignore)
@@ -120,6 +128,8 @@ public class SystemIdentity
                         identity = id.split(":")[ 1 ];
                         randomiz = id.split(":")[ 2 ];
 
+                        usedIdentity = id;
+
                         break;
                     }
                 }
@@ -141,9 +151,17 @@ public class SystemIdentity
             identity = UUID.randomUUID().toString();
             randomiz = UUID.randomUUID().toString();
 
+            foundInPrefers = null;
             foundInStorage = null;
             foundInCookies = null;
             foundInContact = null;
+        }
+        else
+        {
+            if (! Simple.equals(foundInPrefers, usedIdentity)) foundInPrefers = null;
+            if (! Simple.equals(foundInStorage, usedIdentity)) foundInStorage = null;
+            if (! Simple.equals(foundInContact, usedIdentity)) foundInContact = null;
+            if (! Simple.equals(foundInCookies, usedIdentity)) foundInCookies = null;
         }
 
         if (foundInPrefers == null) storeIntoPrefers(context);
@@ -310,21 +328,17 @@ public class SystemIdentity
 
         try
         {
-            if (new File(filename).exists())
-            {
-                byte[] content = new byte[ 4096 ];
+            byte[] content = new byte[ 4096 ];
 
-                inputStream = context.openFileInput(filename);
-                int xfer = inputStream.read(content);
-                inputStream.close();
+            inputStream = context.openFileInput(filename);
+            int xfer = inputStream.read(content);
+            inputStream.close();
 
-                JSONObject ident = new JSONObject(new String(content, 0, xfer));
-                foundInStorage = ident.getString("identity");
-            }
+            JSONObject ident = new JSONObject(new String(content, 0, xfer));
+            foundInStorage = ident.getString("identity");
         }
-        catch (Exception ex)
+        catch (Exception ignore)
         {
-            OopsService.log(LOGTAG, ex);
         }
 
         if (foundInStorage != null) Log.d(LOGTAG,"foundInStorage: " + foundInStorage);
