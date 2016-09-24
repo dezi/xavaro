@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
+@SuppressWarnings("ResourceType")
 public class HomeLaunch extends HomeFrame
 {
     public HomeLaunch(Context context)
@@ -28,6 +29,7 @@ public class HomeLaunch extends HomeFrame
         layoutNormal = new LayoutParams(layoutParams);
     }
 
+    @SuppressWarnings({"EmptyMethod", "UnusedParameters"})
     public void setConfig(JSONObject config)
     {
     }

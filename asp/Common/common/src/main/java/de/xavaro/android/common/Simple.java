@@ -1094,7 +1094,7 @@ public class Simple
         return externalFilesDir;
     }
 
-    public static File getCacheDir()
+    public static File getCacheDirWeg()
     {
         return getAnyContext().getCacheDir();
     }

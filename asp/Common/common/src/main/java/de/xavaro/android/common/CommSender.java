@@ -1,10 +1,10 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.app.NotificationManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONObject;

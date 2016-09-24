@@ -84,13 +84,13 @@ public class WebAppCache
 
     public static void nukeWebAppCache()
     {
-        File file = new File(Simple.getExternalCacheDir(), "webappcache");
+        File file = Simple.getExternalCacheDir("webappcache");
         removeDirectories(file);
 
         freeMemory.run();
 
-        File act = new File(Simple.getExternalCacheDir(), "webappcache.act.json");
-        File bak = new File(Simple.getExternalCacheDir(), "webappcache.bak.json");
+        File act = Simple.getExternalCacheDir("webappcache.act.json");
+        File bak = Simple.getExternalCacheDir("webappcache.bak.json");
 
         if (act.delete() && bak.delete())
         {
@@ -108,12 +108,6 @@ public class WebAppCache
             (String webappname, String url, int interval)
     {
         return getCacheFile(webappname, url, interval, null);
-    }
-
-    public static WebAppCacheResponse getCacheFile(
-            String webappname, String url, int interval, boolean nolastuse)
-    {
-        return getCacheFile(webappname, url, interval, null, nolastuse);
     }
 
     public static WebAppCacheResponse getCacheFile(
@@ -154,7 +148,7 @@ public class WebAppCache
             return new WebAppCacheResponse(null, null, null, false);
         }
 
-        File cachedir = new File(Simple.getExternalCacheDir(), "webappcache/" + webappname);
+        File cachedir = Simple.getExternalCacheDir("webappcache/" + webappname);
 
         if (! cachedir.exists())
         {
@@ -568,8 +562,8 @@ public class WebAppCache
         {
             if (webappcache != null) return;
 
-            File file = new File(Simple.getExternalCacheDir(), "webappcache.act.json");
-            if (! file.exists()) file = new File(Simple.getExternalCacheDir(), "webappcache.bak.json");
+            File file = Simple.getExternalCacheDir("webappcache.act.json");
+            if (! file.exists()) file = Simple.getExternalCacheDir("webappcache.bak.json");
 
             try
             {
@@ -596,9 +590,9 @@ public class WebAppCache
         {
             if (webappcache == null) return;
 
-            File tmp = new File(Simple.getExternalCacheDir(), "webappcache.tmp.json");
-            File bak = new File(Simple.getExternalCacheDir(), "webappcache.bak.json");
-            File act = new File(Simple.getExternalCacheDir(), "webappcache.act.json");
+            File tmp = Simple.getExternalCacheDir("webappcache.tmp.json");
+            File bak = Simple.getExternalCacheDir("webappcache.bak.json");
+            File act = Simple.getExternalCacheDir("webappcache.act.json");
 
             try
             {
@@ -742,7 +736,7 @@ public class WebAppCache
                 // Process unused list.
                 //
 
-                File cachedir = new File(Simple.getExternalCacheDir(), "webappcache/" + webappname);
+                File cachedir = Simple.getExternalCacheDir("webappcache/" + webappname);
 
                 for (String url : unusedUrls)
                 {
@@ -765,7 +759,7 @@ public class WebAppCache
         return nextItem;
     }
 
-    public static void revalidateWebapp(String webappname)
+    private static void revalidateWebapp(String webappname)
     {
         Simple.removePost(freeMemory);
         getStorage();
@@ -790,7 +784,7 @@ public class WebAppCache
                 if (!url.startsWith("/")) continue;
 
                 url = WebApp.getHTTPRoot() + url;
-                getCacheFile(webappname, url, 1, true);
+                getCacheFile(webappname, url, 1, null, true);
             }
         }
 
@@ -848,7 +842,7 @@ public class WebAppCache
                         // Manifest check.
                         //
 
-                        WebAppCacheResponse res = getCacheFile(webappname, url, ival, true);
+                        WebAppCacheResponse res = getCacheFile(webappname, url, ival, null, true);
 
                         if (! res.notmodified)
                         {
@@ -875,7 +869,7 @@ public class WebAppCache
                     // File from app data servers or other.
                     //
 
-                    getCacheFile(webappname, url, ival, true);
+                    getCacheFile(webappname, url, ival, null, true);
                 }
 
                 nextLoadItem = null;

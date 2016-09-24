@@ -9,9 +9,14 @@ import android.view.Gravity;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SocialFacebook;
+import de.xavaro.android.common.SocialGoogleplus;
+import de.xavaro.android.common.SocialInstagram;
+import de.xavaro.android.common.SocialTwitter;
 import de.xavaro.android.common.WebAppView;
 
 @SuppressLint("RtlHardcoded")
+@SuppressWarnings("ResourceType")
 public class HomeSocial extends HomeFrame
 {
     private static final String LOGTAG = HomeSocial.class.getSimpleName();
@@ -34,9 +39,16 @@ public class HomeSocial extends HomeFrame
         layoutNormal = new LayoutParams(layoutParams);
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void setConfig(JSONObject config)
     {
-        if (Simple.isTablet())
+        boolean social =
+                SocialTwitter.getInstance().isEnabled() ||
+                SocialFacebook.getInstance().isEnabled() ||
+                SocialInstagram.getInstance().isEnabled() ||
+                SocialGoogleplus.getInstance().isEnabled();
+
+        if (Simple.isTablet() && social)
         {
             if (webView == null)
             {
@@ -50,14 +62,24 @@ public class HomeSocial extends HomeFrame
 
                 payloadFrame.addView(webView);
             }
+
+            setVisibility(VISIBLE);
         }
         else
         {
+            if (webView != null)
+            {
+                Simple.removeFromParent(webView);
+
+                webView.destroy();
+                webView = null;
+            }
+
             setVisibility(GONE);
         }
     }
 
-    protected void newsPostUpdateTitle()
+    private void newsPostUpdateTitle()
     {
         if ((webView != null) && (webView.social != null))
         {
@@ -86,7 +108,7 @@ public class HomeSocial extends HomeFrame
         }
     }
 
-    protected final Runnable newsPostRunner = new Runnable()
+    private final Runnable newsPostRunner = new Runnable()
     {
         @Override
         public void run()

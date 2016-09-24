@@ -249,6 +249,9 @@ public class HomeActivity extends CaptureActivity implements
             notifyScreen.setConfig(launchConfig);
             peopleScreen.setConfig(launchConfig);
 
+            socialScreen.setConfig(null);
+            launchScreen.setConfig(null);
+
             launchGroup.setConfig(null, launchConfig);
 
             launchFrame.addView(launchGroup);
