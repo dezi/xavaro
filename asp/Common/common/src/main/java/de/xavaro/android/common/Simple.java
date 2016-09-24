@@ -1082,19 +1082,16 @@ public class Simple
 
     private static File externalFilesDir;
     private static File externalCacheDir;
+    private static File externalStorageDir;
 
     public static File getExternalFilesDir()
     {
-        if (externalFilesDir != null) return externalFilesDir;
-        externalFilesDir = getAnyContext().getExternalFilesDir(null);
-        return externalFilesDir;
-    }
+        if (externalFilesDir == null)
+        {
+            externalFilesDir = getAnyContext().getExternalFilesDir(null);
+        }
 
-    public static File getExternalCacheDir()
-    {
-        if (externalCacheDir != null) return externalCacheDir;
-        externalCacheDir = getAnyContext().getExternalCacheDir();
-        return externalCacheDir;
+        return externalFilesDir;
     }
 
     public static File getCacheDir()
@@ -1102,7 +1099,25 @@ public class Simple
         return getAnyContext().getCacheDir();
     }
 
-    private static File externalStorageDir;
+    public static File getExternalCacheDir()
+    {
+        if (externalCacheDir == null)
+        {
+            externalCacheDir = getAnyContext().getExternalCacheDir();
+        }
+
+        return externalCacheDir;
+    }
+
+    public static File getExternalCacheDir(String subname)
+    {
+        if (externalCacheDir == null)
+        {
+            externalCacheDir = getAnyContext().getExternalCacheDir();
+        }
+
+        return new File(externalCacheDir, subname);
+    }
 
     public static File getExternalStorageDir()
     {
@@ -1111,8 +1126,11 @@ public class Simple
         // SD-Card is not installed.
         //
 
-        if (externalStorageDir != null) return externalStorageDir;
-        externalStorageDir = Environment.getExternalStorageDirectory();
+        if (externalStorageDir == null)
+        {
+            externalStorageDir = Environment.getExternalStorageDirectory();
+        }
+
         return externalStorageDir;
     }
 

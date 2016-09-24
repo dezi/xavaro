@@ -89,8 +89,8 @@ public class WebAppCache
 
         freeMemory.run();
 
-        File act = new File(Simple.getFilesDir(), "webappcache.act.json");
-        File bak = new File(Simple.getFilesDir(), "webappcache.bak.json");
+        File act = new File(Simple.getExternalCacheDir(), "webappcache.act.json");
+        File bak = new File(Simple.getExternalCacheDir(), "webappcache.bak.json");
 
         if (act.delete() && bak.delete())
         {
@@ -156,8 +156,6 @@ public class WebAppCache
 
         File cachedir = new File(Simple.getExternalCacheDir(), "webappcache/" + webappname);
 
-        Log.d(LOGTAG, "getCacheFile:======================" + cachedir);
-
         if (! cachedir.exists())
         {
             if (cachedir.mkdirs())
@@ -178,41 +176,44 @@ public class WebAppCache
         if (cachefiles.has(cacheurl))
         {
             cachefile = Json.getObject(cachefiles, cacheurl);
-
-            uuid = Json.getString(cachefile, "uuid");
             mimetype = Json.getString(cachefile, "mime");
-            String lget = Json.getString(cachefile, "lget");
+            uuid = Json.getString(cachefile, "uuid");
 
-            if ((interval > 0) && (uuid != null) && (lget != null))
+            if (uuid != null)
             {
                 File cfile = new File(cachedir, uuid);
 
-                long get = Simple.getTimeStamp(lget);
-                long now = Simple.nowAsTimeStamp();
-                long age = (now - get) / 1000;
-
-                if (age < (interval * 3600))
+                if (! cfile.exists())
                 {
                     //
-                    // Entry is within age.
+                    // The file is known in cache but does not
+                    // exists. Remove the last modified date
+                    // to ensure, it is reloaded.
                     //
 
-                    content = Simple.readBinaryFile(cfile);
-                    mimetype = Json.getString(cachefile, "mime");
-
-                    Log.d(LOGTAG,"getCacheFile: HIT=" + age + "=" + mimetype + "=" + url);
+                    Json.remove(cachefile, "lmod");
                 }
                 else
                 {
-                    if (! cfile.exists())
-                    {
-                        //
-                        // The file is known in cache but does not
-                        // exists. Remove the last modified date
-                        // to ensure, it is reloaded.
-                        //
+                    String lget = Json.getString(cachefile, "lget");
 
-                        Json.remove(cachefile, "lmod");
+                    if ((interval > 0) && (lget != null))
+                    {
+                        long get = Simple.getTimeStamp(lget);
+                        long now = Simple.nowAsTimeStamp();
+                        long age = (now - get) / 1000;
+
+                        if (age < (interval * 3600))
+                        {
+                            //
+                            // Entry is within age.
+                            //
+
+                            content = Simple.readBinaryFile(cfile);
+                            mimetype = Json.getString(cachefile, "mime");
+
+                            Log.d(LOGTAG, "getCacheFile: HIT=" + age + "=" + mimetype + "=" + url);
+                        }
                     }
                 }
             }
@@ -567,8 +568,8 @@ public class WebAppCache
         {
             if (webappcache != null) return;
 
-            File file = new File(Simple.getFilesDir(), "webappcache.act.json");
-            if (! file.exists()) file = new File(Simple.getFilesDir(), "webappcache.bak.json");
+            File file = new File(Simple.getExternalCacheDir(), "webappcache.act.json");
+            if (! file.exists()) file = new File(Simple.getExternalCacheDir(), "webappcache.bak.json");
 
             try
             {
@@ -595,9 +596,9 @@ public class WebAppCache
         {
             if (webappcache == null) return;
 
-            File tmp = new File(Simple.getFilesDir(), "webappcache.tmp.json");
-            File bak = new File(Simple.getFilesDir(), "webappcache.bak.json");
-            File act = new File(Simple.getFilesDir(), "webappcache.act.json");
+            File tmp = new File(Simple.getExternalCacheDir(), "webappcache.tmp.json");
+            File bak = new File(Simple.getExternalCacheDir(), "webappcache.bak.json");
+            File act = new File(Simple.getExternalCacheDir(), "webappcache.act.json");
 
             try
             {

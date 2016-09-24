@@ -22,9 +22,9 @@ import java.net.URL;
 
 public class CacheManager
 {
-    private final static String LOGTAG = "CacheManager";
+    private static final String LOGTAG = CacheManager.class.getSimpleName();
 
-    private final static String cachedir =  Simple.getCacheDir() + "/" + "iconcache";
+    private final static File cachedir =  Simple.getExternalCacheDir("iconcache");
 
     @Nullable
     public static Bitmap getIcon(String filename)

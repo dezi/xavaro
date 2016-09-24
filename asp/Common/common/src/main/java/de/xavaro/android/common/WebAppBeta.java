@@ -30,7 +30,7 @@ public class WebAppBeta
             String remotename = Simple.getPackageName() + "." + version + ".apk";
             String localname = Simple.getPackageName() + ".apk";
 
-            File localfile = new File(Simple.getCacheDir(), localname);
+            File localfile = Simple.getExternalCacheDir(localname);
 
             if (localfile.exists() && localfile.delete())
             {
@@ -91,7 +91,7 @@ public class WebAppBeta
             WebAppCache.nukeWebAppCache();
 
             String localname = Simple.getPackageName() + ".apk";
-            File localfile = new File(Simple.getCacheDir(), localname);
+            File localfile = Simple.getExternalCacheDir(localname);
 
             Log.d(LOGTAG, "makeBetaInstall: version: " + localfile.length());
 

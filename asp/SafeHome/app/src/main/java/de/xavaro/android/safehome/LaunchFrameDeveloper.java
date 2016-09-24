@@ -158,7 +158,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
     {
         Log.d(LOGTAG, "clearWebappCache: ...");
 
-        File file = new File(Simple.getCacheDir(), "webappcache");
+        File file = Simple.getExternalCacheDir("webappcache");
         removeDirectories(file);
 
         JSONObject empty = new JSONObject();
@@ -318,14 +318,7 @@ public class LaunchFrameDeveloper extends LaunchFrame
 
     private void loadStorageCache()
     {
-        File cache = Simple.getCacheDir();
-
-        Simple.removeFiles(cache, "thumbnail.");
-
-        deleteRecursive(new File(cache, "webappcache/tvscrape"));
-        deleteRecursive(new File(cache, "org.chromium.android_webview"));
-
-        loadStorage(cache);
+        loadStorage(Simple.getExternalCacheDir());
     }
 
     private void loadStorageSDCard()
