@@ -76,7 +76,7 @@
         "label": "phoenix",
         "default": true,
         "icon": "http://www.zdf.de/ZDFmediathek/contentblob/2492878/timg644x363blob/12166545",
-        "videourl": "http://zdf-hds-de-f.zdf.de/i/de09_v1@87012/master.m3u8",
+        "videourl": "http://zdf0910-lh.akamaihd.net/i/de09_v1@392871/master.m3u8?dw=0",
         "aliase": [ "tv/de/Phoenix", "tv/de/Phoenix HD" ]
       }
     ]
@@ -110,7 +110,7 @@
         "label": "arte",
         "default": true,
         "icon": "http://pbs.twimg.com/profile_images/755318292156383232/UqOCW0VU_400x400.jpg",
-        "videourl": "http://delive.artestras.cshls.lldns.net/artestras/contrib/delive.m3u8",
+        "videourl": "http://artelive-lh.akamaihd.net/i/artelive_de@393591/master.m3u8",
         "aliase": [ "tv/de/ARTE Deutsch", "tv/de/ARTE Deutsch HD" ]
       }
     ]
@@ -429,8 +429,9 @@
       {
         "url": "http://www.rtl.de/",
         "label": "RTL",
-        "default": false,
         "develop": true,
+        "default": false,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/505332383269142528/dxFEuzbY_400x400.png",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl.html",
         "aliase": [ "tv/de/RTL Deutschland", "tv/de/RTL Deutschland HD" ]
@@ -441,6 +442,7 @@
         "label": "RTL II",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/777850006812385280/jhv_64zR_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl2.html",
         "aliase": [ "tv/de/RTL 2 Deutschland", "tv/de/RTL 2 Deutschland HD" ]
@@ -451,6 +453,7 @@
         "label": "SUPER RTL",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/673846526054146048/TwwE_0e7_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/superrtl.html",
         "aliase": [ "tv/de/Super RTL Deutschland", "tv/de/Super RTL Deutschland HD" ]
@@ -461,6 +464,7 @@
         "label": "RTL NITRO",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/2530896718/rn3do2g6wuxc8kekdasv_400x400.jpeg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtlnitro.html",
         "aliase": [ "tv/de/RTL Nitro Deutschland", "tv/de/RTL Nitro Deutschland HD" ]
@@ -471,6 +475,7 @@
         "label": "VOX",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/460059950455083012/7m3LwYsN_400x400.png",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/vox.html",
         "aliase": [ "tv/de/Vox Deutschland", "tv/de/Vox Deutschland HD" ]
@@ -481,6 +486,7 @@
         "label": "N-TV",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/562216949191434240/oHlTVT_Q_400x400.jpeg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/ntv.html",
         "aliase": [ "tv/de/N-TV", "tv/de/N-TV HD" ]
@@ -500,6 +506,7 @@
         "label": "SAT.1",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/1497994582/SAT1_3D_BM_CMYK_Voransicht_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sat1.html",
         "aliase": [ "tv/de/Sat. 1 Deutschland", "tv/de/Sat. 1 Deutschland HD" ]
@@ -510,6 +517,7 @@
         "label": "PRO7",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/741164987712983040/w3TLX9_e_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7.html",
         "aliase": [ "tv/de/Pro Sieben Deutschland", "tv/de/Pro Sieben Deutschland HD" ]
@@ -520,6 +528,7 @@
         "label": "PRO7 MAXX",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/755664623165173761/3iss_A2Y_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7_maxx.html",
         "aliase": [ "tv/de/Pro Sieben Maxx Deutschland", "tv/de/Pro Sieben Maxx Deutschland HD" ]
@@ -530,6 +539,7 @@
         "label": "KABEL 1",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/638243226953084928/0aOngpLN_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/kabel1.html",
         "aliase": [ "tv/de/Kabel Eins Deutschland", "tv/de/Kabel Eins Deutschland HD" ]
@@ -540,6 +550,7 @@
         "label": "SIXX",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/609280667281661952/_VFt44k-_400x400.png",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sixx.html",
         "aliase": [ "tv/de/Sixx Deutschland", "tv/de/Sixx Deutschland HD" ]
@@ -558,6 +569,7 @@
         "label": "DMAX",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/776303016718823424/f5tYYg25_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/dmax.html",
         "aliase": [ "tv/de/DMAX Deutschland", "tv/de/DMAX Deutschland HD" ]
@@ -576,6 +588,7 @@
         "label": "TELE 5",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/711856625498198016/M0xEqzy1_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/tele5.html",
         "aliase": [ "tv/de/Tele 5", "tv/de/Tele 5 HD" ]
@@ -594,6 +607,7 @@
         "label": "Nickelodion",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/715298426754236416/MN9DJ73J_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/nickcc.html",
         "aliase": [ "tv/de/Nickelodeon Deutschland", "tv/de/Nickelodeon Deutschland HD" ]
@@ -612,6 +626,7 @@
         "label": "Disney Channel",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/459327809760931840/Ez365Pcs_400x400.jpeg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/disney_channel.html",
         "aliase": [ "tv/de/Disney Channel Deutschland", "tv/de/Disney Channel Deutschland HD" ]
@@ -630,6 +645,7 @@
         "label": "VIVA",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/627842131122651136/L0PGaxTP_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/viva-comedy_central.html",
         "aliase": [ "tv/de/Comedy Central Deutschland", "tv/de/Comedy Central Deutschland HD" ]
@@ -648,6 +664,7 @@
         "label": "Deluxe Music",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/3108296919/6b1e875583edb8ba44216f339ee040e8_400x400.png",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/deluxemusic.html",
         "aliase": [ "tv/de/Deluxe Music", "tv/de/Deluxe Music HD" ]
@@ -666,6 +683,7 @@
         "label": "EUROSPORT",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/664929268003176449/R0Wi-91u_400x400.png",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/eurosport.html",
         "aliase": [ "tv/de/Eurosport 1 Germany", "tv/de/Eurosport 1 Germany HD" ]
@@ -684,6 +702,7 @@
         "label": "SPORT 1",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/726059518061383680/cZxtg0Xb_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sport1.html",
         "aliase": [ "tv/de/Sport 1", "tv/de/Sport 1 HD" ]
@@ -702,17 +721,19 @@
         "label": "ORF 1",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/orf1.html",
         "aliase": [ "tv/de/ORF Eins", "tv/de/ORF Eins HD" ]
       },
       {
-      "label": "ORF 2",
-      "default": false,
-      "develop": true,
-      "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
-      "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/orf2.html",
-      "aliase": [ "tv/de/ORF 2", "tv/de/ORF 2 HD" ]
+        "label": "ORF 2",
+        "default": false,
+        "develop": true,
+        "enabled": false,
+        "icon": "http://pbs.twimg.com/profile_images/3698374901/0c7cefe8ceaf6b81ac8c30188e7f45ab_400x400.png",
+        "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/orf2.html",
+        "aliase": [ "tv/de/ORF 2", "tv/de/ORF 2 HD" ]
       }
     ]
   },
@@ -728,6 +749,7 @@
         "label": "ATV",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/748484632522391552/wJemk0gY_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/atv.html",
         "aliase": [ "tv/de/ATV", "tv/de/ATV HD" ]
@@ -746,6 +768,7 @@
         "label": "Servus TV",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/587888784945086464/3aMl6Uyt_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/servustv.html",
         "aliase": [ "tv/de/Servus TV Deutschland", "tv/de/Servus TV Deutschland HD" ]
@@ -764,6 +787,7 @@
         "label": "SF 1",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sf1.html"
       },
@@ -771,6 +795,7 @@
         "label": "SF 2",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/2966142677/642b78296efa8acf5f8e8d3d5975ee3e_400x400.jpeg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sf2.html"
       }
@@ -788,10 +813,10 @@
         "label": "3plus",
         "default": false,
         "develop": true,
+        "enabled": false,
         "icon": "http://pbs.twimg.com/profile_images/458964347834732545/F4xlFkN9_400x400.jpeg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/3plus.html"
       }
     ]
   }
-
 }
