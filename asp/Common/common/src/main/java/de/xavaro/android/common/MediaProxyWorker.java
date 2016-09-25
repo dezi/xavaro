@@ -11,18 +11,37 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MediaProxyWorker extends Thread
 {
-    private final String LOGTAG = MediaProxyWorker.class.getSimpleName();
+    private final static String LOGTAG = MediaProxyWorker.class.getSimpleName();
 
     //
     // Fake content length > 24h for broadcasts.
     //
 
-    private final long fakeContentLength = 99999999L;
+    private final static long fakeContentLength = 999999999L;
+
+    //
+    // Class for storing a fragment url and its current stream offset.
+    //
+
+    private class Fragment
+    {
+        public String fragment;
+        public long offset;
+
+        public Fragment(String fragment, long offset)
+        {
+            this.fragment = fragment;
+            this.offset = offset;
+        }
+    }
+
+    private final static Map<String, ArrayList<Fragment>> streamFragments = new HashMap<>();
 
     //
     // Request properties.
@@ -72,7 +91,50 @@ public class MediaProxyWorker extends Thread
 
     public void terminate()
     {
+        Log.d(LOGTAG, "terminate: ...");
+
         running = false;
+    }
+
+    private void clearFragments()
+    {
+        synchronized (streamFragments)
+        {
+            Log.d(LOGTAG, "clearFragments: requestUrl=" + requestUrl);
+
+            if (streamFragments.containsKey(requestUrl))
+            {
+                streamFragments.remove(requestUrl);
+            }
+        }
+    }
+
+    private void registerFragment(String fragment, long offset)
+    {
+        synchronized (streamFragments)
+        {
+            Log.d(LOGTAG, "registerFragment: requestUrl=" + requestUrl);
+            Log.d(LOGTAG, "registerFragment: fragment=" + fragment);
+            Log.d(LOGTAG, "registerFragment: offset=" + offset);
+
+            if (! streamFragments.containsKey(requestUrl))
+            {
+                streamFragments.put(requestUrl, new ArrayList<Fragment>());
+            }
+
+            ArrayList<Fragment> fragments = streamFragments.get(requestUrl);
+            if (fragments.size() > 10) fragments.remove(0);
+            fragments.add(new Fragment(fragment, offset));
+        }
+    }
+
+    private void retrieveFragment(long offset)
+    {
+        synchronized (streamFragments)
+        {
+            Log.d(LOGTAG, "retrieveFragment: requestUrl=" + requestUrl);
+            Log.d(LOGTAG, "retrieveFragment: offset=" + offset);
+        }
     }
 
     @Override
@@ -129,10 +191,29 @@ public class MediaProxyWorker extends Thread
         {
             currentOption = MediaProxy.getInstance().getCurrentStreamOption();
 
+            if (requestIsPartial)
+            {
+                //
+                // Adjust last fragment to last fully
+                // delivered fragment.
+                //
+
+                total += partialFrom;
+            }
+            else
+            {
+                //
+                // Reset list of fragments for new request.
+                //
+
+                clearFragments();
+            }
+
             boolean first = true;
 
             while (running)
             {
+
                 while (nextFragment == null)
                 {
                     readFragments();
@@ -148,6 +229,7 @@ public class MediaProxyWorker extends Thread
 
                 Log.d(LOGTAG, "workOnVideo: fragment: " + nextFragment);
 
+                registerFragment(nextFragment, total);
                 openUnderscoreConnection(nextFragment);
 
                 InputStream fraginput = connection.getInputStream();
@@ -239,16 +321,15 @@ public class MediaProxyWorker extends Thread
                 {
                     Log.d(LOGTAG, "workOnVideo: player closed connect...");
 
-                    fraginput.close();
-                    break;
+                    running = false;
                 }
 
+                Log.d(LOGTAG, "workOnVideo: fragment close: " + fragt);
+                Log.d(LOGTAG, "workOnVideo: total so far: " + total);
                 fraginput.close();
 
                 lastFragment = nextFragment;
                 nextFragment = null;
-
-                Log.d(LOGTAG, "workOnVideo: fragment close: " + fragt);
             }
         }
         catch (Exception ex)
@@ -258,8 +339,8 @@ public class MediaProxyWorker extends Thread
             Log.d(LOGTAG, "workOnVideo exception: " + ex.getMessage());
         }
 
-        Log.d(LOGTAG, "workOnVideo wrote total:" + total);
-        Log.d(LOGTAG, "workOnVideo terminating thread");
+        Log.d(LOGTAG, "workOnVideo: wrote total:" + total);
+        Log.d(LOGTAG, "workOnVideo: terminating thread");
     }
 
     private void workOnAudio()

@@ -381,7 +381,8 @@ public class MediaSurface extends FrameLayout implements
         {
             if (! isFullscreen)
             {
-                if ((Math.abs(xscreen - xStartTouch) >= 10) || (Math.abs(yscreen - yStartTouch) >= 10))
+                if ((Math.abs(xscreen - xStartTouch) >= Simple.DP(10))
+                        || (Math.abs(yscreen - yStartTouch) >= Simple.DP(10)))
                 {
                     normalParams.leftMargin = xStartMargin + xscreen - xStartTouch;
                     normalParams.topMargin = yStartMargin + yscreen - yStartTouch;
@@ -393,7 +394,8 @@ public class MediaSurface extends FrameLayout implements
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP)
         {
-            if ((Math.abs(xscreen - xStartTouch) < 10) && (Math.abs(yscreen - yStartTouch) < 10))
+            if ((Math.abs(xscreen - xStartTouch) < Simple.DP(10))
+                    && (Math.abs(yscreen - yStartTouch) < Simple.DP(10)))
             {
                 ViewParent parent = view.getParent();
 
