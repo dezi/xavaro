@@ -1,20 +1,18 @@
 package de.xavaro.android.common;
 
-import android.app.Dialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
-import android.os.Build;
 import android.provider.Settings;
-import android.view.InputDevice;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.view.MotionEvent;
 import android.content.Context;
+import android.view.WindowManager;
+import android.view.InputDevice;
+import android.view.MotionEvent;
+import android.view.ViewGroup;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.app.Dialog;
+import android.os.Build;
 import android.util.Log;
 
 public class CaptureOverlay extends FrameLayout
@@ -48,6 +46,14 @@ public class CaptureOverlay extends FrameLayout
         }
 
         return instance;
+    }
+
+    public static void monitorAllTouches(Dialog dialog)
+    {
+        if (instance != null)
+        {
+            instance.monitorAllTouchesInternal(dialog);
+        }
     }
 
     private WindowManager.LayoutParams overlayParam;
@@ -249,7 +255,7 @@ public class CaptureOverlay extends FrameLayout
         }
     }
 
-    public void monitorAllTouches(Dialog dialog)
+    private void monitorAllTouchesInternal(Dialog dialog)
     {
         if ((dialog == null) || (dialog.getWindow() == null)) return;
 

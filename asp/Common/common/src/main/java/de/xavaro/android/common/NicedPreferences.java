@@ -134,7 +134,7 @@ public class NicedPreferences
         {
             super.showDialog(state);
 
-            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+            CaptureOverlay.monitorAllTouches(getDialog());
         }
 
         @Override
@@ -276,7 +276,7 @@ public class NicedPreferences
         {
             super.showDialog(state);
 
-            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+            CaptureOverlay.monitorAllTouches(getDialog());
         }
 
         @Override
@@ -437,7 +437,7 @@ public class NicedPreferences
         {
             super.showDialog(state);
 
-            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+            CaptureOverlay.monitorAllTouches(getDialog());
         }
 
         @Override
@@ -918,10 +918,7 @@ public class NicedPreferences
             {
                 super.showDialog(state);
 
-                if (CaptureOverlay.getInstance() != null)
-                {
-                    CaptureOverlay.getInstance().monitorAllTouches(getDialog());
-                }
+                CaptureOverlay.monitorAllTouches(getDialog());
 
                 return;
             }
@@ -1117,7 +1114,7 @@ public class NicedPreferences
             {
                 super.showDialog(state);
 
-                CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+                CaptureOverlay.monitorAllTouches(getDialog());
 
                 View view = getDialog().getWindow().getDecorView();
                 View edit = view.findViewById(android.R.id.edit);
@@ -1725,7 +1722,7 @@ public class NicedPreferences
                 }
             });
 
-            CaptureOverlay.getInstance().monitorAllTouches(dialog);
+            CaptureOverlay.monitorAllTouches(dialog);
         }
 
         public interface SearchCallback
