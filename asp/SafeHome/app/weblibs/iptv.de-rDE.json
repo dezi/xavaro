@@ -441,7 +441,7 @@
         "label": "RTL II",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/768725097171517440/Rhw4GwFq_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/777850006812385280/jhv_64zR_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl2.html",
         "aliase": [ "tv/de/RTL 2 Deutschland", "tv/de/RTL 2 Deutschland HD" ]
       },
@@ -551,14 +551,14 @@
 
     "label": "DMAX",
     "url": "http://www.dmax.de/",
-    "icon": "http://pbs.twimg.com/profile_images/772698472336199680/qtH2kt_S_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/776303016718823424/f5tYYg25_400x400.jpg",
 
     "channels": [
       {
         "label": "DMAX",
         "default": false,
         "develop": true,
-        "icon": "http://pbs.twimg.com/profile_images/772698472336199680/qtH2kt_S_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/776303016718823424/f5tYYg25_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/dmax.html",
         "aliase": [ "tv/de/DMAX Deutschland", "tv/de/DMAX Deutschland HD" ]
       }

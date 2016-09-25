@@ -8,6 +8,10 @@ import android.view.Gravity;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Simple;
+import de.xavaro.android.common.SocialFacebook;
+import de.xavaro.android.common.SocialGoogleplus;
+import de.xavaro.android.common.SocialInstagram;
+import de.xavaro.android.common.SocialTwitter;
 
 @SuppressLint("RtlHardcoded")
 @SuppressWarnings("ResourceType")
@@ -29,9 +33,17 @@ public class HomeLaunch extends HomeFrame
         layoutNormal = new LayoutParams(layoutParams);
     }
 
-    @SuppressWarnings({"EmptyMethod", "UnusedParameters"})
+    @SuppressWarnings({"UnusedParameters"})
     public void setConfig(JSONObject config)
     {
+        boolean social =
+                SocialTwitter.getInstance().isEnabled() ||
+                        SocialFacebook.getInstance().isEnabled() ||
+                        SocialInstagram.getInstance().isEnabled() ||
+                        SocialGoogleplus.getInstance().isEnabled();
+
+        layoutParams.width = (Simple.isTablet() && social) ? HomeActivity.launchWid : Simple.MP;
+        layoutNormal.width = layoutParams.width;
     }
 
     @Override
