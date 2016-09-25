@@ -89,6 +89,14 @@ public abstract class Social
         }
     }
 
+    public static boolean isAnyEnabled()
+    {
+        return SocialTwitter.getInstance().isEnabled() ||
+                SocialFacebook.getInstance().isEnabled() ||
+                SocialInstagram.getInstance().isEnabled() ||
+                SocialGoogleplus.getInstance().isEnabled();
+    }
+
     public String getPlatformName()
     {
         return this.platformname;
