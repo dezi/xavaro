@@ -23,25 +23,7 @@ public class MediaProxyWorker extends Thread
     // Fake content length > 24h for broadcasts.
     //
 
-    private final static long fakeContentLength = 999999999L;
-
-    //
-    // Class for storing a fragment url and its current stream offset.
-    //
-
-    private class Fragment
-    {
-        public String fragment;
-        public long offset;
-
-        public Fragment(String fragment, long offset)
-        {
-            this.fragment = fragment;
-            this.offset = offset;
-        }
-    }
-
-    private final static Map<String, ArrayList<Fragment>> streamFragments = new HashMap<>();
+    private final static long fakeContentLength = 9999999999L;
 
     //
     // Request properties.
@@ -96,16 +78,19 @@ public class MediaProxyWorker extends Thread
         running = false;
     }
 
-    private void clearFragments()
-    {
-        synchronized (streamFragments)
-        {
-            Log.d(LOGTAG, "clearFragments: requestUrl=" + requestUrl);
+    //region Partial request fragment evaluation.
 
-            if (streamFragments.containsKey(requestUrl))
-            {
-                streamFragments.remove(requestUrl);
-            }
+    private final static Map<String, ArrayList<Fragment>> streamFragments = new HashMap<>();
+
+    private class Fragment
+    {
+        public String fragment;
+        public long offset;
+
+        public Fragment(String fragment, long offset)
+        {
+            this.fragment = fragment;
+            this.offset = offset;
         }
     }
 
@@ -128,14 +113,52 @@ public class MediaProxyWorker extends Thread
         }
     }
 
-    private void retrieveFragment(long offset)
+    private long retrieveFragment()
     {
         synchronized (streamFragments)
         {
             Log.d(LOGTAG, "retrieveFragment: requestUrl=" + requestUrl);
-            Log.d(LOGTAG, "retrieveFragment: offset=" + offset);
+            Log.d(LOGTAG, "retrieveFragment: partialFrom=" + partialFrom);
+
+            if (streamFragments.containsKey(requestUrl))
+            {
+                ArrayList<Fragment> fragments = streamFragments.get(requestUrl);
+
+                for (int inx = fragments.size() - 1; inx >= 0; inx--)
+                {
+                    Fragment fragment = fragments.get(inx);
+
+                    if (fragment.offset <= partialFrom)
+                    {
+                        nextFragment = fragment.fragment;
+
+                        Log.d(LOGTAG, "retrieveFragment: nextFragment=" + nextFragment);
+                        Log.d(LOGTAG, "retrieveFragment: partialFrom=" + partialFrom);
+                        Log.d(LOGTAG, "retrieveFragment: offset=" + fragment.offset);
+
+                        return fragment.offset;
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private void clearFragments()
+    {
+        synchronized (streamFragments)
+        {
+            Log.d(LOGTAG, "clearFragments: requestUrl=" + requestUrl);
+
+            if (streamFragments.containsKey(requestUrl))
+            {
+                streamFragments.remove(requestUrl);
+            }
         }
     }
+
+    //endregion Partial request fragment evaluation.
 
     @Override
     public void run()
@@ -198,7 +221,7 @@ public class MediaProxyWorker extends Thread
                 // delivered fragment.
                 //
 
-                total += partialFrom;
+                total = retrieveFragment();
             }
             else
             {
@@ -213,7 +236,6 @@ public class MediaProxyWorker extends Thread
 
             while (running)
             {
-
                 while (nextFragment == null)
                 {
                     readFragments();
@@ -285,19 +307,21 @@ public class MediaProxyWorker extends Thread
                         // Skip first bytes.
                         //
 
-                        long max = partialFrom;
+                        long skip = partialFrom - total;
+                        long have = 0;
                         long want;
 
-                        while (max > 0)
+                        while (have < skip)
                         {
-                            want = (max > buffer.length) ? buffer.length : max;
+                            want = ((skip - have) > buffer.length) ? buffer.length : skip - have;
                             xfer = fraginput.read(buffer, 0, (int) want);
                             if (xfer < 0) break;
 
-                            max -= xfer;
+                            total += xfer;
+                            have += xfer;
                         }
 
-                        Log.d(LOGTAG, "workOnVideo: skipped partial: " + partialFrom);
+                        Log.d(LOGTAG, "workOnVideo: skipped partial: " + skip);
                     }
 
                     first = false;
