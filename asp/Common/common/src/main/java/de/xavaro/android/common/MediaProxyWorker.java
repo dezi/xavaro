@@ -23,7 +23,7 @@ public class MediaProxyWorker extends Thread
     // Fake content length > 24h for broadcasts.
     //
 
-    private final static long fakeContentLength = 9999999999L;
+    private final static long fakeContentLength = 99999999999L;
 
     //
     // Request properties.
