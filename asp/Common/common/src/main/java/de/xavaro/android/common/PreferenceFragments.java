@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.view.View;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -291,12 +290,14 @@ public class PreferenceFragments
                         String iconurl = Json.getString(channel, "icon");
                         String iconname = website + "." + label;
                         Drawable drawable = CacheManager.getWebIcon(iconname, iconurl);
+
+                        boolean enabled = (! Json.has(channel, "enabled")) || Json.getBoolean(channel, "enabled");
                         boolean developer = Json.getBoolean(channel, "develop");
 
-                        if (developer && ! Simple.getSharedPrefBoolean("developer.enable"))
+                        if ((developer && ! Simple.getSharedPrefBoolean("developer.enable")) || ! enabled)
                         {
                             //
-                            // Developer only enabled content.
+                            // Developer only enabled or disabled content.
                             //
 
                             continue;

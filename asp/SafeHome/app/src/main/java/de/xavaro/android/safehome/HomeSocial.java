@@ -8,12 +8,9 @@ import android.view.Gravity;
 
 import org.json.JSONObject;
 
-import de.xavaro.android.common.Simple;
-import de.xavaro.android.common.SocialFacebook;
-import de.xavaro.android.common.SocialGoogleplus;
-import de.xavaro.android.common.SocialInstagram;
-import de.xavaro.android.common.SocialTwitter;
 import de.xavaro.android.common.WebAppView;
+import de.xavaro.android.common.Social;
+import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
 @SuppressWarnings("ResourceType")
@@ -42,11 +39,7 @@ public class HomeSocial extends HomeFrame
     @SuppressWarnings("UnusedParameters")
     public void setConfig(JSONObject config)
     {
-        boolean social =
-                SocialTwitter.getInstance().isEnabled() ||
-                SocialFacebook.getInstance().isEnabled() ||
-                SocialInstagram.getInstance().isEnabled() ||
-                SocialGoogleplus.getInstance().isEnabled();
+        boolean social = Social.isAnyEnabled();
 
         if (Simple.isTablet() && social)
         {

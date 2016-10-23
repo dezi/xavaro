@@ -134,7 +134,7 @@ public class NicedPreferences
         {
             super.showDialog(state);
 
-            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+            CaptureOverlay.monitorAllTouches(getDialog());
         }
 
         @Override
@@ -276,7 +276,7 @@ public class NicedPreferences
         {
             super.showDialog(state);
 
-            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+            CaptureOverlay.monitorAllTouches(getDialog());
         }
 
         @Override
@@ -437,7 +437,7 @@ public class NicedPreferences
         {
             super.showDialog(state);
 
-            CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+            CaptureOverlay.monitorAllTouches(getDialog());
         }
 
         @Override
@@ -711,7 +711,13 @@ public class NicedPreferences
 
             if ((current != null) && (obj instanceof Set))
             {
-                current.setText(getDisplayValue((Set<String>) obj));
+                try
+                {
+                    current.setText(getDisplayValue((Set<String>) obj));
+                }
+                catch (Exception ignore)
+                {
+                }
             }
 
             return true;
@@ -918,10 +924,7 @@ public class NicedPreferences
             {
                 super.showDialog(state);
 
-                if (CaptureOverlay.getInstance() != null)
-                {
-                    CaptureOverlay.getInstance().monitorAllTouches(getDialog());
-                }
+                CaptureOverlay.monitorAllTouches(getDialog());
 
                 return;
             }
@@ -1117,23 +1120,30 @@ public class NicedPreferences
             {
                 super.showDialog(state);
 
-                CaptureOverlay.getInstance().monitorAllTouches(getDialog());
+                CaptureOverlay.monitorAllTouches(getDialog());
 
-                View view = getDialog().getWindow().getDecorView();
-                View edit = view.findViewById(android.R.id.edit);
-
-                if ((edit != null) && (edit instanceof EditText))
+                if (getDialog().getWindow() != null)
                 {
-                    ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+                    View view = getDialog().getWindow().getDecorView();
 
-                    if (isUppercase)
+                    if (view != null)
                     {
-                        ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-                    }
+                        View edit = view.findViewById(android.R.id.edit);
 
-                    if (isPhonenumber)
-                    {
-                        ((EditText) edit).setInputType(InputType.TYPE_CLASS_PHONE);
+                        if ((edit != null) && (edit instanceof EditText))
+                        {
+                            ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
+                            if (isUppercase)
+                            {
+                                ((EditText) edit).setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                            }
+
+                            if (isPhonenumber)
+                            {
+                                ((EditText) edit).setInputType(InputType.TYPE_CLASS_PHONE);
+                            }
+                        }
                     }
                 }
 
@@ -1247,16 +1257,16 @@ public class NicedPreferences
             {
                 LinearLayout scorelayout = new LinearLayout(getContext());
                 scorelayout.setOrientation(LinearLayout.HORIZONTAL);
-                scorelayout.setLayoutParams(new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, 36));
+                scorelayout.setLayoutParams(Simple.layoutParamsXX(Simple.MP, Simple.DP(36)));
 
                 int rest = score;
 
                 for (int inx = 0; inx < 5; inx++)
                 {
                     stars[ inx ] = new ImageView(getContext());
-                    stars[ inx ].setPadding(0, 5, 0, 0);
-                    scorelayout.addView(stars[ inx ], new ViewGroup.LayoutParams(25, 30));
+                    stars[ inx ].setLayoutParams(Simple.layoutParamsXX(Simple.DP(25), Simple.DP(30)));
+                    Simple.setPadding(stars[ inx ], 0, 5, 0, 0);
+                    scorelayout.addView(stars[ inx ]);
 
                     if (rest >= 3)
                     {
@@ -1289,8 +1299,7 @@ public class NicedPreferences
                 degree.setGravity(Gravity.CENTER_VERTICAL);
                 degree.setTextSize(Simple.getPreferredTextSize());
                 degree.setText(degreeText[ score ]);
-                degree.setPadding(8, 0, 0, 0);
-
+                Simple.setPadding(degree, 8, 0, 0, 0);
                 scorelayout.addView(degree);
 
                 ((ViewGroup) view).addView(scorelayout, 1);
@@ -1339,7 +1348,7 @@ public class NicedPreferences
         }
     }
 
-    public static LinearLayout FuckIntoShape(Context context, View view)
+    private static LinearLayout FuckIntoShape(Context context, View view)
     {
         //
         // Re-arrange completely shitty checkbox layout.
@@ -1725,7 +1734,7 @@ public class NicedPreferences
                 }
             });
 
-            CaptureOverlay.getInstance().monitorAllTouches(dialog);
+            CaptureOverlay.monitorAllTouches(dialog);
         }
 
         public interface SearchCallback

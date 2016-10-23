@@ -92,30 +92,30 @@ public class MediaSurface extends FrameLayout implements
     {
         setOnTouchListener(this);
 
-        normalParams = new LayoutParams(400, 240);
-        normalParams.leftMargin = 40;
-        normalParams.topMargin  = 400;
+        normalParams = new LayoutParams(Simple.DP(400), Simple.DP(240));
+        normalParams.leftMargin = Simple.DP(40);
+        normalParams.topMargin  = Simple.DP(400);
 
-        fullScreenParams = new LayoutParams(400, 240);
-        fullScreenParams.leftMargin = 40;
-        fullScreenParams.topMargin  = 400;
+        fullScreenParams = new LayoutParams(Simple.DP(400), Simple.DP(240));
+        fullScreenParams.leftMargin = Simple.DP(40);
+        fullScreenParams.topMargin  = Simple.DP(400);
 
         topArea = new FrameLayout(context);
-        topArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 80, Gravity.TOP));
-        topArea.setPadding(10, 10, 10, 10);
+        topArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, Simple.DP(80), Gravity.TOP));
+        Simple.setPadding(topArea, 10, 10, 10, 10);
         topArea.setVisibility(INVISIBLE);
 
         this.addView(topArea);
 
         bottomArea = new FrameLayout(context);
-        bottomArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 80, Gravity.BOTTOM));
-        bottomArea.setPadding(10, 10, 10, 10);
+        bottomArea.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, Simple.DP(80), Gravity.BOTTOM));
+        Simple.setPadding(bottomArea, 10, 10, 10, 10);
         bottomArea.setVisibility(INVISIBLE);
 
         this.addView(bottomArea);
 
         FrameLayout offButton = new FrameLayout(context);
-        offButton.setLayoutParams(new LayoutParams(60, 60, Gravity.START + Gravity.TOP));
+        offButton.setLayoutParams(new LayoutParams(Simple.DP(60), Simple.DP(60), Gravity.START + Gravity.TOP));
         offButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_shutdown_190x190));
 
         topArea.addView(offButton);
@@ -130,7 +130,7 @@ public class MediaSurface extends FrameLayout implements
         });
 
         playButton = new FrameLayout(context);
-        playButton.setLayoutParams(new LayoutParams(60, 60, Gravity.END + Gravity.TOP));
+        playButton.setLayoutParams(new LayoutParams(Simple.DP(60), Simple.DP(60), Gravity.END + Gravity.TOP));
         playButton.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_play_190x190));
 
         topArea.addView(playButton);
@@ -152,12 +152,12 @@ public class MediaSurface extends FrameLayout implements
         });
 
         FrameLayout outer = new FrameLayout(context);
-        outer.setLayoutParams(new LayoutParams(320, 80, Gravity.CENTER_HORIZONTAL));
-        outer.setPadding(10, 0, 10, 0);
+        outer.setLayoutParams(new LayoutParams(Simple.DP(320), Simple.DP(80), Gravity.CENTER_HORIZONTAL));
+        Simple.setPadding(outer, 10, 0, 10, 0);
 
         FrameLayout inner = new FrameLayout(context);
-        inner.setLayoutParams(new LayoutParams(150, 60, Gravity.CENTER_HORIZONTAL));
-        inner.setPadding(5, 0, 5, 0);
+        inner.setLayoutParams(new LayoutParams(Simple.DP(150), Simple.DP(80), Gravity.CENTER_HORIZONTAL));
+        Simple.setPadding(inner, 5, 0, 5, 0);
 
         outer.addView(inner);
         topArea.addView(outer);
@@ -231,14 +231,14 @@ public class MediaSurface extends FrameLayout implements
     private FrameLayout buttonWithText(Context context, String text, int gravity)
     {
         FrameLayout button = new FrameLayout(context);
-        button.setLayoutParams(new LayoutParams(60, 60, gravity));
+        button.setLayoutParams(new LayoutParams(Simple.DP(60), Simple.DP(60), gravity));
         button.setBackground(VersionUtils.getDrawableFromResources(getContext(), R.drawable.player_empty_190x190));
 
         TextView textview = new TextView(context);
         textview.setTypeface(null, Typeface.BOLD);
         textview.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
         textview.setTextColor(CommonConfigs.VideoSurfaceDisabledButton);
-        textview.setPadding(0, 5, 0, 0);
+        Simple.setPadding(textview, 0, 5, 0, 0);
         textview.setTextSize(32f);
         textview.setText(text);
         button.addView(textview);
@@ -381,7 +381,8 @@ public class MediaSurface extends FrameLayout implements
         {
             if (! isFullscreen)
             {
-                if ((Math.abs(xscreen - xStartTouch) >= 10) || (Math.abs(yscreen - yStartTouch) >= 10))
+                if ((Math.abs(xscreen - xStartTouch) >= Simple.DP(10))
+                        || (Math.abs(yscreen - yStartTouch) >= Simple.DP(10)))
                 {
                     normalParams.leftMargin = xStartMargin + xscreen - xStartTouch;
                     normalParams.topMargin = yStartMargin + yscreen - yStartTouch;
@@ -393,7 +394,8 @@ public class MediaSurface extends FrameLayout implements
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP)
         {
-            if ((Math.abs(xscreen - xStartTouch) < 10) && (Math.abs(yscreen - yStartTouch) < 10))
+            if ((Math.abs(xscreen - xStartTouch) < Simple.DP(10))
+                    && (Math.abs(yscreen - yStartTouch) < Simple.DP(10)))
             {
                 ViewParent parent = view.getParent();
 

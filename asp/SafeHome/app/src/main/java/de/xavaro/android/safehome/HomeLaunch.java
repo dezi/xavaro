@@ -7,6 +7,7 @@ import android.view.Gravity;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.Social;
 import de.xavaro.android.common.Simple;
 
 @SuppressLint("RtlHardcoded")
@@ -29,9 +30,13 @@ public class HomeLaunch extends HomeFrame
         layoutNormal = new LayoutParams(layoutParams);
     }
 
-    @SuppressWarnings({"EmptyMethod", "UnusedParameters"})
+    @SuppressWarnings("UnusedParameters")
     public void setConfig(JSONObject config)
     {
+        boolean social = Social.isAnyEnabled();
+
+        layoutParams.width = (Simple.isTablet() && social) ? HomeActivity.launchWid : Simple.MP;
+        layoutNormal.width = layoutParams.width;
     }
 
     @Override

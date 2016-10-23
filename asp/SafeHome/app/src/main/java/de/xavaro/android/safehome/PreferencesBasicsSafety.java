@@ -304,9 +304,25 @@ public class PreferencesBasicsSafety extends PreferenceFragments.BasicFragmentSt
         {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
-                Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    ProcessManager.launchIntent(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    ProcessManager.launchIntent(intent);
+                }
+
+                /* Test
+                Intent intent = new Intent(Intent.ACTION_ASSIST);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 ProcessManager.launchIntent(intent);
+                */
             }
             else
             {
