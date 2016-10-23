@@ -201,7 +201,9 @@
         "keywords": [ "SVZ", "Schweriner Volkszeitung" ],
         "response": "Ich öffne die Schweriner Volkszeitung",
         "sample": "Ich möchte die SVZ lesen"
-      }
+      },
+
+      "subdomains": [ "trauer.svz.de" ]
     },
 
     "t.haz.de": {
@@ -367,8 +369,8 @@
       }
     },
 
-    "mobil.bunte.de": {
-      "url": "http://mobil.bunte.de/",
+    "www.bunte.de": {
+      "url": "http://www.bunte.de/",
       "icon": "http://pbs.twimg.com/profile_images/308504986/bunte_only_400x400.jpg",
       "label": "Bunte",
       "default": true,
