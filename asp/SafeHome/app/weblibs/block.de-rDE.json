@@ -835,6 +835,23 @@
     },
 
     {
+      "domain": "quantserve.com",
+      "type": "Tracking",
+      "source": "Wikipedia",
+      "description": [
+        "Quantcast is an American technology company, founded in 2006, that specializes ",
+        "in audience measurement and real-time advertising. The company offers public ",
+        "access to traffic and demographic data for millions of Web sites and detailed ",
+        "user insights to digital publishers enrolled in its Quantified Publisher Program. ",
+        "Their data centers process more than 800,000 transactions per second and the ",
+        "company states that it produces accurate audience measurement to over 100 million ",
+        "web destinations. As of 2013 it was said to be one of the world's top ",
+        "five big data processing organisations."
+      ],
+      "faults": [ "noprivger", "nooptin" ]
+    },
+
+    {
       "domain": "research.de.com",
       "type": "Tracking",
       "source": "Recherche",

@@ -39,6 +39,7 @@ public class WebGuard extends WebViewClient
     //region Internal variables.
 
     private final static String LOGTAG = "WebGuard";
+    private final ArrayList<String> codomains = new ArrayList<>();
     private final ArrayList<String> subdomains = new ArrayList<>();
 
     private Context context;
@@ -86,6 +87,21 @@ public class WebGuard extends WebViewClient
         subdomains.add("syndication.twitter.com");
 
         if (config == null) return;
+
+        //
+        // Check for known and validated co-domains.
+        //
+
+        JSONArray jsonscodom = Json.getArray(config, "codomains");
+
+        if (jsonscodom != null)
+        {
+            for (int inx = 0; inx < jsonscodom.length(); inx++)
+            {
+                String name = Json.getString(jsonscodom, inx);
+                if (name != null) codomains.add(name);
+            }
+        }
 
         //
         // Check for known and validated subdomains.
@@ -236,6 +252,18 @@ public class WebGuard extends WebViewClient
         Uri follow = Uri.parse(url);
 
         if (currentUri.getHost().equals(follow.getHost()))
+        {
+            currentUrl = url;
+            currentUri = Uri.parse(url);
+
+            return false;
+        }
+
+        //
+        // Check for co-domains.
+        //
+
+        if (codomains.contains(follow.getHost()))
         {
             currentUrl = url;
             currentUri = Uri.parse(url);

@@ -203,7 +203,7 @@
         "sample": "Ich möchte die SVZ lesen"
       },
 
-      "subdomains": [ "trauer.svz.de" ]
+      "codomains": [ "trauer.svz.de" ]
     },
 
     "t.haz.de": {
