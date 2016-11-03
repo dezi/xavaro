@@ -7,6 +7,10 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import de.xavaro.android.common.Simple;
 
 //
@@ -40,17 +44,14 @@ public class BlueToothECG extends BlueTooth
     @Override
     protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
-        return characteristic.getUuid().toString().equals("00002a37-0000-1000-8000-00805f9b34fb");
+        return characteristic.getUuid().toString().equals("00002a36-0000-1000-8000-00805f9b34fb");
     }
 
     @Override
     protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
     {
-        return characteristic.getUuid().toString().equals("00002a35-0000-1000-8000-00805f9b34fb");
+        return characteristic.getUuid().toString().equals("00002a37-0000-1000-8000-00805f9b34fb");
     }
-
-    private BluetoothGattCharacteristic c2;
-    private BluetoothGattCharacteristic c3;
 
     @Override
     protected boolean isCompatibleControl(BluetoothGattCharacteristic characteristic)
@@ -68,6 +69,16 @@ public class BlueToothECG extends BlueTooth
     @Override
     protected void syncSequence()
     {
+        BlueTooth.GattAction ga;
+
+        ga = new BlueTooth.GattAction();
+
+        ga.mode = BlueTooth.GattAction.MODE_WRITE;
+        ga.data = getConfiguration();
+        ga.characteristic = currentSecondary;
+
+        gattSchedule.add(ga);
+
         fireNext(false);
     }
 
@@ -76,41 +87,122 @@ public class BlueToothECG extends BlueTooth
     {
         Log.d(LOGTAG, "parseResponse: " + Simple.getHexBytesToString(rd));
 
-        /*
-        if (characteristic == currentSecondary)
+        if (characteristic == currentPrimary)
         {
-            JSONObject oxydata = new JSONObject();
+            byte sequence = rd[ 0 ];
+            byte format = rd[ 1 ];
+            byte subtype;
+            int value;
 
-            Json.put(oxydata, "type", "OxyMeasurement");
+            if (format == 3)
+            {
+                for (int inx = 4; inx < 20; inx += 4)
+                {
+                    subtype = rd[ inx ];
 
-            float sat = rd[ 3 ];
-            float pls = rd[ 4 ];
+                    value = ((rd[ inx + 2 ] & 0xff) << 8) + (rd[ inx + 3 ] & 0xff);
 
-            Calendar calendar = new GregorianCalendar();
-            long utc = calendar.getTimeInMillis();
-            Json.put(oxydata, "dts", Simple.timeStampAsISO(utc));
+                    if (subtype == 70)
+                    {
+                        //
+                        // Puls
+                        //
 
-            Log.d(LOGTAG,"parseResponse result=" + Simple.timeStampAsISO(utc) + "=" + sat + "/" + pls);
+                        Log.d(LOGTAG, "parseResponse: pls=" + value);
+                    }
 
-            Json.put(oxydata, "sat", sat);
-            Json.put(oxydata, "pls", pls);
+                    if (subtype == 71)
+                    {
+                        //
+                        // Diastolic
+                        //
 
-            JSONObject data = new JSONObject();
-            Json.put(data, "oxy", oxydata);
+                        Log.d(LOGTAG, "parseResponse: dia=" + value);
+                    }
 
-            if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
+                    if (subtype == 72)
+                    {
+                        //
+                        // Timestamp
+                        //
 
-            //
-            // Store data.
-            //
+                        Log.d(LOGTAG, "parseResponse: tim=" + value);
+                    }
 
-            JSONObject record = Json.clone(oxydata);
-            Json.remove(record, "type");
+                    if (subtype == 73)
+                    {
+                        //
+                        // Raw voltage
+                        //
 
-            HealthData.addRecord("oxy", record);
-            HealthData.setLastReadDate("oxy");
+                        //Log.d(LOGTAG, "parseResponse: ecv=" + value);
+                    }
+
+                    if (subtype == 74)
+                    {
+                        //
+                        // ECG size
+                        //
+
+                        Log.d(LOGTAG, "parseResponse: siz=" + value);
+                    }
+                }
+            }
         }
-        */
+    }
+
+    private byte[] getConfiguration()
+    {
+        Log.d(LOGTAG, "getConfiguration");
+
+        Calendar date = new GregorianCalendar();
+
+        byte year = (byte) (date.get(Calendar.YEAR) - 100);
+        byte month = (byte) (date.get(Calendar.MONTH) + 1);
+        byte day = (byte) date.get(Calendar.DAY_OF_MONTH);
+        byte hour = (byte) date.get(Calendar.HOUR_OF_DAY);
+        byte minute = (byte) date.get(Calendar.MINUTE);
+        byte second = (byte) date.get(Calendar.SECOND);
+
+        byte[] data = new byte[ 20 ];
+
+        data[  1 ] = 5;
+        data[  2 ] = 2;
+        data[  3 ] = year;
+        data[  4 ] = month;
+        data[  5 ] = day;
+        data[  6 ] = hour;
+        data[  7 ] = minute;
+        data[  8 ] = second;
+        data[  9 ] = 1; // Key beep
+        data[ 10 ] = 1; // Heartbeat beep
+        data[ 11 ] = 1; // 24h display ???
+
+        return data;
+    }
+
+    private byte[] getInfo1()
+    {
+        Log.d(LOGTAG, "getInfo1");
+
+        byte[] data = new byte[ 20 ];
+
+        data[ 1 ] = 7;
+        data[ 2 ] = 1;
+
+        return data;
+    }
+
+    private byte[] getInfo2()
+    {
+        Log.d(LOGTAG, "getInfo2");
+
+        byte[] data = new byte[ 20 ];
+
+        data[ 1 ] = 7;
+        data[ 2 ] = 2;
+
+        return data;
     }
 
     @Override
