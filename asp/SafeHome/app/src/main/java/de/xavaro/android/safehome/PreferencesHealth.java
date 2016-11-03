@@ -481,6 +481,107 @@ public class PreferencesHealth
 
     //endregion Health Oxy preferences
 
+    //region Health ECG preferences
+
+    public static class HealthECGFragment extends BlueToothFragment
+    {
+        public static PreferenceActivity.Header getHeader()
+        {
+            PreferenceActivity.Header header;
+
+            header = new PreferenceActivity.Header();
+            header.title = "EKG";
+            header.iconRes = GlobalConfigs.IconResHealthECG;
+            header.fragment = HealthECGFragment.class.getName();
+
+            return header;
+        }
+
+        public HealthECGFragment()
+        {
+            super();
+
+            isECG = true;
+
+            iconres = GlobalConfigs.IconResHealthECG;
+            keyprefix = "health.ecg";
+            masterenable = "EKG freischalten";
+            devicetitle = "EKG-Gerät";
+            devicesearch = "EKG-Geräte werden gesucht...";
+        }
+
+        @Override
+        public void registerAll(Context context)
+        {
+            super.registerAll(context);
+
+            NicedPreferences.NiceCategoryPreference pc;
+            NicedPreferences.NiceCheckboxPreference cb;
+            NicedPreferences.NiceNumberPreference np;
+            NicedPreferences.NiceSwitchPreference sp;
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Warnungen");
+            preferences.add(pc);
+
+            sp = new NicedPreferences.NiceSwitchPreference(context);
+
+            sp.setKey(keyprefix + ".alert.enable");
+            sp.setTitle("Aktivieren");
+            sp.setEnabled(enabled);
+
+            sp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    for (Preference pref : preferences)
+                    {
+                        if (pref.getKey() == null) continue;
+                        if (pref.getKey().equals(keyprefix + ".alert.enable")) continue;
+                        if (! pref.getKey().startsWith(keyprefix + ".alert.")) continue;
+
+                        pref.setEnabled((boolean) newValue);
+                    }
+
+                    return true;
+                }
+            });
+
+            preferences.add(sp);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.lowpls");
+            np.setMinMaxValue(30, 80, 1);
+            np.setDefaultValue(60);
+            np.setTitle("Zu niedriger Puls");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            np = new NicedPreferences.NiceNumberPreference(context);
+
+            np.setKey(keyprefix + ".alert.highpls");
+            np.setMinMaxValue(90, 140, 1);
+            np.setDefaultValue(90);
+            np.setTitle("Zu hoher Puls");
+            np.setEnabled(enabled);
+
+            preferences.add(np);
+
+            cb = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cb.setKey(keyprefix + ".alert.alertgroup");
+            cb.setTitle("Assistenz informieren");
+            cb.setEnabled(enabled);
+
+            preferences.add(cb);
+        }
+    }
+
+    //endregion Health ECG preferences
+
     //region Health BPM preferences
 
     public static class HealthBPMFragment extends BlueToothFragment
@@ -948,6 +1049,7 @@ public class PreferencesHealth
         protected String devicesearch;
 
         protected boolean isBPM;
+        protected boolean isECG;
         protected boolean isOxy;
         protected boolean isScale;
         protected boolean isThermo;
@@ -1116,6 +1218,7 @@ public class PreferencesHealth
                     public void onClick(View view)
                     {
                         if (isBPM) new BlueToothBPM(context).discover(self);
+                        if (isECG) new BlueToothECG(context).discover(self);
                         if (isOxy) new BlueToothOxy(context).discover(self);
                         if (isScale) new BlueToothScale(context).discover(self);
                         if (isThermo) new BlueToothThermo(context).discover(self);

@@ -114,6 +114,7 @@ public class SettingsActivity extends CaptureSettings
         target.add(PreferencesHealth.HealthScaleFragment.getHeader());
         target.add(PreferencesHealth.HealthThermoFragment.getHeader());
         target.add(PreferencesHealth.HealthSensorFragment.getHeader());
+        target.add(PreferencesHealth.HealthECGFragment.getHeader());
         target.add(PreferencesHealth.HealthUnitsFragment.getHeader());
         target.add(PreferencesHealth.HealthMedicatorFragment.getHeader());
 

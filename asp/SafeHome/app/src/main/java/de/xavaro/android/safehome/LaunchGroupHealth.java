@@ -37,6 +37,19 @@ public class LaunchGroupHealth extends LaunchGroup
             if (Simple.sharedPrefEquals("health.bpm.icon", "folder")) Json.put(adir, entry);
         }
 
+        if (Simple.getSharedPrefBoolean("health.ecg.enable"))
+        {
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "type", "health");
+            Json.put(entry, "subtype", "ecg");
+            Json.put(entry, "label", "EKG");
+            Json.put(entry, "order", 1000);
+
+            if (Simple.sharedPrefEquals("health.ecg.icon", "home")) Json.put(home, entry);
+            if (Simple.sharedPrefEquals("health.ecg.icon", "folder")) Json.put(adir, entry);
+        }
+
         if (Simple.getSharedPrefBoolean("health.oxy.enable"))
         {
             JSONObject entry = new JSONObject();
@@ -155,6 +168,22 @@ public class LaunchGroupHealth extends LaunchGroup
             }
         }
 
+        if (getDevice("ecg") != null)
+        {
+            if (! HealthECG.getInstance().isConfigured())
+            {
+                HealthECG.getInstance().setBlueTooth(
+                        new BlueToothECG(context, getDevice("ecg")));
+            }
+        }
+        else
+        {
+            if (HealthECG.getInstance().isConfigured())
+            {
+                HealthECG.getInstance().setBlueTooth(null);
+            }
+        }
+
         if (getDevice("oxy") != null)
         {
             if (! HealthOxy.getInstance().isConfigured())
@@ -241,6 +270,11 @@ public class LaunchGroupHealth extends LaunchGroup
         if (subtype.equals("bpm") && (HealthBPM.getInstance() != null))
         {
             HealthBPM.subscribe(subscriber);
+        }
+
+        if (subtype.equals("ecg") && (HealthECG.getInstance() != null))
+        {
+            HealthECG.subscribe(subscriber);
         }
 
         if (subtype.equals("oxy") && (HealthOxy.getInstance() != null))

@@ -84,6 +84,7 @@ public class GlobalConfigs
     public static final int IconResHealthUnits        = R.drawable.health_units_512x512;
     public static final int IconResHealthPerson       = R.drawable.health_person_320x320;
     public static final int IconResHealthBPM          = R.drawable.health_bpm_256x256;
+    public static final int IconResHealthECG          = R.drawable.health_ecg_512x512;
     public static final int IconResHealthOxy          = R.drawable.health_oxy_440x440;
     public static final int IconResHealthScale        = R.drawable.health_scale_280x280;
     public static final int IconResHealthSensor       = R.drawable.health_sensor_256x256;

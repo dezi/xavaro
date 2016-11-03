@@ -71,11 +71,11 @@ public class HealthBPM extends HealthBase
         }
     }
 
-    JSONObject lastRecord;
-    String lastDts;
-    int lastSys;
-    int lastDia;
-    int lastPls;
+    private JSONObject lastRecord;
+    private String lastDts;
+    private int lastSys;
+    private int lastDia;
+    private int lastPls;
 
     private void informAssistance(int resid)
     {

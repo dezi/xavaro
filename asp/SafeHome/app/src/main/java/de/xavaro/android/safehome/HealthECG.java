@@ -1,12 +1,9 @@
 package de.xavaro.android.safehome;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.Locale;
 
 import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
@@ -18,15 +15,15 @@ import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
 
-public class HealthThermo extends HealthBase
+public class HealthECG extends HealthBase
 {
-    private static final String LOGTAG = HealthThermo.class.getSimpleName();
+    private static final String LOGTAG = HealthECG.class.getSimpleName();
 
-    private static HealthThermo instance;
+    private static HealthECG instance;
 
-    public static HealthThermo getInstance()
+    public static HealthECG getInstance()
     {
-        if (instance == null) instance = new HealthThermo();
+        if (instance == null) instance = new HealthECG();
 
         return instance;
     }
@@ -41,27 +38,29 @@ public class HealthThermo extends HealthBase
     {
         Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
 
-        if (! data.has("thermo")) return;
+        if (! data.has("ecg")) return;
 
         //
         // The results come in unordered.
         //
 
-        lastRecord = Json.getObject(data, "thermo");
+        lastRecord = Json.getObject(data, "ecg");
         if (lastRecord == null) return;
 
         String type = Json.getString(lastRecord, "type");
 
-        if (Simple.equals(type, "ThermoRecord"))
+        if (Simple.equals(type, "ECGMeasurement"))
         {
             String date = Json.getString(lastRecord, "dts");
             if (date == null) return;
 
-            double temperature = Json.getDouble(lastRecord, "tmp");
+            int saturation = Json.getInt(lastRecord, "sat");
+            int pulse = Json.getInt(lastRecord, "pls");
 
             if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
             {
-                lastTmp = Math.round(temperature * 10.0) / 10.0;
+                lastSat = saturation;
+                lastPls = pulse;
                 lastDts = date;
 
                 handler.removeCallbacks(messageSpeaker);
@@ -72,7 +71,8 @@ public class HealthThermo extends HealthBase
 
     private JSONObject lastRecord;
     private String lastDts;
-    private double lastTmp;
+    private int lastSat;
+    private int lastPls;
 
     private void informAssistance(int resid)
     {
@@ -86,15 +86,16 @@ public class HealthThermo extends HealthBase
         }
 
         if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return;
-        if (! Simple.getSharedPrefBoolean("health.thermo.alert.alertgroup")) return;
+        if (! Simple.getSharedPrefBoolean("health.ecg.alert.alertgroup")) return;
 
         String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
         if (groupIdentity == null) return;
 
         String name = Simple.getOwnerName();
-        String bval = String.format(Locale.getDefault(), "%.1f", lastTmp);
+        String bval = "" + lastSat;
+        String puls = "" + lastPls;
 
-        String text = Simple.getTrans(R.string.health_thermo_alert, name, bval)
+        String text = Simple.getTrans(R.string.health_oxy_alert, name, bval, puls)
                 + " " + Simple.getTrans(resid);
 
         JSONObject assistMessage = new JSONObject();
@@ -123,7 +124,7 @@ public class HealthThermo extends HealthBase
             String date = Json.getString(event, "date");
             String medication = Json.getString(event, "medication");
 
-            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZT")) continue;
+            if ((date == null) || (medication == null) || ! medication.endsWith(",ZZE")) continue;
 
             //
             // Check event and measurement dates.
@@ -141,7 +142,8 @@ public class HealthThermo extends HealthBase
 
             Json.put(event, "taken", true);
             Json.put(event, "takendate", lastDts);
-            Json.put(event, "temp", lastTmp);
+            Json.put(event, "saturation", lastSat);
+            Json.put(event, "puls", lastPls);
 
             EventManager.updateComingEvent("webapps.medicator", event);
 
@@ -150,7 +152,7 @@ public class HealthThermo extends HealthBase
             break;
         }
 
-        NotifyManager.removeNotification("medicator.take.temperature");
+        NotifyManager.removeNotification("medicator.take.bloodoxygen");
         Simple.makePost(CommonConfigs.UpdateNotifications);
     }
 
@@ -158,30 +160,27 @@ public class HealthThermo extends HealthBase
     {
         if (lastRecord == null) return;
         String type = Json.getString(lastRecord, "type");
-        if (! Simple.equals(type, "ThermoRecord")) return;
+        if (! Simple.equals(type, "ECGMeasurement")) return;
 
-        String bval = String.format(Locale.getDefault(), "%.1f", lastTmp);
-
-        String sm = Simple.getTrans(R.string.health_thermo_spoken, bval);
-        String am = Simple.getTrans(R.string.health_thermo_activity, bval);
+        String sm = Simple.getTrans(R.string.health_oxy_spoken, lastSat, lastPls);
+        String am = Simple.getTrans(R.string.health_oxy_activity, lastSat, lastPls);
 
         Speak.speak(sm);
         ActivityOldManager.recordActivity(am);
 
         evaluateEvents();
 
-        if (!Simple.getSharedPrefBoolean("health.thermo.alert.enable")) return;
+        if (!Simple.getSharedPrefBoolean("health.oxy.alert.enable")) return;
 
         try
         {
-            String lowstr = Simple.getSharedPrefString("health.thermo.alert.lowtemp");
-            Double low = Simple.parseDouble(lowstr);
+            int low = Simple.getSharedPrefInt("health.oxy.alert.lowsat");
 
-            if (low >= lastTmp)
+            if (low >= lastSat)
             {
-                Speak.speak(Simple.getTrans(R.string.health_thermo_lowtemp));
-                ActivityOldManager.recordAlert(R.string.health_thermo_lowtemp);
-                informAssistance(R.string.health_thermo_lowtemp);
+                Speak.speak(Simple.getTrans(R.string.health_oxy_lowsat));
+                ActivityOldManager.recordAlert(R.string.health_oxy_lowsat);
+                informAssistance(R.string.health_oxy_lowsat);
             }
         }
         catch (Exception ex)
@@ -191,14 +190,29 @@ public class HealthThermo extends HealthBase
 
         try
         {
-            String highstr = Simple.getSharedPrefString("health.thermo.alert.hightemp");
-            Double high = Simple.parseDouble(highstr);
+            int low = Simple.getSharedPrefInt("health.oxy.alert.lowpls");
 
-            if (high <= lastTmp)
+            if (low >= lastPls)
             {
-                Speak.speak(Simple.getTrans(R.string.health_thermo_hightemp));
-                ActivityOldManager.recordAlert(R.string.health_thermo_hightemp);
-                informAssistance(R.string.health_thermo_hightemp);
+                Speak.speak(Simple.getTrans(R.string.health_oxy_lowpls));
+                ActivityOldManager.recordAlert(R.string.health_oxy_lowpls);
+                informAssistance(R.string.health_oxy_lowpls);
+            }
+        }
+        catch (Exception ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        try
+        {
+            int high = Simple.getSharedPrefInt("health.oxy.alert.highpls");
+
+            if (high <= lastPls)
+            {
+                Speak.speak(Simple.getTrans(R.string.health_oxy_highpls));
+                ActivityOldManager.recordAlert(R.string.health_oxy_highpls);
+                informAssistance(R.string.health_oxy_highpls);
             }
         }
         catch (Exception ex)

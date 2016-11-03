@@ -34,6 +34,12 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
                 icon.setImageResource(GlobalConfigs.IconResHealthBPM);
             }
 
+            if (subtype.equals("ecg"))
+            {
+                LaunchGroupHealth.subscribeDevice(this, "ecg");
+                icon.setImageResource(GlobalConfigs.IconResHealthECG);
+            }
+
             if (subtype.equals("oxy"))
             {
                 LaunchGroupHealth.subscribeDevice(this, "oxy");

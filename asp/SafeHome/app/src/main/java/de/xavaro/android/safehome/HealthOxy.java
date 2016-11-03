@@ -69,10 +69,10 @@ public class HealthOxy extends HealthBase
         }
     }
 
-    JSONObject lastRecord;
-    String lastDts;
-    int lastSat;
-    int lastPls;
+    private JSONObject lastRecord;
+    private String lastDts;
+    private int lastSat;
+    private int lastPls;
 
     private void informAssistance(int resid)
     {

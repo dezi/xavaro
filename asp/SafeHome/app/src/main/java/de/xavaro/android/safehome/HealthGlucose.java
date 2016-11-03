@@ -66,7 +66,7 @@ public class HealthGlucose extends HealthBase
     }
 
     private JSONObject lastRecord;
-    String lastDts;
+    private String lastDts;
 
     private void informAssistance(int resid)
     {

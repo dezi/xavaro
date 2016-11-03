@@ -13,9 +13,10 @@ public abstract class HealthBase implements
         BlueTooth.BlueToothConnectCallback
 {
     protected String deviceName;
-    protected boolean isConnected;
-    protected BlueTooth blueTooth;
-    protected BlueTooth.BlueToothConnectCallback connectCallback;
+
+    private boolean isConnected;
+    private BlueTooth blueTooth;
+    private BlueTooth.BlueToothConnectCallback connectCallback;
 
     protected final Handler handler = new Handler();
 
