@@ -17,6 +17,9 @@ public class Defucker
         WriteCharacteristic(chara);
         ChangedCharacteristic(chara);
         ReadCharacteristic(chara);
+
+        LogInt(4711);
+        LogShort((short) 4711);
     }
 
     public static String getHexBytesToString(byte[] bytes)
@@ -63,5 +66,15 @@ public class Defucker
     {
         Log.d(LOGTAG, "ChangedCharacteristic char=" + chara.getUuid().toString());
         Log.d(LOGTAG, "ChangedCharacteristic vals=" + getHexBytesToString(chara.getValue()));
+    }
+
+    public static void LogInt(int value)
+    {
+        Log.d(LOGTAG, "LogInt int=" + value);
+    }
+
+    public static void LogShort(short value)
+    {
+        Log.d(LOGTAG, "LogShort short=" + value);
     }
 }
