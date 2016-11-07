@@ -96,7 +96,7 @@ public class BlueToothECG extends BlueTooth
         gattSchedule.add(ga);
         */
 
-        actfile = 2;
+        actfile = 3;
 
         ga = new BlueTooth.GattAction();
 
