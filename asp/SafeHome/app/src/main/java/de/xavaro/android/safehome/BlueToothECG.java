@@ -96,6 +96,8 @@ public class BlueToothECG extends BlueTooth
         gattSchedule.add(ga);
         */
 
+        actfile = 2;
+
         ga = new BlueTooth.GattAction();
 
         ga.mode = BlueTooth.GattAction.MODE_WRITE;
@@ -114,9 +116,9 @@ public class BlueToothECG extends BlueTooth
     private int maxrecord;
 
     private int actfile;
-    private int maxfile;
 
     private byte[] resultBuffer;
+    private byte[] rawData;
 
     private JSONArray resultPls;
     private JSONArray resultTim;
@@ -166,7 +168,7 @@ public class BlueToothECG extends BlueTooth
                     // We have some result.
                     //
 
-                    generateResult();
+                    generateResult(true);
                 }
             }
 
@@ -218,7 +220,7 @@ public class BlueToothECG extends BlueTooth
                         // Raw voltage
                         //
 
-                        Json.put(resultEcv, value);
+                        if (resultEcv.length() < 8704) Json.put(resultEcv, value);
                     }
 
                     if (channel == 74)
@@ -293,6 +295,13 @@ public class BlueToothECG extends BlueTooth
 
                     if (subseq == 15)
                     {
+                        //
+                        // Copy chunk into raw data.
+                        //
+
+                        if (rawData == null) rawData = new byte[ 80 * 256 ];
+                        System.arraycopy(resultBuffer, 0, rawData, (actrecord * 256), 256);
+
                         actrecord++;
 
                         if (actrecord < 80)
@@ -305,6 +314,10 @@ public class BlueToothECG extends BlueTooth
                             // Store file.
                             //
 
+                            generateFile();
+
+                            rawData = null;
+                            actrecord = 0;
 
                             //
                             // Check for next file.
@@ -442,7 +455,85 @@ public class BlueToothECG extends BlueTooth
         actrecord++;
     }
 
-    private void generateResult()
+    private void generateFile()
+    {
+        //
+        // Get record header from raw data.
+        //
+
+        System.arraycopy(rawData, 0, resultBuffer, 0, 256);
+
+        //
+        // Copy ECG data from raw data.
+        //
+
+        int offset = 256;
+
+        for (int inx = 0; inx < 8704; inx++)
+        {
+            short value = (short) (((rawData[ offset++ ] & 0xff) << 8) + (rawData[ offset++ ] & 0xff));
+
+            Json.put(resultEcv, value);
+        }
+
+        //
+        // Puls data (skip first value).
+        //
+
+        offset = 256 + (8704 * 2);
+
+        for (int inx = 1; inx < 128; inx++)
+        {
+            short value = (short) (((rawData[ offset++ ] & 0xff) << 8) + (rawData[ offset++ ] & 0xff));
+            if (value == -1) break;
+
+            value = (short) (60000 / value);
+            Json.put(resultPls, value);
+        }
+
+        //
+        // Puls time (skip first value).
+        //
+
+        offset = 256 + (8704 * 2) + (5 * 256);
+
+        for (int inx = 1; inx < 128; inx++)
+        {
+            short value = (short) (((rawData[ offset++ ] & 0xff) << 8) + (rawData[ offset++ ] & 0xff));
+            if (value == -1) break;
+
+            //
+            // Timing value in storage is
+            // for some reason one less.
+
+            Json.put(resultTim, value + 1);
+        }
+
+        //
+        // Dump all trailers.
+        //
+
+        /*
+        for (int trailer = 69; trailer < 80; trailer++)
+        {
+            JSONArray list = new JSONArray();
+
+            offset = trailer * 256;
+
+            for (int inx = 0; inx < 128; inx++)
+            {
+                short value = (short) (((rawData[ offset++ ] & 0xff) << 8) + (rawData[ offset++ ] & 0xff));
+                Json.put(list, value);
+            }
+
+            Json.put(resultDia, list);
+        }
+        */
+
+        generateResult(false);
+    }
+
+    private void generateResult(boolean online)
     {
         JSONObject result = new JSONObject();
 
@@ -474,7 +565,7 @@ public class BlueToothECG extends BlueTooth
         Json.put(result, "esz", resultEsz);
         Json.put(result, "ecv", resultEcv);
 
-        String resname = "ecg." + datetime + ".json";
+        String resname = "ecg." + datetime + (online ? ".online" : ".download") + ".json";
         File resfile = new File(Simple.getExternalFilesDir(), resname);
 
         Simple.putFileJSON(resfile, result);
