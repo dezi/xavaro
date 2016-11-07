@@ -86,10 +86,20 @@ public class BlueToothECG extends BlueTooth
 
         gattSchedule.add(ga);
 
+        /*
         ga = new BlueTooth.GattAction();
 
         ga.mode = BlueTooth.GattAction.MODE_WRITE;
-        ga.data = getStorageStatus();
+        ga.data = getRecordCount();
+        ga.characteristic = currentSecondary;
+
+        gattSchedule.add(ga);
+        */
+
+        ga = new BlueTooth.GattAction();
+
+        ga.mode = BlueTooth.GattAction.MODE_WRITE;
+        ga.data = getFile();
         ga.characteristic = currentSecondary;
 
         gattSchedule.add(ga);
@@ -99,8 +109,13 @@ public class BlueToothECG extends BlueTooth
 
     private int sequence;
     private boolean seqerror;
-    private int maxrecord;
+
     private int actrecord;
+    private int maxrecord;
+
+    private int actfile;
+    private int maxfile;
+
     private byte[] resultBuffer;
 
     private JSONArray resultPls;
@@ -162,13 +177,13 @@ public class BlueToothECG extends BlueTooth
                 //
 
                 int channel;
-                int value;
+                short value;
 
                 for (int inx = 4; inx < 20; inx += 4)
                 {
                     channel = rd[ inx ];
 
-                    value = ((rd[ inx + 2 ] & 0xff) << 8) + ((rd[ inx + 3 ] & 0xff));
+                    value = (short) (((rd[ inx + 2 ] & 0xff) << 8) + ((rd[ inx + 3 ] & 0xff)));
 
                     if (channel == 70)
                     {
@@ -176,7 +191,7 @@ public class BlueToothECG extends BlueTooth
                         // Puls
                         //
 
-                        Json.put(resultPls, (short) value);
+                        Json.put(resultPls, value);
                     }
 
                     if (channel == 71)
@@ -185,7 +200,7 @@ public class BlueToothECG extends BlueTooth
                         // Diastolic
                         //
 
-                        Json.put(resultDia, (short) value);
+                        Json.put(resultDia, value);
                     }
 
                     if (channel == 72)
@@ -194,7 +209,7 @@ public class BlueToothECG extends BlueTooth
                         // Timestamp
                         //
 
-                        Json.put(resultTim, (short) value);
+                        Json.put(resultTim, value);
                     }
 
                     if (channel == 73)
@@ -203,7 +218,7 @@ public class BlueToothECG extends BlueTooth
                         // Raw voltage
                         //
 
-                        Json.put(resultEcv, (short) value);
+                        Json.put(resultEcv, value);
                     }
 
                     if (channel == 74)
@@ -212,7 +227,7 @@ public class BlueToothECG extends BlueTooth
                         // ECG size
                         //
 
-                        Json.put(resultEsz, (short) value);
+                        Json.put(resultEsz, value);
                     }
                 }
             }
@@ -220,28 +235,36 @@ public class BlueToothECG extends BlueTooth
             if (format == 4)
             {
                 //
-                // Storage record.
+                // Record storage.
                 //
 
-                boolean firenext = false;
+                BlueTooth.GattAction ga = new BlueTooth.GattAction();
 
                 byte subtype = rd[ 2 ];
 
                 if (subtype == 1)
                 {
+                    //
+                    // Number of records.
+                    //
+
                     int numRecs1 = rd[ 3 ];
                     int numRecs2 = rd[ 4 ];
 
                     actrecord = 0;
-                    maxrecord = numRecs1;
+                    maxrecord = numRecs1 + numRecs2;
 
                     Log.d(LOGTAG, "parseResponse: nr1=" + numRecs1 + " nr2=" + numRecs2);
 
-                    firenext = true;
+                    ga.data = (actrecord < maxrecord) ? getRecord() : getReady();
                 }
 
                 if (subtype == 2)
                 {
+                    //
+                    // Record header.
+                    //
+
                     byte subseq = rd[ 3 ];
 
                     System.arraycopy(rd, 4, resultBuffer, (subseq * 16), 16);
@@ -252,9 +275,43 @@ public class BlueToothECG extends BlueTooth
                         // We have some result.
                         //
 
-                        generateStored();
+                        generateRecord();
 
-                        firenext = true;
+                        ga.data = (actrecord < maxrecord) ? getRecord() : getReady();
+                    }
+                }
+
+                if (subtype == 3)
+                {
+                    //
+                    // Record data.
+                    //
+
+                    byte subseq = rd[ 3 ];
+
+                    System.arraycopy(rd, 4, resultBuffer, (subseq * 16), 16);
+
+                    if (subseq == 15)
+                    {
+                        actrecord++;
+
+                        if (actrecord < 80)
+                        {
+                            ga.data = getFile();
+                        }
+                        else
+                        {
+                            //
+                            // Store file.
+                            //
+
+
+                            //
+                            // Check for next file.
+                            //
+
+                            ga.data = getReady();
+                        }
                     }
                 }
 
@@ -262,13 +319,10 @@ public class BlueToothECG extends BlueTooth
                 // Fire next command.
                 //
 
-                if (firenext)
+                if (ga.data != null)
                 {
-                    BlueTooth.GattAction ga = new BlueTooth.GattAction();
-
                     ga.mode = BlueTooth.GattAction.MODE_WRITE;
                     ga.characteristic = currentSecondary;
-                    ga.data = (actrecord < maxrecord) ? getStorage() : getReady();
 
                     gattSchedule.add(ga);
                     fireNext(0);
@@ -277,17 +331,17 @@ public class BlueToothECG extends BlueTooth
         }
     }
 
-    private int getBufferByte(int index)
+    private int readBufferByte(int index)
     {
         return resultBuffer[ index ] & 0xff;
     }
 
-    private int getBufferShort(int index)
+    private int readBufferShort(int index)
     {
-        return (resultBuffer[ index ] & 0xff) + ((resultBuffer[ index + 1 ] & 0xff) << 8);
+        return (short) ((resultBuffer[ index ] & 0xff) + ((resultBuffer[ index + 1 ] & 0xff) << 8));
     }
 
-    private int getBufferInt(int index)
+    private int readBufferInt(int index)
     {
         return (resultBuffer[ index ] & 0xff)
                 + ((resultBuffer[ index + 1 ] & 0xff) << 8)
@@ -296,7 +350,7 @@ public class BlueToothECG extends BlueTooth
                 ;
     }
 
-    private String getBufferDigits(int index, int count)
+    private String readBufferDigits(int index, int count)
     {
         String res = "";
 
@@ -308,69 +362,82 @@ public class BlueToothECG extends BlueTooth
         return res;
     }
 
-    private void generateStatus()
+    private JSONObject generateStatus()
     {
         JSONObject status = new JSONObject();
 
-        Json.put(status, "Sequence", getBufferByte(0));
-        Json.put(status, "Signature", getBufferDigits(1, 3));
-        Json.put(status, "FirmwareVersion", getBufferShort(4));
-        Json.put(status, "HardwareVersion", getBufferShort(6));
-        Json.put(status, "HeaderSize", getBufferShort(8));
-        Json.put(status, "VersionTag", getBufferDigits(10, 6));
-        Json.put(status, "DeviceID", getBufferInt(16));
-        Json.put(status, "DateYear", getBufferByte(20));
-        Json.put(status, "DateMonth", getBufferByte(21));
-        Json.put(status, "DateDay", getBufferByte(22));
-        Json.put(status, "DateHour", getBufferByte(23));
-        Json.put(status, "DateMinute", getBufferByte(24));
-        Json.put(status, "DateSecond", getBufferByte(25));
-        Json.put(status, "SamplingRate", getBufferShort(26));
-        Json.put(status, "GainSetting", getBufferByte(28));
-        Json.put(status, "Resolution", getBufferByte(29));
-        Json.put(status, "Noise", getBufferByte(30));
-        Json.put(status, "PhysicalMinimum", getBufferShort(31));
-        Json.put(status, "PhysicalMaximum", getBufferShort(33));
-        Json.put(status, "DigitalMinimum", getBufferShort(35));
-        Json.put(status, "DigitalMaximum", getBufferShort(37));
-        Json.put(status, "Prefiltering", getBufferByte(39));
-        Json.put(status, "TotalSize", getBufferInt(40));
-        Json.put(status, "UserMode", getBufferByte(44));
-        Json.put(status, "RSensitivity", getBufferByte(45));
-        Json.put(status, "WSensitivity", getBufferByte(46));
-        Json.put(status, "HeartRate", getBufferByte(47));
-        Json.put(status, "Tachycardia", getBufferByte(48));
-        Json.put(status, "Bradycardia", getBufferByte(49));
-        Json.put(status, "Pause", getBufferByte(50));
-        Json.put(status, "PauseValue", getBufferByte(51));
-        Json.put(status, "Rhythm", getBufferByte(52));
-        Json.put(status, "Waveform", getBufferByte(53));
-        Json.put(status, "WaveformStable", getBufferByte(54));
-        Json.put(status, "EntryPosition", getBufferByte(55));
-        Json.put(status, "TachycardiaValue", getBufferByte(56));
-        Json.put(status, "BradycardiaValue", getBufferByte(57));
-        Json.put(status, "MID", getBufferInt(58));
-        Json.put(status, "BPMNoiseFlag", getBufferByte(62));
-        Json.put(status, "BPHeartRate", getBufferByte(63));
-        Json.put(status, "HighBloodPressure", getBufferShort(64));
-        Json.put(status, "LowBloodPressure", getBufferShort(66));
-        Json.put(status, "WHOIndicate", getBufferByte(68));
-        Json.put(status, "DCValue", getBufferShort(69));
-        Json.put(status, "AnalysisType", getBufferByte(71));
-        Json.put(status, "CheckSum", getBufferByte(255));
+        Json.put(status, "Sequence", readBufferByte(0));
+        Json.put(status, "Signature", readBufferDigits(1, 3));
+        Json.put(status, "FirmwareVersion", readBufferShort(4));
+        Json.put(status, "HardwareVersion", readBufferShort(6));
+        Json.put(status, "HeaderSize", readBufferShort(8));
+        Json.put(status, "VersionTag", readBufferDigits(10, 6));
+        Json.put(status, "DeviceID", readBufferInt(16));
+        Json.put(status, "DateYear", readBufferByte(20));
+        Json.put(status, "DateMonth", readBufferByte(21));
+        Json.put(status, "DateDay", readBufferByte(22));
+        Json.put(status, "DateHour", readBufferByte(23));
+        Json.put(status, "DateMinute", readBufferByte(24));
+        Json.put(status, "DateSecond", readBufferByte(25));
+        Json.put(status, "SamplingRate", readBufferShort(26));
+        Json.put(status, "GainSetting", readBufferByte(28));
+        Json.put(status, "Resolution", readBufferByte(29));
+        Json.put(status, "Noise", readBufferByte(30));
+        Json.put(status, "PhysicalMinimum", readBufferShort(31));
+        Json.put(status, "PhysicalMaximum", readBufferShort(33));
+        Json.put(status, "DigitalMinimum", readBufferShort(35));
+        Json.put(status, "DigitalMaximum", readBufferShort(37));
+        Json.put(status, "Prefiltering", readBufferByte(39));
+        Json.put(status, "TotalSize", readBufferInt(40));
+        Json.put(status, "UserMode", readBufferByte(44));
+        Json.put(status, "RSensitivity", readBufferByte(45));
+        Json.put(status, "WSensitivity", readBufferByte(46));
+        Json.put(status, "HeartRate", readBufferByte(47));
+        Json.put(status, "Tachycardia", readBufferByte(48));
+        Json.put(status, "Bradycardia", readBufferByte(49));
+        Json.put(status, "Pause", readBufferByte(50));
+        Json.put(status, "PauseValue", readBufferByte(51));
+        Json.put(status, "Rhythm", readBufferByte(52));
+        Json.put(status, "Waveform", readBufferByte(53));
+        Json.put(status, "WaveformStable", readBufferByte(54));
+        Json.put(status, "EntryPosition", readBufferByte(55));
+        Json.put(status, "TachycardiaValue", readBufferByte(56));
+        Json.put(status, "BradycardiaValue", readBufferByte(57));
+        Json.put(status, "MID", readBufferInt(58));
+        Json.put(status, "BPMNoiseFlag", readBufferByte(62));
+        Json.put(status, "BPHeartRate", readBufferByte(63));
+        Json.put(status, "HighBloodPressure", readBufferShort(64));
+        Json.put(status, "LowBloodPressure", readBufferShort(66));
+        Json.put(status, "WHOIndicate", readBufferByte(68));
+        Json.put(status, "DCValue", readBufferShort(69));
+        Json.put(status, "AnalysisType", readBufferByte(71));
+        Json.put(status, "CheckSum", readBufferByte(255));
+
+        return status;
     }
 
-    private void generateStored()
+    private void generateRecord()
     {
-        String datetime = String.format(Locale.ROOT, "%02d.%02d.%02d.%02d.%02d.%02d",
-                resultBuffer[ 20 ],
+        Calendar calendar = new GregorianCalendar();
+
+        calendar.set(resultBuffer[ 20 ] + 2000,
+                resultBuffer[ 21 ] - 1,
+                resultBuffer[ 22 ],
+                resultBuffer[ 23 ],
+                resultBuffer[ 24 ],
+                resultBuffer[ 25 ]);
+
+        String dts = Simple.timeStampAsISO(calendar.getTimeInMillis());
+
+        String datetime = String.format(Locale.ROOT, "%04d%02d%02d.%02d%02d%02d",
+                resultBuffer[ 20 ] + 2000,
                 resultBuffer[ 21 ],
                 resultBuffer[ 22 ],
                 resultBuffer[ 23 ],
                 resultBuffer[ 24 ],
                 resultBuffer[ 25 ]);
 
-        Log.d(LOGTAG, "generateStored: pos=" + (actrecord + 1) + " seq=" + resultBuffer[ 0 ] + " dts=" + datetime);
+        Log.d(LOGTAG, "generateRecord: pos=" + (actrecord + 1) + " seq=" + resultBuffer[ 0 ] + " dts=" + datetime);
 
         actrecord++;
     }
@@ -379,15 +446,27 @@ public class BlueToothECG extends BlueTooth
     {
         JSONObject result = new JSONObject();
 
-        String datetime = String.format(Locale.ROOT, "%02d.%02d.%02d.%02d.%02d.%02d",
-                resultBuffer[ 20 ],
+        Calendar calendar = new GregorianCalendar();
+
+        calendar.set(resultBuffer[ 20 ] + 2000,
+                resultBuffer[ 21 ] - 1,
+                resultBuffer[ 22 ],
+                resultBuffer[ 23 ],
+                resultBuffer[ 24 ],
+                resultBuffer[ 25 ]);
+
+        String dts = Simple.timeStampAsISO(calendar.getTimeInMillis());
+
+        String datetime = String.format(Locale.ROOT, "%04d%02d%02d.%02d%02d%02d",
+                resultBuffer[ 20 ] + 2000,
                 resultBuffer[ 21 ],
                 resultBuffer[ 22 ],
                 resultBuffer[ 23 ],
                 resultBuffer[ 24 ],
                 resultBuffer[ 25 ]);
 
-        Json.put(result, "dts", datetime);
+        Json.put(result, "dts", dts);
+        Json.put(result, "inf", generateStatus());
 
         Json.put(result, "pls", resultPls);
         Json.put(result, "tim", resultTim);
@@ -395,7 +474,7 @@ public class BlueToothECG extends BlueTooth
         Json.put(result, "esz", resultEsz);
         Json.put(result, "ecv", resultEcv);
 
-        String resname = "ecg." + Simple.nowAsISO() + ".json";
+        String resname = "ecg." + datetime + ".json";
         File resfile = new File(Simple.getExternalFilesDir(), resname);
 
         Simple.putFileJSON(resfile, result);
@@ -405,27 +484,74 @@ public class BlueToothECG extends BlueTooth
         clearBuffers();
     }
 
-    private byte[] getStorageStatus()
+    public static final byte BT_CONFIG_INFO = 7;
+    public static final byte BT_CONFIG_INFO_DEVICE = 1;
+    public static final byte BT_CONFIG_INFO_SETTING = 2;
+    public static final byte BT_DOWNLOAD = 4;
+    public static final byte BT_DOWNLOAD_HEADER = 2;
+    public static final byte BT_DOWNLOAD_RAWD = 3;
+    public static final byte BT_DOWNLOAD_U1_U2_COUNT = 1;
+    public static final byte BT_DOWNLOAD_WAIT = 0;
+    public static final byte BT_ERASE_ALL_FLASH = 6;
+    public static final byte BT_HEADER = 1;
+    public static final byte BT_MEASURE = 3;
+    public static final byte BT_SETUP = 5;
+    public static final byte BT_SETUP_700X = 2;
+    public static final byte BT_SETUP_ID = 1;
+    public static final byte BT_STANDBY = 2;
+    public static final byte BT_START = 8;
+    public static final byte BT_START_BP = 1;
+    public static final byte BT_START_BP_ECG = 3;
+    public static final byte BT_START_ECG = 2;
+    public static final byte BT_WAIT = 0;
+
+    private byte[] getEraseAll()
     {
-        Log.d(LOGTAG, "getStorageStatus");
+        Log.d(LOGTAG, "getEraseAll");
 
         byte[] data = new byte[ 20 ];
 
-        data[ 1 ] = 4;
-        data[ 2 ] = 1;
+        data[ 1 ] = BT_ERASE_ALL_FLASH;
 
         return data;
     }
 
-    private byte[] getStorage()
+    private byte[] getRecordCount()
     {
-        Log.d(LOGTAG, "getStorage");
+        Log.d(LOGTAG, "getRecordCount");
 
         byte[] data = new byte[ 20 ];
 
-        data[ 1 ] = 4;
-        data[ 2 ] = 2;
+        data[ 1 ] = BT_DOWNLOAD;
+        data[ 2 ] = BT_DOWNLOAD_U1_U2_COUNT;
+
+        return data;
+    }
+
+    private byte[] getRecord()
+    {
+        Log.d(LOGTAG, "getRecord");
+
+        byte[] data = new byte[ 20 ];
+
+        data[ 1 ] = BT_DOWNLOAD;
+        data[ 2 ] = BT_DOWNLOAD_HEADER;
         data[ 3 ] = (byte) actrecord;
+
+        return data;
+    }
+
+    private byte[] getFile()
+    {
+        Log.d(LOGTAG, "getFile");
+
+        byte[] data = new byte[ 20 ];
+
+        data[ 1 ] = BT_DOWNLOAD;
+        data[ 2 ] = BT_DOWNLOAD_RAWD;
+        data[ 3 ] = 0;
+        data[ 4 ] = (byte) actfile;
+        data[ 5 ] = (byte) actrecord;
 
         return data;
     }
@@ -445,8 +571,8 @@ public class BlueToothECG extends BlueTooth
 
         byte[] data = new byte[ 20 ];
 
-        data[  1 ] = 5;
-        data[  2 ] = 2;
+        data[  1 ] = BT_SETUP;
+        data[  2 ] = BT_SETUP_700X;
         data[  3 ] = year;
         data[  4 ] = month;
         data[  5 ] = day;
@@ -466,31 +592,31 @@ public class BlueToothECG extends BlueTooth
 
         byte[] data = new byte[ 20 ];
 
-        data[ 1 ] = 2;
+        data[ 1 ] = BT_START_ECG;
 
         return data;
     }
 
-    private byte[] getInfo1()
+    private byte[] getInfoDevice()
     {
-        Log.d(LOGTAG, "getInfo1");
+        Log.d(LOGTAG, "getInfoDevice");
 
         byte[] data = new byte[ 20 ];
 
-        data[ 1 ] = 7;
-        data[ 2 ] = 1;
+        data[ 1 ] = BT_CONFIG_INFO;
+        data[ 2 ] = BT_CONFIG_INFO_DEVICE;
 
         return data;
     }
 
-    private byte[] getInfo2()
+    private byte[] getInfoSetting()
     {
-        Log.d(LOGTAG, "getInfo2");
+        Log.d(LOGTAG, "getInfoSetting");
 
         byte[] data = new byte[ 20 ];
 
-        data[ 1 ] = 7;
-        data[ 2 ] = 2;
+        data[ 1 ] = BT_CONFIG_INFO;
+        data[ 2 ] = BT_CONFIG_INFO_SETTING;
 
         return data;
     }
