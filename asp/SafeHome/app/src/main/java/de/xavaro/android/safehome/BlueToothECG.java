@@ -602,6 +602,7 @@ public class BlueToothECG extends BlueTooth
         Json.put(ecgdata, "noi", Json.getInt(status, "Noise"));
         Json.put(ecgdata, "raf", Json.getInt(status, "Rhythm"));
         Json.put(ecgdata, "waf", Json.getInt(status, "Waveform"));
+        Json.put(ecgdata, "dev", deviceName);
 
         JSONObject data = new JSONObject();
         Json.put(data, "ecg", Json.clone(ecgdata));
