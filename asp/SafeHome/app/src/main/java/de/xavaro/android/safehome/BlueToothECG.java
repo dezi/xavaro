@@ -14,6 +14,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.io.File;
 
+import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Json;
 
@@ -21,8 +22,22 @@ import de.xavaro.android.common.Json;
 // Health data record format:
 //
 //  dts => ISO timestamp
-//  sat => Oxygene saturation
-//  pls => Pulse
+//  exf => External data file name
+//  aty => Analysis type
+//  aps => Average puls / heart rate
+//  tps => Tachycardia
+//  bps => Bradycardia
+//  noi => Noise
+//  raf => Rhythm abnormal flag
+//  waf => Waveform abnormal flag
+//
+// Additional in external file:
+//
+//  inf => Info record
+//  pls => Puls values
+//  tim => Puls timing values
+//  efi => ECG data filtered
+//  ecv => ECG data raw
 //
 
 public class BlueToothECG extends BlueTooth
@@ -118,10 +133,10 @@ public class BlueToothECG extends BlueTooth
     private JSONArray resultDia;
     private JSONArray resultEsz;
     private JSONArray resultEcv;
-    private JSONArray resultFil;
+    private JSONArray resultEfi;
 
-    private FIRfilter firFilter = new FIRfilter();
-    private IIRFilter iirFilter = new IIRFilter();
+    private final FIRfilter firFilter = new FIRfilter();
+    private final IIRFilter iirFilter = new IIRFilter();
 
     private void clearBuffers()
     {
@@ -134,10 +149,10 @@ public class BlueToothECG extends BlueTooth
         resultDia = new JSONArray();
         resultEsz = new JSONArray();
         resultEcv = new JSONArray();
-        resultFil = new JSONArray();
+        resultEfi = new JSONArray();
 
         firFilter.reset();
-        iirFilter.reset(256, 0.8f);
+        iirFilter.reset();
     }
 
     @Override
@@ -229,7 +244,7 @@ public class BlueToothECG extends BlueTooth
 
                             value = firFilter.filter(iirFilter.filter(value));
 
-                            Json.put(resultFil, value);
+                            Json.put(resultEfi, value);
                         }
                     }
 
@@ -405,8 +420,24 @@ public class BlueToothECG extends BlueTooth
 
     private JSONObject generateStatus()
     {
+        Calendar calendar = new GregorianCalendar();
+
+        calendar.set(readBufferByte(20) + 2000,
+                readBufferByte(21) - 1,
+                readBufferByte(22),
+                readBufferByte(23),
+                readBufferByte(24),
+                readBufferByte(25));
+
+        String dts = Simple.timeStampAsISO(calendar.getTimeInMillis());
+
+        File resfile = generateFileName();
+
         JSONObject status = new JSONObject();
 
+        Json.put(status, "Timestamp", dts);
+        Json.put(status, "Filename", resfile.getName());
+        Json.put(status, "SequenceError", seqerror);
         Json.put(status, "Sequence", readBufferByte(0));
         Json.put(status, "Signature", readBufferDigits(1, 3));
         Json.put(status, "FirmwareVersion", readBufferShort(4));
@@ -515,7 +546,7 @@ public class BlueToothECG extends BlueTooth
 
             value = firFilter.filter(iirFilter.filter(value));
 
-            Json.put(resultFil, value);
+            Json.put(resultEfi, value);
         }
 
         //
@@ -551,92 +582,78 @@ public class BlueToothECG extends BlueTooth
             Json.put(resultTim, value + 1);
         }
 
-        //
-        // Dump all trailers.
-        //
-
-        /*
-        for (int trailer = 69; trailer < 80; trailer++)
-        {
-            JSONArray list = new JSONArray();
-
-            offset = trailer * 256;
-
-            for (int inx = 0; inx < 128; inx++)
-            {
-                short value = (short) (((rawData[ offset++ ] & 0xff) << 8) + (rawData[ offset++ ] & 0xff));
-                Json.put(list, value);
-            }
-
-            Json.put(resultDia, list);
-        }
-        */
-
         generateResult();
     }
 
     private void generateResult()
     {
-        JSONObject result = new JSONObject();
+        JSONObject ecgdata = new JSONObject();
+        JSONObject status = generateStatus();
 
-        Calendar calendar = new GregorianCalendar();
+        Json.put(ecgdata, "type", "ECGMeasurement");
 
-        calendar.set(resultBuffer[ 20 ] + 2000,
-                resultBuffer[ 21 ] - 1,
-                resultBuffer[ 22 ],
-                resultBuffer[ 23 ],
-                resultBuffer[ 24 ],
-                resultBuffer[ 25 ]);
+        Json.put(ecgdata, "dts", Json.getString(status, "Timestamp"));
+        Json.put(ecgdata, "exf", Json.getString(status, "Filename"));
+        Json.put(ecgdata, "aty", Json.getInt(status, "AnalysisType"));
+        Json.put(ecgdata, "aps", Json.getInt(status, "HeartRate"));
+        Json.put(ecgdata, "tps", Json.getInt(status, "Tachycardia"));
+        Json.put(ecgdata, "bps", Json.getInt(status, "Bradycardia"));
+        Json.put(ecgdata, "noi", Json.getInt(status, "Noise"));
+        Json.put(ecgdata, "raf", Json.getInt(status, "Rhythm"));
+        Json.put(ecgdata, "waf", Json.getInt(status, "Waveform"));
 
-        String dts = Simple.timeStampAsISO(calendar.getTimeInMillis());
+        JSONObject data = new JSONObject();
+        Json.put(data, "ecg", Json.clone(ecgdata));
 
-        String datetime = String.format(Locale.ROOT, "%04d%02d%02d.%02d%02d%02d",
-                resultBuffer[ 20 ] + 2000,
-                resultBuffer[ 21 ],
-                resultBuffer[ 22 ],
-                resultBuffer[ 23 ],
-                resultBuffer[ 24 ],
-                resultBuffer[ 25 ]);
+        if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
 
-        Json.put(result, "dts", dts);
-        Json.put(result, "inf", generateStatus());
+        //
+        // Add file only data.
+        //
 
-        Json.put(result, "pls", resultPls);
-        Json.put(result, "tim", resultTim);
-        Json.put(result, "dia", resultDia);
-        Json.put(result, "esz", resultEsz);
-        Json.put(result, "ecv", resultEcv);
-        Json.put(result, "fil", resultFil);
+        Json.put(ecgdata, "inf", status);
+
+        Json.put(ecgdata, "pls", resultPls);
+        Json.put(ecgdata, "tim", resultTim);
+        Json.put(ecgdata, "efi", resultEfi);
+        Json.put(ecgdata, "ecv", resultEcv);
+
+        //Json.put(ecgdata, "dia", resultDia);
+        //Json.put(ecgdata, "esz", resultEsz);
+
+        Json.remove(ecgdata, "type");
+
+        HealthData.addRecord("ecg", ecgdata);
+        HealthData.setLastReadDate("ecg");
 
         File resfile = generateFileName();
+        Simple.putFileJSON(resfile, ecgdata);
 
-        Simple.putFileJSON(resfile, result);
-
-        Log.d(LOGTAG, "parseResponse: file=" + resfile);
+        Log.d(LOGTAG, "generateResult: file=" + resfile);
 
         clearBuffers();
     }
 
-    public static final byte BT_CONFIG_INFO = 7;
-    public static final byte BT_CONFIG_INFO_DEVICE = 1;
-    public static final byte BT_CONFIG_INFO_SETTING = 2;
-    public static final byte BT_DOWNLOAD = 4;
-    public static final byte BT_DOWNLOAD_HEADER = 2;
-    public static final byte BT_DOWNLOAD_RAWD = 3;
-    public static final byte BT_DOWNLOAD_U1_U2_COUNT = 1;
-    public static final byte BT_DOWNLOAD_WAIT = 0;
-    public static final byte BT_ERASE_ALL_FLASH = 6;
-    public static final byte BT_HEADER = 1;
-    public static final byte BT_MEASURE = 3;
-    public static final byte BT_SETUP = 5;
-    public static final byte BT_SETUP_700X = 2;
-    public static final byte BT_SETUP_ID = 1;
-    public static final byte BT_STANDBY = 2;
-    public static final byte BT_START = 8;
-    public static final byte BT_START_BP = 1;
-    public static final byte BT_START_BP_ECG = 3;
-    public static final byte BT_START_ECG = 2;
-    public static final byte BT_WAIT = 0;
+    private static final byte BT_CONFIG_INFO = 7;
+    private static final byte BT_CONFIG_INFO_DEVICE = 1;
+    private static final byte BT_CONFIG_INFO_SETTING = 2;
+    private static final byte BT_DOWNLOAD = 4;
+    private static final byte BT_DOWNLOAD_HEADER = 2;
+    private static final byte BT_DOWNLOAD_RAWD = 3;
+    private static final byte BT_DOWNLOAD_U1_U2_COUNT = 1;
+    private static final byte BT_DOWNLOAD_WAIT = 0;
+    private static final byte BT_ERASE_ALL_FLASH = 6;
+    private static final byte BT_HEADER = 1;
+    private static final byte BT_MEASURE = 3;
+    private static final byte BT_SETUP = 5;
+    private static final byte BT_SETUP_700X = 2;
+    private static final byte BT_SETUP_ID = 1;
+    private static final byte BT_STANDBY = 2;
+    private static final byte BT_START = 8;
+    private static final byte BT_START_BP = 1;
+    private static final byte BT_START_BP_ECG = 3;
+    private static final byte BT_START_ECG = 2;
+    private static final byte BT_WAIT = 0;
 
     private byte[] getEraseAll()
     {
@@ -744,6 +761,7 @@ public class BlueToothECG extends BlueTooth
         return data;
     }
 
+    @SuppressWarnings("unused")
     private byte[] getInfoDevice()
     {
         Log.d(LOGTAG, "getInfoDevice");
@@ -756,6 +774,7 @@ public class BlueToothECG extends BlueTooth
         return data;
     }
 
+    @SuppressWarnings("unused")
     private byte[] getInfoSetting()
     {
         Log.d(LOGTAG, "getInfoSetting");
@@ -848,8 +867,11 @@ public class BlueToothECG extends BlueTooth
         private short previous;
         private double output;
 
-        public void reset(int Fs, float Fc)
+        public void reset()
         {
+            int Fs = 256;
+            float Fc = 0.8f;
+
             double tan_term = Math.tan((Math.PI * ((double) Fc)) / ((double) Fs));
 
             double k1 = 1.0d / (1.0d + tan_term);
