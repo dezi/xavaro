@@ -24,7 +24,7 @@ import de.xavaro.android.common.Json;
 //  dts => ISO timestamp
 //  exf => External data file name
 //  aty => Analysis type
-//  aps => Average puls / heart rate
+//  pls => Average puls / heart rate
 //  tps => Tachycardia
 //  bps => Bradycardia
 //  noi => Noise
@@ -34,7 +34,7 @@ import de.xavaro.android.common.Json;
 // Additional in external file:
 //
 //  inf => Info record
-//  pls => Puls values
+//  pld => Puls values
 //  tim => Puls timing values
 //  efi => ECG data filtered
 //  ecv => ECG data raw
@@ -129,7 +129,7 @@ public class BlueToothECG extends BlueTooth
     private byte[] resultBuffer;
     private byte[] rawData;
 
-    private JSONArray resultPls;
+    private JSONArray resultPld;
     private JSONArray resultTim;
     private JSONArray resultDia;
     private JSONArray resultEsz;
@@ -145,7 +145,7 @@ public class BlueToothECG extends BlueTooth
 
         resultBuffer = new byte[ 256 ];
 
-        resultPls = new JSONArray();
+        resultPld = new JSONArray();
         resultTim = new JSONArray();
         resultDia = new JSONArray();
         resultEsz = new JSONArray();
@@ -212,7 +212,7 @@ public class BlueToothECG extends BlueTooth
                         // Puls
                         //
 
-                        Json.put(resultPls, value);
+                        Json.put(resultPld, value);
                     }
 
                     if (channel == 71)
@@ -562,7 +562,7 @@ public class BlueToothECG extends BlueTooth
             if (value == -1) break;
 
             value = (short) (60000 / value);
-            Json.put(resultPls, value);
+            Json.put(resultPld, value);
         }
 
         //
@@ -596,7 +596,7 @@ public class BlueToothECG extends BlueTooth
         Json.put(ecgdata, "dts", Json.getString(status, "Timestamp"));
         Json.put(ecgdata, "exf", Json.getString(status, "Filename"));
         Json.put(ecgdata, "aty", Json.getInt(status, "AnalysisType"));
-        Json.put(ecgdata, "aps", Json.getInt(status, "HeartRate"));
+        Json.put(ecgdata, "pls", Json.getInt(status, "HeartRate"));
         Json.put(ecgdata, "tps", Json.getInt(status, "Tachycardia"));
         Json.put(ecgdata, "bps", Json.getInt(status, "Bradycardia"));
         Json.put(ecgdata, "noi", Json.getInt(status, "Noise"));
@@ -609,23 +609,29 @@ public class BlueToothECG extends BlueTooth
         if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
 
         //
+        // Store data.
+        //
+
+        Json.remove(ecgdata, "type");
+
+        JSONObject record = Json.clone(ecgdata);
+
+        HealthData.addRecord("ecg", record);
+        HealthData.setLastReadDate("ecg");
+
+        //
         // Add file only data.
         //
 
         Json.put(ecgdata, "inf", status);
 
-        Json.put(ecgdata, "pls", resultPls);
+        Json.put(ecgdata, "pld", resultPld);
         Json.put(ecgdata, "tim", resultTim);
         Json.put(ecgdata, "efi", resultEfi);
         Json.put(ecgdata, "ecv", resultEcv);
 
         //Json.put(ecgdata, "dia", resultDia);
         //Json.put(ecgdata, "esz", resultEsz);
-
-        Json.remove(ecgdata, "type");
-
-        HealthData.addRecord("ecg", ecgdata);
-        HealthData.setLastReadDate("ecg");
 
         File resfile = generateFileName();
         Simple.putFileJSON(resfile, ecgdata);

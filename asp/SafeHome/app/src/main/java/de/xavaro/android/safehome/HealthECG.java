@@ -2,18 +2,14 @@ package de.xavaro.android.safehome;
 
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
-import de.xavaro.android.common.CommonConfigs;
-import de.xavaro.android.common.EventManager;
-import de.xavaro.android.common.Json;
-import de.xavaro.android.common.NotifyManager;
 import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
+import de.xavaro.android.common.Json;
 
 public class HealthECG extends HealthBase
 {
@@ -54,14 +50,14 @@ public class HealthECG extends HealthBase
             String date = Json.getString(lastRecord, "dts");
             if (date == null) return;
 
-            int saturation = Json.getInt(lastRecord, "sat");
-            int pulse = Json.getInt(lastRecord, "pls");
-
             if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
             {
-                lastSat = saturation;
-                lastPls = pulse;
                 lastDts = date;
+
+                lastPls = Json.getInt(lastRecord, "pls");
+                lastNoi = Json.getInt(lastRecord, "noi");
+                lastRaf = Json.getInt(lastRecord, "raf");
+                lastWaf = Json.getInt(lastRecord, "waf");
 
                 handler.removeCallbacks(messageSpeaker);
                 handler.postDelayed(messageSpeaker, 500);
@@ -71,8 +67,10 @@ public class HealthECG extends HealthBase
 
     private JSONObject lastRecord;
     private String lastDts;
-    private int lastSat;
+    private int lastNoi;
     private int lastPls;
+    private int lastRaf;
+    private int lastWaf;
 
     private void informAssistance(int resid)
     {
@@ -92,10 +90,9 @@ public class HealthECG extends HealthBase
         if (groupIdentity == null) return;
 
         String name = Simple.getOwnerName();
-        String bval = "" + lastSat;
         String puls = "" + lastPls;
 
-        String text = Simple.getTrans(R.string.health_oxy_alert, name, bval, puls)
+        String text = Simple.getTrans(R.string.health_ecg_alert, name, puls)
                 + " " + Simple.getTrans(resid);
 
         JSONObject assistMessage = new JSONObject();
@@ -110,6 +107,7 @@ public class HealthECG extends HealthBase
 
     private void evaluateEvents()
     {
+        /*
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
 
@@ -142,7 +140,6 @@ public class HealthECG extends HealthBase
 
             Json.put(event, "taken", true);
             Json.put(event, "takendate", lastDts);
-            Json.put(event, "saturation", lastSat);
             Json.put(event, "puls", lastPls);
 
             EventManager.updateComingEvent("webapps.medicator", event);
@@ -154,6 +151,7 @@ public class HealthECG extends HealthBase
 
         NotifyManager.removeNotification("medicator.take.bloodoxygen");
         Simple.makePost(CommonConfigs.UpdateNotifications);
+        */
     }
 
     private void evaluateMessage()
@@ -162,41 +160,75 @@ public class HealthECG extends HealthBase
         String type = Json.getString(lastRecord, "type");
         if (! Simple.equals(type, "ECGMeasurement")) return;
 
-        String sm = Simple.getTrans(R.string.health_oxy_spoken, lastSat, lastPls);
-        String am = Simple.getTrans(R.string.health_oxy_activity, lastSat, lastPls);
+        if (lastNoi != 0)
+        {
+            String noise = Simple.getTrans(R.string.health_ecg_noise);
+            Speak.speak(noise);
+
+            return;
+        }
+
+        String sm = Simple.getTrans(R.string.health_ecg_spoken, lastPls);
+        String am = Simple.getTrans(R.string.health_ecg_activity, lastPls);
+
+        //
+        // Check rhythm and wave form.
+        //
+
+        if ((lastRaf == 0) && (lastWaf == 0))
+        {
+            sm += " " + Simple.getTrans(R.string.health_ecg_ruw_ok);
+            am += " " + Simple.getTrans(R.string.health_ecg_ruw_ok);
+        }
+        else
+        {
+            if ((lastRaf != 0) && (lastWaf != 0))
+            {
+                sm += " " + Simple.getTrans(R.string.health_ecg_ruw_bad);
+                am += " " + Simple.getTrans(R.string.health_ecg_ruw_bad);
+            }
+            else
+            {
+                if (lastRaf == 0)
+                {
+                    sm += " " + Simple.getTrans(R.string.health_ecg_raf_ok);
+                    am += " " + Simple.getTrans(R.string.health_ecg_raf_ok);
+                }
+                else
+                {
+                    sm += " " + Simple.getTrans(R.string.health_ecg_raf_bad);
+                    am += " " + Simple.getTrans(R.string.health_ecg_raf_bad);
+                }
+
+                if (lastWaf == 0)
+                {
+                    sm += " " + Simple.getTrans(R.string.health_ecg_waf_ok);
+                    am += " " + Simple.getTrans(R.string.health_ecg_waf_ok);
+                }
+                else
+                {
+                    sm += " " + Simple.getTrans(R.string.health_ecg_waf_bad);
+                    am += " " + Simple.getTrans(R.string.health_ecg_waf_bad);
+                }
+            }
+        }
 
         Speak.speak(sm);
         ActivityOldManager.recordActivity(am);
 
         evaluateEvents();
 
-        if (!Simple.getSharedPrefBoolean("health.oxy.alert.enable")) return;
+        if (! Simple.getSharedPrefBoolean("health.ecg.alert.enable")) return;
 
         try
         {
-            int low = Simple.getSharedPrefInt("health.oxy.alert.lowsat");
-
-            if (low >= lastSat)
-            {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_lowsat));
-                ActivityOldManager.recordAlert(R.string.health_oxy_lowsat);
-                informAssistance(R.string.health_oxy_lowsat);
-            }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
-
-        try
-        {
-            int low = Simple.getSharedPrefInt("health.oxy.alert.lowpls");
+            int low = Simple.getSharedPrefInt("health.ecg.alert.lowpls");
 
             if (low >= lastPls)
             {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_lowpls));
-                ActivityOldManager.recordAlert(R.string.health_oxy_lowpls);
-                informAssistance(R.string.health_oxy_lowpls);
+                Speak.speak(Simple.getTrans(R.string.health_ecg_lowpls));
+                ActivityOldManager.recordAlert(R.string.health_ecg_lowpls);
+                informAssistance(R.string.health_ecg_lowpls);
             }
         }
         catch (Exception ex)
@@ -206,13 +238,13 @@ public class HealthECG extends HealthBase
 
         try
         {
-            int high = Simple.getSharedPrefInt("health.oxy.alert.highpls");
+            int high = Simple.getSharedPrefInt("health.ecg.alert.highpls");
 
             if (high <= lastPls)
             {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_highpls));
-                ActivityOldManager.recordAlert(R.string.health_oxy_highpls);
-                informAssistance(R.string.health_oxy_highpls);
+                Speak.speak(Simple.getTrans(R.string.health_ecg_highpls));
+                ActivityOldManager.recordAlert(R.string.health_ecg_highpls);
+                informAssistance(R.string.health_ecg_highpls);
             }
         }
         catch (Exception ex)

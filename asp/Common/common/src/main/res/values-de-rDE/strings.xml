@@ -815,6 +815,21 @@
     <string name="health_oxy_activity">Sie haben eine Sauerstoff-Sättigung von %1$d %%. Ihr Puls ist %2$d.</string>
     <string name="health_oxy_activity_du">Du hast eine Sauerstoff-Sättigung von %1$d %%. Dein Puls ist %2$d.</string>
 
+    <string name="health_ecg_noise">Die letzte Messung war ungültig. Bitte wiederholen Sie die Messung.</string>
+    <string name="health_ecg_noise_du">Die letzte Messung war ungültig. Bitte wiederhole die Messung.</string>
+    <string name="health_ecg_spoken">Die letzte Messung war gültig. Der Puls war %1$d</string>
+    <string name="health_ecg_alert">%1$s hat eine gültige EKG Messung mit einem Puls von %2$s</string>
+    <string name="health_ecg_raf_ok">Der Herzrhythmus ist in Ordnung.</string>
+    <string name="health_ecg_waf_ok">Die Wellenform ist in Ordnung.</string>
+    <string name="health_ecg_ruw_ok">Der Herzrhythmus und die Wellenform sind in Ordnung.</string>
+    <string name="health_ecg_raf_bad">Der Herzrhythmus ist unregelmäßig.</string>
+    <string name="health_ecg_waf_bad">Die Wellenform ist unregelmäßig.</string>
+    <string name="health_ecg_ruw_bad">Der Herzrhythmus und die Wellenform sind unregelmäßig.</string>
+    <string name="health_ecg_lowpls">Der Puls ist bedenklich niedrig.</string>
+    <string name="health_ecg_highpls">Der Puls ist bedenklich hoch.</string>
+    <string name="health_ecg_activity">Sie haben ein gültiges EKG gemessen. Der Puls ist %1$d.</string>
+    <string name="health_ecg_activity_du">Du hast ein gültiges EKG gemessen. Der Puls ist %1$d.</string>
+
     <string name="health_glucose_spoken">Die letzte Messung ergab einen Blutzuckerwert von %1$d</string>
     <string name="health_glucose_alert">%1$s hat einen Blutzuckerwert von %2$s</string>
     <string name="health_glucose_lowglucose">Der Blutzuckerwert ist bedenklich niedrig.</string>
