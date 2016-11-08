@@ -320,10 +320,6 @@ public class PreferencesHealth
 
             preferences.add(sp);
 
-            //
-            // Legacy removes.
-            //
-
             dp = new NicedPreferences.NiceDualpickPreference(context);
 
             dp.setKey(keyprefix + ".alert.lowtemp");
