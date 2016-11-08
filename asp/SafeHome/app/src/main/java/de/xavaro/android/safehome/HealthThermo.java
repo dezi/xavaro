@@ -177,6 +177,8 @@ public class HealthThermo extends HealthBase
             String lowstr = Simple.getSharedPrefString("health.thermo.alert.lowtemp");
             Double low = Simple.parseDouble(lowstr);
 
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + lastTmp + " low=" + low);
+
             if (low >= lastTmp)
             {
                 Speak.speak(Simple.getTrans(R.string.health_thermo_lowtemp));
@@ -193,6 +195,8 @@ public class HealthThermo extends HealthBase
         {
             String highstr = Simple.getSharedPrefString("health.thermo.alert.hightemp");
             Double high = Simple.parseDouble(highstr);
+
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + lastTmp + " high=" + high);
 
             if (high <= lastTmp)
             {

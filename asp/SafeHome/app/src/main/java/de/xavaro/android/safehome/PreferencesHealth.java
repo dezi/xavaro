@@ -324,19 +324,9 @@ public class PreferencesHealth
             // Legacy removes.
             //
 
-            if (Simple.getSharedPrefString(keyprefix + ".alert.lowtherm") == null)
-            {
-                Simple.removeSharedPref(keyprefix + ".alert.lowtherm");
-            }
-
-            if (Simple.getSharedPrefString(keyprefix + ".alert.hightherm") == null)
-            {
-                Simple.removeSharedPref(keyprefix + ".alert.hightherm");
-            }
-
             dp = new NicedPreferences.NiceDualpickPreference(context);
 
-            dp.setKey(keyprefix + ".alert.lowtherm");
+            dp.setKey(keyprefix + ".alert.lowtemp");
             dp.setMinMaxValue1(35, 37, 1);
             dp.setMinMaxValue2(0, 9, 1);
             dp.setSeparator(".");
@@ -348,7 +338,7 @@ public class PreferencesHealth
 
             dp = new NicedPreferences.NiceDualpickPreference(context);
 
-            dp.setKey(keyprefix + ".alert.hightherm");
+            dp.setKey(keyprefix + ".alert.hightemp");
             dp.setMinMaxValue1(37, 40, 1);
             dp.setMinMaxValue2(0, 9, 1);
             dp.setSeparator(".");
@@ -1270,7 +1260,7 @@ public class PreferencesHealth
             String newEntry = name + "";
             String newValue = name + " => " + macaddress;
 
-            if (! recentText.contains(newEntry))
+            if (! recentVals.contains(newValue))
             {
                 recentText.add(newEntry);
                 recentVals.add(newValue);

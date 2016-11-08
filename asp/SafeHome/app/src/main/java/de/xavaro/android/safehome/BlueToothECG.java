@@ -40,6 +40,7 @@ import de.xavaro.android.common.Json;
 //  ecv => ECG data raw
 //
 
+@SuppressWarnings("unused")
 public class BlueToothECG extends BlueTooth
 {
     private static final String LOGTAG = BlueToothECG.class.getSimpleName();
@@ -170,7 +171,7 @@ public class BlueToothECG extends BlueTooth
 
             BlueTooth.GattAction ga = new BlueTooth.GattAction();
 
-            if (format == 1)
+            if (format == BT_HEADER)
             {
                 //
                 // Status record.
@@ -190,7 +191,7 @@ public class BlueToothECG extends BlueTooth
                 }
             }
 
-            if (format == 3)
+            if (format == BT_MEASURE)
             {
                 //
                 // Measurement record.
@@ -259,7 +260,7 @@ public class BlueToothECG extends BlueTooth
                 }
             }
 
-            if (format == 4)
+            if (format == BT_DOWNLOAD)
             {
                 //
                 // Record storage.
@@ -267,7 +268,7 @@ public class BlueToothECG extends BlueTooth
 
                 byte subtype = rd[ 2 ];
 
-                if (subtype == 1)
+                if (subtype == BT_DOWNLOAD_U1_U2_COUNT)
                 {
                     //
                     // Number of records.
@@ -284,7 +285,7 @@ public class BlueToothECG extends BlueTooth
                     ga.data = (actrecord < maxrecord) ? getRecord() : getReady();
                 }
 
-                if (subtype == 2)
+                if (subtype == BT_DOWNLOAD_HEADER)
                 {
                     //
                     // Record header.
@@ -313,7 +314,7 @@ public class BlueToothECG extends BlueTooth
                     }
                 }
 
-                if (subtype == 3)
+                if (subtype == BT_DOWNLOAD_RAWD)
                 {
                     //
                     // Record data.
@@ -359,7 +360,7 @@ public class BlueToothECG extends BlueTooth
                 }
             }
 
-            if (format == 6)
+            if (format == BT_ERASE_ALL_FLASH)
             {
                 //
                 // Erase all response.
@@ -761,31 +762,33 @@ public class BlueToothECG extends BlueTooth
         return data;
     }
 
-    @SuppressWarnings("unused")
-    private byte[] getInfoDevice()
-    {
-        Log.d(LOGTAG, "getInfoDevice");
+// --Commented out by Inspection START (08.11.16, 13:44):
+//    private byte[] getInfoDevice()
+//    {
+//        Log.d(LOGTAG, "getInfoDevice");
+//
+//        byte[] data = new byte[ 20 ];
+//
+//        data[ 1 ] = BT_CONFIG_INFO;
+//        data[ 2 ] = BT_CONFIG_INFO_DEVICE;
+//
+//        return data;
+//    }
+// --Commented out by Inspection STOP (08.11.16, 13:44)
 
-        byte[] data = new byte[ 20 ];
-
-        data[ 1 ] = BT_CONFIG_INFO;
-        data[ 2 ] = BT_CONFIG_INFO_DEVICE;
-
-        return data;
-    }
-
-    @SuppressWarnings("unused")
-    private byte[] getInfoSetting()
-    {
-        Log.d(LOGTAG, "getInfoSetting");
-
-        byte[] data = new byte[ 20 ];
-
-        data[ 1 ] = BT_CONFIG_INFO;
-        data[ 2 ] = BT_CONFIG_INFO_SETTING;
-
-        return data;
-    }
+// --Commented out by Inspection START (08.11.16, 13:44):
+//    private byte[] getInfoSetting()
+//    {
+//        Log.d(LOGTAG, "getInfoSetting");
+//
+//        byte[] data = new byte[ 20 ];
+//
+//        data[ 1 ] = BT_CONFIG_INFO;
+//        data[ 2 ] = BT_CONFIG_INFO_SETTING;
+//
+//        return data;
+//    }
+// --Commented out by Inspection STOP (08.11.16, 13:44)
 
     @Override
     public void sendCommand(JSONObject command)
