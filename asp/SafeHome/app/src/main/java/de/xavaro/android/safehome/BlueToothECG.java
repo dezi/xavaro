@@ -8,6 +8,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -68,6 +69,8 @@ public class BlueToothECG extends BlueTooth
         if (currentPrimary != null) gattSchedule.add(new GattAction(currentPrimary));
         if (currentSecondary != null) gattSchedule.add(new GattAction(currentSecondary));
 
+        recordsToLoad = new ArrayList<>();
+
         sequence = 0;
 
         clearBuffers();
@@ -86,22 +89,10 @@ public class BlueToothECG extends BlueTooth
 
         gattSchedule.add(ga);
 
-        /*
         ga = new BlueTooth.GattAction();
 
         ga.mode = BlueTooth.GattAction.MODE_WRITE;
         ga.data = getRecordCount();
-        ga.characteristic = currentSecondary;
-
-        gattSchedule.add(ga);
-        */
-
-        actfile = 3;
-
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_WRITE;
-        ga.data = getFile();
         ga.characteristic = currentSecondary;
 
         gattSchedule.add(ga);
@@ -111,6 +102,8 @@ public class BlueToothECG extends BlueTooth
 
     private int sequence;
     private boolean seqerror;
+
+    private ArrayList<byte[]> recordsToLoad;
 
     private int actrecord;
     private int maxrecord;
@@ -125,6 +118,10 @@ public class BlueToothECG extends BlueTooth
     private JSONArray resultDia;
     private JSONArray resultEsz;
     private JSONArray resultEcv;
+    private JSONArray resultFil;
+
+    private FIRfilter firFilter = new FIRfilter();
+    private IIRFilter iirFilter = new IIRFilter();
 
     private void clearBuffers()
     {
@@ -137,6 +134,10 @@ public class BlueToothECG extends BlueTooth
         resultDia = new JSONArray();
         resultEsz = new JSONArray();
         resultEcv = new JSONArray();
+        resultFil = new JSONArray();
+
+        firFilter.reset();
+        iirFilter.reset(256, 0.8f);
     }
 
     @Override
@@ -151,6 +152,8 @@ public class BlueToothECG extends BlueTooth
 
             if (sequence != recseq) seqerror = true;
             sequence = recseq + 1;
+
+            BlueTooth.GattAction ga = new BlueTooth.GattAction();
 
             if (format == 1)
             {
@@ -168,7 +171,7 @@ public class BlueToothECG extends BlueTooth
                     // We have some result.
                     //
 
-                    generateResult(true);
+                    generateResult();
                 }
             }
 
@@ -220,7 +223,14 @@ public class BlueToothECG extends BlueTooth
                         // Raw voltage
                         //
 
-                        if (resultEcv.length() < 8704) Json.put(resultEcv, value);
+                        if (resultEcv.length() < 8704)
+                        {
+                            Json.put(resultEcv, value);
+
+                            value = firFilter.filter(iirFilter.filter(value));
+
+                            Json.put(resultFil, value);
+                        }
                     }
 
                     if (channel == 74)
@@ -239,8 +249,6 @@ public class BlueToothECG extends BlueTooth
                 //
                 // Record storage.
                 //
-
-                BlueTooth.GattAction ga = new BlueTooth.GattAction();
 
                 byte subtype = rd[ 2 ];
 
@@ -274,12 +282,19 @@ public class BlueToothECG extends BlueTooth
                     if (subseq == 15)
                     {
                         //
-                        // We have some result.
+                        // We read a complete record header.
                         //
 
                         generateRecord();
 
-                        ga.data = (actrecord < maxrecord) ? getRecord() : getReady();
+                        if (actrecord < maxrecord)
+                        {
+                            ga.data = getRecord();
+                        }
+                        else
+                        {
+                            ga.data = (recordsToLoad.size() > 0) ? getNextFile() : getEraseAll();
+                        }
                     }
                 }
 
@@ -306,7 +321,7 @@ public class BlueToothECG extends BlueTooth
 
                         if (actrecord < 80)
                         {
-                            ga.data = getFile();
+                            ga.data = getFileRecords();
                         }
                         else
                         {
@@ -320,26 +335,39 @@ public class BlueToothECG extends BlueTooth
                             actrecord = 0;
 
                             //
-                            // Check for next file.
+                            // Check for next file or erase flash after download.
                             //
 
-                            ga.data = getReady();
+                            ga.data = (recordsToLoad.size() > 0) ? getNextFile() : getEraseAll();
                         }
                     }
                 }
+            }
 
+            if (format == 6)
+            {
                 //
-                // Fire next command.
+                // Erase all response.
                 //
 
-                if (ga.data != null)
-                {
-                    ga.mode = BlueTooth.GattAction.MODE_WRITE;
-                    ga.characteristic = currentSecondary;
+                ga.data = getConfiguration();
+                gattSchedule.add(ga);
 
-                    gattSchedule.add(ga);
-                    fireNext(0);
-                }
+                ga = new GattAction();
+                ga.data = getReady();
+            }
+
+            //
+            // Fire next command.
+            //
+
+            if (ga.data != null)
+            {
+                ga.mode = BlueTooth.GattAction.MODE_WRITE;
+                ga.characteristic = currentSecondary;
+
+                gattSchedule.add(ga);
+                fireNext(0);
             }
         }
     }
@@ -429,28 +457,38 @@ public class BlueToothECG extends BlueTooth
         return status;
     }
 
-    private void generateRecord()
+    private String generateDatetime()
     {
-        Calendar calendar = new GregorianCalendar();
-
-        calendar.set(resultBuffer[ 20 ] + 2000,
-                resultBuffer[ 21 ] - 1,
-                resultBuffer[ 22 ],
-                resultBuffer[ 23 ],
-                resultBuffer[ 24 ],
-                resultBuffer[ 25 ]);
-
-        String dts = Simple.timeStampAsISO(calendar.getTimeInMillis());
-
-        String datetime = String.format(Locale.ROOT, "%04d%02d%02d.%02d%02d%02d",
+        return String.format(Locale.ROOT, "%04d%02d%02d.%02d%02d%02d",
                 resultBuffer[ 20 ] + 2000,
                 resultBuffer[ 21 ],
                 resultBuffer[ 22 ],
                 resultBuffer[ 23 ],
                 resultBuffer[ 24 ],
                 resultBuffer[ 25 ]);
+    }
+
+    private File generateFileName()
+    {
+        String filename = "ecg." + generateDatetime() + ".json";
+        return new File(Simple.getExternalFilesDir(), filename);
+    }
+
+    private void generateRecord()
+    {
+        String datetime = generateDatetime();
 
         Log.d(LOGTAG, "generateRecord: pos=" + (actrecord + 1) + " seq=" + resultBuffer[ 0 ] + " dts=" + datetime);
+
+        File resfile = generateFileName();
+
+        if (! resfile.exists())
+        {
+            Log.d(LOGTAG, "generateRecord: new=" + (actrecord + 1) + " seq=" + resultBuffer[ 0 ] + " dts=" + datetime);
+
+            recordsToLoad.add(resultBuffer);
+            resultBuffer = new byte[ 256 ];
+        }
 
         actrecord++;
     }
@@ -474,6 +512,10 @@ public class BlueToothECG extends BlueTooth
             short value = (short) (((rawData[ offset++ ] & 0xff) << 8) + (rawData[ offset++ ] & 0xff));
 
             Json.put(resultEcv, value);
+
+            value = firFilter.filter(iirFilter.filter(value));
+
+            Json.put(resultFil, value);
         }
 
         //
@@ -530,10 +572,10 @@ public class BlueToothECG extends BlueTooth
         }
         */
 
-        generateResult(false);
+        generateResult();
     }
 
-    private void generateResult(boolean online)
+    private void generateResult()
     {
         JSONObject result = new JSONObject();
 
@@ -564,9 +606,9 @@ public class BlueToothECG extends BlueTooth
         Json.put(result, "dia", resultDia);
         Json.put(result, "esz", resultEsz);
         Json.put(result, "ecv", resultEcv);
+        Json.put(result, "fil", resultFil);
 
-        String resname = "ecg." + datetime + (online ? ".online" : ".download") + ".json";
-        File resfile = new File(Simple.getExternalFilesDir(), resname);
+        File resfile = generateFileName();
 
         Simple.putFileJSON(resfile, result);
 
@@ -632,9 +674,23 @@ public class BlueToothECG extends BlueTooth
         return data;
     }
 
-    private byte[] getFile()
+    private byte[] getNextFile()
     {
-        Log.d(LOGTAG, "getFile");
+        if (recordsToLoad.size() == 0) return null;
+
+        byte[] header = recordsToLoad.remove(0);
+
+        Log.d(LOGTAG, "getNextFile: seq=" + header[ 0 ]);
+
+        actfile = header[ 0 ];
+        actrecord = 0;
+
+        return getFileRecords();
+    }
+
+    private byte[] getFileRecords()
+    {
+        Log.d(LOGTAG, "getFileRecords");
 
         byte[] data = new byte[ 20 ];
 
@@ -662,15 +718,15 @@ public class BlueToothECG extends BlueTooth
 
         byte[] data = new byte[ 20 ];
 
-        data[  1 ] = BT_SETUP;
-        data[  2 ] = BT_SETUP_700X;
-        data[  3 ] = year;
-        data[  4 ] = month;
-        data[  5 ] = day;
-        data[  6 ] = hour;
-        data[  7 ] = minute;
-        data[  8 ] = second;
-        data[  9 ] = 1; // Key beep
+        data[ 1 ] = BT_SETUP;
+        data[ 2 ] = BT_SETUP_700X;
+        data[ 3 ] = year;
+        data[ 4 ] = month;
+        data[ 5 ] = day;
+        data[ 6 ] = hour;
+        data[ 7 ] = minute;
+        data[ 8 ] = second;
+        data[ 9 ] = 1; // Key beep
         data[ 10 ] = 1; // Heartbeat beep
         data[ 11 ] = 1; // 24h display ???
 
@@ -715,5 +771,105 @@ public class BlueToothECG extends BlueTooth
     @Override
     public void sendCommand(JSONObject command)
     {
+    }
+
+    private class FIRfilter
+    {
+        private static final int FIR_SIZE = 29;
+
+        private final double[] Bcoff = new double[]
+                {
+                        -0.000548709320230d,
+                        -0.001861858218000d,
+                        -0.003197339503612d,
+                        -0.002018976092472d,
+                        +0.003614763960978d,
+                        +0.011297422965327d,
+                        +0.013585528900925d,
+                        +0.002771137785404d,
+                        -0.020484387472122d,
+                        -0.041602859844199d,
+                        -0.036772038992183d,
+                        +0.011973653974951d,
+                        +0.100565210202073d,
+                        +0.198612358279079d,
+                        +0.263134308468351d,
+                        +0.263134308468351d,
+                        +0.198612358279079d,
+                        +0.100565210202073d,
+                        +0.011973653974951d,
+                        -0.036772038992183d,
+                        -0.041602859844199d,
+                        -0.020484387472122d,
+                        +0.002771137785404d,
+                        +0.013585528900925d,
+                        +0.011297422965327d,
+                        +0.003614763960978d,
+                        -0.002018976092472d,
+                        -0.003197339503612d,
+                        -0.001861858218000d,
+                        -0.000548709320230d
+                };
+
+        private final short[] inputs = new short[ FIR_SIZE ];
+
+        public void reset()
+        {
+            for (int inx = 0; inx < inputs.length; inx++)
+            {
+                inputs[ inx ] = (short) 0;
+            }
+        }
+
+        public short filter(short input)
+        {
+            double output = Bcoff[ 0 ] * (double) input;
+
+            for (int inx = FIR_SIZE - 1; inx >= 0; inx--)
+            {
+                output += Bcoff[ inx + 1 ] * (double) inputs[ inx ];
+
+                if (inx > 0)
+                {
+                    inputs[ inx ] = inputs[ inx - 1 ];
+                }
+            }
+
+            inputs[ 0 ] = input;
+
+            return (short) ((int) output);
+        }
+    }
+
+    public class IIRFilter
+    {
+        private final double[] Bcoff = new double[ 2 ];
+        private double Acoff;
+        private short previous;
+        private double output;
+
+        public void reset(int Fs, float Fc)
+        {
+            double tan_term = Math.tan((Math.PI * ((double) Fc)) / ((double) Fs));
+
+            double k1 = 1.0d / (1.0d + tan_term);
+            double k2 = (1.0d - tan_term) * k1;
+
+            Bcoff[0] = k2;
+            Bcoff[1] = -1.0d * k2;
+
+            Acoff = -1.0d * k1;
+
+            output = 0.0d;
+            previous = (short) 0;
+        }
+
+        public short filter(short input)
+        {
+            output = ((Bcoff[ 0 ] * ((double) input)) + (Bcoff[ 1 ] * ((double) previous))) - (Acoff * output);
+
+            previous = input;
+            return (short) ((int) output);
+        }
     }
 }
