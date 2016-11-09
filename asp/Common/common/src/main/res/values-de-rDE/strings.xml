@@ -122,6 +122,12 @@
         <item>Vital-Ordner</item>
     </string-array>
 
+    <string-array name="pref_health_alert_vals">
+        <item>Nie</item>
+        <item>Warnungen</item>
+        <item>Immer</item>
+    </string-array>
+
     <string-array name="pref_beta_where_vals">
         <item>Inaktiv</item>
         <item>Home</item>
@@ -798,6 +804,8 @@
 
     <string name="today_label">Logbuch</string>
 
+    <string name="health_measure_datetime">Messung vom %1$s %2$s:</string>
+
     <string name="health_bpm_spoken">Die letzte Messung ergab einen Blutdruck von %1$d zu %2$d Der Puls beträgt %3$d</string>
     <string name="health_bpm_alert">%1$s hat einen Blutdruck von %2$s bei einem Puls von %3$s.</string>
     <string name="health_bpm_lowpb">Der Blutdruck ist bedenklich niedrig.</string>
@@ -815,20 +823,27 @@
     <string name="health_oxy_activity">Sie haben eine Sauerstoff-Sättigung von %1$d %%. Ihr Puls ist %2$d.</string>
     <string name="health_oxy_activity_du">Du hast eine Sauerstoff-Sättigung von %1$d %%. Dein Puls ist %2$d.</string>
 
-    <string name="health_ecg_noise">Die letzte Messung war ungültig. Bitte wiederholen Sie die Messung.</string>
-    <string name="health_ecg_noise_du">Die letzte Messung war ungültig. Bitte wiederhole die Messung.</string>
-    <string name="health_ecg_spoken">Die letzte Messung war gültig. Der Puls war %1$d</string>
-    <string name="health_ecg_alert">%1$s hat eine gültige EKG Messung mit einem Puls von %2$s</string>
+    <string name="health_ecg_noise_spoken">Die letzte EKG-Messung ist ungültig. Bitte wiederholen Sie die Messung.</string>
+    <string name="health_ecg_noise_spoken_du">Die letzte EKG-Messung ist ungültig. Bitte wiederhole die Messung.</string>
+    <string name="health_ecg_noise_logger">Sie haben eine ungültige EKG-Messung gemacht.</string>
+    <string name="health_ecg_noise_logger_du">Du hast eine ungültige EKG-Messung gemacht.</string>
+    <string name="health_ecg_noise_assist">%1$s hat eine ungültige EKG-Messung gemacht.</string>
+
+    <string name="health_ecg_valid_spoken">Die letzte EKG-Messung war gültig.</string>
+    <string name="health_ecg_valid_logger">Sie haben eine gültige EKG-Messung gemacht.</string>
+    <string name="health_ecg_valid_logger_du">Du hast eine gültige EKG-Messung gemacht.</string>
+    <string name="health_ecg_valid_assist">%1$s hat eine gültige EKG-Messung gemacht.</string>
+
     <string name="health_ecg_raf_ok">Der Herz-Rhythmus ist in Ordnung.</string>
     <string name="health_ecg_waf_ok">Die Wellenform ist in Ordnung.</string>
     <string name="health_ecg_ruw_ok">Der Herz-Rhythmus und die Wellenform sind in Ordnung.</string>
     <string name="health_ecg_raf_bad">Der Herz-Rhythmus ist unregelmäßig.</string>
     <string name="health_ecg_waf_bad">Die Wellenform ist unregelmäßig.</string>
     <string name="health_ecg_ruw_bad">Der Herz-Rhythmus und die Wellenform sind unregelmäßig.</string>
-    <string name="health_ecg_lowpls">Der Puls ist bedenklich niedrig.</string>
-    <string name="health_ecg_highpls">Der Puls ist bedenklich hoch.</string>
-    <string name="health_ecg_activity">Sie haben ein gültiges EKG gemessen. Der Puls ist %1$d.</string>
-    <string name="health_ecg_activity_du">Du hast ein gültiges EKG gemessen. Der Puls ist %1$d.</string>
+
+    <string name="health_ecg_pls">Der Puls ist %1$d pro Minute.</string>
+    <string name="health_ecg_pls_low">Der Puls ist bedenklich niedrig.</string>
+    <string name="health_ecg_pls_high">Der Puls ist bedenklich hoch.</string>
 
     <string name="health_glucose_spoken">Die letzte Messung ergab einen Blutzuckerwert von %1$d</string>
     <string name="health_glucose_alert">%1$s hat einen Blutzuckerwert von %2$s</string>

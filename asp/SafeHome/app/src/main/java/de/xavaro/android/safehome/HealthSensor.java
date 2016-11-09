@@ -39,6 +39,33 @@ public class HealthSensor extends HealthBase
         handler.post(messageSpeaker);
     }
 
+    @Override
+    protected void evaluateEvents()
+    {
+    }
+
+    @Override
+    protected void evaluateMessage()
+    {
+        if (lastRecord == null) return;
+
+        String type = Json.getString(lastRecord, "type");
+
+        if (Simple.equals(type, "TodaysData"))
+        {
+            int steps = Json.getInt(lastRecord, "stp");
+
+            if (steps == 0)
+            {
+                Speak.speak("Sie sind heute noch keine Schritte gegangen");
+            }
+            else
+            {
+                Speak.speak("Sie sind heute " + steps + " Schritte gegangen");
+            }
+        }
+    }
+
     private JSONObject lastRecord;
 
     private Runnable messageSpeaker = new Runnable()
@@ -46,23 +73,7 @@ public class HealthSensor extends HealthBase
         @Override
         public void run()
         {
-            if (lastRecord == null) return;
-
-            String type = Json.getString(lastRecord, "type");
-
-            if (Simple.equals(type, "TodaysData"))
-            {
-                int steps = Json.getInt(lastRecord, "stp");
-
-                if (steps == 0)
-                {
-                    Speak.speak("Sie sind heute noch keine Schritte gegangen");
-                }
-                else
-                {
-                    Speak.speak("Sie sind heute " + steps + " Schritte gegangen");
-                }
-            }
+            evaluateMessage();
         }
     };
 }

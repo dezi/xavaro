@@ -107,7 +107,8 @@ public class HealthThermo extends HealthBase
         Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
     }
 
-    private void evaluateEvents()
+    @Override
+    protected void evaluateEvents()
     {
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
@@ -154,7 +155,8 @@ public class HealthThermo extends HealthBase
         Simple.makePost(CommonConfigs.UpdateNotifications);
     }
 
-    private void evaluateMessage()
+    @Override
+    protected void evaluateMessage()
     {
         if (lastRecord == null) return;
         String type = Json.getString(lastRecord, "type");

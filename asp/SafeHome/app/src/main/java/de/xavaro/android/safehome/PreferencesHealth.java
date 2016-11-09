@@ -505,6 +505,7 @@ public class PreferencesHealth
             NicedPreferences.NiceCheckboxPreference cb;
             NicedPreferences.NiceNumberPreference np;
             NicedPreferences.NiceSwitchPreference sp;
+            NicedPreferences.NiceListPreference lp;
 
             pc = new NicedPreferences.NiceCategoryPreference(context);
             pc.setTitle("Warnungen");
@@ -558,11 +559,34 @@ public class PreferencesHealth
 
             cb = new NicedPreferences.NiceCheckboxPreference(context);
 
-            cb.setKey(keyprefix + ".alert.alertgroup");
-            cb.setTitle("Assistenz informieren");
+            cb.setKey(keyprefix + ".alert.rhythm");
+            cb.setTitle("Rhytmusstörungen melden");
             cb.setEnabled(enabled);
 
             preferences.add(cb);
+
+            cb = new NicedPreferences.NiceCheckboxPreference(context);
+
+            cb.setKey(keyprefix + ".alert.waveform");
+            cb.setTitle("Anomalien melden");
+            cb.setEnabled(enabled);
+
+            preferences.add(cb);
+
+            pc = new NicedPreferences.NiceCategoryPreference(context);
+            pc.setTitle("Assistenz");
+            preferences.add(pc);
+
+            lp = new NicedPreferences.NiceListPreference(context);
+
+            lp.setKey(keyprefix + ".assist.mode");
+            lp.setTitle("Assistenz informieren");
+            lp.setEntries(Simple.getTransArray(R.array.pref_health_alert_vals));
+            lp.setEntryValues(Simple.getTransArray(R.array.pref_health_alert_keys));
+            lp.setDefaultValue("never");
+            lp.setEnabled(enabled);
+
+            preferences.add(lp);
         }
     }
 
@@ -623,8 +647,6 @@ public class PreferencesHealth
             String[] userSelectVals = { "1", "2", "3", "4" };
 
             lp.setKey(keyprefix + ".selecteduser");
-            lp.setEntries(userSelectText);
-            lp.setEntryValues(userSelectVals);
             lp.setDefaultValue("1");
             lp.setTitle("Gerätebenutzer");
             lp.setEnabled(enabled);

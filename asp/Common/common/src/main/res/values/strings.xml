@@ -110,6 +110,18 @@
         <item>Vital-Folder</item>
     </string-array>
 
+    <string-array name="pref_health_alert_keys">
+        <item>never</item>
+        <item>warn</item>
+        <item>always</item>
+    </string-array>
+
+    <string-array name="pref_health_alert_vals">
+        <item>Never</item>
+        <item>Warnings</item>
+        <item>Always</item>
+    </string-array>
+
     <string-array name="pref_alertgroup_keys">
         <item>inactive</item>
         <item>invited</item>
@@ -617,6 +629,8 @@
 
     <string name="today_label">Logbook</string>
 
+    <string name="health_measure_datetime">Measurement from %1$s %2$s:</string>
+
     <string name="health_bpm_spoken">The last reading resulted in a blood pressure of %1$d to %2$d The pulse was %3$d</string>
     <string name="health_bpm_alert">%1$s has a blood pressure of %2$s with a pulse of %3$s</string>
     <string name="health_bpm_lowpb">The blood pressure is alarming low.</string>
@@ -632,18 +646,24 @@
     <string name="health_oxy_highpls">The pulse is alarming high.</string>
     <string name="health_oxy_activity">You have a blood oxygene saturation of %1$d %%. The pulse is %2$d.</string>
 
-    <string name="health_ecg_noise">The last ECG reading was invalid. Please redo measurement.</string>
-    <string name="health_ecg_spoken">The last ECG reading was valid. The pulse was %1$d</string>
-    <string name="health_ecg_alert">%1$s has made a valid ECG measurement with a puls of %2$s</string>
+    <string name="health_ecg_noise_spoken">The last ECG reading is invalid. Please redo measurement.</string>
+    <string name="health_ecg_noise_logger">You have recorded an invalid ECG.</string>
+    <string name="health_ecg_noise_assist">%1$s has recorded an invalid ECG.</string>
+
+    <string name="health_ecg_valid_spoken">The last ECG recording is valid.</string>
+    <string name="health_ecg_valid_logger">You have recorded a valid ECG.</string>
+    <string name="health_ecg_valid_assist">%1$s has made a valid ECG measurement.</string>
+
     <string name="health_ecg_raf_ok">The rhythm is ok.</string>
     <string name="health_ecg_waf_ok">The wave form is ok.</string>
     <string name="health_ecg_ruw_ok">The rhythm and the wave form are ok.</string>
     <string name="health_ecg_raf_bad">The rhythm is distorted.</string>
     <string name="health_ecg_waf_bad">The wave form is distorted.</string>
     <string name="health_ecg_ruw_bad">The rhythm and the wave form are distorted.</string>
-    <string name="health_ecg_lowpls">The pulse is alarming low.</string>
-    <string name="health_ecg_highpls">The pulse is alarming high.</string>
-    <string name="health_ecg_activity">You have recorded a valid ECG. The pulse is %1$d.</string>
+
+    <string name="health_ecg_pls">The pulse is %1$d per minute.</string>
+    <string name="health_ecg_pls_low">The pulse is alarming low.</string>
+    <string name="health_ecg_pls_high">The pulse is alarming high.</string>
 
     <string name="health_glucose_spoken">The last reading resulted in a glucose value of %1$d</string>
     <string name="health_glucose_alert">%1$s has a glucose value of %2$s</string>

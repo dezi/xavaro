@@ -1,8 +1,8 @@
 package de.xavaro.android.common;
 
+import android.support.annotation.Nullable;
 import android.Manifest;
 import android.os.Build;
-import android.support.annotation.Nullable;
 import android.media.projection.MediaProjectionManager;
 import android.os.StrictMode;
 
@@ -2317,6 +2317,27 @@ public class Simple
         }
 
         return 0L;
+    }
+
+    public static String getLocaleDateLong(long timestamp)
+    {
+        DateFormat df = android.text.format.DateFormat.getLongDateFormat(appContext);
+
+        return df.format(new Date(timestamp));
+    }
+
+    public static String getLocaleDateMedium(long timestamp)
+    {
+        DateFormat df = android.text.format.DateFormat.getMediumDateFormat(appContext);
+
+        return df.format(new Date(timestamp));
+    }
+
+    public static String getLocaleTime(long timestamp)
+    {
+        DateFormat df = android.text.format.DateFormat.getTimeFormat(appContext);
+
+        return df.format(new Date(timestamp));
     }
 
     //endregion Date and time

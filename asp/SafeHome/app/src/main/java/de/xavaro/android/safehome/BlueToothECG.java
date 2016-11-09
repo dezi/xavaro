@@ -137,6 +137,8 @@ public class BlueToothECG extends BlueTooth
     private final FIRfilter firFilter = new FIRfilter();
     private final IIRFilter iirFilter = new IIRFilter();
 
+    private final ArrayList<JSONObject> callbackResults = new ArrayList<>();
+
     private void clearBuffers()
     {
         seqerror = false;
@@ -371,17 +373,33 @@ public class BlueToothECG extends BlueTooth
                 ga.data = getReady();
             }
 
-            //
-            // Fire next command.
-            //
-
             if (ga.data != null)
             {
+                //
+                // Fire next command.
+                //
+
                 ga.mode = BlueTooth.GattAction.MODE_WRITE;
                 ga.characteristic = currentSecondary;
 
                 gattSchedule.add(ga);
                 fireNext(0);
+            }
+            else
+            {
+                //
+                // No commands to fire, check for data callbacks now.
+                //
+
+                while (callbackResults.size() > 0)
+                {
+                    JSONObject data = callbackResults.remove(0);
+
+                    if (dataCallback != null)
+                    {
+                        dataCallback.onBluetoothReceivedData(deviceName, data);
+                    }
+                }
             }
         }
     }
@@ -589,8 +607,6 @@ public class BlueToothECG extends BlueTooth
         JSONObject ecgdata = new JSONObject();
         JSONObject status = generateStatus();
 
-        Json.put(ecgdata, "type", "ECGMeasurement");
-
         Json.put(ecgdata, "dts", Json.getString(status, "Timestamp"));
         Json.put(ecgdata, "exf", Json.getString(status, "Filename"));
         Json.put(ecgdata, "aty", Json.getInt(status, "AnalysisType"));
@@ -600,19 +616,21 @@ public class BlueToothECG extends BlueTooth
         Json.put(ecgdata, "waf", Json.getInt(status, "Waveform"));
         Json.put(ecgdata, "dev", deviceName);
 
+        //
+        // Schedule data for application callback.
+        //
+
         if (dataCallback != null)
         {
             JSONObject data = new JSONObject();
             Json.put(data, "ecg", Json.clone(ecgdata));
 
-            dataCallback.onBluetoothReceivedData(deviceName, data);
+            callbackResults.add(data);
         }
 
         //
         // Store data.
         //
-
-        Json.remove(ecgdata, "type");
 
         JSONObject record = Json.clone(ecgdata);
 
@@ -865,7 +883,7 @@ public class BlueToothECG extends BlueTooth
         }
     }
 
-    public class IIRFilter
+    private class IIRFilter
     {
         private final double[] Bcoff = new double[ 2 ];
         private double Acoff;

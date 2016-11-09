@@ -108,7 +108,8 @@ public class HealthOxy extends HealthBase
         Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
     }
 
-    private void evaluateEvents()
+    @Override
+    protected void evaluateEvents()
     {
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
@@ -190,7 +191,8 @@ public class HealthOxy extends HealthBase
         }
     }
 
-    private void evaluateMessage()
+    @Override
+    protected void evaluateMessage()
     {
         if (lastRecord == null) return;
         String type = Json.getString(lastRecord, "type");
