@@ -80,7 +80,7 @@ public class GlobalConfigs
     public static final int IconResWebConfigShopping  = R.drawable.shopping_440x440;
     public static final int IconResWebConfigErotics   = R.drawable.erotica_280x280;
     public static final int IconResWebConfigInternet  = R.drawable.internet_512x512;
-    public static final int IconResHealth             = R.drawable.health_512x512;
+    public static final int IconResHealth             = R.drawable.health_300x300;
     public static final int IconResHealthUnits        = R.drawable.health_units_512x512;
     public static final int IconResHealthPerson       = R.drawable.health_person_320x320;
     public static final int IconResHealthBPM          = R.drawable.health_bpm_256x256;
