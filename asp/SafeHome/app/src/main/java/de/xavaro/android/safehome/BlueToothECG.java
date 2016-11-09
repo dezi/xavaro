@@ -28,6 +28,7 @@ import de.xavaro.android.common.Json;
 //  noi => Noise
 //  raf => Rhythm abnormal flag
 //  waf => Waveform abnormal flag
+//  dev => Device name
 //
 // Additional in external file:
 //
@@ -62,12 +63,20 @@ public class BlueToothECG extends BlueTooth
     @Override
     protected boolean isCompatiblePrimary(BluetoothGattCharacteristic characteristic)
     {
+        //
+        // Note: Characteristics is custom and NOT what Bluetooth doc says.
+        //
+
         return characteristic.getUuid().toString().equals("00002a36-0000-1000-8000-00805f9b34fb");
     }
 
     @Override
     protected boolean isCompatibleSecondary(BluetoothGattCharacteristic characteristic)
     {
+        //
+        // Note: Characteristics is custom and NOT what Bluetooth doc says.
+        //
+
         return characteristic.getUuid().toString().equals("00002a37-0000-1000-8000-00805f9b34fb");
     }
 
@@ -80,10 +89,13 @@ public class BlueToothECG extends BlueTooth
     @Override
     protected void enableDevice()
     {
-        if (currentPrimary != null) gattSchedule.add(new GattAction(currentPrimary));
-        if (currentSecondary != null) gattSchedule.add(new GattAction(currentSecondary));
+        super.enableDevice();
 
         recordsToLoad = new ArrayList<>();
+        callbackResults = new ArrayList<>();
+
+        firFilter = new FIRfilter();
+        iirFilter = new IIRFilter();
 
         sequence = 0;
 
@@ -117,8 +129,6 @@ public class BlueToothECG extends BlueTooth
     private int sequence;
     private boolean seqerror;
 
-    private ArrayList<byte[]> recordsToLoad;
-
     private int actrecord;
     private int maxrecord;
 
@@ -134,10 +144,11 @@ public class BlueToothECG extends BlueTooth
     private JSONArray resultEcv;
     private JSONArray resultEfi;
 
-    private final FIRfilter firFilter = new FIRfilter();
-    private final IIRFilter iirFilter = new IIRFilter();
+    private ArrayList<byte[]> recordsToLoad;
+    private ArrayList<JSONObject> callbackResults;
 
-    private final ArrayList<JSONObject> callbackResults = new ArrayList<>();
+    private FIRfilter firFilter;
+    private IIRFilter iirFilter;
 
     private void clearBuffers()
     {
