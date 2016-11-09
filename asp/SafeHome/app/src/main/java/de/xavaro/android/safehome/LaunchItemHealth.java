@@ -1,10 +1,10 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Simple;
 
 public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothConnectCallback
 {
@@ -20,8 +20,6 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
     @Override
     protected void setConfig()
     {
-        if (handler == null) handler = new Handler();
-
         if (subtype == null)
         {
             icon.setImageResource(GlobalConfigs.IconResHealth);
@@ -125,30 +123,30 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
     {
         Log.d(LOGTAG, "onBluetoothConnect: " + deviceName);
 
-        handler.post(bluetoothIsConnected);
+        Simple.makePost(bluetoothIsConnected);
     }
 
     public void onBluetoothFakeConnect(String deviceName)
     {
         Log.d(LOGTAG, "onBluetoothFakeConnect: " + deviceName);
 
-        handler.post(bluetoothIsConnected);
+        Simple.makePost(bluetoothIsConnected);
     }
 
     public void onBluetoothDisconnect(String deviceName)
     {
         Log.d(LOGTAG, "onBluetoothDisconnect: " + deviceName);
 
-        handler.removeCallbacks(bluetoothIsConnected);
-        handler.post(bluetoothIsDisconnected);
+        Simple.removePost(bluetoothIsConnected);
+        Simple.makePost(bluetoothIsDisconnected);
     }
 
     public void onBluetoothFakeDisconnect(String deviceName)
     {
         Log.d(LOGTAG, "onBluetoothFakeDisconnect: " + deviceName);
 
-        handler.removeCallbacks(bluetoothIsConnected);
-        handler.post(bluetoothIsDisconnected);
+        Simple.removePost(bluetoothIsConnected);
+        Simple.makePost(bluetoothIsDisconnected);
     }
 
     //endregion BlueTooth connect states

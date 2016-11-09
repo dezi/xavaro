@@ -22,10 +22,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import de.xavaro.android.common.IdentityManager;
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.PersistManager;
 import de.xavaro.android.common.RemoteContacts;
 import de.xavaro.android.common.RemoteGroups;
+import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
 
 public class LaunchFrameDeveloper extends LaunchFrame

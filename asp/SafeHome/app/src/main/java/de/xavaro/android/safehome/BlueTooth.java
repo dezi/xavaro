@@ -221,17 +221,17 @@ public abstract class BlueTooth extends BroadcastReceiver
             Log.d(LOGTAG, "onReceive: Found"
                     + ":" + device.getAddress()
                     + "=" + device.getType()
-                    + "=" + device.getName()
+                    + "=" + getDeviceName(device)
                     + "=" + device.getBondState()
                     + "=" + getDeviceTypeString(device.getType()));
 
             if (((device.getType() == BluetoothDevice.DEVICE_TYPE_LE) ||
                     (device.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)))
             {
-                //deviceName = device.getName();
+                //deviceName = getDeviceName(device);
                 //macAddress = device.getAddress();
 
-                Log.d(LOGTAG, "onReceive: connectGatt=" + device.getName());
+                Log.d(LOGTAG, "onReceive: connectGatt=" + getDeviceName(device));
                 device.connectGatt(context, true, gattCallback);
                 discoverBGJobs++;
             }
@@ -505,7 +505,7 @@ public abstract class BlueTooth extends BroadcastReceiver
             final int nbs = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1);
             final int obs = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1);
 
-            Log.d(LOGTAG, "Bond state changed for: " + device.getName() + obs + " => " + nbs);
+            Log.d(LOGTAG, "Bond state changed for: " + getDeviceName(device) + obs + " => " + nbs);
 
             if (nbs == BluetoothDevice.BOND_BONDED)
             {
@@ -513,13 +513,13 @@ public abstract class BlueTooth extends BroadcastReceiver
 
                 if (currentPrimary == null)
                 {
-                    Log.d(LOGTAG, "bondingReceiver: discoverServices after bonding: " + device.getName());
+                    Log.d(LOGTAG, "bondingReceiver: discoverServices after bonding: " + getDeviceName(device));
 
                     gattHandler.postDelayed(runDiscoverServices, 100);
                 }
                 else
                 {
-                    Log.d(LOGTAG, "bondingReceiver: enableDevice after bonding: " + device.getName());
+                    Log.d(LOGTAG, "bondingReceiver: enableDevice after bonding: " + getDeviceName(device));
 
                     gattHandler.postDelayed(runEnableAndSync, 100);
                 }
@@ -724,7 +724,8 @@ public abstract class BlueTooth extends BroadcastReceiver
 
     protected String getDeviceName(BluetoothDevice device)
     {
-        return device.getName();
+        String devname = device.getName();
+        return (devname == null) ? null : devname.trim();
     }
 
     protected abstract boolean isCompatibleService(BluetoothGattService service);

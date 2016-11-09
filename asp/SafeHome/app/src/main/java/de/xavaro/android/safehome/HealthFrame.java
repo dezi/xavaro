@@ -5,6 +5,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -25,6 +26,8 @@ public class HealthFrame extends LaunchFrame
     private ScrollView scrollview;
     private TextView jsonListing;
     private ImageView schwalbe;
+    private ListView listview;
+    private HealthFrameAdapter adapter;
 
     public HealthFrame(Context context, LaunchItem parent)
     {
@@ -33,6 +36,19 @@ public class HealthFrame extends LaunchFrame
     }
 
     private void myInit()
+    {
+        listview = new ListView(getContext());
+        listview.setBackgroundColor(0xffffc080);
+
+        addView(listview, 0);
+
+        adapter = new HealthFrameAdapter();
+        listview.setAdapter(adapter);
+        listview.setOnItemClickListener(adapter);
+        listview.setOnItemLongClickListener(adapter);
+    }
+
+    private void myInitOld()
     {
         scrollview = new ScrollView(getContext());
         scrollview.setBackgroundColor(0xffffff80);
@@ -69,6 +85,12 @@ public class HealthFrame extends LaunchFrame
     }
 
     private void loadContent()
+    {
+        JSONArray records = HealthData.getRecords(subtype);
+        adapter.setContent(subtype, records);
+    }
+
+    private void loadContentOld()
     {
         JSONObject status = HealthData.getStatus(subtype);
         JSONArray records = HealthData.getRecords(subtype);
