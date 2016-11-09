@@ -1719,6 +1719,11 @@ public class Simple
         return (json != null) && putFileContent(file, Json.toPretty(json));
     }
 
+    public static boolean putFileJSON(File file, JSONArray json)
+    {
+        return (json != null) && putFileContent(file, Json.toPretty(json));
+    }
+
     public static File changeExtension(File file, String extension)
     {
         return new File(file.getParent(), file.getName().replaceAll("\\.[a-zA-Z0-9]*$", extension));

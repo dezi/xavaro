@@ -25,8 +25,6 @@ import de.xavaro.android.common.Json;
 //  exf => External data file name
 //  aty => Analysis type
 //  pls => Average puls / heart rate
-//  tps => Tachycardia
-//  bps => Bradycardia
 //  noi => Noise
 //  raf => Rhythm abnormal flag
 //  waf => Waveform abnormal flag
@@ -502,8 +500,8 @@ public class BlueToothECG extends BlueTooth
 
     private File generateFileName()
     {
-        String filename = "ecg." + generateDatetime() + ".json";
-        return new File(Simple.getExternalFilesDir(), filename);
+        String filename = "ecg." + generateDatetime() + ".data.json";
+        return new File(HealthData.getDataDir(), filename);
     }
 
     private void generateRecord()
@@ -597,17 +595,18 @@ public class BlueToothECG extends BlueTooth
         Json.put(ecgdata, "exf", Json.getString(status, "Filename"));
         Json.put(ecgdata, "aty", Json.getInt(status, "AnalysisType"));
         Json.put(ecgdata, "pls", Json.getInt(status, "HeartRate"));
-        Json.put(ecgdata, "tps", Json.getInt(status, "Tachycardia"));
-        Json.put(ecgdata, "bps", Json.getInt(status, "Bradycardia"));
         Json.put(ecgdata, "noi", Json.getInt(status, "Noise"));
         Json.put(ecgdata, "raf", Json.getInt(status, "Rhythm"));
         Json.put(ecgdata, "waf", Json.getInt(status, "Waveform"));
         Json.put(ecgdata, "dev", deviceName);
 
-        JSONObject data = new JSONObject();
-        Json.put(data, "ecg", Json.clone(ecgdata));
+        if (dataCallback != null)
+        {
+            JSONObject data = new JSONObject();
+            Json.put(data, "ecg", Json.clone(ecgdata));
 
-        if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
+            dataCallback.onBluetoothReceivedData(deviceName, data);
+        }
 
         //
         // Store data.
@@ -769,33 +768,29 @@ public class BlueToothECG extends BlueTooth
         return data;
     }
 
-// --Commented out by Inspection START (08.11.16, 13:44):
-//    private byte[] getInfoDevice()
-//    {
-//        Log.d(LOGTAG, "getInfoDevice");
-//
-//        byte[] data = new byte[ 20 ];
-//
-//        data[ 1 ] = BT_CONFIG_INFO;
-//        data[ 2 ] = BT_CONFIG_INFO_DEVICE;
-//
-//        return data;
-//    }
-// --Commented out by Inspection STOP (08.11.16, 13:44)
+    private byte[] getInfoDevice()
+    {
+        Log.d(LOGTAG, "getInfoDevice");
 
-// --Commented out by Inspection START (08.11.16, 13:44):
-//    private byte[] getInfoSetting()
-//    {
-//        Log.d(LOGTAG, "getInfoSetting");
-//
-//        byte[] data = new byte[ 20 ];
-//
-//        data[ 1 ] = BT_CONFIG_INFO;
-//        data[ 2 ] = BT_CONFIG_INFO_SETTING;
-//
-//        return data;
-//    }
-// --Commented out by Inspection STOP (08.11.16, 13:44)
+        byte[] data = new byte[ 20 ];
+
+        data[ 1 ] = BT_CONFIG_INFO;
+        data[ 2 ] = BT_CONFIG_INFO_DEVICE;
+
+        return data;
+    }
+
+    private byte[] getInfoSetting()
+    {
+        Log.d(LOGTAG, "getInfoSetting");
+
+        byte[] data = new byte[ 20 ];
+
+        data[ 1 ] = BT_CONFIG_INFO;
+        data[ 2 ] = BT_CONFIG_INFO_SETTING;
+
+        return data;
+    }
 
     @Override
     public void sendCommand(JSONObject command)

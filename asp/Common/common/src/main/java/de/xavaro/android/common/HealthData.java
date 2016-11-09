@@ -1,12 +1,29 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Iterator;
 
 public class HealthData
 {
+    private static final String LOGTAG = HealthData.class.getSimpleName();
+
+    public static File getDataDir()
+    {
+        File datadir = new File(Simple.getExternalFilesDir(), "health");
+
+        if ((! datadir.exists()) && (! datadir.mkdirs()))
+        {
+            Log.d(LOGTAG, "getDataDir: cannot create dir=" + datadir);
+        }
+
+        return datadir;
+    }
+
     public static void setLastReadDate(String datatype)
     {
         JSONObject status = getStatus(datatype);
@@ -16,19 +33,15 @@ public class HealthData
 
     public static JSONObject getStatus(String datatype)
     {
-        JSONObject status = new JSONObject();
-
-        String filename = Simple.getPackageName() + ".healthdata." + datatype + ".status.json";
-        String content = Simple.readDatadirFile(filename);
-        if (content != null) status = Json.fromStringObject(content);
-
-        return status;
+        File datafile = new File(getDataDir(), datatype + ".status.json");
+        JSONObject status = Simple.getFileJSONObject(datafile);
+        return (status != null) ? status : new JSONObject();
     }
 
     public static void putStatus(String datatype, JSONObject status)
     {
-        String filename = Simple.getPackageName() + ".healthdata." + datatype + ".status.json";
-        Simple.writeDatadirFile(filename, Json.toPretty(status));
+        File datafile = new File(getDataDir(), datatype + ".status.json");
+        Simple.putFileJSON(datafile, status);
     }
 
     public static void clearStatus(String datatype)
@@ -91,19 +104,16 @@ public class HealthData
 
     public static JSONArray getRecords(String datatype)
     {
-        JSONArray records = new JSONArray();
-
-        String filename = Simple.getPackageName() + ".healthdata." + datatype + ".records.json";
-        String content = Simple.readDatadirFile(filename);
-        if (content != null) records = Json.fromStringArray(content);
-
-        return records;
+        File datafile = new File(getDataDir(), datatype + ".records.json");
+        JSONArray records = Simple.getFileJSONArray(datafile);
+        return (records != null) ? records : new JSONArray();
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static void putRecords(String datatype, JSONArray records)
     {
-        String filename = Simple.getPackageName() + ".healthdata." + datatype + ".records.json";
-        Simple.writeDatadirFile(filename, Json.toPretty(records));
+        File datafile = new File(getDataDir(), datatype + ".records.json");
+        Simple.putFileJSON(datafile, records);
     }
 
     public static void clearRecords(String datatype)
