@@ -1,12 +1,10 @@
 package de.xavaro.android.safehome;
 
-import android.util.Log;
-import android.widget.LinearLayout;
+import android.view.View;
 
 import org.json.JSONObject;
 
 import de.xavaro.android.common.ActivityOldManager;
-import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
 import de.xavaro.android.common.Json;
@@ -151,8 +149,12 @@ public class HealthECG extends HealthBase
         handleAssistance(am, iswarning);
     }
 
-    public LinearLayout createListItem(int position, JSONObject item)
+    public View createListItem()
     {
         return null;
+    }
+
+    public void populateListItem(int position, JSONObject item)
+    {
     }
 }

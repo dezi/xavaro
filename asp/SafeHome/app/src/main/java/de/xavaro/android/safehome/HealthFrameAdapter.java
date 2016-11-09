@@ -1,5 +1,7 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.Typeface;
+import android.view.Gravity;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
@@ -46,28 +48,72 @@ public class HealthFrameAdapter extends BaseAdapter implements
 
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        LinearLayout layout = new LinearLayout(Simple.getActContext());
-        layout.setLayoutParams(Simple.layoutParamsMW());
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-        Simple.setPadding(layout, 10, 10, 10, 10);
+        LinearLayout view;
 
-        TextView itemView = new TextView(Simple.getActContext());
-        itemView.setLayoutParams(Simple.layoutParamsMW());
-        itemView.setPadding(20, 0, 20, 0);
-        itemView.setTextSize(Simple.getDeviceTextSize(18f));
+        if (convertView instanceof LinearLayout)
+        {
+            view = (LinearLayout) convertView;
+        }
+        else
+        {
+            view = new LinearLayout(Simple.getActContext());
+            view.setLayoutParams(Simple.layoutParamsMW());
+            view.setOrientation(LinearLayout.HORIZONTAL);
+            Simple.setPadding(view, 10, 10, 10, 10);
 
-        layout.addView(itemView);
+            LinearLayout dateLayout = new LinearLayout(Simple.getActContext());
+            dateLayout.setLayoutParams(Simple.layoutParamsWW());
+            dateLayout.setOrientation(LinearLayout.VERTICAL);
+            dateLayout.setId(android.R.id.primary);
+            view.addView(dateLayout);
 
-        bindViewxxx(layout, position);
+            TextView dateView = new TextView(Simple.getActContext());
+            dateView.setLayoutParams(Simple.layoutParamsWW());
+            dateView.setTextSize(Simple.getDeviceTextSize(24f));
+            dateView.setTypeface(null, Typeface.BOLD);
+            dateView.setId(android.R.id.text1);
+            dateLayout.addView(dateView);
 
-        return layout;
-    }
+            TextView timeView = new TextView(Simple.getActContext());
+            timeView.setLayoutParams(Simple.layoutParamsWW());
+            timeView.setTextSize(Simple.getDeviceTextSize(24f));
+            timeView.setTypeface(null, Typeface.BOLD);
+            timeView.setId(android.R.id.text2);
+            dateLayout.addView(timeView);
 
-    private void bindViewxxx(LinearLayout view, int position)
-    {
+            TextView pulseView = new TextView(Simple.getActContext());
+            pulseView.setLayoutParams(Simple.layoutParamsWM());
+            pulseView.setGravity(Gravity.CENTER_VERTICAL);
+            Simple.setPadding(pulseView, 40, 0, 0, 0);
+            pulseView.setTextSize(Simple.getDeviceTextSize(24f));
+            pulseView.setTypeface(null, Typeface.BOLD);
+            pulseView.setId(android.R.id.content);
+            view.addView(pulseView);
+
+            TextView jsonView = new TextView(Simple.getActContext());
+            jsonView.setLayoutParams(Simple.layoutParamsWW());
+            jsonView.setTextSize(Simple.getDeviceTextSize(18f));
+            jsonView.setId(android.R.id.summary);
+            //view.addView(jsonView);
+        }
+
         JSONObject item = getItem(position);
 
-        ((TextView) view.getChildAt(0)).setText(Json.defuck(Json.toPretty(item)));
+        long dts = Simple.getTimeStamp(Json.getString(item, "dts"));
+
+        TextView dateView = (TextView) view.findViewById(android.R.id.text1);
+        dateView.setText(Simple.getLocaleDateMedium(dts));
+
+        TextView timeView = (TextView) view.findViewById(android.R.id.text2);
+        timeView.setText(Simple.getLocaleTime(dts));
+
+        TextView pulseView = (TextView) view.findViewById(android.R.id.content);
+        pulseView.setText("Puls" + ": " + Json.getInt(item, "pls"));
+
+        //TextView jsonView = (TextView) view.findViewById(android.R.id.summary);
+        //jsonView.setText(Json.toPretty(item));
+
+        return view;
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
