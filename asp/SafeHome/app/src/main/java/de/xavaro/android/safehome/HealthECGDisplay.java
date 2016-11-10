@@ -30,13 +30,6 @@ public class HealthECGDisplay extends LaunchFrame
     {
         super(context, parent);
 
-        myInit();
-    }
-
-    private void myInit()
-    {
-        Log.d(LOGTAG,"myInit: pupsi");
-
         myPath = new Path();
         myPaint = new Paint();
 
@@ -123,7 +116,7 @@ public class HealthECGDisplay extends LaunchFrame
             }
         }
 
-        int offset = 768; // Skip first three seconds from data.
+        int offset = samplingRate * 3; // Skip first three seconds from data.
         int maxoff = samplingData.length();
 
         float yorg;
@@ -184,7 +177,7 @@ public class HealthECGDisplay extends LaunchFrame
             {
                 sample = Json.getInt(samplingData, offset++) * pixelsPerAmp;;
 
-                xpos = sinx * (wid / (float) samplesPerRow);
+                xpos = sinx * pixelsPerSample;
                 ypos = yorg - sample;
 
                 myPath.lineTo(xpos, ypos);

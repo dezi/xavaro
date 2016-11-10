@@ -28,6 +28,7 @@ import de.xavaro.android.common.Json;
 //  noi => Noise
 //  raf => Rhythm abnormal flag
 //  waf => Waveform abnormal flag
+//  dap => Data present flag
 //  dev => Device name
 //
 // Additional in external file:
@@ -273,99 +274,102 @@ public class BlueToothECG extends BlueTooth
 
             if (format == BT_DOWNLOAD)
             {
-                //
-                // Record storage.
-                //
-
-                byte subtype = rd[ 2 ];
-
-                if (subtype == BT_DOWNLOAD_U1_U2_COUNT)
+                if (rd.length > 2)
                 {
                     //
-                    // Number of records.
+                    // Record storage.
                     //
 
-                    int numRecs1 = rd[ 3 ];
-                    int numRecs2 = rd[ 4 ];
+                    byte subtype = rd[ 2 ];
 
-                    actrecord = 0;
-                    maxrecord = numRecs1 + numRecs2;
-
-                    Log.d(LOGTAG, "parseResponse: nr1=" + numRecs1 + " nr2=" + numRecs2);
-
-                    ga.data = (actrecord < maxrecord) ? getRecord() : getReady();
-                }
-
-                if (subtype == BT_DOWNLOAD_HEADER)
-                {
-                    //
-                    // Record header.
-                    //
-
-                    byte subseq = rd[ 3 ];
-
-                    System.arraycopy(rd, 4, resultBuffer, (subseq * 16), 16);
-
-                    if (subseq == 15)
+                    if (subtype == BT_DOWNLOAD_U1_U2_COUNT)
                     {
                         //
-                        // We read a complete record header.
+                        // Number of records.
                         //
 
-                        generateRecord();
+                        int numRecs1 = rd[ 3 ];
+                        int numRecs2 = rd[ 4 ];
 
-                        if (actrecord < maxrecord)
+                        actrecord = 0;
+                        maxrecord = numRecs1 + numRecs2;
+
+                        Log.d(LOGTAG, "parseResponse: nr1=" + numRecs1 + " nr2=" + numRecs2);
+
+                        ga.data = (actrecord < maxrecord) ? getRecord() : getReady();
+                    }
+
+                    if (subtype == BT_DOWNLOAD_HEADER)
+                    {
+                        //
+                        // Record header.
+                        //
+
+                        byte subseq = rd[ 3 ];
+
+                        System.arraycopy(rd, 4, resultBuffer, (subseq * 16), 16);
+
+                        if (subseq == 15)
                         {
-                            ga.data = getRecord();
-                        }
-                        else
-                        {
-                            ga.data = (recordsToLoad.size() > 0) ? getNextFile() : getEraseAll();
+                            //
+                            // We read a complete record header.
+                            //
+
+                            generateRecord();
+
+                            if (actrecord < maxrecord)
+                            {
+                                ga.data = getRecord();
+                            }
+                            else
+                            {
+                                ga.data = (recordsToLoad.size() > 0) ? getNextFile() : getEraseAll();
+                            }
                         }
                     }
-                }
 
-                if (subtype == BT_DOWNLOAD_RAWD)
-                {
-                    //
-                    // Record data.
-                    //
-
-                    byte subseq = rd[ 3 ];
-
-                    System.arraycopy(rd, 4, resultBuffer, (subseq * 16), 16);
-
-                    if (subseq == 15)
+                    if (subtype == BT_DOWNLOAD_RAWD)
                     {
                         //
-                        // Copy chunk into raw data.
+                        // Record data.
                         //
 
-                        if (rawData == null) rawData = new byte[ 80 * 256 ];
-                        System.arraycopy(resultBuffer, 0, rawData, (actrecord * 256), 256);
+                        byte subseq = rd[ 3 ];
 
-                        actrecord++;
+                        System.arraycopy(rd, 4, resultBuffer, (subseq * 16), 16);
 
-                        if (actrecord < 80)
-                        {
-                            ga.data = getFileRecords();
-                        }
-                        else
+                        if (subseq == 15)
                         {
                             //
-                            // Store file.
+                            // Copy chunk into raw data.
                             //
 
-                            generateFile();
+                            if (rawData == null) rawData = new byte[ 80 * 256 ];
+                            System.arraycopy(resultBuffer, 0, rawData, (actrecord * 256), 256);
 
-                            rawData = null;
-                            actrecord = 0;
+                            actrecord++;
 
-                            //
-                            // Check for next file or erase flash after download.
-                            //
+                            if (actrecord < 80)
+                            {
+                                ga.data = getFileRecords();
+                            }
+                            else
+                            {
+                                //
+                                // Store file.
+                                //
 
-                            ga.data = (recordsToLoad.size() > 0) ? getNextFile() : getEraseAll();
+                                generateFile();
+
+                                rawData = null;
+                                actrecord = 0;
+
+                                //
+                                // Check for next file or erase flash after download.
+                                //
+
+                                ga.data = (recordsToLoad.size() > 0) ? getNextFile() : getEraseAll();
+                            }
                         }
                     }
                 }
@@ -618,6 +622,8 @@ public class BlueToothECG extends BlueTooth
         JSONObject ecgdata = new JSONObject();
         JSONObject status = generateStatus();
 
+        boolean dataPresent = (resultEfi.length() > 1000) && (resultPld.length() > 5);
+
         Json.put(ecgdata, "dts", Json.getString(status, "Timestamp"));
         Json.put(ecgdata, "exf", Json.getString(status, "Filename"));
         Json.put(ecgdata, "aty", Json.getInt(status, "AnalysisType"));
@@ -625,6 +631,7 @@ public class BlueToothECG extends BlueTooth
         Json.put(ecgdata, "noi", Json.getInt(status, "Noise"));
         Json.put(ecgdata, "raf", Json.getInt(status, "Rhythm"));
         Json.put(ecgdata, "waf", Json.getInt(status, "Waveform"));
+        Json.put(ecgdata, "dap", dataPresent ? 1 : 0);
         Json.put(ecgdata, "dev", deviceName);
 
         //

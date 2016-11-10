@@ -241,7 +241,6 @@ public class HealthECG extends HealthBase
         ImageView buttonView = new ImageView(Simple.getActContext());
         buttonView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(60),Simple.WC));
         buttonView.setId(android.R.id.toggle);
-        buttonView.setImageResource(R.drawable.health_ecg_display_256x256);
         Simple.setPadding(buttonView, 0, 0, 10, 0);
         buttonLayout.addView(buttonView);
 
@@ -251,6 +250,10 @@ public class HealthECG extends HealthBase
     public void populateListView(View view, int position, JSONObject item)
     {
         long dts = Simple.getTimeStamp(Json.getString(item, "dts"));
+
+        int pls = Json.getInt(item, "pls");
+        int noi = Json.getInt(item, "noi");
+        int dap = Json.getInt(item, "dap");
 
         TextView dateView = (TextView) view.findViewById(android.R.id.text1);
         TextView timeView = (TextView) view.findViewById(android.R.id.text2);
@@ -266,7 +269,7 @@ public class HealthECG extends HealthBase
         dateView.setText(Simple.getLocaleDateMedium(dts));
         timeView.setText(Simple.getLocaleTime(dts));
 
-        if (Json.getInt(item, "noi") != 0)
+        if (noi != 0)
         {
             pulseView.setText("Puls" + ": " + "--");
 
@@ -278,61 +281,76 @@ public class HealthECG extends HealthBase
         }
         else
         {
-            int pls = Json.getInt(item, "pls");
-
             pulseView.setText("Puls" + ": " + pls);
 
             noiView.setImageResource(R.drawable.health_ecg_ok_300x200);
 
-            if (! Simple.getSharedPrefBoolean("health.ecg.alert.enable"))
+            if (dap == 0)
             {
-                rafView.setVisibility(View.INVISIBLE);
-                wafView.setVisibility(View.INVISIBLE);
-                alertView.setVisibility(View.INVISIBLE);
+                rafView.setImageResource(R.drawable.health_ecg_nodata_300x200);
+                rafView.setVisibility(View.VISIBLE);
             }
             else
             {
-                rafView.setImageResource((Json.getInt(item, "raf") == 0)
-                        ? R.drawable.health_ecg_rhythm_dim_300x200
-                        : R.drawable.health_ecg_rhythm_300x200);
-
-                wafView.setImageResource((Json.getInt(item, "waf") == 0)
-                        ? R.drawable.health_ecg_wave_dim_300x200
-                        : R.drawable.health_ecg_wave_300x200);
-
-                int low = Simple.getSharedPrefInt("health.ecg.alert.lowpls");
-                int high = Simple.getSharedPrefInt("health.ecg.alert.highpls");
-
-                if ((low > 0) && (low >= pls))
+                if (!Simple.getSharedPrefBoolean("health.ecg.alert.enable"))
                 {
-                    alertView.setImageResource(R.drawable.health_ecg_pls_low_300x200);
-                    alertView.setVisibility(View.VISIBLE);
+                    rafView.setVisibility(View.INVISIBLE);
+                    wafView.setVisibility(View.INVISIBLE);
+                    alertView.setVisibility(View.INVISIBLE);
                 }
                 else
                 {
-                    if ((high > 0) && (high <= pls))
+                    rafView.setImageResource((Json.getInt(item, "raf") == 0)
+                            ? R.drawable.health_ecg_rhythm_dim_300x200
+                            : R.drawable.health_ecg_rhythm_300x200);
+
+                    wafView.setImageResource((Json.getInt(item, "waf") == 0)
+                            ? R.drawable.health_ecg_wave_dim_300x200
+                            : R.drawable.health_ecg_wave_300x200);
+
+                    int low = Simple.getSharedPrefInt("health.ecg.alert.lowpls");
+                    int high = Simple.getSharedPrefInt("health.ecg.alert.highpls");
+
+                    if ((low > 0) && (low >= pls))
                     {
-                        alertView.setImageResource(R.drawable.health_ecg_pls_high_300x200);
+                        alertView.setImageResource(R.drawable.health_ecg_pls_low_300x200);
                         alertView.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        alertView.setVisibility(View.INVISIBLE);
+                        if ((high > 0) && (high <= pls))
+                        {
+                            alertView.setImageResource(R.drawable.health_ecg_pls_high_300x200);
+                            alertView.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            alertView.setVisibility(View.INVISIBLE);
+                        }
                     }
                 }
             }
         }
 
-        final JSONObject cbitem = item;
-
-        buttonView.setOnClickListener(new View.OnClickListener()
+        if (dap == 0)
         {
-            @Override
-            public void onClick(View view)
+            buttonView.setImageResource(R.drawable.health_ecg_display_dim_256x256);
+            buttonView.setOnClickListener(null);
+        }
+        else
+        {
+            final JSONObject cbitem = item;
+
+            buttonView.setImageResource(R.drawable.health_ecg_display_256x256);
+            buttonView.setOnClickListener(new View.OnClickListener()
             {
-                makeDisplay(view, cbitem);
-            }
-        });
+                @Override
+                public void onClick(View view)
+                {
+                    makeDisplay(view, cbitem);
+                }
+            });
+        }
     }
 
     private void makeDisplay(View view, JSONObject item)
