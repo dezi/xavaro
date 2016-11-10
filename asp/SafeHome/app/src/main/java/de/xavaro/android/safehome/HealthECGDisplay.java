@@ -122,7 +122,6 @@ public class HealthECGDisplay extends LaunchFrame
         float yorg;
         float ypos;
         float xpos;
-        float base;
 
         float sample;
 
@@ -130,10 +129,11 @@ public class HealthECGDisplay extends LaunchFrame
         // Preflight samples to get baseline offset.
         //
 
-        yorg = iGrid / 2.0f;
+        float base = 0f;
+        float minbase = +100000f;
+        float maxbase = -100000f;
 
-        float minbase = 0.0f;
-        float maxbase = 0.0f;
+        yorg = iGrid / 2.0f;
 
         for (int inx = offset; inx < maxoff; inx++)
         {
@@ -145,13 +145,33 @@ public class HealthECGDisplay extends LaunchFrame
         }
 
         float fitScale = iGrid / (maxbase - minbase);
-        if ((fitScale < 0.5f) || (fitScale > 1.5f)) fitScale = 1.0f;
+        Log.d(LOGTAG, "onDraw: fitScale=" + fitScale);
 
-        pixelsPerAmp = pixelsPerAmp * fitScale;
-        base = minbase * fitScale * 0.75f;
+        if ((fitScale >= 0.25f) && (fitScale <= 1.75f))
+        {
+            //
+            // Redo baseline compute with new scale.
+            //
+
+            pixelsPerAmp *= fitScale;
+
+            minbase = +100000f;
+            maxbase = -100000f;
+
+            for (int inx = offset; inx < maxoff; inx++)
+            {
+                sample = Json.getInt(samplingData, inx) * pixelsPerAmp;
+                ypos = yorg - sample;
+
+                if (ypos < minbase) minbase = ypos;
+                if (ypos > maxbase) maxbase = ypos;
+            }
+
+            base = minbase;
+        }
 
         Log.d(LOGTAG, "onDraw: minbase=" + minbase + " maxbase=" + maxbase + " base=" + base);
-        Log.d(LOGTAG, "onDraw: pixelsPerAmp=" + pixelsPerAmp);
+        Log.d(LOGTAG, "onDraw: pixelsPerAmp=" + pixelsPerAmp + " pixelsPerSample=" + pixelsPerSample);
 
         //
         // Draw samples.
