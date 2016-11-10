@@ -292,6 +292,19 @@ public class Json
         return null;
     }
 
+    public static int getInt(JSONArray json, int index)
+    {
+        try
+        {
+            return json.getInt(index);
+        }
+        catch (Exception ignore)
+        {
+        }
+
+        return 0;
+    }
+
     @Nullable
     public static String getString(JSONArray json, int index)
     {

@@ -158,6 +158,11 @@ public class HealthECG extends HealthBase
         ActivityOldManager.recordActivity(lm);
 
         handleAssistance(am, iswarning);
+
+        if (connectCallback != null)
+        {
+            connectCallback.onBluetoothUpdated(deviceName);
+        }
     }
 
     public View createListView()

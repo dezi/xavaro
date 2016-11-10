@@ -21,9 +21,9 @@ public abstract class HealthBase implements
     protected String actDts;
     protected JSONObject actRecord;
 
-    private boolean isConnected;
-    private BlueTooth blueTooth;
-    private BlueTooth.BlueToothConnectCallback connectCallback;
+    protected boolean isConnected;
+    protected BlueTooth blueTooth;
+    protected BlueTooth.BlueToothConnectCallback connectCallback;
 
     protected final Handler handler = new Handler();
 
@@ -57,7 +57,8 @@ public abstract class HealthBase implements
     {
         connectCallback = subscriber;
 
-        if (isConnected && (connectCallback != null)) connectCallback.onBluetoothConnect(deviceName);
+        if (isConnected && (connectCallback != null))
+            connectCallback.onBluetoothConnect(deviceName);
     }
 
     public void onBluetoothConnect(String deviceName)
@@ -84,6 +85,11 @@ public abstract class HealthBase implements
     public void onBluetoothFakeDisconnect(String deviceName)
     {
         if (connectCallback != null) connectCallback.onBluetoothFakeDisconnect(deviceName);
+    }
+
+    public void onBluetoothUpdated(String deviceName)
+    {
+        if (connectCallback != null) connectCallback.onBluetoothUpdated(deviceName);
     }
 
     public void onBluetoothReceivedData(String deviceName, JSONObject data)

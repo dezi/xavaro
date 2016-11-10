@@ -119,6 +119,18 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
         }
     };
 
+    public final Runnable bluetoothIsUpdated = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            if (healthFrame != null)
+            {
+                healthFrame.onContentUpdated();
+            }
+        }
+    };
+
     public void onBluetoothConnect(String deviceName)
     {
         Log.d(LOGTAG, "onBluetoothConnect: " + deviceName);
@@ -147,6 +159,14 @@ public class LaunchItemHealth extends LaunchItem implements BlueTooth.BlueToothC
 
         Simple.removePost(bluetoothIsConnected);
         Simple.makePost(bluetoothIsDisconnected);
+    }
+
+    public void onBluetoothUpdated(String deviceName)
+    {
+        Log.d(LOGTAG, "onBluetoothUpdated: " + deviceName);
+
+        Simple.removePost(bluetoothIsUpdated);
+        Simple.makePost(bluetoothIsUpdated);
     }
 
     //endregion BlueTooth connect states

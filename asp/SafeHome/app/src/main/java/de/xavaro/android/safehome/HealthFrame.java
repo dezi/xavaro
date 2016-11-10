@@ -2,6 +2,7 @@ package de.xavaro.android.safehome;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -85,10 +86,18 @@ public class HealthFrame extends LaunchFrame
         loadContent();
     }
 
+    public void onContentUpdated()
+    {
+        Log.d(LOGTAG, "onContentUpdated");
+
+        loadContent();
+    }
+
     private void loadContent()
     {
         JSONArray records = HealthData.getRecords(subtype);
         adapter.setContent(subtype, records);
+        listview.invalidate();
     }
 
     private void loadContentOld()
