@@ -1,6 +1,7 @@
 package de.xavaro.android.safehome;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -38,7 +39,7 @@ public class HealthFrame extends LaunchFrame
     private void myInit()
     {
         listview = new ListView(getContext());
-        listview.setBackgroundColor(0xffffc080);
+        listview.setBackgroundColor(Color.WHITE);
 
         addView(listview, 0);
 

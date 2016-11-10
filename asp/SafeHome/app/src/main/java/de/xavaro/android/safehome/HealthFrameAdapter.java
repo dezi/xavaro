@@ -4,6 +4,7 @@ import android.graphics.Typeface;
 import android.view.Gravity;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.View;
@@ -89,6 +90,46 @@ public class HealthFrameAdapter extends BaseAdapter implements
             pulseView.setTypeface(null, Typeface.BOLD);
             pulseView.setId(android.R.id.content);
             view.addView(pulseView);
+
+            LinearLayout iconLayout = new LinearLayout(Simple.getActContext());
+            iconLayout.setLayoutParams(Simple.layoutParamsWM());
+            iconLayout.setOrientation(LinearLayout.HORIZONTAL);
+            iconLayout.setGravity(Gravity.CENTER_VERTICAL);
+            view.addView(iconLayout);
+
+            ImageView okView = new ImageView(Simple.getActContext());
+            okView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(90),Simple.WC));
+            okView.setId(android.R.id.button1);
+            okView.setImageResource(R.drawable.health_ecg_ok_300x200);
+            Simple.setPadding(okView, 20, 0, 0, 0);
+            iconLayout.addView(okView);
+
+            ImageView rhythmView = new ImageView(Simple.getActContext());
+            rhythmView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(90),Simple.WC));
+            rhythmView.setId(android.R.id.button2);
+            rhythmView.setImageResource(R.drawable.health_ecg_rhythm_dim_300x200);
+            Simple.setPadding(rhythmView, 20, 0, 0, 0);
+            iconLayout.addView(rhythmView);
+
+            ImageView waveView = new ImageView(Simple.getActContext());
+            waveView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(90),Simple.WC));
+            waveView.setId(android.R.id.button3);
+            waveView.setImageResource(R.drawable.health_ecg_wave_dim_300x200);
+            Simple.setPadding(waveView, 20, 0, 0, 0);
+            iconLayout.addView(waveView);
+
+            LinearLayout buttonLayout = new LinearLayout(Simple.getActContext());
+            buttonLayout.setLayoutParams(Simple.layoutParamsMM());
+            buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+            buttonLayout.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+            view.addView(buttonLayout);
+
+            ImageView buttonView = new ImageView(Simple.getActContext());
+            buttonView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(70),Simple.WC));
+            buttonView.setId(android.R.id.toggle);
+            buttonView.setImageResource(R.drawable.health_ecg_display_256x256);
+            Simple.setPadding(buttonView, 0, 0, 20, 0);
+            buttonLayout.addView(buttonView);
 
             TextView jsonView = new TextView(Simple.getActContext());
             jsonView.setLayoutParams(Simple.layoutParamsWW());
