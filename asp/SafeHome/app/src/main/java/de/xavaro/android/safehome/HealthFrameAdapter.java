@@ -1,5 +1,6 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.graphics.Typeface;
 import android.view.Gravity;
 import android.widget.AdapterView;
@@ -47,6 +48,7 @@ public class HealthFrameAdapter extends BaseAdapter implements
         return (long) position;
     }
 
+    @SuppressLint("RtlHardcoded")
     public View getView(int position, View convertView, ViewGroup parent)
     {
         LinearLayout view;
@@ -95,6 +97,7 @@ public class HealthFrameAdapter extends BaseAdapter implements
             iconLayout.setLayoutParams(Simple.layoutParamsWM());
             iconLayout.setOrientation(LinearLayout.HORIZONTAL);
             iconLayout.setGravity(Gravity.CENTER_VERTICAL);
+            Simple.setPadding(iconLayout, 40, 0, 0, 0);
             view.addView(iconLayout);
 
             ImageView okView = new ImageView(Simple.getActContext());
@@ -125,10 +128,10 @@ public class HealthFrameAdapter extends BaseAdapter implements
             view.addView(buttonLayout);
 
             ImageView buttonView = new ImageView(Simple.getActContext());
-            buttonView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(70),Simple.WC));
+            buttonView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(60),Simple.WC));
             buttonView.setId(android.R.id.toggle);
             buttonView.setImageResource(R.drawable.health_ecg_display_256x256);
-            Simple.setPadding(buttonView, 0, 0, 20, 0);
+            Simple.setPadding(buttonView, 0, 0, 10, 0);
             buttonLayout.addView(buttonView);
 
             TextView jsonView = new TextView(Simple.getActContext());
