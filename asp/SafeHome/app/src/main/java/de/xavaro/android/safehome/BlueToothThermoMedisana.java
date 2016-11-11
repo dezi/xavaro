@@ -150,8 +150,6 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
 
             JSONObject result = new JSONObject();
 
-            Json.put(result, "type", "ThermoRecord");
-
             Json.put(result, "dts", Simple.timeStampAsISO(utc));
             Json.put(result, "tmp", temperature);
             Json.put(result, "unt", unit);
@@ -172,12 +170,11 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
             //
 
             JSONObject record = Json.clone(result);
-            record.remove("type");
             HealthData.addRecord("thermo", record);
         }
     }
 
-    public byte[] getOnlineData()
+    private byte[] getOnlineData()
     {
         Log.d(LOGTAG, "getOnlineData");
 
@@ -194,7 +191,7 @@ public class BlueToothThermoMedisana implements BlueTooth.BlueToothPhysicalDevic
         return data;
     }
 
-    public byte[] getCurrentTime()
+    private byte[] getCurrentTime()
     {
         Log.d(LOGTAG, "getCurrentTime");
 

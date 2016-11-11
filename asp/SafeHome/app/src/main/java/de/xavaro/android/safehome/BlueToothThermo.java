@@ -87,7 +87,7 @@ public class BlueToothThermo extends BlueTooth
     {
         super.enableDevice();
 
-        if (isGeneric)genericDevice.enableDevice();
+        if (isGeneric) genericDevice.enableDevice();
         if (isMedisana) medisanaDevice.enableDevice();
     }
 

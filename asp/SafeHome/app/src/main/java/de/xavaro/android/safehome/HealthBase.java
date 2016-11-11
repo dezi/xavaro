@@ -1,7 +1,11 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -158,5 +162,46 @@ public abstract class HealthBase implements
 
             Log.d(LOGTAG, "handleAssistance: send=" + datetext);
         }
+    }
+
+    public View createListView()
+    {
+        LinearLayout view = new LinearLayout(Simple.getActContext());
+        view.setLayoutParams(Simple.layoutParamsMW());
+        view.setOrientation(LinearLayout.HORIZONTAL);
+        Simple.setPadding(view, 10, 10, 10, 10);
+
+        LinearLayout dateLayout = new LinearLayout(Simple.getActContext());
+        dateLayout.setLayoutParams(Simple.layoutParamsWW());
+        dateLayout.setOrientation(LinearLayout.VERTICAL);
+        dateLayout.setId(android.R.id.primary);
+        view.addView(dateLayout);
+
+        TextView dateView = new TextView(Simple.getActContext());
+        dateView.setLayoutParams(Simple.layoutParamsWW());
+        dateView.setTextSize(Simple.getDeviceTextSize(24f));
+        dateView.setTypeface(null, Typeface.BOLD);
+        dateView.setId(android.R.id.text1);
+        dateLayout.addView(dateView);
+
+        TextView timeView = new TextView(Simple.getActContext());
+        timeView.setLayoutParams(Simple.layoutParamsWW());
+        timeView.setTextSize(Simple.getDeviceTextSize(20f));
+        timeView.setTypeface(null, Typeface.BOLD);
+        timeView.setId(android.R.id.text2);
+        dateLayout.addView(timeView);
+
+        return view;
+    }
+
+    public void populateListView(View view, int position, JSONObject item)
+    {
+        long dts = Simple.getTimeStamp(Json.getString(item, "dts"));
+
+        TextView dateView = (TextView) view.findViewById(android.R.id.text1);
+        TextView timeView = (TextView) view.findViewById(android.R.id.text2);
+
+        dateView.setText(Simple.getLocaleDateMedium(dts));
+        timeView.setText(Simple.getLocaleTime(dts));
     }
 }

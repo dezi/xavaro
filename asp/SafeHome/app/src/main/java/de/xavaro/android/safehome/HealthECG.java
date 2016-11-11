@@ -1,14 +1,13 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.graphics.Typeface;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.view.Gravity;
+import android.view.View;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -28,7 +27,7 @@ public class HealthECG extends HealthBase
 
     public static HealthECG getInstance()
     {
-        if (instance == null) instance = new HealthECG("ecg");
+        if (instance == null) instance = new HealthECG();
 
         return instance;
     }
@@ -38,9 +37,11 @@ public class HealthECG extends HealthBase
         getInstance().setConnectCallback(subscriber);
     }
 
-    private HealthECG(String deviceType)
+    private HealthECG()
     {
-        this.deviceType = deviceType;
+        super();
+
+        this.deviceType = "ecg";
     }
 
     @Override
@@ -149,9 +150,12 @@ public class HealthECG extends HealthBase
                 }
             }
 
-            sm += " " + at;
-            lm += " " + at;
-            am += " " + at;
+            if (! at.isEmpty())
+            {
+                sm += " " + at;
+                lm += " " + at;
+                am += " " + at;
+            }
         }
 
         Speak.speak(sm);
@@ -165,32 +169,11 @@ public class HealthECG extends HealthBase
         }
     }
 
+    @Override
+    @SuppressLint("RtlHardcoded")
     public View createListView()
     {
-        LinearLayout view = new LinearLayout(Simple.getActContext());
-        view.setLayoutParams(Simple.layoutParamsMW());
-        view.setOrientation(LinearLayout.HORIZONTAL);
-        Simple.setPadding(view, 10, 10, 10, 10);
-
-        LinearLayout dateLayout = new LinearLayout(Simple.getActContext());
-        dateLayout.setLayoutParams(Simple.layoutParamsWW());
-        dateLayout.setOrientation(LinearLayout.VERTICAL);
-        dateLayout.setId(android.R.id.primary);
-        view.addView(dateLayout);
-
-        TextView dateView = new TextView(Simple.getActContext());
-        dateView.setLayoutParams(Simple.layoutParamsWW());
-        dateView.setTextSize(Simple.getDeviceTextSize(24f));
-        dateView.setTypeface(null, Typeface.BOLD);
-        dateView.setId(android.R.id.text1);
-        dateLayout.addView(dateView);
-
-        TextView timeView = new TextView(Simple.getActContext());
-        timeView.setLayoutParams(Simple.layoutParamsWW());
-        timeView.setTextSize(Simple.getDeviceTextSize(20f));
-        timeView.setTypeface(null, Typeface.BOLD);
-        timeView.setId(android.R.id.text2);
-        dateLayout.addView(timeView);
+        LinearLayout view = (LinearLayout) super.createListView();
 
         TextView pulseView = new TextView(Simple.getActContext());
         pulseView.setLayoutParams(Simple.layoutParamsWM());
@@ -247,16 +230,15 @@ public class HealthECG extends HealthBase
         return view;
     }
 
+    @Override
     public void populateListView(View view, int position, JSONObject item)
     {
-        long dts = Simple.getTimeStamp(Json.getString(item, "dts"));
+        super.populateListView(view, position, item);
 
         int pls = Json.getInt(item, "pls");
         int noi = Json.getInt(item, "noi");
         int dap = Json.getInt(item, "dap");
 
-        TextView dateView = (TextView) view.findViewById(android.R.id.text1);
-        TextView timeView = (TextView) view.findViewById(android.R.id.text2);
         TextView pulseView = (TextView) view.findViewById(android.R.id.content);
 
         ImageView noiView = (ImageView) view.findViewById(android.R.id.button1);
@@ -265,9 +247,6 @@ public class HealthECG extends HealthBase
 
         ImageView alertView = (ImageView) view.findViewById(android.R.id.icon1);
         ImageView buttonView = (ImageView) view.findViewById(android.R.id.toggle);
-
-        dateView.setText(Simple.getLocaleDateMedium(dts));
-        timeView.setText(Simple.getLocaleTime(dts));
 
         if (noi != 0)
         {

@@ -646,6 +646,12 @@
     <string name="health_oxy_highpls">The pulse is alarming high.</string>
     <string name="health_oxy_activity">You have a blood oxygene saturation of %1$d %%. The pulse is %2$d.</string>
 
+    <string name="health_glucose_spoken">The last reading resulted in a glucose value of %1$d</string>
+    <string name="health_glucose_alert">%1$s has a glucose value of %2$s</string>
+    <string name="health_glucose_lowglucose">The glucose value is alarming low.</string>
+    <string name="health_glucose_highglucose">The glucose value is alarming high.</string>
+    <string name="health_glucose_activity">You have a glucose value of %1$d.</string>
+
     <string name="health_ecg_noise_spoken">The last ECG reading is invalid. Please redo measurement.</string>
     <string name="health_ecg_noise_logger">You have recorded an invalid ECG.</string>
     <string name="health_ecg_noise_assist">%1$s has recorded an invalid ECG.</string>
@@ -665,17 +671,12 @@
     <string name="health_ecg_pls_low">The pulse is alarming low.</string>
     <string name="health_ecg_pls_high">The pulse is alarming high.</string>
 
-    <string name="health_glucose_spoken">The last reading resulted in a glucose value of %1$d</string>
-    <string name="health_glucose_alert">%1$s has a glucose value of %2$s</string>
-    <string name="health_glucose_lowglucose">The glucose value is alarming low.</string>
-    <string name="health_glucose_highglucose">The glucose value is alarming high.</string>
-    <string name="health_glucose_activity">You have a glucose value of %1$d.</string>
-
     <string name="health_thermo_spoken">The last reading resulted in a temperature of %1$s degree Celsius.</string>
-    <string name="health_thermo_alert">%1$s has a temperature of %2$s degree Celsius.</string>
-    <string name="health_thermo_lowtemp">The temperature is alarming low.</string>
-    <string name="health_thermo_hightemp">The temperature is alarming high.</string>
-    <string name="health_thermo_activity">You have a temperature of %1$s degree Celsius.</string>
+    <string name="health_thermo_logger">You have a temperature of %1$s degree Celsius.</string>
+    <string name="health_thermo_assist">%1$s has a temperature of %2$s degree Celsius.</string>
+
+    <string name="health_thermo_temp_low">The temperature is alarming low.</string>
+    <string name="health_thermo_temp_high">The temperature is alarming high.</string>
 
     <string-array name="phone_labels_keys">
         <item>1</item>

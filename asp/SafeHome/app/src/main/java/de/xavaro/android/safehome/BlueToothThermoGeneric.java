@@ -4,10 +4,8 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.util.Log;
 
-import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Calendar;
 
 import org.json.JSONObject;
 
@@ -68,8 +66,6 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
     {
     }
 
-    private final Map<Integer, JSONObject> lastResults = new HashMap<>();
-
     public void parseResponse(byte[] rd, BluetoothGattCharacteristic characteristic)
     {
         Log.d(LOGTAG, "parseResponse: " + characteristic.getUuid().toString());
@@ -120,8 +116,6 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
 
             JSONObject result = new JSONObject();
 
-            Json.put(result, "type", "ThermoRecord");
-
             Json.put(result, "dts", Simple.timeStampAsISO(utc));
             Json.put(result, "tmp", temperature);
             Json.put(result, "unt", unit);
@@ -141,7 +135,6 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
             //
 
             JSONObject record = Json.clone(result);
-            record.remove("type");
             HealthData.addRecord("thermo", record);
         }
     }

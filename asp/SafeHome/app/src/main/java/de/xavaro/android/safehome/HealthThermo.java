@@ -1,6 +1,11 @@
 package de.xavaro.android.safehome;
 
-import android.annotation.SuppressLint;
+import android.graphics.Typeface;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.view.Gravity;
+import android.view.View;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -9,14 +14,12 @@ import org.json.JSONObject;
 import java.util.Locale;
 
 import de.xavaro.android.common.ActivityOldManager;
-import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.CommonConfigs;
 import de.xavaro.android.common.EventManager;
-import de.xavaro.android.common.Json;
 import de.xavaro.android.common.NotifyManager;
-import de.xavaro.android.common.OopsService;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Speak;
+import de.xavaro.android.common.Json;
 
 public class HealthThermo extends HealthBase
 {
@@ -36,75 +39,11 @@ public class HealthThermo extends HealthBase
         getInstance().setConnectCallback(subscriber);
     }
 
-    @Override
-    public void onBluetoothReceivedData(String deviceName, JSONObject data)
+    private HealthThermo()
     {
-        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
+        super();
 
-        if (! data.has("thermo")) return;
-
-        //
-        // The results come in unordered.
-        //
-
-        lastRecord = Json.getObject(data, "thermo");
-        if (lastRecord == null) return;
-
-        String type = Json.getString(lastRecord, "type");
-
-        if (Simple.equals(type, "ThermoRecord"))
-        {
-            String date = Json.getString(lastRecord, "dts");
-            if (date == null) return;
-
-            double temperature = Json.getDouble(lastRecord, "tmp");
-
-            if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
-            {
-                lastTmp = Math.round(temperature * 10.0) / 10.0;
-                lastDts = date;
-
-                handler.removeCallbacks(messageSpeaker);
-                handler.postDelayed(messageSpeaker, 500);
-            }
-        }
-    }
-
-    private JSONObject lastRecord;
-    private String lastDts;
-    private double lastTmp;
-
-    private void informAssistance(int resid)
-    {
-        long last = Simple.getTimeStamp(lastDts);
-        long now = Simple.nowAsTimeStamp();
-
-        if ((now - last) > 1000 * 1000)
-        {
-            Log.d(LOGTAG,"informAssistance: outdated:" + lastDts);
-            return;
-        }
-
-        if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return;
-        if (! Simple.getSharedPrefBoolean("health.thermo.alert.alertgroup")) return;
-
-        String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
-        if (groupIdentity == null) return;
-
-        String name = Simple.getOwnerName();
-        String bval = String.format(Locale.getDefault(), "%.1f", lastTmp);
-
-        String text = Simple.getTrans(R.string.health_thermo_alert, name, bval)
-                + " " + Simple.getTrans(resid);
-
-        JSONObject assistMessage = new JSONObject();
-        Json.put(assistMessage, "uuid", Simple.getUUID());
-        Json.put(assistMessage, "message", text);
-        Json.put(assistMessage, "priority", "alertinfo");
-
-        ChatManager.getInstance().sendOutgoingMessage(groupIdentity, assistMessage);
-
-        Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
+        this.deviceType = "thermo";
     }
 
     @Override
@@ -112,6 +51,11 @@ public class HealthThermo extends HealthBase
     {
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
+
+        if (actRecord == null) return;
+
+        String actDts = Json.getString(actRecord, "dts");
+        double actTmp = Json.getDouble(actRecord, "tmp");
 
         long now = Simple.nowAsTimeStamp();
 
@@ -130,10 +74,10 @@ public class HealthThermo extends HealthBase
             // Check event and measurement dates.
             //
 
-            long dts = Simple.getTimeStamp(date);
-            if (Math.abs(now - dts) > 2 * 3600 * 1000) continue;
+            long mts = Simple.getTimeStamp(date);
+            if (Math.abs(now - mts) > 2 * 3600 * 1000) continue;
 
-            long mts = Simple.getTimeStamp(lastDts);
+            long dts = Simple.getTimeStamp(actDts);
             if (Math.abs(dts - mts) > 2 * 3600 * 1000) continue;
 
             //
@@ -141,8 +85,8 @@ public class HealthThermo extends HealthBase
             //
 
             Json.put(event, "taken", true);
-            Json.put(event, "takendate", lastDts);
-            Json.put(event, "temp", lastTmp);
+            Json.put(event, "takendate", actDts);
+            Json.put(event, "temp", actTmp);
 
             EventManager.updateComingEvent("webapps.medicator", event);
 
@@ -158,67 +102,145 @@ public class HealthThermo extends HealthBase
     @Override
     protected void evaluateMessage()
     {
-        if (lastRecord == null) return;
-        String type = Json.getString(lastRecord, "type");
-        if (! Simple.equals(type, "ThermoRecord")) return;
+        if (actRecord == null) return;
 
-        String bval = String.format(Locale.getDefault(), "%.1f", lastTmp);
+        double tmp = Json.getDouble(actRecord, "tmp");
+        String tmpstr = String.format(Locale.getDefault(), "%.1f", tmp);
 
-        String sm = Simple.getTrans(R.string.health_thermo_spoken, bval);
-        String am = Simple.getTrans(R.string.health_thermo_activity, bval);
+        boolean iswarning = false;
 
-        Speak.speak(sm);
-        ActivityOldManager.recordActivity(am);
+        String sm = Simple.getTrans(R.string.health_thermo_spoken, tmpstr);
+        String lm = Simple.getTrans(R.string.health_thermo_logger, tmpstr);
+        String am = Simple.getTrans(R.string.health_thermo_assist, Simple.getOwnerName(), tmpstr);
 
-        evaluateEvents();
-
-        if (!Simple.getSharedPrefBoolean("health.thermo.alert.enable")) return;
-
-        try
+        if (Simple.getSharedPrefBoolean("health.thermo.alert.enable"))
         {
+            //
+            // Check alerts.
+            //
+
+            String at = "";
+
             String lowstr = Simple.getSharedPrefString("health.thermo.alert.lowtemp");
             Double low = Simple.parseDouble(lowstr);
 
-            Log.d(LOGTAG, "evaluateMessage: tmp=" + lastTmp + " low=" + low);
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + tmp + " low=" + low);
 
-            if (low >= lastTmp)
+            if ((low > 0) && (low >= tmp))
             {
-                Speak.speak(Simple.getTrans(R.string.health_thermo_lowtemp));
-                ActivityOldManager.recordAlert(R.string.health_thermo_lowtemp);
-                informAssistance(R.string.health_thermo_lowtemp);
-            }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+                at += " " + Simple.getTrans(R.string.health_thermo_temp_low);
 
-        try
-        {
+                iswarning = true;
+            }
+
             String highstr = Simple.getSharedPrefString("health.thermo.alert.hightemp");
             Double high = Simple.parseDouble(highstr);
 
-            Log.d(LOGTAG, "evaluateMessage: tmp=" + lastTmp + " high=" + high);
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + tmp + " high=" + high);
 
-            if (high <= lastTmp)
+            if ((high > 0) && (high <= tmp))
             {
-                Speak.speak(Simple.getTrans(R.string.health_thermo_hightemp));
-                ActivityOldManager.recordAlert(R.string.health_thermo_hightemp);
-                informAssistance(R.string.health_thermo_hightemp);
+                at += " " + Simple.getTrans(R.string.health_thermo_temp_high);
+
+                iswarning = true;
+            }
+
+            if (! at.isEmpty())
+            {
+                sm += " " + at;
+                lm += " " + at;
+                am += " " + at;
             }
         }
-        catch (Exception ex)
+
+        Speak.speak(sm);
+        ActivityOldManager.recordActivity(lm);
+
+        handleAssistance(am, iswarning);
+
+        if (connectCallback != null)
         {
-            OopsService.log(LOGTAG, ex);
+            connectCallback.onBluetoothUpdated(deviceName);
         }
     }
 
-    private Runnable messageSpeaker = new Runnable()
+    @Override
+    public View createListView()
     {
-        @Override
-        public void run()
+        LinearLayout view = (LinearLayout) super.createListView();
+
+        TextView tempView = new TextView(Simple.getActContext());
+        tempView.setLayoutParams(Simple.layoutParamsWM());
+        tempView.setGravity(Gravity.CENTER_VERTICAL);
+        Simple.setPadding(tempView, 40, 0, 0, 0);
+        tempView.setTextSize(Simple.getDeviceTextSize(24f));
+        tempView.setTypeface(null, Typeface.BOLD);
+        tempView.setId(android.R.id.content);
+        view.addView(tempView);
+
+        LinearLayout iconLayout = new LinearLayout(Simple.getActContext());
+        iconLayout.setLayoutParams(Simple.layoutParamsWM());
+        iconLayout.setOrientation(LinearLayout.HORIZONTAL);
+        iconLayout.setGravity(Gravity.CENTER_VERTICAL);
+        Simple.setPadding(iconLayout, 20, 0, 0, 0);
+        view.addView(iconLayout);
+
+        ImageView alertView = new ImageView(Simple.getActContext());
+        alertView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(90),Simple.WC));
+        alertView.setId(android.R.id.icon1);
+        Simple.setPadding(alertView, 20, 0, 0, 0);
+        iconLayout.addView(alertView);
+
+        return view;
+    }
+
+    @Override
+    public void populateListView(View view, int position, JSONObject item)
+    {
+        super.populateListView(view, position, item);
+
+        String unt = Json.getString(item, "unt");
+        double tmp = Json.getDouble(item, "tmp");
+        String tmpstr = String.format(Locale.getDefault(), "%.1f", tmp);
+
+        TextView tempView = (TextView) view.findViewById(android.R.id.content);
+        ImageView alertView = (ImageView) view.findViewById(android.R.id.icon1);
+
+        String display = "Temperatur" + ": " + tmpstr + "°";
+
+        if (Simple.equals(unt, "C") || Simple.equals(unt, "c")) display += "C";
+        if (Simple.equals(unt, "F") || Simple.equals(unt, "F")) display += "F";
+
+        tempView.setText(display);
+
+        if (!Simple.getSharedPrefBoolean("health.thermo.alert.enable"))
         {
-            evaluateMessage();
+            alertView.setVisibility(View.INVISIBLE);
         }
-    };
+        else
+        {
+            String lowstr = Simple.getSharedPrefString("health.thermo.alert.lowtemp");
+            Double low = Simple.parseDouble(lowstr);
+            String highstr = Simple.getSharedPrefString("health.thermo.alert.hightemp");
+            Double high = Simple.parseDouble(highstr);
+
+            if ((low > 0) && (low >= tmp))
+            {
+                alertView.setImageResource(R.drawable.health_thermo_low_300x200);
+                alertView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                if ((high > 0) && (high <= tmp))
+                {
+                    alertView.setImageResource(R.drawable.health_thermo_high_300x200);
+                    alertView.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    alertView.setVisibility(View.INVISIBLE);
+                }
+            }
+        }
+    }
 }
