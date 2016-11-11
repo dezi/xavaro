@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;
+import de.xavaro.android.common.Simple;
 
 public class HealthECGDisplay extends LaunchFrame
 {
@@ -179,7 +180,7 @@ public class HealthECGDisplay extends LaunchFrame
 
         myPaint.setStyle(Paint.Style.STROKE);
         myPaint.setColor(Color.rgb(0, 0, 0));
-        myPaint.setStrokeWidth(5.0f);
+        myPaint.setStrokeWidth(Simple.DP(2.0f));
 
         for (int row = 0; row < totalRows; row++)
         {

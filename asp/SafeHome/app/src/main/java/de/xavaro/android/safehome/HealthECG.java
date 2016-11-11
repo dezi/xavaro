@@ -271,7 +271,7 @@ public class HealthECG extends HealthBase
 
         if (noi != 0)
         {
-            pulseView.setText("Puls" + ": " + "--");
+            pulseView.setText("Puls" + ": " + "EE");
 
             noiView.setImageResource(R.drawable.health_ecg_ok_dim_300x200);
 
