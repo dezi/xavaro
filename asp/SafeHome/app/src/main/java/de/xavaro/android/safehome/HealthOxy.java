@@ -1,9 +1,17 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.Typeface;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Locale;
 
 import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
@@ -33,79 +41,11 @@ public class HealthOxy extends HealthBase
         getInstance().setConnectCallback(subscriber);
     }
 
-    @Override
-    public void onBluetoothReceivedData(String deviceName, JSONObject data)
+    private HealthOxy()
     {
-        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
+        super();
 
-        if (! data.has("oxy")) return;
-
-        //
-        // The results come in unordered.
-        //
-
-        lastRecord = Json.getObject(data, "oxy");
-        if (lastRecord == null) return;
-
-        String type = Json.getString(lastRecord, "type");
-
-        if (Simple.equals(type, "OxyMeasurement"))
-        {
-            String date = Json.getString(lastRecord, "dts");
-            if (date == null) return;
-
-            int saturation = Json.getInt(lastRecord, "sat");
-            int pulse = Json.getInt(lastRecord, "pls");
-
-            if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
-            {
-                lastSat = saturation;
-                lastPls = pulse;
-                lastDts = date;
-
-                handler.removeCallbacks(messageSpeaker);
-                handler.postDelayed(messageSpeaker, 500);
-            }
-        }
-    }
-
-    private JSONObject lastRecord;
-    private String lastDts;
-    private int lastSat;
-    private int lastPls;
-
-    private void informAssistance(int resid)
-    {
-        long last = Simple.getTimeStamp(lastDts);
-        long now = Simple.nowAsTimeStamp();
-
-        if ((now - last) > 1000 * 1000)
-        {
-            Log.d(LOGTAG,"informAssistance: outdated:" + lastDts);
-            return;
-        }
-
-        if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return;
-        if (! Simple.getSharedPrefBoolean("health.oxy.alert.alertgroup")) return;
-
-        String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
-        if (groupIdentity == null) return;
-
-        String name = Simple.getOwnerName();
-        String bval = "" + lastSat;
-        String puls = "" + lastPls;
-
-        String text = Simple.getTrans(R.string.health_oxy_alert, name, bval, puls)
-                + " " + Simple.getTrans(resid);
-
-        JSONObject assistMessage = new JSONObject();
-        Json.put(assistMessage, "uuid", Simple.getUUID());
-        Json.put(assistMessage, "message", text);
-        Json.put(assistMessage, "priority", "alertinfo");
-
-        ChatManager.getInstance().sendOutgoingMessage(groupIdentity, assistMessage);
-
-        Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
+        this.deviceType = "oxy";
     }
 
     @Override
@@ -113,6 +53,12 @@ public class HealthOxy extends HealthBase
     {
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
+
+        if (actRecord == null) return;
+
+        String actDts = Json.getString(actRecord, "dts");
+        int actSat = Json.getInt(actRecord, "sat");
+        int actPls = Json.getInt(actRecord, "pls");
 
         long now = Simple.nowAsTimeStamp();
 
@@ -131,10 +77,10 @@ public class HealthOxy extends HealthBase
             // Check event and measurement dates.
             //
 
-            long dts = Simple.getTimeStamp(date);
-            if (Math.abs(now - dts) > 2 * 3600 * 1000) continue;
+            long mts = Simple.getTimeStamp(date);
+            if (Math.abs(now - mts) > 2 * 3600 * 1000) continue;
 
-            long mts = Simple.getTimeStamp(lastDts);
+            long dts = Simple.getTimeStamp(actDts);
             if (Math.abs(dts - mts) > 2 * 3600 * 1000) continue;
 
             //
@@ -142,9 +88,9 @@ public class HealthOxy extends HealthBase
             //
 
             Json.put(event, "taken", true);
-            Json.put(event, "takendate", lastDts);
-            Json.put(event, "saturation", lastSat);
-            Json.put(event, "puls", lastPls);
+            Json.put(event, "takendate", actDts);
+            Json.put(event, "saturation", actSat);
+            Json.put(event, "puls", actPls);
 
             EventManager.updateComingEvent("webapps.medicator", event);
 
@@ -194,75 +140,170 @@ public class HealthOxy extends HealthBase
     @Override
     protected void evaluateMessage()
     {
-        if (lastRecord == null) return;
-        String type = Json.getString(lastRecord, "type");
-        if (! Simple.equals(type, "OxyMeasurement")) return;
+        if (actRecord == null) return;
 
-        String sm = Simple.getTrans(R.string.health_oxy_spoken, lastSat, lastPls);
-        String am = Simple.getTrans(R.string.health_oxy_activity, lastSat, lastPls);
+        int sat = Json.getInt(actRecord, "sat");
+        int pls = Json.getInt(actRecord, "pls");
 
-        Speak.speak(sm);
-        ActivityOldManager.recordActivity(am);
+        boolean iswarning = false;
 
-        evaluateEvents();
+        String sm = Simple.getTrans(R.string.health_oxy_spoken, sat);
+        String lm = Simple.getTrans(R.string.health_oxy_logger, sat);
+        String am = Simple.getTrans(R.string.health_oxy_assist, Simple.getOwnerName(), sat);
 
-        if (!Simple.getSharedPrefBoolean("health.oxy.alert.enable")) return;
+        String at = Simple.getTrans(R.string.health_ecg_pls, pls);
 
-        try
+        if (Simple.getSharedPrefBoolean("health.oxy.alert.enable"))
         {
-            int low = Simple.getSharedPrefInt("health.oxy.alert.lowsat");
+            //
+            // Check alerts.
+            //
 
-            if (low >= lastSat)
+            int lowSat = Simple.getSharedPrefInt("health.oxy.alert.lowsat");
+
+            Log.d(LOGTAG, "evaluateMessage: sat=" + sat + " low=" + lowSat);
+
+            if ((lowSat > 0) && (lowSat >= sat))
             {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_lowsat));
-                ActivityOldManager.recordAlert(R.string.health_oxy_lowsat);
-                informAssistance(R.string.health_oxy_lowsat);
-            }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+                at += " " + Simple.getTrans(R.string.health_oxy_sat_low);
 
-        try
-        {
+                iswarning = true;
+            }
+
             int low = Simple.getSharedPrefInt("health.oxy.alert.lowpls");
 
-            if (low >= lastPls)
-            {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_lowpls));
-                ActivityOldManager.recordAlert(R.string.health_oxy_lowpls);
-                informAssistance(R.string.health_oxy_lowpls);
-            }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + pls + " low=" + low);
 
-        try
-        {
+            if ((low > 0) && (low >= pls))
+            {
+                at += " " + Simple.getTrans(R.string.health_oxy_pls_low);
+
+                iswarning = true;
+            }
+
             int high = Simple.getSharedPrefInt("health.oxy.alert.highpls");
 
-            if (high <= lastPls)
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + pls + " high=" + high);
+
+            if ((high > 0) && (high <= pls))
             {
-                Speak.speak(Simple.getTrans(R.string.health_oxy_highpls));
-                ActivityOldManager.recordAlert(R.string.health_oxy_highpls);
-                informAssistance(R.string.health_oxy_highpls);
+                at += " " + Simple.getTrans(R.string.health_oxy_pls_high);
+
+                iswarning = true;
             }
         }
-        catch (Exception ex)
+
+        if (! at.isEmpty())
         {
-            OopsService.log(LOGTAG, ex);
+            sm += " " + at.trim();
+            lm += " " + at.trim();
+            am += " " + at.trim();
+        }
+
+        Speak.speak(sm);
+        ActivityOldManager.recordActivity(lm);
+
+        handleAssistance(am, iswarning);
+
+        if (connectCallback != null)
+        {
+            connectCallback.onBluetoothUpdated(deviceName);
         }
     }
 
-    private Runnable messageSpeaker = new Runnable()
+    @Override
+    public View createListView()
     {
-        @Override
-        public void run()
+        LinearLayout view = (LinearLayout) super.createListView();
+
+        TextView satView = new TextView(Simple.getActContext());
+        satView.setLayoutParams(Simple.layoutParamsWM());
+        satView.setGravity(Gravity.CENTER_VERTICAL);
+        Simple.setPadding(satView, 40, 0, 0, 0);
+        satView.setTextSize(Simple.getDeviceTextSize(24f));
+        satView.setTypeface(null, Typeface.BOLD);
+        satView.setId(android.R.id.content);
+        view.addView(satView);
+
+        LinearLayout iconLayout = new LinearLayout(Simple.getActContext());
+        iconLayout.setLayoutParams(Simple.layoutParamsWM());
+        iconLayout.setOrientation(LinearLayout.HORIZONTAL);
+        iconLayout.setGravity(Gravity.CENTER_VERTICAL);
+        Simple.setPadding(iconLayout, 20, 0, 0, 0);
+        view.addView(iconLayout);
+
+        ImageView satAlertView = new ImageView(Simple.getActContext());
+        satAlertView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(90),Simple.WC));
+        satAlertView.setId(android.R.id.icon1);
+        Simple.setPadding(satAlertView, 20, 0, 0, 0);
+        iconLayout.addView(satAlertView);
+
+        ImageView plsAlertView = new ImageView(Simple.getActContext());
+        plsAlertView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(90),Simple.WC));
+        plsAlertView.setId(android.R.id.icon2);
+        Simple.setPadding(plsAlertView, 20, 0, 0, 0);
+        iconLayout.addView(plsAlertView);
+
+        return view;
+    }
+
+    @Override
+    public void populateListView(View view, int position, JSONObject item)
+    {
+        super.populateListView(view, position, item);
+
+        int sat = Json.getInt(item, "sat");
+        int pls = Json.getInt(item, "pls");
+
+        TextView satView = (TextView) view.findViewById(android.R.id.content);
+
+        ImageView satAlertView = (ImageView) view.findViewById(android.R.id.icon1);
+        ImageView plsAlertView = (ImageView) view.findViewById(android.R.id.icon2);
+
+        String display = Simple.getTrans(R.string.health_oxygene) + ": " + sat + " %";
+        display += " — " + Simple.getTrans(R.string.health_pulse) + ": " + pls;
+
+        satView.setText(display);
+
+        if (!Simple.getSharedPrefBoolean("health.oxy.alert.enable"))
         {
-            evaluateMessage();
+            satAlertView.setVisibility(View.INVISIBLE);
+            plsAlertView.setVisibility(View.INVISIBLE);
         }
-    };
+        else
+        {
+            int lowSat = Simple.getSharedPrefInt("health.oxy.alert.lowsat");
+
+            if ((lowSat > 0) && (lowSat >= sat))
+            {
+                satAlertView.setImageResource(R.drawable.health_oxy_sat_low_300x200);
+                satAlertView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                satAlertView.setVisibility(View.INVISIBLE);
+            }
+
+            int low = Simple.getSharedPrefInt("health.oxy.alert.lowpls");
+            int high = Simple.getSharedPrefInt("health.oxy.alert.highpls");
+
+            if ((low > 0) && (low >= pls))
+            {
+                plsAlertView.setImageResource(R.drawable.health_oxy_pls_low_300x200);
+                plsAlertView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                if ((high > 0) && (high <= pls))
+                {
+                    plsAlertView.setImageResource(R.drawable.health_oxy_pls_high_300x200);
+                    plsAlertView.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    plsAlertView.setVisibility(View.INVISIBLE);
+                }
+            }
+        }
+    }
 }

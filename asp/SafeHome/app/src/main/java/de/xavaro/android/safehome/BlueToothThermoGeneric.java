@@ -136,6 +136,7 @@ public class BlueToothThermoGeneric implements BlueTooth.BlueToothPhysicalDevice
 
             JSONObject record = Json.clone(result);
             HealthData.addRecord("thermo", record);
+            HealthData.setLastReadDate("thermo");
         }
     }
 

@@ -428,7 +428,7 @@ public class PreferencesHealth
             np = new NicedPreferences.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".alert.lowsat");
-            np.setMinMaxValue(40, 95, 1);
+            np.setMinMaxValue(40, 97, 1);
             np.setDefaultValue(90);
             np.setTitle("Zu niedriger Sauerstoff");
             np.setEnabled(enabled);
@@ -448,7 +448,7 @@ public class PreferencesHealth
             np = new NicedPreferences.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".alert.highpls");
-            np.setMinMaxValue(90, 140, 1);
+            np.setMinMaxValue(80, 140, 1);
             np.setDefaultValue(90);
             np.setTitle("Zu hoher Puls");
             np.setEnabled(enabled);
@@ -550,7 +550,7 @@ public class PreferencesHealth
             np = new NicedPreferences.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".alert.highpls");
-            np.setMinMaxValue(90, 140, 1);
+            np.setMinMaxValue(80, 140, 1);
             np.setDefaultValue(90);
             np.setTitle("Zu hoher Puls");
             np.setEnabled(enabled);
@@ -647,6 +647,8 @@ public class PreferencesHealth
             String[] userSelectVals = { "1", "2", "3", "4" };
 
             lp.setKey(keyprefix + ".selecteduser");
+            lp.setEntries(userSelectText);
+            lp.setEntryValues(userSelectVals);
             lp.setDefaultValue("1");
             lp.setTitle("Gerätebenutzer");
             lp.setEnabled(enabled);
@@ -751,7 +753,7 @@ public class PreferencesHealth
             np = new NicedPreferences.NiceNumberPreference(context);
 
             np.setKey(keyprefix + ".alert.highpls");
-            np.setMinMaxValue(90, 140, 1);
+            np.setMinMaxValue(80, 140, 1);
             np.setDefaultValue(90);
             np.setTitle("Zu hoher Puls");
             np.setEnabled(enabled);

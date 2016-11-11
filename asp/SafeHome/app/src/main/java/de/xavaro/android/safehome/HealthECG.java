@@ -152,9 +152,9 @@ public class HealthECG extends HealthBase
 
             if (! at.isEmpty())
             {
-                sm += " " + at;
-                lm += " " + at;
-                am += " " + at;
+                sm += " " + at.trim();
+                lm += " " + at.trim();
+                am += " " + at.trim();
             }
         }
 
@@ -250,7 +250,7 @@ public class HealthECG extends HealthBase
 
         if (noi != 0)
         {
-            pulseView.setText("Puls" + ": " + "EE");
+            pulseView.setText(Simple.getTrans(R.string.health_pulse) + ": " + "EE");
 
             noiView.setImageResource(R.drawable.health_ecg_ok_dim_300x200);
 
@@ -260,7 +260,7 @@ public class HealthECG extends HealthBase
         }
         else
         {
-            pulseView.setText("Puls" + ": " + pls);
+            pulseView.setText(Simple.getTrans(R.string.health_pulse) + ": " + pls);
 
             noiView.setImageResource(R.drawable.health_ecg_ok_300x200);
 

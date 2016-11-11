@@ -804,6 +804,10 @@
 
     <string name="today_label">Logbuch</string>
 
+    <string name="health_pulse">Puls</string>
+    <string name="health_temperature">Temperatur</string>
+    <string name="health_oxygene">Sauerstoff</string>
+
     <string name="health_measure_datetime">Messung vom %1$s %2$s:</string>
 
     <string name="health_bpm_spoken">Die letzte Messung ergab einen Blutdruck von %1$d zu %2$d Der Puls beträgt %3$d</string>
@@ -815,13 +819,6 @@
     <string name="health_bpm_activity">Sie haben einen Blutdruck von %1$d zu %2$d. Ihr Puls ist %3$d.</string>
     <string name="health_bpm_activity_du">Du hast einen Blutdruck von %1$d zu %2$d. Dein Puls ist %3$d.</string>
 
-    <string name="health_oxy_spoken">Die letzte Messung ergab eine Sauerstoff-Sättigung von %1$d Prozent. Der Puls beträgt %2$d</string>
-    <string name="health_oxy_alert">%1$s hat eine Sauerstoff-Sättigung von %2$s Prozent bei einem Puls von %3$s</string>
-    <string name="health_oxy_lowsat">Die Sauerstoff-Sättigung ist bedenklich niedrig.</string>
-    <string name="health_oxy_lowpls">Der Puls ist bedenklich niedrig.</string>
-    <string name="health_oxy_highpls">Der Puls ist bedenklich hoch.</string>
-    <string name="health_oxy_activity">Sie haben eine Sauerstoff-Sättigung von %1$d %%. Ihr Puls ist %2$d.</string>
-    <string name="health_oxy_activity_du">Du hast eine Sauerstoff-Sättigung von %1$d %%. Dein Puls ist %2$d.</string>
 
     <string name="health_glucose_spoken">Die letzte Messung ergab einen Blutzuckerwert von %1$d</string>
     <string name="health_glucose_alert">%1$s hat einen Blutzuckerwert von %2$s</string>
@@ -829,6 +826,17 @@
     <string name="health_glucose_highglucose">Der Blutzuckerwert ist bedenklich hoch.</string>
     <string name="health_glucose_activity">Sie haben einen Blutzuckerwert von %1$d.</string>
     <string name="health_glucose_activity_du">Du hast einen Blutzuckerwert von %1$d.</string>
+
+    <string name="health_oxy_spoken">Die letzte Messung ergab eine Sauerstoff-Sättigung von %1$d Prozent.</string>
+    <string name="health_oxy_logger">Sie haben eine Sauerstoff-Sättigung von %1$d %%.</string>
+    <string name="health_oxy_logger_du">Du hast eine Sauerstoff-Sättigung von %1$d %%.</string>
+    <string name="health_oxy_assist">%1$s hat eine Sauerstoff-Sättigung von %2$s %%.</string>
+
+    <string name="health_oxy_sat_low">Die Sauerstoff-Sättigung ist bedenklich niedrig.</string>
+
+    <string name="health_oxy_pls">Der Puls ist %1$d pro Minute.</string>
+    <string name="health_oxy_pls_low">Der Puls ist bedenklich niedrig.</string>
+    <string name="health_oxy_pls_high">Der Puls ist bedenklich hoch.</string>
 
     <string name="health_ecg_noise_spoken">Die letzte EKG-Messung ist ungültig. Bitte wiederholen Sie die Messung.</string>
     <string name="health_ecg_noise_spoken_du">Die letzte EKG-Messung ist ungültig. Bitte wiederhole die Messung.</string>

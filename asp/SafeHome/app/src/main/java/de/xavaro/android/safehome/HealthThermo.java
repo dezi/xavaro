@@ -113,13 +113,13 @@ public class HealthThermo extends HealthBase
         String lm = Simple.getTrans(R.string.health_thermo_logger, tmpstr);
         String am = Simple.getTrans(R.string.health_thermo_assist, Simple.getOwnerName(), tmpstr);
 
+        String at = "";
+
         if (Simple.getSharedPrefBoolean("health.thermo.alert.enable"))
         {
             //
             // Check alerts.
             //
-
-            String at = "";
 
             String lowstr = Simple.getSharedPrefString("health.thermo.alert.lowtemp");
             Double low = Simple.parseDouble(lowstr);
@@ -144,13 +144,13 @@ public class HealthThermo extends HealthBase
 
                 iswarning = true;
             }
+        }
 
-            if (! at.isEmpty())
-            {
-                sm += " " + at;
-                lm += " " + at;
-                am += " " + at;
-            }
+        if (! at.isEmpty())
+        {
+            sm += " " + at.trim();
+            lm += " " + at.trim();
+            am += " " + at.trim();
         }
 
         Speak.speak(sm);
@@ -206,7 +206,7 @@ public class HealthThermo extends HealthBase
         TextView tempView = (TextView) view.findViewById(android.R.id.content);
         ImageView alertView = (ImageView) view.findViewById(android.R.id.icon1);
 
-        String display = "Temperatur" + ": " + tmpstr + "°";
+        String display = Simple.getTrans(R.string.health_temperature) + ": " + tmpstr + "°";
 
         if (Simple.equals(unt, "C") || Simple.equals(unt, "c")) display += "C";
         if (Simple.equals(unt, "F") || Simple.equals(unt, "F")) display += "F";

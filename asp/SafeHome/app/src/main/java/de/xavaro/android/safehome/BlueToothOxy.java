@@ -116,16 +116,6 @@ public class BlueToothOxy extends BlueTooth
 
         gattSchedule.add(ga);
 
-        /*
-        ga = new BlueTooth.GattAction();
-
-        ga.mode = BlueTooth.GattAction.MODE_WRITE;
-        ga.data = getReadRealtime();
-        ga.characteristic = currentControl;
-
-        gattSchedule.add(ga);
-        */
-
         fireNext(false);
     }
 
@@ -137,8 +127,6 @@ public class BlueToothOxy extends BlueTooth
         if (characteristic == currentSecondary)
         {
             JSONObject oxydata = new JSONObject();
-
-            Json.put(oxydata, "type", "OxyMeasurement");
 
             float sat = rd[ 3 ];
             float pls = rd[ 4 ];
@@ -162,8 +150,6 @@ public class BlueToothOxy extends BlueTooth
             //
 
             JSONObject record = Json.clone(oxydata);
-            Json.remove(record, "type");
-
             HealthData.addRecord("oxy", record);
             HealthData.setLastReadDate("oxy");
         }

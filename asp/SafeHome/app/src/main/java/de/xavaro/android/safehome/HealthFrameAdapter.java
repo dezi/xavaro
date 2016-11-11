@@ -57,12 +57,14 @@ public class HealthFrameAdapter extends BaseAdapter implements
         if (view == null)
         {
             if (Simple.equals(subtype, "ecg")) view = HealthECG.getInstance().createListView();
+            if (Simple.equals(subtype, "oxy")) view = HealthOxy.getInstance().createListView();
             if (Simple.equals(subtype, "thermo")) view = HealthThermo.getInstance().createListView();
         }
 
         JSONObject item = getItem(position);
 
         if (Simple.equals(subtype, "ecg")) HealthECG.getInstance().populateListView(view, position, item);
+        if (Simple.equals(subtype, "oxy")) HealthOxy.getInstance().populateListView(view, position, item);
         if (Simple.equals(subtype, "thermo")) HealthThermo.getInstance().populateListView(view, position, item);
 
         return view;
