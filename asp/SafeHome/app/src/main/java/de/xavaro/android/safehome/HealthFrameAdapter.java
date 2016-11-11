@@ -15,6 +15,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.HealthData;
 import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.Json;
 
@@ -73,6 +74,11 @@ public class HealthFrameAdapter extends BaseAdapter implements
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
     {
         Log.d(LOGTAG, "onItemLongClick: " + getItem(position).toString());
+
+        JSONObject item = getItem(position);
+        HealthData.delRecord(subtype, item);
+        jsonArray.remove(position);
+        notifyDataSetChanged();
 
         return true;
     }

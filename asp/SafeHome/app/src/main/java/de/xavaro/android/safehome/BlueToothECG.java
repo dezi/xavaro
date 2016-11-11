@@ -545,7 +545,7 @@ public class BlueToothECG extends BlueTooth
 
         File resfile = generateFileName();
 
-        if (! resfile.exists())
+        if ((! resfile.exists()) || (resfile.length() < (10 * 1024)))
         {
             Log.d(LOGTAG, "generateRecord: new=" + (actrecord + 1) + " seq=" + resultBuffer[ 0 ] + " dts=" + datetime);
 
@@ -619,60 +619,71 @@ public class BlueToothECG extends BlueTooth
 
     private void generateResult()
     {
-        JSONObject ecgdata = new JSONObject();
-        JSONObject status = generateStatus();
-
-        boolean dataPresent = (resultEfi.length() > 1000) && (resultPld.length() > 5);
-
-        Json.put(ecgdata, "dts", Json.getString(status, "Timestamp"));
-        Json.put(ecgdata, "exf", Json.getString(status, "Filename"));
-        Json.put(ecgdata, "aty", Json.getInt(status, "AnalysisType"));
-        Json.put(ecgdata, "pls", Json.getInt(status, "HeartRate"));
-        Json.put(ecgdata, "noi", Json.getInt(status, "Noise"));
-        Json.put(ecgdata, "raf", Json.getInt(status, "Rhythm"));
-        Json.put(ecgdata, "waf", Json.getInt(status, "Waveform"));
-        Json.put(ecgdata, "dap", dataPresent ? 1 : 0);
-        Json.put(ecgdata, "dev", deviceName);
-
         //
-        // Schedule data for application callback.
+        // When the user starts measuring immedeately, the
+        // current records will not have any data. We will
+        // in this case not return the result to user yet
+        // but wait for records downloaded. The data will
+        // then be present.
         //
 
-        if (dataCallback != null)
+        int dataPresent = (resultEfi.length() > 1000) && (resultPld.length() > 5) ? 1 : 0;
+
+        if (dataPresent == 1)
         {
-            JSONObject data = new JSONObject();
-            Json.put(data, "ecg", Json.clone(ecgdata));
+            JSONObject ecgdata = new JSONObject();
+            JSONObject status = generateStatus();
 
-            callbackResults.add(data);
+            Json.put(ecgdata, "dts", Json.getString(status, "Timestamp"));
+            Json.put(ecgdata, "exf", Json.getString(status, "Filename"));
+            Json.put(ecgdata, "aty", Json.getInt(status, "AnalysisType"));
+            Json.put(ecgdata, "pls", Json.getInt(status, "HeartRate"));
+            Json.put(ecgdata, "noi", Json.getInt(status, "Noise"));
+            Json.put(ecgdata, "raf", Json.getInt(status, "Rhythm"));
+            Json.put(ecgdata, "waf", Json.getInt(status, "Waveform"));
+            Json.put(ecgdata, "dap", dataPresent);
+            Json.put(ecgdata, "dev", deviceName);
+
+            //
+            // Schedule data for application callback.
+            //
+
+            if (dataCallback != null)
+            {
+                JSONObject data = new JSONObject();
+                Json.put(data, "ecg", Json.clone(ecgdata));
+
+                callbackResults.add(data);
+            }
+
+            //
+            // Store data.
+            //
+
+            JSONObject record = Json.clone(ecgdata);
+
+            HealthData.addRecord("ecg", record);
+            HealthData.setLastReadDate("ecg");
+
+            //
+            // Add file only data.
+            //
+
+            Json.put(ecgdata, "inf", status);
+
+            Json.put(ecgdata, "pld", resultPld);
+            Json.put(ecgdata, "tim", resultTim);
+            Json.put(ecgdata, "efi", resultEfi);
+            Json.put(ecgdata, "ecv", resultEcv);
+
+            //Json.put(ecgdata, "dia", resultDia);
+            //Json.put(ecgdata, "esz", resultEsz);
+
+            File resfile = generateFileName();
+            Simple.putFileJSON(resfile, ecgdata);
+
+            Log.d(LOGTAG, "generateResult: file=" + resfile);
         }
-
-        //
-        // Store data.
-        //
-
-        JSONObject record = Json.clone(ecgdata);
-
-        HealthData.addRecord("ecg", record);
-        HealthData.setLastReadDate("ecg");
-
-        //
-        // Add file only data.
-        //
-
-        Json.put(ecgdata, "inf", status);
-
-        Json.put(ecgdata, "pld", resultPld);
-        Json.put(ecgdata, "tim", resultTim);
-        Json.put(ecgdata, "efi", resultEfi);
-        Json.put(ecgdata, "ecv", resultEcv);
-
-        //Json.put(ecgdata, "dia", resultDia);
-        //Json.put(ecgdata, "esz", resultEsz);
-
-        File resfile = generateFileName();
-        Simple.putFileJSON(resfile, ecgdata);
-
-        Log.d(LOGTAG, "generateResult: file=" + resfile);
 
         clearBuffers();
     }

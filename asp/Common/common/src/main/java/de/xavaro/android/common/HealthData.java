@@ -49,6 +49,61 @@ public class HealthData
         putStatus(datatype, new JSONObject());
     }
 
+    public static void delRecord(String datatype, JSONObject record)
+    {
+        String dts = Json.getString(record, "dts");
+        if (dts == null) return;
+
+        if (dts.endsWith("Z") && (dts.length() == 24))
+        {
+            Json.put(record, "dts", dts.substring(0, dts.length() - 5) + "Z");
+        }
+
+        JSONArray records = getRecords(datatype);
+
+        for (int inx = 0; inx < records.length(); inx++)
+        {
+            JSONObject oldrecord = Json.getObject(records, inx);
+
+            dts = Json.getString(oldrecord, "dts");
+
+            if (dts == null)
+            {
+                Json.remove(records, inx--);
+                continue;
+            }
+
+            if (dts.endsWith("Z") && (dts.length() == 24))
+            {
+                Json.put(oldrecord, "dts", dts.substring(0, dts.length() - 5) + "Z");
+            }
+
+            if (Json.equals(record, "dts", oldrecord))
+            {
+                records.remove(inx);
+                putRecords(datatype, records);
+
+                //
+                // Check for external file and delete if present.
+                //
+
+                String exf = Json.getString(oldrecord, "exf");
+
+                if (exf != null)
+                {
+                    File delfile = new File(getDataDir(), exf);
+
+                    if (delfile.exists() && delfile.delete())
+                    {
+                        Log.d(LOGTAG, "delRecord deleted=" + delfile);
+                    }
+                }
+
+                return;
+            }
+        }
+    }
+
     public static void addRecord(String datatype, JSONObject record)
     {
         String dts = Json.getString(record, "dts");

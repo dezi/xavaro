@@ -95,9 +95,11 @@ public class HealthFrame extends LaunchFrame
 
     private void loadContent()
     {
+        Log.d(LOGTAG, "loadContent subtype=" + subtype);
+
         JSONArray records = HealthData.getRecords(subtype);
         adapter.setContent(subtype, records);
-        listview.invalidate();
+        adapter.notifyDataSetChanged();
     }
 
     private void loadContentOld()
