@@ -1,9 +1,17 @@
 package de.xavaro.android.safehome;
 
+import android.graphics.Typeface;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Locale;
 
 import de.xavaro.android.common.ActivityOldManager;
 import de.xavaro.android.common.ChatManager;
@@ -152,6 +160,81 @@ public class HealthGlucose extends HealthBase
         if (connectCallback != null)
         {
             connectCallback.onBluetoothUpdated(deviceName);
+        }
+    }
+
+
+    @Override
+    public View createListView()
+    {
+        LinearLayout view = (LinearLayout) super.createListView();
+
+        TextView bgvView = new TextView(Simple.getActContext());
+        bgvView.setLayoutParams(Simple.layoutParamsWM());
+        bgvView.setGravity(Gravity.CENTER_VERTICAL);
+        Simple.setPadding(bgvView, 40, 0, 0, 0);
+        bgvView.setTextSize(Simple.getDeviceTextSize(24f));
+        bgvView.setTypeface(null, Typeface.BOLD);
+        bgvView.setId(android.R.id.content);
+        view.addView(bgvView);
+
+        LinearLayout iconLayout = new LinearLayout(Simple.getActContext());
+        iconLayout.setLayoutParams(Simple.layoutParamsWM());
+        iconLayout.setOrientation(LinearLayout.HORIZONTAL);
+        iconLayout.setGravity(Gravity.CENTER_VERTICAL);
+        Simple.setPadding(iconLayout, 20, 0, 0, 0);
+        view.addView(iconLayout);
+
+        ImageView alertView = new ImageView(Simple.getActContext());
+        alertView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(90),Simple.WC));
+        alertView.setId(android.R.id.icon1);
+        Simple.setPadding(alertView, 20, 0, 0, 0);
+        iconLayout.addView(alertView);
+
+        return view;
+    }
+
+    @Override
+    public void populateListView(View view, int position, JSONObject item)
+    {
+        super.populateListView(view, position, item);
+
+        int bgv = (int) Math.round(Json.getDouble(item, "bgv"));
+        String unt = Json.getString(item, "unt");
+
+        TextView bgvView = (TextView) view.findViewById(android.R.id.content);
+        ImageView alertView = (ImageView) view.findViewById(android.R.id.icon1);
+
+        String display = Simple.getTrans(R.string.health_bgshort) + ": " + bgv + " " + unt;
+
+        bgvView.setText(display);
+
+        if (!Simple.getSharedPrefBoolean("health.thermo.alert.enable"))
+        {
+            alertView.setVisibility(View.INVISIBLE);
+        }
+        else
+        {
+            int low = Simple.getSharedPrefInt("health.glucose.alert.lowglucose");
+            int high = Simple.getSharedPrefInt("health.glucose.alert.highglucose");
+
+            if ((low > 0) && (low >= bgv))
+            {
+                alertView.setImageResource(R.drawable.health_glucose_bgv_low_300x200);
+                alertView.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                if ((high > 0) && (high <= bgv))
+                {
+                    alertView.setImageResource(R.drawable.health_glucose_bgv_high_300x20);
+                    alertView.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    alertView.setVisibility(View.INVISIBLE);
+                }
+            }
         }
     }
 }

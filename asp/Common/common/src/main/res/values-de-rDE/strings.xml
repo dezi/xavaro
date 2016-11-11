@@ -809,6 +809,8 @@
     <string name="health_oxygene">Sauerstoff</string>
     <string name="health_bpshort">BD</string>
     <string name="health_bloodpressure">Blutdruck</string>
+    <string name="health_bgshort">BZ</string>
+    <string name="health_bloodglucose">Blutzucker</string>
 
     <string name="health_measure_datetime">Messung vom %1$s %2$s:</string>
 

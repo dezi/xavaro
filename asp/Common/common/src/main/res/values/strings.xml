@@ -634,6 +634,8 @@
     <string name="health_oxygene">Oxygene</string>
     <string name="health_bpshort">BP</string>
     <string name="health_bloodpressure">Blood Pressure</string>
+    <string name="health_bgshort">BG</string>
+    <string name="health_bloodglucose">Glucose</string>
 
     <string name="health_measure_datetime">Measurement from %1$s %2$s:</string>
 
