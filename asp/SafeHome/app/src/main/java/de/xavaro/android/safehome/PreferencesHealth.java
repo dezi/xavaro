@@ -732,8 +732,8 @@ public class PreferencesHealth
             dp = new NicedPreferences.NiceDualpickPreference(context);
 
             dp.setKey(keyprefix + ".alert.lowbp");
-            dp.setMinMaxValue1(60, 110, 10);
-            dp.setMinMaxValue2(60, 80, 10);
+            dp.setMinMaxValue1(60, 120, 10);
+            dp.setMinMaxValue2(60, 90, 10);
             dp.setDefaultValue("80:60");
             dp.setTitle("Zu niedriger Blutdruck");
             dp.setEnabled(enabled);

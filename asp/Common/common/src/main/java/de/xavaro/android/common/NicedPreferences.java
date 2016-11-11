@@ -374,7 +374,7 @@ public class NicedPreferences
 
             if (stepValue1 != 1)
             {
-                int steps = (maxValue1 - minValue1) / stepValue1;
+                int steps = 1 + ((maxValue1 - minValue1) / stepValue1);
 
                 if (steps < 100)
                 {
@@ -402,7 +402,7 @@ public class NicedPreferences
 
             if (stepValue2 != 1)
             {
-                int steps = (maxValue2 - minValue2) / stepValue2;
+                int steps =  1 + ((maxValue2 - minValue2) / stepValue2);
 
                 if (steps < 100)
                 {

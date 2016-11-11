@@ -33,72 +33,11 @@ public class HealthGlucose extends HealthBase
         getInstance().setConnectCallback(subscriber);
     }
 
-    @Override
-    public void onBluetoothReceivedData(String deviceName, JSONObject data)
+    private HealthGlucose()
     {
-        Log.d(LOGTAG,"onBluetoothReceivedData: " + data.toString());
+        super();
 
-        if (! data.has("glucose")) return;
-
-        //
-        // The results come in unordered.
-        //
-
-        JSONObject record = Json.getObject(data, "glucose");
-        if (record == null) return;
-
-        String type = Json.getString(record, "type");
-
-        if (Simple.equals(type, "GlucoseRecord"))
-        {
-            String date = Json.getString(record, "dts");
-            if (date == null) return;
-
-            if ((lastDts == null) || (lastDts.compareTo(date) <= 0))
-            {
-                lastDts = date;
-                lastRecord = record;
-
-                handler.removeCallbacks(messageSpeaker);
-                handler.postDelayed(messageSpeaker, 500);
-            }
-        }
-    }
-
-    private JSONObject lastRecord;
-    private String lastDts;
-
-    private void informAssistance(int resid)
-    {
-        long last = Simple.getTimeStamp(lastDts);
-        long now = Simple.nowAsTimeStamp();
-
-        if ((now - last) > 1000 * 1000)
-        {
-            Log.d(LOGTAG,"informAssistance: outdated:" + lastDts);
-            return;
-        }
-
-        if (! Simple.getSharedPrefBoolean("alertgroup.enable")) return;
-        if (! Simple.getSharedPrefBoolean("health.glucose.alert.alertgroup")) return;
-
-        String groupIdentity = Simple.getSharedPrefString("alertgroup.groupidentity");
-        if (groupIdentity == null) return;
-
-        String name = Simple.getOwnerName();
-        String bval = "" + (int) Math.round(Json.getDouble(lastRecord, "bgv"));
-
-        String text = Simple.getTrans(R.string.health_glucose_alert, name, bval)
-                + " " + Simple.getTrans(resid);
-
-        JSONObject assistMessage = new JSONObject();
-        Json.put(assistMessage, "uuid", Simple.getUUID());
-        Json.put(assistMessage, "message", text);
-        Json.put(assistMessage, "priority", "alertinfo");
-
-        ChatManager.getInstance().sendOutgoingMessage(groupIdentity, assistMessage);
-
-        Log.d(LOGTAG, "informAssistance: send alertinfo:" + text);
+        this.deviceType = "glucose";
     }
 
     @Override
@@ -106,6 +45,11 @@ public class HealthGlucose extends HealthBase
     {
         JSONArray events = EventManager.getComingEvents("webapps.medicator");
         if (events == null) return;
+
+        if (actRecord == null) return;
+
+        String actDts = Json.getString(actRecord, "dts");
+        int actBGV = (int) Math.round(Json.getDouble(actRecord, "bgv"));
 
         long now = Simple.nowAsTimeStamp();
 
@@ -124,21 +68,19 @@ public class HealthGlucose extends HealthBase
             // Check event and measurement dates.
             //
 
-            long dts = Simple.getTimeStamp(date);
-            if (Math.abs(now - dts) > 2 * 3600 * 1000) continue;
+            long mts = Simple.getTimeStamp(date);
+            if (Math.abs(now - mts) > 2 * 3600 * 1000) continue;
 
-            long mts = Simple.getTimeStamp(lastDts);
+            long dts = Simple.getTimeStamp(actDts);
             if (Math.abs(dts - mts) > 2 * 3600 * 1000) continue;
 
             //
             // Event is suitable.
             //
 
-            int bgv = (int) Math.round(Json.getDouble(lastRecord, "bgv"));
-
             Json.put(event, "taken", true);
-            Json.put(event, "takendate", lastDts);
-            Json.put(event, "glucose", bgv);
+            Json.put(event, "takendate", actDts);
+            Json.put(event, "glucose", actBGV);
 
             EventManager.updateComingEvent("webapps.medicator", event);
 
@@ -154,61 +96,62 @@ public class HealthGlucose extends HealthBase
     @Override
     protected void evaluateMessage()
     {
-        if (lastRecord == null) return;
-        String type = Json.getString(lastRecord, "type");
-        if (!Simple.equals(type, "GlucoseRecord")) return;
+        if (actRecord == null) return;
 
-        int bgv = (int) Math.round(Json.getDouble(lastRecord, "bgv"));
+        int bgv = (int) Math.round(Json.getDouble(actRecord, "bgv"));
+
+        boolean iswarning = false;
 
         String sm = Simple.getTrans(R.string.health_glucose_spoken, bgv);
-        String am = Simple.getTrans(R.string.health_glucose_activity, bgv);
+        String lm = Simple.getTrans(R.string.health_glucose_logger, bgv);
+        String am = Simple.getTrans(R.string.health_glucose_assist, Simple.getOwnerName(), bgv);
 
-        Speak.speak(sm);
-        ActivityOldManager.recordActivity(am);
+        String at = "";
 
-        evaluateEvents();
-
-        if (!Simple.getSharedPrefBoolean("health.glucose.alert.enable")) return;
-
-        try
+        if (Simple.getSharedPrefBoolean("health.glucose.alert.enable"))
         {
+            //
+            // Check alerts.
+            //
+
             int low = Simple.getSharedPrefInt("health.glucose.alert.lowglucose");
 
-            if (low >= bgv)
-            {
-                Speak.speak(Simple.getTrans(R.string.health_glucose_lowglucose));
-                ActivityOldManager.recordAlert(R.string.health_glucose_lowglucose);
-                informAssistance(R.string.health_glucose_lowglucose);
-            }
-        }
-        catch (Exception ex)
-        {
-            OopsService.log(LOGTAG, ex);
-        }
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + bgv + " low=" + low);
 
-        try
-        {
+            if ((low > 0) && (low >= bgv))
+            {
+                at += " " + Simple.getTrans(R.string.health_glucose_glucose_low);
+
+                iswarning = true;
+            }
+
             int high = Simple.getSharedPrefInt("health.glucose.alert.highglucose");
 
-            if (high <= bgv)
+            Log.d(LOGTAG, "evaluateMessage: tmp=" + bgv + " high=" + high);
+
+            if ((high > 0) && (high <= bgv))
             {
-                Speak.speak(Simple.getTrans(R.string.health_glucose_highglucose));
-                ActivityOldManager.recordAlert(R.string.health_glucose_highglucose);
-                informAssistance(R.string.health_glucose_highglucose);
+                at += " " + Simple.getTrans(R.string.health_glucose_glucose_high);
+
+                iswarning = true;
             }
         }
-        catch (Exception ex)
+
+        if (! at.isEmpty())
         {
-            OopsService.log(LOGTAG, ex);
+            sm += " " + at.trim();
+            lm += " " + at.trim();
+            am += " " + at.trim();
+        }
+
+        Speak.speak(sm);
+        ActivityOldManager.recordActivity(lm);
+
+        handleAssistance(am, iswarning);
+
+        if (connectCallback != null)
+        {
+            connectCallback.onBluetoothUpdated(deviceName);
         }
     }
-
-    private Runnable messageSpeaker = new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            evaluateMessage();
-        }
-    };
 }

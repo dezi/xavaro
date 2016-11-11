@@ -158,8 +158,6 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
 
             JSONObject result = new JSONObject();
 
-            Json.put(result, "type", "GlucoseRecord");
-
             Json.put(result, "dts", Simple.timeStampAsISO(utc));
             Json.put(result, "bgv", glucose);
             Json.put(result, "unt", unit);
@@ -184,8 +182,8 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
             //
 
             JSONObject record = Json.clone(result);
-            record.remove("type");
             HealthData.addRecord("glucose", record);
+            HealthData.setLastReadDate("glucose");
         }
 
         if (isCompatibleSecondary(characteristic))
@@ -226,8 +224,8 @@ public class BlueToothGlucoseGeneric implements BlueTooth.BlueToothPhysicalDevic
             //
 
             JSONObject record = Json.clone(result);
-            record.remove("type");
             HealthData.addRecord("glucose", record);
+            HealthData.setLastReadDate("glucose");
         }
     }
 

@@ -225,7 +225,7 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         }
     }
 
-    public ArrayList<byte[]> parseCommands(byte[] payload)
+    private ArrayList<byte[]> parseCommands(byte[] payload)
     {
         if (outgoingCommand == COMMAND_READCHALLENGE)
         {
@@ -284,7 +284,7 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         return null;
     }
 
-    public void parseGlucoseRecord(byte[] pl)
+    private void parseGlucoseRecord(byte[] pl)
     {
         Log.d(LOGTAG, "parseGlucoseRecord: result=" + Simple.getHexBytesToString(pl));
 
@@ -340,40 +340,40 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         HealthData.addRecord("glucose", record);
     }
 
-    public void parseMeterHighRange(byte[] pl)
+    private void parseMeterHighRange(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
         Log.d(LOGTAG, "parseMeterHighRange: result=" + intval);
     }
 
-    public void parseMeterLowRange(byte[] pl)
+    private void parseMeterLowRange(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
         Log.d(LOGTAG, "parseMeterLowRange: result=" + intval);
     }
 
-    public void parseMeterRecordCount(byte[] pl)
+    private void parseMeterRecordCount(byte[] pl)
     {
         recordCount = Simple.getIntFromLEByteArray(pl);
 
         Log.d(LOGTAG, "parseMeterRecordCount: result=" + recordCount);
     }
 
-    public void parseMeterTestCount(byte[] pl)
+    private void parseMeterTestCount(byte[] pl)
     {
         testCount = Simple.getIntFromLEByteArray(pl);
 
         Log.d(LOGTAG, "parseMeterTestCount: result=" + testCount);
     }
 
-    public void parseEnableFeatures(byte[] pl)
+    private void parseEnableFeatures(byte[] pl)
     {
         Log.d(LOGTAG, "parseEnableFeatures: result=" + Simple.getHexBytesToString(pl));
     }
 
-    public void parseMeterChallenge(byte[] pl)
+    private void parseMeterChallenge(byte[] pl)
     {
         String id = "";
 
@@ -389,14 +389,14 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         Log.d(LOGTAG, "parseMeterChallenge: result=" + id + ":" + Simple.getHexBytesToString(pl));
     }
 
-    public void parseMeterUnit(byte[] pl)
+    private void parseMeterUnit(byte[] pl)
     {
         int intval = Simple.getIntFromLEByteArray(pl);
 
         Log.d(LOGTAG, "parseMeterUnit: result=" + intval + "=" + ((intval == 0) ? "mg/dL" : "mmol/L"));
     }
 
-    public void parseMeterTime(byte[] pl)
+    private void parseMeterTime(byte[] pl)
     {
         long timestamp = Simple.getIntFromLEByteArray(pl);
 
@@ -406,7 +406,7 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
         Log.d(LOGTAG, "parseMeterTime: result=" + Simple.timeStampAsISO(timestamp));
     }
 
-    public ArrayList<byte[]> getReadGlucoseRecord()
+    private ArrayList<byte[]> getReadGlucoseRecord()
     {
         Log.d(LOGTAG, "getReadGlucoseRecord");
 
@@ -447,8 +447,8 @@ public class BlueToothGlucoseOneTouch implements BlueTooth.BlueToothPhysicalDevi
 
         return createTransmitChunks(data);
     }
-    
-    public ArrayList<byte[]> getReadMeterRecordCount()
+
+    private ArrayList<byte[]> getReadMeterRecordCount()
     {
         Log.d(LOGTAG, "getReadMeterRecordCount");
 

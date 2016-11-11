@@ -89,8 +89,6 @@ public class BlueToothBPM extends BlueTooth
 
         JSONObject bpmdata = new JSONObject();
 
-        Json.put(bpmdata, "type", "BPMMeasurement");
-
         float sys = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
         float dia = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
         float map = bytesToFloat(rd[ ++offset ], rd[ ++offset ]);
@@ -134,18 +132,19 @@ public class BlueToothBPM extends BlueTooth
 
         if (isfinal)
         {
-            JSONObject data = new JSONObject();
-            Json.put(data, "bpm", bpmdata);
+            if (dataCallback != null)
+            {
+                JSONObject data = new JSONObject();
+                Json.put(data, "bpm", bpmdata);
 
-            if (dataCallback != null) dataCallback.onBluetoothReceivedData(deviceName, data);
+                dataCallback.onBluetoothReceivedData(deviceName, data);
+            }
 
             //
             // Store data.
             //
 
             JSONObject record = Json.clone(bpmdata);
-            Json.remove(record, "type");
-
             HealthData.addRecord("bpm", record);
             HealthData.setLastReadDate("bpm");
         }
