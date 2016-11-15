@@ -5,6 +5,7 @@
     "appname": "sudoku",
     "appicon": "sudoku_512x512.png",
     "preferences": false,
+    "category": "games",
     "events": false,
 
     "permissions": [

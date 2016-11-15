@@ -30,7 +30,10 @@ public class LaunchItemWebApp extends LaunchItem
         }
         else
         {
-            icon.setImageResource(GlobalConfigs.IconResWebApps);
+            if (! config.has("iconres"))
+            {
+                icon.setImageResource(GlobalConfigs.IconResWebApps);
+            }
 
             if (directory == null)
             {

@@ -158,6 +158,12 @@
         <item>Webapp-Folder</item>
     </string-array>
 
+    <string-array name="pref_webapps_where_games_vals">
+        <item>None</item>
+        <item>Home-Screen</item>
+        <item>Games-Folder</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_keys">
         <item>incoming</item>
         <item>camera</item>

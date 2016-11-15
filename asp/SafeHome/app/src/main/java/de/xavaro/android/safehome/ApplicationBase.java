@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -19,6 +20,7 @@ import de.xavaro.android.common.Simple;
 import de.xavaro.android.common.SocialGoogleplus;
 import de.xavaro.android.common.SocialInstagram;
 import de.xavaro.android.common.SocialTwitter;
+import de.xavaro.android.common.SystemIdentity;
 import de.xavaro.android.common.WebAppCache;
 import de.xavaro.android.common.WebCookie;
 

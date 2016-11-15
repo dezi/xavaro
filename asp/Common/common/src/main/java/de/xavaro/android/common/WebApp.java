@@ -61,6 +61,12 @@ public class WebApp
     }
 
     @Nullable
+    public static String getCategory(String webappname)
+    {
+        return Json.getString(getManifest(webappname), "category");
+    }
+
+    @Nullable
     public static byte[] getIconData(String webappname, String iconurl)
     {
         int interval = WebApp.getWebAppInterval();

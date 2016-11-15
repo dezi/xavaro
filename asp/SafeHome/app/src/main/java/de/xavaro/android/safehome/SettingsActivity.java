@@ -141,10 +141,16 @@ public class SettingsActivity extends CaptureSettings
         target.add(PreferencesSocialTinder.getHeader());
 
         category = new Header();
+        category.title = "Spiele";
+        target.add(category);
+
+        PreferencesWebApps.WebappFragment.getHeaders(target, "games");
+
+        category = new Header();
         category.title = "Web-Apps";
         target.add(category);
 
-        PreferencesWebApps.WebappFragment.getHeaders(target);
+        PreferencesWebApps.WebappFragment.getHeaders(target, null);
 
         category = new Header();
         category.title = "Medien";

@@ -5,6 +5,7 @@
     "appname": "blockgame",
     "appicon": "blockgame_512x512.png",
     "preferences": false,
+    "category": "games",
     "events": false,
 
     "permissions": [

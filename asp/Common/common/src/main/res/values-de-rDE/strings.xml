@@ -140,6 +140,12 @@
         <item>Webapp-Ordner</item>
     </string-array>
 
+    <string-array name="pref_webapps_where_games_vals">
+        <item>Nicht anzeigen</item>
+        <item>Home-Screen</item>
+        <item>Spiele-Ordner</item>
+    </string-array>
+
     <string-array name="pref_media_image_directories_vals">
         <item>Fotos</item>
         <item>Kamera</item>

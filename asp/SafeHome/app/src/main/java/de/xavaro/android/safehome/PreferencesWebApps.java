@@ -37,7 +37,7 @@ public class PreferencesWebApps
     {
         private static final String LOGTAG = WebappFragment.class.getSimpleName();
 
-        public static void getHeaders(List<PreferenceActivity.Header> target)
+        public static void getHeaders(List<PreferenceActivity.Header> target, String category)
         {
             JSONObject webapps = StaticUtils.readRawTextResourceJSON(
                     Simple.getAnyContext(), R.raw.default_webapps);
@@ -51,6 +51,12 @@ public class PreferencesWebApps
             while (keysIterator.hasNext())
             {
                 String webappname = keysIterator.next();
+                String appcat = WebApp.getCategory(webappname);
+
+                if (! (((category == null) && (appcat == null)) || Simple.equals(category, appcat)))
+                {
+                    continue;
+                }
 
                 PreferenceActivity.Header header;
 
@@ -65,7 +71,6 @@ public class PreferencesWebApps
         }
 
         private final Handler handler = new Handler();
-        private String webappkeyprefix;
         private String webappname;
         private WebAppView webprefs;
 
@@ -77,9 +82,8 @@ public class PreferencesWebApps
         @Override
         public void onCreate(Bundle savedInstanceState)
         {
-            keyprefix = "webapps";
             webappname = getArguments().getString("webappname");
-            webappkeyprefix = keyprefix + ".pref." + webappname + ".";
+            keyprefix = "webapps.pref." + webappname + ".";
             icondraw = WebApp.getAppIcon(webappname);
             masterenable = WebApp.getLabel(webappname) + " " + "freischalten";
 
@@ -93,16 +97,24 @@ public class PreferencesWebApps
 
             NicedPreferences.NiceListPreference lp;
 
+            String category = WebApp.getCategory(webappname);
+
             String[] keys =  Simple.getTransArray(R.array.pref_webapps_where_keys);
             String[] vals =  Simple.getTransArray(R.array.pref_webapps_where_vals);
 
+            if (Simple.equals(category, "games"))
+            {
+                vals =  Simple.getTransArray(R.array.pref_webapps_where_games_vals);
+            }
+
             lp = new NicedPreferences.NiceListPreference(context);
 
-            lp.setKey(keyprefix + ".mode." + webappname);
+            lp.setKey("webapps.mode." + webappname);
             lp.setEntries(vals);
             lp.setEntryValues(keys);
             lp.setDefaultValue("none");
             lp.setTitle("Anzeige");
+            lp.setEnabled(enabled);
 
             lp.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
             {
@@ -204,7 +216,7 @@ public class PreferencesWebApps
                     pcl.onPreferenceChange(preference, obj);
                 }
 
-                final String key = preference.getKey().substring(webappkeyprefix.length());
+                final String key = preference.getKey().substring(keyprefix.length());
 
                 handler.post(new Runnable()
                 {
@@ -234,7 +246,7 @@ public class PreferencesWebApps
 
                 if (key == null) return null;
 
-                key = webappkeyprefix + key;
+                key = keyprefix + key;
 
                 NicedPreferences.NiceSearchPreference qp;
                 NicedPreferences.NiceCategoryPreference ct;
@@ -395,7 +407,7 @@ public class PreferencesWebApps
 
                     String key = Json.getString(pref, "key");
                     if (key == null) continue;
-                    String realkey = webappkeyprefix + key;
+                    String realkey = keyprefix + key;
 
                     if ((preferences.size() > 0) && ! gameover)
                     {
@@ -453,7 +465,7 @@ public class PreferencesWebApps
 
             public void onSearchCancel(String prefkey)
             {
-                prefkey = prefkey.substring(webappkeyprefix.length());
+                prefkey = prefkey.substring(keyprefix.length());
 
                 String script = "if (WebAppPrefBuilder.onSearchCancel) "
                         + "WebAppPrefBuilder.onSearchCancel"
@@ -464,7 +476,7 @@ public class PreferencesWebApps
 
             public void onSearchRequest(String prefkey, String query)
             {
-                prefkey = prefkey.substring(webappkeyprefix.length());
+                prefkey = prefkey.substring(keyprefix.length());
 
                 String script = "if (WebAppPrefBuilder.onSearchRequest) "
                         + "WebAppPrefBuilder.onSearchRequest"
@@ -475,7 +487,7 @@ public class PreferencesWebApps
 
             public void onDeleteRequest(String prefkey)
             {
-                prefkey = prefkey.substring(webappkeyprefix.length());
+                prefkey = prefkey.substring(keyprefix.length());
 
                 String script = "if (WebAppPrefBuilder.onDeleteRequest) "
                         + "WebAppPrefBuilder.onDeleteRequest"

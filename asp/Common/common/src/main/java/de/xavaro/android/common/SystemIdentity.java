@@ -1,6 +1,7 @@
 package de.xavaro.android.common;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.os.Build;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -20,6 +22,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -157,7 +161,7 @@ public class SystemIdentity
             String[] packageName = context.getPackageName().split("\\.");
 
             appsname = packageName[ packageName.length - 1];
-            identity = UUID.randomUUID().toString();
+            identity = createSystemIdentity();
             randomiz = UUID.randomUUID().toString();
 
             foundInPrefers = null;
@@ -177,6 +181,32 @@ public class SystemIdentity
         if (foundInStorage == null) storeIntoStorage(context);
         if (foundInContact == null) storeIntoContact(context);
         if (foundInCookies == null) storeIntoCookies(context);
+    }
+
+    @SuppressLint("HardwareIds")
+    private static String createSystemIdentity()
+    {
+        String newident = UUID.randomUUID().toString();
+
+        try
+        {
+            String devid = Settings.Secure.getString(Simple.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+            digest.reset();
+
+            newident = UUID.nameUUIDFromBytes(digest.digest(devid.getBytes())).toString();
+
+            Log.d(LOGTAG, "createSystemIdentity: devid=" + devid);
+            Log.d(LOGTAG, "createSystemIdentity: newident=" + newident);
+        }
+        catch (NoSuchAlgorithmException ex)
+        {
+            OopsService.log(LOGTAG, ex);
+        }
+
+        return newident;
     }
 
     private static void retrieveFromPrefers(Context context)

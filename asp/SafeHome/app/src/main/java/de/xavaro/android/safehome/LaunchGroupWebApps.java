@@ -31,6 +31,7 @@ public class LaunchGroupWebApps extends LaunchGroup
 
         JSONArray home = new JSONArray();
         JSONArray adir = new JSONArray();
+        JSONArray gdir = new JSONArray();
         JSONObject entry;
 
         //
@@ -51,6 +52,7 @@ public class LaunchGroupWebApps extends LaunchGroup
         for (String prefkey : webapps.keySet())
         {
             String webappname = prefkey.substring(prefix.length());
+            String category = WebApp.getCategory(webappname);
 
             entry = new JSONObject();
 
@@ -64,7 +66,15 @@ public class LaunchGroupWebApps extends LaunchGroup
             String mode = (String) webapps.get(prefkey);
 
             if (Simple.equals(mode, "home")) home.put(entry);
-            if (Simple.equals(mode, "folder")) adir.put(entry);
+
+            if (Simple.equals(category, "games"))
+            {
+                if (Simple.equals(mode, "folder")) gdir.put(entry);
+            }
+            else
+            {
+                if (Simple.equals(mode, "folder")) adir.put(entry);
+            }
         }
 
         if (adir.length() > 0)
@@ -73,9 +83,23 @@ public class LaunchGroupWebApps extends LaunchGroup
 
             Json.put(entry, "type", "webapp");
             Json.put(entry, "label", "Anwendungen");
+            Json.put(entry, "iconres", GlobalConfigs.IconResWebApps);
             Json.put(entry, "order", 1050);
 
             Json.put(entry, "launchitems", adir);
+            Json.put(home, entry);
+        }
+
+        if (gdir.length() > 0)
+        {
+            entry = new JSONObject();
+
+            Json.put(entry, "type", "webapp");
+            Json.put(entry, "label", "Spiele");
+            Json.put(entry, "iconres", GlobalConfigs.IconResGames);
+            Json.put(entry, "order", 1050);
+
+            Json.put(entry, "launchitems", gdir);
             Json.put(home, entry);
         }
 

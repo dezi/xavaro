@@ -4,6 +4,7 @@
     "label": "Mahjong",
     "appname": "mahjong",
     "appicon": "mahjong_600x600.png",
+    "category": "games",
     "preferences": false,
     "events": false,
 

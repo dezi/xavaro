@@ -4,6 +4,7 @@
     "label": "Solitaire",
     "appname": "solitaire",
     "appicon": "solitaire_600x600.png",
+    "category": "games",
     "preferences": false,
     "events": false,
 

@@ -41,6 +41,7 @@ public class GlobalConfigs
     public static final int IconResContacts           = R.drawable.contacts_340x340;
     public static final int IconResXavaro             = R.drawable.communication_400x400;
     public static final int IconResToday              = R.drawable.today_512x512;
+    public static final int IconResGames              = R.drawable.games_512x512;
     public static final int IconResMedia              = R.drawable.media_image_480x480;
     public static final int IconResMediaImage         = R.drawable.media_image_480x480;
     public static final int IconResMediaAudio         = R.drawable.media_audio_512x512;
