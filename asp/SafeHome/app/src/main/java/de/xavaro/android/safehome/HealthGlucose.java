@@ -153,8 +153,7 @@ public class HealthGlucose extends HealthBase
         }
 
         Speak.speak(sm);
-        ActivityOldManager.recordActivity(lm);
-
+        handleActivity(lm, iswarning, GlobalConfigs.IconResHealthGlucose);
         handleAssistance(am, iswarning);
 
         if (connectCallback != null)

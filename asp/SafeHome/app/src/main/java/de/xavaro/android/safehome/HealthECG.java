@@ -159,8 +159,7 @@ public class HealthECG extends HealthBase
         }
 
         Speak.speak(sm);
-        ActivityOldManager.recordActivity(lm);
-
+        handleActivity(lm, iswarning, GlobalConfigs.IconResHealthECG);
         handleAssistance(am, iswarning);
 
         if (connectCallback != null)

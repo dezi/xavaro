@@ -197,8 +197,7 @@ public class HealthOxy extends HealthBase
         }
 
         Speak.speak(sm);
-        ActivityOldManager.recordActivity(lm);
-
+        handleActivity(lm, iswarning, GlobalConfigs.IconResHealthOxy);
         handleAssistance(am, iswarning);
 
         if (connectCallback != null)

@@ -16,6 +16,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.CacheManager;
 import de.xavaro.android.common.Chooser;
 import de.xavaro.android.common.CommonConfigs;
@@ -135,6 +136,8 @@ public class LaunchItem extends FrameLayout implements
     protected boolean isTextless;
     protected boolean isFrameless;
     protected boolean isDirectory;
+
+    protected long activityStart;
 
     public LaunchItem(Context context)
     {
@@ -530,6 +533,43 @@ public class LaunchItem extends FrameLayout implements
         //
         // To be overridden...
         //
+    }
+
+    public void onLogActivityStarted()
+    {
+        activityStart = Simple.nowAsTimeStamp();
+    }
+
+    public void onLogActivityEnded()
+    {
+        Log.d(LOGTAG, "onLogActivityEnded");
+
+        JSONObject intent = Json.getObject(config, "intent");
+        String action = Json.getString(intent, "action");
+        String acttext = Json.getString(intent, "activity");
+
+        if ((acttext != null) && (action != null))
+        {
+            acttext = Simple.getTrans(R.string.simple_you_have) + " " + acttext;
+
+            long now = Simple.nowAsTimeStamp();
+
+            JSONObject activity = new JSONObject();
+
+            Json.put(activity, "date", Simple.timeStampAsISO(now));
+            Json.put(activity, "text", acttext);
+            Json.put(activity, "action", action);
+            Json.put(activity, "type", type);
+            Json.put(activity, "subtype", subtype);
+
+            if (activityStart > 0)
+            {
+                long duration = (now - activityStart) / 1000L;
+                Json.put(activity, "duration", duration);
+            }
+
+            ActivityManager.getInstance().recordActivity(activity);
+        }
     }
 
     public void onBackKeyExecuted()

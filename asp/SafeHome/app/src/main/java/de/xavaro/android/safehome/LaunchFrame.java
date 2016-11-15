@@ -26,6 +26,8 @@ public class LaunchFrame extends FrameLayout implements BackKeyClient
     {
         super.onAttachedToWindow();
 
+        if (parent != null) parent.onLogActivityStarted();
+
         //
         // Adjust pages bullets and subtitle.
         //
@@ -65,5 +67,7 @@ public class LaunchFrame extends FrameLayout implements BackKeyClient
         //
 
         Log.d(LOGTAG, "onBackKeyExecuted");
+
+        if (parent != null) parent.onLogActivityEnded();
     }
 }

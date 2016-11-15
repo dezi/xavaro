@@ -154,8 +154,7 @@ public class HealthThermo extends HealthBase
         }
 
         Speak.speak(sm);
-        ActivityOldManager.recordActivity(lm);
-
+        handleActivity(lm, iswarning, GlobalConfigs.IconResHealthThermo);
         handleAssistance(am, iswarning);
 
         if (connectCallback != null)

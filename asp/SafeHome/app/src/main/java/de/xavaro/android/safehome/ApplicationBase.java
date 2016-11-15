@@ -35,29 +35,6 @@ public class ApplicationBase extends Application
 
         super.onCreate();
 
-        /*
-        final PackageManager pm = getPackageManager();
-
-        List<ApplicationInfo> packages =  pm.getInstalledApplications(PackageManager.GET_META_DATA);
-
-        for (ApplicationInfo packageInfo : packages)
-        {
-            if (packageInfo.packageName.equals("com.nianticlabs.pokemongo"))
-            {
-                Log.d(LOGTAG, "Installed package :" + packageInfo.packageName);
-                Log.d(LOGTAG, "Apk file path:" + packageInfo.sourceDir);
-
-                Simple.fileCopy(new File(packageInfo.sourceDir),
-                        new File(Simple.getMediaPath("download"),
-                                "com.nianticlabs.pokemongo.apk"));
-            }
-        }
-
-        System.exit(1);
-        */
-
-        //Pokemongo.testEncode();
-
         //
         // Make application context available.
         //

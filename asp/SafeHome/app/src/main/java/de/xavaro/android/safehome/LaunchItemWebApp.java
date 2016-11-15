@@ -52,6 +52,8 @@ public class LaunchItemWebApp extends LaunchItem
     @Override
     public void onBackKeyExecuted()
     {
+        super.onBackKeyExecuted();
+
         Log.d(LOGTAG, "onBackKeyExecuted:");
 
         if ((subtype != null) && (webappFrame != null))

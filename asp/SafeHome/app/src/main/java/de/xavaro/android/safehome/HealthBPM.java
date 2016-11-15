@@ -199,8 +199,7 @@ public class HealthBPM extends HealthBase
         }
 
         Speak.speak(sm);
-        ActivityOldManager.recordActivity(lm);
-
+        handleActivity(lm, iswarning, GlobalConfigs.IconResHealthBPM);
         handleAssistance(am, iswarning);
 
         if (connectCallback != null)

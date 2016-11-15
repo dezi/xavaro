@@ -3,7 +3,6 @@ package de.xavaro.android.safehome;
 import android.content.Context;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.xavaro.android.common.Json;

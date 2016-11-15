@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import de.xavaro.android.common.ActivityManager;
 import de.xavaro.android.common.ChatManager;
 import de.xavaro.android.common.Json;
 import de.xavaro.android.common.Simple;
@@ -162,6 +163,21 @@ public abstract class HealthBase implements
 
             Log.d(LOGTAG, "handleAssistance: send=" + datetext);
         }
+    }
+
+    protected void handleActivity(String text, boolean iswarning, int iconres)
+    {
+        JSONObject activity = new JSONObject();
+
+        Json.put(activity, "date", Simple.nowAsISO());
+        Json.put(activity, "text", text);
+        Json.put(activity, "type", "health");
+        Json.put(activity, "subtype", deviceType);
+        Json.put(activity, "action", "measure");
+        Json.put(activity, "mode", iswarning ? "warning" : "normal");
+        Json.put(activity, "icid", iconres);
+
+        ActivityManager.getInstance().recordActivity(activity);
     }
 
     public View createListView()

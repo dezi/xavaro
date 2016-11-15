@@ -20,6 +20,7 @@
         "action": "view",
         "keywords": [ "Bild Online", "Bild Zeitung", "Bildzeitung", "Bild" ],
         "response": "Ich öffne die Bild Zeitung",
+        "activity": "die Bild Zeitung gelesen",
         "sample": "Ich möchte die Bild Zeitung lesen"
       },
 
@@ -44,6 +45,7 @@
         "action": "view",
         "keywords": [ "Sport Bild", "Sportbild", "Sport Online", "Sport Zeitung", "Sport", "Bild" ],
         "response": "Ich öffne Sport Bild",
+        "activity": "Sport Bild gelesen",
         "sample": "Ich möchte Sport Bild lesen"
       },
 
@@ -68,6 +70,7 @@
         "action" : "view",
         "keywords": [ "FAZ", "F A Z", "Frankfurter Allgemeine" ],
         "response": "Ich öffne die FAZ",
+        "activity": "die FAZ gelesen",
         "sample": "Ich möchte die FAZ lesen"
       },
 
@@ -86,6 +89,7 @@
         "action" : "view",
         "keywords": [ "TAZ" ],
         "response": "Ich öffne die TAZ",
+        "activity": "die TAZ gelesen",
         "sample": "Ich möchte die TAZ lesen"
       }
     },
@@ -102,6 +106,7 @@
         "action" : "view",
         "keywords": [ "Süddeutsche Zeitung" ],
         "response": "Ich öffne die Süddeutsche Zeitung",
+        "activity": "die Süddeutsche gelesen",
         "sample": "Ich möchte die Süddeutsche Zeitung lesen"
       }
     },
@@ -118,6 +123,7 @@
         "action" : "view",
         "keywords": [ "Frankfurter Rundschau" ],
         "response": "Ich öffne die Frankfurter Rundschau",
+        "activity": "die Frankfurter Rundschau gelesen",
         "sample": "Ich möchte die Frankfurter Rundschau lesen"
       }
     },
@@ -134,6 +140,7 @@
         "action" : "view",
         "keywords": [ "Neues Deutschland", "Neue Deutschland" ],
         "response": "Ich öffne die Zeitung Neues Deutschland",
+        "activity": "das Neue Deutschland gelesen",
         "sample": "Ich möchte das Neue Deutschland lesen"
       }
     },
@@ -150,6 +157,7 @@
         "action" : "view",
         "keywords": [ "Die Welt" ],
         "response": "Ich öffne Die Welt",
+        "activity": "die Welt gelesen",
         "sample": "Ich möchte Die Welt lesen"
       }
     },
@@ -166,6 +174,7 @@
         "action" : "view",
         "keywords": [ "Handelsblatt" ],
         "response": "Ich öffne das Handelsblatt",
+        "activity": "das Handelsblatt gelesen",
         "sample": "Ich möchte das Handelsblatt lesen"
       }
     },
@@ -182,6 +191,7 @@
         "action" : "view",
         "keywords": [ "Mopo", "Hamburger Morgenpost" ],
         "response": "Ich öffne die MOPO",
+        "activity": "die MOPO gelesen",
         "sample": "Ich möchte die MOPO lesen"
       },
 
@@ -200,6 +210,7 @@
         "action" : "view",
         "keywords": [ "SVZ", "Schweriner Volkszeitung" ],
         "response": "Ich öffne die Schweriner Volkszeitung",
+        "activity": "die Schweriner Volkszeitung gelesen",
         "sample": "Ich möchte die SVZ lesen"
       },
 
@@ -218,6 +229,7 @@
         "action" : "view",
         "keywords": [ "HAZ", "Hannoversche Allgemeine" ],
         "response": "Ich öffne die Hannoversche Allgemeine Zeitung",
+        "activity": "die Hannoversche Allgemeine gelesen",
         "sample": "Ich möchte die HAZ lesen"
       }
     },
@@ -234,6 +246,7 @@
         "action" : "view",
         "keywords": [ "LVZ", "Leipziger Volkszeitung" ],
         "response": "Ich öffne die Leipziger Volkszeitung",
+        "activity": "die Leipziger Volkszeitung gelesen",
         "sample": "Ich möchte die Leipziger Volkszeitung lesen"
       }
     },
@@ -250,6 +263,7 @@
         "action" : "view",
         "keywords": [ "Express", "Kölner Express" ],
         "response": "Ich öffne den Kölner Express",
+        "activity": "den Kölner Express gelesen",
         "sample": "Ich möchte den Kölner Express lesen"
       }
     }
@@ -274,6 +288,7 @@
         "action": "view",
         "keywords": [ "Spiegel", "Spiegel Online", "den Spiegel", "Spiegel Magazin" ],
         "response": "Ich öffne den Spiegel",
+        "activity": "in Spiegel Online gelesen",
         "sample": "Ich möchte Spiegel Online lesen"
       }
     },
@@ -288,6 +303,7 @@
         "action" : "view",
         "keywords": [ "Manager Magazin" ],
         "response": "Ich öffne das Manager Magazin",
+        "activity": "das Manager Magazin gelesen",
         "sample": "Ich möchte das Manager Magazin lesen"
       }
     },
@@ -302,6 +318,7 @@
         "action" : "view",
         "keywords": [ "Fokus", "Focus", "Focus Online", "den Focus", "Focus Magazin" ],
         "response": "Ich öffne das Focus Magazin",
+        "activity": "im Focus gelesen",
         "sample": "Ich möchte den Focus lesen"
       },
 
@@ -318,6 +335,7 @@
         "action" : "view",
         "keywords": [ "Natgeo", "National Geographic", "National Geo graphic" ],
         "response": "Ich öffne National Geographic",
+        "activity": "in National Geographic gelesen",
         "sample": "Ich möchte National Geographic lesen"
       }
     },
@@ -332,6 +350,7 @@
         "action" : "view",
         "keywords": [ "Bento" ],
         "response": "Ich öffne Bento",
+        "activity": "in Bento gelesen",
         "sample": "Ich möchte Bento lesen"
       },
 
@@ -365,6 +384,7 @@
         "action": "view",
         "keywords": [ "die Gala", "etwas Buntes" ],
         "response": "Ich öffne die Gala",
+        "activity": "die Gala gelesen",
         "sample": "Ich möchte die Gala lesen"
       }
     },
@@ -379,6 +399,7 @@
         "action": "view",
         "keywords": [ "die Bunte", "etwas Buntes" ],
         "response": "Ich öffne die Bunte",
+        "activity": "die Bunte gelesen",
         "sample": "Ich möchte die Bunte lesen"
       },
 
@@ -395,6 +416,7 @@
         "action": "view",
         "keywords": [ "den Stern", "etwas Buntes" ],
         "response": "Ich öffne den Stern",
+        "activity": "im Stern gelesen",
         "sample": "Ich möchte den Stern lesen"
       },
 
@@ -411,6 +433,7 @@
         "action": "view",
         "keywords": [ "die Petra", "Petra", "etwas Buntes" ],
         "response": "Ich öffne die Petra",
+        "activity": "die Petra gelesen",
         "sample": "Ich möchte die Petra lesen"
       }
     },
@@ -425,6 +448,7 @@
         "action" : "view",
         "keywords": [ "Playboy", "hübsche Mädels", "schöne Titten" ],
         "response": "Ich öffne den Playboy",
+        "activity": "im Playboy gelesen",
         "sample": "Ich möchte den Playboy lesen"
       },
 
@@ -451,6 +475,7 @@
         "action": "shop",
         "keywords": [ "Zalando" ],
         "response": "Ich öffne den Zalando Web-Shop",
+        "activity": "bei Zalando geschaut",
         "sample": "Ich möchte bei Zalando etwas bestellen"
       },
 
@@ -467,6 +492,7 @@
         "action": "shop",
         "keywords": [ "Otto", "Otto Versand" ],
         "response": "Ich öffne den Otto Web-Shop",
+        "activity": "im Otto Web-Shop geschaut",
         "sample": "Ich möchte bei Otto etwas stöbern"
       },
 
@@ -483,6 +509,7 @@
         "action": "shop",
         "keywords": [ "Dawanda", "schöne Dinge" ],
         "response": "Ich öffne den Dawanda Web-Shop",
+        "activity": "bei Dawanda geschaut",
         "sample": "Ich möchte bei Dawanda etwas stöbern"
       },
 
@@ -506,6 +533,7 @@
         "action": "shop",
         "keywords": [ "Klingel", "schöne Dinge" ],
         "response": "Ich öffne den Klingel Web-Shop",
+        "activity": "im Klingel Web-Shop geschaut",
         "sample": "Ich möchte bei Klingel etwas bestellen"
       },
 
