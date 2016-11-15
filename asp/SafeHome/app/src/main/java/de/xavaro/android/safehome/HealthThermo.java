@@ -238,7 +238,8 @@ public class HealthThermo extends HealthBase
                 }
                 else
                 {
-                    alertView.setVisibility(View.INVISIBLE);
+                    alertView.setImageResource(R.drawable.health_thermo_dim_300x200);
+                    alertView.setVisibility(View.VISIBLE);
                 }
             }
         }

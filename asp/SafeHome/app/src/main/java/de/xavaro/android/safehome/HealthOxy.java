@@ -277,7 +277,8 @@ public class HealthOxy extends HealthBase
             }
             else
             {
-                satAlertView.setVisibility(View.INVISIBLE);
+                satAlertView.setImageResource(R.drawable.health_oxy_sat_dim_300x200);
+                satAlertView.setVisibility(View.VISIBLE);
             }
 
             int lowPls = Simple.getSharedPrefInt("health.oxy.alert.lowpls");

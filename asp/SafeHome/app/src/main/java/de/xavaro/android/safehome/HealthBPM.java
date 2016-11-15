@@ -271,13 +271,13 @@ public class HealthBPM extends HealthBase
         }
         else
         {
-            bpmAlertView.setVisibility(View.INVISIBLE);
+            boolean setBP = false;
 
-            try
+            String lowBP = Simple.getSharedPrefString("health.bpm.alert.lowbp");
+
+            if (lowBP != null)
             {
-                String lowBP = Simple.getSharedPrefString("health.bpm.alert.lowbp");
-
-                if (lowBP != null)
+                try
                 {
                     String[] lp = lowBP.split(":");
 
@@ -287,19 +287,20 @@ public class HealthBPM extends HealthBase
                     {
                         bpmAlertView.setImageResource(R.drawable.health_bpm_bp_low_300x200);
                         bpmAlertView.setVisibility(View.VISIBLE);
+                        setBP = true;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                OopsService.log(LOGTAG, ex);
+                catch (Exception ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
             }
 
-            try
-            {
-                String highBP = Simple.getSharedPrefString("health.bpm.alert.highbp");
+            String highBP = Simple.getSharedPrefString("health.bpm.alert.highbp");
 
-                if (highBP != null)
+            if (highBP != null)
+            {
+                try
                 {
                     String[] hp = highBP.split(":");
 
@@ -309,12 +310,19 @@ public class HealthBPM extends HealthBase
                     {
                         bpmAlertView.setImageResource(R.drawable.health_bpm_bp_high_300x200);
                         bpmAlertView.setVisibility(View.VISIBLE);
+                        setBP = true;
                     }
                 }
+                catch (Exception ex)
+                {
+                    OopsService.log(LOGTAG, ex);
+                }
             }
-            catch (Exception ex)
+
+            if (! setBP)
             {
-                OopsService.log(LOGTAG, ex);
+                bpmAlertView.setImageResource(R.drawable.health_bpm_bp_dim_300x200);
+                bpmAlertView.setVisibility(View.VISIBLE);
             }
 
             int lowPls = Simple.getSharedPrefInt("health.bpm.alert.lowpls");

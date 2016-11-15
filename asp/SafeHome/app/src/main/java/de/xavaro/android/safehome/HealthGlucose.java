@@ -232,7 +232,8 @@ public class HealthGlucose extends HealthBase
                 }
                 else
                 {
-                    alertView.setVisibility(View.INVISIBLE);
+                    alertView.setImageResource(R.drawable.health_glucose_bgv_dim_300x200);
+                    alertView.setVisibility(View.VISIBLE);
                 }
             }
         }
