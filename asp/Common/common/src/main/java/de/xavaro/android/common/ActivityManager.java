@@ -112,9 +112,13 @@ public class ActivityManager
             Json.put(days, day);
         }
 
-        //Log.d(LOGTAG, "loadDays: days=" + Json.toPretty(Json.sort(days, "date", true)));
+        //
+        // Final descending sort of days.
+        //
 
-        return Json.sort(days, "date", true);
+        days = Json.sort(days, "date", true);
+
+        return days;
     }
 
     public void recordActivity(JSONObject activity)
@@ -146,7 +150,8 @@ public class ActivityManager
         JSONArray records = Simple.getFileJSONArray(datafile);
         if (records == null) records = new JSONArray();
         Json.put(records, activity);
-        Json.sort(records, "date", true);
+
+        records = Json.sort(records, "date", true);
         Simple.putFileJSON(datafile, records);
     }
 }

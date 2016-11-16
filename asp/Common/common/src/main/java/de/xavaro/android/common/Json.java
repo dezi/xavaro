@@ -484,7 +484,9 @@ public class Json
         List<JSONObject> jsonValues = new ArrayList<>();
 
         for (int inx = 0; inx < array.length(); inx++)
+        {
             jsonValues.add(getObject(array, inx));
+        }
 
         Collections.sort(jsonValues, new comparedat());
 
