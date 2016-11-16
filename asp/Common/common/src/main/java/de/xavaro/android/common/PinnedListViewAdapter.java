@@ -1,9 +1,9 @@
 package de.xavaro.android.common;
 
-import android.util.SparseArray;
+import android.widget.BaseAdapter;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.util.SparseArray;
 
 public abstract class PinnedListViewAdapter extends BaseAdapter
         implements PinnedListView.PinnedListViewAdapterInterface
@@ -11,38 +11,12 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     private final static int HEADER_VIEW_TYPE = 0;
     private final static int ITEM_VIEW_TYPE = 0;
 
-    /**
-     * Holds the calculated values of @{link getPositionInSectionForPosition}
-     */
-    private SparseArray<Integer> mSectionPositionCache;
-    /**
-     * Holds the calculated values of @{link getSectionForPosition}
-     */
-    private SparseArray<Integer> mSectionCache;
-    /**
-     * Holds the calculated values of @{link getCountForSection}
-     */
-    private SparseArray<Integer> mSectionCountCache;
+    private SparseArray<Integer> mSectionPositionCache = new SparseArray<Integer>();
+    private SparseArray<Integer> mSectionCache = new SparseArray<Integer>();
+    private SparseArray<Integer> mSectionCountCache = new SparseArray<Integer>();
 
-    /**
-     * Caches the item count
-     */
-    private int mCount;
-    /**
-     * Caches the section count
-     */
-    private int mSectionCount;
-
-    public PinnedListViewAdapter()
-    {
-        super();
-
-        mSectionCache = new SparseArray<Integer>();
-        mSectionPositionCache = new SparseArray<Integer>();
-        mSectionCountCache = new SparseArray<Integer>();
-        mCount = -1;
-        mSectionCount = -1;
-    }
+    private int mCount = -1;
+    private int mSectionCount = -1;
 
     @Override
     public void notifyDataSetChanged()
@@ -170,7 +144,7 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
         return 0;
     }
 
-    public final boolean isSectionHeader(int position)
+    public boolean isSectionHeader(int position)
     {
         int sectionStart = 0;
         for (int i = 0; i < internalGetSectionCount(); i++)

@@ -16,18 +16,17 @@ public class PinnedListView extends ListView implements OnScrollListener
 {
     private OnScrollListener mOnScrollListener;
 
-    public static interface PinnedListViewAdapterInterface
+    public interface PinnedListViewAdapterInterface
     {
-        public boolean isSectionHeader(int position);
+        boolean isSectionHeader(int position);
 
-        public int getSectionForPosition(int position);
+        int getSectionForPosition(int position);
 
-        public View getSectionHeaderView(int section, View convertView, ViewGroup parent);
+        View getSectionHeaderView(int section, View convertView, ViewGroup parent);
 
-        public int getSectionHeaderViewType(int section);
+        int getSectionHeaderViewType(int section);
 
-        public int getCount();
-
+        int getCount();
     }
 
     private PinnedListViewAdapterInterface mAdapter;
@@ -174,22 +173,25 @@ public class PinnedListView extends ListView implements OnScrollListener
     protected void dispatchDraw(Canvas canvas)
     {
         super.dispatchDraw(canvas);
-        if (mAdapter == null || !mShouldPin || mCurrentHeader == null)
+
+        if ((mAdapter == null) || (mCurrentHeader == null) || ! mShouldPin)
+        {
             return;
+        }
+
         int saveCount = canvas.save();
+
         canvas.translate(0, mHeaderOffset);
-        canvas.clipRect(0, 0, getWidth(), mCurrentHeader.getMeasuredHeight()); // needed
-        // for
-        // <
-        // HONEYCOMB
+        canvas.clipRect(0, 0, getWidth(), mCurrentHeader.getMeasuredHeight());
         mCurrentHeader.draw(canvas);
+
         canvas.restoreToCount(saveCount);
     }
 
     @Override
-    public void setOnScrollListener(OnScrollListener l)
+    public void setOnScrollListener(OnScrollListener listener)
     {
-        mOnScrollListener = l;
+        mOnScrollListener = listener;
     }
 
     @Override
@@ -222,6 +224,7 @@ public class PinnedListView extends ListView implements OnScrollListener
             {
                 adapter = (PinnedListViewAdapter) adapterView.getAdapter();
             }
+
             int section = adapter.getSectionForPosition(rawPosition);
             int position = adapter.getPositionInSectionForPosition(rawPosition);
 
