@@ -103,8 +103,6 @@ public class LaunchItemToday extends LaunchItem
         if (type.equals("today")) launchToday();
     }
 
-    LaunchFrameToday todayFrame;
-
     private Runnable updateTime = new Runnable()
     {
         @Override
@@ -123,11 +121,7 @@ public class LaunchItemToday extends LaunchItem
 
     private void launchToday()
     {
-        if (todayFrame == null)
-        {
-            todayFrame = new LaunchFrameToday(context, this);
-        }
-
+        LaunchFrameToday todayFrame = new LaunchFrameToday(context, this);
         ((HomeActivity) context).addViewToBackStack(todayFrame);
     }
 }

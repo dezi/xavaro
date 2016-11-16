@@ -3,17 +3,19 @@ package de.xavaro.android.common;
 import android.widget.BaseAdapter;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.SparseArray;
+import android.util.SparseIntArray;
 
 public abstract class PinnedListViewAdapter extends BaseAdapter
         implements PinnedListView.PinnedListViewAdapterInterface
 {
-    private final static int HEADER_VIEW_TYPE = 0;
-    private final static int ITEM_VIEW_TYPE = 0;
+    private static final String LOGTAG = PinnedListViewAdapter.class.getSimpleName();
 
-    private SparseArray<Integer> mSectionPositionCache = new SparseArray<Integer>();
-    private SparseArray<Integer> mSectionCache = new SparseArray<Integer>();
-    private SparseArray<Integer> mSectionCountCache = new SparseArray<Integer>();
+    private static final int HEAD_VIEW_TYPE = 0;
+    private static final int ITEM_VIEW_TYPE = 0;
+
+    private SparseIntArray mSectionCache = new SparseIntArray();
+    private SparseIntArray mSectionCountCache = new SparseIntArray();
+    private SparseIntArray mSectionPositionCache = new SparseIntArray();
 
     private int mCount = -1;
     private int mSectionCount = -1;
@@ -22,8 +24,9 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     public void notifyDataSetChanged()
     {
         mSectionCache.clear();
-        mSectionPositionCache.clear();
         mSectionCountCache.clear();
+        mSectionPositionCache.clear();
+
         mCount = -1;
         mSectionCount = -1;
 
@@ -34,8 +37,9 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     public void notifyDataSetInvalidated()
     {
         mSectionCache.clear();
-        mSectionPositionCache.clear();
         mSectionCountCache.clear();
+        mSectionPositionCache.clear();
+
         mCount = -1;
         mSectionCount = -1;
 
@@ -45,18 +49,16 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     @Override
     public final int getCount()
     {
-        if (mCount >= 0)
+        if (mCount >= 0) return mCount;
+
+        mCount = 0;
+
+        for (int section = 0; section < internalGetSectionCount(); section++)
         {
-            return mCount;
+            mCount += 1 + internalGetCountForSection(section);
         }
-        int count = 0;
-        for (int i = 0; i < internalGetSectionCount(); i++)
-        {
-            count += internalGetCountForSection(i);
-            count++; // for the header view
-        }
-        mCount = count;
-        return count;
+
+        return mCount;
     }
 
     @Override
@@ -74,92 +76,103 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     @Override
     public final View getView(int position, View convertView, ViewGroup parent)
     {
-        if (isSectionHeader(position))
+        int section = getSectionForPosition(position);
+
+        if (isHead(position))
         {
-            return getSectionHeaderView(getSectionForPosition(position), convertView, parent);
+            return getHeadView(section, convertView, parent);
         }
-        return getItemView(getSectionForPosition(position), getPositionInSectionForPosition(position), convertView, parent);
+
+        return getItemView(section, getPositionInSectionForPosition(position), convertView, parent);
     }
 
     @Override
     public final int getItemViewType(int position)
     {
-        if (isSectionHeader(position))
+        int section = getSectionForPosition(position);
+
+        if (isHead(position))
         {
-            return getItemViewTypeCount() + getSectionHeaderViewType(getSectionForPosition(position));
+            return getItemViewTypeCount() + getHeadViewType(section);
         }
-        return getItemViewType(getSectionForPosition(position), getPositionInSectionForPosition(position));
+
+        return getItemViewType(section, getPositionInSectionForPosition(position));
     }
 
     @Override
     public final int getViewTypeCount()
     {
-        return getItemViewTypeCount() + getSectionHeaderViewTypeCount();
+        return getItemViewTypeCount() + getHeadViewTypeCount();
     }
 
     public final int getSectionForPosition(int position)
     {
-        // first try to retrieve values from cache
-        Integer cachedSection = mSectionCache.get(position);
-        if (cachedSection != null)
-        {
-            return cachedSection;
-        }
+        int section = mSectionCache.get(position, -1);
+        if (section >= 0) return section;
+
         int sectionStart = 0;
-        for (int i = 0; i < internalGetSectionCount(); i++)
+
+        for (section = 0; section < internalGetSectionCount(); section++)
         {
-            int sectionCount = internalGetCountForSection(i);
+            int sectionCount = internalGetCountForSection(section);
             int sectionEnd = sectionStart + sectionCount + 1;
+
             if (position >= sectionStart && position < sectionEnd)
             {
-                mSectionCache.put(position, i);
-                return i;
+                mSectionCache.put(position, section);
+                return section;
             }
+
             sectionStart = sectionEnd;
         }
+
         return 0;
     }
 
     public int getPositionInSectionForPosition(int position)
     {
-        // first try to retrieve values from cache
-        Integer cachedPosition = mSectionPositionCache.get(position);
-        if (cachedPosition != null)
+        int sectionStart = mSectionPositionCache.get(position, -1);
+        if (sectionStart >= 0) return sectionStart;
+
+        sectionStart = 0;
+
+        for (int section = 0; section < internalGetSectionCount(); section++)
         {
-            return cachedPosition;
-        }
-        int sectionStart = 0;
-        for (int i = 0; i < internalGetSectionCount(); i++)
-        {
-            int sectionCount = internalGetCountForSection(i);
+            int sectionCount = internalGetCountForSection(section);
             int sectionEnd = sectionStart + sectionCount + 1;
+
             if (position >= sectionStart && position < sectionEnd)
             {
                 int positionInSection = position - sectionStart - 1;
                 mSectionPositionCache.put(position, positionInSection);
                 return positionInSection;
             }
+
             sectionStart = sectionEnd;
         }
+
         return 0;
     }
 
-    public boolean isSectionHeader(int position)
+    public boolean isHead(int position)
     {
         int sectionStart = 0;
-        for (int i = 0; i < internalGetSectionCount(); i++)
+
+        for (int section = 0; section < internalGetSectionCount(); section++)
         {
             if (position == sectionStart)
             {
                 return true;
             }
-            else
-                if (position < sectionStart)
-                {
-                    return false;
-                }
-            sectionStart += internalGetCountForSection(i) + 1;
+
+            if (position < sectionStart)
+            {
+                return false;
+            }
+
+            sectionStart += internalGetCountForSection(section) + 1;
         }
+
         return false;
     }
 
@@ -173,12 +186,12 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
         return 1;
     }
 
-    public int getSectionHeaderViewType(int section)
+    public int getHeadViewType(int section)
     {
-        return HEADER_VIEW_TYPE;
+        return HEAD_VIEW_TYPE;
     }
 
-    public int getSectionHeaderViewTypeCount()
+    public int getHeadViewTypeCount()
     {
         return 1;
     }
@@ -193,16 +206,14 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
 
     public abstract View getItemView(int section, int position, View convertView, ViewGroup parent);
 
-    public abstract View getSectionHeaderView(int section, View convertView, ViewGroup parent);
+    public abstract View getHeadView(int section, View convertView, ViewGroup parent);
 
     private int internalGetCountForSection(int section)
     {
-        Integer cachedSectionCount = mSectionCountCache.get(section);
-        if (cachedSectionCount != null)
-        {
-            return cachedSectionCount;
-        }
-        int sectionCount = getCountForSection(section);
+        int sectionCount = mSectionCountCache.get(section, -1);
+        if (sectionCount >= 0) return sectionCount;
+
+        sectionCount = getCountForSection(section);
         mSectionCountCache.put(section, sectionCount);
         return sectionCount;
     }

@@ -2453,6 +2453,30 @@ public class Simple
         return Json.sort(list, "time", desc);
     }
 
+    public static JSONArray getDirectorySortedByName(File dir, FilenameFilter ff, boolean desc)
+    {
+        if ((dir == null) || !dir.isDirectory()) return null;
+
+        String[] dirlist = dir.list(ff);
+        if (dirlist == null) return null;
+
+        JSONArray list = new JSONArray();
+
+        for (String name : dirlist)
+        {
+            File file = new File(dir, name);
+
+            JSONObject entry = new JSONObject();
+
+            Json.put(entry, "file", file.toString());
+            Json.put(entry, "time", timeStampAsISO(file.lastModified()));
+
+            Json.put(list, entry);
+        }
+
+        return Json.sort(list, "file", desc);
+    }
+
     public static String[] getDirectoryAsArray(File dir, FilenameFilter filter)
     {
         String[] files = null;

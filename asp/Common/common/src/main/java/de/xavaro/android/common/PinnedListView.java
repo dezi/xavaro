@@ -18,13 +18,13 @@ public class PinnedListView extends ListView implements OnScrollListener
 
     public interface PinnedListViewAdapterInterface
     {
-        boolean isSectionHeader(int position);
+        boolean isHead(int position);
 
         int getSectionForPosition(int position);
 
-        View getSectionHeaderView(int section, View convertView, ViewGroup parent);
+        View getHeadView(int section, View convertView, ViewGroup parent);
 
-        int getSectionHeaderViewType(int section);
+        int getHeadViewType(int section);
 
         int getCount();
     }
@@ -95,8 +95,8 @@ public class PinnedListView extends ListView implements OnScrollListener
         firstVisibleItem -= getHeaderViewsCount();
 
         int section = mAdapter.getSectionForPosition(firstVisibleItem);
-        int viewType = mAdapter.getSectionHeaderViewType(section);
-        mCurrentHeader = getSectionHeaderView(section, mCurrentHeaderViewType != viewType ? null : mCurrentHeader);
+        int viewType = mAdapter.getHeadViewType(section);
+        mCurrentHeader = getHeadView(section, mCurrentHeaderViewType != viewType ? null : mCurrentHeader);
         ensurePinnedHeaderLayout(mCurrentHeader);
         mCurrentHeaderViewType = viewType;
 
@@ -104,7 +104,7 @@ public class PinnedListView extends ListView implements OnScrollListener
 
         for (int i = firstVisibleItem; i < firstVisibleItem + visibleItemCount; i++)
         {
-            if (mAdapter.isSectionHeader(i))
+            if (mAdapter.isHead(i))
             {
                 View header = getChildAt(i - firstVisibleItem);
                 float headerTop = header.getTop();
@@ -134,11 +134,11 @@ public class PinnedListView extends ListView implements OnScrollListener
         }
     }
 
-    private View getSectionHeaderView(int section, View oldView)
+    private View getHeadView(int section, View oldView)
     {
         boolean shouldLayout = section != mCurrentSection || oldView == null;
 
-        View view = mAdapter.getSectionHeaderView(section, oldView, this);
+        View view = mAdapter.getHeadView(section, oldView, this);
         if (shouldLayout)
         {
             // a new section, thus a new header. We should lay it out again
