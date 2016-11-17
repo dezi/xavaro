@@ -75,7 +75,7 @@
       {
         "label": "phoenix",
         "default": true,
-        "icon": "http://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Phoenix_Logo_2012.svg/533px-Phoenix_Logo_2012.svg.png",
+        "icon": "http://pbs.twimg.com/profile_images/432828941061988353/mSj7d1eO_400x400.png",
         "videourl": "http://zdf0910-lh.akamaihd.net/i/de09_v1@392871/master.m3u8?dw=0",
         "aliase": [ "tv/de/Phoenix", "tv/de/Phoenix HD" ]
       }
@@ -166,13 +166,13 @@
 
     "label": "WDR Fernsehen",
     "url": "http://www.wdr.de//",
-    "icon": "https://pbs.twimg.com/profile_images/797362560886521856/7Wel-VmR_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/797362560886521856/7Wel-VmR_400x400.jpg",
 
     "channels": [
       {
         "label": "WDR Fernsehen",
         "default": true,
-        "icon": "https://pbs.twimg.com/profile_images/797362560886521856/7Wel-VmR_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/797362560886521856/7Wel-VmR_400x400.jpg",
         "videourl": "http://www.metafilegenerator.de/WDR/WDR_FS/m3u8/wdrfernsehen.m3u8",
         "aliase": [
           "tv/de/WDR Fernsehen Köln",
@@ -443,7 +443,7 @@
         "default": false,
         "develop": true,
         "enabled": false,
-        "icon": "https://pbs.twimg.com/profile_images/786900355502182400/vMq81AVT_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/786900355502182400/vMq81AVT_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/rtl2.html",
         "aliase": [ "tv/de/RTL 2 Deutschland", "tv/de/RTL 2 Deutschland HD" ]
       },
@@ -498,7 +498,7 @@
 
     "label": "SAT.1 / PRO 7",
     "url": "http://www.sat1.de/",
-    "icon": "https://pbs.twimg.com/profile_images/786103043863482373/-tMhOY1i_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/786103043863482373/-tMhOY1i_400x400.jpg",
 
     "channels": [
       {
@@ -507,7 +507,7 @@
         "default": false,
         "develop": true,
         "enabled": false,
-        "icon": "https://pbs.twimg.com/profile_images/786103043863482373/-tMhOY1i_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/786103043863482373/-tMhOY1i_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/sat1.html",
         "aliase": [ "tv/de/Sat. 1 Deutschland", "tv/de/Sat. 1 Deutschland HD" ]
       },
@@ -518,7 +518,7 @@
         "default": false,
         "develop": true,
         "enabled": false,
-        "icon": "https://pbs.twimg.com/profile_images/785083567617478656/Q26VQYFX_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/785083567617478656/Q26VQYFX_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/pro7.html",
         "aliase": [ "tv/de/Pro Sieben Deutschland", "tv/de/Pro Sieben Deutschland HD" ]
       },
@@ -581,7 +581,7 @@
 
     "label": "TELE 5",
     "url": "http://www.tele5.de/",
-    "icon": "https://pbs.twimg.com/profile_images/797097226715746313/srv2_KZ9_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/797097226715746313/srv2_KZ9_400x400.jpg",
 
     "channels": [
       {
@@ -589,7 +589,7 @@
         "default": false,
         "develop": true,
         "enabled": false,
-        "icon": "https://pbs.twimg.com/profile_images/797097226715746313/srv2_KZ9_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/797097226715746313/srv2_KZ9_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/tele5.html",
         "aliase": [ "tv/de/Tele 5", "tv/de/Tele 5 HD" ]
       }
@@ -600,7 +600,7 @@
 
     "label": "Nickelodion",
     "url": "http://www.nick.de/",
-    "icon": "https://pbs.twimg.com/profile_images/793505457973243905/x6C9sUg3_400x400.jpg",
+    "icon": "http://pbs.twimg.com/profile_images/793505457973243905/x6C9sUg3_400x400.jpg",
 
     "channels": [
       {
@@ -608,7 +608,7 @@
         "default": false,
         "develop": true,
         "enabled": false,
-        "icon": "https://pbs.twimg.com/profile_images/793505457973243905/x6C9sUg3_400x400.jpg",
+        "icon": "http://pbs.twimg.com/profile_images/793505457973243905/x6C9sUg3_400x400.jpg",
         "videourl": "http://www.live-stream.tv/online/fernsehen/deutsch/nickcc.html",
         "aliase": [ "tv/de/Nickelodeon Deutschland", "tv/de/Nickelodeon Deutschland HD" ]
       }

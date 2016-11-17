@@ -99,7 +99,7 @@ function checkWebLibsIPxx($file)
 
 function checkIcon($file, $keytag, $icon)
 {
-	$cont = @file_get_contents($icon);
+	$cont = file_get_contents($icon);
 	$result = ($cont == null) ? "FAIL" : "OK";
 	
 	if ($result == "FAIL")
