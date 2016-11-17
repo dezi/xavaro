@@ -154,6 +154,7 @@ public class ImageSmartCache
         if (! cachename.contains(".")) cachename = "webapp." + cachename + ".icon";
 
         cachename = width + "x" + height + "." + (circle ? "circle" : "normal") + "." + cachename;
+        cachename = cachename.replace("/", ".");
 
         File cachedir = new File(Simple.getExternalCacheDir(), "screenicons");
         File cachefile = new File(cachedir, cachename);

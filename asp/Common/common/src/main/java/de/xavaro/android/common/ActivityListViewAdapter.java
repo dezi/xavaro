@@ -1,16 +1,20 @@
 package de.xavaro.android.common;
 
 import android.graphics.Typeface;
+import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.ViewGroup;
 import android.view.View;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ActivityListViewAdapter extends PinnedListViewAdapter
 {
+    private static final String LOGTAG = ActivityListViewAdapter.class.getSimpleName();
+
     private JSONArray days;
 
     public ActivityListViewAdapter()
@@ -54,14 +58,15 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
 
         if (convertView == null)
         {
-            view = new LinearLayout(Simple.getActContext());
+            view = new LinearLayout(parent.getContext());
             view.setLayoutParams(Simple.layoutParamsMW());
             view.setOrientation(LinearLayout.HORIZONTAL);
             Simple.setPadding(view, 10, 10, 10, 10);
-            view.setBackgroundColor(0xffffffff);
+            view.setBackgroundColor(0xdddddddd);
 
-            TextView dateView = new TextView(Simple.getActContext());
-            dateView.setLayoutParams(Simple.layoutParamsWW());
+            TextView dateView = new TextView(parent.getContext());
+            dateView.setLayoutParams(Simple.layoutParamsMW());
+            dateView.setGravity(Gravity.CENTER_HORIZONTAL);
             dateView.setTextSize(Simple.getDeviceTextSize(24f));
             dateView.setTypeface(null, Typeface.BOLD);
             dateView.setId(android.R.id.text1);
@@ -75,7 +80,9 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
         JSONObject day = Json.getObject(days, section);
         String date = Json.getString(day, "date");
 
-        ((TextView) view.findViewById(android.R.id.text1)).setText(date);
+        TextView dateView = (TextView) view.findViewById(android.R.id.text1);
+
+        if (dateView != null) dateView.setText(date);
 
         return view;
     }
@@ -87,18 +94,25 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
 
         if (convertView == null)
         {
-            view = new LinearLayout(Simple.getActContext());
+            view = new LinearLayout(parent.getContext());
             view.setLayoutParams(Simple.layoutParamsMW());
             view.setOrientation(LinearLayout.HORIZONTAL);
             Simple.setPadding(view, 10, 10, 10, 10);
-            view.setBackgroundColor(0xffccccff);
+            view.setBackgroundColor(0xffffffff);
 
-            TextView dateView = new TextView(Simple.getActContext());
-            dateView.setLayoutParams(Simple.layoutParamsWW());
-            dateView.setTextSize(Simple.getDeviceTextSize(24f));
-            dateView.setTypeface(null, Typeface.BOLD);
-            dateView.setId(android.R.id.text1);
-            view.addView(dateView);
+            ImageSmartView iconView = new ImageSmartView(parent.getContext());
+            iconView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(80),Simple.DP(80)));
+            iconView.setBackgroundColor(0xcccccccc);
+            iconView.setId(android.R.id.icon);
+            view.addView(iconView);
+
+            TextView textView = new TextView(parent.getContext());
+            textView.setLayoutParams(Simple.layoutParamsWW());
+            Simple.setPadding(textView, 10, 0, 0, 0);
+            textView.setTextSize(Simple.getDeviceTextSize(24f));
+            textView.setTypeface(null, Typeface.BOLD);
+            textView.setId(android.R.id.text1);
+            view.addView(textView);
         }
         else
         {
@@ -109,8 +123,15 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
         JSONArray recs = Json.getArray(day, "recs");
         JSONObject rec = Json.getObject(recs, position);
         String text = Json.getString(rec, "text");
+        String icon = Json.getString(rec, "icon");
 
-        ((TextView) view.findViewById(android.R.id.text1)).setText(text);
+        ImageSmartView iconView = (ImageSmartView) view.findViewById(android.R.id.icon);
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+
+        if (iconView != null) iconView.setImageResource(icon);
+        if (textView != null) textView.setText(text);
+
+        Log.d(LOGTAG, "pupsikate=" + icon);
 
         return view;
     }
