@@ -440,19 +440,26 @@ public class LaunchItem extends FrameLayout implements
         {
             String iconref = Json.getString(config, "icon");
 
-            if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
+            if (Simple.startsWith(iconref,"weblib|"))
             {
-                if (config.has("name"))
-                {
-                    String iconname = Json.getString(config, "name");
-                    String iconpath = CacheManager.getWebIconPath(iconname, iconref);
-                    icon.setImageResource(iconpath);
-                }
+                icon.setImageResource(iconref);
             }
             else
             {
-                int resourceId = Simple.getIconResourceId(iconref);
-                if (resourceId > 0) icon.setImageResource(resourceId);
+                if (Simple.startsWith(iconref, "http://") || Simple.startsWith(iconref, "https://"))
+                {
+                    if (config.has("name"))
+                    {
+                        String iconname = Json.getString(config, "name");
+                        String iconpath = CacheManager.getWebIconPath(iconname, iconref);
+                        icon.setImageResource(iconpath);
+                    }
+                }
+                else
+                {
+                    int resourceId = Simple.getIconResourceId(iconref);
+                    if (resourceId > 0) icon.setImageResource(resourceId);
+                }
             }
         }
 

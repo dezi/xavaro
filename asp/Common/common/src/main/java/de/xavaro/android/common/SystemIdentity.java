@@ -53,15 +53,6 @@ public class SystemIdentity
 
     public static String getIdentity()
     {
-        try
-        {
-            double vvv = 8 / 0;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-
         if (identity == null) initialize();
 
         return identity;

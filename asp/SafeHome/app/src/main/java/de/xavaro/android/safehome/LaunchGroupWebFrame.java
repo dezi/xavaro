@@ -60,6 +60,13 @@ public class LaunchGroupWebFrame extends LaunchGroup
             Json.put(webitem, "name", website);
             Json.put(webitem, "order", 500);
 
+            //
+            // Redirect icon path to pre-loaded logos inside weblibs.
+            //
+
+            String icon = "weblib|logos|" + type + "/" + subtype + "/" + website + ".img";
+            Json.put(webitem, "icon", icon);
+
             String mode = Simple.getSharedPrefString(key);
 
             adir.put(webitem);
