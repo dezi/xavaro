@@ -140,16 +140,9 @@ function checkIcon($file, $keytag, $icon, $storepath = null)
 		$error[ "icon"   ] = $icon;
 		
 		$GLOBALS[ "fails" ][] = $error;
-
-		echo "CHECK: $result => $keytag => $icon\n";
 	}
 	else
-	{
-		$info = getimagesize($icon);
-		$fext = image_type_to_extension($info[ 2 ]);
-		if ($fext == ".jpeg") $fext = ".jpg";
-		
-		echo "CHECK: $result => $keytag => $fext => $icon\n";
+	{		
 		
 		if ($storepath)
 		{
@@ -161,6 +154,8 @@ function checkIcon($file, $keytag, $icon, $storepath = null)
 			echo "STORE: $storefile\n";
 		}
 	}
+	
+	echo "CHECK: $result => $keytag => $icon\n";
 }
 
 function checkWebLibs()
