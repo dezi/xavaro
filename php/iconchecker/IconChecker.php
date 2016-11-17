@@ -145,7 +145,7 @@ function checkIcon($file, $keytag, $icon, $storepath = null)
 	}
 	else
 	{
-		$info = getimagesizefromstring($cont);
+		$info = getimagesize($icon);
 		$fext = image_type_to_extension($info[ 2 ]);
 		if ($fext == ".jpeg") $fext = ".jpg";
 		
