@@ -547,6 +547,9 @@ public class LaunchItem extends FrameLayout implements
         JSONObject intent = Json.getObject(config, "intent");
         String action = Json.getString(intent, "action");
         String acttext = Json.getString(intent, "activity");
+        String icon = Json.getString(config,"icon");
+        String name = Json.getString(config,"name");
+        int iconres = Json.getInt(config,"iconres");
 
         if ((acttext != null) && (action != null))
         {
@@ -561,6 +564,10 @@ public class LaunchItem extends FrameLayout implements
             Json.put(activity, "action", action);
             Json.put(activity, "type", type);
             Json.put(activity, "subtype", subtype);
+
+            if (name != null) Json.put(activity, "name", name);
+            if (icon != null) Json.put(activity, "icon", icon);
+            if (iconres != 0) Json.put(activity, "icid", iconres);
 
             if (activityStart > 0)
             {
