@@ -30,6 +30,8 @@ public class CommonConfigs
     public static final int IconResSocialInstagram  = R.drawable.social_instagram_400x400;
     public static final int IconResSocialTinder     = R.drawable.social_tinder_300x300;
     public static final int IconResSettingsAndroid  = R.drawable.settings_android_512x512;
+    public static final int IconResWarning          = R.drawable.warning_300x300;
+
     // @formatter:on
 
     //endregion Global icons

@@ -252,6 +252,18 @@ public class ImageSmartCache
 
         if ((tmp == null) && (data == null))
         {
+            resid = Simple.getIdentifier(restag, "drawable");
+
+            if (resid > 0)
+            {
+                BitmapFactory.decodeResource(Simple.getAnyContext().getResources(), resid, options);
+                adjustOptions(options, width, height);
+                tmp = BitmapFactory.decodeResource(Simple.getAnyContext().getResources(), resid, options);
+            }
+        }
+
+        if ((tmp == null) && (data == null))
+        {
             data = WebApp.getAppIconData(restag);
         }
 

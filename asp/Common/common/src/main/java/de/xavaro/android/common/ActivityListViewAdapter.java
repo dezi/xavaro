@@ -2,6 +2,7 @@ package de.xavaro.android.common;
 
 import android.graphics.Typeface;
 import android.view.Gravity;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.ViewGroup;
@@ -54,7 +55,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
     @Override
     public View getHeadView(int section, View convertView, ViewGroup parent)
     {
-        LinearLayout view = null;
+        LinearLayout view;
 
         if (convertView == null)
         {
@@ -62,14 +63,14 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
             view.setLayoutParams(Simple.layoutParamsMW());
             view.setOrientation(LinearLayout.HORIZONTAL);
             Simple.setPadding(view, 10, 10, 10, 10);
-            view.setBackgroundColor(0xdddddddd);
+            view.setBackgroundColor(0xddddddff);
 
             TextView dateView = new TextView(parent.getContext());
             dateView.setLayoutParams(Simple.layoutParamsMW());
             dateView.setGravity(Gravity.CENTER_HORIZONTAL);
             dateView.setTextSize(Simple.getDeviceTextSize(24f));
             dateView.setTypeface(null, Typeface.BOLD);
-            dateView.setId(android.R.id.text1);
+            dateView.setId(android.R.id.content);
             view.addView(dateView);
         }
         else
@@ -80,7 +81,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
         JSONObject day = Json.getObject(days, section);
         String date = Json.getString(day, "date");
 
-        TextView dateView = (TextView) view.findViewById(android.R.id.text1);
+        TextView dateView = (TextView) view.findViewById(android.R.id.content);
 
         if (dateView != null) dateView.setText(date);
 
@@ -90,48 +91,98 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
     @Override
     public View getItemView(int section, int position, View convertView, ViewGroup parent)
     {
-        LinearLayout view = null;
+        FrameLayout view;
 
         if (convertView == null)
         {
-            view = new LinearLayout(parent.getContext());
+            view = new FrameLayout(parent.getContext());
             view.setLayoutParams(Simple.layoutParamsMW());
-            view.setOrientation(LinearLayout.HORIZONTAL);
-            Simple.setPadding(view, 10, 10, 10, 10);
-            view.setBackgroundColor(0xffffffff);
+            view.setBackgroundColor(((position % 2) == 0) ? 0xfff8f8f8 : 0xfff0f0f0);
+
+            LinearLayout contFrame = new LinearLayout(parent.getContext());
+            contFrame.setLayoutParams(Simple.layoutParamsWW());
+            contFrame.setOrientation(LinearLayout.HORIZONTAL);
+            view.addView(contFrame);
+
+            FrameLayout iconFrame = new FrameLayout(parent.getContext());
+            iconFrame.setLayoutParams(Simple.layoutParamsXX(Simple.DP(100),Simple.DP(100)));
+            Simple.setPadding(iconFrame, 10, 10, 10, 10);
+            contFrame.addView(iconFrame);
 
             ImageSmartView iconView = new ImageSmartView(parent.getContext());
             iconView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(80),Simple.DP(80)));
-            iconView.setBackgroundColor(0xcccccccc);
-            iconView.setId(android.R.id.icon);
-            view.addView(iconView);
+            iconView.setBackgroundColor(0xffffffff);
+            iconView.setId(android.R.id.icon1);
+            iconFrame.addView(iconView);
 
             TextView textView = new TextView(parent.getContext());
             textView.setLayoutParams(Simple.layoutParamsWW());
-            Simple.setPadding(textView, 10, 0, 0, 0);
-            textView.setTextSize(Simple.getDeviceTextSize(24f));
+            Simple.setPadding(textView, 10, 4, 10, 16);
+            textView.setTextSize(Simple.getDeviceTextSize(22f));
             textView.setTypeface(null, Typeface.BOLD);
             textView.setId(android.R.id.text1);
-            view.addView(textView);
+            contFrame.addView(textView);
+
+            ImageSmartView alertView = new ImageSmartView(parent.getContext());
+            alertView.setLayoutParams(Simple.layoutParamsXX(Simple.DP(50), Simple.DP(50), Gravity.RIGHT | Gravity.TOP));
+            alertView.setId(android.R.id.icon2);
+            Simple.setPadding(alertView, 0, 10, 10, 0);
+            view.addView(alertView);
+
+            TextView timeView = new TextView(parent.getContext());
+            timeView.setLayoutParams(Simple.layoutParamsWW(Gravity.RIGHT | Gravity.BOTTOM));
+            timeView.setTextSize(Simple.getDeviceTextSize(16f));
+            timeView.setId(android.R.id.text2);
+            Simple.setPadding(timeView, 0, 0, 15, 0);
+            view.addView(timeView);
         }
         else
         {
-            view = (LinearLayout) convertView;
+            view = (FrameLayout) convertView;
         }
 
         JSONObject day = Json.getObject(days, section);
         JSONArray recs = Json.getArray(day, "recs");
         JSONObject rec = Json.getObject(recs, position);
+        String date = Json.getString(rec, "date");
         String text = Json.getString(rec, "text");
         String icon = Json.getString(rec, "icon");
+        String mode = Json.getString(rec, "mode");
 
-        ImageSmartView iconView = (ImageSmartView) view.findViewById(android.R.id.icon);
+        String time = Simple.getLocal24HTime(date);
+
+        if ((text != null) && ! text.endsWith(".")) text += ".";
+
+        int duration = Json.getInt(rec, "duration");
+
+        if (duration > 0)
+        {
+            int mins = duration / 60;
+
+            time = ((mins == 0) ? "<1" : ("~" + mins)) + " min, " + time;
+        }
+
+        ImageSmartView iconView = (ImageSmartView) view.findViewById(android.R.id.icon1);
+        ImageSmartView alertView = (ImageSmartView) view.findViewById(android.R.id.icon2);
+
         TextView textView = (TextView) view.findViewById(android.R.id.text1);
+        TextView timeView = (TextView) view.findViewById(android.R.id.text2);
 
         if (iconView != null) iconView.setImageResource(icon);
         if (textView != null) textView.setText(text);
+        if (timeView != null) timeView.setText(time);
 
-        Log.d(LOGTAG, "pupsikate=" + icon);
+        if (alertView != null)
+        {
+            if (Simple.equals(mode, "warning"))
+            {
+                alertView.setImageResource(CommonConfigs.IconResWarning);
+            }
+            else
+            {
+                alertView.setImageResource(0);
+            }
+        }
 
         return view;
     }

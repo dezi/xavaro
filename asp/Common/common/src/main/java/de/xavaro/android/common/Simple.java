@@ -2352,9 +2352,9 @@ public class Simple
         return new LinearLayout.LayoutParams(width, height);
     }
 
-    public static LinearLayout.LayoutParams layoutParamsXX(int width, int height, int gravity)
+    public static FrameLayout.LayoutParams layoutParamsXX(int width, int height, int gravity)
     {
-        return new LinearLayout.LayoutParams(width, height, gravity);
+        return new FrameLayout.LayoutParams(width, height, gravity);
     }
 
     public static ViewGroup.LayoutParams layoutParamsWW()
@@ -2961,6 +2961,11 @@ public class Simple
     public static String getResourceName(int resid)
     {
         return getResources().getResourceEntryName(resid);
+    }
+
+    public static int getIdentifier(String name, String type)
+    {
+        return getResources().getIdentifier(name, type, getPackageName());
     }
 
     public static int getIdentifier(String name, String type, String pack)
