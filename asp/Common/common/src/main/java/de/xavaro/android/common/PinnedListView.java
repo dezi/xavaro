@@ -1,6 +1,6 @@
 package de.xavaro.android.common;
 
-import android.widget.HeaderViewListAdapter;
+import android.util.Log;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -12,8 +12,13 @@ import android.view.ViewGroup;
 import android.view.View;
 import android.util.AttributeSet;
 
-public class PinnedListView extends ListView implements OnScrollListener
+public class PinnedListView extends ListView implements
+        OnScrollListener,
+        View.OnClickListener,
+        View.OnLongClickListener
 {
+    private static final String LOGTAG = PinnedListView.class.getSimpleName();
+
     private OnScrollListener mOnScrollListener;
 
     public interface PinnedListViewAdapterInterface
@@ -27,6 +32,12 @@ public class PinnedListView extends ListView implements OnScrollListener
         int getHeadViewType(int section);
 
         int getCount();
+
+        long getItemId(int position);
+
+        void onHeadClick(AdapterView<?> parent, View view, int section, long id);
+
+        boolean onHeadLongClick(AdapterView<?> parent, View view, int section, long id);
     }
 
     private PinnedListViewAdapterInterface mAdapter;
@@ -34,6 +45,7 @@ public class PinnedListView extends ListView implements OnScrollListener
     private int mCurrentHeaderViewType = 0;
     private float mHeaderOffset;
     private boolean mShouldPin = true;
+    private int mCurrentPosition = 0;
     private int mCurrentSection = 0;
     private int mWidthMode;
     private int mHeightMode;
@@ -96,7 +108,11 @@ public class PinnedListView extends ListView implements OnScrollListener
 
         int section = mAdapter.getSectionForPosition(firstVisibleItem);
         int viewType = mAdapter.getHeadViewType(section);
-        mCurrentHeader = getHeadView(section, mCurrentHeaderViewType != viewType ? null : mCurrentHeader);
+        mCurrentHeader = getHeadView(section, firstVisibleItem, mCurrentHeaderViewType != viewType ? null : mCurrentHeader);
+
+        mCurrentHeader.setOnClickListener(this);
+        mCurrentHeader.setOnLongClickListener(this);
+
         ensurePinnedHeaderLayout(mCurrentHeader);
         mCurrentHeaderViewType = viewType;
 
@@ -134,17 +150,31 @@ public class PinnedListView extends ListView implements OnScrollListener
         }
     }
 
-    private View getHeadView(int section, View oldView)
+    public void onClick(View view)
+    {
+        Log.d(LOGTAG, "onClick: fixed head click section=" + mCurrentSection + " position=" + mCurrentPosition);
+
+        mAdapter.onHeadClick(this, view, mCurrentSection, mAdapter.getItemId(mCurrentPosition));
+    }
+
+    public boolean onLongClick(View view)
+    {
+        Log.d(LOGTAG, "onLongClick: fixed head click section=" + mCurrentSection + " position=" + mCurrentPosition);
+
+        return mAdapter.onHeadLongClick(this, view, mCurrentSection, mAdapter.getItemId(mCurrentPosition));
+    }
+
+    private View getHeadView(int section, int position, View oldView)
     {
         boolean shouldLayout = section != mCurrentSection || oldView == null;
 
         View view = mAdapter.getHeadView(section, oldView, this);
-        if (shouldLayout)
-        {
-            // a new section, thus a new header. We should lay it out again
-            ensurePinnedHeaderLayout(view);
-            mCurrentSection = section;
-        }
+
+        if (shouldLayout) ensurePinnedHeaderLayout(view);
+
+        mCurrentSection = section;
+        mCurrentPosition = position;
+
         return view;
     }
 
@@ -201,46 +231,5 @@ public class PinnedListView extends ListView implements OnScrollListener
 
         mWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         mHeightMode = MeasureSpec.getMode(heightMeasureSpec);
-    }
-
-    public void setOnItemClickListener(PinnedListView.OnItemClickListener listener)
-    {
-        super.setOnItemClickListener(listener);
-    }
-
-    public static abstract class OnItemClickListener implements AdapterView.OnItemClickListener
-    {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int rawPosition, long id)
-        {
-            PinnedListViewAdapter adapter;
-
-            if (adapterView.getAdapter().getClass().equals(HeaderViewListAdapter.class))
-            {
-                HeaderViewListAdapter wrapperAdapter = (HeaderViewListAdapter) adapterView.getAdapter();
-                adapter = (PinnedListViewAdapter) wrapperAdapter.getWrappedAdapter();
-            }
-            else
-            {
-                adapter = (PinnedListViewAdapter) adapterView.getAdapter();
-            }
-
-            int section = adapter.getSectionForPosition(rawPosition);
-            int position = adapter.getPositionInSectionForPosition(rawPosition);
-
-            if (position == -1)
-            {
-                onSectionClick(adapterView, view, section, id);
-            }
-            else
-            {
-                onItemClick(adapterView, view, section, position, id);
-            }
-        }
-
-        public abstract void onItemClick(AdapterView<?> adapterView, View view, int section, int position, long id);
-
-        public abstract void onSectionClick(AdapterView<?> adapterView, View view, int section, long id);
-
     }
 }

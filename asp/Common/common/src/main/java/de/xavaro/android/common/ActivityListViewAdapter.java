@@ -1,11 +1,12 @@
 package de.xavaro.android.common;
 
+import android.annotation.SuppressLint;
 import android.graphics.Typeface;
-import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.ViewGroup;
+import android.view.Gravity;
 import android.view.View;
 import android.util.Log;
 
@@ -24,11 +25,14 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
 
         days = ActivityManager.getInstance().loadDays();
     }
-
+    
     @Override
     public Object getItem(int section, int position)
     {
-        return null;
+        JSONObject day = Json.getObject(days, section);
+        JSONArray recs = Json.getArray(day, "recs");
+
+        return (recs == null) ? null : Json.getObject(recs, position);
     }
 
     @Override
@@ -49,7 +53,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
         JSONObject day = Json.getObject(days, section);
         JSONArray recs = Json.getArray(day, "recs");
 
-        return (recs != null) ? recs.length() : 0;
+        return (recs == null) ? 0 : recs.length();
     }
 
     @Override
@@ -63,7 +67,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
             view.setLayoutParams(Simple.layoutParamsMW());
             view.setOrientation(LinearLayout.HORIZONTAL);
             Simple.setPadding(view, 10, 10, 10, 10);
-            view.setBackgroundColor(0xddddddff);
+            view.setBackgroundColor(0x448888ff);
 
             TextView dateView = new TextView(parent.getContext());
             dateView.setLayoutParams(Simple.layoutParamsMW());
@@ -89,6 +93,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
     }
 
     @Override
+    @SuppressLint("RtlHardcoded")
     public View getItemView(int section, int position, View convertView, ViewGroup parent)
     {
         FrameLayout view;
@@ -97,7 +102,6 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
         {
             view = new FrameLayout(parent.getContext());
             view.setLayoutParams(Simple.layoutParamsMW());
-            view.setBackgroundColor(((position % 2) == 0) ? 0xfff8f8f8 : 0xfff0f0f0);
 
             LinearLayout contFrame = new LinearLayout(parent.getContext());
             contFrame.setLayoutParams(Simple.layoutParamsWW());
@@ -140,6 +144,8 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
         {
             view = (FrameLayout) convertView;
         }
+
+        view.setBackgroundColor(((position % 2) == 0) ? 0x44ffffff : 0x44dddddd);
 
         JSONObject day = Json.getObject(days, section);
         JSONArray recs = Json.getArray(day, "recs");

@@ -1,34 +1,27 @@
 package de.xavaro.android.common;
 
+import android.util.Log;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.view.View;
 import android.view.ViewGroup;
-import android.util.SparseIntArray;
+import android.view.View;
 
-public abstract class PinnedListViewAdapter extends BaseAdapter
-        implements PinnedListView.PinnedListViewAdapterInterface
+public abstract class PinnedListViewAdapter extends BaseAdapter implements
+        AdapterView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener,
+        PinnedListView.PinnedListViewAdapterInterface
 {
     private static final String LOGTAG = PinnedListViewAdapter.class.getSimpleName();
 
     private static final int HEAD_VIEW_TYPE = 0;
     private static final int ITEM_VIEW_TYPE = 0;
 
-    private SparseIntArray mSectionCache = new SparseIntArray();
-    private SparseIntArray mSectionCountCache = new SparseIntArray();
-    private SparseIntArray mSectionPositionCache = new SparseIntArray();
-
-    private int mCount = -1;
-    private int mSectionCount = -1;
+    private int totalCount = -1;
 
     @Override
     public void notifyDataSetChanged()
     {
-        mSectionCache.clear();
-        mSectionCountCache.clear();
-        mSectionPositionCache.clear();
-
-        mCount = -1;
-        mSectionCount = -1;
+        totalCount = -1;
 
         super.notifyDataSetChanged();
     }
@@ -36,12 +29,7 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     @Override
     public void notifyDataSetInvalidated()
     {
-        mSectionCache.clear();
-        mSectionCountCache.clear();
-        mSectionPositionCache.clear();
-
-        mCount = -1;
-        mSectionCount = -1;
+        totalCount = -1;
 
         super.notifyDataSetInvalidated();
     }
@@ -49,16 +37,16 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     @Override
     public final int getCount()
     {
-        if (mCount >= 0) return mCount;
+        if (totalCount >= 0) return totalCount;
 
-        mCount = 0;
+        totalCount = 0;
 
-        for (int section = 0; section < internalGetSectionCount(); section++)
+        for (int section = 0; section < getSectionCount(); section++)
         {
-            mCount += 1 + internalGetCountForSection(section);
+            totalCount += 1 + getCountForSection(section);
         }
 
-        return mCount;
+        return totalCount;
     }
 
     @Override
@@ -107,48 +95,28 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
 
     public final int getSectionForPosition(int position)
     {
-        int section = mSectionCache.get(position, -1);
-        if (section >= 0) return section;
+        int sectionMax = getSectionCount();
 
-        int sectionStart = 0;
-
-        for (section = 0; section < internalGetSectionCount(); section++)
+        for (int section = 0, sectionPos = 0; section < sectionMax; section++)
         {
-            int sectionCount = internalGetCountForSection(section);
-            int sectionEnd = sectionStart + sectionCount + 1;
-
-            if (position >= sectionStart && position < sectionEnd)
-            {
-                mSectionCache.put(position, section);
-                return section;
-            }
-
-            sectionStart = sectionEnd;
+            sectionPos += getCountForSection(section) + 1;
+            if (position < sectionPos) return section;
         }
 
         return 0;
     }
 
-    public int getPositionInSectionForPosition(int position)
+    public final int getPositionInSectionForPosition(int position)
     {
-        int sectionStart = mSectionPositionCache.get(position, -1);
-        if (sectionStart >= 0) return sectionStart;
+        int sectionMax = getSectionCount();
 
-        sectionStart = 0;
-
-        for (int section = 0; section < internalGetSectionCount(); section++)
+        for (int section = 0, sectionPos = 0; section < sectionMax; section++)
         {
-            int sectionCount = internalGetCountForSection(section);
-            int sectionEnd = sectionStart + sectionCount + 1;
+            int sectionEnd = sectionPos + getCountForSection(section) + 1;
 
-            if (position >= sectionStart && position < sectionEnd)
-            {
-                int positionInSection = position - sectionStart - 1;
-                mSectionPositionCache.put(position, positionInSection);
-                return positionInSection;
-            }
+            if (position < sectionEnd) return position - sectionPos - 1;
 
-            sectionStart = sectionEnd;
+            sectionPos = sectionEnd;
         }
 
         return 0;
@@ -158,7 +126,7 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
     {
         int sectionStart = 0;
 
-        for (int section = 0; section < internalGetSectionCount(); section++)
+        for (int section = 0; section < getSectionCount(); section++)
         {
             if (position == sectionStart)
             {
@@ -170,27 +138,31 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
                 return false;
             }
 
-            sectionStart += internalGetCountForSection(section) + 1;
+            sectionStart += getCountForSection(section) + 1;
         }
 
         return false;
     }
 
+    @SuppressWarnings({"UnusedParameters", "WeakerAccess"})
     public int getItemViewType(int section, int position)
     {
         return ITEM_VIEW_TYPE;
     }
 
+    @SuppressWarnings({"WeakerAccess", "SameReturnValue"})
     public int getItemViewTypeCount()
     {
         return 1;
     }
 
+    @SuppressWarnings({"WeakerAccess", "SameReturnValue"})
     public int getHeadViewType(int section)
     {
         return HEAD_VIEW_TYPE;
     }
 
+    @SuppressWarnings({"WeakerAccess", "SameReturnValue"})
     public int getHeadViewTypeCount()
     {
         return 1;
@@ -208,24 +180,65 @@ public abstract class PinnedListViewAdapter extends BaseAdapter
 
     public abstract View getHeadView(int section, View convertView, ViewGroup parent);
 
-    private int internalGetCountForSection(int section)
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-        int sectionCount = mSectionCountCache.get(section, -1);
-        if (sectionCount >= 0) return sectionCount;
+        Log.d(LOGTAG, "onItemClick: " + position);
 
-        sectionCount = getCountForSection(section);
-        mSectionCountCache.put(section, sectionCount);
-        return sectionCount;
-    }
+        int section = getSectionForPosition(position);
+        int posinsect = getPositionInSectionForPosition(position);
 
-    private int internalGetSectionCount()
-    {
-        if (mSectionCount >= 0)
+        if (posinsect == -1)
         {
-            return mSectionCount;
+            onHeadClick(parent, view, section, id);
         }
-        mSectionCount = getSectionCount();
-        return mSectionCount;
+        else
+        {
+            onItemClick(parent, view, section, posinsect, id);
+        }
     }
 
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        Log.d(LOGTAG, "onItemLongClick: " + position);
+
+        int section = getSectionForPosition(position);
+        int posinsect = getPositionInSectionForPosition(position);
+
+        if (posinsect == -1)
+        {
+            return onHeadLongClick(parent, view, section, id);
+        }
+        else
+        {
+            return onItemLongClick(parent, view, section, posinsect, id);
+        }
+    }
+
+    @SuppressWarnings({"UnusedParameters", "WeakerAccess"})
+    public void onHeadClick(AdapterView<?> parent, View view, int section, long id)
+    {
+        Log.d(LOGTAG, "onHeadClick: section=" + section);
+    }
+
+    @SuppressWarnings({"UnusedParameters", "WeakerAccess"})
+    public void onItemClick(AdapterView<?> parent, View view, int section, int position, long id)
+    {
+        Log.d(LOGTAG, "onItemClick: section=" + section + " position=" + position);
+    }
+
+    @SuppressWarnings({"UnusedParameters", "WeakerAccess", "SameReturnValue"})
+    public boolean onHeadLongClick(AdapterView<?> parent, View view, int section, long id)
+    {
+        Log.d(LOGTAG, "onHeadLongClick: section=" + section);
+
+        return true;
+    }
+
+    @SuppressWarnings({"UnusedParameters", "WeakerAccess", "SameReturnValue"})
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int section, int position, long id)
+    {
+        Log.d(LOGTAG, "onItemLongClick: section=" + section + " position=" + position);
+
+        return true;
+    }
 }

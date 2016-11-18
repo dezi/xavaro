@@ -45,6 +45,7 @@ public class HealthFrame extends LaunchFrame
         addView(listview, 0);
 
         adapter = new HealthFrameAdapter();
+
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(adapter);
         listview.setOnItemLongClickListener(adapter);
