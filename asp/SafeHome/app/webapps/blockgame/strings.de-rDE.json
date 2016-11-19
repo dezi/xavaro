@@ -1,4 +1,12 @@
 {
+  "intent": {
+    "action": "play",
+    "keywords": [ "Blocks", "Blockspiel" ],
+    "response": "Ich öffne das Blockspiel",
+    "activity": "das Blockspiel gespielt",
+    "sample": "Öffne das Blockspiel",
+    "icon": "/webapps/blockgame/blockgame_512x512.png"
+  },
 
-  "EOL" : true
+  "EOL": true
 }

@@ -551,22 +551,36 @@ public class LaunchItem extends FrameLayout implements
     {
         Log.d(LOGTAG, "onLogActivityEnded");
 
-        JSONObject intent = Json.getObject(config, "intent");
-        String action = Json.getString(intent, "action");
-        String acttext = Json.getString(intent, "activity");
-        String icon = Json.getString(config,"icon");
-        String name = Json.getString(config,"name");
-        int iconres = Json.getInt(config,"iconres");
+        JSONArray intents = Json.getArray(config, "intents");
 
-        if ((acttext != null) && (action != null))
+        if (intents == null)
         {
+            intents = new JSONArray();
+
+            JSONObject intent = Json.getObject(config, "intent");
+            if (intent != null) intents.put(intent);
+        }
+
+        for (int inx = 0; inx < intents.length(); inx++)
+        {
+            JSONObject intent = Json.getObject(intents, inx);
+            if (intent == null) continue;
+
+            String action = Json.getString(intent, "action");
+            String acttext = Json.getString(intent, "activity");
+            if ((action == null) || (acttext == null)) continue;
+
+            String name = Json.getString(config, "name");
+            String icon = Json.getString(config, "icon");
+            int iconres = Json.getInt(config, "iconres");
+            
             acttext = Simple.getTrans(R.string.simple_you_have) + " " + acttext;
 
             long now = Simple.nowAsTimeStamp();
 
             JSONObject activity = new JSONObject();
 
-            Json.put(activity, "date", Simple.timeStampAsISO(now));
+            Json.put(activity, "date", Simple.timeStampAsISO((activityStart > 0) ? activityStart : now));
             Json.put(activity, "text", acttext);
             Json.put(activity, "action", action);
             Json.put(activity, "type", type);
@@ -583,6 +597,8 @@ public class LaunchItem extends FrameLayout implements
             }
 
             ActivityManager.getInstance().recordActivity(activity);
+
+            break;
         }
     }
 

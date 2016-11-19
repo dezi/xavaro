@@ -1,12 +1,13 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.AttributeSet;
 import android.util.Log;
 
 import de.xavaro.android.common.VoiceIntent;
 import de.xavaro.android.common.WebAppView;
 
+@SuppressLint("ViewConstructor")
 public class LaunchFrameWebApp extends LaunchFrame
 {
     private static final String LOGTAG = LaunchFrameWebApp.class.getSimpleName();
@@ -32,6 +33,7 @@ public class LaunchFrameWebApp extends LaunchFrame
         return webview;
     }
 
+    @SuppressWarnings("unused")
     public void doDataCallback(String function, String data)
     {
         webview.request.doDataCallback(function, data);
@@ -58,6 +60,8 @@ public class LaunchFrameWebApp extends LaunchFrame
     @Override
     public void onBackKeyExecuted()
     {
+        super.onBackKeyExecuted();
+
         if (parent != null)
         {
             //

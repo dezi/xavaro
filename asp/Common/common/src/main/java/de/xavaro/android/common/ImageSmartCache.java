@@ -136,6 +136,8 @@ public class ImageSmartCache
     @Nullable
     private static Bitmap getBitmap(String restag, int width, int height, boolean circle)
     {
+        Log.d(LOGTAG, "getBitmap: restag=" + restag);
+
         String cachename = restag.replace("|", ".");
 
         int resid = Simple.parseNumber(restag);
@@ -224,6 +226,11 @@ public class ImageSmartCache
         if ((tmp == null) && restag.startsWith("webapp|"))
         {
             String[] parts = restag.split("\\|");
+
+            if (parts.length == 2)
+            {
+                data = WebApp.getAppIconData(parts[ 1 ]);
+            }
 
             if (parts.length == 3)
             {

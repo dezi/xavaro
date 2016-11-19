@@ -53,12 +53,14 @@ public class LaunchGroupWebApps extends LaunchGroup
         {
             String webappname = prefkey.substring(prefix.length());
             String category = WebApp.getCategory(webappname);
+            String iconurl = WebApp.getAppIconName(webappname);
 
             entry = new JSONObject();
 
             Json.put(entry, "type", "webapp");
             Json.put(entry, "subtype", webappname);
             Json.put(entry, "order", 400);
+            Json.put(entry, "icon", "webapp|" + webappname);
 
             JSONArray intents = WebApp.getVoiceIntents(webappname);
             if (intents != null) Json.put(entry, "intents", intents);

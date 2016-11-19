@@ -119,7 +119,8 @@ public class WebAppCache
     private static WebAppCacheResponse getCacheFile(
             String webappname, String url, int interval, String agent, boolean nolastuse)
     {
-        Simple.removePost(freeMemory);
+        if (interval >= 0) Simple.removePost(freeMemory);
+
         getStorage();
 
         //
@@ -138,14 +139,13 @@ public class WebAppCache
 
         synchronized (webappsync)
         {
-            if (! webappcache.has(webappname)) Json.put(webappcache, webappname, new JSONObject());
             cachefiles = Json.getObject(webappcache, webappname);
-        }
 
-        if (cachefiles == null)
-        {
-            Simple.makePost(freeMemory, 10 * 1000);
-            return new WebAppCacheResponse(null, null, null, false);
+            if (cachefiles == null)
+            {
+                cachefiles = new JSONObject();
+                Json.put(webappcache, webappname, cachefiles);
+            }
         }
 
         File cachedir = Simple.getExternalCacheDir("webappcache/" + webappname);
@@ -310,13 +310,15 @@ public class WebAppCache
             if (interval >= 0)
             {
                 if (! nolastuse) Json.put(cachefile, "luse", Simple.nowAsISO());
-                dirty = true;
             }
+
+            dirty = true;
         }
         else
         {
             Log.d(LOGTAG, "getCacheFile: ERR=" + url);
         }
+
 
         Simple.makePost(freeMemory, 10 * 1000);
 
@@ -386,6 +388,8 @@ public class WebAppCache
 
                 String lastmodified = Json.getString(cachefile, "lmod");
                 connection.setRequestProperty("If-Modified-Since", lastmodified);
+
+                Log.d(LOGTAG, "getContentFromServer: If-Modified-Since=" + lastmodified);
             }
 
             if (agent == null)
@@ -468,6 +472,8 @@ public class WebAppCache
                     {
                         if (headerKey.equalsIgnoreCase("Last-Modified"))
                         {
+                            Log.d(LOGTAG, "getContentFromServer: Last-Modified=" + headerValue);
+
                             Json.put(cachefile, "lmod", headerValue);
                             dirty = true;
                         }
@@ -600,9 +606,26 @@ public class WebAppCache
                 {
                     boolean ok = true;
 
-                    if (bak.exists()) ok = bak.delete();
-                    if (act.exists()) ok &= act.renameTo(bak);
-                    if (tmp.exists()) ok &= tmp.renameTo(act);
+                    if (bak.exists())
+                    {
+                        Log.d(LOGTAG, "putStorage: del=" + bak);
+
+                        ok = bak.delete();
+                    }
+
+                    if (act.exists())
+                    {
+                        Log.d(LOGTAG, "putStorage: ren=" + act + "=" + bak);
+
+                        ok &= act.renameTo(bak);
+                    }
+
+                    if (tmp.exists())
+                    {
+                        Log.d(LOGTAG, "putStorage: ren=" + tmp + "=" + act);
+
+                        ok &= tmp.renameTo(act);
+                    }
 
                     dirty = false;
 
@@ -788,7 +811,7 @@ public class WebAppCache
             }
         }
 
-        Simple.makePost(freeMemory, 10 * 1000);
+        Simple.makePost(freeMemory, 2 * 1000);
     }
 
     public static void commTick()

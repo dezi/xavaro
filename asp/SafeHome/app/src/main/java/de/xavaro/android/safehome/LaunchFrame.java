@@ -1,13 +1,14 @@
 package de.xavaro.android.safehome;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
-import android.util.AttributeSet;
 import android.util.Log;
 
 import de.xavaro.android.common.BackKeyClient;
 
+@SuppressLint("ViewConstructor")
 public class LaunchFrame extends FrameLayout implements BackKeyClient
 {
     private static final String LOGTAG = LaunchFrame.class.getSimpleName();

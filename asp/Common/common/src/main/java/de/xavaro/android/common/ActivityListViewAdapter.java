@@ -111,6 +111,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
             FrameLayout iconFrame = new FrameLayout(parent.getContext());
             iconFrame.setLayoutParams(Simple.layoutParamsXX(Simple.DP(100),Simple.DP(100)));
             Simple.setPadding(iconFrame, 10, 10, 10, 10);
+            iconFrame.setBackgroundColor(0xffffff);
             contFrame.addView(iconFrame);
 
             ImageSmartView iconView = new ImageSmartView(parent.getContext());
@@ -121,7 +122,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
 
             TextView textView = new TextView(parent.getContext());
             textView.setLayoutParams(Simple.layoutParamsWW());
-            Simple.setPadding(textView, 10, 4, 10, 16);
+            Simple.setPadding(textView, 10, 4, 50, 16);
             textView.setTextSize(Simple.getDeviceTextSize(22f));
             textView.setTypeface(null, Typeface.BOLD);
             textView.setId(android.R.id.text1);
@@ -145,7 +146,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
             view = (FrameLayout) convertView;
         }
 
-        view.setBackgroundColor(((position % 2) == 0) ? 0x44ffffff : 0x44dddddd);
+        view.setBackgroundColor(((position % 2) == 0) ? 0x44eeeeee : 0x44cccccc);
 
         JSONObject day = Json.getObject(days, section);
         JSONArray recs = Json.getArray(day, "recs");

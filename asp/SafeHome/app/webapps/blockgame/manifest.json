@@ -1,12 +1,13 @@
 {
   "manifest": {
 
-    "label": "Game of Blocks",
+    "label": "Blockspiel",
     "appname": "blockgame",
     "appicon": "blockgame_512x512.png",
     "preferences": false,
     "category": "games",
     "events": false,
+    "voice": true,
 
     "permissions": [
       "request",

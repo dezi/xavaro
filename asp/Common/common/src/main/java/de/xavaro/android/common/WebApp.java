@@ -76,7 +76,6 @@ public class WebApp
         return wcr.content;
     }
 
-
     @Nullable
     public static JSONArray getVoiceIntents(String webappname)
     {
@@ -116,11 +115,16 @@ public class WebApp
         return null;
     }
 
+    @Nullable
+    public static String getAppIconName(String webappname)
+    {
+        return Json.getString(getManifest(webappname), "appicon");
+    }
 
     @Nullable
     public static byte[] getAppIconData(String webappname)
     {
-        String appiconpng = Json.getString(getManifest(webappname), "appicon");
+        String appiconpng = getAppIconName(webappname);
         if (appiconpng == null) return null;
 
         String appiconsrc = getHTTPAppRoot(webappname) + appiconpng;
