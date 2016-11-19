@@ -24,6 +24,8 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
         super();
 
         days = ActivityManager.getInstance().loadDays();
+
+        Log.d(LOGTAG, "Constructor: days=" + days.length());
     }
     
     @Override
@@ -38,7 +40,7 @@ public class ActivityListViewAdapter extends PinnedListViewAdapter
     @Override
     public long getItemId(int section, int position)
     {
-        return 0;
+        return getPosition(section, position);
     }
 
     @Override

@@ -93,6 +93,19 @@ public abstract class PinnedListViewAdapter extends BaseAdapter implements
         return getItemViewTypeCount() + getHeadViewTypeCount();
     }
 
+    public final int getPosition(int section, int position)
+    {
+        int sectionMax = getSectionCount();
+        int sectionPos = 0;
+
+        for (int sinx = 0; (sinx < section) && (sinx < sectionMax); sinx++)
+        {
+            sectionPos += getCountForSection(section) + 1;
+        }
+
+        return sectionPos + position;
+    }
+
     public final int getSectionForPosition(int position)
     {
         int sectionMax = getSectionCount();
