@@ -4,12 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
-import android.widget.ListView;
-
-import org.json.JSONArray;
 
 import de.xavaro.android.common.ActivityListViewAdapter;
-import de.xavaro.android.common.HealthData;
+
 import de.xavaro.android.common.PinnedListView;
 
 @SuppressLint("ViewConstructor")
