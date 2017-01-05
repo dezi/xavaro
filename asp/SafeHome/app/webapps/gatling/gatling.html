@@ -19,9 +19,11 @@
 	var height    = 200.0;
 	var totalDM   = 160.0;
 	var centerDM  =  10.0;
-	var wingsRD   =  62.0;
-	var barrelDM  =   6.5;
+	var wingsRD   =  70.0;
+	var barrelDM  =   6.4;
 	var barrelRD  =  50.0;
+	var bulletDM  =   5.0;
+	var bulletRD  =  55.0;
 	
 	MM2dots = function(mm)
 	{
@@ -110,12 +112,15 @@
 	{	
 		var xcen = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD);
 		var ycen = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD);
-		var xout = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(totalDM * 1.05 / 2);
-		var yout = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(totalDM * 1.05 / 2);
+
+		var xc0 = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD - 1);
+		var yc0 = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD - 1);
+		var xc1 = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD + 1);
+		var yc1 = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD + 1);
 		
 		ctx.beginPath();
-		ctx.moveTo(xcen, ycen);
-		ctx.lineTo(xout, yout);
+		ctx.moveTo(xc0, yc0);
+		ctx.lineTo(xc1, yc1);
 		ctx.closePath();
 		
 		ctx.lineWidth = 3;
@@ -124,6 +129,28 @@
 		
 		ctx.beginPath();
 		ctx.arc(xcen, ycen, MM2dots(barrelDM) / 2, 0, 2 * Math.PI, false);
+		ctx.closePath();
+		
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "#000000";
+		ctx.stroke();
+	}
+	
+	for (var inx = 0; inx < barrels; inx++)
+	{	
+		var xcen = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(bulletRD);
+		var ycen = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(bulletRD);
+		
+		ctx.beginPath();
+		ctx.arc(xcen, ycen, MM2dots(0.1), 0, 2 * Math.PI, false);
+		ctx.closePath();
+		
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "#000000";
+		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.arc(xcen, ycen, MM2dots(bulletDM) / 2, 0, 2 * Math.PI, false);
 		ctx.closePath();
 		
 		ctx.lineWidth = 3;
