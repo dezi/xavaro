@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+ 	<title>Gatling Drum V2.0</title>
+<head>
+<body>
+<script>
+
+	document.body.style.padding = "0px";
+	document.body.style.margins = "0px";
+	
+	superscale = 160.0 / 160.1;
+
+	var wings   = 24;
+	var barrels =  8;
+
+	var width     = 170.0;
+	var height    = 200.0;
+	var totalDM   = 160.0;
+	var syncerDM  =   6.0;
+	var centerDM  =  10.0;
+	var washerDM  =  40.0;
+	var wingsRD   =  70.0;
+	var barrelDM  =   6.4;
+	var barrelRD  =  55.0;
+	var bulletDM  =   6.0;
+	var bulletRD  =  47.0;
+	var bulletOF  =   6.5;
+	
+	MM2dots = function(mm)
+	{
+		return mm * 300 / 25.4;
+	}
+	
+	var canvas = document.createElement("canvas");
+	
+	canvas.style.width  = (width  * superscale) + "mm";
+	canvas.style.height = (height * superscale) + "mm";
+	
+	canvas.width  = MM2dots(width);
+	canvas.height = MM2dots(height);
+
+	document.body.appendChild(canvas);
+	
+	var ctx = canvas.getContext("2d");
+	var centerX = canvas.width  / 2.0;
+	var centerY = canvas.height / 2.0;
+	
+	console.log(canvas.width + " x " + canvas.height);
+
+	ctx.translate(centerX, centerY);
+	
+	ctx.beginPath();
+	ctx.moveTo(MM2dots(totalDM / -2.0), MM2dots(totalDM / 1.85));
+	ctx.lineTo(MM2dots(totalDM / +2.0), MM2dots(totalDM / 1.85));
+	ctx.closePath();
+
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+
+	ctx.beginPath();
+	ctx.moveTo(MM2dots(totalDM / -2.0), MM2dots(totalDM / 1.90));
+	ctx.lineTo(MM2dots(totalDM / -2.0), MM2dots(totalDM / 1.80));
+	ctx.moveTo(MM2dots(totalDM / +2.0), MM2dots(totalDM / 1.90));
+	ctx.lineTo(MM2dots(totalDM / +2.0), MM2dots(totalDM / 1.80));
+	ctx.closePath();
+	
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.arc(0, 0, MM2dots(0.1), 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.arc(0, 0, MM2dots(totalDM) / 2, 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	var syncerRD = - (wingsRD + syncerDM / 5 * 4);
+	
+	ctx.beginPath();
+	ctx.arc(0, MM2dots(syncerRD), MM2dots(0.1) / 2, 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.arc(0, MM2dots(syncerRD), MM2dots(syncerDM) / 2, 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.arc(0, 0, MM2dots(centerDM) / 2, 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.arc(0, 0, MM2dots(washerDM) / 2, 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.arc(0, 0, MM2dots(wingsRD), 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.arc(0, 0, MM2dots(barrelRD), 0, 2 * Math.PI, false);
+	ctx.closePath();
+	
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+	
+	for (var inx = 0; inx < barrels; inx++)
+	{	
+		var xcen = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD);
+		var ycen = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD);
+
+		var xc0 = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD - 1);
+		var yc0 = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD - 1);
+		var xc1 = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD + 1);
+		var yc1 = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(barrelRD + 1);
+		
+		ctx.beginPath();
+		ctx.moveTo(xc0, yc0);
+		ctx.lineTo(xc1, yc1);
+		ctx.closePath();
+		
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "#000000";
+		ctx.stroke();
+		
+		ctx.beginPath();
+		ctx.arc(xcen, ycen, MM2dots(barrelDM) / 2, 0, 2 * Math.PI, false);
+		ctx.closePath();
+		
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "#000000";
+		ctx.stroke();
+	}
+	
+	for (var ring = 0; ring < 4; ring++)
+	{
+		var radius = bulletRD - (ring * bulletOF);
+		
+		for (var inx = 0; inx < barrels; inx++)
+		{	
+			var xcen = Math.sin((2 * Math.PI / barrels) * inx) * MM2dots(radius);
+			var ycen = Math.cos((2 * Math.PI / barrels) * inx) * MM2dots(radius);
+		
+			ctx.beginPath();
+			ctx.arc(xcen, ycen, MM2dots(0.1), 0, 2 * Math.PI, false);
+			ctx.closePath();
+		
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "#000000";
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.arc(xcen, ycen, MM2dots(bulletDM) / 2, 0, 2 * Math.PI, false);
+			ctx.closePath();
+		
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "#000000";
+			ctx.stroke();
+		}
+	}
+	
+	for (var inx = 0; inx < wings; inx++)
+	{	
+		var xcen = Math.sin((2 * Math.PI / wings) * (inx + 0.5)) * MM2dots(wingsRD);
+		var ycen = Math.cos((2 * Math.PI / wings) * (inx + 0.5)) * MM2dots(wingsRD);
+		var xout = Math.sin((2 * Math.PI / wings) * (inx + 0.5)) * MM2dots(totalDM * 1.025 / 2);
+		var yout = Math.cos((2 * Math.PI / wings) * (inx + 0.5)) * MM2dots(totalDM * 1.025 / 2);
+		
+		ctx.beginPath();
+		ctx.moveTo(xcen, ycen);
+		ctx.lineTo(xout, yout);
+		ctx.closePath();
+		
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = "#000000";
+		ctx.stroke();
+	}
+
+	//window.location = canvas.toDataURL("image/png");
+</script>
+</body>
+</html>
