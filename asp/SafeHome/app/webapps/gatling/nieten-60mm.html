@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+ 	<title>Nieten 60mm V1.0</title>
+<head>
+<body>
+<script>
+
+	document.body.style.padding = "0px";
+	document.body.style.margins = "0px";
+	
+	superscale = 160.0 / 160.1;
+
+	var width     = 200.0;
+	var height    = 260.0;
+	
+	var rivetDM	  = 12.0;
+	
+	var part1width  =  60.0;
+	var part1height = 240.0;
+	var part1rivetshorz = 3;
+	var part1rivetsvert = 6;
+	
+	MM2dots = function(mm)
+	{
+		return mm * 300 / 25.4;
+	}
+	
+	var canvas = document.createElement("canvas");
+	
+	canvas.style.width  = (width  * superscale) + "mm";
+	canvas.style.height = (height * superscale) + "mm";
+	
+	canvas.width  = MM2dots(width);
+	canvas.height = MM2dots(height);
+
+	document.body.appendChild(canvas);
+	
+	var ctx = canvas.getContext("2d");
+	var centerX = canvas.width  / 2.0;
+	var centerY = canvas.height / 2.0;
+	
+	console.log(canvas.width + " x " + canvas.height);
+
+	ctx.translate(centerX, centerY);
+	
+	//
+	// Layout 1
+	//
+
+	var space = 0;
+
+	ctx.beginPath();
+	ctx.moveTo(MM2dots(part1width / -2.0) + space, MM2dots(0));
+	ctx.lineTo(MM2dots(part1width / +2.0) + space, MM2dots(0));
+	ctx.moveTo(MM2dots(part1width / -2.0) + space, MM2dots(part1height / -2.0));
+	ctx.lineTo(MM2dots(part1width / -2.0) + space, MM2dots(part1height / +2.0));
+	ctx.lineTo(MM2dots(part1width / +2.0) + space, MM2dots(part1height / +2.0));
+	ctx.lineTo(MM2dots(part1width / +2.0) + space, MM2dots(part1height / -2.0));
+	ctx.lineTo(MM2dots(part1width / -2.0) + space, MM2dots(part1height / -2.0));
+	ctx.closePath();
+
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#000000";
+	ctx.stroke();
+
+	var rivethorz = (part1width - rivetDM / 2) / part1rivetshorz;
+	var rivetvert = (part1height - rivetDM) / 2 / part1rivetsvert;
+	var horz, vert;
+	
+	for (var row = 0; row < part1rivetsvert; row++)
+	{
+		for (var col = 0; col < part1rivetshorz; col++)
+		{
+			vert = MM2dots((rivetDM / 4) + row * rivetvert + rivetvert / 2);
+			horz = MM2dots((rivetDM / 4) + col * rivethorz + rivethorz / 2);
+				
+			horz -= MM2dots(part1width / 2);
+				
+			ctx.beginPath();
+			ctx.arc(horz + space, +vert, MM2dots(0.1) / 2, 0, 2 * Math.PI, false);
+			ctx.closePath();
+	
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "#000000";
+			ctx.stroke();
+		
+			ctx.beginPath();
+			ctx.arc(horz + space, +vert, MM2dots(rivetDM) / 2, 0, 2 * Math.PI, false);
+			ctx.closePath();
+		
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "#000000";
+			ctx.stroke();
+			
+			ctx.beginPath();
+			ctx.arc(horz + space, -vert, MM2dots(0.1) / 2, 0, 2 * Math.PI, false);
+			ctx.closePath();
+	
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "#000000";
+			ctx.stroke();
+		
+			ctx.beginPath();
+			ctx.arc(horz + space, -vert, MM2dots(rivetDM) / 2, 0, 2 * Math.PI, false);
+			ctx.closePath();
+		
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = "#000000";
+			ctx.stroke();
+		}
+	}
+	
+	//window.location = canvas.toDataURL("image/png");
+</script>
+</body>
+</html>
